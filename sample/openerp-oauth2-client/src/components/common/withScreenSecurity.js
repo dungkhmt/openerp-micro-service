@@ -16,29 +16,29 @@ import NotAuthorized from "./NotAuthorized";
  */
 function withScreenSecurity(SecuredComponent, id, viewError) {
   return function ScreenSecurityComponent({ ...props }) {
-    const [isChecking, setIsChecking] = useState(true);
-    const [screenAuthorization, setScreenAuthorization] = useState(new Set());
+    const [checking, setChecking] = useState(true);
+    const [screenAuthorization, setScreenAuthorization] = useState();
 
     useEffect(() => {
-      setIsChecking(true);
+      setChecking(true);
 
       request(
         "get",
         `/entity-authorization/${id}`,
         (res) => {
-          setIsChecking(false);
+          setChecking(false);
           setScreenAuthorization(new Set(res.data));
         },
         {
           onError: (e) => {
-            setIsChecking(false);
+            setChecking(false);
             console.log(e);
           },
         }
       );
     }, []);
 
-    if (isChecking)
+    if (checking)
       return (
         <LinearProgress
           style={{

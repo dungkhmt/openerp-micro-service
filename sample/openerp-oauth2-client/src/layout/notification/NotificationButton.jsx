@@ -3,7 +3,7 @@ import { Avatar, Badge, IconButton } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { styled } from "@mui/material/styles";
 import { bearerAuth, request } from "api";
-import { API_URL } from "config/constant";
+import { config } from "config/constant";
 import keycloak from "config/keycloak";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import randomColor from "randomcolor";
@@ -213,13 +213,16 @@ function NotificationButton() {
     function setupEventSource() {
       fetchNotification();
 
-      es = new EventSourcePolyfill(`${API_URL}/notification/subscription`, {
-        headers: {
-          Authorization: bearerAuth(keycloak.token),
-          // Count: count++,
-        },
-        heartbeatTimeout: 120000,
-      });
+      es = new EventSourcePolyfill(
+        `${config.API_URL}/notification/subscription`,
+        {
+          headers: {
+            Authorization: bearerAuth(keycloak.token),
+            // Count: count++,
+          },
+          heartbeatTimeout: 120000,
+        }
+      );
 
       // In fact, this callback function is usually not fired as soon as the connection is opened,
       // but fired when the first event is received. Don't know the reason but this doesn't matter

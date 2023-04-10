@@ -1,6 +1,6 @@
 import axios from "axios";
 import keycloak from "config/keycloak";
-import { API_URL } from "./config/constant";
+import { config } from "./config/constant";
 import { infoNoti, wifiOffNotify } from "./utils/notification";
 
 export const isFunction = (func) =>
@@ -10,7 +10,7 @@ export const isFunction = (func) =>
     func instanceof Function);
 
 const axiosInstance = axios.create({
-  baseURL: API_URL,
+  baseURL: config.API_URL,
 });
 
 // Alter defaults after instance has been created
