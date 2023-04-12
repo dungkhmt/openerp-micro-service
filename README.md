@@ -10,7 +10,7 @@
 
 ### 1. Installs Nginx
 
-* Tải xuống Nginx [tại đây](http://nginx.org/download/nginx-1.23.4.zip)
+* Tải xuống Nginx [tại đây](https://nginx.org/download/nginx-1.23.4.zip)
 * Sau đó giải nén và di chuyển đến thư mục <b>nginx-1.23.4</b>
 * Copy [file cấu hình](https://drive.google.com/file/d/1cxQqamvnojM4zCzk3m4a4kkQfHt1OPsp/view?usp=sharing) vào thư
   mục <b>conf</b>
