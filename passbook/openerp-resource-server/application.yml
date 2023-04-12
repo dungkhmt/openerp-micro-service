@@ -1,0 +1,59 @@
+SQL_DB_HOST: openerp3.dailyopt.ai
+SQL_DB_PORT: 6543
+SQL_DB_USER: postgres
+SQL_DB_PASS: openerp
+POSTGRES_DB: openerp_dev
+
+server:
+  servlet:
+    context-path: '/api'
+  compression:
+    enabled: true # Enable response compression
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json # The comma-separated list of mime types that should be compressed
+    min-response-size: 2048 # Compress the response only if the response size is at least 1 KB
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://openerp3.dailyopt.ai/iam/realms/OpenERP-Dev/protocol/openid-connect/certs
+  jmx:
+    enabled: false
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${SQL_DB_HOST}:${SQL_DB_PORT}/${POSTGRES_DB}
+    username: ${SQL_DB_USER}
+    password: ${SQL_DB_PASS}
+    hikari: # reference: https://github:com/brettwooldridge/HikariCP#configuration-knobs-baby:
+      maxLifetime: 30000
+      leakDetectionThreshold: 60000
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true # not recommended for production
+        order_inserts: true
+        jdbc:
+          batch_size: 50
+
+
+app:
+  cors:
+    allowed-origins: http://localhost:3000
+
+logging:
+  level:
+    root: INFO
+    org:
+      springframework: INFO
+#      springframework.security: TRACE
+#      hibernate:
+#        SQL: DEBUG
+#        type:
+#          descriptor:
+#            sql:
+#              BasicBinder: TRACE
+
+
+
+
