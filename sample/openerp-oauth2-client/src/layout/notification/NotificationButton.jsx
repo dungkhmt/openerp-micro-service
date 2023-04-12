@@ -214,7 +214,7 @@ function NotificationButton() {
       fetchNotification();
 
       es = new EventSourcePolyfill(
-        `${config.API_URL}/notification/subscription`,
+        `${config.url.API_URL}/notification/subscription`,
         {
           headers: {
             Authorization: bearerAuth(keycloak.token),
