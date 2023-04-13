@@ -3,7 +3,7 @@ import { Badge, Button, FormControl, Grid, InputLabel, MenuItem, Select } from "
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import { PROGRAMMING_LANGUAGES, SOCKET_EVENTS } from "utils/constants";
+import { PROGRAMMING_LANGUAGES } from "utils/constants";
 import { setIsVisibleParticipants, setSelectedLanguage } from "../reducers/codeEditorReducers";
 
 const NavBarRoom = (props) => {
@@ -20,8 +20,6 @@ const NavBarRoom = (props) => {
   const handleLeaveRoom = () => {
     history.push("/code-editor/create-join-room");
     socket.current.disconnect();
-
-    
   };
   return (
     <div>

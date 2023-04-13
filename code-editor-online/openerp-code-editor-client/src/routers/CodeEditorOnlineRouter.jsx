@@ -1,4 +1,3 @@
-import ProtectedScreen from "components/ProtectedScreen";
 import { Route, Switch, useRouteMatch } from "react-router";
 import CodeEditorPage from "views/code-editor/CodeEditorPage";
 import CreateJoinRoomPage from "views/create-join-room/CreateJoinRoomPage";
