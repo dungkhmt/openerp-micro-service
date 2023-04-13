@@ -1,7 +1,7 @@
 export const codeEditorOnline = {
     id: "MENU_CODE_EDITOR_ONLINE",
     icon: "DashboardIcon",
-    text: "Dashboard",
+    text: "Code Editor Online",
     child: [
       {
         id: "MENU_CODE_EDITOR_ONLINE.CREATE_JOIN_ROOM",
