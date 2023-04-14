@@ -55,7 +55,7 @@ export default function AdminRouter () {
         <Route
           component={ReceiptRequestProcess}
           exact
-          path={`${path}/process-receipt/:id`}
+          path={`${path}/process-receipts/:id`}
         ></Route>
       </Switch>
     </div>

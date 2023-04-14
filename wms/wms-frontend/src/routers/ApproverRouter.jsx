@@ -12,6 +12,11 @@ export default function ApproverRouter () {
           exact
           path={`${path}/receipts`}
         ></Route>
+        <Route
+          component={ReceiptRequestForApproval}
+          exact
+          path={`${path}/receipts/:id`}
+        ></Route>
       </Switch>
     </div>
   );

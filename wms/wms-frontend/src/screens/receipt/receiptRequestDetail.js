@@ -43,7 +43,7 @@ const ReceiptRequestDetail = ( props ) => {
     </Select>
   }
 
-  const WarehouseDropDown = ({ warehouseList, setSelectedWarehouse }) => {
+  const WarehouseDropDown = ({ warehouseList, setSelectedWarehouseId }) => {
     return <Select onChange={(e) => setSelectedWarehouseId(e.target.value)}>
       {
         warehouseList.length > 0 &&
@@ -194,7 +194,7 @@ const ReceiptRequestDetail = ( props ) => {
                     { title: "Số lượng", field: "quantity", type: "numeric" },
                     { title: "Kho nhận (không bắt buộc)", field: "warehouseName", 
                       editComponent: props => <WarehouseDropDown 
-                        setSelectedWarehouse={setSelectedWarehouseId}
+                        setSelectedWarehouseId={setSelectedWarehouseId}
                         warehouseList={warehouseList} />}
                   ]}
                   data={productTableData}
