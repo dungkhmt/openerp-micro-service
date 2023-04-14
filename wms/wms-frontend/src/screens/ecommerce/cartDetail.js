@@ -87,13 +87,13 @@ const CartDetail = () => {
           successNoti("Tạo đơn hàng thành công");
           // remove cart items in localstorage
           localStorage.removeItem(LOCAL_STORAGE.CART_ITEMS);
-          history.push("/wmsv2/customer/products")
+          history.push("/customer/products")
         } else {
           errorNoti("Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại sau");
         }
       },
       {
-
+        500: () => errorNoti("Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại sau")
       },
       data
     )

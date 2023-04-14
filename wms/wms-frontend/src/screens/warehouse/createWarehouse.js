@@ -554,7 +554,7 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
               }
               data={productTableData}
               options={{
-                pageSize: 20,
+                pageSize: 5,
                 search: true,
                 sorting: true,
               }}
