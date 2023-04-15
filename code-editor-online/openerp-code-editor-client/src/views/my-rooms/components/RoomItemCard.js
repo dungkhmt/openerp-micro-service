@@ -4,6 +4,7 @@ import {
   Card,
   CardContent,
   Grid,
+  IconButton,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -52,7 +53,6 @@ const RoomItemCard = (props) => {
   };
 
   const handleEditRoom = () => {
-   
     dispatch(setIsVisibleRoomForm(true));
     dispatch(setSelectedRoom(item));
     handleClose();
@@ -75,14 +75,16 @@ const RoomItemCard = (props) => {
             <div>
               Id phòng: <strong>{item?.id}</strong>{" "}
               <Tooltip title="Copy to clipboard">
-                <ContentCopy
-                  fontSize="small"
-                  color="primary"
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => {
-                    handleCopyRoomId();
-                  }}
-                />
+                <IconButton>
+                  <ContentCopy
+                    fontSize="small"
+                    color="primary"
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => {
+                      handleCopyRoomId();
+                    }}
+                  />
+                </IconButton>
               </Tooltip>
             </div>
           </Grid>
@@ -105,14 +107,15 @@ const RoomItemCard = (props) => {
             </Button>
           </Grid>
           <Grid item sx={{ alignItems: "center", display: "flex" }} xs={1}>
-            <Settings
-              fontSize="large"
-              sx={{ cursor: "pointer" }}
-              aria-controls={open ? "basic-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
-              onClick={handleClick}
-            />
+            <IconButton onClick={handleClick}>
+              <Settings
+                fontSize="large"
+                aria-controls={open ? "basic-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? "true" : undefined}
+              />
+            </IconButton>
+
             <Menu
               id="basic-menu"
               anchorEl={anchorEl}

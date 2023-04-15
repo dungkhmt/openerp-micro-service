@@ -17,15 +17,13 @@ function getAllClients(roomId) {
   return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map((socketId) => {
     return {
       socketId,
-      fullName: userSocketMap[socketId].fullName,
+      fullName: userSocketMap[socketId]?.fullName,
     };
   });
 }
 io.on("connection", (socket) => {
-  console.log(socket.id);
+  console.log(`Connected ${socket.id}`);
   socket.on(SOCKET_IO_EVENTS.CONNECT_TO_EDITOR, ({ fullName, roomId }) => {
-    console.log("🚀 ~ file: index.js:44 ~ socket.on ~ fullName:", fullName);
-
     socket.join(roomId);
     userSocketMap[socket.id] = { fullName, roomId };
     const clients = getAllClients(roomId);
@@ -40,22 +38,23 @@ io.on("connection", (socket) => {
       });
     });
 
-    socket.on(SOCKET_IO_EVENTS.SEND_CODE_CHANGES, (source) => {
-      socket.broadcast.to(roomId).emit(SOCKET_IO_EVENTS.RECEIVE_CODE_CHANGES, source);
+    socket.on(SOCKET_IO_EVENTS.SEND_CODE_CHANGES, ({ language, source }) => {
+      socket.broadcast
+        .to(roomId)
+        .emit(SOCKET_IO_EVENTS.RECEIVE_CODE_CHANGES, { language: language, source: source });
     });
   });
 
   socket.on("disconnecting", () => {
     const rooms = [...socket.rooms];
+    const fullName = userSocketMap[socket.id]?.fullName;
+
     rooms.forEach((roomId) => {
-      socket.broadcast.to(roomId).emit(SOCKET_IO_EVENTS.LEAVE_ROOM, {
-        fullName: userSocketMap[socket.id]?.fullName,
+      socket.in(roomId).emit(SOCKET_IO_EVENTS.LEAVE_ROOM, {
+        fullName: fullName,
         socketId: socket.id,
+        clients: getAllClients(roomId),
       });
-      console.log(
-        "🚀 ~ file: index.js:55 ~ socket.in ~ userSocketMap[socket.id]?.fullName:",
-        userSocketMap[socket.id]?.fullName
-      );
     });
     delete userSocketMap[socket.id];
     socket.leave();

@@ -1,21 +1,26 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { javascript } from "@codemirror/lang-javascript";
-import ReactCodeMirror from "@uiw/react-codemirror";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { request } from "api";
 import { errorNoti } from "utils/notification";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { debounce } from "lodash";
-import { SOCKET_EVENTS } from "utils/constants";
+import { PROGRAMMING_LANGUAGES, SOCKET_EVENTS } from "utils/constants";
+import AceEditor from "react-ace";
+
+import "ace-builds/src-noconflict/theme-monokai";
+import "ace-builds/src-noconflict/ext-language_tools";
+import { setSource } from "../reducers/codeEditorReducers";
 
 const CodeEditor = (props) => {
   const { socket, roomId } = props;
-  const [source, setSource] = useState();
-  const { selectedLanguage } = useSelector((state) => state.codeEditor);
+  const dispatch = useDispatch();
+  const { selectedLanguage, source } = useSelector((state) => state.codeEditor);
   const onChange = (value) => {
-    socket.current.emit(SOCKET_EVENTS.SEND_CODE_CHANGES, value);
+    socket.current.emit(SOCKET_EVENTS.SEND_CODE_CHANGES, {
+      language: selectedLanguage,
+      source: value,
+    });
     handleSaveSource(value);
-    // setSource(value);
   };
 
   const handleSaveSource = debounce((value) => {
@@ -43,15 +48,17 @@ const CodeEditor = (props) => {
 
   useEffect(() => {
     if (socket.current) {
-      socket.current.on(SOCKET_EVENTS.RECEIVE_CODE_CHANGES, (code) => {
-        setSource(code);
+      socket.current.on(SOCKET_EVENTS.RECEIVE_CODE_CHANGES, ({ language, source }) => {
+        if (language === selectedLanguage) {
+          dispatch(setSource(source));
+        }
       });
     }
 
     return () => {
       socket.current.off(SOCKET_EVENTS.RECEIVE_CODE_CHANGES);
     };
-  }, [socket.current]);
+  }, [socket.current, selectedLanguage]);
 
   const loadSource = (roomId, language) => {
     request(
@@ -59,8 +66,8 @@ const CodeEditor = (props) => {
       `/code-editor/sources/load-source?roomId=${roomId}&language=${language}`,
       (response) => {
         if (response && response.status === 200) {
-          console.log(response.data);
-          setSource(response.data.source);
+          dispatch(setSource(response.data.source))
+          
         }
       },
       {
@@ -73,15 +80,39 @@ const CodeEditor = (props) => {
   useEffect(() => {
     loadSource(roomId, selectedLanguage);
   }, [roomId, selectedLanguage]);
+
+  function getModeLanguage(language) {
+    if (language === PROGRAMMING_LANGUAGES.CPP.value) {
+      require("ace-builds/src-noconflict/mode-c_cpp");
+      return "c_cpp";
+    }
+    if (language === PROGRAMMING_LANGUAGES.JAVA.value) {
+      require("ace-builds/src-noconflict/mode-java");
+      return "java";
+    }
+    if (language === PROGRAMMING_LANGUAGES.PYTHON.value) {
+      require("ace-builds/src-noconflict/mode-python");
+      return "python";
+    }
+  }
   return (
-    <ReactCodeMirror
+    <AceEditor
+      mode={`${getModeLanguage(selectedLanguage)}`}
+      theme="monokai"
+      onChange={onChange}
+      width="100%"
+      height="100%"
+      fontSize={14}
+      showPrintMargin={false}
+      showGutter={true}
+      highlightActiveLine={true}
       value={source}
-      height="50vh"
-      style={{ border: "1px solid black" }}
-      extensions={[javascript({ jsx: true })]}
-      theme="dark"
-      onChange={(value) => {
-        onChange(value);
+      setOptions={{
+        enableBasicAutocompletion: true,
+        enableLiveAutocompletion: true,
+        enableSnippets: false,
+        showLineNumbers: true,
+        tabSize: 2,
       }}
     />
   );

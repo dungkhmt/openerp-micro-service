@@ -1,5 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Grid, Typography } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Grid,
+  OutlinedInput,
+  Paper,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import NavBarRoom from "./components/NavBarRoom";
 import { useParams } from "react-router-dom";
@@ -11,7 +21,14 @@ import { io } from "socket.io-client";
 import CodeEditor from "./components/CodeEditor";
 import Participants from "./components/Participants";
 import { useKeycloak } from "@react-keycloak/web";
-import { setNumberOfParticipants, setParticipants } from "./reducers/codeEditorReducers";
+import { setParticipants } from "./reducers/codeEditorReducers";
+import { Allotment } from "allotment";
+import "allotment/dist/style.css";
+import SplitPane from "react-split-pane";
+import SplitterLayout from "react-splitter-layout";
+import "react-splitter-layout/lib/index.css";
+import InputOutputCard from "./components/InputOuputCard";
+import "./style.css"
 
 const CodeEditorPage = () => {
   const { id: roomId } = useParams();
@@ -28,18 +45,18 @@ const CodeEditorPage = () => {
         if (socketRef.current.id !== socketId) {
           successNoti(`${fullName} đã tham gia vào phòng`, true);
         }
-        dispatch(setNumberOfParticipants(clients.length));
         dispatch(setParticipants(clients));
       });
 
-      socketRef.current.on(SOCKET_EVENTS.DISCONNECT, ({fullName, socketId})=>{
-        console.log(fullName)
-      })
+      socketRef.current.on(SOCKET_EVENTS.LEAVE_ROOM, ({ fullName, socketId, clients }) => {
+        errorNoti(`${fullName} đã rời phòng`, true);
+        dispatch(setParticipants(clients.filter((client) => client.socketId !== socketId)));
+      });
     }
     return () => {
       socketRef.current.disconnect();
       socketRef.current.off(SOCKET_EVENTS.JOINED);
-      socketRef.current.off(SOCKET_EVENTS.DISCONNECT);
+      socketRef.current.off(SOCKET_EVENTS.LEAVE_ROOM);
     };
   }, []);
 
@@ -77,16 +94,19 @@ const CodeEditorPage = () => {
       <br />
       <NavBarRoom socket={socketRef} />
       <Grid container spacing={2}>
-        <Grid item xs={isVisibleParticipants ? 10 : 12}>
-          <CodeEditor socket={socketRef} roomId={roomId} />
-          <Grid container>
-            <Grid item md={6}>
-              Input
+        <Grid
+          item
+          xs={isVisibleParticipants ? 10 : 12}
+          sx={{ position: "relative", height: "100vh" }}
+        >
+          <SplitterLayout vertical>
+            <CodeEditor socket={socketRef} roomId={roomId} />
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <InputOutputCard />
+              </Grid>
             </Grid>
-            <Grid item md={6}>
-              Output
-            </Grid>
-          </Grid>
+          </SplitterLayout>
         </Grid>
         <Grid hidden={!isVisibleParticipants} item xs={isVisibleParticipants ? 2 : 0}>
           <Participants />

@@ -3,9 +3,9 @@ import { PROGRAMMING_LANGUAGES } from "utils/constants";
 
 const initialState = {
   selectedLanguage: PROGRAMMING_LANGUAGES.CPP.value,
+  source: null,
   isVisibleParticipants: false,
 
-  numberOfParticipants: 0,
   participants: [],
 };
 
@@ -19,20 +19,17 @@ export const codeEditorSlice = createSlice({
     setIsVisibleParticipants: (state, action) => {
       state.isVisibleParticipants = action.payload;
     },
-    setNumberOfParticipants: (state, action) => {
-      state.numberOfParticipants = action.payload;
-    },
+
     setParticipants: (state, action) => {
       state.participants = action.payload;
+    },
+    setSource: (state, action) => {
+      state.source = action.payload;
     },
   },
 });
 
-export const {
-  setSelectedLanguage,
-  setIsVisibleParticipants,
-  setNumberOfParticipants,
-  setParticipants,
-} = codeEditorSlice.actions;
+export const { setSelectedLanguage, setIsVisibleParticipants, setParticipants, setSource } =
+  codeEditorSlice.actions;
 
 export default codeEditorSlice.reducer;
