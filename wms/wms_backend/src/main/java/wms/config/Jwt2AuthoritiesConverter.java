@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.config.security;
+package wms.config;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,19 +23,19 @@ public class Jwt2AuthoritiesConverter implements Converter<Jwt, Collection<Grant
      */
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
-        final var realmAccess = (Map<String, Object>) jwt
+        final Map<String, Object> realmAccess = (Map<String, Object>) jwt
                 .getClaims()
                 .getOrDefault("realm_access", Collections.emptyMap());
-        final var realmRoles = (Collection<String>) realmAccess.getOrDefault("roles", Collections.emptyList());
+        final Collection<String> realmRoles = (Collection<String>) realmAccess.getOrDefault("roles", Collections.emptyList());
 
-        final var resourceAccess = (Map<String, Object>) jwt
+        final Map<String, Object> resourceAccess = (Map<String, Object>) jwt
                 .getClaims()
                 .getOrDefault("resource_access", Collections.emptyMap());
 
         // We assume here you have "openerp-ui-dev" client configured with "client roles" mapper in Keycloak
-        final var publicClientAccess = (Map<String, Object>) resourceAccess
+        final Map<String, Object> publicClientAccess = (Map<String, Object>) resourceAccess
                 .getOrDefault("openerp-ui-dev", Collections.emptyMap());
-        final var publicClientRoles = (Collection<String>) publicClientAccess.getOrDefault(
+        final Collection<String> publicClientRoles = (Collection<String>) publicClientAccess.getOrDefault(
                 "roles",
                 Collections.emptyList());
 

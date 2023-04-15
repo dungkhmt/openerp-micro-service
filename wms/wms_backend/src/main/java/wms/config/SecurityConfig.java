@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.config.security;
+package wms.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +16,7 @@ public class SecurityConfig {
     @Bean
     public Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter(
     ) {
-        final var jwtConverter = new Jwt2AuthenticationConverter();
+        final Jwt2AuthenticationConverter jwtConverter = new Jwt2AuthenticationConverter();
 
         jwtConverter.setJwtGrantedAuthoritiesConverter(new Jwt2AuthoritiesConverter());
         jwtConverter.setPrincipalClaimName("preferred_username");
@@ -52,6 +52,12 @@ public class SecurityConfig {
         // Route security
         http
                 .authorizeHttpRequests()
+                .antMatchers("/v2/api-docs",
+                        "/configuration/ui",
+                        "/swagger-resources/**",
+                        "/configuration/security",
+                        "/swagger-ui.html",
+                        "/webjars/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .requestCache()

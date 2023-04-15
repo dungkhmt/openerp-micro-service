@@ -1,7 +1,7 @@
-package openerp.openerpresourceserver.controller;
+package wms.controller;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.service.EntityAuthorizationService;
+import wms.service.EntityAuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;

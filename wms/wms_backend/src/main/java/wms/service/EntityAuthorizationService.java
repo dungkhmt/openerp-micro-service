@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.service;
+package wms.service;
 
 import java.util.List;
 import java.util.Set;

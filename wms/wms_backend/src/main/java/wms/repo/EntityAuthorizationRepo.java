@@ -1,8 +1,8 @@
-package openerp.openerpresourceserver.repo;
+package wms.repo;
 
 
-import openerp.openerpresourceserver.entity.EntityAuthorization;
 import org.springframework.data.jpa.repository.JpaRepository;
+import wms.entity.EntityAuthorization;
 
 import java.util.List;
 

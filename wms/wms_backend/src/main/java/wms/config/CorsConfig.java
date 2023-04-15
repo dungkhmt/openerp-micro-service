@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.config.security;
+package wms.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -21,16 +21,16 @@ public class CorsConfig {
             @Value("${app.cors.allowed-origins}")
             List<String> allowedOrigins
     ) {
-        final var config = new CorsConfiguration();
+        final CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.setAllowedOrigins(allowedOrigins);
         config.setAllowedHeaders(Collections.singletonList("*"));
         config.setAllowedMethods(Collections.singletonList("*"));
 
-        final var source = new UrlBasedCorsConfigurationSource();
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
 
-        final var bean = new FilterRegistrationBean<>(new CorsFilter(source));
+        final FilterRegistrationBean bean = new FilterRegistrationBean<>(new CorsFilter(source));
         bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return bean;
     }
