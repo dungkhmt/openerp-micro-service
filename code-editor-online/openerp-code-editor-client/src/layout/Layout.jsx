@@ -98,6 +98,11 @@ function Layout({ children }) {
   useEffect(() => {
     if (isMeeting) setOpen(false);
   }, [isMeeting]);
+  useEffect(() => {
+    if (pathname.startsWith("/code-editor/room/")) {
+      setOpen(false);
+    }
+  }, [pathname]);
 
   return (
     <Box sx={styles.root}>
