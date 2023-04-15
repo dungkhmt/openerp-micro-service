@@ -3,7 +3,7 @@ package openerp.notification.repo;
 
 import openerp.notification.entity.Notifications;
 import openerp.notification.entity.QNotifications;
-import openerp.notification.dto.NotificationDTO;
+import openerp.notification.dto.NotificationProjection;
 import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.core.types.dsl.StringPath;
 import org.springframework.data.domain.Page;
@@ -42,7 +42,7 @@ public interface NotificationsRepo
             	n.to_user = ?
             """,
             nativeQuery = true)
-    Page<NotificationDTO> findAllNotifications(String toUser, Pageable pageable);
+    Page<NotificationProjection> findAllNotifications(String toUser, Pageable pageable);
 
     @Query(value = """
             with cte as (
@@ -90,7 +90,7 @@ public interface NotificationsRepo
                     	n2.to_user = ?1
                     	and n2.created_stamp < cte.created_stamp
                     """)
-    Page<NotificationDTO> findNotificationsFromId(String toUser, UUID fromId, Pageable pageable);
+    Page<NotificationProjection> findNotificationsFromId(String toUser, UUID fromId, Pageable pageable);
 
     @Query(value = """
             select
@@ -110,7 +110,7 @@ public interface NotificationsRepo
             	n.id = ?1
             """,
             nativeQuery = true)
-    NotificationDTO findNotificationById(UUID notificationId);
+    NotificationProjection findNotificationById(UUID notificationId);
 
     @Override
     default void customize(

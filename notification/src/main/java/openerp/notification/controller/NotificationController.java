@@ -186,4 +186,9 @@ public class NotificationController {
             return ResponseEntity.ok().body(null);
         }
     }
+
+    @GetMapping("/test")
+    public void test() {
+        notificationsService.create("anonymous", "dungpq", "test", "/");
+    }
 }

@@ -1,18 +1,16 @@
 package openerp.notification.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.minidev.json.JSONObject;
+import openerp.notification.dto.rabbitMessage.NotificationDTO;
 import openerp.notification.entity.Notifications;
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public interface NotificationDTO {
+public interface NotificationProjection {
 
-    DateFormat ISO_8601_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+//    DateFormat ISO_8601_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     String getId();
 
@@ -48,17 +46,21 @@ public interface NotificationDTO {
         return avatar.equals("") ? null : avatar;
     }
 
-    @JsonIgnore
-    default String toJson() {
-        JSONObject jsonObject = new JSONObject();
+//    @JsonIgnore
+//    default String toJson() {
+//        JSONObject jsonObject = new JSONObject();
+//
+//        jsonObject.put("id", getId());
+//        jsonObject.put("content", getContent());
+//        jsonObject.put("url", getUrl());
+//        jsonObject.put("avatar", getAvatar());
+//        jsonObject.put("read", getRead());
+//        jsonObject.put("createdStamp", ISO_8601_DATE_FORMAT.format(getCreatedStamp()));
+//
+//        return jsonObject.toJSONString();
+//    }
 
-        jsonObject.put("id", getId());
-        jsonObject.put("content", getContent());
-        jsonObject.put("url", getUrl());
-        jsonObject.put("avatar", getAvatar());
-        jsonObject.put("read", getRead());
-        jsonObject.put("createdStamp", ISO_8601_DATE_FORMAT.format(getCreatedStamp()));
-
-        return jsonObject.toJSONString();
+    default NotificationDTO toDTO() {
+        return new NotificationDTO(getId(), getContent(), getUrl(), getAvatar(), getRead(), getCreatedStamp());
     }
 }
