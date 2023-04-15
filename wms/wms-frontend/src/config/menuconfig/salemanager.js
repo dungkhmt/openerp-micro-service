@@ -17,5 +17,12 @@ export const salemanager = {
       text: "Tạo đơn xin nhập hàng",
       child: [],
     },
+    {
+      id: "MENU_WMSv2_SALE_MANAGER.ORDERS",
+      path: "/sale-manager/orders",
+      isPublic: true,
+      text: "Phê duyệt đơn mua hàng",
+      child: [],
+    },
   ],
 };

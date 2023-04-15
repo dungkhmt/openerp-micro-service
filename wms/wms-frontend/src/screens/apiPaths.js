@@ -9,6 +9,8 @@ export const API_PATH = {
   CART: "/wmsv2/customer/cart",
   CUSTOMER_SALE_ORDER: "/wmsv2/customer/cart/create-order",
   ADMIN_SALE_ORDER: "/wmsv2/admin/order",
+  APPROVE_SALE_ORDER: "/wmsv2/admin/order/approve",
+  CANCEL_SALE_ORDER: "/wmsv2/admin/order/cancel",
   SALE_MANAGEMENT_RECEIPT_REQUEST: "/wmsv2/sale-management/receipt",
   SALE_MANAGEMENT_RECEIPT_REQUEST_APPROVAL_LISTING: "/wmsv2/sale-management/receipt/approval-listing",
   APPROVE_RECEIPT_REQUEST: "/wmsv2/sale-management/receipt/approve",
