@@ -1,4 +1,4 @@
-package wms.service;
+package wms.service.auth;
 
 import java.util.List;
 import java.util.Set;

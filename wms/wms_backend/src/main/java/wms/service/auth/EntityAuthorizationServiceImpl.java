@@ -1,4 +1,4 @@
-package wms.service;
+package wms.service.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -6,6 +6,7 @@ import wms.entity.EntityAuthorization;
 import wms.repo.EntityAuthorizationRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import wms.service.auth.EntityAuthorizationService;
 
 import java.util.Collections;
 import java.util.List;
