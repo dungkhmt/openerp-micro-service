@@ -58,7 +58,7 @@ public class SecurityConfig {
                         "/configuration/security",
                         "/swagger-ui.html",
                         "/webjars/**").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
                 .and()
                 .requestCache()
                 .requestCache(new NullRequestCache()) // Not cache request because of having frontend

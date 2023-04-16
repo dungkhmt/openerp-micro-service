@@ -6,42 +6,42 @@ import wms.entity.ResultEntity;
 import java.util.*;
 
 public interface IResult<T> {
-    default ResultEntity ok() throws Exception {
-        return ok("status", 1);
+    default ResultEntity success() throws Exception {
+        return success("status", 1);
     }
 
-    /**
-     * Create standard response code=0
-     */
-    default ResultEntity ok(Object data) {
-        ResultEntity resultEntity = new ResultEntity();
-        resultEntity.setData(data);
-        return resultEntity;
-    }
-
-
-    default ResultEntity ok(Page<T> result) throws Exception {
-        return ok(result.getTotalElements(), result.getContent());
-    }
-
-    default ResultEntity ok(Long total, Iterable<T> data) throws Exception {
-        ResultEntity resultEntity = new ResultEntity();
-        resultEntity.setData(getResult(total, data));
-        return resultEntity;
-    }
-
-    default ResultEntity ok(Integer total, Iterable<T> data) throws Exception {
-        return ok(Long.valueOf(total), data);
-    }
-
-    default ResultEntity ok(String key, Object value) throws Exception {
+    default ResultEntity success(String key, Object value) throws Exception {
         ResultEntity resultEntity = new ResultEntity();
         resultEntity.setData(getResult(key, value));
         return resultEntity;
     }
-
-    default ResultEntity ok(List<String> keys, List<Object> values) throws Exception {
-        return ok(getResult(keys, values));
+    default Map<String, Object> getResult(String key, Object value) throws Exception {
+        return getResult(Collections.singletonList(key), Collections.singletonList(value));
+    }
+    /**
+     * Create standard response code=0
+     */
+    default ResultEntity success(List<String> keys, List<Object> values) throws Exception {
+        return success(getResult(keys, values));
+    }
+    default ResultEntity success(Object data) {
+        ResultEntity resultEntity = new ResultEntity();
+        resultEntity.setData(data);
+        return resultEntity;
+    }
+    default ResultEntity success(Page<T> result) throws Exception {
+        return success(result.getTotalElements(), result.getContent());
+    }
+    default ResultEntity success(Integer total, Iterable<T> data) throws Exception {
+        return success(Long.valueOf(total), data);
+    }
+    default ResultEntity success(Long total, Iterable<T> data) throws Exception {
+        ResultEntity resultEntity = new ResultEntity();
+        resultEntity.setData(getResult(total, data));
+        return resultEntity;
+    }
+    default Map<String, Object> getResult(Long total, Iterable<T> objects) throws Exception {
+        return getResult(Arrays.asList("total", "data"), Arrays.asList(total, objects));
     }
 
     /**
@@ -56,16 +56,5 @@ public interface IResult<T> {
             mapResult.put(keys.get(i), values.get(i));
         }
         return mapResult;
-    }
-
-    default Map<String, Object> getResult(Long total, Iterable<T> objects) throws Exception {
-        return getResult(Arrays.asList("total", "data"), Arrays.asList(total, objects));
-    }
-
-    /**
-     * Create result with one key and value
-     */
-    default Map<String, Object> getResult(String key, Object value) throws Exception {
-        return getResult(Collections.singletonList(key), Collections.singletonList(value));
     }
 }
