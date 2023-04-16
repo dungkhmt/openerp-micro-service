@@ -32,9 +32,9 @@ const InputOutputCard = () => {
 
   const handleClear = (tab) => {
     if (tab === "input") {
-      setValueInput();
+      setValueInput('');
     } else if (tab === "output") {
-      setValueOutput();
+      setValueOutput('');
     }
   };
   return (
@@ -89,6 +89,7 @@ const InputOutputCard = () => {
         {tabKey === "output" && (
           <OutlinedInput
             value={valueOutput}
+            sx={{height: '100%'}}
             multiline
             fullWidth
             minRows={5}
