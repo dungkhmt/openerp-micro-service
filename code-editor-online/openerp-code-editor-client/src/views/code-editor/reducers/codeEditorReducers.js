@@ -5,6 +5,7 @@ const initialState = {
   selectedLanguage: PROGRAMMING_LANGUAGES.CPP.value,
   source: null,
   isVisibleParticipants: false,
+  isVisibleShareForm: false,
 
   participants: [],
 };
@@ -26,10 +27,18 @@ export const codeEditorSlice = createSlice({
     setSource: (state, action) => {
       state.source = action.payload;
     },
+    setIsVisibleShareForm: (state, action) => {
+      state.isVisibleShareForm = action.payload;
+    },
   },
 });
 
-export const { setSelectedLanguage, setIsVisibleParticipants, setParticipants, setSource } =
-  codeEditorSlice.actions;
+export const {
+  setSelectedLanguage,
+  setIsVisibleParticipants,
+  setParticipants,
+  setSource,
+  setIsVisibleShareForm,
+} = codeEditorSlice.actions;
 
 export default codeEditorSlice.reducer;

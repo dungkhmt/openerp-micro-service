@@ -23,8 +23,13 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { PROGRAMMING_LANGUAGES } from "utils/constants";
-import { setIsVisibleParticipants, setSelectedLanguage } from "../reducers/codeEditorReducers";
+import {
+  setIsVisibleParticipants,
+  setIsVisibleShareForm,
+  setSelectedLanguage,
+} from "../reducers/codeEditorReducers";
 import { getLanguageFileType } from "utils/CodeEditorUtils";
+import ShareForm from "./ShareForm";
 
 const NavBarRoom = (props) => {
   const { socket } = props;
@@ -53,6 +58,7 @@ const NavBarRoom = (props) => {
   }
   return (
     <div>
+      <ShareForm />
       <Grid container justifyContent="space-between" alignItems="center">
         <Grid item>
           <Grid container spacing={2}>
@@ -74,7 +80,14 @@ const NavBarRoom = (props) => {
               </Button>
             </Grid>
             <Grid item>
-              <Button size="small" startIcon={<Share />} variant="contained">
+              <Button
+                size="small"
+                startIcon={<Share />}
+                variant="contained"
+                onClick={() => {
+                  dispatch(setIsVisibleShareForm(true));
+                }}
+              >
                 Share
               </Button>
             </Grid>
