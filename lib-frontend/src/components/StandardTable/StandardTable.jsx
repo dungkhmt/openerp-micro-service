@@ -124,7 +124,7 @@ export const StandardTable = (props) => {
                     icons={tableIcons}
                     options={{
                         selection: true,
-                        pageSize: 20,
+                        pageSize: 10,
                         headerStyle: {
                             backgroundColor: "#f4f4f4",
                             color: "#404040",

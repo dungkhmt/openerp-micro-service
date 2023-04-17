@@ -1,10 +1,10 @@
 {
   "name": "erp-hust",
-  "version": "0.0.12",
+  "version": "0.0.20",
   "description": "",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "babel src/components --out-dir lib --copy-files",
+    "build": "babel src/components --out-dir dist --copy-files",
     "test": "echo \"Error: no test specified\" && exit 1",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -20,10 +20,15 @@
     "@emotion/styled": "^11.10.6",
     "@mui/icons-material": "^5.11.16",
     "@mui/lab": "^5.0.0-alpha.126",
-    "@mui/material": "^5.12.0",
+    "@mui/material": "^5.0.3",
     "@mui/styles": "^5.12.0",
-    "material-table": "^2.0.3",
-    "react-ace": "^10.1.0"
+    "material-table": "^1.68.1",
+    "ace-builds": "^1.14.0",
+    "react-ace": "^10.1.0",
+    "prop-types": "^15.8.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^7.0.4"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "^7.0.4",
@@ -32,10 +37,6 @@
     "@storybook/blocks": "^7.0.4",
     "@storybook/react": "^7.0.4",
     "@storybook/react-webpack5": "^7.0.4",
-    "@storybook/testing-library": "^0.0.14-next.2",
-    "prop-types": "^15.8.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "storybook": "^7.0.4"
+    "@storybook/testing-library": "^0.0.14-next.2"
   }
 }
