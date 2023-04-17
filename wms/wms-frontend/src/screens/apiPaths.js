@@ -15,5 +15,6 @@ export const API_PATH = {
   SALE_MANAGEMENT_RECEIPT_REQUEST_APPROVAL_LISTING: "/wmsv2/sale-management/receipt/approval-listing",
   APPROVE_RECEIPT_REQUEST: "/wmsv2/sale-management/receipt/approve",
   CANCEL_RECEIPT_REQUEST: "/wmsv2/sale-management/receipt/cancel",
-  PROCESS_RECEIPT_REQUEST: "/wmsv2/process/receipt-request"
+  PROCESS_RECEIPT_REQUEST: "/wmsv2/process/receipt-request",
+  DELIVERY_MANAGER_DELIVERY_PERSON: "/wmsv2/delivery-manager/delivery-person"
 }
