@@ -30,7 +30,7 @@ public class TruckController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> filterTruck(@PathVariable long id) {
+    public ResponseEntity<?> getTruckById(@PathVariable long id) {
         TruckModel truckModel = truckService.getTruckById(id);
         return ResponseEntity.status(HttpStatus.OK).body(truckModel);
     }

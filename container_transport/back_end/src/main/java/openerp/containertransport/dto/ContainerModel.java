@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 @Data
 @Builder
 public class ContainerModel {
-    private Long id;
+    private long id;
     private String containerCode;
     private Integer facilityId;
     private Timestamp createdAt;
