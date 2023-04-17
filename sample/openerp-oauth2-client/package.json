@@ -8,12 +8,13 @@
     "@hookstate/core": "^3.0.8",
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.0.3",
+    "@mui/styles": "^5.12.0",
     "@react-keycloak/web": "^3.4.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^0.27.2",
-    "erp-hust": "^0.0.20",
+    "erp-hust": "^0.0.21",
     "event-source-polyfill": "^1.0.24",
     "framer-motion": "^2.9.5",
     "keycloak-js": "^21.0.2",
@@ -42,11 +43,21 @@
       "react-app/jest"
     ]
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not op_mini all"
-  ],
+  "browserslist": {
+      "production": [
+        ">0.2%",
+        "not dead",
+        "not op_mini all"
+      ],
+      "development": [
+        "last 1 chrome version",
+        "last 1 firefox version",
+        "last 1 safari version"
+      ]
+    },
   "devDependencies": {
+      "babel-plugin-import": "^1.13.3",
+      "compression-webpack-plugin": "^6.1.1",
+      "prop-types": "^15.7.2"
   }
 }

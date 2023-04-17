@@ -1,7 +1,9 @@
-import Button from "@mui/material/Button";
 import React, {useEffect, useState} from "react";
 import {request} from "../api";
-import {StandardTable} from "erp-hust/dist/StandardTable";
+import {StandardTable} from "erp-hust/lib/StandardTable";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 function DemoScreen() {
 
@@ -23,16 +25,33 @@ function DemoScreen() {
             field: "createdOn",
         },
         {
-            title: "Action",
+            title: "Edit",
             sorting: false,
             render: (rowData) => (
-                <Button
+                <IconButton
+                    onClick={() => {
+                        demoFunction(rowData)
+                    }}
+                    variant="contained"
+                    color="success"
+                >
+                    <EditIcon/>
+                </IconButton>
+            ),
+        },
+        {
+            title: "Delete",
+            sorting: false,
+            render: (rowData) => (
+                <IconButton
+                    onClick={() => {
+                        demoFunction(rowData)
+                    }}
                     variant="contained"
                     color="error"
-                    onClick={() => demoFunction(rowData)}
                 >
-                    Detail
-                </Button>
+                    <DeleteIcon/>
+                </IconButton>
             ),
         },
     ];
