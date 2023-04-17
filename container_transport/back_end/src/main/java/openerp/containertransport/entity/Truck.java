@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import openerp.containertransport.dto.TruckModel;
+import org.modelmapper.ModelMapper;
 
 @Getter
 @Setter
@@ -37,4 +39,10 @@ public class Truck {
 
     @Column(name = "updated_at")
     private long updatedAt;
+
+    public static TruckModel convertToModel(Truck truck) {
+        ModelMapper modelMapper = new ModelMapper();
+        TruckModel truckModel = modelMapper.map(truck, TruckModel.class);
+        return truckModel;
+    }
 }

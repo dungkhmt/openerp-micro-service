@@ -1,18 +1,25 @@
 package openerp.containertransport.service.impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import openerp.containertransport.dto.TruckFilterRequestDTO;
 import openerp.containertransport.dto.TruckModel;
 import openerp.containertransport.entity.Truck;
 import openerp.containertransport.repo.TruckRepo;
 import openerp.containertransport.service.TruckService;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class TruckServiceImpl implements TruckService  {
     private final TruckRepo truckRepo;
+    private final EntityManager entityManager;
 
     @Override
     public Truck createTruck(TruckModel truckModel) {
@@ -27,5 +34,42 @@ public class TruckServiceImpl implements TruckService  {
         truck.setTruckCode("TR"+truck.getId());
         truck = truckRepo.save(truck);
         return truck;
+    }
+
+    @Override
+    public List<TruckModel> filterTruck(TruckFilterRequestDTO truckFilterRequestDTO) {
+        String sql = "SELECT * FROM trucks WHERE 1=1";
+        HashMap<String, Object> params = new HashMap<>();
+        if(!truckFilterRequestDTO.getTruckCode().isEmpty()) {
+            sql += " AND truck_code = :truckCode";
+            params.put("truckCode", truckFilterRequestDTO.getTruckCode());
+        }
+        sql += "ORDER BY updated_at DESC";
+
+        Query query = this.entityManager.createNativeQuery(sql, Truck.class);
+        for (String i : params.keySet()) {
+            query.setParameter(i, params.get(i));
+        }
+        List<TruckModel> truckModels = query.getResultList();
+        return truckModels;
+    }
+
+    @Override
+    public TruckModel getTruckById(long id) {
+        Truck truck = truckRepo.findById(id);
+        TruckModel truckModel = Truck.convertToModel(truck);
+        return truckModel;
+    }
+
+    @Override
+    public TruckModel updateTruck(TruckModel truckModel) {
+        Truck truck = truckRepo.findById(truckModel.getId());
+        if(truckModel.getFacilityId() != null){
+            truck.setFacilityId(truckModel.getFacilityId());
+        }
+        truck.setUpdatedAt(System.currentTimeMillis());
+        truckRepo.save(truck);
+        TruckModel truckModelUpdate = Truck.convertToModel(truck);
+        return truckModelUpdate;
     }
 }
