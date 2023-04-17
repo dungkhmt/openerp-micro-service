@@ -3,8 +3,10 @@ import { request } from "api";
 import { API_PATH } from "../apiPaths";
 import StandardTable from "components/table/StandardTable";
 import { ORDER_STATUS_CODE } from "components/constants";
+import { useRouteMatch } from "react-router-dom";
 
 const AdminOrderListing = () => {
+  const { path } = useRouteMatch();
 
   const [orderTableData, setOrderTableData] = useState([]);
   const [processedOrderTableData, setProcessedOrderTableData] = useState([]);
@@ -50,6 +52,9 @@ const AdminOrderListing = () => {
           pageSize: 5,
           search: true,
           sorting: true,
+        }}
+        onRowClick={(event, rowData) => {
+          window.location.href = `${path}/${rowData.orderId}`;
         }}
       />
 
