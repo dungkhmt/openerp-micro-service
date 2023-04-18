@@ -13,7 +13,10 @@
 }
 
 .container {
-    background-color: white;
+    .divider {
+        margin-top: 8px;
+        margin-bottom: 48px;
+    }
 }
 
 .headerTruckScreen {
@@ -38,11 +41,25 @@
     .btn-header {
         display: flex;
         align-items: center;
+
         .material-icons {
             height: auto;
             display: flex;
             margin-right: 4px;
         }
+    }
+}
+.modal {
+    position: absolute;
+    margin-top: 10%;
+    margin-left: 35%;
+    min-width: 700px;
+    height: auto;
+    background-color: white;
+    padding: 32px;
+    .header-modal {
+        font-size: 20px;
+        font-weight: 800;
     }
 }
 

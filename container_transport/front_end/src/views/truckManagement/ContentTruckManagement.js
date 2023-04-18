@@ -23,32 +23,6 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { request } from 'api';
 
-function createData(name, calories, fat, carbs, protein) {
-  return {
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-  };
-}
-
-const rows = [
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Donut', 452, 25.0, 51, 4.9),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-  createData('Honeycomb', 408, 3.2, 87, 6.5),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Jelly Bean', 375, 0.0, 94, 0.0),
-  createData('KitKat', 518, 26.0, 65, 7.0),
-  createData('Lollipop', 392, 0.2, 98, 0.0),
-  createData('Marshmallow', 318, 0, 81, 2.0),
-  createData('Nougat', 360, 19.0, 9, 37.0),
-  createData('Oreo', 437, 18.0, 63, 4.0),
-];
-
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -90,31 +64,31 @@ const headCells = [
   },
   {
     id: 'facility',
-    numeric: true,
+    numeric: false,
     disablePadding: false,
-    label: 'Facility',
+    label: 'Facility Name',
   },
   {
     id: 'driver',
-    numeric: true,
+    numeric: false,
     disablePadding: false,
-    label: 'Driver',
+    label: 'Driver Name',
   },
   {
     id: 'licensePlates',
-    numeric: true,
+    numeric: false,
     disablePadding: false,
     label: 'License Plates',
   },
   {
-    id: 'status',
+    id: 'brand',
     numeric: false,
     disablePadding: false,
-    label: 'Status'
+    label: 'Brand'
   },
   {
     id: 'createdAt',
-    numeric: true,
+    numeric: false,
     disablePadding: false,
     label: 'Created At',
   },
@@ -243,23 +217,17 @@ export default function ContentsTruckManagement() {
   const [visibleRows, setVisibleRows] = React.useState(null);
   const [rowsPerPage, setRowsPerPage] = React.useState(DEFAULT_ROWS_PER_PAGE);
   const [paddingHeight, setPaddingHeight] = React.useState(0);
+  const [trucks, setTruck] = React.useState([]);
 
   React.useEffect(() => {
-    let rowsOnMount = stableSort(
-      rows,
-      getComparator(DEFAULT_ORDER, DEFAULT_ORDER_BY),
-    );
-
-    rowsOnMount = rowsOnMount.slice(
-      0 * DEFAULT_ROWS_PER_PAGE,
-      0 * DEFAULT_ROWS_PER_PAGE + DEFAULT_ROWS_PER_PAGE,
-    );
-
-    setVisibleRows(rowsOnMount);
+    console.log("start call api");
     request(
-      "get",
-      ``
-    )
+      "post",
+      `/truck/`, {},{},{},{},
+    ).then((res) => {
+      console.log("truck==========", res.data)
+      setTruck(res.data);
+    });
   }, []);
 
   const handleRequestSort = React.useCallback(
@@ -269,7 +237,7 @@ export default function ContentsTruckManagement() {
       setOrder(toggledOrder);
       setOrderBy(newOrderBy);
 
-      const sortedRows = stableSort(rows, getComparator(toggledOrder, newOrderBy));
+      const sortedRows = stableSort(trucks, getComparator(toggledOrder, newOrderBy));
       const updatedRows = sortedRows.slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage,
@@ -282,7 +250,7 @@ export default function ContentsTruckManagement() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = rows.map((n) => n.name);
+      const newSelected = trucks.map((n) => n.name);
       setSelected(newSelected);
       return;
     }
@@ -313,7 +281,7 @@ export default function ContentsTruckManagement() {
     (event, newPage) => {
       setPage(newPage);
 
-      const sortedRows = stableSort(rows, getComparator(order, orderBy));
+      const sortedRows = stableSort(trucks, getComparator(order, orderBy));
       const updatedRows = sortedRows.slice(
         newPage * rowsPerPage,
         newPage * rowsPerPage + rowsPerPage,
@@ -323,7 +291,7 @@ export default function ContentsTruckManagement() {
 
       // Avoid a layout jump when reaching the last page with empty rows.
       const numEmptyRows =
-        newPage > 0 ? Math.max(0, (1 + newPage) * rowsPerPage - rows.length) : 0;
+        newPage > 0 ? Math.max(0, (1 + newPage) * rowsPerPage - trucks.length) : 0;
 
       const newPaddingHeight = (dense ? 33 : 53) * numEmptyRows;
       setPaddingHeight(newPaddingHeight);
@@ -338,7 +306,7 @@ export default function ContentsTruckManagement() {
 
       setPage(0);
 
-      const sortedRows = stableSort(rows, getComparator(order, orderBy));
+      const sortedRows = stableSort(trucks, getComparator(order, orderBy));
       const updatedRows = sortedRows.slice(
         0 * updatedRowsPerPage,
         0 * updatedRowsPerPage + updatedRowsPerPage,
@@ -355,8 +323,8 @@ export default function ContentsTruckManagement() {
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2, boxShadow: "none" }}>
+    <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white"}}>
+      <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
         {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
         <TableContainer>
           <Table
@@ -370,11 +338,11 @@ export default function ContentsTruckManagement() {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+              rowCount={trucks.length}
             />
             <TableBody>
-              {visibleRows
-                ? visibleRows.map((row, index) => {
+              {trucks
+                ? trucks.map((row, index) => {
                     const isItemSelected = isSelected(row.name);
                     const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -404,12 +372,13 @@ export default function ContentsTruckManagement() {
                           scope="row"
                           padding="none"
                         >
-                          {row.name}
+                          {row.truckCode}
                         </TableCell>
-                        <TableCell align="right">{row.calories}</TableCell>
-                        <TableCell align="right">{row.fat}</TableCell>
-                        <TableCell align="right">{row.carbs}</TableCell>
-                        <TableCell align="right">{row.protein}</TableCell>
+                        <TableCell align="left">{row.facilityName}</TableCell>
+                        <TableCell align="left">{row.driverName}</TableCell>
+                        <TableCell align="left">{row.licensePlates}</TableCell>
+                        <TableCell align="left">{row.brandTruck}</TableCell>
+                        <TableCell align="left">{row.createdAt}</TableCell>
                       </TableRow>
                     );
                   })
@@ -429,7 +398,7 @@ export default function ContentsTruckManagement() {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={rows.length}
+          count={trucks.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
