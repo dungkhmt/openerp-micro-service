@@ -2,7 +2,7 @@ import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { request } from "api";
 import { BayDropDown, ProductDropDown, WarehouseDropDown } from "components/table/DropDown";
 import StandardTable from "components/table/StandardTable";
-import { Fragment, useEffect, useState } from "react"
+import React, { Fragment, useEffect, useRef, useState } from "react"
 import { API_PATH } from "screens/apiPaths";
 import useStyles from 'screens/styles';
 import { convertTimeStampToDate, convertToVNDFormat } from "screens/utils/utils";
@@ -15,6 +15,7 @@ const AdminOrderDetail = ( props ) => {
   const [orderInfo, setOrderInfo] = useState({});
   const [processingItems, setProcessingItems] = useState([]);
   const [processedItems, setProcessedItems] = useState([]);
+  const [remainingItems, setRemainingItems] = useState([]);
 
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [selectedProductName, setSelectedProductName] = useState(null);
@@ -47,6 +48,7 @@ const AdminOrderDetail = ( props ) => {
         `${API_PATH.ADMIN_SALE_ORDER}/${orderId}`,
         (res) => {
           setOrderInfo(res.data);
+          setRemainingItems(res.data.remainingItems)
         }
       );
 
@@ -128,6 +130,18 @@ const AdminOrderDetail = ( props ) => {
       }
     )
   }
+
+  const autoAssignButtonHandle = () => {
+    request(
+      "put",
+      `${API_PATH.AUTO_ASSIGN_ORDER_ITEM}/${orderId}`,
+      (res) => {
+        const data = res.data;
+        setProcessingItems(data.processingItems);
+        setRemainingItems(data.remainingItems);
+      }
+    )
+  }
   
   return <Fragment>
     <Box>
@@ -140,6 +154,10 @@ const AdminOrderDetail = ( props ) => {
         <Grid className={classes.buttonWrap}>
           <Button variant="contained" className={classes.addButton} 
             type="submit" onClick={saveProcessingItems} >Lưu</Button>
+        </Grid>
+        <Grid className={classes.buttonWrap}>
+          <Button variant="contained" className={classes.addButton} 
+            type="submit" onClick={autoAssignButtonHandle} >Phân phối tự động</Button>
         </Grid>
         <Grid className={classes.buttonWrap}>
           <Button variant="contained" className={classes.addButton} 
@@ -291,7 +309,7 @@ const AdminOrderDetail = ( props ) => {
           { title: "Tên sản phẩm", field: "productName" },
           { title: "Số lượng", field: "quantity" }
         ]}
-        data={orderInfo?.remainingItems}
+        data={remainingItems}
         options={{
           selection: false,
           pageSize: 5,
@@ -301,7 +319,7 @@ const AdminOrderDetail = ( props ) => {
       />
 
       <StandardTable
-        title="Danh sách sản phẩm đang phân phối"
+        title="Danh sách sản phẩm đang xử lý"
         hideCommandBar={true}
         columns={[
           { title: "Tên sản phẩm", field: "productName",
@@ -365,6 +383,7 @@ const AdminOrderDetail = ( props ) => {
                 }
               }
               setOrderInfo(newOrderInfo);
+              setRemainingItems(newOrderInfo.remainingItems);
               setSelectedQuantity(0);
               resolve();
             })
@@ -384,7 +403,10 @@ const AdminOrderDetail = ( props ) => {
           { title: "Tên sản phẩm", field: "productName" },
           { title: "Số lượng", field: "quantity" },
           { title: "Kho", field: "warehouseName" },
-          { title: "Vị trí kệ hàng", field: "bayCode" }
+          { title: "Vị trí kệ hàng", field: "bayCode" },
+          { title: "Trạng thái", field: "status"},
+          { title: "Số lô", field: "lotId" },
+          { title: "Ngày phân phối", field: "createdDate"}
         ]}
         data={orderInfo?.processedItems}
         options={{
