@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Builder
 public class FacilityModel {
-    private Long id;
+    private long id;
     private String facilityCode;
     private String facilityName;
     private String facilityType;

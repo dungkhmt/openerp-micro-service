@@ -46,7 +46,7 @@ public class TruckServiceImpl implements TruckService  {
             sql += " AND truck_code = :truckCode";
             params.put("truckCode", truckFilterRequestDTO.getTruckCode());
         }
-        sql += "ORDER BY updated_at DESC";
+        sql += " ORDER BY updated_at DESC";
 
         Query query = this.entityManager.createNativeQuery(sql, Truck.class);
         for (String i : params.keySet()) {
