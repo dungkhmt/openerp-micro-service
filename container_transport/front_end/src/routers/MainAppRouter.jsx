@@ -7,6 +7,7 @@ import { useNotificationState } from "state/NotificationState";
 import NotFound from "views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import TeacherRouter from "./TeacherRouter";
+import TruckScreen from "views/truckManagement/TruckScreen";
 
 const styles = {
   loadingProgress: {
@@ -35,7 +36,7 @@ function MainAppRouter(props) {
         <Switch>
           <Route component={() => <></>} exact path="/" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
-
+          <PrivateRoute component={TruckScreen} path="/truck" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>

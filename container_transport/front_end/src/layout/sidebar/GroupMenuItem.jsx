@@ -24,7 +24,7 @@ export const menuItemBaseStyle = (theme) => ({
     // lineHeight: "1.5em",
   },
   menuItemIcon: {
-    width: "24px",
+    width: "30px",
     height: "30px",
     fontSize: "24px",
     lineHeight: "30px",

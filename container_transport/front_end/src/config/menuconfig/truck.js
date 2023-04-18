@@ -1,13 +1,13 @@
 export const truck = {
-    id: "MENU_TRUCK",
-    icon: "BlurOnIcon",
+    id: "MENU_CONTAINER",
+    icon: "Truck",
     text: "Truck",
     child: [
       {
-        id: "MENU_TRUCK.TRUCK",
+        id: "MENU_CONTAINER.TRUCK",
         path: "/truck",
         isPublic: false,
-        text: "Truck",
+        text: "Truck Management",
         child: [],
       },
     ],

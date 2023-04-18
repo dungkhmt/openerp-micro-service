@@ -31,7 +31,8 @@ const Main = styled("main")(({ theme, isOpen }) => ({
   flexShrink: 1,
   flexGrow: 1,
   maxWidth: "100%",
-  padding: theme.spacing(3),
+  minHeight: "100%",
+  // padding: theme.spacing(3),
   transition: theme.transitions.create(["maxWidth", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,

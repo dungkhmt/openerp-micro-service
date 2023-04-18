@@ -19,7 +19,12 @@ import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import PersonIcon from "@mui/icons-material/Person";
 import StarBorder from "@mui/icons-material/StarBorder";
 import StoreMallDirectorySharpIcon from "@mui/icons-material/StoreMallDirectorySharp";
+import FireTruckRoundedIcon from '@mui/icons-material/FireTruckRounded';
+import AddIcon from '@mui/icons-material/Add';
+import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import TeachingIcon from "assets/icons/mathematics.svg";
+import ContainerIcon from "assets/icons/container.svg";
+import TrailerIcon from "assets/icons/trailer.svg";
 import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
 import { buildMapPathMenu } from "utils/MenuUtils";
@@ -29,15 +34,22 @@ import { teacher } from "./menuconfig/teacher";
 import { user } from "./menuconfig/user";
 import { truck } from "./menuconfig/truck";
 import { trailer } from "./menuconfig/trailer";
+import { container } from "./menuconfig/container";
+import { facility } from "./menuconfig/facility";
+import { trip } from "./menuconfig/trip";
 
 export const MENUS = [];
 
 MENUS.push(general);
 MENUS.push(user);
-MENUS.push(teacher);
-MENUS.push(student);
+// MENUS.push(teacher);
+// MENUS.push(student);
 MENUS.push(truck);
 MENUS.push(trailer);
+MENUS.push(container);
+MENUS.push(facility);
+MENUS.push(trip)
+
 
 export const menuIconMap = new Map();
 
@@ -49,6 +61,14 @@ menuIconMap.set(
 menuIconMap.set(
   "Teaching",
   <img alt="Teaching icon" src={TeachingIcon} height={24} width={24} />
+);
+menuIconMap.set(
+  "Container",
+  <img alt="Container icon" src={ContainerIcon} height={24} width={24} />
+);
+menuIconMap.set(
+  "Trailer",
+  <img alt="Trailer icon" src={TrailerIcon} height={24} width={30} />
 );
 menuIconMap.set("DashboardIcon", <DashboardRoundedIcon />);
 menuIconMap.set("GiTeacher", <GiTeacher size={24} />);
@@ -72,5 +92,8 @@ menuIconMap.set("LocalLibraryIcon", <LocalLibraryIcon />);
 menuIconMap.set("AssignmentOutlinedIcon", <AssignmentOutlinedIcon />);
 menuIconMap.set("ManageAccountsIcon", <ManageAccountsIcon />);
 menuIconMap.set("CiEdit", <CiEdit />);
+menuIconMap.set("Truck", <FireTruckRoundedIcon />);
+menuIconMap.set("AddIcon", <AddIcon />);
+menuIconMap.set("ControlPointIcon", <ControlPointIcon />);
 
 export const mapPathMenu = buildMapPathMenu(MENUS);
