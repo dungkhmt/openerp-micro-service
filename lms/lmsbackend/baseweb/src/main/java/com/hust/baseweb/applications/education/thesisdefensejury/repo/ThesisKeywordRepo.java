@@ -1,6 +1,5 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.repo;
 
-import com.hust.baseweb.applications.education.thesisdefensejury.entity.ThesisDefensePlan;
 import com.hust.baseweb.applications.education.thesisdefensejury.entity.ThesisKeyword;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

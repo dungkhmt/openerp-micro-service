@@ -1,11 +1,9 @@
 package localsearch.constraints.multiknapsack;
 
 
-
-
 import localsearch.model.*;
-import core.BasicEntity;
-import java.util.*;
+
+import java.util.HashMap;
 
 public class MultiKnapsack extends AbstractInvariant implements IConstraint {
 

@@ -1,9 +1,9 @@
 package localsearch.constraints.alldifferent;
 
 
-import java.util.HashMap;
-
 import localsearch.model.*;
+
+import java.util.HashMap;
 
 public class AllDifferentVarIntLS extends AbstractInvariant implements IConstraint {
 

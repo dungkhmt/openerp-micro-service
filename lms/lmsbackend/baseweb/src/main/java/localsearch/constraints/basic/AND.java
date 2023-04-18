@@ -1,12 +1,14 @@
 package localsearch.constraints.basic;
 
+import localsearch.constraints.alldifferent.AllDifferent;
 import localsearch.model.AbstractInvariant;
 import localsearch.model.IConstraint;
-import localsearch.model.VarIntLS;
 import localsearch.model.LocalSearchManager;
-import localsearch.constraints.alldifferent.*;
+import localsearch.model.VarIntLS;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 
 public class AND extends AbstractInvariant implements IConstraint {
 	private int _violations;

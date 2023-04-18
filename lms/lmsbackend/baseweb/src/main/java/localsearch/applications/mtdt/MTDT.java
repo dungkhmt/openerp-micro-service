@@ -1,10 +1,5 @@
 package localsearch.applications.mtdt;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Scanner;
-
 import localsearch.constraints.alldifferent.AllDifferent;
 import localsearch.constraints.basic.Implicate;
 import localsearch.constraints.basic.IsEqual;
@@ -12,17 +7,19 @@ import localsearch.constraints.basic.LessOrEqual;
 import localsearch.constraints.basic.NotEqual;
 import localsearch.functions.basic.FuncMinus;
 import localsearch.functions.basic.FuncPlus;
+import localsearch.functions.element.Element;
 import localsearch.functions.max_min.Max;
 import localsearch.functions.max_min.Min;
 import localsearch.functions.occurrence.Occurrence;
 import localsearch.functions.sum.Sum;
 import localsearch.model.ConstraintSystem;
-import localsearch.model.IConstraint;
 import localsearch.model.IFunction;
 import localsearch.model.LocalSearchManager;
 import localsearch.model.VarIntLS;
-import localsearch.functions.element.*;
-import core.*;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Scanner;
 
 public class MTDT {
 	public int[][] match;

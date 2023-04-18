@@ -1,11 +1,13 @@
 package localsearch.constraints.alldifferent;
 
 
-import java.util.*;
-
-import core.*;
+import core.VarInt;
 import localsearch.functions.basic.FuncPlus;
 import localsearch.model.*;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Vector;
 
 public class AllDifferentFunctions extends AbstractInvariant implements IConstraint {
 

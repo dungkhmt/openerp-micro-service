@@ -1,9 +1,10 @@
 package localsearch.search;
 
-import java.util.HashMap;
-
-import localsearch.model.*;
+import localsearch.model.IConstraint;
+import localsearch.model.VarIntLS;
 import localsearch.selectors.MinMaxSelector;
+
+import java.util.HashMap;
 public class MultiStageGreedySearch {
 
 	/**

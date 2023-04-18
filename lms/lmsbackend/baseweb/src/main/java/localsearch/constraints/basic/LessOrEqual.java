@@ -1,10 +1,9 @@
 package localsearch.constraints.basic;
 
-import java.util.HashSet;
-
 import localsearch.functions.basic.FuncVarConst;
 import localsearch.model.*;
-import core.*;
+
+import java.util.HashSet;
 
 public class LessOrEqual extends AbstractInvariant implements IConstraint {
 
@@ -174,5 +173,4 @@ public class LessOrEqual extends AbstractInvariant implements IConstraint {
 		// TODO Auto-generated method stub
 	}	
 }
-	
 	

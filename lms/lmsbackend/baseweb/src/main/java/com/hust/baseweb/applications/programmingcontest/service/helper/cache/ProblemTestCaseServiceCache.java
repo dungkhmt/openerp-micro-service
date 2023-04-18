@@ -1,10 +1,6 @@
 package com.hust.baseweb.applications.programmingcontest.service.helper.cache;
 
 import com.hust.baseweb.applications.programmingcontest.cache.RedisCacheService;
-import com.hust.baseweb.applications.programmingcontest.entity.ContestEntity;
-import com.hust.baseweb.applications.programmingcontest.entity.ProblemEntity;
-import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
-import com.hust.baseweb.applications.programmingcontest.model.ModelGetContestDetailResponse;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.ProblemRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.TestCaseRepo;
@@ -13,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))

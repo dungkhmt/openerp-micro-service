@@ -1,8 +1,5 @@
 package localsearch.constraints.basic;
 
-import localsearch.model.IConstraint;
-import localsearch.model.LocalSearchManager;
-import localsearch.model.VarIntLS;
 import localsearch.model.*;
 
 public class LessThan extends AbstractInvariant implements IConstraint {

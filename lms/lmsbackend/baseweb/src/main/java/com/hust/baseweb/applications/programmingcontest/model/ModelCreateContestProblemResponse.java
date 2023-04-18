@@ -1,13 +1,13 @@
 package com.hust.baseweb.applications.programmingcontest.model;
 
-import java.util.Date;
-import java.util.List;
-
 import com.hust.baseweb.applications.programmingcontest.entity.TagEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter

@@ -1,7 +1,6 @@
 package com.hust.baseweb.applications.education.quiztest.entity;
 
 import com.hust.baseweb.applications.education.quiztest.entity.compositeid.CompositeEduQuizTestQuizQuestionId;
-import com.hust.baseweb.applications.education.quiztest.entity.compositeid.CompositeTestQuizParticipationId;
 import lombok.Getter;
 import lombok.Setter;
 

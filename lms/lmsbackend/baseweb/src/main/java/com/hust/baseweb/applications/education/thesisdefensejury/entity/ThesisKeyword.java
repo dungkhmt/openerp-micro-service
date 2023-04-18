@@ -1,7 +1,6 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.entity;
 
 
-import com.hust.baseweb.applications.education.thesisdefensejury.composite.DefenseJuryTeacherID;
 import com.hust.baseweb.applications.education.thesisdefensejury.composite.ThesisKeywordID;
 import lombok.Data;
 import lombok.NoArgsConstructor;

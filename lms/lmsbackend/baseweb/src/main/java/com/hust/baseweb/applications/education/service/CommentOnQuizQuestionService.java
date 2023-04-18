@@ -4,7 +4,6 @@ import com.hust.baseweb.applications.education.entity.CommentOnQuizQuestion;
 import com.hust.baseweb.applications.education.model.quiz.CommentOnQuizQuestionDetailOM;
 import com.hust.baseweb.entity.UserLogin;
 
-import javax.xml.stream.events.Comment;
 import java.util.List;
 import java.util.UUID;
 

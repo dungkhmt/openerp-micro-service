@@ -1,6 +1,5 @@
 package com.hust.baseweb.applications.whiteboard.entity;
 
-import com.hust.baseweb.applications.education.entity.QuizCourseTopic;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;

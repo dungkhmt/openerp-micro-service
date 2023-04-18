@@ -1,15 +1,12 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.entity;
 
 
-import com.hust.baseweb.entity.UserLogin;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 @Entity

@@ -1,15 +1,11 @@
 package localsearch.functions.sum;
 
+import localsearch.constraints.basic.LessOrEqual;
+import localsearch.model.*;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
-
-import localsearch.constraints.basic.LessOrEqual;
-import localsearch.model.AbstractInvariant;
-import localsearch.model.IConstraint;
-import localsearch.model.IFunction;
-import localsearch.model.LocalSearchManager;
-import localsearch.model.VarIntLS;
 
 public class SumVarConstraints extends AbstractInvariant implements IFunction {
 	private int _value;

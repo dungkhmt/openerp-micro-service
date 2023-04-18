@@ -1,7 +1,6 @@
 package com.hust.baseweb.applications.programmingcontest.entity;
 
 import com.hust.baseweb.applications.programmingcontest.composite.ContestUserLoginRoleFromDateId;
-import com.hust.baseweb.applications.programmingcontest.composite.UserSubmissionContestResultID;
 import lombok.*;
 
 import javax.persistence.*;

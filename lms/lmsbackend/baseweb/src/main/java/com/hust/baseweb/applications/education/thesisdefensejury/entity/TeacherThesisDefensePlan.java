@@ -1,9 +1,6 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.entity;
 
 
-import com.hust.baseweb.applications.education.entity.mongodb.Teacher;
-import com.hust.baseweb.applications.education.teacherclassassignment.entity.EduTeacher;
-import com.hust.baseweb.applications.education.thesisdefensejury.composite.DefenseJuryTeacherID;
 import com.hust.baseweb.applications.education.thesisdefensejury.composite.DefensePlanTeacherID;
 import lombok.Data;
 import lombok.NoArgsConstructor;

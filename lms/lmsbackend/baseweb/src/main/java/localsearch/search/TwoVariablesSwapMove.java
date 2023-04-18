@@ -1,6 +1,6 @@
 package localsearch.search;
 
-import localsearch.model.*;
+import localsearch.model.VarIntLS;
 public class TwoVariablesSwapMove extends Move{
 
 	private VarIntLS	_x;

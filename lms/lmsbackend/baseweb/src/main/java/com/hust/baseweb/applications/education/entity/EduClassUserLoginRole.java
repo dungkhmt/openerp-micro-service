@@ -1,7 +1,6 @@
 package com.hust.baseweb.applications.education.entity;
 
 import com.hust.baseweb.applications.education.entity.compositeid.EduClassUserLoginRoleId;
-import com.hust.baseweb.entity.UserLogin;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

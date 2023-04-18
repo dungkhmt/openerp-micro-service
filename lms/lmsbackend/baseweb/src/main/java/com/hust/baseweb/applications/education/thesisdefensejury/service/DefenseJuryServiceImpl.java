@@ -1,10 +1,12 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.service;
 
-import com.hust.baseweb.applications.education.recourselink.entity.EducationResourceDomain;
 import com.hust.baseweb.applications.education.teacherclassassignment.entity.EduTeacher;
 import com.hust.baseweb.applications.education.teacherclassassignment.repo.EduTeacherRepo;
 import com.hust.baseweb.applications.education.thesisdefensejury.entity.*;
-import com.hust.baseweb.applications.education.thesisdefensejury.models.*;
+import com.hust.baseweb.applications.education.thesisdefensejury.models.DefenseJuryIM;
+import com.hust.baseweb.applications.education.thesisdefensejury.models.DefenseJuryOM;
+import com.hust.baseweb.applications.education.thesisdefensejury.models.Response;
+import com.hust.baseweb.applications.education.thesisdefensejury.models.ThesisWithDefenseJuryIM;
 import com.hust.baseweb.applications.education.thesisdefensejury.repo.*;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.repo.UserLoginRepo;

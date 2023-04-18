@@ -1,7 +1,10 @@
 package localsearch.selectors;
 
-import localsearch.model.*;
-import java.util.*;
+import localsearch.model.IConstraint;
+import localsearch.model.VarIntLS;
+
+import java.util.ArrayList;
+import java.util.Random;
 public class MinMaxSelector {
 
 	/**

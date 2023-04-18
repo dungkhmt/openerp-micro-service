@@ -2,15 +2,12 @@ package com.hust.baseweb.applications.education.recourselink.controller;
 
 import com.hust.baseweb.applications.education.recourselink.entity.EducationResource;
 import com.hust.baseweb.applications.education.recourselink.entity.EducationResourceDomain;
-import com.hust.baseweb.applications.education.recourselink.enumeration.ErrorCode;
 import com.hust.baseweb.applications.education.recourselink.service.EducationResourceDomainService;
 import com.hust.baseweb.applications.education.recourselink.service.EducationResourceService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.apache.http.client.HttpResponseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +15,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 
 @Log4j2

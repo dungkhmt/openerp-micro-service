@@ -1,8 +1,6 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.repo;
 
-import com.hust.baseweb.applications.education.recourselink.entity.EducationResourceDomain;
 import com.hust.baseweb.applications.education.thesisdefensejury.entity.DefenseJury;
-import com.hust.baseweb.applications.education.thesisdefensejury.entity.Thesis;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

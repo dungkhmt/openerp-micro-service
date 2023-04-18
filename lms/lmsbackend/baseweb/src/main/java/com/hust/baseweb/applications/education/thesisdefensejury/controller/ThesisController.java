@@ -1,16 +1,11 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.controller;
 
-import ch.qos.logback.classic.Logger;
-import com.hust.baseweb.applications.education.recourselink.entity.EducationResourceDomain;
 import com.hust.baseweb.applications.education.teacherclassassignment.entity.EduTeacher;
 import com.hust.baseweb.applications.education.teacherclassassignment.repo.EduTeacherRepo;
-import com.hust.baseweb.applications.education.thesisdefensejury.entity.DefenseJury;
 import com.hust.baseweb.applications.education.thesisdefensejury.entity.Thesis;
 import com.hust.baseweb.applications.education.thesisdefensejury.models.*;
-import com.hust.baseweb.applications.education.thesisdefensejury.repo.ThesisRepo;
 import com.hust.baseweb.applications.education.thesisdefensejury.service.ThesisService;
 import com.hust.baseweb.entity.UserLogin;
-import com.hust.baseweb.repo.UserLoginRepo;
 import com.hust.baseweb.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;

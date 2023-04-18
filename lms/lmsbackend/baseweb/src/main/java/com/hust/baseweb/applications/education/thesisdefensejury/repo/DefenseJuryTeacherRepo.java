@@ -1,7 +1,6 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.repo;
 
 import com.hust.baseweb.applications.education.thesisdefensejury.composite.DefenseJuryTeacherID;
-import com.hust.baseweb.applications.education.thesisdefensejury.entity.AcademicKeyword;
 import com.hust.baseweb.applications.education.thesisdefensejury.entity.DefenseJuryTeacher;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

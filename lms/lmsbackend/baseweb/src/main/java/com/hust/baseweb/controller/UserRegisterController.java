@@ -2,9 +2,6 @@ package com.hust.baseweb.controller;
 
 import com.google.gson.Gson;
 import com.hust.baseweb.applications.education.exception.SimpleResponse;
-import com.hust.baseweb.applications.programmingcontest.entity.UserRegistrationContestEntity;
-import com.hust.baseweb.applications.programmingcontest.model.ModelAddUserToContest;
-import com.hust.baseweb.applications.programmingcontest.model.ModelUploadExcelParticipantToContestInput;
 import com.hust.baseweb.entity.RegisteredAffiliation;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.model.*;

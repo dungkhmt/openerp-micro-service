@@ -1,9 +1,5 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.entity;
 
-import com.hust.baseweb.applications.education.entity.mongodb.Teacher;
-import com.hust.baseweb.applications.education.teacherclassassignment.entity.EduTeacher;
-import com.hust.baseweb.applications.education.teacherclassassignment.entity.TeacherCourse;
-import com.hust.baseweb.entity.UserLogin;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;

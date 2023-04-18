@@ -10,11 +10,7 @@ import com.hust.baseweb.applications.education.model.quiz.QuizQuestionDetailMode
 import com.hust.baseweb.applications.education.quiztest.UserQuestionQuizExecutionOM;
 import com.hust.baseweb.applications.education.quiztest.entity.*;
 import com.hust.baseweb.applications.education.quiztest.entity.compositeid.CompositeEduTestQuizGroupParticipationAssignmentId;
-import com.hust.baseweb.applications.education.quiztest.model.EditQuizTestInputModel;
-import com.hust.baseweb.applications.education.quiztest.model.EduQuizTestModel;
-import com.hust.baseweb.applications.education.quiztest.model.ModelResponseGetMyQuizTest;
-import com.hust.baseweb.applications.education.quiztest.model.QuizTestCreateInputModel;
-import com.hust.baseweb.applications.education.quiztest.model.StudentInTestQueryReturnModel;
+import com.hust.baseweb.applications.education.quiztest.model.*;
 import com.hust.baseweb.applications.education.quiztest.model.edutestquizparticipation.QuizTestParticipationExecutionResultOutputModel;
 import com.hust.baseweb.applications.education.quiztest.model.quitestgroupquestion.AutoAssignQuestion2QuizTestGroupInputModel;
 import com.hust.baseweb.applications.education.quiztest.model.quiztestgroup.AutoAssignParticipants2QuizTestGroupInputModel;
@@ -38,7 +34,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;

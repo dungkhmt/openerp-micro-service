@@ -1,17 +1,13 @@
 package com.hust.baseweb.rest.user;
 
 import com.hust.baseweb.applications.education.exception.SimpleResponse;
-import com.hust.baseweb.entity.Party;
-import com.hust.baseweb.entity.SecurityGroup;
-import com.hust.baseweb.entity.SecurityPermission;
-import com.hust.baseweb.entity.UserLogin;
+import com.hust.baseweb.entity.*;
 import com.hust.baseweb.model.ModelAssignGroupAllUsersInput;
 import com.hust.baseweb.model.PersonModel;
 import com.hust.baseweb.model.PersonUpdateModel;
 import com.hust.baseweb.model.UpdatePasswordModel;
-import com.hust.baseweb.entity.UserRegister;
-import com.hust.baseweb.repo.UserRegisterRepo;
 import com.hust.baseweb.model.dto.DPersonDetailModel;
+import com.hust.baseweb.repo.UserRegisterRepo;
 import com.hust.baseweb.service.PartyService;
 import com.hust.baseweb.service.SecurityGroupService;
 import com.hust.baseweb.service.UserService;
@@ -190,30 +186,6 @@ public class UserController {
         partyService.disableParty(partyId);
         return ResponseEntity.ok("");
     }
-
-	/*
-	@GetMapping(path = "/users") 
-	public ResponseEntity<?> getUsers(Pageable page, @RequestParam(name = "filtering", required = false) String filterString) {
-     SortAndFiltersInput sortAndFiltersInput = null; if (filterString != null) {
-       String[] filterSpl = filterString.split(","); 
-       SearchCriteria[] searchCriterias = new SearchCriteria[filterSpl.length]; 
-       for (int i = 0; i <filterSpl.length; i++) { String tmp = filterSpl[i]; 
-       if (tmp != null) {
-       Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?)-");//
-       (\w+?)(:|<|>)(\w+?), Matcher matcher = pattern.matcher(tmp + "-"); while
-       (matcher.find()) { LOG.info(matcher.group(0)); searchCriterias[i] = new
-       SearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3)); } } }
-       sortAndFiltersInput = new SortAndFiltersInput(searchCriterias, null);
-       sortAndFiltersInput = CommonUtils.rebuildQueryDsl(DTOPerson.mapPair,
-       sortAndFiltersInput); LOG.info(sortAndFiltersInput.toString()); }
-       LOG.info("::getUsers, pages = " + page.toString()); Page<DPerson> pg =
-       userService.findAllPerson(page, sortAndFiltersInput); List<DTOPerson> lst =
-       new ArrayList<DTOPerson>(); List<DPerson> lPerson = pg.getContent(); lst =
-       lPerson.stream().map(p -> new DTOPerson(p)).collect(Collectors.toList());
-       Page<DTOPerson> dtoPerson = new PageImpl<DTOPerson>(lst, page,
-       pg.getTotalElements()); return ResponseEntity.ok().body(dtoPerson); 
-       }
-    */
 
     @GetMapping("/get-all-user-login-ids")
     public ResponseEntity<List<String>> getAllUserLoginIds() {

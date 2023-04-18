@@ -1,13 +1,9 @@
 package localsearch.baitap;
 
-import java.util.HashMap;
-
 import localsearch.constraints.basic.LessOrEqual;
-import localsearch.model.AbstractInvariant;
-import localsearch.model.IConstraint;
-import localsearch.model.IFunction;
-import localsearch.model.LocalSearchManager;
-import localsearch.model.VarIntLS;
+import localsearch.model.*;
+
+import java.util.HashMap;
 
 public class MySum extends AbstractInvariant implements IFunction {
 	private VarIntLS[] _x;

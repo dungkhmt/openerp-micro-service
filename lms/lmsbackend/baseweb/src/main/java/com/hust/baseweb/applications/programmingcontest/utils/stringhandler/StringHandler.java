@@ -2,10 +2,8 @@ package com.hust.baseweb.applications.programmingcontest.utils.stringhandler;
 
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
-import com.hust.baseweb.applications.programmingcontest.entity.ProblemEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.TextStringBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;

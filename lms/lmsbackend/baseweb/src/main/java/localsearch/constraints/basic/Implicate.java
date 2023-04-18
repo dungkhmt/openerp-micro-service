@@ -1,12 +1,10 @@
 package localsearch.constraints.basic;
 
 
-
-import java.util.HashSet;
-
 import localsearch.functions.basic.FuncPlus;
 import localsearch.model.*;
-import core.*;
+
+import java.util.HashSet;
 
 public class Implicate extends AbstractInvariant implements IConstraint {
 

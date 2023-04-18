@@ -1,21 +1,28 @@
 package localsearch.applications.timetabling;
 
 
-
-import java.io.*;
-import java.util.*;
-
-import localsearch.model.*;
-import localsearch.search.TabuSearch;
-import localsearch.constraints.basic.*;
+import localsearch.constraints.basic.Implicate;
+import localsearch.constraints.basic.IsEqual;
+import localsearch.constraints.basic.NotEqual;
+import localsearch.constraints.basic.NotOverLap;
 import localsearch.functions.basic.FuncPlus;
+import localsearch.model.ConstraintSystem;
+import localsearch.model.LocalSearchManager;
+import localsearch.model.VarIntLS;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.*;
-import org.xml.sax.SAXException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 class Busy {
 	public int day;

@@ -1,8 +1,6 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.entity;
 
-import com.hust.baseweb.applications.education.teacherclassassignment.entity.EduTeacher;
 import com.hust.baseweb.applications.education.thesisdefensejury.composite.DefenseJuryTeacherID;
-import com.hust.baseweb.applications.programmingcontest.composite.UserSubmissionContestResultID;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;

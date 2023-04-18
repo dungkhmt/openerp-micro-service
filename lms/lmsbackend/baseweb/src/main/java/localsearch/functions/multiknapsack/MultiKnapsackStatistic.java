@@ -1,11 +1,11 @@
 package localsearch.functions.multiknapsack;
 
-import java.util.HashMap;
-
 import localsearch.model.AbstractInvariant;
 import localsearch.model.IFunction;
 import localsearch.model.LocalSearchManager;
 import localsearch.model.VarIntLS;
+
+import java.util.HashMap;
 
 public class MultiKnapsackStatistic extends AbstractInvariant implements IFunction {
 

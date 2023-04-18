@@ -1,11 +1,7 @@
 package localsearch.model;
 
-import java.util.Comparator;
-import java.util.TreeSet;
-import java.util.Vector;
-
 import core.BasicEntity;
-import localsearch.model.VarIntLS;
+
 import java.util.*;
 public class LocalSearchManager {
 

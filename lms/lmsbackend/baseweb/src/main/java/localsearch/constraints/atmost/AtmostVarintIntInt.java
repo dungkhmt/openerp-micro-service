@@ -1,11 +1,8 @@
 package localsearch.constraints.atmost;
 
+import localsearch.model.*;
+
 import java.util.HashMap;
-import localsearch.model.AbstractInvariant;
-import localsearch.model.ConstraintSystem;
-import localsearch.model.IConstraint;
-import localsearch.model.LocalSearchManager;
-import localsearch.model.VarIntLS;
 
 public class AtmostVarintIntInt extends AbstractInvariant implements IConstraint{
 

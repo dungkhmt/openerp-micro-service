@@ -1,10 +1,9 @@
 package com.hust.baseweb.applications.programmingcontest.repo;
 
+import com.hust.baseweb.applications.programmingcontest.entity.ContestEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-
-import com.hust.baseweb.applications.programmingcontest.entity.ContestEntity;
 
 public interface ContestRepo extends JpaRepository<ContestEntity, String> {
     ContestEntity findContestByContestId(String contestId);

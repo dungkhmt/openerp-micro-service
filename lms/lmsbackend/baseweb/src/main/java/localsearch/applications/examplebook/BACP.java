@@ -1,5 +1,4 @@
 package localsearch.applications.examplebook;
-import java.util.*;
 
 import localsearch.constraints.basic.LessOrEqual;
 import localsearch.constraints.basic.LessThan;

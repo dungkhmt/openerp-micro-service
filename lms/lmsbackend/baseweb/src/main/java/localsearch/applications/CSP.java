@@ -3,7 +3,6 @@ package localsearch.applications;
 import localsearch.constraints.basic.IsEqual;
 import localsearch.constraints.basic.LessOrEqual;
 import localsearch.constraints.basic.LessThan;
-import localsearch.constraints.basic.NotEqual;
 import localsearch.functions.basic.FuncPlus;
 import localsearch.model.ConstraintSystem;
 import localsearch.model.LocalSearchManager;

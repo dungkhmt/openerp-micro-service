@@ -1,19 +1,16 @@
 package localsearch.applications.bacp;
 
 
-import java.util.Vector;
-
-import localsearch.model.*;
-
-import localsearch.constraints.basic.Implicate;
 import localsearch.constraints.basic.LessOrEqual;
-// import localsearch.functions.*;
 import localsearch.functions.basic.FuncMinus;
-import localsearch.functions.basic.FuncPlus;
 import localsearch.functions.conditionalsum.ConditionalSum;
 import localsearch.functions.max_min.Max;
 import localsearch.functions.max_min.Min;
-import localsearch.search.*;
+import localsearch.model.ConstraintSystem;
+import localsearch.model.IFunction;
+import localsearch.model.LocalSearchManager;
+import localsearch.model.VarIntLS;
+import localsearch.search.TabuSearch;
 
 public class BACP {
 

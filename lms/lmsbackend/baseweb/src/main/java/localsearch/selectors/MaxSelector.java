@@ -1,8 +1,11 @@
 package localsearch.selectors;
 // import localsearch.functions.*;
-import localsearch.model.*;
-import localsearch.invariants.*;
-import java.util.*;
+
+import localsearch.invariants.ArgMax;
+import localsearch.model.IFunction;
+
+import java.util.ArrayList;
+import java.util.Random;
 public class MaxSelector {
 
 	/**

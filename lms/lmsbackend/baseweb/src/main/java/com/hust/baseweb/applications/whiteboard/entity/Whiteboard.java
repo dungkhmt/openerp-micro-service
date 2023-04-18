@@ -1,8 +1,6 @@
 package com.hust.baseweb.applications.whiteboard.entity;
 
 import com.hust.baseweb.applications.education.classmanagement.entity.EduClassSession;
-import com.hust.baseweb.applications.education.entity.EduCourse;
-import com.hust.baseweb.entity.UserLogin;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
@@ -12,7 +10,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Set;
 
 @Getter
 @Setter

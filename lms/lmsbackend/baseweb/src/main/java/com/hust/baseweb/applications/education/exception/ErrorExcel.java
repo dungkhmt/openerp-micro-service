@@ -1,7 +1,6 @@
 package com.hust.baseweb.applications.education.exception;
 
 
-import com.hust.baseweb.applications.education.exception.CustomExceptionExcel;
 import lombok.Getter;
 
 import java.util.ArrayList;

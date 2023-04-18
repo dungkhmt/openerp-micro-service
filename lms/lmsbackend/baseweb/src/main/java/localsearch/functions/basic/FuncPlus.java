@@ -1,10 +1,12 @@
 package localsearch.functions.basic;
 
 
+import localsearch.model.AbstractInvariant;
+import localsearch.model.IFunction;
+import localsearch.model.LocalSearchManager;
+import localsearch.model.VarIntLS;
 
 import java.util.HashSet;
-
-import localsearch.model.*;
 
 public class FuncPlus extends AbstractInvariant implements IFunction {
 

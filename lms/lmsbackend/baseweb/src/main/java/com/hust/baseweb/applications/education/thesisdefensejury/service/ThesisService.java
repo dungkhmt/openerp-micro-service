@@ -1,13 +1,14 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.service;
 
-import com.hust.baseweb.applications.education.thesisdefensejury.entity.DefenseJury;
 import com.hust.baseweb.applications.education.thesisdefensejury.entity.Thesis;
-import com.hust.baseweb.applications.education.thesisdefensejury.models.*;
+import com.hust.baseweb.applications.education.thesisdefensejury.models.Response;
+import com.hust.baseweb.applications.education.thesisdefensejury.models.ThesisFilter;
+import com.hust.baseweb.applications.education.thesisdefensejury.models.ThesisIM;
+import com.hust.baseweb.applications.education.thesisdefensejury.models.ThesisOM;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface ThesisService {

@@ -1,14 +1,14 @@
 package com.hust.baseweb.applications.education.service;
 
+import com.hust.baseweb.applications.education.entity.CommentsEduCourseMaterial;
 import com.hust.baseweb.applications.education.entity.EduCourseChapterMaterial;
 import com.hust.baseweb.applications.education.model.CommentEduCourseDetailOM;
 import com.hust.baseweb.applications.education.repo.CommentsEduCourseMaterialRepo;
-import com.hust.baseweb.applications.education.entity.CommentsEduCourseMaterial;
 import com.hust.baseweb.applications.notifications.service.NotificationsService;
-import com.hust.baseweb.service.UserService;
-import com.hust.baseweb.model.PersonModel;
-import lombok.AllArgsConstructor;
 import com.hust.baseweb.entity.UserLogin;
+import com.hust.baseweb.model.PersonModel;
+import com.hust.baseweb.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.c;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))

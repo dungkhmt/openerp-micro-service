@@ -1,8 +1,9 @@
 package localsearch.applications;
 // import localsearch.constraints.*;
-import localsearch.constraints.basic.*;
-import localsearch.search.*;
+
+import localsearch.constraints.basic.NotEqual;
 import localsearch.model.*;
+import localsearch.search.TabuSearch;
 public class Test {
 
 	/**

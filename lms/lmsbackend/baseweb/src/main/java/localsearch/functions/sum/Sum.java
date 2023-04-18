@@ -2,9 +2,7 @@ package localsearch.functions.sum;
 
 
 import localsearch.constraints.basic.LessOrEqual;
-import localsearch.functions.basic.*;
-import localsearch.functions.basic.FuncVarConst;
-import localsearch.functions.conditionalsum.ConditionalSum;
+import localsearch.functions.basic.FuncMinus;
 import localsearch.model.*;
 public class Sum extends AbstractInvariant implements IFunction {
 	

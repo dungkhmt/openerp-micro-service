@@ -1,11 +1,10 @@
 package localsearch.constraints.basic;
 
-import java.util.HashSet;
-
-// import localsearch.functions.*;
-import localsearch.functions.basic.*;
+import localsearch.functions.basic.FuncPlus;
+import localsearch.functions.basic.FuncVarConst;
 import localsearch.model.*;
-import core.*;
+
+import java.util.HashSet;
 
 public class IsEqual extends AbstractInvariant implements IConstraint{
 

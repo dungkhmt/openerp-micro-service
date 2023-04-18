@@ -1,6 +1,9 @@
 package localsearch.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 
 public class ConstraintSystem extends AbstractInvariant implements IConstraint {
 	LocalSearchManager _mgr = null;

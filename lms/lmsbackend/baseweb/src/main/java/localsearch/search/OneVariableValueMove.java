@@ -1,5 +1,6 @@
 package localsearch.search;
-import localsearch.model.*;
+
+import localsearch.model.VarIntLS;
 public class OneVariableValueMove extends Move{
 
 	/**

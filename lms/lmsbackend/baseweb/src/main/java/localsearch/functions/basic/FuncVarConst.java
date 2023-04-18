@@ -1,8 +1,9 @@
 package localsearch.functions.basic;
 
-import java.util.HashSet;
-
-import localsearch.model.*;
+import localsearch.model.AbstractInvariant;
+import localsearch.model.IFunction;
+import localsearch.model.LocalSearchManager;
+import localsearch.model.VarIntLS;
 
 public class FuncVarConst extends AbstractInvariant implements IFunction {
 

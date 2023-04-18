@@ -1,5 +1,6 @@
 package com.hust.baseweb.applications.programmingcontest.utils;
-import java.util.*;
+
+import java.util.Scanner;
 public class Main {
     public int C(int k, int n){
         if(k == 0 || k == n) return 1;

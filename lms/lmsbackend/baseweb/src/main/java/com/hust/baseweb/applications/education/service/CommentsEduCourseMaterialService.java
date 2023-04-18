@@ -3,7 +3,6 @@ package com.hust.baseweb.applications.education.service;
 import com.hust.baseweb.applications.education.entity.CommentsEduCourseMaterial;
 import com.hust.baseweb.applications.education.model.CommentEduCourseDetailOM;
 import com.hust.baseweb.entity.UserLogin;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
 import java.util.List;

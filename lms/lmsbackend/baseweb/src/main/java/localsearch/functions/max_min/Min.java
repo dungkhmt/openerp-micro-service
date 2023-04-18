@@ -1,18 +1,17 @@
 package localsearch.functions.max_min;
 
 
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.TreeSet;
-import java.util.Vector;
-
 import localsearch.functions.basic.FuncPlus;
 import localsearch.functions.basic.FuncVarConst;
 import localsearch.model.AbstractInvariant;
 import localsearch.model.IFunction;
 import localsearch.model.LocalSearchManager;
 import localsearch.model.VarIntLS;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.TreeSet;
+import java.util.Vector;
 
 public class Min extends AbstractInvariant implements IFunction {
 	private int _value;

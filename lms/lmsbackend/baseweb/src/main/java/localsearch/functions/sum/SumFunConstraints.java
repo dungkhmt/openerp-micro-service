@@ -1,7 +1,8 @@
 package localsearch.functions.sum;
 
 
-import localsearch.model.*;
+import localsearch.model.AbstractInvariant;
+import localsearch.model.IConstraint;
 import localsearch.model.IFunction;
 import localsearch.model.VarIntLS;
 

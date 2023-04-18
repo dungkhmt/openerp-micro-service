@@ -2,8 +2,8 @@ package com.hust.baseweb.repo;
 
 import com.hust.baseweb.entity.Party;
 import com.hust.baseweb.entity.UserLogin;
-import com.hust.baseweb.model.UserLoginWithPersonModel;
 import com.hust.baseweb.model.PersonModel;
+import com.hust.baseweb.model.UserLoginWithPersonModel;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

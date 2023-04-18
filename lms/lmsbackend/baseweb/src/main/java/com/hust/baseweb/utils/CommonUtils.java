@@ -14,36 +14,7 @@ import java.util.*;
 
 public class CommonUtils {
 
-    public static Logger LOG = LoggerFactory.getLogger(CommonUtils.class);
     public static int SEQ_ID_LEN = 6;
-
-    public static boolean nullString(String s) {
-        return s == null || s.equals("");
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Map<String, Object> json2MapObject(String json) {
-        Gson gson = new Gson();
-        Map<String, Object> map = new HashMap<>();
-        map = (Map<String, Object>) gson.fromJson(json, map.getClass());
-        return map;
-    }
-
-    public static Sort buildSortBySortCriteria(SortCriteria[] sort) {
-        if (sort.length == 0) {
-            return null;
-        }
-        List<Order> lorder = new ArrayList<>();
-        for (int i = 0; i < sort.length; i++) {
-            if (sort[i].isAsc()) {
-                lorder.add(new Sort.Order(Sort.Direction.ASC, sort[i].getField()));
-            } else {
-                lorder.add(new Sort.Order(Sort.Direction.DESC, sort[i].getField()));
-            }
-        }
-        return Sort.by(lorder);
-
-    }
 
     public static Sort buildSortBySortCriteria(List<SortCriteria> sort) {
         if (sort.size() == 0) {
@@ -59,42 +30,6 @@ public class CommonUtils {
         }
         return Sort.by(orders);
 
-    }
-
-    public static SortAndFiltersInput rebuildQueryDsl(Map<String, String> map, SortAndFiltersInput query) {
-        SortCriteria[] sort = query.getSort();
-        SearchCriteria[] filter = query.getFilters();
-        if (sort != null) {
-            for (SortCriteria sortCriteria : sort) {
-                sortCriteria.setField(map.get(sortCriteria.getField()));
-            }
-        }
-        if (filter != null) {
-            for (SearchCriteria searchCriteria : filter) {
-                searchCriteria.setKey(map.get(searchCriteria.getKey()));
-            }
-        }
-        return new SortAndFiltersInput(filter, sort);
-    }
-
-    public static SortAndFiltersInput rebuildQueryDsl(
-        @SuppressWarnings("rawtypes") Pair<Map<String, String>, Map<String, Pair>> pair,
-        SortAndFiltersInput query
-    ) {
-        SortCriteria[] sort = query.getSort();
-        SearchCriteria[] filter = query.getFilters();
-        if (sort != null) {
-            for (SortCriteria sortCriteria : sort) {
-                sortCriteria.setField(buildQueryDslPath(pair, sortCriteria.getField()));
-            }
-        }
-
-        if (filter != null) {
-            for (SearchCriteria searchCriteria : filter) {
-                searchCriteria.setKey(buildQueryDslPath(pair, searchCriteria.getKey()));
-            }
-        }
-        return new SortAndFiltersInput(filter, sort);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -190,13 +125,5 @@ public class CommonUtils {
             n = n - 1;
         }
         return ans;
-    }
-
-    public static void main(String[] args) {
-        Random R = new Random();
-        int[] a = genRandom(4, 10, R);
-        for (int i = 0; i < a.length; i++) {
-            System.out.print(a[i] + " ");
-        }
     }
 }

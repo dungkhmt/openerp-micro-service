@@ -1,6 +1,5 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.service;
 
-import com.hust.baseweb.applications.education.repo.mongodb.TeacherRepo;
 import com.hust.baseweb.applications.education.teacherclassassignment.repo.EduTeacherRepo;
 import com.hust.baseweb.applications.education.thesisdefensejury.entity.ThesisDefensePlan;
 import com.hust.baseweb.applications.education.thesisdefensejury.models.Response;

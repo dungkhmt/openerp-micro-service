@@ -1,7 +1,6 @@
 package com.hust.baseweb.applications.admin.dataadmin.education.model.statistic;
 
 import com.hust.baseweb.applications.admin.dataadmin.education.entity.LearningStatisticEntity;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

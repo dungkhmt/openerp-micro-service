@@ -1,8 +1,6 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.service;
 
-import com.hust.baseweb.applications.education.recourselink.entity.EducationResourceDomain;
 import com.hust.baseweb.applications.education.thesisdefensejury.entity.DefenseJury;
-import com.hust.baseweb.applications.education.thesisdefensejury.entity.DefenseJuryTeacher;
 import com.hust.baseweb.applications.education.thesisdefensejury.models.DefenseJuryIM;
 import com.hust.baseweb.applications.education.thesisdefensejury.models.DefenseJuryOM;
 import com.hust.baseweb.applications.education.thesisdefensejury.models.Response;

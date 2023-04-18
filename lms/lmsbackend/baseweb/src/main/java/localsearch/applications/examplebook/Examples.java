@@ -1,19 +1,15 @@
 package localsearch.applications.examplebook;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import localsearch.constraints.alldifferent.AllDifferent;
 import localsearch.constraints.basic.LessOrEqual;
 import localsearch.functions.basic.FuncMinus;
 import localsearch.functions.basic.FuncPlus;
 import localsearch.functions.conditionalsum.ConditionalSum;
 import localsearch.functions.sum.Sum;
-import localsearch.model.ConstraintSystem;
-import localsearch.model.IConstraint;
-import localsearch.model.IFunction;
-import localsearch.model.LocalSearchManager;
-import localsearch.model.VarIntLS;
+import localsearch.model.*;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Examples {
 	public static void example1() {

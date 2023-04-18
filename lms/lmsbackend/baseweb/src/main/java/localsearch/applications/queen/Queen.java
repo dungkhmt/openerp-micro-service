@@ -1,15 +1,14 @@
 package localsearch.applications.queen;
 
-import java.util.ArrayList;
-
-// import localsearch.*;
-import localsearch.model.*;
-// import localsearch.constraints.*;
 import localsearch.constraints.alldifferent.AllDifferent;
-// import localsearch.functions.*;
-import localsearch.functions.basic.*;
-import localsearch.selectors.*;
-import java.util.*;
+import localsearch.functions.basic.FuncPlus;
+import localsearch.model.ConstraintSystem;
+import localsearch.model.IFunction;
+import localsearch.model.LocalSearchManager;
+import localsearch.model.VarIntLS;
+import localsearch.selectors.MinMaxSelector;
+
+import java.util.HashMap;
 public class Queen {
 
 	/**

@@ -1,14 +1,17 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.controller;
 
-import com.hust.baseweb.applications.education.entity.mongodb.Teacher;
 import com.hust.baseweb.applications.education.teacherclassassignment.entity.EduTeacher;
 import com.hust.baseweb.applications.education.teacherclassassignment.repo.EduTeacherRepo;
-import com.hust.baseweb.applications.education.thesisdefensejury.entity.*;
-import com.hust.baseweb.applications.education.thesisdefensejury.models.*;
+import com.hust.baseweb.applications.education.thesisdefensejury.entity.TeacherKeyword;
+import com.hust.baseweb.applications.education.thesisdefensejury.entity.TeacherThesisDefensePlan;
+import com.hust.baseweb.applications.education.thesisdefensejury.entity.ThesisDefensePlan;
+import com.hust.baseweb.applications.education.thesisdefensejury.models.AddTeacherToPlanIM;
+import com.hust.baseweb.applications.education.thesisdefensejury.models.Response;
+import com.hust.baseweb.applications.education.thesisdefensejury.models.TeacherWithKeyword;
+import com.hust.baseweb.applications.education.thesisdefensejury.models.ThesisDefensePlanIM;
 import com.hust.baseweb.applications.education.thesisdefensejury.repo.TeacherKeywordRepo;
 import com.hust.baseweb.applications.education.thesisdefensejury.repo.TeacherThesisDefensePlanRepo;
 import com.hust.baseweb.applications.education.thesisdefensejury.service.ThesisDefensePlanService;
-import com.hust.baseweb.applications.education.thesisdefensejury.service.TranningProgramService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Log4j2
 @Controller

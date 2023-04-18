@@ -5,11 +5,7 @@ import localsearch.constraints.basic.IsEqual;
 import localsearch.constraints.basic.LessOrEqual;
 import localsearch.constraints.basic.OR;
 import localsearch.functions.basic.FuncPlus;
-import localsearch.model.ConstraintSystem;
-import localsearch.model.IConstraint;
-import localsearch.model.IFunction;
-import localsearch.model.LocalSearchManager;
-import localsearch.model.VarIntLS;
+import localsearch.model.*;
 import localsearch.search.TabuSearch;
 
 public class Test {

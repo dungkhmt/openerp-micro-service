@@ -1,6 +1,10 @@
 package localsearch.constraints.basic;
 
-import localsearch.model.*;
+import localsearch.model.AbstractInvariant;
+import localsearch.model.IConstraint;
+import localsearch.model.LocalSearchManager;
+import localsearch.model.VarIntLS;
+
 import java.util.HashMap;
 public class NotOverLap extends AbstractInvariant implements IConstraint {
 	private VarIntLS[] _vars;

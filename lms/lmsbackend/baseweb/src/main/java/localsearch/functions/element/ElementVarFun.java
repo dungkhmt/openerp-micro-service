@@ -1,15 +1,14 @@
 package localsearch.functions.element;
 
 
-
-import java.util.HashMap;
-import java.util.HashSet;
-
 import localsearch.functions.basic.FuncPlus;
 import localsearch.model.AbstractInvariant;
 import localsearch.model.IFunction;
 import localsearch.model.LocalSearchManager;
 import localsearch.model.VarIntLS;
+
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class ElementVarFun extends AbstractInvariant implements IFunction {
 	private int                _value;

@@ -1,11 +1,10 @@
 package localsearch.constraints.basic;
 
-import java.util.HashSet;
-
 import localsearch.constraints.alldifferent.AllDifferent;
 import localsearch.functions.basic.FuncVarConst;
 import localsearch.model.*;
-import core.*;
+
+import java.util.HashSet;
 
 public class NotEqual extends AbstractInvariant implements IConstraint{
 

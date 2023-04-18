@@ -1,11 +1,11 @@
 package localsearch.applications.examplebook;
 
-import java.util.HashMap;
-
 import localsearch.model.AbstractInvariant;
 import localsearch.model.IFunction;
 import localsearch.model.LocalSearchManager;
 import localsearch.model.VarIntLS;
+
+import java.util.HashMap;
 
 public class SumArray extends AbstractInvariant implements IFunction {
 	private int _value;

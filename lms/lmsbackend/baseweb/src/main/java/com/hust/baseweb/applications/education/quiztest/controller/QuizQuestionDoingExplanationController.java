@@ -1,6 +1,5 @@
 package com.hust.baseweb.applications.education.quiztest.controller;
 
-import com.hust.baseweb.applications.education.quiztest.entity.QuizQuestionDoingExplanation;
 import com.hust.baseweb.applications.education.quiztest.model.quizdoingexplanation.QuizDoingExplanationInputModel;
 import com.hust.baseweb.applications.education.quiztest.service.QuizQuestionDoingExplanationService;
 import lombok.AllArgsConstructor;

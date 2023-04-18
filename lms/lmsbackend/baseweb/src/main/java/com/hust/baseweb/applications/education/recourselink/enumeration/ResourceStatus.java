@@ -1,6 +1,5 @@
 package com.hust.baseweb.applications.education.recourselink.enumeration;
 
-import com.hust.baseweb.applications.education.classmanagement.enumeration.RegistStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

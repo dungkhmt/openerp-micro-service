@@ -1,16 +1,12 @@
 package localsearch.functions.occurrence;
 
 
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Vector;
-
-import localsearch.applications.Test;
 import localsearch.model.AbstractInvariant;
 import localsearch.model.IFunction;
 import localsearch.model.LocalSearchManager;
 import localsearch.model.VarIntLS;
+
+import java.util.HashMap;
 
 public class OccurrenceVarIntLSConstant extends AbstractInvariant implements IFunction {
 

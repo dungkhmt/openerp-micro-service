@@ -3,8 +3,6 @@
  */
 package core;
 
-import localsearch.model.VarIntLS;
-
 public class BasicEntity {
 
 	/**

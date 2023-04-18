@@ -1,15 +1,11 @@
 package localsearch.constraints.atmost;
 
+import localsearch.constraints.basic.IsEqual;
+import localsearch.model.*;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
-
-import localsearch.constraints.basic.IsEqual;
-import localsearch.model.AbstractInvariant;
-import localsearch.model.ConstraintSystem;
-import localsearch.model.IConstraint;
-import localsearch.model.LocalSearchManager;
-import localsearch.model.VarIntLS;
 
 public class AtmostConstraintInt extends AbstractInvariant implements IConstraint {
 	private int              						_violations;

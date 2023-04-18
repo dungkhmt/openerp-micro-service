@@ -1,7 +1,5 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.controller;
 
-import com.hust.baseweb.applications.education.recourselink.entity.EducationResource;
-import com.hust.baseweb.applications.education.recourselink.entity.EducationResourceDomain;
 import com.hust.baseweb.applications.education.thesisdefensejury.entity.DefenseJury;
 import com.hust.baseweb.applications.education.thesisdefensejury.entity.DefenseJuryTeacher;
 import com.hust.baseweb.applications.education.thesisdefensejury.entity.Thesis;
@@ -28,7 +26,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.security.Principal;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Log4j2
 @Controller

@@ -1,11 +1,9 @@
 package com.hust.baseweb.applications.programmingcontest.entity;
 
 import lombok.*;
-
-import javax.persistence.*;
-
 import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Getter

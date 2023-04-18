@@ -15,7 +15,8 @@ import java.io.IOException;
 import java.util.UUID;
 
 import static com.hust.baseweb.config.rabbitmq.QuizRoutingKey.QUIZ_DL;
-import static com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestConfig.*;
+import static com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestConfig.QUIZ_DEAD_LETTER_EXCHANGE;
+import static com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestConfig.QUIZ_QUEUE;
 
 @Component
 public class QuizSubmissionListener extends BaseRabbitListener {

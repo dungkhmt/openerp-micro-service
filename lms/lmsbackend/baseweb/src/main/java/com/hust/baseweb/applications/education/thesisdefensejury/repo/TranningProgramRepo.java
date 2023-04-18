@@ -1,6 +1,5 @@
 package com.hust.baseweb.applications.education.thesisdefensejury.repo;
 
-import com.hust.baseweb.applications.education.thesisdefensejury.entity.DefenseJury;
 import com.hust.baseweb.applications.education.thesisdefensejury.entity.TraningProgram;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

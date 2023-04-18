@@ -1,7 +1,9 @@
 package localsearch.common;
 
 import localsearch.model.VarIntLS;
-import java.util.*;
+
+import java.util.Random;
+import java.util.Set;
 public class OpenCBLS {
 
 	public static int MAX_INT = 2147483647;

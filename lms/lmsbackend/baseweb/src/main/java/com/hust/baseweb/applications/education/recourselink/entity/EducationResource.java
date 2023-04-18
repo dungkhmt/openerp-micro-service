@@ -1,7 +1,6 @@
 package com.hust.baseweb.applications.education.recourselink.entity;
 
 import com.hust.baseweb.applications.education.recourselink.enumeration.ResourceStatus;
-import com.hust.baseweb.entity.UserLogin;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

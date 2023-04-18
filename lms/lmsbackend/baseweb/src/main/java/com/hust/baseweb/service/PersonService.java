@@ -1,6 +1,5 @@
 package com.hust.baseweb.service;
 
-import com.hust.baseweb.applications.taskmanagement.dto.dao.PersonDao;
 import com.hust.baseweb.entity.Person;
 
 import java.util.List;

@@ -1,9 +1,9 @@
 package localsearch.model;
 
+import core.VarInt;
+
 import java.util.Set;
 import java.util.TreeSet;
-
-import core.VarInt;
 
 public class VarIntLS extends VarInt {
 

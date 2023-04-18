@@ -1,10 +1,8 @@
 package com.hust.baseweb.service;
 
 import com.hust.baseweb.applications.education.exception.SimpleResponse;
-import com.hust.baseweb.entity.AccountActivation;
 import com.hust.baseweb.entity.Party;
 import com.hust.baseweb.entity.UserLogin;
-import com.hust.baseweb.entity.UserRegister;
 import com.hust.baseweb.model.*;
 import com.hust.baseweb.model.getregists.GetAllRegistsOM;
 import com.hust.baseweb.model.querydsl.SortAndFiltersInput;
@@ -12,7 +10,6 @@ import com.hust.baseweb.rest.user.DPerson;
 import com.hust.baseweb.rest.user.UserRestBriefProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Collection;
 import java.util.List;

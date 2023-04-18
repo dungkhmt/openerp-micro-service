@@ -5,8 +5,6 @@ package core;
 
 import java.util.Set;
 
-import localsearch.model.VarIntLS;
-
 
 
 public class VarInt extends BasicEntity {

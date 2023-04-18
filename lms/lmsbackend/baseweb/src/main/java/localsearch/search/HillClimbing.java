@@ -1,10 +1,11 @@
 
 package localsearch.search;
 
-import java.util.ArrayList;
-import java.util.Random;
 import localsearch.model.ConstraintSystem;
 import localsearch.model.VarIntLS;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class HillClimbing {
     class AssignMove {

@@ -3,7 +3,6 @@ package com.hust.baseweb.applications.education.cache;
 import com.hust.baseweb.applications.education.entity.QuizCourseTopic;
 
 import java.util.HashMap;
-import java.util.UUID;
 
 public class CacheQuizCourseTopic {
     private HashMap<String, QuizCourseTopic> mId2QuizCourseTopic;

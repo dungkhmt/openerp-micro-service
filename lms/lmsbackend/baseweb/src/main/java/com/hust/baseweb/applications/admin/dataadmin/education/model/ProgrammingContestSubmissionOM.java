@@ -1,7 +1,6 @@
 package com.hust.baseweb.applications.admin.dataadmin.education.model;
 
 import java.util.Date;
-import java.util.UUID;
 
 public interface ProgrammingContestSubmissionOM {
     String getContestId();

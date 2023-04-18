@@ -2,8 +2,8 @@ package com.hust.baseweb.applications.education.controller;
 
 import com.hust.baseweb.applications.education.entity.CommentsEduCourseMaterial;
 import com.hust.baseweb.applications.education.model.CommentEduCourseDetailOM;
-import com.hust.baseweb.entity.*;
 import com.hust.baseweb.applications.education.service.CommentsEduCourseMaterialService;
+import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 

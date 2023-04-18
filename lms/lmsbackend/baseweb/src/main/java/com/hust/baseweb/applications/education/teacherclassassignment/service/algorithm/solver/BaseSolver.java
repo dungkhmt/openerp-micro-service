@@ -2,8 +2,6 @@ package com.hust.baseweb.applications.education.teacherclassassignment.service.a
 
 import com.hust.baseweb.applications.education.teacherclassassignment.model.SolverConfig;
 import com.hust.baseweb.applications.education.teacherclassassignment.service.MapDataInput;
-//import com.hust.baseweb.applications.education.teacherclassassignment.service.algorithm.solver.cplex.cp.CplexCPSolver;
-//import com.hust.baseweb.applications.education.teacherclassassignment.service.algorithm.solver.cplex.mip.CplexMIPSolver;
 import com.hust.baseweb.applications.education.teacherclassassignment.service.algorithm.solver.ortools.cp.OrtoolsCPSolver;
 import com.hust.baseweb.applications.education.teacherclassassignment.service.algorithm.solver.ortools.mip.OrtoolsMIPSolver;
 

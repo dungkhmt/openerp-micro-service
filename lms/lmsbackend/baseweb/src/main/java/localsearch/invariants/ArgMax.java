@@ -1,9 +1,15 @@
 package localsearch.invariants;
 
 import localsearch.functions.basic.FuncPlus;
-import localsearch.model.*;
+import localsearch.model.AbstractInvariant;
+import localsearch.model.IFunction;
+import localsearch.model.LocalSearchManager;
+import localsearch.model.VarIntLS;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Vector;
 public class ArgMax extends AbstractInvariant {
 
 	/**

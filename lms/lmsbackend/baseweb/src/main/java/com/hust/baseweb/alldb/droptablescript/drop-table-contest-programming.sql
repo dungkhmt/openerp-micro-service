@@ -1,1 +1,0 @@
-drop table programming_contest_user_registration_problem;

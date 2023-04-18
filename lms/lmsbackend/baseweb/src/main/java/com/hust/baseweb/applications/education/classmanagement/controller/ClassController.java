@@ -21,9 +21,6 @@ import com.hust.baseweb.applications.education.report.model.courseparticipation.
 import com.hust.baseweb.applications.education.report.model.quizparticipation.StudentQuizParticipationModel;
 import com.hust.baseweb.applications.education.service.*;
 import com.hust.baseweb.applications.notifications.service.NotificationsService;
-import com.hust.baseweb.applications.programmingcontest.entity.UserRegistrationContestEntity;
-import com.hust.baseweb.applications.programmingcontest.model.ModelAddUserToContest;
-import com.hust.baseweb.applications.programmingcontest.model.ModelUploadExcelParticipantToContestInput;
 import com.hust.baseweb.config.FileSystemStorageProperties;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;

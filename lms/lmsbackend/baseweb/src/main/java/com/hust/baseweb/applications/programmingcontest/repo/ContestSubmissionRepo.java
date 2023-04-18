@@ -3,7 +3,6 @@ package com.hust.baseweb.applications.programmingcontest.repo;
 import com.hust.baseweb.applications.admin.dataadmin.education.model.ProgrammingContestSubmissionOM;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
 import com.hust.baseweb.applications.programmingcontest.model.ModelProblemMaxSubmissionPoint;
-
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

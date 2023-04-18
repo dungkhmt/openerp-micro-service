@@ -57,8 +57,6 @@ public class ContestProblemController {
     UserContestProblemRoleRepo userContestProblemRoleRepo;
     ProblemTestCaseServiceCache cacheService;
 
-    public static ConcurrentMap<String, ModelGetContestDetailResponse> runningContests = new ConcurrentHashMap();
-
     @PostMapping("/create-problem")
     public ResponseEntity<?> createContestProblem(Principal principal,
             @RequestParam("ModelCreateContestProblem") String json,
@@ -117,7 +115,7 @@ public class ContestProblemController {
     @Secured("ROLE_TEACHER")
     @GetMapping("/problem-details/{problemId}")
     public ResponseEntity<?> getProblemDetails(@PathVariable("problemId") String problemId) throws Exception {
-        log.info("getProblemDetails problemId ", problemId);
+        log.info("getProblemDetails problemId {}", problemId);
         ModelCreateContestProblemResponse problemResponse = problemTestCaseService.getContestProblem(problemId);
         return ResponseEntity.status(200).body(problemResponse);
     }
@@ -306,11 +304,6 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body("ok");
     }
 
-//    synchronized static void removeContestFromCache(String contestId) {
-//        log.info("removeContestFromCache synchronized remove from cache contestId " + contestId);
-//        runningContests.remove(contestId);
-//    }
-
     @GetMapping("/get-list-roles-contest")
     public ResponseEntity<?> getListRolesContest() {
         List<String> L = UserRegistrationContestEntity.getListRoles();
@@ -361,11 +354,6 @@ public class ContestProblemController {
     }
     @PostMapping("/get-code-similarity")
     public ResponseEntity<?> getCodeSimilarity(Principal principal, @RequestBody ModelGetCodeSimilarityParams input) {
-        // String contestId = input.getContestId();
-        // String userId = input.getUserId();
-        // String problemId = input.getProblemId();
-        // List<CodePlagiarism> codePlagiarism =
-        // problemTestCaseService.findAllByContestId(contestId);
         List<CodePlagiarism> codePlagiarism = problemTestCaseService.findAllBy(input);
         return ResponseEntity.ok().body(codePlagiarism);
     }
@@ -416,7 +404,6 @@ public class ContestProblemController {
 
                 ModelStudentOverviewProblem response = new ModelStudentOverviewProblem();
                 response.setProblemId(problemId);
-//                response.setProblemName(problem.getProblemName());
                 response.setProblemName(contestProblem.getProblemRename());
                 response.setProblemCode(contestProblem.getProblemRecode());
                 response.setLevelId(problem.getLevelId());
@@ -480,13 +467,6 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(response);
     }
 
-//    synchronized static void checkAndAddRunningContest(ModelGetContestDetailResponse response) {
-//        if (runningContests.get(response.getContestId()) == null) {
-//            runningContests.put(response.getContestId(), response);
-//            log.info("getContestDetail constestid " + response.getContestId()
-//                    + " not found in the cache --> load from DB AND push successfully in cache");
-//        }
-//    }
 
     //@Secured("ROLE_STUDENT")
     @PostMapping("/student-register-contest/{contestId}")
@@ -787,15 +767,10 @@ public class ContestProblemController {
         } else {
             log.info("uploadUpdateTestCase, multipart file is null");
         }
-        // res = problemTestCaseService.addTestCase(testCase, modelUploadTestCase,
-        // principal.getName());
+
         res = problemTestCaseService.uploadUpdateTestCase(testCaseUUID, testCase.toString(), modelUploadTestCase,
                                                           principal.getName());
         return ResponseEntity.ok().body(res);
-
-        // res.setStatus("FAILURE");
-        // res.setMessage("Exception!!");
-        // return ResponseEntity.ok().body(res);
     }
 
     @PostMapping("/update-test-case-without-file/{testCaseId}")
@@ -811,14 +786,9 @@ public class ContestProblemController {
         log.info("uploadUpdateTestCaseWithoutFile, problemId = " + problemId + " tesCaseId = " + testCaseId
                 + " testCaseUUID = " + testCaseUUID);
         ModelUploadTestCaseOutput res = new ModelUploadTestCaseOutput();
-        // res = problemTestCaseService.addTestCase(testCase, modelUploadTestCase,
-        // principal.getName());
         res = problemTestCaseService.uploadUpdateTestCase(testCaseUUID, null, modelUploadTestCase, principal.getName());
         return ResponseEntity.ok().body(res);
 
-        // res.setStatus("FAILURE");
-        // res.setMessage("Exception!!");
-        // return ResponseEntity.ok().body(res);
     }
 
     @PostMapping("/upload-test-case")
@@ -1532,22 +1502,6 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(contestSubmission);
     }
 
-    // @DeleteMapping("/delete-contest/{contestId}")
-    // public ResponseEntity<?> deleteContest(@PathVariable("contestId") String
-    // contestId, Principal principal) throws MiniLeetCodeException {
-    // log.info("delete-contest {}", contestId);
-    // problemTestCaseService.deleteContest(contestId, principal.getName());
-    // return ResponseEntity.status(HttpStatus.OK).body(null);
-    // }
-    //
-    // @DeleteMapping("/delete-problem/{problemId}")
-    // public ResponseEntity<?> deleteProblem(@PathVariable("problemId") String
-    // problemId, Principal principal) throws MiniLeetCodeException {
-    // log.info("delete-problem {}", problemId);
-    // problemTestCaseService.deleteProblem(problemId, principal.getName());
-    // return ResponseEntity.status(HttpStatus.OK).body(null);
-    //
-    // }
 
     @DeleteMapping("/delete-test-case/{testCaseId}")
     public ResponseEntity<?> deleteTestCase(@PathVariable("testCaseId") UUID testCaseId, Principal principal)
@@ -1692,7 +1646,7 @@ public class ContestProblemController {
         log.info("ManagerSubmitCodeOfParticipant, filename = " + file.getOriginalFilename());
         String[] s = filename.split("\\.");
         log.info("ManagerSubmitCodeOfParticipant, extract from filename, s.length = " + s.length);
-        if(s == null || s.length < 2){
+        if(s.length < 2){
             return ResponseEntity.ok().body("Filename " + filename + " Invalid");
         }
         String language = s[1].trim();
@@ -1706,7 +1660,7 @@ public class ContestProblemController {
 
         String[] s1 = s[0].split("_");
         log.info("ManagerSubmitCodeOfParticipant, extract from filename, s[0] = " + s[0] + " s1 = " + s1.length);
-        if(s1 == null || s1.length < 2){
+        if(s1.length < 2){
             ModelContestSubmissionResponse resp = buildSubmissionResponseInvalidFilename(filename);
             return ResponseEntity.ok().body(resp);
         }
@@ -1787,7 +1741,8 @@ public class ContestProblemController {
             ModelContestSubmissionResponse resp = null;
             if (contestEntity.getSubmissionActionType()
                              .equals(ContestEntity.CONTEST_SUBMISSION_ACTION_TYPE_STORE_AND_EXECUTE)) {
-                if (cp != null && cp.getSubmissionMode() != null && cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_SOLUTION_OUTPUT)){
+                if (cp.getSubmissionMode() != null &&
+                    cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_SOLUTION_OUTPUT)){
                     resp = problemTestCaseService.submitContestProblemStoreOnlyNotExecute(request, userId, principal.getName());
                 }else {
                     resp = problemTestCaseService.submitContestProblemTestCaseByTestCaseWithFile(request, userId,  principal.getName());
