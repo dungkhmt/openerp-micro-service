@@ -1,0 +1,16 @@
+{
+  "title": "Danh sách lớp",
+  "columns": {
+    "classCode": "Mã lớp",
+    "courseId": "Mã học phần",
+    "name": "Tên học phần",
+    "classType": "Loại lớp",
+    "semester": "Học kỳ",
+    "status": "Trạng thái"
+  },
+  "classStatus": {
+    "approved": "Đã phê duyệt",
+    "pendingApproval": "Chờ phê duyệt"
+  },
+  "notiWhenClickingNonApprovedClass": "Vui lòng chờ giảng viên phê duyệt để xem thông tin của lớp "
+}

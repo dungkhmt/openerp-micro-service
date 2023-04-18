@@ -1,0 +1,29 @@
+{
+  "problem": "Problem",
+  "problemId": "Problem ID",
+  "problemName": "Problem name",
+  "level": "Level",
+  "timeLimit": "Time limit",
+  "memoryLimit": "Memory limit",
+  "problemDescription": "Problem description",
+  "problemSuggestion": "Suggesstion for solution",
+  "problemSuggesstionPlaceholder": "Provide a suggestion in case of contestants facing difficulties solving the problem effectively",
+  "correctSourceCode": "Solution Source code",
+  "allowSubmittingOutput": "Allow contestants to submit output only (without source code)",
+  "isCustomEvaluated": "Customize function for testcase evaluation",
+  "customEvaluationNote1": "* Use this mode for problems with many correct output, please do not select this for normal problem (only 1 correct result for each testcase)",
+  "customEvaluationNote2": "** View demo here",
+  "checkerSourceCode": "Checker Source code",
+  "checkerSourceCodePlaceholder": "Source code to evaluate contestant's output",
+  "checkSolutionCompile": "Check compile",
+  "problemList": {
+    "title": "Problems"
+  },
+  "createProblem": "Create new Problem",
+  "editProblem": "Edit problem",
+  "validateSubmit": {
+      "warningCheckSolutionCompile": "Your source code must pass \"CHECK COMPILE\" step",
+      "missingField": "Missing required field: {{fieldName}}"
+    }
+
+}
