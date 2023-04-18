@@ -5,34 +5,29 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import openerp.containertransport.dto.TruckModel;
-import org.modelmapper.ModelMapper;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "container_transport_trucks")
-public class Truck {
+@Table(name = "container_transport_trailers")
+public class Trailer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
-    @Column(name = "truck_code")
-    private String truckCode;
+    @Column(name = "trailer_code")
+    private String trailerCode;
 
     @Column(name = "facility_id")
     private Integer facilityId;
 
-    @Column(name = "driver_id")
-    private Integer driverId;
+    @Column(name = "status_id")
+    private String statusId;
 
-    @Column(name = "license plates")
-    private String licensePlates;
-
-    @Column(name = "brand_truck")
-    private String brandTruck;
+    @Column(name = "truck_id")
+    private Integer truckId;
 
     @Column(name = "created_at")
     private long createdAt;

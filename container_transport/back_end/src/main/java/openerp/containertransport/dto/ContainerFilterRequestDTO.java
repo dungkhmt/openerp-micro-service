@@ -7,6 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OrderModel {
-    private String orderCode;
+public class ContainerFilterRequestDTO {
+    private String containerCode;
 }

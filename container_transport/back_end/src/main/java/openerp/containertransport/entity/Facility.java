@@ -35,8 +35,8 @@ public class Facility {
     private Integer maxNumberContainer;
 
     @Column(name = "created_at")
-    private Timestamp createdAt;
+    private long createdAt;
 
     @Column(name = "updated_at")
-    private Timestamp updatedAt;
+    private long updatedAt;
 }

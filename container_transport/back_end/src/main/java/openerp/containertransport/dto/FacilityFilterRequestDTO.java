@@ -2,11 +2,10 @@ package openerp.containertransport.dto;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OrderModel {
-    private String orderCode;
+public class FacilityFilterRequestDTO {
+    private String facilityName;
 }

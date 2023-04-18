@@ -1,9 +1,9 @@
 package openerp.containertransport.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class TripItemModel {
 }
