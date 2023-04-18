@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/facility")
 public class FacilityController {
-    private FacilityService facilityService;
+    private final FacilityService facilityService;
 
     @PostMapping("/create")
     public ResponseEntity<?> createFacility (@RequestBody FacilityModel facilityModel){

@@ -27,12 +27,13 @@ public class FacilityServiceImpl implements FacilityService {
     @Override
     public Facility createFacility(FacilityModel facilityModel) {
         Facility facility = new Facility();
-        facility.setFacilityName(facility.getFacilityName());
-        facility.setFacilityType(facility.getFacilityType());
-        facility.setMaxNumberContainer(facility.getMaxNumberTrailer());
-        facility.setMaxNumberTrailer(facility.getMaxNumberContainer());
-        facility.setMaxNumberTruck(facility.getMaxNumberTruck());
+        facility.setFacilityName(facilityModel.getFacilityName());
+        facility.setFacilityType(facilityModel.getFacilityType());
+        facility.setMaxNumberContainer(facilityModel.getMaxNumberTrailer());
+        facility.setMaxNumberTrailer(facilityModel.getMaxNumberContainer());
+        facility.setMaxNumberTruck(facilityModel.getMaxNumberTruck());
         facility.setCreatedAt(System.currentTimeMillis());
+        facility.setUpdatedAt(System.currentTimeMillis());
         facilityRepo.save(facility);
         facility.setFacilityCode("FACI" + facility.getId());
         facilityRepo.save(facility);

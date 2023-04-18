@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.containertransport.dto.TruckFilterRequestDTO;
 import openerp.containertransport.dto.TruckModel;
+import openerp.containertransport.entity.Facility;
 import openerp.containertransport.entity.Truck;
+import openerp.containertransport.repo.FacilityRepo;
 import openerp.containertransport.repo.TruckRepo;
 import openerp.containertransport.service.TruckService;
 import org.modelmapper.ModelMapper;
@@ -21,12 +23,15 @@ import java.util.List;
 @Log4j2
 public class TruckServiceImpl implements TruckService  {
     private final TruckRepo truckRepo;
+    private final FacilityRepo facilityRepo;
     private final EntityManager entityManager;
 
     @Override
     public Truck createTruck(TruckModel truckModel) {
+        Facility facility = facilityRepo.findById(truckModel.getFacilityId().longValue());
         Truck truck = new Truck();
-        truck.setFacilityId(truckModel.getFacilityId());
+        truck.setFacility_id(facility);
+        truck.setFacilityName(facility.getFacilityName());
         truck.setDriverId(truckModel.getDriverId());
         truck.setLicensePlates(truckModel.getLicensePlates());
         truck.setBrandTruck(truckModel.getBrandTruck());
@@ -68,9 +73,9 @@ public class TruckServiceImpl implements TruckService  {
     @Override
     public TruckModel updateTruck(TruckModel truckModel) {
         Truck truck = truckRepo.findById(truckModel.getId());
-        if(truckModel.getFacilityId() != null){
-            truck.setFacilityId(truckModel.getFacilityId());
-        }
+//        if(truckModel.getFacilityId() != null){
+//            truck.setFacilityId(truckModel.getFacilityId());
+//        }
         truck.setUpdatedAt(System.currentTimeMillis());
         truckRepo.save(truck);
         TruckModel truckModelUpdate = convertToModel(truck);

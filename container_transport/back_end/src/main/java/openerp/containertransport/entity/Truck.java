@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import openerp.containertransport.dto.TruckModel;
-import org.modelmapper.ModelMapper;
 
 @Getter
 @Setter
@@ -22,8 +20,15 @@ public class Truck {
     @Column(name = "truck_code")
     private String truckCode;
 
-    @Column(name = "facility_id")
-    private Integer facilityId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "facility_id")
+    private Facility facility_id;
+
+    @Column(name = "facility_name")
+    private String facilityName;
+
+    @Column(name = "driver_name")
+    private String driverName;
 
     @Column(name = "driver_id")
     private Integer driverId;
