@@ -52,7 +52,7 @@ public class SecurityConfig {
         // Route security
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/truck/create").permitAll().anyRequest().authenticated())
+                        .requestMatchers("/truck/**").permitAll().anyRequest().authenticated())
                 .requestCache()
                 .requestCache(new NullRequestCache()) // Not cache request because of having frontend
                 .and()

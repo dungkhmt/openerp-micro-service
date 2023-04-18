@@ -1,11 +1,13 @@
 package openerp.containertransport.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.sql.Timestamp;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class FacilityModel {
     private Long id;

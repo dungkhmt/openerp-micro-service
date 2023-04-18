@@ -9,8 +9,10 @@ import openerp.containertransport.dto.TruckModel;
 import openerp.containertransport.entity.Truck;
 import openerp.containertransport.repo.TruckRepo;
 import openerp.containertransport.service.TruckService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,9 +40,9 @@ public class TruckServiceImpl implements TruckService  {
 
     @Override
     public List<TruckModel> filterTruck(TruckFilterRequestDTO truckFilterRequestDTO) {
-        String sql = "SELECT * FROM trucks WHERE 1=1";
+        String sql = "SELECT * FROM container_transport_trucks WHERE 1=1";
         HashMap<String, Object> params = new HashMap<>();
-        if(!truckFilterRequestDTO.getTruckCode().isEmpty()) {
+        if(truckFilterRequestDTO.getTruckCode() != null) {
             sql += " AND truck_code = :truckCode";
             params.put("truckCode", truckFilterRequestDTO.getTruckCode());
         }
@@ -50,14 +52,16 @@ public class TruckServiceImpl implements TruckService  {
         for (String i : params.keySet()) {
             query.setParameter(i, params.get(i));
         }
-        List<TruckModel> truckModels = query.getResultList();
+        List<Truck> trucks = query.getResultList();
+        List<TruckModel> truckModels = new ArrayList<>();
+        trucks.forEach((item) -> truckModels.add(convertToModel(item)));
         return truckModels;
     }
 
     @Override
     public TruckModel getTruckById(long id) {
         Truck truck = truckRepo.findById(id);
-        TruckModel truckModel = Truck.convertToModel(truck);
+        TruckModel truckModel = convertToModel(truck);
         return truckModel;
     }
 
@@ -69,7 +73,13 @@ public class TruckServiceImpl implements TruckService  {
         }
         truck.setUpdatedAt(System.currentTimeMillis());
         truckRepo.save(truck);
-        TruckModel truckModelUpdate = Truck.convertToModel(truck);
+        TruckModel truckModelUpdate = convertToModel(truck);
         return truckModelUpdate;
+    }
+
+    public TruckModel convertToModel(Truck truck) {
+        ModelMapper modelMapper = new ModelMapper();
+        TruckModel truckModel = modelMapper.map(truck, TruckModel.class);
+        return truckModel;
     }
 }

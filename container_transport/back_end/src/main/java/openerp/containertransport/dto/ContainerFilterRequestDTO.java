@@ -1,8 +1,12 @@
 package openerp.containertransport.dto;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class ContainerFilterRequestDTO {
     private String containerCode;
 }

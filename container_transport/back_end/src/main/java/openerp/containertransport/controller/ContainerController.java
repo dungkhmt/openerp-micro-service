@@ -17,13 +17,13 @@ import java.util.List;
 public class ContainerController {
     private final ContainerService containerService;
     @PostMapping("/create")
-    public ResponseEntity<?> createContainer(ContainerModel containerModelDTO) {
+    public ResponseEntity<?> createContainer(@RequestBody ContainerModel containerModelDTO) {
         ContainerModel containerModel = containerService.createContainer(containerModelDTO);
         return ResponseEntity.status(HttpStatus.OK).body(containerModel);
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> filterContainer(ContainerFilterRequestDTO containerFilterRequestDTO){
+    public ResponseEntity<?> filterContainer(@RequestBody ContainerFilterRequestDTO containerFilterRequestDTO){
         List<ContainerModel> containerModels = containerService.filterContainer(containerFilterRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(containerModels);
     }
@@ -35,7 +35,7 @@ public class ContainerController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateContainer(ContainerModel containerModel) {
+    public ResponseEntity<?> updateContainer(@RequestBody ContainerModel containerModel) {
         ContainerModel containerModelUpdate = containerService.updateContainer(containerModel);
         return ResponseEntity.status(HttpStatus.OK).body(containerModelUpdate);
     }

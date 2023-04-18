@@ -33,6 +33,7 @@ public class ContainerServiceImpl implements ContainerService {
         container.setUpdatedAt(System.currentTimeMillis());
         containerRepo.save(container);
         container.setContainerCode("CONT" + container.getId());
+        containerRepo.save(container);
         return convertToModel(container);
     }
 
@@ -57,9 +58,9 @@ public class ContainerServiceImpl implements ContainerService {
 
     @Override
     public List<ContainerModel> filterContainer(ContainerFilterRequestDTO containerFilterRequestDTO) {
-        String sql = "SELECT * FROM containers WHERE 1=1";
+        String sql = "SELECT * FROM container_transport_container WHERE 1=1";
         HashMap<String, Object> params = new HashMap<>();
-        if(!containerFilterRequestDTO.getContainerCode().isEmpty()) {
+        if(containerFilterRequestDTO.getContainerCode() != null) {
             sql += " AND container_code = :containerCode";
             params.put("containerCode", containerFilterRequestDTO.getContainerCode());
         }

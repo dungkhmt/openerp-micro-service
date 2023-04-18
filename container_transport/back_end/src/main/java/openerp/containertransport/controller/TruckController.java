@@ -24,7 +24,7 @@ public class TruckController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> filterTruck(TruckFilterRequestDTO truckFilterRequestDTO) {
+    public ResponseEntity<?> filterTruck(@RequestBody TruckFilterRequestDTO truckFilterRequestDTO) {
         List<TruckModel> truckModels = truckService.filterTruck(truckFilterRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(truckModels);
     }
@@ -36,7 +36,7 @@ public class TruckController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateTruck(TruckModel truckModel) {
+    public ResponseEntity<?> updateTruck(@RequestBody TruckModel truckModel) {
         TruckModel truckModelUpdate = truckService.updateTruck(truckModel);
         return ResponseEntity.status(HttpStatus.OK).body(truckModelUpdate);
     }

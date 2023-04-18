@@ -2,17 +2,17 @@ package openerp.containertransport.dto;
 
 import lombok.*;
 
-import java.sql.Timestamp;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ContainerModel {
+public class TrailerModel {
     private long id;
-    private String containerCode;
+    private String trailerCode;
     private Integer facilityId;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
+    private String statusId;
+    private Integer truckId;
+    private long createdAt;
+    private long updatedAt;
 }
