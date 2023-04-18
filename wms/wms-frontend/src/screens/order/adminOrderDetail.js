@@ -1,3 +1,4 @@
+import LoadingScreen from "components/common/loading/loading";
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { request } from "api";
 import { BayDropDown, ProductDropDown, WarehouseDropDown } from "components/table/DropDown";
@@ -12,6 +13,7 @@ const AdminOrderDetail = ( props ) => {
   const orderId = props.match?.params?.id;
   const classes = useStyles();
 
+  const [loading, setLoading] = useState(false);
   const [orderInfo, setOrderInfo] = useState({});
   const [processingItems, setProcessingItems] = useState([]);
   const [processedItems, setProcessedItems] = useState([]);
@@ -132,6 +134,7 @@ const AdminOrderDetail = ( props ) => {
   }
 
   const autoAssignButtonHandle = () => {
+    setLoading(true);
     request(
       "put",
       `${API_PATH.AUTO_ASSIGN_ORDER_ITEM}/${orderId}`,
@@ -139,11 +142,14 @@ const AdminOrderDetail = ( props ) => {
         const data = res.data;
         setProcessingItems(data.processingItems);
         setRemainingItems(data.remainingItems);
+        setLoading(false);
       }
     )
   }
   
-  return <Fragment>
+  return (
+    loading ? <LoadingScreen /> :
+    <Fragment>
     <Box>
     <Grid container justifyContent="space-between" 
         className={classes.headerBox} >
@@ -417,7 +423,7 @@ const AdminOrderDetail = ( props ) => {
         }}
       />
     </Box>
-  </Fragment>
+  </Fragment>)
 };
 
 export default AdminOrderDetail;
