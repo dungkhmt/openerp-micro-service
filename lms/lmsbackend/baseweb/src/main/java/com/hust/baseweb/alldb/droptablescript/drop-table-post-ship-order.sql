@@ -1,0 +1,5 @@
+drop table post_ship_order_postman_last_mile_assignment;
+drop table post_ship_order_fixed_trip_post_office_assignment;
+drop table post_ship_order_post_office_assignment;
+drop table post_ship_order_itinerary;
+drop table post_ship_order;

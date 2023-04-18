@@ -1,0 +1,136 @@
+-- public.edu_semester
+INSERT INTO public.edu_semester (id,semester_name,last_updated_stamp,created_stamp,is_active) VALUES
+(20182,'20182',NULL,'2020-09-22 11:47:41.000',false)
+,(20191,'HK1 - 2019',NULL,'2020-09-22 11:47:41.000',false)
+,(20201,'Học kỳ I năm học 2020-2021','2020-09-23 14:13:01.889','2020-09-23 14:13:01.889',true)
+;
+
+
+-- public.edu_department
+INSERT INTO public.edu_department (id,department_name) VALUES
+('KCNTT','KCNTT')
+,('VMICA','')
+,('VCNSHVTP','Viện Công nghệ sinh học và Thực phẩm')
+;
+INSERT INTO public.edu_department (id,department_name) VALUES
+('KCNHH','Khoa Công nghệ Hoá học')
+,('TTNNHT','')
+,('KSPKT','')
+,('KD','')
+,('KKTVQL','Khoa Kinh tế và Quản lý')
+,('KDTVT','Khoa Điện tử viễn thông')
+,('VKHVCNMT','Viện Khoa học và Công nghệ Môi trường')
+,('KNN','')
+,('KCK','')
+,('KTTD','')
+;
+INSERT INTO public.edu_department (id,department_name) VALUES
+('KGDQP','')
+,('KKHVCNVL','')
+,('KHVCNVL','')
+,('VVLKT','')
+,('BGDTC','')
+,('KML','')
+,('VCKDL','')
+,('KCNDMVTT','')
+,('VKHVCNNL','Viện Khoa học và Công nghệ Nhiệt-Lạnh')
+;
+
+
+-- public.edu_course
+INSERT INTO public.edu_course (id,course_name,credit,last_updated_stamp,created_stamp) VALUES
+('IT3020','Toán rời rạc',3,NULL,'2020-09-23 14:36:48.207')
+,('IT4663','Tối ưu lập kế hoạch',3,NULL,'2020-09-23 14:15:21.651')
+,('IT3052E','Fundamentals of optimization',3,NULL,'2020-09-23 14:33:28.628')
+,('IT3011','Cấu trúc dữ liệu và thuật toán',2,NULL,'2020-09-23 14:34:35.265')
+,('IT3170','Thuật toán ứng dụng',2,NULL,'2020-09-23 14:35:24.529')
+,('IT3240E','Data Structures and Algorithms Advanced Lab',2,NULL,'2020-09-23 14:36:48.207')
+;
+
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3011_RECURSIVE','Đệ quy','IT3011');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3011_LINKED_LIST','Danh sách tuyến tính','IT3011');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3011_STACK','Ngăn xếp','IT3011');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3011_QUEUE','Hàng đợi','IT3011');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3011_TREE','Cây','IT3011');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3011_HASHING','Bảng băm','IT3011');
+
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT4663_OVERVIEW','Tổng quan tối ưu tổ hợp','IT4663');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT4663_LINEAR_PROGRAMMING','Quy hoạch tuyến tính','IT4663');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT4663_CONSTRAINT_PROGRAMMING','Quy hoạch ràng buộc','IT4663');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT4663_HEURISTICS','Phương pháp heuristics','IT4663');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT4663_CBLS','Tìm kiếm cục bộ dựa trên ràng buộc','IT4663');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT4663_MODELLING','Mô hình hóa','IT4663');
+
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3170_OVERVIEW','Tổng quan TTUD','IT3170');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3170_LIBRARY','Thư viện','IT3170');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3170_DIVIDE_AND_CONQUER','Chia để trị','IT3170');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3170_GREEDY','Tham lam','IT3170');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3170_DYNAMIC_PROGRAMMING','Quy hoạch động','IT3170');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3170_GRAPH','Đồ thị','IT3170');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3170_DFS','Tìm kiếm theo chiều sâu','IT3170');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3170_BFS','Tìm kiếm theo chiều rộng','IT3170');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3170_STACK','Ngăn xếp','IT3170');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3170_QUEUE','Hàng đợi','IT3170');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3170_PRIORITY_QUEUE','Hàng đợi ưu tiên','IT3170');
+insert into public.quiz_course_topic(quiz_course_topic_id,quiz_course_topic_name,course_id) values
+('IT3170_DISJOINT_SET','Cấu trúc Disjoint Set','IT3170');
+
+
+
+
+-- public.edu_class
+INSERT INTO public.edu_class (id,code,semester_id,course_id,class_type,department_id,teacher_id,last_updated_stamp,created_stamp) VALUES
+('1a8a7596-fd6f-11ea-bf67-0862665303f9',118427,20201,'IT3052E','LT+BT','KCNTT','admin',NULL,'2020-09-23 14:33:41.669')
+,('3ea18460-fd6f-11ea-bf68-0862665303f9',118565,20201,'IT3011','LT+BT','KCNTT','admin',NULL,'2020-09-23 14:34:42.219')
+,('5ca138fc-fd6f-11ea-bf69-0862665303f9',118604,20201,'IT3170','LT+BT','KCNTT','admin',NULL,'2020-09-23 14:35:32.549')
+,('908a0b08-fd6f-11ea-bf6a-0862665303f9',121337,20201,'IT3240E','LT+BT','KCNTT','admin',NULL,'2020-09-23 14:36:59.638')
+,('b4d7228a-fd6e-11ea-bf66-0862665303f9',118133,20201,'IT4663','LT+BT','KCNTT','admin',NULL,'2020-09-23 14:30:51.029')
+;
+
+
+-- public.edu_class_registration
+INSERT INTO public.edu_class_registration (class_id,student_id,status,last_updated_stamp,created_stamp) VALUES
+('1a8a7596-fd6f-11ea-bf67-0862665303f9','admin','APPROVED',NULL,'2020-09-26 13:18:52.857')
+,('1a8a7596-fd6f-11ea-bf67-0862665303f9','leanhtuan','APPROVED',NULL,'2020-09-26 13:19:01.530')
+,('1a8a7596-fd6f-11ea-bf67-0862665303f9','dungkhmt','APPROVED',NULL,'2020-09-26 13:19:27.338')
+,('1a8a7596-fd6f-11ea-bf67-0862665303f9','dungpq','APPROVED',NULL,'2020-09-26 13:19:41.292')
+;
+
+
+-- public.edu_assignment
+INSERT INTO public.edu_assignment (id,assignment_name,subject,class_id,last_updated_stamp,created_stamp,dead_line) VALUES
+('717729ee-fe55-11ea-8b6c-0862665303f9','Test','Viết chương trình Hello World','1a8a7596-fd6f-11ea-bf67-0862665303f9',NULL,'2020-09-24 18:02:31.739','2020-09-29 14:30:51.000')
+;
+
+
+-- screen security
+INSERT INTO security_permission
+(permission_id, description, last_updated_stamp, created_stamp)
+VALUES('SCR_TCLASSLIST', 'The permission to view class list screen for eduTeachers', now(), now());
+
+INSERT INTO security_group_permission
+(group_id, permission_id, last_updated_stamp, created_stamp)
+VALUES('ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER', 'SCR_TCLASSLIST', now(), now());
