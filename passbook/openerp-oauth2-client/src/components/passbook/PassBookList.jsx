@@ -12,6 +12,8 @@ export default function PassBookList() {
     { title: "userId", field: "userId" },
     { title: "duration", field: "duration" },
     { title: "startDate", field: "startDate" },
+    { title: "EndDate", field: "endDate" },
+    
     { title: "amountMoney", field: "amountMoney" },
     { title: "rate", field: "rate" },
   ];
@@ -23,6 +25,7 @@ export default function PassBookList() {
       const data = D.map((c) => ({
         ...c,
         startDate: toFormattedDateTime(c.startDate),
+        endDate:toFormattedDateTime(c.endDate),
       }));
       console.log("passbooks data = ", data);
       setPassBooks(data);

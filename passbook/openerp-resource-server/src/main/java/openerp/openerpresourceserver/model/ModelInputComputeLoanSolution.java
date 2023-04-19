@@ -8,13 +8,10 @@ import java.util.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ModelResponsePassbook {
-    private UUID passBookId;
-    private String passBookName;
+public class ModelInputComputeLoanSolution {
     private String userId;
-    private int duration;
-    private Date startDate;
-    private Date endDate;
-    private int amountMoney;
-    private double rate;
+    private int loan;
+    private String date;
+    private double loadRate;
+    private double discountRate;
 }

@@ -8,6 +8,7 @@ import openerp.openerpresourceserver.model.ModelResponsePassbook;
 import openerp.openerpresourceserver.repo.PassBookRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import utils.DateTimeUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,7 +24,9 @@ public class PassBookServiceImpl implements PassBookService{
     public PassBook save(String userLoginId, ModelCreatePassBook I) {
         PassBook pb = new PassBook();
         pb.setAmountMoneyDeposit(I.getAmountMoney());
-        pb.setCreatedDate(new Date());
+        Date currentDate = new Date();
+        pb.setCreatedDate(currentDate);
+        pb.setEndDate(DateTimeUtils.next(currentDate,I.getDuration()));
         pb.setUserId(I.getUserId());
         Date d = new Date();
         pb.setCreatedStamp(d);
@@ -47,7 +50,7 @@ public class PassBookServiceImpl implements PassBookService{
             m.setAmountMoney(pb.getAmountMoneyDeposit());
             m.setRate(pb.getRate());
             m.setStartDate(pb.getCreatedDate());
-            m.setEndDate(null);
+            m.setEndDate(pb.getEndDate());
             res.add(m);
         }
 

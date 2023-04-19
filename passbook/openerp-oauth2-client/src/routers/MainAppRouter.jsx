@@ -10,6 +10,7 @@ import TeacherRouter from "./TeacherRouter";
 import DemoScreen from "views/DemoScreen";
 import CreatePassBook from "components/passbook/CreatePassBook";
 import PassBookList from "components/passbook/PassBookList";
+import OptimizePassBookForLoan from "components/passbook/OptimizePassBookForLoan";
 
 const styles = {
   loadingProgress: {
@@ -41,9 +42,11 @@ function MainAppRouter(props) {
           <PrivateRoute
             component={CreatePassBook}
             exact
-            path="/create-pass-book"
+            path="/create-passbook"
           />
-          <PrivateRoute component={PassBookList} exact path="/pass-book-list" />
+          <PrivateRoute component={PassBookList} exact path="/passbook-list" />
+          <PrivateRoute component={OptimizePassBookForLoan} exact path="/optimize-passbook" />
+          
           <PrivateRoute component={TeacherRouter} path="/teacher" />
 
           {/* <Route component={error} path="*" /> */}
