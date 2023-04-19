@@ -53,7 +53,9 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/truck/*").permitAll()
-                        .requestMatchers("/facility/*").permitAll().anyRequest().authenticated())
+                        .requestMatchers("/facility/*").permitAll()
+                        .requestMatchers("/container/*").permitAll()
+                        .anyRequest().authenticated())
                 .requestCache()
                 .requestCache(new NullRequestCache()) // Not cache request because of having frontend
                 .and()

@@ -29,6 +29,7 @@ public class ContainerServiceImpl implements ContainerService {
     public ContainerModel createContainer(ContainerModel containerModelDTO) {
         Container container = new Container();
         container.setFacilityId(containerModelDTO.getFacilityId());
+        container.setSize(containerModelDTO.getSize());
         container.setCreatedAt(System.currentTimeMillis());
         container.setUpdatedAt(System.currentTimeMillis());
         containerRepo.save(container);

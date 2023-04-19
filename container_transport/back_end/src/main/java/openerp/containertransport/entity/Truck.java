@@ -1,10 +1,13 @@
 package openerp.containertransport.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.io.Serializable;
 
 @Getter
 @Setter
@@ -12,7 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "container_transport_trucks")
-public class Truck {
+public class Truck implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
@@ -20,9 +23,10 @@ public class Truck {
     @Column(name = "truck_code")
     private String truckCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "facility_id")
-    private Facility facility_id;
+    @ManyToOne()
+    @JoinColumn(name = "facility_id", referencedColumnName = "id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Facility facility;
 
     @Column(name = "facility_name")
     private String facilityName;

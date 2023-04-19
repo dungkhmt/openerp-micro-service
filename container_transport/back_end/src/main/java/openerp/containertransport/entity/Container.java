@@ -22,6 +22,9 @@ public class Container {
     @Column(name = "container_code")
     private String containerCode;
 
+    @Column(name = "size")
+    private Integer size;
+
     @Column(name = "facility_id")
     private Integer facilityId;
 

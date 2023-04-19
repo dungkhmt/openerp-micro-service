@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import openerp.containertransport.dto.FacilityModel;
 import openerp.containertransport.dto.TruckFilterRequestDTO;
 import openerp.containertransport.dto.TruckModel;
 import openerp.containertransport.entity.Facility;
@@ -30,7 +31,7 @@ public class TruckServiceImpl implements TruckService  {
     public Truck createTruck(TruckModel truckModel) {
         Facility facility = facilityRepo.findById(truckModel.getFacilityId().longValue());
         Truck truck = new Truck();
-        truck.setFacility_id(facility);
+        truck.setFacility(facility);
         truck.setFacilityName(facility.getFacilityName());
         truck.setDriverId(truckModel.getDriverId());
         truck.setLicensePlates(truckModel.getLicensePlates());
@@ -85,6 +86,7 @@ public class TruckServiceImpl implements TruckService  {
     public TruckModel convertToModel(Truck truck) {
         ModelMapper modelMapper = new ModelMapper();
         TruckModel truckModel = modelMapper.map(truck, TruckModel.class);
+        truckModel.setFacility(FacilityModel.builder().facilityName(truck.getFacility().getFacilityName()).build());
         return truckModel;
     }
 }
