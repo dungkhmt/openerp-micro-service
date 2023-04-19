@@ -20,9 +20,15 @@ import ContestManagerUserSubmission from "./ContestManagerUserSubmission";
 import ContestManagerRankingNew from "./ContestManagerRankingNew";
 import ContestResultDistribution from "./ContestResultDistribution";
 import {ContestManagerManageProblem} from "./ContestManagerManageProblem";
+import {useState} from "react";
 
 export function ContestManager() {
   const {contestId} = useParams();
+
+  const [value, setValue] = useState(0);
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
   return (
     <div>
