@@ -26,16 +26,20 @@ import { PROGRAMMING_LANGUAGES } from "utils/constants";
 import {
   setIsVisibleParticipants,
   setIsVisibleShareForm,
+  setOutput,
   setSelectedLanguage,
+  setTabKey,
 } from "../reducers/codeEditorReducers";
 import { getLanguageFileType } from "utils/CodeEditorUtils";
 import ShareForm from "./ShareForm";
+import axios from "axios";
+import { errorNoti, successNoti } from "utils/notification";
 
 const NavBarRoom = (props) => {
   const { socket } = props;
   const dispatch = useDispatch();
   const history = useHistory();
-  const { isVisibleParticipants, selectedLanguage, participants, source } = useSelector(
+  const { isVisibleParticipants, selectedLanguage, participants, source, input } = useSelector(
     (state) => state.codeEditor
   );
   const handleDisplayParticipants = () => {
@@ -56,6 +60,40 @@ const NavBarRoom = (props) => {
     link.click();
     document.body.removeChild(link);
   }
+
+  function getJdoodleLanguage(language) {
+    if (language === PROGRAMMING_LANGUAGES.CPP.value) {
+      return "cpp";
+    } else if (language === PROGRAMMING_LANGUAGES.JAVA.value) {
+      return "java";
+    } else if (language === PROGRAMMING_LANGUAGES.PYTHON.value) {
+      return "python3";
+    }
+    return "";
+  }
+
+  const handleRunCode = async (input, source, language) => {
+    try {
+      const response = await axios({
+        method: "post",
+        url: "http://localhost:7008/api/code-editor/execute",
+        data: {
+          source: source,
+          input: input,
+          language: language,
+        },
+      });
+      if (response && response.status === 200) {
+        successNoti("Compiled successfully", true);
+        dispatch(setTabKey("output"))
+        dispatch(setOutput(response.data.output))
+      } else {
+        errorNoti("Compiled failed", true);
+      }
+    } catch (error) {
+      errorNoti("Compiled failed", true);
+    }
+  };
   return (
     <div>
       <ShareForm />
@@ -63,7 +101,15 @@ const NavBarRoom = (props) => {
         <Grid item>
           <Grid container spacing={2}>
             <Grid item>
-              <Button size="small" startIcon={<PlayArrow />} variant="contained" color="success">
+              <Button
+                size="small"
+                startIcon={<PlayArrow />}
+                variant="contained"
+                color="success"
+                onClick={() => {
+                  handleRunCode(input, source, getJdoodleLanguage(selectedLanguage));
+                }}
+              >
                 Run
               </Button>
             </Grid>

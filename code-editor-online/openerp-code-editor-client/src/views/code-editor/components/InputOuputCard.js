@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { ContentCopy, DeleteOutline } from "@mui/icons-material";
 import {
   Card,
@@ -12,31 +13,39 @@ import {
 import copy from "copy-to-clipboard";
 import React from "react";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { successNoti } from "utils/notification";
+import { setInput, setOutput, setTabKey } from "../reducers/codeEditorReducers";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 const InputOutputCard = () => {
-  const [tabKey, setTabKey] = useState("input");
+  const { pathname } = useLocation();
+  const dispatch = useDispatch();
+  const { input, output, tabKey } = useSelector((state) => state.codeEditor);
   const handleChangeTab = (event, value) => {
-    setTabKey(value);
+    dispatch(setTabKey(value));
   };
-  const [valueInput, setValueInput] = useState();
-  const [valueOutput, setValueOutput] = useState();
   const handleCopy = (tab) => {
     if (tab === "input") {
-      copy(valueInput || "");
+      copy(input);
     } else if (tab === "output") {
-      copy(valueOutput || "");
+      copy(output);
     }
     successNoti("Copied to clipboard", true);
   };
 
   const handleClear = (tab) => {
     if (tab === "input") {
-      setValueInput('');
+      dispatch(setInput(""));
     } else if (tab === "output") {
-      setValueOutput('');
+      dispatch(setOutput(""));
     }
   };
+  useEffect(() => {
+    dispatch(setInput(""));
+    dispatch(setOutput(""));
+  }, [pathname]);
   return (
     <Card>
       <CardHeader
@@ -77,24 +86,25 @@ const InputOutputCard = () => {
       <CardContent>
         {tabKey === "input" && (
           <OutlinedInput
-            value={valueInput}
+            value={input}
             multiline
             fullWidth
             minRows={5}
             onChange={(e) => {
-              setValueInput(e.target.value);
+              dispatch(setInput(e.target.value));
             }}
           />
         )}
         {tabKey === "output" && (
           <OutlinedInput
-            value={valueOutput}
-            sx={{height: '100%'}}
+            value={output}
+            sx={{ height: "100%" }}
+            readOnly
             multiline
             fullWidth
             minRows={5}
             onChange={(e) => {
-              setValueOutput(e.target.value);
+              dispatch(setOutput(e.target.value));
             }}
           />
         )}

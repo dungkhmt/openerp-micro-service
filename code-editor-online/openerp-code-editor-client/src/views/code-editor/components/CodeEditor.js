@@ -35,6 +35,7 @@ const CodeEditor = (props) => {
       (response) => {
         if (response && response.status === 200) {
           console.log(response.data);
+          dispatch(setSource(value))
         }
       },
       {
