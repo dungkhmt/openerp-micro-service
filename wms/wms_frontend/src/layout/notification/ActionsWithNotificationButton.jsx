@@ -9,7 +9,7 @@ import Paper from "@mui/material/Paper";
 import MuiPopper from "@mui/material/Popper";
 import { grey } from "@mui/material/colors";
 import { styled } from "@mui/material/styles";
-import { request } from "api";
+import { request } from "controllers/api-middleware";
 import React, { useEffect } from "react";
 import { useNotificationState } from "state/NotificationState";
 import {

@@ -1,5 +1,5 @@
 import { LinearProgress } from "@mui/material";
-import { request } from "api";
+import { request } from "controllers/api-middleware";
 import { useEffect, useState } from "react";
 import NotAuthorized from "./NotAuthorized";
 
@@ -50,7 +50,8 @@ function withScreenSecurity(SecuredComponent, id, viewError) {
           }}
         />
       );
-    else if (screenAuthorization.has(`${id}.VIEW`))
+    // TODO: Change this thing back by removing exclamation syntax
+    else if (!screenAuthorization.has(`${id}.VIEW`))
       return (
         <SecuredComponent
           {...props}

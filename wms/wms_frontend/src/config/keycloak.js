@@ -1,5 +1,5 @@
 import Keycloak from "keycloak-js";
-import { config } from "./constant";
+import { config } from "../controllers/constant";
 
 //
 export const initOptions = { pkceMethod: "S256" };

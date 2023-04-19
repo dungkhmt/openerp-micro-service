@@ -5,8 +5,10 @@ import { Suspense, useEffect } from "react";
 import { Route, Switch, useLocation } from "react-router-dom";
 import { useNotificationState } from "state/NotificationState";
 import NotFound from "views/errors/NotFound";
+import TestComponent from "../test/TestComponent";
+import CategoryRouter from "./CategoryRouter";
 import PrivateRoute from "./PrivateRoute";
-import TeacherRouter from "./TeacherRouter";
+import SellinRouter from "./SellinRouter";
 
 const styles = {
   loadingProgress: {
@@ -23,6 +25,7 @@ const styles = {
 
 function MainAppRouter(props) {
   const location = useLocation();
+  console.log("Location: ", location);
   const notificationState = useNotificationState();
 
   useEffect(() => {
@@ -34,8 +37,9 @@ function MainAppRouter(props) {
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
           <Route component={() => <></>} exact path="/" />
-          <PrivateRoute component={TeacherRouter} path="/teacher" />
-
+          <Route component={TestComponent} exact path="/test" />
+          <Route component={CategoryRouter} path="/category" />
+          <PrivateRoute component={SellinRouter} path="/sellin" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>

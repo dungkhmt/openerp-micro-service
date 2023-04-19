@@ -3,8 +3,6 @@ package wms.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -12,13 +10,16 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "product_unit")
-public class ProductUnit extends BaseEntity {
+@Table(name = "product_category")
+public class ProductCategory extends BaseEntity{
     @Column(name = "code")
     private String code;
+
     @Column(name = "name")
     private String name;
-    @OneToMany(mappedBy = "productUnit",fetch = FetchType.LAZY)
+
+    @OneToMany(mappedBy = "productCategory",fetch = FetchType.LAZY)
+    // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
     @JsonIgnore
     private Set<ProductEntity> product;
 }

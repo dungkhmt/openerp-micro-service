@@ -23,17 +23,23 @@ import TeachingIcon from "assets/icons/mathematics.svg";
 import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
 import { buildMapPathMenu } from "utils/MenuUtils";
+import { category } from "./menuconfig/category";
+import { delivery } from "./menuconfig/delivery";
 import { general } from "./menuconfig/general";
-import { student } from "./menuconfig/student";
-import { teacher } from "./menuconfig/teacher";
+import { sellin } from "./menuconfig/sellin";
+import { sellout } from "./menuconfig/sellout";
 import { user } from "./menuconfig/user";
+import { warehouse } from "./menuconfig/warehouse";
 
 export const MENUS = [];
 
 MENUS.push(general);
+MENUS.push(category);
+MENUS.push(warehouse);
+MENUS.push(sellin);
+MENUS.push(sellout);
+MENUS.push(delivery);
 MENUS.push(user);
-MENUS.push(teacher);
-MENUS.push(student);
 
 export const menuIconMap = new Map();
 

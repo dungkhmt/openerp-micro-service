@@ -1,5 +1,5 @@
 import { createState, useState } from "@hookstate/core";
-import { request } from "../api";
+import { request } from "../controllers/api-middleware";
 
 export const menuState = createState({
   isFetching: false,

@@ -23,7 +23,7 @@ const NotFound = () => {
       sx={styles.wrapper}
     >
       <Container maxWidth="md">
-        <Typography align="center" color="textPrimary" variant="h4">
+        <Typography align="left" color="textPrimary" variant="h4">
           <b>404: The page you are looking for isn’t here</b>
         </Typography>
         <Typography align="center" color="textPrimary" variant="subtitle2">

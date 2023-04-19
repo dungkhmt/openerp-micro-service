@@ -2,10 +2,12 @@ import { CssBaseline, SvgIcon, Typography } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Box } from "@mui/system";
 import { ReactKeycloakProvider } from "@react-keycloak/web";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Routes from "Router";
-import { request } from "api";
 import { FacebookCircularProgress } from "components/common/progressBar/CustomizedCircularProgress.jsx";
 import keycloak, { initOptions } from "config/keycloak.js";
+import { request } from "controllers/api-middleware";
 import { useEffect } from "react";
 import { Router } from "react-router-dom";
 import { Slide, ToastContainer } from "react-toastify";
@@ -73,6 +75,18 @@ const AppLoading = (
   </Box>
 );
 
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: false,
+      refetchOnReconnect: false,
+      // staleTime: 1000 * 60 * 5,
+      cacheTime: 1000 * 60 * 60 * 1, // 24 hours
+    },
+  },
+});
+
 function App() {
   // TODO: Consider remove this logic!
   const logout = () => {
@@ -109,25 +123,28 @@ function App() {
       LoadingComponent={AppLoading}
       onEvent={onKeycloakEvent}
     >
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Router history={history}>
-          <Routes />
-          <ToastContainer
-            position="bottom-center"
-            transition={Slide}
-            autoClose={3000}
-            limit={3}
-            hideProgressBar={true}
-            newestOnTop
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
-        </Router>
-      </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Router history={history}>
+            <Routes />
+            <ToastContainer
+              position="bottom-center"
+              transition={Slide}
+              autoClose={3000}
+              limit={3}
+              hideProgressBar={true}
+              newestOnTop
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+            />
+          </Router>
+        </ThemeProvider>
+        <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+      </QueryClientProvider>
     </ReactKeycloakProvider>
   );
 }

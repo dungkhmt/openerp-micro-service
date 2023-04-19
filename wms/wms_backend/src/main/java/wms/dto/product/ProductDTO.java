@@ -12,13 +12,17 @@ import java.math.BigDecimal;
 public class ProductDTO {
     @NotBlank(message = "Ma code khong duoc de trong")
     private String code;
+    @NotBlank(message = "Name khong duoc de trong")
     private String name;
-    private Long unitQuantity;
-    private Boolean status;
-    private String color;
-    private Long massNumber;
-    private BigDecimal sku;
-    private String image;
-    @Positive(message = "So luong phai la so duong")
-    private Long quantity;
+    @Positive(message = "Don vi so luong phai la so duong")
+    private Integer unitPerBox;
+    private long unitId;
+    private String brand;
+    private long categoryId;
+    private String status;
+    private String massType;
+    private String sku;
+    // TODO: Add images
+//    @Positive(message = "So luong phai la so duong")
+//    private Long quantity;
 }

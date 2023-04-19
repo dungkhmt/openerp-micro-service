@@ -15,12 +15,12 @@ export const user = {
       text: "All users",
       child: [],
     },
-    // {
-    //   id: "MENU_USER_SEND_MAIL_TO_USERS",
-    //   path: "/user-group/user/send-mail",
-    //   isPublic: true,
-    //   text: "Gửi email",
-    //   child: [],
-    // },
+    {
+      id: "MENU_USER_SEND_MAIL_TO_USERS",
+      path: "/user-group/user/send-mail",
+      isPublic: true,
+      text: "Gửi email",
+      child: [],
+    },
   ],
 };

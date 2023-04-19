@@ -1,6 +1,6 @@
+import Tabs from "@mui/material/Tabs";
 import { teal } from "@mui/material/colors";
 import { styled } from "@mui/material/styles";
-import Tabs from "@mui/material/Tabs";
 import { AntScrollButton } from "./AntScrollButton";
 
 export const AntTabs = styled((props) => (
@@ -14,17 +14,3 @@ export const AntTabs = styled((props) => (
     backgroundColor: teal[800],
   },
 }));
-
-// export const AntTabs = withStyles({
-//   root: {
-//     position: "relative",
-//     borderBottom: "1px solid #e8e8e8",
-//   },
-//   indicator: {
-//     backgroundColor: teal[800],
-//   },
-// })((props) => (
-//   <Tabs ScrollButtonComponent={AntScrollButton} {...props}>
-//     {props.children}
-//   </Tabs>
-// ));

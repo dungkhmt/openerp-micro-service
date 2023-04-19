@@ -1,6 +1,5 @@
-import { withStyles } from "@mui/material/styles";
 import Tabs from "@mui/material/Tabs";
-import React from "react";
+import { withStyles } from "@mui/styles";
 import { AntScrollButton } from "./AntScrollButton";
 
 export const StyledTabs = withStyles({

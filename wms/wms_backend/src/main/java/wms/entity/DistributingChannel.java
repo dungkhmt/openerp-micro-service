@@ -12,13 +12,17 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "product_unit")
-public class ProductUnit extends BaseEntity {
+@Table(name = "distributing_channel")
+public class DistributingChannel extends BaseEntity{
     @Column(name = "code")
     private String code;
+
     @Column(name = "name")
     private String name;
-    @OneToMany(mappedBy = "productUnit",fetch = FetchType.LAZY)
+
+    @OneToMany(mappedBy = "channel",fetch = FetchType.LAZY)
+    // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
     @JsonIgnore
-    private Set<ProductEntity> product;
+    private Set<ContractType> contractTypes;
+
 }
