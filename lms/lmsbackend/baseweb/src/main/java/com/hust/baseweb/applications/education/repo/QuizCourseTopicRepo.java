@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface QuizCourseTopicRepo extends JpaRepository<QuizCourseTopic, String> {
 
-    public List<QuizCourseTopic> findByEduCourse_Id(String courseId);
+    List<QuizCourseTopic> findByEduCourse_Id(String courseId);
 
-    public List<QuizCourseTopic> findAllByEduCourse(EduCourse eduCourse);
+    List<QuizCourseTopic> findAllByEduCourse(EduCourse eduCourse);
 }

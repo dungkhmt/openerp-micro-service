@@ -8,11 +8,11 @@ import java.util.UUID;
 
 public interface EduCourseChapterService {
 
-    public EduCourseChapter save(EduCourseChapterModelCreate eduCourseChapterModelCreate);
+    EduCourseChapter save(EduCourseChapterModelCreate eduCourseChapterModelCreate);
 
-    public List<EduCourseChapter> findAll();
+    List<EduCourseChapter> findAll();
 
-    public List<EduCourseChapter> findAllByCourseId(String courseId);
+    List<EduCourseChapter> findAllByCourseId(String courseId);
 
-    public String changeOpenCloseChapterStatus(UUID chapterId);
+    String changeOpenCloseChapterStatus(UUID chapterId);
 }
