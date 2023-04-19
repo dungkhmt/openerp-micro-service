@@ -9,8 +9,10 @@ import {
   Share,
 } from "@mui/icons-material";
 import {
+  Backdrop,
   Badge,
   Button,
+  CircularProgress,
   FormControl,
   Grid,
   IconButton,
@@ -19,7 +21,7 @@ import {
   Select,
   Tooltip,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { PROGRAMMING_LANGUAGES } from "utils/constants";
@@ -39,6 +41,7 @@ const NavBarRoom = (props) => {
   const { socket } = props;
   const dispatch = useDispatch();
   const history = useHistory();
+  const [loadingRunCode, setLoadingRunCode] = useState(false)
   const { isVisibleParticipants, selectedLanguage, participants, source, input } = useSelector(
     (state) => state.codeEditor
   );
@@ -73,6 +76,7 @@ const NavBarRoom = (props) => {
   }
 
   const handleRunCode = async (input, source, language) => {
+    setLoadingRunCode(true)
     try {
       const response = await axios({
         method: "post",
@@ -87,16 +91,24 @@ const NavBarRoom = (props) => {
         successNoti("Compiled successfully", true);
         dispatch(setTabKey("output"))
         dispatch(setOutput(response.data.output))
+        setLoadingRunCode(false)
       } else {
         errorNoti("Compiled failed", true);
       }
     } catch (error) {
       errorNoti("Compiled failed", true);
+      setLoadingRunCode(false)
     }
   };
   return (
     <div>
       <ShareForm />
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loadingRunCode}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Grid container justifyContent="space-between" alignItems="center">
         <Grid item>
           <Grid container spacing={2}>
