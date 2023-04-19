@@ -6,7 +6,6 @@ import {Button, CircularProgress, Divider, InputAdornment, TextField} from "@mui
 import {pdf} from "@react-pdf/renderer";
 import FileSaver from "file-saver";
 import SubmissionOfParticipantPDFDocument from "./template/SubmissionOfParticipantPDFDocument";
-import {errorNoti, successNoti} from "utils/notification";
 import Box from "@mui/material/Box";
 import HustContainerCard from "../../common/HustContainerCard";
 import {request} from "../../../api";
@@ -16,30 +15,10 @@ export function ContestManagerListProblem(props) {
   const contestId = props.contestId;
   const [contestName, setContestName] = useState();
   const [contestTime, setContestTime] = useState();
-  const [problems, setProblems] = useState([]);
-  const [userSubmissions, setUserSubmissions] = useState([]);
   const [timeLimit, setTimeLimit] = useState();
   const [isProcessing, setIsProcessing] = useState(false);
   const [threshold, setThreshold] = useState(50);
   const history = useHistory();
-  const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
-  const [selectedProblemId, setSelectedProblemId] = useState(null);
-  const [modes, setModes] = useState([]);
-
-  const columns = [
-    {title: "Problem", field: "problemName"},
-    {title: "Level", field: "levelId"},
-    {title: "Created By", field: "createdByUserId"},
-    {title: "Submission Mode", field: "submissionMode"},
-    {
-      title: "Submission Mode",
-      render: (row) => (
-        <Button onClick={() => handleChangeContestProblem(row.problemId)}>
-          Update
-        </Button>
-      ),
-    },
-  ];
 
   const generatePdfDocument = async (documentData, fileName) => {
     const blob = await pdf(
@@ -49,64 +28,9 @@ export function ContestManagerListProblem(props) {
     FileSaver.saveAs(blob, fileName);
   };
 
-  function handleChangeContestProblem(problemId) {
-    //alert("change submission mode " + problemId);
-    setSelectedProblemId(problemId);
-    setOpenUpdateDialog(true);
-  }
-
-  function onUpdateInfo(
-    selectedSubmissionMode,
-    selectedProblemId,
-    selectedContestId
-  ) {
-    //alert(
-    //  "update problem contest " +
-    //    selectedProblemId +
-    //    selectedContestId +
-    //    selectedSubmissionMode
-    //);
-    setIsProcessing(true);
-    let body = {
-      problemId: selectedProblemId,
-      contestId: selectedContestId,
-      submissionMode: selectedSubmissionMode,
-    };
-    request(
-      "post",
-      //"/forbid-member-from-submit-to-contest",
-      "/update-problem-contest",
-      (res) => {
-        successNoti("Đã hoàn thành");
-        setIsProcessing(false);
-        setOpenUpdateDialog(false);
-      },
-      {
-        onError: () => {
-          setIsProcessing(false);
-          errorNoti("Đã có lỗi xảy ra.");
-        },
-        401: () => {},
-      },
-      body
-    );
-  }
-
-  function handleModelClose() {
-    setOpenUpdateDialog(false);
-  }
-
-  function getSubmissionModes() {
-    request("get", "/get-submission-modes/", (res) => {
-      //console.log('get-submission-modes, res.data =' = res.data);
-      setModes(res.data);
-    }).then();
-  }
-
   function getContestDetail() {
     request("get", "/get-contest-detail/" + contestId, (res) => {
       setContestTime(res.data.contestTime);
-      setProblems(res.data.list);
       setContestName(res.data.contestName);
       setTimeLimit(res.data.contestTime);
     }).then();
@@ -114,7 +38,6 @@ export function ContestManagerListProblem(props) {
 
   useEffect(() => {
     getContestDetail();
-    getSubmissionModes();
   }, []);
 
   function handleEdit() {
@@ -122,7 +45,6 @@ export function ContestManagerListProblem(props) {
   }
 
   function handleRejudgeContest(event) {
-    //alert("Rejudge");
     event.preventDefault();
     setIsProcessing(true);
     request(
@@ -139,7 +61,6 @@ export function ContestManagerListProblem(props) {
   }
 
   function handleJudgeContest(event) {
-    //alert("Rejudge");
     event.preventDefault();
     setIsProcessing(true);
     request(
@@ -147,7 +68,7 @@ export function ContestManagerListProblem(props) {
       "/evaluate-batch-not-evaluated-submission-of-contest/" + contestId,
       (res) => {
         console.log("handleJudgeContest", res.data);
-        //alert("Rejudge DONE!!!");
+
         setIsProcessing(false);
         //setSuccessful(res.data.contents.content);
         //setTotalPageSuccessful(res.data.contents.totalPages);
@@ -164,7 +85,6 @@ export function ContestManagerListProblem(props) {
         console.log("handleJudgeContest", res.data);
         //alert("Rejudge DONE!!!");
         setIsProcessing(false);
-        setUserSubmissions(res.data);
         generatePdfDocument(
           res.data,
           `USER_JUDGED_SUBMISSION-${contestId}.pdf`
@@ -266,31 +186,6 @@ export function ContestManagerListProblem(props) {
       <Box sx={{margin: "14px 0"}}>
         <ContestManagerManageProblem contestId={contestId} />
       </Box>
-        {/*
-        <Box sx={{margin: "14px 0"}}>
-          <StandardTable
-            title={"Problems"}
-            columns={columns}
-            data={problems}
-            hideCommandBar
-            options={{
-              selection: false,
-              pageSize: 10,
-              search: true,
-              sorting: true,
-            }}
-          />
-        </Box>
-
-        <UpdateProblemContestDialog
-          open={openUpdateDialog}
-          onClose={handleModelClose}
-          onUpdateInfo={onUpdateInfo}
-          selectedProblemId={selectedProblemId}
-          selectedContestId={contestId}
-          modes={modes}
-        />
-      */}
     </HustContainerCard>
   );
 }
