@@ -7,6 +7,9 @@ import { useNotificationState } from "state/NotificationState";
 import NotFound from "views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import TeacherRouter from "./TeacherRouter";
+import DemoScreen from "views/DemoScreen";
+import CreatePassBook from "components/passbook/CreatePassBook";
+import PassBookList from "components/passbook/PassBookList";
 
 const styles = {
   loadingProgress: {
@@ -34,6 +37,13 @@ function MainAppRouter(props) {
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
           <Route component={() => <></>} exact path="/" />
+          <PrivateRoute component={DemoScreen} exact path="/demo" />
+          <PrivateRoute
+            component={CreatePassBook}
+            exact
+            path="/create-pass-book"
+          />
+          <PrivateRoute component={PassBookList} exact path="/pass-book-list" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
 
           {/* <Route component={error} path="*" /> */}
