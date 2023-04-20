@@ -1,20 +1,12 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  Grid,
-  OutlinedInput,
-  Paper,
-  Tab,
-  Tabs,
-  Typography,
-} from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import NavBarRoom from "./components/NavBarRoom";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { SOCKET_EVENTS } from "utils/constants";
+import Peer from "simple-peer";
 import { request } from "api";
 import { errorNoti, successNoti } from "utils/notification";
 import { io } from "socket.io-client";
@@ -22,13 +14,10 @@ import CodeEditor from "./components/CodeEditor";
 import Participants from "./components/Participants";
 import { useKeycloak } from "@react-keycloak/web";
 import { setParticipants } from "./reducers/codeEditorReducers";
-import { Allotment } from "allotment";
-import "allotment/dist/style.css";
-import SplitPane from "react-split-pane";
 import SplitterLayout from "react-splitter-layout";
 import "react-splitter-layout/lib/index.css";
 import InputOutputCard from "./components/InputOuputCard";
-import "./style.css"
+import "./style.css";
 
 const CodeEditorPage = () => {
   const { id: roomId } = useParams();
