@@ -4,6 +4,20 @@ export const category = {
   text: "Category",
   child: [
     {
+      id: "MENU_WMS_CATEGORY.PRODUCT",
+      path: "/category/product",
+      isPublic: false,
+      text: "Product",
+      child: [],
+    },
+    {
+      id: "MENU_WMS_CATEGORY.CUSTOMER",
+      path: "/category/customer",
+      isPublic: false,
+      text: "Customer",
+      child: [],
+    },
+    {
       id: "MENU_WMS_CATEGORY.PRODUCT_UNIT",
       path: "/category/unit-product",
       isPublic: false,
@@ -36,20 +50,6 @@ export const category = {
       path: "/category/type-contract",
       isPublic: false,
       text: "Contract Type",
-      child: [],
-    },
-    {
-      id: "MENU_WMS_CATEGORY.PRODUCT",
-      path: "/category/product",
-      isPublic: false,
-      text: "Product",
-      child: [],
-    },
-    {
-      id: "MENU_WMS_CATEGORY.CUSTOMER",
-      path: "/category/customer",
-      isPublic: false,
-      text: "Customer",
       child: [],
     },
   ],

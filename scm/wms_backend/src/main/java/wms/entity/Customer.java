@@ -34,8 +34,10 @@ public class Customer extends BaseEntity{
     @Column(name = "status")
     private String status;
 
-    @Column(name = "facility_code")
-    private String facilityCode;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "facility_code")
+    @NotFound(action = NotFoundAction.IGNORE)
+    private Facility facility;
 
     @Column(name = "latitude")
     private String latitude;
@@ -43,8 +45,9 @@ public class Customer extends BaseEntity{
     @Column(name = "longitude")
     private String longitude;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by", referencedColumnName = "user_login_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     private UserLogin user;
 
     @ManyToOne(fetch = FetchType.EAGER)

@@ -1,5 +1,6 @@
 package wms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -7,6 +8,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.Instant;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,8 +20,15 @@ public class UserLogin {
     @Column(name = "user_login_id", nullable = false)
     private String id;
 
-    @OneToOne(mappedBy = "user")
-    private Customer customer;
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
+    @JsonIgnore
+    private Set<Customer> customers;
+
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
+    @JsonIgnore
+    private Set<Facility> facilities;
 
     @Size(max = 60)
     @Column(name = "current_password", length = 60)

@@ -1,7 +1,7 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { useState } from "react";
 import { useToggle, useWindowSize } from "react-use";
-import CustomDataGrid from "../components/datagrid/CustomDataGrid";
+import CustomMap from "../components/map/CustomMap";
 const data = [
   {
     id: 1,
@@ -31,9 +31,11 @@ const TestComponent = () => {
     page_size: 50,
   });
   const { height } = useWindowSize();
+  const [isAdd, setIsAdd] = useToggle(false);
   return (
-    <Box>
-      <Typography>Test component</Typography>
+    <Box sx={{ flexGrow: 1 }}>
+      <CustomMap />
+      {/* <Typography>Test component</Typography> */}
       {/* <FacebookCircularProgress />
       <ErrorDialog open={true} />
       <NotAuthorized />
@@ -85,7 +87,7 @@ const TestComponent = () => {
           />
         </>
       </CustomModal> */}
-      <CustomDataGrid
+      {/* <CustomDataGrid
         params={params}
         setParams={setParams}
         sx={{ height: height - 56 - 64 - 200 - 8 }}
@@ -109,6 +111,9 @@ const TestComponent = () => {
         ]}
         rows={data ? data : []}
       />
+      <CustomDrawer open={isAdd}>
+        <Typography>dkjdkjf</Typography>
+      </CustomDrawer> */}
     </Box>
   );
 };

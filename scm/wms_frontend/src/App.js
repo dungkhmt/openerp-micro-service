@@ -16,12 +16,14 @@ import { menuState } from "state/MenuState";
 import { notificationState } from "state/NotificationState";
 import { ReactComponent as Logo } from "./assets/icons/logo.svg";
 import history from "./history.js";
+import { AppColors } from "./shared/AppColors";
 
 export const theme = createTheme({
   typography: {
     fontFamily: `-apple-system, "Segoe UI", BlinkMacSystemFont, "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif`,
+    fontSize: 14,
   },
   overrides: {
     MuiCssBaseline: {
@@ -38,20 +40,23 @@ export const theme = createTheme({
   },
   palette: {
     primary: {
-      main: "#96161D",
-      light: "#B61C23",
+      main: AppColors.primary,
+      light: AppColors.primary,
+    },
+    secondary: {
+      main: AppColors.secondary,
     },
     error: {
-      main: "#DE4841",
+      main: AppColors.error,
     },
     success: {
-      main: "#66BD50",
+      main: AppColors.success,
     },
     warning: {
-      main: "#EBBC46",
+      main: AppColors.warning,
     },
     info: {
-      main: "#4568F2",
+      main: AppColors.info,
     },
   },
 });

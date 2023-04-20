@@ -89,6 +89,19 @@ const DialogActions = ({ sx, children }) => {
   );
 };
 
+/**
+ * @typedef Prop
+ * @property {boolean} open
+ * @property {string} title
+ * @property {any} customStyles
+ * @property {string} centerTitle
+ * @property {boolean} contentTopDivider
+ * @property {boolean} contentBottomDivider
+ * @property {Function} handleClose
+ * @property {any[]} actions
+ * @property {string} content
+ * @param {Prop} props
+ */
 export default function CustomizedDialogs(props) {
   const {
     open,

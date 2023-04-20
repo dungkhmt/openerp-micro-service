@@ -1,9 +1,9 @@
 import SearchIcon from "@mui/icons-material/Search";
-import { green } from "@mui/material/colors";
+import { AppColors } from "../../shared/AppColors";
 const { styled, InputBase } = require("@mui/material");
 
 const Search = styled("div")(({ theme }) => ({
-  backgroundColor: green[100],
+  backgroundColor: AppColors.secondary,
   borderRadius: "6px",
   flex: 1,
   flexDirection: "row",
@@ -32,7 +32,7 @@ const SearchBox = ({ value, setValue }) => {
   return (
     <Search>
       <SearchIconWrapper>
-        <SearchIcon />
+        <SearchIcon sx={{ color: "white" }} />
       </SearchIconWrapper>
       <Input
         placeholder="Tìm kiếm"
@@ -40,6 +40,9 @@ const SearchBox = ({ value, setValue }) => {
         onChange={(e) => setValue(e.target.value)}
         inputProps={{
           "aria-label": "search",
+        }}
+        sx={{
+          color: "white",
         }}
       />
     </Search>

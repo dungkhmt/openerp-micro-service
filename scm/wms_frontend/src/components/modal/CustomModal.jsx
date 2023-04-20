@@ -27,7 +27,12 @@ const CustomModal = (props) => {
       open={open}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
-      sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20,
+      }}
     >
       <Slide direction="up" in={open} mountOnEnter unmountOnExit>
         <Box
