@@ -21,77 +21,79 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { request } from 'api';
+import './styles.scss';
 
 function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
+    if (b[orderBy] < a[orderBy]) {
+        return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+        return 1;
+    }
+    return 0;
 }
 
 function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+    return order === 'desc'
+        ? (a, b) => descendingComparator(a, b, orderBy)
+        : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort(array, comparator) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
+    const stabilizedThis = array.map((el, index) => [el, index]);
+    stabilizedThis.sort((a, b) => {
+        const order = comparator(a[0], b[0]);
+        if (order !== 0) {
+            return order;
+        }
+        return a[1] - b[1];
+    });
+    return stabilizedThis.map((el) => el[0]);
 }
 
 const headCells = [
-  {
-    id: 'code',
-    numeric: false,
-    disablePadding: true,
-    label: 'Truck Code',
-  },
-  {
-    id: 'facility',
-    numeric: false,
-    disablePadding: false,
-    label: 'Facility Name',
-  },
-  {
-    id: 'driver',
-    numeric: false,
-    disablePadding: false,
-    label: 'Driver Name',
-  },
-  {
-    id: 'licensePlates',
-    numeric: false,
-    disablePadding: false,
-    label: 'License Plates',
-  },
-  {
-    id: 'brand',
-    numeric: false,
-    disablePadding: false,
-    label: 'Brand'
-  },
-  {
-    id: 'createdAt',
-    numeric: false,
-    disablePadding: false,
-    label: 'Created At',
-  },
+    {
+        id: 'code',
+        numeric: false,
+        disablePadding: true,
+        label: 'Facility Code',
+    },
+    {
+        id: 'name',
+        numeric: false,
+        disablePadding: false,
+        label: 'Name',
+    },
+    {
+        id: 'type',
+        numeric: false,
+        disablePadding: false,
+        label: 'Type',
+    },
+    {
+        id: 'numberTruck',
+        numeric: false,
+        disablePadding: false,
+        label: 'Max Number Truck',
+    },
+    {
+        id: 'numberTrailer',
+        numeric: false,
+        disablePadding: false,
+        label: 'Max Number Trailer'
+    },
+    {
+        id: 'numberContainer',
+        numeric: false,
+        disablePadding: false,
+        label: 'Max Number Container'
+    },
+    {
+        id: 'createdAt',
+        numeric: false,
+        disablePadding: false,
+        label: 'Created At',
+    },
 ];
 
 const DEFAULT_ORDER = 'asc';
@@ -99,117 +101,117 @@ const DEFAULT_ORDER_BY = 'calories';
 const DEFAULT_ROWS_PER_PAGE = 5;
 
 function EnhancedTableHead(props) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
-  const createSortHandler = (newOrderBy) => (event) => {
-    onRequestSort(event, newOrderBy);
-  };
+    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+    const createSortHandler = (newOrderBy) => (event) => {
+        onRequestSort(event, newOrderBy);
+    };
 
-  return (
-    <TableHead>
-      <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              'aria-label': 'select all desserts',
-            }}
-          />
-        </TableCell>
-        {headCells.map((headCell) => (
-          <TableCell
-            key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
-            sortDirection={orderBy === headCell.id ? order : false}
-          >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </TableSortLabel>
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
+    return (
+        <TableHead>
+            <TableRow>
+                <TableCell padding="checkbox">
+                    <Checkbox
+                        color="primary"
+                        indeterminate={numSelected > 0 && numSelected < rowCount}
+                        checked={rowCount > 0 && numSelected === rowCount}
+                        onChange={onSelectAllClick}
+                        inputProps={{
+                            'aria-label': 'select all desserts',
+                        }}
+                    />
+                </TableCell>
+                {headCells.map((headCell) => (
+                    <TableCell
+                        key={headCell.id}
+                        align={headCell.numeric ? 'right' : 'left'}
+                        padding={headCell.disablePadding ? 'none' : 'normal'}
+                        sortDirection={orderBy === headCell.id ? order : false}
+                    >
+                        <TableSortLabel
+                            active={orderBy === headCell.id}
+                            direction={orderBy === headCell.id ? order : 'asc'}
+                            onClick={createSortHandler(headCell.id)}
+                        >
+                            {headCell.label}
+                            {orderBy === headCell.id ? (
+                                <Box component="span" sx={visuallyHidden}>
+                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                </Box>
+                            ) : null}
+                        </TableSortLabel>
+                    </TableCell>
+                ))}
+            </TableRow>
+        </TableHead>
+    );
 }
 
 EnhancedTableHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-  onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
-  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-  orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired,
+    numSelected: PropTypes.number.isRequired,
+    onRequestSort: PropTypes.func.isRequired,
+    onSelectAllClick: PropTypes.func.isRequired,
+    order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+    orderBy: PropTypes.string.isRequired,
+    rowCount: PropTypes.number.isRequired,
 };
 
 function EnhancedTableToolbar(props) {
-  const { numSelected } = props;
+    const { numSelected } = props;
 
-  return (
-    <Toolbar
-      sx={{
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-        }),
-      }}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
+    return (
+        <Toolbar
+            sx={{
+                pl: { sm: 2 },
+                pr: { xs: 1, sm: 1 },
+                ...(numSelected > 0 && {
+                    bgcolor: (theme) =>
+                        alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+                }),
+            }}
         >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          Nutrition
-        </Typography>
-      )}
+            {numSelected > 0 ? (
+                <Typography
+                    sx={{ flex: '1 1 100%' }}
+                    color="inherit"
+                    variant="subtitle1"
+                    component="div"
+                >
+                    {numSelected} selected
+                </Typography>
+            ) : (
+                <Typography
+                    sx={{ flex: '1 1 100%' }}
+                    variant="h6"
+                    id="tableTitle"
+                    component="div"
+                >
+                    Nutrition
+                </Typography>
+            )}
 
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Toolbar>
-  );
+            {numSelected > 0 ? (
+                <Tooltip title="Delete">
+                    <IconButton>
+                        <DeleteIcon />
+                    </IconButton>
+                </Tooltip>
+            ) : (
+                <Tooltip title="Filter list">
+                    <IconButton>
+                        <FilterListIcon />
+                    </IconButton>
+                </Tooltip>
+            )}
+        </Toolbar>
+    );
 }
 
 EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
+    numSelected: PropTypes.number.isRequired,
 };
 
-export default function ContentsTruckManagement({trucks}) {
-  const [order, setOrder] = React.useState(DEFAULT_ORDER);
+export default function ContentsFacilityMana ({facilities}) {
+    const [order, setOrder] = React.useState(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
@@ -225,7 +227,7 @@ export default function ContentsTruckManagement({trucks}) {
       setOrder(toggledOrder);
       setOrderBy(newOrderBy);
 
-      const sortedRows = stableSort(trucks, getComparator(toggledOrder, newOrderBy));
+      const sortedRows = stableSort(facilities, getComparator(toggledOrder, newOrderBy));
       const updatedRows = sortedRows.slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage,
@@ -238,7 +240,7 @@ export default function ContentsTruckManagement({trucks}) {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = trucks.map((n) => n.name);
+      const newSelected = facilities.map((n) => n.name);
       setSelected(newSelected);
       return;
     }
@@ -269,7 +271,7 @@ export default function ContentsTruckManagement({trucks}) {
     (event, newPage) => {
       setPage(newPage);
 
-      const sortedRows = stableSort(trucks, getComparator(order, orderBy));
+      const sortedRows = stableSort(facilities, getComparator(order, orderBy));
       const updatedRows = sortedRows.slice(
         newPage * rowsPerPage,
         newPage * rowsPerPage + rowsPerPage,
@@ -279,7 +281,7 @@ export default function ContentsTruckManagement({trucks}) {
 
       // Avoid a layout jump when reaching the last page with empty rows.
       const numEmptyRows =
-        newPage > 0 ? Math.max(0, (1 + newPage) * rowsPerPage - trucks.length) : 0;
+        newPage > 0 ? Math.max(0, (1 + newPage) * rowsPerPage - facilities.length) : 0;
 
       const newPaddingHeight = (dense ? 33 : 53) * numEmptyRows;
       setPaddingHeight(newPaddingHeight);
@@ -294,7 +296,7 @@ export default function ContentsTruckManagement({trucks}) {
 
       setPage(0);
 
-      const sortedRows = stableSort(trucks, getComparator(order, orderBy));
+      const sortedRows = stableSort(facilities, getComparator(order, orderBy));
       const updatedRows = sortedRows.slice(
         0 * updatedRowsPerPage,
         0 * updatedRowsPerPage + updatedRowsPerPage,
@@ -326,11 +328,11 @@ export default function ContentsTruckManagement({trucks}) {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={trucks.length}
+              rowCount={facilities.length}
             />
             <TableBody>
-              {trucks
-                ? trucks.map((row, index) => {
+              {facilities
+                ? facilities.map((row, index) => {
                     const isItemSelected = isSelected(row.id);
                     const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -361,12 +363,13 @@ export default function ContentsTruckManagement({trucks}) {
                           scope="row"
                           padding="none"
                         >
-                          {row.truckCode}
+                          {row.facilityCode}
                         </TableCell>
                         <TableCell align="left">{row.facilityName}</TableCell>
-                        <TableCell align="left">{row.driverName}</TableCell>
-                        <TableCell align="left">{row.licensePlates}</TableCell>
-                        <TableCell align="left">{row.brandTruck}</TableCell>
+                        <TableCell align="left">{row.facilityType}</TableCell>
+                        <TableCell align="left">{row.maxNumberTruck}</TableCell>
+                        <TableCell align="left">{row.maxNumberTrailer}</TableCell>
+                        <TableCell align="left">{row.maxNumberTrailer}</TableCell>
                         <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                       </TableRow>
                     );
@@ -387,7 +390,7 @@ export default function ContentsTruckManagement({trucks}) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={trucks.length}
+          count={facilities.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -396,4 +399,6 @@ export default function ContentsTruckManagement({trucks}) {
       </Paper>
     </Box>
   );
+
 }
+

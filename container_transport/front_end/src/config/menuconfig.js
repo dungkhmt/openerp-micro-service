@@ -25,6 +25,7 @@ import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import TeachingIcon from "assets/icons/mathematics.svg";
 import ContainerIcon from "assets/icons/container.svg";
 import TrailerIcon from "assets/icons/trailer.svg";
+import FacilityIcon from "assets/icons/facility.svg";
 import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
 import { buildMapPathMenu } from "utils/MenuUtils";
@@ -69,6 +70,10 @@ menuIconMap.set(
 menuIconMap.set(
   "Trailer",
   <img alt="Trailer icon" src={TrailerIcon} height={24} width={30} />
+);
+menuIconMap.set(
+  "Facility",
+  <img alt="Facility icon" src={FacilityIcon} height={24} width={30} />
 );
 menuIconMap.set("DashboardIcon", <DashboardRoundedIcon />);
 menuIconMap.set("GiTeacher", <GiTeacher size={24} />);

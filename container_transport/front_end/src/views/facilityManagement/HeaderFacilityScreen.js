@@ -2,27 +2,25 @@ import { Box, Modal, Icon, Typography, Divider, TextField, Button } from "@mui/m
 import './styles.scss';
 import PrimaryButton from "components/button/PrimaryButton";
 import { menuIconMap } from "config/menuconfig";
-import ModalTruck from "./ModalTruck";
 
-const HeaderTruckScreen = ({openModal, handleClose}) => {
+const HeaderFacilityScreen = () => {
     return (
-        <Box className="headerTruckScreen">
+        <Box className="headerScreen">
             <Box className="title">
-                <Typography >Trucks Management</Typography>
+                <Typography >Facility Management</Typography>
             </Box>
-            <Box className="btn-add" onClick={handleClose}
+            <Box className="btn-add"
             >
                 <PrimaryButton className="btn-header">
                     <Icon className="icon">
                         {menuIconMap.get("ControlPointIcon")}
                     </Icon>
                     <Typography>
-                        New Truck
+                        New Facility
                     </Typography>
                 </PrimaryButton>
             </Box>
-            {openModal ? (<ModalTruck openModal={openModal} handleClose={handleClose} />) : null}
         </Box>
     );
-};
-export default HeaderTruckScreen;
+}
+export default HeaderFacilityScreen;

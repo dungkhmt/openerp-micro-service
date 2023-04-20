@@ -1,6 +1,6 @@
 export const facility = {
     id: "MENU_CONTAINER",
-    icon: "BlurOnIcon",
+    icon: "Facility",
     text: "Facility",
     child: [
       {
