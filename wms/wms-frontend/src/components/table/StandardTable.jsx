@@ -169,6 +169,7 @@ export default function StandardTable(props) {
           }}
           actions={props.actions}
           editable={props.editable}
+          tableRef={props.tableRef}
         />
       </ThemeProvider>
     </>
@@ -188,6 +189,6 @@ StandardTable.propTypes = {
   actions: PropTypes.array,
   data: PropTypes.array,
   commandBarComponents: PropTypes.element,
-  editable: PropTypes.object
+  editable: PropTypes.object,
 };
 
