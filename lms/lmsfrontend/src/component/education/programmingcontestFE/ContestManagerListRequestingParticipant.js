@@ -8,8 +8,8 @@ import {Button, Grid, MenuItem, TableHead, TextField,} from "@material-ui/core";
 import TableRow from "@material-ui/core/TableRow";
 import {StyledTableCell, StyledTableRow,} from "./lib";
 import TableBody from "@mui/material/TableBody";
-import {request} from "./Request";
 import Pagination from "@material-ui/lab/Pagination";
+import {request} from "../../../api";
 
 export default function ContestManagerListRequestingParticipant(props) {
   const contestId = props.contestId;

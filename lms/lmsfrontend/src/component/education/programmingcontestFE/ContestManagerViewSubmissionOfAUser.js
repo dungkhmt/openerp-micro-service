@@ -7,9 +7,9 @@ import {Link} from "react-router-dom";
 import {Button, Grid, MenuItem, TableHead, TextField,} from "@material-ui/core";
 import TableRow from "@material-ui/core/TableRow";
 import TableBody from "@mui/material/TableBody";
-import {request} from "./Request";
 import Pagination from "@material-ui/lab/Pagination";
 import {getStatusColor, StyledTableCell, StyledTableRow} from "./lib";
+import {request} from "../../../api";
 
 export default function ContestManagerViewSubmissionOfAUser(props) {
   const contestId = props.contestId;

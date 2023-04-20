@@ -3,12 +3,12 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Box from "@mui/material/Box";
 import SearchIcon from "@mui/icons-material/Search";
-import {request} from "./Request";
 import {Search, SearchIconWrapper} from "./lib";
 import {InputBase} from "@mui/material";
 import StandardTable from "component/table/StandardTable";
 import {Button, MenuItem, TextField} from "@mui/material/";
 import AddMember2ContestDialog from "./AddMember2ContestDialog";
+import {request} from "../../../api";
 
 export default function ContestManagerAddMember2Contest(props) {
   const contestId = props.contestId;

@@ -3,15 +3,14 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Box from "@mui/material/Box";
 import SearchIcon from "@mui/icons-material/Search";
-import {request} from "./Request";
 import {Search, SearchIconWrapper} from "./lib";
-import {InputBase} from "@mui/material";
+import {Button, InputBase} from "@mui/material";
 import StandardTable from "component/table/StandardTable";
-import {Button, MenuItem, TextField} from "@mui/material/";
 import {useParams} from "react-router-dom";
+import {request} from "../../../api";
 
 export default function UserContestProblemRole() {
-  const { problemId } = useParams();
+  const {problemId} = useParams();
   const [searchUsers, setSearchUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [keyword, setKeyword] = useState("");
@@ -21,14 +20,14 @@ export default function UserContestProblemRole() {
   const [userRoles, setUserRoles] = useState([]);
 
   const columnUserRoles = [
-    { title: "UserId", field: "userLoginId" },
-    { title: "FullName", field: "fullname" },
-    { title: "RoleId", field: "roleId" },
+    {title: "UserId", field: "userLoginId"},
+    {title: "FullName", field: "fullname"},
+    {title: "RoleId", field: "roleId"},
   ];
   const columns = [
-    { title: "Index", field: "index" },
-    { title: "UserID", field: "userName" },
-    { title: "FullName", field: "fullName" },
+    {title: "Index", field: "index"},
+    {title: "UserID", field: "userName"},
+    {title: "FullName", field: "fullName"},
     {
       title: "Action",
       render: (row) => (
@@ -36,9 +35,11 @@ export default function UserContestProblemRole() {
       ),
     },
   ];
+
   function handleClick(u) {
     alert("add role to user " + u);
   }
+
   function getRoles() {
     request("get", "/get-list-roles-contest", (res) => {
       console.log("getRoles, res.data = ", res.data);
@@ -52,16 +53,17 @@ export default function UserContestProblemRole() {
       setUserRoles(res.data);
     }).then();
   }
+
   function searchUser(keyword, s, p) {
     request(
       "get",
       "/search-user-based-keyword" +
-        "?size=" +
-        s +
-        "&page=" +
-        (p - 1) +
-        "&keyword=" +
-        keyword,
+      "?size=" +
+      s +
+      "&page=" +
+      (p - 1) +
+      "&keyword=" +
+      keyword,
       (res) => {
         console.log("res search", res);
         //setSearchUsers(res.data.contents.content);
@@ -75,6 +77,7 @@ export default function UserContestProblemRole() {
       }
     ).then();
   }
+
   useEffect(() => {
     getRoles();
     getUserRoles();
@@ -82,15 +85,15 @@ export default function UserContestProblemRole() {
 
   return (
     <div>
-      <Box sx={{ flexGrow: 1, marginBottom: 2 }}>
+      <Box sx={{flexGrow: 1, marginBottom: 2}}>
         <AppBar position="static" color={"transparent"}>
           <Toolbar>
             <Search>
               <SearchIconWrapper>
-                <SearchIcon />
+                <SearchIcon/>
               </SearchIconWrapper>
               <InputBase
-                style={{ paddingLeft: 50 }}
+                style={{paddingLeft: 50}}
                 placeholder={"search..."}
                 onChange={(event) => {
                   setKeyword(event.target.value);

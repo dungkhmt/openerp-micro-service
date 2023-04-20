@@ -82,15 +82,6 @@ export const authPut = (dispatch, token, url, body) => {
     body: JSON.stringify(body),
   });
 };
-export const authGetImg = (dispatch, token, url) => {
-  return fetch(API_URL + url, {
-    method: "GET",
-    headers: {
-      "X-Auth-Token": token,
-      "content-type": "application/octet-stream",
-    },
-  });
-};
 export const authGet = (dispatch, token, url) => {
   return fetch(API_URL + url, {
     method: "GET",
@@ -98,38 +89,6 @@ export const authGet = (dispatch, token, url) => {
       "content-type": "application/json",
       "X-Auth-Token": token,
     },
-  }).then(
-    (res) => {
-      if (!res.ok) {
-        if (res.status === 401) {
-          dispatch(failed());
-          throw Error("Unauthorized");
-        } else {
-          console.log(res);
-          try {
-            res.json().then((res1) => console.log(res1));
-          } catch (err) {}
-          throw Error();
-        }
-        // return null;
-      }
-      return res.json();
-    },
-    (error) => {
-      console.log(error);
-    }
-  );
-};
-
-export const authGetBody = (dispatch, token, url, body) => {
-  debugger;
-  return fetch(API_URL + url, {
-    method: "GET",
-    headers: {
-      "content-type": "application/json",
-      "X-Auth-Token": token,
-    },
-    body: body,
   }).then(
     (res) => {
       if (!res.ok) {
@@ -209,16 +168,6 @@ export const axiosGet = (token, url, dispatch) => {
     },
   });
 };
-
-export const axiosPut = (token, url, data, dispatch) => {
-  return axios.put(API_URL + url, data, {
-    headers: {
-      "content-type": "application/json",
-      "X-Auth-Token": token,
-    },
-  });
-};
-
 export const isFunction = (func) =>
   func &&
   (Object.prototype.toString.call(func) === "[object Function]" ||

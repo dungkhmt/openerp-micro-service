@@ -4,8 +4,7 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {successNoti, warningNoti} from "../../../utils/notification";
-import {request} from "./Request";
-import {authPostMultiPart} from "../../../api";
+import {authPostMultiPart, request} from "../../../api";
 import {useDispatch, useSelector} from "react-redux";
 
 export default function CreateTestCase(props) {
@@ -16,10 +15,8 @@ export default function CreateTestCase(props) {
   const { problemId } = useParams();
   const token = useSelector((state) => state.auth.token);
   const [description, setDescription] = useState();
-  const [solution, setSolution] = useState();
   const [load, setLoad] = useState(false);
   const [checkTestcaseResult, setCheckTestcaseResult] = useState(false);
-  const [showSubmitWarming, setShowSubmitWarming] = useState(false);
   const [point, setPoint] = useState(0);
   const [isPublic, setIsPublic] = useState("N");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -48,7 +45,6 @@ export default function CreateTestCase(props) {
         setLoad(false);
         setResult(res.data.result);
         setCheckTestcaseResult(true);
-        setShowSubmitWarming(false);
         if (res.data.status != "ok") {
           warningNoti(res.data.status, false);
         }

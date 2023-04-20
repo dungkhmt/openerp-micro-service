@@ -3,9 +3,9 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
 import XLSX from "xlsx";
-import {request} from "./Request";
 import HustContainerCard from "../../common/HustContainerCard";
 import StandardTable from "../../table/StandardTable";
+import {request} from "../../../api";
 
 export default function ContestManagerRankingNew(props) {
   const contestId = props.contestId;

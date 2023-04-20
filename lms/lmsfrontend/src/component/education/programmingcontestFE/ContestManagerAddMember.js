@@ -8,13 +8,13 @@ import {Button, Grid, MenuItem, TableHead, TextField,} from "@material-ui/core";
 import TableRow from "@material-ui/core/TableRow";
 import {getColorRegisterStatus, Search, SearchIconWrapper, StyledTableCell, StyledTableRow,} from "./lib";
 import TableBody from "@mui/material/TableBody";
-import {request} from "./Request";
 import Pagination from "@material-ui/lab/Pagination";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Box from "@mui/material/Box";
 import SearchIcon from "@mui/icons-material/Search";
 import {InputBase} from "@mui/material";
+import {request} from "../../../api";
 
 export default function ContestManagerAddMember(props) {
   const contestId = props.contestId;

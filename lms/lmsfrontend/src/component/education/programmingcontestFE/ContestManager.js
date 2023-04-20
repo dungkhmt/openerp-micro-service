@@ -106,9 +106,6 @@ export function ContestManager() {
         <ContestManagerRankingNew contestId={contestId}/>
       </TabPanelVertical>
 
-      {/*<TabPanelVertical value={value} index={5}>*/}
-      {/*  <ContestManagerUserSubmissionNotEvaluated contestId={contestId} />*/}
-      {/*</TabPanelVertical>*/}
       <TabPanelVertical value={value} index={5}>
         <ContestResultDistribution contestId={contestId}/>
       </TabPanelVertical>

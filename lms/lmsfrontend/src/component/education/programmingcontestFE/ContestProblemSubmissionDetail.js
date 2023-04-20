@@ -1,7 +1,6 @@
 import {useParams} from "react-router-dom";
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {request} from "./Request";
 import {Typography} from "@mui/material";
 import Box from "@mui/material/Box";
 import {Grid} from "@material-ui/core";
@@ -10,6 +9,7 @@ import ParticipantProgramSubmissionDetailTestCaseByTestCase
   from "./ParticipantProgramSubmissionDetailTestCaseByTestCase";
 import HustCopyCodeBlock from "../../common/HustCopyCodeBlock";
 import {toFormattedDateTime} from "../../../utils/dateutils";
+import {request} from "../../../api";
 
 export default function ContestProblemSubmissionDetail() {
   const { problemSubmissionId } = useParams();
@@ -23,22 +23,6 @@ export default function ContestProblemSubmissionDetail() {
   const [testCasePass, setTestCasePass] = useState();
   const [status, setStatus] = useState();
   const [message, setMessage] = useState("");
-  function updateCode() {
-    let body = {
-      contestSubmissionId: problemSubmissionId,
-      modifiedSourceCodeSubmitted: submissionSource,
-    };
-
-    request(
-      "post",
-      "/update-contest-submission-source-code",
-      (res) => {
-        console.log("update submission source code", res.data);
-      },
-      {},
-      body
-    ).then();
-  }
 
   useEffect(() => {
     console.log("problemSubmissionId ", problemSubmissionId);
@@ -114,9 +98,6 @@ export default function ContestProblemSubmissionDetail() {
         </Grid>
       </Box>
 
-      {/*
-      <Button onClick={updateCode}>Update Code</Button>
-      */}
       <br />
       {
         <ParticipantProgramSubmissionDetailTestCaseByTestCase
