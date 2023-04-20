@@ -397,6 +397,7 @@ const AdminOrderDetail = ( props ) => {
           onRowDelete: oldData => new Promise((resolve, reject) => {
             setTimeout(() => {
               console.log("Old data => ", oldData);
+              // TODO: on row delete implementation....
             })
           })
         }}

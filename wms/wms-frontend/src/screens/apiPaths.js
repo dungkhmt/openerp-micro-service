@@ -19,5 +19,9 @@ export const API_PATH = {
   DELIVERY_MANAGER_DELIVERY_PERSON: "/wmsv2/delivery-manager/delivery-person",
   WAREHOUSE_DETAIL_WITH_PRODUCT: "/wmsv2/admin/warehouse/detail-with-products",
   ASSIGN_ORDER_ITEM: "/wmsv2/admin/order/assign-order-item",
-  AUTO_ASSIGN_ORDER_ITEM: "/wmsv2/admin/order/auto-assign"
+  AUTO_ASSIGN_ORDER_ITEM: "/wmsv2/admin/order/auto-assign",
+  DELIVERY_MANAGER_SHIPMENT: "/wmsv2/delivery-manager/shipment",
+  GET_USER_LOGIN_ID: "wmsv2/user",
+  DELIVERY_MANAGER_DELIVERY_TRIP: "/wmsv2/delivery-manager/delivery-trip",
+  DELIVERY_MANAGER_ASSIGN_ORDER_ITEM: "/wmsv2/delivery-manager/assigned-order-items"
 }

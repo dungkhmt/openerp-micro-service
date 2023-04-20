@@ -38,3 +38,18 @@ export const BayDropDown = ({ selectedWarehouse, setSelectedBayId, setSelectedBa
     }
   </Select>
 }
+
+export const ShipmentDropDown = ({ shipmentList, setSelectedShipmentId }) => {
+  return <Select onChange={(e, v) => setSelectedShipmentId(e.target.value)}>
+    {
+      shipmentList?.length > 0 &&
+      shipmentList?.map(shipment => 
+        <MenuItem 
+          key={shipment.shipmentId} 
+          value={shipment.shipmentId}>
+            {shipment.shipmentId}
+        </MenuItem>
+        )
+    }
+  </Select>
+}

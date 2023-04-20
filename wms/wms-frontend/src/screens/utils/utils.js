@@ -22,6 +22,24 @@ const convertTimeStampToDate = ( time ) => {
   return date.getDate() + "-" + date.getMonth() + "-" + date.getFullYear();
 }
 
+const getCurrentDateInString = () => {
+  const now = new Date();
+  return `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+}
+
+const convertDateToRequestFormat = ( date ) => {
+  return `${date.getFullYear()}`
+}
+
+const parseJwt = (token) => {
+  if (!token) {
+    return; 
+  }
+  const base64Url = token.split('.')[1];
+  const base64 = base64Url.replace('-', '+').replace('_', '/');
+  return JSON.parse(window.atob(base64));
+}
+
 export function setCanvasSize(size, scale) {
   return (size * scale);
 }
@@ -42,7 +60,8 @@ const convertToVNDFormat = ( valueInt ) => {
 }
 
 
-export { convertToVNDFormat, 
+export { getCurrentDateInString,
+  convertToVNDFormat, 
   getWarehouseNameByWarehouseId, 
   getProductNameFromProductId, 
   convertTimeStampToDate };
