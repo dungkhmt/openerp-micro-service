@@ -16,20 +16,8 @@ import TaskManagementRoute from "./TaskManagementRoute";
 import WhiteBoardRoute from "./WhiteBoardRoute";
 import ContestManagerRankingPublic from "../component/education/programmingcontestFE/ContestManagerRankingPublic";
 
-// const NotFound = lazy(() => import("../views/errors/NotFound"));
-// const AccountActivationRoute = lazy(() => import("./AccountActivationRoute"));
-// const AdminRoute = lazy(() => import("./AdminRoute"));
-// const ChatRoute = lazy(() => import("./ChatRoute"));
-// const ProgrammingContestRoutes = lazy(() =>
-//   import("./ProgrammingContestRoutes")
-// );
-// const TaskManagementRoute = lazy(() => import("./TaskManagementRoute"));
-// const WhiteBoardRoute = lazy(() => import("./WhiteBoardRoute"));
-// const WMSRoute = lazy(() => import("./WMSRoute"));
 const EduRoute = lazy(() => import("./EduRoute"));
 const UserLoginRoute = lazy(() => import("./UserLoginRoute"));
-const TestGroupRoute = lazy(() => import("./TestGroupRoute"));
-const UserGroupRoute = lazy(() => import("./UserGroupRoute"));
 
 const useStyles = makeStyles(() => ({
   loadingProgress: {
@@ -83,18 +71,6 @@ function MainAppRoute(props) {
             path="/programming-contest"
           />
           <PrivateRoute component={ThesisRoutes} path="/thesis" />
-
-          <PrivateRoute
-            component={TestGroupRoute}
-            isAuthenticated={props.isAuthenticated}
-            path="/test-group"
-          />
-
-          <PrivateRoute
-            component={UserGroupRoute}
-            isAuthenticated={props.isAuthenticated}
-            path="/user-group"
-          />
 
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />

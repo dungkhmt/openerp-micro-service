@@ -1,3 +1,6 @@
+import FeedbackIcon from "@mui/icons-material/Feedback";
+import KeyboardBackspaceRoundedIcon from "@mui/icons-material/KeyboardBackspaceRounded";
+import ReportProblemIcon from "@mui/icons-material/ReportProblemRounded";
 import {
   Avatar,
   Box,
@@ -8,23 +11,19 @@ import {
   ListItemText,
   TextField,
   Typography,
-} from "@material-ui/core";
-import {grey} from "@material-ui/core/colors";
-import {makeStyles} from "@material-ui/core/styles";
-import FeedbackIcon from "@material-ui/icons/Feedback";
-import KeyboardBackspaceRoundedIcon from "@material-ui/icons/KeyboardBackspaceRounded";
-import ReportProblemIcon from "@material-ui/icons/ReportProblemRounded";
-import PrimaryButton from "component/button/PrimaryButton";
-import TertiaryButton from "component/button/TertiaryButton";
-import CustomizedDialogs from "component/dialog/CustomizedDialogs";
+} from "@mui/material";
+import {grey} from "@mui/material/colors";
 import {AnimatePresence, motion} from "framer-motion";
 import {useState} from "react";
 import RejectFeedbackDialog from "./RejectFeedbackDialog";
+import CustomizedDialogs from "../../component/dialog/CustomizedDialogs";
+import PrimaryButton from "../../component/button/PrimaryButton";
+import TertiaryButton from "../../component/button/TertiaryButton";
 
 const heightVariants = {
   inactive: {
     overflowX: "hidden",
-    height: 340,
+    height: 352,
     width: 550,
     transition: {
       duration: 0.2,
@@ -62,7 +61,7 @@ const contentVariants = {
   },
 };
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
   backButton: {
     width: 40,
     height: 40,
@@ -82,11 +81,11 @@ const useStyles = makeStyles((theme) => ({
     margin: "8px 12px 8px 0px",
   },
   list: {
-    paddingTop: 4,
+    paddingTop: 0.5,
     paddingBottom: 0,
   },
   listItem: {
-    borderRadius: 8,
+    borderRadius: 2,
     padding: "0 8px",
     "&:hover": {
       background: grey[100],
@@ -96,10 +95,10 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 500,
     fontSize: 17,
   },
-  btn: { margin: "4px 8px" },
-}));
+  // btn: { margin: "4px 8px" },
+};
 
-const listItemIconStyles = { color: "black", fontSize: 26 };
+const listItemIconStyles = {color: "black", fontSize: 26};
 const pageTitle = [
   "Đóng góp ý kiến cho Open ERP",
   "Góp phần cải thiện phiên bản Open ERP mới",
@@ -108,10 +107,7 @@ const pageTitle = [
 
 const isEmpty = (str) => str.trim() === "";
 
-function FeedbackDialog({ open }) {
-  const classes = useStyles();
-
-  //
+function FeedbackDialog({open}) {
   const [[page, direction], setPage] = useState([0, 0]);
   const [feature, setFeature] = useState("");
   const [detail, setDetail] = useState("");
@@ -119,12 +115,12 @@ function FeedbackDialog({ open }) {
   const [openRejectFeedbackDialog, setOpenRejectFeedbackDialog] =
     useState(false);
 
-  // OK
+  //
   const paginate = (newDirection) => {
     setPage([page + newDirection, newDirection]);
   };
 
-  // OK
+  //
   const closeFeedbackDialog = () => {
     open.set(false);
     setPage([0, 0]);
@@ -132,7 +128,7 @@ function FeedbackDialog({ open }) {
     setDetail("");
   };
 
-  // OK
+  //
   const handleClose = () => {
     if (isEmpty(feature) && isEmpty(detail)) {
       closeFeedbackDialog();
@@ -155,13 +151,13 @@ function FeedbackDialog({ open }) {
   };
 
   // RejectFeedbackDialog
-  // OK
+
   const handleReject = () => {
     setOpenRejectFeedbackDialog(false);
     closeFeedbackDialog();
   };
 
-  // OK
+  //
   const handleContinue = () => {
     setOpenRejectFeedbackDialog(false);
   };
@@ -180,10 +176,10 @@ function FeedbackDialog({ open }) {
             <>
               <IconButton
                 aria-label="back"
-                className={classes.backButton}
+                sx={styles.backButton}
                 onClick={() => paginate(-page)}
               >
-                <KeyboardBackspaceRoundedIcon style={{ fontSize: 28 }} />
+                <KeyboardBackspaceRoundedIcon style={{fontSize: 28}}/>
               </IconButton>
               {pageTitle[page]}
             </>
@@ -204,33 +200,33 @@ function FeedbackDialog({ open }) {
                 animate="center"
                 exit="exit"
                 transition={{
-                  opacity: { duration: 0.1 },
+                  opacity: {duration: 0.1},
                 }}
               >
                 {page === 0 ? (
-                  <List className={classes.list}>
+                  <List sx={styles.list}>
                     <ListItem
-                      className={classes.listItem}
+                      sx={styles.listItem}
                       disableGutters
                       button
                       disableRipple
                       onClick={() => paginate(1)}
                     >
                       <ListItemAvatar>
-                        <Avatar className={classes.avatarIcon}>
-                          <FeedbackIcon style={listItemIconStyles} />
+                        <Avatar sx={styles.avatarIcon}>
+                          <FeedbackIcon style={listItemIconStyles}/>
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText
                         primary={
-                          <Typography className={classes.listItemTextPrimary}>
+                          <Typography sx={styles.listItemTextPrimary}>
                             Góp phần cải thiện phiên bản Open ERP mới
                           </Typography>
                         }
                         secondary={
                           <Typography
                             color="textSecondary"
-                            style={{ fontSize: 15 }}
+                            style={{fontSize: 15}}
                           >
                             Đóng góp ý kiến về trải nghiệm với phiên bản Open
                             ERP mới.
@@ -239,27 +235,27 @@ function FeedbackDialog({ open }) {
                       />
                     </ListItem>
                     <ListItem
-                      className={classes.listItem}
+                      sx={styles.listItem}
                       disableGutters
                       button
                       disableRipple
                       onClick={() => paginate(2)}
                     >
                       <ListItemAvatar>
-                        <Avatar className={classes.avatarIcon}>
-                          <ReportProblemIcon style={listItemIconStyles} />
+                        <Avatar sx={styles.avatarIcon}>
+                          <ReportProblemIcon style={listItemIconStyles}/>
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText
                         primary={
-                          <Typography className={classes.listItemTextPrimary}>
+                          <Typography sx={styles.listItemTextPrimary}>
                             Đã xảy ra lỗi
                           </Typography>
                         }
                         secondary={
                           <Typography
                             color="textSecondary"
-                            style={{ fontSize: 15 }}
+                            style={{fontSize: 15}}
                           >
                             Hãy cho chúng tôi biết về tính năng bị lỗi.
                           </Typography>
@@ -272,17 +268,17 @@ function FeedbackDialog({ open }) {
                     <Typography
                       variant="h6"
                       component="h2"
-                      style={{ margin: "0 4px" }}
+                      style={{margin: "0 4px"}}
                     >
                       <strong>Chúng tôi có thể cải thiện như thế nào?</strong>
                     </Typography>
                     <TextField
                       fullWidth
-                      className={classes.textField}
+                      sx={styles.textField}
                       label="Tính năng"
                       size="large"
                       variant="outlined"
-                      style={{ marginTop: 13 }}
+                      style={{marginTop: 13}}
                       value={feature}
                       onChange={(e) => setFeature(e.target.value)}
                     />
@@ -304,7 +300,6 @@ function FeedbackDialog({ open }) {
                         variant="outlined"
                         value={detail}
                         onChange={(e) => setDetail(e.target.value)}
-                        className={classes.textField}
                         id="filled-multiline-static"
                         placeholder="Vui lòng chia sẻ chi tiết nhất có thể..."
                         style={{
@@ -322,7 +317,7 @@ function FeedbackDialog({ open }) {
                     >
                       <TertiaryButton
                         onClick={closeFeedbackDialog}
-                        className={classes.btn}
+                        sx={styles.btn}
                       >
                         Huỷ
                       </TertiaryButton>
@@ -330,8 +325,8 @@ function FeedbackDialog({ open }) {
                         disabled={
                           isEmpty(feature) || isEmpty(detail) || isSubmitting
                         }
-                        className={classes.btn}
-                        style={{ width: 130 }}
+                        sx={styles.btn}
+                        style={{width: 130}}
                         onClick={handleSubmit}
                       >
                         {isSubmitting ? "Đang gửi..." : "Gửi"}

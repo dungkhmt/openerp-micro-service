@@ -279,7 +279,7 @@ function CourseList() {
                 errorNoti("Rất tiếc! Đã xảy ra lỗi :((");
               }
 
-              console.log("onClickSaveButton, error ", error);
+              console.log("onClickSaveButton, error ", err);
             },
             XLSX.utils.sheet_to_json(sheet));
         } else {

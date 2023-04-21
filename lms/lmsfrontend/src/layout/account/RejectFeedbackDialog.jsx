@@ -1,4 +1,4 @@
-import {Typography} from "@material-ui/core";
+import { Typography } from "@mui/material";
 import PrimaryButton from "component/button/PrimaryButton";
 import TertiaryButton from "component/button/TertiaryButton";
 import CustomizedDialogs from "component/dialog/CustomizedDialogs";

@@ -1,10 +1,8 @@
 import axios from "axios";
-import {failed, logout} from "./action/Auth";
+import {failed} from "./action/Auth";
 import {config} from "./config/config";
-import history from "./history";
-import {store} from "./index";
-import {authState} from "./state/AuthState";
 import {infoNoti, wifiOffNotify} from "./utils/notification";
+import keycloak from "./config/keycloak";
 
 export const BASE_URL = config.url.API_URL;
 
@@ -13,7 +11,7 @@ export const authPost = (dispatch, token, url, body) => {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      "X-Auth-Token": token,
+      authorization: bearerAuth(keycloak.token),
     },
     body: JSON.stringify(body),
   }).then(
@@ -43,7 +41,7 @@ export const authPostMultiPart = (dispatch, token, url, body) => {
   return fetch(BASE_URL + url, {
     method: "POST",
     headers: {
-      "X-Auth-Token": token,
+      authorization: bearerAuth(keycloak.token),
     },
     body: body,
   }).then(
@@ -70,7 +68,7 @@ export const authPut = (dispatch, token, url, body) => {
     method: "PUT",
     headers: {
       "content-type": "application/json",
-      "X-Auth-Token": token,
+      authorization: bearerAuth(keycloak.token),
     },
     body: JSON.stringify(body),
   });
@@ -80,7 +78,7 @@ export const authGet = (dispatch, token, url) => {
     method: "GET",
     headers: {
       "content-type": "application/json",
-      "X-Auth-Token": token,
+      authorization: bearerAuth(keycloak.token),
     },
   }).then(
     (res) => {
@@ -109,7 +107,7 @@ export const authDelete = (dispatch, token, url, body) => {
     method: "DELETE",
     headers: {
       "content-type": "application/json",
-      "X-Auth-Token": token,
+      authorization: bearerAuth(keycloak.token),
     },
     body: JSON.stringify(body),
   }).then(
@@ -150,6 +148,10 @@ axiosInstance.defaults.headers.common["Content-Type"] = "application/json";
 
 const wifiOffNotifyToastId = "cannot connect to server";
 
+export function bearerAuth(token) {
+  return `Bearer ${token}`;
+}
+
 /**
  * url, method, and data properties don't need to be specified in config.
  * @param {*} method
@@ -174,7 +176,8 @@ export async function request(
       data: data,
       ...config,
       headers: {
-        "X-Auth-Token": authState.token.get(),
+        // "X-Auth-Token": authState.token.get(),
+        authorization: bearerAuth(keycloak.token),
         ...config?.headers,
       },
     });
@@ -192,14 +195,14 @@ export async function request(
     if (e.response) {
       // The request was made and the server responded with a status code that falls out of the range of 2xx.
       switch (e.response.status) {
-        case 401:
-          if (isFunction(errorHandlers[401])) {
-            errorHandlers[401](e);
-          } else {
-            history.push({ pathname: "/login" });
-            store.dispatch(logout());
-          }
-          break;
+        // case 401:
+        //   if (isFunction(errorHandlers[401])) {
+        //     errorHandlers[401](e);
+        //   } else {
+        //     history.push({ pathname: "/login" });
+        //     store.dispatch(logout());
+        //   }
+        //   break;
         case 403:
           if (isFunction(errorHandlers[403])) {
             errorHandlers[403](e);

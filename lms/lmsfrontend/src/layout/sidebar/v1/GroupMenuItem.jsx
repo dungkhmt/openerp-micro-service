@@ -1,14 +1,12 @@
-import {Downgraded} from "@hookstate/core";
-import {Collapse, Icon, List, ListItem, ListItemText,} from "@material-ui/core";
-import makeStyles from "@material-ui/core/styles/makeStyles";
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
-import classNames from "classnames";
-import React, {useEffect, useState} from "react";
-import {useLocation} from "react-router-dom";
+import { Downgraded } from "@hookstate/core";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { Collapse, Icon, List, ListItem, ListItemText } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import MenuItem, { hexToRgb } from "./MenuItem";
 import {whiteColor} from "../../../assets/jss/material-dashboard-react";
-import {menuIconMap} from "../../../config/menuconfig";
 import {useMenuState} from "../../../state/MenuState";
-import MenuItem, {hexToRgb} from "./MenuItem";
+import {menuIconMap} from "../../../config/menuconfig";
 
 export const menuItemBaseStyle = (theme) => ({
   whiteFont: {
@@ -33,7 +31,9 @@ export const menuItemBaseStyle = (theme) => ({
     float: "left",
     marginRight: "15px",
     textAlign: "center",
-    verticalAlign: "middle",
+    // verticalAlign: "middle",
+    display: "flex",
+    alignItems: "center",
     color: "rgba(" + hexToRgb(whiteColor) + ", 0.8)",
   },
   menuItemText: {
@@ -44,7 +44,7 @@ export const menuItemBaseStyle = (theme) => ({
   },
 });
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
   childSelected: {
     "&.MuiListItem-button": {
       backgroundColor: "rgba(200, 200, 200, 0.2)",
@@ -52,24 +52,24 @@ const useStyles = makeStyles((theme) => ({
   },
   iconExpand: { transform: "rotate(-180deg)", transition: "0.3s" },
   iconCollapse: { transition: "0.3s" },
-  whiteFont: {
+  whiteFont: (theme) => ({
     ...menuItemBaseStyle(theme).whiteFont,
-  },
-  menuItemIcon: {
+  }),
+  menuItemIcon: (theme) => ({
     ...menuItemBaseStyle(theme).menuItemIcon,
-  },
-  menuItemText: {
+  }),
+  menuItemText: (theme) => ({
     ...menuItemBaseStyle(theme).menuItemText,
-  },
-  menuItem: {
+  }),
+  menuItem: (theme) => ({
     ...menuItemBaseStyle(theme).menuItem,
     color: whiteColor,
 
     "&.MuiListItem-button:hover": {
       backgroundColor: "rgba(200, 200, 200, 0.2)",
     },
-  },
-}));
+  }),
+};
 
 const activeRoute = (route) => {
   if (route === "/" || route === "") {
@@ -78,8 +78,18 @@ const activeRoute = (route) => {
   } else return window.location.pathname.indexOf(route) === 0;
 };
 
+/**
+ * This function finds the first element in a set that starts with a given string.
+ * @returns The `findFirstElementStartingWith` function is returning the first element in the `set`
+ * parameter that starts with the `str` parameter. It is using the `find` method to iterate over the
+ * `set` and return the first element that satisfies the condition of starting with the `str`. The
+ * returned value is the first matching element or `undefined` if no element matches the condition.
+ */
+const findFirstElementStartingWith = (str, set) => {
+  return [...set].find((element) => element.startsWith(str));
+};
+
 function GroupMenuItem(props) {
-  const classes = useStyles();
   const { color, group } = props;
   const location = useLocation();
 
@@ -113,12 +123,28 @@ function GroupMenuItem(props) {
     checkSelected();
   }, [location.pathname]);
 
-  if (!group.isPublic) {
-    if (!permittedFunctions.has(group.id)) return null;
+  if (group.child) {
+    let hasPublicChild = group.child.find(
+      (childMenuItem) => childMenuItem.isPublic
+    );
+
+    if (!hasPublicChild) {
+      let hasAuthorizedPrivateChild = findFirstElementStartingWith(
+        group.id,
+        permittedFunctions
+      );
+      if (!hasAuthorizedPrivateChild) {
+        return null;
+      }
+    }
   }
 
-  if (group.child?.length === 1) {
+  if (group.child.length === 1) {
     const childMenuItem = group.child[0];
+
+    if (!childMenuItem.icon) {
+      childMenuItem.icon = group.icon;
+    }
 
     return (
       <MenuItem
@@ -136,15 +162,22 @@ function GroupMenuItem(props) {
         <ListItem
           button
           key={group.text}
-          className={classNames(classes.menuItem, {
-            [classes.childSelected]: hasChildSelected,
+          sx={(theme) => ({
+            ...styles.menuItem(theme),
+            ...(hasChildSelected ? styles.childSelected : {}),
           })}
           onClick={() => setExpanded(!expanded)}
         >
           {/* Icon */}
           <Icon
-            className={classNames(classes.menuItemIcon, classes.whiteFont)}
-            style={{ marginLeft: 3, marginRight: 27 }}
+            sx={(theme) => ({
+              ...styles.menuItemIcon(theme),
+              ...styles.whiteFont(theme),
+            })}
+            style={{
+              marginLeft: 3,
+              marginRight: 27,
+            }}
           >
             {menuIconMap.get(group.icon)}
           </Icon>
@@ -152,16 +185,28 @@ function GroupMenuItem(props) {
           {/* Label */}
           <ListItemText
             primary={group.text}
-            className={classNames(classes.menuItemText, classes.whiteFont)}
+            sx={(theme) => ({
+              ...styles.menuItemText(theme),
+              ...styles.whiteFont(theme),
+
+              // limited lines text
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            })}
             disableTypography={true}
           />
 
           <Icon
-            className={classNames(classes.menuItemIcon, classes.whiteFont, {
-              [classes.iconExpand]: expanded,
-              [classes.iconCollapse]: !expanded,
+            sx={(theme) => ({
+              ...styles.menuItemIcon(theme),
+              ...styles.whiteFont(theme),
+              ...(expanded ? styles.iconExpand : styles.iconCollapse),
             })}
-            style={{ marginRight: 0, marginLeft: 6 }}
+            style={{
+              marginRight: 0,
+              marginLeft: 6,
+            }}
           >
             <ArrowDropDownIcon />
           </Icon>

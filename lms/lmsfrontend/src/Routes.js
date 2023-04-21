@@ -2,12 +2,11 @@ import {LinearProgress} from "@material-ui/core";
 import React, {lazy, Suspense} from "react";
 import {Route, Switch} from "react-router-dom";
 import PrivateRoute from "./common/PrivateRoute";
-import SignInContainer from "./container/SignInContainer";
 import {Layout} from "./layout";
 import MainAppRoute from "./routers/MainAppRoutes";
 import {routeState} from "./state/RouteState";
 
-const Register = lazy(() => import("../src/views/UserRegister/Register"));
+// const Register = lazy(() => import("../src/views/UserRegister/Register"));
 const ForgetPassword = lazy(() =>
   import("../src/views/UserRegister/ForgetPassword")
 );
@@ -18,8 +17,6 @@ const ChangePassword = lazy(() =>
 );
 
 function Routes(props) {
-  //const isError = useSelector((state) => state.error.isError);
-  //if (isError) return <Route component={Error500} path="*" />;
   return (
     <Suspense
       fallback={
@@ -34,7 +31,7 @@ function Routes(props) {
       }
     >
       <Switch>
-        <Route component={Register} layout={Layout} path="/user/register" />
+        {/*<Route component={Register} layout={Layout} path="/user/register" />*/}
         <Route
           component={ForgetPassword}
           layout={Layout}
@@ -44,7 +41,6 @@ function Routes(props) {
           component={ChangePassword}
           path="/userlogin/change-password/:username"
         />
-        <Route component={SignInContainer} path="/login" />
         <Route
           path="*"
           render={(props) => {

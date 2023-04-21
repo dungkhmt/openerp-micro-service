@@ -1,4 +1,4 @@
-import {createState, useState} from "@hookstate/core";
+import { createState, useState } from "@hookstate/core";
 import {request} from "../api";
 
 export const menuState = createState({
@@ -23,7 +23,7 @@ export function fetchMenu() {
 
   request(
     "get",
-    "/menu",
+    "/entity-authorization/MENU_",
     (res) => {
       menuState.merge({
         permittedFunctions: new Set(res.data),

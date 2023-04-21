@@ -41,7 +41,7 @@ export const eduLearningManagement = {
     {
       id: "MENU_EDUCATION_THESIS_DEFENSE_JURY_STUDENT_MANAGEMENT",
       path: "/edu/student/thesis/create",
-      isPublic: true,
+      isPublic: false,
       icon: null,
       text: "Create Thesis",
       child: [],
