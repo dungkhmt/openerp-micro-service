@@ -12,11 +12,9 @@ import UserContestProblemRole from "../component/education/programmingcontestFE/
 import EditContest from "../component/education/programmingcontestFE/EditContest";
 import EditProblem from "../component/education/programmingcontestFE/EditProblem";
 import EditTestCase from "../component/education/programmingcontestFE/EditTestCase";
-import ListContest from "../component/education/programmingcontestFE/ListContest";
 import {ListContestManager} from "../component/education/programmingcontestFE/ListContestManager";
 import ListPracticalProblem from "../component/education/programmingcontestFE/ListPracticalProblem";
 import ListProblem from "../component/education/programmingcontestFE/ListProblem";
-import SolvingContest from "../component/education/programmingcontestFE/SolvingContest";
 import {StudentContestNotRegistered} from "../component/education/programmingcontestFE/StudentContestNotRegistered";
 import {StudentContestRegistered} from "../component/education/programmingcontestFE/StudentContestRegistered";
 import StudentViewContestDetail from "../component/education/programmingcontestFE/StudentViewContestDetail";
@@ -45,11 +43,6 @@ export default function ProgrammingContestRoutes() {
           path={`${path}/user-contest-problem-role-management/:problemId`}
         />
         <Route component={CreateContest} path={`${path}/create-contest`} />
-        <Route component={ListContest} path={`${path}/list-contest`} />
-        <Route
-          component={SolvingContest}
-          path={`${path}/solving-contest/:contestId`}
-        />
         <Route
           component={StudentViewContestDetail}
           path={`${path}/student-view-contest-detail/:contestId`}

@@ -50,7 +50,7 @@ const ReceiptRequestProcessListing = () => {
 
   return <Fragment>
     <StandardTable 
-      title="Danh sách đơn hàng cần xử lý"
+      title="Danh sách đơn nhập hàng cần xử lý"
       columns={[
         { title: "Ngày tạo đơn", field: "createdDate" },
         { title: "Trạng thái", field: "status" },
@@ -72,7 +72,7 @@ const ReceiptRequestProcessListing = () => {
     />
 
     <StandardTable 
-      title="Danh sách đơn hàng đã xử lý"
+      title="Danh sách đơn nhập hàng đã xử lý"
       columns={[
         { title: "Ngày tạo đơn", field: "createdDate" },
         { title: "Trạng thái", field: "status" },

@@ -9,21 +9,27 @@ import java.util.UUID;
 
 public interface EduCourseChapterMaterialService {
 
-    public EduCourseChapterMaterial save(
+    EduCourseChapterMaterial save(
         EduCourseChapterMaterialModelCreate eduCourseChapterMaterialModelCreate,
         Video video
     );
 
-    public EduCourseChapterMaterial saveSlide(
+    EduCourseChapterMaterial saveSlide(
         EduCourseChapterMaterialModelCreate eduCourseChapterMaterialModelCreate,
         String stringIdList
     );
 
-    public List<EduCourseChapterMaterial> findAll();
+    List<EduCourseChapterMaterial> findAll();
 
-    public List<EduCourseChapterMaterial> findAllByChapterId(UUID chapterId);
+    List<EduCourseChapterMaterial> findAllByChapterId(UUID chapterId);
 
-    public EduCourseChapterMaterial findById(UUID eduCourseChapterMaterialId);
+    EduCourseChapterMaterial findById(UUID eduCourseChapterMaterialId);
 
-    public EduCourseChapterMaterial updateMaterial(UUID eduCourseChapterMaterialId, String eduCourseMaterialName, String eduCourseMaterialType, String slideId, UUID sourceId);
+    EduCourseChapterMaterial updateMaterial(
+        UUID eduCourseChapterMaterialId,
+        String eduCourseMaterialName,
+        String eduCourseMaterialType,
+        String slideId,
+        UUID sourceId
+    );
 }

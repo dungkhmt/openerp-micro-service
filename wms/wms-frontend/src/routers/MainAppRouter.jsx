@@ -11,6 +11,7 @@ import AdminRouter from "./AdminRouter";
 import SaleManagerRouter from "./SaleManagerRouter";
 import CustomerRouter from "./CustomerRouter";
 import ApproverRouter from "./ApproverRouter";
+import DeliveryManagerRouter from "./DeliveryManagerRouter";
 
 const styles = {
   loadingProgress: {
@@ -43,6 +44,7 @@ function MainAppRouter(props) {
           <PrivateRoute component={SaleManagerRouter} path="/sale-manager" />
           <PrivateRoute component={CustomerRouter} path="/customer" />
           <PrivateRoute component={ApproverRouter} path="/approver" />
+          <PrivateRoute component={DeliveryManagerRouter} path="/delivery-manager" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>

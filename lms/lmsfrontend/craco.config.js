@@ -75,6 +75,5 @@ module.exports = {
           ? "react-redux/lib"
           : "react-redux",
     },
-  },
-  plugins: [{ plugin: BabelRcPlugin }],
+  }
 };

@@ -136,9 +136,6 @@ export default function AllContestsManager() {
         />
       </Box>
       <ListContestManagerByRegistration/>
-      {/*
-      <ListContestByRole />
-      */}
     </>
   );
 }

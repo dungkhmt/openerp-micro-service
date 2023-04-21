@@ -1,11 +1,14 @@
 import { MenuItem, Select } from "@mui/material"
 
-export const ProductDropDown = ({ productList, setSelectedProduct }) => {
-  return <Select onChange={(e) => setSelectedProduct(e.target.value)}>
+export const ProductDropDown = ({ productList, setSelectedProductId, setSelectedProductName }) => {
+  return <Select onChange={(e, v) => {
+        setSelectedProductId(e.target.value);
+        setSelectedProductName(v?.props.children);
+      }} defaultValue={""}>
     {
       productList.length > 0 &&
       productList.map(product => 
-        <MenuItem value={product.productId}>{product.name}</MenuItem>)
+        <MenuItem key={product.productId} value={product.productId}>{product.productName}</MenuItem>)
     }
   </Select>
 }
@@ -14,11 +17,11 @@ export const WarehouseDropDown = ({ warehouseList, setSelectedWarehouseId, setSe
   return <Select onChange={(e, v) => {
         setSelectedWarehouseId(e.target.value);
         setSelectedWarehouseName(v?.props?.children);
-      }}>
+      }} defaultValue={""}>
     {
       warehouseList.length > 0 &&
       warehouseList.map(warehouse => 
-        <MenuItem value={warehouse.id}>{warehouse.name}</MenuItem>)
+        <MenuItem key={warehouse.id} value={warehouse.id}>{warehouse.name}</MenuItem>)
     }
   </Select>
 }
@@ -27,11 +30,26 @@ export const BayDropDown = ({ selectedWarehouse, setSelectedBayId, setSelectedBa
   return <Select onChange={(e, v) => {
       setSelectedBayId(e.target.value); 
       setSelectedBayCode(v?.props?.children);
-      }}>
+      }} defaultValue={""}>
     {
       selectedWarehouse?.listShelf?.length > 0 &&
       selectedWarehouse?.listShelf?.map(bay => 
-        <MenuItem value={bay.id}>{bay.code}</MenuItem>)
+        <MenuItem key={bay.id} value={bay.id}>{bay.code}</MenuItem>)
+    }
+  </Select>
+}
+
+export const ShipmentDropDown = ({ shipmentList, setSelectedShipmentId }) => {
+  return <Select onChange={(e, v) => setSelectedShipmentId(e.target.value)}>
+    {
+      shipmentList?.length > 0 &&
+      shipmentList?.map(shipment => 
+        <MenuItem 
+          key={shipment.shipmentId} 
+          value={shipment.shipmentId}>
+            {shipment.shipmentId}
+        </MenuItem>
+        )
     }
   </Select>
 }

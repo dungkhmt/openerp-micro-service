@@ -29,24 +29,6 @@ export const ProgrammingContestMenuTeacher = {
       text: "Create Contest",
       child: [],
     },
-    /*
-    {
-      id: "MENU_PROGRAMMING_CONTEST_MANAGER_LIST_CONTEST",
-      path: "/programming-contest/list-contest",
-      isPublic: false,
-      icon: null,
-      text: "List Contest",
-      child: [],
-    },
-    {
-      id: "MENU_PROGRAMMING_CONTEST_MANAGER_IDE",
-      path: "/programming-contest/ide",
-      isPublic: false,
-      icon: null,
-      text: "IDE",
-      child: [],
-    },
-    */
     {
       id: "MENU_PROGRAMMING_CONTEST_MANAGER",
       path: "/programming-contest/teacher-list-contest-manager",
@@ -90,14 +72,6 @@ export const ProgrammingContestMenuStudent = {
       child: [],
     },
     /*
-    {
-      id: "MENU_PROGRAMMING_CONTEST_PARTICIPANT_IDE",
-      path: "/student/ide1",
-      isPublic: false,
-      icon: null,
-      text: "IDE",
-      child: [],
-    },
     {
       id: "MENU_PROGRAMMING_CONTEST_PARTICIPANT_LIST_PUBLIC_PROBLEM",
       path: "/programming-contest/student-public-problem",

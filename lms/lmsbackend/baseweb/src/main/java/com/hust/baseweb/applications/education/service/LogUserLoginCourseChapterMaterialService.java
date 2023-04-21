@@ -10,9 +10,15 @@ import java.util.UUID;
 
 public interface LogUserLoginCourseChapterMaterialService {
 
-    public void logUserLoginMaterial(UserLogin userLogin, UUID eduCourseChapterMaterialId);
-    public void logUserLoginMaterialV2(String userId, UUID classId, UUID eduCourseChapterMaterialId);
+    void logUserLoginMaterial(UserLogin userLogin, UUID eduCourseChapterMaterialId);
 
-    public List<StudentCourseParticipationModel> findAllByClassId(UUID classId);
-    public Page<StudentCourseParticipationModel> findDataByClassIdAndPage(UUID classId, String userIdPattern, Pageable pageable);
+    void logUserLoginMaterialV2(String userId, UUID classId, UUID eduCourseChapterMaterialId);
+
+    List<StudentCourseParticipationModel> findAllByClassId(UUID classId);
+
+    Page<StudentCourseParticipationModel> findDataByClassIdAndPage(
+        UUID classId,
+        String userIdPattern,
+        Pageable pageable
+    );
 }
