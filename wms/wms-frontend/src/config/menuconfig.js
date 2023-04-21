@@ -31,17 +31,19 @@ import { admin } from "./menuconfig/admin";
 import { salemanager } from "./menuconfig/salemanager";
 import { customer } from "./menuconfig/customer";
 import { approver } from "./menuconfig/approver";
+import { deliverymanager } from "./menuconfig/deliverymanager";
 
 export const MENUS = [];
 
 MENUS.push(general);
 MENUS.push(user);
-MENUS.push(teacher);
-MENUS.push(student);
+// MENUS.push(teacher);
+// MENUS.push(student);
 MENUS.push(admin);
 MENUS.push(salemanager);
 MENUS.push(customer);
 MENUS.push(approver);
+MENUS.push(deliverymanager);
 
 export const menuIconMap = new Map();
 

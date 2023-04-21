@@ -9,6 +9,7 @@ import StandardTable from "components/table/StandardTable";
 import { convertTimeStampToDate } from "../utils/utils";
 import { BayDropDown, WarehouseDropDown } from "components/table/DropDown";
 import { errorNoti, successNoti } from "utils/notification";
+import { Grid3x3 } from "@mui/icons-material";
 
 const ProcessItem = ( { rowData, warehousesDetail, setProcessingItems, 
   processingItems, setOpenProcessModal, remainingItems, setRemainingItems } ) => {
@@ -231,14 +232,20 @@ const ReceiptRequestProcess = ( props ) => {
         top: '50%',
         left: '50%',
         width: '75%',
-        height: '90%',
+        height: '50%',
         transform: 'translate(-50%, -50%)',
         bgcolor: 'background.paper',
         border: '2px solid #000',
         boxShadow: 24,
         p: 4,
       }} >
-        <ProcessItem remainingItems={remainingItems} setRemainingItems={setRemainingItems} setOpenProcessModal={setOpenProcessModal} processingItems={processingItems} setProcessingItems={setProcessingItems} rowData={rowData4ProcessItem} warehousesDetail={warehousesDetail4ProcessItem} />
+        <ProcessItem remainingItems={remainingItems} 
+          setRemainingItems={setRemainingItems} 
+          setOpenProcessModal={setOpenProcessModal} 
+          processingItems={processingItems} 
+          setProcessingItems={setProcessingItems} 
+          rowData={rowData4ProcessItem} 
+          warehousesDetail={warehousesDetail4ProcessItem} />
       </Box>
     </Modal>
 
@@ -247,7 +254,7 @@ const ReceiptRequestProcess = ( props ) => {
         <Typography variant="h5">Xử lý đơn nhập hàng</Typography>
         {
           !isDoneReceipt &&
-          <Grid>
+          <Grid container xs={6} justifyContent="space-around">
             <Grid className={classes.buttonWrap}>
               <Button variant="contained" className={classes.addButton}
                 type="submit" onClick={saveButtonHandle} >Lưu</Button>

@@ -25,13 +25,42 @@ import java.util.List;
 @Service
 public class PassBookOptimizerImpl implements PassBookOptimizer{
     private PassBookRepo passBookRepo;
-    public static void main(String[]args ){
-        // FOR TESTING OR-TOOLS
-        int n = 3;
+    public static void main(String[] args){
+
+        final double INFINITY = java.lang.Double.POSITIVE_INFINITY;
+
+        int n = 10;
+
+        double[] moneyEarly = { 82025, 69024, 99015, 1858091, 82057, 2590075, 933697, 132032, 903782, 79004 };
+
+        double[] moneyMature = { 87823, 69918, 99398, 1865482, 87823, 2768570, 998184, 133757, 929718, 80051 };
+
+        int[] nbDaysRemain = { 304, 24, 2, 21, 231, 2, 28, 45, 22, 80 };
+
+//        double[] moneyEarly = new double[n];
+//        double[] moneyMature = new double[n];
+//        int[] nbDaysRemain = new int[n];
+        int amountLoan = 6828000;
+
+        // These rates are annual rate (yearly)
+        double loanRate = 0.07;
+        double discountRate = 0.05;
+
+        double[] loanRateArr = new double[n];
+        double[] discountRateArr = new double[n];
+        // Compute Loan Amount and Discount Amount for each book
+
+        for (int i = 0; i < n; i++) {
+            loanRateArr[i] = Math.pow((1 + loanRate / 365), nbDaysRemain[i]);
+            discountRateArr[i] = Math.pow((1 + discountRate / 365), nbDaysRemain[i]);
+        }
+
         MPVariable[] x = new MPVariable[n];
+        MPVariable[] y = new MPVariable[n];
 
         Loader.loadNativeLibraries();
-        MPSolver solver = MPSolver.createSolver(String.valueOf(MPSolver.OptimizationProblemType.SCIP_MIXED_INTEGER_PROGRAMMING));
+        MPSolver solver = MPSolver.createSolver(
+                String.valueOf(MPSolver.OptimizationProblemType.SCIP_MIXED_INTEGER_PROGRAMMING));
 
         if (solver == null) {
             System.err.println("Could not create solver SCIP");
@@ -39,23 +68,58 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
         }
 
         for(int i = 0; i < n; i++){
-            x[i] = solver.makeIntVar(0,4,"x[" + i + "]");
+            x[i] = solver.makeIntVar(0.0, 1.0, "x[" + i + "]");
+            y[i] = solver.makeIntVar(0.0, INFINITY, "y[" + i + "]");
         }
-        MPConstraint c = solver.makeConstraint(1,10);
-        c.setCoefficient(x[0],1);
-        c.setCoefficient(x[1],-5);
-        c.setCoefficient(x[2],7);
+
+        MPConstraint sumConstraint = solver.makeConstraint(amountLoan, amountLoan);
+        for (int i = 0; i < n; i++) {
+            sumConstraint.setCoefficient(x[i], moneyEarly[i]);
+            sumConstraint.setCoefficient(y[i], 1.0);
+        }
+
+        MPConstraint[] loanLimitConstraints = new MPConstraint[n];
+        for (int i = 0; i < n; i++) {
+            loanLimitConstraints[i] = solver.makeConstraint(0.0, moneyMature[i] / loanRateArr[i]);
+            loanLimitConstraints[i].setCoefficient(y[i], 1.0);
+            loanLimitConstraints[i].setCoefficient(x[i], moneyMature[i] / loanRateArr[i]);
+        }
 
         MPObjective obj = solver.objective();
         obj.setMaximization();
-        obj.setCoefficient(x[0],-4);
-        obj.setCoefficient(x[2],2);
+        for (int i = 0; i < n; i++) {
+            obj.setCoefficient(x[i], - moneyMature[i] / discountRateArr[i]);
+            obj.setCoefficient(y[i], - loanRateArr[i] / discountRateArr[i]);
+        }
 
         final MPSolver.ResultStatus resultStatus = solver.solve();
         if (resultStatus == MPSolver.ResultStatus.OPTIMAL) {
-            System.out.println(obj.value());
-            for(int i = 0; i < n; i++) System.out.println("x[" + i + "] = " + x[i].solutionValue());
-        }else{
+            System.out.println("Raw objective = " + obj.value());
+            double temp = 0; // The constant in the objective
+            for (int i = 0; i < n; i++) {
+                temp += moneyMature[i] / discountRateArr[i];
+            }
+            System.out.println("Objective value = " + (obj.value() + temp));
+            for (int i = 0; i < n; i++) {
+                System.out.println("x[" + i + "] = " + x[i].solutionValue());
+                if (x[i].solutionValue() == 0) {
+                    System.out.println("Tat toan dung han so thu " + i);
+                    if (y[i].solutionValue() == 0)
+                        System.out.println("Khong the chap so thu " + i);
+                    else
+                        System.out.println("The chap so thu " + i + " de vay " + y[i].solutionValue());
+                }
+                else
+                    System.out.println("Tat toan truoc han so thu " + i);
+            }
+            System.out.println("Checking objective value...");
+            double obj_value = 0;
+            for (int i = 0; i < n; i++) {
+                obj_value += (moneyMature[i] * (1 - x[i].solutionValue())
+                        - y[i].solutionValue() * loanRateArr[i]) / discountRateArr[i];
+            }
+            System.out.println(obj_value);
+        } else{
             System.out.println("No optimal");
         }
     }
@@ -73,7 +137,10 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
         }
         // mapped data input
         int n = passBooks.size();
-        double[] moneyGot = new double[n];
+        double[] moneyEarly = new double[n];// = { 82025, 69024, 99015, 1858091, 82057, 2590075, 933697, 132032, 903782, 79004 };
+
+        double[] moneyMature = new double[n];// = { 87823, 69918, 99398, 1865482, 87823, 2768570, 998184, 133757, 929718, 80051 };
+
         int[] nbDaysRemain = new int[n];
         int amountLoan = I.getLoan();
         double loanRate = I.getLoadRate();
@@ -85,16 +152,91 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
             //int nbDays = (int)( (b.getCreatedDate().getTime() - date.getTime())
             nbDaysRemain[i] =  (int)( (b.getEndDate().getTime() - date.getTime())
                     / (1000 * 60 * 60 * 24) );
-            moneyGot[i] = b.getAmountMoneyDeposit()*(1 + b.getRate()); // TO BE CORRECTED
-            System.out.println("number days passbook " + b.getPassBookName() + " = " + nbDaysRemain[i]);
+            moneyMature[i] = b.getAmountMoneyDeposit()*(1 + b.getRate()); // TO BE CORRECTED
+            int dayPass = b.getDuration() - nbDaysRemain[i];
+            moneyEarly[i] = b.getAmountMoneyDeposit()*(1 + b.getRate()*(dayPass)/b.getDuration());
+            System.out.println("number days passbook " + b.getPassBookName() + " = " + nbDaysRemain[i]+
+                    " dayPass = " + dayPass + " moneyEarly = " + moneyEarly[i] + " moneyMature = " + moneyMature[i]);
         }
 
-        // modelling
+
+        double[] loanRateArr = new double[n];
+        double[] discountRateArr = new double[n];
+        // Compute Loan Amount and Discount Amount for each book
+
+        for (int i = 0; i < n; i++) {
+            loanRateArr[i] = Math.pow((1 + loanRate / 365), nbDaysRemain[i]);
+            discountRateArr[i] = Math.pow((1 + discountRate / 365), nbDaysRemain[i]);
+        }
+        final double INFINITY = java.lang.Double.POSITIVE_INFINITY;
         MPVariable[] x = new MPVariable[n];
-        MPVariable[] y= new MPVariable[n]; // if x[i] = 0, then loan y[i] (tat toan dung han thi vay y[i])
-        /*
-        TO BE CONTINUE... model & solve
-         */
+        MPVariable[] y = new MPVariable[n];
+
+        Loader.loadNativeLibraries();
+        MPSolver solver = MPSolver.createSolver(
+                String.valueOf(MPSolver.OptimizationProblemType.SCIP_MIXED_INTEGER_PROGRAMMING));
+
+        if (solver == null) {
+            System.err.println("Could not create solver SCIP");
+            return null;
+        }
+
+        for(int i = 0; i < n; i++){
+            x[i] = solver.makeIntVar(0.0, 1.0, "x[" + i + "]");
+            y[i] = solver.makeIntVar(0.0, INFINITY, "y[" + i + "]");
+        }
+
+        MPConstraint sumConstraint = solver.makeConstraint(amountLoan, amountLoan);
+        for (int i = 0; i < n; i++) {
+            sumConstraint.setCoefficient(x[i], moneyEarly[i]);
+            sumConstraint.setCoefficient(y[i], 1.0);
+        }
+
+        MPConstraint[] loanLimitConstraints = new MPConstraint[n];
+        for (int i = 0; i < n; i++) {
+            loanLimitConstraints[i] = solver.makeConstraint(0.0, moneyMature[i] / loanRateArr[i]);
+            loanLimitConstraints[i].setCoefficient(y[i], 1.0);
+            loanLimitConstraints[i].setCoefficient(x[i], moneyMature[i] / loanRateArr[i]);
+        }
+
+        MPObjective obj = solver.objective();
+        obj.setMaximization();
+        for (int i = 0; i < n; i++) {
+            obj.setCoefficient(x[i], - moneyMature[i] / discountRateArr[i]);
+            obj.setCoefficient(y[i], - loanRateArr[i] / discountRateArr[i]);
+        }
+
+        final MPSolver.ResultStatus resultStatus = solver.solve();
+        if (resultStatus == MPSolver.ResultStatus.OPTIMAL) {
+            System.out.println("Raw objective = " + obj.value());
+            double temp = 0; // The constant in the objective
+            for (int i = 0; i < n; i++) {
+                temp += moneyMature[i] / discountRateArr[i];
+            }
+            System.out.println("Objective value = " + (obj.value() + temp));
+            for (int i = 0; i < n; i++) {
+                System.out.println("x[" + i + "] = " + x[i].solutionValue());
+                if (x[i].solutionValue() == 0) {
+                    System.out.println("Tat toan dung han so thu " + i);
+                    if (y[i].solutionValue() == 0)
+                        System.out.println("Khong the chap so thu " + i);
+                    else
+                        System.out.println("The chap so thu " + i + " de vay " + y[i].solutionValue());
+                }
+                else
+                    System.out.println("Tat toan truoc han so thu " + i);
+            }
+            System.out.println("Checking objective value...");
+            double obj_value = 0;
+            for (int i = 0; i < n; i++) {
+                obj_value += (moneyMature[i] * (1 - x[i].solutionValue())
+                        - y[i].solutionValue() * loanRateArr[i]) / discountRateArr[i];
+            }
+            System.out.println(obj_value);
+        } else{
+            System.out.println("No optimal");
+        }
+
 
         // FORM result and return to client
         List<ModelResponseLoanElement> loanElements = new ArrayList<>();

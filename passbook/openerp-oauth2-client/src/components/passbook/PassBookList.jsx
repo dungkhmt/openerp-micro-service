@@ -16,10 +16,31 @@ export default function PassBookList() {
     
     { title: "amountMoney", field: "amountMoney" },
     { title: "rate", field: "rate" },
+    {
+      title: "Delete",
+      sorting: false,
+      render: (rowData) => (
+          <IconButton
+              onClick={() => {
+                  deletePassBook(rowData.passBookId)
+              }}
+              variant="contained"
+              color="error"
+          >
+              <DeleteIcon/>
+          </IconButton>
+      ),
+  },
   ];
   const [passBooks, setPassBooks] = useState([]);
 
-  useEffect(() => {
+  function deletePassBook(passBookId){
+    request("get", "/remove-passbook/" + passBookId, (res) => {
+      console.log("remove passbooks data = ", res.data);
+      getListPassBooks();
+    }).then();
+  }
+  function getListPassBooks(){
     request("get", "/get-passbook-list", (res) => {
       let D = res.data;
       const data = D.map((c) => ({
@@ -30,7 +51,11 @@ export default function PassBookList() {
       console.log("passbooks data = ", data);
       setPassBooks(data);
     }).then();
-  }, []);
+
+  }
+  useEffect(() => {
+    getListPassBooks();
+      }, []);
   return (
     <div>
       <StandardTable
@@ -38,6 +63,8 @@ export default function PassBookList() {
         columns={columns}
         data={passBooks}
         // hideCommandBar
+        onSelectionChange={() =>{}}
+
         options={{
           selection: true,
           pageSize: 20,
