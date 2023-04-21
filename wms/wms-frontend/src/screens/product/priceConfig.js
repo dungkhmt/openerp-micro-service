@@ -1,4 +1,5 @@
-import { Box, Modal } from "@mui/material";
+import { Grid, Modal } from "@mui/material";
+import { Box } from "@mui/system";
 import { request } from "api";
 import StandardTable from "components/table/StandardTable";
 import { errorNoti } from "utils/notification";
@@ -134,23 +135,29 @@ const PriceConfig = () => {
         <PriceHistory data={priceHistory} />
       </Box>
     </Modal>
-    <StandardTable 
-      title={"Cấu hình giá sản phẩm"}
-      columns={columns}
-      data={priceTableData}
-      options={{
-        selection: true,
-        pageSize: 20,
-        search: true,
-        sorting: true,
-      }}
-      onRowClick={ (event, rowData) => { 
-          console.log("On row click => row data: ", rowData);
-          setPriceHistory(rowData); 
-          setOpenModal(true)
-        } 
-      }
-    />
+    <Box className={classes.formWrap}>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <StandardTable
+            title={"Cấu hình giá sản phẩm"}
+            columns={columns}
+            data={priceTableData}
+            options={{
+              selection: true,
+              pageSize: 20,
+              search: true,
+              sorting: true,
+            }}
+            onRowClick={ (event, rowData) => {
+                console.log("On row click => row data: ", rowData);
+                setPriceHistory(rowData);
+                setOpenModal(true)
+              }
+            }
+          />
+        </Grid>
+      </Grid>
+    </Box>
   </Fragment>);
 }
 

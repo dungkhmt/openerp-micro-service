@@ -1,7 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Button, Grid, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
 import { request } from "api";
-import { WarehouseDropDown } from "components/table/DropDown";
 import StandardTable from "components/table/StandardTable";
 import { Fragment, useEffect, useState } from "react";
 import { API_PATH } from "screens/apiPaths";
@@ -13,6 +12,7 @@ const DeliveryTripDetail = ( props ) => {
   const classes = useStyles();
 
   const [tripInfo, setTripInfo] = useState({});
+  const [isDeleted, setDeleted] = useState(false);
   const [deliveryPersons, setDeliveryPersons] = useState([]);
   const [warehouseList, setWarehouseList] = useState([]);
   const [deliveryItemsTableData, setDeliveryItemsTableData] = useState([]);
@@ -27,6 +27,7 @@ const DeliveryTripDetail = ( props ) => {
   const [maxQuantity, setMaxQuantity] = useState(0);
   const [selectedQuantity, setSelectedQuantity] = useState(0);
   const [createdItemsTableData, setCreatedItemsTableData] = useState([]);
+  const [rawCreatedItemsTableData, setRawCreatedItemsTableData] = useState([]);
   const [maxSequence, setMaxSequence] = useState(0);
 
   // chọn danh sách sản phẩm (phải cùng một warehouse)
@@ -40,6 +41,10 @@ const DeliveryTripDetail = ( props ) => {
         setTripInfo(res.data);
         setMaxSequence(res.data.totalLocations);
         setSelectedWarehouseId(res.data.warehouseId);
+        setDeliveryItemsTableData(res.data.items);
+        if (res.data.warehouseName != null) {
+          setSelectedWarehouseName(res.data.warehouseName);
+        }
       }
     );
 
@@ -63,17 +68,26 @@ const DeliveryTripDetail = ( props ) => {
       "get",
       API_PATH.DELIVERY_MANAGER_ASSIGN_ORDER_ITEM,
       (res) => {
+        setRawCreatedItemsTableData(res.data);
         setCreatedItemsTableData(res.data);
       }
     );
   }, []);
 
+  // useEffect(() => {
+  //   const assignedItemsIdArr = deliveryItemsTableData.map(e => e.assignOrderItemId);
+  //   const newCreatedItemsTableData = createdItemsTableData.filter(item => !assignedItemsIdArr.includes(item.assignOrderItemId));
+  //   setCreatedItemsTableData(newCreatedItemsTableData);
+  // }, [deliveryItemsTableData]);
+
   useEffect(() => {
-    // filter created assigned items table data
-    // that match with selected warehouse id
+    // lọc created items table data 
+    // loại bỏ các items có assignOrderItemId nằm trong deliveryItemsTableData
+    // và loại bỏ các items có warehouseId != deliveryTrip warehouseId
     if (selectedWarehouseId != null) {
+      const assignedItemsIdArr = deliveryItemsTableData.map(e => e.assignOrderItemId);
       const filterTableData = createdItemsTableData.filter(
-        item => item.warehouseId == selectedWarehouseId);
+        item => item.warehouseId == selectedWarehouseId && !assignedItemsIdArr.includes(item.assignOrderItemId));
       setCreatedItemsTableData(filterTableData);
     }
   }, [selectedWarehouseId]);
@@ -87,19 +101,19 @@ const DeliveryTripDetail = ( props ) => {
       sequence: maxSequence + 1
     };
     var updated = false;
-    for (var i = 0; i < deliveryItemsTableData.length; i++) {
-      if (deliveryItemsTableData[i].assignOrderItemId 
-        == newDeliveryItem.assignOrderItemId) {
-          var localDeliveryItem = deliveryItemsTableData[i];
-          const newQuantity = parseInt(localDeliveryItem.quantity) + parseInt(newDeliveryItem.quantity);
-          localDeliveryItem.quantity = newQuantity;
-          var newDeliveryItemsTableData = deliveryItemsTableData;
-          newDeliveryItemsTableData.splice(i, 1);
-          setDeliveryItemsTableData([...newDeliveryItemsTableData, localDeliveryItem]);
-          updated = true;
-          break;
-        }
-    }
+    // for (var i = 0; i < deliveryItemsTableData.length; i++) {
+    //   if (deliveryItemsTableData[i].assignOrderItemId 
+    //     == newDeliveryItem.assignOrderItemId) {
+    //       var localDeliveryItem = deliveryItemsTableData[i];
+    //       const newQuantity = parseInt(localDeliveryItem.quantity) + parseInt(newDeliveryItem.quantity);
+    //       localDeliveryItem.quantity = newQuantity;
+    //       var newDeliveryItemsTableData = deliveryItemsTableData;
+    //       newDeliveryItemsTableData.splice(i, 1);
+    //       setDeliveryItemsTableData([...newDeliveryItemsTableData, localDeliveryItem]);
+    //       updated = true;
+    //       break;
+    //     }
+    // }
     if (!updated) {
       setDeliveryItemsTableData([...deliveryItemsTableData, newDeliveryItem]);
       setMaxSequence(maxSequence + 1);
@@ -108,27 +122,17 @@ const DeliveryTripDetail = ( props ) => {
     setSelectedWarehouseName(selectedAssignedItem.warehouseName);
     setSelectedQuantity(0);
 
-    // update created assign items table data 
-    // substract quantity 
-    // or remove item if quantity if needed 
-    var localSelectedItem = selectedAssignedItem;
-    const newQuantity = maxQuantity - selectedQuantity;
-    localSelectedItem.quantity = newQuantity;
-    var index = -1;
-    for (var i = 0 ; i < createdItemsTableData.length; i++) {
-      if (createdItemsTableData[i].assignOrderItemId 
-        == selectedAssignedItem.assignOrderItemId) {
-        index = i;
+    // remove các createdOrderItem có assignOrderItem trùng với newDeliveryItem
+    var newCreatedItemsTableData = createdItemsTableData;
+    var removeItemIndex;
+    for (var i = 0; i < newCreatedItemsTableData.length; i++) {
+      if (newCreatedItemsTableData[i].assignOrderItemId == newDeliveryItem.assignOrderItemId) {
+        removeItemIndex = i;
         break;
       }
     }
-    var newCreatedItemsTableData = createdItemsTableData;
-    newCreatedItemsTableData.splice(index, 1);
-    if (newQuantity > 0) {
-      setCreatedItemsTableData([...newCreatedItemsTableData, localSelectedItem]);
-    } else {
-      setCreatedItemsTableData(newCreatedItemsTableData);
-    }
+    newCreatedItemsTableData.splice(removeItemIndex, 1);
+    setCreatedItemsTableData(newCreatedItemsTableData);
   }
 
   const saveDeliveryTripButtonHandle = () => {
@@ -155,7 +159,20 @@ const DeliveryTripDetail = ( props ) => {
     )
   }
 
-  return <Fragment>
+  const deleteButtonHandle = () => {
+    request(
+      "delete",
+      `${API_PATH.DELIVERY_MANAGER_DELIVERY_TRIP}/${tripId}`,
+      (res) => {
+        if (res.status == 200) {
+          successNoti("Hủy bỏ chuyến giao hàng thành công");
+          setDeleted(true);
+        }
+      }
+    )
+  }
+
+  return (<Fragment>
 
     <Modal open={isShowAssignedItemsModal}
       onClose={() => setShowAssignedItemsModal(!isShowAssignedItemsModal)}
@@ -247,10 +264,22 @@ const DeliveryTripDetail = ( props ) => {
             Thông tin chuyến giao hàng</Typography>
         </Grid>
 
-        <Grid className={classes.buttonWrap}>
-          <Button variant="contained" className={classes.addButton} 
-            type="submit" onClick={saveDeliveryTripButtonHandle} >Lưu</Button>
-        </Grid>
+        {
+          !isDeleted &&
+          <Grid className={classes.buttonWrap}>
+            <Button variant="contained" className={classes.addButton} 
+              type="submit" onClick={saveDeliveryTripButtonHandle} >Lưu</Button>
+          </Grid>
+        }
+
+        {
+          !isDeleted &&
+          <Grid className={classes.buttonWrap}>
+            <Button variant="contained" className={classes.addButton} 
+              type="submit" onClick={deleteButtonHandle}>Hủy bỏ</Button>
+          </Grid>
+        }
+
       </Grid>
     </Box>
 
@@ -318,7 +347,7 @@ const DeliveryTripDetail = ( props ) => {
                   deliveryPersons.length > 0 &&
                   deliveryPersons.map(person => 
                     <MenuItem key={person.deliveryPersonId}
-                      value={person.fullName}></MenuItem>)
+                      value={person.fullName}>{person.fullName}</MenuItem>)
                 }
               </Select>
             </Box>
@@ -401,7 +430,7 @@ const DeliveryTripDetail = ( props ) => {
           { title: "Kho", field: "warehouseName" },
           { title: "Địa chỉ nhận hàng", field: "customerAddressName" }
         ]}
-        actions={[
+        actions={!isDeleted && [
           {
             icon: () => <AddIcon onClick={() => setShowAssignedItemsModal(true)} />,
             tooltip: "Thêm sản phẩm vào chuyến giao hàng",
@@ -415,9 +444,56 @@ const DeliveryTripDetail = ( props ) => {
           sorting: true,
         }}
         data={deliveryItemsTableData}
+        editable={{
+          onRowDelete: oldData => new Promise((resolve, reject) => {
+            setTimeout(() => {
+              console.log("Old data => ", oldData);
+              if (oldData.deliveryTripItemId !== undefined) {
+                // nếu đã lưu delivery item vào data base
+                // thì xóa các delivery item này
+                // và cập nhật lại quantity của assigned_order_item
+                console.log("Delete from database");
+                request(
+                  "put",
+                  API_PATH.DELIVERY_MANAGER_ASSIGN_ORDER_ITEM,
+                  (res) => {
+                    setCreatedItemsTableData([...createdItemsTableData, res.data]);
+                  },
+                  {
+                    500: () => errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau")
+                  },
+                  {
+                    assignOrderItemId: oldData.assignOrderItemId,
+                    quantity: oldData.quantity,
+                    deliveryTripItemId: oldData.deliveryTripItemId
+                  }
+                );
+              } else {
+                // nếu chưa lưu delivery item vào database
+                // thì restore created items từ rawCreatedItemsTableData
+                var newCreatedItemsTableData = rawCreatedItemsTableData;
+                for (var i = 0; i < newCreatedItemsTableData.length; i++) {
+                  if (newCreatedItemsTableData[i].assignOrderItemId == oldData.assignOrderItemId) {
+                      var adder = newCreatedItemsTableData[i];
+                      adder.quantity = parseFloat(adder.quantity);
+                      setCreatedItemsTableData([...createdItemsTableData, adder])
+                      break;
+                    }
+                }
+              }
+              
+              const dataDelete = [...deliveryItemsTableData];
+              const index = oldData.tableData.id;
+              dataDelete.splice(index, 1);
+              setDeliveryItemsTableData([...dataDelete]);
+              setMaxSequence(maxSequence - 1);
+              resolve();
+            });
+          })
+        }}
       />
     </Box>
-  </Fragment>
+  </Fragment>)
 }
 
 export default DeliveryTripDetail;

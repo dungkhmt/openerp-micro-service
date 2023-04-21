@@ -120,7 +120,7 @@ const ReceiptRequestDetail = ( props ) => {
           className={classes.headerBox} >
           <Grid>
             <Typography variant="h5">
-              {"Tạo mới đơn xin nhập hàng"}
+              Tạo mới đơn xin nhập hàng
             </Typography>
           </Grid>
           {

@@ -158,7 +158,7 @@ const CartDetail = () => {
           </Grid>
           <Grid className={classes.buttonWrap}>
             <Button variant="contained" className={classes.addButton} 
-              type="submit" onClick={handleSubmit(payOderHandle)} >Thanh toán</Button>
+              type="submit" onClick={handleSubmit(payOderHandle)} >Mua hàng</Button>
           </Grid>
         </Grid>
       </Box>

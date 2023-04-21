@@ -42,7 +42,7 @@ const ReceiptRequestForApprovalListing = () => {
       data={receiptTableData}
       options={{
         selection: false,
-        pageSize: 20,
+        pageSize: 10,
         search: true,
         sorting: true,
       }}
