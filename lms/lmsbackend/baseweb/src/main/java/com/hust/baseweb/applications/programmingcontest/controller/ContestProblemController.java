@@ -72,6 +72,7 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(resp);
     }
 
+    @Secured("ROLE_TEACHER")
     @GetMapping("/get-all-contest-problems")
     public ResponseEntity<?> getAllContestProblems(Principal principal) {
         List<ProblemEntity> problems = problemTestCaseService.getAllProblems();
