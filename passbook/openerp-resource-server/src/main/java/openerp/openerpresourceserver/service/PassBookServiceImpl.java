@@ -13,6 +13,7 @@ import utils.DateTimeUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Log4j2
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -44,6 +45,7 @@ public class PassBookServiceImpl implements PassBookService{
         List<ModelResponsePassbook> res = new ArrayList<>();
         for(PassBook pb: lst){
             ModelResponsePassbook m = new ModelResponsePassbook();
+            m.setPassBookId(pb.getPassBookId());
             m.setPassBookName(pb.getPassBookName());
             m.setUserId(pb.getUserId());
             m.setDuration(pb.getDuration());
@@ -55,5 +57,14 @@ public class PassBookServiceImpl implements PassBookService{
         }
 
         return res;
+    }
+
+    @Override
+    public boolean removePassBook(UUID passBookId) {
+        PassBook pb = passBookRepo.findById(passBookId).orElse(null);
+        if(pb == null)
+        return false;
+        passBookRepo.delete(pb);
+        return true;
     }
 }
