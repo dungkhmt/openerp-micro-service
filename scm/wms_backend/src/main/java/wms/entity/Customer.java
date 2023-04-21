@@ -6,6 +6,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "customer")
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Customer extends BaseEntity{
+public class Customer extends BaseEntity implements Serializable {
     @Column(name = "code")
     private String code;
 
@@ -35,7 +36,7 @@ public class Customer extends BaseEntity{
     private String status;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "facility_code")
+    @JoinColumn(name = "facility_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private Facility facility;
 

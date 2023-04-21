@@ -6,6 +6,8 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -15,7 +17,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductEntity extends BaseEntity{
+public class ProductEntity extends BaseEntity implements Serializable {
     @Column(name = "code")
     private String code;
 
@@ -47,4 +49,26 @@ public class ProductEntity extends BaseEntity{
     // TODO: Should define images field here
     @Column(name = "sku")
     private String sku;
+
+    @OneToMany(
+            mappedBy = "product",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<ProductFacility> productFacilities;
+
+    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
+    // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
+    @JsonIgnore
+    private Set<PurchaseOrderItem> purchaseOrderItems;
+
+    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
+    // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
+    @JsonIgnore
+    private Set<InventoryItem> inventoryItems;
+
+    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
+    // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
+    @JsonIgnore
+    private Set<ReceiptBillItem> receiptBillItems;
 }

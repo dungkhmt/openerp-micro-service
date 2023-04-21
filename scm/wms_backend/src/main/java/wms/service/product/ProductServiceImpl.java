@@ -34,7 +34,7 @@ public class ProductServiceImpl extends BaseService implements IProductService {
 
     @Override
     public ProductEntity createProduct(ProductDTO productDTO) throws CustomException {
-        if (productRepository.getProductByCode(productDTO.getCode()) != null) {
+        if (productRepository.getProductByCode(productDTO.getCode().toUpperCase()) != null) {
             throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Exist product with same code, can't create");
         }
         if (productRepository.getProductBySku(productDTO.getSku()) != null) {

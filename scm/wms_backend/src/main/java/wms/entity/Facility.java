@@ -9,6 +9,8 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -17,7 +19,8 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Facility extends BaseEntity {
+// https://stackoverflow.com/questions/4525186/cannot-be-cast-to-java-io-serializable
+public class Facility extends BaseEntity implements Serializable {
     @Column(name = "code")
     private String code;
 
@@ -42,7 +45,12 @@ public class Facility extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by", referencedColumnName = "user_login_id")
     @NotFound(action = NotFoundAction.IGNORE)
-    private UserLogin user;
+    private UserLogin creator;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "managed_by", referencedColumnName = "user_login_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    private UserLogin manager;
 
     @OneToMany(mappedBy = "facility",fetch = FetchType.LAZY)
     // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
@@ -52,4 +60,27 @@ public class Facility extends BaseEntity {
 //    @JoinColumn(name = "contract_type_code")
 //    @NotFound(action = NotFoundAction.IGNORE)
 //    private ContractType contractType;
+
+    @OneToMany(
+            mappedBy = "facility",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<ProductFacility> productFacilities;
+
+
+    @OneToMany(mappedBy = "facility",fetch = FetchType.LAZY)
+    // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
+    @JsonIgnore
+    private Set<PurchaseOrder> purchaseOrders;
+
+    @OneToMany(mappedBy = "facility",fetch = FetchType.LAZY)
+    // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
+    @JsonIgnore
+    private Set<InventoryItem> inventoryItems;
+
+    @OneToMany(mappedBy = "facility",fetch = FetchType.LAZY)
+    // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
+    @JsonIgnore
+    private Set<ReceiptBill> receiptBills;
 }

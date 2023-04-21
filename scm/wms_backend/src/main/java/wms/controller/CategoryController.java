@@ -21,7 +21,7 @@ public class CategoryController extends BaseController {
     /**
      * Product Unit
      */
-    @PostMapping(path = "/product-unit/create-unit")
+    @PostMapping(path = "/product-unit/create")
     public ResponseEntity<?> createUnit(@Valid @RequestBody ProductUnitDTO productUnitDTO) {
         try {
             return response(new ResultEntity(1, "Create product unit successfully", categoryService.createProductUnit(productUnitDTO)));
@@ -30,7 +30,7 @@ public class CategoryController extends BaseController {
         }
     }
     @ApiOperation(value = "Get all product units with pagination and sorting and some conditions")
-    @GetMapping(path = "/product-unit/get-all-unit")
+    @GetMapping(path = "/product-unit/get-all")
     public ResponseEntity<?> getAllUnits(
             @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
@@ -43,7 +43,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping(path = "/product-unit/get-unit-by-id/{id}")
+    @GetMapping(path = "/product-unit/get-by-id/{id}")
     public ResponseEntity<?> getUnitById(@PathVariable("id") long id) {
         try {
             return response(new ResultEntity(1, "Get unit by id successfully", categoryService.getProductUnitById(id)));
@@ -51,7 +51,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping(path = "/product-unit/get-unit-by-code")
+    @GetMapping(path = "/product-unit/get-by-code")
     public ResponseEntity<?> getUnitByCode(
             @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code) {
         try {
@@ -60,7 +60,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @PutMapping(path = "/product-unit/update-unit/{id}")
+    @PutMapping(path = "/product-unit/update/{id}")
     public ResponseEntity<?> updateProductUnit(@Valid @RequestBody ProductUnitDTO productUnitDTO, @PathVariable("id") long id) {
         try {
             return response(new ResultEntity(1, "Update product unit successfully", categoryService.updateProductUnit(productUnitDTO, id)));
@@ -68,7 +68,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @DeleteMapping(path = "/product-unit/remove-unit/{id}")
+    @DeleteMapping(path = "/product-unit/remove/{id}")
     public ResponseEntity<?> deleteProductUnitByCode(@PathVariable("id") long id) {
         try {
             categoryService.deleteProductUnitById(id);
@@ -80,7 +80,7 @@ public class CategoryController extends BaseController {
     /**
      * Product Category
      */
-    @PostMapping(path = "/product-category/create-category")
+    @PostMapping(path = "/product-category/create")
     public ResponseEntity<?> createUnit(@Valid @RequestBody ProductCategoryDTO productCategoryDTO) {
         try {
             return response(new ResultEntity(1, "Create product category successfully", categoryService.createProductCategory(productCategoryDTO)));
@@ -89,7 +89,7 @@ public class CategoryController extends BaseController {
         }
     }
     @ApiOperation(value = "Get all product categorys with pagination and sorting and some conditions")
-    @GetMapping(path = "/product-category/get-all-category")
+    @GetMapping(path = "/product-category/get-all")
     public ResponseEntity<?> getAllCategories(
             @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
@@ -102,7 +102,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping(path = "/product-category/get-category-by-id/{id}")
+    @GetMapping(path = "/product-category/get-by-id/{id}")
     public ResponseEntity<?> getCategoryById(@PathVariable("id") long id) {
         try {
             return response(new ResultEntity(1, "Get category by id successfully", categoryService.getProductCategoryById(id)));
@@ -110,7 +110,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping(path = "/product-category/get-category-by-code")
+    @GetMapping(path = "/product-category/get-by-code")
     public ResponseEntity<?> getCategoryByCode(
             @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code) {
         try {
@@ -119,7 +119,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @PutMapping(path = "/product-category/update-category/{id}")
+    @PutMapping(path = "/product-category/update/{id}")
     public ResponseEntity<?> updateProductCategory(@Valid @RequestBody ProductCategoryDTO productCategoryDTO, @PathVariable("id") long id) {
         try {
             return response(new ResultEntity(1, "Update product category successfully", categoryService.updateProductCategory(productCategoryDTO, id)));
@@ -127,7 +127,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @DeleteMapping(path = "/product-category/remove-category/{id}")
+    @DeleteMapping(path = "/product-category/remove/{id}")
     public ResponseEntity<?> deleteProductCategoryById(@PathVariable("id") long id) {
         try {
             categoryService.deleteProductCategoryById(id);
@@ -162,7 +162,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping(path = "/customer-type/get-type-by-id/{id}")
+    @GetMapping(path = "/customer-type/get-by-id/{id}")
     public ResponseEntity<?> getCustomerTypeById(@PathVariable("id") long id) {
         try {
             return response(new ResultEntity(1, "Get type by id successfully", categoryService.getCustomerTypeById(id)));
@@ -170,7 +170,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping(path = "/customer-type/get-type-by-code")
+    @GetMapping(path = "/customer-type/get-by-code")
     public ResponseEntity<?> getCustomerTypeByCode(
             @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code) {
         try {
@@ -179,7 +179,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @PutMapping(path = "/customer-type/update-type/{id}")
+    @PutMapping(path = "/customer-type/update/{id}")
     public ResponseEntity<?> updateCustomerType(@Valid @RequestBody CustomerTypeDTO customerTypeDTO, @PathVariable("id") long id) {
         try {
             return response(new ResultEntity(1, "Update customer type successfully", categoryService.updateCustomerType(customerTypeDTO, id)));
@@ -187,7 +187,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @DeleteMapping(path = "/customer-type/remove-type/{id}")
+    @DeleteMapping(path = "/customer-type/remove/{id}")
     public ResponseEntity<?> deleteCustomerTypeByID(@PathVariable("id") long id) {
         try {
             categoryService.deleteCustomerTypeById(id);
@@ -221,7 +221,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping(path = "/distributing-channel/get-channel-by-id/{id}")
+    @GetMapping(path = "/distributing-channel/get-by-id/{id}")
     public ResponseEntity<?> getChannelById(@PathVariable("id") long id) {
         try {
             return response(new ResultEntity(1, "Get channel by id successfully", categoryService.getDistributingChannelById(id)));
@@ -229,7 +229,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping(path = "/distributing-channel/get-channel-by-code")
+    @GetMapping(path = "/distributing-channel/get-by-code")
     public ResponseEntity<?> getChannelByCode(
             @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code) {
         try {
@@ -238,7 +238,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @PutMapping(path = "/distributing-channel/update-channel/{id}")
+    @PutMapping(path = "/distributing-channel/update/{id}")
     public ResponseEntity<?> updateChannel(@Valid @RequestBody DistributingChannelDTO channelDTO, @PathVariable("id") long id) {
         try {
             return response(new ResultEntity(1, "Update distributing channel successfully", categoryService.updateDistributingChannel(channelDTO, id)));
@@ -246,7 +246,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @DeleteMapping(path = "/distributing-channel/remove-channel/{id}")
+    @DeleteMapping(path = "/distributing-channel/remove/{id}")
     public ResponseEntity<?> deleteChannelById(@PathVariable("id") long id) {
         try {
             categoryService.deleteDistributingChannelById(id);
@@ -280,7 +280,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping(path = "/contract-type/get-contract-by-id/{id}")
+    @GetMapping(path = "/contract-type/get-by-id/{id}")
     public ResponseEntity<?> getContractById(@PathVariable("id") long id) {
         try {
             return response(new ResultEntity(1, "Get contract by id successfully", categoryService.getContractTypeById(id)));
@@ -288,7 +288,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping(path = "/contract-type/get-contract-by-code")
+    @GetMapping(path = "/contract-type/get-by-code")
     public ResponseEntity<?> getContractByCode(
             @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code) {
         try {
@@ -297,7 +297,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @PutMapping(path = "/contract-type/update-contract/{id}")
+    @PutMapping(path = "/contract-type/update/{id}")
     public ResponseEntity<?> updateContract(@Valid @RequestBody ContractTypeDTO contractTypeDTO, @PathVariable("id") long id) {
         try {
             return response(new ResultEntity(1, "Update contract type successfully", categoryService.updateContractType(contractTypeDTO, id)));
@@ -305,7 +305,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @DeleteMapping(path = "/contract-type/remove-contract/{id}")
+    @DeleteMapping(path = "/contract-type/remove/{id}")
     public ResponseEntity<?> deleteContractTypeById(@PathVariable("id") long id) {
         try {
             categoryService.deleteContractTypeById(id);

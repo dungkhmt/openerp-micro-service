@@ -45,7 +45,7 @@ public class ProductController extends BaseController {
         }
     }
     @ApiOperation(value = "Get all product with pagination and sorting and some conditions")
-    @GetMapping("/get-all-product")
+    @GetMapping("/get-all")
     public ResponseEntity<?> getAllProducts(
             @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
@@ -58,7 +58,7 @@ public class ProductController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping("/get-product-by-id/{id}")
+    @GetMapping("/get-by-id/{id}")
     public ResponseEntity<?> getProductByID(@PathVariable("id") long id) {
         try {
             return response(new ResultEntity(1, "Get product by id successfully", productService.getProductById(id)));
@@ -66,7 +66,7 @@ public class ProductController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping("/get-product-by-code")
+    @GetMapping("/get-by-code")
     public ResponseEntity<?> getProductByCode(
             @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code) {
         try {
@@ -75,7 +75,7 @@ public class ProductController extends BaseController {
             return response(error(ex));
         }
     }
-    @PutMapping("/update-product/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<?> updateProductCategory(@Valid @RequestBody ProductDTO productDTO, @PathVariable("id") long id) {
         try {
             return response(new ResultEntity(1, "Update product successfully", productService.updateProduct(productDTO, id)));
@@ -83,7 +83,7 @@ public class ProductController extends BaseController {
             return response(error(ex));
         }
     }
-    @DeleteMapping("/delete-product/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteProductCategoryById(@PathVariable("id") long id) {
         try {
             productService.deleteProductById(id);

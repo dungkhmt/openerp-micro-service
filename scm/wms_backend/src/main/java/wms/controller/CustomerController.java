@@ -32,7 +32,7 @@ public class CustomerController extends BaseController{
         }
     }
     @ApiOperation(value = "Get all customer with pagination and sorting and some conditions")
-    @GetMapping("/get-all-customer")
+    @GetMapping("/get-all")
     public ResponseEntity<?> getAllCustomers(
             @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
@@ -45,7 +45,7 @@ public class CustomerController extends BaseController{
             return response(error(ex));
         }
     }
-    @GetMapping("/get-customer-by-id/{id}")
+    @GetMapping("/get-by-id/{id}")
     public ResponseEntity<?> getCustomerByID(@PathVariable("id") long id) {
         try {
             return response(new ResultEntity(1, "Get customer by id successfully", customerService.getCustomerById(id)));
@@ -53,7 +53,7 @@ public class CustomerController extends BaseController{
             return response(error(ex));
         }
     }
-    @GetMapping("/get-customer-by-code")
+    @GetMapping("/get-by-code")
     public ResponseEntity<?> getCustomerByCode(
             @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code) {
         try {
@@ -62,7 +62,7 @@ public class CustomerController extends BaseController{
             return response(error(ex));
         }
     }
-    @PutMapping("/update-customer/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<?> updateCustomer(@Valid @RequestBody CustomerUpdateDTO customerDTO, @PathVariable("id") long id) {
         try {
             return response(new ResultEntity(1, "Update customer successfully", customerService.updateCustomerInfo(customerDTO, id)));
@@ -70,7 +70,7 @@ public class CustomerController extends BaseController{
             return response(error(ex));
         }
     }
-    @DeleteMapping("/delete-customer/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteCustomerById(@PathVariable("id") long id) {
         try {
             customerService.deleteCustomerById(id);

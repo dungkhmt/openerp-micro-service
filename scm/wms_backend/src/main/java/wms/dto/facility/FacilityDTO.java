@@ -3,7 +3,6 @@ package wms.dto.facility;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Data
 public class FacilityDTO {
@@ -17,4 +16,5 @@ public class FacilityDTO {
     private String latitude;
     private String longitude;
     private String createdBy;
+    private String managedBy;
 }
