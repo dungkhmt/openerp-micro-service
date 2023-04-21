@@ -12,11 +12,8 @@ import {
 } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import Alert from "@mui/material/Alert";
-import {axiosPost} from "api";
 import React, {useState} from "react";
-import {useSelector} from "react-redux";
-import {useHistory} from "react-router-dom";
-import * as yup from "yup";
+import {request} from "../../../api";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -38,23 +35,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-let schema = yup.object().shape({
-  name: yup.string().required(),
-  email: yup.string().email("Email invalid").required(),
-  userLogin: yup.string(),
-});
 
-export default function ModalCreateResource({ open, handleClose, domainId }) {
+export default function ModalCreateResource({open, handleClose, domainId}) {
   const classes = useStyles();
-  const history = useHistory();
-  const token = useSelector((state) => state.auth.token);
   const [link, setLink] = useState(null);
-  const [status, setStatus] = useState(null);
   const [description, setDescription] = useState(null);
   const [alert, setAlert] = useState(false);
   const [alertContent, setAlertContent] = useState("");
-
-  // const toastId = React.useRef(null);
 
   const createResource = () => {
     const data = JSON.stringify({
@@ -62,18 +49,27 @@ export default function ModalCreateResource({ open, handleClose, domainId }) {
       description: description,
       statusId: "RESOURCE_CREATED",
     });
-    axiosPost(token, `/domains/${domainId}/resource`, data)
-      .then((res) => {
-        console.log("create, resource ", res.data);
+
+    request(
+      'post',
+      `/domains/${domainId}/resource`,
+      res => {
         if (res.data == true) {
-          setAlertContent("Create susscessed");
+          setAlertContent("Created susscessfully");
           setAlert(true);
         }
-      })
-      .catch((error) => {
+      },
+      err => {
         setAlertContent("Create failed");
         setAlert(true);
-      });
+      },
+      data,
+      {
+        headers: {
+          "content-type": "application/json"
+        }
+      }
+    );
   };
   const handleSubmit = () => {
     createResource();
@@ -93,7 +89,7 @@ export default function ModalCreateResource({ open, handleClose, domainId }) {
       <Fade in={open}>
         <form onSubmit={handleSubmit}>
           <Card className={classes.card}>
-            <CardHeader title="Thêm nguồn tham khảo" />
+            <CardHeader title="Thêm nguồn tham khảo"/>
             <CardContent>
               <Box
                 display="flex"

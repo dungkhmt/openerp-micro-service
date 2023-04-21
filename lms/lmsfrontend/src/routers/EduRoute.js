@@ -34,14 +34,10 @@ import StudentQuizDetailCheckAndConfirmGroupCode
   from "../component/education/quiztest/StudentQuizDetailCheckAndConfirmGroupCode";
 import StudentQuizList from "../component/education/quiztest/StudentQuizTestList";
 import StudentMyQuizTestList from "../component/education/quiztest/StudentMyQuizTestList";
-import ResourceCreate from "../component/education/resourcelink/ResourceCreate";
-import ResourceDomainCreate from "../component/education/resourcelink/ResourceDomainCreate";
-import ResourceDomainEdit from "../component/education/resourcelink/ResourceDomainEdit";
 import ResourceDomainList from "../component/education/resourcelink/ResourceDomainList";
 import ResourceList from "../component/education/resourcelink/ResourceList";
 import AddTeacher from "../component/education/teacher/AddTeacher";
 import TeacherDetail from "../component/education/teacher/TeacherDetail";
-// import TeacherList from "../component/education/teacher/TeacherList";
 import TeacherViewQuestionsOfParticipant from "../component/education/quiztest/TeacherViewQuestionsOfParticipant";
 import ClassRegistration from "../views/Education/ClassManagement/Student/ClassRegistration";
 import SAssignmentDetail from "../views/Education/ClassManagement/Student/SAssignmentDetail";
@@ -155,18 +151,6 @@ export default function EduRoute() {
         <Route
           component={ResourceDomainList}
           path={`${path}/teach/resource-links/list`}
-        />
-        <Route
-          component={ResourceDomainCreate}
-          path={`${path}/domain/create`}
-        />
-        <Route
-          component={ResourceCreate}
-          path={`${path}/domains/:id/resource`}
-        />
-        <Route
-          component={ResourceDomainEdit}
-          path={`${path}/domains/:id/edit`}
         />
         <Route
           component={ResourceList}

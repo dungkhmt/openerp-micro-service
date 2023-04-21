@@ -2,13 +2,13 @@ import React, {useEffect} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import MaterialTable from "material-table";
 import {useSelector} from "react-redux";
-import {API_URL} from "../../config/config";
 import Button from "@material-ui/core/Button";
 import XLSX from "xlsx";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import InputLabel from "@material-ui/core/InputLabel";
 import {FormControl, Typography} from "@material-ui/core";
+import {BASE_URL} from "../../api";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -24,7 +24,7 @@ export default function AssignmentList(props) {
   // pool
   const [semester, setSemester] = React.useState([]);
   const [teacher, setTeacher] = React.useState([
-    { teacherId: " ", teacherName: "Tất cả", email: "Tất cả" },
+    {teacherId: " ", teacherName: "Tất cả", email: "Tất cả"},
   ]);
 
   // selected
@@ -35,14 +35,14 @@ export default function AssignmentList(props) {
   const [assignment, setAssignment] = React.useState([]);
 
   const columns = [
-    { title: "Mã lớp", field: "classId" },
-    { title: "Mã học phần", field: "courseId" },
-    { title: "Tên học phần", field: "courseName" },
-    { title: "Loại lớp", field: "classType" },
-    { title: "Số tín chỉ", field: "credit" },
-    { title: "Tên giảng viên", field: "teacherName" },
-    { title: "Email", field: "email" },
-    { title: "Ca học", field: "sessionId" },
+    {title: "Mã lớp", field: "classId"},
+    {title: "Mã học phần", field: "courseId"},
+    {title: "Tên học phần", field: "courseName"},
+    {title: "Loại lớp", field: "classType"},
+    {title: "Số tín chỉ", field: "credit"},
+    {title: "Tên giảng viên", field: "teacherName"},
+    {title: "Email", field: "email"},
+    {title: "Ca học", field: "sessionId"},
   ];
 
   const semesterChange = (event) => {
@@ -60,10 +60,10 @@ export default function AssignmentList(props) {
       return;
     }
     fetch(
-      API_URL + "/edu/get-all-assignment/" + semesterQuery + "/" + teacherQuery,
+      BASE_URL + "/edu/get-all-assignment/" + semesterQuery + "/" + teacherQuery,
       {
         method: "GET",
-        headers: { "Content-Type": "application/json", "X-Auth-Token": token },
+        headers: {"Content-Type": "application/json", "X-Auth-Token": token},
       }
     )
       .then((response) => response.json())
@@ -73,9 +73,9 @@ export default function AssignmentList(props) {
   };
 
   useEffect(() => {
-    fetch(API_URL + "/edu/get-all-semester", {
+    fetch(BASE_URL + "/edu/get-all-semester", {
       method: "GET",
-      headers: { "Content-Type": "application/json", "X-Auth-Token": token },
+      headers: {"Content-Type": "application/json", "X-Auth-Token": token},
     })
       .then((response) => response.json())
       .then((response) => {
@@ -83,9 +83,9 @@ export default function AssignmentList(props) {
         setSemester(response);
       });
 
-    fetch(API_URL + "/edu/get-all-teachers", {
+    fetch(BASE_URL + "/edu/get-all-teachers", {
       method: "GET",
-      headers: { "Content-Type": "application/json", "X-Auth-Token": token },
+      headers: {"Content-Type": "application/json", "X-Auth-Token": token},
     })
       .then((response) => response.json())
       .then((response) => {
@@ -99,14 +99,14 @@ export default function AssignmentList(props) {
       return;
     }
     var wbcols = [
-      { wpx: 50 },
-      { wpx: 50 },
-      { wpx: 200 },
-      { wpx: 50 },
-      { wpx: 50 },
-      { wpx: 200 },
-      { wpx: 100 },
-      { wpx: 200 },
+      {wpx: 50},
+      {wpx: 50},
+      {wpx: 200},
+      {wpx: 50},
+      {wpx: 50},
+      {wpx: 200},
+      {wpx: 100},
+      {wpx: 200},
     ];
 
     var data = assignment.map((item) => ({

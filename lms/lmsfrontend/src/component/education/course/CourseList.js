@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {Link, useHistory} from "react-router-dom";
 import {toast} from "react-toastify";
 import XLSX from "xlsx";
-import {axiosGet, axiosPost} from "../../../api";
+import {request} from "../../../api";
 import {tableIcons} from "../../../utils/iconutil";
 import {
   errorNoti,
@@ -58,12 +58,13 @@ function CourseList() {
 
   // Functions.
   const getAllCourses = () => {
-    axiosGet(token, "/edu/course/all")
-      .then((res) => {
-        console.log("getAllCourses, courses ", res.data);
+    request('get',
+      '/edu/course/all',
+      res => {
         setCourses(res.data);
-      })
-      .catch((error) => console.log("getAllCourses, error ", error));
+      },
+      error => console.log("getAllCourses, error ", error)
+    )
   };
 
   const onClickCreateNewButton = () => {
@@ -87,8 +88,8 @@ function CourseList() {
 
     reader.onload = (event) => {
       try {
-        const { result } = event.target;
-        const workbook = XLSX.read(result, { type: "binary" });
+        const {result} = event.target;
+        const workbook = XLSX.read(result, {type: "binary"});
 
         if (workbook.Sheets.hasOwnProperty(sheetName)) {
           let sheet = workbook.Sheets[sheetName];
@@ -259,12 +260,10 @@ function CourseList() {
           }
 
           // Everything is OK!.
-          axiosPost(
-            token,
+          request(
+            'post',
             "/edu/course/add-list-of-courses",
-            XLSX.utils.sheet_to_json(sheet)
-          )
-            .then((res) => {
+            res => {
               if (toast.isActive(toastId.current)) {
                 updateSuccessNoti(toastId, res.data);
               } else {
@@ -272,8 +271,8 @@ function CourseList() {
               }
 
               getAllCourses();
-            })
-            .catch((error) => {
+            },
+            err => {
               if (toast.isActive(toastId.current)) {
                 updateErrorNoti(toastId, "Rất tiếc! Đã xảy ra lỗi :((");
               } else {
@@ -281,10 +280,10 @@ function CourseList() {
               }
 
               console.log("onClickSaveButton, error ", error);
-            });
+            },
+            XLSX.utils.sheet_to_json(sheet));
         } else {
           updateErrorNoti(toastId, `Không tìm thấy sheet "${sheetName}"`);
-          return;
         }
       } catch (e) {
         console.log(e);
@@ -294,8 +293,6 @@ function CourseList() {
         } else {
           errorNoti("Rất tiếc! Đã xảy ra lỗi :((");
         }
-
-        return;
       }
     };
 
@@ -341,8 +338,8 @@ function CourseList() {
                           variant="contained"
                           color="primary"
                           onClick={onClickCreateNewButton}
-                          startIcon={<AddCircleIcon />}
-                          style={{ marginRight: 16 }}
+                          startIcon={<AddCircleIcon/>}
+                          style={{marginRight: 16}}
                         >
                           Thêm mới
                         </Button>

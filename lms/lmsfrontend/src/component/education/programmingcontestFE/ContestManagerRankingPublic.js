@@ -11,7 +11,7 @@ import {useEffect, useState} from "react";
 import XLSX from "xlsx";
 import {StyledTableCell, StyledTableRow} from "./lib";
 import {useParams} from "react-router-dom";
-import {API_URL} from "../../../config/config";
+import {BASE_URL} from "../../../api";
 
 export default function ContestManagerRankingPublic() {
   const { contestId } = useParams();
@@ -69,7 +69,7 @@ export default function ContestManagerRankingPublic() {
   };
 
   function getRanking() {
-    fetch(API_URL + "/public/ranking-programming-contest/" + contestId)
+    fetch(BASE_URL + "/public/ranking-programming-contest/" + contestId)
       .then((response) => response.json())
       .then((data) => {
         console.log("fetch ", data);

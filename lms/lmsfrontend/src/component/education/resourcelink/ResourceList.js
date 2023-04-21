@@ -5,14 +5,13 @@ import {MuiThemeProvider} from "@material-ui/core/styles";
 import MaterialTable, {MTableToolbar} from "material-table";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import {useHistory, useLocation, useParams} from "react-router-dom";
-import {authGet, authPost, axiosGet} from "../../../api";
+import {useHistory, useParams} from "react-router-dom";
+import {authGet, authPost} from "../../../api";
 import {tableIcons} from "../../../utils/iconutil";
 import ModalCreateResource from "./ModalCreateResource"
 
 function ResourceList(props) {
   const history = useHistory();
-  const location = useLocation();
   const params = useParams();
   const dispatch = useDispatch();
   const [open,setOpen] = useState(false);
@@ -25,26 +24,11 @@ function ResourceList(props) {
     { field: "statusId", title: "Status" },
   ];
 
-  const [resourceList, setResourceList] = useState([]);
-  // Functions.
-  const getAllResources = () => {
-      console.log(location);
-    axiosGet(token, `/domains/${params.id}/resources`)
-      .then((res) => {
-        console.log("getAllResources, resources ", res.data);
-        setResourceList(res.data.content);
-      })
-      .catch((error) => console.log("getAllResources, error ", error));
-  };
   const handleClose = () => {
     setOpen(false);
   }
 
   const onClickCreateNewButton = () => {
-    // history.push({
-    //   pathname: `/edu/domains/${params.id}/resource`,
-    //   state: {},
-    // });
     setOpen(true);
   };
 
@@ -54,36 +38,20 @@ function ResourceList(props) {
       state: {},
     });
   };
-  
-
-  // useEffect(() => {
-  //   getAllResources();
-  // }, []);
 
   return (
     <MuiThemeProvider>
         <Card>
           <CardContent>
             <MaterialTable
-              title="Danh sách link tham khao"
+              title="Danh sách link tham khảo"
               columns={columns}
               data={(query) =>
                 new Promise((resolve, reject) => {
-               console.log(query.search);
                 let sortParam = "";
                 if (query.orderBy !== undefined) {
                   sortParam =
                     "&sort=" + query.orderBy.field + "," + query.orderDirection;
-                }
-                let filterParam = "";
-                if (query.filters.length > 0) {
-                  console.log(query.filters.search)
-                  // let filter = query.filters;
-                  // filter.forEach((v) => {
-                  //   filterParam = v.column.field + "=" + v.value + "&";
-                  // });
-                  // filterParam =
-                  //   "&" + filterParam.substring(0, filterParam.length - 1);
                 }
 
                 if (query.search.length > 0) {
@@ -115,7 +83,6 @@ function ResourceList(props) {
                     sortParam 
                 ).then(
                   (res) => {
-                   // console.log(res)
                     resolve({
                       data: res.content,
                       page: res.number,
@@ -123,7 +90,7 @@ function ResourceList(props) {
                     });
                   },
                   (error) => {
-                    console.log("error");
+                    console.log(error);
                   }
                 );
                 }

@@ -17,8 +17,7 @@ import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
 import {failed} from "../../action/Auth";
-import {authPost} from "../../api";
-import {API_URL} from "../../config/config";
+import {authPost, BASE_URL} from "../../api";
 import withScreenSecurity from "../withScreenSecurity";
 
 const useStyles = makeStyles((theme) => ({
@@ -70,7 +69,7 @@ function UserCreate(props) {
   const classes = useStyles();
 
   function getSecurityGroups() {
-    fetch(API_URL + "/get-security-groups", {
+    fetch(BASE_URL + "/get-security-groups", {
       method: "GET",
       headers: { "Content-Type": "application/json", "X-Auth-Token": token },
     })

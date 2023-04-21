@@ -1,20 +1,14 @@
 import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
-import {request} from "../../../api";
+import {BASE_URL, request} from "../../../api";
 import {useTranslation} from "react-i18next";
 import {toFormattedDateTime} from "../../../utils/dateutils";
 import {Box, Chip, IconButton} from "@mui/material";
 import {GetApp} from "@material-ui/icons";
-import {API_URL} from "../../../config/config";
 import {getColorLevel} from "./lib";
 import {StandardTable} from "erp-hust/lib/StandardTable";
 
 function ListProblem() {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
-  const [totalPages, setTotalPage] = useState(0);
-  const pageSizes = [20, 50, 100];
-  const [contestProblems, setContestProblems] = useState([]);
   const [problems, setProblems] = useState([]);
 
   const {t} = useTranslation("education/programmingcontest/listproblem");
@@ -26,7 +20,7 @@ function ListProblem() {
     form.setAttribute("target", "_blank");
     form.setAttribute(
       "action",
-      `${API_URL}/export-problem/${problem.problemId}`
+      `${BASE_URL}/export-problem/${problem.problemId}`
     );
 
     document.body.appendChild(form);
@@ -90,16 +84,6 @@ function ListProblem() {
     },
   ];
 
-  const handlePageChange = (event, value) => {
-    setPage(value);
-  };
-
-  const handlePageSizeChange = (event) => {
-    setPageSize(event.target.value);
-    setPage(1);
-    // getProblemContestList();
-  };
-
   function getProblems() {
     request("get", "/get-all-contest-problems", (res) => {
       const data = res.data.map((problem) => ({
@@ -115,21 +99,10 @@ function ListProblem() {
     }).then();
   }
 
-  async function getProblemContestList() {
-    request(
-      "get",
-      "/get-contest-problem-paging?size=" + pageSize + "&page=" + (page - 1),
-      (res) => {
-        setTotalPage(res.data.totalPages);
-        setContestProblems(res.data.content);
-      }
-    ).then();
-  }
 
   useEffect(() => {
     getProblems();
-    getProblemContestList().then();
-  }, [page, pageSize]);
+  }, []);
 
   return (
     <div>

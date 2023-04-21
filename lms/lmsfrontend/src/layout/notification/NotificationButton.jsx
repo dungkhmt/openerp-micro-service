@@ -7,8 +7,7 @@ import {EventSourcePolyfill} from "event-source-polyfill";
 import randomColor from "randomcolor";
 import React from "react";
 import {store} from "../..";
-import {request} from "../../api";
-import {API_URL} from "../../config/config";
+import {BASE_URL, request} from "../../api";
 import {useNotificationState} from "../../state/NotificationState";
 import NotificationMenu from "./NotificationMenu";
 
@@ -211,7 +210,7 @@ function NotificationButton() {
     function setupEventSource() {
       fetchNotification();
 
-      es = new EventSourcePolyfill(`${API_URL}/notification/subscription`, {
+      es = new EventSourcePolyfill(`${BASE_URL}/notification/subscription`, {
         headers: {
           "X-Auth-Token": store.getState().auth.token,
           // Count: count++,

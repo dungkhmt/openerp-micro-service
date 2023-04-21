@@ -10,12 +10,11 @@ import {BiDetail} from "react-icons/bi";
 import {FcDownload} from "react-icons/fc";
 import {useSelector} from "react-redux";
 import {useHistory, useParams} from "react-router";
-import {request} from "../../../../api";
+import {BASE_URL, request} from "../../../../api";
 import CustomizedDialogs from "../../../../component/dialog/CustomizedDialogs";
 import NegativeButton from "../../../../component/education/classmanagement/NegativeButton";
 import NegativeDialogButton from "../../../../component/education/classmanagement/NegativeDialogButton";
 import PositiveButton from "../../../../component/education/classmanagement/PositiveButton";
-import {API_URL} from "../../../../config/config";
 import displayTime from "../../../../utils/DateTimeUtils";
 import changePageSize, {localization, tableIcons,} from "../../../../utils/MaterialTableUtils";
 import {errorNoti} from "../../../../utils/notification";
@@ -232,7 +231,7 @@ function TAssignmentDetail() {
     form.setAttribute("target", "_blank");
     form.setAttribute(
       "action",
-      `${API_URL}/edu/assignment/${params.assignmentId}/submissions?token=${token}`
+      `${BASE_URL}/edu/assignment/${params.assignmentId}/submissions?token=${token}`
     );
 
     const input = document.createElement("input");
@@ -255,7 +254,7 @@ function TAssignmentDetail() {
     form.setAttribute("target", "_blank");
     form.setAttribute(
       "action",
-      `${API_URL}/edu/assignment/${params.assignmentId}/submissions?token=${token}`
+      `${BASE_URL}/edu/assignment/${params.assignmentId}/submissions?token=${token}`
     );
 
     for (const submission of selectedSubmissions) {
@@ -272,20 +271,6 @@ function TAssignmentDetail() {
     form.submit();
     form.parentNode.removeChild(form);
 
-    // request(
-    //   token,
-    //   history,
-    //   "post",
-    //   `/edu/assignment/${params.assignmentId}/submissions`,
-    //   (res) => {
-    //     setIsZipping(false);
-    //     window.location.href = `${API_URL}/edu/assignment/${params.assignmentId}/download-file/${res.data}`;
-    //   },
-    //   { onError: () => setIsZipping(false) },
-    //   {
-    //     studentIds: studentIds,
-    //   }
-    // );
   };
 
   // Delete assignment.

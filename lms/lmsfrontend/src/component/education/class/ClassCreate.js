@@ -13,8 +13,7 @@ import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
 import {failed} from "../../../action/Auth";
-import {authPost} from "../../../api";
-import {API_URL} from "../../../config/config";
+import {authPost, BASE_URL} from "../../../api";
 import withScreenSecurity from "../../withScreenSecurity";
 
 const useStyles = makeStyles((theme) => ({
@@ -42,7 +41,6 @@ function ClassCreate() {
   const [classId, setClassId] = useState(null);
   const [classType, setClassType] = useState(null);
   const [courseId, setCourseId] = useState(null);
-  const [className, setClassName] = useState(null);
 
   const [departmentId, setDepartmentId] = useState(null);
   const [semesterId, setSemesterId] = useState(null);
@@ -64,43 +62,25 @@ function ClassCreate() {
     ];
     */
   const classTypePool = [
-    { type: "LT" },
-    { type: "BT" },
-    { type: "LT+BT" },
-    { type: "TN" },
-    { type: "DA" },
+    {type: "LT"},
+    {type: "BT"},
+    {type: "LT+BT"},
+    {type: "TN"},
+    {type: "DA"},
   ];
   const [invalidCourseId, setInvalidCourseId] = useState(false);
   const [invalidClassId, setInvalidClassId] = useState(false);
   const [invalidRequirementField, setInvalidRequirementField] = useState(false);
 
-  // function isNormalInteger(str) {
-  //   str = str.trim();
-  //   if (!str) {
-  //     return false;
-  //   }
-  //   str = str.replace(/^0+/, "") || "0";
-  //   var n = Math.floor(Number(str));
-  //   return n !== Infinity && String(n) === str && n >= 0;
-  // }
 
   const getAllCourses = () => {
-    fetch(API_URL + "/edu/class/get-all-courses", {
+    fetch(BASE_URL + "/edu/class/get-all-courses", {
       method: "GET",
-      headers: { "Content-Type": "application/json", "X-Auth-Token": token },
+      headers: {"Content-Type": "application/json", "X-Auth-Token": token},
     })
       .then((response) => response.json())
       .then(
         (response) => {
-          /*
-              console.log(response);
-              let arr = [];
-              response.forEach((d) => {
-                arr.push(d);
-              });
-              setCoursePool(arr);
-              */
-          //console.log('getDepartmentList = ',departments);
           setCoursePool(response);
         },
         (error) => {
@@ -110,9 +90,9 @@ function ClassCreate() {
   };
 
   const getAllDepartments = () => {
-    fetch(API_URL + "/edu/class/get-all-departments", {
+    fetch(BASE_URL + "/edu/class/get-all-departments", {
       method: "GET",
-      headers: { "Content-Type": "application/json", "X-Auth-Token": token },
+      headers: {"Content-Type": "application/json", "X-Auth-Token": token},
     })
       .then((response) => response.json())
       .then(
@@ -126,9 +106,9 @@ function ClassCreate() {
   };
 
   const getAllSemesters = () => {
-    fetch(API_URL + "/edu/class/get-all-semesters", {
+    fetch(BASE_URL + "/edu/class/get-all-semesters", {
       method: "GET",
-      headers: { "Content-Type": "application/json", "X-Auth-Token": token },
+      headers: {"Content-Type": "application/json", "X-Auth-Token": token},
     })
       .then((response) => response.json())
       .then(
@@ -346,7 +326,7 @@ function ClassCreate() {
                   id="select-department"
                   select
                   label="Bộ môn"
-                  style={{ width: "40ch" }}
+                  style={{width: "40ch"}}
                   value={departmentId}
                   onChange={(event) => {
                     setDepartmentId(event.target.value);
@@ -367,10 +347,10 @@ function ClassCreate() {
             disabled={isRequesting}
             variant="contained"
             color="primary"
-            style={{ marginLeft: "45px" }}
+            style={{marginLeft: "45px"}}
             onClick={handleSubmit}
           >
-            {isRequesting ? <CircularProgress /> : "Lưu"}
+            {isRequesting ? <CircularProgress/> : "Lưu"}
           </Button>
           <Button
             variant="contained"

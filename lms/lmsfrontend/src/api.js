@@ -1,13 +1,15 @@
 import axios from "axios";
 import {failed, logout} from "./action/Auth";
-import {API_URL} from "./config/config";
+import {config} from "./config/config";
 import history from "./history";
 import {store} from "./index";
 import {authState} from "./state/AuthState";
 import {infoNoti, wifiOffNotify} from "./utils/notification";
 
+export const BASE_URL = config.url.API_URL;
+
 export const authPost = (dispatch, token, url, body) => {
-  return fetch(API_URL + url, {
+  return fetch(BASE_URL + url, {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -37,17 +39,8 @@ export const authPost = (dispatch, token, url, body) => {
   );
 };
 export const authPostMultiPart = (dispatch, token, url, body) => {
-  /*
-  return fetch(API_URL + url, {
-    method: "POST",
-    headers: {
-      "X-Auth-Token": token,
-    },
-    body: body,
-  });
-  */
 
-  return fetch(API_URL + url, {
+  return fetch(BASE_URL + url, {
     method: "POST",
     headers: {
       "X-Auth-Token": token,
@@ -73,7 +66,7 @@ export const authPostMultiPart = (dispatch, token, url, body) => {
   );
 };
 export const authPut = (dispatch, token, url, body) => {
-  return fetch(API_URL + url, {
+  return fetch(BASE_URL + url, {
     method: "PUT",
     headers: {
       "content-type": "application/json",
@@ -83,7 +76,7 @@ export const authPut = (dispatch, token, url, body) => {
   });
 };
 export const authGet = (dispatch, token, url) => {
-  return fetch(API_URL + url, {
+  return fetch(BASE_URL + url, {
     method: "GET",
     headers: {
       "content-type": "application/json",
@@ -112,7 +105,7 @@ export const authGet = (dispatch, token, url) => {
   );
 };
 export const authDelete = (dispatch, token, url, body) => {
-  return fetch(API_URL + url, {
+  return fetch(BASE_URL + url, {
     method: "DELETE",
     headers: {
       "content-type": "application/json",
@@ -142,32 +135,6 @@ export const authDelete = (dispatch, token, url, body) => {
   );
 };
 
-export const axiosPost = (token, url, data, dispatch) => {
-  return axios.post(API_URL + url, data, {
-    headers: {
-      "content-type": "application/json",
-      "X-Auth-Token": token,
-    },
-  });
-};
-
-export const axiosPatch = (token, url, data, dispatch) => {
-  return axios.patch(API_URL + url, data, {
-    headers: {
-      "content-type": "application/json",
-      "X-Auth-Token": token,
-    },
-  });
-};
-
-export const axiosGet = (token, url, dispatch) => {
-  return axios.get(API_URL + url, {
-    headers: {
-      "content-type": "application/json",
-      "X-Auth-Token": token,
-    },
-  });
-};
 export const isFunction = (func) =>
   func &&
   (Object.prototype.toString.call(func) === "[object Function]" ||
@@ -175,7 +142,7 @@ export const isFunction = (func) =>
     func instanceof Function);
 
 const axiosInstance = axios.create({
-  baseURL: API_URL,
+  baseURL: BASE_URL,
 });
 
 // Alter defaults after instance has been created

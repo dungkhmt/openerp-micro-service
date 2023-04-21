@@ -5,7 +5,7 @@ import {MuiThemeProvider} from "@material-ui/core/styles";
 import MaterialTable, {MTableToolbar} from "material-table";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import {useHistory} from "react-router-dom";
-import {authGet, axiosGet} from "../../../api";
+import {authGet} from "../../../api";
 import {tableIcons} from "../../../utils/iconutil";
 import ModalCreate from "./ModalCreate";
 
@@ -21,53 +21,14 @@ function ResourceDomainList(props) {
     { field: "createDateTime", title: "Created Time"},
   ];
 
-  const [domainList, setDomainList] = useState([]);
   const [open,setOpen] = useState(false);
   // Functions
-  const getAllDomains = (query) => {
-    axiosGet(token, "/domains" +
-    "?size=" +
-    query.pageSize +
-    "&page=" +
-    query.page)
-      .then((res) => {
-        console.log("getAllDomains, domains ", res.data);
-        setDomainList(res.data.Domains);
-      })
-      .catch((error) => console.log("getAllDomains, error ", error));
-  };
-
   const handleClose = () => {
     setOpen(false);
   }
   const onClickCreateNewButton = () => {
-    // history.push({
-    //   pathname: "/edu/domain/create",
-    //   state: {},
-    // });
-
       setOpen(true);
   };
-  const onClickEditButton = (id) => {
-    history.push({
-      pathname: `/edu/domains/${id}/edit`,
-      state: {},
-    });
-  };
-  const handleRedirectResource = (id) => {
-    console.log(id);
-    history.push({
-      pathname: `/edu/domains/${id}/resources`,
-      state: {
-        domainId: id,
-      },
-    });
-  }
-
-  // useEffect(() => {
-  //   getAllDomains();
-  // }, []);
-
   return (
     <MuiThemeProvider>
         <Card>
@@ -77,7 +38,6 @@ function ResourceDomainList(props) {
               columns={columns}
               data={(query) =>
                 new Promise((resolve, reject) => {
-                console.log(query);
                 let sortParam = "";
                 if (query.orderBy !== undefined) {
                   sortParam =
