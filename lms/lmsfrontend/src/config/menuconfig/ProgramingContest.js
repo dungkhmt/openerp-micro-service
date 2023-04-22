@@ -28,7 +28,7 @@ export const ProgrammingContestMenuTeacher = {
       child: [],
     },
     {
-      id: "MENU_PROGRAMMING_CONTEST_MANAGER.MENU_PROGRAMMING_CONTEST_MANAGER",
+      id: "MENU_PROGRAMMING_CONTEST_MANAGER.MENU_PROGRAMMING_CONTEST_MANAGER_LIST_CONTEST",
       path: "/programming-contest/teacher-list-contest-manager",
       isPublic: false,
       icon: null,
