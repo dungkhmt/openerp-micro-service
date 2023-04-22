@@ -60,7 +60,7 @@ export const eduTeachingManagement = {
     {
       id: "",
       path: "/edu/teach/resource-links/list",
-      isPublic: true,
+      isPublic: false,
       icon: null,
       text: "Resource Links",
       child: [],
