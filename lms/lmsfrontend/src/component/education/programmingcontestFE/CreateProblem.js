@@ -184,19 +184,7 @@ function CreateProblem() {
     for (const file of attachmentFiles) {
       formData.append("files", file);
     }
-    /*
-    try {
-      authPostMultiPart(dispatch, token, "/create-problem", formData).then(
-        (res) => {
-          sleep(1000).then(() => {
-            history.push("/programming-contest/list-problems");
-          });
-        }
-      );
-    } catch (error) {
-      alert(error);
-    }
-    */
+
     setLoading(true);
     authPostMultiPart(dispatch, token, "/create-problem", formData)
       .then(
@@ -210,19 +198,6 @@ function CreateProblem() {
       .catch(() => errorNoti(t("error", {ns: "common"}), 3000))
       .finally(() => setLoading(false));
 
-    // request(
-    //   "post",
-    //   "/create-problem",
-    //   (res) => {
-    //     console.log("res ", res);
-    //     setShowSubmitSuccess(true);
-    //     sleep(1000).then((r) => {
-    //       history.push("/programming-contest/list-problems");
-    //     });
-    //   },
-    //   {},
-    //   body
-    // ).then();
   }
 
   return (
