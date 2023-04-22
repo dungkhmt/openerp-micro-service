@@ -612,13 +612,14 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 throw new MiniLeetCodeException("Contest is already exist");
             }
             ContestEntity contestEntity = null;
-            List<ProblemEntity> problemEntities = getContestProblemsFromListContestId(modelCreateContest.getProblemIds());
+//            List<ProblemEntity> problemEntities = getContestProblemsFromListContestId(modelCreateContest.getProblemIds());
+
             if (modelCreateContest.getStartedAt() != null) {
                 contestEntity = ContestEntity.builder()
                                              .contestId(modelCreateContest.getContestId())
                                              .contestName(modelCreateContest.getContestName())
                                              .contestSolvingTime(modelCreateContest.getContestTime())
-                                             .problems(problemEntities)
+//                                             .problems(problemEntities)
                                              .isPublic(modelCreateContest.isPublic())
                                              .countDown(modelCreateContest.getCountDownTime())
                                              .startedAt(modelCreateContest.getStartedAt())
@@ -633,7 +634,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .maxNumberSubmissions(modelCreateContest.getMaxNumberSubmissions())
                                              .maxSourceCodeLength(modelCreateContest.getMaxSourceCodeLength())
                                              .minTimeBetweenTwoSubmissions(modelCreateContest.getMinTimeBetweenTwoSubmissions())
-                                             .judgeMode(modelCreateContest.getJudgeMode())
+                                             .judgeMode(ContestEntity.ASYNCHRONOUS_JUDGE_MODE_QUEUE)
                                              .useCacheContestProblem(ContestEntity.USE_CACHE_CONTEST_PROBLEM_YES)
                                              .submissionActionType(ContestEntity.CONTEST_SUBMISSION_ACTION_TYPE_STORE_AND_EXECUTE)
                                              .problemDescriptionViewType(ContestEntity.CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_VISIBLE)
@@ -647,7 +648,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .contestId(modelCreateContest.getContestId())
                                              .contestName(modelCreateContest.getContestName())
                                              .contestSolvingTime(modelCreateContest.getContestTime())
-                                             .problems(problemEntities)
+//                                             .problems(problemEntities)
                                              .isPublic(modelCreateContest.isPublic())
                                              .countDown(modelCreateContest.getCountDownTime())
                                              .userId(userName)

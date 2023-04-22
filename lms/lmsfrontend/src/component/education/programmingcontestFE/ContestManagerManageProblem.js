@@ -106,13 +106,13 @@ export function ContestManagerManageProblem(props) {
 
   const getAllProblems = () => {
     request("get", "/get-all-contest-problems-general-info", (res) => {
-      setAllProblems(res.data);
+      setAllProblems(res.data || []);
     }).then();
   }
 
   const getAllProblemsInContest = () => {
     request("get", "/get-contest-detail/" + contestId, (res) => {
-      setContestProblems(res.data.list);
+      setContestProblems(res.data.list || []);
     }).then();
   }
 
@@ -174,13 +174,18 @@ export function ContestManagerManageProblem(props) {
               return (
                 <Box {...props} key={option.problemId}>
                   <Grid container>
-                    <Grid item xs={6}>
+                    <Grid item xs={5}>
                       {option.problemName}
                     </Grid>
-                    <Grid item xs={6} sx={{display: "flex"}}>
+                    <Grid item xs={5} sx={{display: "flex"}}>
                       <Typography>
                         {" "}
                         {"ID"}: {option.problemId}{" "}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={2} sx={{display: "flex"}}>
+                      <Typography sx={{color: getColorLevel(option.levelId)}}>
+                        {option.levelId}
                       </Typography>
                     </Grid>
                   </Grid>

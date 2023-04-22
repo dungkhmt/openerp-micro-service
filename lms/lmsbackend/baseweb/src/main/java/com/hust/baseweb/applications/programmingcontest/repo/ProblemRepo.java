@@ -24,7 +24,7 @@ public interface ProblemRepo extends JpaRepository<ProblemEntity, String> {
     //     "select p.problem_id as problemId, p.problem_name as problemName, p.problem_description as problemDescription from contest_problem_new p"
     // )
     @Query("select new com.hust.baseweb.applications.programmingcontest.model.ModelProblemGeneralInfo("
-            + "p.problemId, p.problemName, p.problemDescription"
+            + "p.problemId, p.problemName, p.levelId, p.problemDescription"
             + ") from ProblemEntity p")
     List<ModelProblemGeneralInfo> getAllProblemGeneralInformation();
 
