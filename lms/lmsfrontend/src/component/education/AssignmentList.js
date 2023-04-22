@@ -1,14 +1,13 @@
 import React, {useEffect} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import MaterialTable from "material-table";
-import {useSelector} from "react-redux";
 import Button from "@material-ui/core/Button";
 import XLSX from "xlsx";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import InputLabel from "@material-ui/core/InputLabel";
 import {FormControl, Typography} from "@material-ui/core";
-import {BASE_URL} from "../../api";
+import {request} from "../../api";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -19,7 +18,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AssignmentList(props) {
   const classes = useStyles();
-  const token = useSelector((state) => state.auth.token);
 
   // pool
   const [semester, setSemester] = React.useState([]);
@@ -59,39 +57,20 @@ export default function AssignmentList(props) {
     if (semesterQuery === null) {
       return;
     }
-    fetch(
-      BASE_URL + "/edu/get-all-assignment/" + semesterQuery + "/" + teacherQuery,
-      {
-        method: "GET",
-        headers: {"Content-Type": "application/json", "X-Auth-Token": token},
-      }
-    )
-      .then((response) => response.json())
-      .then((response) => {
-        setAssignment(response);
-      });
+
+    request("get",
+      "/edu/get-all-assignment/" + semesterQuery + "/" + teacherQuery,
+      res => setAssignment(res.data));
   };
 
   useEffect(() => {
-    fetch(BASE_URL + "/edu/get-all-semester", {
-      method: "GET",
-      headers: {"Content-Type": "application/json", "X-Auth-Token": token},
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        console.log(response);
-        setSemester(response);
-      });
+    request("get",
+      "/edu/get-all-semester",
+      res => setSemester(res.data));
 
-    fetch(BASE_URL + "/edu/get-all-teachers", {
-      method: "GET",
-      headers: {"Content-Type": "application/json", "X-Auth-Token": token},
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        console.log(response);
-        setTeacher([...teacher, ...response]);
-      });
+    request("get",
+      "/edu/get-all-teachers",
+      res => setTeacher([...teacher, ...res.data]));
   }, []);
 
   const downloadHandler = (event) => {

@@ -13,8 +13,9 @@ import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
 import {failed} from "../../../action/Auth";
-import {authPost, BASE_URL} from "../../../api";
+import {authPost, request} from "../../../api";
 import withScreenSecurity from "../../withScreenSecurity";
+import {errorNoti} from "../../../utils/notification";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -74,73 +75,36 @@ function ClassCreate() {
 
 
   const getAllCourses = () => {
-    fetch(BASE_URL + "/edu/class/get-all-courses", {
-      method: "GET",
-      headers: {"Content-Type": "application/json", "X-Auth-Token": token},
-    })
-      .then((response) => response.json())
-      .then(
-        (response) => {
-          setCoursePool(response);
-        },
-        (error) => {
-          setCoursePool([]);
-        }
-      );
+    request("get",
+      "/edu/class/get-all-courses",
+      res => {
+        setCoursePool(res.data)
+      },
+      err => errorNoti(err, 3000)
+    )
   };
 
   const getAllDepartments = () => {
-    fetch(BASE_URL + "/edu/class/get-all-departments", {
-      method: "GET",
-      headers: {"Content-Type": "application/json", "X-Auth-Token": token},
-    })
-      .then((response) => response.json())
-      .then(
-        (response) => {
-          setDepartmentPool(response);
-        },
-        (error) => {
-          setDepartmentPool([]);
-        }
-      );
+    request("get",
+      "/edu/class/get-all-departments",
+      res => setDepartmentPool(res.data),
+      err => errorNoti(err, 3000)
+    )
   };
 
   const getAllSemesters = () => {
-    fetch(BASE_URL + "/edu/class/get-all-semesters", {
-      method: "GET",
-      headers: {"Content-Type": "application/json", "X-Auth-Token": token},
-    })
-      .then((response) => response.json())
-      .then(
-        (response) => {
-          console.log(response);
-          let arr = [];
-          response.forEach((d) => {
-            arr.push(d);
-          });
-          setSemesterPool(arr);
+    request("get",
+      "/edu/class/get-all-semesters",
+      res => setSemesterPool(res.data),
+      err => errorNoti(err, 3000)
+    )
 
-          //setSemesterPool(response);
-          //console.log('getDepartmentList = ',departments);
-        },
-        (error) => {
-          setSemesterPool([]);
-        }
-      );
-
-    /*
-        authGet(dispatch, token, "/edu/get-all-semester").then((res) => {
-          console.log(res);
-          setSemesterPool(res);
-        });
-        */
   };
 
   useEffect(() => {
     getAllCourses();
     getAllDepartments();
     getAllSemesters();
-    console.log("departments = ", departmentPool);
   }, []);
 
   const onClassIdChange = (event) => {

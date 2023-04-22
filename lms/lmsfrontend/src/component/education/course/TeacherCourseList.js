@@ -1,17 +1,12 @@
 import {Card, CardContent} from "@material-ui/core/";
 import MaterialTable from "material-table";
 import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {useParams} from "react-router";
-import {Link, useHistory} from "react-router-dom";
-import {authGet} from "../../../api";
+import {Link} from "react-router-dom";
+import {request} from "../../../api";
 import TeacherViewCourseList from "./teacher/TeacherViewCourseList";
+import {errorNoti} from "../../../utils/notification";
 
 function TeacherCourseList() {
-  const params = useParams();
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
-  const history = useHistory();
   const [courses, setCourses] = useState([]);
 
   const columns = [
@@ -27,8 +22,10 @@ function TeacherCourseList() {
   ];
 
   async function getCourseList() {
-    let lst = await authGet(dispatch, token, "/edu/class/get-all-courses");
-    setCourses(lst);
+    request("get",
+      "/edu/class/get-all-courses",
+        res => setCourses(res),
+      err => errorNoti(err, 3000));
   }
 
   useEffect(() => {

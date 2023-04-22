@@ -2,7 +2,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import Button from "@material-ui/core/Button";
-import {authGet} from "../../api";
+import {authGet, request} from "../../api";
 import {CircularProgress} from "@material-ui/core";
 import MaterialTable from "material-table";
 
@@ -17,12 +17,11 @@ export default function Approve() {
   const [userRegisterList, setUserRegisterList] = useState([]);
 
   async function getUserRegisterList() {
-    let userRegisterList = await authGet(
-      dispatch,
-      token,
-      "/user/get-all-register-user"
+    await request(
+      "get",
+      "/user/get-all-register-user",
+      res => setUserRegisterList(res.data)
     );
-    setUserRegisterList(userRegisterList);
   }
 
   useEffect(() => {
