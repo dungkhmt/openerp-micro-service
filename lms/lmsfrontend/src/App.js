@@ -1,5 +1,5 @@
-import {Box, CircularProgress, CssBaseline, SvgIcon, Typography} from "@mui/material";
-import {createTheme, ThemeProvider} from "@mui/material/styles";
+import {CssBaseline} from "@material-ui/core";
+import {createTheme, MuiThemeProvider} from "@material-ui/core/styles";
 import {useEffect} from "react";
 import {I18nextProvider} from "react-i18next";
 import {QueryClient, QueryClientProvider} from "react-query";
@@ -15,6 +15,7 @@ import {request} from "./api";
 import {menuState} from "./state/MenuState";
 import {notificationState} from "./state/NotificationState";
 import { ReactComponent as Logo } from "./assets/icons/logo.svg";
+import {Box, CircularProgress, SvgIcon, Typography} from "@material-ui/core";
 
 const theme = createTheme({
   typography: {
@@ -90,6 +91,7 @@ function App() {
     }
   };
 
+  // Fix the bug is described here: https://github.com/facebook/create-react-app/issues/11773
   useEffect(() => {
     window.process = {
       ...window.process,
@@ -105,7 +107,7 @@ function App() {
     >
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider theme={theme}>
+          <MuiThemeProvider theme={theme}>
             <CssBaseline/>
             {/* <Router> */}
             <Router history={history}>
@@ -124,7 +126,8 @@ function App() {
                 pauseOnHover
               />
             </Router>
-          </ThemeProvider>
+            {/* </Router> */}
+          </MuiThemeProvider>
         </QueryClientProvider>
       </I18nextProvider>
     </ReactKeycloakProvider>
