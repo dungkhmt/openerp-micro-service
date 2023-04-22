@@ -6,7 +6,7 @@ export const eduLearningManagement = {
   text: "Learning",
   child: [
     {
-      id: "MENU_EDUCATION_LEARNING_MANAGEMENT_STUDENT_REGISTER_CLASS",
+      id: "MENU_EDUCATION_LEARNING_MANAGEMENT_STUDENT.MENU_EDUCATION_LEARNING_MANAGEMENT_STUDENT_REGISTER_CLASS",
       path: "/edu/class/register",
       isPublic: false,
       icon: null,
@@ -14,7 +14,7 @@ export const eduLearningManagement = {
       child: [],
     },
     {
-      id: "MENU_EDUCATION_LEARNING_MANAGEMENT_STUDENT_VIEW_LIST_CLASS",
+      id: "MENU_EDUCATION_LEARNING_MANAGEMENT_STUDENT.MENU_EDUCATION_LEARNING_MANAGEMENT_STUDENT_VIEW_LIST_CLASS",
       path: "/edu/student/class/list",
       isPublic: false,
       icon: null,
@@ -22,7 +22,7 @@ export const eduLearningManagement = {
       child: [],
     },
     {
-      id: "MENU_EDUCATION_TEACHING_MANAGEMENT_STUDENT_QUIZ_TEST_LIST",
+      id: "MENU_EDUCATION_LEARNING_MANAGEMENT_STUDENT.MENU_EDUCATION_TEACHING_MANAGEMENT_STUDENT_QUIZ_TEST_LIST",
       path: "/edu/class/student/quiztest/list",
       isPublic: false,
       icon: null,
@@ -30,7 +30,7 @@ export const eduLearningManagement = {
       child: [],
     },
     {
-      id: "MENU_EDUCATION_TEACHING_MANAGEMENT_STUDENT_MY_QUIZ_TEST_LIST",
+      id: "MENU_EDUCATION_LEARNING_MANAGEMENT_STUDENT.MENU_EDUCATION_TEACHING_MANAGEMENT_STUDENT_MY_QUIZ_TEST_LIST",
       path: "/edu/class/student/myquiztest/list",
       isPublic: false,
       icon: null,
@@ -39,7 +39,7 @@ export const eduLearningManagement = {
     },
 
     {
-      id: "MENU_EDUCATION_THESIS_DEFENSE_JURY_STUDENT_MANAGEMENT",
+      id: "MENU_EDUCATION_LEARNING_MANAGEMENT_STUDENT.MENU_EDUCATION_THESIS_DEFENSE_JURY_STUDENT_MANAGEMENT",
       path: "/edu/student/thesis/create",
       isPublic: false,
       icon: null,

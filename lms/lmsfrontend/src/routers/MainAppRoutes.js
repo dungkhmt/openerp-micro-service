@@ -55,7 +55,7 @@ function MainAppRoute(props) {
             path={"/programming-contest/public/contest-raking/:contestId"}
           />
 
-          <PrivateRoute component={UserLoginRoute} path="/userlogin" />
+          {/*<PrivateRoute component={UserLoginRoute} path="/userlogin" />*/}
 
           <PrivateRoute component={EduRoute} path="/edu" />
           <PrivateRoute
@@ -65,7 +65,7 @@ function MainAppRoute(props) {
           <PrivateRoute component={WhiteBoardRoute} path="/whiteboard" />
 
           <PrivateRoute component={AdminRoute} path="/admin/data" />
-          <PrivateRoute component={AccountActivationRoute} path="/activation" />
+          {/*<PrivateRoute component={AccountActivationRoute} path="/activation" />*/}
           <PrivateRoute
             component={ProgrammingContestRoutes}
             path="/programming-contest"
