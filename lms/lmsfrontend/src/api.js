@@ -207,7 +207,7 @@ export async function request(
           if (isFunction(errorHandlers[403])) {
             errorHandlers[403](e);
           } else {
-            infoNoti("Bạn cần được cấp quyền để thực hiện hành động này.");
+            infoNoti("Bạn cần được cấp quyền để thực hiện hành động này", 5000);
           }
           break;
         default:
