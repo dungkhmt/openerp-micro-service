@@ -8,4 +8,10 @@ export const queryKey = {
     customer_type_list: "customer_type_list",
     contract_type_list: "contract_type_list",
   },
+  purchase_order: {
+    order_list: "order_list",
+  },
+  facility: {
+    facility_list: "facility_list",
+  },
 };

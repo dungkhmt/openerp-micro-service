@@ -28,7 +28,7 @@ public class ProductEntity extends BaseEntity implements Serializable {
     private Integer unitPerBox;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "unit_id")
+    @JoinColumn(name = "unit_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private ProductUnit productUnit;
 
@@ -36,7 +36,7 @@ public class ProductEntity extends BaseEntity implements Serializable {
     private String brand;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private ProductCategory productCategory;
 

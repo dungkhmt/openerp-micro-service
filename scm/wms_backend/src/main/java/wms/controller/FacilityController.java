@@ -102,8 +102,8 @@ public class FacilityController extends BaseController{
         }
     }
 
-    @PostMapping("/import-item/{id}")
-    public ResponseEntity<?> importItemToFacilty(@Valid @RequestBody ImportToFacilityDTO importToFacilityDTO, @PathVariable("id") long id) {
+    @PostMapping("/import-item")
+    public ResponseEntity<?> importItemToFacilty(@Valid @RequestBody ImportToFacilityDTO importToFacilityDTO) {
         try {
             facilityService.importToFacility(importToFacilityDTO);
             return response(new ResultEntity(1, "Update facility successfully", null));

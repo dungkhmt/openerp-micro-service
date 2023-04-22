@@ -60,7 +60,7 @@ const styles = {
     backdropFilter: "blur(20px)",
     boxShadow: `inset 0px -1px 1px ${theme.palette.grey[300]}`,
     backgroundColor: "rgba(255,255,255,0.72)",
-    zIndex: theme.zIndex.drawer + 1,
+    zIndex: theme.zIndex.drawer - 1,
   }),
   menuButton: {
     marginRight: 3,

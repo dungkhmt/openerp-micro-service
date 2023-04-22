@@ -7,6 +7,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +20,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PurchaseOrder extends BaseEntity {
+public class PurchaseOrder extends BaseEntity implements Serializable {
     @Column(name = "code")
     private String code;
 
@@ -30,7 +31,7 @@ public class PurchaseOrder extends BaseEntity {
     private String status;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "bought_by")
+    @JoinColumn(name = "bought_by", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private Facility facility;
 
@@ -56,10 +57,10 @@ public class PurchaseOrder extends BaseEntity {
     @OneToMany(mappedBy = "purchaseOrder",fetch = FetchType.LAZY)
     // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
     @JsonIgnore
-    private Set<ReceiptBill> receiptBills;
+    private List<ReceiptBill> receiptBills = new ArrayList<>();;
 
     @OneToMany(mappedBy = "purchaseOrder",fetch = FetchType.LAZY)
     // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
     @JsonIgnore
-    private Set<ReceiptBillItem> receiptBillItems;
+    private List<ReceiptBillItem> receiptBillItems = new ArrayList<>();;
 }

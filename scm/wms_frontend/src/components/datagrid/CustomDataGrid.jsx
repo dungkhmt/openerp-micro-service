@@ -73,6 +73,7 @@ const getColumnsShow = (columns, isSerial, params) => {
 /**
  * @typedef Prop
  * @property {boolean} isSerial
+ * @property {boolean} isSelectable
  * @property {import("@mui/x-data-grid").GridRowProps[]} rows
  * @property {any[]} columns
  * @property {number} totalItem
@@ -90,6 +91,7 @@ const getColumnsShow = (columns, isSerial, params) => {
 const CustomDataGrid = (props) => {
   const {
     isSerial,
+    isSelectable = false,
     rows,
     columns,
     totalItem,
@@ -115,9 +117,13 @@ const CustomDataGrid = (props) => {
       // pageSize={params.pageSize}
       // page={params.page - 1}
       loading={isLoading}
+      isRowSelectable={() => {
+        return isSelectable;
+      }}
+      checkboxSelection={isSelectable}
       sortingMode="server"
       // paginationMode="server"
-      checkboxSelection={!!onSelectionChange}
+      // checkboxSelection={!!onSelectionChange}
       disableRowSelectionOnClick
       disableColumnMenu
       pagination
@@ -130,9 +136,7 @@ const CustomDataGrid = (props) => {
       components={{
         LoadingOverlay: LinearProgress,
       }}
-      onSelectionModelChange={(selection) =>
-        onSelectionChange ? onSelectionChange(selection) : undefined
-      }
+      onRowSelectionModelChange={onSelectionChange}
       onPageSizeChange={(page_size) =>
         setParams((prev) => ({ ...prev, page_size, page: 1 }))
       }

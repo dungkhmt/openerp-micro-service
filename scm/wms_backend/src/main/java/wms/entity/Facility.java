@@ -1,10 +1,7 @@
 package wms.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -16,7 +13,8 @@ import java.util.Set;
 @Entity
 @Table(name = "facility")
 @Builder
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 // https://stackoverflow.com/questions/4525186/cannot-be-cast-to-java-io-serializable

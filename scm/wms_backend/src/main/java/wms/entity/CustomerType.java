@@ -5,13 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Set;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "customer_type")
-public class CustomerType extends BaseEntity {
+public class CustomerType extends BaseEntity implements Serializable {
     @Column(name = "code")
     private String code;
 

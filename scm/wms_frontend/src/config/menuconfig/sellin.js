@@ -4,10 +4,10 @@ export const sellin = {
   text: "Sellin",
   child: [
     {
-      id: "MENU_WMS_SELLIN.MENU_ITEM_1",
-      path: "/sellin/screen-1",
+      id: "MENU_WMS_SELLIN.PURCHASE_ORDER",
+      path: "/sellin/purchase-order",
       isPublic: true,
-      text: "Submenu 1",
+      text: "Order",
       child: [],
     },
     {

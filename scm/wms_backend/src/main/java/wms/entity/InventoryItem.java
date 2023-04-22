@@ -21,7 +21,7 @@ public class InventoryItem extends BaseEntity{
     private String code;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "facility_code")
+    @JoinColumn(name = "facility_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private Facility facility;
 
@@ -29,7 +29,7 @@ public class InventoryItem extends BaseEntity{
     private String lotCode;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_code")
+    @JoinColumn(name = "product_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private ProductEntity product;
 

@@ -1,9 +1,6 @@
 package wms.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -12,12 +9,13 @@ import javax.persistence.*;
 @Entity
 @Table(name = "purchase_order_item")
 @Builder
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PurchaseOrderItem extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "order_code")
+    @JoinColumn(name = "order_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private PurchaseOrder purchaseOrder;
 
@@ -25,7 +23,7 @@ public class PurchaseOrderItem extends BaseEntity {
     private String seqId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_code")
+    @JoinColumn(name = "product_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private ProductEntity product;
 

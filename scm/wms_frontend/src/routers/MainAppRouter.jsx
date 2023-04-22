@@ -9,6 +9,8 @@ import TestComponent from "../test/TestComponent";
 import CategoryRouter from "./CategoryRouter";
 import PrivateRoute from "./PrivateRoute";
 import SellinRouter from "./SellinRouter";
+import SelloutRouter from "./SelloutRouter";
+import WarehouseRouter from "./WarehouseRouter";
 
 const styles = {
   loadingProgress: {
@@ -39,6 +41,8 @@ function MainAppRouter(props) {
           <Route component={TestComponent} exact path="/test" />
           <Route component={CategoryRouter} path="/category" />
           <PrivateRoute component={SellinRouter} path="/sellin" />
+          <PrivateRoute component={SelloutRouter} path="/sellout" />
+          <PrivateRoute component={WarehouseRouter} path="/warehouse" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>

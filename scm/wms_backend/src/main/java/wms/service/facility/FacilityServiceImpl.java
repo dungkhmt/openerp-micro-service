@@ -10,19 +10,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import wms.common.enums.ErrorCode;
-import wms.common.enums.OrderStatus;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.facility.FacilityDTO;
 import wms.dto.facility.FacilityUpdateDTO;
 import wms.dto.facility.ImportItemDTO;
 import wms.dto.facility.ImportToFacilityDTO;
-import wms.dto.purchase_order.PurchaseOrderItemDTO;
 import wms.entity.*;
 import wms.exception.CustomException;
 import wms.repo.*;
 import wms.service.BaseService;
 
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -116,21 +117,20 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
 
     @Override
     public void importToFacility(ImportToFacilityDTO importToFacilityDTO) throws CustomException {
-        if (getReceiptBillByCode(importToFacilityDTO.getCode().toUpperCase()) != null) {
+        if (getReceiptBillForOrderByCode(importToFacilityDTO.getOrderCode().toUpperCase(), importToFacilityDTO.getCode().toUpperCase()) != null) {
             throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Exist bill with same code, can't create");
         }
         PurchaseOrder order = purchaseOrderRepo.getOrderByCode(importToFacilityDTO.getOrderCode().toUpperCase());
-        Facility facility = facilityRepo.getFacilityByCode(importToFacilityDTO.getFacilityCode().toUpperCase());
-        if (facility== null) {
-            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Order belongs to no facility, can't create");
-        }
         if (order == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Can't find referenced order, can't create");
+        }
+        if (!canImportToFacility(order, importToFacilityDTO)) {
+            throw caughtException(ErrorCode.USER_ACTION_FAILED.getCode(), "Import with quantity more than current order needs, can't create");
         }
         ReceiptBill newBill = ReceiptBill.builder()
                 .code(importToFacilityDTO.getCode().toUpperCase())
                 .purchaseOrder(order)
-                .facility(facility)
+                .facility(order.getFacility())
                 .receivingDate(ZonedDateTime.now())
                 .build();
         receiptBillRepo.save(newBill);
@@ -149,18 +149,68 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
                     .seqId("00" + seq)
                     .orderSeqId(orderItem.getSeqId())
                     .product(product)
+                    .purchaseOrder(order)
                     .receivingDate(ZonedDateTime.now())
                     .effectiveQty(importItem.getEffectQty())
                     .build();
             receiptBillItemRepo.save(item);
+            // TODO: Should not save every inventory item, save by batch or group product with one update.
+            ProductFacility productFacility = productFacilityRepo.findProductInFacility(order.getFacility().getCode().toUpperCase(), order.getCode());
+            productFacility.setInventoryQty(productFacility.getInventoryQty() + importItem.getEffectQty());
+            productFacilityRepo.save(productFacility);
         }
     }
 
     @Override
-    public ReceiptBill getReceiptBillByCode(String code) {
-        return receiptBillRepo.getReceiptBillByCode(code.toUpperCase());
+    public ReceiptBill getReceiptBillForOrderByCode(String orderCode, String code) {
+        return receiptBillRepo.getReceiptBillByCode(orderCode.toUpperCase(), code.toUpperCase());
     }
 
+    private boolean canImportToFacility(PurchaseOrder currentImportingOrder , ImportToFacilityDTO importToFacilityDTO) {
+        List<ReceiptBill> receiptBills = currentImportingOrder.getReceiptBills();
+        Map<String, Integer> qtyMappingFromBill = new HashMap<>();
+        for (ReceiptBill bill : receiptBills) {
+            for (ReceiptBillItem item : bill.getReceiptBillItems()) {
+                if (qtyMappingFromBill.containsKey(item.getProduct().getCode())) {
+                    qtyMappingFromBill.merge(item.getProduct().getCode(), item.getEffectiveQty(), Integer::sum);
+                }
+                else {
+                    qtyMappingFromBill.put(item.getProduct().getCode(), item.getEffectiveQty());
+                }
+            }
+        }
+        for (PurchaseOrderItem orderItem : currentImportingOrder.getPurchaseOrderItems()) {
+            String currentProductCode = orderItem.getProduct().getCode().toUpperCase();
+            for (ImportItemDTO importItem : importToFacilityDTO.getImportItems()) {
+                if (importItem.getProductCode().equals(currentProductCode)) {
+                    int compareQty = qtyMappingFromBill.get(orderItem.getProduct().getCode().toUpperCase()) + importItem.getEffectQty();
+                    if (compareQty > orderItem.getQuantity()) return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean isFinishedImporting(PurchaseOrder currOrder) {
+        List<ReceiptBill> receiptBills = currOrder.getReceiptBills();
+        Map<String, Integer> qtyMappingFromBill = new HashMap<>();
+        for (ReceiptBill bill : receiptBills) {
+            for (ReceiptBillItem item : bill.getReceiptBillItems()) {
+                if (qtyMappingFromBill.containsKey(item.getProduct().getCode())) {
+                    qtyMappingFromBill.merge(item.getProduct().getCode(), item.getEffectiveQty(), Integer::sum);
+                }
+                else {
+                    qtyMappingFromBill.put(item.getProduct().getCode(), item.getEffectiveQty());
+                }
+            }
+        }
+        for (PurchaseOrderItem orderItem : currOrder.getPurchaseOrderItems()) {
+            String currentProductCode = orderItem.getProduct().getCode().toUpperCase();
+            int compareQty = qtyMappingFromBill.get(currentProductCode);
+            if (compareQty != orderItem.getQuantity()) return false;
+        }
+        return true;
+    }
     @Override
     public void exportFromFacility() {
 

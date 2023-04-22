@@ -22,7 +22,7 @@ public class Customer extends BaseEntity implements Serializable {
     private String name;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "customer_type_id")
+    @JoinColumn(name = "customer_type_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private CustomerType customerType;
 
@@ -52,7 +52,7 @@ public class Customer extends BaseEntity implements Serializable {
     private UserLogin user;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "contract_type_code")
+    @JoinColumn(name = "contract_type_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private ContractType contractType;
 }

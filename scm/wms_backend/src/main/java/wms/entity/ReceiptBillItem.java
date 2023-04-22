@@ -18,7 +18,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 public class ReceiptBillItem extends BaseEntity{
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "receipt_bill_code")
+    @JoinColumn(name = "receipt_bill_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private ReceiptBill receiptBill;
 
@@ -27,12 +27,12 @@ public class ReceiptBillItem extends BaseEntity{
     private String seqId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "order_code")
+    @JoinColumn(name = "order_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private PurchaseOrder purchaseOrder;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_code")
+    @JoinColumn(name = "product_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private ProductEntity product;
 

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import wms.common.enums.ErrorCode;
 import wms.common.enums.OrderStatus;
@@ -37,12 +38,12 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
     private ProductRepo productRepo;
 
     @Override
-    public PurchaseOrder createOrder(PurchaseOrderDTO purchaseOrderDTO) throws CustomException {
+    public PurchaseOrder createOrder(PurchaseOrderDTO purchaseOrderDTO, JwtAuthenticationToken token) throws CustomException {
         if (purchaseOrderRepo.getOrderByCode(purchaseOrderDTO.getOrderCode().toUpperCase()) != null) {
             throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Exist order with same code, can't create");
         }
         Facility boughtBy = facilityRepo.getFacilityByCode(purchaseOrderDTO.getBoughtBy());
-        UserLogin createdBy = userRepo.getUserByUserLoginId(purchaseOrderDTO.getCreatedBy());
+        UserLogin createdBy = userRepo.getUserByUserLoginId(token.getName());
 
         if (boughtBy== null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Order belongs to no facility, can't create");

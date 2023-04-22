@@ -11,7 +11,5 @@ public class ImportToFacilityDTO {
     private String code;
     @NotBlank(message = "Truong order code khong duoc bo trong")
     private String orderCode;
-    @NotBlank(message = "Truong facility code khong duoc bo trong")
-    private String facilityCode;
     List<ImportItemDTO> importItems;
 }

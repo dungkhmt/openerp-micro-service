@@ -1,5 +1,5 @@
 import { Route, Switch, useRouteMatch } from "react-router";
-import ProtectedScreen from "../views/ProtectedScreen";
+import PurchaseOrder from "../views/sellin/PurchaseOrder";
 
 export default function SellinRouter() {
   let { path } = useRouteMatch();
@@ -7,9 +7,9 @@ export default function SellinRouter() {
     <div>
       <Switch>
         <Route
-          component={ProtectedScreen}
+          component={PurchaseOrder}
           exact
-          path={`${path}/screen-1`}
+          path={`${path}/purchase-order`}
         ></Route>
       </Switch>
     </div>

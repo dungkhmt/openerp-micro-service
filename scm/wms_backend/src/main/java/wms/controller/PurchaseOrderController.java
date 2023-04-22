@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import wms.common.constant.DefaultConst;
 import wms.common.enums.OrderStatus;
@@ -23,9 +24,9 @@ public class PurchaseOrderController extends BaseController {
     private IPurchaseOrderService purchaseOrderService;
     @ApiOperation(value = "Thêm mới 1 order mua hàng")
     @PostMapping("/create")
-    public ResponseEntity<?> create(@Valid @RequestBody PurchaseOrderDTO purchaseOrderDTO) {
+    public ResponseEntity<?> create(@Valid @RequestBody PurchaseOrderDTO purchaseOrderDTO,  JwtAuthenticationToken token) {
         try {
-            return response(new ResultEntity(1, "Create order successfully", purchaseOrderService.createOrder(purchaseOrderDTO)));
+            return response(new ResultEntity(1, "Create order successfully", purchaseOrderService.createOrder(purchaseOrderDTO, token)));
         }
         catch (Exception ex) {
             return response(error(ex));

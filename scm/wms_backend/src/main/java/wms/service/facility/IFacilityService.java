@@ -5,7 +5,6 @@ import wms.dto.ReturnPaginationDTO;
 import wms.dto.facility.FacilityDTO;
 import wms.dto.facility.FacilityUpdateDTO;
 import wms.dto.facility.ImportToFacilityDTO;
-import wms.dto.product.ProductDTO;
 import wms.entity.*;
 import wms.exception.CustomException;
 
@@ -17,7 +16,7 @@ public interface IFacilityService {
     ReturnPaginationDTO<ProductFacility> getInventoryItems(int page, int pageSize, String sortField, boolean isSortAsc, String facilityCode) throws JsonProcessingException;
     Facility updateFacility(FacilityUpdateDTO facilityDTO, long id) throws CustomException;
     void importToFacility(ImportToFacilityDTO importToFacilityDTO) throws CustomException;
-    ReceiptBill getReceiptBillByCode(String code);
+    ReceiptBill getReceiptBillForOrderByCode(String orderCode, String code);
     void exportFromFacility();
     void deleteFacilityById(long id);
 }

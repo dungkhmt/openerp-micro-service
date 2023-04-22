@@ -7,13 +7,14 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Set;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "contract_type")
-public class ContractType extends BaseEntity{
+public class ContractType extends BaseEntity implements Serializable {
     @Column(name = "code")
     private String code;
 
@@ -21,7 +22,7 @@ public class ContractType extends BaseEntity{
     private String name;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "channel_id")
+    @JoinColumn(name = "channel_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private DistributingChannel channel;
 

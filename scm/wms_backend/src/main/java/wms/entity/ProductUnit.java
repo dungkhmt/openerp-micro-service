@@ -7,13 +7,14 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Set;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "product_unit")
-public class ProductUnit extends BaseEntity {
+public class ProductUnit extends BaseEntity implements Serializable {
     @Column(name = "code")
     private String code;
     @Column(name = "name")
