@@ -109,7 +109,7 @@ public class ClassController {
         return ResponseEntity.status(res.getStatus()).body(res.getMessage());
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @PostMapping("/add-class-user-login-role")
     public ResponseEntity addEduClassUserLoginRole(
         Principal principal,
@@ -160,7 +160,7 @@ public class ClassController {
         return ResponseEntity.ok().body(lst);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @GetMapping("/update-class-status")
     public ResponseEntity updateClassStatus(
         Principal principal, @RequestParam UUID classId,
@@ -181,14 +181,14 @@ public class ClassController {
     public ResponseEntity<List<GetStudentsOfClassOM>> getStudentsOfClass(@PathVariable UUID id) {
         return ResponseEntity.ok().body(classService.getStudentsOfClass(id));
     }
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @PostMapping("/add-all-users-to-class")
     public ResponseEntity<?> addAllUsers2Class(Principal principal, @RequestBody ModelAddUser2ClassInput I){
         int cnt = classService.addAllUser2Class(I.getClassCode());
         return ResponseEntity.ok().body(cnt);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @GetMapping("/{id}/registered-students")
     public ResponseEntity<List<GetStudentsOfClassOM>> getRegistStudentsOfClass(@PathVariable UUID id) {
         List<GetStudentsOfClassOM> lst = classService.getRegistStudentsOfClass(id);
@@ -196,7 +196,7 @@ public class ClassController {
         return ResponseEntity.ok().body(lst);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @PutMapping("/registration-status")
     public ResponseEntity<?> updateRegistStatus(@Valid @RequestBody UpdateRegistStatusIM im) {
         return ResponseEntity
@@ -204,7 +204,7 @@ public class ClassController {
             .body(classService.updateRegistStatus(im.getClassId(), im.getStudentIds(), im.getStatus()));
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @GetMapping("/list/teacher")
     public ResponseEntity<?> getClassesOfTeacher(Principal principal) {
         return ResponseEntity.ok().body(classService.getClassesOfTeacher(principal.getName()));
@@ -220,19 +220,19 @@ public class ClassController {
         return ResponseEntity.ok().body(classService.getClassDetail(id));
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @GetMapping("/{id}/assignments/teacher")
     public ResponseEntity<?> getAssignOfClass4Teacher(@PathVariable UUID id) {
         return ResponseEntity.ok().body(classService.getAssign4Teacher(id));
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @GetMapping("/{id}/all-student-assignments/teacher")
     public ResponseEntity<?> getAllStuAssignOfClass4Teacher(@PathVariable UUID id) {
         return ResponseEntity.ok().body(classService.getAllStuAssign4Teacher(id));
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @GetMapping("/{id}/assignmentsSubmission/teacher")
     public ResponseEntity<?> getAssignSubmitOfClass4Teacher(@PathVariable UUID id) {
         return ResponseEntity.ok().body(classService.getAssignSubmit4Teacher(id));
@@ -251,7 +251,7 @@ public class ClassController {
         return ResponseEntity.ok().body(aClass);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @GetMapping("/get-all-courses")
     public ResponseEntity<?> getAllCourses(Principal principal) {
         log.info("getAllCourses start...");
@@ -260,7 +260,7 @@ public class ClassController {
         return ResponseEntity.ok().body(courses);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @GetMapping("/get-chapters-of-course/{courseId}")
     public ResponseEntity<?> getChaptersOfCourse(Principal principal, @PathVariable String courseId) {
         log.info("getChaptersOfCourse start... courseId = " + courseId);
@@ -282,7 +282,7 @@ public class ClassController {
         return ResponseEntity.ok().body(eduCourseChapters);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @PostMapping("/create-chapter-of-course")
     public ResponseEntity<?> createChapterOfCourse(
         Principal principal,
@@ -310,7 +310,7 @@ public class ClassController {
         return ResponseEntity.ok().body(types);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @PostMapping("/create-chapter-material-of-course")
     //public ResponseEntity<?> createChapterMaterialOfCourse(Principal principal, @RequestBody
     //  EduCourseChapterMaterialModelCreate eduCourseChapterMaterialModelCreate){
@@ -451,7 +451,7 @@ public class ClassController {
         return ResponseEntity.ok().body(eduCourseChapterMaterial);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @DeleteMapping("/delete-course-chapter-material-detail-slide-video/{chapterMarialId}")
     public ResponseEntity<?>deleteCourseChapterMaterialSlideOrVideo(Principal principal, @PathVariable UUID chapterMarialId){
         log.info("run here");
@@ -508,7 +508,7 @@ public class ClassController {
         return ResponseEntity.ok().body(eduCourseChapterMaterial);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @PutMapping("/update-course-chapter-material-detail/{chapterMarialId}")
     public ResponseEntity<?>updateCourseChapterMaterial(
         Principal principal,
@@ -537,7 +537,7 @@ public class ClassController {
         return ResponseEntity.ok().body(eduCourseChapterMaterial);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @PostMapping("/update-chapter-material-of-course")
     //public ResponseEntity<?> createChapterMaterialOfCourse(Principal principal, @RequestBody
     //  EduCourseChapterMaterialModelCreate eduCourseChapterMaterialModelCreate){
@@ -694,7 +694,7 @@ public class ClassController {
         return ResponseEntity.ok().body(eduCourseChapterMaterial);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @GetMapping("/get-course-chapter-material-detail/{id}")
     public ResponseEntity<?> getCourseChapterMaterialDetail(Principal principal, @PathVariable UUID id) {
         //log.info("getCourseChapterMaterialDetail, id = " + id);
@@ -725,7 +725,7 @@ public class ClassController {
         return ResponseEntity.ok().body(eduCourseChapterMaterials);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @GetMapping("/get-all-semesters")
     public ResponseEntity<?> getAllSemesters(Principal principal) {
         log.info("getAllSemester start...");
@@ -742,7 +742,7 @@ public class ClassController {
         return ResponseEntity.ok().body(eduDepartments);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @GetMapping("/get-log-user-course-chapter-material/{classId}")
     public ResponseEntity<?> getLogUserCourseChapterMaterial(Principal principal, @PathVariable UUID classId) {
         log.info("getLogUserCourseChapterMaterial, classId = " + classId);
@@ -774,7 +774,7 @@ public class ClassController {
         return ResponseEntity.ok().body(studentCourseParticipationModels);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured("ROLE_TEACHER")
     @GetMapping("/{classId}/user-quiz/log")
     public ResponseEntity<?> getLogUserQuiz(
         @PathVariable UUID classId,
