@@ -2,7 +2,7 @@ import axios from "axios";
 import keycloak from "config/keycloak";
 import { infoNoti, wifiOffNotify } from "../utils/notification";
 import { config } from "./constant";
-
+const qs = require("qs");
 export const isFunction = (func) =>
   func &&
   (Object.prototype.toString.call(func) === "[object Function]" ||
@@ -50,6 +50,16 @@ export async function request(
   config
 ) {
   try {
+    if (method === "get") {
+      url =
+        url +
+        "?" +
+        qs.stringify(data, {
+          arrayFormat: "brackets",
+          encode: false,
+        });
+      data = {};
+    }
     const res = await axiosInstance.request({
       method: method.toLowerCase(),
       url: url,

@@ -1,6 +1,7 @@
 import { Route, Switch, useRouteMatch } from "react-router";
+import OrderDetail from "../views/sellin/OrderDetail";
+import Warehouse from "../views/warehouse/Facility";
 import ImportingActivity from "../views/warehouse/ImportingActivity";
-import Warehouse from "../views/warehouse/Warehouse";
 
 export default function WarehouseRouter() {
   let { path } = useRouteMatch();
@@ -12,6 +13,11 @@ export default function WarehouseRouter() {
           component={ImportingActivity}
           exact
           path={`${path}/importing`}
+        ></Route>
+        <Route
+          component={OrderDetail}
+          exact
+          path={`${path}/importing/order-detail`}
         ></Route>
       </Switch>
     </div>

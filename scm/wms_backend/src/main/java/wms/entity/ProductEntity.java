@@ -1,6 +1,7 @@
 package wms.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -52,9 +53,12 @@ public class ProductEntity extends BaseEntity implements Serializable {
 
     @OneToMany(
             mappedBy = "product",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+            fetch = FetchType.LAZY
+//            cascade = CascadeType.ALL,
+//            orphanRemoval = true
     )
+//    @JsonManagedReference
+    @JsonIgnore
     private List<ProductFacility> productFacilities;
 
     @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)

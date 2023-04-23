@@ -1,6 +1,7 @@
 package wms.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -61,9 +62,13 @@ public class Facility extends BaseEntity implements Serializable {
 
     @OneToMany(
             mappedBy = "facility",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+            fetch = FetchType.LAZY
+//            cascade = CascadeType.ALL
+//            orphanRemoval = true
     )
+    // https://stackoverflow.com/questions/3325387/infinite-recursion-with-jackson-json-and-hibernate-jpa-issue
+//    @JsonManagedReference
+    @JsonIgnore
     private List<ProductFacility> productFacilities;
 
 

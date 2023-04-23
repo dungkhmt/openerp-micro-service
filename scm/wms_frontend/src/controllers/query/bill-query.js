@@ -5,13 +5,31 @@ import { request } from "../api-middleware";
 import { endPoint } from "../endpoint";
 import { queryKey } from "./querykey";
 
-export const useGetPurchaseOrderList = (params) => {
+export const useGetReceiptBillList = (params) => {
   return useQuery({
-    queryKey: [queryKey.purchase_order.order_list],
+    queryKey: [queryKey.receipt_bill.receipt_bill_list, params],
     queryFn: async () => {
       const res = await request(
         "get",
-        endPoint.getPurchaseOrder,
+        endPoint.getReceiptBills,
+        (res) => {},
+        () => {}
+      );
+      if (res.data && res.data?.code === 1) {
+        return res.data?.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};
+export const useGetBillItemOfOrder = (params) => {
+  return useQuery({
+    queryKey: [queryKey.receipt_bill.bill_item_of_order, params],
+    queryFn: async () => {
+      const res = await request(
+        "get",
+        endPoint.getBillItemOfPurchaseOrder,
         (res) => {},
         () => {},
         params
@@ -24,31 +42,13 @@ export const useGetPurchaseOrderList = (params) => {
     onSuccess: (data) => {},
   });
 };
-export const useGetPurchaseOrderItems = (params) => {
-  return useQuery({
-    queryKey: [queryKey.purchase_order.order_item],
-    queryFn: async () => {
-      const res = await request(
-        "get",
-        endPoint.getPurchaseOrderItems,
-        (res) => {},
-        () => {},
-        params
-      );
-      if (res.data && res.data?.code === 1) {
-        return res.data?.data;
-      }
-    },
-    keepPreviousData: true,
-    onSuccess: (data) => {},
-  });
-};
-export const useCreatePurchaseOrder = (params) => {
+
+export const useCreateBill = (params) => {
   return useMutation({
     mutationFn: async (params) => {
       const res = await request(
         "post",
-        endPoint.createPurchaseOrder,
+        endPoint.createBill,
         (res) => {},
         () => {},
         params
@@ -58,11 +58,11 @@ export const useCreatePurchaseOrder = (params) => {
       }
     },
     onSuccess: (res, variables, context) => {
-      toast.success("Tạo đơn mua thành công!");
-      queryClient.invalidateQueries([queryKey.purchase_order.order_list]);
+      toast.success("Tạo sản phẩm thành công!");
+      queryClient.invalidateQueries([queryKey.category.product_list]);
     },
     onError: () => {
-      toast.error("Lỗi khi tạo đơn mua, vui lòng kiểm tra lại");
+      toast.error("Lỗi khi tạo sản phẩm, vui lòng kiểm tra lại");
     },
     // befor mutation function actually triggers.
     onMutate: (variables) => {},

@@ -21,3 +21,22 @@ export const useGetFacilityList = (params) => {
     onSuccess: (data) => {},
   });
 };
+export const useGetFacilityInventory = (params) => {
+  return useQuery({
+    queryKey: [queryKey.facility.facility_inventory, params],
+    queryFn: async () => {
+      const res = await request(
+        "get",
+        endPoint.getFacilityInventory,
+        (res) => {},
+        () => {},
+        params
+      );
+      if (res.data && res.data?.code === 1) {
+        return res.data?.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};

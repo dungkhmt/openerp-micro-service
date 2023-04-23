@@ -156,6 +156,14 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
             receiptBillItemRepo.save(item);
             // TODO: Should not save every inventory item, save by batch or group product with one update.
             ProductFacility productFacility = productFacilityRepo.findProductInFacility(order.getFacility().getCode().toUpperCase(), order.getCode());
+            if (productFacility == null) {
+                productFacility = ProductFacility.builder()
+                        .product(product)
+                        .inventoryQty(0)
+                        .qtyThreshold(1000)
+                        .facility(order.getFacility())
+                        .build();
+            }
             productFacility.setInventoryQty(productFacility.getInventoryQty() + importItem.getEffectQty());
             productFacilityRepo.save(productFacility);
         }
@@ -168,6 +176,7 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
 
     private boolean canImportToFacility(PurchaseOrder currentImportingOrder , ImportToFacilityDTO importToFacilityDTO) {
         List<ReceiptBill> receiptBills = currentImportingOrder.getReceiptBills();
+        if (receiptBills.size() == 0) return true;
         Map<String, Integer> qtyMappingFromBill = new HashMap<>();
         for (ReceiptBill bill : receiptBills) {
             for (ReceiptBillItem item : bill.getReceiptBillItems()) {

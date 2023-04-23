@@ -10,7 +10,6 @@ import wms.common.constant.DefaultConst;
 import wms.dto.facility.FacilityDTO;
 import wms.dto.facility.FacilityUpdateDTO;
 import wms.dto.facility.ImportToFacilityDTO;
-import wms.dto.product.ProductDTO;
 import wms.entity.ResultEntity;
 import wms.service.facility.IFacilityService;
 

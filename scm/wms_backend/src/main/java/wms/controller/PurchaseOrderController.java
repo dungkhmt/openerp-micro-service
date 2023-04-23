@@ -38,10 +38,25 @@ public class PurchaseOrderController extends BaseController {
             @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
-            @RequestParam(value = "sort_asc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc
+            @RequestParam(value = "sortAsc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
+            @RequestParam(value = "orderStatus", required = false, defaultValue = DefaultConst.STRING) String orderStatus
     ) {
         try {
-            return response(new ResultEntity(1, "Get list orders successfully", purchaseOrderService.getAllOrders(page, pageSize, sortField, isSortAsc)));
+            return response(new ResultEntity(1, "Get list orders successfully", purchaseOrderService.getAllOrders(page, pageSize, sortField, isSortAsc, orderStatus)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @GetMapping("/get-order-items")
+    public ResponseEntity<?> getOrderItemsFromOrder(
+            @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
+            @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
+            @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
+            @RequestParam(value = "sortAsc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
+            @RequestParam(value = "orderCode", required = false, defaultValue = DefaultConst.STRING) String orderCode
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get order items successfully", purchaseOrderService.getOrderItems(page, pageSize, sortField, isSortAsc, orderCode)));
         } catch (Exception ex) {
             return response(error(ex));
         }

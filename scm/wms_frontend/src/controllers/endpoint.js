@@ -11,6 +11,11 @@ export const endPoint = {
   getCustomer: baseUrl + "/customer/get-all",
   createProduct: baseUrl + "/product/create",
   getPurchaseOrder: baseUrl + "/purchase-order/get-all",
+  getPurchaseOrderItems: baseUrl + "/purchase-order/get-order-items",
   getFacility: baseUrl + "/facility/get-all",
+  getFacilityInventory: baseUrl + "/facility/get-inventory",
   createPurchaseOrder: baseUrl + "/purchase-order/create",
+  getReceiptBills: baseUrl + "/receipt-bill/get-all",
+  getBillItemOfPurchaseOrder: baseUrl + "/receipt-bill/get-bill-items",
+  createBill: baseUrl + "/facility/import-item",
 };

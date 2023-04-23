@@ -1,25 +1,34 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { green } from "@mui/material/colors";
 import { useState } from "react";
 import { useToggle, useWindowSize } from "react-use";
 import withScreenSecurity from "../../components/common/withScreenSecurity";
 import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
 import CustomDrawer from "../../components/drawer/CustomDrawer";
-import { useGetProductList } from "../../controllers/query/category-query";
-import { useGetFacilityList } from "../../controllers/query/facility-query";
+import {
+  useGetFacilityInventory,
+  useGetFacilityList,
+} from "../../controllers/query/facility-query";
 import { Action } from "../sellin/PurchaseOrder";
-function WarehouseScreen({ screenAuthorization }) {
+import { staticDatagridCols, staticProductFields } from "./LocalConstant";
+function FacilityScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
     page_size: 50,
   });
   const { height } = useWindowSize();
-  const { isLoading: isLoadingProduct, data: product } = useGetProductList();
+
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
+  const [facilityCode, setFacilityCode] = useState("");
+
   const { isLoading, data } = useGetFacilityList();
+  const { isLoading: isLoadingInventory, data: inventory } =
+    useGetFacilityInventory({
+      code: facilityCode,
+    });
   const extraActions = [
     {
       title: "Sửa",
@@ -42,36 +51,12 @@ function WarehouseScreen({ screenAuthorization }) {
     {
       title: "Xem",
       callback: (item) => {
+        console.log("Item: ", item);
         setOpenDrawer((pre) => !pre);
+        setFacilityCode(item?.code);
       },
       icon: <VisibilityIcon />,
       // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
-    },
-  ];
-  var product_fields = [
-    {
-      field: "code",
-      headerName: "Mã code",
-      sortable: false,
-      pinnable: true,
-    },
-    {
-      field: "name",
-      headerName: "Tên sản phẩm",
-      sortable: false,
-      minWidth: 200,
-    },
-    {
-      field: "status",
-      headerName: "Trạng thái",
-      sortable: false,
-      minWidth: 100,
-    },
-    {
-      field: "quantity",
-      headerName: "Số lượng mua",
-      sortable: false,
-      minWidth: 150,
     },
   ];
   return (
@@ -108,58 +93,7 @@ function WarehouseScreen({ screenAuthorization }) {
         isLoading={isLoading}
         totalItem={100}
         columns={[
-          {
-            field: "code",
-            headerName: "Mã code",
-            sortable: false,
-            pinnable: true,
-            minWidth: 150,
-          },
-          {
-            field: "name",
-            headerName: "Tên kho",
-            sortable: false,
-            minWidth: 150,
-          },
-          {
-            field: "createdBy",
-            headerName: "Người tạo",
-            sortable: false,
-            minWidth: 150,
-            valueGetter: (params) => {
-              return params?.row?.creator?.id;
-            },
-          },
-          {
-            field: "address",
-            headerName: "Địa chỉ",
-            sortable: false,
-            pinnable: true,
-          },
-          {
-            field: "managedBy",
-            headerName: "Thủ kho",
-            sortable: false,
-            minWidth: 150,
-            valueGetter: (params) => {
-              return params?.row?.manager?.name
-                ? params?.row?.manager?.name
-                : "Chưa có";
-            },
-          },
-          {
-            field: "status",
-            headerName: "Trạng thái",
-            sortable: false,
-            minWidth: 150,
-            renderCell: (params) => {
-              return (
-                <Button variant="outlined" color="info">
-                  {params?.row?.status}
-                </Button>
-              );
-            },
-          },
+          ...staticDatagridCols,
           {
             field: "quantity",
             headerName: "Hành động",
@@ -172,17 +106,11 @@ function WarehouseScreen({ screenAuthorization }) {
                   item={params.row}
                   key={index}
                   extraAction={extraAction}
+                  onActionCall={extraAction.callback}
                   disabled={false}
                 />
               )),
             ],
-            // renderCell: (params) => (
-            //   <Action
-            //     disabled={false}
-            //     extraAction={extraActions[0]}
-            //     item={params.row}
-            //   />
-            // ),
           },
         ]}
         rows={data ? data?.content : []}
@@ -218,14 +146,14 @@ function WarehouseScreen({ screenAuthorization }) {
           </Typography>
         </Box>
         <CustomDataGrid
-          isSelectable={true}
+          isSelectable={false}
           params={params}
           setParams={setParams}
           sx={{ height: height - 64 - 71 - 24 - 20 - 35 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom - Page Title
-          isLoading={isLoadingProduct}
+          isLoading={isLoadingInventory}
           totalItem={100}
-          columns={product_fields}
-          rows={product ? product?.content : []}
+          columns={staticProductFields}
+          rows={inventory ? inventory?.content : []}
         />
       </CustomDrawer>
     </Box>
@@ -233,4 +161,4 @@ function WarehouseScreen({ screenAuthorization }) {
 }
 
 const SCR_ID = "SCR_WAREHOUSE";
-export default withScreenSecurity(WarehouseScreen, SCR_ID, true);
+export default withScreenSecurity(FacilityScreen, SCR_ID, true);

@@ -10,8 +10,14 @@ export const queryKey = {
   },
   purchase_order: {
     order_list: "order_list",
+    order_item: "order_items",
   },
   facility: {
     facility_list: "facility_list",
+    facility_inventory: "facility_inventory",
+  },
+  receipt_bill: {
+    receipt_bill_list: "receipt_bill_list",
+    bill_item_of_order: "bill_item_of_order",
   },
 };

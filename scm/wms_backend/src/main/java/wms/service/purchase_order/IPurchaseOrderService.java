@@ -10,9 +10,12 @@ import wms.entity.PurchaseOrder;
 import wms.entity.PurchaseOrderItem;
 import wms.exception.CustomException;
 
+import java.util.List;
+
 public interface IPurchaseOrderService {
     PurchaseOrder createOrder(PurchaseOrderDTO purchaseOrderDTO,  JwtAuthenticationToken token) throws CustomException;
-    ReturnPaginationDTO<PurchaseOrder> getAllOrders(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
+    ReturnPaginationDTO<PurchaseOrder> getAllOrders(int page, int pageSize, String sortField, boolean isSortAsc, String orderStatus) throws JsonProcessingException;
+    ReturnPaginationDTO<PurchaseOrderItem> getOrderItems(int page, int pageSize, String sortField, boolean isSortAsc, String orderStatus) throws JsonProcessingException;
     PurchaseOrder getOrderById(long id);
     PurchaseOrder getOrderByCode(String code);
     PurchaseOrderItem getOrderItemByProduct(String orderCode, String productCode);
