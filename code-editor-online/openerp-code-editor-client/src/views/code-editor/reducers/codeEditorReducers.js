@@ -2,22 +2,28 @@ import { createSlice } from "@reduxjs/toolkit";
 import { PROGRAMMING_LANGUAGES } from "utils/constants";
 
 const initialState = {
+  // code editor
   selectedLanguage: PROGRAMMING_LANGUAGES.CPP.value,
   source: null,
   input: "",
   output: "",
-  isVisibleParticipants: false,
-  isVisibleShareForm: false,
 
+  isVisibleShareForm: false,
   tabKey: "input",
 
+  // participants
+  isVisibleParticipants: false,
   participants: [],
 
+  // setting editor
   isVisibleConfigEditor: false,
   theme: "dark",
   fontSize: 14,
   tabSpace: 4,
   isAutoComplete: true,
+
+  // mic
+  isMute: false,
 };
 
 export const codeEditorSlice = createSlice({
@@ -64,6 +70,9 @@ export const codeEditorSlice = createSlice({
     setIsAutoComplete: (state, action) => {
       state.isAutoComplete = action.payload;
     },
+    setIsMute: (state, action) => {
+      state.isMute = action.payload;
+    },
   },
 });
 
@@ -81,6 +90,7 @@ export const {
   setFontSize,
   setTabSpace,
   setIsAutoComplete,
+  setIsMute
 } = codeEditorSlice.actions;
 
 export default codeEditorSlice.reducer;

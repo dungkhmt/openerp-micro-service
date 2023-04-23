@@ -23,7 +23,7 @@ import Peer from "peerjs";
 const CodeEditorPage = () => {
   const { id: roomId } = useParams();
   const dispatch = useDispatch();
-  const { isVisibleParticipants } = useSelector((state) => state.codeEditor);
+  const { isVisibleParticipants, isMute } = useSelector((state) => state.codeEditor);
   const [roomName, setRoomName] = useState();
   const { keycloak } = useKeycloak();
   const token = keycloak.tokenParsed;
@@ -51,24 +51,20 @@ const CodeEditorPage = () => {
             successNoti(`${fullName} đã tham gia vào phòng`, true);
           }
           dispatch(setParticipants(clients));
-            localAudioRef.current.srcObject = stream;
+          localAudioRef.current.srcObject = stream;
 
-            myPeer.current.on("call", (call) => {
-              call.answer(stream);
-              call.on("stream", (userAudioStream) => {
-                remoteAudioRef.current.srcObject = userAudioStream;
-              });
+          myPeer.current.on("call", (call) => {
+            call.answer(stream);
+            call.on("stream", (userAudioStream) => {
+              remoteAudioRef.current.srcObject = userAudioStream;
             });
+          });
 
-            const call = myPeer.current.call(peerId, stream);
-            console.log(
-              "🚀 ~ file: CodeEditorPage.js:64 ~ navigator.mediaDevices.getUserMedia ~ call:",
-              call
-            );
+          const call = myPeer.current.call(peerId, stream);
 
-            call.on("stream", (userVideoStream) => {
-              remoteAudioRef.current.srcObject = userVideoStream;
-            });
+          call.on("stream", (userVideoStream) => {
+            remoteAudioRef.current.srcObject = userVideoStream;
+          });
         });
 
         socketRef.current.on(SOCKET_EVENTS.LEAVE_ROOM, ({ fullName, socketId, clients }) => {
@@ -85,6 +81,10 @@ const CodeEditorPage = () => {
     };
   }, []);
 
+  /**
+   * Get basic information about room as id, name...
+   * @param {*} id of room
+   */
   const getRoomById = (id) => {
     request(
       "get",
@@ -104,6 +104,13 @@ const CodeEditorPage = () => {
   useEffect(() => {
     getRoomById(roomId);
   }, [roomId]);
+
+  useEffect(() => {
+    if(localAudioRef.current.srcObject && localAudioRef.current.srcObject.getAudioTracks().length > 0){
+      localAudioRef.current.srcObject.getAudioTracks()[0].enabled = !isMute;
+
+    }
+  }, [isMute]);
   return (
     <div>
       <audio ref={localAudioRef} muted autoPlay></audio>

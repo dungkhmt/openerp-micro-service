@@ -5,6 +5,7 @@ import {
   ExitToApp,
   Groups,
   Mic,
+  MicOff,
   PlayArrow,
   Settings,
   Share,
@@ -27,6 +28,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { PROGRAMMING_LANGUAGES } from "utils/constants";
 import {
+  setIsMute,
   setIsVisibleConfigEditor,
   setIsVisibleParticipants,
   setIsVisibleShareForm,
@@ -45,9 +47,8 @@ const NavBarRoom = (props) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const [loadingRunCode, setLoadingRunCode] = useState(false);
-  const { isVisibleParticipants, selectedLanguage, participants, source, input } = useSelector(
-    (state) => state.codeEditor
-  );
+  const { isVisibleParticipants, selectedLanguage, participants, source, input, isMute } =
+    useSelector((state) => state.codeEditor);
 
   const [anchorConfigEditor, setAnchorConfigEditor] = useState(null);
   const handleDisplayParticipants = () => {
@@ -55,11 +56,10 @@ const NavBarRoom = (props) => {
   };
 
   const handleLeaveRoom = () => {
-    myPeer.current.disconnect()
-    myPeer.current.destroy()
+    myPeer.current.disconnect();
+    myPeer.current.destroy();
     socket.current.disconnect();
     history.push("/code-editor/create-join-room");
-
   };
   function handleDownloadSource(language) {
     const blob = new Blob([source], { type: "text/plain" });
@@ -117,6 +117,10 @@ const NavBarRoom = (props) => {
   const handleCloseConfigEditor = () => {
     setAnchorConfigEditor(null);
     dispatch(setIsVisibleConfigEditor(false));
+  };
+
+  const handleMuteMicrophone = () => {
+    dispatch(setIsMute(!isMute));
   };
   return (
     <div>
@@ -198,8 +202,8 @@ const NavBarRoom = (props) => {
         <Grid item>
           <Grid container spacing={2} alignItems="center">
             <Grid item>
-              <IconButton>
-                  <Mic fontSize="large" />
+              <IconButton onClick={handleMuteMicrophone}>
+                {isMute ? <MicOff fontSize="large" /> : <Mic fontSize="large" />}
               </IconButton>
             </Grid>
             <Grid item>
