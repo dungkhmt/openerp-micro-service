@@ -26,6 +26,7 @@
     "lodash": "^4.17.21",
     "overlayscrollbars": "^1.13.1",
     "overlayscrollbars-react": "^0.2.3",
+    "peerjs": "^1.4.7",
     "randomcolor": "^0.6.2",
     "react": "^18.2.0",
     "react-ace": "^10.1.0",
@@ -39,7 +40,6 @@
     "react-scripts": "5.0.1",
     "react-splitter-layout": "^4.0.0",
     "react-toastify": "^6.2.0",
-    "simple-peer": "^9.11.1",
     "simplebar-react": "^2.3.6",
     "socket.io-client": "^4.6.1",
     "web-vitals": "^2.1.4"

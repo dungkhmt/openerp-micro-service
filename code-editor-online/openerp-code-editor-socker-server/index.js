@@ -28,17 +28,18 @@ function getAllClients(roomId) {
 }
 io.on("connection", (socket) => {
   console.log(`Connected ${socket.id}`);
-  socket.on(SOCKET_IO_EVENTS.CONNECT_TO_EDITOR, ({ fullName, roomId }) => {
+  socket.on(SOCKET_IO_EVENTS.CONNECT_TO_EDITOR, ({ fullName, roomId, peerId }) => {
     socket.join(roomId);
-    userSocketMap[socket.id] = { fullName, roomId };
+    userSocketMap[socket.id] = { fullName, roomId, peerId };
     const clients = getAllClients(roomId);
 
     clients.forEach((client) => {
       let socketId = client.socketId;
-
+      
       io.to(socketId).emit(SOCKET_IO_EVENTS.JOINED, {
         fullName: fullName,
         socketId: socket.id,
+        peerId,
         clients,
       });
     });
