@@ -26,8 +26,8 @@ function withScreenSecurity(SecuredComponent, id, viewError) {
         "get",
         `/entity-authorization/${id}`,
         (res) => {
-          setChecking(false);
           setScreenAuthorization(new Set(res.data));
+          setChecking(false);
         },
         {
           onError: (e) => {
