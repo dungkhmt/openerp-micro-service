@@ -41,7 +41,7 @@ import { errorNoti, successNoti } from "utils/notification";
 import ConfigEditor from "./ConfigEditor";
 
 const NavBarRoom = (props) => {
-  const { socket } = props;
+  const { socket, myPeer } = props;
   const dispatch = useDispatch();
   const history = useHistory();
   const [loadingRunCode, setLoadingRunCode] = useState(false);
@@ -55,8 +55,11 @@ const NavBarRoom = (props) => {
   };
 
   const handleLeaveRoom = () => {
-    history.push("/code-editor/create-join-room");
+    myPeer.current.disconnect()
+    myPeer.current.destroy()
     socket.current.disconnect();
+    history.push("/code-editor/create-join-room");
+
   };
   function handleDownloadSource(language) {
     const blob = new Blob([source], { type: "text/plain" });
