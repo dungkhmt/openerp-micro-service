@@ -4,11 +4,10 @@ import {Card, CardActions, CardContent, TextField, Typography,} from "@material-
 import Button from "@material-ui/core/Button";
 import {makeStyles} from "@material-ui/core/styles";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useEffect, useState} from "react";
 import {useParams} from "react-router";
 import {useHistory} from "react-router-dom";
-import {authPost} from "../../../api";
+import {request} from "../../../api";
 import AlertDialog from "../../common/AlertDialog";
 
 let reDirect = null;
@@ -43,8 +42,6 @@ function CreateTopicOfCourse() {
   const [alertSeverity, setAlertSeverty] = useState("info");
   const [openAlert, setOpenAlert] = useState(false);
   const history = useHistory();
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
 
   const onClickAlertBtn = () => {
     setOpenAlert(false);
@@ -64,15 +61,13 @@ function CreateTopicOfCourse() {
       courseId: courseId,
     };
     setIsRequesting(true);
-    let topic = await authPost(
-      dispatch,
-      token,
+
+    request(
+      "post",
       "/create-quiz-course-topic",
-      body
-    ).then(
       (res) => {
         setIsRequesting(false);
-        if (res.message === "") {
+        if (res.data.message === "") {
           alert("Tạo thành công");
           console.log("Create topic success, topic = ", res);
           history.push("/edu/course/detail/" + courseId);
@@ -81,14 +76,19 @@ function CreateTopicOfCourse() {
           console.log("Create topic fail");
         }
       },
-      (error) => {
-        alert("Dữ liệu không đúng");
-      }
+      {
+        onError: (error) => {
+          alert("Dữ liệu không đúng");
+        },
+      },
+      body
     );
   }
+
   useEffect(() => {
     console.log("Create topic of course " + courseId);
   }, []);
+
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <Card>

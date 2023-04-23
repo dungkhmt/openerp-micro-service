@@ -18,11 +18,10 @@ import {
 } from "@mui/material";
 import React, {useEffect, useState} from "react";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
 import {CompileStatus} from "./CompileStatus";
 import {sleep} from "./lib";
-import {authPostMultiPart, request} from "../../../api";
+import {request} from "../../../api";
 import {useTranslation} from "react-i18next";
 import HustDropzoneArea from "../../common/HustDropzoneArea";
 import {errorNoti, successNoti, warningNoti} from "../../../utils/notification";
@@ -59,8 +58,6 @@ function CreateProblem() {
   );
   const classes = useStyles();
   const history = useHistory();
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
 
   const [problemId, setProblemID] = useState("");
   const [problemName, setProblemName] = useState("");
@@ -186,17 +183,32 @@ function CreateProblem() {
     }
 
     setLoading(true);
-    authPostMultiPart(dispatch, token, "/create-problem", formData)
-      .then(
-        () => {
-          successNoti("Problem saved successfully", 1000);
-          sleep(1000).then(() => {
-            history.push("/programming-contest/list-problems");
-          });
+
+    const config = {
+      headers: {
+        "content-Type": "multipart/form-data",
+      },
+    };
+
+    request(
+      "post",
+      "/create-problem",
+      (res) => {
+        setLoading(false);
+        successNoti("Problem saved successfully", 1000);
+        sleep(1000).then(() => {
+          history.push("/programming-contest/list-problems");
+        });
+      },
+      {
+        onError: () => {
+          errorNoti(t("error", { ns: "common" }), 3000);
+          setLoading(false);
         },
-      )
-      .catch(() => errorNoti(t("error", {ns: "common"}), 3000))
-      .finally(() => setLoading(false));
+      },
+      formData,
+      config
+    );
 
   }
 

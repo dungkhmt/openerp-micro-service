@@ -12,8 +12,8 @@ import {
 } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import Alert from "@mui/material/Alert";
-import React, {useState} from "react";
-import {request} from "../../../api";
+import {request} from "api";
+import {useState} from "react";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -35,42 +35,41 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
-export default function ModalCreateResource({open, handleClose, domainId}) {
+export default function ModalCreateResource({ open, handleClose, domainId }) {
   const classes = useStyles();
+
   const [link, setLink] = useState(null);
   const [description, setDescription] = useState(null);
   const [alert, setAlert] = useState(false);
   const [alertContent, setAlertContent] = useState("");
 
-  const createResource = () => {
-    const data = JSON.stringify({
-      link: link,
-      description: description,
-      statusId: "RESOURCE_CREATED",
-    });
+  // const toastId = React.useRef(null);
 
+  const createResource = () => {
     request(
-      'post',
+      "post",
       `/domains/${domainId}/resource`,
-      res => {
+      (res) => {
+        console.log("create, resource ", res.data);
         if (res.data == true) {
-          setAlertContent("Created susscessfully");
+          setAlertContent("Create susscessed");
           setAlert(true);
         }
       },
-      err => {
-        setAlertContent("Create failed");
-        setAlert(true);
-      },
-      data,
       {
-        headers: {
-          "content-type": "application/json"
-        }
+        onError: (error) => {
+          setAlertContent("Create failed");
+          setAlert(true);
+        },
+      },
+      {
+        link: link,
+        description: description,
+        statusId: "RESOURCE_CREATED",
       }
     );
   };
+
   const handleSubmit = () => {
     createResource();
   };
@@ -89,7 +88,7 @@ export default function ModalCreateResource({open, handleClose, domainId}) {
       <Fade in={open}>
         <form onSubmit={handleSubmit}>
           <Card className={classes.card}>
-            <CardHeader title="Thêm nguồn tham khảo"/>
+            <CardHeader title="Thêm nguồn tham khảo" />
             <CardContent>
               <Box
                 display="flex"

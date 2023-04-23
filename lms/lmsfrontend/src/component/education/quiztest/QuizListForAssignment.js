@@ -1,9 +1,7 @@
 import {Box, Paper, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {Skeleton} from "@material-ui/lab";
-import React, {Fragment, useEffect, useState} from "react";
-import {useSelector} from "react-redux";
-import {useHistory} from "react-router";
+import {Fragment, useEffect, useState} from "react";
 import {request} from "../../../api";
 //import TeacherViewQuizDetail from "../course/TeacherViewQuizDetail";
 import TeacherViewQuizDetailForAssignment from "./TeacherViewQuizDetailForAssignment";
@@ -29,8 +27,6 @@ const useStyles = makeStyles(() => ({
 
 function QuizListForAssignment({ testId }) {
   const classes = useStyles();
-  const token = useSelector((state) => state.auth.token);
-  const history = useHistory();
 
   const [quizList, setQuizList] = useState([]);
   const [quizGroups, setQuizGroups] = useState();

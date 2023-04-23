@@ -2,8 +2,7 @@ import DateFnsUtils from "@date-io/date-fns";
 import {Button, Card, Grid, MenuItem, TextField} from "@material-ui/core/";
 import {KeyboardDatePicker, KeyboardTimePicker, MuiPickersUtilsProvider,} from "@material-ui/pickers";
 import {Typography} from "@mui/material";
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useEffect, useState} from "react";
 import {useParams} from "react-router";
 import {useHistory} from "react-router-dom";
 import {request} from "../../../api";
@@ -40,8 +39,7 @@ function QuizTestEdit() {
   let testId = param.id;
   const history = useHistory();
   //const classes = useStyles();
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+
   const [quizTest, setQuizTest] = useState(null);
   const [duration, setDuration] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);

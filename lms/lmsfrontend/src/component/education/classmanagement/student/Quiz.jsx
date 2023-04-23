@@ -4,19 +4,16 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormGroup from "@material-ui/core/FormGroup";
 import {makeStyles, withStyles} from "@material-ui/core/styles";
 import parse from "html-react-parser";
-import React, {useEffect, useRef, useState} from "react";
-import {useSelector} from "react-redux";
-import {useHistory} from "react-router";
+import {useEffect, useRef, useState} from "react";
 import {request} from "../../../../api";
 import TestButton from "./TestButton";
 
-import CommentsOnQuiz from "./CommentsOnQuiz";
 import CreateQuizDoingExplanationDialog from "../../quiztest/quizdoingexplanation/CreateQuizDoingExplanationDialog";
 import QuizDoingExplanationDetail from "../../quiztest/quizdoingexplanation/QuizDoingExplanationDetail";
+import CommentsOnQuiz from "./CommentsOnQuiz";
 
 const useStyles = makeStyles(() => ({
-  testBtn: {
-  },
+  testBtn: {},
   wrapper: {
     padding: "24px 0px",
   },
@@ -51,13 +48,13 @@ const useStyles = makeStyles(() => ({
     maxWidth: "100%",
   },
   actionContainer: {
-    display: 'flex',
-    marginTop: '12px',
-    columnGap: '10px'
+    display: "flex",
+    marginTop: "12px",
+    columnGap: "10px",
   },
   solutionsContainer: {
-    marginTop: '16px'
-  }
+    marginTop: "16px",
+  },
 }));
 
 /**
@@ -82,11 +79,11 @@ const GreenCheckbox = withStyles({
  */
 export default function Quizz({ quizz, index, classId }) {
   const classes = useStyles();
-  const token = useSelector((state) => state.auth.token);
-  const history = useHistory();
 
-  const [createExplanationDlgOpen, setCreateExplanationDlgOpen] = useState(false);
-  const [quizDoingExplanationOpen, setQuizDoingExplanationOpen] = useState(false);
+  const [createExplanationDlgOpen, setCreateExplanationDlgOpen] =
+    useState(false);
+  const [quizDoingExplanationOpen, setQuizDoingExplanationOpen] =
+    useState(false);
   const [result, setResult] = useState({ submited: false, isCorrect: false });
   const [openCommentBox, setOpenCommentBox] = useState(false);
   const [numberComments, setNumberComments] = useState(0);
@@ -221,34 +218,47 @@ export default function Quizz({ quizz, index, classId }) {
           </div>
         )}
 
-        { !quizDoingExplanationOpen &&
+        {!quizDoingExplanationOpen && (
           <div className={classes.testBtn}>
-            <Button variant="outlined" onClick={() => setQuizDoingExplanationOpen(true)}>
+            <Button
+              variant="outlined"
+              onClick={() => setQuizDoingExplanationOpen(true)}
+            >
               Xem cách làm
             </Button>
           </div>
-        }
+        )}
 
-        { quizDoingExplanationOpen && (
+        {quizDoingExplanationOpen && (
           <div className={classes.testBtn}>
-            <Button variant="outlined" onClick={() => setQuizDoingExplanationOpen(false)}>
+            <Button
+              variant="outlined"
+              onClick={() => setQuizDoingExplanationOpen(false)}
+            >
               Ẩn cách làm
             </Button>
           </div>
         )}
 
         <div className={classes.testBtn}>
-          <Button variant="outlined" onClick={() => setCreateExplanationDlgOpen(true)}>
+          <Button
+            variant="outlined"
+            onClick={() => setCreateExplanationDlgOpen(true)}
+          >
             Thêm cách làm
           </Button>
         </div>
       </div>
 
-      { quizDoingExplanationOpen && (
+      {quizDoingExplanationOpen && (
         <div className={classes.solutionsContainer}>
-          <Typography variant="h6">Các cách làm đã tạo cho câu hỏi này</Typography>
-          <QuizDoingExplanationDetail questionId={quizz.questionId}
-                                      ref={explanationDetailRef}/>
+          <Typography variant="h6">
+            Các cách làm đã tạo cho câu hỏi này
+          </Typography>
+          <QuizDoingExplanationDetail
+            questionId={quizz.questionId}
+            ref={explanationDetailRef}
+          />
         </div>
       )}
 
@@ -262,10 +272,12 @@ export default function Quizz({ quizz, index, classId }) {
         </div>
       )}
 
-      <CreateQuizDoingExplanationDialog questionId={quizz.questionId}
-                                        open={createExplanationDlgOpen}
-                                        onClose={() => setCreateExplanationDlgOpen(false)}
-                                        onCreateSuccess={refreshExplanation}/>
+      <CreateQuizDoingExplanationDialog
+        questionId={quizz.questionId}
+        open={createExplanationDlgOpen}
+        onClose={() => setCreateExplanationDlgOpen(false)}
+        onCreateSuccess={refreshExplanation}
+      />
     </div>
   );
 }

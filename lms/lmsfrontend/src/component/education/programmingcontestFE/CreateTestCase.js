@@ -4,16 +4,14 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {successNoti, warningNoti} from "../../../utils/notification";
-import {authPostMultiPart, request} from "../../../api";
-import {useDispatch, useSelector} from "react-redux";
+import {request} from "../../../api";
 
 export default function CreateTestCase(props) {
   const history = useHistory();
   const [value, setValue] = useState(0);
   const [input, setInput] = useState("");
   const [result, setResult] = useState("");
-  const { problemId } = useParams();
-  const token = useSelector((state) => state.auth.token);
+  const {problemId} = useParams();
   const [description, setDescription] = useState();
   const [load, setLoad] = useState(false);
   const [checkTestcaseResult, setCheckTestcaseResult] = useState(false);
@@ -23,9 +21,8 @@ export default function CreateTestCase(props) {
   const [filename, setFilename] = useState("");
   const [uploadMode, setUploadMode] = useState("EXECUTE");
 
-  const dispatch = useDispatch();
   const [uploadMessage, setUploadMessage] = useState("");
-  //const token = useSelector((state) => state.auth.token);
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -84,7 +81,7 @@ export default function CreateTestCase(props) {
 
   useEffect(() => {
     console.log("problemId ", problemId);
-    console.log("token ", token);
+
     /*
     request("GET", "/problem-details/" + problemId, (res) => {
       console.log("res ", res);
@@ -110,8 +107,17 @@ export default function CreateTestCase(props) {
     formData.append("inputJson", JSON.stringify(body));
     formData.append("file", filename);
 
-    authPostMultiPart(dispatch, token, "/upload-test-case", formData)
-      .then((res) => {
+    const config = {
+      headers: {
+        "content-Type": "multipart/form-data",
+      },
+    };
+
+    request(
+      "post",
+      "/upload-test-case",
+      (res) => {
+        res = res.data;
         setIsProcessing(false);
         console.log("handleFormSubmit, res = ", res);
         setUploadMessage(res.message);
@@ -119,16 +125,23 @@ export default function CreateTestCase(props) {
         //  alert("Time Out!!!");
         //} else {
         //}
-      })
-      .catch((e) => {
-        setIsProcessing(false);
-        console.error(e);
-        //alert("Time Out!!!");
-      });
+      },
+      {
+        onError: (e) => {
+          setIsProcessing(false);
+          console.error(e);
+          //alert("Time Out!!!");
+        },
+      },
+      formData,
+      config
+    );
   };
+
   function onFileChange(event) {
     setFilename(event.target.files[0]);
   }
+
   const onInputChange = (event) => {
     let name = event.target.value;
     setFilename(name);
@@ -165,7 +178,7 @@ export default function CreateTestCase(props) {
             setIsPublic(event.target.value);
           }}
           value={isPublic}
-          style={{ width: "140px" }}
+          style={{width: "140px"}}
         >
           <MenuItem key={"Y"} value={"Y"}>
             {"Y"}
@@ -184,7 +197,7 @@ export default function CreateTestCase(props) {
             setUploadMode(event.target.value);
           }}
           value={uploadMode}
-          style={{ width: "140px" }}
+          style={{width: "140px"}}
         >
           <MenuItem key={"NOT_EXECUTE"} value={"NOT_EXECUTE"}>
             {"NOT_EXECUTE"}
@@ -194,7 +207,7 @@ export default function CreateTestCase(props) {
           </MenuItem>
         </TextField>
       </Box>
-      <br />
+      <br/>
 
       <form onSubmit={handleFormSubmit}>
         <Grid container spacing={1} alignItems="flex-end">
@@ -245,7 +258,7 @@ export default function CreateTestCase(props) {
             </Button>
             <h2> Status: {uploadMessage}</h2>
           </Grid>
-          {isProcessing ? <CircularProgress /> : ""}
+          {isProcessing ? <CircularProgress/> : ""}
         </Grid>
       </form>
     </Box>

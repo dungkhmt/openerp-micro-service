@@ -1,19 +1,18 @@
 import DateFnsUtils from "@date-io/date-fns";
-import Button from "@material-ui/core/Button";
 import {Card, CardActions, CardContent, MenuItem, TextField, Typography,} from "@material-ui/core/";
+import Button from "@material-ui/core/Button";
 import {makeStyles} from "@material-ui/core/styles";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
-import React, {useEffect, useState} from "react";
-import {useHistory} from "react-router-dom";
-import {authDelete, authGet, authPost} from "../../../api";
-import {useDispatch, useSelector} from "react-redux";
-import AlertDialog from "../../common/AlertDialog";
+import {ContentState, convertToRaw, EditorState} from "draft-js";
+import {useEffect, useState} from "react";
 import {Editor} from "react-draft-wysiwyg";
 import {useParams} from "react-router";
-import {ContentState, convertToRaw, EditorState} from "draft-js";
+import {useHistory} from "react-router-dom";
+import AlertDialog from "../../common/AlertDialog";
 
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
+import {request} from "../../../api";
 
 let reDirect = null;
 const useStyles = makeStyles((theme) => ({
@@ -59,8 +58,7 @@ function TeacherCourseQuizChoiceAnswerDetail() {
   const [alertSeverity, setAlertSeverty] = useState("info");
   const [openAlert, setOpenAlert] = useState(false);
   const history = useHistory();
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
   const onClickAlertBtn = () => {
@@ -69,24 +67,27 @@ function TeacherCourseQuizChoiceAnswerDetail() {
       history.push(reDirect);
     }
   };
+
   const handleCloseAlert = () => {
     setOpenAlert(false);
   };
+
   async function getYesNoList() {
-    let lst = await authGet(dispatch, token, "/get-yes-no-list");
-    setYesno(lst);
+    request("get", "/get-yes-no-list", (res) => {
+      setYesno(res.data);
+    });
   }
+
   const onChangeEditorState = (editorState) => {
     setEditorState(editorState);
   };
 
   async function getQuizChoiceAnswerDetail() {
-    await authGet(
-      dispatch,
-      token,
-      "/get-quiz-choice-answer-detail/" + choiceAnswerId
-    ).then(
+    request(
+      "get",
+      "/get-quiz-choice-answer-detail/" + choiceAnswerId,
       (res) => {
+        res = res.data;
         if (res) {
           setIsCorrectAnswer(res.isCorrectAnswer);
           let blocksFromHtml = htmlToDraft(res.choiceAnswerContent);
@@ -105,8 +106,10 @@ function TeacherCourseQuizChoiceAnswerDetail() {
           alert("Lỗi kết nối, thử tải lại trang");
         }
       },
-      (error) => {
-        alert("Lỗi kết nối, thử tải lại trang");
+      {
+        onError: (error) => {
+          alert("Lỗi kết nối, thử tải lại trang");
+        },
       }
     );
   }
@@ -120,40 +123,39 @@ function TeacherCourseQuizChoiceAnswerDetail() {
       isCorrectAnswer: isCorrectAnswer,
       quizQuestionId: questionId,
     };
-    await authPost(
-      dispatch,
-      token,
+
+    request(
+      "post",
       "/update-quiz-choice-answer/" + choiceAnswerId,
-      body
-    ).then(
       (res) => {
-        if (res.length !== 0) {
-          alert("Cập nhật thành công");
-        } else {
+        if (res.data === "No permission") {
           alert("Cập nhật không thành công");
+        } else {
+          alert("Cập nhật thành công");
         }
         history.push(
           "/edu/teacher/course/quiz/detail/" + questionId + "/" + courseId
         );
       },
-      (error) => {
-        alert("Cập nhật không thành công");
-        //history.push("/edu/teacher/course/quiz/detail/" + questionId);
-        history.push(
-          "/edu/teacher/course/quiz/detail/" + questionId + "/" + courseId
-        );
-      }
+      {
+        onError: (error) => {
+          alert("Cập nhật không thành công");
+          //history.push("/edu/teacher/course/quiz/detail/" + questionId);
+          history.push(
+            "/edu/teacher/course/quiz/detail/" + questionId + "/" + courseId
+          );
+        },
+      },
+      body
     );
   }
 
   async function handleDelete() {
-    await authDelete(
-      dispatch,
-      token,
-      "/delete-quiz-choice-answer/" + choiceAnswerId
-    ).then(
+    request(
+      "delete",
+      "/delete-quiz-choice-answer/" + choiceAnswerId,
       (res) => {
-        if (res.length !== 0) {
+        if (res.data.length !== 0) {
           alert("Xóa thành công");
         } else {
           alert("Xóa không thành công");
@@ -163,12 +165,14 @@ function TeacherCourseQuizChoiceAnswerDetail() {
           "/edu/teacher/course/quiz/detail/" + questionId + "/" + courseId
         );
       },
-      (error) => {
-        alert("Xóa không thành công");
-        //history.push("/edu/teacher/course/quiz/detail/" + questionId);
-        history.push(
-          "/edu/teacher/course/quiz/detail/" + questionId + "/" + courseId
-        );
+      {
+        onError: (error) => {
+          alert("Xóa không thành công");
+          //history.push("/edu/teacher/course/quiz/detail/" + questionId);
+          history.push(
+            "/edu/teacher/course/quiz/detail/" + questionId + "/" + courseId
+          );
+        },
       }
     );
   }

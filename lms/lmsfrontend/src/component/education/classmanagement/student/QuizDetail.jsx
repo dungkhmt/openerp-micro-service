@@ -3,12 +3,10 @@ import {green} from "@material-ui/core/colors";
 import FormGroup from "@material-ui/core/FormGroup";
 import {makeStyles, withStyles} from "@material-ui/core/styles";
 import parse from "html-react-parser";
-import React, {useState} from "react";
-import {useSelector} from "react-redux";
-import {useHistory} from "react-router";
+import {useState} from "react";
 import {request} from "../../../../api";
-import TestButton from "./TestButton";
 import CommentsOnQuiz from "./CommentsOnQuiz";
+import TestButton from "./TestButton";
 
 const useStyles = makeStyles(() => ({
   testBtn: {
@@ -63,8 +61,6 @@ const GreenCheckbox = withStyles({
  */
 export default function QuizDetail({ quizz, index, classId }) {
   const classes = useStyles();
-  const token = useSelector((state) => state.auth.token);
-  const history = useHistory();
 
   const [result, setResult] = useState({ submited: false, isCorrect: false });
   const [openCommentBox, setOpenCommentBox] = useState(false);

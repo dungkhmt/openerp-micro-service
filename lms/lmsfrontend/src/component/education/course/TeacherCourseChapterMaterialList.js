@@ -1,15 +1,13 @@
 import {Card, CardContent} from "@material-ui/core/";
 import AddIcon from "@material-ui/icons/Add";
 import MaterialTable from "material-table";
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useEffect, useState} from "react";
 import {Link, useHistory} from "react-router-dom";
 import {request} from "../../../api";
 
 function TeacherCourseChapterMaterialList(props) {
   const chapterId = props.chapterId;
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+
   const history = useHistory();
   const [chapterMaterials, setChapterMaterials] = useState([]);
 

@@ -3,16 +3,16 @@ import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
+import MenuItem from "@material-ui/core/MenuItem";
 import {makeStyles} from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
-import MenuItem from "@material-ui/core/MenuItem";
-import {MuiPickersUtilsProvider,} from "@material-ui/pickers";
-import React, {useEffect, useState} from "react";
-import {useHistory} from "react-router-dom";
-import {authGet} from "../../../api";
-import {useDispatch, useSelector} from "react-redux";
+
 import {CircularProgress} from "@material-ui/core";
+import {MuiPickersUtilsProvider} from "@material-ui/pickers";
+import {useEffect, useState} from "react";
+import {useHistory} from "react-router-dom";
+import {request} from "../../../api";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -52,8 +52,7 @@ const columns = [
 export default function CreateClass() {
   const classes = useStyles();
   const history = useHistory();
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+
   const [isRequesting, setIsRequesting] = useState(false);
 
   const [classId, setClassId] = useState(null);
@@ -86,7 +85,8 @@ export default function CreateClass() {
   const [invalidCourseId, setInvalidCourseId] = useState(false);
 
   const getAllCourse = () => {
-    authGet(dispatch, token, "/edu/class/get-all-courses").then((res) => {
+    request("get", "/edu/class/get-all-courses", (res) => {
+      res = res.data;
       console.log(res);
       setCoursePool(res);
     });
@@ -100,7 +100,8 @@ export default function CreateClass() {
   //   };
 
   const getAllSemester = () => {
-    authGet(dispatch, token, "/edu/class/get-all-semesters").then((res) => {
+    request("get", "/edu/class/get-all-semesters", (res) => {
+      res = res.data;
       console.log(res);
       setSemesterPool(res);
     });

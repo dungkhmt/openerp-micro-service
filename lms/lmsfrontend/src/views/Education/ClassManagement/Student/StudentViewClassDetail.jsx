@@ -1,17 +1,16 @@
 import {Avatar, Card, CardContent, CardHeader, Divider, Grid, Link, Typography,} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {BiDetail} from "react-icons/bi";
-import {useDispatch,} from "react-redux";
 import {useParams,} from "react-router";
+import {classState} from "state/ClassState";
 import {request} from "../../../../api";
 import QuizTab from "../../../../component/education/classmanagement/student/QuizTab";
 import {a11yProps, AntTab, AntTabs, TabPanel,} from "../../../../component/tab";
-import {setClassId} from "../../../../reducers/classReducer";
-import StudentViewClassDetailChapterList from "./StudentViewClassDetailChapterList";
-import StudentViewClassDetailStudentList from "./StudentViewClassDetailStudentList";
-import StudentViewClassDetailLearningSessionList from "./StudentViewClassDetailLearningSessionList";
 import StudentViewClassDetailAssignmentList from "./StudentViewClassDetailAssignmentList";
+import StudentViewClassDetailChapterList from "./StudentViewClassDetailChapterList";
+import StudentViewClassDetailLearningSessionList from "./StudentViewClassDetailLearningSessionList";
+import StudentViewClassDetailStudentList from "./StudentViewClassDetailStudentList";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -36,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
 export default function StudentViewClassDetail() {
   const classes = useStyles();
   const params = useParams();
-  const dispatch = useDispatch();
 
   const classId = params.id;
   const [classDetail, setClassDetail] = useState({});
@@ -50,7 +48,7 @@ export default function StudentViewClassDetail() {
     const classId = params.id;
     request("get", `/edu/class/${params.id}`, (res) => {
         setClassDetail(res.data);
-        dispatch(setClassId(classId));
+      classState.classId.set(classId);
     });
   };
 
@@ -64,16 +62,18 @@ export default function StudentViewClassDetail() {
     "Bài tập trắc nghiệm",
     "DS sinh viên",
     "Bài tập",
-    "Buổi học"
-  ]
+    "Buổi học",
+  ];
 
   return (
     <div>
-      <AntTabs value={activeTab}
+      <AntTabs
+        value={activeTab}
                onChange={handleChangeTab}
                aria-label="student-view-class-detail-tabs"
                scrollButtons="auto"
-               variant="scrollable">
+        variant="scrollable"
+      >
         {tabsLabel.map((label, idx) => (
           <AntTab key={label} label={label} {...a11yProps(idx)} />
         ))}

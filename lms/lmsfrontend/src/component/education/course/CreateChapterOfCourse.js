@@ -4,11 +4,10 @@ import Button from "@material-ui/core/Button";
 import {makeStyles} from "@material-ui/core/styles";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import {EditorState} from "draft-js";
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useEffect, useState} from "react";
 import {useParams} from "react-router";
 import {useHistory} from "react-router-dom";
-import {authPost} from "../../../api";
+import {request} from "../../../api";
 import AlertDialog from "../../common/AlertDialog";
 
 let reDirect = null;
@@ -41,8 +40,7 @@ function CreateChapterOfCourse() {
   const [alertSeverity, setAlertSeverty] = useState("info");
   const [openAlert, setOpenAlert] = useState(false);
   const history = useHistory();
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
   const onClickAlertBtn = () => {
@@ -61,14 +59,17 @@ function CreateChapterOfCourse() {
       courseId: courseId,
       chapterName: chapterName,
     };
-    let chapter = await authPost(
-      dispatch,
-      token,
+
+    request(
+      "post",
       "/edu/class/create-chapter-of-course",
+      (res) => {
+        console.log("Create chapter success, chapter = ", res.data);
+        history.push("/edu/course/detail/" + courseId);
+      },
+      {},
       body
     );
-    console.log("Create chapter success, chapter = ", chapter);
-    history.push("/edu/course/detail/" + courseId);
   }
   useEffect(() => {
     console.log("Create chapter of course " + courseId);

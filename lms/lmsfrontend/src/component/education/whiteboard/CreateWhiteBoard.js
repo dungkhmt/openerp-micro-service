@@ -17,14 +17,15 @@ export default function CreateWhiteBoard() {
         await request(
           'put',
           `/whiteboards/user/${whiteboardId}`,
-          (res) => {},
+          (res) => {
+          },
           {},
-          { roleId: ROLE_STATUS.WRITE, statusId: ROLE_STATUS.ACCEPTED },
+          {roleId: ROLE_STATUS.WRITE, statusId: ROLE_STATUS.ACCEPTED},
         )
         history.push(`/whiteboard/board/${whiteboardId}`)
       },
       {},
-      { whiteboardId },
+      {whiteboardId},
     )
   }
 

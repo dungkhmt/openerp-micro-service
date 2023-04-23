@@ -12,11 +12,10 @@ import {ContentState, EditorState} from "draft-js";
 import htmlToDraft from "html-to-draftjs";
 import React, {useEffect, useState} from "react";
 import {Editor} from "react-draft-wysiwyg";
-import {useDispatch, useSelector} from "react-redux";
 import {useParams} from "react-router";
 import {useHistory} from "react-router-dom";
 import {randomImageName,} from "utils/FileUpload/covert";
-import {authGet, request} from "../../../api";
+import {request} from "../../../api";
 import ContestsUsingAProblem from "./ContestsUsingAProblem";
 import {StyledTableCell, StyledTableRow} from "./lib";
 import {copyAllTestCases, downloadAllTestCases} from "./service/TestCaseService";
@@ -49,8 +48,7 @@ export default function ManagerViewProblemDetail() {
   const [runTime, setRunTime] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [selectedTestcase, setSelectedTestcase] = useState();
-  const token = useSelector((state) => state.auth.token);
-  const dispatch = useDispatch();
+
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [editorStateDescription, setEditorStateDescription] = useState(
     EditorState.createEmpty()
@@ -79,35 +77,36 @@ export default function ManagerViewProblemDetail() {
   }
 
   function getProblemDetail() {
-    authGet(
-      dispatch,
-      token,
-      "/get-problem-detail-view-by-manager/" + problemId
-    ).then((res) => {
-      setProblem(res);
-      console.log(res);
-      if (res.attachment && res.attachment.length !== 0) {
-        const newFileURLArray = res.attachment.map((url) => ({
-          id: randomImageName(),
-          content: url,
-        }));
-        newFileURLArray.forEach((file, idx) => {
-          file.fileName = res.attachmentNames[idx];
-        });
-        setFetchedImageArray(newFileURLArray);
+    request(
+      "get",
+      "/get-problem-detail-view-by-manager/" + problemId,
+      (res) => {
+        res = res.data;
+        setProblem(res);
+        console.log(res);
+        if (res.attachment && res.attachment.length !== 0) {
+          const newFileURLArray = res.attachment.map((url) => ({
+            id: randomImageName(),
+            content: url,
+          }));
+          newFileURLArray.forEach((file, idx) => {
+            file.fileName = res.attachmentNames[idx];
+          });
+          setFetchedImageArray(newFileURLArray);
+        }
+        //setProblemStatement(res.data.problemStatement);
+        let problemDescriptionHtml = htmlToDraft(res.problemStatement);
+        let {contentBlocks, entityMap} = problemDescriptionHtml;
+        let contentDescriptionState = ContentState.createFromBlockArray(
+          contentBlocks,
+          entityMap
+        );
+        let statementDescription = EditorState.createWithContent(
+          contentDescriptionState
+        );
+        setEditorStateDescription(statementDescription);
       }
-      //setProblemStatement(res.data.problemStatement);
-      let problemDescriptionHtml = htmlToDraft(res.problemStatement);
-      let {contentBlocks, entityMap} = problemDescriptionHtml;
-      let contentDescriptionState = ContentState.createFromBlockArray(
-        contentBlocks,
-        entityMap
-      );
-      let statementDescription = EditorState.createWithContent(
-        contentDescriptionState
-      );
-      setEditorStateDescription(statementDescription);
-    }, {});
+    );
   }
 
   useEffect(() => {

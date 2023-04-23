@@ -14,7 +14,7 @@ import keycloak, {initOptions} from "./config/keycloak";
 import {request} from "./api";
 import {menuState} from "./state/MenuState";
 import {notificationState} from "./state/NotificationState";
-import { ReactComponent as Logo } from "./assets/icons/logo.svg";
+import {ReactComponent as Logo} from "./assets/icons/logo.svg";
 import {Box, CircularProgress, SvgIcon, Typography} from "@material-ui/core";
 
 const theme = createTheme({
@@ -25,8 +25,7 @@ const theme = createTheme({
   },
   overrides: {
     MuiCssBaseline: {
-      "@global": {
-      },
+      "@global": {},
     },
   },
 });
@@ -50,13 +49,13 @@ const AppLoading = (
         flexGrow: 1,
       }}
     >
-      <SvgIcon sx={{ fontSize: 150, mb: 4 }} viewBox="0 0 150 150">
-        <Logo width={132} height={132} x={9} y={9} />
+      <SvgIcon sx={{fontSize: 150, mb: 4}} viewBox="0 0 150 150">
+        <Logo width={132} height={132} x={9} y={9}/>
       </SvgIcon>
       <CircularProgress/>
     </Box>
     <Box>
-      <Typography sx={{ mb: 4 }}>OpenERP Team</Typography>
+      <Typography sx={{mb: 4}}>OpenERP Team</Typography>
     </Box>
   </Box>
 );
@@ -84,6 +83,29 @@ function App() {
   const onKeycloakEvent = async (event, error) => {
     if (event === "onAuthSuccess") {
       request("get", `/`);
+      console.log(keycloak.tokenParsed.preferred_username);
+      // // Currently maybe not necessary
+      // // Check token validity every 10 seconds (10 000 ms) and, if necessary, update the token.
+      // // Refresh token if it's valid for less then 60 seconds
+      // const updateTokenInterval = setInterval(
+      //   () =>
+      //     keycloak
+      //       .updateToken(60)
+      //       .then((refreshed) => {
+      //         if (refreshed) {
+      //           console.debug(`Access token refreshed`);
+      //         } else {
+      //           console.warn(`Refresh token refreshed`);
+      //         }
+      //       })
+      //       .catch(() => {
+      //         console.error(`Failed to refresh authentication tokens`);
+      //         keycloak.clearToken();
+      //       }),
+      //   10 * 1000
+      // );
+      // Currently not used
+      // dispatch(getScrSecurInfo());
     } else if (event === "onAuthError") {
       console.error("Authenticated failed");
     } else if (event === "onAuthLogout") {

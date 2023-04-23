@@ -2,10 +2,9 @@ import {Typography} from "@material-ui/core/";
 import AddIcon from "@material-ui/icons/Add";
 import parse from "html-react-parser";
 import MaterialTable from "material-table";
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useEffect, useState} from "react";
 import {Link, useHistory} from "react-router-dom";
-import {authGet} from "../../../api";
+import {request} from "../../../api";
 
 // const useStyles = makeStyles((theme) => ({
 //   card: {
@@ -19,8 +18,7 @@ function TeacherCourseQuizChoiceAnswerList(props) {
   // const classes = useStyles();
   const questionId = props.questionId;
   const courseId = props.courseId;
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+
   const history = useHistory();
   const [choiceAnswers, setChoiceAnswers] = useState([]);
 
@@ -50,13 +48,11 @@ function TeacherCourseQuizChoiceAnswerList(props) {
   ];
 
   async function getChoiceAnswerList() {
-    let lst = await authGet(
-      dispatch,
-      token,
-      "/get-quiz-choice-answer-of-a-quiz/" + questionId
-    );
-    setChoiceAnswers(lst);
-    console.log("getCHoiceAnsweList, questionId = " + questionId);
+    request("get", "/get-quiz-choice-answer-of-a-quiz/" + questionId, (res) => {
+      const lst = res.data;
+      setChoiceAnswers(lst);
+      console.log("getCHoiceAnsweList, questionId = " + questionId);
+    });
   }
 
   useEffect(() => {

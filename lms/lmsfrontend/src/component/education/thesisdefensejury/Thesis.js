@@ -1,24 +1,12 @@
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Checkbox,
-  MenuItem,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@material-ui/core/";
-import {Box, FormControl, InputAdornment, InputLabel, ListSubheader, Select} from "@mui/material";
+import {Button, Card, Grid, MenuItem, TextField, Typography} from "@material-ui/core";
+import Delete from "@material-ui/icons/Delete";
+import SearchIcon from "@mui/icons-material/Search";
+import {Box, FormControl, InputAdornment, InputLabel, ListSubheader, Select,} from "@mui/material";
+import MaterialTable, {MTableToolbar} from "material-table";
 import React, {useEffect, useMemo, useState} from "react";
 import {useHistory} from "react-router-dom";
 import {request} from "../../../api";
-import MaterialTable, {MTableToolbar} from "material-table";
-import {Grid} from "@material-ui/core";
-import SearchIcon from "@mui/icons-material/Search";
-import ModalLoading from "./ModalLoading"
-import Delete from '@material-ui/icons/Delete';
-
+import ModalLoading from "./ModalLoading";
 
 function Thesis() {
   const history = useHistory();

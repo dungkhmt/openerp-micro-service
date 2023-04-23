@@ -1,10 +1,9 @@
 import {Card, CardContent} from "@material-ui/core/";
 import MaterialTable from "material-table";
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {request} from "../../../api";
 import TeacherViewCourseList from "./teacher/TeacherViewCourseList";
-import {errorNoti} from "../../../utils/notification";
 
 function TeacherCourseList() {
   const [courses, setCourses] = useState([]);
@@ -22,10 +21,9 @@ function TeacherCourseList() {
   ];
 
   async function getCourseList() {
-    request("get",
-      "/edu/class/get-all-courses",
-        res => setCourses(res),
-      err => errorNoti(err, 3000));
+    request("get", "/edu/class/get-all-courses", (res) => {
+      setCourses(res.data);
+    });
   }
 
   useEffect(() => {
@@ -34,8 +32,8 @@ function TeacherCourseList() {
 
   return (
     <div>
-      <TeacherViewCourseList/>
-      <br/>
+      <TeacherViewCourseList />
+      <br />
 
       <Card>
         <CardContent>

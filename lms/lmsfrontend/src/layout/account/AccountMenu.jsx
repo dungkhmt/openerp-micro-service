@@ -1,4 +1,4 @@
-import { useState } from "@hookstate/core";
+import {useState} from "@hookstate/core";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import FeedbackIcon from "@mui/icons-material/Feedback";
@@ -16,10 +16,10 @@ import {
   Popper,
   Typography,
 } from "@mui/material";
-import { grey } from "@mui/material/colors";
-import { styled } from "@mui/material/styles";
-import { useKeycloak } from "@react-keycloak/web";
-import { lazy } from "react";
+import {grey} from "@mui/material/colors";
+import {styled} from "@mui/material/styles";
+import {useKeycloak} from "@react-keycloak/web";
+import {lazy} from "react";
 
 const FeedbackDialog = lazy(() => import("./FeedbackDialog"));
 
@@ -64,16 +64,16 @@ const styles = {
   }),
 };
 
-export const iconStyles = { color: "black" };
-export const menuItemWrapperStyles = { padding: "0px 8px" };
+export const iconStyles = {color: "black"};
+export const menuItemWrapperStyles = {padding: "0px 8px"};
 
 export function AccountMenu(props) {
-  const { keycloak } = useKeycloak();
+  const {keycloak} = useKeycloak();
   const token = keycloak.tokenParsed;
   const accountUrl = keycloak.createAccountUrl();
 
   //
-  const { open, id, anchorRef, avatarBgColor } = props;
+  const {open, id, anchorRef, avatarBgColor} = props;
   const openFeedback = useState(false);
 
   // Menu
@@ -104,15 +104,12 @@ export function AccountMenu(props) {
   };
 
   const handleLogout = () => {
-    const logoutOptions = {
-      redirectUri: window.location.origin + "/",
-    };
-
+    const logoutOptions = { redirectUri: window.location.origin };
     keycloak.logout(logoutOptions);
   };
 
   const menuItems = [
-    { topDivider: true },
+    {topDivider: true},
     {
       text: "Đóng góp ý kiến",
       subheader: "Góp phần cải thiện phiên bản Open ERP mới.",
@@ -124,7 +121,7 @@ export function AccountMenu(props) {
         />
       ),
     },
-    { topDivider: true },
+    {topDivider: true},
     {
       text: "Tài khoản",
       onClick: handleViewAccount,
@@ -136,7 +133,7 @@ export function AccountMenu(props) {
       ),
     },
 
-    { topDivider: true },
+    {topDivider: true},
     {
       text: "Đăng xuất",
       onClick: handleLogout,
@@ -172,7 +169,7 @@ export function AccountMenu(props) {
           },
         ]}
       >
-        {({ TransitionProps, placement }) => (
+        {({TransitionProps, placement}) => (
           <Grow
             {...TransitionProps}
             style={{
@@ -214,9 +211,9 @@ export function AccountMenu(props) {
                   </li>
 
                   {menuItems.map(
-                    ({ text, subheader, topDivider, onClick, icon }, index) =>
+                    ({text, subheader, topDivider, onClick, icon}, index) =>
                       topDivider ? (
-                        <Divider key={index} sx={styles.divider} />
+                        <Divider key={index} sx={styles.divider}/>
                       ) : (
                         <div key={text} style={menuItemWrapperStyles}>
                           <StyledMenuItem onClick={onClick}>
@@ -240,7 +237,7 @@ export function AccountMenu(props) {
           </Grow>
         )}
       </Popper>
-      <FeedbackDialog open={openFeedback} />
+      <FeedbackDialog open={openFeedback}/>
     </>
   );
 }

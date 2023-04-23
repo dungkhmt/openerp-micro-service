@@ -2,11 +2,10 @@ import {Card, CardContent} from "@material-ui/core/";
 import {makeStyles} from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
 import MaterialTable from "material-table";
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import ReactExport from "react-data-export";
-import {useDispatch, useSelector} from "react-redux";
 import {Link, useHistory} from "react-router-dom";
-import {authGet} from "../../../api";
+import {request} from "../../../api";
 import PositiveButton from "../classmanagement/PositiveButton";
 import {exportQuizsListPdf} from "./TeacherCourseQuizListExportPDF.js";
 
@@ -24,8 +23,7 @@ const useStyles = makeStyles((theme) => ({
 function TeacherCourseQuizList(props) {
   const classes = useStyles();
   const courseId = props.courseId;
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+
   const history = useHistory();
   const [quizs, setQuizs] = useState([]);
   const [fetchedQuizs, setfetchedQuizs] = useState(false);
@@ -152,28 +150,32 @@ function TeacherCourseQuizList(props) {
 
   const changeStatus = (rowData) => {
     //alert('change status');
-    let quiz = authGet(
-      dispatch,
-      token,
-      "/change-quiz-open-close-status/" + rowData.questionId
+
+    request(
+      "get",
+      "/change-quiz-open-close-status/" + rowData.questionId,
+      (res) => {
+        const quiz = res.data;
+        console.log("change status, return status = " + quiz);
+        history.push("/edu/course/detail/" + courseId);
+      }
     );
-    console.log("change status, return status = " + quiz);
-    history.push("/edu/course/detail/" + courseId);
   };
 
   async function getQuestionList() {
     //let lst = await authGet(dispatch, token, '/get-all-quiz-questions');
-    await authGet(
-      dispatch,
-      token,
+    request(
+      "get",
       //"/get-quiz-of-course/" + courseId).then(
-      "/get-quiz-of-course-sorted-created-time-desc/" + courseId
-    ).then((res) => {
-      setfetchedQuizs(true);
-      if (res) {
-        setQuizs(res);
+      "/get-quiz-of-course-sorted-created-time-desc/" + courseId,
+      (res) => {
+        res = res.data;
+        setfetchedQuizs(true);
+        if (res) {
+          setQuizs(res);
+        }
       }
-    });
+    );
   }
 
   useEffect(() => {

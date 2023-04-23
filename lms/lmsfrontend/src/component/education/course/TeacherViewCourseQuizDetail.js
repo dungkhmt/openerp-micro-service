@@ -1,16 +1,15 @@
-import React, {useEffect, useState} from "react";
-import {useHistory, useParams} from "react-router";
-import {request} from "../../../api";
 import {Box, Button, Checkbox, Typography} from "@material-ui/core";
 import {green} from "@material-ui/core/colors";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormGroup from "@material-ui/core/FormGroup";
 import {makeStyles, withStyles} from "@material-ui/core/styles";
 import parse from "html-react-parser";
+import {useEffect, useState} from "react";
+import {useParams} from "react-router";
+import {request} from "../../../api";
 
-import {useSelector} from "react-redux";
-import TestButton from "../classmanagement/student/TestButton";
 import CommentsOnQuiz from "../classmanagement/student/CommentsOnQuiz";
+import TestButton from "../classmanagement/student/TestButton";
 import QuizTestUsingAQuestion from "../quiztest/QuizTestUsingAQuestion";
 
 const useStyles = makeStyles(() => ({
@@ -90,8 +89,6 @@ export default function TeacherViewCourseQuizDetail() {
   }, []);
 
   const classes = useStyles();
-  const token = useSelector((state) => state.auth.token);
-  const history = useHistory();
 
   const [result, setResult] = useState({ submited: false, isCorrect: false });
   const [openCommentBox, setOpenCommentBox] = useState(false);

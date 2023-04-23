@@ -1,13 +1,8 @@
-import {combineReducers} from "redux";
-import auth from "./auth";
-import error from "./error";
-import screenSecurity from "./screen";
-import classReducer from "./classReducer";
-
-export default combineReducers({
-  auth,
-  // menu,
-  error,
-  screenSecurity,
-  class: classReducer,
-});
+// import { combineReducers } from "redux";
+// import classReducer from "./classReducer";
+// import screenSecurity from "./screen";
+//
+// export default combineReducers({
+//   screenSecurity,
+//   class: classReducer,
+// });

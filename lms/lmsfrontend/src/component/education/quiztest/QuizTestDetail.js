@@ -1,18 +1,19 @@
+import {Card, CardContent} from "@material-ui/core";
 import {Box, CircularProgress, Typography} from "@material-ui/core/";
 import {teal} from "@material-ui/core/colors";
 import {useTheme} from "@material-ui/core/styles";
 import {Skeleton} from "@material-ui/lab";
-import {authGet, request} from "api";
+import {request} from "api";
 import PrimaryButton from "component/button/PrimaryButton";
 import TertiaryButton from "component/button/TertiaryButton";
 import {a11yProps, AntTab, AntTabs, TabPanel} from "component/tab";
 import {useEffect, useState} from "react";
 import {FcCalendar, FcClock} from "react-icons/fc";
-import {useDispatch, useSelector} from "react-redux";
 import {useParams} from "react-router";
 import {Link as RouterLink} from "react-router-dom";
 import {addZeroBefore} from "utils/dateutils";
 import withScreenSecurity from "../../withScreenSecurity";
+import TeacherViewQuizTestDetail from "./detail/TeacherViewQuizTestDetail";
 import ParticipantRolesOfQuizTest from "./ParticipantRolesOfQuizTest";
 import QuizListForAssignment from "./QuizListForAssignment";
 import QuizQuestionsInQuizTest from "./QuizQuestionsInQuizTest";
@@ -22,8 +23,6 @@ import QuizTestJoinRequestList from "./QuizTestJoinRequestList";
 import QuizTestResultChart from "./QuizTestResultChart";
 import QuizTestStudentListResult from "./QuizTestResultList";
 import QuizTestStudentList from "./QuizTestStudentList";
-import {Card, CardContent} from "@material-ui/core";
-import TeacherViewQuizTestDetail from "./detail/TeacherViewQuizTestDetail";
 
 const styles = {
   btn: {
@@ -65,9 +64,6 @@ const weekDay = [
 function QuizTestDetail() {
   let param = useParams();
   let testId = param.id;
-
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
 
   const [testInfo, setTestInfo] = useState([]);
   const [courseInfo, setCourseInfo] = useState();
@@ -138,49 +134,49 @@ function QuizTestDetail() {
 
   async function getQuizTestDetail() {
     //do something to get test info from param.id
-    let res = await authGet(
-      dispatch,
-      token,
-      "/get-quiz-test?testId=" + param.id
-    );
+    request("get", "/get-quiz-test?testId=" + param.id, (res) => {
+      res = res.data;
 
-    // Format scheduleDateTime.
-    const date = new Date(res.scheduleDatetime);
-    const currentTime = new Date();
-    const year =
-      currentTime.getFullYear() === date.getFullYear()
-        ? ""
-        : ` ${date.getFullYear()},`;
+      // Format scheduleDateTime.
+      const date = new Date(res.scheduleDatetime);
+      const currentTime = new Date();
+      const year =
+        currentTime.getFullYear() === date.getFullYear()
+          ? ""
+          : ` ${date.getFullYear()},`;
 
-    const scheduleDateTime = `${
-      weekDay[date.getDay()]
-    }, ${date.getDate()} Tháng ${
-      date.getMonth() + 1
-    }, ${year} lúc ${addZeroBefore(date.getHours(), 2)}:${addZeroBefore(
-      date.getMinutes(),
-      2
-    )}`;
+      const scheduleDateTime = `${
+        weekDay[date.getDay()]
+      }, ${date.getDate()} Tháng ${
+        date.getMonth() + 1
+      }, ${year} lúc ${addZeroBefore(date.getHours(), 2)}:${addZeroBefore(
+        date.getMinutes(),
+        2
+      )}`;
 
-    setTestInfo({
-      testId: res.testId,
-      classId: res.classId,
-      courseId: res.courseId,
-      duration: res.duration,
-      scheduleDateTime: scheduleDateTime,
-      testName: res.testName,
-      statusId: res.statusId,
-    });
+      setTestInfo({
+        testId: res.testId,
+        classId: res.classId,
+        courseId: res.courseId,
+        duration: res.duration,
+        scheduleDateTime: scheduleDateTime,
+        testName: res.testName,
+        statusId: res.statusId,
+      });
 
-    //do something to get course info from testInfo.courseId
-    /* request(
+      //do something to get course info from testInfo.courseId
+      /* request(
       // token, history, 
       "get", `/edu/class/${re.classId}`, (res) => {
             tempCourseInfo.id = res.data.courseId;
             tempCourseInfo.courseName = res.data.name;
         }); */
 
-    let re2 = await authGet(dispatch, token, `/edu/class/${res.classId}`);
-    setCourseInfo({ id: re2.courseId, courseName: re2.name });
+      request("get", `/edu/class/${res.classId}`, (res2) => {
+        res2 = res2.data;
+        setCourseInfo({ id: res2.courseId, courseName: res2.name });
+      });
+    });
   }
 
   useEffect(() => {

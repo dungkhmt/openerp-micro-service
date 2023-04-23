@@ -1,5 +1,5 @@
 import {Button} from "@material-ui/core";
-import {Box, IconButton} from "@material-ui/core/";
+import {Box} from "@material-ui/core/";
 import {MuiThemeProvider} from "@material-ui/core/styles";
 import Grid from "@mui/material/Grid";
 import React, {useEffect, useState} from "react";
@@ -10,9 +10,7 @@ import ElementAddThesis from "./ElementAddThesis";
 import ElementDeleteTeacher from "./ElementDeleteTeacher";
 import ElementDeleteThesis from "./ElementDeleteThesis";
 
-
 function DefenseJuryDetail(props) {
-
   const history = useHistory();
   const params = useParams();
   const [toggle, setToggle] = useState(false);

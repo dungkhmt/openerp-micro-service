@@ -1,9 +1,8 @@
 import {Box, Grid, Paper} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {Bar, Doughnut, HorizontalBar, Line} from "react-chartjs-2";
-import {useDispatch, useSelector} from "react-redux";
-import {authPost, request} from "../../api";
+import {request} from "../../api";
 import withScreenSecurity from "../withScreenSecurity";
 
 const useStyles = makeStyles((theme) => ({
@@ -66,10 +65,55 @@ const taskCounterOpt = {
   },
 };
 
+const columns = [
+  { field: "id", headerName: "ID", width: 90 },
+  {
+    field: "firstName",
+    headerName: "First name",
+    width: 150,
+    editable: true,
+  },
+  {
+    field: "lastName",
+    headerName: "Last name",
+    width: 150,
+    editable: true,
+  },
+  {
+    field: "age",
+    headerName: "Age",
+    type: "number",
+    width: 110,
+    editable: true,
+  },
+  {
+    field: "fullName",
+    headerName: "Full name",
+    description: "This column has a value getter and is not sortable.",
+    sortable: false,
+    width: 160,
+    valueGetter: (params) =>
+      `${params.getValue(params.id, "firstName") || ""} ${
+        params.getValue(params.id, "lastName") || ""
+      }`,
+  },
+];
+
+const rows = [
+  { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
+  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
+  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
+  { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
+  { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
+  { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
+  { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
+  { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
+  { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
+];
+
 function MainDashBoard(props) {
   const classes = useStyles();
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+
   const taskCounterOption = taskCounterOpt;
 
   const [dataAllProject, setDataAllProject] = useState({});
@@ -89,11 +133,62 @@ function MainDashBoard(props) {
     []
   );
 
+  // const data = {
+  //   labels: ["January", "February", "March", "April", "May", "June", "July"],
+  //   datasets: [
+  //     {
+  //       label: "My First dataset",
+  //       backgroundColor: "rgba(255,99,132,0.2)",
+  //       borderColor: "rgba(255,99,132,1)",
+  //       borderWidth: 1,
+  //       hoverBackgroundColor: "rgba(255,99,132,0.4)",
+  //       hoverBorderColor: "rgba(255,99,132,1)",
+  //       data: [65, 59, 80, 81, 56, 55, 40],
+  //     },
+  //   ],
+  // };
+
+  const dataRevenue = {
+    labels: dateRevenue,
+    datasets: [
+      {
+        label: "Rev.",
+        backgroundColor: "rgba(255,99,132,0.2)",
+        borderColor: "rgba(255,99,132,1)",
+        borderWidth: 1,
+        hoverBackgroundColor: "rgba(255,99,132,0.4)",
+        hoverBorderColor: "rgba(255,99,132,1)",
+        data: revenue,
+      },
+    ],
+  };
+
+  const dataVehicleDistance = {
+    labels: vehicle,
+    datasets: [
+      {
+        label: "Dis.",
+        backgroundColor: "rgba(255,99,132,0.2)",
+        borderColor: "rgba(255,99,132,1)",
+        borderWidth: 1,
+        hoverBackgroundColor: "rgba(255,99,132,0.4)",
+        hoverBorderColor: "rgba(255,99,132,1)",
+        data: distance,
+      },
+    ],
+  };
+
   const dataStudentParticipation = {
     labels: dateStudentParticipation,
     datasets: [
       {
         label: "Part.",
+        //backgroundColor: "rgba(255,99,132,0.2)",
+        //borderColor: "rgba(255,99,132,1)",
+        //borderWidth: 1,
+        //height: 500,
+        //hoverBackgroundColor: "rgba(255,99,132,0.4)",
+        //hoverBorderColor: "rgba(255,99,132,1)",
         data: totalParticipation,
 
         backgroundColor: "rgba(54, 162, 235, 0.2)",
@@ -110,6 +205,12 @@ function MainDashBoard(props) {
     datasets: [
       {
         label: "Acc.Part.",
+        //backgroundColor: "rgba(255,99,132,0.2)",
+        //borderColor: "rgba(255,99,132,1)",
+        //borderWidth: 1,
+        //height: 500,
+        //hoverBackgroundColor: "rgba(255,99,132,0.4)",
+        //hoverBorderColor: "rgba(255,99,132,1)",
         data: accTotalParticipation,
         backgroundColor: "rgba(54, 162, 235, 0.2)",
         borderColor: "rgba(54, 162, 235, 1)",
@@ -125,6 +226,11 @@ function MainDashBoard(props) {
     datasets: [
       {
         label: "Qz.",
+        //backgroundColor: "rgba(255,99,132,0.2)",
+        //borderColor: "rgba(255,99,132,1)",
+        //borderWidth: 1,
+        //hoverBackgroundColor: "rgba(255,99,132,0.4)",
+        //hoverBorderColor: "rgba(255,99,132,1)",
         data: totalQuizParticipation,
         backgroundColor: "rgba(54, 162, 235, 0.2)",
         borderColor: "rgba(54, 162, 235, 1)",
@@ -139,8 +245,13 @@ function MainDashBoard(props) {
     datasets: [
       {
         label: "Acc.Qz.",
+        //backgroundColor: "rgba(255,99,132,0.2)",
+        //borderColor: "rgba(255,99,132,1)",
+        //borderWidth: 1,
         height: 500,
         fill: false,
+        //hoverBackgroundColor: "rgba(255,99,132,0.4)",
+        //hoverBorderColor: "rgba(255,99,132,1)",
         data: accTotalQuizParticipation,
         backgroundColor: "rgba(54, 162, 235, 0.2)",
         borderColor: "rgba(54, 162, 235, 1)",
@@ -160,6 +271,7 @@ function MainDashBoard(props) {
         let dates = [];
         let participations = [];
         let accParticipation = [];
+        // console.log("getStudentParticipation, lst = ", lst);
 
         lst.forEach((r) => {
           dates.push(r.date);
@@ -180,6 +292,36 @@ function MainDashBoard(props) {
   }
 
   async function getQuizParticipation() {
+    // // send multipart form
+    // var formData = new FormData();
+    // formData.append("file", null);
+
+    // request(
+    //   "post",
+    //   "/get-quiz-participation-statistic",
+    //   (res) => {
+    //     let lst = res.data;
+    //     let dates = [];
+    //     let participations = [];
+
+    //     console.log("getQuizParticipation, lst = ", lst);
+
+    //     lst.forEach((r) => {
+    //       dates.push(r.date);
+    //       participations.push(r.count);
+    //     });
+
+    //     setDateQuizParticipation(dates);
+    //     setTotalQuizParticipation(participations);
+    //   },
+    //   {},
+    //   formData,
+    //   {
+    //     headers: {
+    //       "Content-Type": "multipart/form-data",
+    //     },
+    //   }
+    // );
     request(
       "post",
       "/get-quiz-participation-statistic",
@@ -206,43 +348,51 @@ function MainDashBoard(props) {
     );
   }
 
-  function getRevenueDateRecent() {
-    // console.log("getRevenueDateRecent");
-    authPost(dispatch, token, "/report-date-based-revenue-recent", {
-      nbDays: 15,
-    })
-      .then((response) => {
-        let listRev = response.revenueElements;
-        let arrDates = [];
-        let arrRevenues = [];
-        listRev.forEach((r) => {
-          arrDates.push(r.date);
-          arrRevenues.push(r.revenue);
-        });
-        setDateRevenue(arrDates);
-        setRevenue(arrRevenues);
-      })
-      .catch(console.log);
-  }
+  // function getRevenueDateRecent() {
+  //   // console.log("getRevenueDateRecent");
+  //   authPost(dispatch, token, "/report-date-based-revenue-recent", {
+  //     nbDays: 15,
+  //   })
+  //     .then((response) => {
+  //       let listRev = response.revenueElements;
+  //       //setVehicleDistance(response);
+  //       let arrDates = [];
+  //       let arrRevenues = [];
+  //       listRev.forEach((r) => {
+  //         arrDates.push(r.date);
+  //         arrRevenues.push(r.revenue);
+  //       });
+  //       setDateRevenue(arrDates);
+  //       setRevenue(arrRevenues);
+  //       //dataVehicleDistance.labels = vehicle;
+  //       //dataVehicleDistance.datasets[0].data = distance;
+  //       //console.log('dataVehicleDistance.vehicle = ', dataVehicleDistance.labels);
+  //       //console.log('dataVehicleDistance.distance = ', dataVehicleDistance.datasets[0].data);
+  //     })
+  //     .catch(console.log);
+  // }
 
-  function getVehicleDistance() {
-    // console.log("getVehicleDistance");
-    authPost(dispatch, token, "/statistic-vehicle-distance", {
-      fromDate: "",
-      thruDate: "",
-    })
-      .then((response) => {
-        let vehicle = [];
-        let distance = [];
-        response.forEach((vh) => {
-          vehicle.push(vh.vehicleId);
-          distance.push(vh.distance);
-        });
-        setVehicle(vehicle);
-        setDistance(distance);
-      })
-      .catch(console.log);
-  }
+  // function getVehicleDistance() {
+  //   // console.log("getVehicleDistance");
+  //   authPost(dispatch, token, "/statistic-vehicle-distance", {
+  //     fromDate: "",
+  //     thruDate: "",
+  //   })
+  //     .then((response) => {
+  //       //setVehicleDistance(response);
+  //       let vehicle = [];
+  //       let distance = [];
+  //       response.forEach((vh) => {
+  //         vehicle.push(vh.vehicleId);
+  //         distance.push(vh.distance);
+  //       });
+  //       setVehicle(vehicle);
+  //       setDistance(distance);
+  //       //dataVehicleDistance.labels = vehicle;
+  //       //dataVehicleDistance.datasets[0].data = distance;
+  //     })
+  //     .catch(console.log);
+  // }
 
   function getChartBackLog() {
     request(
@@ -297,8 +447,8 @@ function MainDashBoard(props) {
   }
   useEffect(() => {
     getChartBackLog();
-    getVehicleDistance();
-    getRevenueDateRecent();
+    // getVehicleDistance();
+    // getRevenueDateRecent();
     //getStudentParticipation();
     //getQuizParticipation();
     getStudentParticipation();
@@ -357,6 +507,18 @@ function MainDashBoard(props) {
           </Paper>
         </Grid>
 
+        {/* <Grid item xs={12}>
+          <Paper>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              pageSize={5}
+              checkboxSelection
+              disableSelectionOnClick
+            />
+          </Paper>
+        </Grid> */}
+
         <Grid item xs={12}>
           <Paper elevation={0}>
             <Box className={classes.doughnutStyle}>
@@ -365,6 +527,14 @@ function MainDashBoard(props) {
           </Paper>
         </Grid>
 
+        {/* <Grid item xs={6}>
+          <h2>Rev.</h2>
+          <HorizontalBar data={dataRevenue} />
+        </Grid>
+        <Grid item xs={6}>
+          <h2>Dis.</h2>
+          <HorizontalBar data={dataVehicleDistance} />
+        </Grid> */}
       </Grid>
     </div>
   );

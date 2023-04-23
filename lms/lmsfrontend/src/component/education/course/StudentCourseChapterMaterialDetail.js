@@ -1,18 +1,19 @@
 import {Button, Card, CardContent} from "@material-ui/core/";
-import {KeyboardArrowLeft, KeyboardArrowRight, ZoomIn, ZoomOut,} from "@material-ui/icons";
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {useParams} from "react-router";
-import {Link, useHistory} from "react-router-dom";
-import {authGet, authPost, request} from "../../../api";
-import Player from "../../../utils/Player";
-import InputComment from "./comment/InputComment";
-import CommentItem from "./comment/CommentItem";
 import {makeStyles} from "@material-ui/core/styles";
-import {FullScreen, useFullScreenHandle} from "react-full-screen";
+import {KeyboardArrowLeft, KeyboardArrowRight, ZoomIn, ZoomOut,} from "@material-ui/icons";
+import {useKeycloak} from "@react-keycloak/web";
 import {number} from "prop-types";
-import Loading from "../../common/Loading";
+import {useEffect, useState} from "react";
+import {FullScreen, useFullScreenHandle} from "react-full-screen";
+import {useParams} from "react-router";
+import {Link} from "react-router-dom";
+import {classState} from "state/ClassState";
 import {errorNoti, successNoti} from "utils/notification";
+import {request} from "../../../api";
+import Player from "../../../utils/Player";
+import Loading from "../../common/Loading";
+import CommentItem from "./comment/CommentItem";
+import InputComment from "./comment/InputComment";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,10 +35,9 @@ function StudentCourseChapterMaterialDetail() {
   const [listComment, setListComment] = useState([]);
   const params = useParams();
   const chapterMaterialId = params.chapterMaterialId;
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
-  const classId = useSelector((state) => state.class.classId);
-  const history = useHistory();
+
+  const classId = classState.classId.get();
+
   const [chapterMaterial, setChapterMaterial] = useState(null);
   const [sourceId, setSourceId] = useState(null);
   const [chapterId, setChapterId] = useState(null);
@@ -48,7 +48,10 @@ function StudentCourseChapterMaterialDetail() {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [pageNumberValue, setPageNumberValue] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [loginUser, setLoginUser] = useState(null);
+
+  //
+  const { keycloak } = useKeycloak();
+  const token = keycloak.tokenParsed;
 
   //handle change page number
   const onHandleChangePageNumber = (event) => {
@@ -68,14 +71,22 @@ function StudentCourseChapterMaterialDetail() {
 
   async function getImages(slideId) {
     setIsLoading(true);
-    let res = await authPost(dispatch, token, "/get-slide", {
-      // fileId: "62829f1693445a31606162b6;62829f1793445a31606162b8",
-      fileId: slideId,
-    }).then((res) => {
-      console.log("listImg: ", res);
-      setListImage(res);
-      setIsLoading(false);
-    });
+
+    request(
+      "post",
+      "/get-slide",
+      (res) => {
+        console.log("listImg: ", res.data);
+        setListImage(res.data);
+        setIsLoading(false);
+      },
+      {},
+      {
+        // fileId: "62829f1693445a31606162b6;62829f1793445a31606162b8",
+        fileId: slideId,
+      }
+    );
+
     //let res = authGet(dispatch, token, '/edu/class/get-course-chapter-material-detail/' + chapterMaterialId);
   }
 
@@ -85,20 +96,23 @@ function StudentCourseChapterMaterialDetail() {
     //   token,
     //   "/edu/class/get-course-chapter-material-detail/" + chapterMaterialId
     // );
-    let res = await authGet(
-      dispatch,
-      token,
-      `/edu/class/get-course-chapter-material-detail/${chapterMaterialId}/${classId}`
+
+    request(
+      "get",
+      `/edu/class/get-course-chapter-material-detail/${chapterMaterialId}/${classId}`,
+      (res) => {
+        res = res.data;
+        setChapterMaterial(res);
+        console.log("getCourseChapterMaterialDetail ", res);
+        if (res.sourceId !== null) {
+          setSourceId(res.sourceId);
+        } else {
+          getImages(res.slideId);
+        }
+        setChapterId(res.eduCourseChapter.chapterId);
+        setChapterName(res.eduCourseChapter.chapterName);
+      }
     );
-    setChapterMaterial(res);
-    console.log("getCourseChapterMaterialDetail ", res);
-    if (res.sourceId !== null) {
-      setSourceId(res.sourceId);
-    } else {
-      getImages(res.slideId);
-    }
-    setChapterId(res.eduCourseChapter.chapterId);
-    setChapterName(res.eduCourseChapter.chapterName);
   }
 
   const prevImage = () => {
@@ -117,36 +131,37 @@ function StudentCourseChapterMaterialDetail() {
 
   const handleSeeFullScreen = useFullScreenHandle();
 
-  async function getListCommentsEduCourseMaterial() {
-    let res = await authGet(
-      dispatch,
-      token,
-      `/edu/class/comment/${chapterMaterialId}`
-    );
+  // async function getListCommentsEduCourseMaterial() {
+  //   let res = await authGet(
+  //     dispatch,
+  //     token,
+  //     `/edu/class/comment/${chapterMaterialId}`
+  //   );
 
-    let cmtOnVideo = res.filter((cmt) => {
-      return cmt.replyToCommentId === null;
-    });
-    let cmtReplyCmt = res.filter((cmt) => {
-      return cmt.replyToCommentId !== null;
-    });
+  //   let cmtOnVideo = res.filter((cmt) => {
+  //     return cmt.replyToCommentId === null;
+  //   });
+  //   let cmtReplyCmt = res.filter((cmt) => {
+  //     return cmt.replyToCommentId !== null;
+  //   });
 
-    cmtOnVideo.map((cmtOnVid) => {
-      cmtOnVid.listReplyComments = [];
-      return cmtOnVid;
-    });
-    cmtReplyCmt.forEach((cmt) => {
-      cmtOnVideo.map((cmtOnVid) => {
-        if (cmtOnVid.commentId === cmt.replyToCommentId) {
-          cmtOnVid.listReplyComments.push(cmt);
-        }
+  //   cmtOnVideo.map((cmtOnVid) => {
+  //     cmtOnVid.listReplyComments = [];
+  //     return cmtOnVid;
+  //   });
+  //   cmtReplyCmt.forEach((cmt) => {
+  //     cmtOnVideo.map((cmtOnVid) => {
+  //       if (cmtOnVid.commentId === cmt.replyToCommentId) {
+  //         cmtOnVid.listReplyComments.push(cmt);
+  //       }
 
-        return cmtOnVid;
-      });
-    });
-    setListComment(cmtOnVideo);
-    console.log(cmtOnVideo);
-  }
+  //       return cmtOnVid;
+  //     });
+  //   });
+  //   setListComment(cmtOnVideo);
+  //   console.log(cmtOnVideo);
+  // }
+
   // const commentOnCourse = async () => {
   //   let body = {
   //     commentMessage: comment.commentMessage,
@@ -197,14 +212,10 @@ function StudentCourseChapterMaterialDetail() {
   // };
 
   async function getListMainCommentOnCourse() {
-    let res = await authGet(
-      dispatch,
-      token,
-      `/edu/class/main-comment/${chapterMaterialId}`
-    );
-
-    console.log(res);
-    setListComment(res);
+    request("get", `/edu/class/main-comment/${chapterMaterialId}`, (res) => {
+      console.log(res.data);
+      setListComment(res.data);
+    });
   }
 
   const commentOnCourse = async () => {
@@ -272,8 +283,6 @@ function StudentCourseChapterMaterialDetail() {
       };
 
       request(
-        // token,
-        // history,
         "put",
         `/edu/class/comment/${cmtId}`,
         (res) => {
@@ -310,20 +319,6 @@ function StudentCourseChapterMaterialDetail() {
     getCourseChapterMaterialDetail();
     //setSourceId(chapterMaterial.sourceId);
     //get user login
-    request(
-      "get",
-      "/my-account/",
-      (res) => {
-        let data = res.data;
-
-        setLoginUser({
-          name: data.name,
-          userName: data.user,
-          partyId: data.partyId,
-        });
-      },
-      { 401: () => {} }
-    );
   }, []);
 
   useEffect(() => {
@@ -552,7 +547,7 @@ function StudentCourseChapterMaterialDetail() {
               commentOnCourse={commentOnCourse}
               deleteComment={deleteComment}
               editComment={editComment}
-              loginUser={loginUser}
+              userId={token.preferred_username}
             />
           ))}
       </Card>

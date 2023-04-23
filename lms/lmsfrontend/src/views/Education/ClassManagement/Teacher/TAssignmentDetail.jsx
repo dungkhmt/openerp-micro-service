@@ -4,13 +4,12 @@ import {makeStyles, MuiThemeProvider} from "@material-ui/core/styles";
 import {GetApp, PeopleAltRounded} from "@material-ui/icons";
 import parse from "html-react-parser";
 import MaterialTable from "material-table";
-import React, {Fragment, useEffect, useRef, useState} from "react";
+import {Fragment, useEffect, useRef, useState} from "react";
 import {CountdownCircleTimer} from "react-countdown-circle-timer";
 import {BiDetail} from "react-icons/bi";
 import {FcDownload} from "react-icons/fc";
-import {useSelector} from "react-redux";
 import {useHistory, useParams} from "react-router";
-import {BASE_URL, request} from "../../../../api";
+import {request} from "../../../../api";
 import CustomizedDialogs from "../../../../component/dialog/CustomizedDialogs";
 import NegativeButton from "../../../../component/education/classmanagement/NegativeButton";
 import NegativeDialogButton from "../../../../component/education/classmanagement/NegativeDialogButton";
@@ -120,7 +119,7 @@ function TAssignmentDetail() {
   const classes = useStyles();
   const params = useParams();
   const history = useHistory();
-  const token = useSelector((state) => state.auth.token);
+  // const token = useSelector((state) => state.auth.token);
 
   // Countdown.
   const [remainingTime, setRemainingTime] = useState(0);
@@ -183,12 +182,7 @@ function TAssignmentDetail() {
 
   // Functions.
   const getAssignDetail = () => {
-    request(
-      // token,
-      // history,
-      "get",
-      `/edu/assignment/${params.assignmentId}/teacher`,
-      (res) => {
+    request("get", `/edu/assignment/${params.assignmentId}/teacher`, (res) => {
         let assignDetail = res.data.assignmentDetail;
         let startTime = new Date(assignDetail.openTime);
         let endTime = new Date(assignDetail.closeTime);
@@ -220,8 +214,7 @@ function TAssignmentDetail() {
           noSubmissions: res.data.noSubmissions,
           deleted: assignDetail.deleted,
         });
-      }
-    );
+    });
   };
 
   const onSingleDownload = (submission) => {
@@ -229,10 +222,12 @@ function TAssignmentDetail() {
 
     form.setAttribute("method", "post");
     form.setAttribute("target", "_blank");
-    form.setAttribute(
-      "action",
-      `${BASE_URL}/edu/assignment/${params.assignmentId}/submissions?token=${token}`
-    );
+
+    // // TODO: consider
+    // form.setAttribute(
+    //   "action",
+    //   `${API_URL}/edu/assignment/${params.assignmentId}/submissions?token=${token}`
+    // );
 
     const input = document.createElement("input");
 
@@ -252,10 +247,12 @@ function TAssignmentDetail() {
 
     form.setAttribute("method", "post");
     form.setAttribute("target", "_blank");
-    form.setAttribute(
-      "action",
-      `${BASE_URL}/edu/assignment/${params.assignmentId}/submissions?token=${token}`
-    );
+
+    // // TODO: consider
+    // form.setAttribute(
+    //   "action",
+    //   `${API_URL}/edu/assignment/${params.assignmentId}/submissions?token=${token}`
+    // );
 
     for (const submission of selectedSubmissions) {
       const input = document.createElement("input");
@@ -271,6 +268,18 @@ function TAssignmentDetail() {
     form.submit();
     form.parentNode.removeChild(form);
 
+    // request(
+    //   "post",
+    //   `/edu/assignment/${params.assignmentId}/submissions`,
+    //   (res) => {
+    //     setIsZipping(false);
+    //     window.location.href = `${API_URL}/edu/assignment/${params.assignmentId}/download-file/${res.data}`;
+    //   },
+    //   { onError: () => setIsZipping(false) },
+    //   {
+    //     studentIds: studentIds,
+    //   }
+    // );
   };
 
   // Delete assignment.
@@ -278,8 +287,6 @@ function TAssignmentDetail() {
     setOpen(false);
 
     request(
-      // token,
-      // history,
       "delete",
       `/edu/assignment/${params.assignmentId}`,
       () => {

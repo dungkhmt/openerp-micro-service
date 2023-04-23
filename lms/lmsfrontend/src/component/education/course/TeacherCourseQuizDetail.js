@@ -1,23 +1,17 @@
 import {Card} from "@material-ui/core/";
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useEffect} from "react";
 import {useParams} from "react-router";
-import {Link, useHistory} from "react-router-dom";
+import {Link} from "react-router-dom";
 import {request} from "../../../api";
-import TeacherCourseQuizChoiceAnswerList from "./TeacherCourseQuizChoiceAnswerList";
-import TeacherCourseQuizContent from "./TeacherCourseQuizContent";
 import withScreenSecurity from "../../withScreenSecurity";
 import QuizUserRole from "./QuizUserRole";
+import TeacherCourseQuizChoiceAnswerList from "./TeacherCourseQuizChoiceAnswerList";
+import TeacherCourseQuizContent from "./TeacherCourseQuizContent";
 
 function TeacherCourseQuizDetail() {
   const params = useParams();
   const questionId = params.questionId;
   const courseId = params.courseId;
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
-  const history = useHistory();
-  const [courseChapter, setCourseChapter] = useState(null);
-  const [course, setCourse] = useState(null);
 
   function getCourseDetailOfQuestion() {
     request(

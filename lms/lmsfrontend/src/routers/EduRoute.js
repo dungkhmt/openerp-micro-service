@@ -193,8 +193,6 @@ export default function EduRoute() {
 
         {/* <Route component={CreateSemester} path={`${path}/semester`} /> */}
 
-        <Route component={ClassCreate} path={`${path}/class/add`} />
-
         {/**
          * route for quiz test
          */}

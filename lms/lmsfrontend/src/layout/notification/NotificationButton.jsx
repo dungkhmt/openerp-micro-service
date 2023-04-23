@@ -3,11 +3,11 @@ import {grey} from "@material-ui/core/colors";
 import {makeStyles} from "@material-ui/core/styles";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import clsx from "clsx";
+import keycloak from "config/keycloak";
 import {EventSourcePolyfill} from "event-source-polyfill";
 import randomColor from "randomcolor";
 import React from "react";
-import {store} from "../..";
-import {BASE_URL, request} from "../../api";
+import {BASE_URL, bearerAuth, request} from "../../api";
 import {useNotificationState} from "../../state/NotificationState";
 import NotificationMenu from "./NotificationMenu";
 
@@ -210,13 +210,16 @@ function NotificationButton() {
     function setupEventSource() {
       fetchNotification();
 
-      es = new EventSourcePolyfill(`${BASE_URL}/notification/subscription`, {
-        headers: {
-          "X-Auth-Token": store.getState().auth.token,
-          // Count: count++,
-        },
-        heartbeatTimeout: 120000,
-      });
+      es = new EventSourcePolyfill(
+        `${BASE_URL}/notification/subscription`,
+        {
+          headers: {
+            Authorization: bearerAuth(keycloak.token),
+            // Count: count++,
+          },
+          heartbeatTimeout: 120000,
+        }
+      );
 
       // In fact, this callback function is usually not fired as soon as the connection is opened,
       // but fired when the first event is received. Don't know the reason but this doesn't matter

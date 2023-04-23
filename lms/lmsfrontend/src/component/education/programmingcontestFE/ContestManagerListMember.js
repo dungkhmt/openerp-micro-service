@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from "react";
-import {authPostMultiPart, request} from "../../../api";
+import {request} from "../../../api";
 import StandardTable from "component/table/StandardTable";
 import {Button, CircularProgress} from "@mui/material";
 import {errorNoti, successNoti} from "utils/notification";
 import {toFormattedDateTime} from "utils/dateutils";
 import UpdatePermissionMemberOfContestDialog from "./UpdatePermissionMemberOfContestDialog";
-import {useDispatch, useSelector} from "react-redux";
 
 export default function ContestManagerListMember(props) {
   const contestId = props.contestId;
@@ -15,10 +14,8 @@ export default function ContestManagerListMember(props) {
   const [permissionIds, setPermissionIds] = useState([]);
   const [selectedUserRegisId, setSelectedUserRegisId] = useState(null);
 
-  const token = useSelector((state) => state.auth.token);
   const [filename, setFilename] = useState(null);
   const [uploadMessage, setUploadMessage] = useState("");
-  const dispatch = useDispatch();
 
   const columns = [
     { title: "Index", field: "index" },
@@ -134,13 +131,16 @@ export default function ContestManagerListMember(props) {
     formData.append("inputJson", JSON.stringify(body));
     formData.append("file", filename);
 
-    authPostMultiPart(
-      dispatch,
-      token,
+    const config = {
+      headers: {
+        "content-Type": "multipart/form-data",
+      },
+    };
+
+    request(
+      "post",
       "/upload-excel-student-list-to-contest",
-      formData
-    )
-      .then((res) => {
+      (res) => {
         setIsProcessing(false);
         console.log("handleFormSubmit, res = ", res);
         setUploadMessage(res.message);
@@ -148,12 +148,17 @@ export default function ContestManagerListMember(props) {
         //  alert("Time Out!!!");
         //} else {
         //}
-      })
-      .catch((e) => {
-        setIsProcessing(false);
-        console.error(e);
-        //alert("Time Out!!!");
-      });
+      },
+      {
+        onError: (e) => {
+          setIsProcessing(false);
+          console.error(e);
+          //alert("Time Out!!!");
+        },
+      },
+      formData,
+      config
+    );
   };
 
   function onFileChange(event) {

@@ -2,13 +2,12 @@ import {LinearProgress} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import React, {lazy, Suspense, useEffect} from "react";
 import {Route, Switch, useLocation} from "react-router-dom";
-import PrivateRoute from "../common/PrivateRoute";
+import PrivateRoute from "./PrivateRoute";
 import {Home} from "../component";
 import {Layout} from "../layout";
 import {drawerWidth} from "../layout/sidebar/v1/SideBar";
 import {useNotificationState} from "../state/NotificationState";
 import NotFound from "../views/errors/NotFound";
-import AccountActivationRoute from "./AccountActivationRoute";
 import AdminRoute from "./AdminRoute";
 import ProgrammingContestRoutes from "./ProgrammingContestRoutes";
 import ThesisRoutes from "./ThesisRoutes";
@@ -17,7 +16,7 @@ import WhiteBoardRoute from "./WhiteBoardRoute";
 import ContestManagerRankingPublic from "../component/education/programmingcontestFE/ContestManagerRankingPublic";
 
 const EduRoute = lazy(() => import("./EduRoute"));
-const UserLoginRoute = lazy(() => import("./UserLoginRoute"));
+// const UserLoginRoute = lazy(() => import("./UserLoginRoute"));
 
 const useStyles = makeStyles(() => ({
   loadingProgress: {
@@ -55,6 +54,7 @@ function MainAppRoute(props) {
             path={"/programming-contest/public/contest-raking/:contestId"}
           />
 
+          {/* consider remove */}
           {/*<PrivateRoute component={UserLoginRoute} path="/userlogin" />*/}
 
           <PrivateRoute component={EduRoute} path="/edu" />

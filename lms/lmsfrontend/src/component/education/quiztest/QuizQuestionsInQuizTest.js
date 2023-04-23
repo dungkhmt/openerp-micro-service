@@ -1,12 +1,10 @@
 import {Box, Paper, TextField, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {Skeleton} from "@material-ui/lab";
-import React, {Fragment, useEffect, useState} from "react";
-import {useSelector} from "react-redux";
-import {useHistory} from "react-router";
+import {Fragment, useEffect, useState} from "react";
 import {request} from "../../../api";
-import TeacherViewQuizDetailInQuizTest from "./TeacherViewQuizDetailInQuizTest";
 import PrimaryButton from "../../button/PrimaryButton";
+import TeacherViewQuizDetailInQuizTest from "./TeacherViewQuizDetailInQuizTest";
 
 const useStyles = makeStyles(() => ({
   titleContainer: {
@@ -29,8 +27,6 @@ const useStyles = makeStyles(() => ({
 
 function QuizQuestionsInQuizTest({ testId }) {
   const classes = useStyles();
-  const token = useSelector((state) => state.auth.token);
-  const history = useHistory();
 
   const [quizList, setQuizList] = useState([]);
   const [quizGroups, setQuizGroups] = useState();

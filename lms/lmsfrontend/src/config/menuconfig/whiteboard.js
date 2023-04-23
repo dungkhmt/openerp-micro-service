@@ -2,7 +2,7 @@ export const whiteboard = {
   id: "MENU_WHITE_BOARD",
   path: "",
   isPublic: false,
-  icon: "AssignmentOutlinedIcon",
+  icon: "CiEdit",
   text: "Bảng viết",
   child: [
     {

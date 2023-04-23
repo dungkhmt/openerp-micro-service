@@ -12,11 +12,10 @@ import {
   TextField,
 } from "@material-ui/core";
 import {useEffect, useState} from "react";
-import {authGet, request,} from "../../../../api";
-import {useDispatch, useSelector} from "react-redux";
-import ReplyCommentItem from "./ReplyCommentItem";
-import {errorNoti, successNoti} from "utils/notification";
 import displayTime from "utils/DateTimeUtils";
+import {errorNoti, successNoti} from "utils/notification";
+import {request} from "../../../../api";
+import ReplyCommentItem from "./ReplyCommentItem";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -52,10 +51,8 @@ export default function CommentItem({
   chapterMaterialId,
   deleteComment,
   editComment,
-  loginUser,
+  userId,
 }) {
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
   const [valueCommentMessage, setValueCommentMessage] = useState(
     comment.commentMessage
   );
@@ -162,13 +159,12 @@ export default function CommentItem({
   //get list reply of comment
   const onGetListReplyComment = async (commentId) => {
     // if (showReplyList === false) {
-    let res = await authGet(
-      dispatch,
-      token,
-      `/edu/class/reply-comment/${commentId}`
-    );
-    setListReplyComment(res);
-    console.log(listReplyComment);
+
+    request("get", `/edu/class/reply-comment/${commentId}`, (res) => {
+      setListReplyComment(res.data);
+      console.log(listReplyComment);
+    });
+
     // }
     // setShowReplyList(!showReplyList);
   };
@@ -263,7 +259,7 @@ export default function CommentItem({
             )}
           </Button>
 
-          {loginUser?.userName === comment.postedByUserLoginId && (
+          {userId === comment.postedByUserLoginId && (
             <Button
               aria-label="more"
               id="long-button"
@@ -289,7 +285,7 @@ export default function CommentItem({
                     chapterMaterialId={chapterMaterialId}
                     flag={flag}
                     setFlag={setFlag}
-                    loginUser={loginUser}
+                    userId={userId}
                   />
                 ))}
             </div>

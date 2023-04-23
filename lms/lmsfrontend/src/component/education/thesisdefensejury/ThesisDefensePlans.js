@@ -1,18 +1,8 @@
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Checkbox,
-  MenuItem,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@material-ui/core/";
+import {Button, Card} from "@material-ui/core";
+import MaterialTable, {MTableToolbar} from "material-table";
 import React, {useEffect, useState} from "react";
 import {useHistory} from "react-router-dom";
 import {request} from "../../../api";
-import MaterialTable, {MTableToolbar} from "material-table";
 import ModalCreateThesisDefensePlan from "./ModalCreateThesisDefensePlan";
 
 

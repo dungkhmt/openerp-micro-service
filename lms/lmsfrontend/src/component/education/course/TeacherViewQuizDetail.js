@@ -5,8 +5,7 @@ import {grey} from "@material-ui/core/colors";
 import {makeStyles} from "@material-ui/core/styles";
 //import { makeStyles } from "@material-ui/core/styles";
 import parse from "html-react-parser";
-import React, {useEffect, useState} from "react";
-import {useSelector} from "react-redux";
+import {useEffect, useState} from "react";
 import {useHistory} from "react-router";
 import {request} from "../../../api";
 import {randomImageName} from "../../../utils/FileUpload/covert";
@@ -87,7 +86,7 @@ const useStyles = makeStyles(() => ({
  */
 export default function TeacherViewQuizDetail({ quiz, index, courseId }) {
   const classes = useStyles();
-  const token = useSelector((state) => state.auth.token);
+
   const history = useHistory();
 
   const [fileAttachments, setFileAttachments] = useState([]);

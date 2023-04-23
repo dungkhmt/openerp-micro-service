@@ -1,16 +1,14 @@
 /* eslint-disable */
-import {Button, Card, CardContent} from "@material-ui/core/";
+import {Card, CardContent} from "@material-ui/core/";
 import MaterialTable from "material-table";
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useEffect, useState} from "react";
 import {useParams} from "react-router";
 import {useHistory} from "react-router-dom";
 import {request} from "../../../api";
 
 function StudentMyQuizTestList() {
   const params = useParams();
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+
   const history = useHistory();
   const [ListQuiz, setListQuizs] = useState([]);
 

@@ -35,10 +35,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function LearningSessionStudentViewQuizTestList(props) {
-  //const dispatch = useDispatch();
-  //const token = useSelector((state) => state.auth.token);
-  //const history = useHistory();
-
   //const testQuizId = history.location.state.testId;
   const [testQuizId, setTestQuizId] = useState(null);
   const sessionId = props.sessionId;

@@ -1,20 +1,10 @@
-import React, {useEffect, useState} from "react";
-import {request} from "../../../api";
-import Alert from '@mui/material/Alert';
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Checkbox,
-  MenuItem,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@material-ui/core/";
+import {Card} from "@material-ui/core/";
+import Add from "@mui/icons-material/Add";
+import Alert from "@mui/material/Alert";
 import MaterialTable, {MTableToolbar} from "material-table";
-import Add from '@mui/icons-material/Add';
-import ModalLoading from "./ModalLoading"
+import {useEffect, useState} from "react";
+import {request} from "../../../api";
+import ModalLoading from "./ModalLoading";
 
 export default function ElementAddThesis({
                                            notBelongThesis,

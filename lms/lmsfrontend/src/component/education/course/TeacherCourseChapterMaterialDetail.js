@@ -1,3 +1,4 @@
+import DateFnsUtils from "@date-io/date-fns";
 import {
   Button,
   Card,
@@ -12,19 +13,17 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core/";
-import DateFnsUtils from "@date-io/date-fns";
-import React, {useEffect, useState} from "react";
+import {makeStyles} from "@material-ui/core/styles";
 import {Add, KeyboardArrowLeft, KeyboardArrowRight} from "@material-ui/icons";
-import {useDispatch, useSelector} from "react-redux";
+import {MuiPickersUtilsProvider} from "@material-ui/pickers";
+import {useEffect, useState} from "react";
 import {useParams} from "react-router";
 import {Link} from "react-router-dom";
-import {authDelete, authGet, authPost, authPostMultiPart} from "../../../api";
-import Player from "../../../utils/Player";
-import withScreenSecurity from "../../withScreenSecurity";
-import {makeStyles} from "@material-ui/core/styles";
+import {request} from "../../../api";
 import {errorNoti, successNoti} from "../../../utils/notification";
+import Player from "../../../utils/Player";
 import Loading from "../../common/Loading";
-import {MuiPickersUtilsProvider} from "@material-ui/pickers";
+import withScreenSecurity from "../../withScreenSecurity";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -43,8 +42,7 @@ const useStyles = makeStyles((theme) => ({
 function TeacherCourseChapterMaterialDetail() {
   const params = useParams();
   const chapterMaterialId = params.chapterMaterialId;
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+
   const [chapterMaterial, setChapterMaterial] = useState(null);
   const [sourceId, setSourceId] = useState(null);
   const [listImage, setListImage] = useState([]);
@@ -60,56 +58,71 @@ function TeacherCourseChapterMaterialDetail() {
   const classes = useStyles();
 
   async function getImages(slideId) {
-    let res = await authPost(dispatch, token, "/get-slide", {
-      // fileId: "62829f1693445a31606162b6;62829f1793445a31606162b8",
-      fileId: slideId,
-    });
+    request(
+      "post",
+      "/get-slide",
+      (res) => {
+        setListImage(res.data);
+      },
+      {},
+      {
+        // fileId: "62829f1693445a31606162b6;62829f1793445a31606162b8",
+        fileId: slideId,
+      }
+    );
+
     //let res = authGet(dispatch, token, '/edu/class/get-course-chapter-material-detail/' + chapterMaterialId);
-    setListImage(res);
   }
 
   async function getCourseChapterMaterialDetail() {
-    let res = await authGet(
-      dispatch,
-      token,
-      "/edu/class/get-course-chapter-material-detail/" + chapterMaterialId
+    request(
+      "get",
+      "/edu/class/get-course-chapter-material-detail/" + chapterMaterialId,
+      (res) => {
+        res = res.data;
+        setChapterMaterial(res);
+        console.log("getCourseChapterMaterialDetail ", res);
+        if (res.sourceId !== null) {
+          setSourceId(res.sourceId);
+        } else if (res.slideId !== null) {
+          getImages(res.slideId);
+        }
+      }
     );
+
     //let res = authGet(dispatch, token, '/edu/class/get-course-chapter-material-detail/' + chapterMaterialId);
-    setChapterMaterial(res);
-    console.log("getCourseChapterMaterialDetail ", res);
-    if (res.sourceId !== null) {
-      setSourceId(res.sourceId);
-    } else if (res.slideId !== null) {
-      getImages(res.slideId);
-    }
   }
 
   async function deleteSlideOrVideo() {
-    let res = await authDelete(
-      dispatch,
-      token,
+    request(
+      "delete",
       "/edu/class/delete-course-chapter-material-detail-slide-video/" +
-        chapterMaterialId
-    ).then((res) => {
-      if (res.error) {
-        errorNoti("Xóa thất bại", true);
-        setFlag(!flag);
-      } else {
+        chapterMaterialId,
+      (res) => {
         successNoti("Xóa thành công", true);
         setFlag(!flag);
+      },
+      {
+        onError: (e) => {
+          errorNoti("Xóa thất bại", true);
+          setFlag(!flag);
+        },
       }
-    });
+    );
   }
 
   async function getCourseChapterMaterialTypeList() {
-    let lst = await authGet(
-      dispatch,
-      token,
-      "/edu/class/get-course-chapter-material-type-list"
+    request(
+      "get",
+      "/edu/class/get-course-chapter-material-type-list",
+      (res) => {
+        const lst = res.data;
+        setMaterialTypeList(lst);
+        console.log("types = ", lst);
+      }
     );
-    setMaterialTypeList(lst);
-    console.log("types = ", lst);
   }
+
   function onInputFileChange(event) {
     setSelectedInputFile(event.target.files[0]);
   }
@@ -128,25 +141,33 @@ function TeacherCourseChapterMaterialDetail() {
     formData.append("inputJson", JSON.stringify(body));
     formData.append("files", selectedInputFile);
 
-    let chapter = authPostMultiPart(
-      dispatch,
-      token,
+    const config = {
+      headers: {
+        "content-Type": "multipart/form-data",
+      },
+    };
+
+    request(
+      "post",
       "/edu/class/update-chapter-material-of-course",
-      formData
-    ).then((res) => {
-      console.log("res = ", res);
-      if (res.error) {
-        errorNoti("Thêm bài giảng thất bại", true);
-      } else {
-        successNoti("Thêm bài giảng thành công", true);
-        setIsEditting(false);
-        setFlag(!flag);
-      }
-      setIsLoading(false);
-    });
+      (res) => {
+        res = res.data;
+        console.log("res = ", res);
+        if (res.error) {
+          errorNoti("Thêm bài giảng thất bại", true);
+        } else {
+          successNoti("Thêm bài giảng thành công", true);
+          setIsEditting(false);
+          setFlag(!flag);
+        }
+        setIsLoading(false);
+      },
+      {},
+      formData,
+      config
+    );
 
     //let chapter = await authPost(dispatch, token, '/edu/class/create-chapter-material-of-course', body);
-    console.log("Create chapter success, chapter = ", chapter);
     //history.push("/edu/course/chapter/detail/" + chapterId);
     //edu/teacher/course/chapter/detail/010a357c-eb5b-49a6-93de-ec1aef3695dd
   }

@@ -1,22 +1,16 @@
-import React, {useEffect, useState} from "react";
-import {request} from "../../../api";
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Checkbox,
-  MenuItem,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@material-ui/core/";
+import {Card} from "@material-ui/core/";
+import Delete from "@material-ui/icons/Delete";
 import MaterialTable, {MTableToolbar} from "material-table";
-import Delete from '@material-ui/icons/Delete';
-import ModalLoading from "./ModalLoading"
+import {useEffect, useState} from "react";
+import {request} from "../../../api";
+import ModalLoading from "./ModalLoading";
 
-export default function ElementDeleteThesis({thesis, defenseJuryID, handleToggle, getListThesisOfDefenseJury}) {
-
+export default function ElementDeleteThesis({
+                                              thesis,
+                                              defenseJuryID,
+                                              handleToggle,
+                                              getListThesisOfDefenseJury,
+                                            }) {
   const [openLoading, setOpenLoading] = useState(false);
 
   async function DeleteThesisById(thesisID, defenseJuryID) {

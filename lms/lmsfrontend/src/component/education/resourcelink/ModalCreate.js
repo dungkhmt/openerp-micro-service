@@ -12,8 +12,8 @@ import {
 } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import Alert from "@mui/material/Alert";
-import React, {useState} from "react";
-import {request} from "../../../api";
+import {request} from "api";
+import {useState} from "react";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -35,9 +35,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
-export default function ModalCreate({open, handleClose}) {
+export default function ModalCreate({ open, handleClose }) {
   const classes = useStyles();
+
   const [name, setName] = useState("");
   const [alert, setAlert] = useState(false);
   const [alertContent, setAlertContent] = useState("");
@@ -45,28 +45,26 @@ export default function ModalCreate({open, handleClose}) {
   // const toastId = React.useRef(null);
 
   const createDomain = () => {
-    const data = JSON.stringify({name: name});
     request(
-      'post',
-      '/domain',
-      res => {
+      "post",
+      "/domain",
+      (res) => {
+        console.log("crean, domain ", res.data);
         if (res.data == true) {
-          setAlertContent("Created susscessfully");
+          setAlertContent("Create susscessed");
           setAlert(true);
         }
       },
-      err => {
-        setAlertContent("Create failed");
-        setAlert(true);
-      },
-      data,
       {
-        headers: {
-          "content-type": "application/json"
-        }
+        onError: (error) => {
+          setAlertContent("Create failed");
+          setAlert(true);
+        },
       },
-    )
+      { name: name }
+    );
   };
+
   const handleSubmit = () => {
     createDomain();
   };
@@ -85,7 +83,7 @@ export default function ModalCreate({open, handleClose}) {
       <Fade in={open}>
         <form onSubmit={handleSubmit}>
           <Card className={classes.card}>
-            <CardHeader title="Thêm nguồn tham khảo"/>
+            <CardHeader title="Thêm nguồn tham khảo" />
             <CardContent>
               <Box
                 display="flex"

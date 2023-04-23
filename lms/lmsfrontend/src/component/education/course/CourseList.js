@@ -3,7 +3,6 @@ import {MuiThemeProvider} from "@material-ui/core/styles";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import MaterialTable, {MTableToolbar} from "material-table";
 import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
 import {Link, useHistory} from "react-router-dom";
 import {toast} from "react-toastify";
 import XLSX from "xlsx";
@@ -21,8 +20,6 @@ import UploadButton from "../UploadButton";
 
 function CourseList() {
   const history = useHistory();
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
 
   // Snackbar
   const toastId = React.useRef(null);
@@ -58,13 +55,15 @@ function CourseList() {
 
   // Functions.
   const getAllCourses = () => {
-    request('get',
-      '/edu/course/all',
-      res => {
+    request(
+      "get",
+      "/edu/course/all",
+      (res) => {
+        console.log("getAllCourses, courses ", res.data);
         setCourses(res.data);
       },
-      error => console.log("getAllCourses, error ", error)
-    )
+      { onError: (e) => console.log("getAllCourses, error ", e) }
+    );
   };
 
   const onClickCreateNewButton = () => {
@@ -88,8 +87,8 @@ function CourseList() {
 
     reader.onload = (event) => {
       try {
-        const {result} = event.target;
-        const workbook = XLSX.read(result, {type: "binary"});
+        const { result } = event.target;
+        const workbook = XLSX.read(result, { type: "binary" });
 
         if (workbook.Sheets.hasOwnProperty(sheetName)) {
           let sheet = workbook.Sheets[sheetName];
@@ -261,9 +260,9 @@ function CourseList() {
 
           // Everything is OK!.
           request(
-            'post',
+            "post",
             "/edu/course/add-list-of-courses",
-            res => {
+            (res) => {
               if (toast.isActive(toastId.current)) {
                 updateSuccessNoti(toastId, res.data);
               } else {
@@ -272,18 +271,22 @@ function CourseList() {
 
               getAllCourses();
             },
-            err => {
-              if (toast.isActive(toastId.current)) {
-                updateErrorNoti(toastId, "Rất tiếc! Đã xảy ra lỗi :((");
-              } else {
-                errorNoti("Rất tiếc! Đã xảy ra lỗi :((");
-              }
+            {
+              onError: (error) => {
+                if (toast.isActive(toastId.current)) {
+                  updateErrorNoti(toastId, "Rất tiếc! Đã xảy ra lỗi :((");
+                } else {
+                  errorNoti("Rất tiếc! Đã xảy ra lỗi :((");
+                }
 
-              console.log("onClickSaveButton, error ", err);
+                console.log("onClickSaveButton, error ", error);
+              },
             },
-            XLSX.utils.sheet_to_json(sheet));
+            XLSX.utils.sheet_to_json(sheet)
+          );
         } else {
           updateErrorNoti(toastId, `Không tìm thấy sheet "${sheetName}"`);
+          return;
         }
       } catch (e) {
         console.log(e);
@@ -293,6 +296,8 @@ function CourseList() {
         } else {
           errorNoti("Rất tiếc! Đã xảy ra lỗi :((");
         }
+
+        return;
       }
     };
 
@@ -338,8 +343,8 @@ function CourseList() {
                           variant="contained"
                           color="primary"
                           onClick={onClickCreateNewButton}
-                          startIcon={<AddCircleIcon/>}
-                          style={{marginRight: 16}}
+                          startIcon={<AddCircleIcon />}
+                          style={{ marginRight: 16 }}
                         >
                           Thêm mới
                         </Button>

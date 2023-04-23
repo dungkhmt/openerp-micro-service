@@ -1,13 +1,13 @@
-import React, {useEffect} from "react";
-import {makeStyles} from "@material-ui/core/styles";
-import MaterialTable from "material-table";
-import Button from "@material-ui/core/Button";
-import XLSX from "xlsx";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
-import InputLabel from "@material-ui/core/InputLabel";
 import {FormControl, Typography} from "@material-ui/core";
-import {request} from "../../api";
+import Button from "@material-ui/core/Button";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+import {makeStyles} from "@material-ui/core/styles";
+import {request} from "api";
+import MaterialTable from "material-table";
+import React, {useEffect} from "react";
+import XLSX from "xlsx";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -22,7 +22,7 @@ export default function AssignmentList(props) {
   // pool
   const [semester, setSemester] = React.useState([]);
   const [teacher, setTeacher] = React.useState([
-    {teacherId: " ", teacherName: "Tất cả", email: "Tất cả"},
+    { teacherId: " ", teacherName: "Tất cả", email: "Tất cả" },
   ]);
 
   // selected
@@ -33,14 +33,14 @@ export default function AssignmentList(props) {
   const [assignment, setAssignment] = React.useState([]);
 
   const columns = [
-    {title: "Mã lớp", field: "classId"},
-    {title: "Mã học phần", field: "courseId"},
-    {title: "Tên học phần", field: "courseName"},
-    {title: "Loại lớp", field: "classType"},
-    {title: "Số tín chỉ", field: "credit"},
-    {title: "Tên giảng viên", field: "teacherName"},
-    {title: "Email", field: "email"},
-    {title: "Ca học", field: "sessionId"},
+    { title: "Mã lớp", field: "classId" },
+    { title: "Mã học phần", field: "courseId" },
+    { title: "Tên học phần", field: "courseName" },
+    { title: "Loại lớp", field: "classType" },
+    { title: "Số tín chỉ", field: "credit" },
+    { title: "Tên giảng viên", field: "teacherName" },
+    { title: "Email", field: "email" },
+    { title: "Ca học", field: "sessionId" },
   ];
 
   const semesterChange = (event) => {
@@ -58,19 +58,27 @@ export default function AssignmentList(props) {
       return;
     }
 
-    request("get",
+    request(
+      "get",
       "/edu/get-all-assignment/" + semesterQuery + "/" + teacherQuery,
-      res => setAssignment(res.data));
+      (response) => {
+        setAssignment(response.data);
+      }
+    );
   };
 
   useEffect(() => {
-    request("get",
-      "/edu/get-all-semester",
-      res => setSemester(res.data));
+    request("get", "/edu/get-all-semester", (response) => {
+      response = response.data;
+      console.log(response);
+      setSemester(response);
+    });
 
-    request("get",
-      "/edu/get-all-teachers",
-      res => setTeacher([...teacher, ...res.data]));
+    request("get", "/edu/get-all-teachers", (response) => {
+      response = response.data;
+      console.log(response);
+      setTeacher([...teacher, ...response]);
+    });
   }, []);
 
   const downloadHandler = (event) => {
@@ -78,14 +86,14 @@ export default function AssignmentList(props) {
       return;
     }
     var wbcols = [
-      {wpx: 50},
-      {wpx: 50},
-      {wpx: 200},
-      {wpx: 50},
-      {wpx: 50},
-      {wpx: 200},
-      {wpx: 100},
-      {wpx: 200},
+      { wpx: 50 },
+      { wpx: 50 },
+      { wpx: 200 },
+      { wpx: 50 },
+      { wpx: 50 },
+      { wpx: 200 },
+      { wpx: 100 },
+      { wpx: 200 },
     ];
 
     var data = assignment.map((item) => ({

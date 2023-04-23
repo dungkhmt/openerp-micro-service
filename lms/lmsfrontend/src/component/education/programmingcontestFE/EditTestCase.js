@@ -3,21 +3,19 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import Typography from "@mui/material/Typography";
 import {useHistory, useParams} from "react-router-dom";
-import {authPostMultiPart, request} from "../../../api";
-import {useDispatch, useSelector} from "react-redux";
+import {request} from "../../../api";
 import {successNoti, warningNoti} from "../../../utils/notification";
 
 export default function EditTestCase(props) {
   const history = useHistory();
-  const token = useSelector((state) => state.auth.token);
-  const dispatch = useDispatch();
+
   const [value, setValue] = useState(0);
   const [input, setInput] = useState("");
   const [result, setResult] = useState("");
   const [screenHeight, setScreenHeight] = useState(
     (window.innerHeight - 300) / 2 + "px"
   );
-  const { problemId, testCaseId } = useParams();
+  const {problemId, testCaseId} = useParams();
   const [description, setDescription] = useState("");
   const [solution, setSolution] = useState("");
   const [load, setLoad] = useState(false);
@@ -123,13 +121,11 @@ export default function EditTestCase(props) {
     if (filename !== "") {
       formData.append("file", filename);
 
-      authPostMultiPart(
-        dispatch,
-        token,
+      request(
+        "post",
         "/upload-update-test-case/" + testCaseId,
-        formData
-      )
-        .then((res) => {
+        (res) => {
+          res = res.data;
           setIsProcessing(false);
           console.log("handleFormSubmit, res = ", res);
           setUploadMessage(res.message);
@@ -137,21 +133,24 @@ export default function EditTestCase(props) {
           //  alert("Time Out!!!");
           //} else {
           //}
-        })
-        .catch((e) => {
-          setIsProcessing(false);
-          console.error(e);
-          //alert("Time Out!!!");
-        });
+        },
+        {
+          onError: (e) => {
+            setIsProcessing(false);
+            console.error(e);
+            //alert("Time Out!!!");
+          },
+        },
+        formData,
+        config
+      );
     } else {
       // without file attached
-      authPostMultiPart(
-        dispatch,
-        token,
+      request(
+        "post",
         "/update-test-case-without-file/" + testCaseId,
-        formData
-      )
-        .then((res) => {
+        (res) => {
+          res = res.data;
           setIsProcessing(false);
           console.log("handleFormSubmit, res = ", res);
           setUploadMessage(res.message);
@@ -159,17 +158,24 @@ export default function EditTestCase(props) {
           //  alert("Time Out!!!");
           //} else {
           //}
-        })
-        .catch((e) => {
-          setIsProcessing(false);
-          console.error(e);
-          //alert("Time Out!!!");
-        });
+        },
+        {
+          onError: (e) => {
+            setIsProcessing(false);
+            console.error(e);
+            //alert("Time Out!!!");
+          },
+        },
+        formData,
+        config
+      );
     }
   };
+
   function onFileChange(event) {
     setFilename(event.target.files[0]);
   }
+
   const onInputChange = (event) => {
     let name = event.target.value;
     setFilename(name);
@@ -210,7 +216,7 @@ export default function EditTestCase(props) {
               {"N"}
             </MenuItem>
           </TextField>
-          <br />
+          <br/>
         </Grid>
       </Grid>
       <form onSubmit={handleFormSubmit}>
@@ -264,7 +270,7 @@ export default function EditTestCase(props) {
             </Button>
             <h2> Status: {uploadMessage}</h2>
           </Grid>
-          {isProcessing ? <CircularProgress /> : ""}
+          {isProcessing ? <CircularProgress/> : ""}
         </Grid>
       </form>
     </div>

@@ -1,9 +1,7 @@
 import {Box, Paper, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {Skeleton} from "@material-ui/lab";
-import React, {Fragment, useEffect, useState} from "react";
-import {useSelector} from "react-redux";
-import {useHistory} from "react-router";
+import {Fragment, useEffect, useState} from "react";
 import {request} from "../../../../api";
 import Quiz from "./Quiz";
 
@@ -28,8 +26,6 @@ const useStyles = makeStyles(() => ({
 
 function QuizzTab({ classId }) {
   const classes = useStyles();
-  const token = useSelector((state) => state.auth.token);
-  const history = useHistory();
 
   const [quizzList, setQuizList] = useState([]);
   const [loading, setLoading] = useState(true);

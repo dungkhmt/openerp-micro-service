@@ -1,10 +1,8 @@
 import {Avatar, Card, CardContent, CardHeader, Link, Paper, Typography,} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import MaterialTable from "material-table";
-import React, {useEffect, useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {FcConferenceCall} from "react-icons/fc";
-import {useSelector} from "react-redux";
-import {useHistory} from "react-router";
 import {request} from "../../../../api";
 import changePageSize, {localization, tableIcons,} from "../../../../utils/MaterialTableUtils";
 
@@ -16,8 +14,6 @@ const useStyles = makeStyles((theme) => ({
 
 function StudentListTab({ classId }) {
   const classes = useStyles();
-  const token = useSelector((state) => state.auth.token);
-  const history = useHistory();
 
   const [students, setStudents] = useState([]);
 

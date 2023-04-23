@@ -23,7 +23,7 @@ import TertiaryButton from "../../component/button/TertiaryButton";
 const heightVariants = {
   inactive: {
     overflowX: "hidden",
-    height: 352,
+    height: 340,
     width: 550,
     transition: {
       duration: 0.2,

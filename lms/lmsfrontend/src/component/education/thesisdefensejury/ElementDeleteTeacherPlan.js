@@ -1,20 +1,10 @@
-import React, {useEffect, useState} from "react";
-import {request} from "../../../api";
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Checkbox,
-  MenuItem,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@material-ui/core/";
-import MaterialTable, {MTableToolbar} from "material-table";
-import Delete from '@material-ui/icons/Delete';
-import ModalLoading from "./ModalLoading"
+import {Card} from "@material-ui/core/";
+import Delete from "@material-ui/icons/Delete";
 import {Alert} from "@material-ui/lab";
+import MaterialTable, {MTableToolbar} from "material-table";
+import {useEffect, useState} from "react";
+import {request} from "../../../api";
+import ModalLoading from "./ModalLoading";
 
 export default function ElementDeleteTeacherPlan({
                                                    teacher,

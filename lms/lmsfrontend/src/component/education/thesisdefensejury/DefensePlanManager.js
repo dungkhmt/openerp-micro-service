@@ -24,12 +24,7 @@ export default function DefensePlanManager() {
 //     setValue(location.state.valueTab);
 //  }, [location]);
 
-
-  useEffect(() => {
-
-
-  }, []);
-
+  useEffect(() => {}, []);
 
   return (
     <div>

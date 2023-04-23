@@ -3,10 +3,9 @@ import Button from "@material-ui/core/Button";
 import {makeStyles, MuiThemeProvider} from "@material-ui/core/styles";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import MaterialTable, {MTableToolbar} from "material-table";
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useEffect, useState} from "react";
 import {useHistory} from "react-router-dom";
-import {authGet} from "../../../api";
+import {request} from "../../../api";
 import {tableIcons} from "../../../utils/iconutil";
 
 const useStyles = makeStyles((theme) => ({
@@ -18,8 +17,7 @@ const useStyles = makeStyles((theme) => ({
 export default function ClassesList() {
   const classes = useStyles();
   const history = useHistory();
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+
   const [allClasses, setAllClasses] = useState([]);
 
   // Table
@@ -34,7 +32,8 @@ export default function ClassesList() {
   ];
 
   const getAllClasses = () => {
-    authGet(dispatch, token, "/edu/get-all-classes").then((res) => {
+    request("get", "/edu/get-all-classes", (res) => {
+      res = res.data;
       console.log(res);
       setAllClasses(res);
     });

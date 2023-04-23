@@ -1,22 +1,12 @@
-import React, {useEffect, useState} from "react";
-import {request} from "../../../api";
-import Alert from '@mui/material/Alert';
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Checkbox,
-  MenuItem,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@material-ui/core/";
+import {Button, Card} from "@material-ui/core/";
+import Edit from "@mui/icons-material/Edit";
+import Alert from "@mui/material/Alert";
 import MaterialTable, {MTableToolbar} from "material-table";
-import Edit from '@mui/icons-material/Edit';
-import ModalLoading from "./ModalLoading"
+import React, {useEffect, useState} from "react";
 import {useHistory} from "react-router-dom";
-import ModalAssignKeywordToTeacher from "./ModalAssignKeywordToTeacher"
+import {request} from "../../../api";
+import ModalAssignKeywordToTeacher from "./ModalAssignKeywordToTeacher";
+import ModalLoading from "./ModalLoading";
 
 export default function TeacherBelongToPlan(props) {
   const [toggle, setToggle] = React.useState(false);

@@ -4,9 +4,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
 import parse from "html-react-parser";
 import MaterialTable from "material-table";
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {useHistory} from "react-router-dom";
+import {useEffect, useState} from "react";
 import {request} from "../../../api";
 
 const useStyles = makeStyles({
@@ -24,10 +22,8 @@ const headerProperties = {
 };
 
 function QuizTestGroupQuestionList(props) {
-  const history = useHistory();
   const classes = useStyles();
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+
   const [data, setData] = useState([]);
   let testId = props.testId;
   const columns = [

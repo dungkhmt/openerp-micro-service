@@ -1,17 +1,14 @@
 import React, {useEffect, useState} from "react";
-import {Link, useHistory} from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux";
-import {authPostMultiPart, request} from "../../../../api";
+import {Link} from "react-router-dom";
+
+import {request} from "api";
 //import {Button} from "@mui/material";
 import {Button, CircularProgress} from "@mui/material";
 import StandardTable from "../../../table/StandardTable";
 
 export default function StudentListOfClass({ classId }) {
   const [studentsOfClass, setStudentsOfClass] = useState([]);
-  const dispatch = useDispatch();
-  const history = useHistory();
 
-  const token = useSelector((state) => state.auth.token);
   const [filename, setFilename] = React.useState(null);
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [uploadMessage, setUploadMessage] = React.useState("");
@@ -60,9 +57,11 @@ export default function StudentListOfClass({ classId }) {
       setStudentsOfClass(res.data);
     });
   }
+
   function onFileChange(event) {
     setFilename(event.target.files[0]);
   }
+
   const handleUploadExcelUserList = (event) => {
     event.preventDefault();
     setIsProcessing(true);
@@ -75,13 +74,16 @@ export default function StudentListOfClass({ classId }) {
     formData.append("inputJson", JSON.stringify(body));
     formData.append("file", filename);
 
-    authPostMultiPart(
-      dispatch,
-      token,
+    const config = {
+      headers: {
+        "content-Type": "multipart/form-data",
+      },
+    };
+
+    request(
+      "post",
       "/edu/class/add-students-to-class-excel-upload",
-      formData
-    )
-      .then((res) => {
+      (res) => {
         setIsProcessing(false);
         console.log("handleFormSubmit, res = ", res);
         setUploadMessage(res.message);
@@ -89,12 +91,17 @@ export default function StudentListOfClass({ classId }) {
         //  alert("Time Out!!!");
         //} else {
         //}
-      })
-      .catch((e) => {
-        setIsProcessing(false);
-        console.error(e);
-        //alert("Time Out!!!");
-      });
+      },
+      {
+        onError: (e) => {
+          setIsProcessing(false);
+          console.error(e);
+          //alert("Time Out!!!");
+        },
+      },
+      formData,
+      config
+    );
   };
 
   return (

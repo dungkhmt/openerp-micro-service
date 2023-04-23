@@ -1,9 +1,6 @@
 import {Button, Grid} from "@material-ui/core";
-import React, {useEffect, useMemo, useState} from "react";
-import {useHistory} from "react-router-dom";
-import {SubmitSuccess} from "../programmingcontestFE/SubmitSuccess";
-import {request} from "../../../api";
 import {Alert} from "@material-ui/lab";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
   FormControl,
@@ -13,16 +10,19 @@ import {
   MenuItem,
   Select,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import ModalLoading from "./ModalLoading"
-import {boxChildComponent, boxComponentStyle} from "../../taskmanagement/ultis/constant";
+import Checkbox from "@mui/material/Checkbox";
+import ListItemText from "@mui/material/ListItemText";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import React, {useEffect, useMemo, useState} from "react";
 import {useForm} from "react-hook-form";
+import {useHistory} from "react-router-dom";
+import {request} from "../../../api";
+import {boxChildComponent, boxComponentStyle,} from "../../taskmanagement/ultis/constant";
+import {SubmitSuccess} from "../programmingcontestFE/SubmitSuccess";
 import FormError from "./FormError";
-import ListItemText from '@mui/material/ListItemText';
-import Checkbox from '@mui/material/Checkbox';
-import OutlinedInput from '@mui/material/OutlinedInput';
+import ModalLoading from "./ModalLoading";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -35,26 +35,24 @@ const MenuProps = {
   },
 };
 
-
 const modalStyle = {
   paper: {
-    boxSizing: 'border-box',
-    position: 'absolute',
-    width: '55%',
+    boxSizing: "border-box",
+    position: "absolute",
+    width: "55%",
     maxHeight: 1000,
     // border: '2px solid #000',
-    borderRadius: '5px',
-    boxShadow: '0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%)',
-    backgroundColor: 'white',
+    borderRadius: "5px",
+    boxShadow:
+      "0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%)",
+    backgroundColor: "white",
     zIndex: 999,
-    left: '60%',
-    top: '90%',
-    transform: 'translate(-50% , -50%)',
-    padding: '20px 40px'
-
-  }
-}
-
+    left: "60%",
+    top: "90%",
+    transform: "translate(-50% , -50%)",
+    padding: "20px 40px",
+  },
+};
 
 function CreateThesis(props) {
   const history = useHistory();
@@ -80,13 +78,14 @@ function CreateThesis(props) {
   const {register, errors} = useForm();
   const [isInputValidThesis, setIsInputValidThesis] = React.useState(true);
   const [isInputValidDescript, setIsInputValidDescrip] = React.useState(true);
-  const [isInputValidStudentName, setIsInputValidStudentName] = React.useState(true);
+  const [isInputValidStudentName, setIsInputValidStudentName] =
+    React.useState(true);
   const [isInputValidKeyWord, setIsInputValidKeyWord] = React.useState(true);
-  const [isInputValidStudentID, setIsInputValidStudentID] = React.useState(true);
+  const [isInputValidStudentID, setIsInputValidStudentID] =
+    React.useState(true);
 
-  const [errorMessage, setErrorMessage] = React.useState('');
+  const [errorMessage, setErrorMessage] = React.useState("");
   const [keyword, setKeyword] = React.useState([]);
-
 
   const handleChangeKeyword = (event) => {
     const {
@@ -94,7 +93,7 @@ function CreateThesis(props) {
     } = event;
     setKeyword(
       // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
+      typeof value === "string" ? value.split(",") : value
     );
   };
   const containsText = (text, searchText) =>
@@ -105,38 +104,39 @@ function CreateThesis(props) {
     if (checkingText == "" || checkingText == null) {
       return {
         isInputValid: false,
-        errorMessage: 'Trường này không được bỏ trống và không có ký tự đặc biệt'
+        errorMessage:
+          "Trường này không được bỏ trống và không có ký tự đặc biệt",
       };
     }
     return {
       isInputValid: true,
-      errorMessage: ''
+      errorMessage: "",
     };
-  }
-  const handleInputValidationThesis = e => {
-    console.log(e)
+  };
+  const handleInputValidationThesis = (e) => {
+    console.log(e);
     const {isInputValid, errorMessage} = validateInput(e.target.value);
-    setIsInputValidThesis(isInputValid)
-    setErrorMessage(errorMessage)
-  }
-  const handleInputValidationDescript = e => {
-    console.log(e)
+    setIsInputValidThesis(isInputValid);
+    setErrorMessage(errorMessage);
+  };
+  const handleInputValidationDescript = (e) => {
+    console.log(e);
     const {isInputValid, errorMessage} = validateInput(e.target.value);
-    setIsInputValidDescrip(isInputValid)
-    setErrorMessage(errorMessage)
-  }
-  const handleInputValidationStudentName = e => {
-    console.log(e)
+    setIsInputValidDescrip(isInputValid);
+    setErrorMessage(errorMessage);
+  };
+  const handleInputValidationStudentName = (e) => {
+    console.log(e);
     const {isInputValid, errorMessage} = validateInput(e.target.value);
-    setIsInputValidStudentName(isInputValid)
-    setErrorMessage(errorMessage)
-  }
-  const handleInputValidationStudentID = e => {
-    console.log(e)
+    setIsInputValidStudentName(isInputValid);
+    setErrorMessage(errorMessage);
+  };
+  const handleInputValidationStudentID = (e) => {
+    console.log(e);
     const {isInputValid, errorMessage} = validateInput(e.target.value);
-    setIsInputValidStudentID(isInputValid)
-    setErrorMessage(errorMessage)
-  }
+    setIsInputValidStudentID(isInputValid);
+    setErrorMessage(errorMessage);
+  };
 
   async function getAllProgram() {
     request(
@@ -145,9 +145,8 @@ function CreateThesis(props) {
       "GET",
       "/program_tranings",
       (res) => {
-        console.log(res.data)
-        setListProgram(res.data)
-
+        console.log(res.data);
+        setListProgram(res.data);
       }
     );
   }
@@ -159,9 +158,8 @@ function CreateThesis(props) {
       "GET",
       "/thesis/userlogins",
       (res) => {
-        console.log(res.data)
-        setListUserLoginID(res.data)
-
+        console.log(res.data);
+        setListUserLoginID(res.data);
       }
     );
   }
@@ -173,9 +171,8 @@ function CreateThesis(props) {
       "GET",
       "/defense_jurys",
       (res) => {
-        console.log("Jury", res.data)
-        setListJury(res.data.DefenseJurys)
-
+        console.log("Jury", res.data);
+        setListJury(res.data.DefenseJurys);
       }
     );
   }
@@ -187,9 +184,8 @@ function CreateThesis(props) {
       "GET",
       "/thesis_defense_plan",
       (res) => {
-        console.log("Plan", res.data)
-        setListPlan(res.data)
-
+        console.log("Plan", res.data);
+        setListPlan(res.data);
       }
     );
   }
@@ -242,16 +238,13 @@ function CreateThesis(props) {
       thesisPlanName: thesisPlanName,
       keyword: keyword,
     };
-    console.log("Body Thesis:", body)
-    setTimeout(
-      () => setOpenAlert(true),
-      3000
-    );
+    console.log("Body Thesis:", body);
+    setTimeout(() => setOpenAlert(true), 3000);
     request(
       "post",
       "/thesis",
       (res) => {
-        console.log(res.data)
+        console.log(res.data);
         setShowSubmitSuccess(true);
         setOpenLoading(false);
         history.push({
@@ -263,12 +256,11 @@ function CreateThesis(props) {
         onError: (e) => {
           setShowSubmitSuccess(false);
           setOpenLoading(false);
-        }
+        },
       },
       body
     ).then();
-
-  }
+  };
 
   useEffect(() => {
     getAllProgram();
@@ -277,14 +269,17 @@ function CreateThesis(props) {
     getAllPlan();
     getAllKeywords();
     // getAllUserLoginID();
-  }, [])
+  }, []);
 
   const displayedProgramOptions = useMemo(
     () => listProgram.filter((option) => containsText(option.name, searchText)),
     [searchText]
   );
   const displayedTeacherOptions = useMemo(
-    () => listTeacher.filter((option) => containsText(option.teacherName, searchText)),
+    () =>
+      listTeacher.filter((option) =>
+        containsText(option.teacherName, searchText)
+      ),
     [searchText]
   );
   const displayedJuryOptions = useMemo(
@@ -296,13 +291,16 @@ function CreateThesis(props) {
     [searchText]
   );
   const displayedUserLoginIDOptions = useMemo(
-    () => listUserLoginID.filter((option) => containsText(option.userLoginId, searchText)),
+    () =>
+      listUserLoginID.filter((option) =>
+        containsText(option.userLoginId, searchText)
+      ),
     [searchText]
   );
   return (
     <>
       <Box sx={boxComponentStyle}>
-        <Typography variant="h4" mb={4} component={'h4'}>
+        <Typography variant="h4" mb={4} component={"h4"}>
           Thêm mới luận văn
         </Typography>
         <div width="100%">

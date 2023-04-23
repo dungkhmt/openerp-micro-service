@@ -1,15 +1,14 @@
-import * as React from "react";
+import {Button, TableHead} from "@material-ui/core";
+import Paper from "@material-ui/core/Paper";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableRow from "@material-ui/core/TableRow";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {request} from "../../../api";
-import Typography from "@mui/material/Typography";
-import TableContainer from "@material-ui/core/TableContainer";
-import Paper from "@material-ui/core/Paper";
-import Table from "@mui/material/Table";
-import {Button, TableHead} from "@material-ui/core";
-import TableRow from "@material-ui/core/TableRow";
 import {StyledTableCell, StyledTableRow} from "../programmingcontestFE/lib";
-import TableBody from "@mui/material/TableBody";
 
 export default function ThesisDetail(props) {
   const params = useParams();

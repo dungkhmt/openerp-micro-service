@@ -1,12 +1,12 @@
-import {Card, CardContent,} from "@material-ui/core";
+import {Card, CardContent} from "@material-ui/core";
 //import EditIcon from "@material-ui/icons/Edit";
 import {makeStyles, MuiThemeProvider} from "@material-ui/core/styles";
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {useHistory} from "react-router";
 import {request} from "../../../../api";
-import withScreenSecurity from "../../../../component/withScreenSecurity";
 import CurrentTeacherClassList from "../../../../component/education/class/CurrentTeacherClassList";
 import CurrentUserClassList from "../../../../component/education/class/CurrentUserClassList";
+import withScreenSecurity from "../../../../component/withScreenSecurity";
 
 const useStyles = makeStyles((theme) => ({
   card: {

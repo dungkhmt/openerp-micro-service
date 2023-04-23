@@ -1,19 +1,8 @@
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Checkbox,
-  MenuItem,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@material-ui/core/";
-import React, {useEffect, useState} from "react";
+import {Button, Card} from "@material-ui/core/";
+import MaterialTable, {MTableToolbar} from "material-table";
+import {useEffect, useState} from "react";
 import {useHistory} from "react-router-dom";
 import {request} from "../../../api";
-import MaterialTable, {MTableToolbar} from "material-table";
-
 
 function DefenseJury() {
   const history = useHistory();
@@ -33,7 +22,7 @@ function DefenseJury() {
       "GET",
       "/defense_jurys",
       (res) => {
-        console.log(res.data)
+        console.log(res.data);
         setJurys(res.data.DefenseJurys);
       }
     );

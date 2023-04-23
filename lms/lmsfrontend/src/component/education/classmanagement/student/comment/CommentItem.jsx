@@ -1,5 +1,3 @@
-import {makeStyles} from "@material-ui/core/styles";
-import {request} from "../../../../../api";
 import {
   Avatar,
   Button,
@@ -13,12 +11,13 @@ import {
   Menu,
   MenuItem,
 } from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import {useDispatch, useSelector} from "react-redux";
 import {useEffect, useState} from "react";
-import ReplyCommentItem from "./ReplyCommentItem";
 import displayTime from "utils/DateTimeUtils";
 import {errorNoti, successNoti} from "utils/notification";
+import {request} from "../../../../../api";
+import ReplyCommentItem from "./ReplyCommentItem";
 
 const useStyles = makeStyles((theme) => ({
   commentItem: {
@@ -52,10 +51,8 @@ export default function CommentItem({
   comment,
   commentFlag,
   setCommentFlag,
-  loginUser,
+  userId,
 }) {
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
   const [isEditting, setIsEditting] = useState(false);
   const [commentTextEdit, setCommentTextEdit] = useState(comment.commentText);
   const [openModal, setOpenModal] = useState(false);
@@ -80,7 +77,6 @@ export default function CommentItem({
   useEffect(() => {
     let getListReply = async () => {
       request(
-        // token, history,
         "get",
         `/get-list-reply-comments-on-quiz/${comment.commentId}`,
         (res) => {
@@ -126,14 +122,9 @@ export default function CommentItem({
   //get list reply of comment
   const onGetListReplyComment = async (commentId) => {
     if (isShowReplyComment === false) {
-      request(
-        // token, history,
-        "get",
-        `/get-list-reply-comments-on-quiz/${commentId}`,
-        (res) => {
-          setListReplyComment(res.data);
-        }
-      );
+      request("get", `/get-list-reply-comments-on-quiz/${commentId}`, (res) => {
+        setListReplyComment(res.data);
+      });
 
       /*
 		let res = await authGet(
@@ -163,8 +154,6 @@ export default function CommentItem({
     );
 		*/
     request(
-      // token,
-      // history,
       "put",
       `/edit-comment-on-quiz/${comment.commentId}`,
       (res) => {
@@ -330,7 +319,7 @@ export default function CommentItem({
                   <span>&#x25BC; Xem các phản hổi</span>
                 )}
               </Button>
-              {/* {loginUser?.userName === comment.createdByUserLoginId && (
+              {/* {userId === comment.createdByUserLoginId && (
               <>
                 <Button
                   className={classes.commentActionBtn}
@@ -349,19 +338,18 @@ export default function CommentItem({
             </div>
           </div>
           <div style={{ height: "70px", minWidth: "70px" }}>
-            {isDisplayMenu &&
-              loginUser?.userName === comment.createdByUserLoginId && (
-                <IconButton
-                  aria-label="more"
-                  aria-controls="long-menu"
-                  aria-haspopup="true"
-                  onClick={handleClick}
-                  // className={isDisplayMenu ? classes.displayMenu : classes.hideMenu}
-                  style={{ height: "70px", width: "70px" }}
-                >
-                  <MoreVertIcon />
-                </IconButton>
-              )}
+            {isDisplayMenu && userId === comment.createdByUserLoginId && (
+              <IconButton
+                aria-label="more"
+                aria-controls="long-menu"
+                aria-haspopup="true"
+                onClick={handleClick}
+                // className={isDisplayMenu ? classes.displayMenu : classes.hideMenu}
+                style={{ height: "70px", width: "70px" }}
+              >
+                <MoreVertIcon />
+              </IconButton>
+            )}
             <Menu
               id="long-menu"
               anchorEl={menuAnchorEl}
@@ -398,7 +386,7 @@ export default function CommentItem({
                   comment={comment}
                   flag={flag}
                   setFlag={setFlag}
-                  loginUser={loginUser}
+                  userId={userId}
                 />
               ))}
           </div>

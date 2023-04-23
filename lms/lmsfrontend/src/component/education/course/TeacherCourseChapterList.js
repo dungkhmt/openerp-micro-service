@@ -2,10 +2,9 @@ import {Card, CardContent} from "@material-ui/core/";
 import {makeStyles} from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
 import MaterialTable from "material-table";
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useEffect, useState} from "react";
 import {Link, useHistory} from "react-router-dom";
-import {authGet} from "../../../api";
+import {request} from "../../../api";
 import PositiveButton from "../classmanagement/PositiveButton";
 
 const useStyles = makeStyles((theme) => ({
@@ -19,8 +18,7 @@ const useStyles = makeStyles((theme) => ({
 function TeacherCourseChapterList(props) {
   const classes = useStyles();
   const courseId = props.courseId;
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+
   const history = useHistory();
   const [chapters, setChapters] = useState([]);
 
@@ -54,22 +52,23 @@ function TeacherCourseChapterList(props) {
 
   const changeStatus = (rowData) => {
     //alert('change status');
-    let statusId = authGet(
-      dispatch,
-      token,
-      "/edu/class/change-chapter-status/" + rowData.chapterId
+
+    request(
+      "get",
+      "/edu/class/change-chapter-status/" + rowData.chapterId,
+      (res) => {
+        const statusId = res.data;
+        console.log("change status, return status = " + statusId);
+        history.push("/edu/course/detail/" + courseId);
+      }
     );
-    console.log("change status, return status = " + statusId);
-    history.push("/edu/course/detail/" + courseId);
   };
 
   async function getChapterList() {
-    let lst = await authGet(
-      dispatch,
-      token,
-      "/edu/class/get-chapters-of-course/" + courseId
-    );
-    setChapters(lst);
+    request("get", "/edu/class/get-chapters-of-course/" + courseId, (res) => {
+      const lst = res.data;
+      setChapters(lst);
+    });
   }
 
   useEffect(() => {

@@ -4,34 +4,31 @@ import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import HustModal from "component/common/HustModal";
 import MaterialTable from "material-table";
 import {React, useEffect, useState} from "react";
-import {authPostMultiPart, request} from "../../../api";
+import {request} from "../../../api";
 import {toFormattedDateTime} from "../../../utils/dateutils";
-import {useDispatch, useSelector} from "react-redux";
 import Box from "@mui/material/Box";
 
 export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
   props
 ) {
-  const dispatch = useDispatch();
-  const { submissionId } = props;
+  const {submissionId} = props;
   const [submissionTestCase, setSubmissionTestCase] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [testcaseDetailList, setTestcaseDetailList] = useState([]);
   const [selectedTestcase, setSelectedTestcase] = useState();
 
   const [isProcessing, setIsProcessing] = useState(false);
-  const token = useSelector((state) => state.auth.token);
 
   const [score, setScore] = useState(0);
 
   const columns = [
-    { title: "Contest", field: "contestId" },
-    { title: "Problem", field: "problemId" },
-    { title: "Message", field: "message" },
-    { title: "Point", field: "point" },
+    {title: "Contest", field: "contestId"},
+    {title: "Problem", field: "problemId"},
+    {title: "Message", field: "message"},
+    {title: "Point", field: "point"},
     // {title: "Correct result", field: "testCaseAnswer"},
     // {title: "Participant's result", field: "participantAnswer"},
-    { title: "Submit at", field: "createdAt" },
+    {title: "Submit at", field: "createdAt"},
     {
       title: "Detail",
       render: (rowData) => (
@@ -46,7 +43,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
             setOpenModal(true);
           }}
         >
-          <InfoIcon />
+          <InfoIcon/>
         </IconButton>
       ),
     },
@@ -55,7 +52,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
       render: (rowData) =>
         rowData.viewSubmitSolutionOutputMode == "Y" ? (
           <div>
-            {isProcessing ? <CircularProgress /> : ""}
+            {isProcessing ? <CircularProgress/> : ""}
             <button
               color="primary"
               type="submit"
@@ -101,13 +98,17 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
     formData.append("inputJson", JSON.stringify(body));
     formData.append("file", selectedFile);
 
-    authPostMultiPart(
-      dispatch,
-      token,
+    const config = {
+      headers: {
+        "content-Type": "multipart/form-data",
+      },
+    };
+
+    request(
+      "post",
       "/submit-solution-output-of-testcase",
-      formData
-    )
-      .then((res) => {
+      (res) => {
+        res = res.data;
         setIsProcessing(false);
         console.log("result submit = ", res);
         //alert("submit solution output OK");
@@ -125,11 +126,16 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
         setSubmissionTestCase(arr_res);
         getSubmissionDetailTestCaseByTestCase();
         //setFilename("");
-      })
-      .catch((e) => {
-        setIsProcessing(false);
-        console.error(e);
-      });
+      },
+      {
+        onError: (e) => {
+          setIsProcessing(false);
+          console.error(e);
+        },
+      },
+      formData,
+      config
+    );
   }
 
   function onFileChange(e, testCaseId) {
@@ -150,7 +156,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
     request(
       "get",
       "/get-contest-problem-submission-detail-by-testcase-of-a-submission-viewed-by-participant/" +
-        submissionId,
+      submissionId,
       (res) => {
         let L = res.data.map((c) => ({
           ...c,
@@ -172,7 +178,8 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
         setTestcaseDetailList(tcl);
       },
       {
-        401: () => {},
+        401: () => {
+        },
       }
     );
   }
@@ -186,7 +193,8 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
         setTestcaseDetailList((prev) => [...prev, res.data]);
       },
       {
-        401: () => {},
+        401: () => {
+        },
       }
     );
   }
@@ -252,7 +260,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
         columns={columns}
         data={submissionTestCase}
       />
-      <ModalPreview chosenTestcase={selectedTestcase} />
+      <ModalPreview chosenTestcase={selectedTestcase}/>
     </div>
   );
 }

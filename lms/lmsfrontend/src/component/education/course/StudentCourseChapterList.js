@@ -1,10 +1,8 @@
 import {Card, CardContent} from "@material-ui/core/";
 import MaterialTable from "material-table";
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useEffect, useState} from "react";
 import {useParams} from "react-router";
-import {Link, useHistory} from "react-router-dom";
-import {authGet} from "../../../api";
+import {Link} from "react-router-dom";
 
 function StudentCourseChapterList(props) {
   const params = useParams();
@@ -15,9 +13,7 @@ function StudentCourseChapterList(props) {
     console.log("StudentCourseChapterList, chapters = ", props.chapters);
     return props.chapters;
   });
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
-  const history = useHistory();
+
   //const [chapters, setChapters] = useState([]);
 
   const columns = [
@@ -33,14 +29,14 @@ function StudentCourseChapterList(props) {
     { title: "Chapter Name", field: "chapterName" },
   ];
 
-  async function getChapterList() {
-    let lst = await authGet(
-      dispatch,
-      token,
-      "/edu/class/get-chapters-of-course"
-    );
-    setChapters(lst);
-  }
+  // async function getChapterList() {
+  //   let lst = await authGet(
+  //     dispatch,
+  //     token,
+  //     "/edu/class/get-chapters-of-course"
+  //   );
+  //   setChapters(lst);
+  // }
 
   useEffect(() => {
     //setChapters(chapterList);

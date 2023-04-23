@@ -1,11 +1,9 @@
 import React from "react";
 import {useParams} from "react-router";
-import {authPostMultiPart} from "../../../api";
 import {Button, Grid} from "@material-ui/core";
-import {useDispatch, useSelector} from "react-redux";
+import {request} from "../../../api";
 
 export default function SubmitSolutionOutput() {
-  const dispatch = useDispatch();
   const params = useParams();
   const contestId = params.contestId;
   const problemId = params.problemId;
@@ -13,12 +11,12 @@ export default function SubmitSolutionOutput() {
   const [filename, setFilename] = React.useState("");
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [score, setScore] = React.useState(0);
-  const token = useSelector((state) => state.auth.token);
 
   function onFileChange(event) {
     setFilename(event.target.files[0]);
     console.log(event.target.files[0].name);
   }
+
   const onInputChange = (event) => {
     let name = event.target.value;
     setFilename(name);
@@ -35,16 +33,30 @@ export default function SubmitSolutionOutput() {
     formData.append("inputJson", JSON.stringify(body));
     formData.append("file", filename);
 
-    authPostMultiPart(dispatch, token, "/submit-solution-output", formData)
-      .then((res) => {
+    const config = {
+      headers: {
+        "content-Type": "multipart/form-data",
+      },
+    };
+
+    request(
+      "post",
+      "/submit-solution-output",
+      (res) => {
+        res = res.data;
         setIsProcessing(false);
         console.log("result submit = ", res);
         setScore(res.score);
-      })
-      .catch((e) => {
-        setIsProcessing(false);
-        console.error(e);
-      });
+      },
+      {
+        onError: (e) => {
+          setIsProcessing(false);
+          console.error(e);
+        },
+      },
+      formData,
+      config
+    );
   };
 
   return (

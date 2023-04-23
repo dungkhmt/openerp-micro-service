@@ -1,15 +1,13 @@
-import * as React from "react";
+import {TableHead} from "@material-ui/core";
+import Paper from "@material-ui/core/Paper";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableRow from "@material-ui/core/TableRow";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
 import {request} from "../../../api";
-import Typography from "@mui/material/Typography";
-import TableContainer from "@material-ui/core/TableContainer";
-import Paper from "@material-ui/core/Paper";
-import Table from "@mui/material/Table";
-
-import {TableHead} from "@material-ui/core";
-import TableRow from "@material-ui/core/TableRow";
 import {StyledTableCell, StyledTableRow} from "../programmingcontestFE/lib";
-import TableBody from "@mui/material/TableBody";
 
 export default function DefensePlanDetail(props) {
   const defensePlanId = props.defensePlanId;
@@ -17,7 +15,7 @@ export default function DefensePlanDetail(props) {
   const [defensePlan, setDefensePlan] = useState([]);
 
   async function getDefensePlanDetail() {
-    console.log("defensePlanId", defensePlanId)
+    console.log("defensePlanId", defensePlanId);
     request(
       // token,
       // history,

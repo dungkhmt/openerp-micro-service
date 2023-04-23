@@ -1,5 +1,3 @@
-import {makeStyles} from "@material-ui/core/styles";
-import {request} from "../../../../../api";
 import {
   Avatar,
   Button,
@@ -10,10 +8,11 @@ import {
   DialogTitle,
   Input,
 } from "@material-ui/core";
-import {useDispatch, useSelector} from "react-redux";
+import {makeStyles} from "@material-ui/core/styles";
 import {useState} from "react";
-import {errorNoti, successNoti} from "utils/notification";
 import displayTime from "utils/DateTimeUtils";
+import {errorNoti, successNoti} from "utils/notification";
+import {request} from "../../../../../api";
 
 const useStyles = makeStyles((theme) => ({
   commentItem: {
@@ -32,14 +31,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ReplyCommentItem({
-  comment,
-  flag,
-  setFlag,
-  loginUser,
-}) {
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+export default function ReplyCommentItem({ comment, flag, setFlag, userId }) {
   const [isEditting, setIsEditting] = useState(false);
   const [commentTextEdit, setCommentTextEdit] = useState(comment.commentText);
   const [openModal, setOpenModal] = useState(false);
@@ -81,8 +73,6 @@ export default function ReplyCommentItem({
     //   body
     // );
     request(
-      // token,
-      // history,
       "put",
       `/edit-comment-on-quiz/${comment.commentId}`,
       (res) => {
@@ -187,7 +177,7 @@ export default function ReplyCommentItem({
               </div>
             )}
           </div>
-          {loginUser?.userName === comment.createdByUserLoginId && (
+          {userId === comment.createdByUserLoginId && (
             <div>
               <Button
                 className={classes.commentActionBtn}

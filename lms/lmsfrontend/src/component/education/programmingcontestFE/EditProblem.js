@@ -17,9 +17,8 @@ import {
 } from "@mui/material";
 import {makeStyles} from "@material-ui/core/styles";
 import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import {authGet, authPostMultiPart, request} from "../../../api";
+import {request} from "../../../api";
 import {CompileStatus} from "./CompileStatus";
 import {useParams} from "react-router";
 import {randomImageName,} from "../../../utils/FileUpload/covert";
@@ -57,8 +56,6 @@ function EditProblem() {
   const classes = useStyles();
 
   const {problemId} = useParams();
-  const token = useSelector((state) => state.auth.token);
-  const dispatch = useDispatch();
 
   const [problemName, setProblemName] = useState("");
   const [description, setDescription] = useState("");
@@ -113,34 +110,32 @@ function EditProblem() {
   };
 
   useEffect(() => {
-    authGet(dispatch, token, "/problem-details/" + problemId)
-      .then((res) => {
-        if (res.attachment && res.attachment.length !== 0) {
-          const newFileURLArray = res.attachment.map((url) => ({
-            id: randomImageName(),
-            content: url,
-          }));
-          newFileURLArray.forEach((file, idx) => {
-            file.fileName = res.attachmentNames[idx];
-          });
-          setFetchedImageArray(newFileURLArray);
-        }
+    request("get", "/problem-details/" + problemId, (res) => {
+      res = res.data;
+      if (res.attachment && res.attachment.length !== 0) {
+        const newFileURLArray = res.attachment.map((url) => ({
+          id: randomImageName(),
+          content: url,
+        }));
+        newFileURLArray.forEach((file, idx) => {
+          file.fileName = res.attachmentNames[idx];
+        });
+        setFetchedImageArray(newFileURLArray);
+      }
 
-        setProblemName(res.problemName);
-        setLevelId(res.levelId);
-        setTimeLimit(res.timeLimit);
-        setMemoryLimit(res.memoryLimit);
-        setIsPublic(res.publicProblem);
-        setLanguageSolution(res.correctSolutionLanguage);
-        setCodeSolution(res.correctSolutionSourceCode);
-        setSolutionCheckerLanguage(res.solutionCheckerLanguage);
-        setSolutionChecker(res.solutionCheckerSourceCode || "");
-        setIsCustomEvaluated(res.scoreEvaluationType === CUSTOM_EVALUATION)
-        setDescription(res.problemDescription);
-        setSelectedTags(res.tags);
-      }, {})
-      .then();
-
+      setProblemName(res.problemName);
+      setLevelId(res.levelId);
+      setTimeLimit(res.timeLimit);
+      setMemoryLimit(res.memoryLimit);
+      setIsPublic(res.publicProblem);
+      setLanguageSolution(res.correctSolutionLanguage);
+      setCodeSolution(res.correctSolutionSourceCode);
+      setSolutionCheckerLanguage(res.solutionCheckerLanguage);
+      setSolutionChecker(res.solutionCheckerSourceCode || "");
+      setIsCustomEvaluated(res.scoreEvaluationType === CUSTOM_EVALUATION);
+      setDescription(res.problemDescription);
+      setSelectedTags(res.tags);
+    });
   }, [problemId]);
 
   function checkCompile() {
@@ -230,17 +225,29 @@ function EditProblem() {
     }
 
     setLoading(true);
-    authPostMultiPart(
-      dispatch,
-      token,
+
+    const config = {
+      headers: {
+        "content-Type": "multipart/form-data",
+      },
+    };
+
+    request(
+      "post",
       "/update-problem-detail/" + problemId,
-      formData
-    ).then(
       (res) => {
+        setLoading(false);
         successNoti("Problem saved successfully", 10000);
-      })
-      .catch(() => errorNoti(t("error", {ns: "common"}), 3000))
-      .finally(() => setLoading(false));
+      },
+      {
+        onError: (e) => {
+          errorNoti(t("error", {ns: "common"}), 3000);
+          setLoading(false);
+        },
+      },
+      formData,
+      config
+    );
   }
 
   return (

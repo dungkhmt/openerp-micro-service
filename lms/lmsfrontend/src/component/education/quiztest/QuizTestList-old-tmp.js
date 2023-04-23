@@ -1,13 +1,12 @@
 import {Button, Tooltip} from "@material-ui/core/";
 import AddIcon from "@material-ui/icons/Add";
 import MaterialTable from "material-table";
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useEffect, useState} from "react";
 import {Link, useHistory} from "react-router-dom";
-import {authGet} from "../../../api";
+import QuizTestListOfCurrentTeacher from "../../../views/Education/quiztest/teacher/QuizTestListOfCurrentTeacher";
 import withScreenSecurity from "../../withScreenSecurity";
 import QuizTestsOfParticipantRole from "./QuizTestsOfParticipantRole";
-import QuizTestListOfCurrentTeacher from "../../../views/Education/quiztest/teacher/QuizTestListOfCurrentTeacher";
+import {request} from "../../../api";
 
 const nextLine = <pre></pre>;
 
@@ -117,46 +116,43 @@ const columns = [
 function QuizTestList() {
   const history = useHistory();
 
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
-
   const [quizTestList, setQuizTestList] = useState([]);
 
-  async function getAllQuizTestByUser() {
-    try {
-      let list = await authGet(dispatch, token, "/get-all-quiz-test-by-user");
-      let listClass = await authGet(dispatch, token, "/edu/class/list/teacher");
+  function getAllQuizTestByUser() {
+    request("get", "/get-all-quiz-test-by-user", (res) => {
+      const list = res.data;
 
-      rows.splice(0, rows.length);
+      request("get", "/edu/class/list/teacher", (res2) => {
+        const listClass = res2.data;
 
-      list.map((elm, index) => {
-        let foundIndex = -1;
-        for (let index = 0; index < listClass.length; index++) {
-          if (listClass[index].id == elm.classId) {
-            foundIndex = index;
-            break;
+        rows.splice(0, rows.length);
+        list.map((elm, index) => {
+          let foundIndex = -1;
+          for (let index = 0; index < listClass.length; index++) {
+            if (listClass[index].id == elm.classId) {
+              foundIndex = index;
+              break;
+            }
           }
-        }
 
-        if (foundIndex == -1) {
-          //alert("Something went wrong !!!");
-        } else
-          rows.push(
-            createData(
-              elm.testId,
-              elm.testName,
-              elm.scheduleDatetime,
-              elm.duration,
-              listClass[foundIndex].classCode,
-              elm.classId
-            )
-          );
+          if (foundIndex == -1) {
+            //alert("Something went wrong !!!");
+          } else
+            rows.push(
+              createData(
+                elm.testId,
+                elm.testName,
+                elm.scheduleDatetime,
+                elm.duration,
+                listClass[foundIndex].classCode,
+                elm.classId
+              )
+            );
+        });
+
+        setQuizTestList(rows);
       });
-
-      setQuizTestList(rows);
-    } catch (e) {
-      // console.log("ERROR", e);
-    }
+    });
   }
 
   useEffect(() => {
@@ -174,7 +170,7 @@ function QuizTestList() {
 
   return (
     <>
-      <QuizTestListOfCurrentTeacher/>
+      <QuizTestListOfCurrentTeacher />
 
       {/* <Grid container spacing={5} justify='flex-end' direction="row">
                     <Tooltip title="Thêm mới một đề thi" aria-label="Thêm mới một đề thi" placement="top">

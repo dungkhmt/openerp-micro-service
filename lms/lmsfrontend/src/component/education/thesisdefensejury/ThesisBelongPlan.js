@@ -1,27 +1,16 @@
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Checkbox,
-  MenuItem,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@material-ui/core/";
+import {Button, Card} from "@material-ui/core/";
+import Delete from "@material-ui/icons/Delete";
+import MaterialTable, {MTableToolbar} from "material-table";
 import React, {useEffect, useState} from "react";
 import {useHistory} from "react-router-dom";
 import {request} from "../../../api";
-import MaterialTable, {MTableToolbar} from "material-table";
-import ModalLoading from "./ModalLoading"
-import ModalDelete from "./ModalDelete"
-import Delete from '@material-ui/icons/Delete';
-
+import ModalDelete from "./ModalDelete";
+import ModalLoading from "./ModalLoading";
 
 function ThesisBelongPlan(props) {
   const defensePlanId = props.defensePlanId;
   const history = useHistory();
-  const [toggle, setToggle] = useState(false)
+  const [toggle, setToggle] = useState(false);
   const [thesiss, setThesiss] = useState([]);
   const [thesisId, setThesisId] = useState();
   const [loginID, setLoginID] = useState();
