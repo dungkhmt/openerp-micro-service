@@ -30,64 +30,60 @@ const CodeEditorPage = () => {
   const socketRef = useRef();
   const localAudioRef = useRef();
   const remoteAudioRef = useRef();
+  const myPeer = useRef();
 
   useEffect(() => {
     socketRef.current = io(process.env.CODE_EDITOR_ONLINE_SERVER_DOMAIN || "http://localhost:7008");
-
-    const myPeer = new Peer();
-    myPeer.on("open", (id) => {
+    navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then((stream) => {
+      myPeer.current = new Peer();
+      myPeer.current.on("open", (id) => {
+        if (socketRef.current) {
+          socketRef.current.emit(SOCKET_EVENTS.CONNECT_TO_EDITOR, {
+            roomId: roomId,
+            fullName: token.name,
+            peerId: id,
+          });
+        }
+      });
       if (socketRef.current) {
-        socketRef.current.emit(SOCKET_EVENTS.CONNECT_TO_EDITOR, {
-          roomId: roomId,
-          fullName: token.name,
-          peerId: id,
+        socketRef.current.on(SOCKET_EVENTS.JOINED, ({ fullName, socketId, peerId, clients }) => {
+          if (socketRef.current.id !== socketId) {
+            successNoti(`${fullName} đã tham gia vào phòng`, true);
+          }
+          dispatch(setParticipants(clients));
+            localAudioRef.current.srcObject = stream;
+
+            myPeer.current.on("call", (call) => {
+              call.answer(stream);
+              call.on("stream", (userAudioStream) => {
+                remoteAudioRef.current.srcObject = userAudioStream;
+              });
+            });
+
+            const call = myPeer.current.call(peerId, stream);
+            console.log(
+              "🚀 ~ file: CodeEditorPage.js:64 ~ navigator.mediaDevices.getUserMedia ~ call:",
+              call
+            );
+
+            call.on("stream", (userVideoStream) => {
+              remoteAudioRef.current.srcObject = userVideoStream;
+            });
+        });
+
+        socketRef.current.on(SOCKET_EVENTS.LEAVE_ROOM, ({ fullName, socketId, clients }) => {
+          errorNoti(`${fullName} đã rời phòng`, true);
+          dispatch(setParticipants(clients.filter((client) => client.socketId !== socketId)));
         });
       }
     });
-    if (socketRef.current) {
-      socketRef.current.on(SOCKET_EVENTS.JOINED, ({ fullName, socketId,peerId, clients }) => {
-        if (socketRef.current.id !== socketId) {
-          successNoti(`${fullName} đã tham gia vào phòng`, true);
-        }
-        dispatch(setParticipants(clients));
-        navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then((stream) => {
-          localAudioRef.current.srcObject = stream;
 
-          myPeer.on("call", (call) => {
-            call.answer(stream);
-            call.on("stream", (userAudioStream) => {
-              remoteAudioRef.current.srcObject = userAudioStream;
-            });
-          });
-
-          const call = myPeer.call(peerId, stream);
-
-          call.on("stream", (userVideoStream) => {
-            remoteAudioRef.current.srcObject = userVideoStream;
-          });
-        });
-      });
-
-      socketRef.current.on(SOCKET_EVENTS.LEAVE_ROOM, ({ fullName, socketId, clients }) => {
-        errorNoti(`${fullName} đã rời phòng`, true);
-        dispatch(setParticipants(clients.filter((client) => client.socketId !== socketId)));
-      });
-    }
     return () => {
       socketRef.current.disconnect();
       socketRef.current.off(SOCKET_EVENTS.JOINED);
       socketRef.current.off(SOCKET_EVENTS.LEAVE_ROOM);
     };
   }, []);
-
-  // useEffect(() => {
-  //   if (socketRef.current) {
-  //     socketRef.current.emit(SOCKET_EVENTS.CONNECT_TO_EDITOR, {
-  //       roomId: roomId,
-  //       fullName: token.name,
-  //     });
-  //   }
-  // }, [roomId, token]);
 
   const getRoomById = (id) => {
     request(
@@ -111,11 +107,11 @@ const CodeEditorPage = () => {
   return (
     <div>
       <audio ref={localAudioRef} muted autoPlay></audio>
-      <audio ref={remoteAudioRef}  autoPlay></audio>
+      <audio ref={remoteAudioRef} autoPlay></audio>
       <div id="code-editor-audio"></div>
       <Typography variant="h4">{roomName}</Typography>
       <br />
-      <NavBarRoom socket={socketRef} />
+      <NavBarRoom socket={socketRef} myPeer={myPeer} />
       <Grid container spacing={2}>
         <Grid
           item
