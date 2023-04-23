@@ -4,6 +4,7 @@ import {
   Download,
   ExitToApp,
   Groups,
+  Mic,
   PlayArrow,
   Settings,
   Share,
@@ -26,6 +27,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { PROGRAMMING_LANGUAGES } from "utils/constants";
 import {
+  setIsVisibleConfigEditor,
   setIsVisibleParticipants,
   setIsVisibleShareForm,
   setOutput,
@@ -36,15 +38,18 @@ import { getLanguageFileType } from "utils/CodeEditorUtils";
 import ShareForm from "./ShareForm";
 import axios from "axios";
 import { errorNoti, successNoti } from "utils/notification";
+import ConfigEditor from "./ConfigEditor";
 
 const NavBarRoom = (props) => {
   const { socket } = props;
   const dispatch = useDispatch();
   const history = useHistory();
-  const [loadingRunCode, setLoadingRunCode] = useState(false)
+  const [loadingRunCode, setLoadingRunCode] = useState(false);
   const { isVisibleParticipants, selectedLanguage, participants, source, input } = useSelector(
     (state) => state.codeEditor
   );
+
+  const [anchorConfigEditor, setAnchorConfigEditor] = useState(null);
   const handleDisplayParticipants = () => {
     dispatch(setIsVisibleParticipants(!isVisibleParticipants));
   };
@@ -76,7 +81,7 @@ const NavBarRoom = (props) => {
   }
 
   const handleRunCode = async (input, source, language) => {
-    setLoadingRunCode(true)
+    setLoadingRunCode(true);
     try {
       const response = await axios({
         method: "post",
@@ -89,22 +94,33 @@ const NavBarRoom = (props) => {
       });
       if (response && response.status === 200) {
         successNoti("Compiled successfully", true);
-        dispatch(setTabKey("output"))
-        dispatch(setOutput(response.data.output))
-        setLoadingRunCode(false)
+        dispatch(setTabKey("output"));
+        dispatch(setOutput(response.data.output));
+        setLoadingRunCode(false);
       } else {
         errorNoti("Compiled failed", true);
       }
     } catch (error) {
       errorNoti("Compiled failed", true);
-      setLoadingRunCode(false)
+      setLoadingRunCode(false);
     }
+  };
+
+  const handleConfigEditor = (event) => {
+    setAnchorConfigEditor(event.currentTarget);
+    dispatch(setIsVisibleConfigEditor(true));
+  };
+
+  const handleCloseConfigEditor = () => {
+    setAnchorConfigEditor(null);
+    dispatch(setIsVisibleConfigEditor(false));
   };
   return (
     <div>
       <ShareForm />
+      <ConfigEditor anchorElement={anchorConfigEditor} handleClose={handleCloseConfigEditor} />
       <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={loadingRunCode}
       >
         <CircularProgress color="inherit" />
@@ -161,7 +177,6 @@ const NavBarRoom = (props) => {
               label="Language"
               autoWidth
               onChange={(e) => {
-                console.log(e);
                 dispatch(setSelectedLanguage(e.target.value));
               }}
             >
@@ -180,6 +195,11 @@ const NavBarRoom = (props) => {
         <Grid item>
           <Grid container spacing={2} alignItems="center">
             <Grid item>
+              <IconButton>
+                  <Mic fontSize="large" />
+              </IconButton>
+            </Grid>
+            <Grid item>
               <Tooltip title="Người tham gia">
                 <IconButton
                   onClick={() => {
@@ -194,7 +214,7 @@ const NavBarRoom = (props) => {
             </Grid>
             <Grid item>
               <Tooltip title="Cài đặt">
-                <IconButton>
+                <IconButton onClick={handleConfigEditor}>
                   <Settings fontSize="large" />
                 </IconButton>
               </Tooltip>

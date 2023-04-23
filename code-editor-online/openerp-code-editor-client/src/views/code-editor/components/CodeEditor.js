@@ -8,13 +8,14 @@ import { PROGRAMMING_LANGUAGES, SOCKET_EVENTS } from "utils/constants";
 import AceEditor from "react-ace";
 
 import "ace-builds/src-noconflict/theme-monokai";
+import "ace-builds/src-noconflict/theme-tomorrow";
 import "ace-builds/src-noconflict/ext-language_tools";
 import { setSource } from "../reducers/codeEditorReducers";
 
 const CodeEditor = (props) => {
   const { socket, roomId } = props;
   const dispatch = useDispatch();
-  const { selectedLanguage, source } = useSelector((state) => state.codeEditor);
+  const { selectedLanguage, source, theme, fontSize, tabSpace, isAutoComplete } = useSelector((state) => state.codeEditor);
   const onChange = (value) => {
     socket.current.emit(SOCKET_EVENTS.SEND_CODE_CHANGES, {
       language: selectedLanguage,
@@ -96,24 +97,32 @@ const CodeEditor = (props) => {
       return "python";
     }
   }
+
+  function getTheme(theme){
+    if(theme === "dark"){
+      return "monokai"
+    }
+
+    return "tomorrow"
+  }
   return (
     <AceEditor
       mode={`${getModeLanguage(selectedLanguage)}`}
-      theme="monokai"
+      theme={getTheme(theme)}
       onChange={onChange}
       width="100%"
       height="100%"
-      fontSize={14}
+      fontSize={fontSize}
       showPrintMargin={false}
       showGutter={true}
       highlightActiveLine={true}
       value={source}
       setOptions={{
-        enableBasicAutocompletion: true,
-        enableLiveAutocompletion: true,
+        enableBasicAutocompletion: isAutoComplete,
+        enableLiveAutocompletion: isAutoComplete,
         enableSnippets: false,
         showLineNumbers: true,
-        tabSize: 2,
+        tabSize: tabSpace,
       }}
     />
   );

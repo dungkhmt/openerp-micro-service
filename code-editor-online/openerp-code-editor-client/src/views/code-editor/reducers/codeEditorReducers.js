@@ -12,6 +12,12 @@ const initialState = {
   tabKey: "input",
 
   participants: [],
+
+  isVisibleConfigEditor: false,
+  theme: "dark",
+  fontSize: 14,
+  tabSpace: 4,
+  isAutoComplete: true,
 };
 
 export const codeEditorSlice = createSlice({
@@ -43,6 +49,21 @@ export const codeEditorSlice = createSlice({
     setTabKey: (state, action) => {
       state.tabKey = action.payload;
     },
+    setIsVisibleConfigEditor: (state, action) => {
+      state.isVisibleConfigEditor = action.payload;
+    },
+    setTheme: (state, action) => {
+      state.theme = action.payload;
+    },
+    setFontSize: (state, action) => {
+      state.fontSize = action.payload;
+    },
+    setTabSpace: (state, action) => {
+      state.tabSpace = action.payload;
+    },
+    setIsAutoComplete: (state, action) => {
+      state.isAutoComplete = action.payload;
+    },
   },
 });
 
@@ -55,6 +76,11 @@ export const {
   setInput,
   setOutput,
   setTabKey,
+  setIsVisibleConfigEditor,
+  setTheme,
+  setFontSize,
+  setTabSpace,
+  setIsAutoComplete,
 } = codeEditorSlice.actions;
 
 export default codeEditorSlice.reducer;
