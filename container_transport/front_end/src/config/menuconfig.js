@@ -22,6 +22,7 @@ import StoreMallDirectorySharpIcon from "@mui/icons-material/StoreMallDirectoryS
 import FireTruckRoundedIcon from '@mui/icons-material/FireTruckRounded';
 import AddIcon from '@mui/icons-material/Add';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 import TeachingIcon from "assets/icons/mathematics.svg";
 import ContainerIcon from "assets/icons/container.svg";
 import TrailerIcon from "assets/icons/trailer.svg";
@@ -38,13 +39,14 @@ import { trailer } from "./menuconfig/trailer";
 import { container } from "./menuconfig/container";
 import { facility } from "./menuconfig/facility";
 import { trip } from "./menuconfig/trip";
+import { order } from "./menuconfig/order";
 
 export const MENUS = [];
 
 MENUS.push(general);
 MENUS.push(user);
 // MENUS.push(teacher);
-// MENUS.push(student);
+MENUS.push(order);
 MENUS.push(truck);
 MENUS.push(trailer);
 MENUS.push(container);
@@ -100,5 +102,6 @@ menuIconMap.set("CiEdit", <CiEdit />);
 menuIconMap.set("Truck", <FireTruckRoundedIcon />);
 menuIconMap.set("AddIcon", <AddIcon />);
 menuIconMap.set("ControlPointIcon", <ControlPointIcon />);
+menuIconMap.set("OrderIcon", <ListAltIcon />);
 
 export const mapPathMenu = buildMapPathMenu(MENUS);
