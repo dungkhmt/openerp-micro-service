@@ -28,16 +28,16 @@ public class EntityAuthorizationController {
     @GetMapping("/entity-authorization/{id}")
     public ResponseEntity<Set<String>> getEntityAuthorization(@PathVariable String id, JwtAuthenticationToken token) {
         List<String> roleIds = token
-                .getAuthorities()
-                .stream()
-                .filter(grantedAuthority -> !grantedAuthority
-                        .getAuthority()
-                        .startsWith("ROLE_GR")) // remove all composite roles
-                .map(grantedAuthority -> { // convert role to permission
-                    String roleId = grantedAuthority.getAuthority().substring(5); // remove prefix "ROLE_"
-                    return roleId;
-                })
-                .collect(Collectors.toList());
+            .getAuthorities()
+            .stream()
+            .filter(grantedAuthority -> !grantedAuthority
+                .getAuthority()
+                .startsWith("ROLE_GR")) // remove all composite roles
+            .map(grantedAuthority -> { // convert role to permission
+                String roleId = grantedAuthority.getAuthority().substring(5); // remove prefix "ROLE_"
+                return roleId;
+            })
+            .collect(Collectors.toList());
 
         return ResponseEntity.ok().body(entityAuthorizationService.getEntityAuthorization(id, roleIds));
     }

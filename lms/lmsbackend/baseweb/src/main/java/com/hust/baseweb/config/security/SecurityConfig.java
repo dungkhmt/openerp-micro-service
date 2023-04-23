@@ -1,33 +1,40 @@
-package com.hust.baseweb.config;
+package com.hust.baseweb.config.security;
 
 import com.hust.baseweb.applications.education.exception.CustomAccessDeniedHandler;
 import lombok.AllArgsConstructor;
 import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.savedrequest.NullRequestCache;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+
 
 @Configuration
 @AllArgsConstructor(onConstructor_ = @Autowired)
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+//    private BaseWebUserDetailService userDetailsService;
+//
+//    private BasicAuthenticationEndPoint basicAuthenticationEndPoint;
+
+    // TODO: consider
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.userDetailsService(this.userDetailsService).passwordEncoder(UserLogin.PASSWORD_ENCODER);
+//    }
+
+    /**
+     * OK
+     *
+     * @return
+     */
     @Bean
     public Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter(
     ) {
@@ -46,6 +53,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 //        // Enable anonymous
 //        http.anonymous();
+//
+//        // Enable and configure CORS
+//        http.cors().configurationSource(corsConfigurationSource());
 
         // State-less session (state in access-token only)
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -53,7 +63,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // Disable CSRF because of state-less session-management
         http.csrf().disable();
 
-//        // Return 401 (unauthorized) instead of 302 (redirect to login) when authorization is missing or invalid
+//        // Return 401 (unauthorized) instead of 302 (redirect to login) when
+//        // authorization is missing or invalid
 //        http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
 //            response.addHeader(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"Restricted Content\"");
 //            response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
@@ -71,7 +82,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/actuator/prometheus/**").permitAll()
             .antMatchers(HttpMethod.GET, "/videos/videos/*").permitAll()
 
-            //permission to access all static resources
+            // permission to access all static resources
             .antMatchers("/resources/**").permitAll()
             .antMatchers("/css/**").permitAll()
             .antMatchers("/image/**").permitAll()
@@ -94,27 +105,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .permitAll()
             .antMatchers("/public/**")
             .permitAll()
-            .anyRequest()
-            .authenticated()
+            .anyRequest().authenticated()
             .and()
             .requestCache()
-            .requestCache(new NullRequestCache())
-            .and() // Not cache request because of having frontend
+            .requestCache(new NullRequestCache()) // Not cache request because of having frontend
+            .and()
             .httpBasic()
 //            .authenticationEntryPoint(basicAuthenticationEndPoint)
-            .and()
+            .disable()
             .exceptionHandling()
             .accessDeniedHandler(accessDeniedHandler())
             .and()
-            .csrf()
-            .disable()
             .headers()
             .frameOptions()
             .disable()
-            .and()
-            .logout()
-            .logoutSuccessUrl("/");
-
+//            .and()
+//            .logout()
+//            .logoutSuccessUrl("/")
+        ;
     }
 
     @Bean
@@ -122,18 +130,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new CustomAccessDeniedHandler();
     }
 
-    @Bean
-    @SuppressWarnings("unchecked")
-    public FilterRegistrationBean corsFilterRegistrationBean() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        source.registerCorsConfiguration("/**", config);
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        return bean;
-    }
 }

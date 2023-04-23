@@ -1,4 +1,4 @@
-package com.hust.baseweb.config;
+package com.hust.baseweb.config.security;
 
 import lombok.var;
 import org.springframework.core.convert.converter.Converter;
@@ -13,6 +13,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * @author Le Anh Tuan
+ */
+
+/**
  * This is a converter for roles as embedded in the JWT by a Keycloak server
  * Roles are taken from both realm_access.roles & resource_access.{client}.roles
  */
@@ -25,27 +29,27 @@ public class Jwt2AuthoritiesConverter implements Converter<Jwt, Collection<Grant
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
         final var realmAccess = (Map<String, Object>) jwt
-                .getClaims()
-                .getOrDefault("realm_access", Collections.emptyMap());
+            .getClaims()
+            .getOrDefault("realm_access", Collections.emptyMap());
         final var realmRoles = (Collection<String>) realmAccess.getOrDefault("roles", Collections.emptyList());
 
         final var resourceAccess = (Map<String, Object>) jwt
-                .getClaims()
-                .getOrDefault("resource_access", Collections.emptyMap());
+            .getClaims()
+            .getOrDefault("resource_access", Collections.emptyMap());
 
         // We assume here you have "openerp-ui-dev" client configured with "client roles" mapper in Keycloak
         final var publicClientAccess = (Map<String, Object>) resourceAccess
-                .getOrDefault("openerp-ui-dev", Collections.emptyMap());
+            .getOrDefault("openerp-ui-dev", Collections.emptyMap());
         final var publicClientRoles = (Collection<String>) publicClientAccess.getOrDefault(
-                "roles",
-                Collections.emptyList());
+            "roles",
+            Collections.emptyList());
 
         return Stream
-                .concat(
-                        realmRoles.stream(),
-                        publicClientRoles.stream())
-                .map(roleName -> "ROLE_" + roleName)
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+            .concat(
+                realmRoles.stream(),
+                publicClientRoles.stream())
+            .map(roleName -> "ROLE_" + roleName)
+            .map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toList());
     }
 }

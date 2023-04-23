@@ -1,4 +1,4 @@
-package com.hust.baseweb.config;
+package com.hust.baseweb.config.security;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -10,8 +10,11 @@ import org.springframework.util.Assert;
 
 import java.util.Collection;
 
+/**
+ * @author Le Anh Tuan
+ */
 public class Jwt2AuthenticationConverter
-        implements Converter<Jwt, AbstractAuthenticationToken> {
+    implements Converter<Jwt, AbstractAuthenticationToken> {
 
     private Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
     private String principalClaimName = "sub";

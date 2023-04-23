@@ -21,8 +21,13 @@ public class EntityAuthorizationServiceImpl implements EntityAuthorizationServic
 
     @Override
     public Set<String> getEntityAuthorization(String id, List<String> roleIds) {
-        List<EntityAuthorization> entityAuthorizations = entityAuthorizationRepo.findAllByIdStartingWithAndRoleIdIn(id, roleIds);
+        List<EntityAuthorization> entityAuthorizations = entityAuthorizationRepo.findAllByIdStartingWithAndRoleIdIn(
+            id,
+            roleIds);
 
-        return entityAuthorizations != null ? entityAuthorizations.stream().map(EntityAuthorization::getId).collect(Collectors.toSet()) : Collections.emptySet();
+        return entityAuthorizations != null ? entityAuthorizations
+            .stream()
+            .map(EntityAuthorization::getId)
+            .collect(Collectors.toSet()) : Collections.emptySet();
     }
 }
