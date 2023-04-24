@@ -23,6 +23,7 @@ import java.util.List;
 @Log4j2
 @AllArgsConstructor(onConstructor_ = @Autowired)
 @Service
+
 public class PassBookOptimizerImpl implements PassBookOptimizer{
     private PassBookRepo passBookRepo;
     public static void main(String[] args){
@@ -57,6 +58,7 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
 
         MPVariable[] x = new MPVariable[n];
         MPVariable[] y = new MPVariable[n];
+
 
         Loader.loadNativeLibraries();
         MPSolver solver = MPSolver.createSolver(
@@ -173,7 +175,10 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
         MPVariable[] x = new MPVariable[n];
         MPVariable[] y = new MPVariable[n];
 
+        log.info(("computeSolution starting to load library or-tools"));
         Loader.loadNativeLibraries();
+        log.info(("computeSolution load library or-tools OK"));
+
         MPSolver solver = MPSolver.createSolver(
                 String.valueOf(MPSolver.OptimizationProblemType.SCIP_MIXED_INTEGER_PROGRAMMING));
 
