@@ -147,6 +147,7 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
         double discountRate = I.getDiscountRate();
 
         System.out.println(date);
+        String info = "";
         for(int i = 0; i < n; i++){
             PassBook b = passBooks.get(i);
             //int nbDays = (int)( (b.getCreatedDate().getTime() - date.getTime())
@@ -209,22 +210,31 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
         final MPSolver.ResultStatus resultStatus = solver.solve();
         if (resultStatus == MPSolver.ResultStatus.OPTIMAL) {
             System.out.println("Raw objective = " + obj.value());
+            info += "Raw objective = " + obj.value() + "\n";
             double temp = 0; // The constant in the objective
             for (int i = 0; i < n; i++) {
                 temp += moneyMature[i] / discountRateArr[i];
             }
             System.out.println("Objective value = " + (obj.value() + temp));
+            info += " Objective value = " + (obj.value() + temp) + "\n";
             for (int i = 0; i < n; i++) {
                 System.out.println("x[" + i + "] = " + x[i].solutionValue());
+                info += " x[" + i + "] = " + x[i].solutionValue() + "\n";
                 if (x[i].solutionValue() == 0) {
                     System.out.println("Tat toan dung han so thu " + i);
-                    if (y[i].solutionValue() == 0)
+                    info += " Tat toan dung han so thu " + i + "\n";
+                    if (y[i].solutionValue() == 0) {
                         System.out.println("Khong the chap so thu " + i);
-                    else
+                        info += " Khong the chap so thu " + i + "\n";
+                    }else {
                         System.out.println("The chap so thu " + i + " de vay " + y[i].solutionValue());
+                        info += " The chap so thu " + i + " de vay " + y[i].solutionValue() + "\n";
+                    }
                 }
-                else
+                else {
                     System.out.println("Tat toan truoc han so thu " + i);
+                    info += " Tat toan truoc han so thu " + i + "\n";
+                }
             }
             System.out.println("Checking objective value...");
             double obj_value = 0;
@@ -235,6 +245,7 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
             System.out.println(obj_value);
         } else{
             System.out.println("No optimal");
+            info += " No optimal" + "\n";
         }
 
 
@@ -245,12 +256,15 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
                 // create a loan corresponding to this passbook
                 ModelResponseLoanElement e = new ModelResponseLoanElement();
                 e.setPassBook(passBooks.get(i));
+                e.setMoneyEarly(moneyEarly[i]);
+                e.setMoneyMature(moneyMature[i]);
                 e.setAmountMoneyLoan(y[i].solutionValue());
                 loanElements.add(e);
             }
         }
         ModelResponseOptimizePassBookForLoan res = new ModelResponseOptimizePassBookForLoan();
         res.setLoans(loanElements);
+        res.setInfo(info);
         return res;
     }
 }

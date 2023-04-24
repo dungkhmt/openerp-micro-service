@@ -14,4 +14,5 @@ import java.util.List;
 public class ModelResponseOptimizePassBookForLoan {
     private int score;
     private List<ModelResponseLoanElement> loans;
+    private String info;
 }

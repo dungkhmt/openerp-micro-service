@@ -39,9 +39,16 @@ export default  function OptimizePassBookForLoan(){
     const [discountRate, setDiscountRate] = useState(0);
     const[userId, setUserId] = useState(null);
     const[loans, setLoans] = useState([]);
-
+    const [rawRs, setRawRs] = useState(null);
     const columns = [
-        {title:"PassBook", field: "passBook.passBookName"},
+        {title:"PassBook", field: "passBookName"},
+        {title:"Duration", field: "duration"},
+        {title:"Start Date", field: "startDate"},
+        {title:"End Date", field: "endDate"},
+        {title:"Deposit", field: "amountMoneyDeposit"},
+        {title:"Rate", field: "rate"},        
+        {title:"Money Early", field: "moneyEarly"},
+        {title:"Money Mature", field: "moneyMature"},        
         {title:"Loan", field: "amountMoneyLoan"},
     ];
 
@@ -59,7 +66,17 @@ export default  function OptimizePassBookForLoan(){
           "post",
           "/compute-loan-solution",
           (res) => {
-            setLoans(res.data.loans);
+            //setLoans(res.data.loans);
+            const data = res.data.loans.map((c) => ({
+              ...c.passBook,
+              startDate: toFormattedDateTime(c.passBook.createdDate),
+              endDate: toFormattedDateTime(c.passBook.endDate),
+              moneyEarly: c.moneyEarly,
+              moneyMature: c.moneyMature,
+              amountMoneyLoan: c.amountMoneyLoan
+            }));
+            setLoans(data);
+            setRawRs(res.data.info);
           },
           {},
           body
@@ -153,6 +170,7 @@ export default  function OptimizePassBookForLoan(){
           sorting: true,
         }}
       />
+      {rawRs}
       </div>
   
     )

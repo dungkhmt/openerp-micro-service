@@ -12,6 +12,8 @@ import openerp.openerpresourceserver.entity.PassBook;
 @NoArgsConstructor
 public class ModelResponseLoanElement {
     private double amountMoneyLoan;
+    private double moneyEarly;
+    private double moneyMature;
     private PassBook passBook;
 
 }

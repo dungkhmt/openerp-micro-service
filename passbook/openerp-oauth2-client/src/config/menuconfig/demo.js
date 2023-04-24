@@ -1,5 +1,5 @@
 export const demo = {
-  id: "MENU_DEMO",
+  id: "MENU_PASSBOOK",
   icon: "DashboardIcon",
   text: "PassBook",
   child: [
@@ -18,7 +18,7 @@ export const demo = {
       child: [],
     },
     {
-      id: "MENU_DEMO.LIST_PASSBOOK",
+      id: "MENU_PASSBOOK.MENU_LIST_PASSBOOK",
       path: "/passbook-list",
       isPublic: true,
       text: "Passbooks",

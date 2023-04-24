@@ -25,6 +25,7 @@ public class PassBookController {
 
     @PostMapping("/create-passbook")
     public ResponseEntity<?> createPassBook(Principal principal, @RequestBody ModelCreatePassBook model){
+        System.out.println("createPassBook, amount = " + model.getAmountMoney() + " passBookName = " + model.getPassBookName());
         PassBook pb = passBookService.save(principal.getName(), model);
         return ResponseEntity.ok().body(pb);
     }
