@@ -4,12 +4,11 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import wms.common.constant.DefaultConst;
-import wms.dto.category.CustomerTypeDTO;
 import wms.dto.customer.CustomerDTO;
 import wms.dto.customer.CustomerUpdateDTO;
-import wms.dto.product.ProductDTO;
 import wms.entity.ResultEntity;
 import wms.service.customer.ICustomerService;
 
@@ -23,9 +22,9 @@ public class CustomerController extends BaseController{
     private ICustomerService customerService;
     @ApiOperation(value = "Thêm mới khách hàng")
     @PostMapping("/create")
-    public ResponseEntity<?> create(@Valid @RequestBody CustomerDTO customerDTO) {
+    public ResponseEntity<?> create(@Valid @RequestBody CustomerDTO customerDTO,  JwtAuthenticationToken token) {
         try {
-            return response(new ResultEntity(1, "Create new customer successfully", customerService.createNewCustomer(customerDTO)));
+            return response(new ResultEntity(1, "Create new customer successfully", customerService.createNewCustomer(customerDTO, token)));
         }
         catch (Exception ex) {
             return response(error(ex));

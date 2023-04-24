@@ -9,12 +9,6 @@ export const staticDatagridCols = [
     minWidth: 150,
   },
   {
-    field: "supplierCode",
-    headerName: "Mã nhà sản xuất",
-    sortable: false,
-    minWidth: 150,
-  },
-  {
     field: "totalMoney",
     headerName: "Tổng tiền đặt",
     sortable: false,
@@ -27,8 +21,8 @@ export const staticDatagridCols = [
     minWidth: 150,
   },
   {
-    field: "vat",
-    headerName: "VAT",
+    field: "discount",
+    headerName: "Khuyến mãi (%)",
     sortable: false,
     minWidth: 150,
   },
@@ -39,6 +33,15 @@ export const staticDatagridCols = [
     minWidth: 150,
     valueGetter: (params) => {
       return params.row.user.id;
+    },
+  },
+  {
+    field: "boughtBy",
+    headerName: "Mua bởi",
+    sortable: false,
+    minWidth: 150,
+    valueGetter: (params) => {
+      return params.row.customer.name;
     },
   },
   {
@@ -58,15 +61,6 @@ export const staticDatagridCols = [
           {params?.row?.status}
         </Button>
       );
-    },
-  },
-  {
-    field: "facility",
-    headerName: "Kho trực thuộc",
-    sortable: false,
-    minWidth: 150,
-    valueGetter: (params) => {
-      return params.row.facility.name;
     },
   },
 ];
@@ -94,14 +88,8 @@ export const staticProductFields = [
 
 export const staticFormControlFields = [
   {
-    name: "supplierCode",
-    label: "Mã NSX",
-    type: "text",
-    component: "input",
-  },
-  {
-    name: "vat",
-    label: "VAT",
+    name: "discount",
+    label: "Discount",
     type: "text",
     component: "input",
   },

@@ -113,6 +113,7 @@ const CustomDataGrid = (props) => {
       columns={getColumnsShow(columns, isSerial, params)}
       rows={rows}
       rowCount={totalItem}
+      paginationMode="server"
       // rowsPerPageOptions={[10, 20, 50, 70]}
       // pageSize={params.pageSize}
       // page={params.page - 1}

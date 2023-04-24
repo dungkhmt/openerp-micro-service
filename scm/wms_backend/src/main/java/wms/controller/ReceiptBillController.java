@@ -32,14 +32,10 @@ public class ReceiptBillController extends BaseController {
     }
     @GetMapping("/get-bill-items")
     public ResponseEntity<?> getBillsOfOrder(
-            @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
-            @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
-            @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
-            @RequestParam(value = "sortAsc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
             @RequestParam(value = "orderCode", required = false, defaultValue = DefaultConst.STRING) String orderCode
     ) {
         try {
-            return response(new ResultEntity(1, "Get bill items successfully", receiptBillService.getBillItemsOfOrder(page, pageSize, sortField, isSortAsc, orderCode)));
+            return response(new ResultEntity(1, "Get bill items successfully", receiptBillService.getBillItemsOfOrder( orderCode)));
         } catch (Exception ex) {
             return response(error(ex));
         }

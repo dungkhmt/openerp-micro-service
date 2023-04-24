@@ -171,7 +171,6 @@ function ProductScreen({ screenAuthorization }) {
       component: "select",
       options: productCate ? productCate?.content : [],
       loading: isLoadingProductCate,
-      // field_type: "info",
     },
     {
       name: "status",

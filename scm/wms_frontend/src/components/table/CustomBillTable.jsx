@@ -12,13 +12,27 @@ function createData(code, name, quantity, price_unit, total_money) {
   return { code, name, quantity, price_unit, total_money };
 }
 const CustomBillTable = ({ orderItem, billItem }) => {
+  console.log(orderItem, billItem);
   const rows = orderItem?.map((item) => {
     let mappedBill = billItem.filter(
       (bill) => bill?.product?.code === item?.product?.code
     );
+    console.log("MappedBill", mappedBill);
+    console.log(
+      mappedBill.reduce((accumulator, curr) => {
+        console.log("Curr: ", curr.effectiveQty);
+        return accumulator + curr.effectiveQty;
+      }, 0)
+    );
     return {
       name: item?.product?.name,
-      effQty: mappedBill ? mappedBill[0]?.effectiveQty : 0,
+      effQty:
+        mappedBill.length > 0
+          ? mappedBill.reduce(
+              (accumulator, curr) => accumulator + curr.effectiveQty,
+              0
+            )
+          : 0,
       qty: item?.quantity,
       // item?.purchaseOrder?.totalMoney
     };

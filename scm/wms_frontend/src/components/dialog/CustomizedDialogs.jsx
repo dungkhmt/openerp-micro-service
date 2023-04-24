@@ -95,8 +95,8 @@ const DialogActions = ({ sx, children }) => {
  * @property {string} title
  * @property {any} customStyles
  * @property {string} centerTitle
- * @property {boolean} contentTopDivider
- * @property {boolean} contentBottomDivider
+ * @property {boolean} contentTopDivider - boolean, has divider on top?
+ * @property {boolean} contentBottomDivider - has divider on bottom?
  * @property {Function} handleClose
  * @property {any[]} actions
  * @property {string} content

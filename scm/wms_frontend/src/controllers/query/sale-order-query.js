@@ -5,15 +5,11 @@ import axiosSendRequest from "../axiosSendRequest";
 import { endPoint } from "../endpoint";
 import { queryKey } from "./querykey";
 
-export const useGetPurchaseOrderList = (params) => {
+export const useGetSaleOrderList = (params) => {
   return useQuery({
-    queryKey: [queryKey.purchase_order.order_list],
+    queryKey: [queryKey.sale_order.order_list],
     queryFn: async () => {
-      const res = await axiosSendRequest(
-        "get",
-        endPoint.getPurchaseOrder,
-        params
-      );
+      const res = await axiosSendRequest("get", endPoint.getSaleOrder, params);
       if (res.data && res.code === 1) {
         return res.data;
       }
@@ -22,13 +18,13 @@ export const useGetPurchaseOrderList = (params) => {
     onSuccess: (data) => {},
   });
 };
-export const useGetPurchaseOrderItems = (params, data) => {
+export const useGetSaleOrderItems = (params, data) => {
   return useQuery({
-    queryKey: [queryKey.purchase_order.order_item],
+    queryKey: [queryKey.sale_order.order_item],
     queryFn: async () => {
       const res = await axiosSendRequest(
         "get",
-        endPoint.getPurchaseOrderItems,
+        endPoint.getSaleOrderItems,
         params,
         data
       );
@@ -40,12 +36,12 @@ export const useGetPurchaseOrderItems = (params, data) => {
     onSuccess: (data) => {},
   });
 };
-export const useCreatePurchaseOrder = (params) => {
+export const useCreateSaleOrder = (params) => {
   return useMutation({
     mutationFn: async (data) => {
       const res = await axiosSendRequest(
         "post",
-        endPoint.createPurchaseOrder,
+        endPoint.createSaleOrder,
         params,
         data
       );
@@ -54,22 +50,22 @@ export const useCreatePurchaseOrder = (params) => {
       }
     },
     onSuccess: (res, variables, context) => {
-      toast.success("Tạo đơn mua thành công!");
-      queryClient.invalidateQueries([queryKey.purchase_order.order_list]);
+      toast.success("Tạo đơn bán thành công!");
+      queryClient.invalidateQueries([queryKey.sale_order.order_list]);
     },
     onError: () => {
-      toast.error("Lỗi khi tạo đơn mua, vui lòng kiểm tra lại");
+      toast.error("Lỗi khi tạo đơn bán, vui lòng kiểm tra lại");
     },
     // befor mutation function actually triggers.
     onMutate: (variables) => {},
   });
 };
-export const useUpdatePurchaseOrderStatus = (params) => {
+export const useUpdateSaleOrderStatus = (params) => {
   return useMutation({
     mutationFn: async (data) => {
       const res = await axiosSendRequest(
         "put",
-        endPoint.updatePurchaseOrderStatus,
+        endPoint.updateSaleOrderStatus,
         params,
         data
       );
@@ -78,8 +74,8 @@ export const useUpdatePurchaseOrderStatus = (params) => {
       }
     },
     onSuccess: (res, variables, context) => {
-      toast.success("Cập nhật đơn mua thành công!");
-      queryClient.invalidateQueries([queryKey.purchase_order.order_list]);
+      toast.success("Cập nhật đơn bán thành công!");
+      queryClient.invalidateQueries([queryKey.sale_order.order_list]);
     },
     onError: () => {
       toast.error("Lỗi khi cập nhật, vui lòng kiểm tra lại");

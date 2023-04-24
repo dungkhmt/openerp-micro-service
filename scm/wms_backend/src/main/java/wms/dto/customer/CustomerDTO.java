@@ -7,8 +7,6 @@ import javax.validation.constraints.Positive;
 
 @Data
 public class CustomerDTO {
-    @NotBlank(message = "Ma code khong duoc de trong")
-    private String code;
     @NotBlank(message = "Name khong duoc de trong")
     private String name;
     @NotBlank(message = "So dien thoai khong duoc de trong")
@@ -21,6 +19,6 @@ public class CustomerDTO {
     private String latitude;
     private String longitude;
     private String createdBy;
-    private long customerTypeId;
+    private String customerTypeCode;
     private String contractTypeCode;
 }

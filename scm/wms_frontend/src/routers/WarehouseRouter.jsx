@@ -1,5 +1,5 @@
 import { Route, Switch, useRouteMatch } from "react-router";
-import OrderDetail from "../views/sellin/OrderDetail";
+import OrderDetail from "../views/sellin/PurchaseOrderDetail";
 import Warehouse from "../views/warehouse/Facility";
 import ImportingActivity from "../views/warehouse/ImportingActivity";
 

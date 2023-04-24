@@ -5,9 +5,9 @@ export const sellout = {
   child: [
     {
       id: "MENU_WMS_SELLOUT.MENU_ITEM_1",
-      path: "/sellout/screen-1",
+      path: "/sellout/sale-order",
       isPublic: true,
-      text: "Submenu 1",
+      text: "Sale Order",
       child: [],
     },
     {

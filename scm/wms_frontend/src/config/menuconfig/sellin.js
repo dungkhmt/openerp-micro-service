@@ -7,7 +7,7 @@ export const sellin = {
       id: "MENU_WMS_SELLIN.PURCHASE_ORDER",
       path: "/sellin/purchase-order",
       isPublic: true,
-      text: "Order",
+      text: "Purchase Order",
       child: [],
     },
     {

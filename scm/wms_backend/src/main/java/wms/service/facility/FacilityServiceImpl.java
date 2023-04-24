@@ -9,7 +9,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import wms.common.enums.ErrorCode;
+import wms.common.enums.OrderStatus;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.facility.FacilityDTO;
 import wms.dto.facility.FacilityUpdateDTO;
@@ -19,9 +21,11 @@ import wms.entity.*;
 import wms.exception.CustomException;
 import wms.repo.*;
 import wms.service.BaseService;
+import wms.service.purchase_order.IPurchaseOrderService;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +48,11 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
     private UserRepo userRepo;
     @Autowired
     private FacilityRepo facilityRepo;
+
+    @Autowired
+    private IPurchaseOrderService purchaseOrderService;
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Facility createFacility(FacilityDTO facilityDTO) throws CustomException {
         if (facilityRepo.getFacilityByCode(facilityDTO.getCode()) != null) {
             throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Exist customer with same code, can't create");
@@ -116,10 +124,11 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void importToFacility(ImportToFacilityDTO importToFacilityDTO) throws CustomException {
-        if (getReceiptBillForOrderByCode(importToFacilityDTO.getOrderCode().toUpperCase(), importToFacilityDTO.getCode().toUpperCase()) != null) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Exist bill with same code, can't create");
-        }
+//        if (getReceiptBillForOrderByCode(importToFacilityDTO.getOrderCode().toUpperCase(), importToFacilityDTO.getCode().toUpperCase()) != null) {
+//            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Exist bill with same code, can't create");
+//        }
         PurchaseOrder order = purchaseOrderRepo.getOrderByCode(importToFacilityDTO.getOrderCode().toUpperCase());
         if (order == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Can't find referenced order, can't create");
@@ -128,13 +137,13 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
             throw caughtException(ErrorCode.USER_ACTION_FAILED.getCode(), "Import with quantity more than current order needs, can't create");
         }
         ReceiptBill newBill = ReceiptBill.builder()
-                .code(importToFacilityDTO.getCode().toUpperCase())
+                .code(String.valueOf(System.currentTimeMillis()))
                 .purchaseOrder(order)
                 .facility(order.getFacility())
+                .receiptBillItems(new HashSet<>())  // https://stackoverflow.com/questions/70406298/adding-objects-to-an-array-list-cannot-invoke-xxx-add-because-yyy-is-null
                 .receivingDate(ZonedDateTime.now())
                 .build();
         receiptBillRepo.save(newBill);
-
         int seq = 0;
         for (ImportItemDTO importItem : importToFacilityDTO.getImportItems()) {
             seq++;
@@ -153,9 +162,9 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
                     .receivingDate(ZonedDateTime.now())
                     .effectiveQty(importItem.getEffectQty())
                     .build();
-            receiptBillItemRepo.save(item);
+            newBill.getReceiptBillItems().add(receiptBillItemRepo.save(item));
             // TODO: Should not save every inventory item, save by batch or group product with one update.
-            ProductFacility productFacility = productFacilityRepo.findProductInFacility(order.getFacility().getCode().toUpperCase(), order.getCode());
+            ProductFacility productFacility = productFacilityRepo.findProductInFacility(order.getFacility().getCode().toUpperCase(), product.getCode());
             if (productFacility == null) {
                 productFacility = ProductFacility.builder()
                         .product(product)
@@ -166,6 +175,11 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
             }
             productFacility.setInventoryQty(productFacility.getInventoryQty() + importItem.getEffectQty());
             productFacilityRepo.save(productFacility);
+        }
+        receiptBillRepo.save(newBill);
+        PurchaseOrder currOrder = purchaseOrderRepo.getOrderByCode(importToFacilityDTO.getOrderCode().toUpperCase());
+        if (isFinishedImporting(currOrder)) {
+            purchaseOrderService.updateOrderStatus(OrderStatus.DELIVERING.getStatus(), order.getCode());
         }
     }
 
@@ -192,8 +206,11 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
             String currentProductCode = orderItem.getProduct().getCode().toUpperCase();
             for (ImportItemDTO importItem : importToFacilityDTO.getImportItems()) {
                 if (importItem.getProductCode().equals(currentProductCode)) {
-                    int compareQty = qtyMappingFromBill.get(orderItem.getProduct().getCode().toUpperCase()) + importItem.getEffectQty();
-                    if (compareQty > orderItem.getQuantity()) return false;
+                    if (qtyMappingFromBill.containsKey(orderItem.getProduct().getCode().toUpperCase())) {
+                        int mappingQty = qtyMappingFromBill.get(orderItem.getProduct().getCode().toUpperCase());
+                        int compareQty = mappingQty + importItem.getEffectQty();
+                        if (compareQty > orderItem.getQuantity()) return false;
+                    }
                 }
             }
         }
@@ -201,7 +218,8 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
     }
 
     private boolean isFinishedImporting(PurchaseOrder currOrder) {
-        List<ReceiptBill> receiptBills = currOrder.getReceiptBills();
+        List<ReceiptBill> receiptBills = receiptBillRepo.getAllBillOfOrder(currOrder.getCode().toUpperCase());
+        if (receiptBills.size() == 0) return false;
         Map<String, Integer> qtyMappingFromBill = new HashMap<>();
         for (ReceiptBill bill : receiptBills) {
             for (ReceiptBillItem item : bill.getReceiptBillItems()) {
@@ -221,11 +239,13 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
         return true;
     }
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void exportFromFacility() {
 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteFacilityById(long id) {
         facilityRepo.deleteById(id);
     }

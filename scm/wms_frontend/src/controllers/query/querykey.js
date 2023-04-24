@@ -9,8 +9,12 @@ export const queryKey = {
     contract_type_list: "contract_type_list",
   },
   purchase_order: {
-    order_list: "order_list",
-    order_item: "order_items",
+    order_list: "purchase_order_list",
+    order_item: "purchase_order_items",
+  },
+  sale_order: {
+    order_list: "sale_order_list",
+    order_item: "sale_order_items",
   },
   facility: {
     facility_list: "facility_list",

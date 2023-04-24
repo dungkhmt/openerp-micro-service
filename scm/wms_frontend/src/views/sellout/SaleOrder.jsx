@@ -15,25 +15,27 @@ import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomFormControl from "components/form/CustomFormControl";
 import CustomModal from "components/modal/CustomModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetProductList } from "controllers/query/category-query";
-import { useGetFacilityList } from "controllers/query/facility-query";
 import {
-  useCreatePurchaseOrder,
-  useGetPurchaseOrderList,
-  useUpdatePurchaseOrderStatus,
-} from "controllers/query/purchase-order-query";
+  useGetCustomerList,
+  useGetProductList,
+} from "controllers/query/category-query";
 import { useState } from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { useToggle, useWindowSize } from "react-use";
 import PrimaryButton from "../../components/button/PrimaryButton";
 import CustomizedDialogs from "../../components/dialog/CustomizedDialogs";
 import {
+  useCreateSaleOrder,
+  useGetSaleOrderList,
+  useUpdateSaleOrderStatus,
+} from "../../controllers/query/sale-order-query";
+import {
   staticDatagridCols,
   staticFormControlFields,
   staticProductFields,
 } from "./LocalConstant";
 
-function PurchaseOrderScreen({ screenAuthorization }) {
+function SaleOrderScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
     page_size: 50,
@@ -42,11 +44,11 @@ function PurchaseOrderScreen({ screenAuthorization }) {
   const [isApproved, setIsApproved] = useToggle(false);
   const [updatingOrder, setUpdateOrder] = useState();
   const { height } = useWindowSize();
-  const { isLoading: isLoadingFacility, data: facility } = useGetFacilityList();
+  const { isLoading: isLoadingCustomer, data: customer } = useGetCustomerList();
   const { isLoading: isLoadingProduct, data: product } = useGetProductList();
-  const { isLoading, data } = useGetPurchaseOrderList();
-  const createPurchaseOrderQuery = useCreatePurchaseOrder();
-  const updatePurchaseOrderQuery = useUpdatePurchaseOrderStatus({
+  const { isLoading, data } = useGetSaleOrderList();
+  const createSaleOrderQuery = useCreateSaleOrder();
+  const updatePurchaseOrderQuery = useUpdateSaleOrderStatus({
     orderCode: updatingOrder?.code,
   });
   const methods = useForm({
@@ -78,10 +80,9 @@ function PurchaseOrderScreen({ screenAuthorization }) {
           quantity: pro?.quantity,
         };
       }),
-      supplierCode: data?.supplierCode,
-      vat: data?.vat,
+      discount: data?.discount,
     };
-    await createPurchaseOrderQuery.mutateAsync(orderParams);
+    await createSaleOrderQuery.mutateAsync(orderParams);
     setIsAdd((pre) => !pre);
     reset();
   };
@@ -154,7 +155,7 @@ function PurchaseOrderScreen({ screenAuthorization }) {
           color={green[800]}
           fontSize={17}
         >
-          {"ĐƠN HÀNG"}
+          {"ĐƠN HÀNG BÁN"}
         </Typography>
       </Box>
       <Box>
@@ -200,10 +201,10 @@ function PurchaseOrderScreen({ screenAuthorization }) {
               ...staticFormControlFields,
               {
                 name: "boughtBy",
-                label: "Mua bởi kho",
+                label: "Người mua",
                 component: "select",
-                options: facility ? facility?.content : [],
-                loading: isLoadingFacility,
+                options: customer ? customer?.content : [],
+                loading: isLoadingCustomer,
               },
             ]}
           />
@@ -305,7 +306,7 @@ function PurchaseOrderScreen({ screenAuthorization }) {
 }
 
 const SCR_ID = "SCR_PURCHASE_ORDER";
-export default withScreenSecurity(PurchaseOrderScreen, SCR_ID, true);
+export default withScreenSecurity(SaleOrderScreen, SCR_ID, true);
 export const Action = ({ extraAction, item, disabled, onActionCall }) => {
   return (
     <IconButton

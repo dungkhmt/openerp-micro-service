@@ -62,5 +62,5 @@ public class PurchaseOrder extends BaseEntity implements Serializable {
     @OneToMany(mappedBy = "purchaseOrder",fetch = FetchType.LAZY)
     // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
     @JsonIgnore
-    private List<ReceiptBillItem> receiptBillItems = new ArrayList<>();;
+    private List<ReceiptBillItem> receiptBillItems = new ArrayList<>();
 }

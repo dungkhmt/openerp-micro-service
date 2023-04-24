@@ -12,7 +12,6 @@ import bgImage from "assets/images/sidebar-2.webp";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import AccountButton from "./account/AccountButton";
-import NotificationButton from "./notification/NotificationButton";
 import SideBar, { drawerWidth } from "./sidebar/SideBar";
 
 /**
@@ -125,7 +124,7 @@ function Layout({ children }) {
           <Box sx={styles.sectionDesktop}>
             {keycloak.authenticated && (
               <>
-                <NotificationButton />
+                {/* <NotificationButton /> */}
                 <AccountButton />
               </>
             )}

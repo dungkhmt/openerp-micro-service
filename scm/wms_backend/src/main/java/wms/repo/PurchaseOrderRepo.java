@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import wms.entity.PurchaseOrder;
 
-public interface PurchaseOrderRepo  extends JpaRepository<PurchaseOrder, Long>  {
+public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Long>  {
     @Query(value = "select po.* from purchase_order po" +
             "         where po.status != 'DELETED' and (po.status = :orderStatus or :orderStatus = '')\n", nativeQuery = true)
     Page<PurchaseOrder> search(Pageable pageable, String orderStatus);

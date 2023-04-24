@@ -5,20 +5,19 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
-import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "receipt_bill_item")
+@Table(name = "delivery_bill_item")
 @Builder
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceiptBillItem extends BaseEntity{
+public class DeliveryBillItem extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "receipt_bill_code", referencedColumnName = "code")
+    @JoinColumn(name = "delivery_bill_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
-    private ReceiptBill receiptBill;
+    private DeliveryBill deliveryBill;
 
     @Column(name = "item_seq_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +26,7 @@ public class ReceiptBillItem extends BaseEntity{
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
-    private PurchaseOrder purchaseOrder;
+    private SaleOrder saleOrder;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_code", referencedColumnName = "code")
@@ -40,8 +39,8 @@ public class ReceiptBillItem extends BaseEntity{
     @Column(name = "effective_qty")
     private Integer effectiveQty;
 
-    @Column(name = "receiving_date")
-    private ZonedDateTime receivingDate;
+//    @Column(name = "receiving_date")
+//    private ZonedDateTime receivingDate;
 
     @Column(name = "price_unit")
     private Double price_unit;

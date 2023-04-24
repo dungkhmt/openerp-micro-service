@@ -6,7 +6,6 @@ import java.util.List;
 
 @Data
 public class PurchaseOrderDTO {
-    private String orderCode;
     private String supplierCode;
     private String boughtBy;
     private double vat;

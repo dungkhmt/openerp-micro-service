@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { request } from "../api-middleware";
+import axiosSendRequest from "../axiosSendRequest";
 import { endPoint } from "../endpoint";
 import { queryKey } from "./querykey";
 
@@ -7,14 +7,9 @@ export const useGetFacilityList = (params) => {
   return useQuery({
     queryKey: [queryKey.facility.facility_list, params],
     queryFn: async () => {
-      const res = await request(
-        "get",
-        endPoint.getFacility,
-        (res) => {},
-        () => {}
-      );
-      if (res.data && res.data?.code === 1) {
-        return res.data?.data;
+      const res = await axiosSendRequest("get", endPoint.getFacility);
+      if (res.data && res.code === 1) {
+        return res.data;
       }
     },
     keepPreviousData: true,
@@ -25,15 +20,13 @@ export const useGetFacilityInventory = (params) => {
   return useQuery({
     queryKey: [queryKey.facility.facility_inventory, params],
     queryFn: async () => {
-      const res = await request(
+      const res = await axiosSendRequest(
         "get",
         endPoint.getFacilityInventory,
-        (res) => {},
-        () => {},
         params
       );
-      if (res.data && res.data?.code === 1) {
-        return res.data?.data;
+      if (res.data && res.code === 1) {
+        return res.data;
       }
     },
     keepPreviousData: true,

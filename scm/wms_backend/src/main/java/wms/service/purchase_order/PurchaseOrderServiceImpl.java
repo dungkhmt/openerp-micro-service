@@ -1,7 +1,6 @@
 package wms.service.purchase_order;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.internal.util.StringHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import wms.common.enums.ErrorCode;
 import wms.common.enums.OrderStatus;
 import wms.dto.ReturnPaginationDTO;
@@ -21,9 +21,7 @@ import wms.entity.*;
 import wms.exception.CustomException;
 import wms.repo.*;
 import wms.service.BaseService;
-
-import java.util.ArrayList;
-import java.util.List;
+import wms.utils.GeneralUtils;
 
 @Service
 @Slf4j
@@ -42,10 +40,8 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
     private ProductRepo productRepo;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public PurchaseOrder createOrder(PurchaseOrderDTO purchaseOrderDTO, JwtAuthenticationToken token) throws CustomException {
-        if (purchaseOrderRepo.getOrderByCode(purchaseOrderDTO.getOrderCode().toUpperCase()) != null) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Exist order with same code, can't create");
-        }
         Facility boughtBy = facilityRepo.getFacilityByCode(purchaseOrderDTO.getBoughtBy());
         UserLogin createdBy = userRepo.getUserByUserLoginId(token.getName());
 
@@ -56,7 +52,7 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Order created by unknown person, can't create");
         }
         PurchaseOrder newOrder = PurchaseOrder.builder()
-                .code(purchaseOrderDTO.getOrderCode().toUpperCase())
+                .code("PO" + GeneralUtils.generateCodeFromSysTime())
                 .supplierCode(purchaseOrderDTO.getSupplierCode())
                 .status(OrderStatus.CREATED.getStatus())
                 .facility(boughtBy)
@@ -123,6 +119,7 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public PurchaseOrder updateOrder(UpdatePurchaseOrderDTO updatePurchaseOrderDTO, long id) throws CustomException {
         double totalMoney = 0.0;
         PurchaseOrder currOrder = getOrderByCode(updatePurchaseOrderDTO.getCreatedOrderCode());
@@ -150,13 +147,15 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
     }
 
     @Override
-    public PurchaseOrder updateOrderStatus(OrderStatus status, long id) throws CustomException {
-        PurchaseOrder currOrder = getOrderById(id);
-        currOrder.setStatus(status.getStatus());
+    @Transactional(rollbackFor = Exception.class)
+    public PurchaseOrder updateOrderStatus(String status, String orderCode) throws CustomException {
+        PurchaseOrder currOrder = getOrderByCode(orderCode.toUpperCase());
+        currOrder.setStatus(status.toUpperCase());
         return purchaseOrderRepo.save(currOrder);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteOrderById(long id) {
         PurchaseOrder order = getOrderById(id);
         order.setStatus(OrderStatus.DELETED.getStatus());

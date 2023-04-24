@@ -13,7 +13,7 @@ import CustomBillTable from "components/table/CustomBillTable";
 import CustomOrderTable from "components/table/CustomOrderTable";
 import CustomToolBar from "components/toolbar/CustomToolBar";
 import { useGetProductList } from "controllers/query/category-query";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
@@ -26,7 +26,7 @@ import {
 } from "../../controllers/query/bill-query";
 import { useGetPurchaseOrderItems } from "../../controllers/query/purchase-order-query";
 
-function OrderDetailScreen({}) {
+function PurchaseOrderDetailScreen({}) {
   const location = useLocation();
   const currOrder = location.state.order;
   const [params, setParams] = useState({
@@ -60,7 +60,6 @@ function OrderDetailScreen({}) {
     name: "products",
   });
   const onSubmit = async (data) => {
-    console.log("Data: ", data);
     let importParams = {
       orderCode: currOrder?.code,
       importItems: data?.products?.map((pro) => {
@@ -69,9 +68,6 @@ function OrderDetailScreen({}) {
           productCode: pro?.code,
         };
       }),
-      code:
-        "RECP00" +
-        (parseInt(billItem?.content?.[0]?.receiptBill?.code.substring(4)) + 1),
     };
     const res = await createBillQuery.mutateAsync(importParams);
     setIsAdd((pre) => !pre);
@@ -165,6 +161,16 @@ function OrderDetailScreen({}) {
     orderCode: currOrder?.code,
   });
   const { isLoading: isLoadingProduct, data: product } = useGetProductList();
+  const renderCustomTable = useCallback(() => {
+    return (
+      <CustomOrderTable items={orderItem?.content ? orderItem?.content : []} />
+    );
+  }, [orderItem]);
+  const renderCustomBill = useCallback(() => {
+    return (
+      <CustomBillTable orderItem={orderItem?.content} billItem={billItem} />
+    );
+  }, [orderItem, billItem]);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box
@@ -208,7 +214,7 @@ function OrderDetailScreen({}) {
         <Typography>4. Thời gian tạo: {currOrder?.createdDate}</Typography>
         <Typography>5. Kho trực thuộc: {currOrder?.facility?.name}</Typography>
       </Box>
-      <CustomOrderTable items={orderItem?.content ? orderItem?.content : []} />
+      {renderCustomTable()}
       <Divider variant="fullWidth" sx={{ marginTop: 2, height: 5 }} />
       <Box>
         <Box flexDirection={"row"}>
@@ -222,10 +228,7 @@ function OrderDetailScreen({}) {
         size="sm"
         style={{ padding: 2 }}
       >
-        <CustomBillTable
-          orderItem={orderItem?.content}
-          billItem={billItem?.content}
-        />
+        {renderCustomBill()}
         <IconButton onClick={toggleTables}>
           {showTable1 ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
         </IconButton>
@@ -271,4 +274,4 @@ function OrderDetailScreen({}) {
 }
 
 const SCR_ID = "SCR_PURCHASE_ORDER_DETAIL";
-export default withScreenSecurity(OrderDetailScreen, SCR_ID, true);
+export default withScreenSecurity(PurchaseOrderDetailScreen, SCR_ID, true);

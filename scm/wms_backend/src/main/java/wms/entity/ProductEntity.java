@@ -75,4 +75,9 @@ public class ProductEntity extends BaseEntity implements Serializable {
     // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
     @JsonIgnore
     private Set<ReceiptBillItem> receiptBillItems;
+
+    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
+    // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
+    @JsonIgnore
+    private Set<SaleOrderItem> saleOrderItems;
 }

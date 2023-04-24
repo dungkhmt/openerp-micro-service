@@ -7,6 +7,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 @Entity
 @Table(name = "customer")
@@ -55,4 +56,8 @@ public class Customer extends BaseEntity implements Serializable {
     @JoinColumn(name = "contract_type_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private ContractType contractType;
+
+    @OneToMany(mappedBy = "customer",fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<SaleOrder> saleOrders;
 }

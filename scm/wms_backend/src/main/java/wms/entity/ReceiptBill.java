@@ -9,6 +9,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -35,8 +36,9 @@ public class ReceiptBill extends BaseEntity implements Serializable {
     @NotFound(action = NotFoundAction.IGNORE)
     private PurchaseOrder purchaseOrder;
 
+    // https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl
     @OneToMany(mappedBy = "receiptBill",fetch = FetchType.LAZY)
     // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
     @JsonIgnore
-    private List<ReceiptBillItem> receiptBillItems = new ArrayList<>();
+    private Set<ReceiptBillItem> receiptBillItems = new HashSet<>();
 }

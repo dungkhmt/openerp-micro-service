@@ -10,12 +10,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import wms.dto.ReturnPaginationDTO;
-import wms.entity.PurchaseOrder;
 import wms.entity.ReceiptBill;
 import wms.entity.ReceiptBillItem;
 import wms.repo.ReceiptBillItemRepo;
 import wms.repo.ReceiptBillRepo;
 import wms.service.BaseService;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -34,12 +35,8 @@ public class ReceiptBillServiceImpl extends BaseService implements IReceiptBillS
     }
 
     @Override
-    public ReturnPaginationDTO<ReceiptBillItem> getBillItemsOfOrder(int page, int pageSize, String sortField, boolean isSortAsc, String orderCode) throws JsonProcessingException {
-        Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
-                : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
-                : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
-        Page<ReceiptBillItem> receiptBillItems = receiptBillItemRepo.search(pageable, orderCode);
-        return getPaginationResult(receiptBillItems.getContent(), page, receiptBillItems.getTotalPages(), receiptBillItems.getTotalElements());
+    public List<ReceiptBillItem> getBillItemsOfOrder(String orderCode) throws JsonProcessingException {
+        return receiptBillItemRepo.search(orderCode);
     }
 
     @Override

@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import wms.common.constant.DefaultConst;
-import wms.common.enums.OrderStatus;
 import wms.dto.purchase_order.PurchaseOrderDTO;
+import wms.dto.purchase_order.UpdateOrderStatusDTO;
 import wms.dto.purchase_order.UpdatePurchaseOrderDTO;
 import wms.entity.ResultEntity;
 import wms.service.purchase_order.IPurchaseOrderService;
@@ -90,10 +90,11 @@ public class PurchaseOrderController extends BaseController {
     }
 
     @ApiOperation(value = "Approve created order. Only created order can be approved")
-    @PutMapping("/update-status/{id}")
-    public ResponseEntity<?> updateOrderStatus(@RequestParam(value = "status", required = true) OrderStatus status, @PathVariable("id") long id) {
+    @PutMapping("/update-status")
+    public ResponseEntity<?> updateOrderStatus(@RequestBody UpdateOrderStatusDTO status,
+                                               @RequestParam(value = "orderCode", required = true) String orderCode) {
         try {
-            return response(new ResultEntity(1, "Update order successfully", purchaseOrderService.updateOrderStatus(status, id)));
+            return response(new ResultEntity(1, "Update order status successfully", purchaseOrderService.updateOrderStatus(status.getStatus(), orderCode)));
         } catch (Exception ex) {
             return response(error(ex));
         }
