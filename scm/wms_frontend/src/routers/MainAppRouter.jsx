@@ -7,6 +7,7 @@ import { useNotificationState } from "state/NotificationState";
 import NotFound from "views/errors/NotFound";
 import TestComponent from "../test/TestComponent";
 import CategoryRouter from "./CategoryRouter";
+import DeliveryRouter from "./DeliveryRouter";
 import PrivateRoute from "./PrivateRoute";
 import SellinRouter from "./SellinRouter";
 import SelloutRouter from "./SelloutRouter";
@@ -43,6 +44,7 @@ function MainAppRouter(props) {
           <PrivateRoute component={SellinRouter} path="/sellin" />
           <PrivateRoute component={SelloutRouter} path="/sellout" />
           <PrivateRoute component={WarehouseRouter} path="/warehouse" />
+          <PrivateRoute component={DeliveryRouter} path="/delivery" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>

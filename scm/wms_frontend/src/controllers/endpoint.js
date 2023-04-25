@@ -24,10 +24,15 @@ export const endPoint = {
   // Bill
   getReceiptBills: baseUrl + "/receipt-bill/get-all",
   getBillItemOfPurchaseOrder: baseUrl + "/receipt-bill/get-bill-items",
-  createBill: baseUrl + "/facility/import-item",
+  createReceiptBill: baseUrl + "/facility/import-item",
+  getDeliveryBills: baseUrl + "/delivery-bill/get-all",
+  getBillItemOfSaleOrder: baseUrl + "/delivery-bill/get-bill-items",
+  createDeliveryBill: baseUrl + "/facility/export-item",
   // Sale Order
   getSaleOrder: baseUrl + "/sale-order/get-all",
   getSaleOrderItems: baseUrl + "/sale-order/get-order-items",
   createSaleOrder: baseUrl + "/sale-order/create",
   updateSaleOrderStatus: baseUrl + "/sale-order/update-status",
+  // Shipment
+  createShipment: baseUrl + "/shipment/create",
 };

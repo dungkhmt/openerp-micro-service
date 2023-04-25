@@ -1,7 +1,8 @@
 import { Box } from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { useState } from "react";
 import { useToggle, useWindowSize } from "react-use";
-import CustomMap from "../components/map/CustomMap";
 const data = [
   {
     id: 1,
@@ -34,7 +35,7 @@ const TestComponent = () => {
   const [isAdd, setIsAdd] = useToggle(false);
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <CustomMap />
+      {/* <CustomMap /> */}
       {/* <Typography>Test component</Typography> */}
       {/* <FacebookCircularProgress />
       <ErrorDialog open={true} />
@@ -114,6 +115,9 @@ const TestComponent = () => {
       <CustomDrawer open={isAdd}>
         <Typography>dkjdkjf</Typography>
       </CustomDrawer> */}
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <DatePicker />
+      </LocalizationProvider>
     </Box>
   );
 };

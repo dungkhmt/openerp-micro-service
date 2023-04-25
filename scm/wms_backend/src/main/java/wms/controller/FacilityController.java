@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import wms.common.constant.DefaultConst;
+import wms.dto.facility.ExportFromFacilityDTO;
 import wms.dto.facility.FacilityDTO;
 import wms.dto.facility.FacilityUpdateDTO;
 import wms.dto.facility.ImportToFacilityDTO;
@@ -101,10 +102,20 @@ public class FacilityController extends BaseController{
         }
     }
 
+    @ApiOperation(value = "Import item to facility with specific order, split bills")
     @PostMapping("/import-item")
     public ResponseEntity<?> importItemToFacilty(@Valid @RequestBody ImportToFacilityDTO importToFacilityDTO) {
         try {
-            facilityService.importToFacility(importToFacilityDTO);
+            facilityService.importToFacilityWithOrder(importToFacilityDTO);
+            return response(new ResultEntity(1, "Update facility successfully", null));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @PostMapping("/export-item")
+    public ResponseEntity<?> exportItemFromFacilty(@Valid @RequestBody ExportFromFacilityDTO exportFromFacilityDTO) {
+        try {
+            facilityService.exportFromFacility(exportFromFacilityDTO);
             return response(new ResultEntity(1, "Update facility successfully", null));
         } catch (Exception ex) {
             return response(error(ex));

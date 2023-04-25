@@ -22,6 +22,13 @@ export const queryKey = {
   },
   receipt_bill: {
     receipt_bill_list: "receipt_bill_list",
-    bill_item_of_order: "bill_item_of_order",
+    bill_item_of_purchase_order: "bill_item_of_purchase_order",
+  },
+  delivery_bill: {
+    delivery_bill_list: "delivery_bill_list",
+    bill_item_of_delivery_order: "bill_item_of_delivery_order",
+  },
+  shipment: {
+    shipment_list: "shipment_list",
   },
 };

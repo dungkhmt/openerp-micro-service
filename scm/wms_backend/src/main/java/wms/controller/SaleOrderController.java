@@ -7,10 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import wms.common.constant.DefaultConst;
-import wms.dto.purchase_order.PurchaseOrderDTO;
-import wms.dto.purchase_order.UpdateOrderStatusDTO;
-import wms.dto.purchase_order.UpdatePurchaseOrderDTO;
+import wms.dto.purchase_order.UpdatePurchaseOrderStatusDTO;
 import wms.dto.sale_order.SaleOrderDTO;
+import wms.dto.sale_order.UpdateSaleOrderStatusDTO;
 import wms.entity.ResultEntity;
 import wms.service.sale_order.ISaleOrderService;
 
@@ -47,20 +46,20 @@ public class SaleOrderController extends BaseController {
             return response(error(ex));
         }
     }
-//    @GetMapping("/get-order-items")
-//    public ResponseEntity<?> getOrderItemsFromOrder(
-//            @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
-//            @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
-//            @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
-//            @RequestParam(value = "sortAsc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
-//            @RequestParam(value = "orderCode", required = false, defaultValue = DefaultConst.STRING) String orderCode
-//    ) {
-//        try {
-//            return response(new ResultEntity(1, "Get order items successfully", purchaseOrderService.getOrderItems(page, pageSize, sortField, isSortAsc, orderCode)));
-//        } catch (Exception ex) {
-//            return response(error(ex));
-//        }
-//    }
+    @GetMapping("/get-order-items")
+    public ResponseEntity<?> getOrderItemsFromOrder(
+            @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
+            @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
+            @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
+            @RequestParam(value = "sortAsc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
+            @RequestParam(value = "orderCode", required = false, defaultValue = DefaultConst.STRING) String orderCode
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get order items successfully", saleOrderService.getOrderItems(page, pageSize, sortField, isSortAsc, orderCode)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
 //    @GetMapping("/get-by-id/{id}")
 //    public ResponseEntity<?> getOrderByID(@PathVariable("id") long id) {
 //        try {
@@ -89,16 +88,16 @@ public class SaleOrderController extends BaseController {
 //        }
 //    }
 //
-//    @ApiOperation(value = "Approve created order. Only created order can be approved")
-//    @PutMapping("/update-status")
-//    public ResponseEntity<?> updateOrderStatus(@RequestBody UpdateOrderStatusDTO status,
-//                                               @RequestParam(value = "orderCode", required = true) String orderCode) {
-//        try {
-//            return response(new ResultEntity(1, "Update order status successfully", purchaseOrderService.updateOrderStatus(status.getStatus(), orderCode)));
-//        } catch (Exception ex) {
-//            return response(error(ex));
-//        }
-//    }
+    @ApiOperation(value = "Approve created order. Only created order can be approved")
+    @PutMapping("/update-status")
+    public ResponseEntity<?> updateOrderStatus(@RequestBody UpdateSaleOrderStatusDTO status,
+                                               @RequestParam(value = "orderCode", required = true) String orderCode) {
+        try {
+            return response(new ResultEntity(1, "Update order status successfully", saleOrderService.updateOrderStatus(status.getStatus(), orderCode)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
 //    @DeleteMapping("/delete/{id}")
 //    public ResponseEntity<?> deleteOrderById(@PathVariable("id") long id) {
 //        try {

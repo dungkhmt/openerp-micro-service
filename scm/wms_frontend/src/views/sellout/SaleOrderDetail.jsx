@@ -9,32 +9,33 @@ import {
   Typography,
 } from "@mui/material";
 import withScreenSecurity from "components/common/withScreenSecurity";
-import CustomBillTable from "components/table/CustomBillTable";
+import CustomDataGrid from "components/datagrid/CustomDataGrid";
+import CustomModal from "components/modal/CustomModal";
 import CustomOrderTable from "components/table/CustomOrderTable";
 import CustomToolBar from "components/toolbar/CustomToolBar";
+import {
+  useCreateDeliveryBill,
+  useGetBillItemOfSaleOrder,
+} from "controllers/query/bill-query";
 import { useGetProductList } from "controllers/query/category-query";
 import { useCallback, useState } from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
-import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
-import CustomModal from "../../components/modal/CustomModal";
-import {
-  useCreateBill,
-  useGetBillItemOfOrder,
-} from "../../controllers/query/bill-query";
-import { useGetPurchaseOrderItems } from "../../controllers/query/purchase-order-query";
+import CustomDeliveryBillTable from "../../components/table/CustomDeliveryBillTable";
+import { useGetSaleOrderItems } from "../../controllers/query/sale-order-query";
 
-function SaleOrderDetailScreen({}) {
+function SaleOrderDetailScreen() {
   const location = useLocation();
   const currOrder = location.state.order;
+  console.log("Curr order: ", currOrder);
   const [params, setParams] = useState({
     page: 1,
     pageSize: 5,
   });
   const { height } = useWindowSize();
-  const createBillQuery = useCreateBill();
+  const createBillQuery = useCreateDeliveryBill();
   const [isAdd, setIsAdd] = useToggle(false);
   const [showTable1, setShowTable1] = useState(true);
 
@@ -62,7 +63,7 @@ function SaleOrderDetailScreen({}) {
   const onSubmit = async (data) => {
     let importParams = {
       orderCode: currOrder?.code,
-      importItems: data?.products?.map((pro) => {
+      exportItems: data?.products?.map((pro) => {
         return {
           effectQty: pro?.quantity,
           productCode: pro?.code,
@@ -75,7 +76,7 @@ function SaleOrderDetailScreen({}) {
   };
   let actions = [
     {
-      title: "Tạo phiếu nhập kho",
+      title: "Tạo phiếu xuất kho",
       callback: (pre) => {
         setIsAdd((pre) => !pre);
       },
@@ -154,10 +155,10 @@ function SaleOrderDetailScreen({}) {
       },
     },
   ];
-  const { isLoading, data: orderItem } = useGetPurchaseOrderItems({
+  const { isLoading, data: orderItem } = useGetSaleOrderItems({
     orderCode: currOrder?.code,
   });
-  const { isLoadingBillItem, data: billItem } = useGetBillItemOfOrder({
+  const { isLoadingBillItem, data: billItem } = useGetBillItemOfSaleOrder({
     orderCode: currOrder?.code,
   });
   const { isLoading: isLoadingProduct, data: product } = useGetProductList();
@@ -168,7 +169,10 @@ function SaleOrderDetailScreen({}) {
   }, [orderItem]);
   const renderCustomBill = useCallback(() => {
     return (
-      <CustomBillTable orderItem={orderItem?.content} billItem={billItem} />
+      <CustomDeliveryBillTable
+        orderItem={orderItem?.content}
+        billItem={billItem}
+      />
     );
   }, [orderItem, billItem]);
   return (
@@ -209,10 +213,12 @@ function SaleOrderDetailScreen({}) {
         <Typography>Thông tin cơ bản</Typography>
         <Typography></Typography>
         <Typography>1. Mã đơn: {currOrder?.code}</Typography>
-        <Typography>2. Nhà sản xuất: {currOrder?.supplierCode}</Typography>
+        <Typography>2. Khách hàng: {currOrder?.customer?.name}</Typography>
         <Typography>3. Người tạo: {currOrder?.user?.id}</Typography>
         <Typography>4. Thời gian tạo: {currOrder?.createdDate}</Typography>
-        <Typography>5. Kho trực thuộc: {currOrder?.facility?.name}</Typography>
+        <Typography>
+          5. Kho trực thuộc: {currOrder?.customer?.facility?.name}
+        </Typography>
       </Box>
       {renderCustomTable()}
       <Divider variant="fullWidth" sx={{ marginTop: 2, height: 5 }} />

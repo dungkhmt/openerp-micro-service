@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.product.ProductDTO;
@@ -120,6 +121,7 @@ public class ProductServiceImpl extends BaseService implements IProductService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteProductById(long id) {
         productRepository.deleteById(id);
     }

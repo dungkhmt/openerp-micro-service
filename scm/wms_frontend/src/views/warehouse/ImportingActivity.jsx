@@ -31,7 +31,7 @@ function ImportingActivityScreen({ screenAuthorization }) {
 
   const handleButtonClick = (params) => {
     console.log("params: ", params);
-    history.push(`${path}/order-detail`, {
+    history.push(`${path}/purchase-order-detail`, {
       order: params,
     });
   };

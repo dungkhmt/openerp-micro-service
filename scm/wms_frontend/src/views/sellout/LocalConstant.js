@@ -41,7 +41,7 @@ export const staticDatagridCols = [
     sortable: false,
     minWidth: 150,
     valueGetter: (params) => {
-      return params.row.customer.name;
+      return params?.row?.customer?.name;
     },
   },
   {

@@ -9,7 +9,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*;
 import wms.common.constant.DefaultConst;
 import wms.dto.purchase_order.PurchaseOrderDTO;
-import wms.dto.purchase_order.UpdateOrderStatusDTO;
+import wms.dto.purchase_order.UpdatePurchaseOrderStatusDTO;
 import wms.dto.purchase_order.UpdatePurchaseOrderDTO;
 import wms.entity.ResultEntity;
 import wms.service.purchase_order.IPurchaseOrderService;
@@ -91,7 +91,7 @@ public class PurchaseOrderController extends BaseController {
 
     @ApiOperation(value = "Approve created order. Only created order can be approved")
     @PutMapping("/update-status")
-    public ResponseEntity<?> updateOrderStatus(@RequestBody UpdateOrderStatusDTO status,
+    public ResponseEntity<?> updateOrderStatus(@RequestBody UpdatePurchaseOrderStatusDTO status,
                                                @RequestParam(value = "orderCode", required = true) String orderCode) {
         try {
             return response(new ResultEntity(1, "Update order status successfully", purchaseOrderService.updateOrderStatus(status.getStatus(), orderCode)));

@@ -92,8 +92,12 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
     }
 
     @Override
-    public ReturnPaginationDTO<SaleOrderItem> getOrderItems(int page, int pageSize, String sortField, boolean isSortAsc, String orderStatus) throws JsonProcessingException {
-        return null;
+    public ReturnPaginationDTO<SaleOrderItem> getOrderItems(int page, int pageSize, String sortField, boolean isSortAsc, String orderCode) throws JsonProcessingException {
+        Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
+                : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
+                : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
+        Page<SaleOrderItem> purchaseOrderItems = saleOrderItemRepo.search(pageable, orderCode.toUpperCase());
+        return getPaginationResult(purchaseOrderItems.getContent(), page, purchaseOrderItems.getTotalPages(), purchaseOrderItems.getTotalElements());
     }
 
     @Override
@@ -103,7 +107,7 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
 
     @Override
     public SaleOrder getOrderByCode(String code) {
-        return null;
+        return saleOrderRepo.getOrderByCode(code.toUpperCase());
     }
 
     @Override
@@ -112,8 +116,11 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public SaleOrder updateOrderStatus(String status, String orderCode) throws CustomException {
-        return null;
+        SaleOrder currOrder = getOrderByCode(orderCode.toUpperCase());
+        currOrder.setStatus(status.toUpperCase());
+        return saleOrderRepo.save(currOrder);
     }
 
     @Override

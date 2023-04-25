@@ -7,11 +7,9 @@ import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
-public class ImportToFacilityDTO {
-//    @NotBlank(message = "Truong code khong duoc bo trong")
-//    private String code;
+public class ExportFromFacilityDTO {
     @NotBlank(message = "Truong order code khong duoc bo trong")
     private String orderCode;
     @Valid
-    List<ImportItemDTO> importItems;
+    List<ExportItemDTO> exportItems;
 }

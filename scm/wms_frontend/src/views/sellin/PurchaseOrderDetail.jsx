@@ -21,8 +21,8 @@ import { AppColors } from "shared/AppColors";
 import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
 import CustomModal from "../../components/modal/CustomModal";
 import {
-  useCreateBill,
-  useGetBillItemOfOrder,
+  useCreateReceiptBill,
+  useGetBillItemOfPurchaseOrder,
 } from "../../controllers/query/bill-query";
 import { useGetPurchaseOrderItems } from "../../controllers/query/purchase-order-query";
 
@@ -34,7 +34,7 @@ function PurchaseOrderDetailScreen({}) {
     pageSize: 5,
   });
   const { height } = useWindowSize();
-  const createBillQuery = useCreateBill();
+  const createBillQuery = useCreateReceiptBill();
   const [isAdd, setIsAdd] = useToggle(false);
   const [showTable1, setShowTable1] = useState(true);
 
@@ -157,7 +157,7 @@ function PurchaseOrderDetailScreen({}) {
   const { isLoading, data: orderItem } = useGetPurchaseOrderItems({
     orderCode: currOrder?.code,
   });
-  const { isLoadingBillItem, data: billItem } = useGetBillItemOfOrder({
+  const { isLoadingBillItem, data: billItem } = useGetBillItemOfPurchaseOrder({
     orderCode: currOrder?.code,
   });
   const { isLoading: isLoadingProduct, data: product } = useGetProductList();

@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@mui/material";
 
-const CustomBillTable = ({ orderItem, billItem }) => {
+const CustomDeliveryBillTable = ({ orderItem, billItem }) => {
   console.log(orderItem, billItem);
   const rows = orderItem?.map((item) => {
     let mappedBill = billItem.filter(
@@ -39,8 +39,8 @@ const CustomBillTable = ({ orderItem, billItem }) => {
           <TableRow>
             {/* <TableCell>Mã bill</TableCell> */}
             <TableCell align="right">Tên sản phẩm</TableCell>
-            <TableCell align="right">Số lượng đã nhập kho</TableCell>
-            <TableCell align="right">Tổng số lượng cần nhập</TableCell>
+            <TableCell align="right">Số lượng đã xuất kho</TableCell>
+            <TableCell align="right">Tổng số lượng cần xuất</TableCell>
             {/* <TableCell align="right">Tổng cộng</TableCell> */}
           </TableRow>
         </TableHead>
@@ -64,4 +64,4 @@ const CustomBillTable = ({ orderItem, billItem }) => {
     </TableContainer>
   );
 };
-export default CustomBillTable;
+export default CustomDeliveryBillTable;

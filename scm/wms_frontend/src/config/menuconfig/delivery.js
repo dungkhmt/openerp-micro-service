@@ -4,17 +4,17 @@ export const delivery = {
   text: "Delivery",
   child: [
     {
-      id: "MENU_WMS_DELIVERY.MENU_ITEM_1",
-      path: "/delivery/screen-1",
+      id: "MENU_WMS_DELIVERY.SHIPMENT",
+      path: "/delivery/shipment",
       isPublic: false,
-      text: "Submenu 1",
+      text: "Shipment",
       child: [],
     },
     {
-      id: "MENU_WMS_DELIVERY.MENU_ITEM_2",
-      path: "/delivery/screen-2",
+      id: "MENU_WMS_DELIVERY.scheduling",
+      path: "/delivery/scheduling",
       isPublic: false,
-      text: "Submenu 2",
+      text: "Scheduling",
       child: [],
     },
   ],

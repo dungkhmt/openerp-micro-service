@@ -15,7 +15,7 @@ import wms.exception.CustomException;
 public interface ISaleOrderService {
     SaleOrder createOrder(SaleOrderDTO saleOrderDTO, JwtAuthenticationToken token) throws CustomException;
     ReturnPaginationDTO<SaleOrder> getAllOrders(int page, int pageSize, String sortField, boolean isSortAsc, String orderStatus) throws JsonProcessingException;
-    ReturnPaginationDTO<SaleOrderItem> getOrderItems(int page, int pageSize, String sortField, boolean isSortAsc, String orderStatus) throws JsonProcessingException;
+    ReturnPaginationDTO<SaleOrderItem> getOrderItems(int page, int pageSize, String sortField, boolean isSortAsc, String orderCode) throws JsonProcessingException;
     SaleOrder getOrderById(long id);
     SaleOrder getOrderByCode(String code);
     SaleOrderItem getOrderItemByProduct(String orderCode, String productCode);

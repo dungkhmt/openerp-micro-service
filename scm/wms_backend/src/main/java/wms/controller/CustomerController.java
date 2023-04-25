@@ -22,7 +22,7 @@ public class CustomerController extends BaseController{
     private ICustomerService customerService;
     @ApiOperation(value = "Thêm mới khách hàng")
     @PostMapping("/create")
-    public ResponseEntity<?> create(@Valid @RequestBody CustomerDTO customerDTO,  JwtAuthenticationToken token) {
+    public ResponseEntity<?> create(@Valid @RequestBody CustomerDTO customerDTO, JwtAuthenticationToken token) {
         try {
             return response(new ResultEntity(1, "Create new customer successfully", customerService.createNewCustomer(customerDTO, token)));
         }

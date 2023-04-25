@@ -26,19 +26,20 @@ public class UserLogin {
     private Set<Customer> customers;
 
     @OneToMany(mappedBy = "creator",fetch = FetchType.LAZY)
-    // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
     @JsonIgnore
     private Set<Facility> facilities;
 
     @OneToMany(mappedBy = "manager",fetch = FetchType.LAZY)
-    // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
     @JsonIgnore
     private Set<Facility> listFacilities;
 
     @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
-    // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
     @JsonIgnore
     private Set<PurchaseOrder> purchaseOrders;
+
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Shipment> shipments;
 
     @Size(max = 60)
     @Column(name = "current_password", length = 60)
