@@ -155,9 +155,9 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
             //int nbDays = (int)( (b.getCreatedDate().getTime() - date.getTime())
             nbDaysRemain[i] =  (int)( (b.getEndDate().getTime() - date.getTime())
                     / (1000 * 60 * 60 * 24) );
-            moneyMature[i] = b.getAmountMoneyDeposit()*(1 + b.getRate()); // TO BE CORRECTED
+            moneyMature[i] = b.getAmountMoneyDeposit()*(1 + b.getRate()*b.getDuration()/365); // TO BE CORRECTED
             int dayPass = b.getDuration() - nbDaysRemain[i];
-            moneyEarly[i] = b.getAmountMoneyDeposit()*(1 + b.getRate()*(dayPass)/b.getDuration());
+            moneyEarly[i] = b.getAmountMoneyDeposit()*(1 + b.getRate()*(dayPass)/365);
             System.out.println("number days passbook " + b.getPassBookName() + " = " + nbDaysRemain[i]+
                     " dayPass = " + dayPass + " moneyEarly = " + moneyEarly[i] + " moneyMature = " + moneyMature[i]);
         }
@@ -184,9 +184,10 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
 
         if (solver == null) {
             System.err.println("Could not create solver SCIP");
+            log.info("computeSolution, can not create solver SCIP");
             return null;
         }
-
+        log.info("computeSolution create solver SCIP -> OK");
         for(int i = 0; i < n; i++){
             x[i] = solver.makeIntVar(0.0, 1.0, "x[" + i + "]");
             y[i] = solver.makeIntVar(0.0, INFINITY, "y[" + i + "]");
@@ -211,10 +212,11 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
             obj.setCoefficient(x[i], - moneyMature[i] / discountRateArr[i]);
             obj.setCoefficient(y[i], - loanRateArr[i] / discountRateArr[i]);
         }
-
+        log.info("computeSolution, start call to solve()...");
         final MPSolver.ResultStatus resultStatus = solver.solve();
         if (resultStatus == MPSolver.ResultStatus.OPTIMAL) {
             System.out.println("Raw objective = " + obj.value());
+            log.info("computeSolution, raw objective = " + obj.value());
             info += "Raw objective = " + obj.value() + "\n";
             double temp = 0; // The constant in the objective
             for (int i = 0; i < n; i++) {
@@ -250,6 +252,7 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
             System.out.println(obj_value);
         } else{
             System.out.println("No optimal");
+            log.info("computeSolution, no optimal");
             info += " No optimal" + "\n";
         }
 
@@ -257,6 +260,7 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
         // FORM result and return to client
         List<ModelResponseLoanElement> loanElements = new ArrayList<>();
         for(int i = 0; i < x.length; i++){
+            log.info("computeSolution, x[" + i + "] = " + x[i].solutionValue());
             if(x[i].solutionValue() <= 0){// tat toan dung han, co vay 1 khoan y[i]
                 // create a loan corresponding to this passbook
                 ModelResponseLoanElement e = new ModelResponseLoanElement();
@@ -270,6 +274,7 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
         ModelResponseOptimizePassBookForLoan res = new ModelResponseOptimizePassBookForLoan();
         res.setLoans(loanElements);
         res.setInfo(info);
+        log.info("computeSolution return res to frontend");
         return res;
     }
 }
