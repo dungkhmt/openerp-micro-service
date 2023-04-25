@@ -7,8 +7,10 @@ import openerp.containertransport.dto.ContainerFilterRequestDTO;
 import openerp.containertransport.dto.ContainerModel;
 import openerp.containertransport.dto.TruckModel;
 import openerp.containertransport.entity.Container;
+import openerp.containertransport.entity.Facility;
 import openerp.containertransport.entity.Truck;
 import openerp.containertransport.repo.ContainerRepo;
+import openerp.containertransport.repo.FacilityRepo;
 import openerp.containertransport.service.ContainerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -23,12 +25,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ContainerServiceImpl implements ContainerService {
     private final ContainerRepo containerRepo;
+    private final FacilityRepo facilityRepo;
     private final ModelMapper modelMapper;
     private final EntityManager entityManager;
     @Override
     public ContainerModel createContainer(ContainerModel containerModelDTO) {
+        Facility facility = facilityRepo.findById(containerModelDTO.getFacilityId());
         Container container = new Container();
-        container.setFacilityId(containerModelDTO.getFacilityId());
+        container.setFacility(facility);
         container.setSize(containerModelDTO.getSize());
         container.setCreatedAt(System.currentTimeMillis());
         container.setUpdatedAt(System.currentTimeMillis());
@@ -48,9 +52,9 @@ public class ContainerServiceImpl implements ContainerService {
     @Override
     public ContainerModel updateContainer(ContainerModel containerModel) {
         Container container = containerRepo.findById(containerModel.getId());
-        if(containerModel.getFacilityId() != null) {
-            container.setFacilityId(containerModel.getFacilityId());
-        }
+//        if(containerModel.getFacilityId() != null) {
+//            container.setFacilityId(containerModel.getFacilityId());
+//        }
         container.setUpdatedAt(System.currentTimeMillis());
         containerRepo.save(container);
         ContainerModel containerModelUpdate = convertToModel(container);
@@ -80,6 +84,7 @@ public class ContainerServiceImpl implements ContainerService {
 
     public ContainerModel convertToModel(Container container) {
         ContainerModel containerModel = modelMapper.map(container, ContainerModel.class);
+        containerModel.setFacilityName(container.getFacility().getFacilityName());
         return containerModel;
     }
 }

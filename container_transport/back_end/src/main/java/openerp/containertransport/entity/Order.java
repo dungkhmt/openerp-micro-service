@@ -1,5 +1,6 @@
 package openerp.containertransport.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,20 +22,36 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
+    @Column(name = "order_code")
+    private String orderCode;
+
     @Column(name = "customer_id")
     private Integer customerId;
 
+    @Column(name = "type")
+    private String type;
+
+    @Column(name = "weight")
+    private Long weight;
+
+    @Column(name = "is_break_romooc")
+    private Boolean isBreakRomooc;
+
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(	name = "order_container",
+    @JoinTable(	name = "container_transport_order_container",
             joinColumns = @JoinColumn(name = "order_id"),
             inverseJoinColumns = @JoinColumn(name = "container_id"))
-    private List<Container> roles = new ArrayList<>();
+    private List<Container> containers = new ArrayList<>();
 
-    @Column(name = "from_facility_id")
-    private Integer fromFacilityId;
+    @ManyToOne()
+    @JoinColumn(name = "from_facility", referencedColumnName = "id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Facility fromFacility;
 
-    @Column(name = "to_facility")
-    private Integer toFacility;
+    @ManyToOne()
+    @JoinColumn(name = "to_facility", referencedColumnName = "id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Facility toFacility;
 
     @Column(name = "early_delivery_time")
     private long earlyDeliveryTime;
@@ -48,12 +65,12 @@ public class Order {
     @Column(name = "late_pickup_time")
     private long latePickupTime;
 
-    @Column(name = "status_id")
-    private String statusId;
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "created_at")
-    private Timestamp createdAt;
+    private long createdAt;
 
     @Column(name = "updated_at")
-    private Timestamp updatedAt;
+    private long updatedAt;
 }

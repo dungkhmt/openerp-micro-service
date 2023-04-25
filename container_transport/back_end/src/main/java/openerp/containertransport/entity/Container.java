@@ -1,11 +1,13 @@
 package openerp.containertransport.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Getter
@@ -14,7 +16,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Entity
 @Table(name = "container_transport_container")
-public class Container {
+public class Container implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
@@ -25,8 +27,10 @@ public class Container {
     @Column(name = "size")
     private Integer size;
 
-    @Column(name = "facility_id")
-    private Integer facilityId;
+    @ManyToOne()
+    @JoinColumn(name = "facility_id", referencedColumnName = "id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Facility facility;
 
     @Column(name = "created_at")
     private long createdAt;

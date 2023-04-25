@@ -29,10 +29,9 @@ public class TruckServiceImpl implements TruckService  {
 
     @Override
     public Truck createTruck(TruckModel truckModel) {
-        Facility facility = facilityRepo.findById(truckModel.getFacilityId().longValue());
+        Facility facility = facilityRepo.findById(truckModel.getFacilityId());
         Truck truck = new Truck();
         truck.setFacility(facility);
-        truck.setFacilityName(facility.getFacilityName());
         truck.setDriverId(truckModel.getDriverId());
         truck.setLicensePlates(truckModel.getLicensePlates());
         truck.setBrandTruck(truckModel.getBrandTruck());
@@ -86,7 +85,7 @@ public class TruckServiceImpl implements TruckService  {
     public TruckModel convertToModel(Truck truck) {
         ModelMapper modelMapper = new ModelMapper();
         TruckModel truckModel = modelMapper.map(truck, TruckModel.class);
-        truckModel.setFacility(FacilityModel.builder().facilityName(truck.getFacility().getFacilityName()).build());
+        truckModel.setFacilityName(truck.getFacility().getFacilityName());
         return truckModel;
     }
 }

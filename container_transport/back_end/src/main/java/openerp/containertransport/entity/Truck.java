@@ -28,9 +28,6 @@ public class Truck implements Serializable {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Facility facility;
 
-    @Column(name = "facility_name")
-    private String facilityName;
-
     @Column(name = "driver_name")
     private String driverName;
 

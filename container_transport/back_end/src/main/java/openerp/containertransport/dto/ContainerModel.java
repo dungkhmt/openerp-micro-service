@@ -13,7 +13,8 @@ public class ContainerModel {
     private long id;
     private String containerCode;
     private Integer size;
-    private Integer facilityId;
+    private long facilityId;
+    private String facilityName;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 }
