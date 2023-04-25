@@ -56,6 +56,11 @@ const NewOrderModal = ({ open, setOpen }) => {
     const [fromFacility, setFromFacility] = useState();
     const [toFacility, setToFaciity] = useState();
     const [containers, setContainers] = useState([]);
+    const [earlyDeliveryTime, setEarlyDeliveryTime] = useState();
+    const [lateDeliveryTime, setLateDeliveryTime] = useState();
+    const [earlyPickUpTime, setEarlyPickUpTime] = useState();
+    const [latePickUpTime, setLatePickUpTime] = useState();
+
     useEffect(() => {
         request(
             "post",
@@ -78,12 +83,24 @@ const NewOrderModal = ({ open, setOpen }) => {
         { name: "Outbound Empty", id: "OE" },
         { name: "Outbound Full", id: "OF" }
     ];
-    const typeFull = ["IF", "OF"];
+    const typeFull = ["IF", "IE", "OF"];
 
     const handleClose = () => {
         setOpen(false);
     }
-    console.log(facilities)
+    const handleSubmit = () => {
+        const data = {
+            type: type,
+            fromFacilityId: fromFacility,
+            toFacilityId: toFacility,
+            earlyDeliveryTime: earlyDeliveryTime,
+            lateDeliveryTime: lateDeliveryTime,
+            earlyPickupTime: earlyPickUpTime,
+            latePickupTime: latePickUpTime,
+            isBreakRomooc: false
+        }
+        console.log("data", data);
+    }
     return (
         <Box >
             <CustomizedDialogs
@@ -134,7 +151,7 @@ const NewOrderModal = ({ open, setOpen }) => {
                                                 <InputLabel id="demo-simple-select-label">From facility</InputLabel>
                                                 <Select
                                                     value={fromFacility}
-                                                    onChange={(e) => setType(e.target.value)}
+                                                    onChange={(e) => setFromFacility(e.target.value)}
                                                     label="from facility"
                                                 >
                                                     {facilities ? (
@@ -157,7 +174,7 @@ const NewOrderModal = ({ open, setOpen }) => {
                                                 <InputLabel id="demo-simple-select-label">To facility</InputLabel>
                                                 <Select
                                                     value={toFacility}
-                                                    onChange={(e) => setType(e.target.value)}
+                                                    onChange={(e) => setToFaciity(e.target.value)}
                                                     label="to facility"
                                                 >
                                                     {facilities ? (
@@ -202,7 +219,8 @@ const NewOrderModal = ({ open, setOpen }) => {
                                         <Box className="contentModal-item-input">
                                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                                 <DemoContainer components={['DateTimePicker']}>
-                                                    <DateTimePicker label="Early Delivery Time" />
+                                                    <DateTimePicker label="Early Delivery Time" 
+                                                    onChange={(e) => setEarlyDeliveryTime((new Date(e)).getTime())}/>
                                                 </DemoContainer>
                                             </LocalizationProvider>
                                         </Box>
@@ -214,7 +232,8 @@ const NewOrderModal = ({ open, setOpen }) => {
                                         <Box className="contentModal-item-input">
                                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                                 <DemoContainer components={['DateTimePicker']}>
-                                                    <DateTimePicker label="Late Delivery Time" />
+                                                    <DateTimePicker label="Late Delivery Time" 
+                                                    onChange={(e) => setLateDeliveryTime((new Date(e)).getTime())}/>
                                                 </DemoContainer>
                                             </LocalizationProvider>
                                         </Box>
@@ -226,7 +245,8 @@ const NewOrderModal = ({ open, setOpen }) => {
                                         <Box className="contentModal-item-input">
                                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                                 <DemoContainer components={['DateTimePicker']}>
-                                                    <DateTimePicker label="Early PickUp Time" />
+                                                    <DateTimePicker label="Early PickUp Time" 
+                                                    onChange={(e) => setEarlyPickUpTime((new Date(e)).getTime())}/>
                                                 </DemoContainer>
                                             </LocalizationProvider>
                                         </Box>
@@ -238,7 +258,8 @@ const NewOrderModal = ({ open, setOpen }) => {
                                         <Box className="contentModal-item-input">
                                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                                 <DemoContainer components={['DateTimePicker']}>
-                                                    <DateTimePicker label="Late PickUp Time" />
+                                                    <DateTimePicker label="Late PickUp Time" 
+                                                    onChange={(e) => setLatePickUpTime((new Date(e)).getTime())}/>
                                                 </DemoContainer>
                                             </LocalizationProvider>
                                         </Box>
@@ -264,7 +285,7 @@ const NewOrderModal = ({ open, setOpen }) => {
                                             // }
                                             sx={styles.btn}
                                             style={{ width: 100 }}
-                                        // onClick={handleSubmit}
+                                        onClick={handleSubmit}
                                         >
                                             {false ? "Đang gửi..." : "Submit"}
                                         </PrimaryButton>

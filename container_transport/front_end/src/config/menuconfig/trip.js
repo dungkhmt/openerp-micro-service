@@ -1,6 +1,6 @@
 export const trip = {
     id: "MENU_CONTAINER",
-    icon: "BlurOnIcon",
+    icon: "Shipment",
     text: "Trip",
     child: [
       {

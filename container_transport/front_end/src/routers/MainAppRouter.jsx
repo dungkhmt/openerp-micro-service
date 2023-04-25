@@ -10,6 +10,7 @@ import TeacherRouter from "./TeacherRouter";
 import TruckScreen from "views/truckManagement/TruckScreen";
 import FacilityScreen from "views/facilityManagement/FacilityScreen";
 import OrderScreen from "views/order/OrderScreen";
+import ContainerScreen from "views/containerManagerment/ContainerScreen";
 
 const styles = {
   loadingProgress: {
@@ -41,6 +42,7 @@ function MainAppRouter(props) {
           <PrivateRoute component={TruckScreen} path="/truck" />
           <PrivateRoute component={FacilityScreen} path="/facility" />
           <PrivateRoute component={OrderScreen} path="/order" />
+          <PrivateRoute component={ContainerScreen} path="/container" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>
