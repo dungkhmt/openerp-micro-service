@@ -14,7 +14,7 @@ export default function ContestResultDistribution(props) {
   const [numberOfBins, setNumberOfBins] = useState(10);
 
   const [scaleStart, setScaleStart] = useState(0);
-  const [scaleEnd, setScaleEnd] = useState(100);
+  const [scaleEnd, setScaleEnd] = useState(1000);
 
   const defaultStats = {
     "Count": 0,
@@ -171,7 +171,7 @@ export default function ContestResultDistribution(props) {
           <Box sx={{width: "18%", marginLeft: "18px"}}>
             <Box sx={{marginBottom: "12px", display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
               <TextField
-                label={"From"}
+                label={"From (new)"}
                 value={scaleStart}
                 type={"number"}
                 onChange={(event) => {
@@ -180,7 +180,7 @@ export default function ContestResultDistribution(props) {
                 sx={{marginRight: "8px"}}
               />
               <TextField
-                label={"To"}
+                label={"To (new)"}
                 value={scaleEnd}
                 type={"number"}
                 onChange={(event) => {
