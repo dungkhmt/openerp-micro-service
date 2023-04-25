@@ -11,17 +11,7 @@ COPY src src
 RUN chmod +x mvnw && ./mvnw install -DskipTests
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
-FROM eclipse-temurin:20-jdk-alpine
-
-# For ortools and Apache POI
-RUN apk update && apk add --no-cache \
-    gcompat \
-    ncurses-libs \
-    libgcc \
-    libstdc++ \
-    && apk add \
-    --update ttf-dejavu \
-    && rm -rf /var/cache/apk/*
+FROM eclipse-temurin:20-jdk
 
 ENV JAVA_OPTS=""
 
