@@ -98,7 +98,23 @@ export const useGetBillItemOfSaleOrder = (params) => {
     onSuccess: (data) => {},
   });
 };
-
+export const useGetBillItemsOfBill = (params) => {
+  return useQuery({
+    queryKey: [queryKey.delivery_bill.bill_item_of_bill, params],
+    queryFn: async () => {
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getBillItemOfBill,
+        params
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};
 export const useCreateDeliveryBill = (params) => {
   return useMutation({
     mutationFn: async (data) => {

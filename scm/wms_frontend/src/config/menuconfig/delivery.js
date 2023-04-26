@@ -11,10 +11,10 @@ export const delivery = {
       child: [],
     },
     {
-      id: "MENU_WMS_DELIVERY.scheduling",
-      path: "/delivery/scheduling",
+      id: "MENU_WMS_DELIVERY.SPLIT_ORDER",
+      path: "/delivery/split-order",
       isPublic: false,
-      text: "Scheduling",
+      text: "Split order",
       child: [],
     },
   ],

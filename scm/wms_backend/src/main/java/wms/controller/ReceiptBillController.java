@@ -30,7 +30,7 @@ public class ReceiptBillController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping("/get-bill-items")
+    @GetMapping("/get-bill-items-of-order")
     public ResponseEntity<?> getBillsOfOrder(
             @RequestParam(value = "orderCode", required = false, defaultValue = DefaultConst.STRING) String orderCode
     ) {

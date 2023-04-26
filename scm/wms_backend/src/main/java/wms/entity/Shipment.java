@@ -1,11 +1,14 @@
 package wms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -14,7 +17,7 @@ import java.time.ZonedDateTime;
 @Table(name = "shipment")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Shipment extends BaseEntity {
+public class Shipment extends BaseEntity implements Serializable {
     @Column(name = "code")
     private String code;
 
@@ -34,4 +37,12 @@ public class Shipment extends BaseEntity {
     @JoinColumn(name = "created_by", referencedColumnName = "user_login_id")
     @NotFound(action = NotFoundAction.IGNORE)
     private UserLogin user;
+
+    @OneToMany(mappedBy = "shipment",fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<DeliveryTrip> trips;
+
+    @OneToMany(mappedBy = "shipment",fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<ShipmentItem> shipmentItems;
 }

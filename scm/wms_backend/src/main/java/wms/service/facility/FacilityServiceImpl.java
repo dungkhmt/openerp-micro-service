@@ -196,7 +196,7 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
 
     @Override
     public ReceiptBill getReceiptBillForOrderByCode(String orderCode, String code) {
-        return receiptBillRepo.getReceiptBillByCode(orderCode.toUpperCase(), code.toUpperCase());
+        return receiptBillRepo.getBillOfOrderByCode(orderCode.toUpperCase(), code.toUpperCase());
     }
 
     private boolean canImportToFacility(PurchaseOrder currentImportingOrder, ImportToFacilityDTO importToFacilityDTO) {

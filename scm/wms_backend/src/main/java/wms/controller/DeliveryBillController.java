@@ -30,12 +30,23 @@ public class DeliveryBillController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping("/get-bill-items")
+    @GetMapping("/get-bill-items-of-order")
     public ResponseEntity<?> getBillsOfOrder(
             @RequestParam(value = "orderCode", required = false, defaultValue = DefaultConst.STRING) String orderCode
     ) {
         try {
             return response(new ResultEntity(1, "Get bill items successfully", deliveryBillService.getBillItemsOfOrder( orderCode)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+
+    @GetMapping("/get-bill-items-of-bill")
+    public ResponseEntity<?> getBillsOfBill(
+            @RequestParam(value = "bill_code", required = false, defaultValue = DefaultConst.STRING) String billCode
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get bill items successfully", deliveryBillService.getBillItemsOfBill( billCode)));
         } catch (Exception ex) {
             return response(error(ex));
         }

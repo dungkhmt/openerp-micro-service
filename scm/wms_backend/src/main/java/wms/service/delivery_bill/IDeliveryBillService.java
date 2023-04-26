@@ -10,6 +10,7 @@ import java.util.List;
 public interface IDeliveryBillService {
     ReturnPaginationDTO<DeliveryBill> getAllBills(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
     List<DeliveryBillItem> getBillItemsOfOrder(String orderCode) throws JsonProcessingException;
+    List<DeliveryBillItem> getBillItemsOfBill(String billCode) throws JsonProcessingException;
     DeliveryBill getBillById(long id);
     DeliveryBill getBillByCode(String code);
     DeliveryBillItem getBillItemsOfOrder(String billCode, String billItemSeq);

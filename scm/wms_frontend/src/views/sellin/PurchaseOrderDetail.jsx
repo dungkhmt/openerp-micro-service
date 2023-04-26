@@ -9,22 +9,22 @@ import {
   Typography,
 } from "@mui/material";
 import withScreenSecurity from "components/common/withScreenSecurity";
+import CustomDataGrid from "components/datagrid/CustomDataGrid";
+import CustomModal from "components/modal/CustomModal";
 import CustomBillTable from "components/table/CustomBillTable";
 import CustomOrderTable from "components/table/CustomOrderTable";
 import CustomToolBar from "components/toolbar/CustomToolBar";
+import {
+  useCreateReceiptBill,
+  useGetBillItemOfPurchaseOrder,
+} from "controllers/query/bill-query";
 import { useGetProductList } from "controllers/query/category-query";
+import { useGetPurchaseOrderItems } from "controllers/query/purchase-order-query";
 import { useCallback, useState } from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
-import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
-import CustomModal from "../../components/modal/CustomModal";
-import {
-  useCreateReceiptBill,
-  useGetBillItemOfPurchaseOrder,
-} from "../../controllers/query/bill-query";
-import { useGetPurchaseOrderItems } from "../../controllers/query/purchase-order-query";
 
 function PurchaseOrderDetailScreen({}) {
   const location = useLocation();

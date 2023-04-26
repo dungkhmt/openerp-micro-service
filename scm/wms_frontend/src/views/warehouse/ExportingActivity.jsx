@@ -25,7 +25,7 @@ function ExportingActivityScreen({ screenAuthorization }) {
   const { isLoading, data } = useGetSaleOrderList({
     orderStatus: "accepted",
   });
-  const { isLoading: isLoadingReceiptBill, data: receiptBills } =
+  const { isLoading: isLoadingReceiptBill, data: deliveryBills } =
     useGetDeliveryBillList({
       orderStatus: "accepted",
     });
@@ -203,7 +203,7 @@ function ExportingActivityScreen({ screenAuthorization }) {
             ),
           },
         ]}
-        rows={receiptBills ? receiptBills?.content : []}
+        rows={deliveryBills ? deliveryBills?.content : []}
       />
     </Box>
   );

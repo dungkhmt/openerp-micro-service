@@ -9,17 +9,15 @@ import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomFormControl from "components/form/CustomFormControl";
 import CustomModal from "components/modal/CustomModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import {
-  useCreateShipment,
-  useGetShipmentList,
-} from "controllers/query/shipment-query";
-import moment, { unix } from "moment";
+import { useCreateShipment } from "controllers/query/shipment-query";
+import moment from "moment";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
+import { useGetDeliveryBillList } from "../../controllers/query/bill-query";
 import { Action } from "../sellin/PurchaseOrder";
-function ShipmentScreen({ screenAuthorization }) {
+function SplitOrderScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
     page_size: 50,
@@ -43,7 +41,7 @@ function ShipmentScreen({ screenAuthorization }) {
     control,
   } = methods;
 
-  const { isLoading, data } = useGetShipmentList();
+  const { isLoading, data } = useGetDeliveryBillList();
   const createShipmentQuery = useCreateShipment();
 
   const onSubmit = async (data) => {
@@ -59,8 +57,8 @@ function ShipmentScreen({ screenAuthorization }) {
   };
 
   const handleButtonClick = (params) => {
-    history.push(`${path}/shipment-detail`, {
-      shipment: params,
+    history.push(`${path}/split-bill-detail`, {
+      bills: params,
     });
   };
 
@@ -110,6 +108,14 @@ function ShipmentScreen({ screenAuthorization }) {
   ];
   const extraActions = [
     {
+      title: "Xem",
+      callback: (item) => {
+        handleButtonClick(item);
+      },
+      icon: <VisibilityIcon />,
+      // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
+    },
+    {
       title: "Sửa",
       callback: (item) => {
         // setItemSelected(item);
@@ -125,14 +131,6 @@ function ShipmentScreen({ screenAuthorization }) {
         // setItemSelected(item);
       },
       icon: <DeleteIcon />,
-      // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
-    },
-    {
-      title: "Xem",
-      callback: (item) => {
-        handleButtonClick(item);
-      },
-      icon: <VisibilityIcon />,
       // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
     },
   ];
@@ -160,7 +158,7 @@ function ShipmentScreen({ screenAuthorization }) {
           color={green[800]}
           fontSize={17}
         >
-          {"KẾ HOẠCH GIAO HÀNG"}
+          {"DANH SÁCH ĐƠN GIAO HÀNG"}
         </Typography>
       </Box>
       <Box>
@@ -175,51 +173,53 @@ function ShipmentScreen({ screenAuthorization }) {
         columns={[
           {
             field: "code",
-            headerName: "Mã đợt",
+            headerName: "Mã code",
             sortable: false,
+            pinnable: true,
             minWidth: 150,
           },
           {
-            field: "title",
-            headerName: "Tên đợt giao",
+            field: "createdDate",
+            headerName: "Thời điểm tạo",
             sortable: false,
             minWidth: 200,
           },
           {
-            field: "startedDate",
-            headerName: "Ngày bắt đầu",
+            field: "boughtBy",
+            headerName: "Mua bởi",
             sortable: false,
             minWidth: 150,
-            valueGetter: (item) => {
-              return unix(item?.row?.startedDate).format("DD/MM/YYYY");
+            valueGetter: (params) => {
+              return params?.row?.saleOrder?.customer?.name;
             },
           },
           {
-            field: "endedDate",
-            headerName: "Ngày kết thúc dự kiến",
+            field: "status",
+            headerName: "Trạng thái",
             sortable: false,
             minWidth: 150,
-            valueGetter: (item) => {
-              return unix(item?.row?.endedDate).format("DD/MM/YYYY");
+            renderCell: (params) => {
+              return (
+                <Button variant="outlined" color="info">
+                  {"IN PROGRESS"}
+                </Button>
+              );
             },
           },
           {
             field: "quantity",
             headerName: "Hành động",
             sortable: false,
-            minWidth: 150,
+            minWidth: 200,
             type: "actions",
-            getActions: (params) => [
-              ...extraActions.map((extraAction, index) => (
-                <Action
-                  item={params.row}
-                  key={index}
-                  extraAction={extraAction}
-                  onActionCall={extraAction.callback}
-                  disabled={false}
-                />
-              )),
-            ],
+            renderCell: (params) => (
+              <Action
+                disabled={false}
+                extraAction={extraActions[0]}
+                item={params.row}
+                onActionCall={extraActions[0].callback}
+              />
+            ),
           },
         ]}
         rows={data ? data?.content : []}
@@ -255,5 +255,5 @@ function ShipmentScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_SHIPMENT";
-export default withScreenSecurity(ShipmentScreen, SCR_ID, true);
+const SCR_ID = "SCR_SPLIT_ORDER";
+export default withScreenSecurity(SplitOrderScreen, SCR_ID, true);

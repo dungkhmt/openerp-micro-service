@@ -10,8 +10,10 @@ import {
   Typography,
 } from "@mui/material";
 import { green } from "@mui/material/colors";
+import PrimaryButton from "components/button/PrimaryButton";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
+import CustomizedDialogs from "components/dialog/CustomizedDialogs";
 import CustomFormControl from "components/form/CustomFormControl";
 import CustomModal from "components/modal/CustomModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
@@ -25,8 +27,6 @@ import {
 import { useState } from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { useToggle, useWindowSize } from "react-use";
-import PrimaryButton from "../../components/button/PrimaryButton";
-import CustomizedDialogs from "../../components/dialog/CustomizedDialogs";
 import {
   staticDatagridCols,
   staticFormControlFields,

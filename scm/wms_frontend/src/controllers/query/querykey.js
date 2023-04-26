@@ -27,8 +27,16 @@ export const queryKey = {
   delivery_bill: {
     delivery_bill_list: "delivery_bill_list",
     bill_item_of_delivery_order: "bill_item_of_delivery_order",
+    bill_item_of_bill: "bill_item_of_bill",
   },
   shipment: {
     shipment_list: "shipment_list",
+  },
+  delivery_trip: {
+    trip_list: "trip_list",
+  },
+  user: {
+    user_list: "user_list",
+    user_list_all: "user_list_all",
   },
 };

@@ -30,7 +30,7 @@ public class ReceiptBillServiceImpl extends BaseService implements IReceiptBillS
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
-        Page<ReceiptBill> receiptBills = receiptBillRepo.search(pageable);
+        Page<ReceiptBill> receiptBills = receiptBillRepo.getAllBills(pageable);
         return getPaginationResult(receiptBills.getContent(), page, receiptBills.getTotalPages(), receiptBills.getTotalElements());
     }
 

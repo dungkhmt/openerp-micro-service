@@ -41,6 +41,14 @@ public class UserLogin {
     @JsonIgnore
     private Set<Shipment> shipments;
 
+    @OneToMany(mappedBy = "creator",fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<DeliveryTrip> trips;
+
+    @OneToMany(mappedBy = "userInCharge",fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<DeliveryTrip> listTrips;
+
     @Size(max = 60)
     @Column(name = "current_password", length = 60)
     private String currentPassword;

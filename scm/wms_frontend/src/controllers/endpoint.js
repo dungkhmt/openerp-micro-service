@@ -23,10 +23,11 @@ export const endPoint = {
   getFacilityInventory: baseUrl + "/facility/get-inventory",
   // Bill
   getReceiptBills: baseUrl + "/receipt-bill/get-all",
-  getBillItemOfPurchaseOrder: baseUrl + "/receipt-bill/get-bill-items",
+  getBillItemOfPurchaseOrder: baseUrl + "/receipt-bill/get-bill-items-of-order",
   createReceiptBill: baseUrl + "/facility/import-item",
   getDeliveryBills: baseUrl + "/delivery-bill/get-all",
-  getBillItemOfSaleOrder: baseUrl + "/delivery-bill/get-bill-items",
+  getBillItemOfSaleOrder: baseUrl + "/delivery-bill/get-bill-items-of-order",
+  getBillItemOfBill: baseUrl + "/delivery-bill/get-bill-items-of-bill",
   createDeliveryBill: baseUrl + "/facility/export-item",
   // Sale Order
   getSaleOrder: baseUrl + "/sale-order/get-all",
@@ -35,4 +36,12 @@ export const endPoint = {
   updateSaleOrderStatus: baseUrl + "/sale-order/update-status",
   // Shipment
   createShipment: baseUrl + "/shipment/create",
+  getShipments: baseUrl + "/shipment/get-all",
+  // Delivery
+  createDeliveryTrip: baseUrl + "/delivery-trip/create",
+  getDeliveryTrips: baseUrl + "/delivery-trip/get-all",
+  // User
+  // createNewUser: base
+  getAllUsers: baseUrl + "/user/get-all",
+  getAllUsersWithoutPagination: baseUrl + "/user/get-all-exists",
 };

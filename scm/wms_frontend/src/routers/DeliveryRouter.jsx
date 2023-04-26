@@ -1,6 +1,8 @@
 import { Route, Switch, useRouteMatch } from "react-router";
 import Shipment from "../views/delivery/Shipment";
-import ImportingActivity from "../views/warehouse/ImportingActivity";
+import ShipmentDetail from "../views/delivery/ShipmentDetail";
+import SplitBillDetail from "../views/delivery/SplitBillDetail";
+import SplitOrder from "../views/delivery/SplitOrder";
 
 export default function DeliveryRouter() {
   let { path } = useRouteMatch();
@@ -9,9 +11,19 @@ export default function DeliveryRouter() {
       <Switch>
         <Route component={Shipment} exact path={`${path}/shipment`}></Route>
         <Route
-          component={ImportingActivity}
+          component={ShipmentDetail}
           exact
-          path={`${path}/importing`}
+          path={`${path}/shipment/shipment-detail`}
+        ></Route>
+        <Route
+          component={SplitOrder}
+          exact
+          path={`${path}/split-order`}
+        ></Route>
+        <Route
+          component={SplitBillDetail}
+          exact
+          path={`${path}/split-order/split-bill-detail`}
         ></Route>
       </Switch>
     </div>
