@@ -1,4 +1,4 @@
-import { Box, FormControl, InputLabel, MenuItem, Select, TextField, Typography, Autocomplete, Divider } from "@mui/material";
+import { Box, FormControl, InputLabel, MenuItem, Select, TextField, Typography, Autocomplete, Divider, Switch, Alert, AlertTitle } from "@mui/material";
 import PrimaryButton from "components/button/PrimaryButton";
 import TertiaryButton from "components/button/TertiaryButton";
 import CustomizedDialogs from "components/dialog/CustomizedDialogs";
@@ -50,7 +50,7 @@ const styles = {
     btn: { margin: "4px 8px" },
 };
 
-const NewOrderModal = ({ open, setOpen }) => {
+const NewOrderModal = ({ open, setOpen, setToast }) => {
     const [type, setType] = useState();
     const [facilities, setFacilities] = useState([]);
     const [fromFacility, setFromFacility] = useState();
@@ -60,6 +60,7 @@ const NewOrderModal = ({ open, setOpen }) => {
     const [lateDeliveryTime, setLateDeliveryTime] = useState();
     const [earlyPickUpTime, setEarlyPickUpTime] = useState();
     const [latePickUpTime, setLatePickUpTime] = useState();
+    const [isBreakRomooc, setIsBreakRomooc] = useState(false);
 
     useEffect(() => {
         request(
@@ -88,6 +89,9 @@ const NewOrderModal = ({ open, setOpen }) => {
     const handleClose = () => {
         setOpen(false);
     }
+    const handleChangeBreakRomooc = (e) => {
+        setIsBreakRomooc(e.target.checked);
+    }
     const handleSubmit = () => {
         const data = {
             type: type,
@@ -97,208 +101,230 @@ const NewOrderModal = ({ open, setOpen }) => {
             lateDeliveryTime: lateDeliveryTime,
             earlyPickupTime: earlyPickUpTime,
             latePickupTime: latePickUpTime,
-            isBreakRomooc: false
+            isBreakRomooc: isBreakRomooc
         }
-        console.log("data", data);
+        request(
+            "post",
+            `/order/create`, {}, {}, data
+        ).then((res) => {
+            console.log(res);
+            handleClose();
+            setToast(true);
+            setTimeout(() => {
+                setToast(false);
+              }, "2000");
+        })
     }
-    return (
-        <Box >
-            <CustomizedDialogs
-                open={open}
-                handleClose={handleClose}
-                contentTopDivider
-                title="New Order"
-                content={
-                    <AnimatePresence>
+return (
+    <Box >
+        <CustomizedDialogs
+            open={open}
+            handleClose={handleClose}
+            contentTopDivider
+            title="New Order"
+            content={
+                <AnimatePresence>
+                    <motion.div
+                    >
                         <motion.div
+                            animate="center"
+                            transition={{
+                                opacity: { duration: 0.1 },
+                            }}
                         >
-                            <motion.div
-                                animate="center"
-                                transition={{
-                                    opacity: { duration: 0.1 },
-                                }}
-                            >
-                                <Box pt="7px" pb={1} pl={1} pr={1} sx={{ width: "650px" }} className="contentModal">
-                                    <Box className="contentModal-item">
-                                        <Box className="contentModal-item-text">
-                                            <Typography>Type:</Typography>
-                                        </Box>
-                                        <Box className="contentModal-item-input">
-                                            <FormControl>
-                                                <InputLabel id="demo-simple-select-label">Type</InputLabel>
-                                                <Select
-                                                    value={type}
-                                                    onChange={(e) => setType(e.target.value)}
-                                                    label="type"
-                                                >
-                                                    {typeConst ? (
-                                                        typeConst.map((item) => {
-                                                            return (
-                                                                <MenuItem value={item.id}>{item.name}</MenuItem>
-                                                            );
-                                                        })
-                                                    ) : null}
-                                                </Select>
-                                            </FormControl>
-                                        </Box>
+                            <Box pt="7px" pb={1} pl={1} pr={1} sx={{ width: "650px" }} className="contentModal">
+                                <Box className="contentModal-item">
+                                    <Box className="contentModal-item-text">
+                                        <Typography>Type:</Typography>
                                     </Box>
-                                    <Box className="contentModal-item">
-                                        <Box className="contentModal-item-text">
-                                            <Typography>From Facility: </Typography>
-                                        </Box>
-                                        <Box className="contentModal-item-input">
-                                            <FormControl>
-                                                <InputLabel id="demo-simple-select-label">From facility</InputLabel>
-                                                <Select
-                                                    value={fromFacility}
-                                                    onChange={(e) => setFromFacility(e.target.value)}
-                                                    label="from facility"
-                                                >
-                                                    {facilities ? (
-                                                        facilities.map((item) => {
-                                                            return (
-                                                                <MenuItem value={item.id}>{item.facilityName}</MenuItem>
-                                                            );
-                                                        })
-                                                    ) : null}
-                                                </Select>
-                                            </FormControl>
-                                        </Box>
-                                    </Box>
-                                    <Box className="contentModal-item">
-                                        <Box className="contentModal-item-text">
-                                            <Typography>To Facility:</Typography>
-                                        </Box>
-                                        <Box className="contentModal-item-input">
-                                            <FormControl>
-                                                <InputLabel id="demo-simple-select-label">To facility</InputLabel>
-                                                <Select
-                                                    value={toFacility}
-                                                    onChange={(e) => setToFaciity(e.target.value)}
-                                                    label="to facility"
-                                                >
-                                                    {facilities ? (
-                                                        facilities.map((item) => {
-                                                            return (
-                                                                <MenuItem value={item.id}>{item.facilityName}</MenuItem>
-                                                            );
-                                                        })
-                                                    ) : null}
-                                                </Select>
-                                            </FormControl>
-                                        </Box>
-                                    </Box>
-                                    {
-                                        typeFull.includes(type) ? (<Box className="contentModal-item">
-                                            <Box className="contentModal-item-text">
-                                                <Typography>Containers:</Typography>
-                                            </Box>
-                                            <Box className="contentModal-item-input">
-                                                <Autocomplete
-                                                    multiple
-                                                    id="tags-outlined"
-                                                    options={containers}
-                                                    getOptionLabel={(option) => option.containerCode}
-                                                    // defaultValue={[containers[0]]}
-                                                    filterSelectedOptions
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            label="Containers"
-                                                            placeholder="containers"
-                                                        />
-                                                    )}
-                                                />
-                                            </Box>
-                                        </Box>) : null
-                                    }
-                                    <Box className="contentModal-item">
-                                        <Box className="contentModal-item-text">
-                                            <Typography>Early Delivery Time:</Typography>
-                                        </Box>
-                                        <Box className="contentModal-item-input">
-                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                <DemoContainer components={['DateTimePicker']}>
-                                                    <DateTimePicker label="Early Delivery Time" 
-                                                    onChange={(e) => setEarlyDeliveryTime((new Date(e)).getTime())}/>
-                                                </DemoContainer>
-                                            </LocalizationProvider>
-                                        </Box>
-                                    </Box>
-                                    <Box className="contentModal-item">
-                                        <Box className="contentModal-item-text">
-                                            <Typography>Late Delivery Time:</Typography>
-                                        </Box>
-                                        <Box className="contentModal-item-input">
-                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                <DemoContainer components={['DateTimePicker']}>
-                                                    <DateTimePicker label="Late Delivery Time" 
-                                                    onChange={(e) => setLateDeliveryTime((new Date(e)).getTime())}/>
-                                                </DemoContainer>
-                                            </LocalizationProvider>
-                                        </Box>
-                                    </Box>
-                                    <Box className="contentModal-item">
-                                        <Box className="contentModal-item-text">
-                                            <Typography>Early PickUp Time:</Typography>
-                                        </Box>
-                                        <Box className="contentModal-item-input">
-                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                <DemoContainer components={['DateTimePicker']}>
-                                                    <DateTimePicker label="Early PickUp Time" 
-                                                    onChange={(e) => setEarlyPickUpTime((new Date(e)).getTime())}/>
-                                                </DemoContainer>
-                                            </LocalizationProvider>
-                                        </Box>
-                                    </Box>
-                                    <Box className="contentModal-item">
-                                        <Box className="contentModal-item-text">
-                                            <Typography>Late PickUp Time:</Typography>
-                                        </Box>
-                                        <Box className="contentModal-item-input">
-                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                <DemoContainer components={['DateTimePicker']}>
-                                                    <DateTimePicker label="Late PickUp Time" 
-                                                    onChange={(e) => setLatePickUpTime((new Date(e)).getTime())}/>
-                                                </DemoContainer>
-                                            </LocalizationProvider>
-                                        </Box>
-                                    </Box>
-                                    <Divider />
-                                    <Box
-                                        display="flex"
-                                        justifyContent="flex-end"
-                                        pt={2}
-                                        ml={-1}
-                                        mr={-1}
-                                    >
-                                        <TertiaryButton
-                                            onClick={() => setOpen(false)}
-                                            sx={styles.btn}
-                                            style={{ width: 100 }}
-                                        >
-                                            Cancel
-                                        </TertiaryButton>
-                                        <PrimaryButton
-                                            // disabled={
-                                            //     isEmpty(feature) || isEmpty(detail) || isSubmitting
-                                            // }
-                                            sx={styles.btn}
-                                            style={{ width: 100 }}
-                                        onClick={handleSubmit}
-                                        >
-                                            {false ? "Đang gửi..." : "Submit"}
-                                        </PrimaryButton>
+                                    <Box className="contentModal-item-input">
+                                        <FormControl>
+                                            <InputLabel id="demo-simple-select-label">Type</InputLabel>
+                                            <Select
+                                                value={type}
+                                                onChange={(e) => setType(e.target.value)}
+                                                label="type"
+                                            >
+                                                {typeConst ? (
+                                                    typeConst.map((item) => {
+                                                        return (
+                                                            <MenuItem value={item.id}>{item.name}</MenuItem>
+                                                        );
+                                                    })
+                                                ) : null}
+                                            </Select>
+                                        </FormControl>
                                     </Box>
                                 </Box>
-                            </motion.div>
+                                <Box className="contentModal-item">
+                                    <Box className="contentModal-item-text">
+                                        <Typography>From Facility: </Typography>
+                                    </Box>
+                                    <Box className="contentModal-item-input">
+                                        <FormControl>
+                                            <InputLabel id="demo-simple-select-label">From facility</InputLabel>
+                                            <Select
+                                                value={fromFacility}
+                                                onChange={(e) => setFromFacility(e.target.value)}
+                                                label="from facility"
+                                            >
+                                                {facilities ? (
+                                                    facilities.map((item) => {
+                                                        return (
+                                                            <MenuItem value={item.id}>{item.facilityName}</MenuItem>
+                                                        );
+                                                    })
+                                                ) : null}
+                                            </Select>
+                                        </FormControl>
+                                    </Box>
+                                </Box>
+                                <Box className="contentModal-item">
+                                    <Box className="contentModal-item-text">
+                                        <Typography>To Facility:</Typography>
+                                    </Box>
+                                    <Box className="contentModal-item-input">
+                                        <FormControl>
+                                            <InputLabel id="demo-simple-select-label">To facility</InputLabel>
+                                            <Select
+                                                value={toFacility}
+                                                onChange={(e) => setToFaciity(e.target.value)}
+                                                label="to facility"
+                                            >
+                                                {facilities ? (
+                                                    facilities.map((item) => {
+                                                        return (
+                                                            <MenuItem value={item.id}>{item.facilityName}</MenuItem>
+                                                        );
+                                                    })
+                                                ) : null}
+                                            </Select>
+                                        </FormControl>
+                                    </Box>
+                                </Box>
+                                {
+                                    typeFull.includes(type) ? (<Box className="contentModal-item">
+                                        <Box className="contentModal-item-text">
+                                            <Typography>Containers:</Typography>
+                                        </Box>
+                                        <Box className="contentModal-item-input">
+                                            <Autocomplete
+                                                multiple
+                                                id="tags-outlined"
+                                                options={containers}
+                                                getOptionLabel={(option) => option.containerCode}
+                                                // defaultValue={[containers[0]]}
+                                                filterSelectedOptions
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        {...params}
+                                                        label="Containers"
+                                                        placeholder="containers"
+                                                    />
+                                                )}
+                                            />
+                                        </Box>
+                                    </Box>) : null
+                                }
+                                <Box className="contentModal-item">
+                                    <Box className="contentModal-item-text">
+                                        <Typography>Break Romooc:</Typography>
+                                    </Box>
+                                    <Box className="contentModal-item-input">
+                                        <Switch
+                                            checked={isBreakRomooc}
+                                            onChange={handleChangeBreakRomooc}
+                                            inputProps={{ 'aria-label': 'controlled' }}
+                                        />
+                                    </Box>
+                                </Box>
+                                <Box className="contentModal-item">
+                                    <Box className="contentModal-item-text">
+                                        <Typography>Early Delivery Time:</Typography>
+                                    </Box>
+                                    <Box className="contentModal-item-input">
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DemoContainer components={['DateTimePicker']}>
+                                                <DateTimePicker label="Early Delivery Time"
+                                                    onChange={(e) => setEarlyDeliveryTime((new Date(e)).getTime())} />
+                                            </DemoContainer>
+                                        </LocalizationProvider>
+                                    </Box>
+                                </Box>
+                                <Box className="contentModal-item">
+                                    <Box className="contentModal-item-text">
+                                        <Typography>Late Delivery Time:</Typography>
+                                    </Box>
+                                    <Box className="contentModal-item-input">
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DemoContainer components={['DateTimePicker']}>
+                                                <DateTimePicker label="Late Delivery Time"
+                                                    onChange={(e) => setLateDeliveryTime((new Date(e)).getTime())} />
+                                            </DemoContainer>
+                                        </LocalizationProvider>
+                                    </Box>
+                                </Box>
+                                <Box className="contentModal-item">
+                                    <Box className="contentModal-item-text">
+                                        <Typography>Early PickUp Time:</Typography>
+                                    </Box>
+                                    <Box className="contentModal-item-input">
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DemoContainer components={['DateTimePicker']}>
+                                                <DateTimePicker label="Early PickUp Time"
+                                                    onChange={(e) => setEarlyPickUpTime((new Date(e)).getTime())} />
+                                            </DemoContainer>
+                                        </LocalizationProvider>
+                                    </Box>
+                                </Box>
+                                <Box className="contentModal-item">
+                                    <Box className="contentModal-item-text">
+                                        <Typography>Late PickUp Time:</Typography>
+                                    </Box>
+                                    <Box className="contentModal-item-input">
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DemoContainer components={['DateTimePicker']}>
+                                                <DateTimePicker label="Late PickUp Time"
+                                                    onChange={(e) => setLatePickUpTime((new Date(e)).getTime())} />
+                                            </DemoContainer>
+                                        </LocalizationProvider>
+                                    </Box>
+                                </Box>
+                                <Divider />
+                                <Box
+                                    display="flex"
+                                    justifyContent="flex-end"
+                                    pt={2}
+                                    ml={-1}
+                                    mr={-1}
+                                >
+                                    <TertiaryButton
+                                        onClick={() => setOpen(false)}
+                                        sx={styles.btn}
+                                        style={{ width: 100 }}
+                                    >
+                                        Cancel
+                                    </TertiaryButton>
+                                    <PrimaryButton
+                                        // disabled={
+                                        //     isEmpty(feature) || isEmpty(detail) || isSubmitting
+                                        // }
+                                        sx={styles.btn}
+                                        style={{ width: 100 }}
+                                        onClick={handleSubmit}
+                                    >
+                                        {false ? "Đang gửi..." : "Submit"}
+                                    </PrimaryButton>
+                                </Box>
+                            </Box>
                         </motion.div>
-                    </AnimatePresence>
-                }
-                className="modalOrder"
-            />
+                    </motion.div>
+                </AnimatePresence>
+            }
+            className="modalOrder"
+        />
 
-        </Box>
-    )
+    </Box>
+)
 }
 export default NewOrderModal;

@@ -1,4 +1,4 @@
-import { Box, Container, Divider } from "@mui/material";
+import { Alert, AlertTitle, Box, Container, Divider } from "@mui/material";
 import { request } from "api";
 import React, { useEffect, useState } from "react";
 import './styles.scss';
@@ -7,6 +7,7 @@ import HeaderOrderScreen from "./HeaderOrderScreen";
 
 const OrderScreen = () => {
     const [orders, setOrders] = useState([]);
+    const [toastOpen, setToast] = useState(false);
 
     useEffect(() => {
         request(
@@ -20,7 +21,16 @@ const OrderScreen = () => {
     return (
         <Box className="fullScreen">
             <Container maxWidth="md" className="container">
-                <HeaderOrderScreen />
+                <Box className="toast">
+                    {toastOpen ? (
+                        <Alert severity="success" >
+                            <AlertTitle>Success</AlertTitle>
+                            This is a success alert — <strong> check it out!</strong >
+                        </Alert >
+                    ) : null
+                    }
+                </Box>
+                <HeaderOrderScreen setToast={setToast} />
                 <Box className="divider">
                     <Divider />
                 </Box>

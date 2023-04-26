@@ -17,6 +17,12 @@
         margin-top: 8px;
         margin-bottom: 48px;
     }
+    .toast {
+        position: absolute;
+        z-index: 100;
+        bottom: 15px;
+        right: 0px;
+    }
 }
 
 .headerScreen {
@@ -125,7 +131,6 @@
         .contentModal-item-input {
             width: 60%;
             display: flex;
-            justify-content: flex-end;
             .MuiOutlinedInput-root {
                 height: 40px;
                 width: 100%;

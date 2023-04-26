@@ -5,7 +5,7 @@ import './styles.scss';
 import NewOrderModal from "./NewOrderModal";
 import { useState } from "react";
 
-const HeaderOrderScreen = () => {
+const HeaderOrderScreen = ({setToast}) => {
     const [open, setOpen] = useState(false);
     return (
         <Box className="headerScreen">
@@ -24,7 +24,7 @@ const HeaderOrderScreen = () => {
                     </Typography>
                 </PrimaryButton>
             </Box>
-            {open ? (<NewOrderModal open={open} setOpen={setOpen} />) : null}
+            {open ? (<NewOrderModal open={open} setOpen={setOpen} setToast={setToast}/>) : null}
         </Box>
     );
 }
