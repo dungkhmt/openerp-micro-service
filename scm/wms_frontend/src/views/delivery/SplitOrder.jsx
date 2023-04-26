@@ -6,16 +6,16 @@ import { Box, Button, Typography } from "@mui/material";
 import { green } from "@mui/material/colors";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
-import CustomFormControl from "components/form/CustomFormControl";
-import CustomModal from "components/modal/CustomModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useCreateShipment } from "controllers/query/shipment-query";
+import {
+  useCreateShipment,
+  useGetShipmentItems,
+} from "controllers/query/shipment-query";
 import moment from "moment";
 import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
-import { useGetDeliveryBillList } from "../../controllers/query/bill-query";
 import { Action } from "../sellin/PurchaseOrder";
 function SplitOrderScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
@@ -41,7 +41,7 @@ function SplitOrderScreen({ screenAuthorization }) {
     control,
   } = methods;
 
-  const { isLoading, data } = useGetDeliveryBillList();
+  const { isLoading, data } = useGetShipmentItems();
   const createShipmentQuery = useCreateShipment();
 
   const onSubmit = async (data) => {
@@ -57,9 +57,7 @@ function SplitOrderScreen({ screenAuthorization }) {
   };
 
   const handleButtonClick = (params) => {
-    history.push(`${path}/split-bill-detail`, {
-      bills: params,
-    });
+    history.push(`${path}/add-new`);
   };
 
   const fields = [
@@ -89,8 +87,8 @@ function SplitOrderScreen({ screenAuthorization }) {
   let actions = [
     {
       title: "Thêm",
-      callback: (pre) => {
-        setIsAdd((pre) => !pre);
+      callback: (item) => {
+        handleButtonClick(item);
       },
       icon: <AddIcon />,
       describe: "Thêm bản ghi mới",
@@ -109,9 +107,7 @@ function SplitOrderScreen({ screenAuthorization }) {
   const extraActions = [
     {
       title: "Xem",
-      callback: (item) => {
-        handleButtonClick(item);
-      },
+      callback: (item) => {},
       icon: <VisibilityIcon />,
       // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
     },
@@ -224,33 +220,6 @@ function SplitOrderScreen({ screenAuthorization }) {
         ]}
         rows={data ? data?.content : []}
       />
-      <CustomModal
-        open={isAdd}
-        toggle={setIsAdd}
-        size="sm"
-        style={{ padding: 2, zIndex: 3 }}
-      >
-        <FormProvider {...methods}>
-          {/* <Stack spacing={2}> */}
-          <CustomFormControl
-            control={control}
-            errors={errors}
-            fields={fields}
-          />
-          {/* </Stack> */}
-        </FormProvider>
-
-        <Button
-          onClick={handleSubmit(onSubmit)}
-          variant="contained"
-          style={{ marginRight: 20, color: "white" }}
-        >
-          Submit
-        </Button>
-        <Button onClick={() => reset()} variant={"outlined"}>
-          Reset
-        </Button>
-      </CustomModal>
     </Box>
   );
 }

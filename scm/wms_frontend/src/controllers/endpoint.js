@@ -37,6 +37,7 @@ export const endPoint = {
   // Shipment
   createShipment: baseUrl + "/shipment/create",
   getShipments: baseUrl + "/shipment/get-all",
+  getShipmentItems: baseUrl + "/shipment/get-all-item",
   // Delivery
   createDeliveryTrip: baseUrl + "/delivery-trip/create",
   getDeliveryTrips: baseUrl + "/delivery-trip/get-all",

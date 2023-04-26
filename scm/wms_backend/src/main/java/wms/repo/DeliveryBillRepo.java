@@ -17,4 +17,7 @@ public interface DeliveryBillRepo extends JpaRepository<DeliveryBill, Long> {
 
     @Query(value = "select * from delivery_bill where order_code = :orderCode", nativeQuery = true)
     List<DeliveryBill> getAllBillOfOrder(String orderCode);
+
+    @Query(value = "select * from delivery_bill where code = :billCode", nativeQuery = true)
+    DeliveryBill getBillWithCode(String billCode);
 }

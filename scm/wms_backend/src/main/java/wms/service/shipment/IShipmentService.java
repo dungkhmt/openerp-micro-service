@@ -17,6 +17,7 @@ public interface IShipmentService {
     ShipmentItem createShipmentItem(ShipmentItemDTO shipmentItemDTO) throws CustomException;
     void assignShipmentItem(AssignedItemDTO assignedItemDTO) throws CustomException;
     ReturnPaginationDTO<Shipment> getAllShipments(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
+    ReturnPaginationDTO<ShipmentItem> getAllShipmentItems(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
     Shipment getShipmentById(long id);
     Shipment getShipmentByCode(String code);
     ShipmentItem getShipmentItemById(long id);

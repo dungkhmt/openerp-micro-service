@@ -31,6 +31,7 @@ export const queryKey = {
   },
   shipment: {
     shipment_list: "shipment_list",
+    shipment_items: "shipment_items",
   },
   delivery_trip: {
     trip_list: "trip_list",

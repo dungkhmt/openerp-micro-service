@@ -91,6 +91,20 @@ public class ShipmentController extends BaseController {
             return response(error(ex));
         }
     }
+    @ApiOperation(value = "Get all shipment items with pagination and sorting and some conditions")
+    @GetMapping("/get-all-item")
+    public ResponseEntity<?> getAllShipmentItems(
+            @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
+            @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
+            @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
+            @RequestParam(value = "sort_asc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get list shipment items successfully", shipmentService.getAllShipmentItems(page, pageSize, sortField, isSortAsc)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
     @ApiOperation(value = "Assign splitted đơn (shipment item) cho các trip")
     @PutMapping("/assign-shipment-item")
     public ResponseEntity<?> create(@Valid @RequestBody AssignedItemDTO assignedItemDTO, JwtAuthenticationToken token) {

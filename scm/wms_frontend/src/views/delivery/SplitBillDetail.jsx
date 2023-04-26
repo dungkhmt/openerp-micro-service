@@ -13,10 +13,8 @@ import {
   Typography,
 } from "@mui/material";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import withScreenSecurity from "../../components/common/withScreenSecurity";
-import CustomBillTable from "../../components/table/CustomBillTable";
 import { useGetBillItemsOfBill } from "../../controllers/query/bill-query";
 import { AppColors } from "../../shared/AppColors";
 function SplitBillDetailScreen({ screenAuthorization }) {
@@ -27,9 +25,6 @@ function SplitBillDetailScreen({ screenAuthorization }) {
       bill_code: currBills?.code,
     });
 
-  const renderCustomBill = useCallback(() => {
-    return <CustomBillTable billItem={deliveryBillItems} />;
-  }, [deliveryBillItems]);
   let actions = [
     {
       title: "Chia đơn",
@@ -137,6 +132,25 @@ function SplitBillDetailScreen({ screenAuthorization }) {
           </TableBody>
         </Table>
       </TableContainer>
+      <Typography
+        id="modal-modal-title"
+        variant="h6"
+        textTransform="capitalize"
+        letterSpacing={1}
+        fontSize={18}
+        sx={{
+          fontFamily: "Open Sans",
+          color: AppColors.primary,
+          fontWeight: "bold",
+        }}
+      >
+        {"ĐƠN ĐÃ CHIA"}
+      </Typography>
+      <Typography>
+        Thêm 1 bảng hiển thị các đơn đã chia từ bill này (lấy từ
+        export_inventory), bảng này có thể chọn nhiều và - có nút để add vào đơn
+        giao hàng chính thức - có nút để add vào 1 trip cụ thể
+      </Typography>
     </Box>
   );
 }

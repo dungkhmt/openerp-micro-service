@@ -16,12 +16,14 @@ import { useGetAllUsersExist } from "controllers/query/user-query";
 import moment, { unix } from "moment";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useLocation } from "react-router-dom";
+import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { Action } from "../sellin/PurchaseOrder";
 function ShipmentDetailScreen() {
   const location = useLocation();
+  const history = useHistory();
+  let { path } = useRouteMatch();
   const currShipment = location.state.shipment;
   const [params, setParams] = useState({
     page: 1,
@@ -58,6 +60,11 @@ function ShipmentDetailScreen() {
     setIsAdd((pre) => !pre);
     reset();
   };
+  const handleButtonClick = (params) => {
+    history.push(`${path}/trip-detail`, {
+      trip: params,
+    });
+  };
   let actions = [
     {
       title: "Tạo chuyến giao hàng",
@@ -82,8 +89,7 @@ function ShipmentDetailScreen() {
     {
       title: "Xem",
       callback: async (item) => {
-        // setIsApproved((pre) => !pre);
-        // setUpdateOrder(item);
+        handleButtonClick(item);
       },
       icon: <VisibilityIcon />,
       // permission: PERMISSIONS.MANAGE_CATEGORY_EDIT,

@@ -1,0 +1,155 @@
+import AddIcon from "@mui/icons-material/Add";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { Box, Button, Typography } from "@mui/material";
+import CustomToolBar from "components/toolbar/CustomToolBar";
+import { useState } from "react";
+import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
+import { useWindowSize } from "react-use";
+import withScreenSecurity from "../../components/common/withScreenSecurity";
+import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
+import { useGetDeliveryBillList } from "../../controllers/query/bill-query";
+import { AppColors } from "../../shared/AppColors";
+import { Action } from "../sellin/PurchaseOrder";
+function AddShipmentOrderScreen({ screenAuthorization }) {
+  const location = useLocation();
+  const [params, setParams] = useState({
+    page: 1,
+    page_size: 50,
+  });
+  const { height } = useWindowSize();
+  const { isLoading, data } = useGetDeliveryBillList({});
+  const history = useHistory();
+  let { path } = useRouteMatch();
+
+  const handleButtonClick = (params) => {
+    history.push(`${path}/split-bill-detail`, {
+      bills: params,
+    });
+  };
+  let actions = [];
+  const extraActions = [
+    {
+      title: "Xem chi tiết",
+      callback: (item) => {
+        handleButtonClick(item);
+      },
+      icon: <VisibilityIcon />,
+      // permission: PERMISSIONS.MANAGE_CATEGORY_EDIT,
+    },
+    {
+      title: "Thêm",
+      callback: (item) => {
+        // setIsRemove();
+        // setItemSelected(item);
+      },
+      icon: <AddIcon />,
+      // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
+    },
+  ];
+  return (
+    <Box sx={{ flexGrow: 1 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          boxShadow: 3,
+          margin: "0px -16px 0 -16px",
+          paddingX: 2,
+          paddingY: 1,
+          position: "sticky",
+          backgroundColor: "white",
+          zIndex: 1000,
+        }}
+      >
+        <Typography
+          id="modal-modal-title"
+          variant="h6"
+          textTransform="capitalize"
+          letterSpacing={1}
+          fontSize={18}
+          sx={{
+            fontFamily: "Open Sans",
+            color: AppColors.primary,
+            fontWeight: "bold",
+          }}
+        >
+          {"DANH SÁCH ĐƠN CÓ THỂ THÊM"}
+        </Typography>
+      </Box>
+      <Box>
+        <CustomToolBar actions={actions} />
+      </Box>
+      <Box>
+        <Typography>Thông tin cơ bản</Typography>
+        <Typography>Tổng số item: {data?.content?.length}</Typography>
+      </Box>
+      <CustomDataGrid
+        params={params}
+        setParams={setParams}
+        sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
+        isLoading={isLoading}
+        totalItem={100}
+        columns={[
+          {
+            field: "code",
+            headerName: "Mã code",
+            sortable: false,
+            pinnable: true,
+            minWidth: 150,
+          },
+          {
+            field: "createdDate",
+            headerName: "Thời điểm tạo",
+            sortable: false,
+            minWidth: 200,
+          },
+          {
+            field: "boughtBy",
+            headerName: "Mua bởi",
+            sortable: false,
+            minWidth: 150,
+            valueGetter: (params) => {
+              return params?.row?.saleOrder?.customer?.name;
+            },
+          },
+          {
+            field: "status",
+            headerName: "Trạng thái",
+            sortable: false,
+            minWidth: 150,
+            renderCell: (params) => {
+              return (
+                <Button variant="outlined" color="info">
+                  {"IN PROGRESS"}
+                </Button>
+              );
+            },
+          },
+          {
+            field: "quantity",
+            headerName: "Hành động",
+            sortable: false,
+            minWidth: 200,
+            type: "actions",
+            getActions: (params) => [
+              ...extraActions.map((extraAction, index) => (
+                <Action
+                  item={params.row}
+                  key={index}
+                  extraAction={extraAction}
+                  onActionCall={extraAction.callback}
+                  disabled={false}
+                />
+              )),
+            ],
+          },
+        ]}
+        rows={data ? data?.content : []}
+      />
+    </Box>
+  );
+}
+
+const SCR_ID = "SCR_ADD_SHIPMENT_ORDER";
+export default withScreenSecurity(AddShipmentOrderScreen, SCR_ID, true);

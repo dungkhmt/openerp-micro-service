@@ -110,6 +110,15 @@ public class ShipmentServiceImpl extends BaseService implements IShipmentService
     }
 
     @Override
+    public ReturnPaginationDTO<ShipmentItem> getAllShipmentItems(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
+        Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
+                : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
+                : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
+        Page<ShipmentItem> shipmentItems = shipmentItemRepo.search(pageable);
+        return getPaginationResult(shipmentItems.getContent(), page, shipmentItems.getTotalPages(), shipmentItems.getTotalElements());
+    }
+
+    @Override
     public Shipment getShipmentById(long id) {
         return shipmentRepo.getShipmentById(id);
     }

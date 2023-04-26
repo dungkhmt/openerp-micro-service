@@ -41,4 +41,8 @@ public class DeliveryBill extends BaseEntity implements Serializable {
     @OneToMany(mappedBy = "deliveryBill",fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<ShipmentItem> shipmentItems = new HashSet<>();
+
+    @OneToMany(mappedBy = "deliveryBill",fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<ExportInventoryItem> exportInventoryItems = new HashSet<>();
 }
