@@ -2,6 +2,8 @@
 
 # dependencies
 ./passbook/openerp-oauth2-client/node_modules
+./taskforces/openerp-oauth2-client/node_modules
+
 
 
 # misc
@@ -20,6 +22,7 @@ yarn-error.log*
 .history/
 .vscode/
 ./passbook/openerp-oauth2-client/package-lock.json
+./taskforces/openerp-oauth2-client/package-lock.json
 /.idea/
 /.ssh/
 *.bat
