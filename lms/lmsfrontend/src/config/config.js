@@ -1,13 +1,13 @@
 const prod = {
   url: {
-    KEYCLOAK_BASE_URL: "https://openerp3.dailyopt.ai/iam",
+    KEYCLOAK_BASE_URL: "https://lms.dailyopt.ai/iam",
     API_URL: "/api",
   },
 };
 
 const dev = {
   url: {
-    KEYCLOAK_BASE_URL: "https://openerp3.dailyopt.ai/iam",
+    KEYCLOAK_BASE_URL: "https://lms.dailyopt.ai/iam",
     API_URL: "http://localhost/api",
   },
 };
