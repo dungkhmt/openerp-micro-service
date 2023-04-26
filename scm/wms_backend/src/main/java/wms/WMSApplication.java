@@ -19,6 +19,7 @@ public class WMSApplication {
         SpringApplication.run(WMSApplication.class, args);
         log.info("Swagger link: http://localhost:8080/api/swagger-ui.html#/");
         log.info("Swagger docs: http://localhost:8080/api/v2/api-docs");
+        log.info("Just demo git push to multiple repo");
     }
 
 }
