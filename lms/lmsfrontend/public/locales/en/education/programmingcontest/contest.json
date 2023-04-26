@@ -1,0 +1,19 @@
+{
+  "contest": "Contest",
+  "contestId": "Contest ID",
+  "contestName": "Contest name",
+  "contestTime": "Contest time",
+  "isPublic": "Public",
+  "submissionActionType": "Action for Submission",
+  "maxNumberSubmission": "Max number of Submissions",
+  "maxSourceCodeLength": "Max source code length (characters)",
+  "participantViewResultMode": "Participant view result Mode",
+  "judgeMode": "Judging Mode",
+  "evaluateBothPublicPrivateTestcase": "Evaluate Private Testcases",
+  "problemDescriptionViewType": "Participant view problem description",
+  "createContest": "Create new Contest",
+  "editContest": "Edit Contest",
+  "validateSubmit": {
+      "missingField": "Missing required field: {{fieldName}}"
+  }
+}

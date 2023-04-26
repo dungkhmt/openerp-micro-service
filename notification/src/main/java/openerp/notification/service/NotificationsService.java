@@ -1,7 +1,7 @@
 package openerp.notification.service;
 
 
-import openerp.notification.dto.NotificationDTO;
+import openerp.notification.dto.NotificationProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -19,7 +19,7 @@ public interface NotificationsService {
     // Use concurrent instead of synchronized collection because of performance and thread-safe
     ConcurrentHashMap<String, List<SseEmitter>> subscriptions = new ConcurrentHashMap<>();
 
-    Page<NotificationDTO> getNotifications(String toUser, UUID fromId, int page, int size);
+    Page<NotificationProjection> getNotifications(String toUser, UUID fromId, int page, int size);
 
     long countNumUnreadNotification(String toUser);
 

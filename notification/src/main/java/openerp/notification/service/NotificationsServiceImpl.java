@@ -1,13 +1,19 @@
 package openerp.notification.service;
 
-import openerp.notification.dto.NotificationDTO;
-import openerp.notification.entity.Notifications;
-import openerp.notification.entity.QNotifications;
-import openerp.notification.repo.NotificationsRepo;
+import com.google.gson.Gson;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import openerp.notification.dto.NotificationProjection;
+import openerp.notification.dto.rabbitMessage.*;
+import openerp.notification.entity.Notifications;
+import openerp.notification.entity.QNotifications;
+import openerp.notification.repo.NotificationsRepo;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,12 +23,12 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import static openerp.notification.config.rabbitmq.RabbitConfig.NOTIFICATION_HEADERS_EXCHANGE;
 
 
 @Log4j2
@@ -33,6 +39,10 @@ public class NotificationsServiceImpl implements NotificationsService {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private final NotificationsRepo notificationsRepo;
+
+    private RabbitTemplate template;
+
+    private MessageConverter messageConverter;
 
     @PostConstruct
     public void init() {
@@ -47,7 +57,7 @@ public class NotificationsServiceImpl implements NotificationsService {
     }
 
     @Override
-    public Page<NotificationDTO> getNotifications(String toUser, UUID fromId, int page, int size) {
+    public Page<NotificationProjection> getNotifications(String toUser, UUID fromId, int page, int size) {
         Pageable sortedByCreatedStampDsc =
                 PageRequest.of(page, size, Sort.by("created_stamp").descending());
 
@@ -73,19 +83,44 @@ public class NotificationsServiceImpl implements NotificationsService {
 
         notification = notificationsRepo.save(notification);
 
+        // Publish message to queue
+        NotificationMessage message = new NotificationMessage();
+
+        message.setUser(new User(toUser));
+        InAppChannel inApp = new InAppChannel(List.of(notificationsRepo.findNotificationById(notification.getId()).toDTO()), OperationType.CREATE);
+        message.setChannels(new Channel(inApp, null));
+
+        publishMessage(message);
+    }
+
+    private void publishMessage(NotificationMessage message) {
+        Map<String, Object> headers = new HashMap<>();
+        headers.put("channels.inApp", message.getChannels().getInApp() != null);
+        headers.put("channels.email", message.getChannels().getEmail() != null);
+
+        template.convertAndSend(NOTIFICATION_HEADERS_EXCHANGE, "", message, messagePostProcessor -> {
+            messagePostProcessor.getMessageProperties().getHeaders().putAll(headers);
+            return messagePostProcessor;
+        });
+    }
+
+    @RabbitListener(queues = "#{queueInApp.name}")
+    public void onMessage(Message message) {
+        NotificationMessage notificationMessage = (NotificationMessage) messageConverter.fromMessage(message);
+
         // Send new notification.
-        List<SseEmitter> subscription = subscriptions.get(toUser);
+        List<SseEmitter> subscription = subscriptions.get(notificationMessage.getUser().getId());
         if (null != subscription) {
-            send(
+            notificationMessage.getChannels().getInApp().getNotifications().forEach(notification -> send(
                     subscription,
                     SseEmitter.event()
-                            .id(notification.getId().toString())
+                            .id(notification.getId())
                             .name(SSE_EVENT_NEW_NOTIFICATION)
                             .data(
-                                    notificationsRepo.findNotificationById(notification.getId()).toJson(),
+                                    new Gson().toJson(notification),
                                     MediaType.TEXT_EVENT_STREAM)
                     // TODO: discover reconnectTime() method
-            );
+            ));
         }
     }
 
@@ -106,7 +141,6 @@ public class NotificationsServiceImpl implements NotificationsService {
                 }
         ));
     }
-
 
     @Override
     public void updateStatus(UUID notificationId, String status) {
