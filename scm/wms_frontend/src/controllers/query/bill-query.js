@@ -146,3 +146,51 @@ export const useCreateDeliveryBill = (params) => {
     onMutate: (variables) => {},
   });
 };
+export const useGetSplittedBillItem = (params) => {
+  return useQuery({
+    queryKey: [queryKey.delivery_bill.splitted_bill_item, params],
+    queryFn: async () => {
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getSplittedBillItems,
+        params
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};
+export const useCreateSplitBillItem = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.createSplitBillItems,
+        params,
+        data
+      );
+      if (res.code === 1) {
+        toast.success(res.message);
+        queryClient.invalidateQueries([
+          queryKey.delivery_bill.splitted_bill_item,
+        ]);
+        return res.data;
+      } else {
+        // toast.error(res.message);
+      }
+    },
+    onSuccess: (res, variables, context) => {
+      queryClient.invalidateQueries([
+        queryKey.delivery_bill.splitted_bill_item,
+      ]);
+    },
+    onError: (err) => {
+      toast.error(err);
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};

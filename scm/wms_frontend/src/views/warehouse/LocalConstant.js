@@ -64,9 +64,7 @@ export const staticWarehouseCols = [
     sortable: false,
     minWidth: 150,
     valueGetter: (params) => {
-      return params?.row?.manager?.name
-        ? params?.row?.manager?.name
-        : "Chưa có";
+      return params?.row?.manager?.id ? params?.row?.manager?.id : "Chưa có";
     },
   },
   {

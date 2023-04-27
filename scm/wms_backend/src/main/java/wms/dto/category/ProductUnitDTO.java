@@ -8,8 +8,6 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 public class ProductUnitDTO {
-    @NotBlank(message = "Truong code khong duoc bo trong")
-    private String code;
     @NotBlank(message = "Truong name khong duoc bo trong")
     private String name;
 }

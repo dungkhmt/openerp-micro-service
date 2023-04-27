@@ -11,7 +11,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "product_category")
+@Table(name = "scm_product_category")
 public class ProductCategory extends BaseEntity implements Serializable {
     @Column(name = "code")
     private String code;

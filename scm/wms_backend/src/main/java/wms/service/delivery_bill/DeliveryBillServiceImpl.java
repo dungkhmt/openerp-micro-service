@@ -10,9 +10,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import wms.common.enums.BillStatus;
 import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.bill.SplitBillDTO;
+import wms.dto.bill.SplitBillItemDTO;
 import wms.entity.DeliveryBill;
 import wms.entity.DeliveryBillItem;
 import wms.entity.ExportInventoryItem;
@@ -91,17 +93,33 @@ public class DeliveryBillServiceImpl extends BaseService implements IDeliveryBil
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ExportInventoryItem splitBills(SplitBillDTO splitBillDTO) throws CustomException {
+    public void splitBills(SplitBillDTO splitBillDTO) throws CustomException {
         DeliveryBill deliveryBill =  deliveryBillRepo.getBillWithCode(splitBillDTO.getDeliveryBillCode());
         if (deliveryBill == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Can't find referenced bill, can't split");
         }
-        ExportInventoryItem newExportInventoryItem = ExportInventoryItem.builder()
-                .code("EXINV" + GeneralUtils.generateCodeFromSysTime())
-                .quantity(splitBillDTO.getQuantity())
-                .deliveryBillItemSeqId(splitBillDTO.getDeliveryBillItemSeqId())
-                .deliveryBill(deliveryBill)
-                .build();
-        return exportInventoryItemRepo.save(newExportInventoryItem);
+        for (SplitBillItemDTO billItemDTO : splitBillDTO.getBillItemDTOS())
+        {
+            for (DeliveryBillItem billItem : deliveryBill.getDeliveryBillItems()) {
+                if (billItem.getSeqId().equals(billItemDTO.getDeliveryBillItemSeqId())) {
+                    if (billItem.getEffectiveQty() < billItemDTO.getQuantity()) {
+                        throw caughtException(ErrorCode.USER_ACTION_FAILED.getCode(), "Split more than the exist quantity");
+                    }
+                    ExportInventoryItem newExportInventoryItem = ExportInventoryItem.builder()
+                            .code("EXINV" + GeneralUtils.generateCodeFromSysTime())
+                            .quantity(billItemDTO.getQuantity())
+                            .status(BillStatus.SPLITTED.getStatus())
+                            .deliveryBillItemSeqId(billItemDTO.getDeliveryBillItemSeqId())
+                            .deliveryBill(deliveryBill)
+                            .build();
+                    exportInventoryItemRepo.save(newExportInventoryItem);
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<ExportInventoryItem> getSplitBillByCode(String deliveryBillCode) {
+        return exportInventoryItemRepo.search(deliveryBillCode);
     }
 }

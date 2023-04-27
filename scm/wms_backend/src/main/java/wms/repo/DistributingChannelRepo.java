@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import wms.entity.DistributingChannel;
 
 public interface DistributingChannelRepo  extends JpaRepository<DistributingChannel, Long> {
-    @Query(value = "select * from distributing_channel", nativeQuery = true)
+    @Query(value = "select * from scm_distributing_channel", nativeQuery = true)
     Page<DistributingChannel> search(Pageable pageable);
 
     DistributingChannel getDistributingChannelById(long id);

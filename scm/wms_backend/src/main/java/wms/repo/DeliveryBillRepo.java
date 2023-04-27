@@ -9,15 +9,15 @@ import wms.entity.DeliveryBill;
 import java.util.List;
 
 public interface DeliveryBillRepo extends JpaRepository<DeliveryBill, Long> {
-    @Query(value = "select * from delivery_bill where code = :code and order_code = :orderCode", nativeQuery = true)
+    @Query(value = "select * from scm_delivery_bill where code = :code and order_code = :orderCode", nativeQuery = true)
     DeliveryBill getBillOfSaleOrderByCode(String orderCode, String code);
 
-    @Query(value = "select * from delivery_bill", nativeQuery = true)
+    @Query(value = "select * from scm_delivery_bill", nativeQuery = true)
     Page<DeliveryBill> search(Pageable pageable);
 
-    @Query(value = "select * from delivery_bill where order_code = :orderCode", nativeQuery = true)
+    @Query(value = "select * from scm_delivery_bill where order_code = :orderCode", nativeQuery = true)
     List<DeliveryBill> getAllBillOfOrder(String orderCode);
 
-    @Query(value = "select * from delivery_bill where code = :billCode", nativeQuery = true)
+    @Query(value = "select * from scm_delivery_bill where code = :billCode", nativeQuery = true)
     DeliveryBill getBillWithCode(String billCode);
 }

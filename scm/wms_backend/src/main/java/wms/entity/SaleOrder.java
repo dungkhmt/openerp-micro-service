@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "sale_order")
+@Table(name = "scm_sale_order")
 @Builder
 @Getter
 @Setter

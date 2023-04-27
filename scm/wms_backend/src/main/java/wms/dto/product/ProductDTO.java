@@ -10,8 +10,6 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class ProductDTO {
-    @NotBlank(message = "Ma code khong duoc de trong")
-    private String code;
     @NotBlank(message = "Name khong duoc de trong")
     private String name;
     @Positive(message = "Don vi so luong phai la so duong")

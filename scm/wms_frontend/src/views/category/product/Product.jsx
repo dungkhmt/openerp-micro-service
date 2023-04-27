@@ -21,6 +21,7 @@ var columns = [
     headerName: "Mã code",
     sortable: false,
     pinnable: true,
+    minWidth: 200,
   },
   {
     field: "name",
@@ -108,7 +109,6 @@ function ProductScreen({ screenAuthorization }) {
     let productParams = {
       brand: data?.brand,
       categoryId: data?.categoryId?.id,
-      code: data?.code,
       massType: "oke",
       name: data?.name,
       sku: data?.sku,
@@ -141,12 +141,6 @@ function ProductScreen({ screenAuthorization }) {
     },
   ];
   const fields = [
-    {
-      name: "code",
-      label: "Mã sản phẩm",
-      type: "text",
-      component: "input",
-    },
     {
       name: "name",
       label: "Tên sản phẩm",

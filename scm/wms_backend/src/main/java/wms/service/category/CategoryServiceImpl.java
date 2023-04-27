@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
@@ -16,6 +17,7 @@ import wms.entity.*;
 import wms.exception.CustomException;
 import wms.repo.*;
 import wms.service.BaseService;
+import wms.utils.GeneralUtils;
 
 
 @Service
@@ -36,11 +38,8 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     @Override
     public ProductUnit createProductUnit(ProductUnitDTO productUnit) throws CustomException {
         ProductUnit newUnit = new ProductUnit();
-        if (productUnitRepo.getProductUnitByCode(productUnit.getCode().toUpperCase()) != null) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Product unit already exists");
-        }
-        newUnit.setCode(productUnit.getCode().toUpperCase());
-        newUnit.setName(productUnit.getName().toLowerCase());
+        newUnit.setCode("UNIT" + GeneralUtils.generateCodeFromSysTime());
+        newUnit.setName(productUnit.getName());
         return productUnitRepo.save(newUnit);
     }
 
@@ -66,12 +65,7 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     @Override
     public ProductUnit updateProductUnit(ProductUnitDTO productUnitDTO, long id) throws CustomException {
         ProductUnit updatingUnit = productUnitRepo.getProductUnitById(id);
-        ProductUnit scannedProductUnit = productUnitRepo.getProductUnitByCode(productUnitDTO.getCode().toUpperCase());
-        if (scannedProductUnit != null && scannedProductUnit.getId() != id) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Update to an exist product unit");
-        }
-        updatingUnit.setCode(productUnitDTO.getCode().toUpperCase());
-        updatingUnit.setName(productUnitDTO.getName().toLowerCase());
+        updatingUnit.setName(productUnitDTO.getName());
         return productUnitRepo.save(updatingUnit);
     }
 
@@ -91,11 +85,8 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     @Override
     public ProductCategory createProductCategory(ProductCategoryDTO category) throws CustomException {
         ProductCategory newCate = new ProductCategory();
-        if (productCategoryRepo.getProductCategoryByCode(category.getCode().toUpperCase()) != null) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Product category already exists");
-        }
-        newCate.setCode(category.getCode().toUpperCase());
-        newCate.setName(category.getName().toLowerCase());
+        newCate.setCode("PCAT" + GeneralUtils.generateCodeFromSysTime());
+        newCate.setName(category.getName());
         return productCategoryRepo.save(newCate);
     }
 
@@ -121,12 +112,7 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     @Override
     public ProductCategory updateProductCategory(ProductCategoryDTO productCategoryDTO, long id) throws CustomException {
         ProductCategory categoryToUpdate = productCategoryRepo.getProductCategoryById(id);
-        ProductCategory scannedDuplicateProductCate = productCategoryRepo.getProductCategoryByCode(productCategoryDTO.getCode().toUpperCase());
-        if (scannedDuplicateProductCate != null && scannedDuplicateProductCate.getId() != id) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Update to an exist product category");
-        }
-        categoryToUpdate.setCode(productCategoryDTO.getCode().toUpperCase());
-        categoryToUpdate.setName(productCategoryDTO.getName().toLowerCase());
+        categoryToUpdate.setName(productCategoryDTO.getName());
         return productCategoryRepo.save(categoryToUpdate);
     }
 
@@ -146,11 +132,8 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     @Override
     public CustomerType createCustomerType(CustomerTypeDTO customerTypeDTO) throws CustomException {
         CustomerType newType = new CustomerType();
-        if (customerTypeRepo.getCustomerTypeByCode(customerTypeDTO.getCode().toUpperCase()) != null) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Customer type already exists");
-        }
-        newType.setCode(customerTypeDTO.getCode().toUpperCase());
-        newType.setName(customerTypeDTO.getName().toLowerCase());
+        newType.setCode("CTYPE" + GeneralUtils.generateCodeFromSysTime());
+        newType.setName(customerTypeDTO.getName());
         return customerTypeRepo.save(newType);
     }
 
@@ -176,11 +159,6 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     @Override
     public CustomerType updateCustomerType(CustomerTypeDTO productCategoryDTO, long id) throws CustomException {
         CustomerType typeToUpdate = customerTypeRepo.getCustomerTypeById(id);
-        CustomerType scannedType = customerTypeRepo.getCustomerTypeByCode(productCategoryDTO.getCode().toUpperCase());
-        if (scannedType != null && scannedType.getId() != id) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Update to an exist customer type");
-        }
-        typeToUpdate.setCode(productCategoryDTO.getCode().toUpperCase());
         typeToUpdate.setName(productCategoryDTO.getName().toLowerCase());
         return customerTypeRepo.save(typeToUpdate);
     }
@@ -204,11 +182,8 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     @Override
     public DistributingChannel createDistributingChannel(DistributingChannelDTO channelDTO) throws CustomException {
         DistributingChannel newChannel = new DistributingChannel();
-        if (distributingChannelRepo.getDistributingChannelByCode(channelDTO.getCode().toUpperCase()) != null) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Distributing channel already exists");
-        }
-        newChannel.setCode(channelDTO.getCode().toUpperCase());
-        newChannel.setName(channelDTO.getName().toLowerCase());
+        newChannel.setCode("CHN" + GeneralUtils.generateCodeFromSysTime());
+        newChannel.setName(channelDTO.getName());
         return distributingChannelRepo.save(newChannel);
     }
 
@@ -234,11 +209,6 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     @Override
     public DistributingChannel updateDistributingChannel(DistributingChannelDTO channelDTO, long id) throws CustomException {
         DistributingChannel channelToUpdate = distributingChannelRepo.getDistributingChannelById(id);
-        DistributingChannel scannedChannel = distributingChannelRepo.getDistributingChannelByCode(channelDTO.getCode().toUpperCase());
-        if (scannedChannel != null && scannedChannel.getId() != id) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Update to an exist distributing channel");
-        }
-        channelToUpdate.setCode(channelDTO.getCode().toUpperCase());
         channelToUpdate.setName(channelDTO.getName().toLowerCase());
         return distributingChannelRepo.save(channelToUpdate);
     }
@@ -260,17 +230,15 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
      * @throws CustomException
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ContractType createContractType(ContractTypeDTO contractTypeDTO) throws CustomException {
         ContractType newContract = new ContractType();
-        if (contractTypeRepo.getContractTypeByCode(contractTypeDTO.getCode().toUpperCase()) != null) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Contract type already exists");
-        }
-        DistributingChannel channel = distributingChannelRepo.getDistributingChannelById(contractTypeDTO.getChannelId());
+        DistributingChannel channel = distributingChannelRepo.getDistributingChannelByCode(contractTypeDTO.getChannelCode());
         if (channel == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Contract type with no specific distributing channel, can't create");
         }
+        newContract.setCode("CTR" + GeneralUtils.generateCodeFromSysTime());
         newContract.setChannel(channel);
-        newContract.setCode(contractTypeDTO.getCode().toUpperCase());
         newContract.setName(contractTypeDTO.getName().toLowerCase());
         return contractTypeRepo.save(newContract);
     }
@@ -297,16 +265,11 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     @Override
     public ContractType updateContractType(ContractTypeDTO contractTypeDTO, long id) throws CustomException {
         ContractType typeToUpdate = contractTypeRepo.getContractTypeById(id);
-        ContractType scannedType = contractTypeRepo.getContractTypeByCode(contractTypeDTO.getCode().toUpperCase());
-        if (scannedType != null && scannedType.getId() != id) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Update to an exist contract type");
-        }
-        DistributingChannel channel = distributingChannelRepo.getDistributingChannelById(contractTypeDTO.getChannelId());
+        DistributingChannel channel = distributingChannelRepo.getDistributingChannelByCode(contractTypeDTO.getChannelCode());
         if (channel == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Contract type with no specific distributing channel, can't create");
         }
         typeToUpdate.setChannel(channel);
-        typeToUpdate.setCode(contractTypeDTO.getCode().toUpperCase());
         typeToUpdate.setName(contractTypeDTO.getName().toLowerCase());
         return contractTypeRepo.save(typeToUpdate);
     }

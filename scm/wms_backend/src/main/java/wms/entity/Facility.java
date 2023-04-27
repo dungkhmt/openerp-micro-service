@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "facility")
+@Table(name = "scm_facility")
 @Builder
 @Setter
 @Getter

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import wms.entity.ProductCategory;
 
 public interface ProductCategoryRepo extends JpaRepository<ProductCategory, Long> {
-    @Query(value = "select * from product_category", nativeQuery = true)
+    @Query(value = "select * from scm_product_category", nativeQuery = true)
     Page<ProductCategory> search(Pageable pageable);
 
     ProductCategory getProductCategoryById(long id);

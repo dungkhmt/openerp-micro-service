@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 @Entity
-@Table(name = "customer")
+@Table(name = "scm_customer")
 @Builder
 @Data
 @NoArgsConstructor

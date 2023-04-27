@@ -7,7 +7,7 @@ import org.hibernate.annotations.NotFoundAction;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "sale_order_item")
+@Table(name = "scm_sale_order_item")
 @Builder
 @Setter
 @Getter

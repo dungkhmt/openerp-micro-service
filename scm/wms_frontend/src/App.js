@@ -8,6 +8,10 @@ import Routes from "Router";
 import { FacebookCircularProgress } from "components/common/progressBar/CustomizedCircularProgress.jsx";
 import keycloak, { initOptions } from "config/keycloak.js";
 import { request } from "controllers/api-middleware";
+import L from "leaflet";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { useEffect } from "react";
 import { Router } from "react-router-dom";
 import { Slide, ToastContainer } from "react-toastify";
@@ -17,7 +21,6 @@ import { notificationState } from "state/NotificationState";
 import { ReactComponent as Logo } from "./assets/icons/logo.svg";
 import history from "./history.js";
 import { AppColors } from "./shared/AppColors";
-
 export const theme = createTheme({
   typography: {
     fontFamily: `-apple-system, "Segoe UI", BlinkMacSystemFont, "Roboto", "Oxygen",
@@ -138,6 +141,14 @@ function App() {
       ...window.process,
     };
   }, []);
+
+  // https://stackoverflow.com/questions/69434791/react-leaflet-have-a-broken-marker
+  delete L.Icon.Default.prototype._getIconUrl;
+  L.Icon.Default.mergeOptions({
+    iconUrl: markerIcon,
+    iconRetinaUrl: markerIcon2x,
+    shadowUrl: markerShadow,
+  });
 
   return (
     <ReactKeycloakProvider

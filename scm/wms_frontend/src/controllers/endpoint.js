@@ -13,6 +13,11 @@ export const endPoint = {
   getCustomer: baseUrl + "/customer/get-all",
   createCustomer: baseUrl + "/customer/create",
   createProduct: baseUrl + "/product/create",
+  createProductUnit: baseUrl + "/category/product-unit/create",
+  createProductCategory: baseUrl + "/category/product-category/create",
+  createCustomerType: baseUrl + "/category/customer-type/create",
+  createDistChannel: baseUrl + "/category/distributing-channel/create",
+  createContractType: baseUrl + "/category/contract-type/create",
   // Purchase Order
   getPurchaseOrder: baseUrl + "/purchase-order/get-all",
   getPurchaseOrderItems: baseUrl + "/purchase-order/get-order-items",
@@ -21,6 +26,7 @@ export const endPoint = {
   // Facility
   getFacility: baseUrl + "/facility/get-all",
   getFacilityInventory: baseUrl + "/facility/get-inventory",
+  createFacility: baseUrl + "/facility/create",
   // Bill
   getReceiptBills: baseUrl + "/receipt-bill/get-all",
   getBillItemOfPurchaseOrder: baseUrl + "/receipt-bill/get-bill-items-of-order",
@@ -29,6 +35,8 @@ export const endPoint = {
   getBillItemOfSaleOrder: baseUrl + "/delivery-bill/get-bill-items-of-order",
   getBillItemOfBill: baseUrl + "/delivery-bill/get-bill-items-of-bill",
   createDeliveryBill: baseUrl + "/facility/export-item",
+  getSplittedBillItems: baseUrl + "/delivery-bill/get-split-bill",
+  createSplitBillItems: baseUrl + "/delivery-bill/split-bill",
   // Sale Order
   getSaleOrder: baseUrl + "/sale-order/get-all",
   getSaleOrderItems: baseUrl + "/sale-order/get-order-items",

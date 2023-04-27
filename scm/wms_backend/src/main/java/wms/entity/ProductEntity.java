@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "product")
+@Table(name = "scm_product")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

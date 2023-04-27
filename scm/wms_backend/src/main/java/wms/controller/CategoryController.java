@@ -17,7 +17,6 @@ import javax.validation.Valid;
 public class CategoryController extends BaseController {
     @Autowired
     private ICategoryService categoryService;
-
     /**
      * Product Unit
      */

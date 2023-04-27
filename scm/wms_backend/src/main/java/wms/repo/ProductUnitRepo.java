@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import wms.entity.ProductUnit;
 
 public interface ProductUnitRepo extends JpaRepository<ProductUnit, Long> {
-    @Query(value = "select * from product_unit", nativeQuery = true)
+    @Query(value = "select * from scm_product_unit", nativeQuery = true)
     Page<ProductUnit> search(Pageable pageable);
 
     ProductUnit getProductUnitById(long id);

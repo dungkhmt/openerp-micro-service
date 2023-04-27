@@ -8,7 +8,7 @@ import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "receipt_bill_item")
+@Table(name = "scm_receipt_bill_item")
 @Builder
 @Setter
 @Getter

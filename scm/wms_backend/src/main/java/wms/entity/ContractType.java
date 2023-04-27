@@ -13,7 +13,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "contract_type")
+@Table(name = "scm_contract_type")
 public class ContractType extends BaseEntity implements Serializable {
     @Column(name = "code")
     private String code;

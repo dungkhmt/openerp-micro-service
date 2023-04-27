@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import wms.entity.ContractType;
 
 public interface ContractTypeRepo extends JpaRepository<ContractType, Long> {
-    @Query(value = "select * from contract_type", nativeQuery = true)
+    @Query(value = "select * from scm_contract_type", nativeQuery = true)
     Page<ContractType> search(Pageable pageable);
 
     ContractType getContractTypeById(long id);

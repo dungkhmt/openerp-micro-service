@@ -9,6 +9,6 @@ import wms.entity.ShipmentItem;
 public interface ShipmentItemRepo extends JpaRepository<ShipmentItem, Long> {
     ShipmentItem getShipmentItemById(long id);
     ShipmentItem getShipmentItemByCode(String code);
-    @Query(value = "select * from shipment_item", nativeQuery = true)
+    @Query(value = "select * from scm_shipment_item", nativeQuery = true)
     Page<ShipmentItem> search(Pageable pageable);
 }

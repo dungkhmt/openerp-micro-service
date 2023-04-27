@@ -14,7 +14,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Builder
-@Table(name = "shipment")
+@Table(name = "scm_shipment")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Shipment extends BaseEntity implements Serializable {

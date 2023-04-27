@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.customer.CustomerDTO;
@@ -34,6 +35,7 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
     @Autowired
     private CustomerRepo customerRepo;
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Customer createNewCustomer(CustomerDTO customer, JwtAuthenticationToken token) throws CustomException {
         CustomerType customerType = customerTypeRepo.getCustomerTypeByCode(customer.getCustomerTypeCode().toUpperCase());
         ContractType contractType = contractTypeRepo.getContractTypeByCode(customer.getContractTypeCode().toUpperCase());

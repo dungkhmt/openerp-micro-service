@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "receipt_bill")
+@Table(name = "scm_receipt_bill")
 @Builder
 @Setter
 @Getter

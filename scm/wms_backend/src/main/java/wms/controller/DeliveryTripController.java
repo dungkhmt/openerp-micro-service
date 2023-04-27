@@ -46,4 +46,15 @@ public class DeliveryTripController extends BaseController {
             return response(error(ex));
         }
     }
+
+    @ApiOperation(value = "Phân đơn cho chuyến")
+    @PostMapping("/assign-bill-to-trip")
+    public ResponseEntity<?> assignBillToTrip(@Valid @RequestBody DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) {
+        try {
+            return response(new ResultEntity(1, "Assign to trip successfully", deliveryTripService.createDeliveryTrip(deliveryTripDTO, token)));
+        }
+        catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
 }

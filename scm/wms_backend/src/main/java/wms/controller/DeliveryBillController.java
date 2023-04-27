@@ -59,7 +59,19 @@ public class DeliveryBillController extends BaseController {
             @Valid @RequestBody SplitBillDTO splitBillDTO
             ) {
         try {
-            return response(new ResultEntity(1, "Split bills successfully", deliveryBillService.splitBills(splitBillDTO)));
+            deliveryBillService.splitBills(splitBillDTO);
+            return response(new ResultEntity(1, "Split bills successfully", splitBillDTO.getDeliveryBillCode()));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @ApiOperation(value = "Lấy các lô giao hàng dự kiến")
+    @GetMapping("/get-split-bill")
+    public ResponseEntity<?> getSplitBillFromDeliveryBill(
+            @RequestParam(value = "deliveryBillCode", required = false, defaultValue = DefaultConst.STRING) String deliveryBillCode
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get splitted bills successfully", deliveryBillService.getSplitBillByCode(deliveryBillCode)));
         } catch (Exception ex) {
             return response(error(ex));
         }

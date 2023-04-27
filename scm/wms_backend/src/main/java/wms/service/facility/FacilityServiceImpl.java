@@ -8,8 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import wms.common.enums.CommonStatus;
 import wms.common.enums.ErrorCode;
 import wms.common.enums.OrderStatus;
 import wms.dto.ReturnPaginationDTO;
@@ -63,26 +65,20 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
     private ISaleOrderService saleOrderService;
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Facility createFacility(FacilityDTO facilityDTO) throws CustomException {
-        if (facilityRepo.getFacilityByCode(facilityDTO.getCode()) != null) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Exist customer with same code, can't create");
-        }
-        UserLogin user = userRepo.getUserByUserLoginId(facilityDTO.getCreatedBy());
+    public Facility createFacility(FacilityDTO facilityDTO, JwtAuthenticationToken token) throws CustomException {
+        UserLogin createdBy = userRepo.getUserByUserLoginId(token.getName());
         UserLogin manager = userRepo.getUserByUserLoginId(facilityDTO.getManagedBy());
-        if (user == null) {
+        if (createdBy == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown staff create this facility, can't create");
         }
-//        if (manager == null) {
-//            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown staff create this facility, can't create");
-//        }
         Facility newFacility = Facility.builder()
                 .name(facilityDTO.getName())
-                .code(facilityDTO.getCode().toUpperCase())
+                .code("FAC" + GeneralUtils.generateCodeFromSysTime())
                 .address(facilityDTO.getAddress())
-                .status(facilityDTO.getStatus())
+                .status(CommonStatus.ACTIVE.getStatus())
                 .latitude(facilityDTO.getLatitude())
                 .longitude(facilityDTO.getLongitude())
-                .creator(user)
+                .creator(createdBy)
                 .manager(manager)
                 .build();
         return facilityRepo.save(newFacility);

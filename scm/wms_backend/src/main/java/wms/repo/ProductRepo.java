@@ -8,7 +8,7 @@ import wms.entity.ProductCategory;
 import wms.entity.ProductEntity;
 
 public interface ProductRepo extends JpaRepository<ProductEntity, Long> {
-    @Query(value = "select * from product", nativeQuery = true)
+    @Query(value = "select * from scm_product", nativeQuery = true)
     Page<ProductEntity> search(Pageable pageable);
 
     ProductEntity getProductById(long id);

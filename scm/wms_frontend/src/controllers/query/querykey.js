@@ -28,6 +28,7 @@ export const queryKey = {
     delivery_bill_list: "delivery_bill_list",
     bill_item_of_delivery_order: "bill_item_of_delivery_order",
     bill_item_of_bill: "bill_item_of_bill",
+    splitted_bill_item: "splitted_bill_item",
   },
   shipment: {
     shipment_list: "shipment_list",

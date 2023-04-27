@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import wms.entity.Facility;
 
 public interface FacilityRepo extends JpaRepository<Facility, Long> {
-    @Query(value = "select * from facility", nativeQuery = true)
+    @Query(value = "select * from scm_facility", nativeQuery = true)
     Page<Facility> search(Pageable pageable);
     Facility getFacilityById(long id);
     Facility getFacilityByCode(String code);

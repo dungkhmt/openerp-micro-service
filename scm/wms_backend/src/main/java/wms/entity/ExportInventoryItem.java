@@ -8,7 +8,7 @@ import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "export_inventory_item")
+@Table(name = "scm_export_inventory_item")
 @Builder
 @Setter
 @Getter
@@ -31,4 +31,7 @@ public class ExportInventoryItem extends BaseEntity {
 
     @Column(name = "delivery_bill_item_seq_id")
     private String deliveryBillItemSeqId;
+
+    @Column(name = "status")
+    private String status;
 }

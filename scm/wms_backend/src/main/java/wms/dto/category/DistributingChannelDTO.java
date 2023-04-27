@@ -6,8 +6,6 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 public class DistributingChannelDTO {
-    @NotBlank(message = "Truong code khong duoc bo trong")
-    private String code;
     @NotBlank(message = "Truong name khong duoc bo trong")
     private String name;
 }

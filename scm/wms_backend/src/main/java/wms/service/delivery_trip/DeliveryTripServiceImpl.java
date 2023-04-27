@@ -16,6 +16,7 @@ import wms.dto.delivery_trip.DeliveryTripDTO;
 import wms.dto.product.ProductDTO;
 import wms.entity.DeliveryTrip;
 import wms.entity.Shipment;
+import wms.entity.ShipmentItem;
 import wms.entity.UserLogin;
 import wms.exception.CustomException;
 import wms.repo.DeliveryTripRepo;
@@ -88,5 +89,10 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
     @Override
     public void deleteDeliveryTripById(long id) {
 
+    }
+
+    @Override
+    public ShipmentItem assignBillToTrip(DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) throws CustomException {
+        return null;
     }
 }

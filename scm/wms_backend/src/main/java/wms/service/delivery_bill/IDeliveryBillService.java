@@ -20,5 +20,6 @@ public interface IDeliveryBillService {
     DeliveryBillItem getBillItemsOfOrder(String billCode, String billItemSeq);
     //    void updateBillItem(UpdatePurchaseOrderDTO updatePurchaseOrderDTO, long id) throws CustomException;
     void deleteBillItem(long id);
-    ExportInventoryItem splitBills(SplitBillDTO splitBillDTO) throws CustomException;
+    void splitBills(SplitBillDTO splitBillDTO) throws CustomException;
+    List<ExportInventoryItem> getSplitBillByCode(String deliveryBillCode);
 }

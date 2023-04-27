@@ -8,7 +8,7 @@ import wms.entity.PurchaseOrder;
 import wms.entity.SaleOrder;
 
 public interface SaleOrderRepo extends JpaRepository<SaleOrder, Long> {
-    @Query(value = "select so.* from sale_order so" +
+    @Query(value = "select so.* from scm_sale_order so" +
             "         where so.status != 'DELETED' and (so.status = :orderStatus or :orderStatus = '')\n", nativeQuery = true)
     Page<SaleOrder> search(Pageable pageable, String orderStatus);
     SaleOrder getOrderById(long id);

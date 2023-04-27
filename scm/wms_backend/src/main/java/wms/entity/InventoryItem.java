@@ -11,7 +11,7 @@ import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "inventory_item")
+@Table(name = "scm_inventory_item")
 @Builder
 @Data
 @NoArgsConstructor

@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 public class GeneralUtils {
     public static String generateCodeFromSysTime() {
-        return String.valueOf(System.currentTimeMillis()).substring(1, 9);
+        return String.valueOf(System.currentTimeMillis()).substring(1, 10);
     }
     public static ZonedDateTime convertFromStringToDate(String dayMonthYear) {
         //https://stackoverflow.com/questions/23596530/unable-to-obtain-zoneddatetime-from-temporalaccessor-using-datetimeformatter-and

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "purchase_order")
+@Table(name = "scm_purchase_order")
 @Builder
 // https://stackoverflow.com/questions/40266770/spring-jpa-bi-directional-cannot-evaluate-tostring
 @Getter

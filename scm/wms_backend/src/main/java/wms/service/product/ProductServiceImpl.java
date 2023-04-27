@@ -21,6 +21,7 @@ import wms.repo.ProductCategoryRepo;
 import wms.repo.ProductRepo;
 import wms.repo.ProductUnitRepo;
 import wms.service.BaseService;
+import wms.utils.GeneralUtils;
 
 
 @Service
@@ -34,10 +35,8 @@ public class ProductServiceImpl extends BaseService implements IProductService {
     private ProductCategoryRepo productCategoryRepo;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ProductEntity createProduct(ProductDTO productDTO) throws CustomException {
-        if (productRepository.getProductByCode(productDTO.getCode().toUpperCase()) != null) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Exist product with same code, can't create");
-        }
         if (productRepository.getProductBySku(productDTO.getSku()) != null) {
             throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Exist product with same sku, can't create");
         }
@@ -51,7 +50,7 @@ public class ProductServiceImpl extends BaseService implements IProductService {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product with no specific category, can't create");
         }
         ProductEntity newProduct = ProductEntity.builder()
-                .code(productDTO.getCode().toUpperCase())
+                .code("PRO" + GeneralUtils.generateCodeFromSysTime())
                 .name(productDTO.getName())
                 .unitPerBox(productDTO.getUnitPerBox())
                 .productUnit(unit)
@@ -90,11 +89,7 @@ public class ProductServiceImpl extends BaseService implements IProductService {
 
     @Override
     public ProductEntity updateProduct(ProductDTO productDTO, long id) throws CustomException {
-        ProductEntity productByCode = productRepository.getProductByCode(productDTO.getCode());
         ProductEntity productBySku = productRepository.getProductByCode(productDTO.getSku());
-        if (productByCode != null && productByCode.getId() != id) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Exist product with same code, can't update");
-        }
         if (productBySku != null && productBySku.getId() != id) {
             throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Exist product with same sku, can't update");
         }
@@ -108,7 +103,6 @@ public class ProductServiceImpl extends BaseService implements IProductService {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product with no specific category, can't update");
         }
         ProductEntity productToUpdate = productRepository.getProductById(id);
-        productToUpdate.setCode(productDTO.getCode().toUpperCase());
         productToUpdate.setName(productDTO.getName());
         productToUpdate.setUnitPerBox(productDTO.getUnitPerBox());
         productToUpdate.setProductCategory(category);

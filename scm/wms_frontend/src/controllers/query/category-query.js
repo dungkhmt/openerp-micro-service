@@ -103,15 +103,16 @@ export const useGetContractType = (params) => {
 
 export const useCreateProduct = (params) => {
   return useMutation({
-    mutationFn: async (params) => {
+    mutationFn: async (data) => {
       const res = await axiosSendRequest(
         "post",
         endPoint.createProduct,
-        params
+        params,
+        data
       );
       if (res.data && res.code === 1) {
         return res.data;
-      }
+      } else throw Error;
     },
     onSuccess: (res, variables, context) => {
       toast.success("Tạo sản phẩm thành công!");
@@ -144,6 +145,131 @@ export const useCreateCustomer = (params) => {
     },
     onError: () => {
       toast.error("Lỗi khi tạo khách hàng, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
+export const useCreateProductUnit = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.createProductUnit,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Tạo unit thành công!");
+      queryClient.invalidateQueries([queryKey.category.product_unit_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
+export const useCreateProductCategory = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.createProductCategory,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Tạo thành công!");
+      queryClient.invalidateQueries([queryKey.category.product_cate_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
+export const useCreateCustomerType = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.createCustomerType,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Tạo thành công!");
+      queryClient.invalidateQueries([queryKey.category.customer_type_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
+export const useCreateContractType = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.createContractType,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      } else throw Error;
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Tạo thành công!");
+      queryClient.invalidateQueries([queryKey.category.contract_type_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
+export const useCreateDistChannel = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.createDistChannel,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Tạo thành công!");
+      queryClient.invalidateQueries([queryKey.category.dist_channel_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
     },
     // befor mutation function actually triggers.
     onMutate: (variables) => {},

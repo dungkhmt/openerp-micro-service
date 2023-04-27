@@ -1,6 +1,7 @@
 package wms.service.facility;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.facility.ExportFromFacilityDTO;
 import wms.dto.facility.FacilityDTO;
@@ -10,7 +11,7 @@ import wms.entity.*;
 import wms.exception.CustomException;
 
 public interface IFacilityService {
-    Facility createFacility(FacilityDTO facilityDTO) throws CustomException;
+    Facility createFacility(FacilityDTO facilityDTO, JwtAuthenticationToken token) throws CustomException;
     ReturnPaginationDTO<Facility> getAllFacilities(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
     Facility getFacilityById(long id);
     Facility getFacilityByCode(String code);

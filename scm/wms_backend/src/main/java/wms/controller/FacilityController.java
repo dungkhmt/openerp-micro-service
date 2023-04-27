@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import wms.common.constant.DefaultConst;
 import wms.dto.facility.ExportFromFacilityDTO;
@@ -22,11 +23,11 @@ import javax.validation.Valid;
 public class FacilityController extends BaseController{
     @Autowired
     private IFacilityService facilityService;
-    @ApiOperation(value = "Thêm mới nhà phân phối")
+    @ApiOperation(value = "Thêm mới kho hàng nhà phân phối")
     @PostMapping("/create")
-    public ResponseEntity<?> create(@Valid @RequestBody FacilityDTO facilityDTO) {
+    public ResponseEntity<?> create(@Valid @RequestBody FacilityDTO facilityDTO, JwtAuthenticationToken token) {
         try {
-            return response(new ResultEntity(1, "Create facility successfully", facilityService.createFacility(facilityDTO)));
+            return response(new ResultEntity(1, "Create facility successfully", facilityService.createFacility(facilityDTO, token)));
         }
         catch (Exception ex) {
             return response(error(ex));

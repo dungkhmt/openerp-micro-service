@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Builder
-@Table(name = "shipment_item")
+@Table(name = "scm_shipment_item")
 @NoArgsConstructor
 @AllArgsConstructor
 public class ShipmentItem extends BaseEntity{

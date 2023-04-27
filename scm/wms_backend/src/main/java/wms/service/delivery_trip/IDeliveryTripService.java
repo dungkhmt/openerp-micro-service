@@ -6,6 +6,7 @@ import wms.dto.ReturnPaginationDTO;
 import wms.dto.delivery_trip.DeliveryTripDTO;
 import wms.dto.product.ProductDTO;
 import wms.entity.DeliveryTrip;
+import wms.entity.ShipmentItem;
 import wms.exception.CustomException;
 
 public interface IDeliveryTripService {
@@ -15,4 +16,5 @@ public interface IDeliveryTripService {
     DeliveryTrip getDeliveryTripByCode(String code);
     DeliveryTrip updateDeliveryTrip(ProductDTO productDTO, long id) throws CustomException;
     void deleteDeliveryTripById(long id);
+    ShipmentItem assignBillToTrip(DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) throws CustomException;
 }

@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "delivery_bill")
+@Table(name = "scm_delivery_bill")
 @Builder
 @Setter
 @Getter
