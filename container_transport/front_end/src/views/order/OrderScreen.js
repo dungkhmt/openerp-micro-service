@@ -8,6 +8,7 @@ import HeaderOrderScreen from "./HeaderOrderScreen";
 const OrderScreen = () => {
     const [orders, setOrders] = useState([]);
     const [toastOpen, setToast] = useState(false);
+    const [toastType, setToastType] = useState();
 
     useEffect(() => {
         request(
@@ -17,20 +18,24 @@ const OrderScreen = () => {
             console.log("order==========", res.data)
             setOrders(res.data.data);
         });
-    }, [])
+    }, [toastOpen])
     return (
         <Box className="fullScreen">
             <Container maxWidth="md" className="container">
                 <Box className="toast">
                     {toastOpen ? (
-                        <Alert severity="success" >
-                            <AlertTitle>Success</AlertTitle>
-                            This is a success alert — <strong> check it out!</strong >
-                        </Alert >
-                    ) : null
+                        toastType === "success" ? (
+                            <Alert variant="filled" severity={toastType} >
+                                <strong> Created Order Success !!!</strong >
+                            </Alert >
+                        ) : (
+                            <Alert variant="filled" severity={toastType} >
+                                <strong> Created Order False !!!</strong >
+                            </Alert >
+                        )) : null
                     }
                 </Box>
-                <HeaderOrderScreen setToast={setToast} />
+                <HeaderOrderScreen setToast={setToast} setToastType={setToastType} />
                 <Box className="divider">
                     <Divider />
                 </Box>
