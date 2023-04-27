@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { PLACE_HOLDER_ICON_URL } from "components/constants";
+import { PLACE_HOLDER_ICON_URL, BLUE_PLACE_HOLDER_ICON_URL } from "components/constants";
 
 const icon = L.icon({
   iconUrl: PLACE_HOLDER_ICON_URL,
   iconSize: [38, 38],
 });
+
+const bluePlaceHolder = L.icon({
+  iconUrl: BLUE_PLACE_HOLDER_ICON_URL,
+  iconSize: [38, 38],
+});
+
 const NOMINATIM_REVERSE_URL = "https://nominatim.openstreetmap.org/reverse?";
 const TILE_LAYER_URL = "https://api.maptiler.com/maps/basic/256/{z}/{x}/{y}.png?key=GsqVDsxlKcMfyPpnz8xW";
 const TILE_LAYER_ATTRIBUTE = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
@@ -25,7 +31,7 @@ const reverse = async (lat, lon) => {
   return json;
 }
 
-const position = [51.505, -0.09];
+const position = [21, 105]; // [lat, lon]
 
 function ResetCenterView(props) {
   const { selectPosition } = props;
@@ -87,6 +93,39 @@ export default function Maps(props) {
         </Marker>
       )}
       <ResetCenterView selectPosition={selectPosition} />
+    </MapContainer>
+  );
+}
+
+export function RouteMap ({ points, customers, warehouse }) {
+  return (
+    <MapContainer
+      center={position}
+      zoom={8}
+      style={{ width: "100%", height: "100%" }}
+    >
+      <TileLayer
+        attribution={TILE_LAYER_ATTRIBUTE}
+        url={TILE_LAYER_URL}
+      />
+      <Polyline positions={points} />
+      {
+        customers != null && customers != undefined &&
+        customers.length > 0 &&
+        customers.map(customer => <Marker position={customer.position} icon={icon}>
+                                      <Popup>
+                                        {customer.name}
+                                      </Popup>
+                                    </Marker>)
+      }
+      {
+        warehouse != null && warehouse != undefined &&
+        <Marker position={warehouse.position} icon={bluePlaceHolder}>
+          <Popup>
+            {warehouse.name}
+          </Popup>
+        </Marker>
+      }
     </MapContainer>
   );
 }

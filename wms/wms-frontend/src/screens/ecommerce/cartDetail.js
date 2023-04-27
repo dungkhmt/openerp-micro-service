@@ -197,7 +197,7 @@ const CartDetail = () => {
                     variant="outlined"
                     size="small"
                     inputRef={register({ required: "Vui lòng điền số điện thoại" })}
-                    name="customerPhone"
+                    name="customerPhoneNumber"
                     error={!!errors.name}
                   />
                 </Grid>

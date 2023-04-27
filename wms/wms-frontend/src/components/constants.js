@@ -1,5 +1,7 @@
 export const PLACE_HOLDER_ICON_URL = "../../../../../../../placeholder.png"
 
+export const BLUE_PLACE_HOLDER_ICON_URL = "../../../../../../../blueplaceholder.png"
+
 export const LOCAL_STORAGE = {
   CART_ITEMS: "cartItems"
 }

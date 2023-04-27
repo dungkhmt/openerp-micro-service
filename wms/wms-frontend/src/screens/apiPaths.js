@@ -23,5 +23,6 @@ export const API_PATH = {
   DELIVERY_MANAGER_SHIPMENT: "/wmsv2/delivery-manager/shipment",
   GET_USER_LOGIN_ID: "wmsv2/user",
   DELIVERY_MANAGER_DELIVERY_TRIP: "/wmsv2/delivery-manager/delivery-trip",
-  DELIVERY_MANAGER_ASSIGN_ORDER_ITEM: "/wmsv2/delivery-manager/assigned-order-items"
+  DELIVERY_MANAGER_ASSIGN_ORDER_ITEM: "/wmsv2/delivery-manager/assigned-order-items",
+  DELIVREY_MANAGER_AUTO_ROUTE: "/wmsv2/delivery-manager/auto-route"
 }

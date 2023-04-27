@@ -1,6 +1,8 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Button, Grid, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
+import { isEditableInput } from '@testing-library/user-event/dist/utils';
 import { request } from "api";
+import { RouteMap } from 'components/map/maps';
 import StandardTable from "components/table/StandardTable";
 import { Fragment, useEffect, useState } from "react";
 import { API_PATH } from "screens/apiPaths";
@@ -29,6 +31,10 @@ const DeliveryTripDetail = ( props ) => {
   const [createdItemsTableData, setCreatedItemsTableData] = useState([]);
   const [rawCreatedItemsTableData, setRawCreatedItemsTableData] = useState([]);
   const [maxSequence, setMaxSequence] = useState(0);
+
+  const [routeDetails, setRouteDetails] = useState({});
+  const [isShowRouteMapModal, setShowRouteMapModal] = useState(false);
+  const [runnedAutoRoute, setRunnedAutoRoute] = useState(false);
 
   // chọn danh sách sản phẩm (phải cùng một warehouse)
   // nếu danh sách sản phẩm của delivery trip khác rỗng -> không thể update warehouse
@@ -72,6 +78,17 @@ const DeliveryTripDetail = ( props ) => {
         setCreatedItemsTableData(res.data);
       }
     );
+
+    request(
+      "get",
+      `${API_PATH.DELIVREY_MANAGER_AUTO_ROUTE}/${tripId}`,
+      (res) => {
+        setRouteDetails(res.data);
+        if (res.data.points.length > 0) {
+          setRunnedAutoRoute(true);
+        }
+      }
+    )
   }, []);
 
   // useEffect(() => {
@@ -172,6 +189,25 @@ const DeliveryTripDetail = ( props ) => {
     )
   }
 
+  const autoRouteButtonHandle = () => {
+    request(
+      "put",
+      API_PATH.DELIVREY_MANAGER_AUTO_ROUTE,
+      (res) => {
+        successNoti("Đang tiến hành tìm quãng đường tối ưu");
+      },
+      {
+        500: () => errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau")
+      },
+      {
+        deliveryTripId: tripId,
+        items: [
+          ...deliveryItemsTableData
+        ]
+      }
+    )
+  }
+
   return (<Fragment>
 
     <Modal open={isShowAssignedItemsModal}
@@ -218,6 +254,31 @@ const DeliveryTripDetail = ( props ) => {
       </Box>
     </Modal>
 
+    <Modal open={isShowRouteMapModal}
+      onClose={() => setShowRouteMapModal(!isShowRouteMapModal)}
+      aria-labelledby="modal-modal-title" 
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        width: '75%',
+        height: '70%',
+        transform: 'translate(-50%, -50%)',
+        bgcolor: 'background.paper',
+        border: '2px solid #000',
+        boxShadow: 24,
+        p: 4,
+      }}>
+        <RouteMap 
+          points={routeDetails?.points}
+          customers={routeDetails?.customers}
+          warehouse={routeDetails?.warehouse}
+        />
+      </Box>
+    </Modal>
+
     <Modal
       open={isShowQuantityModal}
       onClose={() => setShowQuantityModal(!isShowQuantityModal)}
@@ -228,7 +289,7 @@ const DeliveryTripDetail = ( props ) => {
           top: '50%',
           left: '50%',
           width: '25%',
-          height: '25%',
+          height: '5%',
           transform: 'translate(-50%, -50%)',
           bgcolor: 'background.paper',
           border: '2px solid #000',
@@ -277,6 +338,22 @@ const DeliveryTripDetail = ( props ) => {
           <Grid className={classes.buttonWrap}>
             <Button variant="contained" className={classes.addButton} 
               type="submit" onClick={deleteButtonHandle}>Hủy bỏ</Button>
+          </Grid>
+        }
+
+        {
+          !isDeleted &&
+          <Grid className={classes.buttonWrap}>
+            <Button variant="contained" className={classes.addButton} 
+              type="submit" onClick={autoRouteButtonHandle}>Auto route</Button>
+          </Grid>
+        }
+
+        {
+          !isDeleted && runnedAutoRoute &&
+          <Grid className={classes.buttonWrap}>
+            <Button variant="contained" className={classes.addButton} 
+              type="submit" onClick={() => setShowRouteMapModal(true)}>Xem bản đồ hành trình</Button>
           </Grid>
         }
 
