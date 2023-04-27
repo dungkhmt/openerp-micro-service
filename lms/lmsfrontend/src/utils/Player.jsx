@@ -1,12 +1,11 @@
-import React from "react";
 import ReactPlayer from "react-player";
-import {API_URL} from "../config/config";
+import { config } from "../config/config";
 
 function Player({ id }) {
   return (
     <ReactPlayer
       controls
-      url={`${API_URL}/videos/videos/${id}`}
+      url={`${config.url.API_URL}/videos/videos/${id}`}
       width="100%"
       height="100%"
       config={{

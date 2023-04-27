@@ -10,7 +10,7 @@
 // import { useEffect, useState } from "react";
 // import { connect } from "react-redux";
 // import { useHistory } from "react-router-dom";
-// import { API_URL } from "../../config/config";
+// import { config.url.API_URL } from "../../config/config";
 
 const useStyles = makeStyles({
   table: {
@@ -35,7 +35,7 @@ function ListUserLogins(props) {
     //headers.append("Accept", "application/json");
 
     headers.append("X-Auth-Token", props.token);
-    fetch(`${API_URL}/get-list-user-logins`, {
+    fetch(`${config.url.API_URL}/get-list-user-logins`, {
       method: "GET",
       headers: headers,
     })

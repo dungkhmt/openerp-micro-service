@@ -1,7 +1,7 @@
 // import React, {useState} from "react";
 // import {textField} from "../../utils/FormUtils";
 // import Button from "@material-ui/core/Button";
-// import {API_URL} from "../../config/config";
+// import {config.url.API_URL} from "../../config/config";
 // import {useHistory} from "react-router-dom";
 // import AlertDialog from "../../utils/AlertDialog";
 //
@@ -69,7 +69,7 @@
 //         middleName,
 //         lastName,
 //       };
-//       let userRegister = await fetch(API_URL + "/user/register/", {
+//       let userRegister = await fetch(config.url.API_URL + "/user/register/", {
 //         method: "POST",
 //         headers: {
 //           "content-type": "application/json",

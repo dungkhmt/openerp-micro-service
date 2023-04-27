@@ -1,22 +1,36 @@
-import {Avatar, Box, Button, Card, CardContent, CardHeader, Divider, Grid, Paper, Typography,} from "@material-ui/core";
-import {green} from "@material-ui/core/colors";
-import {makeStyles, MuiThemeProvider} from "@material-ui/core/styles";
-import {GetApp, PeopleAltRounded} from "@material-ui/icons";
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  Grid,
+  Paper,
+  Typography,
+} from "@material-ui/core";
+import { green } from "@material-ui/core/colors";
+import { MuiThemeProvider, makeStyles } from "@material-ui/core/styles";
+import { GetApp, PeopleAltRounded } from "@material-ui/icons";
 import parse from "html-react-parser";
 import MaterialTable from "material-table";
-import {Fragment, useEffect, useRef, useState} from "react";
-import {CountdownCircleTimer} from "react-countdown-circle-timer";
-import {BiDetail} from "react-icons/bi";
-import {FcDownload} from "react-icons/fc";
-import {useHistory, useParams} from "react-router";
-import {request} from "../../../../api";
+import { Fragment, useEffect, useRef, useState } from "react";
+import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import { BiDetail } from "react-icons/bi";
+import { FcDownload } from "react-icons/fc";
+import { useHistory, useParams } from "react-router";
+import { request } from "../../../../api";
 import CustomizedDialogs from "../../../../component/dialog/CustomizedDialogs";
 import NegativeButton from "../../../../component/education/classmanagement/NegativeButton";
 import NegativeDialogButton from "../../../../component/education/classmanagement/NegativeDialogButton";
 import PositiveButton from "../../../../component/education/classmanagement/PositiveButton";
 import displayTime from "../../../../utils/DateTimeUtils";
-import changePageSize, {localization, tableIcons,} from "../../../../utils/MaterialTableUtils";
-import {errorNoti} from "../../../../utils/notification";
+import changePageSize, {
+  localization,
+  tableIcons,
+} from "../../../../utils/MaterialTableUtils";
+import { errorNoti } from "../../../../utils/notification";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -183,37 +197,37 @@ function TAssignmentDetail() {
   // Functions.
   const getAssignDetail = () => {
     request("get", `/edu/assignment/${params.assignmentId}/teacher`, (res) => {
-        let assignDetail = res.data.assignmentDetail;
-        let startTime = new Date(assignDetail.openTime);
-        let endTime = new Date(assignDetail.closeTime);
-        let data = res.data.submissions;
+      let assignDetail = res.data.assignmentDetail;
+      let startTime = new Date(assignDetail.openTime);
+      let endTime = new Date(assignDetail.closeTime);
+      let data = res.data.submissions;
 
-        data = data.map((submission) => ({
-          ...submission,
-          submissionDate: new Date(submission.submissionDate),
-        }));
+      data = data.map((submission) => ({
+        ...submission,
+        submissionDate: new Date(submission.submissionDate),
+      }));
 
-        changePageSize(data.length, tableRef);
-        setData(data);
+      changePageSize(data.length, tableRef);
+      setData(data);
 
-        setRemainingTime(
-          endTime.getTime() < Date.now()
-            ? 0
-            : (endTime.getTime() - Date.now()) / 1000
-        );
+      setRemainingTime(
+        endTime.getTime() < Date.now()
+          ? 0
+          : (endTime.getTime() - Date.now()) / 1000
+      );
 
-        setDuration((endTime.getTime() - startTime.getTime()) / 1000);
+      setDuration((endTime.getTime() - startTime.getTime()) / 1000);
 
-        setKey("update-params");
+      setKey("update-params");
 
-        setAssignDetail({
-          name: assignDetail.name,
-          subject: assignDetail.subject,
-          startTime: startTime,
-          endTime: endTime,
-          noSubmissions: res.data.noSubmissions,
-          deleted: assignDetail.deleted,
-        });
+      setAssignDetail({
+        name: assignDetail.name,
+        subject: assignDetail.subject,
+        startTime: startTime,
+        endTime: endTime,
+        noSubmissions: res.data.noSubmissions,
+        deleted: assignDetail.deleted,
+      });
     });
   };
 
@@ -226,7 +240,7 @@ function TAssignmentDetail() {
     // // TODO: consider
     // form.setAttribute(
     //   "action",
-    //   `${API_URL}/edu/assignment/${params.assignmentId}/submissions?token=${token}`
+    //   `${config.url.API_URL}/edu/assignment/${params.assignmentId}/submissions?token=${token}`
     // );
 
     const input = document.createElement("input");
@@ -251,7 +265,7 @@ function TAssignmentDetail() {
     // // TODO: consider
     // form.setAttribute(
     //   "action",
-    //   `${API_URL}/edu/assignment/${params.assignmentId}/submissions?token=${token}`
+    //   `${config.url.API_URL}/edu/assignment/${params.assignmentId}/submissions?token=${token}`
     // );
 
     for (const submission of selectedSubmissions) {
@@ -273,7 +287,7 @@ function TAssignmentDetail() {
     //   `/edu/assignment/${params.assignmentId}/submissions`,
     //   (res) => {
     //     setIsZipping(false);
-    //     window.location.href = `${API_URL}/edu/assignment/${params.assignmentId}/download-file/${res.data}`;
+    //     window.location.href = `${config.url.API_URL}/edu/assignment/${params.assignmentId}/download-file/${res.data}`;
     //   },
     //   { onError: () => setIsZipping(false) },
     //   {

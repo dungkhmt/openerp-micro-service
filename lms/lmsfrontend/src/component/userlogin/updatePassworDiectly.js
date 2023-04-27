@@ -11,7 +11,7 @@
 // import {useHistory, useParams} from "react-router-dom";
 // import {failed} from "../../action";
 // import {authPost} from "../../api";
-// import {API_URL} from "../../config/config";
+// import {config.url.API_URL} from "../../config/config";
 // import withScreenSecurity from "../withScreenSecurity";
 //
 // const useStyles = makeStyles((theme) => ({
@@ -53,7 +53,7 @@
 //   const [isRequesting, setIsRequesting] = useState(false);
 //
 //   function getSecurityGroups() {
-//     fetch(API_URL + "/get-security-groups", {
+//     fetch(config.url.API_URL + "/get-security-groups", {
 //       method: "GET",
 //       headers: { "Content-Type": "application/json", "X-Auth-Token": token },
 //     })
