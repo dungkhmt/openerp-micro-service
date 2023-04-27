@@ -12,7 +12,7 @@ import java.util.List;
 public interface SaleOrderItemRepo extends JpaRepository<SaleOrderItem, Long> {
     @Query(value = "select * from where order_code = :orderCode", nativeQuery = true)
     List<SaleOrderItem> search(String orderCode);
-    @Query(value = "select * from scm_sale_order_item soi left join product p on p.code = soi.product_code\n" +
+    @Query(value = "select * from scm_sale_order_item soi left join scm_product p on p.code = soi.product_code\n" +
             " where order_code = :orderCode or :orderCode = ''", nativeQuery = true)
     Page<SaleOrderItem> search(Pageable pageable, String orderCode);
 

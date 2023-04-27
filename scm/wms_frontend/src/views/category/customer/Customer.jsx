@@ -1,12 +1,13 @@
 import AddIcon from "@mui/icons-material/Add";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useEffect, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useRef, useState } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useToggle, useWindowSize } from "react-use";
 import withScreenSecurity from "../../../components/common/withScreenSecurity";
 import CustomDataGrid from "../../../components/datagrid/CustomDataGrid";
 import CustomFormControl from "../../../components/form/CustomFormControl";
+import CustomMap from "../../../components/map/CustomMap";
 import CustomModal from "../../../components/modal/CustomModal";
 import {
   useCreateCustomer,
@@ -16,6 +17,7 @@ import {
 } from "../../../controllers/query/category-query";
 import { useGetFacilityList } from "../../../controllers/query/facility-query";
 import { AppColors } from "../../../shared/AppColors";
+import useGeoLocation from "../../../shared/AppHooks";
 import { staticCustomerField } from "../LocalConstant";
 function CustomerScreen({ screenAuthorization }) {
   const status = [{ name: "active" }, { name: "inactive" }];
@@ -26,10 +28,9 @@ function CustomerScreen({ screenAuthorization }) {
   const { height } = useWindowSize();
   const { isLoading, data } = useGetCustomerList();
   const [isAdd, setIsAdd] = useToggle(false);
-  const [currPos, setCurrPos] = useState({
-    latitude: "",
-    longitude: "",
-  });
+  const mapRef = useRef();
+  const currPos = useGeoLocation();
+  const [currMarker, setCurrMarker] = useState(currPos.coordinates);
   const methods = useForm({
     mode: "onChange",
     defaultValues: {},
@@ -39,6 +40,7 @@ function CustomerScreen({ screenAuthorization }) {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
     control,
   } = methods;
 
@@ -58,10 +60,9 @@ function CustomerScreen({ screenAuthorization }) {
       status: data?.status?.name,
       name: data?.name,
       phone: data?.phone,
-      latitude: currPos ? currPos?.latitude : "",
-      longitude: currPos ? currPos?.longitude : "",
+      latitude: data?.map?.lat ? data?.map?.lat : currMarker?.lat,
+      longitude: data?.map?.lng ? data?.map?.lng : currMarker?.lng,
     };
-    console.log("Prams:", customerParams);
     await createCustomerQuery.mutateAsync(customerParams);
     setIsAdd((pre) => !pre);
     reset();
@@ -134,14 +135,6 @@ function CustomerScreen({ screenAuthorization }) {
       loading: isLoadingContractType,
     },
   ];
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      setCurrPos({
-        latitude: position?.coords?.latitude,
-        longitude: position?.coords?.longitude,
-      });
-    });
-  }, []);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box
@@ -198,12 +191,47 @@ function CustomerScreen({ screenAuthorization }) {
             errors={errors}
             fields={fields}
           />
+          <Typography>Lấy vị trí</Typography>
+          <Stack direction={"row"}>
+            <Controller
+              key={"map"}
+              control={control}
+              name={"map"}
+              render={({ field: { onChange, value } }) => (
+                <CustomMap
+                  style={{ width: "30vw", height: "30vh" }}
+                  location={currPos}
+                  mapRef={mapRef}
+                  onChange={(currLoc) => {
+                    setCurrMarker(currLoc);
+                  }}
+                />
+              )}
+            />
+            <Stack direction={"column"}>
+              <Button
+                onClick={() => {
+                  setValue("map", currMarker);
+                }}
+                variant="contained"
+                style={{
+                  margin: "20px 20px",
+                  color: "white",
+                  maxWidth: 100,
+                  maxHeight: 40,
+                }}
+              >
+                Lấy vị trí
+              </Button>
+              <Typography>{`${currMarker.lat}, ${currMarker.lng}`}</Typography>
+            </Stack>
+          </Stack>
           {/* </Stack> */}
         </FormProvider>
         <Button
           onClick={handleSubmit(onSubmit)}
           variant="contained"
-          style={{ marginRight: 20, color: "white" }}
+          style={{ margin: "20px 20px", color: "white" }}
         >
           Submit
         </Button>

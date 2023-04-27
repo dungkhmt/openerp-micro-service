@@ -213,13 +213,14 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
     }
     private boolean isExceedPurchaseOrderQuantity(PurchaseOrder currentImportingOrder, ImportToFacilityDTO importToFacilityDTO) {
         List<ReceiptBill> receiptBills = currentImportingOrder.getReceiptBills();
-        if (receiptBills.size() == 0) return false;
         Map<String, Integer> qtyMappingFromBill = new HashMap<>();
         for (ReceiptBill bill : receiptBills) {
             for (ReceiptBillItem item : bill.getReceiptBillItems()) {
+                // Tồn tại bill của item này rồi => Gộp quantity để so sánh
                 if (qtyMappingFromBill.containsKey(item.getProduct().getCode())) {
                     qtyMappingFromBill.merge(item.getProduct().getCode(), item.getEffectiveQty(), Integer::sum);
                 }
+                // If chưa tồn tại, tạo 1 mapping mới
                 else {
                     qtyMappingFromBill.put(item.getProduct().getCode(), item.getEffectiveQty());
                 }
@@ -229,11 +230,15 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
             String currentProductCode = orderItem.getProduct().getCode().toUpperCase();
             for (ImportItemDTO importItem : importToFacilityDTO.getImportItems()) {
                 if (importItem.getProductCode().equals(currentProductCode)) {
+                    // Nếu có mapping của product này rồi thì so sánh xem lượng nhập vào có quá so với order cần hay không
                     if (qtyMappingFromBill.containsKey(orderItem.getProduct().getCode().toUpperCase())) {
                         int mappingQty = qtyMappingFromBill.get(orderItem.getProduct().getCode().toUpperCase());
                         int compareQty = mappingQty + importItem.getEffectQty();
                         if (compareQty > orderItem.getQuantity()) return true;
                     }
+                    // Nếu chưa có mapping, nghĩa là đây là 1 product mới hoàn toàn, cần so sánh trực tiếp xem cái bill sắp
+                    // được nhập có vượt quá so với order cần hay ko.
+                    if (importItem.getEffectQty() > orderItem.getQuantity()) return true;
                 }
             }
         }
@@ -256,6 +261,10 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
         }
         for (PurchaseOrderItem orderItem : currOrder.getPurchaseOrderItems()) {
             String currentProductCode = orderItem.getProduct().getCode().toUpperCase();
+            // 1 product khác chưa có bill nhưng có order mới nên việc import rõ ràng chưa hết
+            if (!qtyMappingFromBill.containsKey(currentProductCode)) {
+                return false;
+            }
             int compareQty = qtyMappingFromBill.get(currentProductCode);
             if (compareQty != orderItem.getQuantity()) return false;
         }
@@ -312,8 +321,12 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
     }
     private boolean canExportFromFacility(SaleOrder currExportOrder, ExportFromFacilityDTO exportFromFacilityDTO) {
         Facility currFacility = currExportOrder.getCustomer().getFacility();
-        for (ProductFacility productInventory : currFacility.getProductFacilities()) {
-            for (ExportItemDTO exportItem : exportFromFacilityDTO.getExportItems()) {
+        for (ExportItemDTO exportItem : exportFromFacilityDTO.getExportItems()) {
+            // Tại sao lại có cái check này? Ví dụ 1 export Item mới mà ko có trong kho -> ProductFacility sẽ ko có
+            // Sản phẩm này nên khi check ở vòng for bên dưới sẽ chạy qua luôn, ko return.
+            // Do đó để đảm bảo, nếu sản cần xuất ko có trong kho thì rõ ràng không thể xuất đc.
+            boolean isExportItemExistInFacility = false;
+            for (ProductFacility productInventory : currFacility.getProductFacilities()) {
                 if (exportItem.getProductCode().equals(productInventory.getProduct().getCode().toUpperCase())) {
                     int inventoryQty = productInventory.getInventoryQty();
                     int effectiveQty = exportItem.getEffectQty();
@@ -321,14 +334,15 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
                     if (effectiveQty > inventoryQty) {
                         return false;
                     }
+                    isExportItemExistInFacility = true;
                 }
             }
+            if (!isExportItemExistInFacility) return false;
         }
         return true;
     }
     private boolean isBeyondSaleOrderQty(SaleOrder currExportingOrder, ExportFromFacilityDTO exportFromFacilityDTO) {
         List<DeliveryBill> deliveryBills = currExportingOrder.getDeliveryBills();
-        if (deliveryBills.size() == 0) return false;
         Map<String, Integer> qtyMappingFromBill = new HashMap<>();
         for (DeliveryBill bill : deliveryBills) {
             for (DeliveryBillItem item : bill.getDeliveryBillItems()) {
@@ -349,6 +363,9 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
                         int compareQty = mappingQty + exportItem.getEffectQty();
                         if (compareQty > orderItem.getQuantity()) return true;
                     }
+                    // Nếu như ko có cái mapping nào, nghĩa là sản phẩm này mới, chỉ cần check cái số lượng của item
+                    // Xuất kho so với order gốc.
+                    if (exportItem.getEffectQty() > orderItem.getQuantity()) return true;
                 }
             }
         }
