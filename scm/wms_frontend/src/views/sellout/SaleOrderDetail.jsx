@@ -24,12 +24,12 @@ import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import CustomDeliveryBillTable from "../../components/table/CustomDeliveryBillTable";
+import { useGetFacilityInventory } from "../../controllers/query/facility-query";
 import { useGetSaleOrderItems } from "../../controllers/query/sale-order-query";
 
 function SaleOrderDetailScreen() {
   const location = useLocation();
   const currOrder = location.state.order;
-  console.log("Curr order: ", currOrder);
   const [params, setParams] = useState({
     page: 1,
     pageSize: 5,
@@ -158,9 +158,14 @@ function SaleOrderDetailScreen() {
   const { isLoading, data: orderItem } = useGetSaleOrderItems({
     orderCode: currOrder?.code,
   });
-  const { isLoadingBillItem, data: billItem } = useGetBillItemOfSaleOrder({
-    orderCode: currOrder?.code,
-  });
+  const { isLoading: isLoadingBillItem, data: billItem } =
+    useGetBillItemOfSaleOrder({
+      orderCode: currOrder?.code,
+    });
+  const { isLoading: isLoadingInventory, data: facilityInventory } =
+    useGetFacilityInventory({
+      code: currOrder?.customer?.facility?.code,
+    });
   const { isLoading: isLoadingProduct, data: product } = useGetProductList();
   const renderCustomTable = useCallback(() => {
     return (
@@ -172,9 +177,10 @@ function SaleOrderDetailScreen() {
       <CustomDeliveryBillTable
         orderItem={orderItem?.content}
         billItem={billItem}
+        product_facility={facilityInventory?.content}
       />
     );
-  }, [orderItem, billItem]);
+  }, [orderItem, billItem, facilityInventory]);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box

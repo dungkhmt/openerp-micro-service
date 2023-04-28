@@ -11,7 +11,7 @@ import wms.exception.CustomException;
 
 public interface IDeliveryTripService {
     DeliveryTrip createDeliveryTrip(DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) throws CustomException;
-    ReturnPaginationDTO<DeliveryTrip> getAllDeliveryTrips(int page, int pageSize, String sortField, boolean isSortAsc, String shipmentCode) throws JsonProcessingException;
+    ReturnPaginationDTO<DeliveryTrip> getAllDeliveryTrips(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
     DeliveryTrip getDeliveryTripById(long id);
     DeliveryTrip getDeliveryTripByCode(String code);
     DeliveryTrip updateDeliveryTrip(ProductDTO productDTO, long id) throws CustomException;

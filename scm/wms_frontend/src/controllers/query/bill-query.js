@@ -176,6 +176,8 @@ export const useCreateSplitBillItem = (params) => {
         toast.success(res.message);
         queryClient.invalidateQueries([
           queryKey.delivery_bill.splitted_bill_item,
+          queryKey.facility.facility_inventory,
+          queryKey.delivery_bill.bill_item_of_bill,
         ]);
         return res.data;
       } else {
@@ -185,6 +187,8 @@ export const useCreateSplitBillItem = (params) => {
     onSuccess: (res, variables, context) => {
       queryClient.invalidateQueries([
         queryKey.delivery_bill.splitted_bill_item,
+        queryKey.facility.facility_inventory,
+        queryKey.delivery_bill.bill_item_of_bill,
       ]);
     },
     onError: (err) => {

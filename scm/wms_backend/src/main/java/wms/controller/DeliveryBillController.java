@@ -32,7 +32,7 @@ public class DeliveryBillController extends BaseController {
         }
     }
     @GetMapping("/get-bill-items-of-order")
-    public ResponseEntity<?> getBillsOfOrder(
+    public ResponseEntity<?> getBillItemsOfOrder(
             @RequestParam(value = "orderCode", required = false, defaultValue = DefaultConst.STRING) String orderCode
     ) {
         try {
@@ -43,7 +43,7 @@ public class DeliveryBillController extends BaseController {
     }
 
     @GetMapping("/get-bill-items-of-bill")
-    public ResponseEntity<?> getBillsOfBill(
+    public ResponseEntity<?> getBillItemsOfBill(
             @RequestParam(value = "bill_code", required = false, defaultValue = DefaultConst.STRING) String billCode
     ) {
         try {

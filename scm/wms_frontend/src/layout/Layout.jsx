@@ -30,7 +30,7 @@ const Main = styled("main")(({ theme, isOpen }) => ({
   flexShrink: 1,
   flexGrow: 1,
   maxWidth: "100%",
-  padding: theme.spacing(3),
+  // padding: theme.spacing(3), // default has this
   transition: theme.transitions.create(["maxWidth", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -38,7 +38,7 @@ const Main = styled("main")(({ theme, isOpen }) => ({
   marginLeft: -drawerWidth,
   ...(isOpen
     ? {
-        maxWidth: "calc(100% - 300px)",
+        maxWidth: "calc(100% - 230px)", //default: - 300px
         transition: theme.transitions.create(["maxWidth", "margin"], {
           easing: theme.transitions.easing.easeOut,
           duration: theme.transitions.duration.enteringScreen,

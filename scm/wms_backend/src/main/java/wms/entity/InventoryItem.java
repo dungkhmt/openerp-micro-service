@@ -1,5 +1,6 @@
 package wms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +9,10 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "scm_inventory_item")
@@ -16,7 +20,7 @@ import java.time.ZonedDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class InventoryItem extends BaseEntity{
+public class InventoryItem extends BaseEntity implements Serializable {
     @Column(name = "code")
     private String code;
 
@@ -37,5 +41,12 @@ public class InventoryItem extends BaseEntity{
     private Integer quantity;
 
     @Column(name = "receiving_date")
-    private ZonedDateTime receivingDate;
+    private String receivingDate;
+
+    @Column(name = "expire_date")
+    private String expireDate;
+
+    @OneToMany(mappedBy = "inventoryItem",fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<ExportInventoryItem> exportInventoryItems = new HashSet<>();
 }

@@ -6,13 +6,15 @@ import { unix } from "moment";
 import { useLocation } from "react-router-dom";
 import { useWindowSize } from "react-use";
 import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
-import { useGetShipmentItems } from "../../controllers/query/shipment-query";
+import { useGetItemsOfTrip } from "../../controllers/query/shipment-query";
 import { Action } from "../sellin/PurchaseOrder";
 function TripScreen({ screenAuthorization }) {
   const location = useLocation();
   const { height } = useWindowSize();
   const currTrip = location.state.trip;
-  const { isLoading, data } = useGetShipmentItems();
+  const { isLoading, data } = useGetItemsOfTrip({
+    tripCode: currTrip?.code,
+  });
   const extraActions = [
     {
       title: "Xem",

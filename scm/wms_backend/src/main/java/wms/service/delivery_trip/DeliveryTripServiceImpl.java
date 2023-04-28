@@ -63,22 +63,22 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
     }
 
     @Override
-    public ReturnPaginationDTO<DeliveryTrip> getAllDeliveryTrips(int page, int pageSize, String sortField, boolean isSortAsc, String shipmentCode) throws JsonProcessingException {
+    public ReturnPaginationDTO<DeliveryTrip> getAllDeliveryTrips(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
-        Page<DeliveryTrip> deliveryTrips = deliveryTripRepo.search(pageable, shipmentCode);
+        Page<DeliveryTrip> deliveryTrips = deliveryTripRepo.search(pageable);
         return getPaginationResult(deliveryTrips.getContent(), page, deliveryTrips.getTotalPages(), deliveryTrips.getTotalElements());
     }
 
     @Override
     public DeliveryTrip getDeliveryTripById(long id) {
-        return null;
+        return deliveryTripRepo.getDeliveryTripById(id);
     }
 
     @Override
     public DeliveryTrip getDeliveryTripByCode(String code) {
-        return null;
+        return deliveryTripRepo.getDeliveryTripByCode(code);
     }
 
     @Override

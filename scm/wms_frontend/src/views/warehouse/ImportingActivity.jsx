@@ -30,7 +30,6 @@ function ImportingActivityScreen({ screenAuthorization }) {
     });
 
   const handleButtonClick = (params) => {
-    console.log("params: ", params);
     history.push(`${path}/purchase-order-detail`, {
       order: params,
     });
@@ -60,7 +59,6 @@ function ImportingActivityScreen({ screenAuthorization }) {
     {
       title: "Xem chi tiết",
       callback: (item) => {
-        console.log("item: ", item);
         handleButtonClick(item);
       },
       icon: <VisibilityIcon />,

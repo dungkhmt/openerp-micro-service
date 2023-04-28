@@ -6,6 +6,7 @@ import wms.dto.bill.SplitBillDTO;
 import wms.entity.DeliveryBill;
 import wms.entity.DeliveryBillItem;
 import wms.entity.ExportInventoryItem;
+import wms.entity.ShipmentItem;
 import wms.exception.CustomException;
 
 import java.util.List;
@@ -21,5 +22,5 @@ public interface IDeliveryBillService {
     //    void updateBillItem(UpdatePurchaseOrderDTO updatePurchaseOrderDTO, long id) throws CustomException;
     void deleteBillItem(long id);
     void splitBills(SplitBillDTO splitBillDTO) throws CustomException;
-    List<ExportInventoryItem> getSplitBillByCode(String deliveryBillCode);
+    List<ShipmentItem> getSplitBillByCode(String deliveryBillCode);
 }

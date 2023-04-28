@@ -31,7 +31,6 @@ function ExportingActivityScreen({ screenAuthorization }) {
     });
 
   const handleButtonClick = (params) => {
-    console.log("params: ", params);
     history.push(`${path}/sale-order-detail`, {
       order: params,
     });
@@ -61,7 +60,6 @@ function ExportingActivityScreen({ screenAuthorization }) {
     {
       title: "Xem chi tiết",
       callback: (item) => {
-        console.log("item: ", item);
         handleButtonClick(item);
       },
       icon: <VisibilityIcon />,

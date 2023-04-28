@@ -37,11 +37,10 @@ public class DeliveryTripController extends BaseController {
             @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
-            @RequestParam(value = "sort_asc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
-           @RequestParam(value = "shipment_code", required = true, defaultValue = DefaultConst.STRING) String shipmentCode
+            @RequestParam(value = "sort_asc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc
     ) {
         try {
-            return response(new ResultEntity(1, "Get list delivery trips successfully", deliveryTripService.getAllDeliveryTrips(page, pageSize, sortField, isSortAsc, shipmentCode)));
+            return response(new ResultEntity(1, "Get list delivery trips successfully", deliveryTripService.getAllDeliveryTrips(page, pageSize, sortField, isSortAsc)));
         } catch (Exception ex) {
             return response(error(ex));
         }

@@ -139,7 +139,6 @@ function FacilityScreen({ screenAuthorization }) {
     {
       title: "Xem",
       callback: (item) => {
-        console.log("Item: ", item);
         setOpenDrawer((pre) => !pre);
         setFacilityCode(item?.code);
       },

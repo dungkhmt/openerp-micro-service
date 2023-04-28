@@ -1,6 +1,7 @@
 package wms.service.facility;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.internal.util.StringHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,10 @@ import java.util.Map;
 @Service
 @Slf4j
 public class FacilityServiceImpl extends BaseService implements IFacilityService {
+    @Autowired
+    private InventoryItemRepo inventoryItemRepo;
+    @Autowired
+    private ProductUnitRepo productUnitRepo;
     @Autowired
     private DeliveryBillItemRepo deliveryBillItemRepo;
     @Autowired
@@ -169,6 +174,18 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
                     .effectiveQty(importItem.getEffectQty())
                     .build();
             newBill.getReceiptBillItems().add(receiptBillItemRepo.save(item));
+            // Lưu trữ thêm phần inventory_item chính là phần nhập kho thực sự (lưu dư thừa để dễ quản lý)
+            // Ngoài lưu receipt_bill thì phần này cũng nên lưu.
+            InventoryItem inventoryItem = InventoryItem.builder()
+                    .code("INV" + GeneralUtils.generateCodeFromSysTime() + "_" + seq) // TODO: Check if there is any other way to set this code
+                    .facility(order.getFacility())
+                    .lotCode("LOT" + GeneralUtils.generateCodeFromSysTime() + "_" + seq) // TODO: Check if there is any other way to set this code
+                    .expireDate(importItem.getExpireDate())
+                    .receivingDate(ZonedDateTime.now().toString())
+                    .quantity(importItem.getEffectQty())
+                    .product(product)
+                    .build();
+            inventoryItemRepo.save(inventoryItem);
             // TODO: Should not save every inventory item, save by batch or group product with one update.
             // Should have better way to get product facility here.
             ProductFacility productFacility = productFacilityRepo.findInventoryInFacility(order.getFacility().getCode().toUpperCase(), product.getCode());
@@ -387,6 +404,7 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
         }
         for (SaleOrderItem orderItem : currOrder.getSaleOrderItems()) {
             String currentProductCode = orderItem.getProduct().getCode().toUpperCase();
+            // TODO: có cần check tương tự giống phần importing hay không?
             int compareQty = qtyMappingFromBill.get(currentProductCode);
             if (compareQty != orderItem.getQuantity()) return false;
         }

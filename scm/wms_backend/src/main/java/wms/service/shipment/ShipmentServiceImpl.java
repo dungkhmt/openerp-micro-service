@@ -29,6 +29,7 @@ import wms.utils.GeneralUtils;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -98,6 +99,7 @@ public class ShipmentServiceImpl extends BaseService implements IShipmentService
         shipmentItem.setShipment(mappedShipment);
         shipmentItem.setDeliveryTrip(assignedTrip);
         shipmentItem.setTripSeqId(GeneralUtils.generateCodeFromSysTime());
+        shipmentItemRepo.save(shipmentItem);
     }
 
     @Override
@@ -115,6 +117,15 @@ public class ShipmentServiceImpl extends BaseService implements IShipmentService
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
         Page<ShipmentItem> shipmentItems = shipmentItemRepo.search(pageable);
+        return getPaginationResult(shipmentItems.getContent(), page, shipmentItems.getTotalPages(), shipmentItems.getTotalElements());
+    }
+
+    @Override
+    public ReturnPaginationDTO<ShipmentItem> getAllItemOfTrip(int page, int pageSize, String sortField, boolean isSortAsc, String tripCode) throws JsonProcessingException {
+        Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
+                : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
+                : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
+        Page<ShipmentItem> shipmentItems = shipmentItemRepo.getShipmentItemOfATrip(pageable, tripCode);
         return getPaginationResult(shipmentItems.getContent(), page, shipmentItems.getTotalPages(), shipmentItems.getTotalElements());
     }
 

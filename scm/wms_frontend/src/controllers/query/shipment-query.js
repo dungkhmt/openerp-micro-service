@@ -45,13 +45,60 @@ export const useGetShipmentList = (params) => {
 export const useGetShipmentItems = (params) => {
   return useQuery({
     queryKey: [queryKey.shipment.shipment_items, params],
-    queryFn: async () => {
-      const res = await axiosSendRequest("get", endPoint.getShipmentItems);
+    queryFn: async (data) => {
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getShipmentItems,
+        params,
+        data
+      );
       if (res.data && res.code === 1) {
         return res.data;
       }
     },
     keepPreviousData: true,
     onSuccess: (data) => {},
+  });
+};
+export const useGetItemsOfTrip = (params) => {
+  return useQuery({
+    queryKey: [queryKey.shipment.trip_items],
+    queryFn: async (data) => {
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getItemOfTrip,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};
+export const useAssignShipmentToTrip = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "put",
+        endPoint.assignShipmentToTrip,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Phân thành công!");
+      queryClient.invalidateQueries([queryKey.shipment.shipment_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi phân, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
   });
 };

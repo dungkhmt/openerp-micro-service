@@ -21,6 +21,17 @@ moment.updateLocale("en", {
   ],
 });
 
+/**
+ * @typedef Prop
+ * @property {any} value
+ * @property {Function} onChange
+ * @property {React.ReactNode} label
+ * @property {import("@mui/x-date-pickers").DateView} view
+ * @property {any} minDate
+ * @property {string} message
+ * @property {boolean} error
+ * @param {Prop} props
+ */
 export const CustomDatePicker = (props) => {
   const { value, onChange, label, error, message, minDate, view } = props;
   return (

@@ -20,11 +20,13 @@ import {
 } from "controllers/query/bill-query";
 import { useGetProductList } from "controllers/query/category-query";
 import { useGetPurchaseOrderItems } from "controllers/query/purchase-order-query";
+import moment from "moment";
 import { useCallback, useState } from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
+import { CustomDatePicker } from "../../components/datepicker/CustomDatePicker";
 
 function PurchaseOrderDetailScreen({}) {
   const location = useLocation();
@@ -64,12 +66,13 @@ function PurchaseOrderDetailScreen({}) {
       orderCode: currOrder?.code,
       importItems: data?.products?.map((pro) => {
         return {
+          expireDate: moment(pro?.expired_date).format("YYYY-MM-DD"),
           effectQty: pro?.quantity,
           productCode: pro?.code,
         };
       }),
     };
-    const res = await createBillQuery.mutateAsync(importParams);
+    await createBillQuery.mutateAsync(importParams);
     setIsAdd((pre) => !pre);
     reset();
   };
@@ -104,7 +107,7 @@ function PurchaseOrderDetailScreen({}) {
       field: "name",
       headerName: "Tên sản phẩm",
       sortable: false,
-      minWidth: 200,
+      minWidth: 150,
     },
     {
       field: "status",
@@ -148,6 +151,33 @@ function PurchaseOrderDetailScreen({}) {
                 value={value}
                 onChange={onChange}
               />
+            )}
+          />
+        );
+      },
+    },
+    {
+      field: "expireDate",
+      headerName: "Ngày hết hạn",
+      sortable: false,
+      minWidth: 150,
+      type: "date",
+      editable: true,
+      renderCell: (params) => {
+        const product = products.find((el) => el.id === params.id);
+        return product
+          ? moment(product?.expired_date).format("DD-MM-YYYY")
+          : "Nhập ngày hết hạn";
+      },
+      renderEditCell: (params) => {
+        const index = products?.findIndex((el) => el.id === params.id);
+        const value = index !== -1 ? products[index].expired_date : null;
+        return (
+          <Controller
+            name={`products.${index}.expired_date`}
+            control={control}
+            render={({ field: { onChange } }) => (
+              <CustomDatePicker value={value} onChange={onChange} />
             )}
           />
         );

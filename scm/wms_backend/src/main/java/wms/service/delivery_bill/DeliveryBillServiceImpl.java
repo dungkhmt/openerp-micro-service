@@ -15,32 +15,35 @@ import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.bill.SplitBillDTO;
 import wms.dto.bill.SplitBillItemDTO;
-import wms.entity.DeliveryBill;
-import wms.entity.DeliveryBillItem;
-import wms.entity.ExportInventoryItem;
-import wms.entity.ShipmentItem;
+import wms.entity.*;
 import wms.exception.CustomException;
-import wms.repo.DeliveryBillItemRepo;
-import wms.repo.DeliveryBillRepo;
-import wms.repo.ExportInventoryItemRepo;
+import wms.repo.*;
 import wms.service.BaseService;
 import wms.utils.GeneralUtils;
 
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class DeliveryBillServiceImpl extends BaseService implements IDeliveryBillService {
+    private final InventoryItemRepo inventoryItemRepo;
+    private final ShipmentItemRepo shipmentItemRepo;
     private final ExportInventoryItemRepo exportInventoryItemRepo;
     private final DeliveryBillItemRepo deliveryBillItemRepo;
     private final DeliveryBillRepo deliveryBillRepo;
 
     public DeliveryBillServiceImpl(DeliveryBillRepo deliveryBillRepo,
                                    DeliveryBillItemRepo deliveryBillItemRepo,
-                                   ExportInventoryItemRepo exportInventoryItemRepo) {
+                                   ExportInventoryItemRepo exportInventoryItemRepo,
+                                   ShipmentItemRepo shipmentItemRepo,
+                                   InventoryItemRepo inventoryItemRepo) {
         this.deliveryBillRepo = deliveryBillRepo;
         this.deliveryBillItemRepo = deliveryBillItemRepo;
         this.exportInventoryItemRepo = exportInventoryItemRepo;
+        this.shipmentItemRepo = shipmentItemRepo;
+        this.inventoryItemRepo = inventoryItemRepo;
     }
 
     @Override
@@ -98,28 +101,57 @@ public class DeliveryBillServiceImpl extends BaseService implements IDeliveryBil
         if (deliveryBill == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Can't find referenced bill, can't split");
         }
-        for (SplitBillItemDTO billItemDTO : splitBillDTO.getBillItemDTOS())
-        {
-            for (DeliveryBillItem billItem : deliveryBill.getDeliveryBillItems()) {
-                if (billItem.getSeqId().equals(billItemDTO.getDeliveryBillItemSeqId())) {
-                    if (billItem.getEffectiveQty() < billItemDTO.getQuantity()) {
-                        throw caughtException(ErrorCode.USER_ACTION_FAILED.getCode(), "Split more than the exist quantity");
-                    }
-                    ExportInventoryItem newExportInventoryItem = ExportInventoryItem.builder()
-                            .code("EXINV" + GeneralUtils.generateCodeFromSysTime())
-                            .quantity(billItemDTO.getQuantity())
-                            .status(BillStatus.SPLITTED.getStatus())
-                            .deliveryBillItemSeqId(billItemDTO.getDeliveryBillItemSeqId())
-                            .deliveryBill(deliveryBill)
-                            .build();
-                    exportInventoryItemRepo.save(newExportInventoryItem);
+        for (SplitBillItemDTO splitBillItemDTO : splitBillDTO.getBillItemDTOS()) {
+            List<DeliveryBillItem> currBillItems = deliveryBill.getDeliveryBillItems().stream().filter(item -> {
+                return item.getSeqId().equals(splitBillItemDTO.getDeliveryBillItemSeqId());
+            }).collect(Collectors.toList());
+            // There is only one bill item can have same seqId and delivery_bill_code with this DTO.
+            if (currBillItems.size() != 1) {
+                throw caughtException(ErrorCode.UNMATCH.getCode(), "Can't find matched delivery bill item, can't split");
+            }
+            List<ShipmentItem> sameBillShipmentItem = shipmentItemRepo.getItemOfSameBillAndProduct(deliveryBill.getCode(), splitBillItemDTO.getDeliveryBillItemSeqId());
+            // Check if total quantity of all items that are in the same bill and of the same product.
+            int totalSameBillItemQty = sameBillShipmentItem.stream().mapToInt(ob -> (ob.getQuantity())).reduce(0, (pre, curr) -> pre + curr);
+            if (totalSameBillItemQty + splitBillItemDTO.getQuantity() > currBillItems.get(0).getEffectiveQty()) {
+                throw caughtException(ErrorCode.USER_ACTION_FAILED.getCode(), "Exceed quantity limit, can't split anymore");
+            }
+            ShipmentItem shipmentItem = ShipmentItem.builder()
+                    .code("SHIT" + GeneralUtils.generateCodeFromSysTime())
+                    .deliveryBill(deliveryBill)
+                    .deliveryBillItemSeqId(splitBillItemDTO.getDeliveryBillItemSeqId())
+                    .quantity(splitBillItemDTO.getQuantity())
+                    .build();
+            shipmentItemRepo.save(shipmentItem);
+
+            List<InventoryItem> inventoryItems = inventoryItemRepo.getAllItemsOfSameProduct(splitBillItemDTO.getProductCode());
+            List<ExportInventoryItem> exportInventoryItems = exportInventoryItemRepo.getAllItemsOfSameProduct(splitBillItemDTO.getDeliveryBillItemSeqId());
+            int cumulativeInventoryQty = 0;
+            int selectiveInventoryIndex = 0;
+            // Phải liệt kê hết các inventory_item của cùng 1 sản phẩm.
+            // Nếu lô này mà số lượng của nó không đủ để export => Cần phải tìm lô khác đủ lượng sản phẩm (tối thiểu là >=)
+            // Tìm lô theo thứ tự ngày hết hạn của lô. Ưu tiên ngày hết hạn sớm trước.
+            // Chọn ra được cái lô cuối cùng mà tổng qty của các lô trước cộng vào bằng vs số lượng đã nhập trên các shipment và lượng đang chuẩn bị được nhập
+            // SelectiveInventoryIndex sẽ dừng ko tăng nữa khi cumulativeQty vượt quá so vs lượng cần => Oke.
+            for (InventoryItem curr : inventoryItems) {
+                cumulativeInventoryQty += curr.getQuantity();
+                if (cumulativeInventoryQty < totalSameBillItemQty + splitBillItemDTO.getQuantity()) {
+                    selectiveInventoryIndex++;
                 }
             }
+            ExportInventoryItem newExpInventoryItem = ExportInventoryItem.builder()
+                    .code("EXINV" + GeneralUtils.generateCodeFromSysTime() + "_" + selectiveInventoryIndex)
+                    .effective_date(ZonedDateTime.now().toString())
+                    .deliveryBill(deliveryBill)
+                    .deliveryBillItemSeqId(splitBillItemDTO.getDeliveryBillItemSeqId())
+                    .quantity(splitBillItemDTO.getQuantity())
+                    .inventoryItem(inventoryItems.get(selectiveInventoryIndex))
+                    .build();
+            exportInventoryItemRepo.save(newExpInventoryItem);
         }
     }
 
     @Override
-    public List<ExportInventoryItem> getSplitBillByCode(String deliveryBillCode) {
-        return exportInventoryItemRepo.search(deliveryBillCode);
+    public List<ShipmentItem> getSplitBillByCode(String deliveryBillCode) {
+        return shipmentItemRepo.getShipmentItemOfABill(deliveryBillCode);
     }
 }

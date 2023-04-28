@@ -13,25 +13,30 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import withScreenSecurity from "components/common/withScreenSecurity";
+import CustomDataGrid from "components/datagrid/CustomDataGrid";
+import CustomModal from "components/modal/CustomModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useState } from "react";
-import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
-import { useLocation } from "react-router-dom";
-import { useToggle, useWindowSize } from "react-use";
-import withScreenSecurity from "../../components/common/withScreenSecurity";
-import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
-import CustomModal from "../../components/modal/CustomModal";
 import {
   useCreateSplitBillItem,
   useGetBillItemsOfBill,
   useGetSplittedBillItem,
-} from "../../controllers/query/bill-query";
-import { AppColors } from "../../shared/AppColors";
+} from "controllers/query/bill-query";
+import { useGetDeliveryTripList } from "controllers/query/delivery-trip-query";
+import { useState } from "react";
+import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
+import { useLocation } from "react-router-dom";
+import { useToggle, useWindowSize } from "react-use";
+import { AppColors } from "shared/AppColors";
+import CustomSelect from "../../components/select/CustomSelect";
+import { useAssignShipmentToTrip } from "../../controllers/query/shipment-query";
 import { Action } from "../sellin/PurchaseOrder";
 function SplitBillDetailScreen({ screenAuthorization }) {
   const location = useLocation();
   const currBills = location.state.bills;
   const [isAdd, setIsAdd] = useToggle(false);
+  const [isAddTrip, setIsAddTrip] = useToggle(false);
+  const [currShipmentItem, setCurrShipmentItem] = useState("");
   const [params, setParams] = useState({
     page: 1,
     page_size: 50,
@@ -63,18 +68,22 @@ function SplitBillDetailScreen({ screenAuthorization }) {
     useGetSplittedBillItem({
       deliveryBillCode: currBills?.code,
     });
-  const createSplitBillQuery = useCreateSplitBillItem();
+  const { isLoading: isLoadingTrip, data: trips } = useGetDeliveryTripList();
 
+  const createSplitBillQuery = useCreateSplitBillItem();
+  const assignBillToTripQuery = useAssignShipmentToTrip();
   const onSubmit = async (data) => {
     let splitParams = {
       billItemDTOS: data?.products?.map((pro) => {
         return {
           quantity: pro?.quantity,
           deliveryBillItemSeqId: pro?.seqId,
+          productCode: pro?.product?.code,
         };
       }),
       deliveryBillCode: currBills?.code,
     };
+    // TODO: Why this do not render data updated
     await createSplitBillQuery.mutateAsync(splitParams);
     setIsAdd((pre) => !pre);
     reset();
@@ -103,17 +112,16 @@ function SplitBillDetailScreen({ screenAuthorization }) {
   const extraActions = [
     {
       title: "Xem chi tiết",
-      callback: (item) => {
-        console.log("item: ", item);
-      },
+      callback: (item) => {},
       icon: <VisibilityIcon />,
       // permission: PERMISSIONS.MANAGE_CATEGORY_EDIT,
     },
     {
-      title: "Thêm đơn",
+      title: "Thêm đơn vào chuyến",
       callback: (item) => {
-        // setIsRemove();
-        // setItemSelected(item);
+        console.log("Item: ", item);
+        setCurrShipmentItem(item);
+        setIsAddTrip((pre) => !pre);
       },
       icon: <AddIcon />,
       // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
@@ -203,11 +211,6 @@ function SplitBillDetailScreen({ screenAuthorization }) {
       >
         {"ĐƠN ĐÃ CHIA"}
       </Typography>
-      <Typography>
-        Thêm 1 bảng hiển thị các đơn đã chia từ bill này (lấy từ
-        export_inventory), bảng này có thể chọn nhiều và - có nút để add vào đơn
-        giao hàng chính thức - có nút để add vào 1 trip cụ thể
-      </Typography>
       <CustomDataGrid
         params={params}
         setParams={setParams}
@@ -218,13 +221,6 @@ function SplitBillDetailScreen({ screenAuthorization }) {
           {
             field: "code",
             headerName: "Mã code",
-            sortable: false,
-            pinnable: true,
-            minWidth: 150,
-          },
-          {
-            field: "product",
-            headerName: "Tên sản phẩm",
             sortable: false,
             pinnable: true,
             minWidth: 150,
@@ -242,6 +238,16 @@ function SplitBillDetailScreen({ screenAuthorization }) {
             sortable: false,
             pinnable: true,
             minWidth: 150,
+          },
+          {
+            field: "deliveryBillCode",
+            headerName: "Đơn gốc",
+            sortable: false,
+            pinnable: true,
+            minWidth: 150,
+            valueGetter: (params) => {
+              return params?.row?.deliveryBill?.code;
+            },
           },
           {
             field: "actions",
@@ -358,13 +364,14 @@ function SplitBillDetailScreen({ screenAuthorization }) {
               },
             ]}
             rows={deliveryBillItems?.map((item) => {
-              let index = splittedBillItems?.findIndex(
+              let filteredSplittedItem = splittedBillItems?.filter(
                 (i) => i?.deliveryBillItemSeqId === item?.seqId
               );
-              let splittedQty = 0;
-              if (index != -1) {
-                splittedQty = splittedBillItems?.[index]?.quantity;
-              }
+              let splittedQty = filteredSplittedItem.reduce(
+                (pre, curr) => pre + curr.quantity,
+                0
+              );
+
               return {
                 ...item,
                 splittedQty: splittedQty,
@@ -380,6 +387,69 @@ function SplitBillDetailScreen({ screenAuthorization }) {
         </FormProvider>
         <Button
           onClick={handleSubmit(onSubmit)}
+          variant="contained"
+          style={{ marginRight: 20, color: "white" }}
+        >
+          Submit
+        </Button>
+        <Button onClick={() => reset()} variant={"outlined"}>
+          Reset
+        </Button>
+      </CustomModal>
+      <CustomModal
+        open={isAddTrip}
+        toggle={setIsAddTrip}
+        size="sm"
+        style={{ padding: 2, zIndex: 3 }}
+      >
+        <Typography
+          id="modal-modal-title"
+          variant="h6"
+          textTransform="capitalize"
+          letterSpacing={1}
+          fontSize={18}
+          sx={{
+            fontFamily: "Open Sans",
+            color: AppColors.primary,
+            fontWeight: "bold",
+          }}
+        >
+          {"THÊM ĐƠN VÀO CHUYẾN"}
+        </Typography>
+        <FormProvider {...methods}>
+          <Controller
+            control={control}
+            name={"trips"}
+            key={"select"}
+            render={({ field: { onChange, value } }) => (
+              <CustomSelect
+                options={
+                  trips.content
+                    ? trips.content.map((trip) => {
+                        return {
+                          name: trip?.code + "-" + trip?.userInCharge?.id,
+                        };
+                      })
+                    : []
+                }
+                loading={isLoadingTrip}
+                value={value}
+                label={"Trips"}
+                onChange={onChange}
+              />
+            )}
+          />
+        </FormProvider>
+        <Button
+          onClick={handleSubmit(async (data) => {
+            let tripCode = data?.trips?.name.split("-")[0];
+            let assignParams = {
+              shipmentItemCode: currShipmentItem?.code,
+              tripCode: tripCode,
+            };
+            await assignBillToTripQuery.mutateAsync(assignParams);
+            setIsAddTrip((pre) => !pre);
+          })}
           variant="contained"
           style={{ marginRight: 20, color: "white" }}
         >

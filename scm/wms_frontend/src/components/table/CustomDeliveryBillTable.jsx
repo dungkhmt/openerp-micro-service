@@ -8,17 +8,20 @@ import {
   TableRow,
 } from "@mui/material";
 
-const CustomDeliveryBillTable = ({ orderItem, billItem }) => {
-  console.log(orderItem, billItem);
+const CustomDeliveryBillTable = ({ orderItem, billItem, product_facility }) => {
+  console.log(orderItem, billItem, product_facility);
   const rows = orderItem?.map((item) => {
     let mappedBill = billItem.filter(
       (bill) => bill?.product?.code === item?.product?.code
     );
-    console.log(
-      mappedBill.reduce((accumulator, curr) => {
-        return accumulator + curr.effectiveQty;
-      }, 0)
+    let facilityInventory = product_facility.filter(
+      (inv) => inv?.product?.code === item?.product?.code
     );
+    // console.log(
+    //   mappedBill.reduce((accumulator, curr) => {
+    //     return accumulator + curr.effectiveQty;
+    //   }, 0)
+    // );
     return {
       name: item?.product?.name,
       effQty:
@@ -29,6 +32,9 @@ const CustomDeliveryBillTable = ({ orderItem, billItem }) => {
             )
           : 0,
       qty: item?.quantity,
+      inventory: facilityInventory[0]?.inventoryQty
+        ? facilityInventory[0]?.inventoryQty
+        : 0,
       // item?.purchaseOrder?.totalMoney
     };
   });
@@ -41,6 +47,7 @@ const CustomDeliveryBillTable = ({ orderItem, billItem }) => {
             <TableCell align="right">Tên sản phẩm</TableCell>
             <TableCell align="right">Số lượng đã xuất kho</TableCell>
             <TableCell align="right">Tổng số lượng cần xuất</TableCell>
+            <TableCell align="right">Tồn kho hiện tại</TableCell>
             {/* <TableCell align="right">Tổng cộng</TableCell> */}
           </TableRow>
         </TableHead>
@@ -56,6 +63,7 @@ const CustomDeliveryBillTable = ({ orderItem, billItem }) => {
               <TableCell align="right">{row.name}</TableCell>
               <TableCell align="right">{row.effQty}</TableCell>
               <TableCell align="right">{row.qty}</TableCell>
+              <TableCell align="right">{row.inventory}</TableCell>
               {/* <TableCell align="right">{row.total_money}</TableCell> */}
             </TableRow>
           ))}
