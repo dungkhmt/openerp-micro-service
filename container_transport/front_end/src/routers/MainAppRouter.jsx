@@ -11,6 +11,7 @@ import TruckScreen from "views/truckManagement/TruckScreen";
 import FacilityScreen from "views/facilityManagement/FacilityScreen";
 import OrderScreen from "views/order/OrderScreen";
 import ContainerScreen from "views/containerManagerment/ContainerScreen";
+import ShipmentScreen from "views/shipment/ShipmentScreen";
 
 const styles = {
   loadingProgress: {
@@ -43,8 +44,8 @@ function MainAppRouter(props) {
           <PrivateRoute component={FacilityScreen} path="/facility" />
           <PrivateRoute component={OrderScreen} path="/order" />
           <PrivateRoute component={ContainerScreen} path="/container" />
-          {/* <Route component={error} path="*" /> */}
-          <Route component={NotFound} />
+          <Route component={ShipmentScreen} path="/trailer" />
+          <Route component={NotFound}  />
         </Switch>
       </Suspense>
     </Layout>
