@@ -1,9 +1,9 @@
 package openerp.openerpresourceserver.repo;
 
 
-import openerp.openerpresourceserver.entity.UserEntity;
+import openerp.openerpresourceserver.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepo extends JpaRepository<UserEntity, String> {
+public interface UserRepo extends JpaRepository<User, String> {
 
 }

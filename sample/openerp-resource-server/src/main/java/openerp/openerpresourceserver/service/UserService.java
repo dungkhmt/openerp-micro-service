@@ -1,13 +1,15 @@
 package openerp.openerpresourceserver.service;
 
-import openerp.openerpresourceserver.entity.UserEntity;
+import openerp.openerpresourceserver.entity.User;
 
 import java.util.List;
 
 public interface UserService {
 
-    List<UserEntity> getAllUsers();
+    List<User> getAllUsers();
 
-    UserEntity getUserById(String id);
+    User getUserById(String id);
+
+    void synchronizeUser(String userId, String email, String firstName, String lastName);
 
 }
