@@ -85,9 +85,9 @@ function App() {
   };
 
   const onKeycloakEvent = async (event, error) => {
-    console.log(event);
+    console.debug(event);
     if (event === "onAuthSuccess") {
-      request("get", `/`);
+      request("get", `/user`);
     } else if (event === "onAuthError") {
       console.error("Authenticated failed");
     } else if (event === "onAuthLogout") {
