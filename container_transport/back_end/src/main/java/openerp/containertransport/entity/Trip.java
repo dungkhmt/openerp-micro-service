@@ -1,5 +1,6 @@
 package openerp.containertransport.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,21 +20,25 @@ public class Trip {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
-    @Column(name = "truck_id")
-    private Integer truckId;
+    private String code;
+
+    @ManyToOne()
+    @JoinColumn(name = "truck_id", referencedColumnName = "id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Truck truck;
 
     @Column(name = "created_by_user_id")
-    private Integer createdByUserId;
+    private String createdByUserId;
 
     @Column(name = "shipment_id")
-    private String shipmentId;
+    private Long shipmentId;
 
-    @Column(name = "status_id")
-    private String statusId;
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "created_at")
-    private Timestamp createdAt;
+    private long createdAt;
 
     @Column(name = "updated_at")
-    private Timestamp updatedAt;
+    private long updatedAt;
 }

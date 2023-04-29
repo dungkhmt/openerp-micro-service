@@ -19,15 +19,17 @@ public class Shipment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
-    @Column(name = "created_by_user_id")
-    private Integer createdByUserId;
+    private String code;
 
-    @Column(name = "status_id")
-    private String statusId;
+    @Column(name = "created_by_user_id")
+    private String createdByUserId;
+
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "created_at")
-    private Timestamp createdAt;
+    private long createdAt;
 
     @Column(name = "updated_at")
-    private Timestamp updatedAt;
+    private long updatedAt;
 }

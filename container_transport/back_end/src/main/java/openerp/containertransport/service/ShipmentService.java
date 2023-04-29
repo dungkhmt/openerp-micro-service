@@ -1,7 +1,10 @@
 package openerp.containertransport.service;
 
+import openerp.containertransport.dto.ShipmentModel;
 import openerp.containertransport.entity.Shipment;
 
+import java.util.List;
+
 public interface ShipmentService {
-    Shipment createShipment();
+    ShipmentModel createShipment(ShipmentModel shipmentModel);
 }
