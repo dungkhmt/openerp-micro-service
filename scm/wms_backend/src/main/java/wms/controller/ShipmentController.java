@@ -113,7 +113,7 @@ public class ShipmentController extends BaseController {
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
             @RequestParam(value = "sort_asc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
-            @RequestParam(value = "trip_code", required = true, defaultValue = DefaultConst.STRING) String tripCode
+            @RequestParam(value = "", required = true, defaultValue = DefaultConst.STRING) String tripCode
     ) {
         try {
             return response(new ResultEntity(1, "Get list shipment items successfully", shipmentService.getAllItemOfTrip(page, pageSize, sortField, isSortAsc, tripCode)));

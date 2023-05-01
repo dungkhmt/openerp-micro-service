@@ -26,7 +26,7 @@ const CustomDeliveryBillTable = ({ orderItem, billItem, product_facility }) => {
       name: item?.product?.name,
       effQty:
         mappedBill.length > 0
-          ? mappedBill.reduce(
+          ? mappedBill?.reduce(
               (accumulator, curr) => accumulator + curr.effectiveQty,
               0
             )

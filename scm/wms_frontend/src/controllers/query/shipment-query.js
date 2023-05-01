@@ -93,7 +93,10 @@ export const useAssignShipmentToTrip = (params) => {
     },
     onSuccess: (res, variables, context) => {
       toast.success("Phân thành công!");
-      queryClient.invalidateQueries([queryKey.shipment.shipment_list]);
+      queryClient.invalidateQueries([
+        queryKey.shipment.shipment_list,
+        queryKey.delivery_bill.splitted_bill_item,
+      ]);
     },
     onError: () => {
       toast.error("Lỗi khi phân, vui lòng kiểm tra lại");

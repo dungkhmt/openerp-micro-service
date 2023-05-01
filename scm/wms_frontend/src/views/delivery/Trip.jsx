@@ -62,11 +62,7 @@ function TripScreen({ screenAuthorization }) {
           3. Người thực hiện:
           {currTrip?.userInCharge?.id}
         </Typography>
-        <Typography>
-          4. Đơn hàng: Nên liệt kê tất cả các bill thuộc trip này (lấy từ bảng
-          shipment_item, group theo bill_code) Có nút để xem thông tin bill sẽ
-          là các shipment_item.
-        </Typography>
+        <Typography>4. Đơn hàng:</Typography>
       </Box>
       <CustomDataGrid
         // params={params}
@@ -94,7 +90,7 @@ function TripScreen({ screenAuthorization }) {
             sortable: false,
             minWidth: 150,
             valueGetter: (params) => {
-              return params?.row?.saleOrder?.customer?.name;
+              return params?.row?.deliveryBill?.saleOrder?.customer?.name;
             },
           },
           {

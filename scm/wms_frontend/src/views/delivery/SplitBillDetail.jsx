@@ -255,17 +255,21 @@ function SplitBillDetailScreen({ screenAuthorization }) {
             sortable: false,
             minWidth: 200,
             type: "actions",
-            getActions: (params) => [
-              ...extraActions.map((extraAction, index) => (
-                <Action
-                  item={params.row}
-                  key={index}
-                  extraAction={extraAction}
-                  onActionCall={extraAction.callback}
-                  disabled={false}
-                />
-              )),
-            ],
+            getActions: (params) => {
+              return [
+                ...extraActions.map((extraAction, index) => {
+                  return (
+                    <Action
+                      item={params.row}
+                      key={index}
+                      extraAction={extraAction}
+                      onActionCall={extraAction.callback}
+                      disabled={params?.row?.deliveryTrip != null}
+                    />
+                  );
+                }),
+              ];
+            },
           },
         ]}
         rows={splittedBillItems ? splittedBillItems : []}
@@ -367,7 +371,7 @@ function SplitBillDetailScreen({ screenAuthorization }) {
               let filteredSplittedItem = splittedBillItems?.filter(
                 (i) => i?.deliveryBillItemSeqId === item?.seqId
               );
-              let splittedQty = filteredSplittedItem.reduce(
+              let splittedQty = filteredSplittedItem?.reduce(
                 (pre, curr) => pre + curr.quantity,
                 0
               );

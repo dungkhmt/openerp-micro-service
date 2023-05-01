@@ -14,11 +14,11 @@ const CustomBillTable = ({ orderItem, billItem }) => {
     let mappedBill = billItem.filter(
       (bill) => bill?.product?.code === item?.product?.code
     );
-    console.log(
-      mappedBill.reduce((accumulator, curr) => {
-        return accumulator + curr.effectiveQty;
-      }, 0)
-    );
+    // console.log(
+    //   mappedBill.reduce((accumulator, curr) => {
+    //     return accumulator + curr.effectiveQty;
+    //   }, 0)
+    // );
     return {
       name: item?.product?.name,
       effQty:

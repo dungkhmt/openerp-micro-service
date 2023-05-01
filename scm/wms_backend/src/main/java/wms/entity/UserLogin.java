@@ -104,4 +104,9 @@ public class UserLogin {
     @Column(name = "last_name", length = 100)
     private String lastName;
 
+    @OneToOne(mappedBy = "userLogin", cascade = CascadeType.REMOVE)
+    private DroneEntity drone;
+
+    @OneToOne(mappedBy = "userLogin", cascade = CascadeType.REMOVE)
+    private TruckEntity truck;
 }
