@@ -16,9 +16,10 @@ public class TripModel implements Serializable {
     private long id;
     private String code;
     private Long shipmentId;
-    private Integer truckId;
+    private Long truckId;
     private String truckName;
     private List<TripItemModel> tripItemModelList;
+    private List<Long> orderIds;
     private String status;
     @JsonProperty("created_by_user_id")
     private String createdByUserId;

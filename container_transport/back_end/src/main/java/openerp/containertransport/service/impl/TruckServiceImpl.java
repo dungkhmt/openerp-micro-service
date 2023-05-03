@@ -35,6 +35,7 @@ public class TruckServiceImpl implements TruckService  {
         truck.setDriverId(truckModel.getDriverId());
         truck.setLicensePlates(truckModel.getLicensePlates());
         truck.setBrandTruck(truckModel.getBrandTruck());
+        truck.setYearOfManufacture(truckModel.getYearOfManufacture());
         truck.setCreatedAt(System.currentTimeMillis());
         truck.setUpdatedAt(System.currentTimeMillis());
         truck = truckRepo.save(truck);

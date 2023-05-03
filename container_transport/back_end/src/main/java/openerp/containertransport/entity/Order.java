@@ -26,7 +26,7 @@ public class Order {
     private String orderCode;
 
     @Column(name = "customer_id")
-    private Integer customerId;
+    private String customerId;
 
     @Column(name = "type")
     private String type;

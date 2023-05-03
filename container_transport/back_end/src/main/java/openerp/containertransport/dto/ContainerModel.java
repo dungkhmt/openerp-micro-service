@@ -15,6 +15,8 @@ public class ContainerModel {
     private Integer size;
     private long facilityId;
     private String facilityName;
+    private String status;
+    private boolean isEmpty;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 }

@@ -3,8 +3,10 @@ package openerp.containertransport.service.impl;
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.dto.TripItemModel;
 import openerp.containertransport.dto.TripModel;
+import openerp.containertransport.entity.Order;
 import openerp.containertransport.entity.Trip;
 import openerp.containertransport.entity.Truck;
+import openerp.containertransport.repo.OrderRepo;
 import openerp.containertransport.repo.TripRepo;
 import openerp.containertransport.repo.TruckRepo;
 import openerp.containertransport.service.TripItemService;
@@ -22,14 +24,20 @@ public class TripServiceImpl implements TripService {
     private final TripItemService tripItemService;
     private final TruckRepo truckRepo;
     private final ModelMapper modelMapper;
+    private final OrderRepo orderRepo;
     @Override
     public TripModel createTrip(TripModel tripModel, long shipmentId, String createBy) {
         Trip trip = new Trip();
-        Truck truck = truckRepo.findById(tripModel.getTruckId());
+        Truck truck = truckRepo.findById(tripModel.getTruckId()).get();
+        List<Order> orders = new ArrayList<>();
+        tripModel.getOrderIds().forEach((item) -> {
+            orders.add(orderRepo.findById(item).get());
+        });
         trip.setShipmentId(shipmentId);
         trip.setTruck(truck);
         trip.setStatus("Waiting");
         trip.setCreatedByUserId(createBy);
+        trip.setOrders(orders);
         trip.setCreatedAt(System.currentTimeMillis());
         trip.setUpdatedAt(System.currentTimeMillis());
         trip = tripRepo.save(trip);
@@ -46,6 +54,7 @@ public class TripServiceImpl implements TripService {
             });
         }
         tripModelCreate.setTripItemModelList(tripItemModels);
+        tripModelCreate.setOrderIds(tripModel.getOrderIds());
 
         return tripModelCreate;
     }
@@ -57,6 +66,7 @@ public class TripServiceImpl implements TripService {
 
     public TripModel convertToModel(Trip trip) {
         TripModel tripModel = modelMapper.map(trip, TripModel.class);
+        tripModel.setTruckId(trip.getTruck().getId());
         tripModel.setTruckName(trip.getTruck().getDriverName());
         return tripModel;
     }

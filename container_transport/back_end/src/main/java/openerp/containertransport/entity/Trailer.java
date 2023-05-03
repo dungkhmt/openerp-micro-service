@@ -1,5 +1,6 @@
 package openerp.containertransport.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,11 +21,13 @@ public class Trailer {
     @Column(name = "trailer_code")
     private String trailerCode;
 
-    @Column(name = "facility_id")
-    private Integer facilityId;
+    @ManyToOne()
+    @JoinColumn(name = "facility_id", referencedColumnName = "id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Facility facility;
 
-    @Column(name = "status_id")
-    private String statusId;
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "truck_id")
     private Integer truckId;

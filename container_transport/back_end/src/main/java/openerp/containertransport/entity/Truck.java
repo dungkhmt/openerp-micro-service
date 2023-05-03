@@ -34,11 +34,17 @@ public class Truck implements Serializable {
     @Column(name = "driver_id")
     private Integer driverId;
 
+    @Column(name = "status")
+    private String status;
+
     @Column(name = "license plates")
     private String licensePlates;
 
     @Column(name = "brand_truck")
     private String brandTruck;
+
+    @Column(name = "year_of_manufacture")
+    private Integer yearOfManufacture;
 
     @Column(name = "created_at")
     private long createdAt;

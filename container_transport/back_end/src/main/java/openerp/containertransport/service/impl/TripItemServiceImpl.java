@@ -43,6 +43,7 @@ public class TripItemServiceImpl implements TripItemService {
     public TripItemModel convertToModel (TripItem tripItem) {
         TripItemModel tripItemModel = modelMapper.map(tripItem, TripItemModel.class);
         tripItemModel.setFacilityName(tripItem.getFacility().getFacilityName());
+        tripItemModel.setFacilityId(tripItem.getFacility().getId());
         return tripItemModel;
     }
 }

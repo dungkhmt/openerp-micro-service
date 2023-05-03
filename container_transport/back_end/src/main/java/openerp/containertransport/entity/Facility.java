@@ -25,6 +25,8 @@ public class Facility {
     @Column(name = "facility_type")
     private String facilityType;
 
+    private String address;
+
     @Column(name = "max_number_truck")
     private Integer maxNumberTruck;
 
@@ -33,6 +35,16 @@ public class Facility {
 
     @Column(name = "max_number_container")
     private Integer maxNumberContainer;
+
+    @Column(name = "status")
+    private String status;
+
+    private Long longitude;  // kinh do
+
+    private Long latitude;
+
+    @Column(name = "processing_time")
+    private Long processingTime;
 
     @Column(name = "created_at")
     private long createdAt;

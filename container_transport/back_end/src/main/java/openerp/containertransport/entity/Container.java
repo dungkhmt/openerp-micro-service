@@ -27,6 +27,12 @@ public class Container implements Serializable {
     @Column(name = "size")
     private Integer size;
 
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "is_empty")
+    private boolean isEmpty;
+
     @ManyToOne()
     @JoinColumn(name = "facility_id", referencedColumnName = "id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
