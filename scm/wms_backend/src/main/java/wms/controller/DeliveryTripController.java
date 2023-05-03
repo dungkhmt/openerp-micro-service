@@ -8,10 +8,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*;
 import wms.common.constant.DefaultConst;
 import wms.dto.delivery_trip.DeliveryTripDTO;
-import wms.dto.shipment.ShipmentDTO;
 import wms.entity.ResultEntity;
 import wms.service.delivery_trip.IDeliveryTripService;
-import wms.service.shipment.IShipmentService;
 
 import javax.validation.Valid;
 
@@ -45,7 +43,17 @@ public class DeliveryTripController extends BaseController {
             return response(error(ex));
         }
     }
-
+    @ApiOperation(value = "Get delivery trip that a bill can be assign to")
+    @GetMapping("/get-trip-to-assign")
+    public ResponseEntity<?> getTripToAssign(
+            @RequestParam(value = "billCode", required = true, defaultValue = DefaultConst.STRING) String billCode
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get delivery trip to assign successfully", deliveryTripService.getTripToAssignBill(billCode)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
     @ApiOperation(value = "Phân đơn cho chuyến")
     @PostMapping("/assign-bill-to-trip")
     public ResponseEntity<?> assignBillToTrip(@Valid @RequestBody DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) {

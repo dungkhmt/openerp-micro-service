@@ -7,11 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import wms.common.constant.DefaultConst;
+import wms.dto.ReturnPaginationDTO;
 import wms.dto.customer.CustomerDTO;
 import wms.dto.customer.CustomerUpdateDTO;
 import wms.dto.vehicle.DroneDTO;
 import wms.dto.vehicle.TruckDTO;
 import wms.entity.ResultEntity;
+import wms.entity.TruckEntity;
 import wms.repo.TruckRepo;
 import wms.service.vehicle.IVehicleService;
 

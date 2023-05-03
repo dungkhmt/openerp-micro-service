@@ -21,4 +21,7 @@ public interface ShipmentItemRepo extends JpaRepository<ShipmentItem, Long> {
 
     @Query(value = "select * from scm_shipment_item where delivery_trip_code = :tripCode", nativeQuery = true)
     Page<ShipmentItem> getShipmentItemOfATrip(Pageable pageable, String tripCode);
+
+    @Query(value = "select * from scm_shipment_item where delivery_trip_code = :tripCode", nativeQuery = true)
+    List<ShipmentItem> getShipmentItemOfATrip(String tripCode);
 }

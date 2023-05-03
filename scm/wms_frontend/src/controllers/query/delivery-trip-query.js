@@ -46,6 +46,25 @@ export const useGetDeliveryTripList = (params) => {
     onSuccess: (data) => {},
   });
 };
+
+export const useGetDeliveryTripToAssignBill = (params) => {
+  return useQuery({
+    queryKey: [queryKey.delivery_trip.trip_assign_bill, params],
+    queryFn: async () => {
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getTripToAssignBill,
+        params
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};
+
 export const useGetListTruck = (params) => {
   return useQuery({
     queryKey: [queryKey.delivery_trip.truck_list, params],

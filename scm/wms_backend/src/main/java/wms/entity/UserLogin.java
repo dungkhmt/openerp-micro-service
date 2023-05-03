@@ -1,12 +1,14 @@
 package wms.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Set;
 
@@ -14,7 +16,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "user_login")
-public class UserLogin {
+public class UserLogin implements Serializable {
     @Id
     @Size(max = 255)
     @Column(name = "user_login_id", nullable = false)
@@ -104,9 +106,10 @@ public class UserLogin {
     @Column(name = "last_name", length = 100)
     private String lastName;
 
-    @OneToOne(mappedBy = "userLogin", cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "userLogin", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     private DroneEntity drone;
 
-    @OneToOne(mappedBy = "userLogin", cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "userLogin", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private TruckEntity truck;
 }

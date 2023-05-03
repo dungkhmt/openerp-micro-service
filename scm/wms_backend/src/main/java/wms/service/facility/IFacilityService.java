@@ -21,4 +21,5 @@ public interface IFacilityService {
     ReceiptBill getReceiptBillForOrderByCode(String orderCode, String code);
     void exportFromFacility(ExportFromFacilityDTO exportFromFacilityDTO) throws CustomException;
     void deleteFacilityById(long id);
+    void assignStaff(String staffCode, String facilityCode) throws CustomException;
 }

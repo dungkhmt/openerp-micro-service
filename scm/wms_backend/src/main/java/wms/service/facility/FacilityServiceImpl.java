@@ -1,7 +1,6 @@
 package wms.service.facility;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.internal.util.StringHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -414,5 +413,17 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
     @Transactional(rollbackFor = Exception.class)
     public void deleteFacilityById(long id) {
         facilityRepo.deleteById(id);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void assignStaff(String staffCode, String facilityCode) throws CustomException {
+        UserLogin userLogin = userRepo.getUserByUserLoginId(staffCode);
+        if (userLogin == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown staff to assign this facility, can't create");
+        }
+        Facility facility = facilityRepo.getFacilityByCode(facilityCode);
+        facility.setManager(userLogin);
+        facilityRepo.save(facility);
     }
 }

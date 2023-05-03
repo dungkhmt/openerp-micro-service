@@ -122,4 +122,18 @@ public class FacilityController extends BaseController{
             return response(error(ex));
         }
     }
+
+    @ApiOperation(value = "Assign staff to facility")
+    @PostMapping("/assign-staff")
+    public ResponseEntity<?> assignStaffToFacility(
+            @RequestParam(value = "staffCode", required = true, defaultValue = DefaultConst.STRING) String staffCode,
+            @RequestParam(value = "facilityCode", required = true, defaultValue = DefaultConst.STRING) String facilityCode
+    ) {
+        try {
+            facilityService.assignStaff(staffCode, facilityCode);
+            return response(new ResultEntity(1, "Assign staff to facility successfully", facilityCode));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
 }

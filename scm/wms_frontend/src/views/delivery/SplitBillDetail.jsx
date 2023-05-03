@@ -22,7 +22,7 @@ import {
   useGetBillItemsOfBill,
   useGetSplittedBillItem,
 } from "controllers/query/bill-query";
-import { useGetDeliveryTripList } from "controllers/query/delivery-trip-query";
+import { useGetDeliveryTripToAssignBill } from "controllers/query/delivery-trip-query";
 import { useState } from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { useLocation } from "react-router-dom";
@@ -68,7 +68,10 @@ function SplitBillDetailScreen({ screenAuthorization }) {
     useGetSplittedBillItem({
       deliveryBillCode: currBills?.code,
     });
-  const { isLoading: isLoadingTrip, data: trips } = useGetDeliveryTripList();
+  const { isLoading: isLoadingTrip, data: trips } =
+    useGetDeliveryTripToAssignBill({
+      billCode: currBills?.code,
+    });
 
   const createSplitBillQuery = useCreateSplitBillItem();
   const assignBillToTripQuery = useAssignShipmentToTrip();
@@ -428,8 +431,8 @@ function SplitBillDetailScreen({ screenAuthorization }) {
             render={({ field: { onChange, value } }) => (
               <CustomSelect
                 options={
-                  trips.content
-                    ? trips.content.map((trip) => {
+                  trips
+                    ? trips.map((trip) => {
                         return {
                           name: trip?.code + "-" + trip?.userInCharge?.id,
                         };

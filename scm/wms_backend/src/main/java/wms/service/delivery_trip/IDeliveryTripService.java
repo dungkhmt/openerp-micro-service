@@ -9,9 +9,12 @@ import wms.entity.DeliveryTrip;
 import wms.entity.ShipmentItem;
 import wms.exception.CustomException;
 
+import java.util.List;
+
 public interface IDeliveryTripService {
     DeliveryTrip createDeliveryTrip(DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) throws CustomException;
     ReturnPaginationDTO<DeliveryTrip> getAllDeliveryTrips(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
+    List<DeliveryTrip> getTripToAssignBill(String billCode) throws JsonProcessingException;
     DeliveryTrip getDeliveryTripById(long id);
     DeliveryTrip getDeliveryTripByCode(String code);
     DeliveryTrip updateDeliveryTrip(ProductDTO productDTO, long id) throws CustomException;

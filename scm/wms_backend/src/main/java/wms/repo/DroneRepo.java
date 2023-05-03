@@ -12,4 +12,10 @@ public interface DroneRepo extends JpaRepository<DroneEntity, Long> {
     Page<DroneEntity> search(Pageable pageable);
     DroneEntity getDroneById(long id);
     DroneEntity getDroneByCode(String code);
+
+    @Query(value = "select scm_drone.user_id from scm_drone where scm_drone.code = :droneCode", nativeQuery = true)
+    String getUserFromDrone(String droneCode);
+
+    @Query(value = "select * from scm_drone where scm_drone.user_id = :user_id", nativeQuery = true)
+    DroneEntity getDroneFromUser(String user_id);
 }
