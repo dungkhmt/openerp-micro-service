@@ -51,6 +51,10 @@ export const endPoint = {
   // Delivery
   createDeliveryTrip: baseUrl + "/delivery-trip/create",
   getDeliveryTrips: baseUrl + "/delivery-trip/get-all",
+  getTruck: baseUrl + "/vehicle/truck/get-all",
+  getDrone: baseUrl + "/vehicle/drone/get-all",
+  createTruck: baseUrl + "/vehicle/truck/create",
+  createDrone: baseUrl + "/vehicle/drone/create",
   // User
   // createNewUser: base
   getAllUsers: baseUrl + "/user/get-all",

@@ -10,14 +10,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import wms.algorithms.TruckDroneDeliverySolver;
+import wms.algorithms.entity.Drone;
+import wms.algorithms.entity.Truck;
+import wms.algorithms.entity.TruckDroneDeliveryInput;
 import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.delivery_trip.DeliveryTripDTO;
 import wms.dto.product.ProductDTO;
-import wms.entity.DeliveryTrip;
-import wms.entity.Shipment;
-import wms.entity.ShipmentItem;
-import wms.entity.UserLogin;
+import wms.entity.*;
 import wms.exception.CustomException;
 import wms.repo.DeliveryTripRepo;
 import wms.repo.ShipmentRepo;
@@ -94,5 +95,32 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
     @Override
     public ShipmentItem assignBillToTrip(DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) throws CustomException {
         return null;
+    }
+
+    @Override
+    public void createTripRoute(String tripCode) throws CustomException {
+        TruckDroneDeliveryInput input = new TruckDroneDeliveryInput();
+        DeliveryTrip trip = deliveryTripRepo.getDeliveryTripByCode(tripCode);
+        UserLogin user = trip.getUserInCharge();
+        // Set truck properties
+        TruckEntity truckEntity = user.getTruck();
+        Truck truck = new Truck();
+        truck.setID(truckEntity.getCode());
+        truck.setCapacity(truckEntity.getCapacity());
+        truck.setSpeed(truckEntity.getSpeed());
+        truck.setWaitingCost(truckEntity.getWaitingCost());
+        truck.setTransportCostPerUnit(truckEntity.getTransportCostPerUnit());
+        input.setTruck(truck);
+        // Set drone properties
+        DroneEntity droneEntity = user.getDrone();
+        Drone drone = new Drone();
+        drone.setCapacity(droneEntity.getCapacity());
+        drone.setWaitingCost(droneEntity.getWaitingCost());
+        drone.setDurationCapacity(droneEntity.getDurationTime());
+        drone.setTransportCostPerUnit(droneEntity.getTransportCostPerUnit());
+        drone.setSpeed(droneEntity.getSpeed());
+        // Set depot info
+        TruckDroneDeliverySolver heuristicSolver = new TruckDroneDeliverySolver(input);
+        heuristicSolver.solve();
     }
 }

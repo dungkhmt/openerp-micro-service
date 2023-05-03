@@ -37,6 +37,8 @@ export const queryKey = {
   },
   delivery_trip: {
     trip_list: "trip_list",
+    truck_list: "truck_list",
+    drone_list: "drone_list",
   },
   user: {
     user_list: "user_list",

@@ -17,5 +17,19 @@ export const delivery = {
       text: "Split order",
       child: [],
     },
+    {
+      id: "MENU_WMS_DELIVERY.VEHICLE.TRUCK",
+      path: "/delivery/vehicle/truck",
+      isPublic: false,
+      text: "Truck management",
+      child: [],
+    },
+    {
+      id: "MENU_WMS_DELIVERY.VEHICLE.DRONE",
+      path: "/delivery/vehicle/drone",
+      isPublic: false,
+      text: "Drone management",
+      child: [],
+    },
   ],
 };

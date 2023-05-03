@@ -56,4 +56,18 @@ public class DeliveryTripController extends BaseController {
             return response(error(ex));
         }
     }
+
+    @ApiOperation(value = "Tạo lộ trình di chuyển")
+    @PostMapping("/create-trip-route")
+    public ResponseEntity<?> createTripRoute(
+            @RequestParam(value = "tripCode", required = true, defaultValue = DefaultConst.STRING) String tripCode
+    ) {
+        try {
+            deliveryTripService.createTripRoute(tripCode);
+            return response(new ResultEntity(1, "Create trip route successfully", tripCode));
+        }
+        catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
 }

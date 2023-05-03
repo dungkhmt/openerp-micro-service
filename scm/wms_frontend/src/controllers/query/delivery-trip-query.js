@@ -46,3 +46,79 @@ export const useGetDeliveryTripList = (params) => {
     onSuccess: (data) => {},
   });
 };
+export const useGetListTruck = (params) => {
+  return useQuery({
+    queryKey: [queryKey.delivery_trip.truck_list, params],
+    queryFn: async () => {
+      const res = await axiosSendRequest("get", endPoint.getTruck, params);
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};
+export const useCreateTruck = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.createTruck,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Tạo thành công!");
+      queryClient.invalidateQueries([queryKey.delivery_trip.truck_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
+export const useGetDroneList = (params) => {
+  return useQuery({
+    queryKey: [queryKey.delivery_trip.drone_list, params],
+    queryFn: async () => {
+      const res = await axiosSendRequest("get", endPoint.getDrone, params);
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};
+
+export const useCreateDrone = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.createDrone,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Tạo thành công!");
+      queryClient.invalidateQueries([queryKey.delivery_trip.drone_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
