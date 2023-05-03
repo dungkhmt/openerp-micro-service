@@ -167,6 +167,7 @@ const DeliveryTripDetail = ( props ) => {
       },
       {
         ...tripInfo,
+        deliveryPersonId: selectedDeliveryPersonId,
         warehouseId: selectedWarehouseId,
         totalLocations: maxSequence,
         items: [
@@ -326,7 +327,7 @@ const DeliveryTripDetail = ( props ) => {
         </Grid>
 
         {
-          !isDeleted &&
+          !isDeleted && tripInfo?.deliveryTripStatusCode != 'DONE' &&
           <Grid className={classes.buttonWrap}>
             <Button variant="contained" className={classes.addButton} 
               type="submit" onClick={saveDeliveryTripButtonHandle} >Lưu</Button>
@@ -334,7 +335,7 @@ const DeliveryTripDetail = ( props ) => {
         }
 
         {
-          !isDeleted &&
+          !isDeleted && tripInfo?.deliveryTripStatusCode != 'DONE' &&
           <Grid className={classes.buttonWrap}>
             <Button variant="contained" className={classes.addButton} 
               type="submit" onClick={deleteButtonHandle}>Hủy bỏ</Button>
@@ -342,7 +343,7 @@ const DeliveryTripDetail = ( props ) => {
         }
 
         {
-          !isDeleted &&
+          !isDeleted && tripInfo?.deliveryTripStatusCode != 'DONE' &&
           <Grid className={classes.buttonWrap}>
             <Button variant="contained" className={classes.addButton} 
               type="submit" onClick={autoRouteButtonHandle}>Auto route</Button>
@@ -350,7 +351,7 @@ const DeliveryTripDetail = ( props ) => {
         }
 
         {
-          !isDeleted && runnedAutoRoute &&
+          !isDeleted && runnedAutoRoute && 
           <Grid className={classes.buttonWrap}>
             <Button variant="contained" className={classes.addButton} 
               type="submit" onClick={() => setShowRouteMapModal(true)}>Xem bản đồ hành trình</Button>
@@ -423,8 +424,8 @@ const DeliveryTripDetail = ( props ) => {
                 {
                   deliveryPersons.length > 0 &&
                   deliveryPersons.map(person => 
-                    <MenuItem key={person.deliveryPersonId}
-                      value={person.fullName}>{person.fullName}</MenuItem>)
+                    <MenuItem key={person.userLoginId}
+                      value={person.userLoginId}>{person.fullName}</MenuItem>)
                 }
               </Select>
             </Box>
@@ -469,23 +470,28 @@ const DeliveryTripDetail = ( props ) => {
               <Box className={classes.labelInput}>
                 Kho lấy hàng 
               </Box>
-              {/* <Select onChange={(e, v) => {
-                  setSelectedWarehouseId(e.target.value);
-                  setSelectedWarehouseName(v?.props?.children);
-                }}
-                defaultValue={""}
-                value={selectedWarehouseName}>
-              {
-                warehouseList.length > 0 &&
-                warehouseList.map(warehouse => 
-                  <MenuItem key={warehouse.id} value={warehouse.id}>{warehouse.name}</MenuItem>)
-              }
-            </Select> */}
               <TextField
                 fullWidth
                 variant="outlined"
                 size="small"
                 value={selectedWarehouseName}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+            </Box>
+          </Grid>
+
+          <Grid item xs={6}>
+            <Box className={classes.inputWrap}>
+              <Box className={classes.labelInput}>
+                Trạng thái 
+              </Box>
+              <TextField
+                fullWidth
+                variant="outlined"
+                size="small"
+                value={tripInfo?.deliveryTripStatus}
                 InputProps={{
                   readOnly: true,
                 }}

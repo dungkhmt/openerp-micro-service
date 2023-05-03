@@ -24,5 +24,10 @@ export const API_PATH = {
   GET_USER_LOGIN_ID: "wmsv2/user",
   DELIVERY_MANAGER_DELIVERY_TRIP: "/wmsv2/delivery-manager/delivery-trip",
   DELIVERY_MANAGER_ASSIGN_ORDER_ITEM: "/wmsv2/delivery-manager/assigned-order-items",
-  DELIVREY_MANAGER_AUTO_ROUTE: "/wmsv2/delivery-manager/auto-route"
+  DELIVREY_MANAGER_AUTO_ROUTE: "/wmsv2/delivery-manager/auto-route",
+  DELIVERY_PERSON_TODAY: "/wmsv2/delivery-manager/delivery-trip/today",
+  DELIVERY_TRIP_START: "/wmsv2/delivery-manager/delivery-trip/start-delivery",
+  DELIVERY_TRIP_ITEM_COMPLETE: "/wmsv2/delivery-manager/delivery-trip-item/complete",
+  DELIVERY_TRIP_ITEM_FAIL: "/wmsv2/delivery-manager/delivery-trip-item/fail",
+  DELIVERY_TRIP_COMPLETE: "/wmsv2/delivery-manager/delivery-trip/complete"
 }

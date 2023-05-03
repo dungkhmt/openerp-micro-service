@@ -70,14 +70,20 @@ const OrderApprovalDetail = ( props ) => {
           <Typography variant="h5">
             Thông tin đơn hàng</Typography>
         </Grid>
-        <Grid className={classes.buttonWrap}>
-          <Button variant="contained" className={classes.addButton} 
-            type="submit" onClick={approveOrderButtonHandle} >Phê duyệt</Button>
-        </Grid>
-        <Grid className={classes.buttonWrap}>
-          <Button variant="contained" className={classes.addButton} 
-            type="submit" onClick={cancelOrderButtonHandle} >Hủy đơn hàng</Button>
-        </Grid>
+        {
+          orderInfo?.statusCode != 'SUCCESS' &&
+          <Grid className={classes.buttonWrap}>
+            <Button variant="contained" className={classes.addButton}
+              type="submit" onClick={approveOrderButtonHandle} >Phê duyệt</Button>
+          </Grid>
+        }
+        {
+          orderInfo?.statusCode != 'SUCCESS' &&
+          <Grid className={classes.buttonWrap}>
+            <Button variant="contained" className={classes.addButton}
+              type="submit" onClick={cancelOrderButtonHandle} >Hủy đơn hàng</Button>
+          </Grid>
+        }
       </Grid>
 
       <Box className={classes.bodyBox}>

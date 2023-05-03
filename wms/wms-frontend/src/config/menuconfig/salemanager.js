@@ -21,7 +21,7 @@ export const salemanager = {
       id: "MENU_WMSv2_SALE_MANAGER.ORDERS",
       path: "/sale-manager/orders",
       isPublic: false,
-      text: "Phê duyệt đơn mua hàng",
+      text: "Danh sách đơn mua hàng",
       child: [],
     },
   ],
