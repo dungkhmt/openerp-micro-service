@@ -5,9 +5,9 @@ export const trip = {
     child: [
       {
         id: "MENU_CONTAINER.TRIP",
-        path: "/trip",
+        path: "/shipment",
         isPublic: false,
-        text: "Trip Management",
+        text: "Shipment Management",
         child: [],
       },
     ],
