@@ -2,6 +2,7 @@ import axios from "axios";
 // import curlirize from 'axios-curlirize';
 import { toast } from "react-toastify";
 import keycloak from "../config/keycloak";
+import { AppConfig } from "../shared/AppConfig";
 const qs = require("qs");
 const tag = "axiosSendRequest";
 
@@ -23,16 +24,18 @@ async function axiosSendRequest(
   data = null,
   header = null
 ) {
-  console.log(
-    "\n[Axios " + method + "]: \n\t url = ",
-    url,
-    "\n\t params = ",
-    JSON.stringify(params),
-    "\n\t data = ",
-    JSON.stringify(data),
-    "\n\t header = ",
-    header
-  );
+  if (AppConfig.isDebugging) {
+    console.log(
+      "\n[Axios " + method + "]: \n\t url = ",
+      url,
+      "\n\t params = ",
+      JSON.stringify(params),
+      "\n\t data = ",
+      JSON.stringify(data),
+      "\n\t header = ",
+      header
+    );
+  }
 
   // kiểm tra kết nối mạng
   // if (await checkInternetConnection()) {
@@ -83,14 +86,18 @@ async function axiosSendRequest(
   // curlirize(axios);
   await axios(config)
     .catch(function (error) {
-      console.log("Error: ", error, error.response);
+      if (AppConfig.isDebugging) {
+        console.log("Error: ", error, error.response);
+      }
       if (error.response) {
         responseData.code = error.response.status;
         responseData.message = error.response.data?.errors?.[0]
           ? error.response.data?.errors?.[0]
           : error.response.data?.error;
       }
-      console.warn("[Axios]", error);
+      if (AppConfig.isDebugging) {
+        console.warn("[Axios]", error);
+      }
       return { data: responseData };
     })
     .then((response) => response.data)
@@ -98,7 +105,15 @@ async function axiosSendRequest(
     .then((data) => {
       responseData = data;
     });
-  console.log("\n[Axios Response Data]: \n\t", url, "\n\t", responseData, "\n");
+  if (AppConfig.isDebugging) {
+    console.log(
+      "\n[Axios Response Data]: \n\t",
+      url,
+      "\n\t",
+      responseData,
+      "\n"
+    );
+  }
   return responseData;
 }
 

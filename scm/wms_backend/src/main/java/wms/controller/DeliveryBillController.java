@@ -76,17 +76,17 @@ public class DeliveryBillController extends BaseController {
             return response(error(ex));
         }
     }
-    @GetMapping("/get-bill-can-deliver")
-    public ResponseEntity<?> getBillsCanDeliver(
-            @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
-            @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
-            @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
-            @RequestParam(value = "sortAsc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc
-    ) {
-        try {
-            return response(new ResultEntity(1, "Get all bills can be delivered successfully", deliveryBillService.getBillsCanDeliver(page, pageSize, sortField, isSortAsc)));
-        } catch (Exception ex) {
-            return response(error(ex));
-        }
-    }
+//    @GetMapping("/get-bill-can-deliver")
+//    public ResponseEntity<?> getBillsCanDeliver(
+//            @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
+//            @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
+//            @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
+//            @RequestParam(value = "sortAsc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc
+//    ) {
+//        try {
+//            return response(new ResultEntity(1, "Get all bills can be delivered successfully", deliveryBillService.getBillsCanDeliver(page, pageSize, sortField, isSortAsc)));
+//        } catch (Exception ex) {
+//            return response(error(ex));
+//        }
+//    }
 }

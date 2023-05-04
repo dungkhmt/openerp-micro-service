@@ -16,7 +16,6 @@ import {
   useGetCustomerType,
 } from "../../../controllers/query/category-query";
 import { useGetFacilityList } from "../../../controllers/query/facility-query";
-import { AppColors } from "../../../shared/AppColors";
 import useGeoLocation from "../../../shared/AppHooks";
 import { staticCustomerField } from "../LocalConstant";
 function CustomerScreen({ screenAuthorization }) {
@@ -138,35 +137,6 @@ function CustomerScreen({ screenAuthorization }) {
   ];
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          boxShadow: 3,
-          margin: "0px -16px 0 -16px",
-          paddingX: 2,
-          paddingY: 1,
-          position: "sticky",
-          backgroundColor: "white",
-          zIndex: 1000,
-        }}
-      >
-        <Typography
-          id="modal-modal-title"
-          variant="h6"
-          textTransform="capitalize"
-          letterSpacing={1}
-          fontSize={18}
-          sx={{
-            fontFamily: "Open Sans",
-            color: AppColors.primary,
-            fontWeight: "bold",
-          }}
-        >
-          {"KHÁCH HÀNG"}
-        </Typography>
-      </Box>
       <Box>
         <CustomToolBar actions={actions} />
       </Box>

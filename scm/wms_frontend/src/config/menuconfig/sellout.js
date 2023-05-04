@@ -4,17 +4,24 @@ export const sellout = {
   text: "Sellout",
   child: [
     {
-      id: "MENU_WMS_SELLOUT.MENU_ITEM_1",
+      id: "MENU_WMS_SELLOUT.SALE_ORDER",
       path: "/sellout/sale-order",
       isPublic: true,
       text: "Sale Order",
       child: [],
     },
     {
-      id: "MENU_WMS_SELLOUT.MENU_ITEM_2",
-      path: "/sellout/screen-2",
+      id: "MENU_WMS_SELLOUT.SALE_STAFF",
+      path: "/sellout/sale-staff",
       isPublic: true,
-      text: "Submenu 2",
+      text: "Sale staff",
+      child: [],
+    },
+    {
+      id: "MENU_WMS_SELLOUT.SALE_PRICE",
+      path: "/sellout/sale-price",
+      isPublic: true,
+      text: "Sale price",
       child: [],
     },
   ],

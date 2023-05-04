@@ -11,6 +11,7 @@ import { ReactComponent as Logo } from "assets/icons/logo.svg";
 import bgImage from "assets/images/sidebar-2.webp";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import CustomBreadcrumbs from "../components/breadcrumbs/CustomBreadcrumbs";
 import AccountButton from "./account/AccountButton";
 import SideBar, { drawerWidth } from "./sidebar/SideBar";
 
@@ -20,7 +21,7 @@ import SideBar, { drawerWidth } from "./sidebar/SideBar";
 const Offset = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  padding: theme.spacing(0, 1),
+  // padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
   justifyContent: "flex-end",
@@ -38,7 +39,7 @@ const Main = styled("main")(({ theme, isOpen }) => ({
   marginLeft: -drawerWidth,
   ...(isOpen
     ? {
-        maxWidth: "calc(100% - 230px)", //default: - 300px
+        maxWidth: "calc(100% - 250px)", //default: - 300px , have to be equals to drawerWidth.
         transition: theme.transitions.create(["maxWidth", "margin"], {
           easing: theme.transitions.easing.easeOut,
           duration: theme.transitions.duration.enteringScreen,
@@ -134,7 +135,14 @@ function Layout({ children }) {
       <SideBar open={open} image={image} color={color} />
       <Main isOpen={open}>
         <Offset />
-        {children}
+        <CustomBreadcrumbs />
+        <Box
+          sx={{
+            marginX: 2,
+          }}
+        >
+          {children}
+        </Box>
       </Main>
     </Box>
   );

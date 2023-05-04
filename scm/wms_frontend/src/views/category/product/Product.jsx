@@ -1,5 +1,5 @@
 import AddIcon from "@mui/icons-material/Add";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import CustomToolBar from "components/toolbar/CustomToolBar";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -14,7 +14,6 @@ import {
   useGetProductList,
   useGetProductUnitList,
 } from "../../../controllers/query/category-query";
-import { AppColors } from "../../../shared/AppColors";
 var columns = [
   {
     field: "code",
@@ -189,35 +188,6 @@ function ProductScreen({ screenAuthorization }) {
   ];
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          boxShadow: 3,
-          margin: "0px -16px 0 -16px",
-          paddingX: 2,
-          paddingY: 1,
-          position: "sticky",
-          backgroundColor: "white",
-          zIndex: 1000,
-        }}
-      >
-        <Typography
-          id="modal-modal-title"
-          variant="h6"
-          textTransform="capitalize"
-          letterSpacing={1}
-          fontSize={18}
-          sx={{
-            fontFamily: "Open Sans",
-            color: AppColors.primary,
-            fontWeight: "bold",
-          }}
-        >
-          {"SẢN PHẨM"}
-        </Typography>
-      </Box>
       <Box>
         <CustomToolBar actions={actions} />
       </Box>

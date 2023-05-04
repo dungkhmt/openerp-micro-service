@@ -18,18 +18,26 @@ export const delivery = {
       child: [],
     },
     {
-      id: "MENU_WMS_DELIVERY.VEHICLE.TRUCK",
-      path: "/delivery/vehicle/truck",
+      id: "MENU_WMS_DELIVERY.VEHICLE",
+      path: "/delivery/vehicle",
       isPublic: false,
-      text: "Truck management",
-      child: [],
-    },
-    {
-      id: "MENU_WMS_DELIVERY.VEHICLE.DRONE",
-      path: "/delivery/vehicle/drone",
-      isPublic: false,
-      text: "Drone management",
-      child: [],
+      text: "Vehicles",
+      child: [
+        {
+          id: "MENU_WMS_DELIVERY.VEHICLE.TRUCK",
+          path: "/delivery/vehicle/truck",
+          isPublic: false,
+          text: "Truck",
+          child: [],
+        },
+        {
+          id: "MENU_WMS_DELIVERY.VEHICLE.DRONE",
+          path: "/delivery/vehicle/drone",
+          isPublic: false,
+          text: "Drone",
+          child: [],
+        },
+      ],
     },
   ],
 };

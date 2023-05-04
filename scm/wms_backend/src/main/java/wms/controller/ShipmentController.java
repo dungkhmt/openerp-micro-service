@@ -83,7 +83,7 @@ public class ShipmentController extends BaseController {
 
     @ApiOperation(value = "Phân đơn thành các shipment từ các spliting order")
     @PostMapping("/create-shipment-item")
-    public ResponseEntity<?> createItem(@Valid @RequestBody ShipmentItemDTO shipmentItemDTO, JwtAuthenticationToken token) {
+    public ResponseEntity<?> createItem(@Valid @RequestBody ShipmentItemDTO shipmentItemDTO) {
         try {
             return response(new ResultEntity(1, "Create new shipment item successfully", shipmentService.createShipmentItem(shipmentItemDTO)));
         }
@@ -124,7 +124,7 @@ public class ShipmentController extends BaseController {
 
     @ApiOperation(value = "Assign splitted đơn (shipment item) cho các trip")
     @PutMapping("/assign-shipment-item")
-    public ResponseEntity<?> create(@Valid @RequestBody AssignedItemDTO assignedItemDTO, JwtAuthenticationToken token) {
+    public ResponseEntity<?> create(@Valid @RequestBody AssignedItemDTO assignedItemDTO) {
         try {
             shipmentService.assignShipmentItem(assignedItemDTO);
             return response(new ResultEntity(1, "Assign item to trip successfully", null));

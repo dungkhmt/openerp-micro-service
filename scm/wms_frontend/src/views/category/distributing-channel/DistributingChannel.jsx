@@ -1,6 +1,5 @@
 import AddIcon from "@mui/icons-material/Add";
-import { Box, Button, Typography } from "@mui/material";
-import { green } from "@mui/material/colors";
+import { Box, Button } from "@mui/material";
 import CustomToolBar from "components/toolbar/CustomToolBar";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -73,31 +72,6 @@ function DistributingChannelScreen({ screenAuthorization }) {
   ];
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          boxShadow: 3,
-          margin: "0px -16px 0 -16px",
-          paddingX: 2,
-          paddingY: 1,
-          position: "sticky",
-          backgroundColor: "white",
-          zIndex: 1000,
-        }}
-      >
-        <Typography
-          id="modal-modal-title"
-          variant="h6"
-          textTransform="capitalize"
-          letterSpacing={1}
-          color={green[800]}
-          fontSize={17}
-        >
-          {"KÊNH PHÂN PHỐI"}
-        </Typography>
-      </Box>
       <Box>
         <CustomToolBar actions={actions} />
       </Box>

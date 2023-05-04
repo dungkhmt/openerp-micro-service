@@ -35,7 +35,7 @@ export const category = {
       id: "MENU_WMS_CATEGORY.DISTRIBUTING_CHANNEL",
       path: "/category/distributing-channel",
       isPublic: false,
-      text: "Distributing Channel",
+      text: "Distribution Channel",
       child: [],
     },
     {

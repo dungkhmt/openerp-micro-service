@@ -1,1 +1,3 @@
-export const AppConfig = {};
+export const AppConfig = {
+  isDebugging: false,
+};

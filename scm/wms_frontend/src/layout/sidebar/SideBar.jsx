@@ -13,7 +13,7 @@ import { fetchMenu } from "state/MenuState";
 import GroupMenuItem, { menuItemBaseStyle } from "./GroupMenuItem";
 import { blackColor, whiteColor } from "./MenuItem";
 
-export const drawerWidth = 230; // default: 300
+export const drawerWidth = 250; // default: 300
 export const miniDrawerWidth = 50;
 
 const Background = styled("div")(({ theme }) => ({

@@ -12,9 +12,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import wms.algorithms.TruckDroneDeliverySolver;
-import wms.algorithms.entity.Drone;
-import wms.algorithms.entity.Truck;
-import wms.algorithms.entity.TruckDroneDeliveryInput;
+import wms.algorithms.entity.*;
+import wms.algorithms.utils.Utils;
 import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.delivery_trip.DeliveryTripDTO;
@@ -27,7 +26,10 @@ import wms.service.BaseService;
 import wms.service.delivery_bill.IDeliveryBillService;
 import wms.utils.GeneralUtils;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -140,6 +142,7 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         TruckDroneDeliveryInput input = new TruckDroneDeliveryInput();
         DeliveryTrip trip = deliveryTripRepo.getDeliveryTripByCode(tripRouteDTO.getTripCode());
         List<ShipmentItem> shipmentItems = shipmentItemRepo.getShipmentItemOfATrip(tripRouteDTO.getTripCode());
+        List<Node> points = new ArrayList<>(); // All coordinations got
         UserLogin user = trip.getUserInCharge();
         // Set truck properties
         TruckEntity truckEntity = truckRepo.getTruckFromUser(user.getId());
@@ -153,6 +156,7 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         // Set drone properties
         DroneEntity droneEntity = droneRepo.getDroneFromUser(user.getId());
         Drone drone = new Drone();
+        drone.setID(droneEntity.getCode());
         drone.setCapacity(droneEntity.getCapacity());
         drone.setWaitingCost(droneEntity.getWaitingCost());
         drone.setDurationCapacity(droneEntity.getDurationTime());
@@ -160,10 +164,76 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         drone.setSpeed(droneEntity.getSpeed());
         input.setDrone(drone);
         // Set depot info
-
+        Depot depot = new Depot();
+        depot.setLocationID("depot");
+        input.setDepot(depot);
+        Node depotNode = new Node(Double.parseDouble(trip.getFacility().getLatitude()),
+                Double.parseDouble(trip.getFacility().getLongitude()), "depot");
+        points.add(depotNode);
         // Set customer location
+        Set<Customer> customers = new HashSet<>();
+        for (ShipmentItem shipmentItem : shipmentItems) {
+            Customer customer = shipmentItem.getDeliveryBill().getSaleOrder().getCustomer();
+            customers.add(customer);
+        }
+        int count = 0;
+        for (Customer customer: customers) {
+            count++;
+            Node node = new Node();
+            node.setX(Double.parseDouble(customer.getLatitude()));
+            node.setY(Double.parseDouble(customer.getLongitude()));
+            node.setName("C" + count);
+            points.add(node);
+        }
 
+        input.setLocations(points);
+        List<List<DistanceElement>> listDistances = new ArrayList<>();
+        List<Request> listCustomerRequests = new ArrayList<>();
+        for (int i = 0; i < points.size(); i++) {
+            List<DistanceElement> distances = new ArrayList<>();
+            for (int j = 0; j < points.size(); j++) {
+                DistanceElement distanceElement = new DistanceElement();
+                distanceElement.setId(i + "_" + j);
+                distanceElement.setFromLocationId(points.get(i).getName());
+                distanceElement.setToLocationId(points.get(j).getName());
+//              double distance = Utils.calculateEuclideanDistance(points.get(i), points.get(j));
+                double distance = Utils.calculateCoordinationDistance(points.get(i).getX(), points.get(i).getY(),
+                        points.get(j).getX(), points.get(j).getY());
+                distanceElement.setDistance(distance);
+                distanceElement.setTravelTime(distance / input.getTruck().getSpeed());
+                distanceElement.setFlyingTime(distance / input.getDrone().getSpeed());
+                distances.add(distanceElement);
+            }
+            listDistances.add(distances);
+            if (i == 0) continue;
+            Request newRequest = new Request();
+            newRequest.setEarliestTime("10h");
+            newRequest.setLatestTime("11h");
+            newRequest.setWeight(100);
+            newRequest.setID(points.get(i).getName());
+            newRequest.setLocationID(points.get(i).getName());
+            listCustomerRequests.add(newRequest);
+        }
+        input.setDistances(listDistances);
+        input.setRequests(listCustomerRequests);
         TruckDroneDeliverySolver heuristicSolver = new TruckDroneDeliverySolver(input);
         heuristicSolver.solve();
+
+        TruckDroneDeliverySolutionOutput finalSolution = heuristicSolver.getSolution();
+        List<Node> truckRoute = finalSolution.convertTruckRouteToNode(finalSolution.getTruckRoute());
+        List<List<Node>> droneRoutes = new ArrayList<>();
+        for (DroneRoute ele: finalSolution.getDroneRoutes()) {
+            List<Node> droneRoute = finalSolution.convertDroneRouteToNode(ele);
+            droneRoutes.add(droneRoute);
+        }
+        for (Node node : truckRoute) {
+            log.info("Truck node info {} ({}, {})", node.getName(), node.getX(), node.getY());
+        }
+        for (List<Node> droneNode : droneRoutes) {
+            log.info("====================================");
+            for (Node node : droneNode) {
+                log.info("Drone node info {} ({}, {})", node.getName(), node.getX(), node.getY());
+            }
+        }
     }
 }

@@ -113,11 +113,12 @@ public class FacilityController extends BaseController{
             return response(error(ex));
         }
     }
+    @ApiOperation(value = "Export item from facility within specific order, split bills")
     @PostMapping("/export-item")
     public ResponseEntity<?> exportItemFromFacilty(@Valid @RequestBody ExportFromFacilityDTO exportFromFacilityDTO) {
         try {
             facilityService.exportFromFacility(exportFromFacilityDTO);
-            return response(new ResultEntity(1, "Update facility successfully", null));
+            return response(new ResultEntity(1, "Export item from facility successfully", null));
         } catch (Exception ex) {
             return response(error(ex));
         }

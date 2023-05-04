@@ -1,7 +1,7 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import CustomToolBar from "components/toolbar/CustomToolBar";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -10,7 +10,6 @@ import withScreenSecurity from "../../components/common/withScreenSecurity";
 import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
 import { useGetReceiptBillList } from "../../controllers/query/bill-query";
 import { useGetPurchaseOrderList } from "../../controllers/query/purchase-order-query";
-import { AppColors } from "../../shared/AppColors";
 import { Action } from "../sellin/PurchaseOrder";
 function ImportingActivityScreen({ screenAuthorization }) {
   let { path } = useRouteMatch();
@@ -76,35 +75,6 @@ function ImportingActivityScreen({ screenAuthorization }) {
   ];
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          boxShadow: 3,
-          margin: "0px -16px 0 -16px",
-          paddingX: 2,
-          paddingY: 1,
-          position: "sticky",
-          backgroundColor: "white",
-          zIndex: 1000,
-        }}
-      >
-        <Typography
-          id="modal-modal-title"
-          variant="h6"
-          textTransform="capitalize"
-          letterSpacing={1}
-          fontSize={18}
-          sx={{
-            fontFamily: "Open Sans",
-            color: AppColors.primary,
-            fontWeight: "bold",
-          }}
-        >
-          {"TÌNH HÌNH NHẬP KHO"}
-        </Typography>
-      </Box>
       <Box>
         <CustomToolBar actions={actions} />
       </Box>
