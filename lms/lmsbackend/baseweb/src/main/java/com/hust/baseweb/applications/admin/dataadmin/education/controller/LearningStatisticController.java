@@ -8,8 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
-
 @RestController
 @RequestMapping("/statistic/learning")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -18,7 +16,7 @@ public class LearningStatisticController {
     private final LearningStatisticService learningStatisticService;
 
     @PostMapping("/basic")
-    public ResponseEntity<?> executeLearningStatistic() throws ParseException {
+    public ResponseEntity<?> executeLearningStatistic() {
         learningStatisticService.statisticLearningGeneral();
         return ResponseEntity.ok().build();
     }
