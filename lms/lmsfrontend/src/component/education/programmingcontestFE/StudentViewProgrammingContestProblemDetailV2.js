@@ -96,6 +96,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
       "post",
       "/contest-submit-problem-via-upload-file-v3",
       (res) => {
+        res = res.data;
         listSubmissionRef.current.refreshSubmission();
         inputRef.current.value = null;
 
