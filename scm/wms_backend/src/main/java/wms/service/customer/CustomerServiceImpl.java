@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import wms.algorithms.utils.Utils;
 import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.customer.CustomerDTO;
@@ -20,6 +21,8 @@ import wms.exception.CustomException;
 import wms.repo.*;
 import wms.service.BaseService;
 import wms.utils.GeneralUtils;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -40,7 +43,7 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
         CustomerType customerType = customerTypeRepo.getCustomerTypeByCode(customer.getCustomerTypeCode().toUpperCase());
         ContractType contractType = contractTypeRepo.getContractTypeByCode(customer.getContractTypeCode().toUpperCase());
         UserLogin createdBy = userRepo.getUserByUserLoginId(token.getName());
-        Facility facility = facilityRepo.getFacilityByCode(customer.getFacilityCode().toUpperCase());
+//        Facility facility = facilityRepo.getFacilityByCode(customer.getFacilityCode().toUpperCase());
         if (customerType== null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Customer with no specific type, can't create");
         }
@@ -50,9 +53,24 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
         if (createdBy == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown staff create this customer, can't create");
         }
-        if (facility == null) {
-            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Customer with no specific facility, can't create");
+//        if (facility == null) {
+//            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Customer with no specific facility, can't create");
+//        }
+        List<Facility> facilities = facilityRepo.getAllFacility();
+        int bestFacilityIndex = 0;
+        double bestDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < facilities.size(); i++) {
+            double cusLat = Double.parseDouble(customer.getLatitude());
+            double cusLon = Double.parseDouble(customer.getLongitude());
+            double facLat = Double.parseDouble(facilities.get(i).getLatitude());
+            double facLon = Double.parseDouble(facilities.get(i).getLongitude());
+            double cusFacDistance = Utils.calculateCoordinationDistance(cusLat, cusLon, facLat, facLon);
+            if (cusFacDistance < bestDistance) {
+                bestDistance = cusFacDistance;
+                bestFacilityIndex = i;
+            }
         }
+
         Customer newCustomer = Customer.builder()
                 .code("CUS" + GeneralUtils.generateCodeFromSysTime())
                 .phone(customer.getPhone())
@@ -65,7 +83,7 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
                 .customerType(customerType)
                 .contractType(contractType)
                 .user(createdBy)
-                .facility(facility)
+                .facility(facilities.get(bestFacilityIndex))
                 .build();
         return customerRepo.save(newCustomer);
     }

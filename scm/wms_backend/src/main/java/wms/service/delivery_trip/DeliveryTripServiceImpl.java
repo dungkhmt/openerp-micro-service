@@ -18,6 +18,7 @@ import wms.algorithms.entity.TruckDroneDeliveryInput;
 import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.delivery_trip.DeliveryTripDTO;
+import wms.dto.delivery_trip.TripRouteDTO;
 import wms.dto.product.ProductDTO;
 import wms.entity.*;
 import wms.exception.CustomException;
@@ -26,7 +27,6 @@ import wms.service.BaseService;
 import wms.service.delivery_bill.IDeliveryBillService;
 import wms.utils.GeneralUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -71,14 +71,19 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         UserLogin createdBy = userRepo.getUserByUserLoginId(token.getName());
         UserLogin userInCharge = userRepo.getUserByUserLoginId(deliveryTripDTO.getUserInCharge());
         Shipment shipment = shipmentRepo.getShipmentByCode(deliveryTripDTO.getShipmentCode());
+        Facility facility = facilityRepo.getFacilityByCode(deliveryTripDTO.getFacilityCode());
         if (createdBy == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown staff create this shipment, can't create");
         }
         if (shipment == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Not found shipment for this trip, can't create");
         }
+        if (facility == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Not found facility for this trip, can't create");
+        }
         DeliveryTrip newDeliveryTrip = DeliveryTrip.builder()
                 .code("TRIP" + GeneralUtils.generateCodeFromSysTime())
+                .facility(facility)
                 .startedDate(GeneralUtils.convertFromStringToDate(deliveryTripDTO.getCreatedDate()))
                 .creator(createdBy)
                 .userInCharge(userInCharge)
@@ -102,8 +107,7 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         SaleOrder saleOrder = deliveryBill.getSaleOrder();
         Customer customer = saleOrder.getCustomer();
         Facility facility = customer.getFacility();
-        UserLogin facilityManager = facility.getManager();
-        return deliveryTripRepo.getDeliveryTripsByStaff(facilityManager.getId());
+        return deliveryTripRepo.getDeliveryTripsByFacility(facility.getCode());
     }
 
     @Override
@@ -132,10 +136,10 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
     }
 
     @Override
-    public void createTripRoute(String tripCode) throws CustomException {
+    public void createTripRoute(TripRouteDTO tripRouteDTO) throws CustomException {
         TruckDroneDeliveryInput input = new TruckDroneDeliveryInput();
-        DeliveryTrip trip = deliveryTripRepo.getDeliveryTripByCode(tripCode);
-        List<ShipmentItem> shipmentItems = shipmentItemRepo.getShipmentItemOfATrip(tripCode);
+        DeliveryTrip trip = deliveryTripRepo.getDeliveryTripByCode(tripRouteDTO.getTripCode());
+        List<ShipmentItem> shipmentItems = shipmentItemRepo.getShipmentItemOfATrip(tripRouteDTO.getTripCode());
         UserLogin user = trip.getUserInCharge();
         // Set truck properties
         TruckEntity truckEntity = truckRepo.getTruckFromUser(user.getId());

@@ -10,4 +10,6 @@ public class DeliveryTripDTO {
     private String shipmentCode;
     private String userInCharge;
     private String createdDate;
+    @NotBlank(message = "Facility code khong duoc de trong")
+    private String facilityCode;
 }

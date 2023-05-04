@@ -71,7 +71,9 @@ public class InputIO {
                 distanceElement.setId(i + "_" + j);
                 distanceElement.setFromLocationId(points.get(i).getName());
                 distanceElement.setToLocationId(points.get(j).getName());
-                double distance = Utils.calculateEuclideanDistance(points.get(i), points.get(j));
+//              double distance = Utils.calculateEuclideanDistance(points.get(i), points.get(j));
+                double distance = Utils.calculateCoordinationDistance(points.get(i).getX(), points.get(i).getY(),
+                        points.get(j).getX(), points.get(j).getY());
                 distanceElement.setDistance(distance);
                 distanceElement.setTravelTime(distance / input.getTruck().getSpeed());
                 distanceElement.setFlyingTime(distance / input.getDrone().getSpeed());

@@ -14,8 +14,8 @@ public class CustomerDTO {
     @NotBlank(message = "Dia chi khong duoc de trong")
     private String address;
     private String status;
-    @NotBlank(message = "Ma kho hang khong duoc de trong")
-    private String facilityCode;
+//    @NotBlank(message = "Ma kho hang khong duoc de trong")
+//    private String facilityCode;
     private String latitude;
     private String longitude;
     private String createdBy;

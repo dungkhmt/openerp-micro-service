@@ -17,4 +17,7 @@ public interface DeliveryTripRepo extends JpaRepository<DeliveryTrip, Long> {
     // https://stackoverflow.com/questions/42145271/noviablealtexception-while-using-spring-data-query-with-hibernate
     @Query(value = "select * from scm_delivery_trip sdt where sdt.user_in_charge = :staffCode", nativeQuery = true)
     List<DeliveryTrip> getDeliveryTripsByStaff(String staffCode);
+
+    @Query(value = "select * from scm_delivery_trip sdt where sdt.facility_code = :facilityCode", nativeQuery = true)
+    List<DeliveryTrip> getDeliveryTripsByFacility(String facilityCode);
 }

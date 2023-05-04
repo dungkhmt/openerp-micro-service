@@ -19,6 +19,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
+import { useGetFacilityList } from "../../controllers/query/facility-query";
 import { Action } from "../sellin/PurchaseOrder";
 function ShipmentDetailScreen() {
   const location = useLocation();
@@ -44,6 +45,7 @@ function ShipmentDetailScreen() {
   } = methods;
 
   const createTripQuery = useCreateDeliveryTrip();
+  const { isLoading: isLoadingFacility, data: facility } = useGetFacilityList();
   const { isLoading, data } = useGetDeliveryTripList({
     shipment_code: currShipment?.code,
   });
@@ -55,6 +57,7 @@ function ShipmentDetailScreen() {
       createdDate: moment(data?.startDate).format("DD-MM-YYYY"),
       shipmentCode: currShipment?.code,
       userInCharge: data?.userInCharge?.name,
+      facilityCode: data?.facility?.code,
     };
     await createTripQuery.mutateAsync(tripParams);
     setIsAdd((pre) => !pre);
@@ -131,6 +134,13 @@ function ShipmentDetailScreen() {
           })
         : [],
       loading: isLoadingUser,
+    },
+    {
+      name: "facility",
+      label: "Kho lấy hàng",
+      component: "select",
+      options: facility?.content ? facility?.content : [],
+      loading: isLoadingFacility,
     },
   ];
   return (
@@ -244,6 +254,15 @@ function ShipmentDetailScreen() {
             minWidth: 150,
             valueGetter: (item) => {
               return item?.row?.shipment?.code;
+            },
+          },
+          {
+            field: "facility",
+            headerName: "Kho lấy hàng",
+            sortable: false,
+            minWidth: 150,
+            valueGetter: (item) => {
+              return item?.row?.facility?.name;
             },
           },
           {

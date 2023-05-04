@@ -6,6 +6,7 @@ import { unix } from "moment";
 import { useLocation } from "react-router-dom";
 import { useWindowSize } from "react-use";
 import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
+import { useCreateTripRoute } from "../../controllers/query/delivery-trip-query";
 import { useGetItemsOfTrip } from "../../controllers/query/shipment-query";
 import { Action } from "../sellin/PurchaseOrder";
 function TripScreen({ screenAuthorization }) {
@@ -15,6 +16,7 @@ function TripScreen({ screenAuthorization }) {
   const { isLoading, data } = useGetItemsOfTrip({
     tripCode: currTrip?.code,
   });
+  const createTripRouteQuery = useCreateTripRoute();
   const extraActions = [
     {
       title: "Xem",
@@ -134,7 +136,15 @@ function TripScreen({ screenAuthorization }) {
       >
         {"LỘ TRÌNH GIAO HÀNG"}
       </Typography>
-      <Button onClick={() => {}} variant={"outlined"}>
+      <Button
+        onClick={async () => {
+          let tripParams = {
+            tripCode: currTrip?.code,
+          };
+          await createTripRouteQuery.mutateAsync(tripParams);
+        }}
+        variant={"outlined"}
+      >
         Tạo mới lộ trình
       </Button>
     </Box>

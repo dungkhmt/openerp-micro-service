@@ -43,4 +43,9 @@ public class DeliveryTrip extends BaseEntity implements Serializable {
     @OneToMany(mappedBy = "deliveryTrip",fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<ShipmentItem> shipmentItems = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "facility_code", referencedColumnName = "code")
+    @NotFound(action = NotFoundAction.IGNORE)
+    private Facility facility;
 }

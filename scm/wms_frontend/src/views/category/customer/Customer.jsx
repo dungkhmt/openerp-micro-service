@@ -52,11 +52,12 @@ function CustomerScreen({ screenAuthorization }) {
   const createCustomerQuery = useCreateCustomer();
 
   const onSubmit = async (data) => {
+    console.log("Data: ", data);
     let customerParams = {
       address: data?.address,
       contractTypeCode: data?.contractType?.code,
       customerTypeCode: data?.customerType?.code,
-      facilityCode: data?.facility?.code,
+      // facilityCode: data?.facility?.code,
       status: data?.status?.name,
       name: data?.name,
       phone: data?.phone,
@@ -120,13 +121,13 @@ function CustomerScreen({ screenAuthorization }) {
       loading: false,
       component: "select",
     },
-    {
-      name: "facility",
-      label: "Kho trực thuộc",
-      component: "select",
-      options: facility ? facility?.content : [],
-      loading: isLoadingFacility,
-    },
+    // {
+    //   name: "facility",
+    //   label: "Kho trực thuộc",
+    //   component: "select",
+    //   options: facility ? facility?.content : [],
+    //   loading: isLoadingFacility,
+    // },
     {
       name: "contractType",
       label: "Loại hợp đồng",

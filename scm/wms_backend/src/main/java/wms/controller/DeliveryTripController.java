@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*;
 import wms.common.constant.DefaultConst;
 import wms.dto.delivery_trip.DeliveryTripDTO;
+import wms.dto.delivery_trip.TripRouteDTO;
 import wms.entity.ResultEntity;
 import wms.service.delivery_trip.IDeliveryTripService;
 
@@ -58,7 +59,7 @@ public class DeliveryTripController extends BaseController {
     @PostMapping("/assign-bill-to-trip")
     public ResponseEntity<?> assignBillToTrip(@Valid @RequestBody DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) {
         try {
-            return response(new ResultEntity(1, "Assign to trip successfully", deliveryTripService.createDeliveryTrip(deliveryTripDTO, token)));
+            return response(new ResultEntity(1, "Assign to trip successfully", deliveryTripService.assignBillToTrip(deliveryTripDTO, token)));
         }
         catch (Exception ex) {
             return response(error(ex));
@@ -68,11 +69,11 @@ public class DeliveryTripController extends BaseController {
     @ApiOperation(value = "Tạo lộ trình di chuyển")
     @PostMapping("/create-trip-route")
     public ResponseEntity<?> createTripRoute(
-            @RequestParam(value = "tripCode", required = true, defaultValue = DefaultConst.STRING) String tripCode
+          @RequestBody TripRouteDTO tripRouteDTO
     ) {
         try {
-            deliveryTripService.createTripRoute(tripCode);
-            return response(new ResultEntity(1, "Create trip route successfully", tripCode));
+            deliveryTripService.createTripRoute(tripRouteDTO);
+            return response(new ResultEntity(1, "Create trip route successfully", tripRouteDTO.getTripCode()));
         }
         catch (Exception ex) {
             return response(error(ex));

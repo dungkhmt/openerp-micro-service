@@ -86,4 +86,8 @@ public class Facility extends BaseEntity implements Serializable {
     // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
     @JsonIgnore
     private Set<ReceiptBill> receiptBills;
+
+    @OneToMany(mappedBy = "facility",fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<DeliveryTrip> deliveryTrips;
 }

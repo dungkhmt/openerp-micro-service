@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import wms.algorithms.utils.Utils;
 import wms.common.enums.CommonStatus;
 import wms.common.enums.ErrorCode;
 import wms.common.enums.OrderStatus;
@@ -33,6 +34,8 @@ import java.util.Map;
 @Service
 @Slf4j
 public class FacilityServiceImpl extends BaseService implements IFacilityService {
+    @Autowired
+    private CustomerRepo customerRepo;
     @Autowired
     private InventoryItemRepo inventoryItemRepo;
     @Autowired
@@ -61,10 +64,8 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
     private UserRepo userRepo;
     @Autowired
     private FacilityRepo facilityRepo;
-
     @Autowired
     private IPurchaseOrderService purchaseOrderService;
-
     @Autowired
     private ISaleOrderService saleOrderService;
     @Override
@@ -85,9 +86,34 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
                 .creator(createdBy)
                 .manager(manager)
                 .build();
-        return facilityRepo.save(newFacility);
+
+        Facility facility = facilityRepo.save(newFacility);
+        clusterCustomerIntoFacility();
+        return facility;
     }
 
+    public void clusterCustomerIntoFacility() {
+        List<Customer> customers = customerRepo.getAllCustomers();
+        List<Facility> facilities = facilityRepo.getAllFacility();
+        for (Customer customer : customers) {
+            double bestDistance = Double.POSITIVE_INFINITY;
+            int bestIndex = -1;
+            for (int i = 0; i < facilities.size(); i++) {
+                double cusLat = Double.parseDouble(customer.getLatitude());
+                double cusLon = Double.parseDouble(customer.getLongitude());
+                double facLat = Double.parseDouble(facilities.get(i).getLatitude());
+                double facLon = Double.parseDouble(facilities.get(i).getLongitude());
+                double cusFacDistance = Utils.calculateCoordinationDistance(cusLat, cusLon, facLat, facLon);
+                if (cusFacDistance < bestDistance) {
+                    bestDistance = cusFacDistance;
+                    bestIndex = i;
+                }
+            }
+            customer.setFacility(facilities.get(bestIndex));
+            customerRepo.save(customer);
+        }
+
+    }
     @Override
     public ReturnPaginationDTO<Facility> getAllFacilities(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)

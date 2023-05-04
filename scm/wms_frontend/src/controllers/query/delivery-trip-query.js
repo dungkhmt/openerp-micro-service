@@ -64,7 +64,30 @@ export const useGetDeliveryTripToAssignBill = (params) => {
     onSuccess: (data) => {},
   });
 };
-
+export const useCreateTripRoute = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.createTripRoute,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Tạo thành công!");
+      queryClient.invalidateQueries([queryKey.delivery_trip.trip_route]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
 export const useGetListTruck = (params) => {
   return useQuery({
     queryKey: [queryKey.delivery_trip.truck_list, params],

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.delivery_trip.DeliveryTripDTO;
+import wms.dto.delivery_trip.TripRouteDTO;
 import wms.dto.product.ProductDTO;
 import wms.entity.DeliveryTrip;
 import wms.entity.ShipmentItem;
@@ -20,5 +21,5 @@ public interface IDeliveryTripService {
     DeliveryTrip updateDeliveryTrip(ProductDTO productDTO, long id) throws CustomException;
     void deleteDeliveryTripById(long id);
     ShipmentItem assignBillToTrip(DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) throws CustomException;
-    void createTripRoute(String tripCode) throws CustomException;
+    void createTripRoute(TripRouteDTO tripRouteDTO) throws CustomException;
 }
