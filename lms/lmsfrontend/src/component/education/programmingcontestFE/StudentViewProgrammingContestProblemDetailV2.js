@@ -133,6 +133,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
       "/" +
       contestId,
       (res) => {
+        res = res.data;
         setProblem(res);
         //setProblemStatement(res.data.problemStatement);
         if (res.attachment && res.attachment.length !== 0) {
