@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import openerp.coderunnerservice.constants.Constants;
 import openerp.coderunnerservice.docker.DockerClientBase;
 import openerp.coderunnerservice.entity.*;
+import openerp.coderunnerservice.model.ModelRunCodeFromIDE;
 import openerp.coderunnerservice.repo.ContestSubmissionRepo;
 import openerp.coderunnerservice.repo.ContestSubmissionTestCaseEntityRepo;
 import openerp.coderunnerservice.service.helper.SubmissionResponseHandler;
@@ -28,6 +29,52 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     private SubmissionResponseHandler submissionResponseHandler;
     private DockerClientBase dockerClientBase;
 
+    @Override
+    public String executableIDECode(
+            ModelRunCodeFromIDE modelRunCodeFromIDE,
+            String computerLanguage
+    ) throws Exception {
+        String tempName = tempDir.createRandomScriptFileName(Math.random() + "-" + computerLanguage);
+        String response = runCode(
+                modelRunCodeFromIDE.getSource(),
+                computerLanguage,
+                tempName,
+                modelRunCodeFromIDE.getInput(),
+                modelRunCodeFromIDE.getTimeLimit(),
+                "Language Not Found");
+        tempDir.pushToConcurrentLinkedQueue(tempName);
+        return response;
+    }
+
+    private String runCode(
+            String sourceCode,
+            String computerLanguage,
+            String tempName,
+            String input,
+            int timeLimit,
+            String exception
+    ) throws Exception {
+        String ans;
+        tempName = tempName.replaceAll(" ", "");
+        switch (computerLanguage) {
+            case "CPP":
+                tempDir.createScriptFile(sourceCode, input, timeLimit, Constants.Languages.CPP, tempName);
+                ans = dockerClientBase.runExecutable(Constants.Languages.CPP, tempName);
+                break;
+            case "JAVA":
+                tempDir.createScriptFile(sourceCode, input, timeLimit, Constants.Languages.JAVA, tempName);
+                ans = dockerClientBase.runExecutable(Constants.Languages.JAVA, tempName);
+                break;
+            case "PYTHON3":
+                tempDir.createScriptFile(sourceCode, input, timeLimit, Constants.Languages.PYTHON3, tempName);
+                ans = dockerClientBase.runExecutable(Constants.Languages.PYTHON3, tempName);
+                break;
+            default:
+                throw new Exception(exception);
+        }
+//        tempDir.pushToConcurrentLinkedQueue(tempName);
+        return ans;
+    }
     @Override
     public void submitContestProblemTestCaseByTestCaseWithFileProcessor(
             UUID submissionId

@@ -56,6 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // Route security
         http
                 .authorizeRequests()
+                .antMatchers("/ide/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .requestCache()

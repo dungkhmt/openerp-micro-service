@@ -19,13 +19,4 @@ public class FileSystemStorageProperties {
 
     @NotBlank
     private String filesystemRoot;
-
-    @NotBlank
-    private String videoPath;
-
-    @NotBlank
-    private String classManagementDataPath;
-
-    @NotBlank
-    private String backlogDataPath;
 }
