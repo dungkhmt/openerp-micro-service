@@ -46,7 +46,7 @@ function MainAppRouter(props) {
           <PrivateRoute component={OrderScreen} path="/order" />
           <PrivateRoute component={ContainerScreen} path="/container" />
           {/* <Route component={ShipmentScreen} path="/trailer" /> */}
-          <Route component={ShipmentScreen} exact path="/shipment" />
+          <Route component={ShipmentScreen} exact path="/trailer" />
           <Route component={TripDetail} path="/shipment/create" />
           <Route component={NotFound}  />
         </Switch>

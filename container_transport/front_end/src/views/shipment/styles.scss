@@ -163,7 +163,6 @@
 .bodyContent {
     background-color: white;
 }
-
 .content-trip {
     display: flex;
     .content-truck-and-orders {
@@ -176,6 +175,11 @@
         }
         .chose-orders {
             margin: 32px 0px 16px 32px;
+            .chose-orders-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
         }
     }
     .order-arrangement {

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import './styles.scss';
 import ChoseTruckAndOrders from "./ChoseTruckAndOrders";
+import OrderArrangement from "./OrderArrangement";
 
 const TripDetail = () => {
     const [trucks, setTrucks] = useState([]);
@@ -23,7 +24,9 @@ const TripDetail = () => {
             <Box className="content-truck-and-orders">
                 <ChoseTruckAndOrders trucks={trucks} setTruckId={setTruckId} />
             </Box>
-            <Box className="order-arrangement">Sx Order</Box>
+            <Box className="order-arrangement">
+                <OrderArrangement />
+            </Box>
             <Box className="map-order">
                 <Box>
                     <MapContainer center={[51.505, -0.09]} zoom={13} scrollWheelZoom={false} style={{ height: "70vh" }}>
