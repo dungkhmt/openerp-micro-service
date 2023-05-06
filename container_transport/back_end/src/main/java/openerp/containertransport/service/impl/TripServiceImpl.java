@@ -1,6 +1,9 @@
 package openerp.containertransport.service.impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
+import openerp.containertransport.dto.TripFilterRequestDTO;
 import openerp.containertransport.dto.TripItemModel;
 import openerp.containertransport.dto.TripModel;
 import openerp.containertransport.entity.Order;
@@ -15,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -25,6 +29,7 @@ public class TripServiceImpl implements TripService {
     private final TruckRepo truckRepo;
     private final ModelMapper modelMapper;
     private final OrderRepo orderRepo;
+    private final EntityManager entityManager;
     @Override
     public TripModel createTrip(TripModel tripModel, long shipmentId, String createBy) {
         Trip trip = new Trip();
@@ -60,14 +65,37 @@ public class TripServiceImpl implements TripService {
     }
 
     @Override
-    public TripModel filterTrip() {
-        return null;
+    public List<TripModel> filterTrip(TripFilterRequestDTO requestDTO) {
+        String sql = "SELECT * FROM container_transport_trip WHERE 1=1";
+        HashMap<String, Object> params = new HashMap<>();
+
+        sql += " AND shipment_id = :shipmentId";
+        params.put("shipmentId", requestDTO.getShipmentId());
+
+        if (requestDTO.getStatus() != null) {
+            sql += " AND status = :status";
+            params.put("status", requestDTO.getStatus());
+        }
+
+        sql += " ORDER BY updated_at DESC";
+        Query query = this.entityManager.createNativeQuery(sql, Trip.class);
+        for (String i : params.keySet()) {
+            query.setParameter(i, params.get(i));
+        }
+        List<Trip> trips = query.getResultList();
+        List<TripModel> tripModels = new ArrayList<>();
+        trips.forEach((item) -> tripModels.add(convertToModel(item)));
+        return tripModels;
     }
 
     public TripModel convertToModel(Trip trip) {
         TripModel tripModel = modelMapper.map(trip, TripModel.class);
+        List<Long> orderIds = new ArrayList<>();
         tripModel.setTruckId(trip.getTruck().getId());
-        tripModel.setTruckName(trip.getTruck().getDriverName());
+        tripModel.setDriverName(trip.getTruck().getDriverName());
+        tripModel.setTruckCode(trip.getTruck().getTruckCode());
+        trip.getOrders().forEach((item) -> orderIds.add(item.getId()));
+        tripModel.setOrderIds(orderIds);
         return tripModel;
     }
 }

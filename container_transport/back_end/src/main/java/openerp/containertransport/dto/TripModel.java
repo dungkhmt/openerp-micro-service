@@ -17,7 +17,8 @@ public class TripModel implements Serializable {
     private String code;
     private Long shipmentId;
     private Long truckId;
-    private String truckName;
+    private String driverName;
+    private String truckCode;
     private List<TripItemModel> tripItemModelList;
     private List<Long> orderIds;
     private String status;

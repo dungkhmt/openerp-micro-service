@@ -3,6 +3,7 @@ package openerp.containertransport.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Getter
@@ -39,9 +40,9 @@ public class Facility {
     @Column(name = "status")
     private String status;
 
-    private Long longitude;  // kinh do
+    private BigDecimal longitude;  // kinh do
 
-    private Long latitude;
+    private BigDecimal latitude;
 
     @Column(name = "processing_time")
     private Long processingTime;

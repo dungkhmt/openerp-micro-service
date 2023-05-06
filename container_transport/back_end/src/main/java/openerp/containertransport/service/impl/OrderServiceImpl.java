@@ -3,6 +3,7 @@ package openerp.containertransport.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
+import openerp.containertransport.dto.FacilityResponsiveDTO;
 import openerp.containertransport.dto.OrderFilterRequestDTO;
 import openerp.containertransport.dto.OrderModel;
 import openerp.containertransport.entity.Container;
@@ -44,8 +45,8 @@ public class OrderServiceImpl implements OrderService {
             order.setContainers(containers);
         }
         order.setCustomerId(orderModel.getCustomerId());
-        Facility facilityFrom = facilityRepo.findById(orderModel.getFromFacilityId());
-        Facility facilityTo = facilityRepo.findById(orderModel.getToFacilityId());
+        Facility facilityFrom = facilityRepo.findById(orderModel.getFromFacilityId()).get();
+        Facility facilityTo = facilityRepo.findById(orderModel.getToFacilityId()).get();
         order.setFromFacility(facilityFrom);
         order.setToFacility(facilityTo);
         order.setEarlyDeliveryTime(orderModel.getEarlyDeliveryTime());
@@ -91,10 +92,22 @@ public class OrderServiceImpl implements OrderService {
 
     public OrderModel convertToModel(Order order){
         OrderModel orderModel = modelMapper.map(order, OrderModel.class);
-        orderModel.setFromFacilityName(order.getFromFacility().getFacilityName());
-        orderModel.setFromFacilityCode(order.getFromFacility().getFacilityCode());
-        orderModel.setToFacilityName(order.getToFacility().getFacilityName());
-        orderModel.setToFacilityCode(order.getToFacility().getFacilityCode());
+        FacilityResponsiveDTO fromFacility = buildFacilityResponse(order.getFromFacility());
+        FacilityResponsiveDTO toFacility = buildFacilityResponse(order.getToFacility());
+        orderModel.setFromFacility(fromFacility);
+        orderModel.setToFacility(toFacility);
         return orderModel;
+    }
+    public FacilityResponsiveDTO buildFacilityResponse(Facility facility) {
+        FacilityResponsiveDTO facilityResponsive =  FacilityResponsiveDTO.builder()
+                .facilityName(facility.getFacilityName())
+                .facilityCode(facility.getFacilityCode())
+                .facilityId(facility.getId())
+                .longitude(facility.getLongitude())
+                .latitude(facility.getLatitude())
+                .processingTime(facility.getProcessingTime())
+                .address(facility.getAddress())
+                .build();
+        return facilityResponsive;
     }
 }

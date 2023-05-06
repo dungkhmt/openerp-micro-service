@@ -20,12 +20,10 @@ public class OrderModel implements Serializable {
     private boolean isBreakRomooc;
     private String customerId;
     private List<Integer> containerIds;
-    private Integer fromFacilityId;
-    private String fromFacilityName;
-    private String fromFacilityCode;
-    private Integer toFacilityId;
-    private String toFacilityName;
-    private String toFacilityCode;
+    private FacilityResponsiveDTO fromFacility;
+    private Long fromFacilityId;
+    private Long toFacilityId;
+    private FacilityResponsiveDTO toFacility;
     private List<Container> containers;
     private long earlyDeliveryTime;
     private long lateDeliveryTime;
