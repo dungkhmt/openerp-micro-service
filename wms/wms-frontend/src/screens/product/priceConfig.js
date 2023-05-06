@@ -1,7 +1,7 @@
 import { Grid, Modal } from "@mui/material";
 import { Box } from "@mui/system";
 import { request } from "api";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { errorNoti } from "utils/notification";
 import useStyles from "screens/styles";
 import { API_PATH } from "../apiPaths";
@@ -22,6 +22,7 @@ const PriceHistory = ( { data } ) => {
   return (
     <Box>
       <StandardTable
+        rowKey="productPriceId"
         title={"Cấu hình giá cho " + data?.productName}
         columns={columns}
         data={historyPricesArr}

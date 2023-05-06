@@ -1,11 +1,16 @@
+import { TextField } from "@mui/material";
 import { request } from "api";
-import StandardTable from "components/table/StandardTable"
+import StandardTable from "components/StandardTable"
 import { Fragment, useEffect, useState } from "react"
 import { API_PATH } from "screens/apiPaths";
 import { errorNoti, successNoti } from "utils/notification";
 
 const DeliveryPersonManagement = () => {
   const [deliveryPersonsTableData, setDeliveryPersonsTableData] = useState([]);
+
+  const [newFullName, setNewFullName] = useState(null);
+  const [newPhoneNumber, setNewPhoneNumber] = useState(null);
+  const [newUserLoginId, setNewUserLoginId] = useState(null);
   
   useEffect(() => {
     request(
@@ -22,9 +27,12 @@ const DeliveryPersonManagement = () => {
       hideCommandBar={true}
       title="Quản lý nhân viên giao hàng"
       columns={[
-        { title: "Tên *", field: "fullName" },
-        { title: "Số điện thoại", field: "phoneNumber" },
-        { title: "Tài khoản đăng nhập *", field: "userLoginId" }
+        { title: "Tên *", field: "fullName", 
+          editComponent: <TextField onChange={(e) => setNewFullName(e.target.value)} /> },
+        { title: "Số điện thoại", field: "phoneNumber",
+          editComponent: <TextField onChange={(e) => setNewPhoneNumber(e.target.value)} /> },
+        { title: "Tài khoản đăng nhập *", field: "userLoginId",
+          editComponent: <TextField onChange={(e) => setNewUserLoginId(e.target.value)} /> }
       ]}
       data={deliveryPersonsTableData}
       options={{
@@ -33,12 +41,13 @@ const DeliveryPersonManagement = () => {
         search: true,
         sorting: true,
       }}
+      rowKey={"userLoginId"}
       editable={{
         onRowAdd: newData => new Promise((resolve, reject) => {
           setTimeout(() => {
             console.log("New data => ", newData);
-            if (newData.fullName == null || newData.fullName == undefined ||
-              newData.userLoginId == null || newData.userLoginId == undefined) {
+            if (newFullName == null || newFullName == undefined ||
+              newUserLoginId == null || newUserLoginId == undefined) {
               errorNoti("Vui lòng điền đầy đủ thông tin người giao hàng");
               reject();
             } else {
@@ -57,26 +66,22 @@ const DeliveryPersonManagement = () => {
                   500: () => errorNoti("Có lỗi xảy ra khi thêm mới nhân viên")
                 },
                 {
-                  "fullName": newData.fullName,
-                  "phoneNumber": newData.phoneNumber,
-                  "userLoginId": newData.userLoginId
+                  "fullName": newFullName,
+                  "phoneNumber": newPhoneNumber,
+                  "userLoginId": newUserLoginId
                 }
               );
             }
           });
         }),
-        onRowDelete: oldData => new Promise((resolve, reject) => {
+        onRowDelete: selectedIds => new Promise((resolve, reject) => {
           setTimeout(() => {
             request(
               "delete",
-              `${API_PATH.DELIVERY_MANAGER_DELIVERY_PERSON}/${oldData.deliveryPersonId}`,
+              `${API_PATH.DELIVERY_MANAGER_DELIVERY_PERSON}/${selectedIds.join(',')}`,
               (res) => {
                 if (res.status == 200) {
                   successNoti("Xóa nhân viên thành công");
-                  const dataDelete = [...deliveryPersonsTableData];
-                  const index = oldData.tableData.id;
-                  dataDelete.splice(index, 1);
-                  setDeliveryPersonsTableData([...dataDelete]);
                   resolve();
                 }
               },

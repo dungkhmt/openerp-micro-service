@@ -1,7 +1,7 @@
 import { TextField } from "@mui/material";
 import { request } from "api";
 import { ShipmentDropDown } from "components/table/DropDown";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { Fragment, useEffect, useState } from "react"
 import { API_PATH } from "screens/apiPaths";
 import { getCurrentDateInString } from "screens/utils/utils";
@@ -47,17 +47,18 @@ const DeliveryTripListing = () => {
 
   return <Fragment>
     <StandardTable
+      rowKey="deliveryTripId"
       title="Danh sách các chuyến giao hàng"
       hideCommandBar={true}
       columns={[
         { title: "Mã chuyến", field: "deliveryTripId",
-          editComponent: props => <TextField InputProps={{readOnly: true}}/> },
+          editComponent: <TextField InputProps={{readOnly: true}}/> },
         { title: "Ngày tạo", field: "createdStamp",
-          editComponent: props => <TextField value={now}/> },
+          editComponent: <TextField value={now}/> },
         { title: "Người tạo", field: "createdBy", 
-          editComponent: props => <TextField value={userLoginId}/> }, 
+          editComponent: <TextField value={userLoginId}/> }, 
         { title: "Đợt giao hàng", field: "shipmentId",
-          editComponent: props => <ShipmentDropDown shipmentList={shipmentList}
+          editComponent: <ShipmentDropDown shipmentList={shipmentList}
             setSelectedShipmentId={setSelectedShipmentId} />}
       ]}
       data={tripTableData}
