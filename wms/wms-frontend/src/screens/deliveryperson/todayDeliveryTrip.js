@@ -34,7 +34,7 @@ const TodayDeliveryTrip = () => {
       columns={[
         { title: "Mã chuyến", field: "deliveryTripId" },
         { title: "Ngày tạo", field: "createdStamp" },
-        { title: "Trạng thái", field: "status" },
+        { title: "Trạng thái", field: "deliveryTripStatus" },
         { title: "Mã đợt giao hàng", field: "shipmentId"}
       ]}
       options={{

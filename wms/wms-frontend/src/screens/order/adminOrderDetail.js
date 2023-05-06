@@ -186,7 +186,7 @@ const AdminOrderDetail = ( props ) => {
                     fullWidth
                     variant="outlined"
                     size="small"
-                    value={convertTimeStampToDate(orderInfo?.createdDate)}
+                    value={orderInfo?.createdDate}
                     InputProps={{
                       readOnly: true,
                     }}

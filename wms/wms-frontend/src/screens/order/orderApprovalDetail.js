@@ -4,7 +4,7 @@ import StandardTable from "components/table/StandardTable";
 import { Fragment, useEffect, useState } from "react";
 import { API_PATH } from "screens/apiPaths";
 import useStyles from 'screens/styles.js';
-import { convertTimeStampToDate, convertToVNDFormat } from "screens/utils/utils";
+import { convertToVNDFormat } from "screens/utils/utils";
 import { errorNoti, successNoti } from "utils/notification";
 import { useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
@@ -22,7 +22,13 @@ const OrderApprovalDetail = ( props ) => {
         "get",
         `${API_PATH.ADMIN_SALE_ORDER}/${orderId}`,
         (res) => {
-          setOrderInfo(res.data);
+          var data = res.data;
+          for (var i = 0; i < data?.items?.length; i++) {
+            const cost = data?.items[i]?.priceUnit;
+            const costFormated = convertToVNDFormat(cost);
+            data.items[i].priceUnit = costFormated;
+          }
+          setOrderInfo(data);
         }
       )
     }
@@ -71,14 +77,14 @@ const OrderApprovalDetail = ( props ) => {
             Thông tin đơn hàng</Typography>
         </Grid>
         {
-          orderInfo?.statusCode != 'SUCCESS' &&
+          orderInfo?.statusCode == 'CREATED' &&
           <Grid className={classes.buttonWrap}>
             <Button variant="contained" className={classes.addButton}
               type="submit" onClick={approveOrderButtonHandle} >Phê duyệt</Button>
           </Grid>
         }
         {
-          orderInfo?.statusCode != 'SUCCESS' &&
+          orderInfo?.statusCode == 'CREATED' &&
           <Grid className={classes.buttonWrap}>
             <Button variant="contained" className={classes.addButton}
               type="submit" onClick={cancelOrderButtonHandle} >Hủy đơn hàng</Button>
@@ -100,7 +106,7 @@ const OrderApprovalDetail = ( props ) => {
                       fullWidth
                       variant="outlined"
                       size="small"
-                      value={convertTimeStampToDate(orderInfo?.createdDate)}
+                      value={orderInfo?.createdDate}
                       InputProps={{
                         readOnly: true,
                       }}
@@ -277,7 +283,12 @@ const OrderApprovalDetail = ( props ) => {
           sorting: true,
         }}
         data={orderInfo?.items}
-        columns={[
+        columns={orderInfo?.statusCode == "COMPLETED" ? [
+          { title: "Tên sản phẩm", field: "productName" },
+          { title: "Số lượng", field: "quantity" },
+          { title: "Đơn giá", field: "priceUnit" },
+          { title: "Trạng thái", field: "deliveryStatus" }
+        ] : [
           { title: "Tên sản phẩm", field: "productName" },
           { title: "Số lượng", field: "quantity" },
           { title: "Đơn giá", field: "priceUnit" }

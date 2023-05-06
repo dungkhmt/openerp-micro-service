@@ -160,6 +160,7 @@ const DeliveryTripDetail = ( props ) => {
         if (res.status == 200) {
           setTripInfo(res.data);
           successNoti("Lưu thông tin chuyến giao hàng thành công");
+          window.location.reload();
         }
       },
       {
@@ -290,7 +291,7 @@ const DeliveryTripDetail = ( props ) => {
           top: '50%',
           left: '50%',
           width: '25%',
-          height: '5%',
+          height: '15%',
           transform: 'translate(-50%, -50%)',
           bgcolor: 'background.paper',
           border: '2px solid #000',
@@ -327,7 +328,7 @@ const DeliveryTripDetail = ( props ) => {
         </Grid>
 
         {
-          !isDeleted && tripInfo?.deliveryTripStatusCode != 'DONE' &&
+          !isDeleted && tripInfo?.deliveryTripStatusCode == 'CREATED' &&
           <Grid className={classes.buttonWrap}>
             <Button variant="contained" className={classes.addButton} 
               type="submit" onClick={saveDeliveryTripButtonHandle} >Lưu</Button>
@@ -335,7 +336,7 @@ const DeliveryTripDetail = ( props ) => {
         }
 
         {
-          !isDeleted && tripInfo?.deliveryTripStatusCode != 'DONE' &&
+          !isDeleted && tripInfo?.deliveryTripStatusCode == 'CREATED' &&
           <Grid className={classes.buttonWrap}>
             <Button variant="contained" className={classes.addButton} 
               type="submit" onClick={deleteButtonHandle}>Hủy bỏ</Button>
@@ -343,7 +344,7 @@ const DeliveryTripDetail = ( props ) => {
         }
 
         {
-          !isDeleted && tripInfo?.deliveryTripStatusCode != 'DONE' &&
+          !isDeleted && tripInfo?.deliveryTripStatusCode == 'CREATED' &&
           <Grid className={classes.buttonWrap}>
             <Button variant="contained" className={classes.addButton} 
               type="submit" onClick={autoRouteButtonHandle}>Auto route</Button>

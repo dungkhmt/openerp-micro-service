@@ -4,7 +4,7 @@ import StandardTable from "components/table/StandardTable"
 import { request } from "api";
 import { API_PATH } from "screens/apiPaths";
 import { ORDER_STATUS_CODE } from "components/constants";
-import { convertTimeStampToDate } from "screens/utils/utils";
+import { convertTimeStampToDate, convertToVNDFormat } from "screens/utils/utils";
 
 const SaleManagerOrderListing = () => {
   const { path } = useRouteMatch();
@@ -18,9 +18,9 @@ const SaleManagerOrderListing = () => {
       (res) => {
         var data = res.data;
         for (var i = 0; i < data.length; i++) {
-          const createdTimestamp = data[i]?.createdOrderDate;
-          const dateFormated = convertTimeStampToDate(createdTimestamp);
-          data[i].createdOrderDate = dateFormated;
+          const cost = data[i]?.totalOrderCost;
+          const costFormated = convertToVNDFormat(cost);
+          data[i].totalOrderCost = costFormated;
         }
         setOrdersTableData(data); 
       }
