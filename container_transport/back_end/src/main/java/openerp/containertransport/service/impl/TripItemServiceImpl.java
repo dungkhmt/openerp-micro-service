@@ -10,6 +10,9 @@ import openerp.containertransport.service.TripItemService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TripItemServiceImpl implements TripItemService {
@@ -36,8 +39,11 @@ public class TripItemServiceImpl implements TripItemService {
     }
 
     @Override
-    public TripItemModel filterTripItem() {
-        return null;
+    public List<TripItemModel> getTripItemByTripId(long id) {
+        List<TripItem> tripItems = tripItemRepo.findByTripId(id);
+        List<TripItemModel> tripItemModels = new ArrayList<>();
+        tripItems.forEach((tripItem -> tripItemModels.add(convertToModel(tripItem))));
+        return tripItemModels;
     }
 
     public TripItemModel convertToModel (TripItem tripItem) {

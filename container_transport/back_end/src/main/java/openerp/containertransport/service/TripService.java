@@ -10,4 +10,5 @@ public interface TripService {
     TripModel createTrip (TripModel tripModel, long shipmentId, String createBy);
 
     List<TripModel> filterTrip (TripFilterRequestDTO requestDTO);
+    TripModel getById(long id);
 }

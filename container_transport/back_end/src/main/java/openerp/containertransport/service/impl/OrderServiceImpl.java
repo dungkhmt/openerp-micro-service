@@ -90,6 +90,16 @@ public class OrderServiceImpl implements OrderService {
         return orderModels;
     }
 
+    @Override
+    public OrderModel updateOrder(OrderModel orderModel) {
+        Order order = orderRepo.findById(orderModel.getId()).get();
+        if(orderModel.getStatus() != null) {
+            order.setStatus(orderModel.getStatus());
+        }
+        order = orderRepo.save(order);
+        return convertToModel(order);
+    }
+
     public OrderModel convertToModel(Order order){
         OrderModel orderModel = modelMapper.map(order, OrderModel.class);
         FacilityResponsiveDTO fromFacility = buildFacilityResponse(order.getFromFacility());

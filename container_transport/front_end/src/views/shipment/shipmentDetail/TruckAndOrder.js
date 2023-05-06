@@ -4,24 +4,23 @@ import React, { useContext, useEffect, useState } from "react";
 import SettingsIcon from '@mui/icons-material/Settings';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
-import './styles.scss';
+import '../styles.scss';
 import { MyContext } from "contextAPI/MyContext";
 
-const ChoseTruckAndOrders = ({ trucks, setTruckId, truckSelected , orders, ordersSelect, setOrdersSelect}) => {
+const TruckAndOrder = ({ trucks, setTruckSelect, truckSelect, orders, ordersSelect, setOrdersSelect}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [value, setValue] = useState([]);
     const [pendingValue, setPendingValue] = useState([]);
     const open = Boolean(anchorEl);
     const id = open ? 'github-label' : undefined;
-    const [truckSelect, setTruckSelect] = useState();
-    const {tripsCreate, setTripCreate } = useContext(MyContext);
     const [tripTmpId, setTripTmpId] = useState('');
     const [tripTmp, setTripTmp] = useState();
+    const [initTruckSelect, setInitTruck] = useState();
 
-    // useEffect(() => {
-    //     setTruckSelect(truckSelected);
-    //     setValue(ordersSelect)
-    // }, [truckSelected])
+    useEffect(() => {
+        setInitTruck(truckSelect);
+        // setValue(ordersSelect)
+    }, [truckSelect])
     const handleClick = (event) => {
         setPendingValue(value);
         setAnchorEl(event.currentTarget);
@@ -40,8 +39,7 @@ const ChoseTruckAndOrders = ({ trucks, setTruckId, truckSelected , orders, order
         setValue(valueTmp);
         setOrdersSelect(valueTmp);
     }
-    console.log("tripTmp1", truckSelected);
-    console.log("tripTmp2", truckSelect);
+    console.log("truckSelect", truckSelect)
     return (
         <>
             <Box className="chose-truck">
@@ -55,7 +53,8 @@ const ChoseTruckAndOrders = ({ trucks, setTruckId, truckSelected , orders, order
                     getOptionLabel={(option) => `${option.truckCode} - ${option.facilityName}`}
                     onChange={(event, values) => {
                         setTruckSelect(values)
-                        setTruckId(values.id)}}
+                        // setTruckId(values.id)}
+                    }}
                     renderInput={(params) => {
                         return (
                             <TextField {...params}
@@ -168,4 +167,4 @@ const ChoseTruckAndOrders = ({ trucks, setTruckId, truckSelected , orders, order
         </>
     )
 }
-export default ChoseTruckAndOrders;
+export default TruckAndOrder;

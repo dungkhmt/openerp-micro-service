@@ -36,7 +36,10 @@ public class TripServiceImpl implements TripService {
         Truck truck = truckRepo.findById(tripModel.getTruckId()).get();
         List<Order> orders = new ArrayList<>();
         tripModel.getOrderIds().forEach((item) -> {
-            orders.add(orderRepo.findById(item).get());
+            Order order = orderRepo.findById(item).get();
+            order.setStatus("SCHEDULED");
+            order = orderRepo.save(order);
+            orders.add(order);
         });
         trip.setShipmentId(shipmentId);
         trip.setTruck(truck);
@@ -86,6 +89,12 @@ public class TripServiceImpl implements TripService {
         List<TripModel> tripModels = new ArrayList<>();
         trips.forEach((item) -> tripModels.add(convertToModel(item)));
         return tripModels;
+    }
+
+    @Override
+    public TripModel getById(long id) {
+        Trip trip = tripRepo.findById(id).get();
+        return convertToModel(trip);
     }
 
     public TripModel convertToModel(Trip trip) {
