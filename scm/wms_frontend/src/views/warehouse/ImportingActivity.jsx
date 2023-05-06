@@ -6,11 +6,11 @@ import CustomToolBar from "components/toolbar/CustomToolBar";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useWindowSize } from "react-use";
+import { Action } from "../../components/action/Action";
 import withScreenSecurity from "../../components/common/withScreenSecurity";
 import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
 import { useGetReceiptBillList } from "../../controllers/query/bill-query";
 import { useGetPurchaseOrderList } from "../../controllers/query/purchase-order-query";
-import { Action } from "../sellin/PurchaseOrder";
 function ImportingActivityScreen({ screenAuthorization }) {
   let { path } = useRouteMatch();
   const [params, setParams] = useState({

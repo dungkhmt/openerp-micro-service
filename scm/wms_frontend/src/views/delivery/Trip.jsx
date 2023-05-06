@@ -5,10 +5,10 @@ import withScreenSecurity from "components/common/withScreenSecurity";
 import { unix } from "moment";
 import { useLocation } from "react-router-dom";
 import { useWindowSize } from "react-use";
+import { Action } from "../../components/action/Action";
 import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
 import { useCreateTripRoute } from "../../controllers/query/delivery-trip-query";
 import { useGetItemsOfTrip } from "../../controllers/query/shipment-query";
-import { Action } from "../sellin/PurchaseOrder";
 function TripScreen({ screenAuthorization }) {
   const location = useLocation();
   const { height } = useWindowSize();

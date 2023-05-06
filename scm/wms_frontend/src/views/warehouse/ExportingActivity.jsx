@@ -6,11 +6,11 @@ import CustomToolBar from "components/toolbar/CustomToolBar";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useWindowSize } from "react-use";
+import { Action } from "../../components/action/Action";
 import withScreenSecurity from "../../components/common/withScreenSecurity";
 import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
 import { useGetDeliveryBillList } from "../../controllers/query/bill-query";
 import { useGetSaleOrderList } from "../../controllers/query/sale-order-query";
-import { Action } from "../sellin/PurchaseOrder";
 import { staticSaleOrderCols } from "./LocalConstant";
 function ExportingActivityScreen({ screenAuthorization }) {
   let { path } = useRouteMatch();

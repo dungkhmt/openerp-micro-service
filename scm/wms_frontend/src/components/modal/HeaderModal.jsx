@@ -1,6 +1,6 @@
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, IconButton, Typography } from "@mui/material";
-import { grey } from "@mui/material/colors";
+import { AppColors } from "../../shared/AppColors";
 /**
  * @typedef Prop
  * @property {Function} onClose
@@ -17,12 +17,9 @@ const HeaderModal = (props) => {
         alignItems: "center",
         justifyContent: "space-between",
         boxShadow: 3,
+        paddingLeft: 2,
         margin: "0px -16px 0 -16px",
-        paddingX: 2,
-        paddingY: 1,
-        marginBottom: 3,
         position: "sticky",
-        top: 0,
         backgroundColor: "white",
         zIndex: 1000,
         ...style,
@@ -31,15 +28,15 @@ const HeaderModal = (props) => {
       <Typography
         id="modal-modal-title"
         variant="h6"
-        textTransform="capitalize"
-        letterSpacing={1}
-        color={grey[800]}
-        fontSize={17}
+        textTransform="uppercase"
+        letterSpacing={1.5}
+        color={AppColors.primary}
+        fontSize={18}
       >
         {title}
       </Typography>
       <IconButton onClick={onClose}>
-        <CloseIcon />
+        <CloseIcon color={"secondary"} />
       </IconButton>
     </Box>
   );

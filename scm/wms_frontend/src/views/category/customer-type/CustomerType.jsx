@@ -12,6 +12,7 @@ import {
   useCreateCustomerType,
   useGetCustomerType,
 } from "../../../controllers/query/category-query";
+import { customerTypeCols } from "../LocalConstant";
 function CustomerTypeScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
@@ -80,27 +81,7 @@ function CustomerTypeScreen({ screenAuthorization }) {
         sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading}
         totalItem={100}
-        columns={[
-          {
-            field: "code",
-            headerName: "Mã code",
-            sortable: false,
-            pinnable: true,
-            minWidth: 200,
-          },
-          {
-            field: "name",
-            headerName: "Loại khách hàng",
-            sortable: false,
-            minWidth: 200,
-          },
-          {
-            field: "",
-            headerName: "Hành động",
-            sortable: false,
-            minWidth: 200,
-          },
-        ]}
+        columns={customerTypeCols}
         rows={data ? data?.content : []}
       />
       <CustomModal

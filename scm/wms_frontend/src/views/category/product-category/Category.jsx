@@ -12,6 +12,7 @@ import {
   useCreateProductCategory,
   useGetProductCateList,
 } from "../../../controllers/query/category-query";
+import { categoryColumns } from "../LocalConstant";
 function ProductCategoryScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
@@ -80,27 +81,7 @@ function ProductCategoryScreen({ screenAuthorization }) {
         sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading}
         totalItem={100}
-        columns={[
-          {
-            field: "code",
-            headerName: "Mã code",
-            sortable: false,
-            pinnable: true,
-            minWidth: 200,
-          },
-          {
-            field: "name",
-            headerName: "Tên danh mục sản phẩm",
-            sortable: false,
-            minWidth: 200,
-          },
-          {
-            field: "",
-            headerName: "Hành động",
-            sortable: false,
-            minWidth: 200,
-          },
-        ]}
+        columns={categoryColumns}
         rows={data ? data?.content : []}
       />
       <CustomModal

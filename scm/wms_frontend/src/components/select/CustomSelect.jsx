@@ -15,6 +15,7 @@ const CustomSelect = (props) => {
     sx,
     renderOption,
     multiple,
+    fullWidth,
     readOnly,
     renderInput,
     refContainer,
@@ -46,6 +47,7 @@ const CustomSelect = (props) => {
       disableCloseOnSelect={multiple ? true : false}
       multiple={multiple ? true : false}
       loading={loading}
+      fullWidth={fullWidth}
       getOptionLabel={(option) => option.name}
       isOptionEqualToValue={(option, value) => option.value == value.value}
       options={options ? options : []}

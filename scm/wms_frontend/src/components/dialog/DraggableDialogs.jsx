@@ -8,6 +8,7 @@ import {
   Paper,
 } from "@mui/material";
 import Draggable from "react-draggable";
+import { AppColors } from "../../shared/AppColors";
 
 function PaperComponent(props) {
   return (
@@ -29,7 +30,7 @@ function PaperComponent(props) {
  * @property {string} message
  * @param {Prop} props
  */
-export default function DraggableDialog(props) {
+export default function DraggableDeleteDialog(props) {
   const { open, handleOpen, title, message, callback, disable } = props;
   return (
     <Dialog
@@ -37,12 +38,15 @@ export default function DraggableDialog(props) {
       PaperComponent={PaperComponent}
       aria-labelledby="draggable-dialog-title"
     >
-      <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
+      <DialogTitle
+        style={{ cursor: "move", color: AppColors.secondary }}
+        id="draggable-dialog-title"
+      >
         {title ? title : "Xác nhận xóa"}
       </DialogTitle>
       <DialogContent>
         <DialogContentText>
-          {message ? message : "Bạn có chắn chắn muốn xóa bản ghi này"}
+          {message ? message : "Bạn có chắn chắn muốn xóa bản ghi này?"}
         </DialogContentText>
       </DialogContent>
       <DialogActions>

@@ -1,4 +1,6 @@
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
+import { AppColors } from "../../shared/AppColors";
+import { ITEM_STATUS_COLOR_MAPPING } from "../../shared/AppConstants";
 
 export const staticProductFields = [
   {
@@ -35,17 +37,36 @@ export const staticWarehouseCols = [
     headerName: "Mã code",
     sortable: false,
     pinnable: true,
+    width: 125,
     minWidth: 150,
+    maxWidth: 200,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>
+          {params?.row?.code}
+        </Typography>
+      );
+    },
   },
   {
     field: "name",
+    headerAlign: "center",
+    align: "center",
     headerName: "Tên kho",
     sortable: false,
-    minWidth: 150,
+    minWidth: 200,
+    maxWidth: 300,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ fontWeight: "500" }}>{params?.row?.name}</Typography>
+      );
+    },
   },
   {
     field: "createdBy",
     headerName: "Người tạo",
+    headerAlign: "center",
+    align: "center",
     sortable: false,
     minWidth: 150,
     valueGetter: (params) => {
@@ -57,9 +78,13 @@ export const staticWarehouseCols = [
     headerName: "Địa chỉ",
     sortable: false,
     pinnable: true,
+    minWidth: 200,
+    maxWidth: 300,
   },
   {
     field: "managedBy",
+    headerAlign: "center",
+    align: "center",
     headerName: "Thủ kho",
     sortable: false,
     minWidth: 150,
@@ -71,11 +96,28 @@ export const staticWarehouseCols = [
     field: "status",
     headerName: "Trạng thái",
     sortable: false,
+    width: 125,
     minWidth: 150,
+    maxWidth: 200,
     renderCell: (params) => {
       return (
-        <Button variant="outlined" color="info">
-          {params?.row?.status}
+        <Button
+          variant="outlined"
+          sx={{
+            borderRadius: "30px",
+            borderWidth: "1px",
+            height: "30px",
+            borderColor: ITEM_STATUS_COLOR_MAPPING[params?.row?.status],
+          }}
+        >
+          <Typography
+            sx={{
+              textTransform: "capitalize",
+              color: ITEM_STATUS_COLOR_MAPPING[params?.row?.status],
+            }}
+          >
+            {params?.row?.status}
+          </Typography>
         </Button>
       );
     },
@@ -135,11 +177,28 @@ export const staticSaleOrderCols = [
     field: "status",
     headerName: "Trạng thái",
     sortable: false,
+    width: 125,
     minWidth: 150,
+    maxWidth: 200,
     renderCell: (params) => {
       return (
-        <Button variant="outlined" color="info">
-          {params?.row?.status}
+        <Button
+          variant="outlined"
+          sx={{
+            borderRadius: "30px",
+            borderWidth: "1px",
+            height: "30px",
+            borderColor: ITEM_STATUS_COLOR_MAPPING[params?.row?.status],
+          }}
+        >
+          <Typography
+            sx={{
+              textTransform: "capitalize",
+              color: ITEM_STATUS_COLOR_MAPPING[params?.row?.status],
+            }}
+          >
+            {params?.row?.status}
+          </Typography>
         </Button>
       );
     },

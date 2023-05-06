@@ -28,9 +28,9 @@ import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
+import { Action } from "../../components/action/Action";
 import CustomSelect from "../../components/select/CustomSelect";
 import { useAssignShipmentToTrip } from "../../controllers/query/shipment-query";
-import { Action } from "../sellin/PurchaseOrder";
 function SplitBillDetailScreen({ screenAuthorization }) {
   const location = useLocation();
   const currBills = location.state.bills;

@@ -1,72 +1,32 @@
 import AddIcon from "@mui/icons-material/Add";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import { Box } from "@mui/material";
+import { Action } from "components/action/Action";
+import withScreenSecurity from "components/common/withScreenSecurity";
+import CustomDataGrid from "components/datagrid/CustomDataGrid";
+import CustomModal from "components/modal/CustomModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useRef, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { useGetCustomerList } from "controllers/query/category-query";
+import { useState } from "react";
 import { useToggle, useWindowSize } from "react-use";
-import withScreenSecurity from "../../../components/common/withScreenSecurity";
-import CustomDataGrid from "../../../components/datagrid/CustomDataGrid";
-import CustomFormControl from "../../../components/form/CustomFormControl";
-import CustomMap from "../../../components/map/CustomMap";
-import CustomModal from "../../../components/modal/CustomModal";
-import {
-  useCreateCustomer,
-  useGetContractType,
-  useGetCustomerList,
-  useGetCustomerType,
-} from "../../../controllers/query/category-query";
-import { useGetFacilityList } from "../../../controllers/query/facility-query";
-import useGeoLocation from "../../../shared/AppHooks";
+import { AppColors } from "shared/AppColors";
+import DraggableDeleteDialog from "../../../components/dialog/DraggableDialogs";
+import CustomDrawer from "../../../components/drawer/CustomDrawer";
+import HeaderModal from "../../../components/modal/HeaderModal";
 import { staticCustomerField } from "../LocalConstant";
+import CreateCustomerForm from "./components/CreateCustomerForm";
 function CustomerScreen({ screenAuthorization }) {
-  const status = [{ name: "active" }, { name: "inactive" }];
   const [params, setParams] = useState({
     page: 1,
     page_size: 50,
   });
   const { height } = useWindowSize();
   const { isLoading, data } = useGetCustomerList();
+  const [isRemove, setIsRemove] = useToggle(false);
+  const [itemSelected, setItemSelected] = useState(null);
+  const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const [isAdd, setIsAdd] = useToggle(false);
-  const mapRef = useRef();
-  const currPos = useGeoLocation();
-  const [currMarker, setCurrMarker] = useState(currPos.coordinates);
-  const methods = useForm({
-    mode: "onChange",
-    defaultValues: {},
-    // resolver: brandSchema,
-  });
-  const {
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setValue,
-    control,
-  } = methods;
-
-  const { isLoading: isLoadingCustomerType, data: customerType } =
-    useGetCustomerType();
-  const { isLoading: isLoadingContractType, data: contractType } =
-    useGetContractType();
-  const { isLoading: isLoadingFacility, data: facility } = useGetFacilityList();
-  const createCustomerQuery = useCreateCustomer();
-
-  const onSubmit = async (data) => {
-    console.log("Data: ", data);
-    let customerParams = {
-      address: data?.address,
-      contractTypeCode: data?.contractType?.code,
-      customerTypeCode: data?.customerType?.code,
-      // facilityCode: data?.facility?.code,
-      status: data?.status?.name,
-      name: data?.name,
-      phone: data?.phone,
-      latitude: data?.map?.lat ? data?.map?.lat : currMarker?.lat,
-      longitude: data?.map?.lng ? data?.map?.lng : currMarker?.lng,
-    };
-    await createCustomerQuery.mutateAsync(customerParams);
-    setIsAdd((pre) => !pre);
-    reset();
-  };
   let actions = [
     {
       title: "Thêm",
@@ -77,62 +37,24 @@ function CustomerScreen({ screenAuthorization }) {
       describe: "Thêm bản ghi mới",
       disabled: false,
     },
+  ];
+  const extraActions = [
     {
       title: "Sửa",
-      callback: () => {
-        console.log("call back");
+      callback: (item) => {
+        setOpenDrawer((pre) => !pre);
       },
-      icon: <AddIcon />,
-      describe: "Thêm bản ghi mới",
-      disabled: false,
-    },
-  ];
-  const fields = [
-    {
-      name: "address",
-      label: "Địa chỉ",
-      type: "text",
-      component: "input",
+      icon: <EditIcon />,
+      color: AppColors.secondary,
     },
     {
-      name: "name",
-      label: "Tên khách hàng",
-      type: "text",
-      component: "input",
-    },
-    {
-      name: "phone",
-      label: "Số điện thoại",
-      type: "text",
-      component: "input",
-    },
-    {
-      name: "customerType",
-      label: "Loại khách hàng",
-      component: "select",
-      options: customerType ? customerType?.content : [],
-      loading: isLoadingCustomerType,
-    },
-    {
-      name: "status",
-      label: "Trạng thái",
-      options: status,
-      loading: false,
-      component: "select",
-    },
-    // {
-    //   name: "facility",
-    //   label: "Kho trực thuộc",
-    //   component: "select",
-    //   options: facility ? facility?.content : [],
-    //   loading: isLoadingFacility,
-    // },
-    {
-      name: "contractType",
-      label: "Loại hợp đồng",
-      component: "select",
-      options: contractType ? contractType?.content : [],
-      loading: isLoadingContractType,
+      title: "Xóa",
+      callback: (item) => {
+        setIsRemove();
+        setItemSelected(item);
+      },
+      icon: <DeleteIcon />,
+      color: AppColors.error,
     },
   ];
   return (
@@ -146,70 +68,50 @@ function CustomerScreen({ screenAuthorization }) {
         sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading}
         totalItem={100}
-        columns={staticCustomerField}
+        columns={[
+          ...staticCustomerField,
+          {
+            field: "action",
+            headerName: "Hành động",
+            headerAlign: "center",
+            align: "center",
+            sortable: false,
+            width: 125,
+            minWidth: 150,
+            maxWidth: 200,
+            type: "actions",
+            getActions: (params) => [
+              ...extraActions.map((extraAction, index) => (
+                <Action
+                  item={params.row}
+                  key={index}
+                  extraAction={extraAction}
+                  onActionCall={extraAction.callback}
+                  disabled={false}
+                />
+              )),
+            ],
+          },
+        ]}
         rows={data ? data?.content : []}
       />
       <CustomModal
         open={isAdd}
         toggle={setIsAdd}
         size="sm"
-        style={{ padding: 2 }}
+        title="Thêm khách hàng"
       >
-        <FormProvider {...methods}>
-          {/* <Stack spacing={2}> */}
-          <CustomFormControl
-            control={control}
-            errors={errors}
-            fields={fields}
-          />
-          <Typography>Lấy vị trí</Typography>
-          <Stack direction={"row"}>
-            <Controller
-              key={"map"}
-              control={control}
-              name={"map"}
-              render={({ field: { onChange, value } }) => (
-                <CustomMap
-                  style={{ width: "30vw", height: "30vh" }}
-                  location={currPos}
-                  mapRef={mapRef}
-                  onChange={(currLoc) => {
-                    setCurrMarker(currLoc);
-                  }}
-                />
-              )}
-            />
-            <Stack direction={"column"}>
-              <Button
-                onClick={() => {
-                  setValue("map", currMarker);
-                }}
-                variant="contained"
-                style={{
-                  margin: "20px 20px",
-                  color: "white",
-                  maxWidth: 100,
-                  maxHeight: 40,
-                }}
-              >
-                Lấy vị trí
-              </Button>
-              <Typography>{`${currMarker.lat}, ${currMarker.lng}`}</Typography>
-            </Stack>
-          </Stack>
-          {/* </Stack> */}
-        </FormProvider>
-        <Button
-          onClick={handleSubmit(onSubmit)}
-          variant="contained"
-          style={{ margin: "20px 20px", color: "white" }}
-        >
-          Submit
-        </Button>
-        <Button onClick={() => reset()} variant={"outlined"}>
-          Reset
-        </Button>
+        <CreateCustomerForm setIsAdd={setIsAdd} />
       </CustomModal>
+      <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
+        <HeaderModal onClose={setOpenDrawer} title="Sửa thông tin khách hàng" />
+      </CustomDrawer>
+      <DraggableDeleteDialog
+        // disable={isLoadingRemove}
+        open={isRemove && itemSelected}
+        handleOpen={setIsRemove}
+        callback={(flag) => {}}
+      />
     </Box>
   );
 }

@@ -1,5 +1,6 @@
-import { Box, Modal, Slide } from "@mui/material";
-
+import CloseIcon from "@mui/icons-material/Close";
+import { Box, IconButton, Modal, Slide, Typography } from "@mui/material";
+import { AppColors } from "../../shared/AppColors";
 const styleDefault = {
   maxHeight: "80vh",
   overflowY: "auto",
@@ -15,12 +16,13 @@ const styleDefault = {
  * @property {any} children
  * @property {any} toggle
  * @property {"xs" | "sm" | "md" | "lg" | "xl"} size
+ * @property {string} title
  * @property {import("@mui/material").SxProps} style
  * @param {Prop} props
  */
 
 const CustomModal = (props) => {
-  const { open, style, children, toggle, size } = props;
+  const { open, style, children, toggle, size, title } = props;
   return (
     <Modal
       onClose={() => (toggle ? toggle() : undefined)}
@@ -49,6 +51,33 @@ const CustomModal = (props) => {
                 : "90vw",
           }}
         >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              // boxShadow: 3,
+              paddingLeft: 2,
+              margin: "0px -16px 10px -16px",
+              position: "sticky",
+              backgroundColor: "white",
+              zIndex: 1000,
+            }}
+          >
+            <Typography
+              id="modal-modal-title"
+              variant="h6"
+              textTransform="uppercase"
+              letterSpacing={1.5}
+              color={AppColors.primary}
+              fontSize={18}
+            >
+              {title}
+            </Typography>
+            <IconButton onClick={() => (toggle ? toggle() : undefined)}>
+              <CloseIcon color={"secondary"} />
+            </IconButton>
+          </Box>
           {children}
         </Box>
       </Slide>

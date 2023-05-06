@@ -1,4 +1,11 @@
-import { Box, Button, IconButton, Stack, Tooltip } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import { useDebounce, useMeasure } from "react-use";
 import SearchBox from "../searchbox/SearchBox";
@@ -15,8 +22,7 @@ const CustomToolBar = ({ actions }) => {
 
   return (
     <Box ref={ref} sx={{ paddingY: 2 }}>
-      <Stack direction={"row"} spacing={2}>
-        <SearchBox value={keyword} setValue={setKeyword} />
+      <Stack direction={"row-reverse"} spacing={2}>
         <Stack
           direction="row"
           spacing={width < 900 ? 0 : 2}
@@ -73,7 +79,15 @@ const CustomToolBar = ({ actions }) => {
                         onChange={(e) => action.callback(e)}
                       />
                     ) : null}
-                    {action.title ? action.title : null}
+                    <Typography
+                      sx={{
+                        fontSize: 14,
+                        fontWeight: "bold",
+                        color: "white",
+                      }}
+                    >
+                      {action.title ? action.title : null}
+                    </Typography>
                   </>
                 </Tooltip>
               </Button>
@@ -81,6 +95,13 @@ const CustomToolBar = ({ actions }) => {
           )}
         </Stack>
       </Stack>
+      <Box sx={{ flexDirection: "row", alignItems: "flex-end" }}>
+        <SearchBox
+          value={keyword}
+          setValue={setKeyword}
+          sx={{ marginTop: 2 }}
+        />
+      </Box>
     </Box>
   );
 };

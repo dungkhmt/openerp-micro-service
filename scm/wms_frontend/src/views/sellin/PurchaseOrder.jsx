@@ -1,14 +1,8 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import {
-  Box,
-  Button,
-  IconButton,
-  InputBase,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Box, Button, InputBase, Typography } from "@mui/material";
+import { Action } from "components/action/Action";
 import PrimaryButton from "components/button/PrimaryButton";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
@@ -280,16 +274,3 @@ function PurchaseOrderScreen({ screenAuthorization }) {
 
 const SCR_ID = "SCR_PURCHASE_ORDER";
 export default withScreenSecurity(PurchaseOrderScreen, SCR_ID, true);
-export const Action = ({ extraAction, item, disabled, onActionCall }) => {
-  return (
-    <IconButton
-      size="small"
-      disabled={disabled}
-      onClick={() => {
-        onActionCall(item);
-      }}
-    >
-      <Tooltip title={extraAction.title}>{extraAction.icon}</Tooltip>
-    </IconButton>
-  );
-};

@@ -3,25 +3,25 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box, Button, Stack, Typography } from "@mui/material";
-import { green } from "@mui/material/colors";
-import { useRef, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
-import { useToggle, useWindowSize } from "react-use";
-import withScreenSecurity from "../../components/common/withScreenSecurity";
-import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
-import CustomDrawer from "../../components/drawer/CustomDrawer";
-import CustomFormControl from "../../components/form/CustomFormControl";
-import CustomMap from "../../components/map/CustomMap";
-import CustomModal from "../../components/modal/CustomModal";
-import CustomToolBar from "../../components/toolbar/CustomToolBar";
+import withScreenSecurity from "components/common/withScreenSecurity";
+import CustomDataGrid from "components/datagrid/CustomDataGrid";
+import CustomDrawer from "components/drawer/CustomDrawer";
+import CustomFormControl from "components/form/CustomFormControl";
+import CustomMap from "components/map/CustomMap";
+import CustomModal from "components/modal/CustomModal";
+import HeaderModal from "components/modal/HeaderModal";
+import CustomToolBar from "components/toolbar/CustomToolBar";
 import {
   useCreateFacility,
   useGetFacilityInventory,
   useGetFacilityList,
-} from "../../controllers/query/facility-query";
-import { useGetAllUsersExist } from "../../controllers/query/user-query";
-import useGeoLocation from "../../shared/AppHooks";
-import { Action } from "../sellin/PurchaseOrder";
+} from "controllers/query/facility-query";
+import { useGetAllUsersExist } from "controllers/query/user-query";
+import { useRef, useState } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
+import { useToggle, useWindowSize } from "react-use";
+import useGeoLocation from "shared/AppHooks";
+import { Action } from "../../components/action/Action";
 import { staticProductFields, staticWarehouseCols } from "./LocalConstant";
 
 function FacilityScreen({ screenAuthorization }) {
@@ -180,36 +180,8 @@ function FacilityScreen({ screenAuthorization }) {
         ]}
         rows={data ? data?.content : []}
       />
-      <CustomDrawer
-        open={isOpenDrawer}
-        onClose={setOpenDrawer}
-        // style={{ zIndex: 1000 }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            boxShadow: 3,
-            margin: "0px -16px 0 -16px",
-            paddingX: 2,
-            paddingY: 1,
-            position: "sticky",
-            backgroundColor: "white",
-            zIndex: 1000,
-          }}
-        >
-          <Typography
-            id="modal-modal-title"
-            variant="h6"
-            textTransform="capitalize"
-            letterSpacing={1}
-            color={green[800]}
-            fontSize={17}
-          >
-            {"TỒN KHO"}
-          </Typography>
-        </Box>
+      <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
+        <HeaderModal onClose={setOpenDrawer} title="Tồn kho" />
         <CustomDataGrid
           isSelectable={false}
           params={params}

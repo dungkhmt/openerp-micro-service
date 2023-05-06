@@ -1,4 +1,5 @@
 import { CssBaseline, SvgIcon, Typography } from "@mui/material";
+import { viVN } from "@mui/material/locale";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Box } from "@mui/system";
 import { ReactKeycloakProvider } from "@react-keycloak/web";
@@ -21,48 +22,51 @@ import { notificationState } from "state/NotificationState";
 import { ReactComponent as Logo } from "./assets/icons/logo.svg";
 import history from "./history.js";
 import { AppColors } from "./shared/AppColors";
-export const theme = createTheme({
-  typography: {
-    fontFamily: `-apple-system, "Segoe UI", BlinkMacSystemFont, "Roboto", "Oxygen",
+export const theme = createTheme(
+  {
+    typography: {
+      fontFamily: `-apple-system, "Segoe UI", BlinkMacSystemFont, "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif`,
-    fontSize: 14,
-  },
-  overrides: {
-    MuiCssBaseline: {
-      "@global": {
-        // "*, *::before, *::after": {
-        //   boxSizing: "content-box",
-        // },
-        // body: {
-        //   height: "100%",
-        //   backgroundColor: "#fff",
-        // },
+      fontSize: 14,
+    },
+    overrides: {
+      MuiCssBaseline: {
+        "@global": {
+          // "*, *::before, *::after": {
+          //   boxSizing: "content-box",
+          // },
+          // body: {
+          //   height: "100%",
+          //   backgroundColor: "#fff",
+          // },
+        },
+      },
+    },
+    palette: {
+      primary: {
+        main: AppColors.primary,
+        light: AppColors.primary,
+      },
+      secondary: {
+        main: AppColors.secondary,
+      },
+      error: {
+        main: AppColors.error,
+      },
+      success: {
+        main: AppColors.success,
+      },
+      warning: {
+        main: AppColors.warning,
+      },
+      info: {
+        main: AppColors.info,
       },
     },
   },
-  palette: {
-    primary: {
-      main: AppColors.primary,
-      light: AppColors.primary,
-    },
-    secondary: {
-      main: AppColors.secondary,
-    },
-    error: {
-      main: AppColors.error,
-    },
-    success: {
-      main: AppColors.success,
-    },
-    warning: {
-      main: AppColors.warning,
-    },
-    info: {
-      main: AppColors.info,
-    },
-  },
-});
+  viVN
+);
 
 console.log(
   "%c\n\n \u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2588\u2557  \u2588\u2588\u2557\u2003\u2003\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2588\u2588\u2588\u2588\u2557\n\u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2557\u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2557\u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255D\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2551\u2003\u2003\u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255D\u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2557\u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2557\n\u2588\u2588\u2551  \u2588\u2588\u2551\u2588\u2588\u2588\u2588\u2588\u2588\u2554\u255D\u2588\u2588\u2588\u2588\u2588\u2557  \u2588\u2588\u2554\u2588\u2588\u2557\u2588\u2588\u2551\u2003\u2003\u2588\u2588\u2588\u2588\u2588\u2557  \u2588\u2588\u2588\u2588\u2588\u2588\u2554\u255D\u2588\u2588\u2588\u2588\u2588\u2588\u2554\u255D\n\u2588\u2588\u2551  \u2588\u2588\u2551\u2588\u2588\u2554\u2550\u2550\u2550\u255D \u2588\u2588\u2554\u2550\u2550\u255D  \u2588\u2588\u2551\u255A\u2588\u2588\u2588\u2588\u2551\u2003\u2003\u2588\u2588\u2554\u2550\u2550\u255D  \u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2557\u2588\u2588\u2554\u2550\u2550\u2550\u255D\n\u255A\u2588\u2588\u2588\u2588\u2588\u2554\u255D\u2588\u2588\u2551     \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2551 \u255A\u2588\u2588\u2588\u2551\u2003\u2003\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2551  \u2588\u2588\u2551\u2588\u2588\u2551\n \u255A\u2550\u2550\u2550\u2550\u255D \u255A\u2550\u255D     \u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D\u255A\u2550\u255D  \u255A\u2550\u2550\u255D\u2003\u2003\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D\u255A\u2550\u255D  \u255A\u2550\u255D\u255A\u2550\u255D\n\n",

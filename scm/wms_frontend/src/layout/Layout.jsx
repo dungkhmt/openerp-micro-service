@@ -119,9 +119,9 @@ function Layout({ children }) {
           <Typography sx={styles.appName} variant="h6" noWrap>
             Open ERP
           </Typography>
-
           {/* Use this div tag to push the icons to the right */}
           <div style={{ flexGrow: 1 }} />
+          <CustomBreadcrumbs />
           <Box sx={styles.sectionDesktop}>
             {keycloak.authenticated && (
               <>
@@ -135,7 +135,6 @@ function Layout({ children }) {
       <SideBar open={open} image={image} color={color} />
       <Main isOpen={open}>
         <Offset />
-        <CustomBreadcrumbs />
         <Box
           sx={{
             marginX: 2,

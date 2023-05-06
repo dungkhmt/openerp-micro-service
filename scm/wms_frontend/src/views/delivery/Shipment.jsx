@@ -17,7 +17,7 @@ import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
-import { Action } from "../sellin/PurchaseOrder";
+import { Action } from "../../components/action/Action";
 function ShipmentScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,

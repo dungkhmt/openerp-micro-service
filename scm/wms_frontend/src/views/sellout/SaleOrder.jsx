@@ -1,14 +1,7 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import {
-  Box,
-  Button,
-  IconButton,
-  InputBase,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Box, Button, InputBase, Typography } from "@mui/material";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomFormControl from "components/form/CustomFormControl";
@@ -21,6 +14,7 @@ import {
 import { useState } from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { useToggle, useWindowSize } from "react-use";
+import { Action } from "../../components/action/Action";
 import PrimaryButton from "../../components/button/PrimaryButton";
 import CustomizedDialogs from "../../components/dialog/CustomizedDialogs";
 import {
@@ -281,16 +275,3 @@ function SaleOrderScreen({ screenAuthorization }) {
 
 const SCR_ID = "SCR_PURCHASE_ORDER";
 export default withScreenSecurity(SaleOrderScreen, SCR_ID, true);
-export const Action = ({ extraAction, item, disabled, onActionCall }) => {
-  return (
-    <IconButton
-      size="small"
-      disabled={disabled}
-      onClick={() => {
-        onActionCall(item);
-      }}
-    >
-      <Tooltip title={extraAction.title}>{extraAction.icon}</Tooltip>
-    </IconButton>
-  );
-};

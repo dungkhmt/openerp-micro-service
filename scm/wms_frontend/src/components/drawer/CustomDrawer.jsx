@@ -21,7 +21,7 @@ const CustomDrawer = (props) => {
     open,
     style,
     hideFooter,
-    size = "sm",
+    size,
     loading,
   } = props;
   return (
@@ -39,7 +39,7 @@ const CustomDrawer = (props) => {
               ? "70vw"
               : "50vw",
           minHeight: "100%",
-          px: 3,
+          px: 2,
           ...style,
         }}
       >

@@ -25,7 +25,6 @@ import { useCallback, useState } from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
-import { AppColors } from "shared/AppColors";
 import { CustomDatePicker } from "../../components/datepicker/CustomDatePicker";
 
 function PurchaseOrderDetailScreen({}) {
@@ -203,35 +202,6 @@ function PurchaseOrderDetailScreen({}) {
   }, [orderItem, billItem]);
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          boxShadow: 3,
-          margin: "0px -16px 0 -16px",
-          paddingX: 2,
-          paddingY: 1,
-          position: "sticky",
-          backgroundColor: "white",
-          zIndex: 1000,
-        }}
-      >
-        <Typography
-          id="modal-modal-title"
-          variant="h6"
-          textTransform="capitalize"
-          letterSpacing={1}
-          fontSize={18}
-          sx={{
-            fontFamily: "Open Sans",
-            color: AppColors.primary,
-            fontWeight: "bold",
-          }}
-        >
-          {"CHI TIẾT ĐƠN HÀNG"}
-        </Typography>
-      </Box>
       <Box>
         <CustomToolBar actions={actions} />
       </Box>

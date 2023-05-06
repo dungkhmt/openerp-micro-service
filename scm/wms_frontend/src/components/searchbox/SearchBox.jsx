@@ -1,15 +1,20 @@
 import SearchIcon from "@mui/icons-material/Search";
-import { AppColors } from "../../shared/AppColors";
 const { styled, InputBase } = require("@mui/material");
 
 const Search = styled("div")(({ theme }) => ({
-  backgroundColor: AppColors.secondary,
-  borderRadius: "6px",
-  flex: 1,
-  flexDirection: "row",
+  // backgroundColor: AppColors.secondary,
+  borderRadius: "10px",
+  borderStyle: "solid",
+  borderLeftWidth: "0px",
+  borderRightWidth: "0px",
+  borderTopWidth: "0px",
+  borderBottomWidth: "1px",
+  borderBottomRightRadius: 0,
+  borderBottomLeftRadius: 0,
+  borderColor: "gray",
   position: "relative",
   [theme.breakpoints.up("sm")]: {
-    width: "auto",
+    width: "30%",
   },
 }));
 const SearchIconWrapper = styled("div")(({ theme }) => ({
@@ -23,16 +28,16 @@ const Input = styled(InputBase)(({ theme }) => ({
   width: "100%",
   color: "inherit",
   "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
+    // padding: theme.spacing(1, 1, 1, 0),
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create("width"),
   },
 }));
-const SearchBox = ({ value, setValue }) => {
+const SearchBox = ({ value, setValue, sx }) => {
   return (
-    <Search>
+    <Search sx={sx}>
       <SearchIconWrapper>
-        <SearchIcon sx={{ color: "white" }} />
+        <SearchIcon sx={{ color: "grey" }} />
       </SearchIconWrapper>
       <Input
         placeholder="Tìm kiếm"
@@ -41,9 +46,11 @@ const SearchBox = ({ value, setValue }) => {
         inputProps={{
           "aria-label": "search",
         }}
-        sx={{
-          color: "white",
-        }}
+        sx={
+          {
+            // color: "white",
+          }
+        }
       />
     </Search>
   );

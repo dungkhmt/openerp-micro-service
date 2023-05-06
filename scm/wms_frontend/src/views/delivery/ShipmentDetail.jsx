@@ -19,8 +19,8 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
+import { Action } from "../../components/action/Action";
 import { useGetFacilityList } from "../../controllers/query/facility-query";
-import { Action } from "../sellin/PurchaseOrder";
 function ShipmentDetailScreen() {
   const location = useLocation();
   const history = useHistory();

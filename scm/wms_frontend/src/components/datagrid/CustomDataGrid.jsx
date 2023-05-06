@@ -1,55 +1,27 @@
-import {
-  LinearProgress,
-  Pagination,
-  PaginationItem,
-  gridClasses,
-} from "@mui/material";
-import { grey } from "@mui/material/colors";
-import {
-  DataGrid,
-  gridPageCountSelector,
-  gridPageSelector,
-  useGridApiContext,
-  useGridSelector,
-} from "@mui/x-data-grid";
+import { LinearProgress, Typography, gridClasses } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import { AppColors } from "../../shared/AppColors";
 
-/**
- * @typedef Prop
- * @property {any[]} rows
- * @property {import("@mui/x-data-grid").GridColDef[]} columns
- * @property {number} totalItem
- * @property {{page: number, pageSize: number}} params
- * @property {import("@mui/x-data-grid/models/gridStateCommunity").GridInitialStateCommunity} initialState
- * @property {boolean} isLoading
- * @property {Function} setParams - (data) => void
- * @property {Function} onSelectionChange - (ids) => void
- * @property {any} selectionModel
- * @property {import("@mui/x-data-grid").GridColumnGroupingModel} columnGroupingModel
- * @property {"small" | "other"} size
- * @property {import("@mui/material").SxProps} sx
- * @param {Prop} props
- */
-function CustomPagination() {
-  const apiRef = useGridApiContext();
-  const page = useGridSelector(apiRef, gridPageSelector);
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
+// function CustomPagination() {
+//   const apiRef = useGridApiContext();
+//   const page = useGridSelector(apiRef, gridPageSelector);
+//   const pageCount = useGridSelector(apiRef, gridPageCountSelector);
 
-  return (
-    <Pagination
-      color="secondary"
-      variant="text"
-      shape="circular"
-      page={page + 1}
-      count={pageCount}
-      showFirstButton
-      showLastButton
-      siblingCount={4}
-      // @ts-expect-error
-      renderItem={(props2) => <PaginationItem {...props2} disableRipple />}
-      onChange={(event, value) => apiRef.current.setPage(value - 1)}
-    />
-  );
-}
+//   return (
+//     <Pagination
+//       color="secondary"
+//       variant="text"
+//       shape="circular"
+//       page={page + 1}
+//       count={pageCount}
+//       showFirstButton
+//       showLastButton
+//       siblingCount={4}
+//       renderItem={(props2) => <PaginationItem {...props2} disableRipple />}
+//       onChange={(event, value) => apiRef.current.setPage(value - 1)}
+//     />
+//   );
+// }
 
 const getColumnsShow = (columns, isSerial, params) => {
   let columnsRaw = columns || [];
@@ -59,8 +31,11 @@ const getColumnsShow = (columns, isSerial, params) => {
       {
         field: "idx",
         headerName: "STT",
-        renderCell: (index) =>
-          index.row.id + 1 + (params.page - 1) * params.pageSize,
+        renderCell: (index) => (
+          <Typography sx={{ fontWeight: "500" }}>
+            {index.row.id + 1 + (params.page - 1) * params.pageSize}
+          </Typography>
+        ),
         sortable: false,
         width: 50,
       },
@@ -75,7 +50,7 @@ const getColumnsShow = (columns, isSerial, params) => {
  * @property {boolean} isSerial
  * @property {boolean} isSelectable
  * @property {import("@mui/x-data-grid").GridRowProps[]} rows
- * @property {any[]} columns
+ * @property {import("@mui/x-data-grid").GridColDef[]} columns
  * @property {number} totalItem
  * @property {import("@mui/x-data-grid/models/gridStateCommunity").GridInitialStateCommunity} initialState
  * @property {{page: number, pageSize: number}} params
@@ -152,23 +127,31 @@ const CustomDataGrid = (props) => {
         }))
       }
       // styling
-      slots={{
-        // toolbar: GridToolbar,
-        pagination: CustomPagination,
-      }}
+      slots={
+        {
+          // toolbar: GridToolbar,
+          // pagination: CustomPagination,
+        }
+      }
       autoHeight
-      getRowHeight={() => "auto"}
-      rowHeight={sizeDefault === "small" ? 40 : 50}
-      headerHeight={sizeDefault === "small" ? 40 : 50}
+      // getRowHeight={() => "auto"}
+      rowHeight={sizeDefault === "small" ? 50 : 60}
+      headerHeight={sizeDefault === "small" ? 50 : 60}
       sx={{
         borderLeft: 0,
         borderRight: 0,
+        ".MuiDataGrid-columnHeader": {
+          background: "#Dbeef4",
+        },
         ".MuiDataGrid-iconSeparator": {
           visibility: "hidden",
         },
         ".MuiDataGrid-columnHeaderTitle": {
-          fontWeight: 600,
-          color: grey[900],
+          fontWeight: "600",
+          fontFamily: "inherit",
+          color: AppColors.primary,
+          fontSize: 14,
+          textTransform: "uppercase",
         },
         ".MuiDataGrid-actionsCell": {
           gridGap: 0,
