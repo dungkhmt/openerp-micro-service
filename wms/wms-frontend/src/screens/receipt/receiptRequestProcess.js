@@ -5,7 +5,7 @@ import { useRouteMatch } from "react-router-dom";
 import { Box, Button, Grid, Modal, TextField, Typography } from "@mui/material";
 import { request } from "api";
 import { API_PATH } from "../apiPaths";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { convertTimeStampToDate } from "../utils/utils";
 import { BayDropDown, WarehouseDropDown } from "components/table/DropDown";
 import { errorNoti, successNoti } from "utils/notification";
@@ -22,6 +22,9 @@ const ProcessItem = ( { rowData, warehousesDetail, setProcessingItems,
   const [selectedWarehouseName, setSelectedWarehouseName] = useState(null);
   const [selectedWarehouse, setSelectedWarehouse] = useState(null);
   const [addedItemCount, setAddedItemCount] = useState(0);
+  const [newLotId, setNewLotId] = useState(null);
+  const [newImportPrice, setNewImportPrice] = useState(0);
+  const [newQuantity, setNewQuantity] = useState(0);
 
   useEffect(() => {
     for (var i = 0; i < warehousesDetail?.length; i++) {
@@ -55,27 +58,38 @@ const ProcessItem = ( { rowData, warehousesDetail, setProcessingItems,
     setRemainingItems(newRemainingItems);
   }
 
-  console.log("Process item => ", warehousesDetail);
   return <Box>
     <Button variant="contained" className={classes.addButton} 
       onClick={saveButtonHandle}>Lưu</Button>
     <StandardTable
+      rowKey="warehouseName"
       hideCommandBar={true}
       title={`${rowData.productName} - Tổng số lượng cần xử lý ${rowData.quantity}`}
       columns={[
         { title: "Kho nhận *", field: "warehouseName",
-          editComponent: props => <WarehouseDropDown
+          editComponent: <WarehouseDropDown
             warehouseList={warehousesDetail}
             setSelectedWarehouseId={setSelectedWarehouseId}
             setSelectedWarehouseName={setSelectedWarehouseName} /> },
         { title: "Kệ hàng *", field: "bayCode",
-          editComponent: props => <BayDropDown
+          editComponent: <BayDropDown
             selectedWarehouse={selectedWarehouse}
             setSelectedBayId={setSelectedBayId}
             setSelectedBayCode={setSelectedBayCode} /> },
-        { title: "Số lô *", field: "lotId" },
-        { title: "Giá nhập hàng *", field: "importPrice", type: "numeric", min: 0, max: 5 },
-        { title: "Số lượng *", field: "quantity", type: "numeric" },
+        { title: "Số lô *", field: "lotId",
+          editComponent: <TextField 
+                          value={newLotId} 
+                          onChange={(e) => setNewLotId(e.target.value)}/> },
+        { title: "Giá nhập hàng *", field: "importPrice", type: "numeric", 
+          editComponent: <TextField 
+                          value={newImportPrice} 
+                          onChange={(e) => setNewImportPrice(e.target.value)} 
+                          type={"number"} /> },
+        { title: "Số lượng *", field: "quantity", type: "numeric",
+          editComponent: <TextField 
+                          value={newQuantity} 
+                          onChange={(e) => setNewQuantity(e.target.value)} 
+                          type={"number"} /> },
       ]}
       options={{
         selection: false,
@@ -88,9 +102,10 @@ const ProcessItem = ( { rowData, warehousesDetail, setProcessingItems,
         onRowAdd: newData => new Promise((resolve, reject) => {
           setTimeout(() => {
             // validate new row data
-            console.log("New data => ", newData);
             const adder = {
-              ...newData,
+              lotId: newLotId,
+              importPrice: newImportPrice,
+              quantity: newQuantity,
               bayCode: selectedBayCode,
               warehouseName: selectedWarehouseName,
               warehouseId: selectedWarehouseId,
@@ -121,11 +136,11 @@ const ProcessItem = ( { rowData, warehousesDetail, setProcessingItems,
             resolve();
           }, 500);
         }),
-        onRowDelete: oldData => new Promise((resolve, reject) => {
-          const dataDelete = [...localProcessingItems];
-          const index = oldData.tableData.id;
-          dataDelete.splice(index, 1);
-          setLocalProcessingItems([...dataDelete]);
+        onRowDelete: selectedIds => new Promise((resolve, reject) => {
+          // const dataDelete = [...localProcessingItems];
+          // const index = oldData.tableData.id;
+          // dataDelete.splice(index, 1);
+          // setLocalProcessingItems([...dataDelete]);
           resolve();
         })
       }}
@@ -232,7 +247,7 @@ const ReceiptRequestProcess = ( props ) => {
         top: '50%',
         left: '50%',
         width: '75%',
-        height: '50%',
+        height: '70%',
         transform: 'translate(-50%, -50%)',
         bgcolor: 'background.paper',
         border: '2px solid #000',
@@ -363,24 +378,22 @@ const ReceiptRequestProcess = ( props ) => {
                       { title: "Sản phẩm", field: "productName" },
                       { title: "Số lượng", field: "quantity" },
                       { title: "Kho nhận hàng (nếu có)", field: "warehouseName" },
-                      { title: "", fileds: "productId",
-                        render: (rowData) =>
-                          <Button variant="contained" className={classes.addButton}
-                          onClick={() => {
-                            setRowData4ProcessItem(rowData);
-                            // TODO: set warehouse 4 process item
-                            if (rowData.warehouseId != null) {
-                              for (var i = 0; i < warehouseList?.length; i++) {
-                                if (warehouseList[i].id == rowData.warehouseId) {
-                                  setWarehousesDetail4ProcessItem([warehouseList[i]]);
-                                  break;
-                                }
+                      { title: "", fields: "productId",
+                        buttonOnclickHandle: (rowData) => {
+                          setRowData4ProcessItem(rowData);
+                          // TODO: set warehouse 4 process item
+                          if (rowData.warehouseId != null) {
+                            for (var i = 0; i < warehouseList?.length; i++) {
+                              if (warehouseList[i].id == rowData.warehouseId) {
+                                setWarehousesDetail4ProcessItem([warehouseList[i]]);
+                                break;
                               }
-                            } else {
-                              setWarehousesDetail4ProcessItem(warehouseList);
                             }
-                            setOpenProcessModal(true);
-                          }}>Xử lý</Button>
+                          } else {
+                            setWarehousesDetail4ProcessItem(warehouseList);
+                          }
+                          setOpenProcessModal(true);
+                        }
                       }
                     ]}
                     data={remainingItems}
@@ -412,34 +425,34 @@ const ReceiptRequestProcess = ( props ) => {
                       sorting: true,
                     }}
                     hideCommandBar={true}
-                    editable={{
-                      onRowDelete: oldData => new Promise((resolve, reject) => {
-                        // delete record from this table
-                        const dataDelete = [...processingItems];
-                        const index = oldData.tableData.id;
-                        dataDelete.splice(index, 1);
-                        setProcessingItems([...dataDelete]);
-                        // update quantity from remaining item table
-                        console.log("Old data => ", oldData);
-                        var remainingItemTemp = remainingItems;
-                        var quantityUpdated = false;
-                        for (var i = 0; i < remainingItemTemp?.length; i++) {
-                          if (remainingItemTemp[i]?.receiptItemRequestId == oldData.receiptItemRequestId) {
-                            const newQuantity = remainingItemTemp[i].quantity + oldData.quantity;
-                            remainingItemTemp[i].quantity = newQuantity;
-                            quantityUpdated = true;
-                            break;
-                          }
-                        }
-                        if (!quantityUpdated) {
-                          // restore record if needed
-                          setRemainingItems([...remainingItems, oldData]);
-                        } else {
-                          setRemainingItems(remainingItemTemp);
-                        }
-                        resolve();
-                      })
-                    }}
+                    // editable={{
+                    //   onRowDelete: oldData => new Promise((resolve, reject) => {
+                    //     // delete record from this table
+                    //     const dataDelete = [...processingItems];
+                    //     const index = oldData.tableData.id;
+                    //     dataDelete.splice(index, 1);
+                    //     setProcessingItems([...dataDelete]);
+                    //     // update quantity from remaining item table
+                    //     console.log("Old data => ", oldData);
+                    //     var remainingItemTemp = remainingItems;
+                    //     var quantityUpdated = false;
+                    //     for (var i = 0; i < remainingItemTemp?.length; i++) {
+                    //       if (remainingItemTemp[i]?.receiptItemRequestId == oldData.receiptItemRequestId) {
+                    //         const newQuantity = remainingItemTemp[i].quantity + oldData.quantity;
+                    //         remainingItemTemp[i].quantity = newQuantity;
+                    //         quantityUpdated = true;
+                    //         break;
+                    //       }
+                    //     }
+                    //     if (!quantityUpdated) {
+                    //       // restore record if needed
+                    //       setRemainingItems([...remainingItems, oldData]);
+                    //     } else {
+                    //       setRemainingItems(remainingItemTemp);
+                    //     }
+                    //     resolve();
+                    //   })
+                    // }}
                   />
                 </Box>
               </Box>

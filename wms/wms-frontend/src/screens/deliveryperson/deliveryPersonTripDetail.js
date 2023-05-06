@@ -3,7 +3,7 @@ import { Box, Button, Grid, MenuItem, Modal, Select,
   TextField, Typography } from "@mui/material";
 import { request } from "api";
 import { RouteMap } from 'components/map/maps';
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { useEffect, useState } from "react";
 import { API_PATH } from "screens/apiPaths";
 import useStyles from 'screens/styles.js';
@@ -88,10 +88,10 @@ const DeliveryPersonTripDetail = ( props ) => {
     )
   }
 
-  const doneItemsButtonHandle = () => {
-    const selectedItemIds = deliveryItemsTableData
-      .filter((item) => item.tableData.checked == true)
-      .map((obj) => obj.deliveryTripItemId);
+  const doneItemsButtonHandle = (selectedItemIds) => {
+    // const selectedItemIds = deliveryItemsTableData
+    //   .filter((item) => item.tableData.checked == true)
+    //   .map((obj) => obj.deliveryTripItemId);
     console.log("Selected item to mark done => ", selectedItemIds);
     request(
       "put",
@@ -106,10 +106,10 @@ const DeliveryPersonTripDetail = ( props ) => {
     )
   }
 
-  const failItemsButtonHandle = () => {
-    const selectedItemIds = deliveryItemsTableData
-      .filter((item) => item.tableData.checked == true)
-      .map((obj) => obj.deliveryTripItemId);
+  const failItemsButtonHandle = (selectedItemIds) => {
+    // const selectedItemIds = deliveryItemsTableData
+    //   .filter((item) => item.tableData.checked == true)
+    //   .map((obj) => obj.deliveryTripItemId);
     console.log("Selected item to mark fail => ", selectedItemIds);
     request(
       "put",
@@ -326,6 +326,7 @@ const DeliveryPersonTripDetail = ( props ) => {
       </Box>
 
       <StandardTable
+        rowKey="deliveryTripItemId"
         title="Danh sách sản phẩm"
         hideCommandBar={isHideCommandBar}
         columns={[
@@ -347,17 +348,18 @@ const DeliveryPersonTripDetail = ( props ) => {
           sorting: true,
         }}
         onSelectionChange={onSelectionChangeHandle}
-        commandBarComponents={ tripInfo?.deliveryTripStatusCode == 'DELIVERING' &&<Box display="flex" gap={2}>
-          <CommandBarButton onClick={doneItemsButtonHandle}>
-              Giao thành công
-          </CommandBarButton>
-
-          <CommandBarButton 
-            onClick={failItemsButtonHandle}>
-              Giao thất bại
-          </CommandBarButton>
-        </Box> }
         data={deliveryItemsTableData}
+        actions={tripInfo?.deliveryTripStatusCode == 'DELIVERING' && [
+          {
+            tooltip: "Giao thành công",
+            iconOnClickHandle: doneItemsButtonHandle
+          },
+          {
+            tooltip: "Giao thất bại",
+            iconOnClickHandle: failItemsButtonHandle
+          }
+        ]}
+        deletable={false}
       />
     </Box>
   </Fragment>

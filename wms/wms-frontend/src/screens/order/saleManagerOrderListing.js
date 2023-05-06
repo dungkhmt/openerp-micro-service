@@ -1,10 +1,9 @@
 import { useRouteMatch } from "react-router-dom";
  import { Fragment, useEffect, useState } from "react"
-import StandardTable from "components/table/StandardTable"
+import StandardTable from "components/StandardTable"
 import { request } from "api";
 import { API_PATH } from "screens/apiPaths";
-import { ORDER_STATUS_CODE } from "components/constants";
-import { convertTimeStampToDate, convertToVNDFormat } from "screens/utils/utils";
+import { convertToVNDFormat } from "screens/utils/utils";
 
 const SaleManagerOrderListing = () => {
   const { path } = useRouteMatch();
@@ -43,7 +42,6 @@ const SaleManagerOrderListing = () => {
         search: true,
         sorting: true,
       }}
-      hideCommandBar={true}
       onRowClick={(event, rowData) => {
         window.location.href = `${path}/${rowData.orderId}`;
       }}

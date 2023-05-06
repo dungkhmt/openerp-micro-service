@@ -3,7 +3,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { Link } from 'react-router-dom';
 import { Fragment, useState, useEffect } from "react";
 import { request } from "api";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { API_PATH } from "../apiPaths";
 
 const ReceiptListing = () => {
@@ -44,7 +44,6 @@ const ReceiptListing = () => {
         title={"Danh sách đơn nhập hàng"}
         columns={columns}
         data={receiptTableData}
-        hideCommandBar={isHideCommandBar}
         options={{
           selection: false,
           pageSize: 20,
@@ -56,7 +55,7 @@ const ReceiptListing = () => {
         } }
         actions={[
           {
-            icon: () => <Link to={`receipt/create`}>
+            icon: <Link to={`receipt/create`}>
               <AddIcon />
             </Link>,
             tooltip: "Tạo đơn hàng mới",

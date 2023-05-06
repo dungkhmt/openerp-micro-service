@@ -4,7 +4,7 @@ import { Button, Grid, MenuItem, Select, TextField, Typography } from "@mui/mate
 import { Box } from "@mui/system";
 import useStyles from "screens/styles";
 import { useForm } from "react-hook-form";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { request } from "api";
 import { API_PATH } from "../apiPaths";
 import { getProductNameFromProductId, getWarehouseNameByWarehouseId } from "../utils/utils";
@@ -22,6 +22,8 @@ const ReceiptRequestDetail = ( props ) => {
   const [productTableData, setProductTableData] = useState([]);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [selectedWarehouseId, setSelectedWarehouseId] = useState(null);
+
+  const [newQuantity, setNewQuantity] = useState(0);
 
   const receiptId = props.match?.params?.id;
   const isCreateForm = receiptId == null;
@@ -185,15 +187,20 @@ const ReceiptRequestDetail = ( props ) => {
                   Danh sách hàng hóa
                 </Typography> */}
                 <StandardTable 
+                  rowKey="productName"
                   title="Danh sách hàng hóa"
                   columns={[
                     { title: "Tên hàng hóa", field: "productName", 
-                      editComponent: props => <ProductDropDown 
+                      editComponent: <ProductDropDown 
                         setSelectedProduct={setSelectedProductId}
                         productList={productList} /> },
-                    { title: "Số lượng", field: "quantity", type: "numeric" },
+                    { title: "Số lượng", field: "quantity", type: "numeric",
+                      editComponent: <TextField
+                        type={"number"}
+                        value={newQuantity}
+                        onChange={(e) => setNewQuantity(parseInt(e.target.value))} /> },
                     { title: "Kho nhận (không bắt buộc)", field: "warehouseName", 
-                      editComponent: props => <WarehouseDropDown 
+                      editComponent: <WarehouseDropDown 
                         setSelectedWarehouseId={setSelectedWarehouseId}
                         warehouseList={warehouseList} />}
                   ]}
@@ -209,17 +216,17 @@ const ReceiptRequestDetail = ( props ) => {
                     onRowAdd: newData => new Promise((resolve, reject) => {
                       setTimeout(() => {
                         console.log("new data => ", newData);
-                        if (newData.quantity == undefined 
+                        if (newQuantity == undefined 
                           || selectedProductId == null 
-                          || newData.quantity == null 
-                          || newData.quantity < 1) {
+                          || newQuantity == null 
+                          || newQuantity < 1) {
                           errorNoti("Vui lòng kiểm tra lại thông tin đơn hàng vừa nhập.");
                           reject();
                         } else {
                           const newRow = {
                             "productId": selectedProductId,
                             "productName": getProductNameFromProductId(selectedProductId, productList),
-                            "quantity": newData.quantity,
+                            "quantity": newQuantity,
                             "warehouseId": selectedWarehouseId,
                             "warehouseName": getWarehouseNameByWarehouseId(selectedWarehouseId, warehouseList)
                           }
@@ -230,12 +237,11 @@ const ReceiptRequestDetail = ( props ) => {
                         }
                       });
                     }),
-                    onRowDelete: oldData => new Promise((resolve, reject) => {
+                    onRowDelete: selectedProductNames => new Promise((resolve, reject) => {
                       setTimeout(() => {
-                        console.log("Old data => ", oldData);
-                        const dataDelete = [...productTableData];
-                        const index = oldData.tableData.id;
-                        dataDelete.splice(index, 1);
+                        console.log("selected data => ", selectedProductNames);
+                        const dataDelete = productTableData.filter(
+                          product => !selectedProductNames.includes(product["productName"]));
                         setProductTableData([...dataDelete]);
                         resolve();
                       });

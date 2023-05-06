@@ -22,7 +22,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AddIcon from '@mui/icons-material/Add';
 import { visuallyHidden } from '@mui/utils';
-import { MenuItem, Select } from '@mui/material';
+import { Button, MenuItem, Select } from '@mui/material';
 
 function createData(name, calories, fat, carbs, protein) {
   return {
@@ -349,6 +349,7 @@ const TestTable = () => {
                         <MenuItem value={20}>Twenty</MenuItem>
                         <MenuItem value={30}>Thirty</MenuItem>
                       </Select>}></TableCell>
+                      <TableCell children={<Button>Click</Button>}></TableCell>
                     </TableRow>
                   );
                 })}

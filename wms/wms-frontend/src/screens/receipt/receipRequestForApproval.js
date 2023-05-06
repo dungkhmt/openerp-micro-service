@@ -1,7 +1,7 @@
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import useStyles from "screens/styles";
 import { useForm } from "react-hook-form";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { request } from "api";
 import { API_PATH } from "../apiPaths";
 import { convertTimeStampToDate } from "../utils/utils";
@@ -175,7 +175,6 @@ const ReceiptRequestForApproval = ( props ) => {
                   search: true,
                   sorting: true,
                 }}
-                hideCommandBar={true}
               />
             </Box>
           </Grid>

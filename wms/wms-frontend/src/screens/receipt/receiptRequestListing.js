@@ -3,7 +3,7 @@
 // chỉ liệt kê các đơn xin nhập hàng do user này tạo
 
 import { request } from "api";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { Link } from "react-router-dom";
 import { API_PATH } from "../apiPaths";
 import AddIcon from '@mui/icons-material/Add';
@@ -51,13 +51,12 @@ const ReceiptRequestListing = () => {
         search: true,
         sorting: true,
       }}
-      hideCommandBar={true}
       onRowClick={ (event, rowData) => {
         window.location.href = `${path}/${rowData.receiptRequestId}`;
       } }
       actions={[
         {
-          icon: () => <Link to={`${path}/create`}>
+          icon: <Link to={`${path}/create`}>
             <AddIcon />
           </Link>,
           tooltip: "Tạo đơn xin nhập hàng mới",

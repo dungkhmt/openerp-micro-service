@@ -5,7 +5,7 @@ import StandardTable from "components/StandardTable";
 import { Fragment, useEffect, useState } from "react"
 import { API_PATH } from "screens/apiPaths";
 import { getCurrentDateInString } from "screens/utils/utils";
-import { errorNoti } from "utils/notification";
+import { errorNoti, successNoti } from "utils/notification";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
 
@@ -59,7 +59,9 @@ const DeliveryTripListing = () => {
           editComponent: <TextField value={userLoginId}/> }, 
         { title: "Đợt giao hàng", field: "shipmentId",
           editComponent: <ShipmentDropDown shipmentList={shipmentList}
-            setSelectedShipmentId={setSelectedShipmentId} />}
+            setSelectedShipmentId={setSelectedShipmentId} />},
+        { title: "Trạng thái", field: "deliveryTripStatus",
+          editComponent: <TextField value={"Khởi tạo"} InputProps={{readOnly: true}}/>}
       ]}
       data={tripTableData}
       editable={{
@@ -89,9 +91,21 @@ const DeliveryTripListing = () => {
             resolve();
           })
         }),
-        onRowDelete: oldData => new Promise((resolve, reject) => {
+        onRowDelete: selectedIds => new Promise((resolve, reject) => {
           setTimeout(() => {
-            console.log("Old data => ", oldData);
+            console.log("Old data => ", selectedIds);
+            for (var i = 0; i < selectedIds.length; i++) {
+              request(
+                "delete",
+                `${API_PATH.DELIVERY_MANAGER_DELIVERY_TRIP}/${selectedIds[i]}`,
+                (res) => {
+                }
+              );
+            }
+            const deleteTable = tripTableData.filter(
+              trip => !selectedIds.includes(trip["deliveryTripId"]));
+            setTripTableData(deleteTable);
+            successNoti(`Đã xóa ${selectedIds.length} bản ghi`);
             resolve();
           })
         })

@@ -1,10 +1,9 @@
 import { request } from "api";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { useRouteMatch } from "react-router-dom";
 import { API_PATH } from "../apiPaths";
 
 import { Fragment, useState, useEffect } from "react";
-import { convertTimeStampToDate } from "screens/utils/utils";
 
 const ReceiptRequestForApprovalListing = () => {
 
@@ -16,17 +15,7 @@ const ReceiptRequestForApprovalListing = () => {
       "get",
       API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST_APPROVAL_LISTING + "?status=CREATED",
       (res) => {
-        var data = res.data;
-        for (var i = 0; i < data.length; i++) {
-          const createdTimestamp = data[i]?.createdDate;
-          const dateFormated = convertTimeStampToDate(createdTimestamp);
-          data[i].createdDate = dateFormated;
-
-          const expectedReceiveTimestamp = data[i]?.expectedReceiveDate;
-          const expectedReceiveDate = convertTimeStampToDate(expectedReceiveTimestamp);
-          data[i].expectedReceiveDate = expectedReceiveDate;
-        }
-        setReceiptTableData(data);
+        setReceiptTableData(res.data);
       }
     )
   }, []);
@@ -46,7 +35,6 @@ const ReceiptRequestForApprovalListing = () => {
         search: true,
         sorting: true,
       }}
-      hideCommandBar={true}
       onRowClick={ (event, rowData) => {
         window.location.href = `${path}/${rowData.receiptRequestId}`;
       } }

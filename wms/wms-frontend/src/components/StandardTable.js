@@ -23,7 +23,9 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
 import { visuallyHidden } from '@mui/utils';
-import { Modal, TextField } from '@mui/material';
+import { Button, Modal, TextField } from '@mui/material';
+import { successNoti } from 'utils/notification';
+import CommandBarButton from './button/commandBarButton';
 
 const buildHeaderCells = ( columns ) => {
   return columns.map(c => {
@@ -106,7 +108,8 @@ const EnhancedTableHead = ( props ) => {
           headerCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
+            // align={headCell.numeric ? 'right' : 'left'}
+            align={'left'}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
@@ -140,7 +143,8 @@ EnhancedTableHead.propTypes = {
 };
 
 const EnhancedTableToolbar = (props) => {
-  const { numSelected, tableTitle, openNewRow, isEditable, deleteButtonHandle } = props;
+  const { numSelected, tableTitle, openNewRow, isEditable, deleteButtonHandle,
+  actions, deletable, selectedIds } = props;
 
   return (
     <Toolbar
@@ -174,23 +178,49 @@ const EnhancedTableToolbar = (props) => {
       )}
 
       {
+        actions == undefined &&
+        <Tooltip title="Thêm mới">
+          <IconButton onClick={openNewRow}> 
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
+      }
+
+      {
         isEditable ?
         <>
-        {numSelected > 0 ? (
+        {numSelected > 0 && deletable != false ? (
           <Tooltip title="Xóa">
             <IconButton onClick={deleteButtonHandle}>
               <DeleteIcon />
             </IconButton>
           </Tooltip>
         ) : (
-          <Tooltip title="Thêm mới">
-            <IconButton onClick={openNewRow}> 
-              <AddIcon />
-            </IconButton>
-          </Tooltip>
+          // <Tooltip title="Thêm mới">
+          //   <IconButton onClick={openNewRow}> 
+          //     <AddIcon />
+          //   </IconButton>
+          // </Tooltip>
+          <div></div>
         )
         }
         </> : <div></div>
+      }
+
+      {
+        actions != undefined && actions.length > 0 && 
+        actions.map(action => {
+          if (action.iconOnClickHandle == undefined) {
+            return <Tooltip title={action.tooltip}>
+                      {action.icon}
+                    </Tooltip>
+          } else {
+            return <CommandBarButton 
+                    onClick={() => action.iconOnClickHandle(selectedIds)}>
+                       {action.tooltip}
+                   </CommandBarButton>
+          }
+        })
       }
     </Toolbar>
   );
@@ -201,10 +231,13 @@ EnhancedTableToolbar.propTypes = {
   tableTitle: PropTypes.string,
   openNewRow: PropTypes.func,
   isEditable: PropTypes.bool,
-  deleteButtonHandle: PropTypes.func
+  deleteButtonHandle: PropTypes.func,
+  selectedIds: PropTypes.array
 };
 
-const StandardTable = ({ columns, data, title, options, editable, onRowClick, rowKey }) => {
+const StandardTable = ({ columns, data, title, options, editable, onRowClick, 
+  rowKey, actions, deletable }) => {
+
   const [selected, setSelected] = React.useState([]);
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('id'); // id ?
@@ -215,7 +248,8 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick, ro
 
   const headerCells = buildHeaderCells(columns);
 
-  const isEditable = !(editable == null || editable == undefined);
+  const isEditable = editable != null || editable != undefined 
+    || actions != undefined;
 
   React.useEffect(() => {
     setRows(buildTableData(data, columns));
@@ -335,7 +369,10 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick, ro
             Thêm mới bản ghi
           </Typography>
           <Tooltip title="Lưu">
-            <IconButton onClick={editable?.onRowAdd}>
+            <IconButton onClick={() => {
+                editable?.onRowAdd();
+                successNoti("Lưu thành công");
+              }}>
               <SaveIcon />
             </IconButton>
           </Tooltip>
@@ -389,7 +426,9 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick, ro
     <Paper sx={{ width: '100%', mb: 2 }}>
       <EnhancedTableToolbar numSelected={selected.length} tableTitle={title}
         openNewRow={() => setShowAddModal(true)} isEditable={isEditable}
-        deleteButtonHandle={deleteButtonHandle} />
+        deleteButtonHandle={deleteButtonHandle} actions={actions}
+        deletable={deletable} 
+        selectedIds={selected} />
 
       <TableContainer>
           <Table
@@ -439,7 +478,22 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick, ro
                       }
                       {
                         headerCells != undefined &&
-                        headerCells.map(cell => <TableCell onClick={(event) => handleClick(event, row)}>{row[cell.id]}</TableCell>)
+                        headerCells.map(cell => <TableCell 
+                          onClick={(event) => handleClick(event, row)}>
+                            {row[cell.id]}</TableCell>
+                        )
+                      }
+                      {
+                        columns != undefined &&
+                        columns.map(column => {
+                          if (column.buttonOnclickHandle != undefined) {
+                            return <TableCell 
+                              children={<Button variant="contained"
+                                onClick={() => column.buttonOnclickHandle(row)}
+                              >Xử lý</Button>}
+                            />
+                          }
+                        })
                       }
                     </TableRow>
                   );
@@ -478,7 +532,8 @@ StandardTable.propTypes = {
   options: PropTypes.object, 
   editable: PropTypes.object, 
   onRowClick: PropTypes.func, 
-  rowKey: PropTypes.string.isRequired
+  rowKey: PropTypes.string.isRequired,
+  deletable: PropTypes.bool
 };
 
 export default StandardTable;
