@@ -1,5 +1,7 @@
 export const PLACE_HOLDER_ICON_URL = "../../../../../../../placeholder.png"
 
+export const BLUE_PLACE_HOLDER_ICON_URL = "../../../../../../../blueplaceholder.png"
+
 export const LOCAL_STORAGE = {
   CART_ITEMS: "cartItems"
 }
@@ -14,5 +16,7 @@ export const ORDER_STATUS_CODE = {
   LAST_DELIVERING: "LAST_DELIVERING",
   DELIVERING_A_PART: "DELIVERING_A_PART",
   CANCELLED: "CANCELLED",
-  COMPLETED: "COMPLETED"
+  COMPLETED: "COMPLETED",
+  SUCCESS: "SUCCESS",
+  FAIL: "FAIL"
 }

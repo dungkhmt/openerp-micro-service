@@ -22,8 +22,9 @@ const DeliveryPersonManagement = () => {
       hideCommandBar={true}
       title="Quản lý nhân viên giao hàng"
       columns={[
-        { title: "Tên", field: "fullName" },
-        { title: "Số điện thoại", field: "phoneNumber" }
+        { title: "Tên *", field: "fullName" },
+        { title: "Số điện thoại", field: "phoneNumber" },
+        { title: "Tài khoản đăng nhập *", field: "userLoginId" }
       ]}
       data={deliveryPersonsTableData}
       options={{
@@ -36,8 +37,9 @@ const DeliveryPersonManagement = () => {
         onRowAdd: newData => new Promise((resolve, reject) => {
           setTimeout(() => {
             console.log("New data => ", newData);
-            if (newData.fullName == null || newData.fullName == undefined) {
-              errorNoti("Vui lòng nhập tên người giao hàng");
+            if (newData.fullName == null || newData.fullName == undefined ||
+              newData.userLoginId == null || newData.userLoginId == undefined) {
+              errorNoti("Vui lòng điền đầy đủ thông tin người giao hàng");
               reject();
             } else {
               request(
@@ -56,7 +58,8 @@ const DeliveryPersonManagement = () => {
                 },
                 {
                   "fullName": newData.fullName,
-                  "phoneNumber": newData.phoneNumber
+                  "phoneNumber": newData.phoneNumber,
+                  "userLoginId": newData.userLoginId
                 }
               );
             }

@@ -1,7 +1,8 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Button, Grid, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
+import { isEditableInput } from '@testing-library/user-event/dist/utils';
 import { request } from "api";
-import { WarehouseDropDown } from "components/table/DropDown";
+import { RouteMap } from 'components/map/maps';
 import StandardTable from "components/table/StandardTable";
 import { Fragment, useEffect, useState } from "react";
 import { API_PATH } from "screens/apiPaths";
@@ -13,6 +14,7 @@ const DeliveryTripDetail = ( props ) => {
   const classes = useStyles();
 
   const [tripInfo, setTripInfo] = useState({});
+  const [isDeleted, setDeleted] = useState(false);
   const [deliveryPersons, setDeliveryPersons] = useState([]);
   const [warehouseList, setWarehouseList] = useState([]);
   const [deliveryItemsTableData, setDeliveryItemsTableData] = useState([]);
@@ -27,7 +29,12 @@ const DeliveryTripDetail = ( props ) => {
   const [maxQuantity, setMaxQuantity] = useState(0);
   const [selectedQuantity, setSelectedQuantity] = useState(0);
   const [createdItemsTableData, setCreatedItemsTableData] = useState([]);
+  const [rawCreatedItemsTableData, setRawCreatedItemsTableData] = useState([]);
   const [maxSequence, setMaxSequence] = useState(0);
+
+  const [routeDetails, setRouteDetails] = useState({});
+  const [isShowRouteMapModal, setShowRouteMapModal] = useState(false);
+  const [runnedAutoRoute, setRunnedAutoRoute] = useState(false);
 
   // chọn danh sách sản phẩm (phải cùng một warehouse)
   // nếu danh sách sản phẩm của delivery trip khác rỗng -> không thể update warehouse
@@ -40,6 +47,10 @@ const DeliveryTripDetail = ( props ) => {
         setTripInfo(res.data);
         setMaxSequence(res.data.totalLocations);
         setSelectedWarehouseId(res.data.warehouseId);
+        setDeliveryItemsTableData(res.data.items);
+        if (res.data.warehouseName != null) {
+          setSelectedWarehouseName(res.data.warehouseName);
+        }
       }
     );
 
@@ -63,17 +74,37 @@ const DeliveryTripDetail = ( props ) => {
       "get",
       API_PATH.DELIVERY_MANAGER_ASSIGN_ORDER_ITEM,
       (res) => {
+        setRawCreatedItemsTableData(res.data);
         setCreatedItemsTableData(res.data);
       }
     );
+
+    request(
+      "get",
+      `${API_PATH.DELIVREY_MANAGER_AUTO_ROUTE}/${tripId}`,
+      (res) => {
+        setRouteDetails(res.data);
+        if (res.data.points.length > 0) {
+          setRunnedAutoRoute(true);
+        }
+      }
+    )
   }, []);
 
+  // useEffect(() => {
+  //   const assignedItemsIdArr = deliveryItemsTableData.map(e => e.assignOrderItemId);
+  //   const newCreatedItemsTableData = createdItemsTableData.filter(item => !assignedItemsIdArr.includes(item.assignOrderItemId));
+  //   setCreatedItemsTableData(newCreatedItemsTableData);
+  // }, [deliveryItemsTableData]);
+
   useEffect(() => {
-    // filter created assigned items table data
-    // that match with selected warehouse id
+    // lọc created items table data 
+    // loại bỏ các items có assignOrderItemId nằm trong deliveryItemsTableData
+    // và loại bỏ các items có warehouseId != deliveryTrip warehouseId
     if (selectedWarehouseId != null) {
+      const assignedItemsIdArr = deliveryItemsTableData.map(e => e.assignOrderItemId);
       const filterTableData = createdItemsTableData.filter(
-        item => item.warehouseId == selectedWarehouseId);
+        item => item.warehouseId == selectedWarehouseId && !assignedItemsIdArr.includes(item.assignOrderItemId));
       setCreatedItemsTableData(filterTableData);
     }
   }, [selectedWarehouseId]);
@@ -87,19 +118,19 @@ const DeliveryTripDetail = ( props ) => {
       sequence: maxSequence + 1
     };
     var updated = false;
-    for (var i = 0; i < deliveryItemsTableData.length; i++) {
-      if (deliveryItemsTableData[i].assignOrderItemId 
-        == newDeliveryItem.assignOrderItemId) {
-          var localDeliveryItem = deliveryItemsTableData[i];
-          const newQuantity = parseInt(localDeliveryItem.quantity) + parseInt(newDeliveryItem.quantity);
-          localDeliveryItem.quantity = newQuantity;
-          var newDeliveryItemsTableData = deliveryItemsTableData;
-          newDeliveryItemsTableData.splice(i, 1);
-          setDeliveryItemsTableData([...newDeliveryItemsTableData, localDeliveryItem]);
-          updated = true;
-          break;
-        }
-    }
+    // for (var i = 0; i < deliveryItemsTableData.length; i++) {
+    //   if (deliveryItemsTableData[i].assignOrderItemId 
+    //     == newDeliveryItem.assignOrderItemId) {
+    //       var localDeliveryItem = deliveryItemsTableData[i];
+    //       const newQuantity = parseInt(localDeliveryItem.quantity) + parseInt(newDeliveryItem.quantity);
+    //       localDeliveryItem.quantity = newQuantity;
+    //       var newDeliveryItemsTableData = deliveryItemsTableData;
+    //       newDeliveryItemsTableData.splice(i, 1);
+    //       setDeliveryItemsTableData([...newDeliveryItemsTableData, localDeliveryItem]);
+    //       updated = true;
+    //       break;
+    //     }
+    // }
     if (!updated) {
       setDeliveryItemsTableData([...deliveryItemsTableData, newDeliveryItem]);
       setMaxSequence(maxSequence + 1);
@@ -108,27 +139,17 @@ const DeliveryTripDetail = ( props ) => {
     setSelectedWarehouseName(selectedAssignedItem.warehouseName);
     setSelectedQuantity(0);
 
-    // update created assign items table data 
-    // substract quantity 
-    // or remove item if quantity if needed 
-    var localSelectedItem = selectedAssignedItem;
-    const newQuantity = maxQuantity - selectedQuantity;
-    localSelectedItem.quantity = newQuantity;
-    var index = -1;
-    for (var i = 0 ; i < createdItemsTableData.length; i++) {
-      if (createdItemsTableData[i].assignOrderItemId 
-        == selectedAssignedItem.assignOrderItemId) {
-        index = i;
+    // remove các createdOrderItem có assignOrderItem trùng với newDeliveryItem
+    var newCreatedItemsTableData = createdItemsTableData;
+    var removeItemIndex;
+    for (var i = 0; i < newCreatedItemsTableData.length; i++) {
+      if (newCreatedItemsTableData[i].assignOrderItemId == newDeliveryItem.assignOrderItemId) {
+        removeItemIndex = i;
         break;
       }
     }
-    var newCreatedItemsTableData = createdItemsTableData;
-    newCreatedItemsTableData.splice(index, 1);
-    if (newQuantity > 0) {
-      setCreatedItemsTableData([...newCreatedItemsTableData, localSelectedItem]);
-    } else {
-      setCreatedItemsTableData(newCreatedItemsTableData);
-    }
+    newCreatedItemsTableData.splice(removeItemIndex, 1);
+    setCreatedItemsTableData(newCreatedItemsTableData);
   }
 
   const saveDeliveryTripButtonHandle = () => {
@@ -139,6 +160,7 @@ const DeliveryTripDetail = ( props ) => {
         if (res.status == 200) {
           setTripInfo(res.data);
           successNoti("Lưu thông tin chuyến giao hàng thành công");
+          window.location.reload();
         }
       },
       {
@@ -146,6 +168,7 @@ const DeliveryTripDetail = ( props ) => {
       },
       {
         ...tripInfo,
+        deliveryPersonId: selectedDeliveryPersonId,
         warehouseId: selectedWarehouseId,
         totalLocations: maxSequence,
         items: [
@@ -155,7 +178,39 @@ const DeliveryTripDetail = ( props ) => {
     )
   }
 
-  return <Fragment>
+  const deleteButtonHandle = () => {
+    request(
+      "delete",
+      `${API_PATH.DELIVERY_MANAGER_DELIVERY_TRIP}/${tripId}`,
+      (res) => {
+        if (res.status == 200) {
+          successNoti("Hủy bỏ chuyến giao hàng thành công");
+          setDeleted(true);
+        }
+      }
+    )
+  }
+
+  const autoRouteButtonHandle = () => {
+    request(
+      "put",
+      API_PATH.DELIVREY_MANAGER_AUTO_ROUTE,
+      (res) => {
+        successNoti("Đang tiến hành tìm quãng đường tối ưu");
+      },
+      {
+        500: () => errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau")
+      },
+      {
+        deliveryTripId: tripId,
+        items: [
+          ...deliveryItemsTableData
+        ]
+      }
+    )
+  }
+
+  return (<Fragment>
 
     <Modal open={isShowAssignedItemsModal}
       onClose={() => setShowAssignedItemsModal(!isShowAssignedItemsModal)}
@@ -201,6 +256,31 @@ const DeliveryTripDetail = ( props ) => {
       </Box>
     </Modal>
 
+    <Modal open={isShowRouteMapModal}
+      onClose={() => setShowRouteMapModal(!isShowRouteMapModal)}
+      aria-labelledby="modal-modal-title" 
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        width: '75%',
+        height: '70%',
+        transform: 'translate(-50%, -50%)',
+        bgcolor: 'background.paper',
+        border: '2px solid #000',
+        boxShadow: 24,
+        p: 4,
+      }}>
+        <RouteMap 
+          points={routeDetails?.points}
+          customers={routeDetails?.customers}
+          warehouse={routeDetails?.warehouse}
+        />
+      </Box>
+    </Modal>
+
     <Modal
       open={isShowQuantityModal}
       onClose={() => setShowQuantityModal(!isShowQuantityModal)}
@@ -211,7 +291,7 @@ const DeliveryTripDetail = ( props ) => {
           top: '50%',
           left: '50%',
           width: '25%',
-          height: '25%',
+          height: '15%',
           transform: 'translate(-50%, -50%)',
           bgcolor: 'background.paper',
           border: '2px solid #000',
@@ -247,10 +327,38 @@ const DeliveryTripDetail = ( props ) => {
             Thông tin chuyến giao hàng</Typography>
         </Grid>
 
-        <Grid className={classes.buttonWrap}>
-          <Button variant="contained" className={classes.addButton} 
-            type="submit" onClick={saveDeliveryTripButtonHandle} >Lưu</Button>
-        </Grid>
+        {
+          !isDeleted && tripInfo?.deliveryTripStatusCode == 'CREATED' &&
+          <Grid className={classes.buttonWrap}>
+            <Button variant="contained" className={classes.addButton} 
+              type="submit" onClick={saveDeliveryTripButtonHandle} >Lưu</Button>
+          </Grid>
+        }
+
+        {
+          !isDeleted && tripInfo?.deliveryTripStatusCode == 'CREATED' &&
+          <Grid className={classes.buttonWrap}>
+            <Button variant="contained" className={classes.addButton} 
+              type="submit" onClick={deleteButtonHandle}>Hủy bỏ</Button>
+          </Grid>
+        }
+
+        {
+          !isDeleted && tripInfo?.deliveryTripStatusCode == 'CREATED' &&
+          <Grid className={classes.buttonWrap}>
+            <Button variant="contained" className={classes.addButton} 
+              type="submit" onClick={autoRouteButtonHandle}>Auto route</Button>
+          </Grid>
+        }
+
+        {
+          !isDeleted && runnedAutoRoute && 
+          <Grid className={classes.buttonWrap}>
+            <Button variant="contained" className={classes.addButton} 
+              type="submit" onClick={() => setShowRouteMapModal(true)}>Xem bản đồ hành trình</Button>
+          </Grid>
+        }
+
       </Grid>
     </Box>
 
@@ -317,8 +425,8 @@ const DeliveryTripDetail = ( props ) => {
                 {
                   deliveryPersons.length > 0 &&
                   deliveryPersons.map(person => 
-                    <MenuItem key={person.deliveryPersonId}
-                      value={person.fullName}></MenuItem>)
+                    <MenuItem key={person.userLoginId}
+                      value={person.userLoginId}>{person.fullName}</MenuItem>)
                 }
               </Select>
             </Box>
@@ -363,23 +471,28 @@ const DeliveryTripDetail = ( props ) => {
               <Box className={classes.labelInput}>
                 Kho lấy hàng 
               </Box>
-              {/* <Select onChange={(e, v) => {
-                  setSelectedWarehouseId(e.target.value);
-                  setSelectedWarehouseName(v?.props?.children);
-                }}
-                defaultValue={""}
-                value={selectedWarehouseName}>
-              {
-                warehouseList.length > 0 &&
-                warehouseList.map(warehouse => 
-                  <MenuItem key={warehouse.id} value={warehouse.id}>{warehouse.name}</MenuItem>)
-              }
-            </Select> */}
               <TextField
                 fullWidth
                 variant="outlined"
                 size="small"
                 value={selectedWarehouseName}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+            </Box>
+          </Grid>
+
+          <Grid item xs={6}>
+            <Box className={classes.inputWrap}>
+              <Box className={classes.labelInput}>
+                Trạng thái 
+              </Box>
+              <TextField
+                fullWidth
+                variant="outlined"
+                size="small"
+                value={tripInfo?.deliveryTripStatus}
                 InputProps={{
                   readOnly: true,
                 }}
@@ -401,7 +514,7 @@ const DeliveryTripDetail = ( props ) => {
           { title: "Kho", field: "warehouseName" },
           { title: "Địa chỉ nhận hàng", field: "customerAddressName" }
         ]}
-        actions={[
+        actions={!isDeleted && [
           {
             icon: () => <AddIcon onClick={() => setShowAssignedItemsModal(true)} />,
             tooltip: "Thêm sản phẩm vào chuyến giao hàng",
@@ -415,9 +528,56 @@ const DeliveryTripDetail = ( props ) => {
           sorting: true,
         }}
         data={deliveryItemsTableData}
+        editable={{
+          onRowDelete: oldData => new Promise((resolve, reject) => {
+            setTimeout(() => {
+              console.log("Old data => ", oldData);
+              if (oldData.deliveryTripItemId !== undefined) {
+                // nếu đã lưu delivery item vào data base
+                // thì xóa các delivery item này
+                // và cập nhật lại quantity của assigned_order_item
+                console.log("Delete from database");
+                request(
+                  "put",
+                  API_PATH.DELIVERY_MANAGER_ASSIGN_ORDER_ITEM,
+                  (res) => {
+                    setCreatedItemsTableData([...createdItemsTableData, res.data]);
+                  },
+                  {
+                    500: () => errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau")
+                  },
+                  {
+                    assignOrderItemId: oldData.assignOrderItemId,
+                    quantity: oldData.quantity,
+                    deliveryTripItemId: oldData.deliveryTripItemId
+                  }
+                );
+              } else {
+                // nếu chưa lưu delivery item vào database
+                // thì restore created items từ rawCreatedItemsTableData
+                var newCreatedItemsTableData = rawCreatedItemsTableData;
+                for (var i = 0; i < newCreatedItemsTableData.length; i++) {
+                  if (newCreatedItemsTableData[i].assignOrderItemId == oldData.assignOrderItemId) {
+                      var adder = newCreatedItemsTableData[i];
+                      adder.quantity = parseFloat(adder.quantity);
+                      setCreatedItemsTableData([...createdItemsTableData, adder])
+                      break;
+                    }
+                }
+              }
+              
+              const dataDelete = [...deliveryItemsTableData];
+              const index = oldData.tableData.id;
+              dataDelete.splice(index, 1);
+              setDeliveryItemsTableData([...dataDelete]);
+              setMaxSequence(maxSequence - 1);
+              resolve();
+            });
+          })
+        }}
       />
     </Box>
-  </Fragment>
+  </Fragment>)
 }
 
 export default DeliveryTripDetail;

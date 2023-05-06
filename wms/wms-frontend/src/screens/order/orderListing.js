@@ -4,6 +4,7 @@ import { API_PATH } from "../apiPaths";
 import StandardTable from "components/table/StandardTable";
 import { ORDER_STATUS_CODE } from "components/constants";
 import { useRouteMatch } from "react-router-dom";
+import { convertToVNDFormat } from "screens/utils/utils";
 
 const AdminOrderListing = () => {
   const { path } = useRouteMatch();
@@ -17,15 +18,27 @@ const AdminOrderListing = () => {
         "get",
         API_PATH.ADMIN_SALE_ORDER + `?orderStatus=${ORDER_STATUS_CODE.DELIVERING_A_PART},${ORDER_STATUS_CODE.APPROVED}`,
         (res) => {
-          setOrderTableData(res.data);
+          var data = res.data;
+          for (var i = 0; i < data.length; i++) {
+            const cost = data[i]?.totalOrderCost;
+            const costFormated = convertToVNDFormat(cost);
+            data[i].totalOrderCost = costFormated;
+          }
+          setOrderTableData(data);
         }
       );
 
       request(
         "get",
-        API_PATH.ADMIN_SALE_ORDER + `?orderStatus=${ORDER_STATUS_CODE.CANCELLED},${ORDER_STATUS_CODE.LAST_DELIVERING},${ORDER_STATUS_CODE.COMPLETED}`,
+        API_PATH.ADMIN_SALE_ORDER + `?orderStatus=${ORDER_STATUS_CODE.CANCELLED},${ORDER_STATUS_CODE.LAST_DELIVERING},${ORDER_STATUS_CODE.COMPLETED},${ORDER_STATUS_CODE.SUCCESS},${ORDER_STATUS_CODE.FAIL}`,
         (res) => {
-          setProcessedOrderTableData(res.data);
+          var data = res.data;
+          for (var i = 0; i < data.length; i++) {
+            const cost = data[i]?.totalOrderCost;
+            const costFormated = convertToVNDFormat(cost);
+            data[i].totalOrderCost = costFormated;
+          }
+          setProcessedOrderTableData(data);
         }
       )
     }
@@ -43,7 +56,7 @@ const AdminOrderListing = () => {
   return (
     <Fragment>
       <StandardTable 
-        title="Danh sách đơn bán hàng cần xử lý"
+        title="Danh sách đơn xuất hàng cần xử lý"
         columns={columns}
         data={orderTableData}
         hideCommandBar={true}
@@ -59,7 +72,7 @@ const AdminOrderListing = () => {
       />
 
       <StandardTable 
-        title="Danh sách đơn bán hàng đã xử lý"
+        title="Danh sách đơn xuất hàng đã xử lý"
         columns={columns}
         data={processedOrderTableData}
         hideCommandBar={true}

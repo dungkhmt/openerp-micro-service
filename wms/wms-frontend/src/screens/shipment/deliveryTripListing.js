@@ -100,7 +100,7 @@ const DeliveryTripListing = () => {
       }}
       options={{
         selection: false,
-        pageSize: 5,
+        pageSize: 10,
         search: true,
         sorting: true,
       }}

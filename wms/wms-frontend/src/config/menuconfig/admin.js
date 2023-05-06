@@ -6,7 +6,7 @@ export const admin = {
     {
       id: "MENU_WMSv2_ADMIN.WAREHOUSE",
       path: "/admin/warehouse",
-      isPublic: true,
+      isPublic: false,
       text: "Danh sách kho",
       child: [],
     },

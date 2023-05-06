@@ -158,7 +158,7 @@ const CartDetail = () => {
           </Grid>
           <Grid className={classes.buttonWrap}>
             <Button variant="contained" className={classes.addButton} 
-              type="submit" onClick={handleSubmit(payOderHandle)} >Thanh toán</Button>
+              type="submit" onClick={handleSubmit(payOderHandle)} >Mua hàng</Button>
           </Grid>
         </Grid>
       </Box>
@@ -197,7 +197,7 @@ const CartDetail = () => {
                     variant="outlined"
                     size="small"
                     inputRef={register({ required: "Vui lòng điền số điện thoại" })}
-                    name="customerPhone"
+                    name="customerPhoneNumber"
                     error={!!errors.name}
                   />
                 </Grid>
