@@ -1,11 +1,11 @@
 import { TextField } from "@mui/material";
 import { request } from "api";
 import { ShipmentDropDown } from "components/table/DropDown";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { Fragment, useEffect, useState } from "react"
 import { API_PATH } from "screens/apiPaths";
 import { getCurrentDateInString } from "screens/utils/utils";
-import { errorNoti } from "utils/notification";
+import { errorNoti, successNoti } from "utils/notification";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
 
@@ -47,18 +47,21 @@ const DeliveryTripListing = () => {
 
   return <Fragment>
     <StandardTable
+      rowKey="deliveryTripId"
       title="Danh sách các chuyến giao hàng"
       hideCommandBar={true}
       columns={[
         { title: "Mã chuyến", field: "deliveryTripId",
-          editComponent: props => <TextField InputProps={{readOnly: true}}/> },
+          editComponent: <TextField InputProps={{readOnly: true}}/> },
         { title: "Ngày tạo", field: "createdStamp",
-          editComponent: props => <TextField value={now}/> },
+          editComponent: <TextField value={now}/> },
         { title: "Người tạo", field: "createdBy", 
-          editComponent: props => <TextField value={userLoginId}/> }, 
+          editComponent: <TextField value={userLoginId}/> }, 
         { title: "Đợt giao hàng", field: "shipmentId",
-          editComponent: props => <ShipmentDropDown shipmentList={shipmentList}
-            setSelectedShipmentId={setSelectedShipmentId} />}
+          editComponent: <ShipmentDropDown shipmentList={shipmentList}
+            setSelectedShipmentId={setSelectedShipmentId} />},
+        { title: "Trạng thái", field: "deliveryTripStatus",
+          editComponent: <TextField value={"Khởi tạo"} InputProps={{readOnly: true}}/>}
       ]}
       data={tripTableData}
       editable={{
@@ -88,9 +91,21 @@ const DeliveryTripListing = () => {
             resolve();
           })
         }),
-        onRowDelete: oldData => new Promise((resolve, reject) => {
+        onRowDelete: selectedIds => new Promise((resolve, reject) => {
           setTimeout(() => {
-            console.log("Old data => ", oldData);
+            console.log("Old data => ", selectedIds);
+            for (var i = 0; i < selectedIds.length; i++) {
+              request(
+                "delete",
+                `${API_PATH.DELIVERY_MANAGER_DELIVERY_TRIP}/${selectedIds[i]}`,
+                (res) => {
+                }
+              );
+            }
+            const deleteTable = tripTableData.filter(
+              trip => !selectedIds.includes(trip["deliveryTripId"]));
+            setTripTableData(deleteTable);
+            successNoti(`Đã xóa ${selectedIds.length} bản ghi`);
             resolve();
           })
         })

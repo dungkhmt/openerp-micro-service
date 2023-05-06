@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { request } from "api";
 import { API_PATH } from "../apiPaths";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { ORDER_STATUS_CODE } from "components/constants";
 import { useRouteMatch } from "react-router-dom";
 import { convertToVNDFormat } from "screens/utils/utils";

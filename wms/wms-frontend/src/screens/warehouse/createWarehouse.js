@@ -16,7 +16,7 @@ import { API_PATH } from '../apiPaths.js';
 // import { warehouse } from 'config/menuconfig/warehouse.js'; ==> ?
 import { useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
-import StandardTable from 'components/table/StandardTable.jsx';
+import StandardTable from 'components/StandardTable';
 import withScreenSecurity from 'components/common/withScreenSecurity.js';
 
 const CreateWarehouse = ( props, { screenAuthorization } ) => {

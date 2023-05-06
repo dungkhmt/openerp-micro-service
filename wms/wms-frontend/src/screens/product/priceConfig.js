@@ -1,7 +1,7 @@
 import { Grid, Modal } from "@mui/material";
 import { Box } from "@mui/system";
 import { request } from "api";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { errorNoti } from "utils/notification";
 import useStyles from "screens/styles";
 import { API_PATH } from "../apiPaths";
@@ -22,6 +22,7 @@ const PriceHistory = ( { data } ) => {
   return (
     <Box>
       <StandardTable
+        rowKey="productPriceId"
         title={"Cấu hình giá cho " + data?.productName}
         columns={columns}
         data={historyPricesArr}
@@ -64,17 +65,17 @@ const PriceHistory = ( { data } ) => {
               )
             })
           }),
-          onRowDelete: oldData => new Promise((resolve, reject) => {
+          onRowDelete: selectedIds => new Promise((resolve, reject) => {
             setTimeout(() => {
-              const dataDelete = [...historyPricesArr];
-              const index = oldData.tableData.id;
-              dataDelete.splice(index, 1);
               request(
                 "delete",
-                API_PATH.PRODUCT_PRICE + "/" + oldData.productPriceId,
+                `${API_PATH.PRODUCT_PRICE}/${selectedIds.join(',')}`,
                 (res) => {
                   if (res.status == 200) {
-                    setHistoryPricesArr([...dataDelete]);
+                    const dataDelete = historyPricesArr.filter(
+                      history => !selectedIds.includes(history["productPriceId"])
+                    );
+                    setHistoryPricesArr(dataDelete);
                     resolve();
                   } else {
                     errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau");

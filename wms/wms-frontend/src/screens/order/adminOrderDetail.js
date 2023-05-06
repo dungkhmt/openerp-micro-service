@@ -2,11 +2,11 @@ import LoadingScreen from "components/common/loading/loading";
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { request } from "api";
 import { BayDropDown, ProductDropDown, WarehouseDropDown } from "components/table/DropDown";
-import StandardTable from "components/table/StandardTable";
-import React, { Fragment, useEffect, useRef, useState } from "react"
+import StandardTable from "components/StandardTable";
+import React, { Fragment, useEffect, useState } from "react"
 import { API_PATH } from "screens/apiPaths";
 import useStyles from 'screens/styles';
-import { convertTimeStampToDate, convertToVNDFormat } from "screens/utils/utils";
+import { convertToVNDFormat } from "screens/utils/utils";
 import { errorNoti, successNoti } from "utils/notification";
 
 const AdminOrderDetail = ( props ) => {
@@ -325,26 +325,27 @@ const AdminOrderDetail = ( props ) => {
       />
 
       <StandardTable
+        rowKey="productId"
         title="Danh sách sản phẩm đang xử lý"
         hideCommandBar={true}
         columns={[
           { title: "Tên sản phẩm", field: "productName",
-            editComponent: props => <ProductDropDown 
+            editComponent: <ProductDropDown 
               productList={orderInfo?.items} 
               setSelectedProductId={setSelectedProductId}
               setSelectedProductName={setSelectedProductName} /> },
           { title: "Kho", field: "warehouseName",
-            editComponent: props => <WarehouseDropDown
+            editComponent: <WarehouseDropDown
               warehouseList={warehouseList}
               setSelectedWarehouseId={setSelectedWarehouseId}
               setSelectedWarehouseName={setSelectedWarehouseName} />},
           { title: "Vị trí kệ hàng", field: "bayCode",
-            editComponent: props => <BayDropDown
+            editComponent: <BayDropDown
               selectedWarehouse={selectedWarehouse} 
               setSelectedBayId={setSelectedBayId}
               setSelectedBayCode={setSelectedBayCode} /> },
           { title: "Số lượng", field: "quantity", 
-            editComponent: props => <TextField
+            editComponent: <TextField
               type="number"
               InputProps={{
                 inputProps: { 

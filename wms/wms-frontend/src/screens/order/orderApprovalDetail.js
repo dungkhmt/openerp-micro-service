@@ -1,6 +1,6 @@
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { request } from "api";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { Fragment, useEffect, useState } from "react";
 import { API_PATH } from "screens/apiPaths";
 import useStyles from 'screens/styles.js';
@@ -275,7 +275,6 @@ const OrderApprovalDetail = ( props ) => {
 
       <StandardTable
         title="Danh sách sản phẩm"
-        hideCommandBar={true}
         options={{
           selection: false,
           pageSize: 5,

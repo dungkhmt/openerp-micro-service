@@ -1,9 +1,10 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Button, Grid, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, MenuItem, Modal, Select, TextField, 
+  Typography } from "@mui/material";
 import { isEditableInput } from '@testing-library/user-event/dist/utils';
 import { request } from "api";
 import { RouteMap } from 'components/map/maps';
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { Fragment, useEffect, useState } from "react";
 import { API_PATH } from "screens/apiPaths";
 import useStyles from 'screens/styles.js';
@@ -15,6 +16,7 @@ const DeliveryTripDetail = ( props ) => {
 
   const [tripInfo, setTripInfo] = useState({});
   const [isDeleted, setDeleted] = useState(false);
+  const [updatable, setUpdatable] = useState(true);
   const [deliveryPersons, setDeliveryPersons] = useState([]);
   const [warehouseList, setWarehouseList] = useState([]);
   const [deliveryItemsTableData, setDeliveryItemsTableData] = useState([]);
@@ -48,6 +50,9 @@ const DeliveryTripDetail = ( props ) => {
         setMaxSequence(res.data.totalLocations);
         setSelectedWarehouseId(res.data.warehouseId);
         setDeliveryItemsTableData(res.data.items);
+        if (res.data.deliveryTripStatusCode != 'CREATED') {
+          setUpdatable(false);
+        }
         if (res.data.warehouseName != null) {
           setSelectedWarehouseName(res.data.warehouseName);
         }
@@ -503,6 +508,7 @@ const DeliveryTripDetail = ( props ) => {
       </Box>
 
       <StandardTable
+        rowKey='assignOrderItemId'
         title="Danh sách sản phẩm"
         hideCommandBar={true}
         columns={[
@@ -514,9 +520,9 @@ const DeliveryTripDetail = ( props ) => {
           { title: "Kho", field: "warehouseName" },
           { title: "Địa chỉ nhận hàng", field: "customerAddressName" }
         ]}
-        actions={!isDeleted && [
+        actions={!isDeleted && updatable && [
           {
-            icon: () => <AddIcon onClick={() => setShowAssignedItemsModal(true)} />,
+            icon: <AddIcon onClick={() => setShowAssignedItemsModal(true)} />,
             tooltip: "Thêm sản phẩm vào chuyến giao hàng",
             isFreeAction: true
           }
@@ -528,53 +534,53 @@ const DeliveryTripDetail = ( props ) => {
           sorting: true,
         }}
         data={deliveryItemsTableData}
-        editable={{
-          onRowDelete: oldData => new Promise((resolve, reject) => {
-            setTimeout(() => {
-              console.log("Old data => ", oldData);
-              if (oldData.deliveryTripItemId !== undefined) {
-                // nếu đã lưu delivery item vào data base
-                // thì xóa các delivery item này
-                // và cập nhật lại quantity của assigned_order_item
-                console.log("Delete from database");
-                request(
-                  "put",
-                  API_PATH.DELIVERY_MANAGER_ASSIGN_ORDER_ITEM,
-                  (res) => {
-                    setCreatedItemsTableData([...createdItemsTableData, res.data]);
-                  },
-                  {
-                    500: () => errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau")
-                  },
-                  {
-                    assignOrderItemId: oldData.assignOrderItemId,
-                    quantity: oldData.quantity,
-                    deliveryTripItemId: oldData.deliveryTripItemId
-                  }
-                );
-              } else {
-                // nếu chưa lưu delivery item vào database
-                // thì restore created items từ rawCreatedItemsTableData
-                var newCreatedItemsTableData = rawCreatedItemsTableData;
-                for (var i = 0; i < newCreatedItemsTableData.length; i++) {
-                  if (newCreatedItemsTableData[i].assignOrderItemId == oldData.assignOrderItemId) {
-                      var adder = newCreatedItemsTableData[i];
-                      adder.quantity = parseFloat(adder.quantity);
-                      setCreatedItemsTableData([...createdItemsTableData, adder])
-                      break;
-                    }
-                }
-              }
+        // editable={{
+        //   onRowDelete: oldData => new Promise((resolve, reject) => {
+        //     setTimeout(() => {
+        //       console.log("Old data => ", oldData);
+        //       if (oldData.deliveryTripItemId !== undefined) {
+        //         // nếu đã lưu delivery item vào data base
+        //         // thì xóa các delivery item này
+        //         // và cập nhật lại quantity của assigned_order_item
+        //         console.log("Delete from database");
+        //         request(
+        //           "put",
+        //           API_PATH.DELIVERY_MANAGER_ASSIGN_ORDER_ITEM,
+        //           (res) => {
+        //             setCreatedItemsTableData([...createdItemsTableData, res.data]);
+        //           },
+        //           {
+        //             500: () => errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau")
+        //           },
+        //           {
+        //             assignOrderItemId: oldData.assignOrderItemId,
+        //             quantity: oldData.quantity,
+        //             deliveryTripItemId: oldData.deliveryTripItemId
+        //           }
+        //         );
+        //       } else {
+        //         // nếu chưa lưu delivery item vào database
+        //         // thì restore created items từ rawCreatedItemsTableData
+        //         var newCreatedItemsTableData = rawCreatedItemsTableData;
+        //         for (var i = 0; i < newCreatedItemsTableData.length; i++) {
+        //           if (newCreatedItemsTableData[i].assignOrderItemId == oldData.assignOrderItemId) {
+        //               var adder = newCreatedItemsTableData[i];
+        //               adder.quantity = parseFloat(adder.quantity);
+        //               setCreatedItemsTableData([...createdItemsTableData, adder])
+        //               break;
+        //             }
+        //         }
+        //       }
               
-              const dataDelete = [...deliveryItemsTableData];
-              const index = oldData.tableData.id;
-              dataDelete.splice(index, 1);
-              setDeliveryItemsTableData([...dataDelete]);
-              setMaxSequence(maxSequence - 1);
-              resolve();
-            });
-          })
-        }}
+        //       const dataDelete = [...deliveryItemsTableData];
+        //       const index = oldData.tableData.id;
+        //       dataDelete.splice(index, 1);
+        //       setDeliveryItemsTableData([...dataDelete]);
+        //       setMaxSequence(maxSequence - 1);
+        //       resolve();
+        //     });
+        //   })
+        // }}
       />
     </Box>
   </Fragment>)
