@@ -30,10 +30,22 @@ moment.updateLocale("en", {
  * @property {any} minDate
  * @property {string} message
  * @property {boolean} error
+ * @property {boolean} fullWidth
+ * @property {boolean} disablePast
  * @param {Prop} props
  */
 export const CustomDatePicker = (props) => {
-  const { value, onChange, label, error, message, minDate, view } = props;
+  const {
+    value,
+    onChange,
+    label,
+    error,
+    message,
+    minDate,
+    view,
+    fullWidth = true,
+    disablePast = false,
+  } = props;
   return (
     <LocalizationProvider
       adapterLocale={moment.locale("en")}
@@ -43,17 +55,21 @@ export const CustomDatePicker = (props) => {
         views={view ? view : null}
         label={label}
         value={value}
+        disablePast={disablePast}
         onChange={onChange}
         dayOfWeekFormatter={(day) => {
           return `${day}`;
         }}
         minDate={minDate}
+        sx={{
+          padding: 0,
+        }}
         renderInput={(dates) => (
           <TextField
-            sx={{ mb: 2 }}
             variant="outlined"
             error={error}
-            size="small"
+            size="medium"
+            fullWidth={fullWidth}
             helperText={message ? message : ""}
             {...dates}
             InputLabelProps={{

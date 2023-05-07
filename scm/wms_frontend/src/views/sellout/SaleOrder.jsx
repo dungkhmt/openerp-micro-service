@@ -1,32 +1,27 @@
 import AddIcon from "@mui/icons-material/Add";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { Box, Button, InputBase, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
+import { Action } from "components/action/Action";
+import PrimaryButton from "components/button/PrimaryButton";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
-import CustomFormControl from "components/form/CustomFormControl";
+import CustomizedDialogs from "components/dialog/CustomizedDialogs";
 import CustomModal from "components/modal/CustomModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
 import {
-  useGetCustomerList,
-  useGetProductList,
-} from "controllers/query/category-query";
-import { useState } from "react";
-import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
-import { useToggle, useWindowSize } from "react-use";
-import { Action } from "../../components/action/Action";
-import PrimaryButton from "../../components/button/PrimaryButton";
-import CustomizedDialogs from "../../components/dialog/CustomizedDialogs";
-import {
-  useCreateSaleOrder,
   useGetSaleOrderList,
   useUpdateSaleOrderStatus,
-} from "../../controllers/query/sale-order-query";
-import {
-  staticDatagridCols,
-  staticFormControlFields,
-  staticProductFields,
-} from "./LocalConstant";
+} from "controllers/query/sale-order-query";
+import { useState } from "react";
+import { useToggle, useWindowSize } from "react-use";
+import { AppColors } from "shared/AppColors";
+import DraggableDeleteDialog from "../../components/dialog/DraggableDialogs";
+import CustomDrawer from "../../components/drawer/CustomDrawer";
+import HeaderModal from "../../components/modal/HeaderModal";
+import { saleOrderCols } from "./LocalConstant";
+import CreateSaleOrderForm from "./components/CreateSaleOrderForm";
 
 function SaleOrderScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
@@ -35,50 +30,16 @@ function SaleOrderScreen({ screenAuthorization }) {
   });
   const [isAdd, setIsAdd] = useToggle(false);
   const [isApproved, setIsApproved] = useToggle(false);
+  const [isRemove, setIsRemove] = useToggle(false);
+  const [itemSelected, setItemSelected] = useState(null);
   const [updatingOrder, setUpdateOrder] = useState();
+  const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const { height } = useWindowSize();
-  const { isLoading: isLoadingCustomer, data: customer } = useGetCustomerList();
-  const { isLoading: isLoadingProduct, data: product } = useGetProductList();
   const { isLoading, data } = useGetSaleOrderList();
-  const createSaleOrderQuery = useCreateSaleOrder();
   const updatePurchaseOrderQuery = useUpdateSaleOrderStatus({
     orderCode: updatingOrder?.code,
   });
-  const methods = useForm({
-    mode: "onChange",
-    defaultValues: {
-      products: [],
-    },
-    // resolver: brandSchema,
-  });
-  const {
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setValue,
-    control,
-  } = methods;
-  const products = useWatch({
-    control,
-    name: "products",
-  });
 
-  const onSubmit = async (data) => {
-    let orderParams = {
-      boughtBy: data?.boughtBy?.code,
-      orderItems: data?.products?.map((pro) => {
-        return {
-          priceUnit: 35000,
-          productCode: pro?.code,
-          quantity: pro?.quantity,
-        };
-      }),
-      discount: data?.discount,
-    };
-    await createSaleOrderQuery.mutateAsync(orderParams);
-    setIsAdd((pre) => !pre);
-    reset();
-  };
   const handleUpdateOrder = async () => {
     let updateData = {
       status: "accepted",
@@ -88,17 +49,10 @@ function SaleOrderScreen({ screenAuthorization }) {
   };
   let actions = [
     {
-      title: "Thêm",
+      title: "Mua hộ khách",
       callback: (pre) => {
         setIsAdd((pre) => !pre);
       },
-      icon: <AddIcon />,
-      describe: "Thêm bản ghi mới",
-      disabled: false,
-    },
-    {
-      title: "Phê duyệt",
-      callback: () => {},
       icon: <AddIcon />,
       describe: "Thêm bản ghi mới",
       disabled: false,
@@ -108,20 +62,27 @@ function SaleOrderScreen({ screenAuthorization }) {
     {
       title: "Sửa",
       callback: async (item) => {
-        setIsApproved((pre) => !pre);
-        setUpdateOrder(item);
+        setOpenDrawer();
       },
       icon: <EditIcon />,
-      // permission: PERMISSIONS.MANAGE_CATEGORY_EDIT,
+      color: AppColors.secondary,
     },
     {
       title: "Xóa",
       callback: (item) => {
-        // setIsRemove();
-        // setItemSelected(item);
+        setIsRemove();
+        setItemSelected(item);
       },
       icon: <DeleteIcon />,
-      // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
+      color: AppColors.error,
+    },
+    {
+      title: "Phê duyệt",
+      callback: (item) => {
+        setIsApproved((pre) => !pre);
+      },
+      icon: <CheckCircleIcon />,
+      color: AppColors.green,
     },
   ];
   return (
@@ -136,21 +97,30 @@ function SaleOrderScreen({ screenAuthorization }) {
         isLoading={isLoading}
         totalItem={100}
         columns={[
-          ...staticDatagridCols,
+          ...saleOrderCols,
           {
-            field: "quantity",
+            field: "action",
             headerName: "Hành động",
+            headerAlign: "center",
+            align: "center",
             sortable: false,
-            minWidth: 200,
+            width: 125,
+            minWidth: 150,
+            maxWidth: 200,
             type: "actions",
-            renderCell: (params) => (
-              <Action
-                disabled={false}
-                extraAction={extraActions[0]}
-                item={params.row}
-                onActionCall={extraActions[0].callback}
-              />
-            ),
+            getActions: (params) => {
+              return [
+                ...extraActions.map((extraAction, index) => (
+                  <Action
+                    item={params.row}
+                    key={index}
+                    extraAction={extraAction}
+                    onActionCall={extraAction.callback}
+                    // disabled={params?.row?.status !== ORDERS_STATUS.created}
+                  />
+                )),
+              ];
+            },
           },
         ]}
         rows={data ? data?.content : []}
@@ -159,95 +129,9 @@ function SaleOrderScreen({ screenAuthorization }) {
         open={isAdd}
         toggle={setIsAdd}
         size="sm"
-        style={{ padding: 2 }}
+        title="Tạo mới đơn bán hàng"
       >
-        <FormProvider {...methods}>
-          <CustomFormControl
-            control={control}
-            errors={errors}
-            fields={[
-              ...staticFormControlFields,
-              {
-                name: "boughtBy",
-                label: "Người mua",
-                component: "select",
-                options: customer ? customer?.content : [],
-                loading: isLoadingCustomer,
-              },
-            ]}
-          />
-          <CustomDataGrid
-            isSelectable={true}
-            params={params}
-            setParams={setParams}
-            sx={{ height: height - 64 - 71 - 24 - 20 - 35 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom - Page Title
-            isLoading={isLoadingProduct}
-            totalItem={100}
-            columns={[
-              ...staticProductFields,
-              {
-                field: "quantity",
-                headerName: "Số lượng mua",
-                sortable: false,
-                minWidth: 150,
-                type: "number",
-                editable: true,
-                renderCell: (params) => {
-                  const product = products.find((el) => el.id === params.id);
-                  return product ? product.quantity : "Nhập số lượng";
-                },
-                renderEditCell: (params) => {
-                  const index = products?.findIndex(
-                    (el) => el.id === params.id
-                  );
-                  const value = index !== -1 ? products[index].quantity : null;
-                  return (
-                    <Controller
-                      name={`products.${index}.quantity`}
-                      control={control}
-                      render={({ field: { onChange } }) => (
-                        <InputBase
-                          inputProps={{ min: 0 }}
-                          sx={{
-                            "& .MuiInputBase-input": {
-                              textAlign: "right",
-                              fontSize: 14,
-                              "&::placeholder": {
-                                fontSize: 13,
-                                opacity: 0.7,
-                                fontStyle: "italic",
-                              },
-                            },
-                          }}
-                          placeholder="Nhập số lượng"
-                          value={value}
-                          onChange={onChange}
-                        />
-                      )}
-                    />
-                  );
-                },
-              },
-            ]}
-            rows={product ? product?.content : []}
-            onSelectionChange={(ids) => {
-              let results = product?.content.filter((pro) =>
-                ids.includes(pro?.id)
-              );
-              setValue("products", results);
-            }}
-          />
-        </FormProvider>
-        <Button
-          onClick={handleSubmit(onSubmit)}
-          variant="contained"
-          style={{ marginRight: 20, color: "white" }}
-        >
-          Submit
-        </Button>
-        <Button onClick={() => reset()} variant={"outlined"}>
-          Reset
-        </Button>
+        <CreateSaleOrderForm />
       </CustomModal>
       <CustomizedDialogs
         open={isApproved}
@@ -268,6 +152,16 @@ function SaleOrderScreen({ screenAuthorization }) {
           contents: (theme) => ({ width: "100%" }),
           actions: (theme) => ({ paddingRight: theme.spacing(2) }),
         }}
+      />
+      <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
+        <HeaderModal onClose={setOpenDrawer} title="Sửa thông tin đơn hàng" />
+        {/* <UpdateProductForm /> */}
+      </CustomDrawer>
+      <DraggableDeleteDialog
+        // disable={isLoadingRemove}
+        open={isRemove && itemSelected}
+        handleOpen={setIsRemove}
+        callback={(flag) => {}}
       />
     </Box>
   );

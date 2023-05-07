@@ -15,6 +15,7 @@ import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.product.ProductDTO;
 import wms.dto.shipment.AssignedItemDTO;
+import wms.dto.shipment.ReturnShipmentItemDTO;
 import wms.dto.shipment.ShipmentDTO;
 import wms.dto.shipment.ShipmentItemDTO;
 import wms.entity.*;

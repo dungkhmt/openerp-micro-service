@@ -1,5 +1,6 @@
 package wms.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +114,7 @@ public class ShipmentController extends BaseController {
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
             @RequestParam(value = "sort_asc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
-            @RequestParam(value = "", required = true, defaultValue = DefaultConst.STRING) String tripCode
+            @RequestParam(value = "tripCode", required = true, defaultValue = DefaultConst.STRING) String tripCode
     ) {
         try {
             return response(new ResultEntity(1, "Get list shipment items successfully", shipmentService.getAllItemOfTrip(page, pageSize, sortField, isSortAsc, tripCode)));

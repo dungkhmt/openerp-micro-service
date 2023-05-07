@@ -17,6 +17,7 @@ import CustomToolBar from "components/toolbar/CustomToolBar";
 import {
   useCreateReceiptBill,
   useGetBillItemOfPurchaseOrder,
+  useGetReceiptBillList,
 } from "controllers/query/bill-query";
 import { useGetProductList } from "controllers/query/category-query";
 import { useGetPurchaseOrderItems } from "controllers/query/purchase-order-query";
@@ -38,7 +39,10 @@ function PurchaseOrderDetailScreen({}) {
   const createBillQuery = useCreateReceiptBill();
   const [isAdd, setIsAdd] = useToggle(false);
   const [showTable1, setShowTable1] = useState(true);
-
+  const { isLoading: isLoadingReceiptBill, data: receiptBills } =
+    useGetReceiptBillList({
+      orderStatus: "accepted",
+    });
   const toggleTables = () => {
     setShowTable1((prev) => !prev);
   };
@@ -49,6 +53,7 @@ function PurchaseOrderDetailScreen({}) {
     },
     // resolver: brandSchema,
   });
+
   const {
     handleSubmit,
     formState: { errors },
@@ -203,7 +208,7 @@ function PurchaseOrderDetailScreen({}) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} />
+        <CustomToolBar actions={actions} containSearch={false} />
       </Box>
       <Box>
         <Typography>Thông tin cơ bản</Typography>
@@ -221,6 +226,74 @@ function PurchaseOrderDetailScreen({}) {
           <Typography>Trạng thái</Typography>
           <Button variant="outlined">{currOrder?.status}</Button>
         </Box>
+        <CustomDataGrid
+          params={params}
+          setParams={setParams}
+          sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
+          isLoading={isLoading}
+          totalItem={100}
+          columns={[
+            {
+              field: "code",
+              headerName: "Mã code",
+              sortable: false,
+              pinnable: true,
+            },
+            {
+              field: "createdDate",
+              headerName: "Thời điểm tạo",
+              sortable: false,
+              minWidth: 150,
+            },
+            {
+              field: "status",
+              headerName: "Trạng thái",
+              sortable: false,
+              minWidth: 150,
+              renderCell: (params) => {
+                return (
+                  <Button variant="outlined" color="info">
+                    {"IN PROGRESS"}
+                  </Button>
+                );
+              },
+            },
+            {
+              field: "facility",
+              headerName: "Kho trực thuộc",
+              sortable: false,
+              minWidth: 150,
+              valueGetter: (params) => {
+                return params.row.facility.name;
+              },
+            },
+            {
+              field: "order",
+              headerName: "Mã đơn hàng",
+              sortable: false,
+              minWidth: 150,
+              valueGetter: (params) => {
+                return params.row.purchaseOrder.code;
+              },
+            },
+            // {
+            //   field: "quantity",
+            //   headerName: "Hành động",
+            //   sortable: false,
+            //   minWidth: 200,
+            //   type: "actions",
+            //   renderCell: (params) => (
+            //     <Action
+            //       disabled={false}
+            //       extraAction={extraActions[0]}
+            //       item={params.row}
+            //       onActionCall={extraActions[0].callback}
+            //     />
+            //   ),
+            // },
+          ]}
+          rows={receiptBills ? receiptBills?.content : []}
+        />
       </Box>
       <CustomModal
         open={isAdd}

@@ -9,7 +9,7 @@ import {
 import { useState } from "react";
 import { useDebounce, useMeasure } from "react-use";
 import SearchBox from "../searchbox/SearchBox";
-const CustomToolBar = ({ actions }) => {
+const CustomToolBar = ({ actions, containSearch = true }) => {
   const [ref, { width }] = useMeasure();
   const [keyword, setKeyword] = useState("");
   const [,] = useDebounce(
@@ -95,13 +95,15 @@ const CustomToolBar = ({ actions }) => {
           )}
         </Stack>
       </Stack>
-      <Box sx={{ flexDirection: "row", alignItems: "flex-end" }}>
-        <SearchBox
-          value={keyword}
-          setValue={setKeyword}
-          sx={{ marginTop: 2 }}
-        />
-      </Box>
+      {containSearch && (
+        <Box sx={{ flexDirection: "row", alignItems: "flex-end" }}>
+          <SearchBox
+            value={keyword}
+            setValue={setKeyword}
+            sx={{ marginTop: 2 }}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

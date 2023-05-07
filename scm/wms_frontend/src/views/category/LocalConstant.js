@@ -70,7 +70,7 @@ export const staticCustomerField = [
         >
           <Typography
             sx={{
-              textTransform: "capitalize",
+              textTransform: "lowercase",
               color: ITEM_STATUS_COLOR_MAPPING[params?.row?.status],
             }}
           >
@@ -187,7 +187,7 @@ export const productColumns = [
         >
           <Typography
             sx={{
-              textTransform: "capitalize",
+              textTransform: "lowercase",
               color: ITEM_STATUS_COLOR_MAPPING[params?.row?.status],
             }}
           >

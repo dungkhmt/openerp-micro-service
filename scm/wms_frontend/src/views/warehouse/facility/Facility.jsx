@@ -1,33 +1,45 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box } from "@mui/material";
-import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
+import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
+import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetCustomerList } from "controllers/query/category-query";
+import {
+  useGetFacilityInventory,
+  useGetFacilityList,
+} from "controllers/query/facility-query";
 import { useState } from "react";
 import { useToggle, useWindowSize } from "react-use";
-import { AppColors } from "shared/AppColors";
+import { Action } from "../../../components/action/Action";
 import DraggableDeleteDialog from "../../../components/dialog/DraggableDialogs";
-import CustomDrawer from "../../../components/drawer/CustomDrawer";
-import HeaderModal from "../../../components/modal/HeaderModal";
-import { staticCustomerField } from "../LocalConstant";
-import CreateCustomerForm from "./components/CreateCustomerForm";
-import UpdateCustomerForm from "./components/UpdateCustomerForm";
-function CustomerScreen({ screenAuthorization }) {
+import { AppColors } from "../../../shared/AppColors";
+import { staticProductFields, staticWarehouseCols } from "../LocalConstant";
+import CreateFacilityForm from "./components/CreateFacilityForm";
+
+function FacilityScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
     page_size: 50,
   });
   const { height } = useWindowSize();
-  const { isLoading, data } = useGetCustomerList();
+  const [isAdd, setIsAdd] = useToggle(false);
+  const [isOpenEditDrawer, setOpenEditDrawer] = useToggle(false);
+  const [isOpenInventoryDrawer, setOpenInventoryDrawer] = useToggle(false);
+  const [facilityCode, setFacilityCode] = useState("");
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
-  const [isOpenDrawer, setOpenDrawer] = useToggle(false);
-  const [isAdd, setIsAdd] = useToggle(false);
+
+  const { isLoading, data } = useGetFacilityList();
+  const { isLoading: isLoadingInventory, data: inventory } =
+    useGetFacilityInventory({
+      code: facilityCode,
+    });
+
   let actions = [
     {
       title: "Thêm",
@@ -43,7 +55,7 @@ function CustomerScreen({ screenAuthorization }) {
     {
       title: "Sửa",
       callback: (item) => {
-        setOpenDrawer((pre) => !pre);
+        setOpenEditDrawer((pre) => !pre);
       },
       icon: <EditIcon />,
       color: AppColors.secondary,
@@ -56,6 +68,16 @@ function CustomerScreen({ screenAuthorization }) {
       },
       icon: <DeleteIcon />,
       color: AppColors.error,
+    },
+    {
+      title: "Xem tồn kho",
+      callback: (item) => {
+        setOpenInventoryDrawer();
+        setFacilityCode(item?.code);
+      },
+      icon: <VisibilityIcon />,
+      color: AppColors.green,
+      // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
     },
   ];
   return (
@@ -70,17 +92,16 @@ function CustomerScreen({ screenAuthorization }) {
         isLoading={isLoading}
         totalItem={100}
         columns={[
-          ...staticCustomerField,
+          ...staticWarehouseCols,
           {
-            field: "action",
+            field: "quantity",
             headerName: "Hành động",
             headerAlign: "center",
             align: "center",
             sortable: false,
-            width: 125,
-            minWidth: 150,
-            maxWidth: 200,
+            minWidth: 200,
             type: "actions",
+            flex: 1,
             getActions: (params) => [
               ...extraActions.map((extraAction, index) => (
                 <Action
@@ -96,17 +117,31 @@ function CustomerScreen({ screenAuthorization }) {
         ]}
         rows={data ? data?.content : []}
       />
-      <CustomModal
-        open={isAdd}
-        toggle={setIsAdd}
-        size="sm"
-        title="Thêm khách hàng"
+      <CustomDrawer
+        open={isOpenInventoryDrawer}
+        onClose={setOpenInventoryDrawer}
       >
-        <CreateCustomerForm setIsAdd={setIsAdd} />
+        <HeaderModal onClose={setOpenInventoryDrawer} title="Tồn kho" />
+        <CustomDataGrid
+          isSelectable={false}
+          params={params}
+          setParams={setParams}
+          sx={{
+            marginTop: 2,
+          }}
+          // sx={{ height: height - 64 - 71 - 24 - 20 - 35 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom - Page Title
+          isLoading={isLoadingInventory}
+          // totalItem={100}
+          columns={staticProductFields}
+          rows={inventory ? inventory?.content : []}
+        />
+      </CustomDrawer>
+      <CustomModal open={isAdd} toggle={setIsAdd} size="sm" title="Thêm kho">
+        <CreateFacilityForm setIsAdd={setIsAdd} />
       </CustomModal>
-      <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
-        <HeaderModal onClose={setOpenDrawer} title="Sửa thông tin khách hàng" />
-        <UpdateCustomerForm />
+      <CustomDrawer open={isOpenEditDrawer} onClose={setOpenEditDrawer}>
+        <HeaderModal onClose={setOpenEditDrawer} title="Sửa thông tin kho" />
+        {/* <UpdateProductForm /> */}
       </CustomDrawer>
       <DraggableDeleteDialog
         // disable={isLoadingRemove}
@@ -118,5 +153,5 @@ function CustomerScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_CUSTOMER";
-export default withScreenSecurity(CustomerScreen, SCR_ID, true);
+const SCR_ID = "SCR_WAREHOUSE";
+export default withScreenSecurity(FacilityScreen, SCR_ID, true);

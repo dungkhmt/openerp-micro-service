@@ -34,9 +34,9 @@ const CustomBreadcrumbs = () => {
       separator={<NavigateNext fontSize="small" />}
       aria-label="breadcrumb"
       sx={{
-        boxShadow: 3,
-        paddingX: 2,
-        paddingY: 1,
+        // boxShadow: 3,
+        // paddingX: 2,
+        // paddingY: 1,
         display: "flex",
         listStyleType: "none",
         overflow: "hidden",

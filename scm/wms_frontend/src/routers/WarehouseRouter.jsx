@@ -1,9 +1,9 @@
 import { Route, Switch, useRouteMatch } from "react-router";
 import PurchaseOrderDetail from "../views/sellin/PurchaseOrderDetail";
 import SaleOrderDetail from "../views/sellout/SaleOrderDetail";
-import ExportingActivity from "../views/warehouse/ExportingActivity";
-import Warehouse from "../views/warehouse/Facility";
-import ImportingActivity from "../views/warehouse/ImportingActivity";
+import ExportingActivity from "../views/warehouse/export/ExportingActivity";
+import Warehouse from "../views/warehouse/facility/Facility";
+import ImportingActivity from "../views/warehouse/import/ImportingActivity";
 
 export default function WarehouseRouter() {
   let { path } = useRouteMatch();

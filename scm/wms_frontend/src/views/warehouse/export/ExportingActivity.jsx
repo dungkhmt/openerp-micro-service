@@ -2,16 +2,17 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box, Button } from "@mui/material";
+import { Action } from "components/action/Action";
+import withScreenSecurity from "components/common/withScreenSecurity";
+import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomToolBar from "components/toolbar/CustomToolBar";
+import { useGetDeliveryBillList } from "controllers/query/bill-query";
+import { useGetSaleOrderList } from "controllers/query/sale-order-query";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useWindowSize } from "react-use";
-import { Action } from "../../components/action/Action";
-import withScreenSecurity from "../../components/common/withScreenSecurity";
-import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
-import { useGetReceiptBillList } from "../../controllers/query/bill-query";
-import { useGetPurchaseOrderList } from "../../controllers/query/purchase-order-query";
-function ImportingActivityScreen({ screenAuthorization }) {
+import { staticSaleOrderCols } from "../LocalConstant";
+function ExportingActivityScreen({ screenAuthorization }) {
   let { path } = useRouteMatch();
   const [params, setParams] = useState({
     page: 1,
@@ -20,23 +21,23 @@ function ImportingActivityScreen({ screenAuthorization }) {
   const history = useHistory();
   const { height } = useWindowSize();
 
-  const { isLoading, data } = useGetPurchaseOrderList({
+  const { isLoading, data } = useGetSaleOrderList({
     orderStatus: "accepted",
   });
-  const { isLoading: isLoadingReceiptBill, data: receiptBills } =
-    useGetReceiptBillList({
+  const { isLoading: isLoadingReceiptBill, data: deliveryBills } =
+    useGetDeliveryBillList({
       orderStatus: "accepted",
     });
 
   const handleButtonClick = (params) => {
-    history.push(`${path}/purchase-order-detail`, {
+    history.push(`${path}/sale-order-detail`, {
       order: params,
     });
   };
 
   let actions = [
     {
-      title: "Nhập kho",
+      title: "Xuất kho",
       callback: (pre) => {
         handleButtonClick();
       },
@@ -85,73 +86,7 @@ function ImportingActivityScreen({ screenAuthorization }) {
         isLoading={isLoading}
         totalItem={100}
         columns={[
-          {
-            field: "code",
-            headerName: "Mã code",
-            sortable: false,
-            pinnable: true,
-          },
-          {
-            field: "supplierCode",
-            headerName: "Mã nhà sản xuất",
-            sortable: false,
-            minWidth: 150,
-          },
-          {
-            field: "totalMoney",
-            headerName: "Tổng tiền đặt",
-            sortable: false,
-            minWidth: 150,
-          },
-          {
-            field: "totalPayment",
-            headerName: "Tổng tiền trả",
-            sortable: false,
-            minWidth: 150,
-          },
-          {
-            field: "vat",
-            headerName: "VAT",
-            sortable: false,
-            minWidth: 150,
-          },
-          {
-            field: "createdBy",
-            headerName: "Tạo bởi",
-            sortable: false,
-            minWidth: 150,
-            valueGetter: (params) => {
-              return params.row.user.id;
-            },
-          },
-          {
-            field: "createdDate",
-            headerName: "Thời điểm tạo",
-            sortable: false,
-            minWidth: 150,
-          },
-          {
-            field: "status",
-            headerName: "Trạng thái",
-            sortable: false,
-            minWidth: 150,
-            renderCell: (params) => {
-              return (
-                <Button variant="outlined" color="info">
-                  {params?.row?.status}
-                </Button>
-              );
-            },
-          },
-          {
-            field: "facility",
-            headerName: "Kho trực thuộc",
-            sortable: false,
-            minWidth: 150,
-            valueGetter: (params) => {
-              return params.row.facility.name;
-            },
-          },
+          ...staticSaleOrderCols,
           {
             field: "quantity",
             headerName: "Hành động",
@@ -202,22 +137,22 @@ function ImportingActivityScreen({ screenAuthorization }) {
               );
             },
           },
-          {
-            field: "facility",
-            headerName: "Kho trực thuộc",
-            sortable: false,
-            minWidth: 150,
-            valueGetter: (params) => {
-              return params.row.facility.name;
-            },
-          },
+          // {
+          //   field: "facility",
+          //   headerName: "Kho trực thuộc",
+          //   sortable: false,
+          //   minWidth: 150,
+          //   valueGetter: (params) => {
+          //     return params.row.facility.name;
+          //   },
+          // },
           {
             field: "order",
             headerName: "Mã đơn hàng",
             sortable: false,
             minWidth: 150,
             valueGetter: (params) => {
-              return params.row.purchaseOrder.code;
+              return params.row.saleOrder.code;
             },
           },
           {
@@ -236,11 +171,11 @@ function ImportingActivityScreen({ screenAuthorization }) {
             ),
           },
         ]}
-        rows={receiptBills ? receiptBills?.content : []}
+        rows={deliveryBills ? deliveryBills?.content : []}
       />
     </Box>
   );
 }
 
-const SCR_ID = "SCR_IMPORTING_ACTIVITY";
-export default withScreenSecurity(ImportingActivityScreen, SCR_ID, true);
+const SCR_ID = "SCR_EXPORTING_ACTIVITY";
+export default withScreenSecurity(ExportingActivityScreen, SCR_ID, true);

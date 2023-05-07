@@ -1,33 +1,42 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box } from "@mui/material";
-import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomModal from "components/modal/CustomModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetCustomerList } from "controllers/query/category-query";
+import { useGetShipmentList } from "controllers/query/shipment-query";
 import { useState } from "react";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
-import { AppColors } from "shared/AppColors";
-import DraggableDeleteDialog from "../../../components/dialog/DraggableDialogs";
-import CustomDrawer from "../../../components/drawer/CustomDrawer";
-import HeaderModal from "../../../components/modal/HeaderModal";
-import { staticCustomerField } from "../LocalConstant";
-import CreateCustomerForm from "./components/CreateCustomerForm";
-import UpdateCustomerForm from "./components/UpdateCustomerForm";
-function CustomerScreen({ screenAuthorization }) {
+import { Action } from "../../../components/action/Action";
+import { AppColors } from "../../../shared/AppColors";
+import { shipmentCols } from "../LocalConstant";
+import CreateShipmentForm from "./components/CreateShipmentForm";
+function ShipmentScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
     page_size: 50,
   });
   const { height } = useWindowSize();
-  const { isLoading, data } = useGetCustomerList();
-  const [isRemove, setIsRemove] = useToggle(false);
-  const [itemSelected, setItemSelected] = useState(null);
+
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const [isAdd, setIsAdd] = useToggle(false);
+  const [isRemove, setIsRemove] = useToggle(false);
+  const [itemSelected, setItemSelected] = useState(null);
+  const history = useHistory();
+  let { path } = useRouteMatch();
+
+  const { isLoading, data } = useGetShipmentList();
+
+  const handleButtonClick = (params) => {
+    history.push(`${path}/shipment-detail`, {
+      shipment: params,
+    });
+  };
+
   let actions = [
     {
       title: "Thêm",
@@ -42,8 +51,8 @@ function CustomerScreen({ screenAuthorization }) {
   const extraActions = [
     {
       title: "Sửa",
-      callback: (item) => {
-        setOpenDrawer((pre) => !pre);
+      callback: async (item) => {
+        setOpenDrawer();
       },
       icon: <EditIcon />,
       color: AppColors.secondary,
@@ -56,6 +65,14 @@ function CustomerScreen({ screenAuthorization }) {
       },
       icon: <DeleteIcon />,
       color: AppColors.error,
+    },
+    {
+      title: "Xem",
+      callback: (item) => {
+        handleButtonClick(item);
+      },
+      icon: <VisibilityIcon />,
+      color: AppColors.green,
     },
   ];
   return (
@@ -70,28 +87,28 @@ function CustomerScreen({ screenAuthorization }) {
         isLoading={isLoading}
         totalItem={100}
         columns={[
-          ...staticCustomerField,
+          ...shipmentCols,
+
           {
             field: "action",
             headerName: "Hành động",
             headerAlign: "center",
             align: "center",
             sortable: false,
-            width: 125,
-            minWidth: 150,
-            maxWidth: 200,
+            flex: 1,
             type: "actions",
-            getActions: (params) => [
-              ...extraActions.map((extraAction, index) => (
-                <Action
-                  item={params.row}
-                  key={index}
-                  extraAction={extraAction}
-                  onActionCall={extraAction.callback}
-                  disabled={false}
-                />
-              )),
-            ],
+            getActions: (params) => {
+              return [
+                ...extraActions.map((extraAction, index) => (
+                  <Action
+                    item={params.row}
+                    key={index}
+                    extraAction={extraAction}
+                    onActionCall={extraAction.callback}
+                  />
+                )),
+              ];
+            },
           },
         ]}
         rows={data ? data?.content : []}
@@ -100,23 +117,13 @@ function CustomerScreen({ screenAuthorization }) {
         open={isAdd}
         toggle={setIsAdd}
         size="sm"
-        title="Thêm khách hàng"
+        title="Tạo mới đợt giao hàng"
       >
-        <CreateCustomerForm setIsAdd={setIsAdd} />
+        <CreateShipmentForm setIsAdd={setIsAdd} />
       </CustomModal>
-      <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
-        <HeaderModal onClose={setOpenDrawer} title="Sửa thông tin khách hàng" />
-        <UpdateCustomerForm />
-      </CustomDrawer>
-      <DraggableDeleteDialog
-        // disable={isLoadingRemove}
-        open={isRemove && itemSelected}
-        handleOpen={setIsRemove}
-        callback={(flag) => {}}
-      />
     </Box>
   );
 }
 
-const SCR_ID = "SCR_CUSTOMER";
-export default withScreenSecurity(CustomerScreen, SCR_ID, true);
+const SCR_ID = "SCR_SHIPMENT";
+export default withScreenSecurity(ShipmentScreen, SCR_ID, true);

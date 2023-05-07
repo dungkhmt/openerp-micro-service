@@ -7,10 +7,9 @@ import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomToolBar from "components/toolbar/CustomToolBar";
 import { useGetDeliveryBillList } from "controllers/query/bill-query";
 import { useState } from "react";
-import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { useWindowSize } from "react-use";
 function AddShipmentOrderScreen({ screenAuthorization }) {
-  const location = useLocation();
   const [params, setParams] = useState({
     page: 1,
     page_size: 50,

@@ -7,4 +7,7 @@ export const AppColors = {
   warning: "#EBBC46",
   info: "#4568F2",
   deactive: "",
+  green: "#059a3c",
+  pendingStatus: "#4568F2",
+  approvedStatus: "#9C27B0",
 };

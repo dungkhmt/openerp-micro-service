@@ -16,6 +16,7 @@ import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { productColumns } from "../LocalConstant";
 import CreateProductForm from "./components/CreateProductForm";
+import UpdateProductForm from "./components/UpdateProductForm";
 function ProductScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
@@ -106,6 +107,7 @@ function ProductScreen({ screenAuthorization }) {
       </CustomModal>
       <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
         <HeaderModal onClose={setOpenDrawer} title="Sửa thông tin sản phẩm" />
+        <UpdateProductForm />
       </CustomDrawer>
       <DraggableDeleteDialog
         // disable={isLoadingRemove}

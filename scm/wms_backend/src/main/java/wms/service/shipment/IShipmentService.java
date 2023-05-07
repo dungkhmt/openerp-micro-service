@@ -5,6 +5,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.product.ProductDTO;
 import wms.dto.shipment.AssignedItemDTO;
+import wms.dto.shipment.ReturnShipmentItemDTO;
 import wms.dto.shipment.ShipmentDTO;
 import wms.dto.shipment.ShipmentItemDTO;
 import wms.entity.ProductEntity;
@@ -19,7 +20,6 @@ public interface IShipmentService {
     ReturnPaginationDTO<Shipment> getAllShipments(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
     ReturnPaginationDTO<ShipmentItem> getAllShipmentItems(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
     ReturnPaginationDTO<ShipmentItem> getAllItemOfTrip(int page, int pageSize, String sortField, boolean isSortAsc, String tripCode) throws JsonProcessingException;
-
     Shipment getShipmentById(long id);
     Shipment getShipmentByCode(String code);
     ShipmentItem getShipmentItemById(long id);
