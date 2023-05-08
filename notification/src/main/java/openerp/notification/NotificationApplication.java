@@ -1,7 +1,10 @@
 package openerp.notification;
 
+import openerp.notification.service.NotificationsService;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -18,15 +21,12 @@ public class NotificationApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(NotificationApplication.class, args);
-
-
     }
 
 //    @Bean
-//    CommandLineRunner run(NotificationsService service) {
+//    public CommandLineRunner run(NotificationsService service) {
 //        return args -> {
 //            service.create("anonymous", "admin", "test", "/");
 //        };
 //    }
-
 }

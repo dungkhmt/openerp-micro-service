@@ -1,0 +1,29 @@
+{
+  "problem": "Bài tập",
+  "problemId": "Mã bài tập",
+  "problemName": "Tên bài tập",
+  "level": "Mức độ",
+  "timeLimit": "Giới hạn thời gian",
+  "memoryLimit": "Giới hạn bộ nhớ",
+  "problemDescription": "Mô tả bài tập",
+  "problemSuggestion": "Hướng giải gợi ý",
+  "problemSuggesstionPlaceholder": "Gợi ý lời giải, hướng xử lý bài toán cho sinh viên",
+  "correctSourceCode": "Source code đáp án",
+  "allowSubmittingOutput": "Cho phép người làm chỉ cần nộp output để đánh giá kết quả (không cần nộp source code)",
+  "isCustomEvaluated": "Tùy chỉnh công thức chấm điểm testcase",
+  "customEvaluationNote1": "* Sử dụng chế độ này với những bài toán có thể có nhiều kết quả đúng, vui lòng không chọn với bài toán thông thường (mỗi testcase chỉ có 1 kết quả)",
+  "customEvaluationNote2": "** Tham khảo cách sử dụng tại đây",
+  "checkerSourceCode": "Checker Source code",
+  "checkerSourceCodePlaceholder": "Code chấm điểm cho output của sinh viên",
+  "checkSolutionCompile": "Biên dịch",
+  "problemList": {
+    "title": "Danh sách bài tập"
+  },
+  "createProblem": "Tạo bài tập mới",
+  "editProblem": "Chỉnh sửa bài tập",
+  "validateSubmit": {
+    "warningCheckSolutionCompile": "Bạn chưa hoàn thành bước \"BIÊN DỊCH\"",
+    "missingField": "Trường {{fieldName}} không được bỏ trống"
+  }
+
+}

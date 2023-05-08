@@ -1,0 +1,15 @@
+{
+  "error": "An error happened",
+  "search": "Search",
+  "save": "Save",
+  "ok": "Ok",
+  "cancel": "Cancel",
+  "description" : "Description",
+  "edit" : "Edit",
+  "public": "Public",
+  "yes": "Yes",
+  "no": "No",
+  "missingField": "must not be null",
+  "addNew": "Add new",
+  "status": "Status"
+}

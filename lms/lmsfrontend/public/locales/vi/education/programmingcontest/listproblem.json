@@ -1,0 +1,9 @@
+{
+  "index": "STT",
+  "status": "Trạng thái",
+  "title": "Tiêu đề",
+  "solution": "Lời giải",
+  "difficulty": "Độ khó",
+  "addTestCase": "Thêm Test Case",
+  "edit": "Chỉnh sửa"
+}

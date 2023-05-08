@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 @AllArgsConstructor
 public class GetNotifications {
 
-    private Page<NotificationDTO> notifications;
+    private Page<NotificationProjection> notifications;
 
     private long numUnRead;
 }

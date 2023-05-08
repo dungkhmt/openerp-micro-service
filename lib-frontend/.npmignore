@@ -1,0 +1,7 @@
+# Ignore directories
+node_modules/
+.idea/
+src/
+
+# Ignore files
+*.log
