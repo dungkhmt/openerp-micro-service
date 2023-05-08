@@ -800,3 +800,7 @@ Caused by: java.net.ConnectException: Connection refused (Connection refused)
 2023-05-08 10:34:59.625  INFO 25930 --- [nio-8910-exec-5]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
 2023-05-08 10:40:16.109  INFO 25930 --- [nio-8910-exec-2]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
 2023-05-08 10:40:16.122  INFO 25930 --- [nio-8910-exec-2]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:49:30.280  INFO 25930 --- [extShutdownHook]  o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2023-05-08 10:49:30.297  INFO 25930 --- [extShutdownHook]  j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-05-08 10:49:30.299  INFO 25930 --- [extShutdownHook]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2023-05-08 10:49:30.303  INFO 25930 --- [extShutdownHook]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
