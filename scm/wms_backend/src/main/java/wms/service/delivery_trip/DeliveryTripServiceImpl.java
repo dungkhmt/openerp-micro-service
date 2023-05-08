@@ -8,6 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +50,8 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
     @Autowired
     private IDeliveryBillService deliveryBillService;
 
+    @Autowired
+    private MongoTemplate mongoTemplate;
     public DeliveryTripServiceImpl(UserRepo userRepo,
                                    DeliveryTripRepo deliveryTripRepo,
                                    ShipmentRepo shipmentRepo,
@@ -235,5 +240,23 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
                 log.info("Drone node info {} ({}, {})", node.getName(), node.getX(), node.getY());
             }
         }
+
+        RouteSchedulingOutput output = new RouteSchedulingOutput();
+        output.setDroneRoutes(finalSolution.getDroneRoutes());
+        output.setTruckRoute(finalSolution.getTruckRoute());
+        output.setTotalCost(finalSolution.getTotalCost());
+        output.setTotalTruckCost(finalSolution.getTotalTruckCost());
+        output.setTotalDroneCost(finalSolution.getTotalDroneCost());
+        output.setTotalTruckWait(finalSolution.getTotalTruckWait());
+        output.setTotalDroneWait(finalSolution.getTotalDroneWait());
+        output.setTripCode(trip.getCode());
+        mongoTemplate.save(output);
+    }
+
+    @Override
+    public RouteSchedulingOutput getTripRoute(String tripCode) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("tripCode").is(tripCode));
+        return mongoTemplate.findOne(query, RouteSchedulingOutput.class);
     }
 }

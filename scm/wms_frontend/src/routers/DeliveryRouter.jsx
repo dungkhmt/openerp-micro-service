@@ -1,6 +1,8 @@
 import { Route, Switch, useRouteMatch } from "react-router";
 import AddShipmentOrder from "../views/delivery/AddShipmentOrder";
+import Drone from "../views/delivery/Drone";
 import SplitBillDetail from "../views/delivery/SplitBillDetail";
+import Truck from "../views/delivery/Truck";
 import Shipment from "../views/delivery/shipment/Shipment";
 import ShipmentDetail from "../views/delivery/shipment/ShipmentDetail";
 import Trip from "../views/delivery/shipment/TripDetail";
@@ -31,8 +33,8 @@ export default function DeliveryRouter() {
           exact
           path={`${path}/split-order/split-bill-detail`}
         ></Route>
-        {/* <Route component={Truck} exact path={`${path}/vehicle/truck`}></Route>
-        <Route component={Drone} exact path={`${path}/vehicle/drone`}></Route> */}
+        <Route component={Truck} exact path={`${path}/vehicle/truck`}></Route>
+        <Route component={Drone} exact path={`${path}/vehicle/drone`}></Route>
       </Switch>
     </div>
   );

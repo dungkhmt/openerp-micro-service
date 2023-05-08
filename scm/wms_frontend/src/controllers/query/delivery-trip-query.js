@@ -164,3 +164,16 @@ export const useCreateDrone = (params) => {
     onMutate: (variables) => {},
   });
 };
+export const useGetTripRouteList = (params) => {
+  return useQuery({
+    queryKey: [queryKey.delivery_trip.trip_route_list, params],
+    queryFn: async () => {
+      const res = await axiosSendRequest("get", endPoint.getTripRoutes, params);
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};

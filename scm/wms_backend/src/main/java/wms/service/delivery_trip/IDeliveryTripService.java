@@ -7,6 +7,7 @@ import wms.dto.delivery_trip.DeliveryTripDTO;
 import wms.dto.delivery_trip.TripRouteDTO;
 import wms.dto.product.ProductDTO;
 import wms.entity.DeliveryTrip;
+import wms.entity.RouteSchedulingOutput;
 import wms.entity.ShipmentItem;
 import wms.exception.CustomException;
 
@@ -22,4 +23,5 @@ public interface IDeliveryTripService {
     void deleteDeliveryTripById(long id);
     ShipmentItem assignBillToTrip(DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) throws CustomException;
     void createTripRoute(TripRouteDTO tripRouteDTO) throws CustomException;
+    RouteSchedulingOutput getTripRoute(String tripCode);
 }

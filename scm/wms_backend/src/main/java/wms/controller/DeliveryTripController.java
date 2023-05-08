@@ -79,4 +79,16 @@ public class DeliveryTripController extends BaseController {
             return response(error(ex));
         }
     }
+    @GetMapping("/get-trip-route")
+    public ResponseEntity<?> getTripRoute(
+            @RequestParam(value = "tripCode", required = true, defaultValue = DefaultConst.STRING) String tripCode
+    ) {
+        try {
+
+            return response(new ResultEntity(1, "Get trip route successfully", deliveryTripService.getTripRoute(tripCode)));
+        }
+        catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
 }

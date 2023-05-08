@@ -65,6 +65,8 @@ public class TruckDroneDeliverySolutionOutput {
             waitingCost += truckTime > droneTime ? // drone have to wait ? if true -> cost on drone.
                     globalInput.getDrone().getWaitingCost() * waitingTime : globalInput.getTruck().getWaitingCost() * waitingTime;
         }
+        this.totalTruckWait = waitingCost;
+        this.totalDroneWait = waitingCost;
         return waitingCost;
     }
 
@@ -72,7 +74,8 @@ public class TruckDroneDeliverySolutionOutput {
         double waitingCost = this.calculateWaitingCost();
         double truckCost = this.calculateTruckCost();
         double droneCost = this.calculateDroneCost();
-        return waitingCost + truckCost + droneCost;
+        this.totalCost = waitingCost + truckCost + droneCost;
+        return this.totalCost;
     }
     public List<Node> convertTruckRouteToNode(TruckRoute truckRoute) {
         List<Node> truckNode = new ArrayList<>();

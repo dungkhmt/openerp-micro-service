@@ -11,6 +11,7 @@ import java.util.List;
 
 @Setter
 @Getter
+@NoArgsConstructor // https://stackoverflow.com/questions/47387143/mappingexception-no-property-found-on-entity-to-bind-constructor-parameter-to
 public class TruckRoute {
     private List<TruckRouteElement> routeElements;
     public TruckRoute (List<Node> truckRouteNode) {
