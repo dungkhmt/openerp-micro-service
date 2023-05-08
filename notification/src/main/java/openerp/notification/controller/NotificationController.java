@@ -7,11 +7,14 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.notification.dto.GetNotifications;
+import openerp.notification.dto.NewNotificationRequest;
 import openerp.notification.dto.UpdateMultipleNotificationStatus;
 import openerp.notification.entity.Notifications;
 import openerp.notification.service.NotificationsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -190,5 +193,13 @@ public class NotificationController {
     @GetMapping("/test")
     public void test() {
         notificationsService.create("anonymous", "dungpq", "test", "/");
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createNotification(
+            @CurrentSecurityContext(expression = "authentication.name") String fromUser,
+            @RequestBody NewNotificationRequest request) {
+        notificationsService.create(fromUser, request.getToUser(), request.getContent(), request.getUrl());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

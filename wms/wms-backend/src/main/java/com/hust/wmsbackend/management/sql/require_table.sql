@@ -93,6 +93,8 @@ CREATE TABLE user_login
     otp_resend_number        INT       DEFAULT 0 NULL,
     party_id                 UUID,
     email                    VARCHAR(100),
+    first_name varchar(100),
+    last_name  varchar(100),
     CONSTRAINT pk_user_login PRIMARY KEY (user_login_id),
     CONSTRAINT user_party FOREIGN KEY (party_id) REFERENCES party (party_id)
 );
