@@ -56,6 +56,9 @@ const DeliveryTripDetail = ( props ) => {
         if (res.data.warehouseName != null) {
           setSelectedWarehouseName(res.data.warehouseName);
         }
+        if (res.data.deleted) {
+          setDeleted(true);
+        }
       }
     );
 

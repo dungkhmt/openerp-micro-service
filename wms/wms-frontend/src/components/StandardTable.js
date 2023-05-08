@@ -80,8 +80,8 @@ const stableSort = (array, comparator) => {
 }
 
 const EnhancedTableHead = ( props ) => {
-  const { headerCells, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, isEditable } =
-    props;
+  const { headerCells, onSelectAllClick, order, orderBy, numSelected, rowCount, 
+    onRequestSort, isEditable, options } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -90,7 +90,7 @@ const EnhancedTableHead = ( props ) => {
     <TableHead>
       <TableRow>
         {
-          isEditable &&
+          isEditable && options.selection != false && 
           <TableCell padding="checkbox">
             <Checkbox
               color="primary"
@@ -428,7 +428,8 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
         openNewRow={() => setShowAddModal(true)} isEditable={isEditable}
         deleteButtonHandle={deleteButtonHandle} actions={actions}
         deletable={deletable} 
-        selectedIds={selected} />
+        selectedIds={selected}
+      />
 
       <TableContainer>
           <Table
@@ -445,6 +446,7 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
               isEditable={isEditable}
+              options={options}
             />
 
             <TableBody>
@@ -464,7 +466,7 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
                       selected={isItemSelected}
                     >
                       {
-                        isEditable &&
+                        isEditable && options.selection != false &&
                         <TableCell padding="checkbox">
                           <Checkbox
                             color="primary"
