@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.security.Principal;
 import java.util.List;
@@ -110,11 +112,13 @@ public class ShipmentController {
     }
 
     @PutMapping("/auto-route")
-    public ResponseEntity<String> autoRoute(Principal principal, @RequestBody DeliveryTripDTO request) {
+    public ResponseEntity<String> autoRoute(@RequestHeader("Authorization") String token,
+                                            Principal principal,
+                                            @RequestBody DeliveryTripDTO request) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                autoRouteService.route(principal, request);
+                autoRouteService.route(principal, token, request);
             }
         }).start();
         return ResponseEntity.ok("OK");

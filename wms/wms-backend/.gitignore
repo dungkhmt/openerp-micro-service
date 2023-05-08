@@ -35,4 +35,4 @@ build/
 ## osm dataset
 src/main/resources/osm
 
-/logs
+/logs/*

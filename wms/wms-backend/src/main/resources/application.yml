@@ -46,3 +46,7 @@ logging:
 content:
   fs:
     filesystemRoot: /home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend
+
+external-api:
+  notification:
+    uri: http://localhost:8081/api/notification

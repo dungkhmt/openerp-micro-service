@@ -1,12 +1,17 @@
 package com.hust.wmsbackend.management.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.util.PointList;
 import com.hust.wmsbackend.management.entity.*;
 import com.hust.wmsbackend.management.model.DeliveryTripDTO;
+import com.hust.wmsbackend.management.model.request.NewNotificationRequest;
 import com.hust.wmsbackend.management.model.response.AutoRouteResponse;
 import com.hust.wmsbackend.management.repository.*;
 import com.hust.wmsbackend.management.service.AutoRouteService;
+import com.hust.wmsbackend.management.utils.ExternalApiCaller;
 import com.hust.wmsbackend.vrp.delivery.DeliveryAddressDTO;
 import com.hust.wmsbackend.vrp.delivery.DeliveryRouteService;
 import com.hust.wmsbackend.vrp.delivery.RouteRequest;
@@ -14,6 +19,7 @@ import com.hust.wmsbackend.vrp.delivery.RouteResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,23 +29,35 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor(onConstructor = @__(@Autowired))
+//@AllArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
 public class AutoRouteServiceImpl implements AutoRouteService {
 
+    @Autowired
     private DeliveryRouteService deliveryRouteService;
     // repository
+    @Autowired
     private WarehouseRepository warehouseRepository;
+    @Autowired
     private AssignedOrderItemRepository assignedOrderItemRepository;
+    @Autowired
     private SaleOrderHeaderRepository saleOrderHeaderRepository;
+    @Autowired
     private CustomerAddressRepository customerAddressRepository;
+    @Autowired
     private DeliveryTripPathRepository deliveryTripPathRepository;
+    @Autowired
     private DeliveryTripItemRepository deliveryTripItemRepository;
+    @Autowired
     private DeliveryTripRepository deliveryTripRepository;
+    @Value("${external-api.notification.uri}")
+    private String NOTIFICATION_URI;
+    @Autowired
+    private ExternalApiCaller apiCaller;
 
     @Override
     @Transactional
-    public void route(Principal principal, DeliveryTripDTO request) {
+    public void route(Principal principal, String token, DeliveryTripDTO request) {
         // map request to auto route service input
         List<DeliveryTripDTO.DeliveryTripItemDTO> items = request.getItems();
         if (items.size() < 1) {
@@ -114,7 +132,18 @@ public class AutoRouteServiceImpl implements AutoRouteService {
 //        notificationsService.create("AUTO_ROUTE_SERVICE", principal.getName(),
 //                                    String.format("Tìm hành trình tối ưu cho chuyến giao hàng %s thành công", deliveryTripId),
 //                                    String.format("/delivery-manager/delivery-trips/%s", deliveryTripId));
-
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            apiCaller.simpleBooleanCall(NOTIFICATION_URI, token, mapper.writeValueAsString(NewNotificationRequest.builder()
+                    .toUser(principal.getName())
+                    .url(String.format("/delivery-manager/delivery-trips/%s", deliveryTripId))
+                    .content(String.format("Tìm hành trình tối ưu cho chuyến giao hàng %s thành công", deliveryTripId))
+                    .build()));
+            log.info("Push notification done");
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+            log.info("Push notification fail");
+        }
         log.info("Done auto route");
     }
 
