@@ -4,7 +4,6 @@ import ShipmentListing from "screens/shipment/shipmentListing";
 import ShipmentDetail from "screens/shipment/shipmentDetail";
 import DeliveryTripListing from "screens/shipment/deliveryTripListing";
 import DeliveryTripDetail from "screens/shipment/deliveryTripDetail";
-import TestTable from "screens/shipment/testTable";
 
 export default function DeliveryManagerRouter () {
   let { path } = useRouteMatch();
@@ -35,11 +34,6 @@ export default function DeliveryManagerRouter () {
           component={DeliveryTripDetail}
           exact
           path={`${path}/delivery-trips/:id`}
-        ></Route>
-        <Route
-          component={TestTable}
-          exact
-          path={`${path}/orders`}
         ></Route>
       </Switch>
     </div>

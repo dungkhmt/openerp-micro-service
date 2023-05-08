@@ -1,0 +1,48 @@
+SQL_DB_HOST: localhost
+SQL_DB_PORT: 6543
+SQL_DB_USER: postgres
+SQL_DB_PASS: openerp
+POSTGRES_DB: openerpdev
+
+server:
+  port: 8910
+  servlet:
+    context-path: "/api"
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${SQL_DB_HOST}:${SQL_DB_PORT}/${POSTGRES_DB}
+    username: ${SQL_DB_USER}
+    password: ${SQL_DB_PASS}
+    hikari: # reference: https://github:com/brettwooldridge/HikariCP#configuration-knobs-baby:
+      maxLifetime: 30000
+      leakDetectionThreshold: 60000
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true # not recommended for production
+        order_inserts: true
+        jdbc:
+          batch_size: 50
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://openerp3.dailyopt.ai/iam/realms/OpenERP-Dev/protocol/openid-connect/certs
+
+logging:
+  config: classpath:logback-dev.xml
+  file:
+    path: logs
+    name: base.log
+  level:
+    root: INFO
+    #    com.hust.baseweb: OFF
+    org:
+      springframework: INFO
+
+
+content:
+  fs:
+    filesystemRoot: /home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend

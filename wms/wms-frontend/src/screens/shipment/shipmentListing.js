@@ -115,7 +115,6 @@ const ShipmentListing = () => {
                 500: () => errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau")
               }
             )
-            // TODO: delete shipment implement
           })
         })
       }}

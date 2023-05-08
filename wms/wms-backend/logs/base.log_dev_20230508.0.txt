@@ -1,0 +1,802 @@
+2023-05-08 09:56:01.863  INFO 16670 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : Starting WmsBackendApplication on dinh-8560w with PID 16670 (/home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend/target/classes started by dinh in /home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend)
+2023-05-08 09:56:01.869  INFO 16670 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : No active profile set, falling back to default profiles: default
+2023-05-08 09:56:03.198  INFO 16670 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 09:56:03.198  INFO 16670 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 09:56:03.468  INFO 16670 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 261ms. Found 19 repository interfaces.
+2023-05-08 09:56:03.519  INFO 16670 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 09:56:03.519  INFO 16670 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 09:56:03.543  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.AssignedOrderItemRepository.
+2023-05-08 09:56:03.543  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.BayRepository.
+2023-05-08 09:56:03.544  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.CustomerAddressRepository.
+2023-05-08 09:56:03.544  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryPersonRepository.
+2023-05-08 09:56:03.544  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripItemRepository.
+2023-05-08 09:56:03.545  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripPathRepository.
+2023-05-08 09:56:03.547  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripRepository.
+2023-05-08 09:56:03.548  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.InventoryItemRepository.
+2023-05-08 09:56:03.548  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductCategoryRepository.
+2023-05-08 09:56:03.548  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductPriceRepository.
+2023-05-08 09:56:03.549  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductV2Repository.
+2023-05-08 09:56:03.549  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductWarehouseRepository.
+2023-05-08 09:56:03.549  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRepository.
+2023-05-08 09:56:03.550  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRequestRepository.
+2023-05-08 09:56:03.550  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptRepository.
+2023-05-08 09:56:03.551  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderHeaderRepository.
+2023-05-08 09:56:03.551  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderItemRepository.
+2023-05-08 09:56:03.552  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ShipmentRepository.
+2023-05-08 09:56:03.552  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.WarehouseRepository.
+2023-05-08 09:56:03.552  INFO 16670 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 32ms. Found 0 repository interfaces.
+2023-05-08 09:56:03.571  INFO 16670 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 09:56:03.572  INFO 16670 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 09:56:03.605  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.AssignedOrderItemRepository.
+2023-05-08 09:56:03.605  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.BayRepository.
+2023-05-08 09:56:03.606  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.CustomerAddressRepository.
+2023-05-08 09:56:03.607  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryPersonRepository.
+2023-05-08 09:56:03.607  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripItemRepository.
+2023-05-08 09:56:03.608  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripPathRepository.
+2023-05-08 09:56:03.608  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripRepository.
+2023-05-08 09:56:03.609  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.InventoryItemRepository.
+2023-05-08 09:56:03.609  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductCategoryRepository.
+2023-05-08 09:56:03.609  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductPriceRepository.
+2023-05-08 09:56:03.610  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductV2Repository.
+2023-05-08 09:56:03.610  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductWarehouseRepository.
+2023-05-08 09:56:03.610  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRepository.
+2023-05-08 09:56:03.611  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRequestRepository.
+2023-05-08 09:56:03.611  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptRepository.
+2023-05-08 09:56:03.611  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderHeaderRepository.
+2023-05-08 09:56:03.611  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderItemRepository.
+2023-05-08 09:56:03.612  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ShipmentRepository.
+2023-05-08 09:56:03.612  INFO 16670 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.WarehouseRepository.
+2023-05-08 09:56:03.612  INFO 16670 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 32ms. Found 0 repository interfaces.
+2023-05-08 09:56:04.127  INFO 16670 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 09:56:04.460  INFO 16670 --- [           main]  o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8910 (http)
+2023-05-08 09:56:04.468  INFO 16670 --- [           main]  o.a.coyote.http11.Http11NioProtocol      : Initializing ProtocolHandler ["http-nio-8910"]
+2023-05-08 09:56:04.468  INFO 16670 --- [           main]  o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2023-05-08 09:56:04.469  INFO 16670 --- [           main]  org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.27]
+2023-05-08 09:56:04.583  INFO 16670 --- [           main]  o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2023-05-08 09:56:04.584  INFO 16670 --- [           main]  o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 2638 ms
+2023-05-08 09:56:04.773  WARN 16670 --- [           main]  com.zaxxer.hikari.HikariConfig           : HikariPool-1 - leakDetectionThreshold is less than 2000ms or more than maxLifetime, disabling it.
+2023-05-08 09:56:04.773  INFO 16670 --- [           main]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2023-05-08 09:56:04.951  INFO 16670 --- [           main]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2023-05-08 09:56:05.054  INFO 16670 --- [           main]  o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-05-08 09:56:05.135  INFO 16670 --- [           main]  org.hibernate.Version                    : HHH000412: Hibernate Core {5.4.6.Final}
+2023-05-08 09:56:05.256  INFO 16670 --- [           main]  o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
+2023-05-08 09:56:05.371  INFO 16670 --- [           main]  org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQL10Dialect
+2023-05-08 09:56:06.797  INFO 16670 --- [           main]  o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2023-05-08 09:56:06.807  INFO 16670 --- [           main]  j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-05-08 09:56:06.929  INFO 16670 --- [           main]  com.graphhopper.GraphHopper              : version 7.0|2023-03-13T11:56:29Z (9,21,6,5,2,9)
+2023-05-08 09:56:07.299  INFO 16670 --- [           main]  com.graphhopper.GraphHopper              : No custom areas are used, custom_areas.directory not given
+2023-05-08 09:56:07.320  INFO 16670 --- [           main]  com.graphhopper.GraphHopper              : No country rules available
+2023-05-08 09:56:07.320  INFO 16670 --- [           main]  com.graphhopper.GraphHopper              : start creating graph from src/main/resources/osm/vietnam-latest.osm.pbf
+2023-05-08 09:56:07.350  INFO 16670 --- [           main]  com.graphhopper.GraphHopper              : using car|RAM_STORE|2D|no_turn_cost|nodes:9,edges:21,geometry:6,location_index:5,string_index:2,nodesCH:0,shortcuts:9, memory:totalMB:35, usedMB:24
+2023-05-08 09:56:07.370  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : Start reading OSM file: 'src/main/resources/osm/vietnam-latest.osm.pbf'
+2023-05-08 09:56:07.370  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : pass1 - start
+2023-05-08 09:56:16.645  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : pass1 - start reading OSM ways
+2023-05-08 09:56:40.874  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : pass1 - start reading OSM relations
+2023-05-08 09:56:41.031  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : pass1 - finished, processed ways: 3 955 531, accepted ways: 2 942 435, way nodes: 29 719 233, relations: 8 695, totalMB:1010, usedMB:648
+2023-05-08 09:56:41.032  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : pass1 - finished, took: 33.66s
+2023-05-08 09:56:41.032  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : Creating graph. Node count (pillar+tower): 29719233, totalMB:1010, usedMB:648
+2023-05-08 09:56:41.033  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : pass2 - start
+2023-05-08 09:56:41.062  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : pass2 - start reading OSM nodes
+2023-05-08 09:56:45.310  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : pass2 - processed nodes: 10 000 000, accepted nodes: 4 433 717, totalMB:1170, usedMB:922
+2023-05-08 09:56:50.489  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : pass2 - processed nodes: 20 000 000, accepted nodes: 13 811 487, totalMB:1170, usedMB:1051
+2023-05-08 09:56:55.549  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : pass2 - processed nodes: 30 000 000, accepted nodes: 22 466 233, totalMB:1348, usedMB:686
+2023-05-08 09:57:00.459  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : pass2 - start reading OSM ways
+2023-05-08 09:57:08.776  WARN 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : Loop in OSM way: 336029309, will be ignored, duplicate node: 8097437185
+2023-05-08 09:57:16.277  WARN 16670 --- [           main]  com.graphhopper.reader.osm.OSMReader     : Unrealistic low speed calculated from duration. Maybe the duration is too long, or it is applied to a way that only represents a part of the connection? OSM way: 571192540. duration=15:00 (= 900 minutes), distance=687.9992170796727 m
+2023-05-08 09:57:21.276  WARN 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : Loop in OSM way: 638354962, will be ignored, duplicate node: 8158526300
+2023-05-08 09:57:57.099  WARN 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : Loop in OSM way: 852539441, will be ignored, duplicate node: 7952828778
+2023-05-08 09:58:40.798  WARN 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : Loop in OSM way: 957748816, will be ignored, duplicate node: 8862030365
+2023-05-08 09:58:45.252  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : pass2 - start reading OSM relations
+2023-05-08 09:58:45.262  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : pass2 - finished, processed ways: 3 955 531, way nodes: 29 719 233, with tags: 7 037, ignored barriers at junctions: 132
+2023-05-08 09:58:45.262  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : pass2 - finished, took: 2min 4s
+2023-05-08 09:58:45.262  INFO 16670 --- [           main]  c.g.reader.osm.WaySegmentParser          : Finished reading OSM file. pass1: 33s,  pass2: 124s,  total: 157s
+2023-05-08 09:58:45.262  INFO 16670 --- [           main]  com.graphhopper.reader.osm.OSMReader     : Finished reading OSM file: /home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend/src/main/resources/osm/vietnam-latest.osm.pbf, nodes: 5 185 896, edges: 5 947 089, zero distance edges: 6 963
+2023-05-08 09:58:45.366  INFO 16670 --- [           main]  c.g.r.s.PrepareRoutingSubnetworks        : Start marking subnetworks, prepare.min_network_size: 200, threads: 1, nodes: 5 185 896, edges: 5 947 089, jobs: [car_subnetwork|fastest|car_average_speed], totalMB:1647, usedMB:1334
+2023-05-08 09:58:55.478  INFO 16670 --- [pool-3-thread-1]  c.g.r.s.PrepareRoutingSubnetworks        : car - Found 800735 subnetworks (791258 single edges and 9477 components with more than one edge, total nodes: 11894178), took: 10.091576s
+2023-05-08 09:58:55.877  INFO 16670 --- [pool-3-thread-1]  c.g.r.s.PrepareRoutingSubnetworks        : car - Marked 800717 subnetworks (biggest: 392 edges) -> 18 components(s) remain (smallest: 400, biggest: 11009502 edges), total marked edges: 42968, took: 0.39812464s
+2023-05-08 09:58:56.445  INFO 16670 --- [           main]  c.g.r.s.PrepareRoutingSubnetworks        : Finished finding and marking subnetworks for 1 jobs, took: 11.078404s, totalMB:1767, usedMB:1658
+2023-05-08 09:58:56.446  INFO 16670 --- [           main]  com.graphhopper.GraphHopper              : nodes: 5 185 896, edges: 5 947 089
+2023-05-08 09:59:04.045  INFO 16670 --- [           main]  c.g.storage.index.LocationIndexTree      : location index created in 7.596466s, size:8 452 499, leafs:1 138 690, precision:300, depth:7, checksum:1417145, entries:[16, 16, 16, 16, 16, 4, 4], entriesPerLeaf:7.4230027
+2023-05-08 09:59:04.045  INFO 16670 --- [           main]  com.graphhopper.GraphHopper              : flushing graph car|RAM_STORE|2D|no_turn_cost|nodes:9,edges:21,geometry:6,location_index:5,string_index:2,nodesCH:0,shortcuts:9, details:edges: 5 947 089(205MB), nodes: 5 185 896(60MB), bounds: 102.1097471,114.356432,8.4263731,23.3875442, name:(3MB), geo:29 609 021(113MB), totalMB:1875, usedMB:832)
+2023-05-08 09:59:04.690  INFO 16670 --- [           main]  com.graphhopper.GraphHopper              : flushed graph totalMB:1875, usedMB:1097)
+2023-05-08 09:59:06.853  WARN 16670 --- [           main]  JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-05-08 09:59:07.046  INFO 16670 --- [           main]  o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2023-05-08 09:59:07.624  INFO 16670 --- [           main]  org.mongodb.driver.cluster               : Cluster created with settings {hosts=[localhost:27017], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms', maxWaitQueueSize=500}
+2023-05-08 09:59:07.655  INFO 16670 --- [localhost:27017]  org.mongodb.driver.cluster               : Exception in monitor thread while connecting to server localhost:27017
+com.mongodb.MongoSocketOpenException: Exception opening socket
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:70)
+	at com.mongodb.internal.connection.InternalStreamConnection.open(InternalStreamConnection.java:128)
+	at com.mongodb.internal.connection.DefaultServerMonitor$ServerMonitorRunnable.run(DefaultServerMonitor.java:117)
+	at java.lang.Thread.run(Thread.java:826)
+Caused by: java.net.ConnectException: Connection refused (Connection refused)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:607)
+	at com.mongodb.internal.connection.SocketStreamHelper.initialize(SocketStreamHelper.java:64)
+	at com.mongodb.internal.connection.SocketStream.initializeSocket(SocketStream.java:79)
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:65)
+	... 3 common frames omitted
+2023-05-08 09:59:07.723  WARN 16670 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.LocalDateTime to class java.time.Instant as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 09:59:07.723  WARN 16670 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.Instant to class java.time.LocalDateTime as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 09:59:07.760  WARN 16670 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.LocalDateTime to class java.time.Instant as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 09:59:07.760  WARN 16670 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.Instant to class java.time.LocalDateTime as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 09:59:08.180  INFO 16670 --- [           main]  o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@231ece71, org.springframework.security.web.context.SecurityContextPersistenceFilter@cd2c8d81, org.springframework.security.web.header.HeaderWriterFilter@e17c6b33, org.springframework.security.web.csrf.CsrfFilter@ce9faf03, org.springframework.security.web.authentication.logout.LogoutFilter@8571746c, org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter@5493afa7, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@aa053c31, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@c237474b, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@39fe9b10, org.springframework.security.web.session.SessionManagementFilter@b8fbee87, org.springframework.security.web.access.ExceptionTranslationFilter@1c391db5, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@3b15f394]
+2023-05-08 09:59:08.233  INFO 16670 --- [           main]  o.a.coyote.http11.Http11NioProtocol      : Starting ProtocolHandler ["http-nio-8910"]
+2023-05-08 09:59:08.253  INFO 16670 --- [           main]  o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8910 (http) with context path '/api'
+2023-05-08 09:59:08.255  INFO 16670 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : Started WmsBackendApplication in 187.204 seconds (JVM running for 187.704)
+2023-05-08 10:00:35.741  INFO 16670 --- [nio-8910-exec-7]  o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-05-08 10:00:35.742  INFO 16670 --- [nio-8910-exec-7]  o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2023-05-08 10:00:35.753  INFO 16670 --- [nio-8910-exec-7]  o.s.web.servlet.DispatcherServlet        : Completed initialization in 10 ms
+2023-05-08 10:02:06.298  INFO 16670 --- [extShutdownHook]  o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2023-05-08 10:02:06.314  INFO 16670 --- [extShutdownHook]  j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-05-08 10:02:06.316  INFO 16670 --- [extShutdownHook]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2023-05-08 10:02:06.320  INFO 16670 --- [extShutdownHook]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2023-05-08 10:02:14.613  INFO 18245 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : Starting WmsBackendApplication on dinh-8560w with PID 18245 (/home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend/target/classes started by dinh in /home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend)
+2023-05-08 10:02:14.617  INFO 18245 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : No active profile set, falling back to default profiles: default
+2023-05-08 10:02:15.745  INFO 18245 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:02:15.746  INFO 18245 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:02:15.976  INFO 18245 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 221ms. Found 19 repository interfaces.
+2023-05-08 10:02:16.032  INFO 18245 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:02:16.032  INFO 18245 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:02:16.058  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.AssignedOrderItemRepository.
+2023-05-08 10:02:16.059  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.BayRepository.
+2023-05-08 10:02:16.059  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.CustomerAddressRepository.
+2023-05-08 10:02:16.060  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryPersonRepository.
+2023-05-08 10:02:16.060  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripItemRepository.
+2023-05-08 10:02:16.061  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripPathRepository.
+2023-05-08 10:02:16.061  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripRepository.
+2023-05-08 10:02:16.062  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.InventoryItemRepository.
+2023-05-08 10:02:16.062  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductCategoryRepository.
+2023-05-08 10:02:16.063  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductPriceRepository.
+2023-05-08 10:02:16.063  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductV2Repository.
+2023-05-08 10:02:16.064  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductWarehouseRepository.
+2023-05-08 10:02:16.064  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRepository.
+2023-05-08 10:02:16.065  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRequestRepository.
+2023-05-08 10:02:16.066  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptRepository.
+2023-05-08 10:02:16.066  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderHeaderRepository.
+2023-05-08 10:02:16.067  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderItemRepository.
+2023-05-08 10:02:16.067  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ShipmentRepository.
+2023-05-08 10:02:16.068  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.WarehouseRepository.
+2023-05-08 10:02:16.068  INFO 18245 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 36ms. Found 0 repository interfaces.
+2023-05-08 10:02:16.091  INFO 18245 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:02:16.092  INFO 18245 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:02:16.121  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.AssignedOrderItemRepository.
+2023-05-08 10:02:16.122  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.BayRepository.
+2023-05-08 10:02:16.122  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.CustomerAddressRepository.
+2023-05-08 10:02:16.123  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryPersonRepository.
+2023-05-08 10:02:16.123  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripItemRepository.
+2023-05-08 10:02:16.123  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripPathRepository.
+2023-05-08 10:02:16.123  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripRepository.
+2023-05-08 10:02:16.124  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.InventoryItemRepository.
+2023-05-08 10:02:16.124  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductCategoryRepository.
+2023-05-08 10:02:16.124  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductPriceRepository.
+2023-05-08 10:02:16.125  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductV2Repository.
+2023-05-08 10:02:16.125  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductWarehouseRepository.
+2023-05-08 10:02:16.128  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRepository.
+2023-05-08 10:02:16.128  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRequestRepository.
+2023-05-08 10:02:16.128  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptRepository.
+2023-05-08 10:02:16.129  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderHeaderRepository.
+2023-05-08 10:02:16.129  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderItemRepository.
+2023-05-08 10:02:16.129  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ShipmentRepository.
+2023-05-08 10:02:16.129  INFO 18245 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.WarehouseRepository.
+2023-05-08 10:02:16.129  INFO 18245 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 29ms. Found 0 repository interfaces.
+2023-05-08 10:02:16.537  INFO 18245 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:02:16.818  INFO 18245 --- [           main]  o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8910 (http)
+2023-05-08 10:02:16.826  INFO 18245 --- [           main]  o.a.coyote.http11.Http11NioProtocol      : Initializing ProtocolHandler ["http-nio-8910"]
+2023-05-08 10:02:16.826  INFO 18245 --- [           main]  o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2023-05-08 10:02:16.826  INFO 18245 --- [           main]  org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.27]
+2023-05-08 10:02:16.960  INFO 18245 --- [           main]  o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2023-05-08 10:02:16.961  INFO 18245 --- [           main]  o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 2239 ms
+2023-05-08 10:02:17.112  WARN 18245 --- [           main]  com.zaxxer.hikari.HikariConfig           : HikariPool-1 - leakDetectionThreshold is less than 2000ms or more than maxLifetime, disabling it.
+2023-05-08 10:02:17.112  INFO 18245 --- [           main]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2023-05-08 10:02:17.244  INFO 18245 --- [           main]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2023-05-08 10:02:17.306  INFO 18245 --- [           main]  o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-05-08 10:02:17.408  INFO 18245 --- [           main]  org.hibernate.Version                    : HHH000412: Hibernate Core {5.4.6.Final}
+2023-05-08 10:02:17.553  INFO 18245 --- [           main]  o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
+2023-05-08 10:02:17.669  INFO 18245 --- [           main]  org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQL10Dialect
+2023-05-08 10:02:19.022  INFO 18245 --- [           main]  o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2023-05-08 10:02:19.030  INFO 18245 --- [           main]  j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-05-08 10:02:21.381  INFO 18245 --- [           main]  com.graphhopper.GraphHopper              : version 7.0|2023-03-13T11:56:29Z (9,21,6,5,2,9)
+2023-05-08 10:02:21.385  INFO 18245 --- [           main]  com.graphhopper.GraphHopper              : graph car|RAM_STORE|2D|no_turn_cost|nodes:9,edges:21,geometry:6,location_index:5,string_index:2,nodesCH:0,shortcuts:9, details:edges: 5 947 089(205MB), nodes: 5 185 896(60MB), bounds: 102.1097471,114.356432,8.4263731,23.3875442, name:(3MB), geo:29 609 021(113MB)
+2023-05-08 10:02:23.190  WARN 18245 --- [           main]  JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-05-08 10:02:23.376  INFO 18245 --- [           main]  o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2023-05-08 10:02:23.930  INFO 18245 --- [           main]  org.mongodb.driver.cluster               : Cluster created with settings {hosts=[localhost:27017], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms', maxWaitQueueSize=500}
+2023-05-08 10:02:23.961  INFO 18245 --- [localhost:27017]  org.mongodb.driver.cluster               : Exception in monitor thread while connecting to server localhost:27017
+com.mongodb.MongoSocketOpenException: Exception opening socket
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:70)
+	at com.mongodb.internal.connection.InternalStreamConnection.open(InternalStreamConnection.java:128)
+	at com.mongodb.internal.connection.DefaultServerMonitor$ServerMonitorRunnable.run(DefaultServerMonitor.java:117)
+	at java.lang.Thread.run(Thread.java:826)
+Caused by: java.net.ConnectException: Connection refused (Connection refused)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:607)
+	at com.mongodb.internal.connection.SocketStreamHelper.initialize(SocketStreamHelper.java:64)
+	at com.mongodb.internal.connection.SocketStream.initializeSocket(SocketStream.java:79)
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:65)
+	... 3 common frames omitted
+2023-05-08 10:02:24.037  WARN 18245 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.LocalDateTime to class java.time.Instant as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:02:24.037  WARN 18245 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.Instant to class java.time.LocalDateTime as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:02:24.068  WARN 18245 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.LocalDateTime to class java.time.Instant as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:02:24.069  WARN 18245 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.Instant to class java.time.LocalDateTime as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:02:24.605  INFO 18245 --- [           main]  o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@cb55816e, org.springframework.security.web.context.SecurityContextPersistenceFilter@3e7a8c7a, org.springframework.security.web.header.HeaderWriterFilter@184d7017, org.springframework.security.web.csrf.CsrfFilter@4f403aa0, org.springframework.security.web.authentication.logout.LogoutFilter@ed436987, org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter@d265f372, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@16c2b3b4, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@ae046c6b, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@319f5692, org.springframework.security.web.session.SessionManagementFilter@9501c985, org.springframework.security.web.access.ExceptionTranslationFilter@d838471d, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@cff0a8ff]
+2023-05-08 10:02:24.685  INFO 18245 --- [           main]  o.a.coyote.http11.Http11NioProtocol      : Starting ProtocolHandler ["http-nio-8910"]
+2023-05-08 10:02:24.701  INFO 18245 --- [           main]  o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8910 (http) with context path '/api'
+2023-05-08 10:02:24.705  INFO 18245 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : Started WmsBackendApplication in 11.319 seconds (JVM running for 11.899)
+2023-05-08 10:03:24.749  INFO 18245 --- [nio-8910-exec-1]  o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-05-08 10:03:24.750  INFO 18245 --- [nio-8910-exec-1]  o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2023-05-08 10:03:24.761  INFO 18245 --- [nio-8910-exec-1]  o.s.web.servlet.DispatcherServlet        : Completed initialization in 11 ms
+2023-05-08 10:14:21.881  INFO 18245 --- [extShutdownHook]  o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2023-05-08 10:14:21.902  INFO 18245 --- [extShutdownHook]  j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-05-08 10:14:21.904  INFO 18245 --- [extShutdownHook]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2023-05-08 10:14:21.908  INFO 18245 --- [extShutdownHook]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2023-05-08 10:14:29.203  INFO 21074 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : Starting WmsBackendApplication on dinh-8560w with PID 21074 (/home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend/target/classes started by dinh in /home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend)
+2023-05-08 10:14:29.207  INFO 21074 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : No active profile set, falling back to default profiles: default
+2023-05-08 10:14:30.626  INFO 21074 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:14:30.627  INFO 21074 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:14:30.869  INFO 21074 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 233ms. Found 19 repository interfaces.
+2023-05-08 10:14:30.913  INFO 21074 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:14:30.913  INFO 21074 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:14:30.940  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.AssignedOrderItemRepository.
+2023-05-08 10:14:30.941  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.BayRepository.
+2023-05-08 10:14:30.942  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.CustomerAddressRepository.
+2023-05-08 10:14:30.943  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryPersonRepository.
+2023-05-08 10:14:30.943  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripItemRepository.
+2023-05-08 10:14:30.944  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripPathRepository.
+2023-05-08 10:14:30.945  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripRepository.
+2023-05-08 10:14:30.946  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.InventoryItemRepository.
+2023-05-08 10:14:30.946  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductCategoryRepository.
+2023-05-08 10:14:30.947  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductPriceRepository.
+2023-05-08 10:14:30.947  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductV2Repository.
+2023-05-08 10:14:30.948  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductWarehouseRepository.
+2023-05-08 10:14:30.949  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRepository.
+2023-05-08 10:14:30.949  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRequestRepository.
+2023-05-08 10:14:30.950  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptRepository.
+2023-05-08 10:14:30.951  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderHeaderRepository.
+2023-05-08 10:14:30.952  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderItemRepository.
+2023-05-08 10:14:30.953  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ShipmentRepository.
+2023-05-08 10:14:30.953  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.WarehouseRepository.
+2023-05-08 10:14:30.953  INFO 21074 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 39ms. Found 0 repository interfaces.
+2023-05-08 10:14:30.972  INFO 21074 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:14:30.973  INFO 21074 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:14:31.001  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.AssignedOrderItemRepository.
+2023-05-08 10:14:31.001  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.BayRepository.
+2023-05-08 10:14:31.002  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.CustomerAddressRepository.
+2023-05-08 10:14:31.002  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryPersonRepository.
+2023-05-08 10:14:31.002  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripItemRepository.
+2023-05-08 10:14:31.002  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripPathRepository.
+2023-05-08 10:14:31.003  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripRepository.
+2023-05-08 10:14:31.003  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.InventoryItemRepository.
+2023-05-08 10:14:31.003  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductCategoryRepository.
+2023-05-08 10:14:31.003  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductPriceRepository.
+2023-05-08 10:14:31.004  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductV2Repository.
+2023-05-08 10:14:31.004  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductWarehouseRepository.
+2023-05-08 10:14:31.004  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRepository.
+2023-05-08 10:14:31.004  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRequestRepository.
+2023-05-08 10:14:31.005  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptRepository.
+2023-05-08 10:14:31.005  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderHeaderRepository.
+2023-05-08 10:14:31.005  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderItemRepository.
+2023-05-08 10:14:31.005  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ShipmentRepository.
+2023-05-08 10:14:31.006  INFO 21074 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.WarehouseRepository.
+2023-05-08 10:14:31.006  INFO 21074 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 25ms. Found 0 repository interfaces.
+2023-05-08 10:14:31.405  INFO 21074 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:14:31.458  INFO 21074 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration' of type [org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:14:31.461  INFO 21074 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'objectPostProcessor' of type [org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:14:31.464  INFO 21074 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@7da5417e' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:14:31.467  INFO 21074 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration' of type [org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:14:31.473  INFO 21074 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:14:31.776  INFO 21074 --- [           main]  o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8910 (http)
+2023-05-08 10:14:31.782  INFO 21074 --- [           main]  o.a.coyote.http11.Http11NioProtocol      : Initializing ProtocolHandler ["http-nio-8910"]
+2023-05-08 10:14:31.783  INFO 21074 --- [           main]  o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2023-05-08 10:14:31.783  INFO 21074 --- [           main]  org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.27]
+2023-05-08 10:14:31.883  INFO 21074 --- [           main]  o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2023-05-08 10:14:31.883  INFO 21074 --- [           main]  o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 2600 ms
+2023-05-08 10:14:32.044  WARN 21074 --- [           main]  com.zaxxer.hikari.HikariConfig           : HikariPool-1 - leakDetectionThreshold is less than 2000ms or more than maxLifetime, disabling it.
+2023-05-08 10:14:32.044  INFO 21074 --- [           main]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2023-05-08 10:14:32.206  INFO 21074 --- [           main]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2023-05-08 10:14:32.287  INFO 21074 --- [           main]  o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-05-08 10:14:32.366  INFO 21074 --- [           main]  org.hibernate.Version                    : HHH000412: Hibernate Core {5.4.6.Final}
+2023-05-08 10:14:32.505  INFO 21074 --- [           main]  o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
+2023-05-08 10:14:32.627  INFO 21074 --- [           main]  org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQL10Dialect
+2023-05-08 10:14:34.036  INFO 21074 --- [           main]  o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2023-05-08 10:14:34.044  INFO 21074 --- [           main]  j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-05-08 10:14:36.516  INFO 21074 --- [           main]  com.graphhopper.GraphHopper              : version 7.0|2023-03-13T11:56:29Z (9,21,6,5,2,9)
+2023-05-08 10:14:36.518  INFO 21074 --- [           main]  com.graphhopper.GraphHopper              : graph car|RAM_STORE|2D|no_turn_cost|nodes:9,edges:21,geometry:6,location_index:5,string_index:2,nodesCH:0,shortcuts:9, details:edges: 5 947 089(205MB), nodes: 5 185 896(60MB), bounds: 102.1097471,114.356432,8.4263731,23.3875442, name:(3MB), geo:29 609 021(113MB)
+2023-05-08 10:14:37.858  WARN 21074 --- [           main]  JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-05-08 10:14:38.106  INFO 21074 --- [           main]  o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@cb5b5aa4, org.springframework.security.web.context.SecurityContextPersistenceFilter@11db779f, org.springframework.security.web.header.HeaderWriterFilter@899dc8d8, org.springframework.security.web.authentication.logout.LogoutFilter@37f90f46, org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter@23d17c8c, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@b55d8a9a, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@1d62ac9c, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@ce2a06ed, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@f2b04672, org.springframework.security.web.session.SessionManagementFilter@21a70a51, org.springframework.security.web.access.ExceptionTranslationFilter@6e2e526b, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@e29c5a3a]
+2023-05-08 10:14:38.290  INFO 21074 --- [           main]  o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2023-05-08 10:14:38.864  INFO 21074 --- [           main]  org.mongodb.driver.cluster               : Cluster created with settings {hosts=[localhost:27017], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms', maxWaitQueueSize=500}
+2023-05-08 10:14:38.896  INFO 21074 --- [localhost:27017]  org.mongodb.driver.cluster               : Exception in monitor thread while connecting to server localhost:27017
+com.mongodb.MongoSocketOpenException: Exception opening socket
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:70)
+	at com.mongodb.internal.connection.InternalStreamConnection.open(InternalStreamConnection.java:128)
+	at com.mongodb.internal.connection.DefaultServerMonitor$ServerMonitorRunnable.run(DefaultServerMonitor.java:117)
+	at java.lang.Thread.run(Thread.java:826)
+Caused by: java.net.ConnectException: Connection refused (Connection refused)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:607)
+	at com.mongodb.internal.connection.SocketStreamHelper.initialize(SocketStreamHelper.java:64)
+	at com.mongodb.internal.connection.SocketStream.initializeSocket(SocketStream.java:79)
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:65)
+	... 3 common frames omitted
+2023-05-08 10:14:38.985  WARN 21074 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.LocalDateTime to class java.time.Instant as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:14:38.985  WARN 21074 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.Instant to class java.time.LocalDateTime as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:14:39.015  WARN 21074 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.LocalDateTime to class java.time.Instant as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:14:39.016  WARN 21074 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.Instant to class java.time.LocalDateTime as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:14:39.306  INFO 21074 --- [           main]  o.a.coyote.http11.Http11NioProtocol      : Starting ProtocolHandler ["http-nio-8910"]
+2023-05-08 10:14:39.320  INFO 21074 --- [           main]  o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8910 (http) with context path '/api'
+2023-05-08 10:14:39.322  INFO 21074 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : Started WmsBackendApplication in 11.283 seconds (JVM running for 12.128)
+2023-05-08 10:14:56.165  INFO 21074 --- [nio-8910-exec-1]  o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-05-08 10:14:56.166  INFO 21074 --- [nio-8910-exec-1]  o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2023-05-08 10:14:56.179  INFO 21074 --- [nio-8910-exec-1]  o.s.web.servlet.DispatcherServlet        : Completed initialization in 13 ms
+2023-05-08 10:14:56.759  INFO 21074 --- [nio-8910-exec-4]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:14:56.833  INFO 21074 --- [nio-8910-exec-4]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:16:36.762  INFO 21074 --- [nio-8910-exec-3]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:16:36.775  INFO 21074 --- [nio-8910-exec-3]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:16:42.337 ERROR 21074 --- [nio-8910-exec-6]  o.a.c.c.C.[.[.[.[dispatcherServlet]      : Servlet.service() for servlet [dispatcherServlet] in context with path [/api] threw exception [Request processing failed; nested exception is java.lang.NullPointerException] with root cause
+java.lang.NullPointerException: null
+	at com.hust.wmsbackend.management.service.impl.CartServiceImpl.calculateCartFee(CartServiceImpl.java:34)
+	at com.hust.wmsbackend.management.controller.CartController.calculateCartFee(CartController.java:31)
+	at com.hust.wmsbackend.management.controller.CartController$$FastClassBySpringCGLIB$$c140ce27.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:218)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:769)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:747)
+	at org.springframework.validation.beanvalidation.MethodValidationInterceptor.invoke(MethodValidationInterceptor.java:120)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:747)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:689)
+	at com.hust.wmsbackend.management.controller.CartController$$EnhancerBySpringCGLIB$$29bf7d8b.calculateCartFee(<generated>)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:106)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:888)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:660)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:741)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:320)
+	at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.invoke(FilterSecurityInterceptor.java:126)
+	at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.doFilter(FilterSecurityInterceptor.java:90)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:118)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:137)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:111)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:158)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:154)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter.doFilterInternal(BearerTokenAuthenticationFilter.java:130)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:92)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:77)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:105)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:56)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:215)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:178)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:358)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:271)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:202)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:526)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:408)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:861)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1579)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.lang.Thread.run(Thread.java:826)
+2023-05-08 10:17:01.433  INFO 21074 --- [nio-8910-exec-6]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:17:01.444  INFO 21074 --- [nio-8910-exec-6]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:17:09.818  INFO 21074 --- [nio-8910-exec-9]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:17:09.834  INFO 21074 --- [nio-8910-exec-9]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:19:28.768  INFO 21074 --- [nio-8910-exec-6]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:19:28.806  INFO 21074 --- [nio-8910-exec-6]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:19:38.065  INFO 21074 --- [extShutdownHook]  o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2023-05-08 10:19:38.082  INFO 21074 --- [extShutdownHook]  j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-05-08 10:19:38.083  INFO 21074 --- [extShutdownHook]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2023-05-08 10:19:38.085  INFO 21074 --- [extShutdownHook]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2023-05-08 10:19:44.516  INFO 22646 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : Starting WmsBackendApplication on dinh-8560w with PID 22646 (/home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend/target/classes started by dinh in /home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend)
+2023-05-08 10:19:44.524  INFO 22646 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : No active profile set, falling back to default profiles: default
+2023-05-08 10:19:46.511  INFO 22646 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:19:46.512  INFO 22646 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:19:47.132  INFO 22646 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 603ms. Found 19 repository interfaces.
+2023-05-08 10:19:47.281  INFO 22646 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:19:47.281  INFO 22646 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:19:47.314  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.AssignedOrderItemRepository.
+2023-05-08 10:19:47.316  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.BayRepository.
+2023-05-08 10:19:47.316  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.CustomerAddressRepository.
+2023-05-08 10:19:47.317  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryPersonRepository.
+2023-05-08 10:19:47.318  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripItemRepository.
+2023-05-08 10:19:47.319  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripPathRepository.
+2023-05-08 10:19:47.320  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripRepository.
+2023-05-08 10:19:47.321  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.InventoryItemRepository.
+2023-05-08 10:19:47.322  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductCategoryRepository.
+2023-05-08 10:19:47.324  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductPriceRepository.
+2023-05-08 10:19:47.325  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductV2Repository.
+2023-05-08 10:19:47.326  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductWarehouseRepository.
+2023-05-08 10:19:47.327  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRepository.
+2023-05-08 10:19:47.328  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRequestRepository.
+2023-05-08 10:19:47.330  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptRepository.
+2023-05-08 10:19:47.331  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderHeaderRepository.
+2023-05-08 10:19:47.333  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderItemRepository.
+2023-05-08 10:19:47.334  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ShipmentRepository.
+2023-05-08 10:19:47.335  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.WarehouseRepository.
+2023-05-08 10:19:47.335  INFO 22646 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 53ms. Found 0 repository interfaces.
+2023-05-08 10:19:47.365  INFO 22646 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:19:47.367  INFO 22646 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:19:47.432  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.AssignedOrderItemRepository.
+2023-05-08 10:19:47.434  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.BayRepository.
+2023-05-08 10:19:47.435  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.CustomerAddressRepository.
+2023-05-08 10:19:47.437  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryPersonRepository.
+2023-05-08 10:19:47.439  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripItemRepository.
+2023-05-08 10:19:47.440  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripPathRepository.
+2023-05-08 10:19:47.442  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripRepository.
+2023-05-08 10:19:47.443  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.InventoryItemRepository.
+2023-05-08 10:19:47.445  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductCategoryRepository.
+2023-05-08 10:19:47.446  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductPriceRepository.
+2023-05-08 10:19:47.447  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductV2Repository.
+2023-05-08 10:19:47.448  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductWarehouseRepository.
+2023-05-08 10:19:47.450  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRepository.
+2023-05-08 10:19:47.451  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRequestRepository.
+2023-05-08 10:19:47.452  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptRepository.
+2023-05-08 10:19:47.453  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderHeaderRepository.
+2023-05-08 10:19:47.455  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderItemRepository.
+2023-05-08 10:19:47.456  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ShipmentRepository.
+2023-05-08 10:19:47.457  INFO 22646 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.WarehouseRepository.
+2023-05-08 10:19:47.458  INFO 22646 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 46ms. Found 0 repository interfaces.
+2023-05-08 10:19:48.400  INFO 22646 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:19:48.469  INFO 22646 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration' of type [org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:19:48.475  INFO 22646 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'objectPostProcessor' of type [org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:19:48.483  INFO 22646 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@71a19164' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:19:48.490  INFO 22646 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration' of type [org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:19:48.579  INFO 22646 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:19:49.132  INFO 22646 --- [           main]  o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8910 (http)
+2023-05-08 10:19:49.157  INFO 22646 --- [           main]  o.a.coyote.http11.Http11NioProtocol      : Initializing ProtocolHandler ["http-nio-8910"]
+2023-05-08 10:19:49.158  INFO 22646 --- [           main]  o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2023-05-08 10:19:49.159  INFO 22646 --- [           main]  org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.27]
+2023-05-08 10:19:49.350  INFO 22646 --- [           main]  o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2023-05-08 10:19:49.351  INFO 22646 --- [           main]  o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 4683 ms
+2023-05-08 10:19:49.703  WARN 22646 --- [           main]  com.zaxxer.hikari.HikariConfig           : HikariPool-1 - leakDetectionThreshold is less than 2000ms or more than maxLifetime, disabling it.
+2023-05-08 10:19:49.704  INFO 22646 --- [           main]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2023-05-08 10:19:50.008  INFO 22646 --- [           main]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2023-05-08 10:19:50.317  INFO 22646 --- [           main]  o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-05-08 10:19:50.490  INFO 22646 --- [           main]  org.hibernate.Version                    : HHH000412: Hibernate Core {5.4.6.Final}
+2023-05-08 10:19:50.749  INFO 22646 --- [           main]  o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
+2023-05-08 10:19:51.007  INFO 22646 --- [           main]  org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQL10Dialect
+2023-05-08 10:19:54.119  INFO 22646 --- [           main]  o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2023-05-08 10:19:54.142  INFO 22646 --- [           main]  j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-05-08 10:19:59.346  INFO 22646 --- [           main]  com.graphhopper.GraphHopper              : version 7.0|2023-03-13T11:56:29Z (9,21,6,5,2,9)
+2023-05-08 10:19:59.351  INFO 22646 --- [           main]  com.graphhopper.GraphHopper              : graph car|RAM_STORE|2D|no_turn_cost|nodes:9,edges:21,geometry:6,location_index:5,string_index:2,nodesCH:0,shortcuts:9, details:edges: 5 947 089(205MB), nodes: 5 185 896(60MB), bounds: 102.1097471,114.356432,8.4263731,23.3875442, name:(3MB), geo:29 609 021(113MB)
+2023-05-08 10:20:04.211  WARN 22646 --- [           main]  JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-05-08 10:20:05.018  INFO 22646 --- [           main]  o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@1d27f301, org.springframework.security.web.context.SecurityContextPersistenceFilter@44eb5bec, org.springframework.security.web.header.HeaderWriterFilter@a595371b, org.springframework.security.web.authentication.logout.LogoutFilter@bb0fd315, org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter@8e2b5a11, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@ced17d45, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@19fe2c8d, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@49e154e7, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@23fd9aae, org.springframework.security.web.session.SessionManagementFilter@af0e8c56, org.springframework.security.web.access.ExceptionTranslationFilter@f9fea4fa, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@bc112efb]
+2023-05-08 10:20:05.357  INFO 22646 --- [           main]  o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2023-05-08 10:20:06.917  INFO 22646 --- [           main]  org.mongodb.driver.cluster               : Cluster created with settings {hosts=[localhost:27017], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms', maxWaitQueueSize=500}
+2023-05-08 10:20:06.977  INFO 22646 --- [localhost:27017]  org.mongodb.driver.cluster               : Exception in monitor thread while connecting to server localhost:27017
+com.mongodb.MongoSocketOpenException: Exception opening socket
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:70)
+	at com.mongodb.internal.connection.InternalStreamConnection.open(InternalStreamConnection.java:128)
+	at com.mongodb.internal.connection.DefaultServerMonitor$ServerMonitorRunnable.run(DefaultServerMonitor.java:117)
+	at java.lang.Thread.run(Thread.java:826)
+Caused by: java.net.ConnectException: Connection refused (Connection refused)
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:607)
+	at com.mongodb.internal.connection.SocketStreamHelper.initialize(SocketStreamHelper.java:64)
+	at com.mongodb.internal.connection.SocketStream.initializeSocket(SocketStream.java:79)
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:65)
+	... 3 common frames omitted
+2023-05-08 10:20:07.124  WARN 22646 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.LocalDateTime to class java.time.Instant as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:20:07.124  WARN 22646 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.Instant to class java.time.LocalDateTime as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:20:07.190  WARN 22646 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.LocalDateTime to class java.time.Instant as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:20:07.190  WARN 22646 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.Instant to class java.time.LocalDateTime as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:20:07.718  INFO 22646 --- [           main]  o.a.coyote.http11.Http11NioProtocol      : Starting ProtocolHandler ["http-nio-8910"]
+2023-05-08 10:20:07.748  INFO 22646 --- [           main]  o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8910 (http) with context path '/api'
+2023-05-08 10:20:07.752  INFO 22646 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : Started WmsBackendApplication in 24.761 seconds (JVM running for 28.255)
+2023-05-08 10:20:15.601  INFO 22646 --- [nio-8910-exec-1]  o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-05-08 10:20:15.601  INFO 22646 --- [nio-8910-exec-1]  o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2023-05-08 10:20:15.610  INFO 22646 --- [nio-8910-exec-1]  o.s.web.servlet.DispatcherServlet        : Completed initialization in 9 ms
+2023-05-08 10:21:12.873  INFO 22646 --- [nio-8910-exec-5]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:21:12.938  INFO 22646 --- [nio-8910-exec-5]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:21:32.965  INFO 22646 --- [       Thread-7]  c.h.w.v.d.DeliveryRouteServiceImpl       : Origin address => [DeliveryAddressDTO(deliveryTripItemId=TRP_ITEM_00002, longitude=106.38000000000000, latitude=20.94000000000000, sequence=0)]
+2023-05-08 10:21:32.965  INFO 22646 --- [       Thread-7]  c.h.w.v.d.DeliveryRouteServiceImpl       : Norm address => [DeliveryAddressDTO(deliveryTripItemId=TRP_ITEM_00002, longitude=106.38000000000000, latitude=20.94000000000000, sequence=0)]
+2023-05-08 10:21:32.965  INFO 22646 --- [       Thread-7]  c.h.w.v.d.DeliveryRouteServiceImpl       : Start calculate cost matrix for request RouteRequest(warehouseLon=109.18211440000000, warehouseLat=12.23929530000000, addressDTOs=[DeliveryAddressDTO(deliveryTripItemId=TRP_ITEM_00002, longitude=106.38000000000000, latitude=20.94000000000000, sequence=0)])
+2023-05-08 10:21:42.891  INFO 22646 --- [nio-8910-exec-9]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:21:42.904  INFO 22646 --- [nio-8910-exec-9]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:21:49.169  INFO 22646 --- [nio-8910-exec-3]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:21:49.195  INFO 22646 --- [nio-8910-exec-3]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:21:54.279  INFO 22646 --- [nio-8910-exec-4]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:21:54.312  INFO 22646 --- [nio-8910-exec-4]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:21:58.042  INFO 22646 --- [io-8910-exec-10]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:21:58.073  INFO 22646 --- [io-8910-exec-10]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:22:03.515  INFO 22646 --- [       Thread-7]  c.h.w.v.d.DeliveryRouteServiceImpl       : Cost matrix => 
+2023-05-08 10:22:03.516  INFO 22646 --- [       Thread-7]  c.h.w.v.d.DeliveryRouteServiceImpl       : [1.7976931348623157E308, 1289201.2436702973]
+2023-05-08 10:22:03.518  INFO 22646 --- [       Thread-7]  c.h.w.v.d.DeliveryRouteServiceImpl       : [1284883.6326702975, 1.7976931348623157E308]
+2023-05-08 10:22:03.521  INFO 22646 --- [       Thread-7]  c.h.w.v.d.DeliveryRouteServiceImpl       : Save path [0, 1]
+2023-05-08 10:22:03.522  INFO 22646 --- [       Thread-7]  c.h.w.v.d.DeliveryRouteServiceImpl       : Save path [0, 1]
+2023-05-08 10:22:03.814  INFO 22646 --- [nio-8910-exec-4]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:22:03.858  INFO 22646 --- [nio-8910-exec-4]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:22:09.065  INFO 22646 --- [       Thread-7]  c.h.w.m.s.impl.AutoRouteServiceImpl      : Done auto route
+2023-05-08 10:22:11.970  INFO 22646 --- [nio-8910-exec-7]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:22:12.007  INFO 22646 --- [nio-8910-exec-7]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:27:29.204  INFO 22646 --- [extShutdownHook]  o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2023-05-08 10:27:29.222  INFO 22646 --- [extShutdownHook]  j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-05-08 10:27:29.223  INFO 22646 --- [extShutdownHook]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2023-05-08 10:27:29.225  INFO 22646 --- [extShutdownHook]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2023-05-08 10:27:34.848  INFO 24373 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : Starting WmsBackendApplication on dinh-8560w with PID 24373 (/home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend/target/classes started by dinh in /home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend)
+2023-05-08 10:27:34.855  INFO 24373 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : No active profile set, falling back to default profiles: default
+2023-05-08 10:27:35.921  INFO 24373 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:27:35.921  INFO 24373 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:27:36.115  INFO 24373 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 186ms. Found 19 repository interfaces.
+2023-05-08 10:27:36.167  INFO 24373 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:27:36.167  INFO 24373 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:27:36.206  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.AssignedOrderItemRepository.
+2023-05-08 10:27:36.207  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.BayRepository.
+2023-05-08 10:27:36.208  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.CustomerAddressRepository.
+2023-05-08 10:27:36.208  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryPersonRepository.
+2023-05-08 10:27:36.209  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripItemRepository.
+2023-05-08 10:27:36.210  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripPathRepository.
+2023-05-08 10:27:36.210  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripRepository.
+2023-05-08 10:27:36.211  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.InventoryItemRepository.
+2023-05-08 10:27:36.211  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductCategoryRepository.
+2023-05-08 10:27:36.214  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductPriceRepository.
+2023-05-08 10:27:36.214  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductV2Repository.
+2023-05-08 10:27:36.215  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductWarehouseRepository.
+2023-05-08 10:27:36.215  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRepository.
+2023-05-08 10:27:36.216  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRequestRepository.
+2023-05-08 10:27:36.217  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptRepository.
+2023-05-08 10:27:36.217  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderHeaderRepository.
+2023-05-08 10:27:36.218  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderItemRepository.
+2023-05-08 10:27:36.219  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ShipmentRepository.
+2023-05-08 10:27:36.219  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.WarehouseRepository.
+2023-05-08 10:27:36.220  INFO 24373 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 52ms. Found 0 repository interfaces.
+2023-05-08 10:27:36.245  INFO 24373 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:27:36.246  INFO 24373 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:27:36.289  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.AssignedOrderItemRepository.
+2023-05-08 10:27:36.289  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.BayRepository.
+2023-05-08 10:27:36.290  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.CustomerAddressRepository.
+2023-05-08 10:27:36.290  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryPersonRepository.
+2023-05-08 10:27:36.291  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripItemRepository.
+2023-05-08 10:27:36.291  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripPathRepository.
+2023-05-08 10:27:36.291  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripRepository.
+2023-05-08 10:27:36.292  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.InventoryItemRepository.
+2023-05-08 10:27:36.292  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductCategoryRepository.
+2023-05-08 10:27:36.292  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductPriceRepository.
+2023-05-08 10:27:36.293  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductV2Repository.
+2023-05-08 10:27:36.293  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductWarehouseRepository.
+2023-05-08 10:27:36.294  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRepository.
+2023-05-08 10:27:36.294  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRequestRepository.
+2023-05-08 10:27:36.295  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptRepository.
+2023-05-08 10:27:36.295  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderHeaderRepository.
+2023-05-08 10:27:36.296  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderItemRepository.
+2023-05-08 10:27:36.296  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ShipmentRepository.
+2023-05-08 10:27:36.297  INFO 24373 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.WarehouseRepository.
+2023-05-08 10:27:36.297  INFO 24373 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 39ms. Found 0 repository interfaces.
+2023-05-08 10:27:36.728  INFO 24373 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:27:36.765  INFO 24373 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration' of type [org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:27:36.768  INFO 24373 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'objectPostProcessor' of type [org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:27:36.771  INFO 24373 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@c5c27832' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:27:36.773  INFO 24373 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration' of type [org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:27:36.779  INFO 24373 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:27:37.047  INFO 24373 --- [           main]  o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8910 (http)
+2023-05-08 10:27:37.057  INFO 24373 --- [           main]  o.a.coyote.http11.Http11NioProtocol      : Initializing ProtocolHandler ["http-nio-8910"]
+2023-05-08 10:27:37.057  INFO 24373 --- [           main]  o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2023-05-08 10:27:37.058  INFO 24373 --- [           main]  org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.27]
+2023-05-08 10:27:37.165  INFO 24373 --- [           main]  o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2023-05-08 10:27:37.165  INFO 24373 --- [           main]  o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 2233 ms
+2023-05-08 10:27:37.348  WARN 24373 --- [           main]  com.zaxxer.hikari.HikariConfig           : HikariPool-1 - leakDetectionThreshold is less than 2000ms or more than maxLifetime, disabling it.
+2023-05-08 10:27:37.348  INFO 24373 --- [           main]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2023-05-08 10:27:37.476  INFO 24373 --- [           main]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2023-05-08 10:27:37.539  INFO 24373 --- [           main]  o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-05-08 10:27:37.621  INFO 24373 --- [           main]  org.hibernate.Version                    : HHH000412: Hibernate Core {5.4.6.Final}
+2023-05-08 10:27:37.766  INFO 24373 --- [           main]  o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
+2023-05-08 10:27:37.874  INFO 24373 --- [           main]  org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQL10Dialect
+2023-05-08 10:27:39.114  INFO 24373 --- [           main]  o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2023-05-08 10:27:39.122  INFO 24373 --- [           main]  j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-05-08 10:27:40.490  INFO 24373 --- [           main]  com.graphhopper.GraphHopper              : version 7.0|2023-03-13T11:56:29Z (9,21,6,5,2,9)
+2023-05-08 10:27:40.493  INFO 24373 --- [           main]  com.graphhopper.GraphHopper              : graph car|RAM_STORE|2D|no_turn_cost|nodes:9,edges:21,geometry:6,location_index:5,string_index:2,nodesCH:0,shortcuts:9, details:edges: 5 947 089(205MB), nodes: 5 185 896(60MB), bounds: 102.1097471,114.356432,8.4263731,23.3875442, name:(3MB), geo:29 609 021(113MB)
+2023-05-08 10:27:41.847  WARN 24373 --- [           main]  JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-05-08 10:27:42.112  INFO 24373 --- [           main]  o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@aaa0203b, org.springframework.security.web.context.SecurityContextPersistenceFilter@699ca8b, org.springframework.security.web.header.HeaderWriterFilter@f540bf1, org.springframework.security.web.authentication.logout.LogoutFilter@998248a2, org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter@278fa091, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@12ccddcc, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@9cf40237, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@77e4ee4c, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@ad9e7f03, org.springframework.security.web.session.SessionManagementFilter@164e966c, org.springframework.security.web.access.ExceptionTranslationFilter@5b268e6c, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@8e0dea58]
+2023-05-08 10:27:42.297  INFO 24373 --- [           main]  o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2023-05-08 10:27:42.837  INFO 24373 --- [           main]  org.mongodb.driver.cluster               : Cluster created with settings {hosts=[localhost:27017], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms', maxWaitQueueSize=500}
+2023-05-08 10:27:42.869  INFO 24373 --- [localhost:27017]  org.mongodb.driver.cluster               : Exception in monitor thread while connecting to server localhost:27017
+com.mongodb.MongoSocketOpenException: Exception opening socket
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:70)
+	at com.mongodb.internal.connection.InternalStreamConnection.open(InternalStreamConnection.java:128)
+	at com.mongodb.internal.connection.DefaultServerMonitor$ServerMonitorRunnable.run(DefaultServerMonitor.java:117)
+	at java.lang.Thread.run(Thread.java:826)
+Caused by: java.net.ConnectException: Connection refused (Connection refused)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:607)
+	at com.mongodb.internal.connection.SocketStreamHelper.initialize(SocketStreamHelper.java:64)
+	at com.mongodb.internal.connection.SocketStream.initializeSocket(SocketStream.java:79)
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:65)
+	... 3 common frames omitted
+2023-05-08 10:27:42.932  WARN 24373 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.LocalDateTime to class java.time.Instant as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:27:42.932  WARN 24373 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.Instant to class java.time.LocalDateTime as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:27:42.963  WARN 24373 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.LocalDateTime to class java.time.Instant as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:27:42.963  WARN 24373 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.Instant to class java.time.LocalDateTime as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:27:43.244  INFO 24373 --- [           main]  o.a.coyote.http11.Http11NioProtocol      : Starting ProtocolHandler ["http-nio-8910"]
+2023-05-08 10:27:43.257  INFO 24373 --- [           main]  o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8910 (http) with context path '/api'
+2023-05-08 10:27:43.259  INFO 24373 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : Started WmsBackendApplication in 9.115 seconds (JVM running for 9.516)
+2023-05-08 10:28:16.395  INFO 24373 --- [nio-8910-exec-2]  o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-05-08 10:28:16.395  INFO 24373 --- [nio-8910-exec-2]  o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2023-05-08 10:28:16.406  INFO 24373 --- [nio-8910-exec-2]  o.s.web.servlet.DispatcherServlet        : Completed initialization in 11 ms
+2023-05-08 10:30:05.628  INFO 24373 --- [nio-8910-exec-8]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:30:05.638  INFO 24373 --- [nio-8910-exec-8]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:30:34.309  INFO 24373 --- [nio-8910-exec-8]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:30:34.319  INFO 24373 --- [nio-8910-exec-8]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:31:18.506  INFO 24373 --- [nio-8910-exec-8]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:31:18.518  INFO 24373 --- [nio-8910-exec-8]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:32:28.807  INFO 24373 --- [nio-8910-exec-2]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:32:28.817  INFO 24373 --- [nio-8910-exec-2]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:32:52.189  INFO 24373 --- [nio-8910-exec-2]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:32:52.204  INFO 24373 --- [nio-8910-exec-2]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:34:30.081  INFO 24373 --- [extShutdownHook]  o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2023-05-08 10:34:30.098  INFO 24373 --- [extShutdownHook]  j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-05-08 10:34:30.101  INFO 24373 --- [extShutdownHook]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2023-05-08 10:34:30.102  INFO 24373 --- [extShutdownHook]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2023-05-08 10:34:38.470  INFO 25930 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : Starting WmsBackendApplication on dinh-8560w with PID 25930 (/home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend/target/classes started by dinh in /home/dinh/Documents/HUST/thesis/openerp-micro-service/wms/wms-backend)
+2023-05-08 10:34:38.473  INFO 25930 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : No active profile set, falling back to default profiles: default
+2023-05-08 10:34:39.796  INFO 25930 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:34:39.797  INFO 25930 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:34:40.059  INFO 25930 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 252ms. Found 19 repository interfaces.
+2023-05-08 10:34:40.114  INFO 25930 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:34:40.114  INFO 25930 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:34:40.143  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.AssignedOrderItemRepository.
+2023-05-08 10:34:40.144  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.BayRepository.
+2023-05-08 10:34:40.145  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.CustomerAddressRepository.
+2023-05-08 10:34:40.145  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryPersonRepository.
+2023-05-08 10:34:40.146  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripItemRepository.
+2023-05-08 10:34:40.146  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripPathRepository.
+2023-05-08 10:34:40.147  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripRepository.
+2023-05-08 10:34:40.148  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.InventoryItemRepository.
+2023-05-08 10:34:40.148  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductCategoryRepository.
+2023-05-08 10:34:40.149  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductPriceRepository.
+2023-05-08 10:34:40.149  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductV2Repository.
+2023-05-08 10:34:40.150  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductWarehouseRepository.
+2023-05-08 10:34:40.150  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRepository.
+2023-05-08 10:34:40.151  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRequestRepository.
+2023-05-08 10:34:40.151  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptRepository.
+2023-05-08 10:34:40.152  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderHeaderRepository.
+2023-05-08 10:34:40.153  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderItemRepository.
+2023-05-08 10:34:40.154  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ShipmentRepository.
+2023-05-08 10:34:40.154  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.WarehouseRepository.
+2023-05-08 10:34:40.154  INFO 25930 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 40ms. Found 0 repository interfaces.
+2023-05-08 10:34:40.178  INFO 25930 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2023-05-08 10:34:40.179  INFO 25930 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2023-05-08 10:34:40.228  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.AssignedOrderItemRepository.
+2023-05-08 10:34:40.228  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.BayRepository.
+2023-05-08 10:34:40.228  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.CustomerAddressRepository.
+2023-05-08 10:34:40.229  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryPersonRepository.
+2023-05-08 10:34:40.229  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripItemRepository.
+2023-05-08 10:34:40.229  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripPathRepository.
+2023-05-08 10:34:40.230  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.DeliveryTripRepository.
+2023-05-08 10:34:40.230  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.InventoryItemRepository.
+2023-05-08 10:34:40.230  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductCategoryRepository.
+2023-05-08 10:34:40.230  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductPriceRepository.
+2023-05-08 10:34:40.231  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductV2Repository.
+2023-05-08 10:34:40.231  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ProductWarehouseRepository.
+2023-05-08 10:34:40.231  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRepository.
+2023-05-08 10:34:40.232  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptItemRequestRepository.
+2023-05-08 10:34:40.232  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ReceiptRepository.
+2023-05-08 10:34:40.232  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderHeaderRepository.
+2023-05-08 10:34:40.233  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.SaleOrderItemRepository.
+2023-05-08 10:34:40.233  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.ShipmentRepository.
+2023-05-08 10:34:40.233  INFO 25930 --- [           main]  .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.hust.wmsbackend.management.repository.WarehouseRepository.
+2023-05-08 10:34:40.233  INFO 25930 --- [           main]  .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 40ms. Found 0 repository interfaces.
+2023-05-08 10:34:40.704  INFO 25930 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:34:40.745  INFO 25930 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration' of type [org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:34:40.749  INFO 25930 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'objectPostProcessor' of type [org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:34:40.752  INFO 25930 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@9398dea8' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:34:40.754  INFO 25930 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration' of type [org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:34:40.760  INFO 25930 --- [           main]  trationDelegate$BeanPostProcessorChecker : Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-05-08 10:34:41.131  INFO 25930 --- [           main]  o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8910 (http)
+2023-05-08 10:34:41.138  INFO 25930 --- [           main]  o.a.coyote.http11.Http11NioProtocol      : Initializing ProtocolHandler ["http-nio-8910"]
+2023-05-08 10:34:41.139  INFO 25930 --- [           main]  o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2023-05-08 10:34:41.139  INFO 25930 --- [           main]  org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.27]
+2023-05-08 10:34:41.270  INFO 25930 --- [           main]  o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2023-05-08 10:34:41.271  INFO 25930 --- [           main]  o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 2714 ms
+2023-05-08 10:34:41.500  WARN 25930 --- [           main]  com.zaxxer.hikari.HikariConfig           : HikariPool-1 - leakDetectionThreshold is less than 2000ms or more than maxLifetime, disabling it.
+2023-05-08 10:34:41.500  INFO 25930 --- [           main]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2023-05-08 10:34:41.651  INFO 25930 --- [           main]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2023-05-08 10:34:41.715  INFO 25930 --- [           main]  o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-05-08 10:34:41.819  INFO 25930 --- [           main]  org.hibernate.Version                    : HHH000412: Hibernate Core {5.4.6.Final}
+2023-05-08 10:34:41.952  INFO 25930 --- [           main]  o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
+2023-05-08 10:34:42.082  INFO 25930 --- [           main]  org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQL10Dialect
+2023-05-08 10:34:43.502  INFO 25930 --- [           main]  o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2023-05-08 10:34:43.510  INFO 25930 --- [           main]  j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-05-08 10:34:45.762  INFO 25930 --- [           main]  com.graphhopper.GraphHopper              : version 7.0|2023-03-13T11:56:29Z (9,21,6,5,2,9)
+2023-05-08 10:34:45.767  INFO 25930 --- [           main]  com.graphhopper.GraphHopper              : graph car|RAM_STORE|2D|no_turn_cost|nodes:9,edges:21,geometry:6,location_index:5,string_index:2,nodesCH:0,shortcuts:9, details:edges: 5 947 089(205MB), nodes: 5 185 896(60MB), bounds: 102.1097471,114.356432,8.4263731,23.3875442, name:(3MB), geo:29 609 021(113MB)
+2023-05-08 10:34:47.429  WARN 25930 --- [           main]  JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-05-08 10:34:47.715  INFO 25930 --- [           main]  o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@89cdd430, org.springframework.security.web.context.SecurityContextPersistenceFilter@f9f56726, org.springframework.security.web.header.HeaderWriterFilter@31e6e060, org.springframework.security.web.authentication.logout.LogoutFilter@39cc37e1, org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter@62c6cd58, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@66067af2, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@5c1148ad, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3c4d2229, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@3d095399, org.springframework.security.web.session.SessionManagementFilter@52579772, org.springframework.security.web.access.ExceptionTranslationFilter@721ca127, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@1d050890]
+2023-05-08 10:34:47.937  INFO 25930 --- [           main]  o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2023-05-08 10:34:48.608  INFO 25930 --- [           main]  org.mongodb.driver.cluster               : Cluster created with settings {hosts=[localhost:27017], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms', maxWaitQueueSize=500}
+2023-05-08 10:34:48.669  INFO 25930 --- [localhost:27017]  org.mongodb.driver.cluster               : Exception in monitor thread while connecting to server localhost:27017
+com.mongodb.MongoSocketOpenException: Exception opening socket
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:70)
+	at com.mongodb.internal.connection.InternalStreamConnection.open(InternalStreamConnection.java:128)
+	at com.mongodb.internal.connection.DefaultServerMonitor$ServerMonitorRunnable.run(DefaultServerMonitor.java:117)
+	at java.lang.Thread.run(Thread.java:826)
+Caused by: java.net.ConnectException: Connection refused (Connection refused)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:607)
+	at com.mongodb.internal.connection.SocketStreamHelper.initialize(SocketStreamHelper.java:64)
+	at com.mongodb.internal.connection.SocketStream.initializeSocket(SocketStream.java:79)
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:65)
+	... 3 common frames omitted
+2023-05-08 10:34:48.736  WARN 25930 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.LocalDateTime to class java.time.Instant as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:34:48.736  WARN 25930 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.Instant to class java.time.LocalDateTime as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:34:48.766  WARN 25930 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.LocalDateTime to class java.time.Instant as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:34:48.766  WARN 25930 --- [           main]  o.s.data.convert.CustomConversions       : Registering converter from class java.time.Instant to class java.time.LocalDateTime as reading converter although it doesn't convert from a store-supported type! You might wanna check you annotation setup at the converter implementation.
+2023-05-08 10:34:49.060  INFO 25930 --- [           main]  o.a.coyote.http11.Http11NioProtocol      : Starting ProtocolHandler ["http-nio-8910"]
+2023-05-08 10:34:49.076  INFO 25930 --- [           main]  o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8910 (http) with context path '/api'
+2023-05-08 10:34:49.078  INFO 25930 --- [           main]  c.hust.wmsbackend.WmsBackendApplication  : Started WmsBackendApplication in 11.642 seconds (JVM running for 12.113)
+2023-05-08 10:34:58.792  INFO 25930 --- [nio-8910-exec-5]  o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-05-08 10:34:58.792  INFO 25930 --- [nio-8910-exec-5]  o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2023-05-08 10:34:58.806  INFO 25930 --- [nio-8910-exec-5]  o.s.web.servlet.DispatcherServlet        : Completed initialization in 14 ms
+2023-05-08 10:34:59.564  INFO 25930 --- [nio-8910-exec-5]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:34:59.625  INFO 25930 --- [nio-8910-exec-5]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
+2023-05-08 10:40:16.109  INFO 25930 --- [nio-8910-exec-2]  c.h.w.m.s.impl.WarehouseServiceImpl      : Start get all warehouse in service
+2023-05-08 10:40:16.122  INFO 25930 --- [nio-8910-exec-2]  c.h.w.m.s.impl.WarehouseServiceImpl      : Get 4 facilities
