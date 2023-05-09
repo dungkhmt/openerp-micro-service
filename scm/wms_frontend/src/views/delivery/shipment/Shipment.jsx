@@ -26,17 +26,15 @@ function ShipmentScreen({ screenAuthorization }) {
   const [isAdd, setIsAdd] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
-  const history = useHistory();
   let { path } = useRouteMatch();
 
   const { isLoading, data } = useGetShipmentList();
-
+  const history = useHistory();
   const handleButtonClick = (params) => {
     history.push(`${path}/shipment-detail`, {
       shipment: params,
     });
   };
-
   let actions = [
     {
       title: "Thêm",

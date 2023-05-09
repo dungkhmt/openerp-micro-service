@@ -9,12 +9,15 @@ import {
 } from "@mui/material";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import { unix } from "moment";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useWindowSize } from "react-use";
 import { Action } from "../../../components/action/Action";
 import CustomDataGrid from "../../../components/datagrid/CustomDataGrid";
-import { useCreateTripRoute } from "../../../controllers/query/delivery-trip-query";
+import {
+  useCreateTripRoute,
+  useGetTripRouteList,
+} from "../../../controllers/query/delivery-trip-query";
 import { useGetItemsOfTrip } from "../../../controllers/query/shipment-query";
 import { AppColors } from "../../../shared/AppColors";
 import { shipmentItemCols } from "../LocalConstant";
@@ -31,12 +34,16 @@ function TripScreen({ screenAuthorization }) {
   const handleOpen = () => {
     setOpen(true);
   };
-  const [progress, setProgress] = React.useState(50);
 
   const currTrip = location.state.trip;
   const { isLoading, data } = useGetItemsOfTrip({
     tripCode: currTrip?.code,
   });
+  const { isLoading: isLoadingTripRoute, data: tripRoute } =
+    useGetTripRouteList({
+      tripCode: currTrip?.code,
+    });
+  console.log("Trip route: ", tripRoute);
   const createTripRouteQuery = useCreateTripRoute();
   const extraActions = [
     {
@@ -46,21 +53,30 @@ function TripScreen({ screenAuthorization }) {
       color: AppColors.green,
     },
   ];
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) => prevProgress + 10);
-    }, 800);
-    return () => {
-      clearInterval(timer);
-    };
-  }, [open]);
-  console.log("Progress: ", progress);
+  const [count, setCount] = useState(0);
+
   useEffect(() => {
-    if (progress >= 100) {
+    // Start the interval
+    const interval = setInterval(() => {
+      setCount((prevCount) => prevCount + 1);
+    }, 1000);
+
+    // Terminate the interval when count reaches a certain value
+    if (count >= 10) {
+      clearInterval(interval);
+    }
+
+    // Cleanup function to clear the interval on component unmount
+    return () => {
+      clearInterval(interval);
+    };
+  }, [count]);
+  useEffect(() => {
+    if (count >= 10) {
       handleClose();
     }
-    // clearInterval(intervalID);
-  }, [progress]);
+  }, [count]);
+  console.log("Count: ", count);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
@@ -172,29 +188,61 @@ function TripScreen({ screenAuthorization }) {
           TẠO MỚI LỘ TRÌNH GIAO HÀNG
         </Typography>
       </Stack>
-      <Button
-        onClick={
-          () => {
-            handleOpen();
+      <Stack direction={"row"}>
+        <Button
+          disabled={tripRoute}
+          onClick={
+            () => {
+              setCount((pre) => {
+                handleOpen();
+                return 0;
+              });
+            }
+            // async () => {
+            // let tripParams = {
+            //   tripCode: currTrip?.code,
+            // };
+            // await createTripRouteQuery.mutateAsync(tripParams);
+            // }
           }
-          // async () => {
-          // let tripParams = {
-          //   tripCode: currTrip?.code,
-          // };
-          // await createTripRouteQuery.mutateAsync(tripParams);
-          // }
-        }
-        variant={"contained"}
-        sx={{ marginY: 2 }}
-      >
-        <Typography
-          sx={{
-            color: "white",
-          }}
+          variant={"contained"}
+          sx={{ marginY: 2, marginRight: 5 }}
         >
-          TẠO MỚI LỘ TRÌNH
-        </Typography>
-      </Button>
+          <Typography
+            sx={{
+              color: "white",
+            }}
+          >
+            TẠO MỚI LỘ TRÌNH
+          </Typography>
+        </Button>
+        <Button
+          onClick={
+            () => {
+              setCount((pre) => {
+                handleOpen();
+                return 0;
+              });
+            }
+            // async () => {
+            // let tripParams = {
+            //   tripCode: currTrip?.code,
+            // };
+            // await createTripRouteQuery.mutateAsync(tripParams);
+            // }
+          }
+          variant={"contained"}
+          sx={{ marginY: 2 }}
+        >
+          <Typography
+            sx={{
+              color: "white",
+            }}
+          >
+            XEM LỘ TRÌNH ĐÃ TẠO
+          </Typography>
+        </Button>
+      </Stack>
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={open}
@@ -218,7 +266,7 @@ function TripScreen({ screenAuthorization }) {
               variant="caption"
               component="div"
               color="white"
-            >{`${Math.round(progress)}%`}</Typography>
+            >{`${Math.round(count * 10)}%`}</Typography>
           </Box>
         </Box>
       </Backdrop>

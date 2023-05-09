@@ -1,6 +1,7 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import MapIcon from "@mui/icons-material/Map";
 import { Box } from "@mui/material";
 import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
@@ -9,6 +10,7 @@ import CustomModal from "components/modal/CustomModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
 import { useGetCustomerList } from "controllers/query/category-query";
 import { useState } from "react";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import DraggableDeleteDialog from "../../../components/dialog/DraggableDialogs";
@@ -23,11 +25,13 @@ function CustomerScreen({ screenAuthorization }) {
     page_size: 50,
   });
   const { height } = useWindowSize();
-  const { isLoading, data } = useGetCustomerList();
+  const { isLoading, data: customer } = useGetCustomerList();
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const [isAdd, setIsAdd] = useToggle(false);
+  const history = useHistory();
+  let { path } = useRouteMatch();
   let actions = [
     {
       title: "Thêm",
@@ -36,6 +40,15 @@ function CustomerScreen({ screenAuthorization }) {
       },
       icon: <AddIcon />,
       describe: "Thêm bản ghi mới",
+      disabled: false,
+    },
+    {
+      title: "Bản đồ",
+      callback: (item) => {
+        handleButtonClick();
+      },
+      icon: <MapIcon />,
+      describe: "Xem bản đồ vị trí khách hàng",
       disabled: false,
     },
   ];
@@ -58,6 +71,12 @@ function CustomerScreen({ screenAuthorization }) {
       color: AppColors.error,
     },
   ];
+  const handleButtonClick = () => {
+    history.push(`${path}/map`, {
+      customer: customer?.content,
+    });
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
@@ -94,7 +113,7 @@ function CustomerScreen({ screenAuthorization }) {
             ],
           },
         ]}
-        rows={data ? data?.content : []}
+        rows={customer ? customer?.content : []}
       />
       <CustomModal
         open={isAdd}

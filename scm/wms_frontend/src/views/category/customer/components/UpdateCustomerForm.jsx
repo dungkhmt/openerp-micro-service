@@ -8,8 +8,8 @@ import {
   useGetCustomerType,
 } from "controllers/query/category-query";
 import { useRef, useState } from "react";
-import useGeoLocation from "shared/AppHooks";
 import { customerSchema } from "utils/validate";
+import { useGeoLocation } from "../../../../shared/AppHooks";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");

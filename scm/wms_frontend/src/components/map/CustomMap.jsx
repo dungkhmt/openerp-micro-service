@@ -64,7 +64,12 @@ const CustomMap = ({ value, onChange, style, location, mapRef }) => {
       center={{ lat: 51.505, lng: -0.09 }}
       zoom={13}
       scrollWheelZoom={true}
-      style={{ width: "100vw", height: "100vh", ...style }}
+      style={{
+        width: "calc(100vw - 250px)",
+        height: "calc(100vh - 64px)",
+        marginLeft: "-16px",
+        ...style,
+      }}
     >
       <TileLayer
         url="https://api.maptiler.com/maps/basic-v2/256/{z}/{x}/{y}.png?key=yI7HfCmy5qll4mYkkO16"
