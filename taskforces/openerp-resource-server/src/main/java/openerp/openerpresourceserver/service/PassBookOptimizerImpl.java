@@ -268,6 +268,15 @@ public class PassBookOptimizerImpl implements PassBookOptimizer{
                 e.setMoneyEarly(moneyEarly[i]);
                 e.setMoneyMature(moneyMature[i]);
                 e.setAmountMoneyLoan(y[i].solutionValue());
+                e.setEarlyMoneyRetrieved(0);
+                loanElements.add(e);
+            }else{
+                ModelResponseLoanElement e = new ModelResponseLoanElement();
+                e.setPassBook(passBooks.get(i));
+                e.setMoneyEarly(moneyEarly[i]);
+                e.setMoneyMature(moneyMature[i]);
+                e.setAmountMoneyLoan(0);
+                e.setEarlyMoneyRetrieved(moneyEarly[i]);
                 loanElements.add(e);
             }
         }
