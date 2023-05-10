@@ -36,3 +36,5 @@ build/
 src/main/resources/osm
 
 /logs/*
+
+src/main/resources/application.yml

@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @ToString
-@Table(name = "inventory_item_detail")
+@Table(name = "wms_inventory_item_detail")
 public class InventoryItemDetail {
     @Id
     private UUID inventoryItemDetailId;

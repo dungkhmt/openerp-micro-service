@@ -1,6 +1,6 @@
 package com.hust.wmsbackend.management.service.impl;
 
-import com.hust.wmsbackend.management.entity.ProductV2;
+import com.hust.wmsbackend.management.entity.Product;
 import com.hust.wmsbackend.management.model.request.CartItemRequest;
 import com.hust.wmsbackend.management.model.response.CartItemResponse;
 import com.hust.wmsbackend.management.repository.ProductV2Repository;
@@ -39,9 +39,9 @@ public class CartServiceImpl implements CartService {
         List<CartItemResponse.Item> items = new ArrayList<>();
         BigDecimal itemCost = BigDecimal.ZERO;
         for (CartItemRequest.Item r : itemList) {
-            Optional<ProductV2> productOpt = productRepository.findById(UUID.fromString(r.getProductId()));
+            Optional<Product> productOpt = productRepository.findById(UUID.fromString(r.getProductId()));
             if (productOpt.isPresent()) {
-                ProductV2 product = productOpt.get();
+                Product product = productOpt.get();
                 BigDecimal currPrice = productService.getCurrPriceByProductId(product.getProductId());
                 if (currPrice == null) {
                     log.warn("Product %s hasn't configed price. Please try another");

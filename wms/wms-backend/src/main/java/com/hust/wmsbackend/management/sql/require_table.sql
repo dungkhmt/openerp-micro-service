@@ -218,3 +218,21 @@ create table user_register
     created_stamp timestamp default current_timestamp,
     affiliations varchar(200)
 );
+
+create table account_activation
+(
+    id uuid primary key not null default uuid_generate_v1(),
+    user_login_id varchar(60) not null ,
+    status_id varchar(100),
+    last_updated_stamp timestamp ,
+    created_stamp timestamp default current_timestamp
+);
+
+create table entity_authorization
+(
+    id varchar(200) not null primary key,
+    role_id varchar(50),
+    description varchar(200),
+    last_updated timestamp default current_timestamp,
+    created timestamp default current_timestamp
+);

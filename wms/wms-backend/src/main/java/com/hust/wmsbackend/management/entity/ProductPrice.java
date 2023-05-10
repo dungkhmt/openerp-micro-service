@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @ToString
-@Table(name = "product_price")
+@Table(name = "wms_product_price")
 public class ProductPrice {
     @Id
     private UUID productPriceId;

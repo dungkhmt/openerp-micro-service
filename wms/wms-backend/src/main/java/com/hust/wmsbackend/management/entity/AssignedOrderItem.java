@@ -20,7 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "assigned_order_item")
+@Table(name = "wms_assigned_order_item")
 @EntityListeners(AuditingEntityListener.class)
 public class AssignedOrderItem {
     @Id

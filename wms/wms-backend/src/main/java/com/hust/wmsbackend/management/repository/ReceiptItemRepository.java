@@ -19,7 +19,7 @@ public interface ReceiptItemRepository extends JpaRepository<ReceiptItem, UUID> 
            "(ri.receiptItemId, prod.productId, prod.name, ri.quantity, b.bayId, b.code, w.warehouseId, w.name, ri.lotId, " +
            "ri.importPrice, ri.expiredDate, ri.receiptItemRequestId) " +
            "from ReceiptItem ri " +
-           "join ProductV2 prod on prod.productId = ri.productId " +
+           "join Product prod on prod.productId = ri.productId " +
            "join Bay b on ri.bayId = b.bayId " +
            "join Warehouse w on w.warehouseId = b.warehouseId " +
            "where ri.receiptId = :receiptId")

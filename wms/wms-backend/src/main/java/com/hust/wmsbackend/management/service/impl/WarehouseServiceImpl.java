@@ -2,7 +2,7 @@ package com.hust.wmsbackend.management.service.impl;
 
 import com.hust.wmsbackend.management.entity.Bay;
 import com.hust.wmsbackend.management.entity.InventoryItem;
-import com.hust.wmsbackend.management.entity.ProductV2;
+import com.hust.wmsbackend.management.entity.Product;
 import com.hust.wmsbackend.management.entity.Warehouse;
 import com.hust.wmsbackend.management.model.WarehouseWithBays;
 import com.hust.wmsbackend.management.model.response.ProductWarehouseResponse;
@@ -184,8 +184,8 @@ public class WarehouseServiceImpl implements WarehouseService {
             }
             Optional<Bay> bayOpt = bayRepository.findById(item.getBayId());
             Bay bay = bayOpt.get();
-            Optional<ProductV2> productOpt = productRepository.findById(item.getProductId());
-            ProductV2 product = productOpt.get();
+            Optional<Product> productOpt = productRepository.findById(item.getProductId());
+            Product product = productOpt.get();
             ProductWarehouseResponse.ProductWarehouseDetailResponse productDetail = ProductWarehouseResponse
                 .ProductWarehouseDetailResponse
                 .builder()

@@ -19,7 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @ToString
-@Table(name = "sale_order_header")
+@Table(name = "wms_sale_order_header")
 @EntityListeners(AuditingEntityListener.class)
 public class SaleOrderHeader {
     @Id

@@ -1,8 +1,12 @@
 package com.hust.wmsbackend.management.service.impl;
 
+import com.hust.wmsbackend.management.entity.AssignedOrderItem;
 import com.hust.wmsbackend.management.entity.DeliveryTripItem;
+import com.hust.wmsbackend.management.entity.InventoryItemDetail;
 import com.hust.wmsbackend.management.entity.enumentity.DeliveryTripItemStatus;
+import com.hust.wmsbackend.management.repository.AssignedOrderItemRepository;
 import com.hust.wmsbackend.management.repository.DeliveryTripItemRepository;
+import com.hust.wmsbackend.management.repository.InventoryItemDetailRepository;
 import com.hust.wmsbackend.management.service.DeliveryTripItemService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -21,6 +22,8 @@ import java.util.Optional;
 public class DeliveryTripItemServiceImpl implements DeliveryTripItemService {
 
     private DeliveryTripItemRepository deliveryTripItemRepository;
+    private AssignedOrderItemRepository assignedOrderItemRepository;
+    private InventoryItemDetailRepository inventoryItemDetailRepository;
 
     @Override
     public boolean updateItemStatus(String itemId, String newStatusCodeStr) {
@@ -49,6 +52,7 @@ public class DeliveryTripItemServiceImpl implements DeliveryTripItemService {
             return false;
         }
         List<DeliveryTripItem> updateItems = new ArrayList<>();
+        List<InventoryItemDetail> itemDetails = new ArrayList<>();
         for (String itemId : itemIdList) {
             DeliveryTripItem item = getByIdOrThrow(itemId);
             if (item.getStatus() == DeliveryTripItemStatus.CREATED) {
@@ -56,8 +60,16 @@ public class DeliveryTripItemServiceImpl implements DeliveryTripItemService {
             }
             item.setStatus(DeliveryTripItemStatus.DONE);
             updateItems.add(item);
+
+            Optional<AssignedOrderItem> assignedOrderItemOpt = assignedOrderItemRepository.findById(item.getAssignedOrderItemId());
+            assignedOrderItemOpt.ifPresent(assignedOrderItem -> itemDetails.add(InventoryItemDetail.builder()
+                    .inventoryItemId(assignedOrderItem.getInventoryItemId())
+                    .effectiveDate(new Date())
+                    .quantityOnHandDiff(item.getQuantity())
+                    .build()));
         }
         deliveryTripItemRepository.saveAll(updateItems);
+        inventoryItemDetailRepository.saveAll(itemDetails);
         return true;
     }
 

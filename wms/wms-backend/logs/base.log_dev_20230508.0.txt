@@ -1903,3 +1903,7 @@ Caused by: java.net.ConnectException: Connection refused (Connection refused)
 2023-05-08 16:07:11.860  INFO 46260 --- [      Thread-16]  c.h.w.v.d.DeliveryRouteServiceImpl       : Save path [0, 1]
 2023-05-08 16:07:15.412  INFO 46260 --- [      Thread-16]  c.h.w.m.s.impl.AutoRouteServiceImpl      : Push notification done
 2023-05-08 16:07:15.412  INFO 46260 --- [      Thread-16]  c.h.w.m.s.impl.AutoRouteServiceImpl      : Done auto route
+2023-05-08 16:16:55.079  INFO 46260 --- [extShutdownHook]  o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2023-05-08 16:16:55.100  INFO 46260 --- [extShutdownHook]  j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-05-08 16:16:55.102  INFO 46260 --- [extShutdownHook]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2023-05-08 16:16:55.104  INFO 46260 --- [extShutdownHook]  com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
