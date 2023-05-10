@@ -125,7 +125,8 @@ const ProcessItem = ( { rowData, warehousesDetail, setProcessingItems,
             } else if (adder.quantity < 0) {
               errorNoti("Số lượng không được nhỏ hơn 0");
             } else {
-              const total = addedItemCount + adder.quantity;
+              const total = parseInt(addedItemCount) + parseInt(adder.quantity);
+              console.log("Total => ", total, "; Row data quantity => ", rowData.quantity);
               if (total > rowData.quantity) {
                 errorNoti("Bạn đã nhập quá số lượng hàng. Vui lòng kiểm tra lại");
               } else {

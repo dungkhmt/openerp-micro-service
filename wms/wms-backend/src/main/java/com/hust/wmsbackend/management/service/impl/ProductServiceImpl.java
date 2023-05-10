@@ -38,14 +38,14 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductV2 createProduct(ProductRequest request) {
+    public Product createProduct(ProductRequest request) {
         log.info("Start create product " + request);
-        ProductV2 product;
+        Product product;
         boolean isCreateRequest = request.getProductId() == null;
         if (!isCreateRequest) {
             String productId = request.getProductId();
             log.info("Start update product with id " + productId);
-            Optional<ProductV2> productOpt = productRepository.findById(UUID.fromString(productId));
+            Optional<Product> productOpt = productRepository.findById(UUID.fromString(productId));
             if (productOpt.isPresent()) {
                 product = productOpt.get();
             } else {
@@ -53,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
                 return null;
             }
         } else {
-            product = ProductV2.builder()
+            product = Product.builder()
                                .productId(UUID.randomUUID())
                                .build();
         }
@@ -161,9 +161,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductGeneralResponse> getAllProductGeneral() {
-        List<ProductV2> products = productRepository.findAll();
+        List<Product> products = productRepository.findAll();
         Map<String, BigDecimal> productOnHandQuantityMap = new HashMap<>();
-        for (ProductV2 product : products) {
+        for (Product product : products) {
             String productId = product.getProductId().toString();
             productOnHandQuantityMap.put(productId,
                  productWarehouseRepository.getTotalOnHandQuantityByProductId(UUID.fromString(productId)));
@@ -205,7 +205,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDetailResponse getById(String id) {
         UUID productId = UUID.fromString(id);
-        Optional<ProductV2> productInfo = productRepository.findById(productId);
+        Optional<Product> productInfo = productRepository.findById(productId);
         if (!productInfo.isPresent()) {
             log.warn(String.format("Product with id %s is not found", id));
             return null;
@@ -249,8 +249,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductPriceResponse> getAllProductPrices() {
         List<ProductPriceResponse> response = new ArrayList<>();
-        List<ProductV2> products = productRepository.findAll();
-        for (ProductV2 product : products) {
+        List<Product> products = productRepository.findAll();
+        for (Product product : products) {
             List<ProductPrice> prices = productPriceRepository.findAllByProductId(product.getProductId());
             BigDecimal currPrice = getCurrPriceByProductId(product.getProductId());
             List<ProductPriceResponse.ProductHistoryPrices> historyPrices = prices.stream()
@@ -303,9 +303,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Map<UUID, String> getProductNameMap() {
-        List<ProductV2> products = productRepository.findAll();
+        List<Product> products = productRepository.findAll();
         Map<UUID, String> map = new HashMap<>();
-        for (ProductV2 product : products) {
+        for (Product product : products) {
             map.put(product.getProductId(), product.getName());
         }
         return map;

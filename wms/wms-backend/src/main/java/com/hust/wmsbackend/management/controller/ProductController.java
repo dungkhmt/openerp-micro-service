@@ -2,7 +2,7 @@ package com.hust.wmsbackend.management.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hust.wmsbackend.management.entity.ProductCategory;
-import com.hust.wmsbackend.management.entity.ProductV2;
+import com.hust.wmsbackend.management.entity.Product;
 import com.hust.wmsbackend.management.model.request.ProductPriceRequest;
 import com.hust.wmsbackend.management.model.request.ProductRequest;
 import com.hust.wmsbackend.management.model.response.ProductDetailResponse;
@@ -34,8 +34,8 @@ public class ProductController {
     private ProductCategoryService productCategoryService;
 
     @PutMapping()
-    public ResponseEntity<ProductV2> createProduct(@RequestParam(required = false, name = "image") MultipartFile image,
-                                                    @RequestParam("model") String model) {
+    public ResponseEntity<Product> createProduct(@RequestParam(required = false, name = "image") MultipartFile image,
+                                                 @RequestParam("model") String model) {
         try {
             log.info("Model: " + model);
             log.info("Image: " + image);

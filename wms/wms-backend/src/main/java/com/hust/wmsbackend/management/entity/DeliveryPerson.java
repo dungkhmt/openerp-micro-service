@@ -12,7 +12,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @Builder
 @ToString
-@Table(name = "delivery_person")
+@Table(name = "wms_delivery_person")
 public class DeliveryPerson {
     @Id
     private String userLoginId;

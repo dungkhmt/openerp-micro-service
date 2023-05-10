@@ -1,6 +1,6 @@
 package com.hust.wmsbackend.management.service;
 
-import com.hust.wmsbackend.management.entity.ProductV2;
+import com.hust.wmsbackend.management.entity.Product;
 import com.hust.wmsbackend.management.model.request.ProductPriceRequest;
 import com.hust.wmsbackend.management.model.request.ProductRequest;
 import com.hust.wmsbackend.management.model.response.ProductDetailResponse;
@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public interface ProductService {
 
-    ProductV2 createProduct(ProductRequest request);
+    Product createProduct(ProductRequest request);
 
     List<ProductGeneralResponse> getAllProductGeneral();
 

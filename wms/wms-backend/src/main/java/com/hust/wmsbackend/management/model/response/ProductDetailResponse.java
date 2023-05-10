@@ -1,6 +1,6 @@
 package com.hust.wmsbackend.management.model.response;
 
-import com.hust.wmsbackend.management.entity.ProductV2;
+import com.hust.wmsbackend.management.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ProductDetailResponse {
-    private ProductV2 productInfo;
+    private Product productInfo;
     private List<ProductDetailQuantityResponse> quantityList;
 }

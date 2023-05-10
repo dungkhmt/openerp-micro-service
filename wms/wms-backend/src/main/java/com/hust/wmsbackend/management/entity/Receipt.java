@@ -17,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @ToString
-@Table(name = "receipt")
+@Table(name = "wms_receipt")
 @EntityListeners(AuditingEntityListener.class)
 public class Receipt {
 

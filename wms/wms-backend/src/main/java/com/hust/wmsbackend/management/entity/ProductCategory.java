@@ -6,9 +6,11 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.UUID;
 
-@Entity(name = "product_category")
+@Entity
+@Table(name = "wms_product_category")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

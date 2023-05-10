@@ -14,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @ToString
-@Table(name = "delivery_trip_path")
+@Table(name = "wms_delivery_trip_path")
 @EntityListeners(AuditingEntityListener.class)
 public class DeliveryTripPath {
     @Id

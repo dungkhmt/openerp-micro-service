@@ -16,15 +16,11 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
 import { visuallyHidden } from '@mui/utils';
 import { Button, Modal, TextField } from '@mui/material';
-import { successNoti } from 'utils/notification';
 import CommandBarButton from './button/commandBarButton';
 
 const buildHeaderCells = ( columns ) => {
@@ -371,7 +367,8 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
           <Tooltip title="Lưu">
             <IconButton onClick={() => {
                 editable?.onRowAdd();
-                successNoti("Lưu thành công");
+                // successNoti("Lưu thành công");
+                setShowAddModal(false);
               }}>
               <SaveIcon />
             </IconButton>

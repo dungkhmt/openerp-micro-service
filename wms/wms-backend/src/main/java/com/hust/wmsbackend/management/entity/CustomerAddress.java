@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @ToString
-@Table(name = "customer_address")
+@Table(name = "wms_customer_address")
 public class CustomerAddress {
     @Id
     private UUID customerAddressId;
