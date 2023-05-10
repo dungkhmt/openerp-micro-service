@@ -1,7 +1,7 @@
 export const salemanager = {
   id: "MENU_WMSv2_SALE_MANAGER",
   icon: "DashboardIcon",
-  text: "Giám đốc bán hàng",
+  text: "Giám đốc kinh doanh",
   child: [
     {
       id: "MENU_WMSv2_SALE_MANAGER.PRICE_CONFIG",

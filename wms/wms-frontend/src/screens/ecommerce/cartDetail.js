@@ -1,6 +1,7 @@
+import DeleteIcon from '@mui/icons-material/Delete';
 import { ORDER_TYPE } from 'components/constants';
 import MapIcon from '@mui/icons-material/Map';
-import { Button, Grid, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
+import { Button, Grid, IconButton, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import useStyles from 'screens/styles';
 import Maps from 'components/map/maps';
@@ -13,23 +14,78 @@ import { LOCAL_STORAGE } from 'components/constants';
 import { errorNoti, successNoti } from 'utils/notification';
 import { Fragment, useState, useEffect } from 'react';
 import { useHistory } from 'react-router';
+import { convertToVNDFormat } from 'screens/utils/utils';
 
-const ItemDetail = ( { product } ) => {
-  console.log("Product => ", product);
+const ItemDetail = ( { product, cartItems, setCartItems } ) => {
+  const [prevQuantity, setPrevQuantity] = useState(product.quantity);
+  const [quantity, setQuantity] = useState(product.quantity);
+
+  useEffect(() => {
+    const diffTotalCost = (quantity - prevQuantity) * product.priceUnit;
+    const newTotalProductCost = cartItems.totalProductCost + diffTotalCost;
+    const newTotalOrderCost = cartItems.totalOrderCost + diffTotalCost;
+    var newItems = cartItems.items;
+    for (var i = 0; i < newItems.length; i++) {
+      if (newItems[i].productId == product.productId) {
+        newItems[i].quantity = quantity;
+      }
+    }
+    setCartItems({
+      items: newItems,
+      totalProductCost: newTotalProductCost,
+      totalOrderCost: newTotalOrderCost,
+      deliveryFee: cartItems.deliveryFee
+    })
+  }, [quantity]);
+
+  const productDeleteHandle = () => {
+    const diffTotalCost = quantity * product.priceUnit;
+    const newTotalProductCost = cartItems.totalProductCost - diffTotalCost;
+    const newTotalOrderCost = cartItems.totalOrderCost - diffTotalCost;
+    var newItems = cartItems.items;
+    var index = -1;
+    for (var i = 0; i < newItems.length; i++) {
+      if (newItems[i].productId == product.productId) {
+        index = i;
+      }
+    }
+    newItems.splice(index, 1);
+    console.log("New items in delete butotn handle => ", newItems)
+    setCartItems({
+      items: newItems,
+      totalProductCost: newTotalProductCost,
+      totalOrderCost: newTotalOrderCost,
+      deliveryFee: cartItems.deliveryFee
+    });
+  }
+
   return (
     <Grid container spacing={3}>
       <Grid item xs={8}>
         <img width={"100%"} height={"100%"} src={"data:" + product?.imageContentType + ";base64," + product?.imageData} />
       </Grid>
       <Grid item xs={4}>
+        <Grid item
+          // justify="flex-end"
+        >
+          <IconButton onClick={productDeleteHandle}>
+            <DeleteIcon />
+          </IconButton>
+        </Grid>
         <Grid item xs={12}>
           <Typography variant="h6">{product.name}</Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h6">{"Đơn giá: " + product.priceUnit + " VNĐ"}</Typography>
+          <Typography variant="h6">{"Đơn giá: " + convertToVNDFormat(product.priceUnit)}</Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h6">{"Số lượng: " + product.quantity}</Typography>
+          <Typography variant="h6">Số lượng:</Typography>
+          <TextField type="number" value={quantity} onChange={(e) => {setPrevQuantity(quantity); setQuantity(e.target.value);}} 
+            InputProps={{
+              inputProps: { 
+                  min: 1 
+                }
+            }} />
         </Grid>
       </Grid>
     </Grid>
@@ -256,18 +312,18 @@ const CartDetail = () => {
             <Grid container spacing={3} className={classes.inforWrap}>
               {
                 cartItems?.items?.length > 0 &&
-                cartItems?.items.map(item => <ItemDetail product={item} />)
+                cartItems?.items.map(item => <ItemDetail product={item} cartItems={cartItems} setCartItems={setCartItems} />)
               }
             </Grid>
             <Grid>
               <Typography variant="h6" className={classes.inforTitle}>
-                {"Tạm tính: " + (cartItems?.totalProductCost == undefined ? 0 : cartItems?.totalProductCost)  + " VNĐ"}
+                {"Tạm tính: " + (cartItems?.totalProductCost == undefined ? 0 : convertToVNDFormat(cartItems?.totalProductCost))}
               </Typography>
               <Typography variant="h6" className={classes.inforTitle}>
-                {"Phí vận chuyển: " + (cartItems?.deliveryFee == undefined ? 0 : cartItems?.deliveryFee) + " VNĐ"}
+                {"Phí vận chuyển: " + (cartItems?.deliveryFee == undefined ? 0 : convertToVNDFormat(cartItems?.deliveryFee))}
               </Typography>
               <Typography variant="h6" className={classes.inforTitle}>
-                {"Tổng: " + (cartItems?.totalOrderCost == undefined ? 0 : cartItems?.totalOrderCost) + " VNĐ"}
+                {"Tổng: " + (cartItems?.totalOrderCost == undefined ? 0 : convertToVNDFormat(cartItems?.totalOrderCost))}
               </Typography>
             </Grid>
           </Grid>

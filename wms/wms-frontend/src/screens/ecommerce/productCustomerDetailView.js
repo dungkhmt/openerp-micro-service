@@ -1,7 +1,7 @@
 import { RequireStar } from "components/common/requireStar";
 import React, { useEffect, useState } from "react";
 import { Fragment } from "react";
-import { Box, Grid, Button, Typography, TextField, Select, MenuItem } from "@material-ui/core";
+import { Box, Grid, Button, Typography, TextField, Select, MenuItem } from "@mui/material";
 import useStyles from "screens/styles";
 import { errorNoti, successNoti } from 'utils/notification';
 import { request } from 'api';

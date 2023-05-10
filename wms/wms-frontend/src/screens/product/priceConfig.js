@@ -1,4 +1,4 @@
-import { Grid, Modal } from "@mui/material";
+import { Grid, Modal, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import { request } from "api";
 import StandardTable from "components/StandardTable";
@@ -7,17 +7,26 @@ import useStyles from "screens/styles";
 import { API_PATH } from "../apiPaths";
 
 import { Fragment, useState, useEffect } from "react";
+import { convertToVNDFormat } from "screens/utils/utils";
 
 const PriceHistory = ( { data } ) => {
   const [historyPricesArr, setHistoryPricesArr] = useState(data?.historyPrices == null ? [] : data?.historyPrices);
   const classes = useStyles();
+  const [newPrice, setNewPrice] = useState(0);
+  const [newStartDate, setNewStartDate] = useState(null);
+  const [newEndDate, setNewEndDate] = useState(null);
+  const [newDescription, setNewDescription] = useState(null);
 
-  const [columns, setColumns] = useState([
-    { title: "Giá bán", field: "price", type: "numeric" },
-    { title: "Ngày bắt đầu", field: "startDate", type: "date" },
-    { title: "Ngày kết thúc", field: "endDate", type: "date" },
-    { title: "Mô tả", field: "description" }
-  ]);
+  const columns = [
+    { title: "Giá bán *", field: "price",
+      editComponent: <TextField type="number" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} /> },
+    { title: "Ngày bắt đầu *", field: "startDate",
+      editComponent: <TextField type="date" value={newStartDate} onChange={(e) => setNewStartDate(e.target.value)} />  },
+    { title: "Ngày kết thúc", field: "endDate",
+      editComponent: <TextField type="date" value={newEndDate} onChange={(e) => setNewEndDate(e.target.value)} /> },
+    { title: "Mô tả", field: "description",
+      editComponent: <TextField value={newDescription} onChange={(e) => setNewDescription(e.target.value)} /> }
+  ];
 
   return (
     <Box>
@@ -35,17 +44,24 @@ const PriceHistory = ( { data } ) => {
         editable={{
           onRowAdd: newData => new Promise((resolve, reject) => {
             setTimeout(() => {
-              console.log("new data => ", newData);
-              if (newData.startDate > newData.endDate) {
+              if (newStartDate == null) {
+                errorNoti("Vui lòng nhập giá trị Ngày bắt đầu");
+                reject();
+              }
+              if (newPrice <= 0) {
+                errorNoti("Vui lòng kiểm tra lại giá trị giá bán");
+                reject();
+              }
+              if (newStartDate > newEndDate) {
                 errorNoti("Ngày bắt đầu phải trước ngày kết thúc");
                 reject();
               }
               const requestBody = {
                 "productId": data.productId,
-                "price": newData.price,
-                "startDate": newData.startDate,
-                "endDate": newData.endDate,
-                "description": newData.description
+                "price": newPrice,
+                "startDate": newStartDate,
+                "endDate": newEndDate,
+                "description": newDescription
               }
               request(
                 "put",
@@ -53,7 +69,7 @@ const PriceHistory = ( { data } ) => {
                 (res) => {
                   console.log("Response add data => ", res);
                   if (res.status == 200) {
-                    setHistoryPricesArr([...historyPricesArr, newData]);
+                    setHistoryPricesArr([...historyPricesArr, requestBody]);
                     resolve();
                   } else {
                     errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau");
@@ -102,7 +118,14 @@ const PriceConfig = () => {
       "get",
       API_PATH.PRODUCT_PRICE,
       (res) => {
-        setPriceTableData(res.data);
+        var data = res.data;
+        for (var i = 0; i < data?.length; i++) {
+          if (data[i].currPrice == null) {
+            continue;
+          }
+          data[i].currPrice = convertToVNDFormat(data[i].currPrice);
+        }
+        setPriceTableData(data);
       }
     )
   }, []);
