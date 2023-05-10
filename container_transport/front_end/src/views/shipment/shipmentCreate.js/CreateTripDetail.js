@@ -7,15 +7,18 @@ import ChoseTruckAndOrders from "../ChoseTruckAndOrders";
 import OrderArrangement from "../OrderArrangement";
 import { useHistory, useLocation } from "react-router-dom";
 import { MyContext } from "contextAPI/MyContext";
+import { Map } from "leaflet";
+import RoutingMachine from "../routing/RoutingMachine";
 
 const CreateTripDetail = () => {
     const {truckScheduler, setTruckScheduler, tripsCreate, setTripCreate} = useContext(MyContext);
     const {ordersScheduler, setOrderScheduler, preferred_username} = useContext(MyContext);
-    const [truckId, setTruckId] = useState();
+    const [truck, setTruck] = useState();
     const [trucks, setTrucks] = useState([]);
     const [orders, setOrders] = useState([]);
     const [ordersSelect, setOrdersSelect] = useState([]);
     const [truckSelect, setTruckSelect] = useState();
+    const [map , setMap] = useState();
     
     const [tripItems, setTripItem] = useState([]);
     const history = useHistory();
@@ -26,7 +29,7 @@ const CreateTripDetail = () => {
         let check = true;
         if(type === "truck"){
             truckScheduler.forEach((item) => {
-                if(item === id) 
+                if(item.id === id) 
                     return check = false;
             });
         } else {
@@ -39,7 +42,7 @@ const CreateTripDetail = () => {
     }
     const updateScheduler = (orderSubmir) => {
         let truckSchedulerUpdate = truckScheduler
-        truckSchedulerUpdate.push(truckId);
+        truckSchedulerUpdate.push(truck);
         setTruckScheduler(truckSchedulerUpdate);
         let ordersSchedulerUpdate = ordersScheduler;
         setOrderScheduler(ordersSchedulerUpdate.concat(orderSubmir));
@@ -50,9 +53,9 @@ const CreateTripDetail = () => {
             "post",
             `/truck/`, {}, {}, {}, {},
         ).then((res) => {
-            // let truckTmp = res.data.filter(item => checkScheduler(item.id, "truck"))
-            console.log("truck", res.data)
-            setTrucks(res.data);
+            let truckTmp = res.data.filter(item => checkScheduler(item.id, "truck"))
+            // console.log("truck", res.data)
+            setTrucks(truckTmp);
         });
         request(
             "post",
@@ -85,7 +88,10 @@ const CreateTripDetail = () => {
             let tripItem = {
                 seqInTrip: index,
                 action: item.action,
-                facilityId: item.facilityId
+                facilityId: item.facilityId,
+                orderId: item.orderId,
+                arrivalTime: item.arrivalTime,
+                departureTime: item.departureTime
                 // time
             }
             tripItemTmp.push(tripItem);
@@ -93,7 +99,7 @@ const CreateTripDetail = () => {
         let trips = tripsCreate;
         let data = {
             id: tripsCreate?.length > 0 ? tripsCreate.length + 1 : 0,
-            truckId: truckId,
+            truck: truck,
             created_by_user_id: preferred_username,
             orderIds: orderSubmir,
             tripItemModelList: tripItemTmp
@@ -122,7 +128,7 @@ const CreateTripDetail = () => {
             <Divider className="divider-trip-detail" />
             <Box className="content-trip">
                 <Box className="content-truck-and-orders">
-                    <ChoseTruckAndOrders trucks={trucks} setTruckId={setTruckId} truckSelected={truckSelect}
+                    <ChoseTruckAndOrders trucks={trucks} setTruck={setTruck} truckSelected={truckSelect}
                     orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} />
                 </Box>
                 <Box className="order-arrangement">
@@ -130,12 +136,15 @@ const CreateTripDetail = () => {
                 </Box>
                 <Box className="map-order">
                     <Box>
-                        <MapContainer center={[21.018172, 105.829754]} zoom={13} scrollWheelZoom={false} style={{ height: "70vh" }}>
+                        <MapContainer center={[21.018172, 105.829754]} zoom={13} scrollWheelZoom={false} style={{ height: "70vh" }}
+                            // whenCreated={map => setMap(map)}
+                        >
                             <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             />
-                            {(tripItems != null && tripItems.length > 0) ? (
+                            <RoutingMachine tripItems={tripItems} />
+                            {/* {(tripItems != null && tripItems.length > 0) ? (
                                 tripItems.map((item) => {
                                     return (
                                         <Marker position={[item.latitude, item.longitude]}>
@@ -145,7 +154,7 @@ const CreateTripDetail = () => {
                                         </Marker>
                                     )
                                 })
-                            ) : null}
+                            ) : null} */}
                         </MapContainer>
                     </Box>
                     <Box>Thong tin trip</Box>

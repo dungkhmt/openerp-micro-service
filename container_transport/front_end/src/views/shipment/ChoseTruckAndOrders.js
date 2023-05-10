@@ -7,7 +7,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import './styles.scss';
 import { MyContext } from "contextAPI/MyContext";
 
-const ChoseTruckAndOrders = ({ trucks, setTruckId, truckSelected , orders, ordersSelect, setOrdersSelect}) => {
+const ChoseTruckAndOrders = ({ trucks, setTruck, truckSelected , orders, ordersSelect, setOrdersSelect}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [value, setValue] = useState([]);
     const [pendingValue, setPendingValue] = useState([]);
@@ -55,7 +55,8 @@ const ChoseTruckAndOrders = ({ trucks, setTruckId, truckSelected , orders, order
                     getOptionLabel={(option) => `${option.truckCode} - ${option.facilityName}`}
                     onChange={(event, values) => {
                         setTruckSelect(values)
-                        setTruckId(values.id)}}
+                        setTruck(values)
+                    }}
                     renderInput={(params) => {
                         return (
                             <TextField {...params}

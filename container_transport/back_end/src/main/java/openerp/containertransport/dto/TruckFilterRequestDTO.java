@@ -9,4 +9,5 @@ import lombok.*;
 @Builder
 public class TruckFilterRequestDTO {
     private String truckCode;
+    private String status;
 }

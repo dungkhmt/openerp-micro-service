@@ -299,6 +299,14 @@
         width: 50%;
     }
 }
+.item-facility {
+    width: 80%;
+    margin-top: 32px;
+    border: 1px solid #e5e5e5;
+    .trips-item-input {
+        margin-top: 16px;
+    }
+}
 .trip-detail {
     padding: 8px 32px;
     .header-trip-detail {

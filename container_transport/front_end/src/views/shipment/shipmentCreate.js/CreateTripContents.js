@@ -58,10 +58,16 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: 'truckId',
+    id: 'truckCode',
     numeric: false,
     disablePadding: false,
-    label: 'Truck Id',
+    label: 'Truck Code',
+  },
+  {
+    id: 'driverName',
+    numeric: false,
+    disablePadding: false,
+    label: 'Driver Name',
   },
   {
     id: 'numberOrder',
@@ -133,15 +139,6 @@ function EnhancedTableHead(props) {
   );
 }
 
-EnhancedTableHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-  onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
-  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-  orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired,
-};
-
 function EnhancedTableToolbar(props) {
   const { numSelected } = props;
 
@@ -192,10 +189,6 @@ function EnhancedTableToolbar(props) {
     </Toolbar>
   );
 }
-
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-};
 
 export default function CreateTripContents({trips}) {
   const [order, setOrder] = React.useState(DEFAULT_ORDER);
@@ -347,14 +340,15 @@ export default function CreateTripContents({trips}) {
                         </TableCell>
                         <TableCell
                           align="center"
-                          onClick={() => history.push({
-                            pathname: '/shipment/trip/create',
-                            search: `${row.id}`
+                        //   onClick={() => history.push({
+                        //     pathname: '/shipment/trip/create',
+                        //     search: `${row.id}`
               
-                        })}
+                        // })}
                         >
-                          {row.truckId}
+                          {row.truck.truckCode}
                         </TableCell>
+                        <TableCell align="center">{row?.truck.driverName}</TableCell>
                         <TableCell align="center">{row.orderIds?.length}</TableCell>
                         <TableCell align="center">{row.created_by_user_id}</TableCell>
                         <TableCell align="center"></TableCell>

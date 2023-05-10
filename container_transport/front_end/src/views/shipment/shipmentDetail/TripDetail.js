@@ -28,6 +28,7 @@ const TripDetail = () => {
             // let truckTmp = res.data.filter(item => checkScheduler(item.id, "truck"))
             console.log("truck", res.data)
             setTrucks(res.data);
+            // setTruckSelect(res.data[0])
         });
         request(
             "post",
@@ -36,20 +37,7 @@ const TripDetail = () => {
             // let orderTmp = res.data.data.filter(item => checkScheduler(item.id, "order"))
             setOrders(res.data.data);
         });
-        request(
-            "post",
-            `/trip/${tripId}`, {}, {}, {}, {},
-        ).then((res) => {
-            console.log("trip", res.data.data)
-            setTrip(res.data.data);
-            trucks.forEach((item) => {
-                if(item.id == trip.truckId){
-                    console.log("trip", item);
-                    setTruckSelect(item)
-                }
-                    
-            })
-        });
+        
         request(
             "post",
             `/tripItem/${tripId}`, {}, {}, {}, {},
@@ -58,6 +46,24 @@ const TripDetail = () => {
             setTripItems(res.data.data);
         });
     }, [])
+    useEffect(() => {
+        request(
+            "post",
+            `/trip/${tripId}`, {}, {}, {}, {},
+        ).then((res) => {
+            console.log("trip", res.data.data);
+            console.log("truck111", trucks)
+            // setTrip(res.data.data);
+            trucks.forEach((item) => {
+                console.log("123", item.id == res.data.data.truckId);
+                if(item.id == res.data.data.truckId){
+                    console.log("tr999ip", item);
+                    setTruckSelect(item)
+                }
+                    
+            })
+        });
+    }, [trucks, tripId])
     
     return (
         <Box className="trip-detail">
@@ -92,7 +98,7 @@ const TripDetail = () => {
                 </Box>
                 {/* <Box className="order-arrangement">
                     <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} />
-                </Box>
+                </Box> */}
                 <Box className="map-order">
                     <Box>
                         <MapContainer center={[21.018172, 105.829754]} zoom={13} scrollWheelZoom={false} style={{ height: "70vh" }}>
@@ -100,21 +106,21 @@ const TripDetail = () => {
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             />
-                            {(tripItems != null && tripItems.length > 0) ? (
+                            {/* {(tripItems != null && tripItems.length > 0) ? (
                                 tripItems.map((item) => {
-                                    return (
-                                        <Marker position={[item.latitude, item.longitude]}>
+                                    return ( */}
+                                        <Marker position={[21.018172, 105.829754]}>
                                             <Popup>
                                                 A pretty CSS3 popup. <br /> Easily customizable.
                                             </Popup>
                                         </Marker>
-                                    )
+                                    {/* )
                                 })
-                            ) : null}
+                            ) : null} */}
                         </MapContainer>
                     </Box>
                     <Box>Thong tin trip</Box>
-                </Box> */}
+                </Box>
             </Box>
         </Box>
     )

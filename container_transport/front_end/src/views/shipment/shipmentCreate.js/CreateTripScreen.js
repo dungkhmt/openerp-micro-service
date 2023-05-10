@@ -32,7 +32,7 @@ const TripScreen = () => {
         let tripListTmp = [];
         tripsCreate.forEach((item) => {
             let tripListItem = {
-                truckId: item.truckId,
+                truckId: item.truck.id,
                 created_by_user_id: item.created_by_user_id,
                 orderIds: item.orderIds,
                 tripItemModelList: item.tripItemModelList
@@ -44,16 +44,16 @@ const TripScreen = () => {
             tripList: tripListTmp
         }
         console.log("data", data);
-        request(
-            "post",
-            `/shipment/create`, {}, {}, data
-        ).then((res) => {
-            console.log(res);
-            setTripCreate([]);
-            setTruckScheduler([]);
-            setOrderScheduler([]);
-            history.push('/shipment');
-        })
+        // request(
+        //     "post",
+        //     `/shipment/create`, {}, {}, data
+        // ).then((res) => {
+        //     console.log(res);
+        //     setTripCreate([]);
+        //     setTruckScheduler([]);
+        //     setOrderScheduler([]);
+        //     history.push('/shipment');
+        // })
     }
     console.log("tripsCreate", tripsCreate)
     return (

@@ -21,6 +21,7 @@ public class TruckModel implements Serializable {
     private String facilityName;
     private Integer driverId;
     private String driverName;
+    private String status;
     private String licensePlates;
     private Integer yearOfManufacture;
     private String brandTruck;
