@@ -25,6 +25,7 @@
     "framer-motion": "^2.9.5",
     "keycloak-js": "^21.0.2",
     "leaflet": "^1.9.3",
+    "leaflet-routing-machine": "^3.2.12",
     "moment": "^2.29.4",
     "overlayscrollbars": "^1.13.1",
     "overlayscrollbars-react": "^0.2.3",

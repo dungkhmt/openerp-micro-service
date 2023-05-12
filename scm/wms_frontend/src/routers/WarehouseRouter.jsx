@@ -3,6 +3,7 @@ import PurchaseOrderDetail from "../views/sellin/PurchaseOrderDetail";
 import SaleOrderDetail from "../views/sellout/SaleOrderDetail";
 import ExportingActivity from "../views/warehouse/export/ExportingActivity";
 import Warehouse from "../views/warehouse/facility/Facility";
+import FacilityMap from "../views/warehouse/facility/FacilityMap";
 import ImportingActivity from "../views/warehouse/import/ImportingActivity";
 
 export default function WarehouseRouter() {
@@ -11,6 +12,11 @@ export default function WarehouseRouter() {
     <div>
       <Switch>
         <Route component={Warehouse} exact path={`${path}/inventory`}></Route>
+        <Route
+          component={FacilityMap}
+          exact
+          path={`${path}/inventory/map`}
+        ></Route>
         <Route
           component={ImportingActivity}
           exact

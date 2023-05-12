@@ -430,6 +430,9 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
         for (SaleOrderItem orderItem : currOrder.getSaleOrderItems()) {
             String currentProductCode = orderItem.getProduct().getCode().toUpperCase();
             // TODO: có cần check tương tự giống phần importing hay không?
+            if (!qtyMappingFromBill.containsKey(currentProductCode)) {
+                return false;
+            }
             int compareQty = qtyMappingFromBill.get(currentProductCode);
             if (compareQty != orderItem.getQuantity()) return false;
         }

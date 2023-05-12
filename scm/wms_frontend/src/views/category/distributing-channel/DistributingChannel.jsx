@@ -1,18 +1,21 @@
 import AddIcon from "@mui/icons-material/Add";
-import { Box, Button } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import { Box } from "@mui/material";
 import CustomToolBar from "components/toolbar/CustomToolBar";
 import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
 import { useToggle, useWindowSize } from "react-use";
+import { Action } from "../../../components/action/Action";
 import withScreenSecurity from "../../../components/common/withScreenSecurity";
 import CustomDataGrid from "../../../components/datagrid/CustomDataGrid";
-import CustomFormControl from "../../../components/form/CustomFormControl";
+import DraggableDeleteDialog from "../../../components/dialog/DraggableDialogs";
+import CustomDrawer from "../../../components/drawer/CustomDrawer";
 import CustomModal from "../../../components/modal/CustomModal";
-import {
-  useCreateDistChannel,
-  useGetDistChannelList,
-} from "../../../controllers/query/category-query";
+import HeaderModal from "../../../components/modal/HeaderModal";
+import { useGetDistChannelList } from "../../../controllers/query/category-query";
+import { AppColors } from "../../../shared/AppColors";
 import { distChannelCols } from "../LocalConstant";
+import CreateDistChannel from "./components/CreateDistChannel";
 function DistributingChannelScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
@@ -20,37 +23,12 @@ function DistributingChannelScreen({ screenAuthorization }) {
   });
   const { height } = useWindowSize();
   const [isAdd, setIsAdd] = useToggle(false);
-  const methods = useForm({
-    mode: "onChange",
-    defaultValues: {},
-    // resolver: brandSchema,
-  });
-  const {
-    handleSubmit,
-    formState: { errors },
-    reset,
-    control,
-  } = methods;
+  const [isOpenDrawer, setOpenDrawer] = useToggle(false);
+  const [isRemove, setIsRemove] = useToggle(false);
+  const [itemSelected, setItemSelected] = useState(null);
 
   const { isLoading, data } = useGetDistChannelList();
 
-  const createDistChannelQuery = useCreateDistChannel();
-  const onSubmit = async (data) => {
-    let params = {
-      name: data?.name.trim(),
-    };
-    await createDistChannelQuery.mutateAsync(params);
-    setIsAdd((pre) => !pre);
-    reset();
-  };
-  const fields = [
-    {
-      name: "name",
-      label: "Kênh phân phối",
-      type: "text",
-      component: "input",
-    },
-  ];
   let actions = [
     {
       title: "Thêm",
@@ -61,14 +39,24 @@ function DistributingChannelScreen({ screenAuthorization }) {
       describe: "Thêm bản ghi mới",
       disabled: false,
     },
+  ];
+  const extraActions = [
     {
       title: "Sửa",
-      callback: () => {
-        console.log("call back");
+      callback: (item) => {
+        setOpenDrawer((pre) => !pre);
       },
-      icon: <AddIcon />,
-      describe: "Thêm bản ghi mới",
-      disabled: false,
+      icon: <EditIcon />,
+      color: AppColors.secondary,
+    },
+    {
+      title: "Xóa",
+      callback: (item) => {
+        setIsRemove();
+        setItemSelected(item);
+      },
+      icon: <DeleteIcon />,
+      color: AppColors.error,
     },
   ];
   return (
@@ -82,35 +70,51 @@ function DistributingChannelScreen({ screenAuthorization }) {
         sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading}
         totalItem={100}
-        columns={distChannelCols}
+        columns={[
+          ...distChannelCols,
+          {
+            field: "action",
+            headerName: "Hành động",
+            headerAlign: "center",
+            align: "center",
+            sortable: false,
+            flex: 1,
+            type: "actions",
+            getActions: (params) => [
+              ...extraActions.map((extraAction, index) => (
+                <Action
+                  item={params.row}
+                  key={index}
+                  extraAction={extraAction}
+                  onActionCall={extraAction.callback}
+                  disabled={false}
+                />
+              )),
+            ],
+          },
+        ]}
         rows={data ? data?.content : []}
       />
       <CustomModal
         open={isAdd}
         toggle={setIsAdd}
         size="sm"
-        style={{ padding: 2 }}
+        title="Tạo mới kênh phân phối"
       >
-        <FormProvider {...methods}>
-          {/* <Stack spacing={2}> */}
-          <CustomFormControl
-            control={control}
-            errors={errors}
-            fields={fields}
-          />
-          {/* </Stack> */}
-        </FormProvider>
-        <Button
-          onClick={handleSubmit(onSubmit)}
-          variant="contained"
-          style={{ marginRight: 20, color: "white" }}
-        >
-          Submit
-        </Button>
-        <Button onClick={() => reset()} variant={"outlined"}>
-          Reset
-        </Button>
+        <CreateDistChannel setIsAdd={setIsAdd} />
       </CustomModal>
+      <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
+        <HeaderModal
+          onClose={setOpenDrawer}
+          title="Sửa thông tin kênh phân phối"
+        />
+      </CustomDrawer>
+      <DraggableDeleteDialog
+        // disable={isLoadingRemove}
+        open={isRemove && itemSelected}
+        handleOpen={setIsRemove}
+        callback={(flag) => {}}
+      />
     </Box>
   );
 }

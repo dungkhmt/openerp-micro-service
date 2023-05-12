@@ -20,6 +20,7 @@ import { AppColors } from "shared/AppColors";
 import DraggableDeleteDialog from "../../components/dialog/DraggableDialogs";
 import CustomDrawer from "../../components/drawer/CustomDrawer";
 import HeaderModal from "../../components/modal/HeaderModal";
+import { ORDERS_STATUS } from "../../shared/AppConstants";
 import { saleOrderCols } from "./LocalConstant";
 import CreateSaleOrderForm from "./components/CreateSaleOrderForm";
 
@@ -32,19 +33,18 @@ function SaleOrderScreen({ screenAuthorization }) {
   const [isApproved, setIsApproved] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
-  const [updatingOrder, setUpdateOrder] = useState();
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const { height } = useWindowSize();
   const { isLoading, data } = useGetSaleOrderList();
   const updatePurchaseOrderQuery = useUpdateSaleOrderStatus({
-    orderCode: updatingOrder?.code,
+    orderCode: itemSelected?.code,
   });
 
   const handleUpdateOrder = async () => {
     let updateData = {
       status: "accepted",
     };
-    if (updatingOrder) await updatePurchaseOrderQuery.mutateAsync(updateData);
+    if (itemSelected) await updatePurchaseOrderQuery.mutateAsync(updateData);
     setIsApproved((pre) => !pre);
   };
   let actions = [
@@ -80,6 +80,7 @@ function SaleOrderScreen({ screenAuthorization }) {
       title: "Phê duyệt",
       callback: (item) => {
         setIsApproved((pre) => !pre);
+        setItemSelected(item);
       },
       icon: <CheckCircleIcon />,
       color: AppColors.green,
@@ -116,7 +117,7 @@ function SaleOrderScreen({ screenAuthorization }) {
                     key={index}
                     extraAction={extraAction}
                     onActionCall={extraAction.callback}
-                    // disabled={params?.row?.status !== ORDERS_STATUS.created}
+                    disabled={params?.row?.status !== ORDERS_STATUS.created}
                   />
                 )),
               ];
@@ -131,7 +132,7 @@ function SaleOrderScreen({ screenAuthorization }) {
         size="sm"
         title="Tạo mới đơn bán hàng"
       >
-        <CreateSaleOrderForm />
+        <CreateSaleOrderForm setIsAdd={setIsAdd} />
       </CustomModal>
       <CustomizedDialogs
         open={isApproved}

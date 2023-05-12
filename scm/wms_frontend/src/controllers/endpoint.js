@@ -12,6 +12,7 @@ export const endPoint = {
   getProduct: baseUrl + "/product/get-all",
   getCustomer: baseUrl + "/customer/get-all",
   createCustomer: baseUrl + "/customer/create",
+  deleteCustomer: baseUrl + "/customer/delete",
   createProduct: baseUrl + "/product/create",
   createProductUnit: baseUrl + "/category/product-unit/create",
   createProductCategory: baseUrl + "/category/product-category/create",

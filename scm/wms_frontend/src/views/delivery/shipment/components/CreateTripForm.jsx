@@ -1,4 +1,3 @@
-import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Stack } from "@mui/material";
 import { CustomDatePicker } from "components/datepicker/CustomDatePicker";
 import CustomSelect from "components/select/CustomSelect";
@@ -6,7 +5,6 @@ import { useCreateDeliveryTrip } from "controllers/query/delivery-trip-query";
 import { useGetFacilityList } from "controllers/query/facility-query";
 import { useGetAllUsersExist } from "controllers/query/user-query";
 import moment from "moment";
-import { tripSchema } from "utils/validate";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 
@@ -14,7 +12,7 @@ const CreateTripForm = ({ setIsAdd, currShipment }) => {
   const methods = useForm({
     mode: "onChange",
     defaultValues: {},
-    resolver: yupResolver(tripSchema),
+    // resolver: yupResolver(tripSchema),
   });
   const {
     handleSubmit,

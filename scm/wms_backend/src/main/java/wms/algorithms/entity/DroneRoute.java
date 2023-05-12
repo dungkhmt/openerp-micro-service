@@ -10,6 +10,7 @@ import java.util.List;
 
 @Setter
 @Getter
+@NoArgsConstructor
 public class DroneRoute {
     private List<DroneRouteElement> droneRouteElements;
     public DroneRoute(List<Node> droneRoute) {

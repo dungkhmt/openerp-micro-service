@@ -1,6 +1,7 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import MapIcon from "@mui/icons-material/Map";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box } from "@mui/material";
 import withScreenSecurity from "components/common/withScreenSecurity";
@@ -14,6 +15,7 @@ import {
   useGetFacilityList,
 } from "controllers/query/facility-query";
 import { useState } from "react";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { Action } from "../../../components/action/Action";
 import DraggableDeleteDialog from "../../../components/dialog/DraggableDialogs";
@@ -33,8 +35,10 @@ function FacilityScreen({ screenAuthorization }) {
   const [facilityCode, setFacilityCode] = useState("");
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
+  const history = useHistory();
+  let { path } = useRouteMatch();
 
-  const { isLoading, data } = useGetFacilityList();
+  const { isLoading, data: facility } = useGetFacilityList();
   const { isLoading: isLoadingInventory, data: inventory } =
     useGetFacilityInventory({
       code: facilityCode,
@@ -48,6 +52,15 @@ function FacilityScreen({ screenAuthorization }) {
       },
       icon: <AddIcon />,
       describe: "Thêm bản ghi mới",
+      disabled: false,
+    },
+    {
+      title: "Bản đồ",
+      callback: (item) => {
+        handleButtonClick();
+      },
+      icon: <MapIcon />,
+      describe: "Xem bản đồ vị trí kho hàng",
       disabled: false,
     },
   ];
@@ -80,6 +93,12 @@ function FacilityScreen({ screenAuthorization }) {
       // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
     },
   ];
+
+  const handleButtonClick = () => {
+    history.push(`${path}/map`, {
+      facility: facility?.content,
+    });
+  };
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
@@ -115,7 +134,7 @@ function FacilityScreen({ screenAuthorization }) {
             ],
           },
         ]}
-        rows={data ? data?.content : []}
+        rows={facility ? facility?.content : []}
       />
       <CustomDrawer
         open={isOpenInventoryDrawer}

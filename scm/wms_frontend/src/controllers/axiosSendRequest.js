@@ -24,18 +24,18 @@ async function axiosSendRequest(
   data = null,
   header = null
 ) {
-  if (AppConfig.isDebugging) {
-    console.log(
-      "\n[Axios " + method + "]: \n\t url = ",
-      url,
-      "\n\t params = ",
-      JSON.stringify(params),
-      "\n\t data = ",
-      JSON.stringify(data),
-      "\n\t header = ",
-      header
-    );
-  }
+  // if (AppConfig.isDebugging) {
+  //   console.log(
+  //     "\n[Axios " + method + "]: \n\t url = ",
+  //     url,
+  //     "\n\t params = ",
+  //     JSON.stringify(params),
+  //     "\n\t data = ",
+  //     JSON.stringify(data),
+  //     "\n\t header = ",
+  //     header
+  //   );
+  // }
 
   // kiểm tra kết nối mạng
   // if (await checkInternetConnection()) {
@@ -70,7 +70,7 @@ async function axiosSendRequest(
   }
   // optional
   if (params) {
-    if (method === "get" || method === "put") {
+    if (method === "get" || method === "put" || method === "delete") {
       config.url =
         url +
         "?" +
@@ -82,6 +82,10 @@ async function axiosSendRequest(
   }
   if (data) {
     config.data = data || {};
+  }
+
+  if (AppConfig.isDebugging) {
+    console.log(config);
   }
   // curlirize(axios);
   await axios(config)

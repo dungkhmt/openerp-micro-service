@@ -98,8 +98,8 @@ export const staticWarehouseCols = [
     headerName: "Địa chỉ",
     sortable: false,
     pinnable: true,
-    minWidth: 250,
-    maxWidth: 300,
+    minWidth: 300,
+    maxWidth: 350,
   },
   {
     field: "managedBy",

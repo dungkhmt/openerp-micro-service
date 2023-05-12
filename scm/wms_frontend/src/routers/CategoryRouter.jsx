@@ -4,7 +4,7 @@ import ProductUnitScreen from "views/category/product-unit/Unit";
 import ContractType from "../views/category/contract-type/ContractType";
 import CustomerType from "../views/category/customer-type/CustomerType";
 import Customer from "../views/category/customer/Customer";
-import CustomerLocation from "../views/category/customer/CustomerLocation";
+import CustomerLocation from "../views/category/customer/CustomerMap";
 import DistributingChannel from "../views/category/distributing-channel/DistributingChannel";
 import Product from "../views/category/product/Product";
 export default function CategoryRouter() {

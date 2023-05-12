@@ -225,7 +225,29 @@ export const useCreateCustomerType = (params) => {
     onMutate: (variables) => {},
   });
 };
-
+export const useDeleteCustomer = () => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "delete",
+        endPoint.deleteCustomer,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      } else throw Error;
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Xóa thành công!");
+      queryClient.invalidateQueries([queryKey.category.customer_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi xóa, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
 export const useCreateContractType = (params) => {
   return useMutation({
     mutationFn: async (data) => {

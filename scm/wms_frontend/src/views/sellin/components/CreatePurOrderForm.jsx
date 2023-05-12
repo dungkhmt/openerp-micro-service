@@ -1,4 +1,3 @@
-import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, InputBase, Stack } from "@mui/material";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomSelect from "components/select/CustomSelect";
@@ -6,7 +5,6 @@ import { useGetProductList } from "controllers/query/category-query";
 import { useGetFacilityList } from "controllers/query/facility-query";
 import { useCreatePurchaseOrder } from "controllers/query/purchase-order-query";
 import { useState } from "react";
-import { purchaseOrderSchema } from "utils/validate";
 import { staticProductFields } from "../LocalConstant";
 
 const {
@@ -27,7 +25,7 @@ const CreatePurOrderForm = ({ setIsAdd }) => {
     defaultValues: {
       products: [],
     },
-    resolver: yupResolver(purchaseOrderSchema),
+    // resolver: yupResolver(purchaseOrderSchema),
   });
   const {
     handleSubmit,

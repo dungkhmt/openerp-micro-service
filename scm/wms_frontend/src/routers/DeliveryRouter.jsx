@@ -6,6 +6,7 @@ import Truck from "../views/delivery/Truck";
 import Shipment from "../views/delivery/shipment/Shipment";
 import ShipmentDetail from "../views/delivery/shipment/ShipmentDetail";
 import Trip from "../views/delivery/shipment/TripDetail";
+import TripRoutes from "../views/delivery/shipment/TripRoutes";
 
 export default function DeliveryRouter() {
   let { path } = useRouteMatch();
@@ -22,6 +23,11 @@ export default function DeliveryRouter() {
           component={Trip}
           exact
           path={`${path}/shipment/shipment-detail/trip-detail`}
+        ></Route>
+        <Route
+          component={TripRoutes}
+          exact
+          path={`${path}/shipment/shipment-detail/trip-detail/route`}
         ></Route>
         <Route
           component={AddShipmentOrder}

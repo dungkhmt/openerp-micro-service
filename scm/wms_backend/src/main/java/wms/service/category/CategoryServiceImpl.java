@@ -239,7 +239,7 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
         }
         newContract.setCode("CTR" + GeneralUtils.generateCodeFromSysTime());
         newContract.setChannel(channel);
-        newContract.setName(contractTypeDTO.getName().toLowerCase());
+        newContract.setName(StringUtils.capitalize(contractTypeDTO.getName()));
         return contractTypeRepo.save(newContract);
     }
 

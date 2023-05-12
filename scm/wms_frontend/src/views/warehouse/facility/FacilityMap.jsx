@@ -8,14 +8,14 @@ import withScreenSecurity from "../../../components/common/withScreenSecurity";
 const googleTileLayerUrl = "https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}";
 const googleAttribution = "Map data © Google";
 const customIcon = icon({
-  iconUrl: require("../../../assets/images/shop2.png"),
-  iconSize: [32, 32], // set the size of the icon
+  iconUrl: require("../../../assets/images/inventory3.png"),
+  iconSize: [40, 40], // set the size of the icon
   iconAnchor: [16, 0], // set the anchor point of the icon
 });
 
-function CustomerLocationScreen({ screenAuthorization }) {
+function FacilityMapScreen({ screenAuthorization }) {
   const location = useLocation();
-  const customer = location.state.customer;
+  const facility = location.state.facility;
   const markerRef = useRef(null);
 
   return (
@@ -36,7 +36,7 @@ function CustomerLocationScreen({ screenAuthorization }) {
         // url="https://api.maptiler.com/maps/basic-v2/256/{z}/{x}/{y}.png?key=yI7HfCmy5qll4mYkkO16"
         // attribution='<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
       />
-      {customer.map((cus, index) => (
+      {facility.map((cus, index) => (
         <Marker
           key={index}
           position={[cus?.latitude, cus?.longitude]}
@@ -53,4 +53,4 @@ function CustomerLocationScreen({ screenAuthorization }) {
   );
 }
 const SCR_ID = "SCR_CUSTOMER_LOC";
-export default withScreenSecurity(CustomerLocationScreen, SCR_ID, true);
+export default withScreenSecurity(FacilityMapScreen, SCR_ID, true);

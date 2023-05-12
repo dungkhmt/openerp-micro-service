@@ -8,7 +8,10 @@ import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomModal from "components/modal/CustomModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetCustomerList } from "controllers/query/category-query";
+import {
+  useDeleteCustomer,
+  useGetCustomerList,
+} from "controllers/query/category-query";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
@@ -25,13 +28,15 @@ function CustomerScreen({ screenAuthorization }) {
     page_size: 50,
   });
   const { height } = useWindowSize();
-  const { isLoading, data: customer } = useGetCustomerList();
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const [isAdd, setIsAdd] = useToggle(false);
   const history = useHistory();
   let { path } = useRouteMatch();
+
+  const { isLoading, data: customer } = useGetCustomerList();
+  const deleteCustomerQuery = useDeleteCustomer();
   let actions = [
     {
       title: "Thêm",
@@ -131,7 +136,9 @@ function CustomerScreen({ screenAuthorization }) {
         // disable={isLoadingRemove}
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
-        callback={(flag) => {}}
+        callback={async () => {
+          await deleteCustomerQuery.mutateAsync({ id: itemSelected?.id });
+        }}
       />
     </Box>
   );

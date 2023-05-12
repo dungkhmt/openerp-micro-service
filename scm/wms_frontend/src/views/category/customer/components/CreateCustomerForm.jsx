@@ -1,4 +1,3 @@
-import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Stack, Typography } from "@mui/material";
 import CustomMap from "components/map/CustomMap";
 import CustomSelect from "components/select/CustomSelect";
@@ -8,7 +7,6 @@ import {
   useGetCustomerType,
 } from "controllers/query/category-query";
 import { useRef, useState } from "react";
-import { customerSchema } from "utils/validate";
 import { useGeoLocation } from "../../../../shared/AppHooks";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
@@ -22,7 +20,7 @@ const CreateCustomerForm = ({ setIsAdd }) => {
   const methods = useForm({
     mode: "onChange",
     defaultValues: {},
-    resolver: yupResolver(customerSchema),
+    // resolver: yupResolver(customerSchema),
   });
   const {
     handleSubmit,
@@ -38,6 +36,7 @@ const CreateCustomerForm = ({ setIsAdd }) => {
   const createCustomerQuery = useCreateCustomer();
 
   const onSubmit = async (data) => {
+    console.log("Submitting: ", data);
     let customerParams = {
       address: data?.address,
       contractTypeCode: data?.contractType?.code,
@@ -120,7 +119,7 @@ const CreateCustomerForm = ({ setIsAdd }) => {
               loading={isLoadingCustomerType}
               value={value}
               onChange={onChange}
-              label={"Ngành hàng"}
+              label={"Loại khách hàng"}
               error={!!errors["customerType"]}
               message={errors["customerType"]?.message}
             />
@@ -155,7 +154,7 @@ const CreateCustomerForm = ({ setIsAdd }) => {
               loading={isLoadingContractType}
               value={value}
               onChange={onChange}
-              label={"Đơn vị tính"}
+              label={"Loại hợp đồng"}
               error={!!errors["contractType"]}
               message={errors["contractType"]?.message}
             />
@@ -170,7 +169,7 @@ const CreateCustomerForm = ({ setIsAdd }) => {
           name={"map"}
           render={({ field: { onChange, value } }) => (
             <CustomMap
-              style={{ width: "30vw", height: "30vh" }}
+              style={{ width: "50vw", height: "50vh" }}
               location={currPos}
               mapRef={mapRef}
               onChange={(currLoc) => {
@@ -179,15 +178,12 @@ const CreateCustomerForm = ({ setIsAdd }) => {
             />
           )}
         />
-        <Stack direction={"column"}>
-          <Typography>{`${currMarker.lat}, ${currMarker.lng}`}</Typography>
-        </Stack>
       </Stack>
       <Stack
         direction="row"
         justifyContent={"flex-end"}
         spacing={2}
-        sx={{ marginBottom: 2 }}
+        sx={{ marginY: 2 }}
       >
         <Button onClick={() => reset()} variant={"outlined"}>
           Reset

@@ -236,9 +236,7 @@ export const unitColumns = [
     headerName: "Mã code",
     sortable: false,
     pinnable: true,
-    width: 125,
-    minWidth: 150,
-    maxWidth: 200,
+    minWidth: 200,
     renderCell: (params) => {
       return (
         <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>
@@ -255,14 +253,6 @@ export const unitColumns = [
     sortable: false,
     minWidth: 200,
   },
-  {
-    field: "",
-    headerAlign: "center",
-    align: "center",
-    headerName: "Hành động",
-    sortable: false,
-    minWidth: 200,
-  },
 ];
 export const categoryColumns = [
   {
@@ -270,9 +260,7 @@ export const categoryColumns = [
     headerName: "Mã code",
     sortable: false,
     pinnable: true,
-    width: 125,
-    minWidth: 150,
-    maxWidth: 200,
+    minWidth: 250,
     renderCell: (params) => {
       return (
         <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>
@@ -289,14 +277,6 @@ export const categoryColumns = [
     sortable: false,
     minWidth: 250,
   },
-  {
-    field: "",
-    headerAlign: "center",
-    align: "center",
-    headerName: "Hành động",
-    sortable: false,
-    minWidth: 200,
-  },
 ];
 export const distChannelCols = [
   {
@@ -304,9 +284,7 @@ export const distChannelCols = [
     headerName: "Mã code",
     sortable: false,
     pinnable: true,
-    width: 125,
-    minWidth: 150,
-    maxWidth: 200,
+    minWidth: 250,
     renderCell: (params) => {
       return (
         <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>
@@ -323,14 +301,6 @@ export const distChannelCols = [
     sortable: false,
     minWidth: 250,
   },
-  {
-    field: "",
-    headerAlign: "center",
-    align: "center",
-    headerName: "Hành động",
-    sortable: false,
-    minWidth: 200,
-  },
 ];
 export const customerTypeCols = [
   {
@@ -338,9 +308,7 @@ export const customerTypeCols = [
     headerName: "Mã code",
     sortable: false,
     pinnable: true,
-    width: 125,
-    minWidth: 150,
-    maxWidth: 200,
+    minWidth: 250,
     renderCell: (params) => {
       return (
         <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>
@@ -357,14 +325,6 @@ export const customerTypeCols = [
     sortable: false,
     minWidth: 250,
   },
-  {
-    field: "",
-    headerAlign: "center",
-    align: "center",
-    headerName: "Hành động",
-    sortable: false,
-    minWidth: 200,
-  },
 ];
 export const contractTypeCols = [
   {
@@ -372,7 +332,6 @@ export const contractTypeCols = [
     headerName: "Mã code",
     sortable: false,
     pinnable: true,
-    width: 125,
     minWidth: 150,
     maxWidth: 200,
     renderCell: (params) => {
@@ -401,13 +360,5 @@ export const contractTypeCols = [
     valueGetter: (params) => {
       return params?.row?.channel?.name;
     },
-  },
-  {
-    field: "",
-    headerAlign: "center",
-    align: "center",
-    headerName: "Hành động",
-    sortable: false,
-    minWidth: 200,
   },
 ];

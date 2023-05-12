@@ -33,19 +33,18 @@ function PurchaseOrderScreen({ screenAuthorization }) {
   const [isApproved, setIsApproved] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
-  const [updatingOrder, setUpdateOrder] = useState();
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const { height } = useWindowSize();
   const { isLoading, data } = useGetPurchaseOrderList();
   const updatePurchaseOrderQuery = useUpdatePurchaseOrderStatus({
-    orderCode: updatingOrder?.code,
+    orderCode: itemSelected?.code,
   });
-
+  console.log("Updating order: ", itemSelected);
   const handleUpdateOrder = async () => {
     let updateData = {
       status: "accepted",
     };
-    if (updatingOrder) await updatePurchaseOrderQuery.mutateAsync(updateData);
+    if (itemSelected) await updatePurchaseOrderQuery.mutateAsync(updateData);
     setIsApproved((pre) => !pre);
   };
   let actions = [
@@ -81,6 +80,7 @@ function PurchaseOrderScreen({ screenAuthorization }) {
       title: "Phê duyệt",
       callback: (item) => {
         setIsApproved((pre) => !pre);
+        setItemSelected(item);
       },
       icon: <CheckCircleIcon />,
       color: AppColors.green,

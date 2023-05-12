@@ -10,7 +10,7 @@ import {
 import withScreenSecurity from "components/common/withScreenSecurity";
 import { unix } from "moment";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import { useWindowSize } from "react-use";
 import { Action } from "../../../components/action/Action";
 import CustomDataGrid from "../../../components/datagrid/CustomDataGrid";
@@ -28,22 +28,18 @@ function TripScreen({ screenAuthorization }) {
   const location = useLocation();
   const { height } = useWindowSize();
   const [open, setOpen] = useState(false);
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const handleOpen = () => {
-    setOpen(true);
-  };
+  const [count, setCount] = useState(0);
+  const history = useHistory();
+  let { path } = useRouteMatch();
 
   const currTrip = location.state.trip;
-  const { isLoading, data } = useGetItemsOfTrip({
+  const { isLoading, data: itemOfTrip } = useGetItemsOfTrip({
     tripCode: currTrip?.code,
   });
   const { isLoading: isLoadingTripRoute, data: tripRoute } =
     useGetTripRouteList({
       tripCode: currTrip?.code,
     });
-  console.log("Trip route: ", tripRoute);
   const createTripRouteQuery = useCreateTripRoute();
   const extraActions = [
     {
@@ -53,8 +49,19 @@ function TripScreen({ screenAuthorization }) {
       color: AppColors.green,
     },
   ];
-  const [count, setCount] = useState(0);
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleButtonClick = () => {
+    history.push(`${path}/route`, {
+      tripRoute: tripRoute,
+    });
+  };
   useEffect(() => {
     // Start the interval
     const interval = setInterval(() => {
@@ -76,7 +83,8 @@ function TripScreen({ screenAuthorization }) {
       handleClose();
     }
   }, [count]);
-  console.log("Count: ", count);
+
+  console.log("Trip route: ", tripRoute);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
@@ -156,7 +164,7 @@ function TripScreen({ screenAuthorization }) {
             ],
           },
         ]}
-        rows={data ? data?.content : []}
+        rows={itemOfTrip ? itemOfTrip?.content : []}
       />
       <Stack
         sx={{
@@ -190,21 +198,17 @@ function TripScreen({ screenAuthorization }) {
       </Stack>
       <Stack direction={"row"}>
         <Button
-          disabled={tripRoute}
-          onClick={
-            () => {
-              setCount((pre) => {
-                handleOpen();
-                return 0;
-              });
-            }
-            // async () => {
-            // let tripParams = {
-            //   tripCode: currTrip?.code,
-            // };
-            // await createTripRouteQuery.mutateAsync(tripParams);
-            // }
-          }
+          disabled={itemOfTrip?.content?.length === 0 || tripRoute}
+          onClick={async () => {
+            setCount((pre) => {
+              handleOpen();
+              return 0;
+            });
+            let tripParams = {
+              tripCode: currTrip?.code,
+            };
+            await createTripRouteQuery.mutateAsync(tripParams);
+          }}
           variant={"contained"}
           sx={{ marginY: 2, marginRight: 5 }}
         >
@@ -216,32 +220,23 @@ function TripScreen({ screenAuthorization }) {
             TẠO MỚI LỘ TRÌNH
           </Typography>
         </Button>
-        <Button
-          onClick={
-            () => {
-              setCount((pre) => {
-                handleOpen();
-                return 0;
-              });
-            }
-            // async () => {
-            // let tripParams = {
-            //   tripCode: currTrip?.code,
-            // };
-            // await createTripRouteQuery.mutateAsync(tripParams);
-            // }
-          }
-          variant={"contained"}
-          sx={{ marginY: 2 }}
-        >
-          <Typography
-            sx={{
-              color: "white",
+        {tripRoute && (
+          <Button
+            onClick={() => {
+              handleButtonClick();
             }}
+            variant={"contained"}
+            sx={{ marginY: 2 }}
           >
-            XEM LỘ TRÌNH ĐÃ TẠO
-          </Typography>
-        </Button>
+            <Typography
+              sx={{
+                color: "white",
+              }}
+            >
+              XEM LỘ TRÌNH ĐÃ TẠO
+            </Typography>
+          </Button>
+        )}
       </Stack>
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}

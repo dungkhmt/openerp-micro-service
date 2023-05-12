@@ -1,4 +1,3 @@
-import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, InputBase, Stack } from "@mui/material";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomSelect from "components/select/CustomSelect";
@@ -7,7 +6,6 @@ import {
   useGetProductList,
 } from "controllers/query/category-query";
 import { useState } from "react";
-import { saleOrderSchema } from "utils/validate";
 import { useCreateSaleOrder } from "../../../controllers/query/sale-order-query";
 import { staticProductFields } from "../LocalConstant";
 
@@ -29,7 +27,7 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
     defaultValues: {
       products: [],
     },
-    resolver: yupResolver(saleOrderSchema),
+    // resolver: yupResolver(saleOrderSchema),
   });
   const {
     handleSubmit,
@@ -74,9 +72,9 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
             <CustomInput
               required={true}
               value={value}
-              type={"text"}
+              type={"number"}
               onChange={onChange}
-              label={"Mã NSX"}
+              label={"Khuyến mãi (%)"}
               isFullWidth={true}
               error={!!errors["discount"]}
               message={errors["discount"]?.message}

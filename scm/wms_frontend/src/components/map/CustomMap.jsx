@@ -8,6 +8,9 @@ import {
   useMapEvent,
 } from "react-leaflet";
 
+const googleTileLayerUrl = "https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}";
+const googleAttribution = "Map data © Google";
+
 function DraggableMarker({ currPos, getPos }) {
   const [draggable, setDraggable] = useState(false);
   const [position, setPosition] = useState({
@@ -61,7 +64,7 @@ function DraggableMarker({ currPos, getPos }) {
 const CustomMap = ({ value, onChange, style, location, mapRef }) => {
   return (
     <MapContainer
-      center={{ lat: 51.505, lng: -0.09 }}
+      center={{ lat: 20.991322, lng: 105.839077 }}
       zoom={13}
       scrollWheelZoom={true}
       style={{
@@ -72,8 +75,11 @@ const CustomMap = ({ value, onChange, style, location, mapRef }) => {
       }}
     >
       <TileLayer
-        url="https://api.maptiler.com/maps/basic-v2/256/{z}/{x}/{y}.png?key=yI7HfCmy5qll4mYkkO16"
-        attribution='<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
+        url={googleTileLayerUrl}
+        attribution={googleAttribution}
+        subdomains={["mt0", "mt1", "mt2", "mt3"]}
+        // url="https://api.maptiler.com/maps/basic-v2/256/{z}/{x}/{y}.png?key=yI7HfCmy5qll4mYkkO16"
+        // attribution='<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
       />
       <DraggableMarker
         currPos={location}
