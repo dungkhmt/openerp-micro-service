@@ -4,7 +4,13 @@ import "leaflet-routing-machine";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import "leaflet-routing-machine/dist/leaflet.routing.icons.png";
 import { useRef, useState } from "react";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Polyline,
+  Popup,
+  TileLayer,
+} from "react-leaflet";
 import { useLocation } from "react-router-dom";
 import withScreenSecurity from "../../../components/common/withScreenSecurity";
 import RoutingMachine from "./RoutingMachine";
@@ -29,7 +35,14 @@ function TripRoutesScreen({ screenAuthorization }) {
       return L.latLng(cus?.node?.x, cus?.node?.y);
     })
   );
-
+  const polyPoints = tripRoute?.droneRoutes
+    ?.map((droneRoute) => {
+      return droneRoute.droneRouteElements?.map((cus, index) => {
+        return [cus?.node?.x, cus?.node?.y];
+      });
+    })
+    .flat();
+  console.log("Poly points: ", polyPoints);
   return (
     <MapContainer
       center={{ lat: 21.008330038713357, lng: 105.84273632066207 }}
@@ -61,6 +74,25 @@ function TripRoutesScreen({ screenAuthorization }) {
           </Popup>
         </Marker>
       ))}
+      {tripRoute?.droneRoutes?.map((droneRoute) => {
+        return droneRoute.droneRouteElements?.map((cus, index) => (
+          <Marker
+            key={index}
+            position={[cus?.node?.x, cus?.node?.y]}
+            icon={cus?.node?.name === "depot" ? facilityIcon : shopIcon}
+            ref={markerRef}
+          >
+            <Popup>
+              <Typography variant="h6"> {cus?.node?.name}</Typography>
+              <Typography variant="body2">{cus?.phone} </Typography>
+            </Popup>
+          </Marker>
+        ));
+      })}
+      <Polyline
+        positions={[polyPoints ? polyPoints : []]}
+        pathOptions={{ color: "red" }}
+      />
       <RoutingMachine waypoints={waypoints} />
     </MapContainer>
   );
