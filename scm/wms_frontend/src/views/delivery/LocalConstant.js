@@ -218,3 +218,251 @@ export const shipmentItemCols = [
     },
   },
 ];
+export const truckCols = [
+  {
+    field: "code",
+    headerName: "Mã code",
+    sortable: false,
+    pinnable: true,
+    minWidth: 150,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>
+          {params?.row?.code}
+        </Typography>
+      );
+    },
+  },
+  {
+    field: "capacity",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Trọng lượng chuyên chở (kg)",
+    sortable: false,
+    minWidth: 200,
+    valueFormatter: (params) => {
+      return `${params.value} kg`;
+    },
+  },
+  {
+    field: "transportCostPerUnit",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Phí vận chuyển",
+    sortable: false,
+    minWidth: 200,
+    valueFormatter: (params) => {
+      return `${params.value} đ`;
+    },
+  },
+  {
+    field: "waitingCost",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Phí chờ đợi",
+    sortable: false,
+    minWidth: 200,
+    valueFormatter: (params) => {
+      return `${params.value} đ`;
+    },
+  },
+  {
+    field: "speed",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Vận tốc TB (m/s)",
+    sortable: false,
+    minWidth: 200,
+    valueFormatter: (params) => {
+      return `${params.value} m/s`;
+    },
+  },
+];
+export const droneCols = [
+  {
+    field: "code",
+    headerName: "Mã code",
+    sortable: false,
+    pinnable: true,
+    minWidth: 150,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>
+          {params?.row?.code}
+        </Typography>
+      );
+    },
+  },
+  {
+    field: "durationTime",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Thời gian hoạt động (s)",
+    sortable: false,
+    minWidth: 200,
+    valueFormatter: (params) => {
+      return `${params.value} s`;
+    },
+  },
+  {
+    field: "capacity",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Trọng lượng chuyên chở (kg)",
+    sortable: false,
+    minWidth: 200,
+    valueFormatter: (params) => {
+      return `${params.value} kg`;
+    },
+  },
+  {
+    field: "transportCostPerUnit",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Phí vận chuyển",
+    sortable: false,
+    minWidth: 200,
+    valueFormatter: (params) => {
+      return `${params.value} đ`;
+    },
+  },
+  {
+    field: "waitingCost",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Phí chờ đợi",
+    sortable: false,
+    minWidth: 200,
+    valueFormatter: (params) => {
+      return `${params.value} đ`;
+    },
+  },
+  {
+    field: "speed",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Vận tốc TB (m/s)",
+    sortable: false,
+    minWidth: 200,
+    valueFormatter: (params) => {
+      return `${params.value} m/s`;
+    },
+  },
+];
+export const deliveryBillCols = [
+  {
+    field: "code",
+    headerName: "Mã code",
+    sortable: false,
+    pinnable: true,
+    minWidth: 150,
+    maxWidth: 200,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>
+          {params?.row?.code}
+        </Typography>
+      );
+    },
+  },
+  {
+    field: "createdDate",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Thời điểm tạo",
+    sortable: false,
+    minWidth: 200,
+    valueGetter: (params) => {
+      return unix(params?.row?.createdDate).format("DD-MM-YYYY");
+    },
+  },
+  {
+    field: "deliveryDate",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Ngày giao hàng",
+    sortable: false,
+    minWidth: 200,
+    valueGetter: (params) => {
+      return unix(params?.row?.createdDate).format("DD-MM-YYYY");
+    },
+  },
+  {
+    field: "boughtBy",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Mua bởi",
+    sortable: false,
+    minWidth: 200,
+    valueGetter: (params) => {
+      return params?.row?.saleOrder?.customer?.name;
+    },
+  },
+  {
+    field: "facilty",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Kho trực thuộc",
+    sortable: false,
+    minWidth: 200,
+    valueGetter: (params) => {
+      return params?.row?.saleOrder?.customer?.facility?.name;
+    },
+  },
+];
+export const splittedBillCols = [
+  {
+    field: "code",
+    headerName: "Mã code",
+    sortable: false,
+    pinnable: true,
+    minWidth: 200,
+    maxWidth: 300,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>
+          {params?.row?.code}
+        </Typography>
+      );
+    },
+  },
+  {
+    field: "quantity",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Số lượng chia",
+    sortable: false,
+    pinnable: true,
+    minWidth: 150,
+  },
+  {
+    field: "deliveryBillItemSeqId",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Seq id",
+    sortable: false,
+    pinnable: true,
+    minWidth: 150,
+  },
+  {
+    field: "product",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Tên sản phẩm",
+    sortable: false,
+    pinnable: true,
+    minWidth: 150,
+  },
+  {
+    field: "deliveryBillCode",
+    headerName: "Đơn gốc",
+    headerAlign: "center",
+    align: "center",
+    sortable: false,
+    pinnable: true,
+    minWidth: 150,
+    valueGetter: (params) => {
+      return params?.row?.deliveryBill?.code;
+    },
+  },
+];

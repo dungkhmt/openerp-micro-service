@@ -9,6 +9,7 @@ import { useGetPurchaseOrderList } from "controllers/query/purchase-order-query"
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useWindowSize } from "react-use";
+import { AppColors } from "../../../shared/AppColors";
 import { acceptedOrderCols } from "../LocalConstant";
 function ImportingActivityScreen({ screenAuthorization }) {
   let { path } = useRouteMatch();
@@ -37,6 +38,7 @@ function ImportingActivityScreen({ screenAuthorization }) {
         handleButtonClick(item);
       },
       icon: <VisibilityIcon />,
+      color: AppColors.green,
       // permission: PERMISSIONS.MANAGE_CATEGORY_EDIT,
     },
     {
@@ -46,6 +48,7 @@ function ImportingActivityScreen({ screenAuthorization }) {
         // setItemSelected(item);
       },
       icon: <DeleteIcon />,
+      color: AppColors.error,
       // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
     },
   ];
@@ -63,19 +66,26 @@ function ImportingActivityScreen({ screenAuthorization }) {
         columns={[
           ...acceptedOrderCols,
           {
-            field: "quantity",
+            field: "action",
             headerName: "Hành động",
+            headerAlign: "center",
+            align: "center",
             sortable: false,
-            minWidth: 200,
+            width: 125,
+            minWidth: 150,
+            maxWidth: 200,
             type: "actions",
-            renderCell: (params) => (
-              <Action
-                disabled={false}
-                extraAction={extraActions[0]}
-                item={params.row}
-                onActionCall={extraActions[0].callback}
-              />
-            ),
+            getActions: (params) => [
+              ...extraActions.map((extraAction, index) => (
+                <Action
+                  item={params.row}
+                  key={index}
+                  extraAction={extraAction}
+                  onActionCall={extraAction.callback}
+                  disabled={false}
+                />
+              )),
+            ],
           },
         ]}
         rows={data ? data?.content : []}

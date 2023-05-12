@@ -2,18 +2,18 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { Box } from "@mui/material";
+import { Action } from "components/action/Action";
+import withScreenSecurity from "components/common/withScreenSecurity";
+import CustomDataGrid from "components/datagrid/CustomDataGrid";
+import DraggableDeleteDialog from "components/dialog/DraggableDialogs";
+import CustomDrawer from "components/drawer/CustomDrawer";
+import CustomModal from "components/modal/CustomModal";
+import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
+import { useGetCustomerType } from "controllers/query/category-query";
 import { useState } from "react";
 import { useToggle, useWindowSize } from "react-use";
-import { Action } from "../../../components/action/Action";
-import withScreenSecurity from "../../../components/common/withScreenSecurity";
-import CustomDataGrid from "../../../components/datagrid/CustomDataGrid";
-import DraggableDeleteDialog from "../../../components/dialog/DraggableDialogs";
-import CustomDrawer from "../../../components/drawer/CustomDrawer";
-import CustomModal from "../../../components/modal/CustomModal";
-import HeaderModal from "../../../components/modal/HeaderModal";
-import { useGetCustomerType } from "../../../controllers/query/category-query";
-import { AppColors } from "../../../shared/AppColors";
+import { AppColors } from "shared/AppColors";
 import { customerTypeCols } from "../LocalConstant";
 import CreateCustomerType from "./components/CreateCustomerType";
 function CustomerTypeScreen({ screenAuthorization }) {
@@ -106,7 +106,7 @@ function CustomerTypeScreen({ screenAuthorization }) {
       <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
         <HeaderModal
           onClose={setOpenDrawer}
-          title="Sửa thông tin kênh phân phối"
+          title="Sửa thông tin kiểu khách hàng"
         />
       </CustomDrawer>
       <DraggableDeleteDialog

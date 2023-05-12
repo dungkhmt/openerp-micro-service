@@ -31,6 +31,7 @@ public class DroneEntity extends BaseEntity{
     @Column(name = "duration_time")
     private double durationTime;
 
+    // TODO: Check why we can't get userInfo in api get all drones
     @OneToOne(cascade = CascadeType.PERSIST)
     @JsonIgnore
     @JoinColumn(name = "user_id", referencedColumnName = "user_login_id")

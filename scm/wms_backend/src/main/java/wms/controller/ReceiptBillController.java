@@ -22,10 +22,11 @@ public class ReceiptBillController extends BaseController {
             @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
-            @RequestParam(value = "sortAsc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc
+            @RequestParam(value = "sortAsc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
+            @RequestParam(value = "orderCode", required = false, defaultValue = DefaultConst.STRING) String orderCode
     ) {
         try {
-            return response(new ResultEntity(1, "Get bills successfully", receiptBillService.getAllBills(page, pageSize, sortField, isSortAsc)));
+            return response(new ResultEntity(1, "Get bills successfully", receiptBillService.getAllBills(page, pageSize, sortField, isSortAsc, orderCode)));
         } catch (Exception ex) {
             return response(error(ex));
         }
@@ -36,6 +37,20 @@ public class ReceiptBillController extends BaseController {
     ) {
         try {
             return response(new ResultEntity(1, "Get bill items successfully", receiptBillService.getBillItemsOfOrder( orderCode)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @GetMapping("/get-bill-items-of-order-paging")
+    public ResponseEntity<?> getBillsOfOrderPaging(
+            @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
+            @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
+            @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
+            @RequestParam(value = "sortAsc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
+            @RequestParam(value = "orderCode", required = false, defaultValue = DefaultConst.STRING) String orderCode
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get bill items successfully", receiptBillService.getBillItemsOfOrder(page, pageSize, sortField, isSortAsc, orderCode)));
         } catch (Exception ex) {
             return response(error(ex));
         }

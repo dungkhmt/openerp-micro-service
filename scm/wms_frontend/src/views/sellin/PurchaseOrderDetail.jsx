@@ -1,13 +1,7 @@
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
-import {
-  Box,
-  Button,
-  Divider,
-  IconButton,
-  InputBase,
-  Typography,
-} from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { Box, Divider, IconButton, Stack, Typography } from "@mui/material";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomModal from "components/modal/CustomModal";
@@ -15,18 +9,18 @@ import CustomBillTable from "components/table/CustomBillTable";
 import CustomOrderTable from "components/table/CustomOrderTable";
 import CustomToolBar from "components/toolbar/CustomToolBar";
 import {
-  useCreateReceiptBill,
   useGetBillItemOfPurchaseOrder,
   useGetReceiptBillList,
 } from "controllers/query/bill-query";
-import { useGetProductList } from "controllers/query/category-query";
 import { useGetPurchaseOrderItems } from "controllers/query/purchase-order-query";
-import moment from "moment";
+import { unix } from "moment";
 import { useCallback, useState } from "react";
-import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
-import { CustomDatePicker } from "../../components/datepicker/CustomDatePicker";
+import { Action } from "../../components/action/Action";
+import { AppColors } from "../../shared/AppColors";
+import { receiptBillCols } from "./LocalConstant";
+import CreatePurchaseBill from "./components/CreatePurchaseBill";
 
 function PurchaseOrderDetailScreen({}) {
   const location = useLocation();
@@ -36,50 +30,12 @@ function PurchaseOrderDetailScreen({}) {
     pageSize: 5,
   });
   const { height } = useWindowSize();
-  const createBillQuery = useCreateReceiptBill();
   const [isAdd, setIsAdd] = useToggle(false);
   const [showTable1, setShowTable1] = useState(true);
-  const { isLoading: isLoadingReceiptBill, data: receiptBills } =
-    useGetReceiptBillList({
-      orderStatus: "accepted",
-    });
   const toggleTables = () => {
     setShowTable1((prev) => !prev);
   };
-  const methods = useForm({
-    mode: "onChange",
-    defaultValues: {
-      products: [],
-    },
-    // resolver: brandSchema,
-  });
 
-  const {
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setValue,
-    control,
-  } = methods;
-  const products = useWatch({
-    control,
-    name: "products",
-  });
-  const onSubmit = async (data) => {
-    let importParams = {
-      orderCode: currOrder?.code,
-      importItems: data?.products?.map((pro) => {
-        return {
-          expireDate: moment(pro?.expired_date).format("YYYY-MM-DD"),
-          effectQty: pro?.quantity,
-          productCode: pro?.code,
-        };
-      }),
-    };
-    await createBillQuery.mutateAsync(importParams);
-    setIsAdd((pre) => !pre);
-    reset();
-  };
   let actions = [
     {
       title: "Tạo phiếu nhập kho",
@@ -90,119 +46,42 @@ function PurchaseOrderDetailScreen({}) {
       describe: "Thêm bản ghi mới",
       disabled: false,
     },
-    {
-      title: "Sửa",
-      callback: () => {
-        console.log("call back");
-      },
-      icon: <AddIcon />,
-      describe: "Thêm bản ghi mới",
-      disabled: false,
-    },
   ];
-  var product_fields = [
+  const extraActions = [
     {
-      field: "code",
-      headerName: "Mã code",
-      sortable: false,
-      pinnable: true,
-    },
-    {
-      field: "name",
-      headerName: "Tên sản phẩm",
-      sortable: false,
-      minWidth: 150,
-    },
-    {
-      field: "status",
-      headerName: "Trạng thái",
-      sortable: false,
-      minWidth: 100,
-    },
-    {
-      field: "quantity",
-      headerName: "Số lượng mua",
-      sortable: false,
-      minWidth: 150,
-      type: "number",
-      editable: true,
-      renderCell: (params) => {
-        const product = products.find((el) => el.id === params.id);
-        return product ? product.quantity : "Nhập số lượng";
-      },
-      renderEditCell: (params) => {
-        const index = products?.findIndex((el) => el.id === params.id);
-        const value = index !== -1 ? products[index].quantity : null;
-        return (
-          <Controller
-            name={`products.${index}.quantity`}
-            control={control}
-            render={({ field: { onChange } }) => (
-              <InputBase
-                inputProps={{ min: 0 }}
-                sx={{
-                  "& .MuiInputBase-input": {
-                    textAlign: "right",
-                    fontSize: 14,
-                    "&::placeholder": {
-                      fontSize: 13,
-                      opacity: 0.7,
-                      fontStyle: "italic",
-                    },
-                  },
-                }}
-                placeholder="Nhập số lượng"
-                value={value}
-                onChange={onChange}
-              />
-            )}
-          />
-        );
-      },
-    },
-    {
-      field: "expireDate",
-      headerName: "Ngày hết hạn",
-      sortable: false,
-      minWidth: 150,
-      type: "date",
-      editable: true,
-      renderCell: (params) => {
-        const product = products.find((el) => el.id === params.id);
-        return product
-          ? moment(product?.expired_date).format("DD-MM-YYYY")
-          : "Nhập ngày hết hạn";
-      },
-      renderEditCell: (params) => {
-        const index = products?.findIndex((el) => el.id === params.id);
-        const value = index !== -1 ? products[index].expired_date : null;
-        return (
-          <Controller
-            name={`products.${index}.expired_date`}
-            control={control}
-            render={({ field: { onChange } }) => (
-              <CustomDatePicker value={value} onChange={onChange} />
-            )}
-          />
-        );
-      },
+      title: "Xem chi tiết",
+      callback: (item) => {},
+      icon: <VisibilityIcon />,
+      color: AppColors.green,
+      // permission: PERMISSIONS.MANAGE_CATEGORY_EDIT,
     },
   ];
   const { isLoading, data: orderItem } = useGetPurchaseOrderItems({
     orderCode: currOrder?.code,
   });
-  const { isLoadingBillItem, data: billItem } = useGetBillItemOfPurchaseOrder({
+  const { isLoading: isLoadingBillItem, data: billItem } =
+    useGetBillItemOfPurchaseOrder({
+      orderCode: currOrder?.code,
+    });
+
+  const { isLoading: isLoadingBill, data: bills } = useGetReceiptBillList({
     orderCode: currOrder?.code,
   });
-  const { isLoading: isLoadingProduct, data: product } = useGetProductList();
   const renderCustomTable = useCallback(() => {
     return (
-      <CustomOrderTable items={orderItem?.content ? orderItem?.content : []} />
+      <CustomOrderTable
+        items={orderItem?.content ? orderItem?.content : []}
+        currOrder={currOrder}
+      />
     );
   }, [orderItem]);
   const renderCustomBill = useCallback(() => {
     return (
-      <CustomBillTable orderItem={orderItem?.content} billItem={billItem} />
+      <CustomBillTable
+        orderItem={orderItem?.content}
+        billItem={billItem}
+        currOrder={currOrder}
+      />
     );
   }, [orderItem, billItem]);
   return (
@@ -211,136 +90,118 @@ function PurchaseOrderDetailScreen({}) {
         <CustomToolBar actions={actions} containSearch={false} />
       </Box>
       <Box>
-        <Typography>Thông tin cơ bản</Typography>
-        <Typography></Typography>
-        <Typography>1. Mã đơn: {currOrder?.code}</Typography>
+        <Stack direction={"row"} spacing={2} alignItems={"center"}>
+          <Stack
+            sx={{
+              borderRadius: 50,
+              background: "gray",
+              width: 30,
+              height: 30,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Typography sx={{ color: "white" }}>1</Typography>
+          </Stack>
+          <Typography
+            sx={{
+              color: AppColors.secondary,
+              fontSize: 18,
+              fontWeight: "600",
+            }}
+          >
+            THÔNG TIN ĐƠN HÀNG
+          </Typography>
+        </Stack>
+        <Typography
+          sx={{
+            fontSize: 16,
+            marginTop: 2,
+          }}
+        >
+          1. Mã đơn: {currOrder?.code}
+        </Typography>
         <Typography>2. Nhà sản xuất: {currOrder?.supplierCode}</Typography>
         <Typography>3. Người tạo: {currOrder?.user?.id}</Typography>
-        <Typography>4. Thời gian tạo: {currOrder?.createdDate}</Typography>
+        <Typography>
+          4. Thời gian tạo: {unix(currOrder?.createdDate).format("DD-MM-YYYY")}
+        </Typography>
         <Typography>5. Kho trực thuộc: {currOrder?.facility?.name}</Typography>
+        <Typography sx={{ marginBottom: 2 }}>6. Chi tiết</Typography>
       </Box>
-      {renderCustomTable()}
+      <Stack direction={"row"} alignItems={"center"} justifyContent={"center"}>
+        {renderCustomTable(currOrder)}
+      </Stack>
       <Divider variant="fullWidth" sx={{ marginTop: 2, height: 5 }} />
-      <Box>
-        <Box flexDirection={"row"}>
-          <Typography>Trạng thái</Typography>
-          <Button variant="outlined">{currOrder?.status}</Button>
-        </Box>
+      <Box sx={{ marginY: 2 }}>
+        <Stack direction={"row"} spacing={2} alignItems={"center"}>
+          <Stack
+            sx={{
+              borderRadius: 50,
+              background: "gray",
+              width: 30,
+              height: 30,
+              alignItems: "center",
+              justifyContent: "center",
+              marginY: 2,
+            }}
+          >
+            <Typography sx={{ color: "white" }}>2</Typography>
+          </Stack>
+          <Typography
+            sx={{
+              color: AppColors.secondary,
+              fontSize: 18,
+              fontWeight: "600",
+            }}
+          >
+            THÔNG TIN PHIẾU NHẬP ĐƠN HÀNG
+          </Typography>
+        </Stack>
         <CustomDataGrid
           params={params}
           setParams={setParams}
           sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
-          isLoading={isLoading}
+          isLoading={isLoadingBill}
           totalItem={100}
           columns={[
+            ...receiptBillCols,
             {
-              field: "code",
-              headerName: "Mã code",
+              field: "action",
+              headerName: "Hành động",
+              headerAlign: "center",
+              align: "center",
               sortable: false,
-              pinnable: true,
-            },
-            {
-              field: "createdDate",
-              headerName: "Thời điểm tạo",
-              sortable: false,
-              minWidth: 150,
-            },
-            {
-              field: "status",
-              headerName: "Trạng thái",
-              sortable: false,
-              minWidth: 150,
-              renderCell: (params) => {
-                return (
-                  <Button variant="outlined" color="info">
-                    {"IN PROGRESS"}
-                  </Button>
-                );
+              flex: 1,
+              type: "actions",
+              getActions: (params) => {
+                return [
+                  ...extraActions.map((extraAction, index) => (
+                    <Action
+                      item={params.row}
+                      key={index}
+                      extraAction={extraAction}
+                      onActionCall={extraAction.callback}
+                    />
+                  )),
+                ];
               },
             },
-            {
-              field: "facility",
-              headerName: "Kho trực thuộc",
-              sortable: false,
-              minWidth: 150,
-              valueGetter: (params) => {
-                return params.row.facility.name;
-              },
-            },
-            {
-              field: "order",
-              headerName: "Mã đơn hàng",
-              sortable: false,
-              minWidth: 150,
-              valueGetter: (params) => {
-                return params.row.purchaseOrder.code;
-              },
-            },
-            // {
-            //   field: "quantity",
-            //   headerName: "Hành động",
-            //   sortable: false,
-            //   minWidth: 200,
-            //   type: "actions",
-            //   renderCell: (params) => (
-            //     <Action
-            //       disabled={false}
-            //       extraAction={extraActions[0]}
-            //       item={params.row}
-            //       onActionCall={extraActions[0].callback}
-            //     />
-            //   ),
-            // },
           ]}
-          rows={receiptBills ? receiptBills?.content : []}
+          rows={bills ? bills?.content : []}
         />
       </Box>
       <CustomModal
         open={isAdd}
         toggle={setIsAdd}
         size="sm"
-        style={{ padding: 2 }}
+        title="Phiếu nhập kho"
       >
         {renderCustomBill()}
         <IconButton onClick={toggleTables}>
           {showTable1 ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
         </IconButton>
-        <FormProvider {...methods}>
-          <CustomDataGrid
-            isSelectable={true}
-            params={params}
-            setParams={setParams}
-            sx={{ height: height - 64 - 71 - 24 - 20 - 35 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom - Page Title
-            // isLoading={}
-            totalItem={100}
-            columns={product_fields}
-            rows={
-              product?.content
-                ? product?.content?.filter((pro) =>
-                    orderItem?.content
-                      ?.map((item) => item?.product?.code)
-                      .includes(pro?.code)
-                  )
-                : []
-            }
-            onSelectionChange={(ids) => {
-              let results = product?.content.filter((pro) =>
-                ids.includes(pro?.id)
-              );
-              setValue("products", results);
-            }}
-          />
-        </FormProvider>
-        <Button
-          onClick={handleSubmit(onSubmit)}
-          variant="contained"
-          style={{ marginRight: 20, color: "white" }}
-        >
-          Submit
-        </Button>
-        <Button onClick={() => reset()} variant={"outlined"}>
-          Reset
-        </Button>
+        <CreatePurchaseBill currOrder={currOrder} setIsAdd={setIsAdd} />
       </CustomModal>
     </Box>
   );

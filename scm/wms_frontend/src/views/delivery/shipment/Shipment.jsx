@@ -12,6 +12,9 @@ import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { Action } from "../../../components/action/Action";
+import DraggableDeleteDialog from "../../../components/dialog/DraggableDialogs";
+import CustomDrawer from "../../../components/drawer/CustomDrawer";
+import HeaderModal from "../../../components/modal/HeaderModal";
 import { AppColors } from "../../../shared/AppColors";
 import { shipmentCols } from "../LocalConstant";
 import CreateShipmentForm from "./components/CreateShipmentForm";
@@ -119,6 +122,18 @@ function ShipmentScreen({ screenAuthorization }) {
       >
         <CreateShipmentForm setIsAdd={setIsAdd} />
       </CustomModal>
+      <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
+        <HeaderModal
+          onClose={setOpenDrawer}
+          title="Sửa thông tin đợt giao hàng"
+        />
+      </CustomDrawer>
+      <DraggableDeleteDialog
+        // disable={isLoadingRemove}
+        open={isRemove && itemSelected}
+        handleOpen={setIsRemove}
+        callback={(flag) => {}}
+      />
     </Box>
   );
 }

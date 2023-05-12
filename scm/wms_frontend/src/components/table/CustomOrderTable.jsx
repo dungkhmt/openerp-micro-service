@@ -6,48 +6,107 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  styled,
+  tableCellClasses,
 } from "@mui/material";
 
-function createData(code, name, quantity, price_unit, total_money) {
-  return { code, name, quantity, price_unit, total_money };
+function createData(code, name, quantity, price_unit) {
+  return { code, name, quantity, price_unit };
 }
-const CustomOrderTable = ({ items }) => {
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+  // hide last border
+  "&:last-child td, &:last-child th": {
+    border: 0,
+  },
+}));
+
+const CustomOrderTable = ({ items, currOrder }) => {
   const rows = items?.map((item) =>
     createData(
       item?.product?.code,
       item?.product?.name,
       item?.quantity,
-      item?.priceUnit,
-      item?.purchaseOrder?.totalMoney
+      item?.priceUnit
     )
   );
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+    <TableContainer
+      component={Paper}
+      sx={{ maxWidth: "50vw", alignSelf: "center" }}
+    >
+      <Table sx={{ minWidth: 700 }} aria-label="simple table">
         <TableHead>
-          <TableRow>
-            <TableCell>Mã sản phẩm</TableCell>
-            <TableCell align="right">Tên sản phẩm</TableCell>
-            <TableCell align="right">Số lượng</TableCell>
-            <TableCell align="right">Đơn giá</TableCell>
-            <TableCell align="right">Tổng cộng</TableCell>
-          </TableRow>
+          <StyledTableRow>
+            <StyledTableCell align="center" colSpan={2}>
+              Sản phẩm
+            </StyledTableCell>
+            <StyledTableCell align="right" colSpan={3}>
+              Thành tiền
+            </StyledTableCell>
+          </StyledTableRow>
+          <StyledTableRow>
+            <StyledTableCell>Mã sản phẩm</StyledTableCell>
+            <StyledTableCell>Tên sản phẩm</StyledTableCell>
+            <StyledTableCell align="right">Số lượng</StyledTableCell>
+            <StyledTableCell align="right">Đơn giá</StyledTableCell>
+            <StyledTableCell align="right">Tổng cộng</StyledTableCell>
+          </StyledTableRow>
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <TableRow
+            <StyledTableRow
               key={row.name}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
-              <TableCell component="th" scope="row">
+              <StyledTableCell component="th" scope="row">
                 {row.code}
-              </TableCell>
-              <TableCell align="right">{row.name}</TableCell>
-              <TableCell align="right">{row.quantity}</TableCell>
-              <TableCell align="right">{row.price_unit}</TableCell>
-              <TableCell align="right">{row.total_money}</TableCell>
-            </TableRow>
+              </StyledTableCell>
+              <StyledTableCell>{row.name}</StyledTableCell>
+              <StyledTableCell align="right">{row.quantity}</StyledTableCell>
+              <StyledTableCell align="right">{row.price_unit}</StyledTableCell>
+              <StyledTableCell align="right">
+                {row.quantity * row.price_unit}
+              </StyledTableCell>
+            </StyledTableRow>
           ))}
+          <StyledTableRow>
+            <StyledTableCell rowSpan={3} colSpan={2} />
+            <StyledTableCell colSpan={2}>Tổng cộng</StyledTableCell>
+            <StyledTableCell align="right">
+              {currOrder?.totalPayment}
+            </StyledTableCell>
+          </StyledTableRow>
+          <StyledTableRow>
+            <StyledTableCell colSpan={1}>
+              {currOrder?.vat ? "Thuế" : "Khuyến mãi"}
+            </StyledTableCell>
+            <StyledTableCell align="right">{`${
+              currOrder?.vat ? currOrder?.vat : currOrder?.discount
+            } %`}</StyledTableCell>
+            <StyledTableCell align="right">
+              {currOrder?.totalPayment *
+                (currOrder?.vat ? currOrder?.vat : currOrder?.discount / 100)}
+            </StyledTableCell>
+          </StyledTableRow>
+          <StyledTableRow>
+            <StyledTableCell colSpan={2}>Tổng phải trả</StyledTableCell>
+            <StyledTableCell align="right">
+              {currOrder?.totalMoney}
+            </StyledTableCell>
+          </StyledTableRow>
         </TableBody>
       </Table>
     </TableContainer>

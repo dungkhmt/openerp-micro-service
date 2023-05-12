@@ -39,7 +39,6 @@ function PurchaseOrderScreen({ screenAuthorization }) {
   const updatePurchaseOrderQuery = useUpdatePurchaseOrderStatus({
     orderCode: itemSelected?.code,
   });
-  console.log("Updating order: ", itemSelected);
   const handleUpdateOrder = async () => {
     let updateData = {
       status: "accepted",

@@ -80,6 +80,7 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public DroneEntity createDrone(DroneDTO droneDTO) throws CustomException {
         UserLogin userLogin = userRepo.getUserByUserLoginId(droneDTO.getUserManaged());
         DroneEntity newDrone = DroneEntity.builder()

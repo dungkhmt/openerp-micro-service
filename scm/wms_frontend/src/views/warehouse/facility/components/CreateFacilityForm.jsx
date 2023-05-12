@@ -115,7 +115,7 @@ const CreateFacilityForm = ({ setIsAdd }) => {
           name={"map"}
           render={({ field: { onChange, value } }) => (
             <CustomMap
-              style={{ width: "30vw", height: "30vh" }}
+              style={{ width: "50vw", height: "50vh" }}
               location={currPos}
               mapRef={mapRef}
               onChange={(currLoc) => {
@@ -124,15 +124,12 @@ const CreateFacilityForm = ({ setIsAdd }) => {
             />
           )}
         />
-        <Stack direction={"column"}>
-          <Typography>{`${currMarker.lat}, ${currMarker.lng}`}</Typography>
-        </Stack>
       </Stack>
       <Stack
         direction="row"
         justifyContent={"flex-end"}
         spacing={2}
-        sx={{ marginBottom: 2 }}
+        sx={{ marginY: 2 }}
       >
         <Button onClick={() => reset()} variant={"outlined"}>
           Reset

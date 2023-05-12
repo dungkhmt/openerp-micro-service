@@ -8,8 +8,9 @@ import wms.entity.ReceiptBillItem;
 import java.util.List;
 
 public interface IReceiptBillService {
-    ReturnPaginationDTO<ReceiptBill> getAllBills(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
+    ReturnPaginationDTO<ReceiptBill> getAllBills(int page, int pageSize, String sortField, boolean isSortAsc, String orderCode) throws JsonProcessingException;
     List<ReceiptBillItem> getBillItemsOfOrder(String orderCode) throws JsonProcessingException;
+    ReturnPaginationDTO<ReceiptBillItem> getBillItemsOfOrder(int page, int pageSize, String sortField, boolean isSortAsc, String orderCode) throws JsonProcessingException;
     ReceiptBill getBillById(long id);
     ReceiptBill getBillByCode(String code);
     ReceiptBillItem getBillItemsOfOrder(String billCode, String billItemSeq);

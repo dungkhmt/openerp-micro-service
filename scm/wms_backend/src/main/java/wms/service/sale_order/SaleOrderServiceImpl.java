@@ -58,7 +58,7 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
                 .build();
         saleOrderRepo.save(newOrder);
 
-        double totalMoney = 0.0;
+        double total = 0.0;
         int seq = 0;
         for (SaleOrderItemDTO orderItem : saleOrderDTO.getOrderItems()) {
             seq++;
@@ -74,11 +74,11 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
                     .seqId("00" + seq)
                     .quantity(orderItem.getQuantity())
                     .build();
-            totalMoney += orderItem.getPriceUnit() * orderItem.getQuantity();
+            total += orderItem.getPriceUnit() * orderItem.getQuantity();
             saleOrderItemRepo.save(item);
         }
-        newOrder.setTotalMoney(totalMoney);
-        newOrder.setTotalPayment(totalMoney - totalMoney * saleOrderDTO.getDiscount() / 100);
+        newOrder.setTotalMoney(total);
+        newOrder.setTotalPayment(total - total * saleOrderDTO.getDiscount() / 100);
         return saleOrderRepo.save(newOrder);
     }
 

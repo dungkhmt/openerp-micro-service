@@ -31,6 +31,8 @@ export const endPoint = {
   // Bill
   getReceiptBills: baseUrl + "/receipt-bill/get-all",
   getBillItemOfPurchaseOrder: baseUrl + "/receipt-bill/get-bill-items-of-order",
+  getBillItemOfPurchaseOrderPaging:
+    baseUrl + "/receipt-bill/get-bill-items-of-order-paging",
   createReceiptBill: baseUrl + "/facility/import-item",
   getDeliveryBills: baseUrl + "/delivery-bill/get-all",
   getBillItemOfSaleOrder: baseUrl + "/delivery-bill/get-bill-items-of-order",

@@ -6,8 +6,29 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  styled,
+  tableCellClasses,
 } from "@mui/material";
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+  // hide last border
+  "&:last-child td, &:last-child th": {
+    border: 0,
+  },
+}));
 const CustomDeliveryBillTable = ({ orderItem, billItem, product_facility }) => {
   console.log(orderItem, billItem, product_facility);
   const rows = orderItem?.map((item) => {
@@ -17,11 +38,6 @@ const CustomDeliveryBillTable = ({ orderItem, billItem, product_facility }) => {
     let facilityInventory = product_facility.filter(
       (inv) => inv?.product?.code === item?.product?.code
     );
-    // console.log(
-    //   mappedBill.reduce((accumulator, curr) => {
-    //     return accumulator + curr.effectiveQty;
-    //   }, 0)
-    // );
     return {
       name: item?.product?.name,
       effQty:
@@ -35,37 +51,34 @@ const CustomDeliveryBillTable = ({ orderItem, billItem, product_facility }) => {
       inventory: facilityInventory[0]?.inventoryQty
         ? facilityInventory[0]?.inventoryQty
         : 0,
-      // item?.purchaseOrder?.totalMoney
     };
   });
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
-          <TableRow>
-            {/* <TableCell>Mã bill</TableCell> */}
-            <TableCell align="right">Tên sản phẩm</TableCell>
-            <TableCell align="right">Số lượng đã xuất kho</TableCell>
-            <TableCell align="right">Tổng số lượng cần xuất</TableCell>
-            <TableCell align="right">Tồn kho hiện tại</TableCell>
-            {/* <TableCell align="right">Tổng cộng</TableCell> */}
-          </TableRow>
+          <StyledTableRow>
+            <StyledTableCell align="right">Tên sản phẩm</StyledTableCell>
+            <StyledTableCell align="right">
+              Số lượng đã xuất kho
+            </StyledTableCell>
+            <StyledTableCell align="right">
+              Tổng số lượng cần xuất
+            </StyledTableCell>
+            <StyledTableCell align="right">Tồn kho hiện tại</StyledTableCell>
+          </StyledTableRow>
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <TableRow
+            <StyledTableRow
               key={row.name}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
-              {/* <TableCell component="th" scope="row">
-                {row.code}
-              </TableCell> */}
-              <TableCell align="right">{row.name}</TableCell>
-              <TableCell align="right">{row.effQty}</TableCell>
-              <TableCell align="right">{row.qty}</TableCell>
-              <TableCell align="right">{row.inventory}</TableCell>
-              {/* <TableCell align="right">{row.total_money}</TableCell> */}
-            </TableRow>
+              <StyledTableCell align="right">{row.name}</StyledTableCell>
+              <StyledTableCell align="right">{row.effQty}</StyledTableCell>
+              <StyledTableCell align="right">{row.qty}</StyledTableCell>
+              <StyledTableCell align="right">{row.inventory}</StyledTableCell>
+            </StyledTableRow>
           ))}
         </TableBody>
       </Table>

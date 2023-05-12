@@ -10,24 +10,24 @@ import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetProductCateList } from "controllers/query/category-query";
+import { useGetListTruck } from "controllers/query/delivery-trip-query";
 import { useState } from "react";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
-import { categoryColumns } from "../LocalConstant";
-import CreateProductCate from "./components/CreateProductCate";
-function ProductCategoryScreen({ screenAuthorization }) {
+import { truckCols } from "../LocalConstant";
+import CreateTruck from "./components/CreateTruck";
+
+function TruckScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 5,
   });
   const { height } = useWindowSize();
+  const { isLoading, data, isRefetching, isPreviousData } = useGetListTruck();
   const [isAdd, setIsAdd] = useToggle(false);
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
-
-  const { isLoading, data } = useGetProductCateList();
   let actions = [
     {
       title: "Thêm",
@@ -64,13 +64,14 @@ function ProductCategoryScreen({ screenAuthorization }) {
         <CustomToolBar actions={actions} />
       </Box>
       <CustomDataGrid
+        isSerial
         params={params}
         setParams={setParams}
-        sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
-        isLoading={isLoading}
+        sx={{ height: height - 64 - 71 - 24 - 20 - 35 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom - Page Title
+        isLoading={isLoading || isRefetching || isPreviousData}
         totalItem={100}
         columns={[
-          ...categoryColumns,
+          ...truckCols,
           {
             field: "action",
             headerName: "Hành động",
@@ -98,15 +99,12 @@ function ProductCategoryScreen({ screenAuthorization }) {
         open={isAdd}
         toggle={setIsAdd}
         size="sm"
-        title="Tạo danh mục sản phẩm"
+        title="Tạo mới xe tải"
       >
-        <CreateProductCate setIsAdd={setIsAdd} />
+        <CreateTruck setIsAdd={setIsAdd} />
       </CustomModal>
       <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
-        <HeaderModal
-          onClose={setOpenDrawer}
-          title="Sửa thông tin danh mục sản phẩm"
-        />
+        <HeaderModal onClose={setOpenDrawer} title="Sửa thông tin xe tải" />
       </CustomDrawer>
       <DraggableDeleteDialog
         // disable={isLoadingRemove}
@@ -118,5 +116,5 @@ function ProductCategoryScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_PRODUCT_CATEGORY";
-export default withScreenSecurity(ProductCategoryScreen, SCR_ID, true);
+const SCR_ID = "SCR_TRUCK";
+export default withScreenSecurity(TruckScreen, SCR_ID, true);

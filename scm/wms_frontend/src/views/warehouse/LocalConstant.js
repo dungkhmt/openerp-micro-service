@@ -149,15 +149,28 @@ export const staticSaleOrderCols = [
     headerName: "Mã code",
     sortable: false,
     pinnable: true,
+    width: 125,
     minWidth: 150,
+    maxWidth: 200,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>
+          {params?.row?.code}
+        </Typography>
+      );
+    },
   },
   {
+    headerAlign: "center",
+    align: "center",
     field: "totalMoney",
     headerName: "Tổng tiền đặt",
     sortable: false,
     minWidth: 150,
   },
   {
+    headerAlign: "center",
+    align: "center",
     field: "totalPayment",
     headerName: "Tổng tiền trả",
     sortable: false,
@@ -165,13 +178,20 @@ export const staticSaleOrderCols = [
   },
   {
     field: "discount",
+    headerAlign: "center",
+    align: "center",
     headerName: "Khuyến mãi (%)",
     sortable: false,
     minWidth: 150,
+    renderCell: (params) => {
+      return <Typography>{`${params?.row?.discount} %`}</Typography>;
+    },
   },
   {
     field: "createdBy",
     headerName: "Tạo bởi",
+    headerAlign: "center",
+    align: "center",
     sortable: false,
     minWidth: 150,
     valueGetter: (params) => {
@@ -181,6 +201,8 @@ export const staticSaleOrderCols = [
   {
     field: "boughtBy",
     headerName: "Mua bởi",
+    headerAlign: "center",
+    align: "center",
     sortable: false,
     minWidth: 150,
     valueGetter: (params) => {
@@ -189,9 +211,14 @@ export const staticSaleOrderCols = [
   },
   {
     field: "createdDate",
+    headerAlign: "center",
+    align: "center",
     headerName: "Thời điểm tạo",
     sortable: false,
     minWidth: 150,
+    valueGetter: (params) => {
+      return unix(params?.row?.createdDate).format("DD-MM-YYYY");
+    },
   },
   {
     field: "status",
@@ -203,18 +230,22 @@ export const staticSaleOrderCols = [
     renderCell: (params) => {
       return (
         <Button
-          variant="outlined"
+          variant="contained"
           sx={{
-            borderRadius: "30px",
+            borderRadius: "2px",
             borderWidth: "1px",
-            height: "30px",
-            borderColor: ITEM_STATUS_COLOR_MAPPING[params?.row?.status],
+            paddingY: 1,
+            paddingX: 2,
+            height: "24px",
+            background:
+              ORDER_STATUS_COLOR_MAPPING[params?.row?.status.toLowerCase()],
           }}
         >
           <Typography
             sx={{
-              textTransform: "capitalize",
-              color: ITEM_STATUS_COLOR_MAPPING[params?.row?.status],
+              textTransform: "lowercase",
+              fontSize: 14,
+              color: "white",
             }}
           >
             {params?.row?.status}

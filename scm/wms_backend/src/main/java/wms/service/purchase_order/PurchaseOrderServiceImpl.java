@@ -61,7 +61,7 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
                 .build();
         purchaseOrderRepo.save(newOrder);
 
-        double totalMoney = 0.0;
+        double total = 0.0;
         int seq = 0;
         for (PurchaseOrderItemDTO orderItem : purchaseOrderDTO.getOrderItems()) {
             seq++;
@@ -77,11 +77,11 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
                     .seqId("00" + seq)
                     .quantity(orderItem.getQuantity())
                     .build();
-            totalMoney += orderItem.getPriceUnit() * orderItem.getQuantity();
+            total += orderItem.getPriceUnit() * orderItem.getQuantity();
             purchaseOrderItemRepo.save(item);
         }
-        newOrder.setTotalMoney(totalMoney);
-        newOrder.setTotalPayment(totalMoney - totalMoney * purchaseOrderDTO.getVat() / 100);
+        newOrder.setTotalMoney(total + total * purchaseOrderDTO.getVat() / 100);
+        newOrder.setTotalPayment(total);
         return purchaseOrderRepo.save(newOrder);
     }
 

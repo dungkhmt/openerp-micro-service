@@ -14,6 +14,8 @@ public interface DeliveryBillRepo extends JpaRepository<DeliveryBill, Long> {
 
     @Query(value = "select * from scm_delivery_bill", nativeQuery = true)
     Page<DeliveryBill> search(Pageable pageable);
+    @Query(value = "select * from scm_delivery_bill where order_code = :orderCode or :orderCode is null or :orderCode = ''", nativeQuery = true)
+    Page<DeliveryBill> search(Pageable pageable, String orderCode);
 
     @Query(value = "select * from scm_delivery_bill where order_code = :orderCode", nativeQuery = true)
     List<DeliveryBill> getAllBillOfOrder(String orderCode);

@@ -8,8 +8,12 @@ import { queryKey } from "./querykey";
 export const useGetReceiptBillList = (params) => {
   return useQuery({
     queryKey: [queryKey.receipt_bill.receipt_bill_list, params],
-    queryFn: async () => {
-      const res = await axiosSendRequest("get", endPoint.getReceiptBills);
+    queryFn: async (data) => {
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getReceiptBills,
+        params
+      );
       if (res.data && res.code === 1) {
         return res.data;
       }
@@ -35,7 +39,26 @@ export const useGetBillItemOfPurchaseOrder = (params) => {
     onSuccess: (data) => {},
   });
 };
-
+export const useGetBillItemOfPurchaseOrderPaging = (params) => {
+  return useQuery({
+    queryKey: [
+      queryKey.receipt_bill.bill_item_of_purchase_order_paging,
+      params,
+    ],
+    queryFn: async () => {
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getBillItemOfPurchaseOrderPaging,
+        params
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};
 export const useCreateReceiptBill = (params) => {
   return useMutation({
     mutationFn: async (data) => {
@@ -72,7 +95,11 @@ export const useGetDeliveryBillList = (params) => {
   return useQuery({
     queryKey: [queryKey.delivery_bill.delivery_bill_list, params],
     queryFn: async () => {
-      const res = await axiosSendRequest("get", endPoint.getDeliveryBills);
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getDeliveryBills,
+        params
+      );
       if (res.data && res.code === 1) {
         return res.data;
       }

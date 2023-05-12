@@ -84,9 +84,6 @@ async function axiosSendRequest(
     config.data = data || {};
   }
 
-  if (AppConfig.isDebugging) {
-    console.log(config);
-  }
   // curlirize(axios);
   await axios(config)
     .catch(function (error) {

@@ -26,17 +26,26 @@ public class ReceiptBillServiceImpl extends BaseService implements IReceiptBillS
     @Autowired
     private ReceiptBillItemRepo receiptBillItemRepo;
     @Override
-    public ReturnPaginationDTO<ReceiptBill> getAllBills(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
+    public ReturnPaginationDTO<ReceiptBill> getAllBills(int page, int pageSize, String sortField, boolean isSortAsc, String orderCode) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
-        Page<ReceiptBill> receiptBills = receiptBillRepo.getAllBills(pageable);
+        Page<ReceiptBill> receiptBills = receiptBillRepo.getAllBills(pageable, orderCode);
         return getPaginationResult(receiptBills.getContent(), page, receiptBills.getTotalPages(), receiptBills.getTotalElements());
     }
 
     @Override
     public List<ReceiptBillItem> getBillItemsOfOrder(String orderCode) throws JsonProcessingException {
         return receiptBillItemRepo.search(orderCode);
+    }
+
+    @Override
+    public ReturnPaginationDTO<ReceiptBillItem> getBillItemsOfOrder(int page, int pageSize, String sortField, boolean isSortAsc, String orderCode) throws JsonProcessingException {
+        Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
+                : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
+                : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
+        Page<ReceiptBillItem> receiptBillItems = receiptBillItemRepo.searchItems(pageable, orderCode);
+        return getPaginationResult(receiptBillItems.getContent(), page, receiptBillItems.getTotalPages(), receiptBillItems.getTotalElements());
     }
 
     @Override

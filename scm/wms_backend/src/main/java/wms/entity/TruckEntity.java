@@ -31,6 +31,7 @@ public class TruckEntity extends BaseEntity implements Serializable {
     @Column(name = "waiting_cost")
     private double waitingCost;
 
+    // TODO: Check why we can't get userInfo in api get all drones
     @OneToOne(cascade = {CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH}, fetch = FetchType.EAGER)
 //    @JsonIgnore
     @JsonInclude

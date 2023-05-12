@@ -1,12 +1,12 @@
 import { Route, Switch, useRouteMatch } from "react-router";
-import AddShipmentOrder from "../views/delivery/AddShipmentOrder";
-import Drone from "../views/delivery/Drone";
-import SplitBillDetail from "../views/delivery/SplitBillDetail";
-import Truck from "../views/delivery/Truck";
 import Shipment from "../views/delivery/shipment/Shipment";
 import ShipmentDetail from "../views/delivery/shipment/ShipmentDetail";
 import Trip from "../views/delivery/shipment/TripDetail";
 import TripRoutes from "../views/delivery/shipment/TripRoutes";
+import AddShipmentOrder from "../views/delivery/splitbill/SplitBill";
+import SplitBillDetail from "../views/delivery/splitbill/SplitBillDetail";
+import Drone from "../views/delivery/vehicle/Drone";
+import Truck from "../views/delivery/vehicle/Truck";
 
 export default function DeliveryRouter() {
   let { path } = useRouteMatch();

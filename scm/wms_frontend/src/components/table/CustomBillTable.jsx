@@ -6,19 +6,34 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  styled,
+  tableCellClasses,
 } from "@mui/material";
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
 
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+  // hide last border
+  "&:last-child td, &:last-child th": {
+    border: 0,
+  },
+}));
 const CustomBillTable = ({ orderItem, billItem }) => {
   console.log(orderItem, billItem);
   const rows = orderItem?.map((item) => {
     let mappedBill = billItem.filter(
       (bill) => bill?.product?.code === item?.product?.code
     );
-    // console.log(
-    //   mappedBill.reduce((accumulator, curr) => {
-    //     return accumulator + curr.effectiveQty;
-    //   }, 0)
-    // );
     return {
       name: item?.product?.name,
       effQty:
@@ -29,35 +44,35 @@ const CustomBillTable = ({ orderItem, billItem }) => {
             )
           : 0,
       qty: item?.quantity,
-      // item?.purchaseOrder?.totalMoney
     };
   });
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+    <TableContainer
+      component={Paper}
+      sx={{ maxWidth: "50vw", alignSelf: "center" }}
+    >
+      <Table sx={{ minWidth: 700 }} aria-label="simple table">
         <TableHead>
-          <TableRow>
-            {/* <TableCell>Mã bill</TableCell> */}
-            <TableCell align="right">Tên sản phẩm</TableCell>
-            <TableCell align="right">Số lượng đã nhập kho</TableCell>
-            <TableCell align="right">Tổng số lượng cần nhập</TableCell>
-            {/* <TableCell align="right">Tổng cộng</TableCell> */}
-          </TableRow>
+          <StyledTableRow>
+            <StyledTableCell align="center">Tên sản phẩm</StyledTableCell>
+            <StyledTableCell align="right">
+              Số lượng đã nhập kho
+            </StyledTableCell>
+            <StyledTableCell align="right">
+              Tổng số lượng cần nhập
+            </StyledTableCell>
+          </StyledTableRow>
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <TableRow
+            <StyledTableRow
               key={row.name}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
-              {/* <TableCell component="th" scope="row">
-                {row.code}
-              </TableCell> */}
-              <TableCell align="right">{row.name}</TableCell>
-              <TableCell align="right">{row.effQty}</TableCell>
-              <TableCell align="right">{row.qty}</TableCell>
-              {/* <TableCell align="right">{row.total_money}</TableCell> */}
-            </TableRow>
+              <StyledTableCell align="center">{row.name}</StyledTableCell>
+              <StyledTableCell align="right">{row.effQty}</StyledTableCell>
+              <StyledTableCell align="right">{row.qty}</StyledTableCell>
+            </StyledTableRow>
           ))}
         </TableBody>
       </Table>

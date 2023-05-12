@@ -169,3 +169,53 @@ export const staticProductFields = [
     },
   },
 ];
+
+export const deliveryBillCols = [
+  {
+    field: "code",
+    headerName: "Mã code",
+    sortable: false,
+    pinnable: true,
+    minWidth: 200,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>
+          {params?.row?.code}
+        </Typography>
+      );
+    },
+  },
+  {
+    field: "createdDate",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Thời điểm tạo",
+    sortable: false,
+    minWidth: 200,
+    valueGetter: (params) => {
+      return unix(params?.row?.createdDate).format("DD-MM-YYYY");
+    },
+  },
+  {
+    field: "facility",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Kho trực thuộc",
+    sortable: false,
+    minWidth: 200,
+    valueGetter: (params) => {
+      return params.row?.saleOrder?.customer?.facility?.name;
+    },
+  },
+  {
+    field: "order",
+    headerName: "Mã đơn hàng",
+    headerAlign: "center",
+    align: "center",
+    sortable: false,
+    minWidth: 200,
+    valueGetter: (params) => {
+      return params.row?.saleOrder?.code;
+    },
+  },
+];

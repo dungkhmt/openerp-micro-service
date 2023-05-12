@@ -23,6 +23,7 @@ export const queryKey = {
   receipt_bill: {
     receipt_bill_list: "receipt_bill_list",
     bill_item_of_purchase_order: "bill_item_of_purchase_order",
+    bill_item_of_purchase_order_paging: "bill_item_of_purchase_order_paging",
   },
   delivery_bill: {
     delivery_bill_list: "delivery_bill_list",

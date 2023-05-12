@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import wms.common.enums.BillStatus;
 import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.bill.SplitBillDTO;
@@ -47,11 +46,11 @@ public class DeliveryBillServiceImpl extends BaseService implements IDeliveryBil
     }
 
     @Override
-    public ReturnPaginationDTO<DeliveryBill> getAllBills(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
+    public ReturnPaginationDTO<DeliveryBill> getAllBills(int page, int pageSize, String sortField, boolean isSortAsc, String orderCode) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
-        Page<DeliveryBill> deliveryBills = deliveryBillRepo.search(pageable);
+        Page<DeliveryBill> deliveryBills = deliveryBillRepo.search(pageable, orderCode);
         return getPaginationResult(deliveryBills.getContent(), page, deliveryBills.getTotalPages(), deliveryBills.getTotalElements());
     }
 

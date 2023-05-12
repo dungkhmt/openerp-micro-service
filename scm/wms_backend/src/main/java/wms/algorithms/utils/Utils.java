@@ -22,7 +22,7 @@ public class Utils {
 
         double distance = r * c;
 
-        return distance;
+        return distance*1000;
     }
 //    public static double calculateEuclideanDistance(String lat1, String lon1, lat2, lon2) {
 //        double dx = lat1 - lat2;

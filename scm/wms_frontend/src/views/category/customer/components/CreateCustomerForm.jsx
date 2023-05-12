@@ -36,7 +36,6 @@ const CreateCustomerForm = ({ setIsAdd }) => {
   const createCustomerQuery = useCreateCustomer();
 
   const onSubmit = async (data) => {
-    console.log("Submitting: ", data);
     let customerParams = {
       address: data?.address,
       contractTypeCode: data?.contractType?.code,
