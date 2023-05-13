@@ -1,3 +1,4 @@
+import SearchIcon from "@mui/icons-material/Search";
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { alpha } from '@mui/material/styles';
@@ -74,6 +75,31 @@ const stableSort = (array, comparator) => {
   });
   return stabilizedThis.map((el) => el[0]);
 }
+
+const SearchBar = ( { setSearchQuery } ) => {
+  return (
+    <form>
+      <TextField
+        id="search-bar"
+        className="text"
+        onInput={(e) => {
+          setSearchQuery(e.target.value);
+        }}
+        label="Tìm kiếm..."
+        variant="outlined"
+        placeholder="Tìm kiếm..."
+        fullWidth
+      />
+      {/* <IconButton type="submit" aria-label="search">
+        <SearchIcon style={{ fill: "blue" }} />
+      </IconButton> */}
+    </form>
+  );
+}
+SearchBar.propTypes = {
+  setSearchQuery: PropTypes.func.isRequired
+};
+
 
 const EnhancedTableHead = ( props ) => {
   const { headerCells, onSelectAllClick, order, orderBy, numSelected, rowCount, 
@@ -241,6 +267,8 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
   const [rowsPerPage, setRowsPerPage] = React.useState(options?.pageSize != undefined ? options?.pageSize : 5);
   const [rows, setRows] = React.useState([]);
   const [isShowAddModal, setShowAddModal] = React.useState(false);
+  const [originalRows, setOriginalRows] = React.useState([]);
+  const [searchQuery, setSearchQuery] = React.useState(null);
 
   const headerCells = buildHeaderCells(columns);
 
@@ -249,6 +277,7 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
 
   React.useEffect(() => {
     setRows(buildTableData(data, columns));
+    setOriginalRows(buildTableData(data, columns));
   }, [data]);
 
   const handleRequestSort = (event, property) => {
@@ -330,6 +359,16 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
   }
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
+
+  React.useEffect(() => {
+    if (searchQuery == '' || searchQuery == null) {
+      setRows(originalRows);
+    } else {
+      const normQuery = String(searchQuery).toLowerCase();
+      const newRows = originalRows.filter(query => Object.entries(query).some(entry => String(entry[1]).toLowerCase().includes(normQuery)));
+      setRows(newRows);
+    }
+  }, [searchQuery]);
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
@@ -427,6 +466,13 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
         deletable={deletable} 
         selectedIds={selected}
       />
+
+      {
+        options.search == true &&
+        <Paper>
+          <SearchBar setSearchQuery={setSearchQuery} />
+        </Paper>
+      }
 
       <TableContainer>
           <Table

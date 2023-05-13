@@ -18,6 +18,7 @@ import { useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
 import StandardTable from 'components/StandardTable';
 import withScreenSecurity from 'components/common/withScreenSecurity.js';
+import LoadingScreen from 'components/common/loading/loading.js';
 
 const CreateWarehouse = ( props, { screenAuthorization } ) => {
   const holderShelf = { x: "", y: "", width: "", length: "", num: "" };
@@ -44,10 +45,11 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
   // else -> current warehouse address or null
   const [updateAddress, setUpdateAddress] = useState(false);
   const [productTableData, setProductTableData] = useState([]);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (warehouseId != null) {
-      request(
+    const fetchData = async () => {
+      await request(
         "get",
         API_PATH.WAREHOUSE + "/" + warehouseId,
         (res) => {
@@ -59,7 +61,7 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
           503: () => { errorNoti("Có lỗi khi tải dữ liệu của kho") }
         }
       );
-      request(
+      await request(
         "get",
         API_PATH.PRODUCT_WAREHOUSE + "/" + warehouseId,
         ( res ) => {
@@ -69,7 +71,14 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
           401: () => { },
           503: () => { errorNoti("Có lỗi khi tải dữ liệu của kho") }
         }
-      )
+      );
+      setLoading(false);
+    }
+
+    if (warehouseId != null) {
+      fetchData();
+    } else {
+      setLoading(false);
     }
   }, [warehouseId])
 
@@ -184,6 +193,7 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
   }
 
   return (
+    isLoading ? <LoadingScreen /> :
     <Fragment>
       <Modal open={openModal}
         onClose={() => setOpenModal(!openModal)}
@@ -399,6 +409,22 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
                   Tải file lên
                 </Button>
               </label>
+              <label>
+                <Button 
+                  variant="raised" 
+                  component="span" 
+                  style={{ fontSize: "18px !important", color: "#1976d2", marginLeft: 94, textTransform: "none" }}
+                  onClick={() => handleAddShelf()}
+                >
+                  Thêm kệ hàng
+                </Button>
+              </label>
+              {/* <Box className={classes.addIconBox} onClick={() => handleAddShelf()}>
+                  <Box className={classes.addIconWrap} >
+                    <AddCircleOutlineIcon className={classes.addIcon} />
+                    <Typography>Thêm kệ hàng</Typography>
+                  </Box>
+                </Box> */}
             </Typography>
             <Grid container className={classes.detailWrap}>
               <Grid xs={3} sx={{ display: "flex", }} item className={classes.boxWrap}>
@@ -478,12 +504,6 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
                     ))
                   }
                 </Box>
-                <Box className={classes.addIconBox} onClick={() => handleAddShelf()}>
-                  <Box className={classes.addIconWrap} >
-                    <AddCircleOutlineIcon className={classes.addIcon} />
-                    <Typography>Thêm kệ hàng</Typography>
-                  </Box>
-                </Box>
               </Grid>
 
               <Grid xs={9} item sx={{ display: "flex", }} className={classes.boxWrap}>
@@ -549,7 +569,7 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
                   { title: "Số lô", field: "lotId" },
                   { title: "Kệ hàng", field: "bayCode" },
                   { title: "Giá nhập (VNĐ)", field: "importPrice" },
-                  { title: "Giá bán (VNĐ)", field: "exportPrice" }
+                  // { title: "Giá bán (VNĐ)", field: "exportPrice" }
                 ]
               }
               data={productTableData}

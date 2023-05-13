@@ -8,6 +8,7 @@ import { convertToVNDFormat } from "screens/utils/utils";
 import { errorNoti, successNoti } from "utils/notification";
 import { useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
+import LoadingScreen from "components/common/loading/loading";
 
 const OrderApprovalDetail = ( props ) => {
   const { path } = useRouteMatch();
@@ -15,10 +16,11 @@ const OrderApprovalDetail = ( props ) => {
   const orderId = props.match?.params?.id;
   const classes = useStyles();
   const [orderInfo, setOrderInfo] = useState({});
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData () {
-      request(
+      await request(
         "get",
         `${API_PATH.ADMIN_SALE_ORDER}/${orderId}`,
         (res) => {
@@ -30,7 +32,9 @@ const OrderApprovalDetail = ( props ) => {
           }
           setOrderInfo(data);
         }
-      )
+      );
+
+      setLoading(false);
     }
 
     fetchData();
@@ -68,7 +72,9 @@ const OrderApprovalDetail = ( props ) => {
     )
   }
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <Box>
       <Grid container justifyContent="space-between" 
         className={classes.headerBox} >
@@ -294,7 +300,7 @@ const OrderApprovalDetail = ( props ) => {
         ]}
       />
     </Box>
-  </Fragment>
+  </Fragment>)
 }
 
 export default OrderApprovalDetail;

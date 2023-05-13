@@ -8,6 +8,7 @@ import { API_PATH } from "../apiPaths";
 
 import { Fragment, useState, useEffect } from "react";
 import { convertToVNDFormat } from "screens/utils/utils";
+import LoadingScreen from "components/common/loading/loading";
 
 const PriceHistory = ( { data } ) => {
   const [historyPricesArr, setHistoryPricesArr] = useState(data?.historyPrices == null ? [] : data?.historyPrices);
@@ -55,30 +56,32 @@ const PriceHistory = ( { data } ) => {
               if (newStartDate > newEndDate) {
                 errorNoti("Ngày bắt đầu phải trước ngày kết thúc");
                 reject();
+              } else {
+                const requestBody = {
+                  "productId": data.productId,
+                  "price": newPrice,
+                  "startDate": newStartDate,
+                  "endDate": newEndDate,
+                  "description": newDescription
+                }
+                request(
+                  "put",
+                  API_PATH.PRODUCT_PRICE,
+                  (res) => {
+                    console.log("Response add data => ", res);
+                    if (res.status == 200) {
+                      setHistoryPricesArr([...historyPricesArr, requestBody]);
+                      resolve();
+                    } else {
+                      errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau");
+                      reject();
+                    }
+                  },
+                  {},
+                  requestBody
+                )
+                resolve();
               }
-              const requestBody = {
-                "productId": data.productId,
-                "price": newPrice,
-                "startDate": newStartDate,
-                "endDate": newEndDate,
-                "description": newDescription
-              }
-              request(
-                "put",
-                API_PATH.PRODUCT_PRICE,
-                (res) => {
-                  console.log("Response add data => ", res);
-                  if (res.status == 200) {
-                    setHistoryPricesArr([...historyPricesArr, requestBody]);
-                    resolve();
-                  } else {
-                    errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau");
-                    reject();
-                  }
-                },
-                {},
-                requestBody
-              )
             })
           }),
           onRowDelete: selectedIds => new Promise((resolve, reject) => {
@@ -113,21 +116,29 @@ const PriceConfig = () => {
   const [isOpenModal, setOpenModal] = useState(false);
   const [priceTableData, setPriceTableData] = useState([]);
 
+  const [isLoading, setLoading] = useState(true);
+
   useEffect(() => {
-    request(
-      "get",
-      API_PATH.PRODUCT_PRICE,
-      (res) => {
-        var data = res.data;
-        for (var i = 0; i < data?.length; i++) {
-          if (data[i].currPrice == null) {
-            continue;
+    const fetchData = async () => {
+      await request(
+        "get",
+        API_PATH.PRODUCT_PRICE,
+        (res) => {
+          var data = res.data;
+          for (var i = 0; i < data?.length; i++) {
+            if (data[i].currPrice == null) {
+              continue;
+            }
+            data[i].currPrice = convertToVNDFormat(data[i].currPrice);
           }
-          data[i].currPrice = convertToVNDFormat(data[i].currPrice);
+          setPriceTableData(data);
         }
-        setPriceTableData(data);
-      }
-    )
+      );
+
+      setLoading(false);
+    }
+
+    fetchData();
   }, []);
 
   const columns = [
@@ -135,7 +146,9 @@ const PriceConfig = () => {
     { title: "Giá bán hiện tại", field: "currPrice" },
   ];
   
-  return (<Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <Modal 
       open={isOpenModal}
       onClose={() => {
@@ -168,7 +181,7 @@ const PriceConfig = () => {
             data={priceTableData}
             options={{
               selection: true,
-              pageSize: 20,
+              pageSize: 10,
               search: true,
               sorting: true,
             }}

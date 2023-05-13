@@ -1,35 +1,44 @@
 import { request } from "api";
 import { API_PATH } from "../apiPaths";
-import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
 import StandardTable from "components/StandardTable";
 import { Fragment, useState, useEffect } from "react";
+import LoadingScreen from "components/common/loading/loading";
 
 const ReceiptRequestProcessListing = () => {
 
   const [receiptTableData, setReceiptTableData] = useState([]);
   const [processedReceiptTableData, setProcessedReceiptTableData] = useState([]);
   const { path } = useRouteMatch();
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    request(
-      "get",
-      API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "?status=APPROVED,IN_PROGRESS",
-      (res) => {
-        setReceiptTableData(res.data);
-      }
-    );
+    const fetchData = async () => {
+      await request(
+        "get",
+        API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "?status=APPROVED,IN_PROGRESS",
+        (res) => {
+          setReceiptTableData(res.data);
+        }
+      );
 
-    request(
-      "get",
-      API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "?status=CANCELLED,COMPLETED",
-      (res) => {
-        setProcessedReceiptTableData(res.data);
-      }
-    )
+      await request(
+        "get",
+        API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "?status=CANCELLED,COMPLETED",
+        (res) => {
+          setProcessedReceiptTableData(res.data);
+        }
+      );
+
+      setLoading(false);
+    }
+
+    fetchData();
   }, []);
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <StandardTable 
       title="Danh sách đơn nhập hàng cần xử lý"
       columns={[
@@ -72,7 +81,7 @@ const ReceiptRequestProcessListing = () => {
         window.location.href = `${path}/${rowData.receiptRequestId}`;
       } }
     />
-  </Fragment>
+  </Fragment>);
 }
 
 export default ReceiptRequestProcessListing;

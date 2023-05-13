@@ -1,6 +1,7 @@
 import { TextField } from "@mui/material";
 import { request } from "api";
 import StandardTable from "components/StandardTable"
+import LoadingScreen from "components/common/loading/loading";
 import { Fragment, useEffect, useState } from "react"
 import { API_PATH } from "screens/apiPaths";
 import { errorNoti, successNoti } from "utils/notification";
@@ -11,18 +12,27 @@ const DeliveryPersonManagement = () => {
   const [newFullName, setNewFullName] = useState(null);
   const [newPhoneNumber, setNewPhoneNumber] = useState(null);
   const [newUserLoginId, setNewUserLoginId] = useState(null);
+  const [isLoading, setLoading] = useState(true);
   
   useEffect(() => {
-    request(
-      "get",
-      API_PATH.DELIVERY_MANAGER_DELIVERY_PERSON,
-      (res) => {
-        setDeliveryPersonsTableData(res.data);
-      }
-    )
+    const fetchData = async () => {
+      await request(
+        "get",
+        API_PATH.DELIVERY_MANAGER_DELIVERY_PERSON,
+        (res) => {
+          setDeliveryPersonsTableData(res.data);
+        }
+      );
+    
+      setLoading(false);
+    }
+
+    fetchData();
   }, []);
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <StandardTable 
       hideCommandBar={true}
       title="Quản lý nhân viên giao hàng"
@@ -93,7 +103,7 @@ const DeliveryPersonManagement = () => {
         })
       }}
     />
-  </Fragment>
+  </Fragment>);
 };
 
 export default DeliveryPersonManagement;

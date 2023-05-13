@@ -15,6 +15,7 @@ import { errorNoti, successNoti } from 'utils/notification';
 import { Fragment, useState, useEffect } from 'react';
 import { useHistory } from 'react-router';
 import { convertToVNDFormat } from 'screens/utils/utils';
+import LoadingScreen from 'components/common/loading/loading';
 
 const ItemDetail = ( { product, cartItems, setCartItems } ) => {
   const [prevQuantity, setPrevQuantity] = useState(product.quantity);
@@ -98,6 +99,7 @@ const CartDetail = () => {
   const [selectPosition, setSelectPosition] = useState(null);
   const [cartItems, setCartItems] = useState(null);
   const [paymentType, setPaymentType] = useState(null);
+  const [isLoading, setLoading] = useState(true);
 
   const { register, errors, handleSubmit, watch, getValues } = useForm();
 
@@ -111,7 +113,7 @@ const CartDetail = () => {
         "latitude": selectPosition == null ? null : selectPosition?.lat
       };
 
-      request(
+      await request(
         "post",
         API_PATH.CART,
         (res) => {
@@ -123,6 +125,8 @@ const CartDetail = () => {
         },
         cartRequestBody
       );
+
+      setLoading(false);
     }
 
     fetchData();
@@ -156,6 +160,7 @@ const CartDetail = () => {
   }
 
   return (
+    isLoading ? <LoadingScreen /> :
     <Fragment>
       <Modal open={isOpenMapModal}
         onClose={() => setOpenMapModal(!isOpenMapModal)}

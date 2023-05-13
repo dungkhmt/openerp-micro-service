@@ -3,16 +3,18 @@ import StandardTable from "components/StandardTable";
 import { Fragment, useEffect, useState } from "react"
 import { API_PATH } from "screens/apiPaths";
 import { useRouteMatch } from "react-router-dom";
+import LoadingScreen from "components/common/loading/loading";
 
 const TodayDeliveryTrip = () => {
   
   const [tripTableData, setTripTableData] = useState([]);
+  const [isLoading, setLoading] = useState(true);
   const { path } = useRouteMatch();
 
   useEffect(() => {
 
     async function fetchData() {
-      request(
+      await request(
         "get",
         API_PATH.DELIVERY_PERSON_TODAY,
         (res) => {
@@ -25,7 +27,9 @@ const TodayDeliveryTrip = () => {
 
   }, []);
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <StandardTable
       title="Danh sách chuyến giao hàng cần thực hiện hôm nay"
       columns={[
@@ -45,7 +49,7 @@ const TodayDeliveryTrip = () => {
         window.location.href = `${path}/${rowData.deliveryTripId}`;
       }}
     />
-  </Fragment>
+  </Fragment>);
 }
 
 export default TodayDeliveryTrip;

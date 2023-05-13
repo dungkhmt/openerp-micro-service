@@ -7,10 +7,12 @@ import { Link } from 'react-router-dom';
 import { successNoti } from "utils/notification";
 import { Fragment, useState, useEffect } from "react";
 import AddIcon from '@mui/icons-material/Add';
+import LoadingScreen from "components/common/loading/loading";
 
 const ProductListing =  () => {
   const [productTableData, setProductTableData] = useState([]);
   const { path } = useRouteMatch();
+  const [isLoading, setLoading] = useState(true);
   
   const columns = [
     { title: "Tên sản phẩm", field: "name" },
@@ -20,19 +22,22 @@ const ProductListing =  () => {
 
   useEffect(() => {
     async function fetchData() {
-      request(
+      await request(
         "get",
         API_PATH.PRODUCT,
         (res) => {
           setProductTableData(res.data);
         }
-      )
+      );
+      
+      setLoading(false);
     }
 
     fetchData();
   }, []);
 
   return (
+    isLoading ? <LoadingScreen /> :
     <Fragment>
       <StandardTable
         rowKey="productId"
