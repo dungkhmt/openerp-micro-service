@@ -1,0 +1,35 @@
+name: lms Image CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "lms/lmsbackend/baseweb/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        name: Check out code
+      - name: Create file appication.yml
+        uses: timheuer/base64-to-file@v1.1
+        with:
+          fileName: "application.yml"
+          fileDir: "./lms/lmsbackend/baseweb/src/main/resources/"
+          encodedString: ${{ secrets.LMS_B64_SECRET }}
+      - name: Build & push Docker image
+        uses: mr-smithers-excellent/docker-build-push@v5
+        with:
+          image: leanhtuan/baseweb
+          directory: "lms/lmsbackend/baseweb/"
+          registry: docker.io
+          dockerfile: "lms/lmsbackend/baseweb/Dockerfile"
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          addLatest: true
+      - name: Remove config file
+        uses: JesseTG/rm@v1.0.2
+        with:
+          path: "./lms/lmsbackend/baseweb/src/main/resources/application.yml"
