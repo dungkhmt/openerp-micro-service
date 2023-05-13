@@ -13,7 +13,7 @@ const AdminOrderDetail = ( props ) => {
   const orderId = props.match?.params?.id;
   const classes = useStyles();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [orderInfo, setOrderInfo] = useState({});
   const [processingItems, setProcessingItems] = useState([]);
   const [processedItems, setProcessedItems] = useState([]);
@@ -45,7 +45,7 @@ const AdminOrderDetail = ( props ) => {
 
   useEffect(() => {
     async function fetchData () {
-      request(
+      await request(
         "get",
         `${API_PATH.ADMIN_SALE_ORDER}/${orderId}`,
         (res) => {
@@ -54,13 +54,15 @@ const AdminOrderDetail = ( props ) => {
         }
       );
 
-      request(
+      await request(
         "get",
         API_PATH.WAREHOUSE_DETAIL_WITH_PRODUCT,
         (res) => {
           setAllWarehouses(res.data);
         }
-      )
+      );
+
+      setLoading(false);
     }
 
     fetchData();

@@ -4,23 +4,33 @@ import { useRouteMatch } from "react-router-dom";
 import { API_PATH } from "../apiPaths";
 
 import { Fragment, useState, useEffect } from "react";
+import LoadingScreen from "components/common/loading/loading";
 
 const ReceiptRequestForApprovalListing = () => {
 
   const [receiptTableData, setReceiptTableData] = useState([]);
   const { path } = useRouteMatch();
+  const [isLoading, setLoading] = useState(true);
   
   useEffect(() => {
-    request(
-      "get",
-      API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST_APPROVAL_LISTING + "?status=CREATED",
-      (res) => {
-        setReceiptTableData(res.data);
-      }
-    )
+    const fetchData = async () => {
+      await request(
+        "get",
+        API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST_APPROVAL_LISTING + "?status=CREATED",
+        (res) => {
+          setReceiptTableData(res.data);
+        }
+      );
+
+      setLoading(false);
+    }
+
+    fetchData();
   }, []);
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <StandardTable 
       title="Phê duyệt đơn xin nhập hàng"
       columns={[
@@ -39,7 +49,7 @@ const ReceiptRequestForApprovalListing = () => {
         window.location.href = `${path}/${rowData.receiptRequestId}`;
       } }
     />
-  </Fragment>
+  </Fragment>);
 }
 
 export default ReceiptRequestForApprovalListing;

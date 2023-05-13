@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { errorNoti, successNoti } from 'utils/notification';
 import { request } from 'api';
 import { API_PATH } from '../apiPaths';
+import LoadingScreen from "components/common/loading/loading";
 
 const DetailQuantityTable = ({ 
   isCreateForm, 
@@ -261,6 +262,8 @@ const ProductDetail = ( props ) => {
   const [categoryId, setCategoryId] = useState(null);
   const [uom, setUom] = useState(null);
 
+  const [isLoading, setLoading] = useState(true);
+
   const history = useHistory();
   const { path } = useRouteMatch();
 
@@ -319,7 +322,7 @@ const ProductDetail = ( props ) => {
   useEffect(() => {
 
     async function fetchData() {
-      const categoryResponse = request(
+      await request(
         "get",
         API_PATH.PRODUCT_CATEGORY,
         (res) => {
@@ -327,7 +330,8 @@ const ProductDetail = ( props ) => {
           setProductCategories(res.data);
         }
       );
-      const warehouseResponse = request(
+
+      await request(
         "get",
         API_PATH.WAREHOUSE_DETAIL,
         (res) => {
@@ -335,30 +339,30 @@ const ProductDetail = ( props ) => {
         }
       );
 
-      if (isCreateForm) {
-        return;
+      if (!isCreateForm) {
+        await request(
+          "get",
+          API_PATH.PRODUCT + "/" + productId,
+          (res) => {
+            setProductInfo(res.data);
+            setCategoryId(res.data.productInfo.categoryId);
+            setUom(res.data.productInfo.uom);
+            setInitQuantityArray(res.data.quantityList);
+            const imageBytes = res.data.productInfo.imageData;
+            console.log("Image bytes -> ", imageBytes);
+            const blob = new Blob([imageBytes], {type: res.data.productInfo.imageContentType});
+            console.log("blob is setted to -> ", blob);
+            // setUploadedImage(blob);
+            setImageURL("data:" + res.data.productInfo.imageContentType + ";base64," + imageBytes);
+          },
+          {
+            401: () => { },
+            503: () => { errorNoti("Có lỗi khi tải dữ liệu của sản phẩm") }
+          }
+        )
       }
-      console.log("Get information of product with id ", productId);
-      request(
-        "get",
-        API_PATH.PRODUCT + "/" + productId,
-        (res) => {
-          setProductInfo(res.data);
-          setCategoryId(res.data.productInfo.categoryId);
-          setUom(res.data.productInfo.uom);
-          setInitQuantityArray(res.data.quantityList);
-          const imageBytes = res.data.productInfo.imageData;
-          console.log("Image bytes -> ", imageBytes);
-          const blob = new Blob([imageBytes], {type: res.data.productInfo.imageContentType});
-          console.log("blob is setted to -> ", blob);
-          // setUploadedImage(blob);
-          setImageURL("data:" + res.data.productInfo.imageContentType + ";base64," + imageBytes);
-        },
-        {
-          401: () => { },
-          503: () => { errorNoti("Có lỗi khi tải dữ liệu của sản phẩm") }
-        }
-      )
+
+      setLoading(false);
     }
 
     fetchData();
@@ -366,6 +370,7 @@ const ProductDetail = ( props ) => {
   }, []);
 
   return (
+    isLoading ? <LoadingScreen /> :
     <Fragment>
       <Modal open={isShowDetailQuantityModal}
         onClose={() => setShowDetailQuantityModal(!isShowDetailQuantityModal)}

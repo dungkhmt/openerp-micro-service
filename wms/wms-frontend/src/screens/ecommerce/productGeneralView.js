@@ -5,22 +5,27 @@ import { Fragment, useEffect, useState } from "react";
 import { API_PATH } from "../apiPaths";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useHistory } from "react-router";
+import { convertToVNDFormat } from "screens/utils/utils";
+import LoadingScreen from "components/common/loading/loading";
 
 const ProductGeneralView = () => {
   const history = useHistory();
   const { path } = useRouteMatch();
   const [productData, setProductData] = useState([]);
   const [itemInCartCount, setItemInCartCount] = useState(0);
+  const [isLoading, setLoading] = useState(true);
   
   useEffect(() => {
     async function fetchData() {
-      request(
+      await request(
         "get",
         API_PATH.PRODUCT,
         (res) => {
           setProductData(res.data);
         }
       );
+
+      setLoading(false);
     }
 
     fetchData();
@@ -28,6 +33,7 @@ const ProductGeneralView = () => {
   }, []);
 
   return (
+    isLoading ? <LoadingScreen /> :
     <Fragment>
       <Grid container mb={3}>
         <Grid item xs={8}>
@@ -50,7 +56,7 @@ const ProductGeneralView = () => {
               <Box>
                 <img src={"data:" + product?.imageContentType + ";base64," + product?.imageData} width={"100%"} height={"100%"} />
                 <Typography variant="h6">{product?.name}</Typography>
-                <Typography variant="h6">{"Giá bán lẻ: " + (product?.retailPrice == null ? "Liên hệ" : product?.retailPrice)}</Typography>
+                <Typography variant="h6">{"Giá bán lẻ: " + (product?.retailPrice == null ? "Liên hệ" : convertToVNDFormat(product?.retailPrice))}</Typography>
                 <Link href={`${path}/${product.productId}`}>Xem chi tiết</Link>
               </Box>
             </Grid>

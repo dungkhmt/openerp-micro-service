@@ -13,6 +13,7 @@ import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
 
 import { Fragment, useState, useEffect } from "react";
+import LoadingScreen from "components/common/loading/loading";
 
 const ReceiptRequestDetail = ( props ) => {
   const history = useHistory();
@@ -32,6 +33,7 @@ const ReceiptRequestDetail = ( props ) => {
   // Data fetched from server
   const [productList, setProductList] = useState([]);
   const [warehouseList, setWarehouseList] = useState([]);
+  const [isLoading, setLoading] = useState(true);
 
   const ProductDropDown = ({ productList, setSelectedProduct }) => {
     return <Select onChange={(e) => setSelectedProduct(e.target.value)}>
@@ -69,7 +71,8 @@ const ReceiptRequestDetail = ( props ) => {
       (res) => {
         if (res.status == 200) {
           successNoti("Tạo đơn xin nhập hàng hóa thành công");
-          history.push(`${path.replace('/create', '')}`);
+          setProductTableData([]);
+          history.push(`${path}`);
         } else {
           errorNoti("Có lỗi khi tạo đơn. Vui lòng thử lại sau");
         }
@@ -101,7 +104,7 @@ const ReceiptRequestDetail = ( props ) => {
       )
 
       if (!isCreateForm) {
-        request(
+        await request(
           "get",
           API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "/" + receiptId,
           (res) => {
@@ -110,12 +113,15 @@ const ReceiptRequestDetail = ( props ) => {
           }
         )
       }
+
+      setLoading(false)
     }
 
     fetchData();
   }, []);
 
   return (
+    isLoading ? <LoadingScreen /> : 
     <Fragment>
       <Box>
         <Grid container justifyContent="space-between" 
@@ -194,7 +200,7 @@ const ReceiptRequestDetail = ( props ) => {
                       editComponent: <ProductDropDown 
                         setSelectedProduct={setSelectedProductId}
                         productList={productList} /> },
-                    { title: "Số lượng", field: "quantity", type: "numeric",
+                    { title: "Số lượng", field: "quantity",
                       editComponent: <TextField
                         type={"number"}
                         value={newQuantity}

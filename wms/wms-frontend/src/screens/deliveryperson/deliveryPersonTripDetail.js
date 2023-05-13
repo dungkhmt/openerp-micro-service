@@ -9,6 +9,7 @@ import { API_PATH } from "screens/apiPaths";
 import useStyles from 'screens/styles.js';
 import { errorNoti, successNoti } from 'utils/notification';
 import CommandBarButton from "components/button/commandBarButton";
+import LoadingScreen from "components/common/loading/loading";
 
 
 const DeliveryPersonTripDetail = ( props ) => {
@@ -24,31 +25,36 @@ const DeliveryPersonTripDetail = ( props ) => {
   const [selectedWarehouseName, setSelectedWarehouseName] = useState(null);
   const [selectedDeliveryItems, setSelectedDeliveryItems] = useState([]);
   const [isHideCommandBar, setHideCommandBar] = useState(true);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    request(
-      "get",
-      `${API_PATH.DELIVERY_MANAGER_DELIVERY_TRIP}/${tripId}`,
-      (res) => {
-        setTripInfo(res.data);
-        setMaxSequence(res.data.totalLocations);
-        setDeliveryItemsTableData(res.data.items);
-        if (res.data.warehouseName != null) {
-          setSelectedWarehouseName(res.data.warehouseName);
+    const fetchData = async () => {
+      await request(
+        "get",
+        `${API_PATH.DELIVERY_MANAGER_DELIVERY_TRIP}/${tripId}`,
+        (res) => {
+          setTripInfo(res.data);
+          setMaxSequence(res.data.totalLocations);
+          setDeliveryItemsTableData(res.data.items);
+          if (res.data.warehouseName != null) {
+            setSelectedWarehouseName(res.data.warehouseName);
+          }
         }
-      }
-    );
+      );
 
-    request(
-      "get",
-      `${API_PATH.DELIVREY_MANAGER_AUTO_ROUTE}/${tripId}`,
-      (res) => {
-        setRouteDetails(res.data);
-        if (res.data.points.length > 0) {
-          setRunnedAutoRoute(true);
+      await request(
+        "get",
+        `${API_PATH.DELIVREY_MANAGER_AUTO_ROUTE}/${tripId}`,
+        (res) => {
+          setRouteDetails(res.data);
+          if (res.data.points.length > 0) {
+            setRunnedAutoRoute(true);
+          }
         }
-      }
-    )
+      );
+        
+      setLoading(false);
+    }
   }, []);
 
   const onSelectionChangeHandle = (rows) => {
@@ -124,7 +130,9 @@ const DeliveryPersonTripDetail = ( props ) => {
     )
   }
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <Modal open={isShowRouteMapModal}
       onClose={() => setShowRouteMapModal(!isShowRouteMapModal)}
       aria-labelledby="modal-modal-title" 
@@ -362,7 +370,7 @@ const DeliveryPersonTripDetail = ( props ) => {
         deletable={false}
       />
     </Box>
-  </Fragment>
+  </Fragment>);
 }
 
 export default DeliveryPersonTripDetail;

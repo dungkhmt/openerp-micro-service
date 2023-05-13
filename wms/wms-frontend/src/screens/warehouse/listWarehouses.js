@@ -11,24 +11,30 @@ import StandardTable from 'components/StandardTable';
 import { API_PATH } from "../apiPaths";
 import { Box, Modal } from '@material-ui/core';
 import { IconButton } from '@mui/material';
+import LoadingScreen from 'components/common/loading/loading';
 
 const ListWarehouse = () => {
   let { path } = useRouteMatch();
   const [isHideCommandBar, setHideCommandBar] = useState(true);
   const [warehousesTableData, setWarehousesTableData] = useState([]);
   const [isMapModalOpen, setMapModalOpen] = useState(false);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    request(
-      "get",
-      API_PATH.WAREHOUSE,
-      (res) => {
-        const tableData = res.data.map(obj => {
-          obj.tableData = { "checked": false };
-          return obj;
-        })
-        setWarehousesTableData(tableData);
-      })
+    const fetchData = async () => {
+      await request(
+        "get",
+        API_PATH.WAREHOUSE,
+        (res) => {
+          const tableData = res.data.map(obj => {
+            obj.tableData = { "checked": false };
+            return obj;
+          })
+          setWarehousesTableData(tableData);
+      });
+      setLoading(false);
+    }
+    fetchData();
   }, []);
 
   const columns = [
@@ -46,7 +52,9 @@ const ListWarehouse = () => {
     }
   }
 
-  return <div>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <div>
     <Modal
       open={isMapModalOpen}
       onClose={() => setMapModalOpen(!isMapModalOpen)}
@@ -133,6 +141,7 @@ const ListWarehouse = () => {
       />
     </div>
   </div>
+  );
 }
 
 export default ListWarehouse;

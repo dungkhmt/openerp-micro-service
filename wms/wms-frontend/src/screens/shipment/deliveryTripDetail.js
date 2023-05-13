@@ -3,6 +3,7 @@ import { Box, Button, Grid, MenuItem, Modal, Select, TextField,
   Typography } from "@mui/material";
 import { isEditableInput } from '@testing-library/user-event/dist/utils';
 import { request } from "api";
+import LoadingScreen from 'components/common/loading/loading';
 import { RouteMap } from 'components/map/maps';
 import StandardTable from "components/StandardTable";
 import { Fragment, useEffect, useState } from "react";
@@ -38,65 +39,73 @@ const DeliveryTripDetail = ( props ) => {
   const [isShowRouteMapModal, setShowRouteMapModal] = useState(false);
   const [runnedAutoRoute, setRunnedAutoRoute] = useState(false);
 
+  const [isLoading, setLoading] = useState(true);
+
   // chọn danh sách sản phẩm (phải cùng một warehouse)
   // nếu danh sách sản phẩm của delivery trip khác rỗng -> không thể update warehouse
 
   useEffect(() => {
-    request(
-      "get",
-      `${API_PATH.DELIVERY_MANAGER_DELIVERY_TRIP}/${tripId}`,
-      (res) => {
-        setTripInfo(res.data);
-        setMaxSequence(res.data.totalLocations);
-        setSelectedWarehouseId(res.data.warehouseId);
-        setDeliveryItemsTableData(res.data.items);
-        if (res.data.deliveryTripStatusCode != 'CREATED') {
-          setUpdatable(false);
+    const fetchData = async () => {
+      await request(
+        "get",
+        `${API_PATH.DELIVERY_MANAGER_DELIVERY_TRIP}/${tripId}`,
+        (res) => {
+          setTripInfo(res.data);
+          setMaxSequence(res.data.totalLocations);
+          setSelectedWarehouseId(res.data.warehouseId);
+          setDeliveryItemsTableData(res.data.items);
+          if (res.data.deliveryTripStatusCode != 'CREATED') {
+            setUpdatable(false);
+          }
+          if (res.data.warehouseName != null) {
+            setSelectedWarehouseName(res.data.warehouseName);
+          }
+          if (res.data.deleted) {
+            setDeleted(true);
+          }
         }
-        if (res.data.warehouseName != null) {
-          setSelectedWarehouseName(res.data.warehouseName);
+      );
+
+      await request(
+        "get",
+        API_PATH.DELIVERY_MANAGER_DELIVERY_PERSON,
+        (res) => {
+          setDeliveryPersons(res.data);
         }
-        if (res.data.deleted) {
-          setDeleted(true);
+      );
+
+      await request(
+        "get",
+        API_PATH.WAREHOUSE,
+        (res) => {
+          setWarehouseList(res.data);
         }
-      }
-    );
+      );
 
-    request(
-      "get",
-      API_PATH.DELIVERY_MANAGER_DELIVERY_PERSON,
-      (res) => {
-        setDeliveryPersons(res.data);
-      }
-    );
-
-    request(
-      "get",
-      API_PATH.WAREHOUSE,
-      (res) => {
-        setWarehouseList(res.data);
-      }
-    );
-
-    request(
-      "get",
-      API_PATH.DELIVERY_MANAGER_ASSIGN_ORDER_ITEM,
-      (res) => {
-        setRawCreatedItemsTableData(res.data);
-        setCreatedItemsTableData(res.data);
-      }
-    );
-
-    request(
-      "get",
-      `${API_PATH.DELIVREY_MANAGER_AUTO_ROUTE}/${tripId}`,
-      (res) => {
-        setRouteDetails(res.data);
-        if (res.data.points.length > 0) {
-          setRunnedAutoRoute(true);
+      await request(
+        "get",
+        API_PATH.DELIVERY_MANAGER_ASSIGN_ORDER_ITEM,
+        (res) => {
+          setRawCreatedItemsTableData(res.data);
+          setCreatedItemsTableData(res.data);
         }
-      }
-    )
+      );
+
+      await request(
+        "get",
+        `${API_PATH.DELIVREY_MANAGER_AUTO_ROUTE}/${tripId}`,
+        (res) => {
+          setRouteDetails(res.data);
+          if (res.data.points.length > 0) {
+            setRunnedAutoRoute(true);
+          }
+        }
+      );
+
+      setLoading(false);
+    }
+
+    fetchData();
   }, []);
 
   // useEffect(() => {
@@ -218,8 +227,9 @@ const DeliveryTripDetail = ( props ) => {
     )
   }
 
-  return (<Fragment>
-
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <Modal open={isShowAssignedItemsModal}
       onClose={() => setShowAssignedItemsModal(!isShowAssignedItemsModal)}
       aria-labelledby="modal-modal-title" 

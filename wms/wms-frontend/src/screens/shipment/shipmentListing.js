@@ -7,6 +7,7 @@ import { convertTimeStampToDate, getCurrentDateInString } from "screens/utils/ut
 import { errorNoti, successNoti } from "utils/notification";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
+import LoadingScreen from "components/common/loading/loading";
 
 const ShipmentListing = () => {
   const history = useHistory();
@@ -17,32 +18,41 @@ const ShipmentListing = () => {
   const [userLoginId, setUserLoginId] = useState(null);
   const now = getCurrentDateInString();
   const [expectDeliveryDate, setExpectDeliveryDate] = useState(null);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    request(
-      "get",
-      API_PATH.DELIVERY_MANAGER_SHIPMENT,
-      (res) => {
-        var data = res.data;
-        for (var i = 0; i < data?.length; i++) {
-          data[i].numOrder = i + 1;
-          data[i].expectedDeliveryStamp = convertTimeStampToDate(data[i].expectedDeliveryStamp);
+    const fetchData = async () => {  
+      await request(
+        "get",
+        API_PATH.DELIVERY_MANAGER_SHIPMENT,
+        (res) => {
+          var data = res.data;
+          for (var i = 0; i < data?.length; i++) {
+            data[i].numOrder = i + 1;
+            data[i].expectedDeliveryStamp = convertTimeStampToDate(data[i].expectedDeliveryStamp);
+          }
+          setShipmentTableData(res.data);
+          setNumOrder(data.length + 1);
         }
-        setShipmentTableData(res.data);
-        setNumOrder(data.length + 1);
-      }
-    );
+      );
 
-    request(
-      "get",
-      API_PATH.GET_USER_LOGIN_ID,
-      (res) => {
-        setUserLoginId(res.data);
-      }
-    )
+      await request(
+        "get",
+        API_PATH.GET_USER_LOGIN_ID,
+        (res) => {
+          setUserLoginId(res.data);
+        }
+      );
+
+      setLoading(false);
+    }
+
+    fetchData();
   }, []);
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <StandardTable
       hideCommandBar={true}
       rowKey="shipmentId"
@@ -119,7 +129,7 @@ const ShipmentListing = () => {
         })
       }}
     />
-  </Fragment>
+  </Fragment>);
 }
 
 export default ShipmentListing;

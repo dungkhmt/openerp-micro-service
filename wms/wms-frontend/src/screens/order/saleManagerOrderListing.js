@@ -4,29 +4,39 @@ import StandardTable from "components/StandardTable"
 import { request } from "api";
 import { API_PATH } from "screens/apiPaths";
 import { convertToVNDFormat } from "screens/utils/utils";
+import LoadingScreen from "components/common/loading/loading";
 
 const SaleManagerOrderListing = () => {
   const { path } = useRouteMatch();
   const [ordersTableData, setOrdersTableData] = useState([]);
+  const [isLoading, setLoading] = useState(true);
   
   useEffect(() => {
-    request(
-      "get",
-      // API_PATH.ADMIN_SALE_ORDER + `?orderStatus=${ORDER_STATUS_CODE.CREATED}`,
-      API_PATH.ADMIN_SALE_ORDER,
-      (res) => {
-        var data = res.data;
-        for (var i = 0; i < data.length; i++) {
-          const cost = data[i]?.totalOrderCost;
-          const costFormated = convertToVNDFormat(cost);
-          data[i].totalOrderCost = costFormated;
+    const fetchData = async () => {
+      await request(
+        "get",
+        // API_PATH.ADMIN_SALE_ORDER + `?orderStatus=${ORDER_STATUS_CODE.CREATED}`,
+        API_PATH.ADMIN_SALE_ORDER,
+        (res) => {
+          var data = res.data;
+          for (var i = 0; i < data.length; i++) {
+            const cost = data[i]?.totalOrderCost;
+            const costFormated = convertToVNDFormat(cost);
+            data[i].totalOrderCost = costFormated;
+          }
+          setOrdersTableData(data); 
         }
-        setOrdersTableData(data); 
-      }
-    );
+      );
+
+      setLoading(false);
+    }
+
+    fetchData();
   }, []);
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <StandardTable
       title="Danh sách đơn hàng"
       columns={[
@@ -46,7 +56,7 @@ const SaleManagerOrderListing = () => {
         window.location.href = `${path}/${rowData.orderId}`;
       }}
     />
-  </Fragment>
+  </Fragment>);
 }
 
 export default SaleManagerOrderListing;

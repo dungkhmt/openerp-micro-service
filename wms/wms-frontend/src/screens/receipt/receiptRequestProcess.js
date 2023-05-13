@@ -10,6 +10,7 @@ import { convertTimeStampToDate } from "../utils/utils";
 import { BayDropDown, WarehouseDropDown } from "components/table/DropDown";
 import { errorNoti, successNoti } from "utils/notification";
 import { Grid3x3 } from "@mui/icons-material";
+import LoadingScreen from "components/common/loading/loading";
 
 const ProcessItem = ( { rowData, warehousesDetail, setProcessingItems, 
   processingItems, setOpenProcessModal, remainingItems, setRemainingItems } ) => {
@@ -168,43 +169,50 @@ const ReceiptRequestProcess = ( props ) => {
   const [productList, setProductList] = useState([]);
   const history = useHistory();
   const { path } = useRouteMatch();
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    request(
-      "get",
-      API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "/" + receiptId,
-      (res) => {
-        setReceiptInfo(res.data);
-        if (['Đã hoàn thành', 'Đã hủy'].includes(res.data.status)) {
-          setIsDoneReceipt(true);
+    const fetchData = async () => {
+      await request(
+        "get",
+        API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "/" + receiptId,
+        (res) => {
+          setReceiptInfo(res.data);
+          if (['Đã hoàn thành', 'Đã hủy'].includes(res.data.status)) {
+            setIsDoneReceipt(true);
+          }
         }
-      }
-    );
+      );
+  
+      await request(
+        "get",
+        API_PATH.PROCESS_RECEIPT_REQUEST + "/" + receiptId,
+        (res) => {
+          setRemainingItems(res.data?.remainingItems);
+          setProcessedItems(res.data?.processedItems);
+        }
+      );
+  
+      await request(
+        "get",
+        API_PATH.WAREHOUSE_DETAIL,
+        (res) => {
+          setWarehouseList(res.data);
+        }
+      );
+  
+      await request(
+        "get",
+        API_PATH.PRODUCT,
+        (res) => {
+          setProductList(res.data);
+        }
+      );
+  
+      setLoading(false);
+    }
 
-    request(
-      "get",
-      API_PATH.PROCESS_RECEIPT_REQUEST + "/" + receiptId,
-      (res) => {
-        setRemainingItems(res.data?.remainingItems);
-        setProcessedItems(res.data?.processedItems);
-      }
-    );
-
-    request(
-      "get",
-      API_PATH.WAREHOUSE_DETAIL,
-      (res) => {
-        setWarehouseList(res.data);
-      }
-    );
-
-    request(
-      "get",
-      API_PATH.PRODUCT,
-      (res) => {
-        setProductList(res.data);
-      }
-    );
+    fetchData();
   }, []);
 
   const saveButtonHandle = () => {
@@ -238,7 +246,9 @@ const ReceiptRequestProcess = ( props ) => {
     )
   }
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <Modal open={isOpenProcessModal}
       onClose={() => setOpenProcessModal(!isOpenProcessModal)}
       aria-labelledby="modal-modal-title"
@@ -484,7 +494,7 @@ const ReceiptRequestProcess = ( props ) => {
         </Grid>
       </Box>
     </Box>
-  </Fragment>
+  </Fragment>);
 }
 
 export default ReceiptRequestProcess;

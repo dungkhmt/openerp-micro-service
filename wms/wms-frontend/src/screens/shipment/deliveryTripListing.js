@@ -8,6 +8,7 @@ import { getCurrentDateInString } from "screens/utils/utils";
 import { errorNoti, successNoti } from "utils/notification";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
+import LoadingScreen from "components/common/loading/loading";
 
 const DeliveryTripListing = () => {
   const [userLoginId, setUserLoginId] = useState(null);
@@ -15,37 +16,46 @@ const DeliveryTripListing = () => {
   const [selectedShipmentId, setSelectedShipmentId] = useState(null);
   const [tripTableData, setTripTableData] = useState([]);
   const now = getCurrentDateInString();
+  const [isLoading, setLoading] = useState(true);
 
   const history = useHistory();
   const { path } = useRouteMatch();
   
   useEffect(() => {
-    request(
-      "get",
-      API_PATH.GET_USER_LOGIN_ID,
-      (res) => {
-        setUserLoginId(res.data);
-      }
-    );
+    const fetchData = async () => {
+      await request(
+        "get",
+        API_PATH.GET_USER_LOGIN_ID,
+        (res) => {
+          setUserLoginId(res.data);
+        }
+      );
 
-    request(
-      "get",
-      API_PATH.DELIVERY_MANAGER_SHIPMENT,
-      (res) => {
-        setShipmentList(res.data);
-      }
-    );
-    
-    request(
-      "get",
-      API_PATH.DELIVERY_MANAGER_DELIVERY_TRIP,
-      (res) => {
-        setTripTableData(res.data);
-      }
-    )
+      await request(
+        "get",
+        API_PATH.DELIVERY_MANAGER_SHIPMENT,
+        (res) => {
+          setShipmentList(res.data);
+        }
+      );
+      
+      await request(
+        "get",
+        API_PATH.DELIVERY_MANAGER_DELIVERY_TRIP,
+        (res) => {
+          setTripTableData(res.data);
+        }
+      );
+
+      setLoading(false);
+    }
+
+    fetchData();
   }, []);
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <StandardTable
       rowKey="deliveryTripId"
       title="Danh sách các chuyến giao hàng"
@@ -120,7 +130,7 @@ const DeliveryTripListing = () => {
         sorting: true,
       }}
     />
-  </Fragment>
+  </Fragment>)
 }
 
 export default DeliveryTripListing;

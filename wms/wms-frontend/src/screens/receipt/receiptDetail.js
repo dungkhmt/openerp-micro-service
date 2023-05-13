@@ -11,6 +11,7 @@ import { request } from "api";
 import { API_PATH } from "../apiPaths";
 import { errorNoti, successNoti } from "utils/notification";
 import { useHistory } from "react-router";
+import LoadingScreen from "components/common/loading/loading";
 
 const ReceiptDetail = ( props ) => {
   const receiptId = props.match?.params?.id;
@@ -26,6 +27,8 @@ const ReceiptDetail = ( props ) => {
   const [bayList, setBayList] = useState([]);
   const [productReceiptList, setProductReceiptList] = useState([]);
   const [receiptInfo, setReceiptInfo] = useState(null);
+
+  const [isLoading, setLoading] = useState(true);
   
   const history = useHistory();
   const { path } = useRouteMatch();
@@ -60,7 +63,7 @@ const ReceiptDetail = ( props ) => {
 
   useEffect(() => {
     async function fetchData() {
-      request(
+      await request(
         "get",
         API_PATH.PRODUCT,
         (res) => {
@@ -73,7 +76,7 @@ const ReceiptDetail = ( props ) => {
         }
       );
 
-      request(
+      await request(
         "get",
         API_PATH.WAREHOUSE_DETAIL,
         (res) => {
@@ -86,26 +89,27 @@ const ReceiptDetail = ( props ) => {
         }
       )
 
-      if (isCreateForm) {
-        return;
+      if (!isCreateForm) {
+        await request(
+          "get",
+          API_PATH.RECEIPT + "/" + receiptId,
+          (res) => {
+            const data = res.data;
+            setReceiptInfo(data);
+            setWarehouseId(data.warehouseId); // for useEffect
+            setProductReceiptList(data.receiptItemList);
+            console.log("response data -> ", data);
+            console.log("Receipt info -> ", receiptInfo);
+            console.log("received date -> ", receiptInfo?.receivedDate);
+          },
+          {
+            401: () => { },
+            503: () => { errorNoti("Có lỗi khi tải dữ liệu") }
+          }
+        )
       }
-      request(
-        "get",
-        API_PATH.RECEIPT + "/" + receiptId,
-        (res) => {
-          const data = res.data;
-          setReceiptInfo(data);
-          setWarehouseId(data.warehouseId); // for useEffect
-          setProductReceiptList(data.receiptItemList);
-          console.log("response data -> ", data);
-          console.log("Receipt info -> ", receiptInfo);
-          console.log("received date -> ", receiptInfo?.receivedDate);
-        },
-        {
-          401: () => { },
-          503: () => { errorNoti("Có lỗi khi tải dữ liệu") }
-        }
-      )
+
+      setLoading(false);
     }
 
     fetchData();
@@ -167,6 +171,7 @@ const ReceiptDetail = ( props ) => {
   }
 
   return (
+    isLoading ? <LoadingScreen /> :
     <Fragment>
       <Box>
         <Grid container justifyContent="space-between" 
