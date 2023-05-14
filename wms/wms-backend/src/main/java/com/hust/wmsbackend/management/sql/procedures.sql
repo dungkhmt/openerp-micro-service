@@ -26,4 +26,13 @@ end loop;
 end; $$
 language plpgsql;
 
--- call insert_bay_data('f59b6a4d-9be0-40ce-ada1-d0ce78fe5fde', 150, 100, 50, 60);
+-- call insert_bay_data('bc220690-08dd-4825-b250-a4b2b4997756', 10, 10, 5, 5);
+-- call insert_bay_data('f59b6a4d-9be0-40ce-ada1-d0ce78fe5fde', 10, 10, 5, 5);
+-- call insert_bay_data('e108d675-04ce-4e14-a921-50326b295be6', 10, 10, 5, 5);
+-- call insert_bay_data('b2990344-3fab-419f-ad9c-32ba44948f03', 10, 10, 5, 5);
+-- call insert_bay_data('5f35ac00-dfc9-4181-a933-defcde2a8728', 10, 10, 5, 5);
+-- call insert_bay_data('86cfebf3-f366-4f07-ba68-49d94989ebf7', 10, 10, 5, 5);
+-- call insert_bay_data('fe8e941c-cb5b-42c9-b101-199981778975', 10, 10, 5, 5);
+-- call insert_bay_data('f9ad52f5-141f-42d6-af13-7ac40e9b0587', 10, 10, 5, 5);
+-- call insert_bay_data('893c33d0-76bb-45e1-b789-a77c4c098e68', 10, 10, 5, 5);
+-- call insert_bay_data('f59b6a4d-9be0-40ce-ada1-d0ce78fe5fde', 10, 10, 5, 5);
