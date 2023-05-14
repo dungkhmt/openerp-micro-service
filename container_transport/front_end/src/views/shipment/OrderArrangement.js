@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import './styles.scss';
 import { DragDropContext } from "react-beautiful-dnd";
 import { Droppable } from "react-beautiful-dnd";
@@ -13,17 +13,18 @@ import dayjs from "dayjs";
 const TripItem = ({ index, item, facilities, setFacilities }) => {
     const [open, setOpen] = useState(false);
     const [arrivalTime, setArrivalTime] = useState(item.arrivalTime);
-    const handleChangeTime = (time, id) => {
-        console.log("id", id);
-        console.log("index", item.id);
+    const [departureTime, setDepartureTime] = useState(item.departureTime);
+    const handleChangeTime = (time, id, type) => {
         facilities.map((facility, i) => {
         if (facility.id === item.id) {
-
-            facility.arrivalTime = time;
+            if (type == "arrivalTime") {
+                facility.arrivalTime = time;
+            } else {
+                facility.departureTime = time;
+            }
             console.log("facility", dayjs(new Date(time)));
             return facility;
         } else {
-          // The rest haven't changed
           return facility;
         }
       });
@@ -61,7 +62,7 @@ const TripItem = ({ index, item, facilities, setFacilities }) => {
                                         <DemoContainer components={['DateTimePicker']}>
                                             <DateTimePicker label="Early Delivery Time"
                                             defaultValue={item.arrivalTime ? dayjs(new Date(item.arrivalTime)) : null}
-                                            onChange={(e) => handleChangeTime((new Date(e)).getTime(), item.id)}
+                                            onChange={(e) => handleChangeTime((new Date(e)).getTime(), item.id, "arrivalTime")}
                                             />
                                         </DemoContainer>
                                     </LocalizationProvider>
@@ -73,7 +74,8 @@ const TripItem = ({ index, item, facilities, setFacilities }) => {
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DemoContainer components={['DateTimePicker']}>
                                             <DateTimePicker label="Early Delivery Time"
-                                            // onChange={(e) => setEarlyDeliveryTime((new Date(e)).getTime())}
+                                            defaultValue={item.departureTime ? dayjs(new Date(item.departureTime)) : null}
+                                            onChange={(e) => handleChangeTime((new Date(e)).getTime(), item.id, "departureTime")}
                                             />
                                         </DemoContainer>
                                     </LocalizationProvider>
@@ -86,7 +88,7 @@ const TripItem = ({ index, item, facilities, setFacilities }) => {
     )
 }
 
-const OrderArrangement = ({ ordersSelect, setTripItem }) => {
+const OrderArrangement = ({ ordersSelect, setTripItem, tripId }) => {
     const [facilities, setFacilities] = useState([]);
     const [open, setOpen] = useState(false);
 
@@ -140,13 +142,22 @@ const OrderArrangement = ({ ordersSelect, setTripItem }) => {
             facilitiesTmp.push(toFacility);
         });
         setFacilities(facilitiesTmp);
-        setTripItem(facilitiesTmp);
+        if (tripId) {
+            setTripItem(facilitiesTmp)
+        }
     }, [ordersSelect])
     console.log("facilities", facilities);
+    const handleAddTripItem = () => {
+        
+    }
     return (
         <Box className="facility-arrangment">
             <Box className="facility-arrangment-text">
                 <Typography>Facilities Arrangement:</Typography>
+                <Button variant="contained" className="header-trip-detail-btn-save"
+                    onClick={handleAddTripItem}
+                    >Add TripItem
+                </Button>
             </Box>
             <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable droppableId="droppable">
@@ -154,41 +165,6 @@ const OrderArrangement = ({ ordersSelect, setTripItem }) => {
                         <Box ref={provided.innerRef} {...provided.droppableProps}>
                             {facilities.map((item, index) => (
                                 <TripItem index={index} item={item} facilities={facilities} setFacilities={setFacilities}/>
-                                // <Draggable
-                                //     key={item.id}
-                                //     index={index}
-                                //     draggableId={item.id}>
-                                //     {(provided, snapshot) => (
-                                //         <Box
-                                //             ref={provided.innerRef}
-                                //             {...provided.draggableProps}
-                                //             {...provided.dragHandleProps}
-                                //             style={{
-                                //                 // default item style
-                                //                 padding: '8px 16px',
-                                //                 // default drag style
-                                //                 ...provided.draggableProps.style,
-                                //                 // customized drag style
-                                //                 background: snapshot.isDragging
-                                //                     ? 'lightblue'
-                                //                     : 'transparent',
-                                //                 borderRadius: snapshot.isDragging
-                                //                     ? '8px' : '0'
-                                //             }}
-                                //             className="item-facility"
-                                //         >
-                                //             <TripItem index={index} item={item} />
-                                //             <Box 
-                                //             onClick={() => setOpen(!open)}
-                                //             >{item.orderCode} - {item.facilityName} - {item.action}</Box>
-
-                                //             {open ? (<Box>
-                                //                 <Box>anhvu</Box>
-                                //                 <Box></Box>
-                                //             </Box>) : null}
-                                //         </Box>
-                                //     )}
-                                // </Draggable>
                             ))}
                         </Box>
                     )}

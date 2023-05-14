@@ -17,12 +17,9 @@ const TruckAndOrder = ({ trucks, setTruckSelect, truckSelect, orders, ordersSele
     const [tripTmp, setTripTmp] = useState();
     const [initTruckSelect, setInitTruck] = useState();
 
-    // useEffect(() => {
-    //     console.log("truckS", trucks);
-    //     console.log("truckSelect", truckSelect);
-    //     // setInitTruck(truckSelect);
-    //     // setValue(ordersSelect)
-    // }, [trucks, truckSelect])
+    useEffect(() => {
+        setValue(ordersSelect);
+    }, [ordersSelect])
     const handleClick = (event) => {
         setPendingValue(value);
         setAnchorEl(event.currentTarget);

@@ -18,10 +18,9 @@ const ChoseTruckAndOrders = ({ trucks, setTruck, truckSelected , orders, ordersS
     const [tripTmpId, setTripTmpId] = useState('');
     const [tripTmp, setTripTmp] = useState();
 
-    // useEffect(() => {
-    //     setTruckSelect(truckSelected);
-    //     setValue(ordersSelect)
-    // }, [truckSelected])
+    useEffect(() => {
+        setValue(ordersSelect);
+    }, [ordersSelect])
     const handleClick = (event) => {
         setPendingValue(value);
         setAnchorEl(event.currentTarget);
@@ -40,8 +39,6 @@ const ChoseTruckAndOrders = ({ trucks, setTruck, truckSelected , orders, ordersS
         setValue(valueTmp);
         setOrdersSelect(valueTmp);
     }
-    console.log("tripTmp1", truckSelected);
-    console.log("tripTmp2", truckSelect);
     return (
         <>
             <Box className="chose-truck">

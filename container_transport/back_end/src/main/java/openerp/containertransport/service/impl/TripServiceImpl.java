@@ -105,6 +105,7 @@ public class TripServiceImpl implements TripService {
         tripModel.setTruckCode(trip.getTruck().getTruckCode());
         trip.getOrders().forEach((item) -> orderIds.add(item.getId()));
         tripModel.setOrderIds(orderIds);
+        tripModel.setOrders(trip.getOrders());
         return tripModel;
     }
 }

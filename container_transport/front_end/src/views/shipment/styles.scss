@@ -289,22 +289,23 @@
         }
 
         .item-facility {
-            width: 50%;
+            // width: 50%;
             margin-top: 16px;
             border: 1px solid #e5e5e5;
         }
     }
 
     .map-order {
-        width: 50%;
+        width: 48%;
     }
 }
 .item-facility {
-    width: 80%;
+    width: 350px;
     margin-top: 32px;
     border: 1px solid #e5e5e5;
     .trips-item-input {
         margin-top: 16px;
+        width: fit-content;
     }
 }
 .trip-detail {

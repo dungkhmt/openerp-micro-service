@@ -9,6 +9,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import { MyContext } from "contextAPI/MyContext";
 import { Map } from "leaflet";
 import RoutingMachine from "../routing/RoutingMachine";
+import MapComponent from "../routing/Map";
 
 const CreateTripDetail = () => {
     const {truckScheduler, setTruckScheduler, tripsCreate, setTripCreate} = useContext(MyContext);
@@ -19,6 +20,7 @@ const CreateTripDetail = () => {
     const [ordersSelect, setOrdersSelect] = useState([]);
     const [truckSelect, setTruckSelect] = useState();
     const [map , setMap] = useState();
+    const [test, setTest] = useState("anhvu");
     
     const [tripItems, setTripItem] = useState([]);
     const history = useHistory();
@@ -110,8 +112,10 @@ const CreateTripDetail = () => {
         history.goBack();
         console.log("data", data);
     }
-    console.log("tripsTmpId", tripsTmpId);
-    
+    console.log("tripItems", tripItems);
+    useEffect(() => {
+
+    }, [tripItems])
     return (
         <Box className="trip-create">
             <Box className="header-trip-detail">
@@ -136,14 +140,15 @@ const CreateTripDetail = () => {
                 </Box>
                 <Box className="map-order">
                     <Box>
-                        <MapContainer center={[21.018172, 105.829754]} zoom={13} scrollWheelZoom={false} style={{ height: "70vh" }}
+                        <MapComponent tripItems={tripItems}/>
+                        {/* <MapContainer center={[21.018172, 105.829754]} zoom={13} scrollWheelZoom={false} style={{ height: "70vh" }}
                             // whenCreated={map => setMap(map)}
                         >
                             <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             />
-                            <RoutingMachine tripItems={tripItems} />
+                            <RoutingMachine tripItems={tripItems} /> */}
                             {/* {(tripItems != null && tripItems.length > 0) ? (
                                 tripItems.map((item) => {
                                     return (
@@ -155,7 +160,7 @@ const CreateTripDetail = () => {
                                     )
                                 })
                             ) : null} */}
-                        </MapContainer>
+                        {/* </MapContainer> */}
                     </Box>
                     <Box>Thong tin trip</Box>
                 </Box>

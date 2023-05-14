@@ -6,6 +6,7 @@ import ChoseTruckAndOrders from "../ChoseTruckAndOrders";
 import OrderArrangement from "../OrderArrangement";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import TruckAndOrder from "./TruckAndOrder";
+import MapComponent from "../routing/Map";
 
 const { Box, Typography, Button, Divider, Icon } = require("@mui/material")
 
@@ -19,7 +20,7 @@ const TripDetail = () => {
     const [truckSelect, setTruckSelect] = useState([]);
     const [orders, setOrders] = useState([]);
     const [ordersSelect, setOrdersSelect] = useState([]);
-    const [tripItems, setTripItems] = useState([]);
+    const [tripItems, setTripItem] = useState([]);
     useEffect(() => {
         request(
             "post",
@@ -37,13 +38,13 @@ const TripDetail = () => {
             // let orderTmp = res.data.data.filter(item => checkScheduler(item.id, "order"))
             setOrders(res.data.data);
         });
-        
+
         request(
             "post",
             `/tripItem/${tripId}`, {}, {}, {}, {},
         ).then((res) => {
-            
-            setTripItems(res.data.data);
+
+            setTripItem(res.data.data);
         });
     }, [])
     useEffect(() => {
@@ -51,20 +52,17 @@ const TripDetail = () => {
             "post",
             `/trip/${tripId}`, {}, {}, {}, {},
         ).then((res) => {
-            console.log("trip", res.data.data);
-            console.log("truck111", trucks)
-            // setTrip(res.data.data);
+            console.log("res", res)
+            setOrdersSelect(res.data.data.orders);
             trucks.forEach((item) => {
-                console.log("123", item.id == res.data.data.truckId);
-                if(item.id == res.data.data.truckId){
-                    console.log("tr999ip", item);
+                if (item.id == res.data.data.truckId) {
                     setTruckSelect(item)
                 }
-                    
+
             })
         });
     }, [trucks, tripId])
-    
+
     return (
         <Box className="trip-detail">
             <Box className="header-trip-detail">
@@ -94,30 +92,14 @@ const TripDetail = () => {
             <Box className="content-trip">
                 <Box className="content-truck-and-orders">
                     <TruckAndOrder trucks={trucks} setTruckSelect={setTruckSelect} truckSelect={truckSelect}
-                    orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} />
+                        orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} tripId={tripId} />
                 </Box>
-                {/* <Box className="order-arrangement">
-                    <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} />
-                </Box> */}
+                <Box className="order-arrangement">
+                    <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} tripId={tripId} />
+                </Box>
                 <Box className="map-order">
                     <Box>
-                        <MapContainer center={[21.018172, 105.829754]} zoom={13} scrollWheelZoom={false} style={{ height: "70vh" }}>
-                            <TileLayer
-                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            />
-                            {/* {(tripItems != null && tripItems.length > 0) ? (
-                                tripItems.map((item) => {
-                                    return ( */}
-                                        <Marker position={[21.018172, 105.829754]}>
-                                            <Popup>
-                                                A pretty CSS3 popup. <br /> Easily customizable.
-                                            </Popup>
-                                        </Marker>
-                                    {/* )
-                                })
-                            ) : null} */}
-                        </MapContainer>
+                        <MapComponent tripItems={tripItems} />
                     </Box>
                     <Box>Thong tin trip</Box>
                 </Box>
