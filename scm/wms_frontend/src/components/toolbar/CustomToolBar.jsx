@@ -19,7 +19,6 @@ const CustomToolBar = ({ actions, containSearch = true }) => {
     1000,
     [keyword]
   );
-
   return (
     <Box ref={ref} sx={{ paddingY: 2 }}>
       <Stack direction={"row-reverse"} spacing={2}>
@@ -34,7 +33,7 @@ const CustomToolBar = ({ actions, containSearch = true }) => {
                 size="small"
                 key={index}
                 disabled={action.disabled}
-                color={"secondary"}
+                color={action?.color ? action?.color : "secondary"}
                 onClick={action.type !== "type" ? action.callback : undefined}
               >
                 <Tooltip title={action.describe}>
@@ -59,7 +58,7 @@ const CustomToolBar = ({ actions, containSearch = true }) => {
                 disabled={action.disabled}
                 startIcon={action.icon}
                 variant="contained"
-                color={"secondary"}
+                color={action?.color ? action?.color : "secondary"}
                 onClick={action.type !== "type" ? action.callback : undefined}
                 sx={{
                   fontSize: 12,

@@ -78,7 +78,7 @@ export const useUpdatePurchaseOrderStatus = (params) => {
       }
     },
     onSuccess: (res, variables, context) => {
-      toast.success("Cập nhật đơn mua thành công!");
+      toast.success("Phê duyệt đơn mua thành công!");
       queryClient.invalidateQueries([queryKey.purchase_order.order_list]);
     },
     onError: () => {

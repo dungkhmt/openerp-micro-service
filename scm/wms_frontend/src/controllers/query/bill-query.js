@@ -72,22 +72,11 @@ export const useCreateReceiptBill = (params) => {
         toast.success(res.message);
         queryClient.invalidateQueries([
           queryKey.receipt_bill.bill_item_of_purchase_order,
+          queryKey.receipt_bill.receipt_bill_list,
         ]);
         return res.data;
-      } else {
-        // toast.error(res.message);
       }
     },
-    onSuccess: (res, variables, context) => {
-      queryClient.invalidateQueries([
-        queryKey.receipt_bill.bill_item_of_purchase_order,
-      ]);
-    },
-    onError: (err) => {
-      toast.error(err);
-    },
-    // befor mutation function actually triggers.
-    onMutate: (variables) => {},
   });
 };
 
@@ -155,22 +144,11 @@ export const useCreateDeliveryBill = (params) => {
         toast.success(res.message);
         queryClient.invalidateQueries([
           queryKey.delivery_bill.bill_item_of_delivery_order,
+          queryKey.delivery_bill.delivery_bill_list,
         ]);
         return res.data;
-      } else {
-        // toast.error(res.message);
       }
     },
-    onSuccess: (res, variables, context) => {
-      queryClient.invalidateQueries([
-        queryKey.delivery_bill.bill_item_of_delivery_order,
-      ]);
-    },
-    onError: (err) => {
-      toast.error(err);
-    },
-    // befor mutation function actually triggers.
-    onMutate: (variables) => {},
   });
 };
 export const useGetSplittedBillItem = (params) => {
@@ -207,21 +185,7 @@ export const useCreateSplitBillItem = (params) => {
           queryKey.delivery_bill.bill_item_of_bill,
         ]);
         return res.data;
-      } else {
-        // toast.error(res.message);
       }
     },
-    onSuccess: (res, variables, context) => {
-      queryClient.invalidateQueries([
-        queryKey.delivery_bill.splitted_bill_item,
-        queryKey.facility.facility_inventory,
-        queryKey.delivery_bill.bill_item_of_bill,
-      ]);
-    },
-    onError: (err) => {
-      toast.error(err);
-    },
-    // befor mutation function actually triggers.
-    onMutate: (variables) => {},
   });
 };

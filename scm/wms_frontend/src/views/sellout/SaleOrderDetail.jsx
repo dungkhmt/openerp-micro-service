@@ -11,7 +11,6 @@ import {
   useGetBillItemOfSaleOrder,
   useGetDeliveryBillList,
 } from "controllers/query/bill-query";
-import { useGetProductList } from "controllers/query/category-query";
 import { unix } from "moment";
 import { useCallback, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -74,7 +73,6 @@ function SaleOrderDetailScreen() {
   const { isLoading: isLoadingBill, data: bills } = useGetDeliveryBillList({
     orderCode: currOrder?.code,
   });
-  const { isLoading: isLoadingProduct, data: product } = useGetProductList();
   const renderCustomTable = useCallback(() => {
     return (
       <CustomOrderTable
@@ -82,7 +80,7 @@ function SaleOrderDetailScreen() {
         currOrder={currOrder}
       />
     );
-  }, [orderItem]);
+  }, [orderItem, currOrder]);
   const renderCustomBill = useCallback(() => {
     return (
       <CustomDeliveryBillTable

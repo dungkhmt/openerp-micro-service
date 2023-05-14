@@ -51,7 +51,7 @@ const CreateDeliveryBill = ({ setIsAdd, currOrder }) => {
         };
       }),
     };
-    const res = await createBillQuery.mutateAsync(importParams);
+    await createBillQuery.mutateAsync(importParams);
     setIsAdd((pre) => !pre);
     reset();
   };

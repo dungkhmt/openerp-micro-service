@@ -80,8 +80,8 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
             total += orderItem.getPriceUnit() * orderItem.getQuantity();
             purchaseOrderItemRepo.save(item);
         }
-        newOrder.setTotalMoney(total + total * purchaseOrderDTO.getVat() / 100);
-        newOrder.setTotalPayment(total);
+        newOrder.setTotalPayment(total + total * purchaseOrderDTO.getVat() / 100);
+        newOrder.setTotalMoney(total);
         return purchaseOrderRepo.save(newOrder);
     }
 

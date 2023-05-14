@@ -1,23 +1,19 @@
 import AddIcon from "@mui/icons-material/Add";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { Box, Button, Typography } from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { Box } from "@mui/material";
 import { Action } from "components/action/Action";
-import PrimaryButton from "components/button/PrimaryButton";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
-import CustomizedDialogs from "components/dialog/CustomizedDialogs";
 import DraggableDeleteDialog from "components/dialog/DraggableDialogs";
 import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import {
-  useGetPurchaseOrderList,
-  useUpdatePurchaseOrderStatus,
-} from "controllers/query/purchase-order-query";
+import { useGetPurchaseOrderList } from "controllers/query/purchase-order-query";
 import { useState } from "react";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { ORDERS_STATUS } from "shared/AppConstants";
@@ -30,22 +26,21 @@ function PurchaseOrderScreen({ screenAuthorization }) {
     page_size: 50,
   });
   const [isAdd, setIsAdd] = useToggle(false);
-  const [isApproved, setIsApproved] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const { height } = useWindowSize();
-  const { isLoading, data } = useGetPurchaseOrderList();
-  const updatePurchaseOrderQuery = useUpdatePurchaseOrderStatus({
-    orderCode: itemSelected?.code,
-  });
-  const handleUpdateOrder = async () => {
-    let updateData = {
-      status: "accepted",
-    };
-    if (itemSelected) await updatePurchaseOrderQuery.mutateAsync(updateData);
-    setIsApproved((pre) => !pre);
+  const history = useHistory();
+  let { path } = useRouteMatch();
+  const handleButtonClick = (params) => {
+    history.push(`${path}/purchase-order-detail`, {
+      order: params,
+      previous: "purchaseOrderScreen",
+    });
   };
+
+  const { isLoading, data } = useGetPurchaseOrderList();
+
   let actions = [
     {
       title: "Đặt mua",
@@ -58,6 +53,14 @@ function PurchaseOrderScreen({ screenAuthorization }) {
     },
   ];
   const extraActions = [
+    {
+      title: "Xem",
+      callback: (item) => {
+        handleButtonClick(item);
+      },
+      icon: <VisibilityIcon />,
+      color: AppColors.green,
+    },
     {
       title: "Sửa",
       callback: async (item) => {
@@ -74,15 +77,6 @@ function PurchaseOrderScreen({ screenAuthorization }) {
       },
       icon: <DeleteIcon />,
       color: AppColors.error,
-    },
-    {
-      title: "Phê duyệt",
-      callback: (item) => {
-        setIsApproved((pre) => !pre);
-        setItemSelected(item);
-      },
-      icon: <CheckCircleIcon />,
-      color: AppColors.green,
     },
   ];
   return (
@@ -133,26 +127,7 @@ function PurchaseOrderScreen({ screenAuthorization }) {
       >
         <CreatePurOrderForm setIsAdd={setIsAdd} />
       </CustomModal>
-      <CustomizedDialogs
-        open={isApproved}
-        handleClose={setIsApproved}
-        contentTopDivider
-        contentBottomDivider
-        centerTitle="Phê duyệt đơn hàng này?"
-        content={
-          <Typography color="textSecondary" gutterBottom style={{ padding: 8 }}>
-            Bạn có đồng ý phê duyệt đơn hàng đã tạo này?
-          </Typography>
-        }
-        actions={[
-          <Button onClick={setIsApproved}>Hủy bỏ</Button>,
-          <PrimaryButton onClick={handleUpdateOrder}>Phê duyệt</PrimaryButton>,
-        ]}
-        customStyles={{
-          contents: (theme) => ({ width: "100%" }),
-          actions: (theme) => ({ paddingRight: theme.spacing(2) }),
-        }}
-      />
+
       <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
         <HeaderModal onClose={setOpenDrawer} title="Sửa thông tin đơn hàng" />
         {/* <UpdateProductForm /> */}

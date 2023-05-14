@@ -452,6 +452,9 @@ export const splittedBillCols = [
     sortable: false,
     pinnable: true,
     minWidth: 150,
+    valueGetter: (params) => {
+      return params?.row?.product?.name;
+    },
   },
   {
     field: "deliveryBillCode",

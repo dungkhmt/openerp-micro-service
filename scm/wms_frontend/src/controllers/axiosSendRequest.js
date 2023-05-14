@@ -24,18 +24,18 @@ async function axiosSendRequest(
   data = null,
   header = null
 ) {
-  // if (AppConfig.isDebugging) {
-  //   console.log(
-  //     "\n[Axios " + method + "]: \n\t url = ",
-  //     url,
-  //     "\n\t params = ",
-  //     JSON.stringify(params),
-  //     "\n\t data = ",
-  //     JSON.stringify(data),
-  //     "\n\t header = ",
-  //     header
-  //   );
-  // }
+  if (AppConfig.isDebugging) {
+    console.log(
+      "\n[Axios " + method + "]: \n\t url = ",
+      url,
+      "\n\t params = ",
+      JSON.stringify(params),
+      "\n\t data = ",
+      JSON.stringify(data),
+      "\n\t header = ",
+      header
+    );
+  }
 
   // kiểm tra kết nối mạng
   // if (await checkInternetConnection()) {

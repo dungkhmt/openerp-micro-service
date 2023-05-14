@@ -2,6 +2,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box, Button, Typography } from "@mui/material";
 import { Action } from "components/action/Action";
 import PrimaryButton from "components/button/PrimaryButton";
@@ -15,6 +16,7 @@ import {
   useUpdateSaleOrderStatus,
 } from "controllers/query/sale-order-query";
 import { useState } from "react";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import DraggableDeleteDialog from "../../components/dialog/DraggableDialogs";
@@ -35,6 +37,15 @@ function SaleOrderScreen({ screenAuthorization }) {
   const [itemSelected, setItemSelected] = useState(null);
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const { height } = useWindowSize();
+  const history = useHistory();
+  let { path } = useRouteMatch();
+  const handleButtonClick = (params) => {
+    history.push(`${path}/sale-order-detail`, {
+      order: params,
+      previous: "saleOrderScreen",
+    });
+  };
+
   const { isLoading, data } = useGetSaleOrderList();
   const updatePurchaseOrderQuery = useUpdateSaleOrderStatus({
     orderCode: itemSelected?.code,
@@ -59,6 +70,14 @@ function SaleOrderScreen({ screenAuthorization }) {
     },
   ];
   const extraActions = [
+    {
+      title: "Xem",
+      callback: (item) => {
+        handleButtonClick(item);
+      },
+      icon: <VisibilityIcon />,
+      color: AppColors.green,
+    },
     {
       title: "Sửa",
       callback: async (item) => {

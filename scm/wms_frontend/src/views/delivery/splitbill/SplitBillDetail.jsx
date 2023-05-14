@@ -1,24 +1,24 @@
 import AddIcon from "@mui/icons-material/Add";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box, Button, Stack, Typography } from "@mui/material";
+import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomModal from "components/modal/CustomModal";
+import CustomSelect from "components/select/CustomSelect";
+import CustomSplitBillTable from "components/table/CustomSplitBillTable";
 import CustomToolBar from "components/toolbar/CustomToolBar";
 import {
   useGetBillItemsOfBill,
   useGetSplittedBillItem,
 } from "controllers/query/bill-query";
 import { useGetDeliveryTripToAssignBill } from "controllers/query/delivery-trip-query";
-import { useCallback, useState } from "react";
+import { useAssignShipmentToTrip } from "controllers/query/shipment-query";
+import { useCallback, useMemo, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
-import { Action } from "../../../components/action/Action";
-import CustomSelect from "../../../components/select/CustomSelect";
-import CustomSplitBillTable from "../../../components/table/CustomSplitBillTable";
-import { useAssignShipmentToTrip } from "../../../controllers/query/shipment-query";
 import { splittedBillCols } from "../LocalConstant";
 import SplitBillForm from "./components/SplitBillForm";
 function SplitBillDetailScreen({ screenAuthorization }) {
@@ -46,6 +46,7 @@ function SplitBillDetailScreen({ screenAuthorization }) {
     control,
   } = methods;
   const { height } = useWindowSize();
+
   const { isLoading: isLoadingBillItem, data: deliveryBillItems } =
     useGetBillItemsOfBill({
       bill_code: currBills?.code,
@@ -58,15 +59,59 @@ function SplitBillDetailScreen({ screenAuthorization }) {
     useGetDeliveryTripToAssignBill({
       billCode: currBills?.code,
     });
-
   const assignBillToTripQuery = useAssignShipmentToTrip();
+
   const renderCustomTable = useCallback(() => {
     return (
       <CustomSplitBillTable
         items={deliveryBillItems ? deliveryBillItems : []}
       />
     );
-  }, []);
+  }, [deliveryBillItems]);
+
+  const isSplittable = (deliveryBillItems, splittedBillItems) => {
+    let newdeliveryBillItems = deliveryBillItems?.map((item) => {
+      let filteredSplittedItem = splittedBillItems?.filter(
+        (i) => i?.deliveryBillItemSeqId === item?.seqId
+      );
+      let splittedQty = filteredSplittedItem?.reduce(
+        (pre, curr) => pre + curr.quantity,
+        0
+      );
+
+      return {
+        ...item,
+        splittedQty: splittedQty,
+      };
+    });
+    console.log(newdeliveryBillItems);
+    return !newdeliveryBillItems?.reduce((accumulator, curr) => {
+      return accumulator && curr.effectiveQty === curr.splittedQty;
+    }, true);
+  };
+  /**
+   * This code is only used to get product field for splittedBillItem
+   * // start
+   */
+  const addProductToBillItem = (splittedBillItem, deliveryBillItems) => {
+    let newSplittedItem = [];
+    splittedBillItem?.forEach((item) => {
+      deliveryBillItems?.forEach((ditem) => {
+        if (ditem?.seqId === item?.deliveryBillItemSeqId) {
+          item["product"] = ditem?.product;
+          newSplittedItem = [...newSplittedItem, item];
+        }
+      });
+    });
+    return newSplittedItem;
+  };
+  const newSplittedItem = useMemo(() => {
+    addProductToBillItem(splittedBillItems, deliveryBillItems);
+  }, [splittedBillItems, deliveryBillItems]);
+  /**
+   * This code is only used to get product field for splittedBillItem
+   * // end
+   */
   let actions = [
     {
       title: "Chia đơn",
@@ -75,7 +120,7 @@ function SplitBillDetailScreen({ screenAuthorization }) {
       },
       icon: <AddIcon />,
       describe: "Thêm bản ghi mới",
-      disabled: false,
+      disabled: !isSplittable(deliveryBillItems, splittedBillItems),
     },
   ];
   const extraActions = [
@@ -94,6 +139,7 @@ function SplitBillDetailScreen({ screenAuthorization }) {
       icon: <AddIcon />,
     },
   ];
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
@@ -209,22 +255,8 @@ function SplitBillDetailScreen({ screenAuthorization }) {
         open={isAddTrip}
         toggle={setIsAddTrip}
         size="sm"
-        style={{ padding: 2, zIndex: 3 }}
+        title="Thêm đơn vào chuyến"
       >
-        <Typography
-          id="modal-modal-title"
-          variant="h6"
-          textTransform="capitalize"
-          letterSpacing={1}
-          fontSize={18}
-          sx={{
-            fontFamily: "Open Sans",
-            color: AppColors.primary,
-            fontWeight: "bold",
-          }}
-        >
-          {"THÊM ĐƠN VÀO CHUYẾN"}
-        </Typography>
         <FormProvider {...methods}>
           <Controller
             control={control}
@@ -249,24 +281,31 @@ function SplitBillDetailScreen({ screenAuthorization }) {
             )}
           />
         </FormProvider>
-        <Button
-          onClick={handleSubmit(async (data) => {
-            let tripCode = data?.trips?.name.split("-")[0];
-            let assignParams = {
-              shipmentItemCode: currShipmentItem?.code,
-              tripCode: tripCode,
-            };
-            await assignBillToTripQuery.mutateAsync(assignParams);
-            setIsAddTrip((pre) => !pre);
-          })}
-          variant="contained"
-          style={{ marginRight: 20, color: "white" }}
+        <Stack
+          sx={{ marginY: 2 }}
+          direction={"row"}
+          spacing={2}
+          justifyContent={"flex-end"}
         >
-          Submit
-        </Button>
-        <Button onClick={() => reset()} variant={"outlined"}>
-          Reset
-        </Button>
+          <Button onClick={() => reset()} variant={"outlined"}>
+            Reset
+          </Button>
+          <Button
+            onClick={handleSubmit(async (data) => {
+              let tripCode = data?.trips?.name.split("-")[0];
+              let assignParams = {
+                shipmentItemCode: currShipmentItem?.code,
+                tripCode: tripCode,
+              };
+              await assignBillToTripQuery.mutateAsync(assignParams);
+              setIsAddTrip((pre) => !pre);
+            })}
+            variant="contained"
+            style={{ color: "white" }}
+          >
+            Submit
+          </Button>
+        </Stack>
       </CustomModal>
     </Box>
   );

@@ -15,7 +15,6 @@ export const useGetProductList = (params) => {
       }
     },
     keepPreviousData: true,
-    onSuccess: (data) => {},
   });
 };
 export const useGetCustomerList = (params) => {
@@ -28,7 +27,6 @@ export const useGetCustomerList = (params) => {
       }
     },
     keepPreviousData: true,
-    onSuccess: (data) => {},
   });
 };
 export const useGetProductCateList = (params) => {
@@ -41,7 +39,6 @@ export const useGetProductCateList = (params) => {
       }
     },
     keepPreviousData: true,
-    onSuccess: (data) => {},
   });
 };
 
@@ -55,7 +52,6 @@ export const useGetProductUnitList = (params) => {
       }
     },
     keepPreviousData: true,
-    onSuccess: (data) => {},
   });
 };
 
@@ -69,7 +65,6 @@ export const useGetDistChannelList = (params) => {
       }
     },
     keepPreviousData: true,
-    onSuccess: (data) => {},
   });
 };
 
@@ -83,7 +78,6 @@ export const useGetCustomerType = (params) => {
       }
     },
     keepPreviousData: true,
-    onSuccess: (data) => {},
   });
 };
 
@@ -97,7 +91,6 @@ export const useGetContractType = (params) => {
       }
     },
     keepPreviousData: true,
-    onSuccess: (data) => {},
   });
 };
 

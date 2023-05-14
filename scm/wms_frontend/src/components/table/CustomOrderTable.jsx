@@ -86,25 +86,27 @@ const CustomOrderTable = ({ items, currOrder }) => {
             <StyledTableCell rowSpan={3} colSpan={2} />
             <StyledTableCell colSpan={2}>Tổng cộng</StyledTableCell>
             <StyledTableCell align="right">
-              {currOrder?.totalPayment}
+              {currOrder?.totalMoney}
             </StyledTableCell>
           </StyledTableRow>
           <StyledTableRow>
             <StyledTableCell colSpan={1}>
-              {currOrder?.vat ? "Thuế" : "Khuyến mãi"}
+              {currOrder?.vat !== null ? "Thuế" : "Khuyến mãi"}
             </StyledTableCell>
             <StyledTableCell align="right">{`${
-              currOrder?.vat ? currOrder?.vat : currOrder?.discount
+              currOrder?.vat !== null ? currOrder?.vat : currOrder?.discount
             } %`}</StyledTableCell>
             <StyledTableCell align="right">
               {currOrder?.totalPayment *
-                (currOrder?.vat ? currOrder?.vat : currOrder?.discount / 100)}
+                (currOrder?.vat !== null
+                  ? currOrder?.vat / 100
+                  : currOrder?.discount / 100)}
             </StyledTableCell>
           </StyledTableRow>
           <StyledTableRow>
             <StyledTableCell colSpan={2}>Tổng phải trả</StyledTableCell>
             <StyledTableCell align="right">
-              {currOrder?.totalMoney}
+              {currOrder?.totalPayment}
             </StyledTableCell>
           </StyledTableRow>
         </TableBody>
