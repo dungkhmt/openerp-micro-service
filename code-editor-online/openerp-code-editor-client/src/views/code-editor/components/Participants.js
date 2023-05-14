@@ -13,8 +13,8 @@ import {
 import React from "react";
 import CircleIcon from "@mui/icons-material/Circle";
 import { useSelector } from "react-redux";
-import { CHARACTER_COLOR } from "utils/constants";
 import { Mic } from "@mui/icons-material";
+import randomColor from "randomcolor";
 
 const Participants = () => {
   const { participants } = useSelector((state) => state.codeEditor);
@@ -45,7 +45,7 @@ const Participants = () => {
               }
             >
               <ListItemAvatar>
-                <Avatar sx={{ bgcolor: CHARACTER_COLOR[value.fullName.toUpperCase()[0]] }}>{`${
+                <Avatar sx={{ bgcolor: randomColor({luminosity: 'dark', count: 27}) }}>{`${
                   value.fullName.toUpperCase()[0]
                 }`}</Avatar>
               </ListItemAvatar>

@@ -3,7 +3,6 @@ dotenv.config();
 const express = require("express");
 const cors = require("cors");
 
-
 const app = express();
 const http = require("http");
 const { SOCKET_IO_EVENTS } = require("./constants");
@@ -35,7 +34,7 @@ io.on("connection", (socket) => {
 
     clients.forEach((client) => {
       let socketId = client.socketId;
-      
+
       io.to(socketId).emit(SOCKET_IO_EVENTS.JOINED, {
         fullName: fullName,
         socketId: socket.id,
@@ -48,6 +47,22 @@ io.on("connection", (socket) => {
       socket.broadcast
         .to(roomId)
         .emit(SOCKET_IO_EVENTS.RECEIVE_CODE_CHANGES, { language: language, source: source });
+    });
+
+    socket.on(SOCKET_IO_EVENTS.UPDATE_USER_PERMISSION, ({ userId, accessPermission }) => {
+      socket.broadcast
+        .to(roomId)
+        .emit(SOCKET_IO_EVENTS.REFRESH_USER_PERMISSION, { userId, accessPermission });
+    });
+
+    socket.on(SOCKET_IO_EVENTS.UPDATE_ROOM_PERMISSION, ({ roomId, isPublic, accessPermission }) => {
+      socket.broadcast
+        .to(roomId)
+        .emit(SOCKET_IO_EVENTS.REFRESH_ROOM_PERMISSION, { isPublic, accessPermission });
+    });
+
+    socket.on(SOCKET_IO_EVENTS.DELETE_USER_PERMISSION, ({ userId }) => {
+      socket.broadcast.to(roomId).emit(SOCKET_IO_EVENTS.REFRESH_DELETE_PERMISSION, { userId });
     });
   });
 
