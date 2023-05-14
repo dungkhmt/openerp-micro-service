@@ -1,6 +1,7 @@
 import { Box, Grid, TextField, Typography } from "@mui/material";
 import { request } from "api";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
+import LoadingScreen from "components/common/loading/loading";
 import { Fragment, useEffect, useState } from "react";
 import { API_PATH } from "screens/apiPaths";
 import useStyles from 'screens/styles.js';
@@ -11,19 +12,26 @@ const ShipmentDetail = ( props ) => {
   const classes = useStyles();
   const [shipmentInfo, setShipmentInfo] = useState({});
   const [tripTableData, setTripTableData] = useState([]);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    request(
-      "get",
-      `${API_PATH.DELIVERY_MANAGER_SHIPMENT}/${shipmentId}`,
-      (res) => {
-        setShipmentInfo(res.data);
-        setTripTableData(res.data.trips);
-      }
-    );
+    const fetchData = async () => {
+      await request(
+        "get",
+        `${API_PATH.DELIVERY_MANAGER_SHIPMENT}/${shipmentId}`,
+        (res) => {
+          setShipmentInfo(res.data);
+          setTripTableData(res.data.trips);
+        }
+      );
+      setLoading(false);
+    }
+    fetchData();
   }, []);
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <Box>
       <Grid container justifyContent="space-between" 
         className={classes.headerBox} >
@@ -106,7 +114,6 @@ const ShipmentDetail = ( props ) => {
       </Box>
 
       <StandardTable 
-        hideCommandBar={true}
         title="Danh sách các chuyến giao hàng"
         options={{
           selection: false,
@@ -124,7 +131,7 @@ const ShipmentDetail = ( props ) => {
         ]}
       />
     </Box>
-  </Fragment>
+  </Fragment>);
 };
 
 export default ShipmentDetail;

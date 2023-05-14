@@ -6,14 +6,14 @@ export const customer = {
     {
       id: "MENU_WMSv2_CUSTOMER.PRODUCTS",
       path: "/customer/products",
-      isPublic: true,
+      isPublic: false,
       text: "Mua hàng online",
       child: [],
     },
     {
       id: "MENU_WMSv2_CUSTOMER.CART",
       path: "/customer/cart",
-      isPublic: true,
+      isPublic: false,
       text: "Giỏ hàng",
       child: [],
     },

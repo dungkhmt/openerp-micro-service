@@ -4,7 +4,7 @@ import { Button, Grid, MenuItem, Select, TextField, Typography } from "@mui/mate
 import { Box } from "@mui/system";
 import useStyles from "screens/styles";
 import { useForm } from "react-hook-form";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { request } from "api";
 import { API_PATH } from "../apiPaths";
 import { getProductNameFromProductId, getWarehouseNameByWarehouseId } from "../utils/utils";
@@ -13,6 +13,7 @@ import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
 
 import { Fragment, useState, useEffect } from "react";
+import LoadingScreen from "components/common/loading/loading";
 
 const ReceiptRequestDetail = ( props ) => {
   const history = useHistory();
@@ -23,6 +24,8 @@ const ReceiptRequestDetail = ( props ) => {
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [selectedWarehouseId, setSelectedWarehouseId] = useState(null);
 
+  const [newQuantity, setNewQuantity] = useState(0);
+
   const receiptId = props.match?.params?.id;
   const isCreateForm = receiptId == null;
   const [receiptInfo, setReceiptInfo] = useState(null);
@@ -30,6 +33,7 @@ const ReceiptRequestDetail = ( props ) => {
   // Data fetched from server
   const [productList, setProductList] = useState([]);
   const [warehouseList, setWarehouseList] = useState([]);
+  const [isLoading, setLoading] = useState(true);
 
   const ProductDropDown = ({ productList, setSelectedProduct }) => {
     return <Select onChange={(e) => setSelectedProduct(e.target.value)}>
@@ -67,7 +71,8 @@ const ReceiptRequestDetail = ( props ) => {
       (res) => {
         if (res.status == 200) {
           successNoti("Tạo đơn xin nhập hàng hóa thành công");
-          history.push(`${path.replace('/create', '')}`);
+          setProductTableData([]);
+          history.push(`${path}`);
         } else {
           errorNoti("Có lỗi khi tạo đơn. Vui lòng thử lại sau");
         }
@@ -99,7 +104,7 @@ const ReceiptRequestDetail = ( props ) => {
       )
 
       if (!isCreateForm) {
-        request(
+        await request(
           "get",
           API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "/" + receiptId,
           (res) => {
@@ -108,19 +113,22 @@ const ReceiptRequestDetail = ( props ) => {
           }
         )
       }
+
+      setLoading(false)
     }
 
     fetchData();
   }, []);
 
   return (
+    isLoading ? <LoadingScreen /> : 
     <Fragment>
       <Box>
         <Grid container justifyContent="space-between" 
           className={classes.headerBox} >
           <Grid>
             <Typography variant="h5">
-              {"Tạo mới đơn xin nhập hàng"}
+              Tạo mới đơn xin nhập hàng
             </Typography>
           </Grid>
           {
@@ -185,15 +193,20 @@ const ReceiptRequestDetail = ( props ) => {
                   Danh sách hàng hóa
                 </Typography> */}
                 <StandardTable 
+                  rowKey="productName"
                   title="Danh sách hàng hóa"
                   columns={[
                     { title: "Tên hàng hóa", field: "productName", 
-                      editComponent: props => <ProductDropDown 
+                      editComponent: <ProductDropDown 
                         setSelectedProduct={setSelectedProductId}
                         productList={productList} /> },
-                    { title: "Số lượng", field: "quantity", type: "numeric" },
+                    { title: "Số lượng", field: "quantity",
+                      editComponent: <TextField
+                        type={"number"}
+                        value={newQuantity}
+                        onChange={(e) => setNewQuantity(parseInt(e.target.value))} /> },
                     { title: "Kho nhận (không bắt buộc)", field: "warehouseName", 
-                      editComponent: props => <WarehouseDropDown 
+                      editComponent: <WarehouseDropDown 
                         setSelectedWarehouseId={setSelectedWarehouseId}
                         warehouseList={warehouseList} />}
                   ]}
@@ -209,17 +222,17 @@ const ReceiptRequestDetail = ( props ) => {
                     onRowAdd: newData => new Promise((resolve, reject) => {
                       setTimeout(() => {
                         console.log("new data => ", newData);
-                        if (newData.quantity == undefined 
+                        if (newQuantity == undefined 
                           || selectedProductId == null 
-                          || newData.quantity == null 
-                          || newData.quantity < 1) {
+                          || newQuantity == null 
+                          || newQuantity < 1) {
                           errorNoti("Vui lòng kiểm tra lại thông tin đơn hàng vừa nhập.");
                           reject();
                         } else {
                           const newRow = {
                             "productId": selectedProductId,
                             "productName": getProductNameFromProductId(selectedProductId, productList),
-                            "quantity": newData.quantity,
+                            "quantity": newQuantity,
                             "warehouseId": selectedWarehouseId,
                             "warehouseName": getWarehouseNameByWarehouseId(selectedWarehouseId, warehouseList)
                           }
@@ -230,12 +243,11 @@ const ReceiptRequestDetail = ( props ) => {
                         }
                       });
                     }),
-                    onRowDelete: oldData => new Promise((resolve, reject) => {
+                    onRowDelete: selectedProductNames => new Promise((resolve, reject) => {
                       setTimeout(() => {
-                        console.log("Old data => ", oldData);
-                        const dataDelete = [...productTableData];
-                        const index = oldData.tableData.id;
-                        dataDelete.splice(index, 1);
+                        console.log("selected data => ", selectedProductNames);
+                        const dataDelete = productTableData.filter(
+                          product => !selectedProductNames.includes(product["productName"]));
                         setProductTableData([...dataDelete]);
                         resolve();
                       });

@@ -1,12 +1,13 @@
 import { TextField } from "@mui/material";
 import { request } from "api";
-import StandardTable from "components/table/StandardTable"
+import StandardTable from "components/StandardTable"
 import { Fragment, useEffect, useState } from "react"
 import { API_PATH } from "screens/apiPaths";
 import { convertTimeStampToDate, getCurrentDateInString } from "screens/utils/utils";
 import { errorNoti, successNoti } from "utils/notification";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
+import LoadingScreen from "components/common/loading/loading";
 
 const ShipmentListing = () => {
   const history = useHistory();
@@ -17,48 +18,62 @@ const ShipmentListing = () => {
   const [userLoginId, setUserLoginId] = useState(null);
   const now = getCurrentDateInString();
   const [expectDeliveryDate, setExpectDeliveryDate] = useState(null);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    request(
-      "get",
-      API_PATH.DELIVERY_MANAGER_SHIPMENT,
-      (res) => {
-        var data = res.data;
-        for (var i = 0; i < data?.length; i++) {
-          data[i].numOrder = i + 1;
-          data[i].expectedDeliveryStamp = convertTimeStampToDate(data[i].expectedDeliveryStamp);
+    const fetchData = async () => {  
+      await request(
+        "get",
+        API_PATH.DELIVERY_MANAGER_SHIPMENT,
+        (res) => {
+          var data = res.data;
+          for (var i = 0; i < data?.length; i++) {
+            data[i].numOrder = i + 1;
+            data[i].expectedDeliveryStamp = convertTimeStampToDate(data[i].expectedDeliveryStamp);
+          }
+          setShipmentTableData(res.data);
+          setNumOrder(data.length + 1);
         }
-        setShipmentTableData(res.data);
-        setNumOrder(data.length + 1);
-      }
-    );
+      );
 
-    request(
-      "get",
-      API_PATH.GET_USER_LOGIN_ID,
-      (res) => {
-        setUserLoginId(res.data);
-      }
-    )
+      await request(
+        "get",
+        API_PATH.GET_USER_LOGIN_ID,
+        (res) => {
+          setUserLoginId(res.data);
+        }
+      );
+
+      setLoading(false);
+    }
+
+    fetchData();
   }, []);
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <StandardTable
       hideCommandBar={true}
+      rowKey="shipmentId"
       title="Danh sách chuyến giao hàng"
       data={shipmentTableData}
       columns={[
-        { title: "Số thứ tự", field: "numOrder", editComponent: props => <TextField value={numOrder}/> },
-        { title: "Mã chuyến", field: "shipmentId", editComponent: props => <TextField InputProps={{readOnly: true}}/> },
-        { title: "Ngày tạo", field: "createdStamp", editComponent: props => <TextField value={now}/> },
-        { title: "Người tạo", field: "createdBy", editComponent: props => <TextField value={userLoginId}/> }, 
+        // { title: "Số thứ tự", field: "numOrder", 
+        //   editComponent: <TextField value={numOrder}/> },
+        { title: "Mã chuyến", field: "shipmentId", 
+          editComponent: <TextField InputProps={{readOnly: true}}/> },
+        { title: "Ngày tạo", field: "createdStamp", 
+          editComponent: <TextField value={now}/> },
+        { title: "Người tạo", field: "createdBy", 
+          editComponent: <TextField value={userLoginId}/> }, 
         { title: "Ngày giao hàng dự kiến", field: "expectedDeliveryStamp", 
-          editComponent: props => <TextField type="date" value={expectDeliveryDate} 
+          editComponent: <TextField type="date" value={expectDeliveryDate} 
           onChange={(e) => setExpectDeliveryDate(e.target.value)} /> }
       ]}
       options={{
         selection: false,
-        pageSize: 5,
+        pageSize: 10,
         search: true,
         sorting: true,
       }}
@@ -81,7 +96,6 @@ const ShipmentListing = () => {
                     expectedDeliveryStamp: convertTimeStampToDate(expectDeliveryDate),
                     shipmentId: res.data
                   };
-                  console.log("Adder => ", adder);
                   setShipmentTableData([...shipmentTableData, adder]);
                   resolve();
                 }
@@ -95,14 +109,27 @@ const ShipmentListing = () => {
             )
           });
         }),
-        onRowDelete: oldData => new Promise((resolve, reject) => {
+        onRowDelete: selectedIds => new Promise((resolve, reject) => {
           setTimeout(() => {
-            console.log("Old data => ", oldData);
+            console.log("Selected ids => ", selectedIds);
+            request(
+              "delete",
+              `${API_PATH.DELIVERY_MANAGER_SHIPMENT}/${selectedIds.join(',')}`,
+              (res) => {
+                successNoti("Xóa bản ghi thành công");
+                const dataDelete = shipmentTableData.filter(
+                  shipment => !selectedIds.includes(shipment["shipmentId"]));
+                setShipmentTableData([...dataDelete]);
+              },
+              {
+                500: () => errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau")
+              }
+            )
           })
         })
       }}
     />
-  </Fragment>
+  </Fragment>);
 }
 
 export default ShipmentListing;

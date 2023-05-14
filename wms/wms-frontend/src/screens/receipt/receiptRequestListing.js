@@ -3,7 +3,7 @@
 // chỉ liệt kê các đơn xin nhập hàng do user này tạo
 
 import { request } from "api";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { Link } from "react-router-dom";
 import { API_PATH } from "../apiPaths";
 import AddIcon from '@mui/icons-material/Add';
@@ -11,26 +11,33 @@ import { useRouteMatch } from "react-router-dom";
 import { convertTimeStampToDate } from "screens/utils/utils";
 
 import { Fragment, useState, useEffect } from "react";
+import LoadingScreen from "components/common/loading/loading";
 
 const ReceiptRequestListing = () => {
   const { path } = useRouteMatch();
 
   const [receiptTableData, setReceiptTableData] = useState([]);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    request(
-      "get",
-      API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST,
-      (res) => {
-        const data = [];
-        for (var i = 0; i < res.data?.length; i++) {
-          var tempData = res.data[i];
-          tempData.createdDate = convertTimeStampToDate(tempData?.createdDate);
-          data.push(tempData);
+    const fetchData = async() => {
+      await request(
+        "get",
+        API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST,
+        (res) => {
+          const data = [];
+          for (var i = 0; i < res.data?.length; i++) {
+            var tempData = res.data[i];
+            tempData.createdDate = convertTimeStampToDate(tempData?.createdDate);
+            data.push(tempData);
+          }
+          setReceiptTableData(res.data);
         }
-        setReceiptTableData(res.data);
-      }
-    )
+      );
+      setLoading(false);
+    }
+
+    fetchData();
   }, []);
 
   const columns = [
@@ -40,7 +47,9 @@ const ReceiptRequestListing = () => {
     { title: "Người hủy", field: "cancelledBy" }
   ];
 
-  return (<Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <StandardTable
       title="Danh sách đơn xin nhập hàng"
       columns={columns}
@@ -51,13 +60,12 @@ const ReceiptRequestListing = () => {
         search: true,
         sorting: true,
       }}
-      hideCommandBar={true}
       onRowClick={ (event, rowData) => {
         window.location.href = `${path}/${rowData.receiptRequestId}`;
       } }
       actions={[
         {
-          icon: () => <Link to={`${path}/create`}>
+          icon: <Link to={`${path}/create`}>
             <AddIcon />
           </Link>,
           tooltip: "Tạo đơn xin nhập hàng mới",

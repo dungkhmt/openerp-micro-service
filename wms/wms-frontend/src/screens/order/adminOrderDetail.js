@@ -2,18 +2,18 @@ import LoadingScreen from "components/common/loading/loading";
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { request } from "api";
 import { BayDropDown, ProductDropDown, WarehouseDropDown } from "components/table/DropDown";
-import StandardTable from "components/table/StandardTable";
-import React, { Fragment, useEffect, useRef, useState } from "react"
+import StandardTable from "components/StandardTable";
+import React, { Fragment, useEffect, useState } from "react"
 import { API_PATH } from "screens/apiPaths";
 import useStyles from 'screens/styles';
-import { convertTimeStampToDate, convertToVNDFormat } from "screens/utils/utils";
+import { convertToVNDFormat } from "screens/utils/utils";
 import { errorNoti, successNoti } from "utils/notification";
 
 const AdminOrderDetail = ( props ) => {
   const orderId = props.match?.params?.id;
   const classes = useStyles();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [orderInfo, setOrderInfo] = useState({});
   const [processingItems, setProcessingItems] = useState([]);
   const [processedItems, setProcessedItems] = useState([]);
@@ -45,7 +45,7 @@ const AdminOrderDetail = ( props ) => {
 
   useEffect(() => {
     async function fetchData () {
-      request(
+      await request(
         "get",
         `${API_PATH.ADMIN_SALE_ORDER}/${orderId}`,
         (res) => {
@@ -54,13 +54,15 @@ const AdminOrderDetail = ( props ) => {
         }
       );
 
-      request(
+      await request(
         "get",
         API_PATH.WAREHOUSE_DETAIL_WITH_PRODUCT,
         (res) => {
           setAllWarehouses(res.data);
         }
-      )
+      );
+
+      setLoading(false);
     }
 
     fetchData();
@@ -186,7 +188,7 @@ const AdminOrderDetail = ( props ) => {
                     fullWidth
                     variant="outlined"
                     size="small"
-                    value={convertTimeStampToDate(orderInfo?.createdDate)}
+                    value={orderInfo?.createdDate}
                     InputProps={{
                       readOnly: true,
                     }}
@@ -325,26 +327,27 @@ const AdminOrderDetail = ( props ) => {
       />
 
       <StandardTable
+        rowKey="productId"
         title="Danh sách sản phẩm đang xử lý"
         hideCommandBar={true}
         columns={[
           { title: "Tên sản phẩm", field: "productName",
-            editComponent: props => <ProductDropDown 
+            editComponent: <ProductDropDown 
               productList={orderInfo?.items} 
               setSelectedProductId={setSelectedProductId}
               setSelectedProductName={setSelectedProductName} /> },
           { title: "Kho", field: "warehouseName",
-            editComponent: props => <WarehouseDropDown
+            editComponent: <WarehouseDropDown
               warehouseList={warehouseList}
               setSelectedWarehouseId={setSelectedWarehouseId}
               setSelectedWarehouseName={setSelectedWarehouseName} />},
           { title: "Vị trí kệ hàng", field: "bayCode",
-            editComponent: props => <BayDropDown
+            editComponent: <BayDropDown
               selectedWarehouse={selectedWarehouse} 
               setSelectedBayId={setSelectedBayId}
               setSelectedBayCode={setSelectedBayCode} /> },
           { title: "Số lượng", field: "quantity", 
-            editComponent: props => <TextField
+            editComponent: <TextField
               type="number"
               InputProps={{
                 inputProps: { 

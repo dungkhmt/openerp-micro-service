@@ -1,54 +1,44 @@
 import { request } from "api";
 import { API_PATH } from "../apiPaths";
-import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
-
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { Fragment, useState, useEffect } from "react";
-import { convertTimeStampToDate } from "screens/utils/utils";
+import LoadingScreen from "components/common/loading/loading";
 
 const ReceiptRequestProcessListing = () => {
 
   const [receiptTableData, setReceiptTableData] = useState([]);
   const [processedReceiptTableData, setProcessedReceiptTableData] = useState([]);
-  const history = useHistory();
   const { path } = useRouteMatch();
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    request(
-      "get",
-      API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "?status=APPROVED,IN_PROGRESS",
-      (res) => {
-        var data = res.data;
-        for (var i = 0; i < data.length; i++) {
-          const createdTimestamp = data[i]?.createdDate;
-          const dateFormated = convertTimeStampToDate(createdTimestamp);
-          data[i].createdDate = dateFormated;
-
-          const expectedReceiveTimestamp = data[i]?.expectedReceiveDate;
-          const expectedReceiveDate = convertTimeStampToDate(expectedReceiveTimestamp);
-          data[i].expectedReceiveDate = expectedReceiveDate;
+    const fetchData = async () => {
+      await request(
+        "get",
+        API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "?status=APPROVED,IN_PROGRESS",
+        (res) => {
+          setReceiptTableData(res.data);
         }
-        setReceiptTableData(data);
-      }
-    );
+      );
 
-    request(
-      "get",
-      API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "?status=CANCELLED,COMPLETED",
-      (res) => {
-        var data = res.data;
-        for (var i = 0; i < data.length; i++) {
-          const createdTimestamp = data[i]?.createdDate;
-          const dateFormated = convertTimeStampToDate(createdTimestamp);
-          data[i].createdDate = dateFormated;
+      await request(
+        "get",
+        API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "?status=CANCELLED,COMPLETED",
+        (res) => {
+          setProcessedReceiptTableData(res.data);
         }
-        setProcessedReceiptTableData(data);
-      }
-    )
+      );
+
+      setLoading(false);
+    }
+
+    fetchData();
   }, []);
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <StandardTable 
       title="Danh sách đơn nhập hàng cần xử lý"
       columns={[
@@ -65,7 +55,6 @@ const ReceiptRequestProcessListing = () => {
         search: true,
         sorting: true,
       }}
-      hideCommandBar={true}
       onRowClick={ (event, rowData) => {
         window.location.href = `${path}/${rowData.receiptRequestId}`;
       } }
@@ -82,7 +71,6 @@ const ReceiptRequestProcessListing = () => {
         { title: "Cập nhật lần cuối", field: "lastUpdateStamp" }
       ]}
       data={processedReceiptTableData}
-      hideCommandBar={true}
       options={{
         selection: false,
         pageSize: 5,
@@ -93,7 +81,7 @@ const ReceiptRequestProcessListing = () => {
         window.location.href = `${path}/${rowData.receiptRequestId}`;
       } }
     />
-  </Fragment>
+  </Fragment>);
 }
 
 export default ReceiptRequestProcessListing;

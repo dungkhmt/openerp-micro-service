@@ -50,6 +50,8 @@ export default  function OptimizePassBookForLoan(){
         {title:"Money Early", field: "moneyEarly"},
         {title:"Money Mature", field: "moneyMature"},        
         {title:"Loan", field: "amountMoneyLoan"},
+        {title:"MoneyEarly", field: "earlyMoneyRetrieved"},
+        
     ];
 
     const classes = useStyles();
@@ -73,7 +75,8 @@ export default  function OptimizePassBookForLoan(){
               endDate: toFormattedDateTime(c.passBook.endDate),
               moneyEarly: c.moneyEarly,
               moneyMature: c.moneyMature,
-              amountMoneyLoan: c.amountMoneyLoan
+              amountMoneyLoan: c.amountMoneyLoan,
+              earlyMoneyRetrieved: c.earlyMoneyRetrieved
             }));
             setLoans(data);
             setRawRs(res.data.info);

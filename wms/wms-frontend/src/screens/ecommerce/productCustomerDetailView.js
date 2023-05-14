@@ -1,12 +1,13 @@
 import { RequireStar } from "components/common/requireStar";
 import React, { useEffect, useState } from "react";
 import { Fragment } from "react";
-import { Box, Grid, Button, Typography, TextField, Select, MenuItem } from "@material-ui/core";
+import { Box, Grid, Button, Typography, TextField, Select, MenuItem } from "@mui/material";
 import useStyles from "screens/styles";
 import { errorNoti, successNoti } from 'utils/notification';
 import { request } from 'api';
 import { API_PATH } from "../apiPaths";
 import { LOCAL_STORAGE } from "components/constants";
+import LoadingScreen from "components/common/loading/loading";
 
 const ProductCustomerDetailView = ( props ) => {
   const classes = useStyles();
@@ -21,6 +22,8 @@ const ProductCustomerDetailView = ( props ) => {
   // for selection field
   const [categoryId, setCategoryId] = useState(null);
   const [uom, setUom] = useState(null);
+
+  const [isLoading, setLoading] = useState(true);
 
   const addToCart = () => {
     // check if product is already added to cart
@@ -59,23 +62,23 @@ const ProductCustomerDetailView = ( props ) => {
   useEffect(() => {
 
     async function fetchData() {
-      const categoryResponse = request(
+      await request(
         "get",
         API_PATH.PRODUCT_CATEGORY,
         (res) => {
-          console.log("Response product category request -> ", res);
           setProductCategories(res.data);
         }
       );
-      const warehouseResponse = request(
+
+      await request(
         "get",
         API_PATH.WAREHOUSE_DETAIL,
         (res) => {
           setWarehouseDetails(res.data);
         }
       );
-      console.log("Get information of product with id ", productId);
-      request(
+
+      await request(
         "get",
         API_PATH.PRODUCT + "/" + productId,
         (res) => {
@@ -89,13 +92,17 @@ const ProductCustomerDetailView = ( props ) => {
           401: () => { },
           503: () => { errorNoti("Có lỗi khi tải dữ liệu của sản phẩm") }
         }
-      )
+      );
+
+      setLoading(false);
     }
 
     fetchData();
 
   }, []);
+
   return (
+    isLoading ? <LoadingScreen /> :
     <Fragment>
 
       <Box>

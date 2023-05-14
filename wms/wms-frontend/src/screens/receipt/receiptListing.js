@@ -3,14 +3,16 @@ import AddIcon from '@mui/icons-material/Add';
 import { Link } from 'react-router-dom';
 import { Fragment, useState, useEffect } from "react";
 import { request } from "api";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { API_PATH } from "../apiPaths";
+import LoadingScreen from "components/common/loading/loading";
 
 const ReceiptListing = () => {
   const { path } = useRouteMatch();
 
   const [receiptTableData, setReceiptTableData] = useState([]);
   const [isHideCommandBar, setHideCommandBar] = useState(true);
+  const [isLoading, setLoading] = useState(true);
 
   const columns = [
     { title: "Tên đơn hàng", field: "receiptName" },
@@ -21,7 +23,7 @@ const ReceiptListing = () => {
 
   useEffect(() => {
     async function fetchData() {
-      request(
+      await request(
         "get",
         API_PATH.RECEIPT,
         (res) => {
@@ -33,18 +35,20 @@ const ReceiptListing = () => {
           400: (e) => { errorNoti(e.response.data.errors[0].message); }
         }
       );
+
+      setLoading(false);
     }
 
     fetchData();
   }, []);
 
   return (
+    isLoading ? <LoadingScreen /> :
     <Fragment>
       <StandardTable 
         title={"Danh sách đơn nhập hàng"}
         columns={columns}
         data={receiptTableData}
-        hideCommandBar={isHideCommandBar}
         options={{
           selection: false,
           pageSize: 20,
@@ -56,7 +60,7 @@ const ReceiptListing = () => {
         } }
         actions={[
           {
-            icon: () => <Link to={`receipt/create`}>
+            icon: <Link to={`receipt/create`}>
               <AddIcon />
             </Link>,
             tooltip: "Tạo đơn hàng mới",

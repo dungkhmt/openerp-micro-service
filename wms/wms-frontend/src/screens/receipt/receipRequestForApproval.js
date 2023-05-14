@@ -1,7 +1,7 @@
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import useStyles from "screens/styles";
 import { useForm } from "react-hook-form";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { request } from "api";
 import { API_PATH } from "../apiPaths";
 import { convertTimeStampToDate } from "../utils/utils";
@@ -10,6 +10,7 @@ import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
 
 import { Fragment, useState, useEffect } from "react";
+import LoadingScreen from "components/common/loading/loading";
 
 const ReceiptRequestForApproval = ( props ) => {
 
@@ -19,6 +20,7 @@ const ReceiptRequestForApproval = ( props ) => {
   
   const [receiptInfo, setReceiptInfo] = useState(null);
   const [productTableData, setProductTableData] = useState([]);
+  const [isLoading, setLoading] = useState(true);
 
   const classes = useStyles();
   const { register, errors, handleSubmit, watch, getValues } = useForm();
@@ -55,20 +57,23 @@ const ReceiptRequestForApproval = ( props ) => {
 
   useEffect(() => {
     async function fetchData () {
-      request(
+      await request(
         "get",
         API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "/" + receiptId,
         (res) => {
           setReceiptInfo(res.data);
           setProductTableData(res.data?.items);
         }
-      )
+      );
+      setLoading(false);
     }
 
     fetchData();
   }, []);
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <Box>
       <Grid container justifyContent="space-between" className={classes.headerBox}>
         <Grid>
@@ -175,14 +180,13 @@ const ReceiptRequestForApproval = ( props ) => {
                   search: true,
                   sorting: true,
                 }}
-                hideCommandBar={true}
               />
             </Box>
           </Grid>
         </Grid>
       </Box>
     </Box>
-  </Fragment>
+  </Fragment>);
 }
 
 export default ReceiptRequestForApproval;

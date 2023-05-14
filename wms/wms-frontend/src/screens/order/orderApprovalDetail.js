@@ -1,13 +1,14 @@
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { request } from "api";
-import StandardTable from "components/table/StandardTable";
+import StandardTable from "components/StandardTable";
 import { Fragment, useEffect, useState } from "react";
 import { API_PATH } from "screens/apiPaths";
 import useStyles from 'screens/styles.js';
-import { convertTimeStampToDate, convertToVNDFormat } from "screens/utils/utils";
+import { convertToVNDFormat } from "screens/utils/utils";
 import { errorNoti, successNoti } from "utils/notification";
 import { useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
+import LoadingScreen from "components/common/loading/loading";
 
 const OrderApprovalDetail = ( props ) => {
   const { path } = useRouteMatch();
@@ -15,16 +16,25 @@ const OrderApprovalDetail = ( props ) => {
   const orderId = props.match?.params?.id;
   const classes = useStyles();
   const [orderInfo, setOrderInfo] = useState({});
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData () {
-      request(
+      await request(
         "get",
         `${API_PATH.ADMIN_SALE_ORDER}/${orderId}`,
         (res) => {
-          setOrderInfo(res.data);
+          var data = res.data;
+          for (var i = 0; i < data?.items?.length; i++) {
+            const cost = data?.items[i]?.priceUnit;
+            const costFormated = convertToVNDFormat(cost);
+            data.items[i].priceUnit = costFormated;
+          }
+          setOrderInfo(data);
         }
-      )
+      );
+
+      setLoading(false);
     }
 
     fetchData();
@@ -62,7 +72,9 @@ const OrderApprovalDetail = ( props ) => {
     )
   }
 
-  return <Fragment>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <Fragment>
     <Box>
       <Grid container justifyContent="space-between" 
         className={classes.headerBox} >
@@ -70,14 +82,20 @@ const OrderApprovalDetail = ( props ) => {
           <Typography variant="h5">
             Thông tin đơn hàng</Typography>
         </Grid>
-        <Grid className={classes.buttonWrap}>
-          <Button variant="contained" className={classes.addButton} 
-            type="submit" onClick={approveOrderButtonHandle} >Phê duyệt</Button>
-        </Grid>
-        <Grid className={classes.buttonWrap}>
-          <Button variant="contained" className={classes.addButton} 
-            type="submit" onClick={cancelOrderButtonHandle} >Hủy đơn hàng</Button>
-        </Grid>
+        {
+          orderInfo?.statusCode == 'CREATED' &&
+          <Grid className={classes.buttonWrap}>
+            <Button variant="contained" className={classes.addButton}
+              type="submit" onClick={approveOrderButtonHandle} >Phê duyệt</Button>
+          </Grid>
+        }
+        {
+          orderInfo?.statusCode == 'CREATED' &&
+          <Grid className={classes.buttonWrap}>
+            <Button variant="contained" className={classes.addButton}
+              type="submit" onClick={cancelOrderButtonHandle} >Hủy đơn hàng</Button>
+          </Grid>
+        }
       </Grid>
 
       <Box className={classes.bodyBox}>
@@ -94,7 +112,7 @@ const OrderApprovalDetail = ( props ) => {
                       fullWidth
                       variant="outlined"
                       size="small"
-                      value={convertTimeStampToDate(orderInfo?.createdDate)}
+                      value={orderInfo?.createdDate}
                       InputProps={{
                         readOnly: true,
                       }}
@@ -263,7 +281,6 @@ const OrderApprovalDetail = ( props ) => {
 
       <StandardTable
         title="Danh sách sản phẩm"
-        hideCommandBar={true}
         options={{
           selection: false,
           pageSize: 5,
@@ -271,14 +288,19 @@ const OrderApprovalDetail = ( props ) => {
           sorting: true,
         }}
         data={orderInfo?.items}
-        columns={[
+        columns={orderInfo?.statusCode == "COMPLETED" ? [
+          { title: "Tên sản phẩm", field: "productName" },
+          { title: "Số lượng", field: "quantity" },
+          { title: "Đơn giá", field: "priceUnit" },
+          { title: "Trạng thái", field: "deliveryStatus" }
+        ] : [
           { title: "Tên sản phẩm", field: "productName" },
           { title: "Số lượng", field: "quantity" },
           { title: "Đơn giá", field: "priceUnit" }
         ]}
       />
     </Box>
-  </Fragment>
+  </Fragment>)
 }
 
 export default OrderApprovalDetail;

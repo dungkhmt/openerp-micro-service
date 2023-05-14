@@ -3,32 +3,38 @@ import { Link } from 'react-router-dom';
 import { ListingMaps } from 'components/map/maps';
 import MapIcon from '@mui/icons-material/Map';
 import AddIcon from '@mui/icons-material/Add';
-import { successNoti } from "utils/notification";
+import { errorNoti, successNoti } from "utils/notification";
 import { request } from "api";
-import CommandBarButton from 'components/button/commandBarButton';
 import React, { useEffect } from "react";
 import { useState } from "react";
-import StandardTable from 'components/table/StandardTable';
+import StandardTable from 'components/StandardTable';
 import { API_PATH } from "../apiPaths";
 import { Box, Modal } from '@material-ui/core';
+import { IconButton } from '@mui/material';
+import LoadingScreen from 'components/common/loading/loading';
 
 const ListWarehouse = () => {
   let { path } = useRouteMatch();
   const [isHideCommandBar, setHideCommandBar] = useState(true);
   const [warehousesTableData, setWarehousesTableData] = useState([]);
   const [isMapModalOpen, setMapModalOpen] = useState(false);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    request(
-      "get",
-      API_PATH.WAREHOUSE,
-      (res) => {
-        const tableData = res.data.map(obj => {
-          obj.tableData = { "checked": false };
-          return obj;
-        })
-        setWarehousesTableData(tableData);
-      })
+    const fetchData = async () => {
+      await request(
+        "get",
+        API_PATH.WAREHOUSE,
+        (res) => {
+          const tableData = res.data.map(obj => {
+            obj.tableData = { "checked": false };
+            return obj;
+          })
+          setWarehousesTableData(tableData);
+      });
+      setLoading(false);
+    }
+    fetchData();
   }, []);
 
   const columns = [
@@ -36,28 +42,6 @@ const ListWarehouse = () => {
     { title: "Code", field: "code" },
     { title: "Địa chỉ", field: "address" }
   ];
-
-  const removeSelectedFacilities = () => {
-    const selectedFacilityIds = warehousesTableData
-      .filter((facility) => facility.tableData.checked == true)
-      .map((obj) => obj.warehouseId);
-    
-    console.log("warehousesTableData: ", warehousesTableData);
-
-    request(
-      "delete",
-      API_PATH.WAREHOUSE,
-      (res) => { 
-        successNoti("Xóa thành công");
-        const newTableData = warehousesTableData.filter(
-          (facility) => !selectedFacilityIds.includes(facility.warehouseId));
-        setWarehousesTableData(newTableData);
-        setHideCommandBar(true);
-      },
-      { },
-      selectedFacilityIds
-    )
-  }
 
   const onSelectionChangeHandle = (rows) => {
     setWarehousesTableData(warehousesTableData);
@@ -68,7 +52,9 @@ const ListWarehouse = () => {
     }
   }
 
-  return <div>
+  return (
+  isLoading ? <LoadingScreen /> :
+  <div>
     <Modal
       open={isMapModalOpen}
       onClose={() => setMapModalOpen(!isMapModalOpen)}
@@ -115,28 +101,47 @@ const ListWarehouse = () => {
           window.location.href = `${path}/update/${rowData.warehouseId}`;
         } } 
         onSelectionChange={onSelectionChangeHandle}
-        commandBarComponents={ <CommandBarButton 
-                                  onClick={removeSelectedFacilities}>
-                                    Xóa
-                                </CommandBarButton> }
         actions={[
           {
-            icon: () => <MapIcon />,
+            icon: <IconButton onClick={() => setMapModalOpen(true)}>
+              <MapIcon /></IconButton>,
             tooltip: "Xem kho trên bản đồ",
-            onClick: () => setMapModalOpen(true),
             isFreeAction: true
           },
           {
-            icon: () => <Link to={`warehouse/create`}>
+            icon: <Link to={`warehouse/create`}>
               <AddIcon />
             </Link>,
             tooltip: "Thêm mới kho",
             isFreeAction: true
           }
         ]}
+        rowKey='warehouseId'
+        editable={{
+          onRowDelete: (selectedIds) => new Promise((resolve, reject) => {
+            setTimeout(() => {
+              request(
+                "delete",
+                API_PATH.WAREHOUSE,
+                (res) => {
+                  const deleteData = warehousesTableData.filter(
+                    warehouse => !selectedIds.includes(warehouse["warehouseId"])
+                  );
+                  setWarehousesTableData(deleteData);
+                  successNoti(`Đã xóa ${selectedIds.length} bản ghi`);
+                },
+                {
+                  500: () => errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau")
+                },
+                selectedIds
+              )
+            })
+          })
+        }}
       />
     </div>
   </div>
+  );
 }
 
 export default ListWarehouse;
