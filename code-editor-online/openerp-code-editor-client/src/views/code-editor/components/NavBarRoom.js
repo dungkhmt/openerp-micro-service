@@ -41,15 +41,24 @@ import ShareForm from "./ShareForm";
 import axios from "axios";
 import { errorNoti, successNoti } from "utils/notification";
 import ConfigEditor from "./ConfigEditor";
+import { useKeycloak } from "@react-keycloak/web";
 
 const NavBarRoom = (props) => {
   const { socket, myPeer } = props;
   const dispatch = useDispatch();
   const history = useHistory();
   const [loadingRunCode, setLoadingRunCode] = useState(false);
-  const { isVisibleParticipants, selectedLanguage, participants, source, input, isMute } =
-    useSelector((state) => state.codeEditor);
-
+  const {
+    isVisibleParticipants,
+    selectedLanguage,
+    participants,
+    source,
+    input,
+    isMute,
+    roomMaster,
+  } = useSelector((state) => state.codeEditor);
+  const { keycloak } = useKeycloak();
+  const token = keycloak.tokenParsed;
   const [anchorConfigEditor, setAnchorConfigEditor] = useState(null);
   const handleDisplayParticipants = () => {
     dispatch(setIsVisibleParticipants(!isVisibleParticipants));
@@ -70,6 +79,10 @@ const NavBarRoom = (props) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  function checkRoomMaster(currentUserId, roomMasterId) {
+    return currentUserId === roomMasterId;
   }
 
   function getJdoodleLanguage(language) {
@@ -124,7 +137,7 @@ const NavBarRoom = (props) => {
   };
   return (
     <div>
-      <ShareForm />
+      <ShareForm socket={socket} />
       <ConfigEditor anchorElement={anchorConfigEditor} handleClose={handleCloseConfigEditor} />
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -160,18 +173,20 @@ const NavBarRoom = (props) => {
                 Download
               </Button>
             </Grid>
-            <Grid item>
-              <Button
-                size="small"
-                startIcon={<Share />}
-                variant="contained"
-                onClick={() => {
-                  dispatch(setIsVisibleShareForm(true));
-                }}
-              >
-                Share
-              </Button>
-            </Grid>
+            {checkRoomMaster(token.preferred_username, roomMaster?.id) && (
+              <Grid item>
+                <Button
+                  size="small"
+                  startIcon={<Share />}
+                  variant="contained"
+                  onClick={() => {
+                    dispatch(setIsVisibleShareForm(true));
+                  }}
+                >
+                  Share
+                </Button>
+              </Grid>
+            )}
           </Grid>
         </Grid>
         <Grid item>

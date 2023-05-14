@@ -12,6 +12,8 @@ public class CodeEditorRoomMapper {
         codeEditorRoomDTO.setId(codeEditorRoom.getId());
         codeEditorRoomDTO.setRoomName(codeEditorRoom.getRoomName());
         codeEditorRoomDTO.setRoomMasterId(codeEditorRoom.getRoomMasterId());
+        codeEditorRoomDTO.setAccessPermission(codeEditorRoom.getAccessPermission());
+        codeEditorRoomDTO.setIsPublic(codeEditorRoom.getIsPublic());
         return codeEditorRoomDTO;
     }
 }

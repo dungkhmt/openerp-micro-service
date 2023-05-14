@@ -1,7 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { PROGRAMMING_LANGUAGES } from "utils/constants";
+import { ACCESS_PERMISSION } from "../utils/constants";
 
 const initialState = {
+  // room
+  roomName: null,
+  isPublic: false,
+  roomAccessPermission: ACCESS_PERMISSION.VIEWER.value,
+  roomMaster: null,
+  allowedUserList: [],
+  reloadAllowedUser: 0,
+
   // code editor
   selectedLanguage: PROGRAMMING_LANGUAGES.CPP.value,
   source: null,
@@ -10,6 +19,8 @@ const initialState = {
 
   isVisibleShareForm: false,
   tabKey: "input",
+
+  isEditCode: false,
 
   // participants
   isVisibleParticipants: false,
@@ -30,6 +41,15 @@ export const codeEditorSlice = createSlice({
   name: "codeEditor",
   initialState,
   reducers: {
+    setState: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+    setRoomName: (state, action) => {
+      state.roomName = action.payload;
+    },
     setSelectedLanguage: (state, action) => {
       state.selectedLanguage = action.payload;
     },
@@ -77,6 +97,8 @@ export const codeEditorSlice = createSlice({
 });
 
 export const {
+  setState,
+  setRoomName,
   setSelectedLanguage,
   setIsVisibleParticipants,
   setParticipants,
@@ -90,7 +112,9 @@ export const {
   setFontSize,
   setTabSpace,
   setIsAutoComplete,
-  setIsMute
+  setIsMute,
 } = codeEditorSlice.actions;
+
+export const codeEditorSelector = ({ codeEditor }) => codeEditor;
 
 export default codeEditorSlice.reducer;

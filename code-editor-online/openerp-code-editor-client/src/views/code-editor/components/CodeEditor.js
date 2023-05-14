@@ -10,12 +10,27 @@ import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/theme-tomorrow";
 import "ace-builds/src-noconflict/ext-language_tools";
-import { setSource } from "../reducers/codeEditorReducers";
+import { setSource, setState } from "../reducers/codeEditorReducers";
+import { useKeycloak } from "@react-keycloak/web";
+import { ACCESS_PERMISSION } from "../utils/constants";
 
 const CodeEditor = (props) => {
-  const { socket, roomId } = props;
+  const { socket, roomId, roomMasterId } = props;
   const dispatch = useDispatch();
-  const { selectedLanguage, source, theme, fontSize, tabSpace, isAutoComplete } = useSelector((state) => state.codeEditor);
+  const { keycloak } = useKeycloak();
+  const token = keycloak.tokenParsed;
+  const {
+    selectedLanguage,
+    source,
+    theme,
+    fontSize,
+    tabSpace,
+    isAutoComplete,
+    isEditCode,
+    isPublic,
+    roomAccessPermission,
+    allowedUserList,
+  } = useSelector((state) => state.codeEditor);
   const onChange = (value) => {
     socket.current.emit(SOCKET_EVENTS.SEND_CODE_CHANGES, {
       language: selectedLanguage,
@@ -23,6 +38,61 @@ const CodeEditor = (props) => {
     });
     handleSaveSource(value);
   };
+
+  /**
+   * check current user can edit the source code
+   */
+  useEffect(() => {
+    if (roomMasterId === token.preferred_username) {
+      dispatch(setState({ isEditCode: true }));
+    } else if (isPublic && roomAccessPermission === ACCESS_PERMISSION.EDITOR.value) {
+      dispatch(setState({ isEditCode: true }));
+    } else {
+      const user = allowedUserList.find((item) => item.id.userId === token.preferred_username);
+      if (user && user.accessPermission === ACCESS_PERMISSION.EDITOR.value) {
+        dispatch(setState({ isEditCode: true }));
+      } else {
+        dispatch(setState({ isEditCode: false }));
+      }
+    }
+  }, [roomMasterId, token, isPublic, roomAccessPermission]);
+
+  useEffect(() => {
+    if (socket.current) {
+      socket.current.on(SOCKET_EVENTS.REFRESH_ROOM_PERMISSION, ({ isPublic, accessPermission }) => {
+        dispatch(
+          setState({
+            isPublic: isPublic,
+            roomAccessPermission: accessPermission,
+          })
+        );
+      });
+    }
+  }, [socket.current]);
+
+  useEffect(() => {
+    if (socket.current) {
+      socket.current.on(SOCKET_EVENTS.REFRESH_USER_PERMISSION, ({ userId, accessPermission }) => {
+        if (userId === token.preferred_username) {
+          if (isPublic) {
+            if (roomAccessPermission === ACCESS_PERMISSION.VIEWER.value) {
+              if (accessPermission === ACCESS_PERMISSION.VIEWER.value) {
+                dispatch(setState({ isEditCode: false }));
+              } else if (accessPermission === ACCESS_PERMISSION.EDITOR.value) {
+                dispatch(setState({ isEditCode: true }));
+              }
+            }
+          } else {
+            if (accessPermission === ACCESS_PERMISSION.VIEWER.value) {
+              dispatch(setState({ isEditCode: false }));
+            } else if (accessPermission === ACCESS_PERMISSION.EDITOR.value) {
+              dispatch(setState({ isEditCode: true }));
+            }
+          }
+        }
+      });
+    }
+  }, [socket.current, token, isPublic, roomAccessPermission]);
 
   const handleSaveSource = debounce((value) => {
     const payload = {
@@ -35,7 +105,7 @@ const CodeEditor = (props) => {
       `/code-editor/sources`,
       (response) => {
         if (response && response.status === 200) {
-          dispatch(setSource(value))
+          dispatch(setSource(value));
         }
       },
       {
@@ -67,8 +137,7 @@ const CodeEditor = (props) => {
       `/code-editor/sources/load-source?roomId=${roomId}&language=${language}`,
       (response) => {
         if (response && response.status === 200) {
-          dispatch(setSource(response.data.source))
-          
+          dispatch(setSource(response.data.source));
         }
       },
       {
@@ -97,12 +166,12 @@ const CodeEditor = (props) => {
     }
   }
 
-  function getTheme(theme){
-    if(theme === "dark"){
-      return "monokai"
+  function getTheme(theme) {
+    if (theme === "dark") {
+      return "monokai";
     }
 
-    return "tomorrow"
+    return "tomorrow";
   }
   return (
     <AceEditor
@@ -116,6 +185,7 @@ const CodeEditor = (props) => {
       showGutter={true}
       highlightActiveLine={true}
       value={source}
+      readOnly={!isEditCode}
       setOptions={{
         enableBasicAutocompletion: isAutoComplete,
         enableLiveAutocompletion: isAutoComplete,

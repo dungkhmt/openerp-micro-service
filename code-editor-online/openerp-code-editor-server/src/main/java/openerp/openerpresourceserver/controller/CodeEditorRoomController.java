@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.controller;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -17,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.controller.vm.ShareRoomVM;
 import openerp.openerpresourceserver.dto.CodeEditorRoomDTO;
+import openerp.openerpresourceserver.dto.SharedRoomUserDTO;
 import openerp.openerpresourceserver.exception.BadRequestAlertException;
 import openerp.openerpresourceserver.service.CodeEditorRoomService;
 
@@ -27,11 +30,10 @@ import openerp.openerpresourceserver.service.CodeEditorRoomService;
 public class CodeEditorRoomController {
     private final CodeEditorRoomService codeEditorRoomService;
 
-
     @GetMapping(value = "/rooms/search")
     public ResponseEntity<Page<CodeEditorRoomDTO>> searchRoom(Principal principal,
             @RequestParam(name = "keyword", required = false) String keyword,
-           Pageable pageable) {
+            Pageable pageable) {
         return ResponseEntity.ok().body(codeEditorRoomService.search(principal.getName(), keyword, pageable));
     }
 
@@ -61,6 +63,25 @@ public class CodeEditorRoomController {
     @DeleteMapping(value = "/rooms/{id}")
     public ResponseEntity<Void> deleteRoomById(@PathVariable(name = "id") UUID id) {
         codeEditorRoomService.deleteById(id);
+        return ResponseEntity.ok().body(null);
+    }
+
+    @PutMapping(value = "/rooms/share")
+    public ResponseEntity<Void> shareRoom(@RequestBody ShareRoomVM shareRoomVM) {
+        codeEditorRoomService.shareRoom(shareRoomVM);
+        return ResponseEntity.ok().body(null);
+    }
+
+    @GetMapping(value = "/rooms/{roomId}/shared-users")
+    public ResponseEntity<List<SharedRoomUserDTO>> getSharedUsersOfRoom(@PathVariable(name = "roomId") UUID roomId) {
+        List<SharedRoomUserDTO> sharedUsers = codeEditorRoomService.getSharedUsersOfRoom(roomId);
+        return ResponseEntity.ok().body(sharedUsers);
+    }
+
+    @DeleteMapping(value = "/rooms/{roomId}/access-permission/{userId}")
+    public ResponseEntity<Void> deleteAccessPermission(@PathVariable(name = "roomId") UUID roomId,
+            @PathVariable(name = "userId") String userId) {
+        codeEditorRoomService.deleteAccessPermission(roomId, userId);
         return ResponseEntity.ok().body(null);
     }
 }
