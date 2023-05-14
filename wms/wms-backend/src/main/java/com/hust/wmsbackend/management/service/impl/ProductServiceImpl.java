@@ -227,6 +227,11 @@ public class ProductServiceImpl implements ProductService {
             return false;
         }
 
+        if (request.getStartDate() == null) {
+            log.warn("Start date must not be null");
+            return false;
+        }
+
         if (request.getEndDate() != null && request.getStartDate().after(request.getEndDate())) {
             log.warn("Bad request. Start date is after end date");
             return false;
