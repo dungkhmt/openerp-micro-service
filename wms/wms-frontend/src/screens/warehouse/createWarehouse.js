@@ -160,9 +160,9 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
     // const data = getValues();
     if (stageCanvasRef.current) {
       setWidth(stageCanvasRef.current.offsetWidth);
-      setHeight(stageCanvasRef.current.offsetHeight);
+      setHeight(stageCanvasRef.current.offsetHeight + 600);
       setWarehouseHeight(stageCanvasRef.current.offsetWidth 
-        * data.warehouseLength / data.warehouseWidth)
+        * data.warehouseLength / data.warehouseWidth);
       setScale(stageCanvasRef.current.offsetWidth / data.warehouseWidth)
     }
   };
@@ -348,7 +348,7 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
                     <Grid item xs={12}>
                       <Box className={classes.inputWrap}>
                         <Box className={classes.labelInput}>
-                          Chiều dài
+                          Chiều rộng
                         </Box>
                         <OutlinedInput
                           fullWidth
@@ -369,7 +369,7 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
                     <Grid item xs={12}>
                       <Box className={classes.inputWrap}>
                         <Box className={classes.labelInput}>
-                          Chiều rộng
+                          Chiều dài
                         </Box>
                         <OutlinedInput
                           fullWidth
@@ -401,14 +401,14 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
                 onChange={addFile}
                 type="file"
               />
-              <label htmlFor="raised-button-file">
+              {/* <label htmlFor="raised-button-file">
                 <Button 
                   variant="raised" 
                   component="span" 
                   style={{ fontSize: "18px !important", color: "#1976d2", marginLeft: 94, textTransform: "none" }}>
                   Tải file lên
                 </Button>
-              </label>
+              </label> */}
               <label>
                 <Button 
                   variant="raised" 
@@ -417,6 +417,16 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
                   onClick={() => handleAddShelf()}
                 >
                   Thêm kệ hàng
+                </Button>
+              </label>
+              <label>
+              <Button 
+                  variant="raised" 
+                  component="span" 
+                  style={{ fontSize: "18px !important", color: "#1976d2", marginLeft: 94, textTransform: "none" }}
+                  onClick={resetCanvas}
+                >
+                  Tải lại mô phỏng
                 </Button>
               </label>
               {/* <Box className={classes.addIconBox} onClick={() => handleAddShelf()}>
@@ -507,18 +517,16 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
               </Grid>
 
               <Grid xs={9} item sx={{ display: "flex", }} className={classes.boxWrap}>
-                <Box className={classes.titleWap} >
-                  <Typography style={{ fontWeight: 500 }}>
-                    Mô phỏng
-                  </Typography>
-                  <Box className={classes.rerloadIconBox} onClick={resetCanvas}>
-                    <Box className={classes.reloadIconWrap} >
-                      <CachedIcon style={{ color: "#1976d2" }} />
-                      <Typography>Tải lại</Typography>
-                    </Box>
-                  </Box>
-                </Box>
-                <Box className={classes.canvasWrap}>
+                {/* <Box className={classes.canvasWrap}> */}
+                <Box sx={{
+                  padding: 5,
+                  paddingTop: 0,
+                  height: warehouseHeight,
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}>
                   <Box className={classes.stageWrap} ref={stageCanvasRef} >
                     <Stage
                       width={width}
@@ -559,7 +567,7 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
           </Box>
 
           {!isCreateForm &&
-          <Box className={classes.boxInfor}>
+          <Box mt={2} className={classes.boxInfor}>
             <StandardTable
               title={"Danh sách hàng tồn kho"}
               columns={
