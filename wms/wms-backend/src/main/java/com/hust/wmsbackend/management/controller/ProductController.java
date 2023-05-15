@@ -55,6 +55,12 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllProductGeneral());
     }
 
+    @GetMapping("/without-image")
+    public ResponseEntity<List<ProductGeneralResponse>> getProductGeneralWithoutImage() {
+        log.info("Start get product with out images");
+        return ResponseEntity.ok(productService.getAllProductGeneralWithoutImage());
+    }
+
     @DeleteMapping
     public ResponseEntity<List<String>> delete(@RequestBody List<String> productIds) {
         return productService.deleteProducts(productIds) ?

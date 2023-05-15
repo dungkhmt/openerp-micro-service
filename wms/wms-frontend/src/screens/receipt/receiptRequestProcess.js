@@ -203,7 +203,7 @@ const ReceiptRequestProcess = ( props ) => {
   
       await request(
         "get",
-        API_PATH.PRODUCT,
+        API_PATH.PRODUCT_WITHOUT_IMAGE,
         (res) => {
           setProductList(res.data);
         }

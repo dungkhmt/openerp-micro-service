@@ -254,6 +254,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     @Override
     public ReceiptProcessResponse getForProcessingById(String id) {
+        log.info(String.format("Start get receipt for processing with id %s", id));
         UUID receiptId = UUID.fromString(id);
         Optional<Receipt> receiptOpt = receiptRepository.findById(receiptId);
         if (!receiptOpt.isPresent()) {
