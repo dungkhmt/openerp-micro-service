@@ -18,6 +18,8 @@ public interface ProductService {
 
     List<ProductGeneralResponse> getAllProductGeneral();
 
+    List<ProductGeneralResponse> getAllProductGeneralWithoutImage();
+
     boolean deleteProducts(List<String> productIds);
 
     ProductDetailResponse getById(String id);

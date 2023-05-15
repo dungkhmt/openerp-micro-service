@@ -127,7 +127,7 @@ create table wms_receipt_item_request
     product_id uuid not null ,
     quantity decimal(18, 2) not null ,
     warehouse_id uuid
-)
+);
 
 create table wms_receipt_item
 (

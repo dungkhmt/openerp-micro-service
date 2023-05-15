@@ -24,12 +24,11 @@ const ProductListing =  () => {
     async function fetchData() {
       await request(
         "get",
-        API_PATH.PRODUCT,
+        API_PATH.PRODUCT_WITHOUT_IMAGE,
         (res) => {
           setProductTableData(res.data);
         }
       );
-      
       setLoading(false);
     }
 

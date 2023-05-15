@@ -183,6 +183,30 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<ProductGeneralResponse> getAllProductGeneralWithoutImage() {
+        List<Product> products = productRepository.findAll();
+        Map<String, BigDecimal> productOnHandQuantityMap = new HashMap<>();
+        for (Product product : products) {
+            String productId = product.getProductId().toString();
+            productOnHandQuantityMap.put(productId,
+                    productWarehouseRepository.getTotalOnHandQuantityByProductId(UUID.fromString(productId)));
+        }
+        List<ProductGeneralResponse> response = new ArrayList<>();
+        for (Product product : products) {
+            BigDecimal onhandQuantity = productOnHandQuantityMap.get(product.getProductId().toString());
+            response.add(ProductGeneralResponse.builder()
+                    .productId(product.getProductId().toString())
+                    .name(product.getName())
+                    .code(product.getCode())
+                    .retailPrice(getCurrPriceByProductId(product.getProductId()))
+                    .onHandQuantity(onhandQuantity == null ? BigDecimal.ZERO : onhandQuantity)
+                    .build());
+        }
+        log.info(String.format("All product with out image Response %s", response));
+        return response;
+    }
+
+    @Override
     @Transactional
     public boolean deleteProducts(List<String> productIds) {
         if (productIds.isEmpty()) {
