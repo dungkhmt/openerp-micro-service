@@ -176,6 +176,7 @@ public class ProductServiceImpl implements ProductService {
                                         .retailPrice(getCurrPriceByProductId(product.getProductId()))
                                         .imageData(product.getImageData())
                                         .imageContentType(product.getImageContentType())
+                                        .productCategoryId(product.getCategoryId().toString())
                                         .onHandQuantity(productOnHandQuantityMap.get(product.getProductId().toString()))
                                         .build())
                                     .collect(Collectors.toList());
