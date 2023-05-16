@@ -70,12 +70,10 @@ export const useUpdateSaleOrderStatus = (params) => {
         data
       );
       if (res.data && res.code === 1) {
+        toast.success("Cập nhật đơn bán thành công!");
+        queryClient.invalidateQueries([queryKey.sale_order.order_list]);
         return res.data;
       }
-    },
-    onSuccess: (res, variables, context) => {
-      toast.success("Cập nhật đơn bán thành công!");
-      queryClient.invalidateQueries([queryKey.sale_order.order_list]);
     },
     onError: () => {
       toast.error("Lỗi khi cập nhật, vui lòng kiểm tra lại");

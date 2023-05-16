@@ -24,8 +24,8 @@ const CreateDistChannel = ({ setIsAdd }) => {
   const onSubmit = async (data) => {
     let params = {
       name: data?.name.trim(),
+      promotion: data?.promotion,
     };
-    console.log("Submitting...");
     await createDistChannelQuery.mutateAsync(params);
     setIsAdd((pre) => !pre);
     reset();
@@ -47,6 +47,23 @@ const CreateDistChannel = ({ setIsAdd }) => {
               isFullWidth={true}
               error={!!errors["name"]}
               message={errors["name"]?.message}
+            />
+          )}
+        />
+        <Controller
+          key={"promotion"}
+          control={control}
+          name={"promotion"}
+          render={({ field: { onChange, value } }) => (
+            <CustomInput
+              required={true}
+              value={value}
+              type={"number"}
+              onChange={onChange}
+              label={"Mức chiết khấu (%)"}
+              isFullWidth={true}
+              error={!!errors["promotion"]}
+              message={errors["promotion"]?.message}
             />
           )}
         />

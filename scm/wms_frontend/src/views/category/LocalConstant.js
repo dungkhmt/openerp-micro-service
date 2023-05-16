@@ -301,6 +301,17 @@ export const distChannelCols = [
     sortable: false,
     minWidth: 250,
   },
+  {
+    field: "promotion",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Chiết khấu mua hàng (%)",
+    sortable: false,
+    minWidth: 250,
+    valueFormatter: (params) => {
+      return `${params?.value} %`;
+    },
+  },
 ];
 export const customerTypeCols = [
   {

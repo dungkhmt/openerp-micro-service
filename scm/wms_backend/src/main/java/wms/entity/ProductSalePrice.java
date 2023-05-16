@@ -6,27 +6,15 @@ import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "scm_product_price_sellin")
+@Table(name = "scm_product_price_sellout")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductPrice extends BaseEntity implements Serializable {
-    @Column(name = "started_date")
-    private ZonedDateTime startedDate;
-    @Column(name = "ended_date")
-    private ZonedDateTime endedDate;
-    @Column(name = "price_before_vat")
-    private double priceBeforeVat;
-    @Column(name = "vat")
-    private double vat;
-    @Column(name = "status")
-    private String status;
-
+public class ProductSalePrice extends BaseEntity implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
@@ -37,4 +25,9 @@ public class ProductPrice extends BaseEntity implements Serializable {
     @NotFound(action = NotFoundAction.IGNORE)
     private ContractType contractType;
 
+    @Column(name = "mass_quantity_discount")
+    private double massDiscount;
+
+    @Column(name = "contract_discount")
+    private double contractDiscount;
 }

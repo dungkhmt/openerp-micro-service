@@ -228,3 +228,77 @@ export const receiptBillCols = [
     },
   },
 ];
+
+export const purchaseOrderPrice = [
+  {
+    field: "productCode",
+    headerName: "Mã sản phẩm",
+    sortable: false,
+    pinnable: true,
+    width: 125,
+    minWidth: 150,
+    maxWidth: 200,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>
+          {params?.row?.code}
+        </Typography>
+      );
+    },
+  },
+  {
+    field: "name",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Tên sản phẩm",
+    sortable: false,
+    minWidth: 150,
+    maxWidth: 200,
+  },
+  {
+    field: "contractTypeName",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Loại hợp đồng",
+    sortable: false,
+    minWidth: 150,
+    maxWidth: 200,
+    valueGetter: (params) => {
+      return params.row.contract.name;
+    },
+  },
+  {
+    field: "status",
+    headerName: "Trạng thái",
+    sortable: false,
+    width: 125,
+    minWidth: 150,
+    maxWidth: 200,
+    renderCell: (params) => {
+      return (
+        <Button
+          variant="contained"
+          sx={{
+            borderRadius: "2px",
+            borderWidth: "1px",
+            paddingY: 1,
+            paddingX: 2,
+            height: "24px",
+            background:
+              ORDER_STATUS_COLOR_MAPPING[params?.row?.status.toLowerCase()],
+          }}
+        >
+          <Typography
+            sx={{
+              textTransform: "lowercase",
+              fontSize: 14,
+              color: "white",
+            }}
+          >
+            {params?.row?.status}
+          </Typography>
+        </Button>
+      );
+    },
+  },
+];
