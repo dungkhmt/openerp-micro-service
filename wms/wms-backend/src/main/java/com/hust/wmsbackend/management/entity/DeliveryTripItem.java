@@ -20,8 +20,8 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 public class DeliveryTripItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "delivery_trip_item_seq")
-    @GenericGenerator(name = "delivery_trip_item_seq",
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "wms_delivery_trip_item_seq")
+    @GenericGenerator(name = "wms_delivery_trip_item_seq",
         strategy = "com.hust.wmsbackend.management.entity.generator.StringPrefixedSequenceCodeGenerator",
         parameters = {
             @org.hibernate.annotations.Parameter(name = StringPrefixedSequenceCodeGenerator.INCREMENT_PARAM, value = "1"),

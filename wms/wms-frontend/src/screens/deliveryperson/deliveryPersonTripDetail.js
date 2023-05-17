@@ -55,6 +55,8 @@ const DeliveryPersonTripDetail = ( props ) => {
         
       setLoading(false);
     }
+
+    fetchData();
   }, []);
 
   const onSelectionChangeHandle = (rows) => {

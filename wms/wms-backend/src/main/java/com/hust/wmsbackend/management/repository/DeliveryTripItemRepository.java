@@ -25,17 +25,24 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
     @Transactional
     void updateSequenceByDeliveryItemId(int sequence, String itemId);
 
-    @Query(value = "select sum(dti.quantity) from delivery_trip_item dti " +
-           "join assigned_order_item aoi on aoi.assigned_order_item_id = dti.assigned_order_item_id " +
-           "join product p on p.product_id = aoi.product_id " +
+    @Query(value = "select sum(dti.quantity) from wms_delivery_trip_item dti " +
+           "join wms_assigned_order_item aoi on aoi.assigned_order_item_id = dti.assigned_order_item_id " +
+           "join wms_product p on p.product_id = aoi.product_id " +
            "where dti.order_id = ?1 and dti.is_deleted = false and (dti.status = 'DONE' or dti.status = 'FAIL') " +
            "and p.product_id = ?2 ", nativeQuery = true)
     Long getTotalCompleteDeliveryItemByOrderIdAndProductId(UUID orderId, UUID productId);
 
-    @Query(value = "select sum(dti.quantity) from delivery_trip_item dti " +
-                   "join assigned_order_item aoi on aoi.assigned_order_item_id = dti.assigned_order_item_id " +
-                   "join product p on p.product_id = aoi.product_id " +
+    @Query(value = "select sum(dti.quantity) from wms_delivery_trip_item dti " +
+                   "join wms_assigned_order_item aoi on aoi.assigned_order_item_id = dti.assigned_order_item_id " +
+                   "join wms_product p on p.product_id = aoi.product_id " +
                    "where dti.order_id = ?1 and dti.is_deleted = false and dti.status = 'DONE' " +
                    "and p.product_id = ?2 ", nativeQuery = true)
     Long getTotalDoneDeliveryItemByOrderIdAndProductId(UUID orderId, UUID productId);
+
+    @Query(value = "select sum(dti.quantity) from wms_delivery_trip_item dti " +
+            "join wms_assigned_order_item aoi on aoi.assigned_order_item_id = dti.assigned_order_item_id " +
+            "join wms_product p on p.product_id = aoi.product_id " +
+            "where dti.order_id = ?1 and dti.is_deleted = false and dti.status = 'FAIL' " +
+            "and p.product_id = ?2 ", nativeQuery = true)
+    Long getTotalFailDeliveryItemByOrderIdAndProductId(UUID orderId, UUID productId);
 }
