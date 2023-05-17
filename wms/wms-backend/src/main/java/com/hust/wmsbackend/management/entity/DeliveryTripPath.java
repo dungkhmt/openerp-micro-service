@@ -18,8 +18,8 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 public class DeliveryTripPath {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "delivery_trip_path_seq")
-    @SequenceGenerator(name = "delivery_trip_path_seq", allocationSize = 1) // TODO: auto reset on new delivery_trip_id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "wms_delivery_trip_path_seq")
+    @SequenceGenerator(name = "wms_delivery_trip_path_seq", allocationSize = 1) // TODO: auto reset on new delivery_trip_id
     private Long deliveryTripPathId;
     private String deliveryTripId;
     private BigDecimal longitude;

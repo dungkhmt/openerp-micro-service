@@ -64,6 +64,7 @@ public class DeliveryTripItemServiceImpl implements DeliveryTripItemService {
             Optional<AssignedOrderItem> assignedOrderItemOpt = assignedOrderItemRepository.findById(item.getAssignedOrderItemId());
             assignedOrderItemOpt.ifPresent(assignedOrderItem -> itemDetails.add(InventoryItemDetail.builder()
                     .inventoryItemId(assignedOrderItem.getInventoryItemId())
+                    .inventoryItemDetailId(UUID.randomUUID())
                     .effectiveDate(new Date())
                     .quantityOnHandDiff(item.getQuantity())
                     .build()));

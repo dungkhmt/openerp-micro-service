@@ -352,3 +352,9 @@ add constraint fk_delivery_trip_item_assigned_order_item foreign key (assigned_o
 
 alter table wms_delivery_trip_path
 add constraint fk_delivery_trip_path_delivery_trip foreign key (delivery_trip_id) references wms_delivery_trip (delivery_trip_id) on delete cascade ;
+
+-- create sequence for ID generator
+create sequence wms_delivery_trip_item_seq ;
+create sequence wms_delivery_trip_path_seq ;
+create sequence wms_delivery_trip_seq ;
+create sequence wms_shipment_seq ;

@@ -10,6 +10,7 @@ import com.hust.wmsbackend.management.model.response.ProductPriceResponse;
 import com.hust.wmsbackend.management.repository.*;
 import com.hust.wmsbackend.management.service.ProductService;
 import com.hust.wmsbackend.management.service.ProductWarehouseService;
+import com.hust.wmsbackend.management.service.WarehouseService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,8 @@ public class ProductServiceImpl implements ProductService {
     private ProductWarehouseRepository productWarehouseRepository;
     private BayRepository bayRepository;
     private InventoryItemRepository inventoryItemRepository;
+
+    private WarehouseService warehouseService;
 
     @Override
     @Transactional
@@ -176,6 +179,7 @@ public class ProductServiceImpl implements ProductService {
                                         .retailPrice(getCurrPriceByProductId(product.getProductId()))
                                         .imageData(product.getImageData())
                                         .imageContentType(product.getImageContentType())
+                                        .productCategoryId(product.getCategoryId().toString())
                                         .onHandQuantity(productOnHandQuantityMap.get(product.getProductId().toString()))
                                         .build())
                                     .collect(Collectors.toList());
@@ -237,9 +241,19 @@ public class ProductServiceImpl implements ProductService {
 
         List<ProductDetailQuantityResponse> quantityList =
             productRepository.getProductDetailQuantityResponseByProductId(productId);
+        List<ProductWarehouse> productWarehouses = productWarehouseRepository.findAllByProductId(productId);
+        Map<UUID, String> warehouseNameMap = warehouseService.getWarehouseNameMap();
+        List<ProductDetailResponse.ProductWarehouseQuantity> warehouseQuantities = productWarehouses.stream().map(
+                productWarehouse -> ProductDetailResponse.ProductWarehouseQuantity.
+                        builder().quantity(productWarehouse.getQuantityOnHand())
+                        .warehouseName(warehouseNameMap.get(productWarehouse.getWarehouseId()))
+                        .warehouseId(productWarehouse.getWarehouseId().toString())
+                        .build())
+                .collect(Collectors.toList());
         return ProductDetailResponse.builder()
                                     .productInfo(productInfo.get())
                                     .quantityList(quantityList)
+                                    .warehouseQuantities(warehouseQuantities)
                                     .build();
     }
 

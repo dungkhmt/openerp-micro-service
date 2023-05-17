@@ -98,7 +98,7 @@ public class OrderServiceImpl implements OrderService {
                .quantity(BigDecimal.valueOf(item.getQuantity()))
                .priceUnit(item.getPriceUnit())
                .build();
-            Long totalFail = deliveryTripItemRepository.getTotalDoneDeliveryItemByOrderIdAndProductId(orderId, item.getProductId());
+            Long totalFail = deliveryTripItemRepository.getTotalFailDeliveryItemByOrderIdAndProductId(orderId, item.getProductId());
             if (totalFail == null || totalFail == 0) {
                 adder.setDeliveryStatus("Giao hàng thành công");
             } else {

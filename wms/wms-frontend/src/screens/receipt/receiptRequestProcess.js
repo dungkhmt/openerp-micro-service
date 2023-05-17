@@ -200,15 +200,7 @@ const ReceiptRequestProcess = ( props ) => {
           setWarehouseList(res.data);
         }
       );
-  
-      await request(
-        "get",
-        API_PATH.PRODUCT_WITHOUT_IMAGE,
-        (res) => {
-          setProductList(res.data);
-        }
-      );
-  
+
       setLoading(false);
     }
 

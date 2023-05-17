@@ -21,8 +21,8 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 public class Shipment {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "shipment_seq")
-    @GenericGenerator(name = "shipment_seq",
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "wms_shipment_seq")
+    @GenericGenerator(name = "wms_shipment_seq",
     strategy = "com.hust.wmsbackend.management.entity.generator.StringPrefixedSequenceCodeGenerator",
     parameters = {
         @org.hibernate.annotations.Parameter(name = StringPrefixedSequenceCodeGenerator.INCREMENT_PARAM, value = "1"),
