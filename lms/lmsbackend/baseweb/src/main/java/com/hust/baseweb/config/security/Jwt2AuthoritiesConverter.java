@@ -39,7 +39,8 @@ public class Jwt2AuthoritiesConverter implements Converter<Jwt, Collection<Grant
 
         // We assume here you have "openerp-ui-dev" client configured with "client roles" mapper in Keycloak
         final var publicClientAccess = (Map<String, Object>) resourceAccess
-            .getOrDefault("openerp-ui-dev", Collections.emptyMap());
+            .getOrDefault("lms-ui-dev", Collections.emptyMap());
+//            .getOrDefault("openerp-ui-dev", Collections.emptyMap());
         final var publicClientRoles = (Collection<String>) publicClientAccess.getOrDefault(
             "roles",
             Collections.emptyList());
