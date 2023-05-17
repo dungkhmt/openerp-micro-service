@@ -439,7 +439,7 @@ const DeliveryTripDetail = ( props ) => {
               <Box className={classes.labelInput}>
                 Nhân viên giao hàng 
               </Box>
-              <Select onChange={(e) => setSelectedDeliveryPersonId(e.target.value)}>
+              <Select defaultValue={tripInfo?.deliveryPersonId} onChange={(e) => setSelectedDeliveryPersonId(e.target.value)}>
                 {
                   deliveryPersons.length > 0 &&
                   deliveryPersons.map(person => 

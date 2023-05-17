@@ -29,6 +29,7 @@ public class AssignedOrderItemServiceImpl implements AssignedOrderItemService {
     private SaleOrderHeaderRepository saleOrderHeaderRepository;
     private CustomerAddressRepository customerAddressRepository;
     private DeliveryTripItemRepository deliveryTripItemRepository;
+    private ProductWarehouseRepository productWarehouseRepository;
 
     private ProductService productService;
     private WarehouseService warehouseService;
@@ -40,11 +41,13 @@ public class AssignedOrderItemServiceImpl implements AssignedOrderItemService {
         try {
             List<InventoryItem> updateInventoryItems = new ArrayList<>();
             List<AssignedOrderItem> assignedOrderItems = new ArrayList<>();
+            List<ProductWarehouse> productWarehouses = new ArrayList<>();
             UUID orderId = request.getOrderId();
             // lấy hàng theo inventory_item theo thứ tự ưu tiên các lô được nhập vào kho sớm nhất sẽ được lấy trước
             for (AssignedOrderItemRequest.AssignedOrderItemRequestDetail detail : request.getItems()) {
-                List<InventoryItem> inventoryItemList = inventoryItemRepository.getInventoryItemByProductIdAndBayIdAndWarehouseIdOrderByCreatedStamp(
-                    detail.getProductId(), detail.getBayId(), detail.getWarehouseId());
+                List<InventoryItem> inventoryItemList = inventoryItemRepository
+                        .getInventoryItemByProductIdAndBayIdAndWarehouseIdOrderByCreatedStamp(
+                            detail.getProductId(), detail.getBayId(), detail.getWarehouseId());
                 if (inventoryItemList.isEmpty()) {
                     log.warn(String.format("Find Inventory item with detail %s not exist", detail));
                     return false;
@@ -88,10 +91,21 @@ public class AssignedOrderItemServiceImpl implements AssignedOrderItemService {
                         }
                     }
                 }
+
+                // update product warehouse quantity
+                Optional<ProductWarehouse> productWarehouseOpt = productWarehouseRepository
+                        .findProductWarehouseByWarehouseIdAndProductId(detail.getWarehouseId(), detail.getProductId());
+                if (productWarehouseOpt.isPresent()) {
+                    ProductWarehouse productWarehouse = productWarehouseOpt.get();
+                    BigDecimal newQuantity = productWarehouse.getQuantityOnHand().subtract(detail.getQuantity());
+                    productWarehouse.setQuantityOnHand(newQuantity);
+                    productWarehouses.add(productWarehouse);
+                }
             }
 
             inventoryItemRepository.saveAll(updateInventoryItems);
             assignedOrderItemRepository.saveAll(assignedOrderItems);
+            productWarehouseRepository.saveAll(productWarehouses);
             return true;
         } catch (Exception e) {
             log.warn(e.getMessage());

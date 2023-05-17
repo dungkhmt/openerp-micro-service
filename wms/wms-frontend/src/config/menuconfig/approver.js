@@ -1,7 +1,7 @@
 export const approver = {
   id: "MENU_WMSv2_APPROVER",
   icon: "DashboardIcon",
-  text: "Thương mại điện tử",
+  text: "Giám đốc doanh nghiệp",
   child: [
     {
       id: "MENU_WMSv2_APPROVER.RECEIPTS",

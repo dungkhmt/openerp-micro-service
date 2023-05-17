@@ -44,8 +44,8 @@ public class ProductEntity extends BaseEntity implements Serializable {
     @Column(name = "status")
     private String status;
 
-    @Column(name = "mass_type")
-    private String massType;
+    @Column(name = "mass_quantity")
+    private int massQuantity;
 
     // TODO: Should define images field here
     @Column(name = "sku")
@@ -80,4 +80,18 @@ public class ProductEntity extends BaseEntity implements Serializable {
     // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
     @JsonIgnore
     private Set<SaleOrderItem> saleOrderItems;
+
+    @OneToMany(
+            mappedBy = "productEntity",
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    private List<ProductPrice> productPrices;
+
+    @OneToMany(
+            mappedBy = "productEntity",
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    private List<ProductSalePrice> productSalePrices;
 }

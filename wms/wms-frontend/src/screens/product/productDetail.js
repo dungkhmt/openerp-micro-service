@@ -15,6 +15,7 @@ import { errorNoti, successNoti } from 'utils/notification';
 import { request } from 'api';
 import { API_PATH } from '../apiPaths';
 import LoadingScreen from "components/common/loading/loading";
+import StandardTable from "components/StandardTable";
 
 const DetailQuantityTable = ({ 
   isCreateForm, 
@@ -257,6 +258,7 @@ const ProductDetail = ( props ) => {
   const productId = props.match?.params?.id;
   const isCreateForm = productId == null;
   const [productInfo, setProductInfo] = useState(null);
+  const [warehouseQuantities, setWarehouseQuantities] = useState([]);
 
   // for selection field
   const [categoryId, setCategoryId] = useState(null);
@@ -354,6 +356,7 @@ const ProductDetail = ( props ) => {
             console.log("blob is setted to -> ", blob);
             // setUploadedImage(blob);
             setImageURL("data:" + res.data.productInfo.imageContentType + ";base64," + imageBytes);
+            setWarehouseQuantities(res.data.warehouseQuantities);
           },
           {
             401: () => { },
@@ -603,6 +606,13 @@ const ProductDetail = ( props ) => {
               </Box>
             </Grid>
           </Grid>
+          
+          <StandardTable
+            title="Thống kê hàng tồn kho"
+            columns={[{ title: "Kho", field: "warehouseName" }, { title: "Số lượng", field: "quantity" }]}
+            data={warehouseQuantities}
+            rowKey=""
+          />
         </Box>
       </Box>
     </Fragment>

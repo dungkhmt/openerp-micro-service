@@ -8,6 +8,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -30,4 +31,19 @@ public class ContractType extends BaseEntity implements Serializable {
     // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed
     @JsonIgnore
     private Set<Customer> customers;
+
+    @OneToMany(
+            mappedBy = "contractType",
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    private List<ProductPrice> productPrices;
+
+    @OneToMany(
+            mappedBy = "contractType",
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    private List<ProductSalePrice> productSalePrices;
+
 }

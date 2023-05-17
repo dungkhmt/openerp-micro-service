@@ -7,6 +7,7 @@ import {
   useGetCustomerType,
 } from "controllers/query/category-query";
 import { useRef, useState } from "react";
+import SearchBoxMap from "../../../../components/map/SearchBoxMap";
 import { useGeoLocation } from "../../../../shared/AppHooks";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
@@ -178,6 +179,7 @@ const CreateCustomerForm = ({ setIsAdd }) => {
           )}
         />
       </Stack>
+      <SearchBoxMap />
       <Stack
         direction="row"
         justifyContent={"flex-end"}

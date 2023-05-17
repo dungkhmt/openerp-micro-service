@@ -276,12 +276,10 @@ export const useCreateDistChannel = (params) => {
         data
       );
       if (res.data && res.code === 1) {
+        toast.success("Tạo thành công!");
+        queryClient.invalidateQueries([queryKey.category.dist_channel_list]);
         return res.data;
       }
-    },
-    onSuccess: (res, variables, context) => {
-      toast.success("Tạo thành công!");
-      queryClient.invalidateQueries([queryKey.category.dist_channel_list]);
     },
     onError: () => {
       toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");

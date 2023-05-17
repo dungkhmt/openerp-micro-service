@@ -469,7 +469,7 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
       />
 
       {
-        options.search == true &&
+        options?.search == true &&
         <Paper>
           <SearchBar setSearchQuery={setSearchQuery} />
         </Paper>

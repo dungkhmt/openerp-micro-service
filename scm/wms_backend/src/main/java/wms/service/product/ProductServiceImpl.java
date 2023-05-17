@@ -13,13 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.product.ProductDTO;
-import wms.entity.ProductCategory;
-import wms.entity.ProductEntity;
-import wms.entity.ProductUnit;
+import wms.dto.product.ProductDiscountDTO;
+import wms.dto.product.ProductPriceDTO;
+import wms.entity.*;
 import wms.exception.CustomException;
-import wms.repo.ProductCategoryRepo;
-import wms.repo.ProductRepo;
-import wms.repo.ProductUnitRepo;
+import wms.repo.*;
 import wms.service.BaseService;
 import wms.utils.GeneralUtils;
 
@@ -27,6 +25,12 @@ import wms.utils.GeneralUtils;
 @Service
 @Slf4j
 public class ProductServiceImpl extends BaseService implements IProductService {
+    @Autowired
+    private ProductSalePriceRepo productSalePriceRepo;
+    @Autowired
+    private ProductPriceRepo productPriceRepo;
+    @Autowired
+    private ContractTypeRepo contractTypeRepo;
     @Autowired
     private ProductRepo productRepository;
     @Autowired
@@ -57,7 +61,7 @@ public class ProductServiceImpl extends BaseService implements IProductService {
                 .brand(productDTO.getBrand())
                 .productCategory(category)
                 .status(productDTO.getStatus())
-                .massType(productDTO.getMassType())
+                .massQuantity(productDTO.getMassQuantity())
                 .sku(productDTO.getSku().toUpperCase())
                 .build();
         return productRepository.save(newProduct);
@@ -109,7 +113,7 @@ public class ProductServiceImpl extends BaseService implements IProductService {
         productToUpdate.setProductUnit(unit);
         productToUpdate.setBrand(productDTO.getBrand());
         productToUpdate.setStatus(productDTO.getStatus());
-        productToUpdate.setMassType(productDTO.getMassType());
+        productToUpdate.setMassQuantity(productDTO.getMassQuantity());
         productToUpdate.setSku(productDTO.getSku());
         return productRepository.save(productToUpdate);
     }
@@ -118,5 +122,46 @@ public class ProductServiceImpl extends BaseService implements IProductService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteProductById(long id) {
         productRepository.deleteById(id);
+    }
+
+    @Override
+    public ProductPrice setPurchasePrice(ProductPriceDTO productPriceDTO) throws CustomException {
+        ContractType contractType = contractTypeRepo.getContractTypeByCode(productPriceDTO.getContractTypeCode());
+        ProductEntity product = productRepository.getProductByCode(productPriceDTO.getProductCode());
+        if (contractType== null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product price with no specific contract type, can't set");
+        }
+        if (product== null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product price with no specific, can't set");
+        }
+        ProductPrice newPrice = ProductPrice.builder()
+                .vat(productPriceDTO.getVat())
+                .priceBeforeVat(productPriceDTO.getPriceBeforeVat())
+                .status(productPriceDTO.getStatus())
+                .startedDate(productPriceDTO.getStartedDate())
+                .endedDate(productPriceDTO.getEndedDate())
+                .contractType(contractType)
+                .productEntity(product)
+                .build();
+        return productPriceRepo.save(newPrice) ;
+    }
+
+    @Override
+    public ProductSalePrice setSalePrice(ProductDiscountDTO productDiscountDTO) throws CustomException {
+        ContractType contractType = contractTypeRepo.getContractTypeByCode(productDiscountDTO.getContractTypeCode());
+        ProductEntity product = productRepository.getProductByCode(productDiscountDTO.getProductCode());
+        if (contractType== null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product price with no specific contract type, can't set");
+        }
+        if (product== null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product price with no specific, can't set");
+        }
+        ProductSalePrice newPrice = ProductSalePrice.builder()
+                .contractDiscount(productDiscountDTO.getContractDiscount())
+                .massDiscount(productDiscountDTO.getMassDiscount())
+                .contractType(contractType)
+                .productEntity(product)
+                .build();
+        return productSalePriceRepo.save(newPrice) ;
     }
 }

@@ -184,6 +184,7 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
         DistributingChannel newChannel = new DistributingChannel();
         newChannel.setCode("CHN" + GeneralUtils.generateCodeFromSysTime());
         newChannel.setName(channelDTO.getName());
+        newChannel.setPromotion(channelDTO.getPromotion());
         return distributingChannelRepo.save(newChannel);
     }
 
@@ -210,6 +211,7 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     public DistributingChannel updateDistributingChannel(DistributingChannelDTO channelDTO, long id) throws CustomException {
         DistributingChannel channelToUpdate = distributingChannelRepo.getDistributingChannelById(id);
         channelToUpdate.setName(channelDTO.getName().toLowerCase());
+        channelToUpdate.setPromotion(channelDTO.getPromotion());
         return distributingChannelRepo.save(channelToUpdate);
     }
 
