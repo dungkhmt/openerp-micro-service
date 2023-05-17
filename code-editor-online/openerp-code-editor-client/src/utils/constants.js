@@ -12,6 +12,8 @@ export const SOCKET_EVENTS = {
   REFRESH_ROOM_PERMISSION: "refresh-room-permission",
   DELETE_USER_PERMISSION: "delete-user-permission",
   REFRESH_DELETE_PERMISSION: "refresh-delete-permission",
+  REQUEST_ON_OFF_MIC: "request-on-off-mic",
+  ACCEPT_ON_OFF_MIC: "accept-on-off-mic",
 };
 
 export const PROGRAMMING_LANGUAGES = {

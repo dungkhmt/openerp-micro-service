@@ -12,12 +12,33 @@ import {
 } from "@mui/material";
 import React from "react";
 import CircleIcon from "@mui/icons-material/Circle";
-import { useSelector } from "react-redux";
-import { Mic } from "@mui/icons-material";
+import { useDispatch, useSelector } from "react-redux";
+import { Mic, MicOff } from "@mui/icons-material";
 import randomColor from "randomcolor";
+import { CHARACTER_COLOR, SOCKET_EVENTS } from "utils/constants";
+import { useKeycloak } from "@react-keycloak/web";
+import { useState } from "react";
+import { handleOnOffMicParticipant, setState } from "../reducers/codeEditorReducers";
 
-const Participants = () => {
-  const { participants } = useSelector((state) => state.codeEditor);
+const Participants = (props) => {
+  const { socket } = props;
+  const { participants, roomMaster } = useSelector((state) => state.codeEditor);
+  const { keycloak } = useKeycloak();
+  const token = keycloak.tokenParsed;
+  const dispatch = useDispatch();
+
+  const handleMuteRemoteMic = (socketId, audio) => {
+    if (socket.current) {
+      socket.current.emit(SOCKET_EVENTS.REQUEST_ON_OFF_MIC, { socketId, audio });
+    }
+
+    dispatch(
+      handleOnOffMicParticipant({
+        socketId: socketId,
+        audio: audio ,
+      })
+    );
+  };
   return (
     <Paper elevation={3} sx={{ marginTop: "8px" }}>
       <Grid container spacing={1} justifyContent="center" alignItems="center" flexWrap="nowrap">
@@ -37,17 +58,26 @@ const Participants = () => {
         {participants.map((value) => {
           return (
             <ListItem
-              key={Math.random()}
+              key={value.socketId}
               secondaryAction={
-                <IconButton edge="end">
-                  <Mic fontSize="small" />
-                </IconButton>
+                roomMaster.id === token.preferred_username && (
+                  <IconButton
+                    edge="end"
+                    onClick={() => {
+                      handleMuteRemoteMic(value.socketId, !value.audio);
+                    }}
+                  >
+                    {value.audio ? <Mic fontSize="small" /> : <MicOff fontSize="small" />}
+                  </IconButton>
+                )
               }
             >
               <ListItemAvatar>
-                <Avatar sx={{ bgcolor: randomColor({luminosity: 'dark', count: 27}) }}>{`${
-                  value.fullName.toUpperCase()[0]
-                }`}</Avatar>
+                <Avatar
+                  sx={{
+                    bgcolor: CHARACTER_COLOR[value.fullName.split(" ").at(-1)?.toUpperCase()[0]],
+                  }}
+                >{`${value.fullName.split(" ").at(-1)?.toUpperCase()[0]}`}</Avatar>
               </ListItemAvatar>
               <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {value.fullName}

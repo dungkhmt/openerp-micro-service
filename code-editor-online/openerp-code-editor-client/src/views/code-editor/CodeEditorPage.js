@@ -13,7 +13,11 @@ import { io } from "socket.io-client";
 import CodeEditor from "./components/CodeEditor";
 import Participants from "./components/Participants";
 import { useKeycloak } from "@react-keycloak/web";
-import { setParticipants, setRoomName, setState } from "./reducers/codeEditorReducers";
+import {
+  handleOnOffMicParticipant,
+  setParticipants,
+  setState,
+} from "./reducers/codeEditorReducers";
 import SplitterLayout from "react-splitter-layout";
 import "react-splitter-layout/lib/index.css";
 import InputOutputCard from "./components/InputOuputCard";
@@ -130,6 +134,17 @@ const CodeEditorPage = () => {
           })
         );
       });
+
+      socketRef.current.on(SOCKET_EVENTS.ACCEPT_ON_OFF_MIC, ({ socketId, audio }) => {
+        dispatch(handleOnOffMicParticipant({ socketId, audio }));
+        if (socketId === socketRef.current.id) {
+          dispatch(
+            setState({
+              isMute: !audio,
+            })
+          );
+        }
+      });
     }
   }, [socketRef.current]);
 
@@ -143,7 +158,6 @@ const CodeEditorPage = () => {
       `/code-editor/rooms/${id}`,
       (response) => {
         if (response && response.status === 200) {
-          // dispatch(setRoomName(response.data?.roomName));
           dispatch(
             setState({
               roomName: response.data?.roomName,
@@ -200,7 +214,7 @@ const CodeEditorPage = () => {
               </SplitterLayout>
             </Grid>
             <Grid hidden={!isVisibleParticipants} item xs={isVisibleParticipants ? 2 : 0}>
-              <Participants />
+              <Participants socket={socketRef} />
             </Grid>
           </Grid>
         </div>
