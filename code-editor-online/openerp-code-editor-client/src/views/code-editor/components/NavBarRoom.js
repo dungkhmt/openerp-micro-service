@@ -26,14 +26,13 @@ import {
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import { PROGRAMMING_LANGUAGES } from "utils/constants";
+import { PROGRAMMING_LANGUAGES, SOCKET_EVENTS } from "utils/constants";
 import {
-  setIsMute,
   setIsVisibleConfigEditor,
   setIsVisibleParticipants,
   setIsVisibleShareForm,
   setOutput,
-  setSelectedLanguage,
+  setState,
   setTabKey,
 } from "../reducers/codeEditorReducers";
 import { getLanguageFileType } from "utils/CodeEditorUtils";
@@ -68,6 +67,7 @@ const NavBarRoom = (props) => {
     myPeer.current.disconnect();
     myPeer.current.destroy();
     socket.current.disconnect();
+    dispatch(setState({ isMute: false }));
     history.push("/code-editor/create-join-room");
   };
   function handleDownloadSource(language) {
@@ -133,7 +133,14 @@ const NavBarRoom = (props) => {
   };
 
   const handleMuteMicrophone = () => {
-    dispatch(setIsMute(!isMute));
+    if (socket.current) {
+      socket.current.emit(SOCKET_EVENTS.REQUEST_ON_OFF_MIC, { socketId: socket.current.id, audio: isMute });
+    }
+    dispatch(
+      setState({
+        isMute: !isMute,
+      })
+    );
   };
   return (
     <div>
@@ -199,7 +206,11 @@ const NavBarRoom = (props) => {
               label="Language"
               autoWidth
               onChange={(e) => {
-                dispatch(setSelectedLanguage(e.target.value));
+                dispatch(
+                  setState({
+                    selectedLanguage: e.target.value,
+                  })
+                );
               }}
             >
               <MenuItem value={PROGRAMMING_LANGUAGES.CPP.value}>
