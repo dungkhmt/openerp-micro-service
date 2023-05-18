@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,10 +16,12 @@ import java.util.UUID;
 public class OrderDetailResponse {
     private String userLoginId;
     private String customerName;
-    private BigDecimal totalSuccessOrderCount;
-    private BigDecimal totalSuccessOrderCost;
-    private BigDecimal totalCancelledOrderCount;
-    private BigDecimal totalCancelledOrderCost;
+    private BigDecimal totalSuccessProductCount;
+    private BigDecimal totalSuccessProductCost;
+    private BigDecimal totalFailProductCount;
+    private BigDecimal totalFailProductCost;
+    private List<OrderHistoryResponse> successProductHistory;
+    private List<OrderHistoryResponse> failProductHistory;
     private String createdDate;
     private String paymentMethod;
     private String receiptAddress;
@@ -59,6 +60,20 @@ public class OrderDetailResponse {
         private String warehouseName;
         private String lotId;
         private String status;
+        private String createdDate;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class OrderHistoryResponse {
+        private String orderId;
+        private String productId;
+        private String productName;
+        private BigDecimal quantity;
+        private BigDecimal priceUnit;
+        private String address;
         private String createdDate;
     }
 }

@@ -1,4 +1,4 @@
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, Link, Modal, TextField, Typography } from "@mui/material";
 import { request } from "api";
 import StandardTable from "components/StandardTable";
 import { Fragment, useEffect, useState } from "react";
@@ -17,6 +17,9 @@ const OrderApprovalDetail = ( props ) => {
   const classes = useStyles();
   const [orderInfo, setOrderInfo] = useState({});
   const [isLoading, setLoading] = useState(true);
+  const [historyTableData, setHistoryTableData] = useState([]);
+  const [isShowSuccessHistoryModal, setShowSuccessHistoryModal] = useState(false);
+  const [isShowFailHistoryModal, setShowFailHistoryModal] = useState(false);
 
   useEffect(() => {
     async function fetchData () {
@@ -75,6 +78,69 @@ const OrderApprovalDetail = ( props ) => {
   return (
   isLoading ? <LoadingScreen /> :
   <Fragment>
+
+    <Modal open={isShowSuccessHistoryModal}
+        onClose={() => setShowSuccessHistoryModal(!isShowSuccessHistoryModal)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          width: '75%',
+          height: '55%',
+          transform: 'translate(-50%, -50%)',
+          bgcolor: 'background.paper',
+          border: '2px solid #000',
+          boxShadow: 24,
+          p: 4,
+        }}>
+          <StandardTable
+            title="Lịch sử giao hàng thành công"
+            data={orderInfo?.successProductHistory}
+            columns={[
+              { title: "Sản phẩm", field: "productName" },
+              { title: "Giá tiền", field: "priceUnit" },
+              { title: "Số lượng", field: "quantity" },
+              { title: "Địa chỉ nhận hàng", field: "address" },
+              { title: "Ngày mua hàng", field: "createdDate" }
+            ]}
+          />
+        </Box>
+    </Modal>
+
+    <Modal open={isShowFailHistoryModal}
+        onClose={() => setShowFailHistoryModal(!isShowFailHistoryModal)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          width: '75%',
+          height: '55%',
+          transform: 'translate(-50%, -50%)',
+          bgcolor: 'background.paper',
+          border: '2px solid #000',
+          boxShadow: 24,
+          p: 4,
+        }}>
+          <StandardTable
+            title="Lịch sử giao hàng thất bại"
+            data={orderInfo?.successProductHistory}
+            columns={[
+              { title: "Sản phẩm", field: "productName" },
+              { title: "Giá tiền", field: "priceUnit" },
+              { title: "Số lượng", field: "quantity" },
+              { title: "Địa chỉ nhận hàng", field: "address" },
+              { title: "Ngày mua hàng", field: "createdDate" }
+            ]}
+          />
+        </Box>
+    </Modal>
+
     <Box>
       <Grid container justifyContent="space-between" 
         className={classes.headerBox} >
@@ -162,7 +228,7 @@ const OrderApprovalDetail = ( props ) => {
                       fullWidth
                       variant="outlined"
                       size="small"
-                      value={convertToVNDFormat(orderInfo?.totalOrderCost)}
+                      value={convertToVNDFormat(orderInfo?.totalProductCost)}
                       InputProps={{
                         readOnly: true,
                       }}
@@ -209,13 +275,20 @@ const OrderApprovalDetail = ( props ) => {
                 <Grid item xs={6}>
                   <Box className={classes.inputWrap}>
                     <Box className={classes.labelInput}>
-                      Số lượng đơn hàng giao thành công
+                      <Link
+                        component="button"
+                        onClick={() => {
+                          setShowSuccessHistoryModal(true);
+                        }}
+                      >
+                        Số lượng hàng giao thành công
+                      </Link>
                     </Box>
                     <TextField
                       fullWidth
                       variant="outlined"
                       size="small"
-                      value={orderInfo?.totalSuccessOrderCount}
+                      value={orderInfo?.totalSuccessProductCount}
                       InputProps={{
                         readOnly: true,
                       }}
@@ -225,13 +298,20 @@ const OrderApprovalDetail = ( props ) => {
                 <Grid item xs={6}>
                   <Box className={classes.inputWrap}>
                     <Box className={classes.labelInput}>
-                      Tổng giá trị đơn hàng giao thành công
+                      <Link
+                        component="button"
+                        onClick={() => {
+                          setShowSuccessHistoryModal(true);
+                        }}
+                      >
+                        Tổng giá trị hàng giao thành công
+                      </Link>
                     </Box>
                     <TextField
                       fullWidth
                       variant="outlined"
                       size="small"
-                      value={convertToVNDFormat(orderInfo?.totalSuccessOrderCost)}
+                      value={convertToVNDFormat(orderInfo?.totalSuccessProductCost)}
                       InputProps={{
                         readOnly: true,
                       }}
@@ -244,13 +324,20 @@ const OrderApprovalDetail = ( props ) => {
                 <Grid item xs={6}>
                   <Box className={classes.inputWrap}>
                     <Box className={classes.labelInput}>
-                      Tổng số lượng đơn hàng giao thất bại
+                      <Link
+                        component="button"
+                        onClick={() => {
+                          setShowFailHistoryModal(true);
+                        }}
+                      >
+                        Số lượng hàng giao thất bại
+                      </Link>
                     </Box>
                     <TextField
                       fullWidth
                       variant="outlined"
                       size="small"
-                      value={orderInfo?.totalCancelledOrderCount}
+                      value={orderInfo?.totalFailProductCount}
                       InputProps={{
                         readOnly: true,
                       }}
@@ -260,13 +347,20 @@ const OrderApprovalDetail = ( props ) => {
                 <Grid item xs={6}>
                   <Box className={classes.inputWrap}>
                     <Box className={classes.labelInput}>
-                      Tổng giá trị đơn hàng giao thất bại
+                      <Link
+                        component="button"
+                        onClick={() => {
+                          setShowFailHistoryModal(true);
+                        }}
+                      >
+                        Tổng giá trị hàng giao thất bại
+                      </Link>
                     </Box>
                     <TextField
                       fullWidth
                       variant="outlined"
                       size="small"
-                      value={convertToVNDFormat(orderInfo?.totalCancelledOrderCost)}
+                      value={convertToVNDFormat(orderInfo?.totalFailProductCost)}
                       InputProps={{
                         readOnly: true,
                       }}
