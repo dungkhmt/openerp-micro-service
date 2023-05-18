@@ -52,7 +52,7 @@ const CodeEditorPage = () => {
       socketRef.current = io(
         process.env.REACT_APP_CODE_EDITOR_ONLINE_SERVER_DOMAIN || "http://localhost:7008"
       );
-      // get audio instance of system 
+      // get audio instance of system
       navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then((stream) => {
         // Create a peer connection
         myPeer.current = new Peer();
@@ -198,7 +198,7 @@ const CodeEditorPage = () => {
   }, [isMute]);
   return (
     <>
-      {isAccess ? (
+      {isAccess === true && (
         <div>
           <audio ref={localAudioRef} muted autoPlay></audio>
           <audio ref={remoteAudioRef} autoPlay></audio>
@@ -226,9 +226,8 @@ const CodeEditorPage = () => {
             </Grid>
           </Grid>
         </div>
-      ) : (
-        <NotAccess />
       )}
+      {isAccess === false && <NotAccess />}
     </>
   );
 };
