@@ -24,6 +24,9 @@ export const endPoint = {
   getPurchaseOrderItems: baseUrl + "/purchase-order/get-order-items",
   updatePurchaseOrderStatus: baseUrl + "/purchase-order/update-status",
   createPurchaseOrder: baseUrl + "/purchase-order/create",
+  createSellinPrice: baseUrl + "/product/set-purchase-price",
+  getSellinPrice: baseUrl + "/product/get-all-sellin-price",
+  updateSellinPrice: baseUrl + "/product/sellin-price/update",
   // Facility
   getFacility: baseUrl + "/facility/get-all",
   getFacilityInventory: baseUrl + "/facility/get-inventory",

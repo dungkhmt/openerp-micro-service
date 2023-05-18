@@ -2,6 +2,7 @@ package wms.service.product;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
 import org.hibernate.internal.util.StringHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,8 @@ import wms.exception.CustomException;
 import wms.repo.*;
 import wms.service.BaseService;
 import wms.utils.GeneralUtils;
+
+import java.util.List;
 
 
 @Service
@@ -125,25 +128,46 @@ public class ProductServiceImpl extends BaseService implements IProductService {
     }
 
     @Override
-    public ProductPrice setPurchasePrice(ProductPriceDTO productPriceDTO) throws CustomException {
-        ContractType contractType = contractTypeRepo.getContractTypeByCode(productPriceDTO.getContractTypeCode());
-        ProductEntity product = productRepository.getProductByCode(productPriceDTO.getProductCode());
-        if (contractType== null) {
-            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product price with no specific contract type, can't set");
+    @Transactional(rollbackFor = Exception.class)
+    public void setPurchasePrice(List<ProductPriceDTO> productPriceDTO) throws CustomException {
+        for (ProductPriceDTO priceDTO : productPriceDTO) {
+//            ContractType contractType = contractTypeRepo.getContractTypeByCode(priceDTO.getContractTypeCode());
+            ProductEntity product = productRepository.getProductByCode(priceDTO.getProductCode());
+//            if (contractType== null) {
+//                throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product price with no specific contract type, can't set");
+//            }
+            if (product== null) {
+                throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product price with no specific, can't set");
+            }
+            ProductPrice newPrice = ProductPrice.builder()
+                    .vat(priceDTO.getVat())
+                    .priceBeforeVat(priceDTO.getPriceBeforeVat())
+                    .status(priceDTO.getStatus())
+                    .startedDate(priceDTO.getStartedDate())
+                    .endedDate(priceDTO.getEndedDate())
+//                    .contractType(contractType)
+                    .productEntity(product)
+                    .build();
+            productPriceRepo.save(newPrice);
         }
-        if (product== null) {
-            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product price with no specific, can't set");
+    }
+
+    @Override
+    public List<ProductPrice> getAllSellinPrice() {
+        return productPriceRepo.getAll();
+    }
+
+    @Override
+    public ProductPrice updateSellinPrice(ProductPriceDTO productPriceDTO, String productCode) throws CustomException {
+        ProductPrice productPrice = productPriceRepo.getByProductCode(productCode);
+        if (productPrice == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "None existed product, can't update");
         }
-        ProductPrice newPrice = ProductPrice.builder()
-                .vat(productPriceDTO.getVat())
-                .priceBeforeVat(productPriceDTO.getPriceBeforeVat())
-                .status(productPriceDTO.getStatus())
-                .startedDate(productPriceDTO.getStartedDate())
-                .endedDate(productPriceDTO.getEndedDate())
-                .contractType(contractType)
-                .productEntity(product)
-                .build();
-        return productPriceRepo.save(newPrice) ;
+        productPrice.setPriceBeforeVat(productPriceDTO.getPriceBeforeVat());
+        productPrice.setVat(productPriceDTO.getVat());
+        productPrice.setStartedDate(productPriceDTO.getStartedDate());
+        productPrice.setEndedDate(productPriceDTO.getEndedDate());
+        return productPriceRepo.save(productPrice);
     }
 
     @Override

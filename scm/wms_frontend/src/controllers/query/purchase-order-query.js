@@ -88,3 +88,60 @@ export const useUpdatePurchaseOrderStatus = (params) => {
     onMutate: (variables) => {},
   });
 };
+export const useCreateSellinPrice = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.createSellinPrice,
+        params,
+        data
+      );
+      if (res && res.code === 1) {
+        toast.success("Tạo thành công!");
+        queryClient.invalidateQueries([queryKey.purchase_order.purchase_price]);
+        return res.data;
+      }
+    },
+    onError: () => {
+      toast.error("Lỗi khi tạo , vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+export const useGetSellinPrice = (params) => {
+  return useQuery({
+    queryKey: [queryKey.purchase_order.purchase_price, params],
+    queryFn: async () => {
+      const res = await axiosSendRequest("get", endPoint.getSellinPrice);
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+  });
+};
+
+export const useUpdateSellinPrice = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "put",
+        endPoint.updateSellinPrice,
+        params,
+        data
+      );
+      if (res && res.code === 1) {
+        toast.success("Cập nhật thành công!");
+        queryClient.invalidateQueries([queryKey.purchase_order.purchase_price]);
+        return res.data;
+      }
+    },
+    onError: () => {
+      toast.error("Lỗi , vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};

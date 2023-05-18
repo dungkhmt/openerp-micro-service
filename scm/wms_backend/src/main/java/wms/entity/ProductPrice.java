@@ -31,10 +31,10 @@ public class ProductPrice extends BaseEntity implements Serializable {
     @JoinColumn(name = "product_code", referencedColumnName = "code")
     @NotFound(action = NotFoundAction.IGNORE)
     private ProductEntity productEntity;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "contract_type_code", referencedColumnName = "code")
-    @NotFound(action = NotFoundAction.IGNORE)
-    private ContractType contractType;
+//
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "contract_type_code", referencedColumnName = "code")
+//    @NotFound(action = NotFoundAction.IGNORE)
+//    private ContractType contractType;
 
 }

@@ -256,18 +256,6 @@ export const purchaseOrderPrice = [
     maxWidth: 200,
   },
   {
-    field: "contractTypeName",
-    headerAlign: "center",
-    align: "center",
-    headerName: "Loại hợp đồng",
-    sortable: false,
-    minWidth: 150,
-    maxWidth: 200,
-    valueGetter: (params) => {
-      return params.row.contract.name;
-    },
-  },
-  {
     field: "status",
     headerName: "Trạng thái",
     sortable: false,
@@ -285,7 +273,7 @@ export const purchaseOrderPrice = [
             paddingX: 2,
             height: "24px",
             background:
-              ORDER_STATUS_COLOR_MAPPING[params?.row?.status.toLowerCase()],
+              ITEM_STATUS_COLOR_MAPPING[params?.row?.status.toLowerCase()],
           }}
         >
           <Typography
