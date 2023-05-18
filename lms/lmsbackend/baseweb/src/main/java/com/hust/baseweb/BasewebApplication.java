@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @EnableAsync
 @EnableCaching
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true) 
+@EnableGlobalMethodSecurity(securedEnabled = true)
 @SpringBootApplication
 public class BasewebApplication {
 
