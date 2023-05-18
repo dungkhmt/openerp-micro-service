@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelCreateQuizQuestionUserRole {
+
     private UUID questionId;
     private String userId;
     private String roleId;

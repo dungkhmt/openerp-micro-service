@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface ThesisDefensePlanRepo extends JpaRepository<ThesisDefensePlan, String> {
 
     Optional<ThesisDefensePlan> findByName(String name);
+
     Optional<ThesisDefensePlan> findByNameAndAndId(String name, String id);
 }

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface MongoContentService {
+
     public ObjectId storeFileToGridFs(ContentModel contentModel) throws IOException;
 
     public GridFsResource getById(String id);

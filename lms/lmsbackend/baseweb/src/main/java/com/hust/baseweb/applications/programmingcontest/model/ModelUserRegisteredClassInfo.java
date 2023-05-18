@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelUserRegisteredClassInfo {
-//    private String email;
+
+    //    private String email;
 //    private String fullName;
     private String userName;
     private String middleName;

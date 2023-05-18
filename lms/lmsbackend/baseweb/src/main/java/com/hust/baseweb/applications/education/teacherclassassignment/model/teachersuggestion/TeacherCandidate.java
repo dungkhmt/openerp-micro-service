@@ -9,7 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TeacherCandidate{
+public class TeacherCandidate {
+
     private String teacherId;
     private int numberClasses;
     private int numberDays;

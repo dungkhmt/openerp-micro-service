@@ -27,8 +27,8 @@ import java.util.*;
 public class DefenseJuryServiceImpl implements DefenseJuryService {
 
     private final DefenseJuryRepo defenseJuryRepo;
-    private  final TranningProgramRepo tranningProgramRepo;
-    private  final ThesisDefensePlanRepo thesisDefensePlanRepo;
+    private final TranningProgramRepo tranningProgramRepo;
+    private final ThesisDefensePlanRepo thesisDefensePlanRepo;
     private final UserLoginRepo userLoginRepo;
     private final EduTeacherRepo eduTeacherRepo;
     private final DefenseJuryTeacherRepo defenseJuryTeacherRepo;
@@ -37,8 +37,8 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
     @Override
     public DefenseJury createDefenseJury(DefenseJuryIM jury) {
         System.out.println(jury);        // TODO: check valid all fields
-        if ((jury.getName()=="")||(jury.getDefenseDate()==null)
-            ||(jury.getThesisPlanName()==null)||(jury.getUserLoginID())==null){
+        if ((jury.getName() == "") || (jury.getDefenseDate() == null)
+            || (jury.getThesisPlanName() == null) || (jury.getUserLoginID()) == null) {
             return null;
         }
         String s1 = jury.getName().substring(0, 1).toUpperCase() + jury.getName().substring(1);
@@ -48,7 +48,7 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         Optional<ThesisDefensePlan> tdp = thesisDefensePlanRepo.findByName(jury.getThesisPlanName());
         UserLogin user = userLoginRepo.findByUserLoginId(jury.getUserLoginID());
 //        System.out.println(tp);
-        if ((tdp==null)|| (user==null)){
+        if ((tdp == null) || (user == null)) {
             return null;
         }
         // check existed defense jury
@@ -81,13 +81,15 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
     @Override
     public DefenseJuryOM getDefenseJury(DefenseJury jury) {
         Optional<DefenseJury> dj = defenseJuryRepo.findById(jury.getId());
-        if (dj == null){
+        if (dj == null) {
             return null;
         }
         System.out.println(dj);
 
         // get thesis plan name and tranning program
-        Optional<ThesisDefensePlan> thesisDefensePlan = thesisDefensePlanRepo.findById(dj.get().getThesisDefensePlanID());
+        Optional<ThesisDefensePlan> thesisDefensePlan = thesisDefensePlanRepo.findById(dj
+                                                                                           .get()
+                                                                                           .getThesisDefensePlanID());
         Optional<TraningProgram> traningProgram = tranningProgramRepo.findById(dj.get().getProgramID());
 //        if ((!thesisDefensePlan.isPresent())||(!traningProgram.isPresent())){
 //            return null;
@@ -114,21 +116,21 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
     public Response findAllBelongPlanID(String planId) {
         Response res = new Response();
         // check input
-        if(planId == ""){
+        if (planId == "") {
             res.setOk(false);
             res.setErr("Invalid plan id");
             return res;
         }
         // check planID existed
         Optional<ThesisDefensePlan> dp = thesisDefensePlanRepo.findById(planId);
-        if(!dp.isPresent()){
+        if (!dp.isPresent()) {
             res.setOk(false);
             res.setErr("Plan Id isnt existed");
             return res;
         }
         // TODO: handler
         List<DefenseJury> dj = defenseJuryRepo.findAllByPlanId(planId);
-        if (dj.size() == 0){
+        if (dj.size() == 0) {
             res.setOk(true);
             res.setErr("Not found defense jury");
             return res;
@@ -148,13 +150,15 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
 //        System.out.println(juryList);
         // mapping defense jury to defense jury OM
         List<DefenseJuryOM> output = new ArrayList<DefenseJuryOM>();
-        if(juryList.size()== 0){
-            return  null;
+        if (juryList.size() == 0) {
+            return null;
         }
-        for (int i=0;i<juryList.size();i++){
+        for (int i = 0; i < juryList.size(); i++) {
             DefenseJuryOM res = new DefenseJuryOM();
             // get thesis plan name and tranning program
-            Optional<ThesisDefensePlan> thesisDefensePlan = thesisDefensePlanRepo.findById(juryList.get(i).getThesisDefensePlanID());
+            Optional<ThesisDefensePlan> thesisDefensePlan = thesisDefensePlanRepo.findById(juryList
+                                                                                               .get(i)
+                                                                                               .getThesisDefensePlanID());
             Optional<TraningProgram> traningProgram = tranningProgramRepo.findById(juryList.get(i).getProgramID());
 //            if ((!thesisDefensePlan.isPresent())||(!traningProgram.isPresent())){
 //                return null;
@@ -178,7 +182,7 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
     @Override
     public Response getListDefenseJuryTeachers(UUID defenseJuryID) {
         Response res = new Response();
-        if (defenseJuryID == null){
+        if (defenseJuryID == null) {
             res.setErr("Invalid defense jury id");
             res.setOk(false);
             return res;
@@ -186,8 +190,8 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
 
         List<EduTeacher> teachers = new ArrayList<EduTeacher>();
         List<DefenseJuryTeacher> dt = defenseJuryTeacherRepo.findAllByDefenseJuryID(defenseJuryID);
-        if (dt.size() >0 ){
-            for(int i=0;i<dt.size();i++){
+        if (dt.size() > 0) {
+            for (int i = 0; i < dt.size(); i++) {
                 Optional<EduTeacher> teacher = eduTeacherRepo.findById(dt.get(i).getTeacherId());
                 teachers.add(teacher.get());
             }
@@ -198,24 +202,24 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
     }
 
     @Override
-    public Response deleteTheisByIdAtIt(ThesisWithDefenseJuryIM request,UUID juryId) {
+    public Response deleteTheisByIdAtIt(ThesisWithDefenseJuryIM request, UUID juryId) {
         Response res = new Response();
-        if (request.getThesisId() == null || juryId == null){
+        if (request.getThesisId() == null || juryId == null) {
             res.setOk(false);
             res.setErr("Invalid thesis ID or defense jury ID ");
             return res;
         }
         // check exist of defense juryid
         Optional<DefenseJury> dj = defenseJuryRepo.findById(juryId);
-        if (!dj.isPresent()){
+        if (!dj.isPresent()) {
             res.setOk(false);
             res.setErr("Denfense Jury isnt existed");
             return res;
         }
         // check exist at thesis
-        Optional<Thesis> thesis = thesisRepo.findByIdAndDefenseJury(request.getThesisId(),juryId);
+        Optional<Thesis> thesis = thesisRepo.findByIdAndDefenseJury(request.getThesisId(), juryId);
         System.out.println(thesis);
-        if (!thesis.isPresent()){
+        if (!thesis.isPresent()) {
             res.setOk(false);
             res.setErr("Not any thesis is found satisfy the condition");
             return res;
@@ -245,14 +249,14 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
     @Override
     public Response addTheisByIdAtIt(ThesisWithDefenseJuryIM request, UUID juryId) {
         Response res = new Response();
-        if (request.getThesisId() == null || juryId == null){
+        if (request.getThesisId() == null || juryId == null) {
             res.setOk(false);
             res.setErr("Invalid thesis ID or defense jury ID ");
             return res;
         }
         // check exist of defense juryid
         Optional<DefenseJury> dj = defenseJuryRepo.findById(juryId);
-        if (!dj.isPresent()){
+        if (!dj.isPresent()) {
             res.setOk(false);
             res.setErr("Denfense Jury isnt existed");
             return res;
@@ -269,13 +273,13 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         System.out.println(request.getThesisId());
         Optional<Thesis> thesis = thesisRepo.findById(request.getThesisId());
         System.out.println(thesis);
-        if (!thesis.isPresent()){
+        if (!thesis.isPresent()) {
             res.setOk(false);
             res.setErr("Not any thesis is found satisfy the condition");
             return res;
         }
 
-        thesisRepo.updateThesisByDefenJuryId(request.getThesisId(),juryId);
+        thesisRepo.updateThesisByDefenJuryId(request.getThesisId(), juryId);
         res.setOk(true);
         // delete thesisId at defenseJury table;
 

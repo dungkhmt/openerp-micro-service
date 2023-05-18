@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface EduClassSessionService {
+
     EduClassSession save(UUID classId, String sessionName, String description, String userLoginId);
+
     List<EduClassSession> findAllByClassId(UUID classId);
 
     EduQuizTest createQuizTestOfClassSession(UUID sessionId, String testId, String testName, int duration);

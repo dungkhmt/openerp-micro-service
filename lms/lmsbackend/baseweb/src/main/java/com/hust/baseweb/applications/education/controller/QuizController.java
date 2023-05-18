@@ -48,8 +48,10 @@ public class QuizController {
     private QuizQuestionUserRoleRepo quizQuestionUserRoleRepo;
 
     @PostMapping("/post-comment-on-quiz")
-    public ResponseEntity<?> postCommentOnQuizQuestion(Principal principal,
-                                                       @RequestBody CreateCommentOnQuizQuestionIM input){
+    public ResponseEntity<?> postCommentOnQuizQuestion(
+        Principal principal,
+        @RequestBody CreateCommentOnQuizQuestionIM input
+    ) {
 
         UserLogin u = userService.findById(principal.getName());
         log.info("postCommentOnQuizQuestion, user " + u.getUserLoginId() + " post comments = " + input.getComment());
@@ -64,20 +66,22 @@ public class QuizController {
         );
         return ResponseEntity.ok().body(commentOnQuizQuestion);
     }
+
     @GetMapping("/get-list-comments-on-quiz/{questionId}")
-    public ResponseEntity<?> getListCommentsOnQuiz(Principal principal, @PathVariable UUID questionId){
+    public ResponseEntity<?> getListCommentsOnQuiz(Principal principal, @PathVariable UUID questionId) {
         List<CommentOnQuizQuestionDetailOM> lst = commentOnQuizQuestionService.findByQuestionId(questionId);
         return ResponseEntity.ok().body(lst);
     }
+
     @GetMapping("/get-number-comments-on-quiz/{questionId}")
-    public ResponseEntity<?> getNumberCommentsOnQuiz(Principal principal, @PathVariable UUID questionId){
+    public ResponseEntity<?> getNumberCommentsOnQuiz(Principal principal, @PathVariable UUID questionId) {
         int nbr = commentOnQuizQuestionService.getNumberCommentsOnQuiz(questionId);
         //log.info("getNumberCommentsOnQuiz, questionId = " + questionId + " size = " + nbr);
         return ResponseEntity.ok().body(nbr);
     }
 
     @GetMapping("/get-list-reply-comments-on-quiz/{commentId}")
-    public ResponseEntity<?> getListReplyCommentsOnQuiz(Principal principal, @PathVariable UUID commentId){
+    public ResponseEntity<?> getListReplyCommentsOnQuiz(Principal principal, @PathVariable UUID commentId) {
         List<CommentOnQuizQuestionDetailOM> lst = commentOnQuizQuestionService.findByReplyToCommentId(commentId);
         return ResponseEntity.ok().body(lst);
     }
@@ -86,7 +90,7 @@ public class QuizController {
     public ResponseEntity<?> deleteCommentOnQuiz(
         Principal principal,
         @PathVariable UUID commentId
-    ){
+    ) {
         commentOnQuizQuestionService.deleteCommentOnQuiz(commentId);
         return ResponseEntity.ok().body(commentId);
     }
@@ -96,8 +100,10 @@ public class QuizController {
         Principal principal,
         @RequestBody CommentOnQuizQuestion input,
         @PathVariable UUID commentId
-    ){
-        CommentOnQuizQuestion edittedComment = commentOnQuizQuestionService.updateComment(commentId, input.getCommentText());
+    ) {
+        CommentOnQuizQuestion edittedComment = commentOnQuizQuestionService.updateComment(
+            commentId,
+            input.getCommentText());
         return ResponseEntity.ok().body(edittedComment);
     }
 
@@ -135,17 +141,23 @@ public class QuizController {
         // check permission (based on roles)
         List<QuizQuestionUserRole> roles = quizQuestionUserRoleRepo.findAllByUserId(principal.getName());
         boolean hasUpdatePermission = false;
-        for(QuizQuestionUserRole e: roles){
-            if(e.getRoleId().equals(QuizQuestionUserRole.ROLE_MANAGER) || e.getRoleId().equals(QuizQuestionUserRole.ROLE_MANAGER)){
+        for (QuizQuestionUserRole e : roles) {
+            if (e.getRoleId().equals(QuizQuestionUserRole.ROLE_MANAGER) ||
+                e.getRoleId().equals(QuizQuestionUserRole.ROLE_MANAGER)) {
                 hasUpdatePermission = true;
                 break;
             }
         }
-        if(!hasUpdatePermission){
+        if (!hasUpdatePermission) {
             return ResponseEntity.ok().body("No permission");
         }
-        
-        QuizQuestion quizQuestion = quizQuestionService.update(principal.getName(), questionId, json, files, addedSolutionAttachments);
+
+        QuizQuestion quizQuestion = quizQuestionService.update(
+            principal.getName(),
+            questionId,
+            json,
+            files,
+            addedSolutionAttachments);
         return ResponseEntity.ok().body(quizQuestion);
     }
 
@@ -162,7 +174,7 @@ public class QuizController {
     @PostMapping("/create-quiz-course-topic")
     public ResponseEntity<?> createQuizCourseTopic(
         Principal principal, @RequestBody
-        QuizCourseTopicCreateInputModel input
+    QuizCourseTopicCreateInputModel input
     ) {
         //log.info("createQuizCourseTopic, topicId = " + input.getQuizCourseTopicId());
         QuizCourseTopic quizCourseTopic = quizCourseTopicService.save(input);
@@ -187,13 +199,17 @@ public class QuizController {
         lst.add("N");
         return ResponseEntity.ok().body(lst);
     }
+
     @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
     @PostMapping("/copy-quiz-question-to-course")
-    public ResponseEntity<?> copyQuizQuestionToAQuizTopic(Principal principal,
-                                                          @RequestBody AssignQuizQuestionToQuizCourseTopicIM input){
+    public ResponseEntity<?> copyQuizQuestionToAQuizTopic(
+        Principal principal,
+        @RequestBody AssignQuizQuestionToQuizCourseTopicIM input
+    ) {
         // TODO
         return null;
     }
+
     @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
     @PostMapping("/create-quiz-question")
     public ResponseEntity<?> createQuizQuestion(
@@ -241,14 +257,16 @@ public class QuizController {
         }
         return ResponseEntity.ok().body(quizQuestionDetailModels);
     }
+
     @GetMapping("/get-quiz-question-detail/{questionId}")
-    public ResponseEntity<?> getQuizQuestionDetail(Principal principal, @PathVariable UUID questionId){
+    public ResponseEntity<?> getQuizQuestionDetail(Principal principal, @PathVariable UUID questionId) {
         //QuizQuestion q = quizQuestionService.findById(questionId);
         log.info("getQuizQuestionDetail, questionId = " + questionId);
         QuizQuestionDetailModel quizQuestionDetailModel = quizQuestionService.findQuizDetail(questionId);
         return ResponseEntity.ok().body(quizQuestionDetailModel);
 
     }
+
     @GetMapping("/get-published-quiz-of-class/{classId}")
     public ResponseEntity<?> getPublishedQuizOfClass(Principal principal, @PathVariable UUID classId) {
         GetClassDetailOM eduClass = classService.getClassDetail(classId);
@@ -314,8 +332,9 @@ public class QuizController {
         log.info("getCourseOfQuizQuestion, questionId = " + questionId + " got courseId = " + eduCourse.getId());
         return ResponseEntity.ok().body(eduCourse);
     }
+
     @GetMapping("/get-quiz-of-course-topic/{quizCourseTopicId}")
-    public ResponseEntity<?> getQuizOfCourseTopic(@PathVariable String quizCourseTopicId){
+    public ResponseEntity<?> getQuizOfCourseTopic(@PathVariable String quizCourseTopicId) {
         log.info("getQuizOfCourseTopic, quizCourseTopicId = " + quizCourseTopicId);
         List<QuizQuestion> quizQuestions = quizQuestionService.findQuizOfCourseTopic(quizCourseTopicId);
 
@@ -341,6 +360,7 @@ public class QuizController {
         });
         return ResponseEntity.ok().body(quizQuestionDetailModels);
     }
+
     @GetMapping("/get-quiz-of-course-sorted-created-time-desc/{courseId}")
     public ResponseEntity<?> getQuizOfCourseSortedCreatedTimeDesc(Principal principal, @PathVariable String courseId) {
         List<QuizQuestion> quizQuestions = quizQuestionService.findQuizOfCourse(courseId);
@@ -413,9 +433,10 @@ public class QuizController {
         QuizChoiceAnswer quizChoiceAnswer = quizChoiceAnswerService.save(input);
         return ResponseEntity.ok().body(quizChoiceAnswer);
     }
+
     @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
     @GetMapping("/generate-choice-answer-code-for-all-quiz-questions")
-    public ResponseEntity<?> genChoiceCodeForAllQuizQuestions(Principal principal){
+    public ResponseEntity<?> genChoiceCodeForAllQuizQuestions(Principal principal) {
         int cnt = quizQuestionService.generateChoiceCodesForAllQuizQuestions();
         return ResponseEntity.ok().body(cnt);
     }
@@ -433,13 +454,14 @@ public class QuizController {
         // check permission (based on roles)
         List<QuizQuestionUserRole> roles = quizQuestionUserRoleRepo.findAllByUserId(principal.getName());
         boolean hasUpdatePermission = false;
-        for(QuizQuestionUserRole e: roles){
-            if(e.getRoleId().equals(QuizQuestionUserRole.ROLE_MANAGER) || e.getRoleId().equals(QuizQuestionUserRole.ROLE_MANAGER)){
+        for (QuizQuestionUserRole e : roles) {
+            if (e.getRoleId().equals(QuizQuestionUserRole.ROLE_MANAGER) ||
+                e.getRoleId().equals(QuizQuestionUserRole.ROLE_MANAGER)) {
                 hasUpdatePermission = true;
                 break;
             }
         }
-        if(!hasUpdatePermission){
+        if (!hasUpdatePermission) {
             return ResponseEntity.ok().body("No permission");
         }
 
@@ -511,34 +533,49 @@ public class QuizController {
     }
 
     @GetMapping("/get-users-granted-to-quiz-question/{questionId}")
-    public ResponseEntity<?> getUsersGranttedToQuizQuestion(@PathVariable UUID questionId){
+    public ResponseEntity<?> getUsersGranttedToQuizQuestion(@PathVariable UUID questionId) {
         List<QuizQuestionUserRole> res = quizQuestionService.getUsersGranttedToQuizQuestion(questionId);
         return ResponseEntity.ok().body(res);
     }
+
     @PostMapping("/add-quiz-question-user-role")
-    public ResponseEntity<?> addQuizQuestionUserRole(Principal princiapl, @RequestBody ModelCreateQuizQuestionUserRole input){
+    public ResponseEntity<?> addQuizQuestionUserRole(
+        Principal princiapl,
+        @RequestBody ModelCreateQuizQuestionUserRole input
+    ) {
         QuizQuestionUserRole quizQuestionUserRole = quizQuestionService.addQuizQuestionUserRole(input);
         return ResponseEntity.ok().body(quizQuestionUserRole);
     }
+
     @GetMapping("/grant-role-to-user-on-all-quiz-questions/{roleId}/{userId}")
-    public ResponseEntity<?> grantRoleToUserOnAllQuizQuestion(Principal principal, @PathVariable String roleId, @PathVariable String userId){
+    public ResponseEntity<?> grantRoleToUserOnAllQuizQuestion(
+        Principal principal,
+        @PathVariable String roleId,
+        @PathVariable String userId
+    ) {
         boolean ok = quizQuestionService.grantRoleToUserOnAllQuizQuestions(roleId, userId);
         return ResponseEntity.ok().body(ok);
     }
 
     @GetMapping("/get-roles-user-not-granted-in-quiz-question/{questionId}/{userId}")
-    public ResponseEntity<?> getRolesUserNotGranttedInQuizQuestion(@PathVariable UUID questionId, @PathVariable String userId){
-        List<QuizQuestionUserRole> rolesGrantted = quizQuestionUserRoleRepo.findAllByQuestionIdAndUserId(questionId, userId);
+    public ResponseEntity<?> getRolesUserNotGranttedInQuizQuestion(
+        @PathVariable UUID questionId,
+        @PathVariable String userId
+    ) {
+        List<QuizQuestionUserRole> rolesGrantted = quizQuestionUserRoleRepo.findAllByQuestionIdAndUserId(
+            questionId,
+            userId);
         List<String> res = new ArrayList();
         List<String> roles = QuizQuestionUserRole.getRoles();
-        for(String r: roles){
+        for (String r : roles) {
             boolean exist = false;
-            for(QuizQuestionUserRole qr: rolesGrantted){
-                if(qr.getRoleId().equals(r)){
-                    exist= true; break;
+            for (QuizQuestionUserRole qr : rolesGrantted) {
+                if (qr.getRoleId().equals(r)) {
+                    exist = true;
+                    break;
                 }
             }
-            if(!exist){
+            if (!exist) {
                 res.add(r);
             }
         }

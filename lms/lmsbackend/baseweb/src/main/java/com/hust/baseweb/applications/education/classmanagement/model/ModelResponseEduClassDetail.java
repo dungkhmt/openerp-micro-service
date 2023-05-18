@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelResponseEduClassDetail {
+
     private UUID id;
 
     private String classCode;

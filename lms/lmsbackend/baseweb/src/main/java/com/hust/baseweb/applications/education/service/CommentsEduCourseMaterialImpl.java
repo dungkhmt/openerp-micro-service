@@ -19,14 +19,16 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
-public class CommentsEduCourseMaterialImpl implements CommentsEduCourseMaterialService{
+public class CommentsEduCourseMaterialImpl implements CommentsEduCourseMaterialService {
+
     @Autowired
     private CommentsEduCourseMaterialRepo commentsEduCourseMaterialRepo;
     public UserService userService;
     private NotificationsService notificationsService;
     private EduCourseChapterMaterialService eduCourseChapterMaterialService;
+
     @Override
-    public  CommentsEduCourseMaterial createComment(
+    public CommentsEduCourseMaterial createComment(
         UUID eduCourseMaterialId,
         UUID replyToCommentId,
         String comment,
@@ -45,8 +47,8 @@ public class CommentsEduCourseMaterialImpl implements CommentsEduCourseMaterialS
 
         List<String> listUsers = commentsEduCourseMaterialRepo.postedByUserLoginId(eduCourseMaterialId);
         String url = "/edu/student/course/chapter/material/detail/" + eduCourseMaterialId;
-        String message = "User "+  u.getUserLoginId() + " comments on material " + material.getEduCourseMaterialName();
-        listUsers.forEach((user)->{
+        String message = "User " + u.getUserLoginId() + " comments on material " + material.getEduCourseMaterialName();
+        listUsers.forEach((user) -> {
             notificationsService.create(u.getUserLoginId(), user, message, url);
         });
 
@@ -55,10 +57,11 @@ public class CommentsEduCourseMaterialImpl implements CommentsEduCourseMaterialS
     }
 
     @Override
-    public List<CommentEduCourseDetailOM> findByEduCourseMaterialId(UUID eduCourseMaterialId){
-        List<CommentsEduCourseMaterial> lst = commentsEduCourseMaterialRepo.findAllByEduCourseMaterialId(eduCourseMaterialId);
+    public List<CommentEduCourseDetailOM> findByEduCourseMaterialId(UUID eduCourseMaterialId) {
+        List<CommentsEduCourseMaterial> lst = commentsEduCourseMaterialRepo.findAllByEduCourseMaterialId(
+            eduCourseMaterialId);
         List<CommentEduCourseDetailOM> list = new ArrayList();
-        for(CommentsEduCourseMaterial cmt: lst){
+        for (CommentsEduCourseMaterial cmt : lst) {
             // get info of comment detail
             CommentEduCourseDetailOM cmtDetail = new CommentEduCourseDetailOM();
             cmtDetail.setCommentId(cmt.getCommentId());
@@ -69,7 +72,7 @@ public class CommentsEduCourseMaterialImpl implements CommentsEduCourseMaterialS
 
             //get name of comment' person
             PersonModel person = userService.findPersonByUserLoginId(cmtDetail.getPostedByUserLoginId());
-            if(person != null){
+            if (person != null) {
                 cmtDetail.setFullNameOfCreator(person.getLastName() + " " + person.getMiddleName()
                                                + " " + person.getFirstName());
             }
@@ -79,10 +82,11 @@ public class CommentsEduCourseMaterialImpl implements CommentsEduCourseMaterialS
     }
 
     @Override
-    public List<CommentEduCourseDetailOM> findByEduCourseMaterialIdWithoutReplyComment(UUID eduCourseMaterialId){
-        List<CommentsEduCourseMaterial> lst = commentsEduCourseMaterialRepo.findByEduCourseMaterialIdWithoutReplyComment(eduCourseMaterialId);
+    public List<CommentEduCourseDetailOM> findByEduCourseMaterialIdWithoutReplyComment(UUID eduCourseMaterialId) {
+        List<CommentsEduCourseMaterial> lst = commentsEduCourseMaterialRepo.findByEduCourseMaterialIdWithoutReplyComment(
+            eduCourseMaterialId);
         List<CommentEduCourseDetailOM> list = new ArrayList();
-        for(CommentsEduCourseMaterial cmt: lst){
+        for (CommentsEduCourseMaterial cmt : lst) {
             // get info of comment detail
             CommentEduCourseDetailOM cmtDetail = new CommentEduCourseDetailOM();
             cmtDetail.setCommentId(cmt.getCommentId());
@@ -93,7 +97,7 @@ public class CommentsEduCourseMaterialImpl implements CommentsEduCourseMaterialS
 
             //get name of comment' person
             PersonModel person = userService.findPersonByUserLoginId(cmtDetail.getPostedByUserLoginId());
-            if(person != null){
+            if (person != null) {
                 cmtDetail.setFullNameOfCreator(person.getLastName() + " " + person.getMiddleName()
                                                + " " + person.getFirstName());
             }
@@ -103,10 +107,10 @@ public class CommentsEduCourseMaterialImpl implements CommentsEduCourseMaterialS
     }
 
     @Override
-    public List<CommentEduCourseDetailOM> findByReplyCommentId(UUID commentId){
+    public List<CommentEduCourseDetailOM> findByReplyCommentId(UUID commentId) {
         List<CommentsEduCourseMaterial> lst = commentsEduCourseMaterialRepo.findByReplyToCommentId(commentId);
         List<CommentEduCourseDetailOM> list = new ArrayList();
-        for(CommentsEduCourseMaterial cmt: lst){
+        for (CommentsEduCourseMaterial cmt : lst) {
             // get info of comment detail
             CommentEduCourseDetailOM cmtDetail = new CommentEduCourseDetailOM();
             cmtDetail.setCommentId(cmt.getCommentId());
@@ -117,7 +121,7 @@ public class CommentsEduCourseMaterialImpl implements CommentsEduCourseMaterialS
 
             //get name of comment' person
             PersonModel person = userService.findPersonByUserLoginId(cmtDetail.getPostedByUserLoginId());
-            if(person != null){
+            if (person != null) {
                 cmtDetail.setFullNameOfCreator(person.getLastName() + " " + person.getMiddleName()
                                                + " " + person.getFirstName());
             }
@@ -127,7 +131,7 @@ public class CommentsEduCourseMaterialImpl implements CommentsEduCourseMaterialS
     }
 
     @Override
-    public CommentsEduCourseMaterial editCommentEduCourse(UUID commentId, String comment, Date createdStamp){
+    public CommentsEduCourseMaterial editCommentEduCourse(UUID commentId, String comment, Date createdStamp) {
 
         CommentsEduCourseMaterial newComment = commentsEduCourseMaterialRepo.findByCommentId(commentId);
         newComment.setCommentMessage(comment);
@@ -137,7 +141,7 @@ public class CommentsEduCourseMaterialImpl implements CommentsEduCourseMaterialS
     }
 
     @Override
-    public CommentsEduCourseMaterial deleteCommentEduCourse(UUID commentId){
+    public CommentsEduCourseMaterial deleteCommentEduCourse(UUID commentId) {
         CommentsEduCourseMaterial deleteCmt = commentsEduCourseMaterialRepo.findByCommentId(commentId);
         commentsEduCourseMaterialRepo.deleteAllByReplyToCommentId(commentId);
         commentsEduCourseMaterialRepo.deleteById(commentId);

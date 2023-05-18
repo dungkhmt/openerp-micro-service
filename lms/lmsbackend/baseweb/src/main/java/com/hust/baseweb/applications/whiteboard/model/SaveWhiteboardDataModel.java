@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SaveWhiteboardDataModel {
+
     private String whiteboardId;
     private String data;
     private Integer totalPage;

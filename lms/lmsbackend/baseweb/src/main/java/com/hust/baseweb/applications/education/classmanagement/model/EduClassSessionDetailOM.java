@@ -14,6 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 
 public class EduClassSessionDetailOM {
+
     private UUID sessionId;
     private String sessionName;
     private UUID classId;

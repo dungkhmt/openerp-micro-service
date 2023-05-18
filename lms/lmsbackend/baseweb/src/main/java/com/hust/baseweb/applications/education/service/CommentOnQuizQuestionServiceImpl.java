@@ -22,7 +22,7 @@ import java.util.UUID;
 @Log4j2
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @Service
-public class CommentOnQuizQuestionServiceImpl implements CommentOnQuizQuestionService{
+public class CommentOnQuizQuestionServiceImpl implements CommentOnQuizQuestionService {
 
     @Autowired
     private CommentOnQuizQuestionRepo commentOnQuizQuestionRepo;
@@ -55,14 +55,21 @@ public class CommentOnQuizQuestionServiceImpl implements CommentOnQuizQuestionSe
         QuizQuestionDetailModel q = quizQuestionService.findById(questionId);
         String fromUserLoginId = u.getUserLoginId();
         String toUserLoginId = q.getCreatedByUserLoginId();
-        String msg = "user " + fromUserLoginId + " comments on quiz " + q.getQuizCourseTopic().getQuizCourseTopicName() +
-                     " of course " + q.getQuizCourseTopic().getEduCourse().getName();
+        String msg = "user " +
+                     fromUserLoginId +
+                     " comments on quiz " +
+                     q.getQuizCourseTopic().getQuizCourseTopicName() +
+                     " of course " +
+                     q.getQuizCourseTopic().getEduCourse().getName();
 
         //String url = properties.getUrl_root() + "/edu/teacher/course/quiz/view/detail/" + questionId + "/" + q.getQuizCourseTopic().getEduCourse().getId();
-        String url = "/edu/teacher/course/quiz/view/detail/" + questionId + "/" + q.getQuizCourseTopic().getEduCourse().getId();
+        String url = "/edu/teacher/course/quiz/view/detail/" +
+                     questionId +
+                     "/" +
+                     q.getQuizCourseTopic().getEduCourse().getId();
         List<String> listUsers = commentOnQuizQuestionRepo.getListUserIdHadComment(questionId);
-        listUsers.forEach((userId)->{
-            notificationsService.create(fromUserLoginId, userId, msg,url);
+        listUsers.forEach((userId) -> {
+            notificationsService.create(fromUserLoginId, userId, msg, url);
         });
 
         return commentOnQuizQuestion;
@@ -72,7 +79,7 @@ public class CommentOnQuizQuestionServiceImpl implements CommentOnQuizQuestionSe
     public List<CommentOnQuizQuestionDetailOM> findByQuestionId(UUID questionId) {
         List<CommentOnQuizQuestion> lst = commentOnQuizQuestionRepo.findAllByQuestionIdWithoutReplyComment(questionId);
         List<CommentOnQuizQuestionDetailOM> list = new ArrayList();
-        for(CommentOnQuizQuestion c: lst){
+        for (CommentOnQuizQuestion c : lst) {
             CommentOnQuizQuestionDetailOM cd = new CommentOnQuizQuestionDetailOM();
             cd.setCommentId(c.getCommentId());
             cd.setCommentText(c.getCommentText());
@@ -82,7 +89,7 @@ public class CommentOnQuizQuestionServiceImpl implements CommentOnQuizQuestionSe
             cd.setReplyToCommentId(c.getReplyToCommentId());
 
             PersonModel person = userService.findPersonByUserLoginId(c.getCreatedByUserLoginId());
-            if(person != null){
+            if (person != null) {
                 cd.setFullNameOfCreator(person.getLastName() + " " + person.getMiddleName()
                                         + " " + person.getFirstName());
             }
@@ -95,7 +102,7 @@ public class CommentOnQuizQuestionServiceImpl implements CommentOnQuizQuestionSe
     public List<CommentOnQuizQuestionDetailOM> findByReplyToCommentId(UUID questionId) {
         List<CommentOnQuizQuestion> lst = commentOnQuizQuestionRepo.findAllByReplyToCommentId(questionId);
         List<CommentOnQuizQuestionDetailOM> list = new ArrayList();
-        for(CommentOnQuizQuestion c: lst){
+        for (CommentOnQuizQuestion c : lst) {
             CommentOnQuizQuestionDetailOM cd = new CommentOnQuizQuestionDetailOM();
             cd.setCommentId(c.getCommentId());
             cd.setCommentText(c.getCommentText());
@@ -104,7 +111,7 @@ public class CommentOnQuizQuestionServiceImpl implements CommentOnQuizQuestionSe
             cd.setReplyToCommentId(c.getReplyToCommentId());
 
             PersonModel person = userService.findPersonByUserLoginId(c.getCreatedByUserLoginId());
-            if(person != null){
+            if (person != null) {
                 cd.setFullNameOfCreator(person.getLastName() + " " + person.getMiddleName()
                                         + " " + person.getFirstName());
             }
@@ -114,13 +121,13 @@ public class CommentOnQuizQuestionServiceImpl implements CommentOnQuizQuestionSe
     }
 
     @Override
-    public int getNumberCommentsOnQuiz(UUID questionId){
+    public int getNumberCommentsOnQuiz(UUID questionId) {
         int nbr = commentOnQuizQuestionRepo.getNumberCommentsOnQuiz(questionId);
         return nbr;
     }
 
     @Override
-    public CommentOnQuizQuestion deleteCommentOnQuiz(UUID commentId){
+    public CommentOnQuizQuestion deleteCommentOnQuiz(UUID commentId) {
         CommentOnQuizQuestion deleteComment = commentOnQuizQuestionRepo.findByCommentId(commentId);
 
         commentOnQuizQuestionRepo.deleteReplyCommentByCommentId(commentId);
@@ -130,7 +137,7 @@ public class CommentOnQuizQuestionServiceImpl implements CommentOnQuizQuestionSe
     }
 
     @Override
-    public CommentOnQuizQuestion updateComment(UUID commentId, String commentText){
+    public CommentOnQuizQuestion updateComment(UUID commentId, String commentText) {
         CommentOnQuizQuestion deleteComment = commentOnQuizQuestionRepo.findByCommentId(commentId);
         deleteComment.setCommentText(commentText);
 
@@ -139,7 +146,7 @@ public class CommentOnQuizQuestionServiceImpl implements CommentOnQuizQuestionSe
         return deleteComment;
     }
 
-    public List<String> listUserIdHadComment(UUID questionId){
+    public List<String> listUserIdHadComment(UUID questionId) {
         List<String> listUserId = commentOnQuizQuestionRepo.getListUserIdHadComment(questionId);
 
         return listUserId;

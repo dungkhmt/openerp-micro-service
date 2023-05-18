@@ -16,6 +16,7 @@ import java.util.Date;
 @Table(name = "user_submission_contest_result_new")
 @IdClass(UserSubmissionContestResultID.class)
 public class UserSubmissionContestResultNativeEntity {
+
     @Id
     @Column(name = "contest_id")
     private String contestId;

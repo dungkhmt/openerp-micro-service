@@ -28,6 +28,6 @@ public class LogUserLoginCourseChapterMaterial {
     private Date createStamp;
 
     @ManyToOne
-    @JoinColumn(name="edu_class_id")
+    @JoinColumn(name = "edu_class_id")
     private EduClass eduClass;
 }

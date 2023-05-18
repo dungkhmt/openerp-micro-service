@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 
 public class ModelResponseGetMyQuizTest {
+
     private String testId;
     private String testName;
     private String viewTypeId;

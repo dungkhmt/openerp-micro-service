@@ -21,7 +21,8 @@ public class ViewClassMaterialLogsController {
         @PathVariable String studentLoginId,
         @RequestParam String search,
         @RequestParam int page,
-        @RequestParam int size) {
+        @RequestParam int size
+    ) {
         Pageable sortDescendingByTimestampAndPaging = PageRequest.of(
             page, size,
             Sort.by("created_stamp").descending()

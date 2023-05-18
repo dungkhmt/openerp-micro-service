@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ClassOfUserOM {
+
     private UUID classId;
     private String classCode;
     private String courseId;

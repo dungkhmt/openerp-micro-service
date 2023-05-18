@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelResponseSubmitQuizTestExecutionChoice {
+
     private UUID submissionId;
     private List<UUID> choiceAnswerIds;
 }

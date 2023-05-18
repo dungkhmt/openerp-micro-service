@@ -24,7 +24,8 @@ public class ProgrammingContestStatisticServiceImpl implements ProgrammingContes
 
     @Override
     public Map<String, Long> statisticTotalSubmissions(Date statisticFrom) {
-        List<TotalCodeSubmissionModel> listTotalSubmissions = programmingContestStatisticRepo.countTotalCodeSubmissions(statisticFrom);
+        List<TotalCodeSubmissionModel> listTotalSubmissions = programmingContestStatisticRepo.countTotalCodeSubmissions(
+            statisticFrom);
 
         return listTotalSubmissions.stream().collect(
             Collectors.toMap(elem -> elem.getLoginId(), elem -> elem.getTotalSubmissions())
@@ -33,7 +34,8 @@ public class ProgrammingContestStatisticServiceImpl implements ProgrammingContes
 
     @Override
     public Map<String, LocalDateTime> statisticLatestTimesSubmittingCode(Date statisticFrom) {
-        List<CodeSubmissionTimeModel> submissionTimes = programmingContestStatisticRepo.findLatestTimesSubmittingCode(statisticFrom);
+        List<CodeSubmissionTimeModel> submissionTimes = programmingContestStatisticRepo.findLatestTimesSubmittingCode(
+            statisticFrom);
 
         return submissionTimes.stream().collect(
             Collectors.toMap(elem -> elem.getLoginId(), elem -> elem.getSubmitTime())

@@ -1,12 +1,7 @@
 package com.hust.baseweb.utils;
 
-import com.google.gson.Gson;
-import com.hust.baseweb.model.querydsl.SearchCriteria;
-import com.hust.baseweb.model.querydsl.SortAndFiltersInput;
 import com.hust.baseweb.model.querydsl.SortCriteria;
 import org.javatuples.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 

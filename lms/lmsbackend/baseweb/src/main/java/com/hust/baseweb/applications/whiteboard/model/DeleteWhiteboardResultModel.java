@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeleteWhiteboardResultModel {
+
     private Boolean success;
     private String message;
 }

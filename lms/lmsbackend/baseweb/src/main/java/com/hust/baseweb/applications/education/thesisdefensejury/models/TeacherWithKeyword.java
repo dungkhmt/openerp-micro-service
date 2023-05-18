@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TeacherWithKeyword {
+
     private String teacherId;
     private String teacherName;
     private List<String> keywords;

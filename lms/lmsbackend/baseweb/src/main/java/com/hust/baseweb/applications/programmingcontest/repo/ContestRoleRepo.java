@@ -8,5 +8,6 @@ import java.util.Date;
 import java.util.List;
 
 public interface ContestRoleRepo extends JpaRepository<ContestRole, ContestUserLoginRoleFromDateId> {
+
     List<ContestRole> findAllByUserLoginIdAndThruDate(String userLoginId, Date thruDate);
 }

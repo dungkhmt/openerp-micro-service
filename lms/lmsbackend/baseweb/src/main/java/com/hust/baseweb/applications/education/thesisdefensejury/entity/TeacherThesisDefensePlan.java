@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @IdClass(DefensePlanTeacherID.class)
 public class TeacherThesisDefensePlan {
+
     @Id
     @Column(name = "teacher_id")
     private String teacherId;

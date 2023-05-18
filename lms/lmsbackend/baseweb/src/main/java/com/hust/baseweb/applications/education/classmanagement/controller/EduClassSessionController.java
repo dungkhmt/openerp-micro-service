@@ -25,38 +25,53 @@ import java.util.UUID;
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 
 public class EduClassSessionController {
+
     private EduClassSessionService eduClassSessionService;
     private UserService userService;
 
     @GetMapping("/get-sessions-of-class/{classId}")
-    public ResponseEntity<?> getSessionsOfClass(Principal principal, @PathVariable UUID classId){
+    public ResponseEntity<?> getSessionsOfClass(Principal principal, @PathVariable UUID classId) {
 
         List<EduClassSession> lst = eduClassSessionService.findAllByClassId(classId);
         return ResponseEntity.ok().body(lst);
     }
+
     @GetMapping("/get-session-detail/{sessionId}")
-    public ResponseEntity<?> getSessionDetail(Principal principal, @PathVariable UUID sessionId){
+    public ResponseEntity<?> getSessionDetail(Principal principal, @PathVariable UUID sessionId) {
         log.info("getSessionDetail sessionId = " + sessionId);
         EduClassSessionDetailOM sessionDetail = eduClassSessionService.getSessionDetail(sessionId);
         return ResponseEntity.ok().body(sessionDetail);
     }
 
     @PostMapping("/add-a-session-of-class")
-    public ResponseEntity<?> addASessionOfClass(Principal principal, @RequestBody CreateEduClassSessionIM input){
+    public ResponseEntity<?> addASessionOfClass(Principal principal, @RequestBody CreateEduClassSessionIM input) {
         UserLogin u = userService.findById(principal.getName());
         log.info("addASessionOfClass, sessionName = " + input.getSessionName());
-        EduClassSession o = eduClassSessionService.save(input.getClassId(),input.getSessionName(), input.getDescription(),u.getUserLoginId());
+        EduClassSession o = eduClassSessionService.save(
+            input.getClassId(),
+            input.getSessionName(),
+            input.getDescription(),
+            u.getUserLoginId());
         return ResponseEntity.ok().body(o);
     }
+
     @GetMapping("/get-quiz-test-list-of-session/{sessionId}")
-    public ResponseEntity<?> getQuizTestOfSession(Principal principal, @PathVariable UUID sessionId){
+    public ResponseEntity<?> getQuizTestOfSession(Principal principal, @PathVariable UUID sessionId) {
         List<EduQuizTest> lst = eduClassSessionService.findAllBySession(sessionId);
         return ResponseEntity.ok().body(lst);
     }
+
     @PostMapping("/add-a-quiz-test-of-class-session")
-    public ResponseEntity<?> addQuizTestOfClassSession(Principal principal, @RequestBody CreateQuizTestOfClassSessionIM input){
+    public ResponseEntity<?> addQuizTestOfClassSession(
+        Principal principal,
+        @RequestBody CreateQuizTestOfClassSessionIM input
+    ) {
         log.info("addQuizTestOfClassSession....testName = " + input.getTestName());
-        EduQuizTest eduQuizTest = eduClassSessionService.createQuizTestOfClassSession(input.getSessionId(),  input.getTestId(), input.getTestName(), input.getDuration());
+        EduQuizTest eduQuizTest = eduClassSessionService.createQuizTestOfClassSession(
+            input.getSessionId(),
+            input.getTestId(),
+            input.getTestName(),
+            input.getDuration());
         return ResponseEntity.ok().body(eduQuizTest);
 
     }

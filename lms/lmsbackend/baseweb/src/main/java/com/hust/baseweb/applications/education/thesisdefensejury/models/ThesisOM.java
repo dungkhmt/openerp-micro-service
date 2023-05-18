@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ThesisOM {
+
     private UUID id;
     private String name;
     private String thesis_abstract;

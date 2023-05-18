@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ThesisFilter {
+
     private String thesisPlanId;
     private UUID juryId;
     private String key;

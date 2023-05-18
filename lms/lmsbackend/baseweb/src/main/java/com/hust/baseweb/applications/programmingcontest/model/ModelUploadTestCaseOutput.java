@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelUploadTestCaseOutput {
+
     private String status;
     private String message;
 }

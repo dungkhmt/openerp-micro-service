@@ -166,7 +166,7 @@ public class ContestService {
     }
 
     @Transactional
-    public void updateContestSubmissionStatus(UUID submissionId, String status){
+    public void updateContestSubmissionStatus(UUID submissionId, String status) {
         contestSubmissionRepo.updateContestSubmissionStatus(submissionId, status);
     }
 }

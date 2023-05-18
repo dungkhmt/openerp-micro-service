@@ -103,7 +103,7 @@ public class Constants {
         }
 
         public static String mapLanguageToExtension(String languages) {
-            switch (languages){
+            switch (languages) {
                 case "CPP":
                     return ".cpp";
                 case "PYTHON3":

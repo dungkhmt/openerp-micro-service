@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentEduCourseDetailOM {
+
     private UUID commentId;
     private UUID eduCourseMaterialId;
     private UUID replyToCommentId;

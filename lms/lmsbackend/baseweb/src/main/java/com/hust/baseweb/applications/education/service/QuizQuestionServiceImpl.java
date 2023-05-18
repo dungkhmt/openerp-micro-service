@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class QuizQuestionServiceImpl implements QuizQuestionService {
+
     public static final String PREFIX_CHOICE_CODE = "C";
     private QuizQuestionRepo quizQuestionRepo;
 
@@ -207,7 +208,9 @@ public class QuizQuestionServiceImpl implements QuizQuestionService {
     @Override
     public List<QuizQuestion> findQuizOfCourseTopic(String quizCourseTopicId) {
         QuizCourseTopic quizCourseTopic = quizCourseTopicRepo.findById(quizCourseTopicId).orElse(null);
-        if(quizCourseTopic == null) return null;
+        if (quizCourseTopic == null) {
+            return null;
+        }
         List<QuizQuestion> quizQuestions = quizQuestionRepo.findAllByQuizCourseTopic(quizCourseTopic);
 
         return quizQuestions;
@@ -280,8 +283,10 @@ public class QuizQuestionServiceImpl implements QuizQuestionService {
 
         //quizQuestionDetailModel.setQuizChoiceAnswerList(quizChoiceAnswers);
         List<QuizChoiceAnswerHideCorrectAnswer> ans = new ArrayList();
-        for(QuizChoiceAnswer a: quizChoiceAnswers){
-            ans.add(new QuizChoiceAnswerHideCorrectAnswer(a.getChoiceAnswerId(),a.getChoiceAnswerCode(),a.getChoiceAnswerContent()));
+        for (QuizChoiceAnswer a : quizChoiceAnswers) {
+            ans.add(new QuizChoiceAnswerHideCorrectAnswer(a.getChoiceAnswerId(),
+                                                          a.getChoiceAnswerCode(),
+                                                          a.getChoiceAnswerContent()));
         }
         quizQuestionDetailModel.setQuizChoiceAnswerList(ans);
 
@@ -315,15 +320,18 @@ public class QuizQuestionServiceImpl implements QuizQuestionService {
     public boolean checkAnswer(String userId, QuizChooseAnswerInputModel quizChooseAnswerInputModel) {
         //QuizQuestionDetailModel quizQuestionDetail = findQuizDetail(quizChooseAnswerInputModel.getQuestionId());
         QuizQuestion q = quizQuestionRepo.findById(quizChooseAnswerInputModel.getQuestionId()).orElse(null);
-        if(q == null) return false;
+        if (q == null) {
+            return false;
+        }
         List<QuizChoiceAnswer> quizChoiceAnswers = quizChoiceAnswerRepo.findAllByQuizQuestion(q);
 
 
         String classCode = "";
-        if(quizChooseAnswerInputModel.getClassId() != null) {
+        if (quizChooseAnswerInputModel.getClassId() != null) {
             EduClass eduClass = classRepo.findById(quizChooseAnswerInputModel.getClassId()).orElse(null);
-            if(eduClass != null)
+            if (eduClass != null) {
                 classCode = eduClass.getClassCode();
+            }
         }
 
         String isCorrectAnswer = "Y";
@@ -333,10 +341,10 @@ public class QuizQuestionServiceImpl implements QuizQuestionService {
         List<UUID> correctAns =
             //quizQuestionDetail.getQuizChoiceAnswerList()
             quizChoiceAnswers
-            .stream()
-            .filter(answer -> answer.getIsCorrectAnswer() == 'Y')
-            .map(QuizChoiceAnswer::getChoiceAnswerId)
-            .collect(Collectors.toList());
+                .stream()
+                .filter(answer -> answer.getIsCorrectAnswer() == 'Y')
+                .map(QuizChoiceAnswer::getChoiceAnswerId)
+                .collect(Collectors.toList());
 
         if (!correctAns.containsAll(quizChooseAnswerInputModel.getChooseAnsIds())) {
             ans = false;
@@ -396,8 +404,10 @@ public class QuizQuestionServiceImpl implements QuizQuestionService {
 
         List<QuizChoiceAnswer> quizChoiceAnswers = quizChoiceAnswerRepo.findAllByQuizQuestion(quizQuestion);
         List<QuizChoiceAnswerHideCorrectAnswer> ans = new ArrayList();
-        for(QuizChoiceAnswer a: quizChoiceAnswers){
-            ans.add(new QuizChoiceAnswerHideCorrectAnswer(a.getChoiceAnswerId(),a.getChoiceAnswerCode(),a.getChoiceAnswerContent()));
+        for (QuizChoiceAnswer a : quizChoiceAnswers) {
+            ans.add(new QuizChoiceAnswerHideCorrectAnswer(a.getChoiceAnswerId(),
+                                                          a.getChoiceAnswerCode(),
+                                                          a.getChoiceAnswerContent()));
         }
         //quizQuestionDetailModel.setQuizChoiceAnswerList(quizChoiceAnswers);
         quizQuestionDetailModel.setQuizChoiceAnswerList(ans);
@@ -430,7 +440,13 @@ public class QuizQuestionServiceImpl implements QuizQuestionService {
     }
 
     @Override
-    public QuizQuestion update(String userId, UUID questionId, String json, MultipartFile[] files, MultipartFile[] addedSolutionAttachments) {
+    public QuizQuestion update(
+        String userId,
+        UUID questionId,
+        String json,
+        MultipartFile[] files,
+        MultipartFile[] addedSolutionAttachments
+    ) {
 //        Date now = new Date();
 //        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
 //        String prefixFileName = formatter.format(now);
@@ -515,7 +531,9 @@ public class QuizQuestionServiceImpl implements QuizQuestionService {
                                                    .collect(Collectors.toList());
         solutionAttachmentIds.removeAll(Arrays.asList(input.getDeletedAttachmentIds()));
         solutionAttachmentIds.addAll(addedSolutionAttachmentIds);
-        String newSolutionAttachmentIds = solutionAttachmentIds.size() == 0 ? null : String.join(";", solutionAttachmentIds);
+        String newSolutionAttachmentIds = solutionAttachmentIds.size() == 0
+            ? null
+            : String.join(";", solutionAttachmentIds);
         quizQuestion.setSolutionAttachment(newSolutionAttachmentIds);
 
         for (String deletedAttachmentId : input.getDeletedAttachmentIds()) {
@@ -526,7 +544,7 @@ public class QuizQuestionServiceImpl implements QuizQuestionService {
         return quizQuestion;
     }
 
-    public QuizQuestionUserRole addQuizQuestionUserRole(ModelCreateQuizQuestionUserRole input){
+    public QuizQuestionUserRole addQuizQuestionUserRole(ModelCreateQuizQuestionUserRole input) {
         QuizQuestionUserRole quizQuestionUserRole = new QuizQuestionUserRole();
         quizQuestionUserRole.setUserId(input.getUserId());
         quizQuestionUserRole.setQuestionId(input.getQuestionId());
@@ -536,9 +554,9 @@ public class QuizQuestionServiceImpl implements QuizQuestionService {
         return quizQuestionUserRole;
     }
 
-    public boolean grantRoleToUserOnAllQuizQuestions(String roleId, String userId){
+    public boolean grantRoleToUserOnAllQuizQuestions(String roleId, String userId) {
         List<QuizQuestion> questions = quizQuestionRepo.findAll();
-        for(QuizQuestion q: questions){
+        for (QuizQuestion q : questions) {
             QuizQuestionUserRole r = new QuizQuestionUserRole();
             r.setRoleId(roleId);
             r.setUserId(userId);
@@ -548,7 +566,8 @@ public class QuizQuestionServiceImpl implements QuizQuestionService {
         }
         return true;
     }
-    public List<QuizQuestionUserRole> getUsersGranttedToQuizQuestion(UUID questionId){
+
+    public List<QuizQuestionUserRole> getUsersGranttedToQuizQuestion(UUID questionId) {
         List<QuizQuestionUserRole> res = quizQuestionUserRoleRepo.findAllByQuestionId(questionId);
         return res;
     }
@@ -557,12 +576,12 @@ public class QuizQuestionServiceImpl implements QuizQuestionService {
     public int generateChoiceCodesForAllQuizQuestions() {
         int cnt = 0;
         List<QuizQuestion> questions = quizQuestionRepo.findAll();
-        for(QuizQuestion q: questions){
+        for (QuizQuestion q : questions) {
             List<QuizChoiceAnswer> choices = quizChoiceAnswerRepo.findAllByQuizQuestion(q);
             int idx = 0;
-            for(QuizChoiceAnswer a: choices){
+            for (QuizChoiceAnswer a : choices) {
                 idx += 1;
-                String code = PREFIX_CHOICE_CODE + Utils.stdCode(idx,3);
+                String code = PREFIX_CHOICE_CODE + Utils.stdCode(idx, 3);
                 a.setChoiceAnswerCode(code);
                 a = quizChoiceAnswerRepo.save(a);
                 cnt += 1;

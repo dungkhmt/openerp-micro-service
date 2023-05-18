@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelStudentViewProblemDetail {
+
     private String problemName;
     private String problemCode;
     private String problemStatement;

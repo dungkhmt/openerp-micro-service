@@ -18,6 +18,7 @@ import java.util.UUID;
 //@Table(name = "problem_submission")
 @Table(name = "problem_submission_new")
 public class ProblemSubmissionEntity {
+
     @Id
     @Column(name = "problem_submission_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -55,7 +56,7 @@ public class ProblemSubmissionEntity {
     @Column(name = "test_case_pass")
     private String testCasePass;
 
-    @Column(name="disable_status")
+    @Column(name = "disable_status")
     private String disableStatus; // Y or N
 
     @PrePersist

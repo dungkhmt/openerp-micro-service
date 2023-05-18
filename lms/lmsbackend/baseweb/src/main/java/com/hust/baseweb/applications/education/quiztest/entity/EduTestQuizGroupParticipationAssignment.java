@@ -22,6 +22,6 @@ public class EduTestQuizGroupParticipationAssignment {
     @Column(name = "participation_user_login_id")
     private String participationUserLoginId;
 
-    @Column(name="status_id")
+    @Column(name = "status_id")
     private String statusId;
 }

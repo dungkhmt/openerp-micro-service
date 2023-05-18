@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelReponseCodeSimilaritySummaryParticipant {
+
     private String userId;
     private String fullname;
     private double highestSimilarity;

@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateEduClassSessionIM {
+
     private UUID classId;
     private String sessionName;
     private String description;

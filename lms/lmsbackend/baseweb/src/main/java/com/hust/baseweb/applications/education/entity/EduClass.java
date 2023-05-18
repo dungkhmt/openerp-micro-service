@@ -17,6 +17,7 @@ import java.util.UUID;
 @Table(name = "edu_class")
 @EntityListeners(AuditingEntityListener.class)
 public class EduClass {
+
     public static final String STATUS_OPEN = "OPEN";
     public static final String STATUS_HIDDEN = "HIDDEN";
     public static final String STATUS_DISABLED = "DISABLED";
@@ -30,7 +31,7 @@ public class EduClass {
     @Column(name = "class_code")
     private String classCode;
 
-    @Column(name="status_id")
+    @Column(name = "status_id")
     private String statusId;
 
     @ManyToOne(optional = false)

@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentOnQuizQuestionDetailOM {
+
     private UUID commentId;
     private UUID questionId;
     private String commentText;

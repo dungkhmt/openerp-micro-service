@@ -306,10 +306,12 @@ public class DateTimeUtils {
                 out.println(s[0]);
             }
             out.close();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        if(true) return;
+        if (true) {
+            return;
+        }
 
 
         String fromDate = "2020-01-01 00:00:00";
@@ -361,12 +363,12 @@ public class DateTimeUtils {
     }
 
 
-    public enum DateTimeFormat{
+    public enum DateTimeFormat {
         DATE_TIME_ISO_FORMAT("yyyy-MM-dd HH:mm:ss");
 
         private final String value;
 
-        DateTimeFormat(String value){
+        DateTimeFormat(String value) {
             this.value = value;
         }
 
@@ -375,16 +377,16 @@ public class DateTimeUtils {
         }
     }
 
-    public static ZonedDateTime dateToZoneDateTime(Date date){
+    public static ZonedDateTime dateToZoneDateTime(Date date) {
         return date.toInstant().atZone(ZoneId.of("Asia/Ho_Chi_Minh"));
     }
 
-    public static String zonedDateTimeToString(ZonedDateTime zonedDateTime, DateTimeFormat dateTimeFormat){
+    public static String zonedDateTimeToString(ZonedDateTime zonedDateTime, DateTimeFormat dateTimeFormat) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimeFormat.getValue());
         return zonedDateTime.format(formatter);
     }
 
-    public static String dateToString(Date date, DateTimeFormat format){
+    public static String dateToString(Date date, DateTimeFormat format) {
         ZonedDateTime zonedDateTime = dateToZoneDateTime(date);
         return zonedDateTimeToString(zonedDateTime, format);
     }

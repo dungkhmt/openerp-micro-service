@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelContestSubmission {
+
     private String contestId;
     private String problemId;
     private String source;

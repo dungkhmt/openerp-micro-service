@@ -9,9 +9,9 @@ import java.util.UUID;
 
 public interface NotificationRepo extends JpaRepository<Notifications, UUID> {
 
-    @Query(value="select * from notifications offset ?1 limit ?2", nativeQuery = true)
+    @Query(value = "select * from notifications offset ?1 limit ?2", nativeQuery = true)
     List<Notifications> getPage(int offset, int limit);
 
-    @Query(value="select count(*) from notifications", nativeQuery = true)
+    @Query(value = "select count(*) from notifications", nativeQuery = true)
     int countNotifications();
 }

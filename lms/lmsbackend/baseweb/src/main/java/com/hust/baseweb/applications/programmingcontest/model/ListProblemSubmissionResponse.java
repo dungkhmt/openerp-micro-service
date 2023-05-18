@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ListProblemSubmissionResponse {
+
     List<ProblemSubmissionResponse> contents;
     boolean isSubmitted;
 }

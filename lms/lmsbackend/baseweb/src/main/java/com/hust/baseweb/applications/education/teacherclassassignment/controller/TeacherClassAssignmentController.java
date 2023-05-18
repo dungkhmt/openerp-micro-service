@@ -185,7 +185,7 @@ public class TeacherClassAssignmentController {
     @PostMapping("/create-class-teacher-assignment-plan")
     public ResponseEntity<?> createClassTeacherAssignmentPlan(
         Principal principal, @RequestBody
-        ClassTeacherAssignmentPlanCreateModel input
+    ClassTeacherAssignmentPlanCreateModel input
     ) {
         UserLogin u = userService.findById(principal.getName());
         log.info("createClassTeacherAssignmentPlan, planName   = " + input.getPlanName());
@@ -197,7 +197,7 @@ public class TeacherClassAssignmentController {
     @PostMapping("/teacherclassassignment/algo")
     public ResponseEntity<?> computeTeacherClassAssignment(
         Principal principal, @RequestBody
-        AlgoTeacherAssignmentIM input
+    AlgoTeacherAssignmentIM input
     ) {
         System.out.println("computeTeacherClassAssignment start");
         TeacherClassAssignmentOM teacherClassAssignmentOM = algoService.computeTeacherClassAssignment(

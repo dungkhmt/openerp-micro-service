@@ -18,9 +18,11 @@ import java.util.List;
 @Log4j2
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @Service
-public class EduQuizTestParticipantRoleServiceImpl implements EduQuizTestParticipantRoleService{
+public class EduQuizTestParticipantRoleServiceImpl implements EduQuizTestParticipantRoleService {
+
     private EduTestQuizRoleRepo eduTestQuizRoleRepo;
     private EduQuizTestRepo eduQuizTestRepo;
+
     @Override
     public EduTestQuizRole save(ModelCreateEduQuizTestParticipantRole input) {
         EduTestQuizRole eduQuizTestRole = new EduTestQuizRole();
@@ -40,7 +42,7 @@ public class EduQuizTestParticipantRoleServiceImpl implements EduQuizTestPartici
 
         List<QuizTestParticipantRoleModel> res = new ArrayList();
         //log.info("getParticipantRolesOfQuizTest, testId = " + testId + " list  = " + eduTestQuizRoles.size() + "");
-        for(EduTestQuizRole r: eduTestQuizRoles){
+        for (EduTestQuizRole r : eduTestQuizRoles) {
             //log.info("getParticipantRolesOfQuizTest, role  = {}",r);
             QuizTestParticipantRoleModel m = new QuizTestParticipantRoleModel();
             m.setTestId(testId);
@@ -50,14 +52,17 @@ public class EduQuizTestParticipantRoleServiceImpl implements EduQuizTestPartici
         }
         return res;
     }
+
     @Override
     public List<QuizTestParticipantRoleModel> getParticipantRolesOfUserInQuizTest(String userId, String testId) {
         //List<EduTestQuizRole> eduTestQuizRoles = eduTestQuizRoleRepo.findAllByTestId(testId);
-        List<EduTestQuizRole> eduTestQuizRoles = eduTestQuizRoleRepo.findAllByTestIdAndParticipantUserLoginId(testId, userId);
+        List<EduTestQuizRole> eduTestQuizRoles = eduTestQuizRoleRepo.findAllByTestIdAndParticipantUserLoginId(
+            testId,
+            userId);
 
         List<QuizTestParticipantRoleModel> res = new ArrayList();
         //log.info("getParticipantRolesOfQuizTest, testId = " + testId + " list  = " + eduTestQuizRoles.size() + "");
-        for(EduTestQuizRole r: eduTestQuizRoles){
+        for (EduTestQuizRole r : eduTestQuizRoles) {
             //log.info("getParticipantRolesOfQuizTest, role  = {}",r);
             QuizTestParticipantRoleModel m = new QuizTestParticipantRoleModel();
             m.setTestId(testId);
@@ -79,7 +84,7 @@ public class EduQuizTestParticipantRoleServiceImpl implements EduQuizTestPartici
         List<EduTestQuizRole> eduTestQuizRoles = eduTestQuizRoleRepo.findByParticipantUserLoginId(userId);
         log.info("getQuizTestsOfUser, user = " + userId + " res.sz = " + eduTestQuizRoles.size());
         List<QuizTestParticipantRoleModel> res = new ArrayList();
-        for(EduTestQuizRole r: eduTestQuizRoles){
+        for (EduTestQuizRole r : eduTestQuizRoles) {
             //log.info("getParticipantRolesOfQuizTest, role  = {}",r);
             QuizTestParticipantRoleModel m = new QuizTestParticipantRoleModel();
             m.setTestId(r.getTestId());
@@ -95,7 +100,7 @@ public class EduQuizTestParticipantRoleServiceImpl implements EduQuizTestPartici
         //List<EduTestQuizRole> eduTestQuizRoles = eduTestQuizRoleRepo.findAll();
         List<EduQuizTest> eduQuizTests = eduQuizTestRepo.findAll();
         List<QuizTestParticipantRoleModel> res = new ArrayList();
-        for(EduQuizTest r: eduQuizTests){
+        for (EduQuizTest r : eduQuizTests) {
             //log.info("getParticipantRolesOfQuizTest, role  = {}",r);
             QuizTestParticipantRoleModel m = new QuizTestParticipantRoleModel();
             m.setTestId(r.getTestId());

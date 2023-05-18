@@ -81,7 +81,7 @@ public class LogUserLoginQuizQuestionServiceImpl implements LogUserLoginQuizQues
                            personModel.getFirstName();
                 log.info("findByClassId, fullName = " + fullName);
                 affiliations = personModel.getAffiliations();
-            }else{
+            } else {
                 log.info("findByClassId, personModel NULL!");
 
             }
@@ -105,12 +105,19 @@ public class LogUserLoginQuizQuestionServiceImpl implements LogUserLoginQuizQues
 
         return studentQuizParticipationModels;
     }
+
     @Override
-    public Page<StudentQuizParticipationModel> getPageLogStudentQuizOfAStudent(String userLoginId, Integer page, Integer size){
+    public Page<StudentQuizParticipationModel> getPageLogStudentQuizOfAStudent(
+        String userLoginId,
+        Integer page,
+        Integer size
+    ) {
         log.info("getPageLogStudentQuizOfAStudent, studentId = " + userLoginId);
         Pageable sortedByCreatedStampDsc =
             PageRequest.of(page, size, Sort.by("createStamp").descending());
-        Page<LogUserLoginQuizQuestion> logs = logUserLoginQuizQuestionRepo.findByUserLoginId(userLoginId, sortedByCreatedStampDsc);
+        Page<LogUserLoginQuizQuestion> logs = logUserLoginQuizQuestionRepo.findByUserLoginId(
+            userLoginId,
+            sortedByCreatedStampDsc);
         log.info("getPageLogStudentQuizOfAStudent, studentId = " + userLoginId + " sz = " + logs.getSize());
 
         Page<StudentQuizParticipationModel> studentQuizParticipationModels = logs.map(logi -> {
@@ -130,7 +137,7 @@ public class LogUserLoginQuizQuestionServiceImpl implements LogUserLoginQuizQues
             EduCourse course = classService.getCourseOfClassCode(logi.getClassCode());
             String courseId = "";
             String courseName = "";
-            if(course != null){
+            if (course != null) {
                 courseId = course.getId();
                 courseName = course.getName();
             }
@@ -144,13 +151,13 @@ public class LogUserLoginQuizQuestionServiceImpl implements LogUserLoginQuizQues
                            personModel.getFirstName();
                 affiliations = personModel.getAffiliations();
                 //log.info("findByClassId, fullName = " + fullName);
-            }else{
+            } else {
                 //log.info("findByClassId, personModel NULL!");
 
             }
             return new StudentQuizParticipationModel(
                 logi.getUserLoginId(),
-                fullName,affiliations,
+                fullName, affiliations,
                 (logi.getClassId() != null ? logi.getClassId().toString() : ""),
                 logi.getClassCode() + "",
                 (logi.getQuestionId() != null ? logi.getQuestionId().toString() : ""),
@@ -211,7 +218,7 @@ public class LogUserLoginQuizQuestionServiceImpl implements LogUserLoginQuizQues
             EduCourse course = classService.getCourseOfClassCode(logi.getClassCode());
             String courseId = "";
             String courseName = "";
-            if(course != null){
+            if (course != null) {
                 courseId = course.getId();
                 courseName = course.getName();
             }
@@ -225,13 +232,13 @@ public class LogUserLoginQuizQuestionServiceImpl implements LogUserLoginQuizQues
                            personModel.getFirstName();
                 affiliations = personModel.getAffiliations();
                 //log.info("findByClassId, fullName = " + fullName);
-            }else{
+            } else {
                 //log.info("findByClassId, personModel NULL!");
 
             }
             return new StudentQuizParticipationModel(
                 logi.getUserLoginId(),
-                fullName,affiliations,
+                fullName, affiliations,
                 (logi.getClassId() != null ? logi.getClassId().toString() : ""),
                 logi.getClassCode() + "",
                 (logi.getQuestionId() != null ? logi.getQuestionId().toString() : ""),

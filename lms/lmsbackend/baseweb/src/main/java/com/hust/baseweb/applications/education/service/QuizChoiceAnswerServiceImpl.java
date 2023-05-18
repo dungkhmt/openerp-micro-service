@@ -26,28 +26,29 @@ public class QuizChoiceAnswerServiceImpl implements QuizChoiceAnswerService {
         return quizChoiceAnswerRepo.findAll();
     }
 
-    private String getNextChoiceCode(QuizQuestion quizQuestion){
+    private String getNextChoiceCode(QuizQuestion quizQuestion) {
         List<QuizChoiceAnswer> answers = quizChoiceAnswerRepo.findAllByQuizQuestion(quizQuestion);
         Set<Integer> codes = new HashSet();
-        for(QuizChoiceAnswer a: answers){
+        for (QuizChoiceAnswer a : answers) {
             String c = a.getChoiceAnswerCode();
-            try{
+            try {
                 c = c.substring(1); // remove prefix character "C" (PREFIX_CHOICE_CODE)
                 int code = Integer.valueOf(c);
                 codes.add(code);
-            }catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         int idx = 1;
-        while(true){
-            if(!codes.contains(idx)){
+        while (true) {
+            if (!codes.contains(idx)) {
                 break;
             }
             idx += 1;
         }
-        return QuizQuestionServiceImpl.PREFIX_CHOICE_CODE + Utils.stdCode(idx,3);
+        return QuizQuestionServiceImpl.PREFIX_CHOICE_CODE + Utils.stdCode(idx, 3);
     }
+
     @Override
     public QuizChoiceAnswer save(QuizChoiceAnswerCreateInputModel input) {
         QuizQuestion quizQuestion = quizQuestionRepo.findById(input.getQuizQuestionId()).orElse(null);

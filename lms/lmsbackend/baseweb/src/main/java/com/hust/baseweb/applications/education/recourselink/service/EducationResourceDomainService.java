@@ -8,9 +8,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface EducationResourceDomainService {
+
     Page<EducationResourceDomain> findAll(Pageable pageable);
 
     Boolean createDomain(EducationResourceDomain domain);
-    EducationResourceDomain updateDomain(UUID id,EducationResourceDomain domain);
+
+    EducationResourceDomain updateDomain(UUID id, EducationResourceDomain domain);
+
     Optional<EducationResourceDomain> findById(UUID id);
 }

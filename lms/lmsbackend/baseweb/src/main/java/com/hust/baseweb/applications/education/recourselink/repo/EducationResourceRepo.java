@@ -13,14 +13,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface EducationResourceRepo extends JpaRepository<EducationResource, UUID>, CrudRepository<EducationResource,UUID> {
-    @Query(value = "select * from edu_resource er where er.domain_id = :domainId",nativeQuery = true)
-    Page<EducationResource> findByDomainId(UUID domainId,Pageable pageable);
+public interface EducationResourceRepo
+    extends JpaRepository<EducationResource, UUID>, CrudRepository<EducationResource, UUID> {
 
-    @Query(value = "select * from edu_resource er where er.id = :id and er.domain_id = :domainId",nativeQuery = true)
+    @Query(value = "select * from edu_resource er where er.domain_id = :domainId", nativeQuery = true)
+    Page<EducationResource> findByDomainId(UUID domainId, Pageable pageable);
+
+    @Query(value = "select * from edu_resource er where er.id = :id and er.domain_id = :domainId", nativeQuery = true)
     Optional<EducationResource> findByIdAndDomainId(UUID id, UUID domainId);
 
     @Query(value = "select * from edu_resource er where er.domain_id = :domainId " +
-                   "and er.description like %:des%",nativeQuery = true)
-    List<EducationResource> findAllByDescriptionAndDomainId(String des,UUID domainId);
+                   "and er.description like %:des%", nativeQuery = true)
+    List<EducationResource> findAllByDescriptionAndDomainId(String des, UUID domainId);
 }

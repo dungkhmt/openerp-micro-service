@@ -12,6 +12,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "user_whiteboard")
 public class UserWhiteboard {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;

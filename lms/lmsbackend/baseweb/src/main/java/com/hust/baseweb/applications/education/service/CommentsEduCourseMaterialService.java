@@ -9,10 +9,16 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CommentsEduCourseMaterialService {
+
     CommentsEduCourseMaterial createComment(UUID commentId, UUID replyToCommentId, String comment, UserLogin u);
+
     List<CommentEduCourseDetailOM> findByEduCourseMaterialId(UUID eduCourseMaterialId);
+
     List<CommentEduCourseDetailOM> findByEduCourseMaterialIdWithoutReplyComment(UUID eduCourseMaterialId);
+
     List<CommentEduCourseDetailOM> findByReplyCommentId(UUID commentId);
+
     CommentsEduCourseMaterial editCommentEduCourse(UUID commentId, String comment, Date createdStamp);
+
     CommentsEduCourseMaterial deleteCommentEduCourse(UUID commentId);
 }

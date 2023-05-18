@@ -22,7 +22,8 @@ import java.util.UUID;
 @Log4j2
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
-public class WhiteboardServiceImpl implements  WhiteboardService {
+public class WhiteboardServiceImpl implements WhiteboardService {
+
     private WhiteboardRepo whiteboardRepo;
     private EduClassSessionRepo eduClassSessionRepo;
     private UserWhiteboardRepo userWhiteboardRepo;
@@ -46,7 +47,7 @@ public class WhiteboardServiceImpl implements  WhiteboardService {
         EduClassSession eduClassSession = eduClassSessionRepo.findBySessionId(sessionId);
         List<Whiteboard> whiteboardList = whiteboardRepo.findAllByEduClassSession(eduClassSession);
         List<GetListWhiteboardModel> getListWhiteboardModels = new ArrayList<>();
-        for (Whiteboard whiteboard: whiteboardList) {
+        for (Whiteboard whiteboard : whiteboardList) {
             if (whiteboard != null) {
                 GetListWhiteboardModel getListWhiteboardModel = new GetListWhiteboardModel();
                 getListWhiteboardModel.setId(whiteboard.getId());
@@ -89,13 +90,17 @@ public class WhiteboardServiceImpl implements  WhiteboardService {
     }
 
     @Override
-    public AddUserToWhiteboardResultModel addUserToWhiteboard(String whiteboardId, UserLogin userLogin, AddUserToWhiteboardModel input) {
+    public AddUserToWhiteboardResultModel addUserToWhiteboard(
+        String whiteboardId,
+        UserLogin userLogin,
+        AddUserToWhiteboardModel input
+    ) {
         AddUserToWhiteboardResultModel addUserToWhiteboardResultModel = new AddUserToWhiteboardResultModel();
         UserWhiteboard userWhiteboard = new UserWhiteboard();
         List<UserWhiteboard> userWhiteboardList = userWhiteboardRepo.findAllByUserLogin(userLogin);
         boolean found = false;
-        for(UserWhiteboard x : userWhiteboardList){
-            if(x.getWhiteboard().getId().equals(whiteboardId)){
+        for (UserWhiteboard x : userWhiteboardList) {
+            if (x.getWhiteboard().getId().equals(whiteboardId)) {
                 if (x.getWhiteboard().getCreatedBy().equals(userLogin.getUserLoginId())) {
                     addUserToWhiteboardResultModel.setIsCreatedUser(true);
                 } else {
@@ -166,10 +171,11 @@ public class WhiteboardServiceImpl implements  WhiteboardService {
         List<UserWhiteboard> userWhiteboardList = userWhiteboardRepo.findAllByWhiteboard(whiteboard);
         List<AddUserToWhiteboardResultModel> addUserToWhiteboardResultModelList = new ArrayList<>();
 
-        for(UserWhiteboard userWhiteboard : userWhiteboardList){
+        for (UserWhiteboard userWhiteboard : userWhiteboardList) {
             AddUserToWhiteboardResultModel addUserToWhiteboardResultModel = new AddUserToWhiteboardResultModel();
             log.info("x: whiteboardId = " + userWhiteboard.getWhiteboard().getId());
-            if(userWhiteboard.getWhiteboard().getId().equals(whiteboardId) && userWhiteboard.getStatusId().equals("pending")){
+            if (userWhiteboard.getWhiteboard().getId().equals(whiteboardId) &&
+                userWhiteboard.getStatusId().equals("pending")) {
                 addUserToWhiteboardResultModel.setIsCreatedUser(false);
                 addUserToWhiteboardResultModel.setRoleId(userWhiteboard.getRoleId());
                 addUserToWhiteboardResultModel.setStatusId(userWhiteboard.getStatusId());
@@ -190,9 +196,9 @@ public class WhiteboardServiceImpl implements  WhiteboardService {
         Whiteboard whiteboard = whiteboardRepo.findWhiteboardById(whiteboardId);
         List<UserWhiteboard> userWhiteboardList = userWhiteboardRepo.findAllByWhiteboard(whiteboard);
 
-        for(UserWhiteboard userWhiteboard : userWhiteboardList){
+        for (UserWhiteboard userWhiteboard : userWhiteboardList) {
             UsersInWhiteboardModel usersInWhiteboardModel = new UsersInWhiteboardModel();
-            if(userWhiteboard.getWhiteboard().getId().equals(whiteboardId)){
+            if (userWhiteboard.getWhiteboard().getId().equals(whiteboardId)) {
                 usersInWhiteboardModel.setRoleId(userWhiteboard.getRoleId());
                 usersInWhiteboardModel.setStatusId(userWhiteboard.getStatusId());
                 usersInWhiteboardModel.setUserId(userWhiteboard.getUserLogin().getUserLoginId());

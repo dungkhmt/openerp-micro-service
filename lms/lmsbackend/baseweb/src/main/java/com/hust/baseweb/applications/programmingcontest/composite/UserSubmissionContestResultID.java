@@ -12,6 +12,7 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode
 public class UserSubmissionContestResultID implements Serializable {
+
     private String contestId;
     private String userId;
 }

@@ -45,8 +45,9 @@ public class MaxPriorityClassAssignmentORToolMIPSolver {
     // data structures for solution
     private int[] assignment;// assignment[i] is the teacher assigned to class i
     private HashSet<Integer> notAssigned;
+
     public MaxPriorityClassAssignmentORToolMIPSolver(
-       MapDataInput I
+        MapDataInput I
     ) {
         this.n = I.n;
         this.m = I.m;
@@ -58,12 +59,14 @@ public class MaxPriorityClassAssignmentORToolMIPSolver {
         this.preAssignment = I.getPreAssignment();
     }
 
-    public void setNbAssignedClasses(int nbAssignedClasses){
+    public void setNbAssignedClasses(int nbAssignedClasses) {
         this.nbAssignedClasses = nbAssignedClasses;
     }
-    public HashSet<Integer> getNotAssignedClass(){
+
+    public HashSet<Integer> getNotAssignedClass() {
         return notAssigned;
     }
+
     private void initDatastructures() {
         totalHourClass = 0;
         for (int i = 0; i < n; i++) {
@@ -72,11 +75,15 @@ public class MaxPriorityClassAssignmentORToolMIPSolver {
         INF = (int) totalHourClass + 1;
         maxP = 0;
         minP = Integer.MAX_VALUE;
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < m; j++){
-                if(priority[i][j] < Integer.MAX_VALUE){
-                        if(priority[i][j] > maxP) maxP = priority[i][j];
-                        if(priority[i][j] < minP) minP = priority[i][j];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (priority[i][j] < Integer.MAX_VALUE) {
+                    if (priority[i][j] > maxP) {
+                        maxP = priority[i][j];
+                    }
+                    if (priority[i][j] < minP) {
+                        minP = priority[i][j];
+                    }
                 }
 
             }
@@ -85,13 +92,16 @@ public class MaxPriorityClassAssignmentORToolMIPSolver {
         // init parameters
         alpha = 10000;
         beta = new int[maxP + 1];
-        for(int k = minP; k <= maxP; k++) beta[k] = 1;
+        for (int k = minP; k <= maxP; k++) {
+            beta[k] = 1;
+        }
         //beta[minP] = 10000; beta[minP+1] = 100;
-        for(int k = maxP-1; k >= minP; k--){
-            if(beta[k+1] < 10000000)
-                beta[k] = beta[k+1]*10;
-            else
-                beta[k] = beta[k+1];
+        for (int k = maxP - 1; k >= minP; k--) {
+            if (beta[k + 1] < 10000000) {
+                beta[k] = beta[k + 1] * 10;
+            } else {
+                beta[k] = beta[k + 1];
+            }
         }
     }
 
@@ -119,36 +129,42 @@ public class MaxPriorityClassAssignmentORToolMIPSolver {
         }
         obj = solver.makeIntVar(0, totalHourClass, "minOfMaxLoad");
         int sumBeta = 0;
-        for(int p = minP; p <= maxP; p++) sumBeta += beta[p];
+        for (int p = minP; p <= maxP; p++) {
+            sumBeta += beta[p];
+        }
         sumBeta = sumBeta * n;
-        objectiveMaxPriority = solver.makeIntVar(0,sumBeta, "objectiveMaxPriority");
+        objectiveMaxPriority = solver.makeIntVar(0, sumBeta, "objectiveMaxPriority");
 
-        objectiveMaxNbClassAssigned = solver.makeIntVar(0,n,"objectiveMaxNbClassAssigned");
+        objectiveMaxNbClassAssigned = solver.makeIntVar(0, n, "objectiveMaxNbClassAssigned");
 
         // create variables y
-        y = new MPVariable[n][maxP+1];
-        for(int i = 0; i < n; i++){
-            for(int k = minP; k <= maxP; k++){
-                y[i][k] = solver.makeIntVar(0,1,"y[" + i + "," + k + "]");
+        y = new MPVariable[n][maxP + 1];
+        for (int i = 0; i < n; i++) {
+            for (int k = minP; k <= maxP; k++) {
+                y[i][k] = solver.makeIntVar(0, 1, "y[" + i + "," + k + "]");
             }
         }
 
         // create variable z
         z = new MPVariable[n];
-        for(int i = 0; i < n; i++)
-            z[i] = solver.makeIntVar(0,1,"z[" + i + "]");
+        for (int i = 0; i < n; i++) {
+            z[i] = solver.makeIntVar(0, 1, "z[" + i + "]");
+        }
 
         // create variable u
         //u = new MPVariable[n];
         //for(int i = 0; i < n; i++)
         //    u[i] = solver.makeIntVar(0,totalHourClass,"u[" + i + "]");
     }
-    private void createConstraintNumberAssignedClassAtLeast(){
+
+    private void createConstraintNumberAssignedClassAtLeast() {
         MPConstraint c = solver.makeConstraint(nbAssignedClasses, nbAssignedClasses);
-        for(int i = 0; i < n; i++)
-            c.setCoefficient(z[i],1);
+        for (int i = 0; i < n; i++) {
+            c.setCoefficient(z[i], 1);
+        }
     }
-    private void createConstraintAtMostOneTeacherIsAssignedToEachClass(){
+
+    private void createConstraintAtMostOneTeacherIsAssignedToEachClass() {
         // each class is assigned to at most one teacher
         for (int i = 0; i < n; i++) {
             //MPConstraint c = solver.makeConstraint(1, 1);
@@ -159,7 +175,8 @@ public class MaxPriorityClassAssignmentORToolMIPSolver {
         }
 
     }
-    private void createConstraintMaxHourLoadTeacher(){
+
+    private void createConstraintMaxHourLoadTeacher() {
         // hour load of each teacher cannot exceed the maximum allowed valueOf
         for (int j = 0; j < m; j++) {
             MPConstraint c = solver.makeConstraint(0, maxHourTeacher[j]);
@@ -168,7 +185,8 @@ public class MaxPriorityClassAssignmentORToolMIPSolver {
             }
         }
     }
-    private void createConstraintConflictClasses(){
+
+    private void createConstraintConflictClasses() {
         // conflict constraint
         for (int j = 0; j < m; j++) {
             for (int i1 = 0; i1 < n; i1++) {
@@ -182,41 +200,48 @@ public class MaxPriorityClassAssignmentORToolMIPSolver {
             }
         }
     }
-    private void createConstraintChannelXZ(){
+
+    private void createConstraintChannelXZ() {
         // constraint between x and z: z[i] = \sum_{j=1..m} x[j,i]
-        for(int i = 0; i < n; i++){
+        for (int i = 0; i < n; i++) {
             MPConstraint c = solver.makeConstraint(0, 0);
-            c.setCoefficient(z[i],1);
-            for(int j = 0; j < m; j++)
-                c.setCoefficient(x[j][i],-1);
+            c.setCoefficient(z[i], 1);
+            for (int j = 0; j < m; j++) {
+                c.setCoefficient(x[j][i], -1);
+            }
 
         }
     }
-    private void createConstraintChannelYZ(){
-        for(int i = 0; i < n; i++){
-            MPConstraint c = solver.makeConstraint(0,INF);
-            for(int p = minP; p <= maxP; p++)
-                c.setCoefficient(y[i][p],-1);
-            c.setCoefficient(z[i],1);
+
+    private void createConstraintChannelYZ() {
+        for (int i = 0; i < n; i++) {
+            MPConstraint c = solver.makeConstraint(0, INF);
+            for (int p = minP; p <= maxP; p++) {
+                c.setCoefficient(y[i][p], -1);
+            }
+            c.setCoefficient(z[i], 1);
         }
     }
-    private void createConstraintOnY(){
-        for(int i = 0; i < n; i++){
-            MPConstraint c = solver.makeConstraint(0,1);
-            for(int p = minP; p <= maxP; p++)
-                c.setCoefficient(y[i][p],1);
+
+    private void createConstraintOnY() {
+        for (int i = 0; i < n; i++) {
+            MPConstraint c = solver.makeConstraint(0, 1);
+            for (int p = minP; p <= maxP; p++) {
+                c.setCoefficient(y[i][p], 1);
+            }
         }
     }
-    private void createConstraintChannelXY(){
+
+    private void createConstraintChannelXY() {
         // constraint between x and y
-        for(int p = minP; p <= maxP; p++){
-            for(int i = 0; i < n; i++){
-                MPConstraint c = solver.makeConstraint(0,0);
-                c.setCoefficient(y[i][p],1);
-                for(int j = 0; j < m; j++){
-                    if(priority[i][j] == p){ // y[i,p] = x[j,i]
+        for (int p = minP; p <= maxP; p++) {
+            for (int i = 0; i < n; i++) {
+                MPConstraint c = solver.makeConstraint(0, 0);
+                c.setCoefficient(y[i][p], 1);
+                for (int j = 0; j < m; j++) {
+                    if (priority[i][j] == p) { // y[i,p] = x[j,i]
 
-                        c.setCoefficient(x[j][i],-1);
+                        c.setCoefficient(x[j][i], -1);
                     }
                     /*
                     else{
@@ -229,7 +254,8 @@ public class MaxPriorityClassAssignmentORToolMIPSolver {
         }
 
     }
-    private void createConstraintObj(){
+
+    private void createConstraintObj() {
         // constraint on the objective function
         for (int j = 0; j < m; j++) {
             MPConstraint c = solver.makeConstraint(-INF, 0);
@@ -239,33 +265,40 @@ public class MaxPriorityClassAssignmentORToolMIPSolver {
             c.setCoefficient(obj, -1);
         }
     }
+
     private void createMaxPriorityObjectiveConstraint() {
-        MPConstraint c = solver.makeConstraint(0,0);
-        for(int p = minP; p <= maxP; p++){
-            for(int i = 0; i < n; i++){
-                c.setCoefficient(y[i][p],beta[p]);
+        MPConstraint c = solver.makeConstraint(0, 0);
+        for (int p = minP; p <= maxP; p++) {
+            for (int i = 0; i < n; i++) {
+                c.setCoefficient(y[i][p], beta[p]);
             }
         }
-        c.setCoefficient(objectiveMaxPriority,-1);
+        c.setCoefficient(objectiveMaxPriority, -1);
 
     }
-    private void createMaxNbAssignedClassConstraint(){
-        MPConstraint c = solver.makeConstraint(0,0);
-        for(int i = 0; i < n; i++) c.setCoefficient(z[i],1);
-        c.setCoefficient(objectiveMaxNbClassAssigned,-1);
+
+    private void createMaxNbAssignedClassConstraint() {
+        MPConstraint c = solver.makeConstraint(0, 0);
+        for (int i = 0; i < n; i++) {
+            c.setCoefficient(z[i], 1);
+        }
+        c.setCoefficient(objectiveMaxNbClassAssigned, -1);
     }
-    private void createInstantiationConstraint(int j, int i){
+
+    private void createInstantiationConstraint(int j, int i) {
         // create constraint saying that teacher j is assigned to class i: x[j][i] = 1
-        MPConstraint c = solver.makeConstraint(1,1);
-        c.setCoefficient(x[j][i],1);
+        MPConstraint c = solver.makeConstraint(1, 1);
+        c.setCoefficient(x[j][i], 1);
     }
-    private void createPreAssignmentConstraints(){
-        for(int k = 0; k < preAssignment.length; k++){
+
+    private void createPreAssignmentConstraints() {
+        for (int k = 0; k < preAssignment.length; k++) {
             int i = preAssignment[k][0];// class index
             int j = preAssignment[k][1];// teacher
-            createInstantiationConstraint(j,i);
+            createInstantiationConstraint(j, i);
         }
     }
+
     private void createdConstraints() {
         createConstraintAtMostOneTeacherIsAssignedToEachClass();
         createPreAssignmentConstraints();
@@ -280,40 +313,44 @@ public class MaxPriorityClassAssignmentORToolMIPSolver {
         createMaxPriorityObjectiveConstraint();
         createMaxNbAssignedClassConstraint();
     }
-    private void createObjective(){
-        MPObjective objective= solver.objective();
-        objective.setCoefficient(objectiveMaxPriority,1);
+
+    private void createObjective() {
+        MPObjective objective = solver.objective();
+        objective.setCoefficient(objectiveMaxPriority, 1);
         objective.setMaximization();
     }
-    public double getObjectivePriority(){
+
+    public double getObjectivePriority() {
         return objectiveMaxPriority.solutionValue();
     }
-    public double getObjectiveNumberAssignedClass(){
+
+    public double getObjectiveNumberAssignedClass() {
         return objectiveMaxNbClassAssigned.solutionValue();
     }
-    public void printSolutionVariables(){
-        for(int j = 0; j < m; j++){
-            for(int i = 0; i < n; i++){
-                if(x[j][i].solutionValue() > 0){
+
+    public void printSolutionVariables() {
+        for (int j = 0; j < m; j++) {
+            for (int i = 0; i < n; i++) {
+                if (x[j][i].solutionValue() > 0) {
                     System.out.println("x[" + j + "," + i + "] = " + x[j][i].solutionValue());
                 }
             }
         }
-        for(int i = 0; i < n; i++){
-            if(z[i].solutionValue() > 0){
+        for (int i = 0; i < n; i++) {
+            if (z[i].solutionValue() > 0) {
                 System.out.println("z[" + i + "]= " + z[i].solutionValue());
             }
         }
-        for(int i = 0; i < n; i++){
-            for(int p = minP; p <= maxP; p++){
-                if(y[i][p].solutionValue() > 0){
+        for (int i = 0; i < n; i++) {
+            for (int p = minP; p <= maxP; p++) {
+                if (y[i][p].solutionValue() > 0) {
                     System.out.println("y[" + i + "," + p + "] = " + y[i][p].solutionValue());
                 }
             }
         }
     }
 
-    private boolean solvePhase1(){
+    private boolean solvePhase1() {
         // maximize the number of class assigned
         initDatastructures();
         createSolverAndVariables();
@@ -327,18 +364,22 @@ public class MaxPriorityClassAssignmentORToolMIPSolver {
         // Analyse solution.
         if (resultStatus == MPSolver.ResultStatus.OPTIMAL) {
             assignment = new int[n];
-            for(int i = 0; i < n; i++) assignment[i] = -1;
+            for (int i = 0; i < n; i++) {
+                assignment[i] = -1;
+            }
             printSolutionVariables();
             //System.out.println("solve, n = " + n + " m = " + m + ", objective = " + objectiveMaxNbClassAssigned.value());
             for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) if (x[j][i].solutionValue() > 0){
-                    //System.out.println("solver, x[" + i + "," + j + "] = " + x[j][i].solutionValue());
+                for (int j = 0; j < m; j++) {
                     if (x[j][i].solutionValue() > 0) {
-                        assignment[i] = j;
+                        //System.out.println("solver, x[" + i + "," + j + "] = " + x[j][i].solutionValue());
+                        if (x[j][i].solutionValue() > 0) {
+                            assignment[i] = j;
+                        }
                     }
                 }
             }
-            for(int i = 0; i < n; i++) {
+            for (int i = 0; i < n; i++) {
                 //System.out.println("solver z[" + i + "] = " + z[i].solutionValue());
                 if (z[i].solutionValue() <= 0) {
                     notAssigned.add(i);
@@ -351,8 +392,9 @@ public class MaxPriorityClassAssignmentORToolMIPSolver {
     }
 
     public boolean solve() {
-        if(true)
-        return solvePhase1();
+        if (true) {
+            return solvePhase1();
+        }
 
         initDatastructures();
         createSolverAndVariables();

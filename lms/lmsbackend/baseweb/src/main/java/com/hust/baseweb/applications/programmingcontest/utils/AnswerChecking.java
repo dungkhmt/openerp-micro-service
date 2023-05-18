@@ -4,7 +4,8 @@ package com.hust.baseweb.applications.programmingcontest.utils;
 //@Getter
 //@Setter
 public class AnswerChecking {
-    public boolean checkAnswerGenerate(String correctAnswer){
+
+    public boolean checkAnswerGenerate(String correctAnswer) {
         return true;
     }
 }

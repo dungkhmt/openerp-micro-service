@@ -37,7 +37,7 @@ public class QuizGroupQuestionAssignmentController {
     @PostMapping("/remove-quizgroup-question-assignment")
     public ResponseEntity<?> removeQuizGroupQuestionAssignment(
         Principal principal, @RequestBody
-        RemoveQuizGroupQuestionInputModel input
+    RemoveQuizGroupQuestionInputModel input
     ) {
         quizGroupQuestionAssignmentService.removeQuizGroupQuestionAssignment(input);
         return ResponseEntity.ok().body("OK");

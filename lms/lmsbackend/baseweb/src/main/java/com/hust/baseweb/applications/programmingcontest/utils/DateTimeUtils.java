@@ -294,12 +294,12 @@ public class DateTimeUtils {
     }
 
 
-    public enum DateTimeFormat{
+    public enum DateTimeFormat {
         DATE_TIME_ISO_FORMAT("yyyy-MM-dd HH:mm:ss");
 
         private final String value;
 
-        DateTimeFormat(String value){
+        DateTimeFormat(String value) {
             this.value = value;
         }
 
@@ -308,33 +308,33 @@ public class DateTimeUtils {
         }
     }
 
-    public static ZonedDateTime dateToZoneDateTime(Date date){
+    public static ZonedDateTime dateToZoneDateTime(Date date) {
         return date.toInstant().atZone(ZoneId.of("Asia/Ho_Chi_Minh"));
     }
 
-    public static String zonedDateTimeToString(ZonedDateTime zonedDateTime, DateTimeFormat dateTimeFormat){
+    public static String zonedDateTimeToString(ZonedDateTime zonedDateTime, DateTimeFormat dateTimeFormat) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimeFormat.getValue());
         return zonedDateTime.format(formatter);
     }
 
-    public static String dateToString(Date date, DateTimeFormat format){
+    public static String dateToString(Date date, DateTimeFormat format) {
         ZonedDateTime zonedDateTime = dateToZoneDateTime(date);
         return zonedDateTimeToString(zonedDateTime, format);
     }
 
-    public static  Date minusMinutesDate(Date date, Long minutes){
+    public static Date minusMinutesDate(Date date, Long minutes) {
         ZonedDateTime zonedDateTime = dateToZoneDateTime(date);
         zonedDateTime = zonedDateTime.minusMinutes(minutes);
         return Date.from(zonedDateTime.toInstant());
     }
 
-    public static Date addMinutesDate(Date date, Long minutes){
+    public static Date addMinutesDate(Date date, Long minutes) {
         ZonedDateTime zonedDateTime = dateToZoneDateTime(date);
         zonedDateTime = zonedDateTime.plusMinutes(minutes);
         return Date.from(zonedDateTime.toInstant());
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         System.out.println("test");
     }
 }

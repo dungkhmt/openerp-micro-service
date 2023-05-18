@@ -6,11 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelContestByRoleResponse {
+
     private String contestId;
     private String roleId;
     private String createdByUserLoginId;

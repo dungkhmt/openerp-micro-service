@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ThesisRepo extends  PagingAndSortingRepository<Thesis, UUID>{
+public interface ThesisRepo extends PagingAndSortingRepository<Thesis, UUID> {
+
     Page<Thesis> findAll(Pageable pageable);
+
     Optional<Thesis> findByThesisName(String thesisName);
 
 
@@ -20,16 +22,19 @@ public interface ThesisRepo extends  PagingAndSortingRepository<Thesis, UUID>{
     List<Thesis> findAllByThesisName(String thesis_name);
 
     @Modifying
-    @Query(value = "DELETE FROM thesis t WHERE t.id = :id and t.created_by_user_login_id=:UserLoginId", nativeQuery = true)
-    void deleteByIdAndUserLogin(UUID id,String UserLoginId);
+    @Query(value = "DELETE FROM thesis t WHERE t.id = :id and t.created_by_user_login_id=:UserLoginId",
+           nativeQuery = true)
+    void deleteByIdAndUserLogin(UUID id, String UserLoginId);
 
     @Query(value = "select * from thesis t where t.scheduled_jury_id = :juryID", nativeQuery = true)
     List<Thesis> findAllByJuryID(UUID juryID);
 
-    @Query(value = "select * from thesis t where t.scheduled_jury_id = :juryID and t.thesis_name like %:key%", nativeQuery = true)
-    List<Thesis> findAllByJuryIDAAndThesisName(UUID juryID,String key);
+    @Query(value = "select * from thesis t where t.scheduled_jury_id = :juryID and t.thesis_name like %:key%",
+           nativeQuery = true)
+    List<Thesis> findAllByJuryIDAAndThesisName(UUID juryID, String key);
 
-    @Query(value = "select * from thesis t where t.id = :thesisId and t.scheduled_jury_id = :defenseJuryId", nativeQuery = true)
+    @Query(value = "select * from thesis t where t.id = :thesisId and t.scheduled_jury_id = :defenseJuryId",
+           nativeQuery = true)
     Optional<Thesis> findByIdAndDefenseJury(UUID thesisId, UUID defenseJuryId);
 
     @Modifying
@@ -38,22 +43,24 @@ public interface ThesisRepo extends  PagingAndSortingRepository<Thesis, UUID>{
 
     @Modifying
     @Query(value = "Update thesis set scheduled_jury_id = :juryId where id = :thesisId ", nativeQuery = true)
-    void updateThesisByDefenJuryId(UUID thesisId,UUID juryId);
+    void updateThesisByDefenJuryId(UUID thesisId, UUID juryId);
 
 
-    @Query(value = "select count(t.scheduled_jury_id) from  thesis t WHERE t.scheduled_jury_id = :juryId", nativeQuery = true)
+    @Query(value = "select count(t.scheduled_jury_id) from  thesis t WHERE t.scheduled_jury_id = :juryId",
+           nativeQuery = true)
     Long getCountThesisByJuryId(UUID juryId);
 
     @Query(value = "select * from thesis t where t.thesis_defense_plan_id = :planId", nativeQuery = true)
     List<Thesis> findAllByPlanId(String planId);
 
-    @Query(value = "select * from thesis t where t.thesis_defense_plan_id = :planId and t.thesis_name like %:key%", nativeQuery = true)
-    List<Thesis> findAllByPlanIdAndThesisName(String planId,String key);
+    @Query(value = "select * from thesis t where t.thesis_defense_plan_id = :planId and t.thesis_name like %:key%",
+           nativeQuery = true)
+    List<Thesis> findAllByPlanIdAndThesisName(String planId, String key);
 
     @Modifying
-    @Query(value = "select * from thesis t where t.thesis_defense_plan_id = :planId and t.scheduled_jury_id = :juryId and t.thesis_name like %:key%", nativeQuery = true)
-    List<Thesis> findByDefensePlanIdAndAndDefenseJuryAndThesisName(String planId,UUID juryId,String key);
-
+    @Query(value = "select * from thesis t where t.thesis_defense_plan_id = :planId and t.scheduled_jury_id = :juryId and t.thesis_name like %:key%",
+           nativeQuery = true)
+    List<Thesis> findByDefensePlanIdAndAndDefenseJuryAndThesisName(String planId, UUID juryId, String key);
 
 
 //    @Modifying

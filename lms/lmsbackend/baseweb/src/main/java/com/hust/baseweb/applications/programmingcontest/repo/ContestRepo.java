@@ -6,13 +6,14 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 public interface ContestRepo extends JpaRepository<ContestEntity, String> {
+
     ContestEntity findContestByContestId(String contestId);
 
     ContestEntity findContestEntityByContestIdAndUserId(String contestId, String userId);
 
     @Modifying
     @Query(value = "update contest_new " +
-                   "set judge_mode = :judgeMode " 
+                   "set judge_mode = :judgeMode "
         ,
            nativeQuery = true
     )

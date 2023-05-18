@@ -276,7 +276,7 @@ public class ClassServiceImpl implements ClassService {
     public List<ModelResponseEduClassDetail> getAllClass() {
         List<ModelResponseEduClassDetail> res = new ArrayList();
         List<EduClass> cls = classRepo.findAll();
-        for(EduClass c: cls){
+        for (EduClass c : cls) {
             ModelResponseEduClassDetail m = new ModelResponseEduClassDetail();
             m.setClassCode(c.getClassCode());
             m.setId(c.getId());
@@ -468,13 +468,14 @@ public class ClassServiceImpl implements ClassService {
 
     @Override
     public void deleteEduClassUserLoginRole(AddEduClassUserLoginRoleIM deletedPermission) {
-        eduClassUserLoginRoleRepo.deleteByClassIdAndUserLoginIdAndRoleId(deletedPermission.getClassId(),
-                                                                         deletedPermission.getUserLoginId(),
-                                                                         deletedPermission.getRoleId());
+        eduClassUserLoginRoleRepo.deleteByClassIdAndUserLoginIdAndRoleId(
+            deletedPermission.getClassId(),
+            deletedPermission.getUserLoginId(),
+            deletedPermission.getRoleId());
     }
 
     @Transactional
-    private SimpleResponse createOrUpdateRegist(UUID classId, String studentId, RegistStatus status) {
+    SimpleResponse createOrUpdateRegist(UUID classId, String studentId, RegistStatus status) {
         EduClass eduClass = new EduClass();
         UserLogin student = new UserLogin();
         ClassRegistrationId id = new ClassRegistrationId(eduClass, student);

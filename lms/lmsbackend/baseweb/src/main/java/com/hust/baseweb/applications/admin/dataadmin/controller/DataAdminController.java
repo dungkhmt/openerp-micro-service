@@ -58,34 +58,46 @@ public class DataAdminController {
     private ContestSubmissionRepo contestSubmissionRepo;
 
     @GetMapping("/admin/data/notifications")
-    public ResponseEntity<?> getPageNotifications(Principal principal, @RequestParam int page, @RequestParam int size,
-                                Pageable pageable ) {
+    public ResponseEntity<?> getPageNotifications(
+        Principal principal, @RequestParam int page, @RequestParam int size,
+        Pageable pageable
+    ) {
 
-        List<Notifications> lst = notificationRepo.getPage(page*size,size);
+        List<Notifications> lst = notificationRepo.getPage(page * size, size);
         int count = notificationRepo.countNotifications();
         Page<Notifications> aPage = new PageImpl<>(lst, pageable, count);
         return ResponseEntity.ok().body(aPage);
     }
+
     @GetMapping("/admin/data/view-users-do-pratice-quiz")
-    public ResponseEntity<?> getPageLogUsersDoQuiz(Principal principal, @RequestParam int page, int size, Pageable pageable){
+    public ResponseEntity<?> getPageLogUsersDoQuiz(
+        Principal principal,
+        @RequestParam int page,
+        int size,
+        Pageable pageable
+    ) {
         Pageable sortedByCreatedStampDsc =
             PageRequest.of(page, size, Sort.by("createStamp").descending());
         Page<StudentQuizParticipationModel> studentQuizParticipationModels =
             logUserLoginQuizQuestionService.getPageLogStudentQuiz(
-            page,
-            size);
+                page,
+                size);
 
         return ResponseEntity.ok().body(studentQuizParticipationModels);
 
     }
+
     @GetMapping("/admin/data/view-users-do-pratice-quiz/{studentId}")
-    public ResponseEntity<?> getPageLogUsersDoQuizOfAStudent(Principal principal,
-                                                             @PathVariable String studentId,
-                                                             @RequestParam int page, int size, Pageable pageable){
+    public ResponseEntity<?> getPageLogUsersDoQuizOfAStudent(
+        Principal principal,
+        @PathVariable String studentId,
+        @RequestParam int page, int size, Pageable pageable
+    ) {
         Pageable sortedByCreatedStampDsc =
             PageRequest.of(page, size, Sort.by("createStamp").descending());
         Page<StudentQuizParticipationModel> studentQuizParticipationModels =
-            logUserLoginQuizQuestionService.getPageLogStudentQuizOfAStudent(studentId,
+            logUserLoginQuizQuestionService.getPageLogStudentQuizOfAStudent(
+                studentId,
                 page,
                 size);
 
@@ -101,13 +113,13 @@ public class DataAdminController {
             PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<ContestSubmissionEntity> lst = contestSubmissionRepo.findAll(sortedByCreatedStampDsc);
         List<ContestSubmission> L = new ArrayList<ContestSubmission>();
-        for(ContestSubmissionEntity e: lst){
+        for (ContestSubmissionEntity e : lst) {
             ContestSubmission cs = new ContestSubmission();
             cs.setContestId(e.getContestId());
             cs.setProblemId(e.getProblemId());
             cs.setUserId(e.getUserId());
-            PersonModel person= userService.findPersonByUserLoginId(e.getUserId());
-            if(person != null){
+            PersonModel person = userService.findPersonByUserLoginId(e.getUserId());
+            if (person != null) {
                 cs.setFullname(person.getLastName() + " " + person.getMiddleName() + " " + person.getFirstName());
                 cs.setAffiliation(person.getAffiliations());
             }
@@ -123,10 +135,11 @@ public class DataAdminController {
         return ResponseEntity.ok().body(aPage);
 
     }
-        @GetMapping("/admin/data/view-course-video")
+
+    @GetMapping("/admin/data/view-course-video")
     public ResponseEntity<?> getPageLogUserLoginCourseChapterMaterial(
         Principal principal, @RequestParam int page, int size, Pageable pageable
-    ){
+    ) {
         Pageable sortedByCreatedStampDsc =
             PageRequest.of(page, size, Sort.by("createStamp").descending());
         /*
@@ -136,19 +149,20 @@ public class DataAdminController {
         List<EduCourseChapter> chapters = eduCourseChapterRepo.findAll();
         Map<UUID, EduCourseChapterMaterial> mId2ChapterMaterial = new HashMap();
         Map<UUID, EduCourseChapter> mId2Chapter = new HashMap();
-        for(EduCourseChapterMaterial c: chapterMaterials){
-            mId2ChapterMaterial.put(c.getEduCourseMaterialId(),c);
+        for (EduCourseChapterMaterial c : chapterMaterials) {
+            mId2ChapterMaterial.put(c.getEduCourseMaterialId(), c);
         }
-        for(EduCourseChapter c: chapters){
-            mId2Chapter.put(c.getChapterId(),c);
+        for (EduCourseChapter c : chapters) {
+            mId2Chapter.put(c.getChapterId(), c);
         }
 
         //List<LogUserLoginCourseChapterMaterial> lst = dataAdminLogUserLoginCourseChapterMaterial.getPage(page * size, size);
-        Page<LogUserLoginCourseChapterMaterial> lst = dataAdminLogUserLoginCourseChapterMaterial.findAll(sortedByCreatedStampDsc);
+        Page<LogUserLoginCourseChapterMaterial> lst = dataAdminLogUserLoginCourseChapterMaterial.findAll(
+            sortedByCreatedStampDsc);
         int count = dataAdminLogUserLoginCourseChapterMaterial.countTotal();
 
         List<LogUserLoginCourseChapterMaterialOutputModel> lstModel = new ArrayList();
-        for(LogUserLoginCourseChapterMaterial e: lst){
+        for (LogUserLoginCourseChapterMaterial e : lst) {
             LogUserLoginCourseChapterMaterialOutputModel m = new LogUserLoginCourseChapterMaterialOutputModel();
             m.setUserLoginId(e.getUserLoginId());
             String classId = null;
@@ -157,23 +171,23 @@ public class DataAdminController {
             String chapterName = null;
             String materialName = null;
             EduClass eduClass = e.getEduClass();
-            if(eduClass != null) {
+            if (eduClass != null) {
                 classId = eduClass.getClassCode();
                 courseId = eduClass.getEduCourse().getId();
                 courseName = eduClass.getEduCourse().getName();
             }
             EduCourseChapterMaterial chapterMaterial = mId2ChapterMaterial.get(e.getEduCourseMaterialId());
 
-            if(chapterMaterial != null){
+            if (chapterMaterial != null) {
                 EduCourseChapter chapter = chapterMaterial.getEduCourseChapter();
                 materialName = chapterMaterial.getEduCourseMaterialName();
-                if(chapter != null){
+                if (chapter != null) {
                     chapterName = chapter.getChapterName();
                 }
             }
 
-            PersonModel person= userService.findPersonByUserLoginId(e.getUserLoginId());
-            if(person != null){
+            PersonModel person = userService.findPersonByUserLoginId(e.getUserLoginId());
+            if (person != null) {
                 m.setFullname(person.getLastName() + " " + person.getMiddleName() + " " + person.getFirstName());
                 m.setAffiliations(person.getAffiliations());
             }
@@ -196,7 +210,7 @@ public class DataAdminController {
     public ResponseEntity<?> getPageLogUserLoginCourseChapterMaterialOfAStudent(
         Principal principal, @PathVariable String studentId,
         @RequestParam int page, int size, Pageable pageable
-    ){
+    ) {
         Pageable sortedByCreatedStampDsc =
             PageRequest.of(page, size, Sort.by("createStamp").descending());
         /*
@@ -206,19 +220,23 @@ public class DataAdminController {
         List<EduCourseChapter> chapters = eduCourseChapterRepo.findAll();
         Map<UUID, EduCourseChapterMaterial> mId2ChapterMaterial = new HashMap();
         Map<UUID, EduCourseChapter> mId2Chapter = new HashMap();
-        for(EduCourseChapterMaterial c: chapterMaterials){
-            mId2ChapterMaterial.put(c.getEduCourseMaterialId(),c);
+        for (EduCourseChapterMaterial c : chapterMaterials) {
+            mId2ChapterMaterial.put(c.getEduCourseMaterialId(), c);
         }
-        for(EduCourseChapter c: chapters){
-            mId2Chapter.put(c.getChapterId(),c);
+        for (EduCourseChapter c : chapters) {
+            mId2Chapter.put(c.getChapterId(), c);
         }
 
-        List<LogUserLoginCourseChapterMaterial> lst = dataAdminLogUserLoginCourseChapterMaterial.getPageOfUserLogin(page * size, size, studentId);
+        List<LogUserLoginCourseChapterMaterial> lst = dataAdminLogUserLoginCourseChapterMaterial.getPageOfUserLogin(
+            page *
+            size,
+            size,
+            studentId);
         //Page<LogUserLoginCourseChapterMaterial> lst = dataAdminLogUserLoginCourseChapterMaterial.findAll(sortedByCreatedStampDsc);
         int count = dataAdminLogUserLoginCourseChapterMaterial.countTotal();
 
         List<LogUserLoginCourseChapterMaterialOutputModel> lstModel = new ArrayList();
-        for(LogUserLoginCourseChapterMaterial e: lst){
+        for (LogUserLoginCourseChapterMaterial e : lst) {
             LogUserLoginCourseChapterMaterialOutputModel m = new LogUserLoginCourseChapterMaterialOutputModel();
             m.setUserLoginId(e.getUserLoginId());
             String classId = null;
@@ -227,23 +245,23 @@ public class DataAdminController {
             String chapterName = null;
             String materialName = null;
             EduClass eduClass = e.getEduClass();
-            if(eduClass != null) {
+            if (eduClass != null) {
                 classId = eduClass.getClassCode();
                 courseId = eduClass.getEduCourse().getId();
                 courseName = eduClass.getEduCourse().getName();
             }
             EduCourseChapterMaterial chapterMaterial = mId2ChapterMaterial.get(e.getEduCourseMaterialId());
 
-            if(chapterMaterial != null){
+            if (chapterMaterial != null) {
                 EduCourseChapter chapter = chapterMaterial.getEduCourseChapter();
                 materialName = chapterMaterial.getEduCourseMaterialName();
-                if(chapter != null){
+                if (chapter != null) {
                     chapterName = chapter.getChapterName();
                 }
             }
 
-            PersonModel person= userService.findPersonByUserLoginId(e.getUserLoginId());
-            if(person != null){
+            PersonModel person = userService.findPersonByUserLoginId(e.getUserLoginId());
+            if (person != null) {
                 m.setFullname(person.getLastName() + " " + person.getMiddleName() + " " + person.getFirstName());
                 m.setAffiliations(person.getAffiliations());
             }

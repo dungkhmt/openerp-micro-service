@@ -9,6 +9,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import java.util.ArrayList;
 
 public interface ProblemPagingAndSortingRepo extends PagingAndSortingRepository<ProblemEntity, String> {
+
     @Query("select p.problemName from ProblemEntity p")
     ArrayList<String> getProblemNamePaging(Pageable pageable);
 

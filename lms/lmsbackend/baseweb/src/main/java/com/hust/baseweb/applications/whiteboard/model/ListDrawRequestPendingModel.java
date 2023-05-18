@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class ListDrawRequestPendingModel {
+
     private List<AddUserToWhiteboardResultModel> addUserToWhiteboardResultModelList;
 
     public ListDrawRequestPendingModel() {

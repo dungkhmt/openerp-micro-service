@@ -19,10 +19,10 @@ public interface DoingPracticeQuizStatisticRepo extends JpaRepository<LogUserLog
     @Query(
         nativeQuery = true,
         value =
-        "SELECT lg.user_login_id as loginId, COUNT(*) as totalQuizDoingTimes " +
-        "FROM log_user_login_quiz_question lg " +
-        "WHERE lg.created_stamp > :statisticFrom " +
-        "GROUP BY lg.user_login_id"
+            "SELECT lg.user_login_id as loginId, COUNT(*) as totalQuizDoingTimes " +
+            "FROM log_user_login_quiz_question lg " +
+            "WHERE lg.created_stamp > :statisticFrom " +
+            "GROUP BY lg.user_login_id"
     )
     List<TotalQuizDoingTimeModel> countTotalQuizDoingTimes(@Param("statisticFrom") Date statisticFrom);
 
@@ -48,6 +48,8 @@ public interface DoingPracticeQuizStatisticRepo extends JpaRepository<LogUserLog
         "WHERE lg.userLoginId IN :loginIds AND lg.createStamp <= :maxDoingTime " +
         "GROUP BY lg.userLoginId"
     )
-    List<QuizDoingTimeModel> findLatestDoingTimesBefore(@Param("maxDoingTime") Date maxDoingTime,
-                                                        @Param("loginIds") Set<String> loginIds);
+    List<QuizDoingTimeModel> findLatestDoingTimesBefore(
+        @Param("maxDoingTime") Date maxDoingTime,
+        @Param("loginIds") Set<String> loginIds
+    );
 }

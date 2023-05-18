@@ -14,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelGetContestInfosOfSubmissionOutput {
+
     private UUID submissionId;
     private String contestId;
     private List<String> problemIds;

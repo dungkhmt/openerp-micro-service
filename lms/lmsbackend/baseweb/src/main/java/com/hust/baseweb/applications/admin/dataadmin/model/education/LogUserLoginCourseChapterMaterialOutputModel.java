@@ -12,6 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LogUserLoginCourseChapterMaterialOutputModel {
+
     private String userLoginId;
     private String fullname;
     private String affiliations;

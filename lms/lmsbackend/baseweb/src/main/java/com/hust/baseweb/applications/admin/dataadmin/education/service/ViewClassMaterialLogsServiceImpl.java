@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class ViewClassMaterialLogsServiceImpl implements ViewClassMaterialLogsService {
 
     private final DataAdminLogUserLoginCourseChapterMaterialRepo viewClassMaterialLogsRepo;
+
     @Override
     public Page<ViewClassMaterialLogsOM> findViewClassMaterialLogsOfStudent(
         String studentLoginId,

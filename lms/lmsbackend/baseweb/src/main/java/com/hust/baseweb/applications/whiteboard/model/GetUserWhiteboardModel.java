@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetUserWhiteboardModel {
+
     private String roleId;
     private String statusId;
 }

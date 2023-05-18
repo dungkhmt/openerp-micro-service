@@ -55,11 +55,13 @@ public class EduTestQuizParticipantServiceImpl implements EduTestQuizParticipant
         String userId,
         String testId
     ) {
-        return eduTestQuizParticipationRepo.findEduTestQuizParticipantByParticipantUserLoginIdAndAndTestId(userId, testId);
+        return eduTestQuizParticipationRepo.findEduTestQuizParticipantByParticipantUserLoginIdAndAndTestId(
+            userId,
+            testId);
     }
 
     @Override
-    public boolean addParticipant2QuizTest(String userId, String testId){
+    public boolean addParticipant2QuizTest(String userId, String testId) {
         List<EduTestQuizParticipant> eduTestQuizParticipants = eduTestQuizParticipationRepo
             .findByTestIdAndParticipantUserLoginId(testId, userId);
 
@@ -72,9 +74,9 @@ public class EduTestQuizParticipantServiceImpl implements EduTestQuizParticipant
             return false;
         }
         UserLogin u = userLoginRepo.findById(userId).orElse(null);
-        if(u == null){
+        if (u == null) {
             log.info("addParticipant2QuizTest, userLoginId = " +
-                     userId  +
+                     userId +
                      " NOT EXISTS!!");
             return false;
         }

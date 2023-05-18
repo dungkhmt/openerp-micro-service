@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelUpdateContestSubmission {
+
     private UUID contestSubmissionId;
     private String modifiedSourceCodeSubmitted;
     private String language;

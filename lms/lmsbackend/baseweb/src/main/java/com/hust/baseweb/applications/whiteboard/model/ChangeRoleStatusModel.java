@@ -8,11 +8,12 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ChangeRoleStatusModel {
+
     private String userId;
     private String roleId;
     private String statusId;
 
-    public ChangeRoleStatusModel(){
+    public ChangeRoleStatusModel() {
 
     }
 }

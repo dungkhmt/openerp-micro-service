@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelGetRolesOfUserInContestResponse {
+
     private String userId;
     private String contestId;
     private List<String> rolesApprovedInContest;
