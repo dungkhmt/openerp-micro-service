@@ -7,7 +7,10 @@ import com.hust.baseweb.applications.education.thesisdefensejury.models.ThesisDe
 import java.util.List;
 
 public interface ThesisDefensePlanService {
+
     List<ThesisDefensePlan> getAllThesisDefensePlan();
+
     Response createThesisDefensePlan(ThesisDefensePlanIM request);
+
     Response findById(String id);
 }

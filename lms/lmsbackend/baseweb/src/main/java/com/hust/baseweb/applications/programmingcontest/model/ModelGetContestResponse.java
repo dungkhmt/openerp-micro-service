@@ -8,6 +8,7 @@ import java.util.Date;
 @Data
 @Builder
 public class ModelGetContestResponse {
+
     private String contestId;
     private String contestName;
     private long contestTime;

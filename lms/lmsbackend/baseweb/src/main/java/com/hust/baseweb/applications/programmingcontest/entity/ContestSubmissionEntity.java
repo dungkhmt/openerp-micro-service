@@ -15,10 +15,11 @@ import java.util.UUID;
 //@Table(name = "contest_problem")
 @Table(name = "contest_submission_new")
 public class ContestSubmissionEntity {
-    public static final String SUBMISSION_STATUS_ACCEPTED ="Accept";
-    public static final String SUBMISSION_STATUS_PARTIAL ="Partial";
-    public static final String SUBMISSION_STATUS_FAILED ="Failed";
-    public static final String SUBMISSION_STATUS_WRONG ="Wrong Answer";
+
+    public static final String SUBMISSION_STATUS_ACCEPTED = "Accept";
+    public static final String SUBMISSION_STATUS_PARTIAL = "Partial";
+    public static final String SUBMISSION_STATUS_FAILED = "Failed";
+    public static final String SUBMISSION_STATUS_WRONG = "Wrong Answer";
     public static final String SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED = "Time Limit Exceeded";
     public static final String SUBMISSION_STATUS_OUTPUT_LIMIT_EXCEEDED = "Output Size Limit Exceeded";
     public static final String SUBMISSION_STATUS_MEMORY_ALLOCATION_ERROR = "Memory Allocation Error";
@@ -89,7 +90,7 @@ public class ContestSubmissionEntity {
     @Column(name = "management_status")
     private String managementStatus;
 
-    @Column(name="submitted_by_user_id")
+    @Column(name = "submitted_by_user_id")
     private String submittedByUserId;
 
     @Column(name = "created_stamp")
@@ -101,6 +102,6 @@ public class ContestSubmissionEntity {
     @Column(name = "last_updated_by_user_id")
     private Date lastUpdatedByUserId;
 
-    @Column(name="message")
+    @Column(name = "message")
     private String message;
 }

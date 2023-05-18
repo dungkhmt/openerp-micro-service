@@ -17,8 +17,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @SecondaryTables({
-                     @SecondaryTable(name = "person"),
-                     @SecondaryTable(name = "user_login", pkJoinColumns = @PrimaryKeyJoinColumn(name = "party_id"))})
+    @SecondaryTable(name = "person"),
+    @SecondaryTable(name = "user_login", pkJoinColumns = @PrimaryKeyJoinColumn(name = "party_id"))})
 public class DUserCombineEntity {
 
     public static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();

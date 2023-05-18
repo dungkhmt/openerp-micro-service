@@ -30,7 +30,7 @@ public class EduTestQuizParticipantController {
     @PostMapping("/create-quiz-test-participation-register")
     public ResponseEntity<?> createQuizTestParticipationRegister(
         Principal principal, @RequestBody
-        EduTestQuizParticipationCreateInputModel input
+    EduTestQuizParticipationCreateInputModel input
     ) {
         UserLogin u = userService.findById(principal.getName());
         log.info("createQuizTestParticipationRegister, userLoginId = " + u.getUserLoginId());

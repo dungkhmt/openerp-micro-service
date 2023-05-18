@@ -14,8 +14,10 @@ import java.util.List;
 @Service
 @Transactional
 @Slf4j
-public class AcademicKeywordImpl implements AcademicKeywordService{
+public class AcademicKeywordImpl implements AcademicKeywordService {
+
     private final AcademicKeywordRepo academicKeywordRepo;
+
     @Override
     public List<AcademicKeyword> getAllAcademicKeywords() {
         return academicKeywordRepo.findAll();

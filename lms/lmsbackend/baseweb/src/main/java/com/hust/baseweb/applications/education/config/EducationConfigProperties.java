@@ -12,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 @ConstructorBinding
 @ConfigurationProperties(prefix = "")
 public class EducationConfigProperties {
+
     @NotBlank
     private String url_root;
 }

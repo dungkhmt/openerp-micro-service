@@ -11,7 +11,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface DefenseJuryRepo extends JpaRepository<DefenseJury, UUID> {
+
     Page<DefenseJury> findAll(Pageable pageable);
+
     @Override
     @Query(value = "select * from defense_jury d where d.id= :Id", nativeQuery = true)
     Optional<DefenseJury> findById(UUID Id);

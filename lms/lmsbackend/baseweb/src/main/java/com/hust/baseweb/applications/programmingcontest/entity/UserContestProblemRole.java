@@ -18,11 +18,12 @@ import java.util.UUID;
 @Table(name = "user_contest_problem_role")
 
 public class UserContestProblemRole {
+
     public static final String ROLE_MANAGER = "MANAGER";
     public static final String ROLE_VIEW = "VIEW";
     public static final String ROLE_OWNER = "OWNER";
 
-    public static List<String> getListRoles(){
+    public static List<String> getListRoles() {
         List<String> L = new ArrayList();
         L.add(ROLE_MANAGER);
         L.add(ROLE_VIEW);
@@ -35,22 +36,22 @@ public class UserContestProblemRole {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(name="user_id")
+    @Column(name = "user_id")
     private String userId;
 
-    @Column(name="problem_id")
+    @Column(name = "problem_id")
     private String problemId;
 
-    @Column(name="role_id")
+    @Column(name = "role_id")
     private String roleId;
 
-    @Column(name="update_by_user_id")
+    @Column(name = "update_by_user_id")
     private String updateByUserId;
 
-    @Column(name="created_stamp")
+    @Column(name = "created_stamp")
     private Date createdStamp;
 
-    @Column(name="last_updated_stamp")
+    @Column(name = "last_updated_stamp")
     private Date lastUpdated;
 
 }

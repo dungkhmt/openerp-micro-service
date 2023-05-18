@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public
 class AlgoTeacherClassPriorityModel {
+
     private int t;// teacher index
     private int c; // class index
     private int priority;

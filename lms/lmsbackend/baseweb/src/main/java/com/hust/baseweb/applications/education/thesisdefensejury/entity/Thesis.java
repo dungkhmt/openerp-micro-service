@@ -13,6 +13,7 @@ import java.util.UUID;
 @Table(name = "thesis") // Entity map voi bang thesis
 @NoArgsConstructor
 public class Thesis {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(updatable = false, nullable = false)
@@ -24,7 +25,7 @@ public class Thesis {
     @Column(name = "thesis_abstract")
     private String thesisAbstract;
 
-//    @ManyToOne
+    //    @ManyToOne
     @Column(name = "program_id") // thông qua khóa ngoại program_id
     private UUID programId;
 
@@ -45,11 +46,11 @@ public class Thesis {
 
     @Column(name = "scheduled_reviewer_id") // thông qua khóa ngoại scheduled_reviewer_id
     private String scheduled_reviewer_id;
-//
+    //
 //    @ManyToOne
     @Column(name = "scheduled_jury_id", nullable = true) // thông qua khóa ngoại scheduled_jury_id
     private UUID defenseJury;
-//
+    //
 //    @ManyToOne
     @Column(name = "keywords") // thông qua khóa ngoại keyword
     private String thesisKeyword;

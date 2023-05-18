@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CopyQuestionFromQuizTest2QuizTestInputModel {
+
     private String fromTestId;
     private String toTestId;
 }

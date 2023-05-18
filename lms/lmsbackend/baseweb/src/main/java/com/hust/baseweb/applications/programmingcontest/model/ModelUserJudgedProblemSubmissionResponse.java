@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelUserJudgedProblemSubmissionResponse {
+
     private String userId;
     private String fullName;
     private String problemId;

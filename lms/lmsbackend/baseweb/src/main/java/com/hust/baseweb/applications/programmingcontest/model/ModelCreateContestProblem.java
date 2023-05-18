@@ -8,6 +8,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ModelCreateContestProblem {
+
     private String problemId;
     private String problemName;
     private String problemDescription;

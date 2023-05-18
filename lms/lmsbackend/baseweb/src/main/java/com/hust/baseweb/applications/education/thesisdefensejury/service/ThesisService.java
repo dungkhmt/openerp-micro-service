@@ -12,13 +12,22 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ThesisService {
+
     Thesis createThesis(ThesisIM thesis);
+
     ThesisOM findById(UUID id);
+
     Page<ThesisOM> findAll(Pageable pageable);
+
     List<ThesisOM> searchByThesisName(String name);
+
     Response deleteThesis(UUID id, String UserId);
+
     Response editThesis(ThesisIM thesis);
-    Response disableThesisWithDefenseJury(UUID id,UUID defenseJuryId);
+
+    Response disableThesisWithDefenseJury(UUID id, UUID defenseJuryId);
+
     Response findAllBelongPlanID(String planId);
+
     Response filterThesis(ThesisFilter filter);
 }

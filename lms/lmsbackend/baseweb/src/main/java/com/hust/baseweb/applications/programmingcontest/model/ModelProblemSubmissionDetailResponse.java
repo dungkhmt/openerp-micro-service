@@ -8,6 +8,7 @@ import java.util.UUID;
 @Data
 @Builder
 public class ModelProblemSubmissionDetailResponse {
+
     UUID problemSubmissionId;
     String problemId;
     String problemName;

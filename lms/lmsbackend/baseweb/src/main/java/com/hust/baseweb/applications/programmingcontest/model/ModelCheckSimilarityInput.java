@@ -10,5 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelCheckSimilarityInput {
+
     private double threshold;
 }

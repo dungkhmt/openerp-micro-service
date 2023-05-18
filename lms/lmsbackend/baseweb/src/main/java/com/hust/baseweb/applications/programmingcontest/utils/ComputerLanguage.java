@@ -1,7 +1,8 @@
 package com.hust.baseweb.applications.programmingcontest.utils;
 
 public class ComputerLanguage {
-    public enum Languages{
+
+    public enum Languages {
         CPP,
         PYTHON3,
         JAVA,

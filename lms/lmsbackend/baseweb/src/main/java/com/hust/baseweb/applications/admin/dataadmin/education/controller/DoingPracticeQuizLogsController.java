@@ -16,10 +16,12 @@ public class DoingPracticeQuizLogsController {
     private final DoingPracticeQuizLogsService doingPracticeQuizLogsService;
 
     @GetMapping("/{studentLoginId}")
-    public ResponseEntity<?> getDoingPracticeQuizLogsOfStudent(@PathVariable String studentLoginId,
-                                                               @RequestParam String search,
-                                                               @RequestParam int page,
-                                                               @RequestParam int size) {
+    public ResponseEntity<?> getDoingPracticeQuizLogsOfStudent(
+        @PathVariable String studentLoginId,
+        @RequestParam String search,
+        @RequestParam int page,
+        @RequestParam int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(
             doingPracticeQuizLogsService.findDoingPracticeQuizLogsOfStudent(

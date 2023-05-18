@@ -12,6 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CodeSimilarityElement {
+
     private String source1;
     private String userLoginId1;
     private Date submitDate1;

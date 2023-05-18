@@ -32,12 +32,18 @@ public class LearningStatisticServiceImpl implements LearningStatisticService {
         Date latestStatisticTime = findLatestStatisticTime();
 
         Map<String, Long> totalDoingTimes = doingQuizStatisticService.statisticTotalQuizDoingTimes(latestStatisticTime);
-        Map<String, LocalDateTime> latestDoingTimes = doingQuizStatisticService.statisticLatestTimeDoingQuiz(latestStatisticTime);
-        Map<String, Long> numberOfDoingPeriods = doingQuizStatisticService.statisticNumberOfQuizDoingPeriods(latestStatisticTime, 10);
+        Map<String, LocalDateTime> latestDoingTimes = doingQuizStatisticService.statisticLatestTimeDoingQuiz(
+            latestStatisticTime);
+        Map<String, Long> numberOfDoingPeriods = doingQuizStatisticService.statisticNumberOfQuizDoingPeriods(
+            latestStatisticTime,
+            10);
         Map<String, Long> totalSubmissions = contestStatisticService.statisticTotalSubmissions(latestStatisticTime);
-        Map<String, LocalDateTime> latestSubmitTimes = contestStatisticService.statisticLatestTimesSubmittingCode(latestStatisticTime);
-        Map<String, Long> totalSubmissionsAcceptedOnTheFirstSubmit = contestStatisticService.statisticTotalSubmissionsAcceptedOnTheFirstSubmit(latestStatisticTime);
-        Map<String, Long> totalErrorSubmissions = contestStatisticService.statisticTotalErrorSubmissions(latestStatisticTime);
+        Map<String, LocalDateTime> latestSubmitTimes = contestStatisticService.statisticLatestTimesSubmittingCode(
+            latestStatisticTime);
+        Map<String, Long> totalSubmissionsAcceptedOnTheFirstSubmit = contestStatisticService.statisticTotalSubmissionsAcceptedOnTheFirstSubmit(
+            latestStatisticTime);
+        Map<String, Long> totalErrorSubmissions = contestStatisticService.statisticTotalErrorSubmissions(
+            latestStatisticTime);
 
         Set<String> loginIdsHaveNewOrChangedStatistic = new HashSet<>();
         loginIdsHaveNewOrChangedStatistic.addAll(totalDoingTimes.keySet());
@@ -48,7 +54,8 @@ public class LearningStatisticServiceImpl implements LearningStatisticService {
         loginIdsHaveNewOrChangedStatistic.addAll(totalSubmissionsAcceptedOnTheFirstSubmit.keySet());
         loginIdsHaveNewOrChangedStatistic.addAll(totalErrorSubmissions.keySet());
 
-        List<LearningStatisticEntity> newOrChangedStatistics = getNewOrChangedStatistics(loginIdsHaveNewOrChangedStatistic);
+        List<LearningStatisticEntity> newOrChangedStatistics = getNewOrChangedStatistics(
+            loginIdsHaveNewOrChangedStatistic);
 
         newOrChangedStatistics.forEach(statistic -> {
             String loginId = statistic.getLoginId();
@@ -69,6 +76,7 @@ public class LearningStatisticServiceImpl implements LearningStatisticService {
 
     private static final SimpleDateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String MIN_STATISTIC_TIME_STR = "2000-01-01 00:00:00";
+
     private Date findLatestStatisticTime() {
         Date MIN_STATISTIC_TIME = null;
         try {
@@ -92,8 +100,8 @@ public class LearningStatisticServiceImpl implements LearningStatisticService {
         };
 
         return statisticLoginIds.parallelStream()
-            .map(identityOrNewOneIfNotExist)
-            .collect(Collectors.toList());
+                                .map(identityOrNewOneIfNotExist)
+                                .collect(Collectors.toList());
     }
 
     private void accumulateStatisticChanges(

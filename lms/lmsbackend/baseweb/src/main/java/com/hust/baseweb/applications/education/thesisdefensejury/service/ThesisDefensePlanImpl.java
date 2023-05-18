@@ -18,9 +18,11 @@ import java.util.Optional;
 @Service
 @Transactional
 @Slf4j
-public class ThesisDefensePlanImpl implements ThesisDefensePlanService{
+public class ThesisDefensePlanImpl implements ThesisDefensePlanService {
+
     private final ThesisDefensePlanRepo thesisDefensePlanRepo;
     private final EduTeacherRepo eduTeacherRepo;
+
     @Override
     public List<ThesisDefensePlan> getAllThesisDefensePlan() {
         return thesisDefensePlanRepo.findAll();
@@ -30,7 +32,7 @@ public class ThesisDefensePlanImpl implements ThesisDefensePlanService{
     public Response createThesisDefensePlan(ThesisDefensePlanIM request) {
         Response res = new Response();
         // check request
-        if(request.getName() == "" || request.getId() == ""){
+        if (request.getName() == "" || request.getId() == "") {
             res.setOk(false);
             res.setErr("Invalid defense plan name or id");
             return res;
@@ -38,14 +40,15 @@ public class ThesisDefensePlanImpl implements ThesisDefensePlanService{
         // TODO
         // check name and id were existed?
         Optional<ThesisDefensePlan> findbyID = thesisDefensePlanRepo.findById(request.getId());
-        if(findbyID.isPresent()){
+        if (findbyID.isPresent()) {
             res.setOk(false);
             res.setErr("Id of thesis defense plan are existed");
             return res;
         }
-        Optional<ThesisDefensePlan> findedPlan = thesisDefensePlanRepo.findByNameAndAndId(request.getName(),
-                                                                                          request.getId());
-        if (findedPlan.isPresent()){
+        Optional<ThesisDefensePlan> findedPlan = thesisDefensePlanRepo.findByNameAndAndId(
+            request.getName(),
+            request.getId());
+        if (findedPlan.isPresent()) {
             res.setOk(false);
             res.setErr("Name or Id of thesis defense plan are existed");
             return res;
@@ -63,14 +66,14 @@ public class ThesisDefensePlanImpl implements ThesisDefensePlanService{
     public Response findById(String id) {
         Response res = new Response();
         // check input
-        if (id == ""){
+        if (id == "") {
             res.setOk(false);
             res.setErr("Invalid id");
             return res;
         }
         // TODO: handler
         Optional<ThesisDefensePlan> dp = thesisDefensePlanRepo.findById(id);
-        if(!dp.isPresent()){
+        if (!dp.isPresent()) {
             res.setOk(false);
             res.setErr("Not found thesis plan");
             return res;

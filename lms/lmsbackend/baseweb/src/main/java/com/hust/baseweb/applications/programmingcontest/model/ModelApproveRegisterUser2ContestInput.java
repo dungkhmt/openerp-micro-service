@@ -12,5 +12,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelApproveRegisterUser2ContestInput {
+
     private UUID id;
 }

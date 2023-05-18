@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelMemberOfContestResponse {
+
     private UUID id;
     private String contestId;
     private String userId;

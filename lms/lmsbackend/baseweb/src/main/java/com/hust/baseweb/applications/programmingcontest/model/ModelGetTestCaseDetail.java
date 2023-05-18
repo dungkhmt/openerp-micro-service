@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelGetTestCaseDetail {
+
     private UUID testCaseId;
     private String problemId;
     private String correctAns;

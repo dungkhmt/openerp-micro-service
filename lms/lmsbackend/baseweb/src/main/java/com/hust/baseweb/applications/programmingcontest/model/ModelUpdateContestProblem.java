@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 @ToString
 public class ModelUpdateContestProblem {
+
     private String problemId;
     private String problemName;
     private String problemDescription;

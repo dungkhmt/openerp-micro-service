@@ -30,10 +30,11 @@ import java.util.UUID;
 @Log4j2
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 
-public class EduClassSessionServiceImpl implements EduClassSessionService{
+public class EduClassSessionServiceImpl implements EduClassSessionService {
+
     private EduClassSessionRepo eduClassSessionRepo;
     private EduQuizTestRepo eduQuizTestRepo;
-    private ClassRepo  classRepo;
+    private ClassRepo classRepo;
     private EduTestQuizParticipantRepo eduTestQuizParticipationRepo;
     private EduQuizTestGroupService eduQuizTestGroupService;
 
@@ -61,12 +62,14 @@ public class EduClassSessionServiceImpl implements EduClassSessionService{
         EduClassSession eduClassSession = eduClassSessionRepo.findById(sessionId).orElse(null);
         UUID classId = null;
         String courseId = null;
-        if(eduClassSession != null){
+        if (eduClassSession != null) {
             classId = eduClassSession.getClassId();
             EduClass eduClass = classRepo.findById(classId).orElse(null);
-            if(eduClass != null){
+            if (eduClass != null) {
                 EduCourse eduCourse = eduClass.getEduCourse();
-                if(eduCourse != null) courseId = eduCourse.getId();
+                if (eduCourse != null) {
+                    courseId = eduCourse.getId();
+                }
             }
         }
         EduQuizTest eduQuizTest = new EduQuizTest();
@@ -86,8 +89,10 @@ public class EduClassSessionServiceImpl implements EduClassSessionService{
         eduQuizTest = eduQuizTestRepo.save(eduQuizTest);
 
         // update automatically participants by participants of classId
-        List<GetStudentsOfClassOM> participants = classRepo.getStudentsOfClass(classId, RegistStatus.APPROVED.toString());
-        for(GetStudentsOfClassOM p: participants){
+        List<GetStudentsOfClassOM> participants = classRepo.getStudentsOfClass(
+            classId,
+            RegistStatus.APPROVED.toString());
+        for (GetStudentsOfClassOM p : participants) {
             EduTestQuizParticipant eduTestQuizParticipant = new EduTestQuizParticipant();
             eduTestQuizParticipant.setTestId(testId);
             eduTestQuizParticipant.setParticipantUserLoginId(p.getId());
@@ -103,7 +108,7 @@ public class EduClassSessionServiceImpl implements EduClassSessionService{
         }
 
         // gen only one EduQuizTestGroup
-        GenerateQuizTestGroupInputModel input = new GenerateQuizTestGroupInputModel(testId,1);
+        GenerateQuizTestGroupInputModel input = new GenerateQuizTestGroupInputModel(testId, 1);
         List<EduTestQuizGroup> eduTestQuizGroups = eduQuizTestGroupService.generateQuizTestGroups(input);
         return eduQuizTest;
     }
@@ -119,8 +124,8 @@ public class EduClassSessionServiceImpl implements EduClassSessionService{
     public EduClassSessionDetailOM getSessionDetail(UUID sessionId) {
         EduClassSession s = eduClassSessionRepo.findById(sessionId).orElse(null);
         EduClassSessionDetailOM m = new EduClassSessionDetailOM();
-        if(s != null){
-            m.setSessionId(s.getSessionId()) ;
+        if (s != null) {
+            m.setSessionId(s.getSessionId());
             m.setSessionName(s.getSessionName());
             m.setClassId(s.getClassId());
         }

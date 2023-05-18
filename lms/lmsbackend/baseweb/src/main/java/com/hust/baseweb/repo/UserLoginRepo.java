@@ -18,8 +18,9 @@ import java.util.UUID;
 @RepositoryRestResource(exported = false)
 public interface UserLoginRepo extends JpaRepository<UserLogin, String> {
 
-    @Query("select new com.hust.baseweb.model.PersonModel( ul.userLoginId, p.lastName, p.middleName, p.firstName) from UserLogin ul " +
-           "inner join Party pa on ul.party = pa inner join Person p on p.partyId = ul.party and  (ul.userLoginId like %:keyword% )")
+    @Query(
+        "select new com.hust.baseweb.model.PersonModel( ul.userLoginId, p.lastName, p.middleName, p.firstName) from UserLogin ul " +
+        "inner join Party pa on ul.party = pa inner join Person p on p.partyId = ul.party and  (ul.userLoginId like %:keyword% )")
     Page<PersonModel> searchUser(Pageable pageable, @Param("keyword") String keyword);
 
     UserLogin findByUserLoginId(String userLoginId);
@@ -59,12 +60,14 @@ public interface UserLoginRepo extends JpaRepository<UserLogin, String> {
     @Query(
         nativeQuery = true,
         value = "SELECT u.user_login_id FROM user_login u " +
-           "WHERE UPPER(u.user_login_id) LIKE CONCAT('%', UPPER(:partOfLoginId), '%') " +
-           "AND u.enabled = true " +
-           "LIMIT :limit"
+                "WHERE UPPER(u.user_login_id) LIKE CONCAT('%', UPPER(:partOfLoginId), '%') " +
+                "AND u.enabled = true " +
+                "LIMIT :limit"
     )
-    List<String> findByEnabledLoginIdContains(@Param("partOfLoginId") String partOfLoginId,
-                                              @Param("limit") Integer limit);
+    List<String> findByEnabledLoginIdContains(
+        @Param("partOfLoginId") String partOfLoginId,
+        @Param("limit") Integer limit
+    );
 
     @Query(
         nativeQuery = true,

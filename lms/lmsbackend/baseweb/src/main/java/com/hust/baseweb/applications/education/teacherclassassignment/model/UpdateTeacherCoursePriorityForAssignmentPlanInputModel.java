@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateTeacherCoursePriorityForAssignmentPlanInputModel {
+
     private UUID planId;
     private String teacherId;
     private String courseId;

@@ -9,8 +9,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface EducationResourceService {
-    Page<EducationResource> findByDomainId(UUID domainId,Pageable pageable);
-    Optional<EducationResource> findByIdAndDomainId(UUID id,UUID domainId);
-    Boolean createResource(UUID domainId,EducationResource resource);
-    List<EducationResource> findResourceWithFilter(EducationResource request,UUID domainId);
+
+    Page<EducationResource> findByDomainId(UUID domainId, Pageable pageable);
+
+    Optional<EducationResource> findByIdAndDomainId(UUID id, UUID domainId);
+
+    Boolean createResource(UUID domainId, EducationResource resource);
+
+    List<EducationResource> findResourceWithFilter(EducationResource request, UUID domainId);
 }

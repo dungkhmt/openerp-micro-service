@@ -4,7 +4,8 @@ import com.hust.baseweb.applications.programmingcontest.composite.UserSubmission
 import com.hust.baseweb.applications.programmingcontest.entity.UserSubmissionContestResultNativeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserSubmissionContestResultNativeRepo extends JpaRepository<UserSubmissionContestResultNativeEntity, UserSubmissionContestResultID> {
+public interface UserSubmissionContestResultNativeRepo
+    extends JpaRepository<UserSubmissionContestResultNativeEntity, UserSubmissionContestResultID> {
 
     void deleteAllByContestId(String contestId);
 }

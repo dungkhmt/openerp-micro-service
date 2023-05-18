@@ -18,6 +18,7 @@ import java.util.List;
 @Table(name = "edu_test_quiz_role")
 @IdClass(CompositeTestQuizRoleId.class)
 public class EduTestQuizRole {
+
     public static final String STATUS_REGISTERED = "STATUS_REGISTERED";
     public static final String STATUS_APPROVED = "STATUS_APPROVED";
     public static final String STATUS_REJECTED = "STATUS_REJECTED";
@@ -26,13 +27,14 @@ public class EduTestQuizRole {
     public static final String ROLE_MANAGER = "MANAGER";
     public static final String ROLE_OWNER = "OWNER";
 
-    public static List<String> getRoles(){
+    public static List<String> getRoles() {
         List<String> L = new ArrayList();
         L.add(ROLE_PARTICIPANT);
         L.add(ROLE_MANAGER);
         L.add(ROLE_OWNER);
         return L;
     }
+
     @Id
     @Column(name = "test_id")
     private String testId;
@@ -44,9 +46,9 @@ public class EduTestQuizRole {
     @Column(name = "status_id")
     private String statusId;
 
-    @Column(name="permutation")
+    @Column(name = "permutation")
     private String permutation;
 
-    @Column(name="role_id")
+    @Column(name = "role_id")
     private String roleId;
 }

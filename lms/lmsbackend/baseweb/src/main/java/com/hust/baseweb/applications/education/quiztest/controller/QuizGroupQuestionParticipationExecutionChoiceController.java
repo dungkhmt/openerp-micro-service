@@ -55,10 +55,11 @@ public class QuizGroupQuestionParticipationExecutionChoiceController {
     private RabbitTemplate rabbitTemplate;
 
     @GetMapping("/summarize-quiz-test-execution-choice/{testId}")
-    public ResponseEntity<?> summarizeQuizTestExecutionChoice(Principal principal, @PathVariable String testId){
+    public ResponseEntity<?> summarizeQuizTestExecutionChoice(Principal principal, @PathVariable String testId) {
         int cnt = quizTestService.summarizeQuizTestExecutionChoice(testId);
         return ResponseEntity.ok().body(cnt);
     }
+
     @PostMapping("/submit-quiz-test-choose_answer-by-user")
     public ResponseEntity<?> submitQuizChooseAnswer(
         Principal principal,
@@ -77,8 +78,10 @@ public class QuizGroupQuestionParticipationExecutionChoiceController {
             log.info("submitQuizChooseAnswer, user " + principal.getName() + " try to submit BUT out time~!");
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
         }
-        if(!test.getStatusId().equals(EduQuizTest.QUIZ_TEST_STATUS_RUNNING)){
-            log.info("submitQuizChooseAnswer, user " + principal.getName() + " try to submit BUT quiz test is NOT running!");
+        if (!test.getStatusId().equals(EduQuizTest.QUIZ_TEST_STATUS_RUNNING)) {
+            log.info("submitQuizChooseAnswer, user " +
+                     principal.getName() +
+                     " try to submit BUT quiz test is NOT running!");
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
         }
 
@@ -90,25 +93,33 @@ public class QuizGroupQuestionParticipationExecutionChoiceController {
         ModelResponseSubmitQuizTestExecutionChoice res = new ModelResponseSubmitQuizTestExecutionChoice();
         res.setChoiceAnswerIds(chooseAnsIds);
 
-        if(test.getJudgeMode() != null){
-            if(test.getJudgeMode().equals(EduQuizTest.JUDGE_MODE_SYNCHRONOUS)){
+        if (test.getJudgeMode() != null) {
+            if (test.getJudgeMode().equals(EduQuizTest.JUDGE_MODE_SYNCHRONOUS)) {
                 QuizTestExecutionSubmission response = quizTestService
                     .submitSynchronousQuizTestExecutionChoice(questionId, groupId, userId, chooseAnsIds);
                 res.setSubmissionId(response.getSubmissionId());
 
                 //return ResponseEntity.ok().body(res);
-            }else if(test.getJudgeMode().equals(EduQuizTest.JUDGE_MODE_ASYNCHRONOUS_QUEUE)){
-                QuizTestExecutionSubmission sub = quizTestService.submitAsynchronousQuizTestExecutionChoiceUsingRabbitMQ(questionId, groupId, userId, chooseAnsIds);
+            } else if (test.getJudgeMode().equals(EduQuizTest.JUDGE_MODE_ASYNCHRONOUS_QUEUE)) {
+                QuizTestExecutionSubmission sub = quizTestService.submitAsynchronousQuizTestExecutionChoiceUsingRabbitMQ(
+                    questionId,
+                    groupId,
+                    userId,
+                    chooseAnsIds);
                 res.setSubmissionId(sub.getSubmissionId());
 
                 //return ResponseEntity.ok().body(res);
-            }else if(test.getJudgeMode().equals(EduQuizTest.JUDGE_MODE_BATCH_LAZY_EVALUATION)){
-                QuizTestExecutionSubmission sub = quizTestService.submitQuizTestExecutionChoiceBatchLazyEvaluation(questionId, groupId, userId, chooseAnsIds);
+            } else if (test.getJudgeMode().equals(EduQuizTest.JUDGE_MODE_BATCH_LAZY_EVALUATION)) {
+                QuizTestExecutionSubmission sub = quizTestService.submitQuizTestExecutionChoiceBatchLazyEvaluation(
+                    questionId,
+                    groupId,
+                    userId,
+                    chooseAnsIds);
                 res.setSubmissionId(sub.getSubmissionId());
 
                 //return ResponseEntity.ok().body(res);
             }
-        }else{// by default: SYNCHRONOUS
+        } else {// by default: SYNCHRONOUS
             QuizTestExecutionSubmission response = quizTestService
                 .submitSynchronousQuizTestExecutionChoice(questionId, groupId, userId, chooseAnsIds);
 
@@ -136,11 +147,15 @@ public class QuizGroupQuestionParticipationExecutionChoiceController {
         //System.out.println(test.getDuration());
 
         if (timeTest > test.getDuration()) {
-            log.info("quizChooseAnswerVersion2Asynchronous, user " + principal.getName() + " try to submit BUT out time~!");
+            log.info("quizChooseAnswerVersion2Asynchronous, user " +
+                     principal.getName() +
+                     " try to submit BUT out time~!");
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
         }
-        if(!test.getStatusId().equals(EduQuizTest.QUIZ_TEST_STATUS_RUNNING)){
-            log.info("quizChooseAnswerVersion2Asynchronous, user " + principal.getName() + " try to submit BUT quiz test is NOT running!");
+        if (!test.getStatusId().equals(EduQuizTest.QUIZ_TEST_STATUS_RUNNING)) {
+            log.info("quizChooseAnswerVersion2Asynchronous, user " +
+                     principal.getName() +
+                     " try to submit BUT quiz test is NOT running!");
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
         }
 
@@ -176,7 +191,11 @@ public class QuizGroupQuestionParticipationExecutionChoiceController {
             sub.getSubmissionId()
         );
         */
-        QuizTestExecutionSubmission sub = quizTestService.submitAsynchronousQuizTestExecutionChoiceUsingRabbitMQ(questionId, groupId, userId, chooseAnsIds);
+        QuizTestExecutionSubmission sub = quizTestService.submitAsynchronousQuizTestExecutionChoiceUsingRabbitMQ(
+            questionId,
+            groupId,
+            userId,
+            chooseAnsIds);
         ModelResponseSubmitQuizTestExecutionChoice res = new ModelResponseSubmitQuizTestExecutionChoice();
         res.setSubmissionId(sub.getSubmissionId());
         res.setChoiceAnswerIds(chooseAnsIds);
@@ -205,7 +224,7 @@ public class QuizGroupQuestionParticipationExecutionChoiceController {
             log.info("quizChooseAnswer, user " + principal.getName() + " try to submit BUT out time~!");
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
         }
-        if(!test.getStatusId().equals(EduQuizTest.QUIZ_TEST_STATUS_RUNNING)){
+        if (!test.getStatusId().equals(EduQuizTest.QUIZ_TEST_STATUS_RUNNING)) {
             log.info("quizChooseAnswer, user " + principal.getName() + " try to submit BUT quiz test is NOT running!");
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
         }
@@ -226,6 +245,7 @@ public class QuizGroupQuestionParticipationExecutionChoiceController {
         //return ResponseEntity.ok().body(chooseAnsIds);
         return ResponseEntity.ok().body(res);
     }
+
     @PostMapping("/quiz-test-session-choose_answer-by-user")
     public ResponseEntity<?> quizTestSessionChooseAnswer(
         Principal principal,
@@ -241,10 +261,10 @@ public class QuizGroupQuestionParticipationExecutionChoiceController {
         //System.out.println(test.getDuration());
 
         //if (timeTest > test.getDuration()) {
-            //System.out.println("out time~!");
+        //System.out.println("out time~!");
         //    return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
         //}
-        if(!test.getStatusId().equals(EduQuizTest.QUIZ_TEST_STATUS_OPEN)){
+        if (!test.getStatusId().equals(EduQuizTest.QUIZ_TEST_STATUS_OPEN)) {
             log.info("quizTestSessionChooseAnswer, quizTestSession is not Open, but user try to submit answer");
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
         }

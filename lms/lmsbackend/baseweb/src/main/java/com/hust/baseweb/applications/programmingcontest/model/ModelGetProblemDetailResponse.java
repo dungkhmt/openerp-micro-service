@@ -8,6 +8,7 @@ import java.io.Serializable;
 @Data
 @Builder
 public class ModelGetProblemDetailResponse implements Serializable {
+
     private String problemId;
     private String problemName;
     private String levelId;

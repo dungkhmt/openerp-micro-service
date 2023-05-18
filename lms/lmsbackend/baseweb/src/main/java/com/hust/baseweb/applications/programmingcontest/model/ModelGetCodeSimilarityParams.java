@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelGetCodeSimilarityParams {
+
     private String contestId;
     private String userId;
     private String problemId;

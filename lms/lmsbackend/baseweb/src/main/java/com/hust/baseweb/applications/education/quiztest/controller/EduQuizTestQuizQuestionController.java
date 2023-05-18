@@ -25,16 +25,18 @@ import java.util.UUID;
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @CrossOrigin
 public class EduQuizTestQuizQuestionController {
+
     private EduQuizTestQuizQuestionService eduQuizTestQuizQuestionService;
     private UserService userService;
 
     @GetMapping("/get-quiz-test-using-question/{questionId}")
-    public ResponseEntity<?> getQuizTestsUsingQuestion(Principal principal, @PathVariable UUID questionId){
+    public ResponseEntity<?> getQuizTestsUsingQuestion(Principal principal, @PathVariable UUID questionId) {
         List<EduQuizTestModel> eduQuizTestModels = eduQuizTestQuizQuestionService.getQuizTestsUsingQuestion(questionId);
         return ResponseEntity.ok().body(eduQuizTestModels);
     }
+
     @GetMapping("/get-questions-of-quiz-test/{testId}")
-    public ResponseEntity<?> getQuestionOfQuizTest(Principal principal, @PathVariable String testId){
+    public ResponseEntity<?> getQuestionOfQuizTest(Principal principal, @PathVariable String testId) {
         log.info("getQuestionOfQuizTest, testId = " + testId);
         List<QuizQuestionDetailModel> eduQuizTestQuizQuestionList =
             eduQuizTestQuizQuestionService.findAllByTestId(testId);
@@ -42,21 +44,31 @@ public class EduQuizTestQuizQuestionController {
     }
 
     @PostMapping("/add-question-to-quiz-test")
-    public ResponseEntity<?> addQuestionToQuizTest(Principal principal, @RequestBody CreateQuizTestQuestionInputModel input){
+    public ResponseEntity<?> addQuestionToQuizTest(
+        Principal principal,
+        @RequestBody CreateQuizTestQuestionInputModel input
+    ) {
         UserLogin u = userService.findById(principal.getName());
         log.info("addQuestionToQuizTest, questionId = " + input.getQuestionId() + ", testId = " + input.getTestId());
 
         EduQuizTestQuizQuestion eduQuizTestQuizQuestion = eduQuizTestQuizQuestionService
-            .createQuizTestQuestion(u,input);
+            .createQuizTestQuestion(u, input);
         return ResponseEntity.ok().body(eduQuizTestQuizQuestion);
     }
+
     @PostMapping("/remove-question-from-quiz-test")
-    public ResponseEntity<?> removeQuestionFromQuizTest(Principal principal, @RequestBody CreateQuizTestQuestionInputModel input){
+    public ResponseEntity<?> removeQuestionFromQuizTest(
+        Principal principal,
+        @RequestBody CreateQuizTestQuestionInputModel input
+    ) {
         UserLogin u = userService.findById(principal.getName());
-        log.info("removeQuestionFromQuizTest, questionId = " + input.getQuestionId() + ", testId = " + input.getTestId());
+        log.info("removeQuestionFromQuizTest, questionId = " +
+                 input.getQuestionId() +
+                 ", testId = " +
+                 input.getTestId());
 
         EduQuizTestQuizQuestion eduQuizTestQuizQuestion = eduQuizTestQuizQuestionService
-            .removeQuizTestQuestion(u,input);
+            .removeQuizTestQuestion(u, input);
         return ResponseEntity.ok().body(eduQuizTestQuizQuestion);
     }
 

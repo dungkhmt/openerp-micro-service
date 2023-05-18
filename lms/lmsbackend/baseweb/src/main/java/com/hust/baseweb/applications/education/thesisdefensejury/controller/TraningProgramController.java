@@ -24,30 +24,34 @@ import java.util.List;
 @Validated
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class TraningProgramController {
+
     private final TranningProgramService tranningProgramService;
+
     @GetMapping("/program_tranings")
-    public ResponseEntity<?> getAllTranningProgram(Pageable pageable){
+    public ResponseEntity<?> getAllTranningProgram(Pageable pageable) {
         try {
             List<TraningProgram> tp;
             tp = tranningProgramService.getAllTranningProgram();
 
             return new ResponseEntity<>(tp, HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/tranning_program")
     public ResponseEntity<?> createTranningProgram(
         @RequestBody TranningProgramIM request
-    ){
+    ) {
         Response res = new Response();
         // TODO: check valid request
         if (request == null || request.getName() == "") {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request or invalid tranning program name");
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("Invalid body request or invalid tranning program name");
         }
 
-        res  = tranningProgramService.createTranningProgram(request);
+        res = tranningProgramService.createTranningProgram(request);
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }

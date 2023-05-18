@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class ModelUpdateContest {
+
     private String contestName;
     private long contestSolvingTime;
     private List<String> problemIds;

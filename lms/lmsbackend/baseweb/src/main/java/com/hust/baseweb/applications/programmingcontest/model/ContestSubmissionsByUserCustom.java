@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ContestSubmissionsByUserCustom {
+
     private String problemId;
     private Integer point;
 }

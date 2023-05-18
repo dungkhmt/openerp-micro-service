@@ -12,6 +12,7 @@ import java.util.UUID;
 @Data
 @Builder
 public class ModelGetTestCase {
+
     private boolean viewMore;
     private String testCase;
     private String correctAns;

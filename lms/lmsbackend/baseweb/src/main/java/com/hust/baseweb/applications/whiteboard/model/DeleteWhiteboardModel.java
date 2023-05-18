@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeleteWhiteboardModel {
+
     private String whiteboardId;
     private UUID classSessionId;
 }

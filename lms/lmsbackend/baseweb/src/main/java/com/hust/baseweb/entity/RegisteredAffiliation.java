@@ -15,13 +15,14 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="registered_affiliation")
+@Table(name = "registered_affiliation")
 public class RegisteredAffiliation {
+
     @Id
-    @Column(name="affiliation_id")
+    @Column(name = "affiliation_id")
     private String affiliationId;
 
-    @Column(name="affiliation_name")
+    @Column(name = "affiliation_name")
     private String affiliationName;
 
 }

@@ -5,5 +5,6 @@ import com.hust.baseweb.applications.education.thesisdefensejury.entity.Academic
 import java.util.List;
 
 public interface AcademicKeywordService {
+
     List<AcademicKeyword> getAllAcademicKeywords();
 }

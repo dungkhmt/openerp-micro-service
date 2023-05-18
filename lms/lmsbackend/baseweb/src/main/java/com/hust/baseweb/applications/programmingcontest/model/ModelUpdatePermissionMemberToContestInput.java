@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelUpdatePermissionMemberToContestInput {
+
     private UUID userRegisId;
     private String permissionId;
 }

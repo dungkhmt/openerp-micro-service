@@ -26,7 +26,15 @@ public class CBLSSolver {
     private HashSet<Integer>[] classesAssigned2Teacher;
     private double[] load;
 
-    public CBLSSolver(int n, int m, HashSet[] D, int[][] priority, boolean[][] conflict, double[] hourClass, double[] maxHourTeacher) {
+    public CBLSSolver(
+        int n,
+        int m,
+        HashSet[] D,
+        int[][] priority,
+        boolean[][] conflict,
+        double[] hourClass,
+        double[] maxHourTeacher
+    ) {
         this.n = n;
         this.m = m;
         this.D = D;

@@ -7,6 +7,8 @@ import com.hust.baseweb.applications.education.thesisdefensejury.models.Tranning
 import java.util.List;
 
 public interface TranningProgramService {
+
     List<TraningProgram> getAllTranningProgram();
+
     Response createTranningProgram(TranningProgramIM request);
 }

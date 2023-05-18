@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserQuestionQuizExecutionOM {
+
     private String userLoginId;
     private String fullName;
     private UUID questionId;

@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class ModelProblemInfoInContest {
+
     private String contestId;
     private String problemId;
     private String problemName;

@@ -85,6 +85,7 @@ public class QuizTestController {
         EduQuizTest eduQuizTest = quizTestService.update(input);
         return ResponseEntity.ok().body(eduQuizTest);
     }
+
     @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
     @GetMapping("/open-quiz-test/{testId}")
     public ResponseEntity<?> openQuizTest(Principal principal, @PathVariable String testId) {
@@ -98,49 +99,66 @@ public class QuizTestController {
         EduQuizTest eduQuizTest = quizTestService.hideQuizTest(testId);
         return ResponseEntity.ok().body(eduQuizTest);
     }
+
     @GetMapping("/get-users-role-of-quiz-test/{testId}")
-    public ResponseEntity<?> getUserRolesOfQuizTest(@PathVariable String testId){
+    public ResponseEntity<?> getUserRolesOfQuizTest(@PathVariable String testId) {
         List<QuizTestParticipantRoleModel> res = eduQuizTestParticipantRoleService.getParticipantRolesOfQuizTest(testId);
         return ResponseEntity.ok().body(res);
     }
+
     @GetMapping("/get-roles-user-not-granted-in-quiz-test/{testId}/{userId}")
-    public ResponseEntity<?> getRolesUserNotGrantedInQuizTest(@PathVariable String testId, @PathVariable String userId){
-        List<QuizTestParticipantRoleModel> rolesGranted = eduQuizTestParticipantRoleService.getParticipantRolesOfUserInQuizTest(userId, testId);
+    public ResponseEntity<?> getRolesUserNotGrantedInQuizTest(
+        @PathVariable String testId,
+        @PathVariable String userId
+    ) {
+        List<QuizTestParticipantRoleModel> rolesGranted = eduQuizTestParticipantRoleService.getParticipantRolesOfUserInQuizTest(
+            userId,
+            testId);
         List<String> res = new ArrayList();
         List<String> roles = EduTestQuizRole.getRoles();
-        for(String r: roles){
+        for (String r : roles) {
             boolean exist = false;
-            for(QuizTestParticipantRoleModel ri: rolesGranted)
-                if(ri.getRoleId().equals(r)){
-                    exist = true; break;
+            for (QuizTestParticipantRoleModel ri : rolesGranted) {
+                if (ri.getRoleId().equals(r)) {
+                    exist = true;
+                    break;
                 }
-            if(!exist) res.add(r);
+            }
+            if (!exist) {
+                res.add(r);
+            }
         }
         return ResponseEntity.ok().body(res);
     }
+
     @GetMapping("/get-all-quiz-test")
-    public ResponseEntity<?> getAllQuizTests(Principal principal){
+    public ResponseEntity<?> getAllQuizTests(Principal principal) {
         List<QuizTestParticipantRoleModel> res = eduQuizTestParticipantRoleService.getAllQuizTests();
         return ResponseEntity.ok().body(res);
     }
 
     @GetMapping("/get-quiz-tests-of-user-login")
-    public ResponseEntity<?> getQuizTestsOfUserLogin(Principal principal){
+    public ResponseEntity<?> getQuizTestsOfUserLogin(Principal principal) {
         log.info("getQuizTestsOfUserLogin, user = " + principal.getName());
         List<QuizTestParticipantRoleModel> res = eduQuizTestParticipantRoleService.getQuizTestsOfUser(principal.getName());
         return ResponseEntity.ok().body(res);
     }
 
     @PostMapping("/add-quiz-test-participant-role")
-    public ResponseEntity<?> addQuizTestParticipantRole(Principal principal, @RequestBody ModelCreateEduQuizTestParticipantRole input){
+    public ResponseEntity<?> addQuizTestParticipantRole(
+        Principal principal,
+        @RequestBody ModelCreateEduQuizTestParticipantRole input
+    ) {
         EduTestQuizRole eduTestQuizRole = eduQuizTestParticipantRoleService.save(input);
         return ResponseEntity.ok().body(eduTestQuizRole);
     }
 
     @DeleteMapping("/quiz-test-participant-role")
-    public ResponseEntity<?> deleteQuizTestParticipantRole(@RequestParam String testId,
-                                                           @RequestParam String userId,
-                                                           @RequestParam String roleId) {
+    public ResponseEntity<?> deleteQuizTestParticipantRole(
+        @RequestParam String testId,
+        @RequestParam String userId,
+        @RequestParam String roleId
+    ) {
         eduQuizTestParticipantRoleService.deleteParticipantRole(testId, userId, roleId);
         return ResponseEntity.ok().build();
     }
@@ -164,19 +182,21 @@ public class QuizTestController {
     ) {
         return ResponseEntity.ok().body(quizTestService.getQuizTestById(testId));
     }
+
     @GetMapping("/get-list-question-statement-view-type-id")
-    public ResponseEntity<?> getListQuestionStatementViewTypeId(){
+    public ResponseEntity<?> getListQuestionStatementViewTypeId() {
         List<String> L = EduQuizTest.getListQuestionStatementViewType();
         return ResponseEntity.ok().body(L);
     }
+
     @GetMapping("/get-list-quiz-test-view-type-id")
-    public ResponseEntity<?> getListQuizTestViewTypeId(){
+    public ResponseEntity<?> getListQuizTestViewTypeId() {
         List<String> L = EduQuizTest.getListQuizTestViewTypes();
         return ResponseEntity.ok().body(L);
     }
 
     @GetMapping("/get-list-participant-quizgroup-assignment-mode")
-    public ResponseEntity<?> getListParticipantQuizGroupAssignmentMode(){
+    public ResponseEntity<?> getListParticipantQuizGroupAssignmentMode() {
         List<String> L = EduQuizTest.getListParticipantQuizGroupAssignmentModes();
         return ResponseEntity.ok().body(L);
     }
@@ -189,6 +209,7 @@ public class QuizTestController {
         List<EduQuizTestModel> listQuizTest = quizTestService.getListQuizByUserId(user.getUserLoginId());
         return ResponseEntity.ok().body(listQuizTest);
     }
+
     @GetMapping("/get-my-quiz-test-list")
     public ResponseEntity<?> getMyQuizTestListByUser(
         Principal principal
@@ -205,8 +226,9 @@ public class QuizTestController {
     ) {
         UserLogin user = userService.findById(principal.getName());
 
-        List<EduQuizTestModel> listQuizTest = quizTestService.getListOpenQuizTestOfSession(sessionId,user.getUserLoginId());
-        if(listQuizTest == null ||  listQuizTest.size() == 0) {
+        List<EduQuizTestModel> listQuizTest = quizTestService.getListOpenQuizTestOfSession(sessionId,
+                                                                                           user.getUserLoginId());
+        if (listQuizTest == null || listQuizTest.size() == 0) {
             log.info("getActiveQuizTestOfSession, listQuizTest null or size = 0 -> RETURN");
             return ResponseEntity.ok().body(new QuizGroupTestDetailModel());
         }
@@ -215,7 +237,7 @@ public class QuizTestController {
         //for(EduQuizTestModel qt: listQuizTest){
         // TO BE IMPROVED
         EduQuizTestModel qt = listQuizTest.get(0);
-            String testID = qt.getTestId();
+        String testID = qt.getTestId();
             /*
             EduQuizTest eduQuizTest = quizTestService.getQuizTestById(testID);
             Date startDateTime = eduQuizTest.getScheduleDatetime();
@@ -228,42 +250,42 @@ public class QuizTestController {
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
             }
             */
-            log.info("getActiveQuizTestOfSession, get TestId = " + testID);
-            EduTestQuizParticipant testParticipant = eduTestQuizParticipationRepo
-                .findEduTestQuizParticipantByParticipantUserLoginIdAndAndTestId(
+        log.info("getActiveQuizTestOfSession, get TestId = " + testID);
+        EduTestQuizParticipant testParticipant = eduTestQuizParticipationRepo
+            .findEduTestQuizParticipantByParticipantUserLoginIdAndAndTestId(
                 principal.getName(),
                 testID);
 
-            if (testParticipant == null ||
-                (!testParticipant.getStatusId().equals(EduTestQuizParticipant.STATUS_APPROVED))) {
-                log.info("getActiveQuizTestOfSession, participant to testID " + testID + " is NULL -> return");
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        if (testParticipant == null ||
+            (!testParticipant.getStatusId().equals(EduTestQuizParticipant.STATUS_APPROVED))) {
+            log.info("getActiveQuizTestOfSession, participant to testID " + testID + " is NULL -> return");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+
+        testDetail = eduQuizTestGroupService.getTestGroupQuestionDetail(principal, testID);
+
+        // check if user has already done the quiz question, then return null
+        // in this context, each user can only take quiz once
+        Set<String> disableQuestionIds = new HashSet();
+        for (String questionId : testDetail.getParticipationExecutionChoice().keySet()) {
+            List<UUID> choiceAnswers = testDetail.getParticipationExecutionChoice().get(questionId);
+            if (choiceAnswers.size() > 0) {
+                // disable this question, do not return
+                disableQuestionIds.add(questionId);
             }
-
-
-            testDetail = eduQuizTestGroupService.getTestGroupQuestionDetail(principal, testID);
-
-            // check if user has already done the quiz question, then return null
-            // in this context, each user can only take quiz once
-            Set<String> disableQuestionIds = new HashSet();
-            for(String questionId: testDetail.getParticipationExecutionChoice().keySet()){
-                List<UUID> choiceAnswers = testDetail.getParticipationExecutionChoice().get(questionId);
-                if(choiceAnswers.size() > 0){
-                    // disable this question, do not return
-                    disableQuestionIds.add(questionId);
+        }
+        for (String qid : disableQuestionIds) {
+            testDetail.getParticipationExecutionChoice().remove(qid);
+            //testDetail.getListQuestion().remove(qid);
+            for (QuizQuestionDetailModel q : testDetail.getListQuestion()) {
+                if (q.getQuestionId().toString().equals(qid)) {
+                    testDetail.getListQuestion().remove(q);
+                    break;
                 }
             }
-            for(String qid: disableQuestionIds){
-                testDetail.getParticipationExecutionChoice().remove(qid);
-                //testDetail.getListQuestion().remove(qid);
-                for(QuizQuestionDetailModel q: testDetail.getListQuestion()){
-                    if(q.getQuestionId().toString().equals(qid)){
-                        testDetail.getListQuestion().remove(q);
-                        break;
-                    }
-                }
-                log.info("getActiveQuizTestOfSession, question  " + qid + " has already been answered, remove this");
-            }
+            log.info("getActiveQuizTestOfSession, question  " + qid + " has already been answered, remove this");
+        }
         return ResponseEntity.ok().body(testDetail);
     }
 
@@ -287,7 +309,7 @@ public class QuizTestController {
     @PostMapping("/auto-assign-participants-2-quiz-test-group")
     public ResponseEntity<?> autoAssignParticipants2QuizTestGroup(
         Principal principal, @RequestBody
-        AutoAssignParticipants2QuizTestGroupInputModel input
+    AutoAssignParticipants2QuizTestGroupInputModel input
     ) {
         boolean ok = quizTestService.autoAssignParticipants2QuizTestGroup(input);
 
@@ -297,7 +319,7 @@ public class QuizTestController {
     @PostMapping("auto-assign-question-2-quiz-group")
     public ResponseEntity<?> autoAssignQuestion2QuizTestGroup(
         Principal principal, @RequestBody
-        AutoAssignQuestion2QuizTestGroupInputModel input
+    AutoAssignQuestion2QuizTestGroupInputModel input
     ) {
 
         boolean ok = quizTestService.autoAssignQuestion2QuizTestGroup(input);
@@ -321,7 +343,12 @@ public class QuizTestController {
 
 
         List<QuizQuestion> quizQuestions = quizQuestionService.findQuizOfCourse(courseId);
-        log.info("getListQuizForAssignmentOfTest, testId = " + testId + " courseId = " + courseId + " all questions = " + quizQuestions.size());
+        log.info("getListQuizForAssignmentOfTest, testId = " +
+                 testId +
+                 " courseId = " +
+                 courseId +
+                 " all questions = " +
+                 quizQuestions.size());
         List<QuizQuestionDetailModel> quizQuestionDetailModels = new ArrayList<>();
         for (QuizQuestion q : quizQuestions) {
             if (q.getStatusId().equals(QuizQuestion.STATUS_PUBLIC)) {
@@ -397,14 +424,15 @@ public class QuizTestController {
     @PostMapping("/get-quiz-test-participation-execution-result")
     public ResponseEntity<?> getQuizTestParticipationExecutionResult(
         Principal principal, @RequestBody
-        GetQuizTestParticipationExecutionResultInputModel input
+    GetQuizTestParticipationExecutionResultInputModel input
     ) {
         List<QuizTestParticipationExecutionResultOutputModel> quizTestParticipationExecutionResultOutputModels =
             quizTestService.getQuizTestParticipationExecutionResult(input.getTestId());
-            //quizTestService.getQuizTestParticipationExecutionResultNewByPQD(input.getTestId());
+        //quizTestService.getQuizTestParticipationExecutionResultNewByPQD(input.getTestId());
 
         return ResponseEntity.ok().body(quizTestParticipationExecutionResultOutputModels);
     }
+
     @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
     @GetMapping("/get-quiz-test-participation-execution-result-of-user-login/{userLoginId}")
     public ResponseEntity<?> getQuizTestParticipationExecutionResultOfAStudent(
@@ -419,22 +447,29 @@ public class QuizTestController {
 
     @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
     @PostMapping("/copy-question-from-quiztest-to-quiztest")
-    public ResponseEntity<?> copyQuestionFromQuizTestId2QuizTestId(Principal principal,
-                                                                   @RequestBody  CopyQuestionFromQuizTest2QuizTestInputModel input){
+    public ResponseEntity<?> copyQuestionFromQuizTestId2QuizTestId(
+        Principal principal,
+        @RequestBody CopyQuestionFromQuizTest2QuizTestInputModel input
+    ) {
         UserLogin u = userService.findById(principal.getName());
 
-        log.info("copyQuestionFromQuizTestId2QuizTestId from test " + input.getFromTestId() + " to test " + input.getToTestId());
-        int cnt = quizTestService.copyQuestionsFromQuizTest2QuizTest(u,input.getFromTestId(), input.getToTestId());
+        log.info("copyQuestionFromQuizTestId2QuizTestId from test " +
+                 input.getFromTestId() +
+                 " to test " +
+                 input.getToTestId());
+        int cnt = quizTestService.copyQuestionsFromQuizTest2QuizTest(u, input.getFromTestId(), input.getToTestId());
         return ResponseEntity.ok().body(cnt);
     }
 
     @PostMapping("/upload-solution-excel-quiz-of-student")
-    public ResponseEntity<?> uploadSolutionExcelQuizTestOfStudent(Principal principal,
-                                                                  @RequestParam("inputJson") String inputJson,
-                                                                  @RequestParam("file") MultipartFile file){
+    public ResponseEntity<?> uploadSolutionExcelQuizTestOfStudent(
+        Principal principal,
+        @RequestParam("inputJson") String inputJson,
+        @RequestParam("file") MultipartFile file
+    ) {
         Gson gson = new Gson();
         ModelUploadSolutionExcelQuizTestOfStudent modelUpload = gson.fromJson(
-            inputJson,ModelUploadSolutionExcelQuizTestOfStudent.class);
+            inputJson, ModelUploadSolutionExcelQuizTestOfStudent.class);
         try (InputStream is = file.getInputStream()) {
             XSSFWorkbook wb = new XSSFWorkbook(is);
             XSSFSheet sheet = wb.getSheetAt(0);
@@ -450,27 +485,36 @@ public class QuizTestController {
             String quizGroupCode = c.getStringCellValue();
             EduTestQuizGroup group = eduQuizTestGroupService.getQuizTestGroupFrom(quizGroupCode, testId);
             UUID groupId = null;
-            if(group != null){
+            if (group != null) {
                 groupId = group.getQuizGroupId();
             }
-            log.debug("uploadSolutionExcelQuizTestOfStudent, userId = " + userId + " testId = " + testId + " groupCode = " + quizGroupCode
-            + " groupId = " + groupId);
+            log.debug("uploadSolutionExcelQuizTestOfStudent, userId = " +
+                      userId +
+                      " testId = " +
+                      testId +
+                      " groupCode = " +
+                      quizGroupCode
+                      +
+                      " groupId = " +
+                      groupId);
 
             EduQuizTest eduQuizTest = quizTestService.getQuizTestById(testId);
-            if(eduQuizTest.getJudgeMode()== null ||
-               !eduQuizTest.getJudgeMode().equals(EduQuizTest.JUDGE_MODE_OFFLINE_VIA_EXCEL_UPLOAD)){
-               return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Mode Not Allowed");
+            if (eduQuizTest.getJudgeMode() == null ||
+                !eduQuizTest.getJudgeMode().equals(EduQuizTest.JUDGE_MODE_OFFLINE_VIA_EXCEL_UPLOAD)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Mode Not Allowed");
             }
 
-            QuizGroupTestDetailModel res = eduQuizTestGroupService.getTestGroupQuestionDetailNotUsePermutationConfig(userId,testId);
-            if(res == null){
+            QuizGroupTestDetailModel res = eduQuizTestGroupService.getTestGroupQuestionDetailNotUsePermutationConfig(
+                userId,
+                testId);
+            if (res == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not Found Quiz Test Group");
             }
-            if(res.getListQuestion() == null || res.getListQuestion().size() == 0){
+            if (res.getListQuestion() == null || res.getListQuestion().size() == 0) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Not Found Questions of the Quiz Test Group");
             }
             int lastRowNum = sheet.getLastRowNum();
-            for(int i = 1; i <= lastRowNum; i++){
+            for (int i = 1; i <= lastRowNum; i++) {
                 r = sheet.getRow(i);
                 c = r.getCell(0);
                 String questionIdx = c.getStringCellValue();
@@ -482,46 +526,67 @@ public class QuizTestController {
                 //if(!c.getCellType().equals(CellType.STRING)){
                 //    continue;
                 //}
-                if(c != null)
-                    if(c.getCellType().equals(CellType.STRING)) {
+                if (c != null) {
+                    if (c.getCellType().equals(CellType.STRING)) {
                         if (c.getStringCellValue() != null && !c.getStringCellValue().equals("")) {
                             choices = c.getStringCellValue().split(",");
                         }
                     }
-                if(i-1 >= res.getListQuestion().size()) {
-                    log.debug("uploadSolutionExcelQuizTestOfStudent, question " + questionIdx + " i = " + i + " -> continue");
+                }
+                if (i - 1 >= res.getListQuestion().size()) {
+                    log.debug("uploadSolutionExcelQuizTestOfStudent, question " +
+                              questionIdx +
+                              " i = " +
+                              i +
+                              " -> continue");
                     continue;
                 }
                 //if(choices == null || choices.length == 0) continue;
-                QuizQuestionDetailModel question = res.getListQuestion().get(i-1);
+                QuizQuestionDetailModel question = res.getListQuestion().get(i - 1);
                 UUID questionId = question.getQuestionId();
                 List<UUID> chooseAnsIds = new ArrayList();
-                if(choices != null && choices.length > 0) {
-                    for(int j = 0; j < choices.length; j++){
+                if (choices != null && choices.length > 0) {
+                    for (int j = 0; j < choices.length; j++) {
                         String choiceCode = choices[j].trim();
-                        for(QuizChoiceAnswerHideCorrectAnswer a: question.getQuizChoiceAnswerList()){
-                            if(choiceCode.equals(a.getChoiceAnswerCode())){
-                                chooseAnsIds.add(a.getChoiceAnswerId()); break;
+                        for (QuizChoiceAnswerHideCorrectAnswer a : question.getQuizChoiceAnswerList()) {
+                            if (choiceCode.equals(a.getChoiceAnswerCode())) {
+                                chooseAnsIds.add(a.getChoiceAnswerId());
+                                break;
                             }
                         }
-                        log.debug("uploadSolutionExcelQuizTestOfStudent, question " + questionIdx + " choiceCode = " + choiceCode);
+                        log.debug("uploadSolutionExcelQuizTestOfStudent, question " +
+                                  questionIdx +
+                                  " choiceCode = " +
+                                  choiceCode);
                     }
-                    log.debug("uploadSolutionExcelQuizTestOfStudent, question " + questionIdx + " chooseAnsIds = " + chooseAnsIds.size());
+                    log.debug("uploadSolutionExcelQuizTestOfStudent, question " +
+                              questionIdx +
+                              " chooseAnsIds = " +
+                              chooseAnsIds.size());
                 }
-                log.debug("uploadSolutionExcelQuizTestOfStudent, question " + questionIdx + " questionId = " + questionId + " choices (len = " + chooseAnsIds.size() + ") ");
+                log.debug("uploadSolutionExcelQuizTestOfStudent, question " +
+                          questionIdx +
+                          " questionId = " +
+                          questionId +
+                          " choices (len = " +
+                          chooseAnsIds.size() +
+                          ") ");
 
                 quizTestService.submitSynchronousQuizTestExecutionChoice(questionId, groupId, userId, chooseAnsIds);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return ResponseEntity.ok().body("OK");
 
     }
+
     @PostMapping("/upload-excel-student-list")
-    public ResponseEntity<?> uploadExcelStudentListOfQuizTest(Principal principal,
-                                            @RequestParam("inputJson") String inputJson,
-                                            @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadExcelStudentListOfQuizTest(
+        Principal principal,
+        @RequestParam("inputJson") String inputJson,
+        @RequestParam("file") MultipartFile file
+    ) {
         Gson gson = new Gson();
         ModelUploadExcelStudentListOfQuizTest modelUpload = gson.fromJson(
             inputJson,
@@ -541,12 +606,12 @@ public class QuizTestController {
 
                 String userId = c.getStringCellValue();
                 boolean ok = eduTestQuizParticipantService.addParticipant2QuizTest(userId, testId);
-                if(ok){
+                if (ok) {
                     uploadedUsers.add(userId);
                 }
                 //System.out.print("get user " + userId);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return ResponseEntity.ok().body(uploadedUsers);
@@ -555,13 +620,13 @@ public class QuizTestController {
     }
 
     @GetMapping("/get-list-quiz-test-status-ids")
-    public ResponseEntity<?> getListQuizTestStatusIds(){
+    public ResponseEntity<?> getListQuizTestStatusIds() {
         List<String> statusIds = EduQuizTest.getListStatusIds();
         return ResponseEntity.ok().body(statusIds);
     }
 
     @GetMapping("/get-list-judge-modes")
-    public ResponseEntity<?> getListJudgeModes(){
+    public ResponseEntity<?> getListJudgeModes() {
         List<String> judgeModes = EduQuizTest.getListJudgeModes();
         return ResponseEntity.ok().body(judgeModes);
     }

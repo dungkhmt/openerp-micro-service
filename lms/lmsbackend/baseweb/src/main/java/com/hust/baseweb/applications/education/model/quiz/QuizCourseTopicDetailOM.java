@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuizCourseTopicDetailOM {
+
     private String quizCourseTopicId;
     private String quizCourseTopicName;
     private int numberOfPublishedQuizs;

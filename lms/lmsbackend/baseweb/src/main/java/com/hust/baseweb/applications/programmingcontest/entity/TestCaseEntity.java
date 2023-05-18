@@ -15,6 +15,7 @@ import java.util.UUID;
 //@Table(name = "test_case")
 @Table(name = "test_case_new")
 public class TestCaseEntity implements Serializable {
+
     public static final String STATUS_DISABLED = "DISABLED";
     public static final String STATUS_ENABLED = "ENABLED";
 
@@ -35,25 +36,34 @@ public class TestCaseEntity implements Serializable {
     @Column(name = "contest_problem_id")
     private String problemId;
 
-    @Column(name="is_public")
+    @Column(name = "is_public")
     private String isPublic;
 
-    @Column(name="description")
+    @Column(name = "description")
     private String description;
 
-    @Column(name="status_id")
+    @Column(name = "status_id")
     private String statusId;
 
-    public String getTestCaseShort(int sz){
+    public String getTestCaseShort(int sz) {
         String res = "";
-        if(sz > testCase.length()) sz = testCase.length();
-        for(int i = 0; i < sz; i++) res += testCase.charAt(i);
+        if (sz > testCase.length()) {
+            sz = testCase.length();
+        }
+        for (int i = 0; i < sz; i++) {
+            res += testCase.charAt(i);
+        }
         return res;
     }
-    public String getCorrectAnswerShort(int sz){
+
+    public String getCorrectAnswerShort(int sz) {
         String res = "";
-        if(sz > correctAnswer.length()) sz = correctAnswer.length();
-        for(int i = 0; i < sz; i++) res += correctAnswer.charAt(i);
+        if (sz > correctAnswer.length()) {
+            sz = correctAnswer.length();
+        }
+        for (int i = 0; i < sz; i++) {
+            res += correctAnswer.charAt(i);
+        }
         return res;
     }
 //    @JoinColumn(name = "contest_problem_id", referencedColumnName = "problem_id")

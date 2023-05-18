@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class ModelProblemDetailRunCode {
+
     String sourceCode;
     String input;
     String computerLanguage;

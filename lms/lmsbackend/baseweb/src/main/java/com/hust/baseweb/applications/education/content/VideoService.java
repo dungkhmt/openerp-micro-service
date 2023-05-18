@@ -54,10 +54,10 @@ public class VideoService {
     }
 
     public void deleteVideo(UUID id) {
-        File deleteFile = new File(videoPath +"/" +id);
+        File deleteFile = new File(videoPath + "/" + id);
         try {
             deleteFile.delete();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -80,7 +80,7 @@ public class VideoService {
      * @throws IOException
      */
     @Transactional
-    private Video store(MultipartFile file, Video metadata) throws IOException {
+    Video store(MultipartFile file, Video metadata) throws IOException {
         String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
 
         if (file.isEmpty()) {

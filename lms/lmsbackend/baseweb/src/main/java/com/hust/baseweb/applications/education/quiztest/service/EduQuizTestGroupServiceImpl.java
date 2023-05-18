@@ -48,7 +48,10 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
             codes[i] = eduTestQuizGroups.get(i).getGroupCode();
         }
         String[] newCodes = CommonUtils.generateNextSeqId(codes, input.getNumberOfQuizTestGroups());
-        log.info("generateQuizTestGroups, number of groups = " + input.getNumberOfQuizTestGroups() + " newCodes.length = "+ newCodes.length);
+        log.info("generateQuizTestGroups, number of groups = " +
+                 input.getNumberOfQuizTestGroups() +
+                 " newCodes.length = " +
+                 newCodes.length);
         for (int i = 0; i < newCodes.length; i++) {
             log.info("generateQuizTestGroups, gen newCode " + newCodes[i]);
             EduTestQuizGroup eduTestQuizGroup = new EduTestQuizGroup();
@@ -114,9 +117,10 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
             return testDetail;
         }
         String permutation = "0123456789";
-        if(participant != null){
-            if(participant.getPermutation() != null && !participant.getPermutation().equals(""))
+        if (participant != null) {
+            if (participant.getPermutation() != null && !participant.getPermutation().equals("")) {
                 permutation = participant.getPermutation();
+            }
         }
         /*
         ArrayList<Integer> indices = new ArrayList();
@@ -129,17 +133,19 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
         */
         int len = tmpl.size();
         //log.info("getTestGroupQuestionDetail, permutation = " + permutation + " len = tmpl.sz = " + len);
-        for(QuizGroupQuestionAssignment asign: tmpl){
+        for (QuizGroupQuestionAssignment asign : tmpl) {
             //System.out.println("here ");
             QuizQuestionDetailModel quizQuestion = quizQuestionService.findQuizDetail(asign.getQuestionId());
-            if(len < quizQuestion.getQuizChoiceAnswerList().size()){
-                len  = quizQuestion.getQuizChoiceAnswerList().size();
+            if (len < quizQuestion.getQuizChoiceAnswerList().size()) {
+                len = quizQuestion.getQuizChoiceAnswerList().size();
             }
         }
-        if(len < permutation.length()) len = permutation.length();
+        if (len < permutation.length()) {
+            len = permutation.length();
+        }
 
         // randome indices sequence based on permutation
-        int[] indices = Utils.genSequence(permutation,len);
+        int[] indices = Utils.genSequence(permutation, len);
         //log.info("getTestGroupQuestionDetail, update len = " + len + " indices = " + indices.toString());
 
         //log.info("getTestGroupQuestionDetail, random indices = ");
@@ -153,8 +159,8 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
             // random order choices based on permutation
             //List<QuizChoiceAnswer> answers = new ArrayList();
             List<QuizChoiceAnswerHideCorrectAnswer> answers = new ArrayList();
-            for(int i = 0;i < indices.length; i++){
-                if(indices[i] >= quizQuestion.getQuizChoiceAnswerList().size()){
+            for (int i = 0; i < indices.length; i++) {
+                if (indices[i] >= quizQuestion.getQuizChoiceAnswerList().size()) {
                     //log.info("getTestGroupQuestionDetail, indices[" + i + "] = " + indices[i] + " > answers.size -> continue");
                     continue;
                 }
@@ -162,7 +168,9 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
                 //QuizChoiceAnswer ans = quizQuestion.getQuizChoiceAnswerList().get(indices[i]);
 
 
-                if(answers.size() == quizQuestion.getQuizChoiceAnswerList().size()) break;
+                if (answers.size() == quizQuestion.getQuizChoiceAnswerList().size()) {
+                    break;
+                }
             }
             //for(int i = m+1; i < quizQuestion.getQuizChoiceAnswerList().size();i++){
             //    answers.add(quizQuestion.getQuizChoiceAnswerList().get(i));
@@ -190,9 +198,9 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
 
 
         ArrayList<QuizQuestionDetailModel> sorted_lst = new ArrayList();
-        for(int i = 0; i < indices.length; i++){
+        for (int i = 0; i < indices.length; i++) {
             int idx = indices[i];
-            if(idx >= listQuestions.size()){
+            if (idx >= listQuestions.size()) {
                 //log.info("getTestGroupQuestionDetail, indices[" + i + "] = " + idx + " > listQuesions.sz -> continue");
                 continue;
             }
@@ -231,21 +239,29 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
         testDetail.setParticipationExecutionChoice(participationExecutionChoice);
         return testDetail;
     }
-    private Map<String, List<UUID>> getChoiceAnswers(List<QuizGroupQuestionAssignment> questionAssignment, String userId, UUID groupId){
+
+    private Map<String, List<UUID>> getChoiceAnswers(
+        List<QuizGroupQuestionAssignment> questionAssignment,
+        String userId,
+        UUID groupId
+    ) {
         Map<String, List<UUID>> participationExecutionChoice = new HashMap<>();
-        for(QuizGroupQuestionAssignment asign: questionAssignment) {
+        for (QuizGroupQuestionAssignment asign : questionAssignment) {
             //System.out.println("here ");
             //QuizQuestionDetailModel quizQuestion = quizQuestionService.findQuizDetail(asign.getQuestionId());
             UUID questionId = asign.getQuestionId();
             List<QuizTestExecutionSubmission> choices = quizTestExecutionSubmissionRepo
-            .findAllByQuestionIdAndQuizGroupIdAndParticipationUserLoginIdOrderByCreatedStampDesc(questionId, groupId, userId);
-            if(choices != null && choices.size() > 0){
+                .findAllByQuestionIdAndQuizGroupIdAndParticipationUserLoginIdOrderByCreatedStampDesc(
+                    questionId,
+                    groupId,
+                    userId);
+            if (choices != null && choices.size() > 0) {
                 QuizTestExecutionSubmission mostRecentlyChoice = choices.get(0);
                 String[] listChoices = mostRecentlyChoice.getChoiceAnswerIds().split(",");
-                if(listChoices != null && listChoices.length > 0){
-                    for(int i = 0; i < listChoices.length; i++){
+                if (listChoices != null && listChoices.length > 0) {
+                    for (int i = 0; i < listChoices.length; i++) {
                         log.debug("getChoiceAnswers, listChoices[" + i + "] = " + listChoices[i]);
-                        if(listChoices[i] != null && !listChoices[i].equals("")) {
+                        if (listChoices[i] != null && !listChoices[i].equals("")) {
                             UUID choiceId = UUID.fromString(listChoices[i].trim());
                             if (participationExecutionChoice.containsKey(questionId.toString())) {
                                 participationExecutionChoice.get(questionId.toString()).add(choiceId);
@@ -255,12 +271,13 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
                                 participationExecutionChoice.put(questionId.toString(), tmp);
                             }
                         }
+                    }
                 }
             }
         }
+        return participationExecutionChoice;
     }
-    return participationExecutionChoice;
-    }
+
     @Override
     public QuizGroupTestDetailModel getTestGroupQuestionDetailHeavyReload(Principal principal, String testID) {
         EduTestQuizParticipant participant = eduTestQuizParticipantService
@@ -315,9 +332,10 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
             return testDetail;
         }
         String permutation = "0123456789";
-        if(participant != null){
-            if(participant.getPermutation() != null && !participant.getPermutation().equals(""))
+        if (participant != null) {
+            if (participant.getPermutation() != null && !participant.getPermutation().equals("")) {
                 permutation = participant.getPermutation();
+            }
         }
         /*
         ArrayList<Integer> indices = new ArrayList();
@@ -330,17 +348,19 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
         */
         int len = tmpl.size();
         //log.info("getTestGroupQuestionDetail, permutation = " + permutation + " len = tmpl.sz = " + len);
-        for(QuizGroupQuestionAssignment asign: tmpl){
+        for (QuizGroupQuestionAssignment asign : tmpl) {
             //System.out.println("here ");
             QuizQuestionDetailModel quizQuestion = quizQuestionService.findQuizDetail(asign.getQuestionId());
-            if(len < quizQuestion.getQuizChoiceAnswerList().size()){
-                len  = quizQuestion.getQuizChoiceAnswerList().size();
+            if (len < quizQuestion.getQuizChoiceAnswerList().size()) {
+                len = quizQuestion.getQuizChoiceAnswerList().size();
             }
         }
-        if(len < permutation.length()) len = permutation.length();
+        if (len < permutation.length()) {
+            len = permutation.length();
+        }
 
         // randome indices sequence based on permutation
-        int[] indices = Utils.genSequence(permutation,len);
+        int[] indices = Utils.genSequence(permutation, len);
         //log.info("getTestGroupQuestionDetail, update len = " + len + " indices = " + indices.toString());
 
         //log.info("getTestGroupQuestionDetail, random indices = ");
@@ -354,8 +374,8 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
             // random order choices based on permutation
             //List<QuizChoiceAnswer> answers = new ArrayList();
             List<QuizChoiceAnswerHideCorrectAnswer> answers = new ArrayList();
-            for(int i = 0;i < indices.length; i++){
-                if(indices[i] >= quizQuestion.getQuizChoiceAnswerList().size()){
+            for (int i = 0; i < indices.length; i++) {
+                if (indices[i] >= quizQuestion.getQuizChoiceAnswerList().size()) {
                     //log.info("getTestGroupQuestionDetail, indices[" + i + "] = " + indices[i] + " > answers.size -> continue");
                     continue;
                 }
@@ -363,7 +383,9 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
                 //QuizChoiceAnswer ans = quizQuestion.getQuizChoiceAnswerList().get(indices[i]);
 
 
-                if(answers.size() == quizQuestion.getQuizChoiceAnswerList().size()) break;
+                if (answers.size() == quizQuestion.getQuizChoiceAnswerList().size()) {
+                    break;
+                }
             }
             //for(int i = m+1; i < quizQuestion.getQuizChoiceAnswerList().size();i++){
             //    answers.add(quizQuestion.getQuizChoiceAnswerList().get(i));
@@ -391,13 +413,13 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
         });
         */
 
-        Map<String, List<UUID>> participationExecutionChoice = getChoiceAnswers(tmpl,userId, groupId);
+        Map<String, List<UUID>> participationExecutionChoice = getChoiceAnswers(tmpl, userId, groupId);
 
 
         ArrayList<QuizQuestionDetailModel> sorted_lst = new ArrayList();
-        for(int i = 0; i < indices.length; i++){
+        for (int i = 0; i < indices.length; i++) {
             int idx = indices[i];
-            if(idx >= listQuestions.size()){
+            if (idx >= listQuestions.size()) {
                 //log.info("getTestGroupQuestionDetail, indices[" + i + "] = " + idx + " > listQuesions.sz -> continue");
                 continue;
             }
@@ -489,9 +511,10 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
             return testDetail;
         }
         String permutation = "0123456789";
-        if(participant != null){
-            if(participant.getPermutation() != null && !participant.getPermutation().equals(""))
+        if (participant != null) {
+            if (participant.getPermutation() != null && !participant.getPermutation().equals("")) {
                 permutation = participant.getPermutation();
+            }
         }
         /*
         ArrayList<Integer> indices = new ArrayList();
@@ -504,17 +527,19 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
         */
         int len = tmpl.size();
         //log.info("getTestGroupQuestionDetail, permutation = " + permutation + " len = tmpl.sz = " + len);
-        for(QuizGroupQuestionAssignment asign: tmpl){
+        for (QuizGroupQuestionAssignment asign : tmpl) {
             //System.out.println("here ");
             QuizQuestionDetailModel quizQuestion = quizQuestionService.findQuizDetail(asign.getQuestionId());
-            if(len < quizQuestion.getQuizChoiceAnswerList().size()){
-                len  = quizQuestion.getQuizChoiceAnswerList().size();
+            if (len < quizQuestion.getQuizChoiceAnswerList().size()) {
+                len = quizQuestion.getQuizChoiceAnswerList().size();
             }
         }
-        if(len < permutation.length()) len = permutation.length();
+        if (len < permutation.length()) {
+            len = permutation.length();
+        }
 
         // randome indices sequence based on permutation
-        int[] indices = Utils.genSequence(permutation,len);
+        int[] indices = Utils.genSequence(permutation, len);
         //log.info("getTestGroupQuestionDetail, update len = " + len + " indices = " + indices.toString());
 
         //log.info("getTestGroupQuestionDetail, random indices = ");
@@ -528,8 +553,8 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
             // random order choices based on permutation
             //List<QuizChoiceAnswer> answers = new ArrayList();
             List<QuizChoiceAnswerHideCorrectAnswer> answers = new ArrayList();
-            for(int i = 0;i < indices.length; i++){
-                if(indices[i] >= quizQuestion.getQuizChoiceAnswerList().size()){
+            for (int i = 0; i < indices.length; i++) {
+                if (indices[i] >= quizQuestion.getQuizChoiceAnswerList().size()) {
                     //log.info("getTestGroupQuestionDetail, indices[" + i + "] = " + indices[i] + " > answers.size -> continue");
                     continue;
                 }
@@ -537,7 +562,9 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
                 //QuizChoiceAnswer ans = quizQuestion.getQuizChoiceAnswerList().get(indices[i]);
 
 
-                if(answers.size() == quizQuestion.getQuizChoiceAnswerList().size()) break;
+                if (answers.size() == quizQuestion.getQuizChoiceAnswerList().size()) {
+                    break;
+                }
             }
             //for(int i = m+1; i < quizQuestion.getQuizChoiceAnswerList().size();i++){
             //    answers.add(quizQuestion.getQuizChoiceAnswerList().get(i));
@@ -564,9 +591,9 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
         });
 
         ArrayList<QuizQuestionDetailModel> sorted_lst = new ArrayList();
-        for(int i = 0; i < indices.length; i++){
+        for (int i = 0; i < indices.length; i++) {
             int idx = indices[i];
-            if(idx >= listQuestions.size()){
+            if (idx >= listQuestions.size()) {
                 //log.info("getTestGroupQuestionDetail, indices[" + i + "] = " + idx + " > listQuesions.sz -> continue");
                 continue;
             }
@@ -608,7 +635,11 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
 
 
     @Override
-    public QuizGroupTestDetailModel getTestGroupQuestionDetailOfGroupCode(String userLoginId, String groupCode, String testID) {
+    public QuizGroupTestDetailModel getTestGroupQuestionDetailOfGroupCode(
+        String userLoginId,
+        String groupCode,
+        String testID
+    ) {
         EduTestQuizParticipant participant = eduTestQuizParticipantService
             .findEduTestQuizParticipantByParticipantUserLoginIdAndAndTestId(userLoginId, testID);
 
@@ -633,7 +664,7 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
         //System.out.println(listGroupAsignment.size());
         List<EduTestQuizGroup> groups = eduQuizTestGroupRepo.findAllByTestIdAndGroupCode(testID, groupCode);
         EduTestQuizGroup eduTestQuizGroup = null;//new EduTestQuizGroup();
-        if(groups != null && groups.size() > 0){
+        if (groups != null && groups.size() > 0) {
             eduTestQuizGroup = groups.get(0);
         }
         if (eduTestQuizGroup == null) {
@@ -656,9 +687,10 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
             return testDetail;
         }
         String permutation = "0123456789";
-        if(participant != null){
-            if(participant.getPermutation() != null && !participant.getPermutation().equals(""))
+        if (participant != null) {
+            if (participant.getPermutation() != null && !participant.getPermutation().equals("")) {
                 permutation = participant.getPermutation();
+            }
         }
         /*
         ArrayList<Integer> indices = new ArrayList();
@@ -671,17 +703,19 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
         */
         int len = tmpl.size();
         //log.info("getTestGroupQuestionDetail, permutation = " + permutation + " len = tmpl.sz = " + len);
-        for(QuizGroupQuestionAssignment asign: tmpl){
+        for (QuizGroupQuestionAssignment asign : tmpl) {
             //System.out.println("here ");
             QuizQuestionDetailModel quizQuestion = quizQuestionService.findQuizDetail(asign.getQuestionId());
-            if(len < quizQuestion.getQuizChoiceAnswerList().size()){
-                len  = quizQuestion.getQuizChoiceAnswerList().size();
+            if (len < quizQuestion.getQuizChoiceAnswerList().size()) {
+                len = quizQuestion.getQuizChoiceAnswerList().size();
             }
         }
-        if(len < permutation.length()) len = permutation.length();
+        if (len < permutation.length()) {
+            len = permutation.length();
+        }
 
         // randome indices sequence based on permutation
-        int[] indices = Utils.genSequence(permutation,len);
+        int[] indices = Utils.genSequence(permutation, len);
         //log.info("getTestGroupQuestionDetail, update len = " + len + " indices = " + indices.toString());
 
         //log.info("getTestGroupQuestionDetail, random indices = ");
@@ -695,8 +729,8 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
             // random order choices based on permutation
             //List<QuizChoiceAnswer> answers = new ArrayList();
             List<QuizChoiceAnswerHideCorrectAnswer> answers = new ArrayList();
-            for(int i = 0;i < indices.length; i++){
-                if(indices[i] >= quizQuestion.getQuizChoiceAnswerList().size()){
+            for (int i = 0; i < indices.length; i++) {
+                if (indices[i] >= quizQuestion.getQuizChoiceAnswerList().size()) {
                     //log.info("getTestGroupQuestionDetail, indices[" + i + "] = " + indices[i] + " > answers.size -> continue");
                     continue;
                 }
@@ -704,7 +738,9 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
                 //QuizChoiceAnswer ans = quizQuestion.getQuizChoiceAnswerList().get(indices[i]);
 
 
-                if(answers.size() == quizQuestion.getQuizChoiceAnswerList().size()) break;
+                if (answers.size() == quizQuestion.getQuizChoiceAnswerList().size()) {
+                    break;
+                }
             }
             //for(int i = m+1; i < quizQuestion.getQuizChoiceAnswerList().size();i++){
             //    answers.add(quizQuestion.getQuizChoiceAnswerList().get(i));
@@ -731,9 +767,9 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
         });
 
         ArrayList<QuizQuestionDetailModel> sorted_lst = new ArrayList();
-        for(int i = 0; i < indices.length; i++){
+        for (int i = 0; i < indices.length; i++) {
             int idx = indices[i];
-            if(idx >= listQuestions.size()){
+            if (idx >= listQuestions.size()) {
                 //log.info("getTestGroupQuestionDetail, indices[" + i + "] = " + idx + " > listQuesions.sz -> continue");
                 continue;
             }
@@ -773,30 +809,32 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
         return testDetail;
     }
 
-    public List<QuizGroupTestDetailModel> getQuizTestGroupWithQuestionsDetail(String testId){
+    public List<QuizGroupTestDetailModel> getQuizTestGroupWithQuestionsDetail(String testId) {
         EduQuizTest test = eduQuizTestRepo.findById(testId).get();
         String courseName = "";
         EduCourse course = eduCourseRepo.findById(test.getCourseId()).orElse(null);
-        if(course != null) courseName = course.getName();
+        if (course != null) {
+            courseName = course.getName();
+        }
 
         List<EduTestQuizGroup> groups = eduQuizTestGroupRepo.findByTestId(testId);
 
         List<QuizGroupTestDetailModel> res = new ArrayList();
-        for(EduTestQuizGroup g: groups){
+        for (EduTestQuizGroup g : groups) {
             // get list of questions of this group g
             QuizGroupTestDetailModel quizGroupTestDetailModel = new QuizGroupTestDetailModel();
             List<QuizGroupQuestionAssignment> questions = quizGroupQuestionAssignmentRepo
-            .findQuizGroupQuestionAssignmentsByQuizGroupId(g.getQuizGroupId());
+                .findQuizGroupQuestionAssignmentsByQuizGroupId(g.getQuizGroupId());
             List<QuizQuestionDetailModel> listQuestions = new ArrayList();
-            for(QuizGroupQuestionAssignment asign: questions) {
+            for (QuizGroupQuestionAssignment asign : questions) {
                 QuizQuestionDetailModel quizQuestion = quizQuestionService.findQuizDetail(asign.getQuestionId());
                 int seq = asign.getSeq();
                 List<QuizChoiceAnswerHideCorrectAnswer> choices = quizQuestion.getQuizChoiceAnswerList();
                 // order the choiceAnswers based on seq
                 List<QuizChoiceAnswerHideCorrectAnswer> choiceAnswers = new ArrayList();
-                int[] idx = Utils.getPermutationBasedOnSeq(seq,choices.size());
-                if(idx != null) {
-                    for(int i = 0; i < choices.size(); i++) {
+                int[] idx = Utils.getPermutationBasedOnSeq(seq, choices.size());
+                if (idx != null) {
+                    for (int i = 0; i < choices.size(); i++) {
                         choiceAnswers.add(quizQuestion.getQuizChoiceAnswerList().get(idx[i]));
                     }
                 }
@@ -822,7 +860,10 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
     }
 
     @Override
-    public QuizGroupTestDetailModel getTestGroupQuestionDetailNotUsePermutationConfig(String userLoginId, String testID){
+    public QuizGroupTestDetailModel getTestGroupQuestionDetailNotUsePermutationConfig(
+        String userLoginId,
+        String testID
+    ) {
         EduTestQuizParticipant participant = eduTestQuizParticipantService
             .findEduTestQuizParticipantByParticipantUserLoginIdAndAndTestId(userLoginId, testID);
 
@@ -880,15 +921,15 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
 
 
         List<QuizQuestionDetailModel> listQuestions = new ArrayList();
-        for(QuizGroupQuestionAssignment asign: questions) {
+        for (QuizGroupQuestionAssignment asign : questions) {
             QuizQuestionDetailModel quizQuestion = quizQuestionService.findQuizDetail(asign.getQuestionId());
             int seq = asign.getSeq();
             List<QuizChoiceAnswerHideCorrectAnswer> choices = quizQuestion.getQuizChoiceAnswerList();
             // order the choiceAnswers based on seq
             List<QuizChoiceAnswerHideCorrectAnswer> choiceAnswers = new ArrayList();
-            int[] idx = Utils.getPermutationBasedOnSeq(seq,choices.size());
-            if(idx != null) {
-                for(int i = 0; i < choices.size(); i++) {
+            int[] idx = Utils.getPermutationBasedOnSeq(seq, choices.size());
+            if (idx != null) {
+                for (int i = 0; i < choices.size(); i++) {
                     choiceAnswers.add(quizQuestion.getQuizChoiceAnswerList().get(idx[i]));
                 }
             }
@@ -990,15 +1031,15 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
 
 
         List<QuizQuestionDetailModel> listQuestions = new ArrayList();
-        for(QuizGroupQuestionAssignment asign: questions) {
+        for (QuizGroupQuestionAssignment asign : questions) {
             QuizQuestionDetailModel quizQuestion = quizQuestionService.findQuizDetail(asign.getQuestionId());
             int seq = asign.getSeq();
             List<QuizChoiceAnswerHideCorrectAnswer> choices = quizQuestion.getQuizChoiceAnswerList();
             // order the choiceAnswers based on seq
             List<QuizChoiceAnswerHideCorrectAnswer> choiceAnswers = new ArrayList();
-            int[] idx = Utils.getPermutationBasedOnSeq(seq,choices.size());
-            if(idx != null) {
-                for(int i = 0; i < choices.size(); i++) {
+            int[] idx = Utils.getPermutationBasedOnSeq(seq, choices.size());
+            if (idx != null) {
+                for (int i = 0; i < choices.size(); i++) {
                     choiceAnswers.add(quizQuestion.getQuizChoiceAnswerList().get(idx[i]));
                 }
             }
@@ -1007,7 +1048,7 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
             listQuestions.add(quizQuestion);
         }
 
-        Map<String, List<UUID>> participationExecutionChoice = getChoiceAnswers(questions,userLoginId, groupId);
+        Map<String, List<UUID>> participationExecutionChoice = getChoiceAnswers(questions, userLoginId, groupId);
 
         //SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         //String strDate = formatter.format(test.getScheduleDatetime());
@@ -1026,7 +1067,7 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
     }
 
     @Override
-    public QuizGroupTestDetailModel getQuestionsDetailOfQuizGroup(String groupCode, String testID){
+    public QuizGroupTestDetailModel getQuestionsDetailOfQuizGroup(String groupCode, String testID) {
         QuizGroupTestDetailModel quizGroupTestDetailModel = new QuizGroupTestDetailModel();
         EduQuizTest test = eduQuizTestRepo.findById(testID).get();
         String courseName = eduCourseRepo.findById(test.getCourseId()).get().getName();
@@ -1076,15 +1117,15 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
 
 
         List<QuizQuestionDetailModel> listQuestions = new ArrayList();
-        for(QuizGroupQuestionAssignment asign: questions) {
+        for (QuizGroupQuestionAssignment asign : questions) {
             QuizQuestionDetailModel quizQuestion = quizQuestionService.findQuizDetail(asign.getQuestionId());
             int seq = asign.getSeq();
             List<QuizChoiceAnswerHideCorrectAnswer> choices = quizQuestion.getQuizChoiceAnswerList();
             // order the choiceAnswers based on seq
             List<QuizChoiceAnswerHideCorrectAnswer> choiceAnswers = new ArrayList();
-            int[] idx = Utils.getPermutationBasedOnSeq(seq,choices.size());
-            if(idx != null) {
-                for(int i = 0; i < choices.size(); i++) {
+            int[] idx = Utils.getPermutationBasedOnSeq(seq, choices.size());
+            if (idx != null) {
+                for (int i = 0; i < choices.size(); i++) {
                     choiceAnswers.add(quizQuestion.getQuizChoiceAnswerList().get(idx[i]));
                 }
             }
@@ -1111,7 +1152,8 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
 
     @Override
     public QuizGroupTestDetailModel getQuestionsDetailWithUserExecutionChoideOfQuizGroupNotUsePermutationConfig(
-        String userLoginId, String groupCode, String testID){
+        String userLoginId, String groupCode, String testID
+    ) {
         QuizGroupTestDetailModel quizGroupTestDetailModel = new QuizGroupTestDetailModel();
         EduQuizTest test = eduQuizTestRepo.findById(testID).get();
         String courseName = eduCourseRepo.findById(test.getCourseId()).get().getName();
@@ -1161,15 +1203,15 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
 
 
         List<QuizQuestionDetailModel> listQuestions = new ArrayList();
-        for(QuizGroupQuestionAssignment asign: questions) {
+        for (QuizGroupQuestionAssignment asign : questions) {
             QuizQuestionDetailModel quizQuestion = quizQuestionService.findQuizDetail(asign.getQuestionId());
             int seq = asign.getSeq();
             List<QuizChoiceAnswerHideCorrectAnswer> choices = quizQuestion.getQuizChoiceAnswerList();
             // order the choiceAnswers based on seq
             List<QuizChoiceAnswerHideCorrectAnswer> choiceAnswers = new ArrayList();
-            int[] idx = Utils.getPermutationBasedOnSeq(seq,choices.size());
-            if(idx != null) {
-                for(int i = 0; i < choices.size(); i++) {
+            int[] idx = Utils.getPermutationBasedOnSeq(seq, choices.size());
+            if (idx != null) {
+                for (int i = 0; i < choices.size(); i++) {
                     choiceAnswers.add(quizQuestion.getQuizChoiceAnswerList().get(idx[i]));
                 }
             }
@@ -1212,8 +1254,15 @@ public class EduQuizTestGroupServiceImpl implements EduQuizTestGroupService {
     @Override
     public EduTestQuizGroup getQuizTestGroupFrom(String groupCode, String testId) {
         List<EduTestQuizGroup> groups = eduQuizTestGroupRepo.findAllByTestIdAndGroupCode(testId, groupCode);
-        log.debug("getQuizTestGroupFrom, testId = " + testId + " groupCode = " + groupCode + " len = " + groupCode.length() + " ret.sz = " + groups.size());
-        if(groups != null && groups.size() > 0){
+        log.debug("getQuizTestGroupFrom, testId = " +
+                  testId +
+                  " groupCode = " +
+                  groupCode +
+                  " len = " +
+                  groupCode.length() +
+                  " ret.sz = " +
+                  groups.size());
+        if (groups != null && groups.size() > 0) {
             return groups.get(0);
         }
         return null;

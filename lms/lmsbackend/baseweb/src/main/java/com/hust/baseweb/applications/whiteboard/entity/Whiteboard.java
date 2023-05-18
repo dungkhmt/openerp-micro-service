@@ -16,6 +16,7 @@ import java.util.Date;
 @Entity
 @Table(name = "whiteboard")
 public class Whiteboard {
+
     @Id
     private String id;
 

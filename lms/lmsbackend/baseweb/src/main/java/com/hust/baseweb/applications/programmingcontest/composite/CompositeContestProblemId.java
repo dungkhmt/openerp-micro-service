@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 public class CompositeContestProblemId implements Serializable {
+
     private String contestId;
     private String problemId;
 }

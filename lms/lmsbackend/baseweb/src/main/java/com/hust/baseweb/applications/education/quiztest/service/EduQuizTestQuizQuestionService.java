@@ -10,9 +10,13 @@ import java.util.List;
 import java.util.UUID;
 
 public interface EduQuizTestQuizQuestionService {
+
     public EduQuizTestQuizQuestion createQuizTestQuestion(UserLogin u, CreateQuizTestQuestionInputModel input);
+
     public int createQuizTestQuestion(UserLogin u, String testId, UUID questionId);
+
     public EduQuizTestQuizQuestion removeQuizTestQuestion(UserLogin u, CreateQuizTestQuestionInputModel input);
+
     public List<QuizQuestionDetailModel> findAllByTestId(String testId);
 
     public List<EduQuizTestModel> getQuizTestsUsingQuestion(UUID questionId);

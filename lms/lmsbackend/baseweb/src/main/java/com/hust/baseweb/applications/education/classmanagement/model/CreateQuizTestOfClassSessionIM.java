@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateQuizTestOfClassSessionIM {
+
     private String testId;
     private String testName;
     private UUID sessionId;

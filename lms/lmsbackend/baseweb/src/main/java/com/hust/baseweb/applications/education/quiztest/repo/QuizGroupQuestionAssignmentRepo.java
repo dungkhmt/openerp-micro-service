@@ -11,8 +11,8 @@ import java.util.UUID;
 public interface QuizGroupQuestionAssignmentRepo
     extends JpaRepository<QuizGroupQuestionAssignment, CompositeQuizGroupQuestionAssignmentId> {
 
-    @Query(value="select * from quiz_group_question_assignment " +
-                 "where quiz_group_id = ?1 order by seq asc",nativeQuery=true)
+    @Query(value = "select * from quiz_group_question_assignment " +
+                   "where quiz_group_id = ?1 order by seq asc", nativeQuery = true)
     List<QuizGroupQuestionAssignment> findQuizGroupQuestionAssignmentsByQuizGroupId(UUID groupId);
 
     List<QuizGroupQuestionAssignment> findAllByQuizGroupIdIn(List<UUID> quizGroupIds);

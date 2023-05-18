@@ -12,6 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class EduClassUserLoginRoleId implements Serializable {
+
     private UUID classId;
     private String userLoginId;
     private String roleId;

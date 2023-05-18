@@ -36,42 +36,44 @@ public class ResourceController {
     public ResponseEntity<?> getAllResources(
         Pageable pageable,
         @PathVariable("domainId") EducationResourceDomain domainId
-        ){
-        return ResponseEntity.ok().body(educationResourceService.findByDomainId(domainId.getId(),pageable));
+    ) {
+        return ResponseEntity.ok().body(educationResourceService.findByDomainId(domainId.getId(), pageable));
     }
+
     @GetMapping("/domains/{domainId}")
-    public  ResponseEntity<?> getDomain(@PathVariable("domainId")EducationResourceDomain domainId){
+    public ResponseEntity<?> getDomain(@PathVariable("domainId") EducationResourceDomain domainId) {
         return ResponseEntity.ok().body(educationResourceDomainService.findById(domainId.getId()));
     }
 
     @GetMapping("/domains/{domainId}/resources/{resourceId}")
     public ResponseEntity<?> getResource(
         @PathVariable("domainId") EducationResourceDomain domainId,
-        @PathVariable("resourceId")UUID resourceId
-    ){
-        return ResponseEntity.ok().body(educationResourceService.findByIdAndDomainId(resourceId,domainId.getId()));
+        @PathVariable("resourceId") UUID resourceId
+    ) {
+        return ResponseEntity.ok().body(educationResourceService.findByIdAndDomainId(resourceId, domainId.getId()));
     }
 
     @GetMapping("/domains")
-    public ResponseEntity<?> getAllDomains(Pageable pageable){
+    public ResponseEntity<?> getAllDomains(Pageable pageable) {
         try {
-            Map<String,Object> response = new HashMap<>();
+            Map<String, Object> response = new HashMap<>();
             Page<EducationResourceDomain> pageDomain;
             pageDomain = educationResourceDomainService.findAll(pageable);
-            response.put("Domains",pageDomain.getContent());
-            response.put("currentPagge",pageDomain.getNumber());
-            response.put("totalItems",pageDomain.getTotalElements());
-            response.put("totalPages",pageDomain.getTotalPages());
+            response.put("Domains", pageDomain.getContent());
+            response.put("currentPagge", pageDomain.getNumber());
+            response.put("totalItems", pageDomain.getTotalElements());
+            response.put("totalPages", pageDomain.getTotalPages());
 
-            return new ResponseEntity<>(response,HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/domain")
     public ResponseEntity<?> createDomain(
-        @RequestBody EducationResourceDomain request){
+        @RequestBody EducationResourceDomain request
+    ) {
         EducationResourceDomain domain = new EducationResourceDomain(
             request.getName()
         );
@@ -86,9 +88,9 @@ public class ResourceController {
     public ResponseEntity<?> createResource(
         @RequestBody EducationResource request,
         @PathVariable("domainId") EducationResourceDomain domainId
-    ){
+    ) {
 
-        Boolean status = educationResourceService.createResource(domainId.getId(),request);
+        Boolean status = educationResourceService.createResource(domainId.getId(), request);
         if (!status) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error Message");
         }
@@ -99,10 +101,12 @@ public class ResourceController {
     public ResponseEntity<?> getResourceWithFilter(
         @RequestBody EducationResource request,
         @PathVariable("domainId") EducationResourceDomain domainId
-    ){
+    ) {
 
 
-        return ResponseEntity.status(HttpStatus.OK).body(educationResourceService.findResourceWithFilter(request,domainId.getId()));
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(educationResourceService.findResourceWithFilter(request, domainId.getId()));
     }
 
 
@@ -110,11 +114,11 @@ public class ResourceController {
     public ResponseEntity<?> updateDomain(
         @RequestBody EducationResourceDomain request,
         @PathVariable("id") EducationResourceDomain domainId
-    ){
+    ) {
         EducationResourceDomain domain = new EducationResourceDomain(
             request.getName()
         );
-        EducationResourceDomain res = educationResourceDomainService.updateDomain(domainId.getId(),domain);
+        EducationResourceDomain res = educationResourceDomainService.updateDomain(domainId.getId(), domain);
         return ResponseEntity.ok().body(res);
     }
 

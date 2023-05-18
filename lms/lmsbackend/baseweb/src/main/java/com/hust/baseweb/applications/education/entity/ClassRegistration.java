@@ -16,6 +16,7 @@ import java.util.Date;
 @Table(name = "edu_class_registration")
 @EntityListeners(AuditingEntityListener.class)
 public class ClassRegistration {
+
     public static final String ROLE_OWNER = "OWNER";
     public static final String ROLE_MANAGER = "MANAGER";
     public static final String ROLE_PARTICIPANT = "PARTICIPANT";

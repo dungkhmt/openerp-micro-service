@@ -5,7 +5,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class MiniLeetCodeException extends Exception{
+public class MiniLeetCodeException extends Exception {
+
     private int code;
 
     public MiniLeetCodeException(int code) {
@@ -17,7 +18,7 @@ public class MiniLeetCodeException extends Exception{
         this.code = code;
     }
 
-    public MiniLeetCodeException(String message){
+    public MiniLeetCodeException(String message) {
         super(message);
     }
 
@@ -31,7 +32,13 @@ public class MiniLeetCodeException extends Exception{
         this.code = code;
     }
 
-    public MiniLeetCodeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, int code) {
+    public MiniLeetCodeException(
+        String message,
+        Throwable cause,
+        boolean enableSuppression,
+        boolean writableStackTrace,
+        int code
+    ) {
         super(message, cause, enableSuppression, writableStackTrace);
         this.code = code;
     }

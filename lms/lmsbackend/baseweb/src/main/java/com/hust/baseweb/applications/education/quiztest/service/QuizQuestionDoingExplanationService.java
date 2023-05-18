@@ -9,11 +9,15 @@ import java.util.UUID;
 
 public interface QuizQuestionDoingExplanationService {
 
-    Collection<QuizQuestionDoingExplanation> findExplanationByParticipantIdAndQuestionId(String participantLoginId,
-                                                                                         UUID questionId);
+    Collection<QuizQuestionDoingExplanation> findExplanationByParticipantIdAndQuestionId(
+        String participantLoginId,
+        UUID questionId
+    );
 
-    QuizQuestionDoingExplanation createExplanation(QuizDoingExplanationInputModel solutionExplanation,
-                                                   MultipartFile attachment);
+    QuizQuestionDoingExplanation createExplanation(
+        QuizDoingExplanationInputModel solutionExplanation,
+        MultipartFile attachment
+    );
 
     QuizQuestionDoingExplanation updateExplanation(UUID explanationId, String newExplanation, MultipartFile attachment);
 

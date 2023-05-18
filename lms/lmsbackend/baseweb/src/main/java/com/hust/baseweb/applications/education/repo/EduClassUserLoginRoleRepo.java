@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface EduClassUserLoginRoleRepo extends JpaRepository<EduClassUserLoginRole, EduClassUserLoginRoleId> {
+
     EduClassUserLoginRole save(EduClassUserLoginRole eduClassUserLoginRole);
 
     List<EduClassUserLoginRole> findAllByUserLoginIdAndThruDate(String userLoginId, Date thruDate);

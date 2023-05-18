@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuizChoiceAnswerHideCorrectAnswer {
+
     private UUID choiceAnswerId;
     private String choiceAnswerCode;
     private String choiceAnswerContent;

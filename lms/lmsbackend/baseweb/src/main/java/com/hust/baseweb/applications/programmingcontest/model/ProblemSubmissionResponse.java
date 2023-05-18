@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProblemSubmissionResponse {
+
     private UUID problemSubmissionId;
     private String timeSubmitted;
     private String status;

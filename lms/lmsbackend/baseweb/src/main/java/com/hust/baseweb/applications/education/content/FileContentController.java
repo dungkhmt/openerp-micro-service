@@ -76,20 +76,26 @@ public class FileContentController {
 
                 //check if folder slides is existing
                 File slidesDir = new File(properties.getFilesystemRoot() + "/slides/");
-                if (!slidesDir.exists()){
+                if (!slidesDir.exists()) {
                     slidesDir.mkdirs();
                 }
 
                 //change pdf format to png
                 int numberOfPages = document.getNumberOfPages();
-                System.out.println("Total files to be converting -> "+ numberOfPages);
+                System.out.println("Total files to be converting -> " + numberOfPages);
 
                 String fileName = content.getFilename().replace(".pdf", "");
-                String fileExtension= "png";
+                String fileExtension = "png";
 
                 int dpi = 120;  //for render speed
                 for (int i = 0; i < numberOfPages; ++i) {
-                    File outPutFile = new File(properties.getFilesystemRoot() + "/slides/" + fileName +"_"+ (i+1) +"."+ fileExtension);
+                    File outPutFile = new File(properties.getFilesystemRoot() +
+                                               "/slides/" +
+                                               fileName +
+                                               "_" +
+                                               (i + 1) +
+                                               "." +
+                                               fileExtension);
                     BufferedImage bImage = pdfRenderer.renderImageWithDPI(i, dpi, ImageType.RGB);
                     ImageIO.write(bImage, fileExtension, outPutFile);
 
@@ -100,11 +106,10 @@ public class FileContentController {
                     files.add(IOUtils.toByteArray(input));
 
                     //delete image
-                    try  {
+                    try {
                         outPutFile.delete();
-                    }
-                    catch (Exception e){
-                     e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }

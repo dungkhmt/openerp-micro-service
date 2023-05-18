@@ -36,7 +36,7 @@ public class EduTestQuizParticipant {
     @Column(name = "status_id")
     private String statusId;
 
-    @Column(name="permutation")
+    @Column(name = "permutation")
     private String permutation;
 
 

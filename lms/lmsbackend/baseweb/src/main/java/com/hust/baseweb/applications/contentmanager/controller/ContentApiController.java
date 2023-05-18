@@ -1,4 +1,3 @@
-
 package com.hust.baseweb.applications.contentmanager.controller;
 
 import com.google.gson.Gson;
@@ -22,15 +21,18 @@ import java.io.InputStream;
 @RestController
 @Log
 public class ContentApiController {
+
     @Autowired
     private MongoContentService mongoContentService;
 
     @PostMapping("/content/create")
-    public ResponseEntity<?> create(@RequestParam("inputJson") String inputJson,
-                                         @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> create(
+        @RequestParam("inputJson") String inputJson,
+        @RequestParam("file") MultipartFile file
+    ) {
         Gson gson = new Gson();
         ContentHeaderModel modelHeader = gson.fromJson(inputJson, ContentHeaderModel.class);
-        ContentModel model = new ContentModel(modelHeader.getId(),file);
+        ContentModel model = new ContentModel(modelHeader.getId(), file);
 
         ObjectId id;
         try {
@@ -53,7 +55,7 @@ public class ContentApiController {
             GridFsResource content = mongoContentService.getById(id);
             if (content != null) {
                 InputStream inputStream = content.getInputStream();
-                HttpHeaders headers= new HttpHeaders();
+                HttpHeaders headers = new HttpHeaders();
 //                headers.setContentType(MediaType.parseMediaType( content.getContentType()));
                 headers.add("Content-Type", content.getContentType());
                 headers.add("Content-Disposition", "attachment");

@@ -7,6 +7,7 @@ import java.util.Map;
 public interface DoingPracticeQuizStatisticService {
 
     Date findLatestStatisticTime();
+
     Map<String, Long> statisticTotalQuizDoingTimes(Date statisticFrom);
 
     Map<String, LocalDateTime> statisticLatestTimeDoingQuiz(Date statisticFrom);

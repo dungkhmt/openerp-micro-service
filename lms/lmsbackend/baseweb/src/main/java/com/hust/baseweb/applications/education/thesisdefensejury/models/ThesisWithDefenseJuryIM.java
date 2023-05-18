@@ -12,5 +12,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ThesisWithDefenseJuryIM {
+
     private UUID thesisId;
 }

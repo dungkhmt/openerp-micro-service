@@ -16,6 +16,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 public class UserRegister {
+
     public static final String STATUS_DISABLED = "USER_DISABLED";
     public static final String STATUS_REGISTERED = "USER_REGISTERED";
     public static final String STATUS_APPROVED = "USER_APPROVED";

@@ -34,26 +34,28 @@ import java.util.Optional;
 @Validated
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class ThesisDefensePlanController {
+
     private final ThesisDefensePlanService thesisDefensePlanService;
     private final EduTeacherRepo eduTeacherRepo;
     private final TeacherKeywordRepo teacherKeywordRepo;
     private final TeacherThesisDefensePlanRepo teacherThesisDefensePlanRepo;
+
     @GetMapping("/thesis_defense_plan")
-    public ResponseEntity<?> getAll(Pageable pageable){
+    public ResponseEntity<?> getAll(Pageable pageable) {
         try {
             List<ThesisDefensePlan> tdp;
             tdp = thesisDefensePlanService.getAllThesisDefensePlan();
 
             return new ResponseEntity<>(tdp, HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/thesis_defense_plan/{defensePlanId}")
-    public ResponseEntity<?> getDetailThesis(@PathVariable("defensePlanId") String defensePlanId){
+    public ResponseEntity<?> getDetailThesis(@PathVariable("defensePlanId") String defensePlanId) {
         System.out.println(defensePlanId);
-        if (defensePlanId == ""){
+        if (defensePlanId == "") {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid defense plan id");
         }
 
@@ -64,36 +66,35 @@ public class ThesisDefensePlanController {
     @PostMapping("/thesis_defense_plan")
     public ResponseEntity<?> createThesisDefensePlan(
         @RequestBody ThesisDefensePlanIM request
-    ){
+    ) {
 
         // TODO: check valid request
         if (request == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request");
         }
-        if(request.getName() == ""){
+        if (request.getName() == "") {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request");
         }
 
         Response res = thesisDefensePlanService.createThesisDefensePlan(request);
 
 
-
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @GetMapping("/thesis_defense_plan/teachers")
-    public ResponseEntity<?> getAllTeacher(){
+    public ResponseEntity<?> getAllTeacher() {
         List<EduTeacher> res = eduTeacherRepo.findAll();
-        if (res.size() == 0){
+        if (res.size() == 0) {
             return ResponseEntity.ok().body("Not found any teacher");
         }
         List<TeacherWithKeyword> tws = new ArrayList<TeacherWithKeyword>();
-        for(int i=0;i<res.size();i++){
+        for (int i = 0; i < res.size(); i++) {
             TeacherWithKeyword tw = new TeacherWithKeyword();
             // get  list keyword for eachteacher
             List<TeacherKeyword> tk = teacherKeywordRepo.findAllByTeacherId(res.get(i).getId());
             List<String> keywords = new ArrayList<String>();
-            for (int j=0;j<tk.size();j++){
+            for (int j = 0; j < tk.size(); j++) {
                 keywords.add(tk.get(j).getKeyword());
             }
             // add to  tws
@@ -107,19 +108,19 @@ public class ThesisDefensePlanController {
     }
 
     @GetMapping("/thesis_defense_plan/{defensePlanId}/teachers")
-    public ResponseEntity<?> getAllTeacherBelongToPlan(@PathVariable("defensePlanId") String defensePlanId){
+    public ResponseEntity<?> getAllTeacherBelongToPlan(@PathVariable("defensePlanId") String defensePlanId) {
         List<TeacherThesisDefensePlan> res = teacherThesisDefensePlanRepo.findAllByDefensePlanID(defensePlanId);
-        if (res.size() == 0){
+        if (res.size() == 0) {
             return ResponseEntity.ok().body("Not found any thesis defense plan");
         }
         List<TeacherWithKeyword> tws = new ArrayList<TeacherWithKeyword>();
-        for(int i=0;i<res.size();i++){
+        for (int i = 0; i < res.size(); i++) {
             Optional<EduTeacher> teacher = eduTeacherRepo.findById(res.get(i).getTeacherId());
             TeacherWithKeyword tw = new TeacherWithKeyword();
             // get  list keyword for eachteacher
             List<TeacherKeyword> tk = teacherKeywordRepo.findAllByTeacherId(res.get(i).getTeacherId());
             List<String> keywords = new ArrayList<String>();
-            for (int j=0;j<tk.size();j++){
+            for (int j = 0; j < tk.size(); j++) {
                 keywords.add(tk.get(j).getKeyword());
             }
             // add to  tws
@@ -136,8 +137,8 @@ public class ThesisDefensePlanController {
     @PostMapping("/thesis_defense_plan/{defensePlanId}/addTeacher")
     public ResponseEntity<?> addTeachertoDefenseJury(
         @RequestBody AddTeacherToPlanIM request,
-        @PathVariable("defensePlanId")String planID
-    ){
+        @PathVariable("defensePlanId") String planID
+    ) {
         // TODO: check valid request
         if (request == null || planID == "") {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request");
@@ -157,8 +158,8 @@ public class ThesisDefensePlanController {
     @PostMapping("/thesis_defense_plan/{defensePlanId}/deleteTeacher")
     public ResponseEntity<?> deleteTeachertoDefenseJury(
         @RequestBody AddTeacherToPlanIM request,
-        @PathVariable("defensePlanId")String planID
-    ){
+        @PathVariable("defensePlanId") String planID
+    ) {
         // TODO: check valid request
         if (request.getTeacherId() == "" || planID == "") {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request");
@@ -178,14 +179,16 @@ public class ThesisDefensePlanController {
     @PostMapping("/thesis_defense_plan/{defensePlanId}/teacher/edit")
     public ResponseEntity<?> editTeachertoDefensePlan(
         @RequestBody TeacherWithKeyword request,
-        @PathVariable("defensePlanId")String planID
-    ){
+        @PathVariable("defensePlanId") String planID
+    ) {
         // TODO: check valid request
-        if (request == null || request.getTeacherId()=="" || request.getTeacherName()=="" || planID == "") {
+        if (request == null || request.getTeacherId() == "" || request.getTeacherName() == "" || planID == "") {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request");
         }
         // check teacher belong to plan
-        TeacherThesisDefensePlan ttp = teacherThesisDefensePlanRepo.findByDefensePlanIDAndTeacherId(planID, request.getTeacherId());
+        TeacherThesisDefensePlan ttp = teacherThesisDefensePlanRepo.findByDefensePlanIDAndTeacherId(
+            planID,
+            request.getTeacherId());
         if (ttp == null) {
             log.info("1");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request invalid");
@@ -204,9 +207,9 @@ public class ThesisDefensePlanController {
         // update keyword
         teacherKeywordRepo.deleteByTeacherID(request.getTeacherId());
 //        List<TeacherKeyword> tkDao = teacherKeywordRepo.findAllByTeacherId(request.getTeacherId());
-        for(int i=0;i<request.getKeywords().size();i++){
+        for (int i = 0; i < request.getKeywords().size(); i++) {
 
-            teacherKeywordRepo.insertByTeacherIdAndKeyword(request.getTeacherId(),request.getKeywords().get(i));
+            teacherKeywordRepo.insertByTeacherIdAndKeyword(request.getTeacherId(), request.getKeywords().get(i));
 
         }
 

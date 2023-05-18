@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateQuizTestQuestionInputModel {
+
     private String testId;
     private UUID questionId;
 

@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,42 +15,43 @@ import java.util.UUID;
 @Table(name = "contest_submission_testcase_new")
 
 public class ContestSubmissionTestCaseEntity {
+
     @Id
     @Column(name = "contest_submission_testcase_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID contestSubmissionTestcaseId;
 
-    @Column(name="contest_submission_id")
+    @Column(name = "contest_submission_id")
     private UUID contestSubmissionId;
 
-    @Column(name="contest_id")
+    @Column(name = "contest_id")
     private String contestId;
 
-    @Column(name="problem_id")
+    @Column(name = "problem_id")
     private String problemId;
 
-    @Column(name="submitted_by_user_login_id")
+    @Column(name = "submitted_by_user_login_id")
     private String submittedByUserLoginId;
 
-    @Column(name="test_case_id")
+    @Column(name = "test_case_id")
     private UUID testCaseId;
 
-    @Column(name="point")
+    @Column(name = "point")
     private int point;
 
-    @Column(name="status")
+    @Column(name = "status")
     private String status;
 
-    @Column(name ="participant_solution_output")
+    @Column(name = "participant_solution_output")
     private String participantSolutionOtput;
 
-    @Column(name="runtime")
+    @Column(name = "runtime")
     private Long runtime;
 
-    @Column(name="memory_usage")
+    @Column(name = "memory_usage")
     private int memoryUsage;
 
-    @Column(name="created_stamp")
+    @Column(name = "created_stamp")
     private Date createdStamp;
 
 }

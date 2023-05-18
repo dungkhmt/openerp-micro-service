@@ -18,7 +18,7 @@ public class QuizChoiceAnswer {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID choiceAnswerId;
 
-    @Column(name="choice_answer_code")
+    @Column(name = "choice_answer_code")
     private String choiceAnswerCode;
 
     @Column(name = "choice_answer_content")

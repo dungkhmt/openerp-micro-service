@@ -12,11 +12,12 @@ import java.util.UUID;
 @Entity
 @Table(name = "quiz_test_execution_submission")
 public class QuizTestExecutionSubmission {
+
     public static final String STATUS_IN_PROGRESS = "IN_PROGRESS";
     public static final String STATUS_SOLVED = "SOLVED";
 
     @Id
-    @Column(name="submission_id")
+    @Column(name = "submission_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID submissionId;
 
@@ -35,10 +36,10 @@ public class QuizTestExecutionSubmission {
     @Column(name = "status_id")
     private String statusId;
 
-    @Column(name="created_stamp")
+    @Column(name = "created_stamp")
     private Date createdStamp;
 
-    @Column(name="last_updated_stamp")
+    @Column(name = "last_updated_stamp")
     private Date lastUpdatedStamp;
 
 }

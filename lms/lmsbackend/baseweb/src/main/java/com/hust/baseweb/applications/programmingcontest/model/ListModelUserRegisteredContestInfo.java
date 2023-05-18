@@ -7,5 +7,6 @@ import org.springframework.data.domain.Page;
 @Data
 @Builder
 public class ListModelUserRegisteredContestInfo {
+
     Page<ModelUserRegisteredClassInfo> contents;
 }

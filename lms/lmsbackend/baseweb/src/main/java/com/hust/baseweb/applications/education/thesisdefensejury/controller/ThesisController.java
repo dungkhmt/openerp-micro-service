@@ -27,35 +27,40 @@ import java.util.UUID;
 @Validated
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class ThesisController {
+
     private final ThesisService thesisService;
     private final EduTeacherRepo eduTeacherRepo;
     private UserService userService;
+
     @GetMapping("/thesis")
-    public ResponseEntity<?> getThesis(Pageable pageable){
+    public ResponseEntity<?> getThesis(Pageable pageable) {
         Page<ThesisOM> res = thesisService.findAll(pageable);
-        if (res == null){
+        if (res == null) {
             return ResponseEntity.ok().body("Not found thesis");
         }
         return ResponseEntity.ok().body(res);
     }
+
     @GetMapping("/thesis/{thesisId}")
-    public ResponseEntity<?> getDetailThesis(@PathVariable("thesisId") UUID thesisId){
+    public ResponseEntity<?> getDetailThesis(@PathVariable("thesisId") UUID thesisId) {
         System.out.println(thesisId);
-        if (thesisId == null){
+        if (thesisId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid thesis id");
         }
         return ResponseEntity.ok().body(thesisService.findById(thesisId));
     }
+
     @GetMapping("/teachers")
-    public ResponseEntity<?> getTeachers(Pageable pageable){
+    public ResponseEntity<?> getTeachers(Pageable pageable) {
         List<EduTeacher> res = eduTeacherRepo.findAll();
-        if (res == null){
+        if (res == null) {
             return ResponseEntity.ok().body("Not found any teacher");
         }
         return ResponseEntity.ok().body(res);
     }
+
     @PostMapping("/thesis/search")
-    public ResponseEntity<?> searchByName(@RequestBody SearchThesisIM input){
+    public ResponseEntity<?> searchByName(@RequestBody SearchThesisIM input) {
         // check input
 //        if (input == null){
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request");
@@ -72,7 +77,7 @@ public class ThesisController {
     public ResponseEntity<?> createThesis(
         Principal principal,
         @RequestBody ThesisIM request
-    ){
+    ) {
 
 
         // TODO: check valid request
@@ -80,10 +85,10 @@ public class ThesisController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request");
         }
 
-        if (request.getUserLoginID() == ""){
+        if (request.getUserLoginID() == "") {
             log.info("Session Login , sessionName = " + principal.getName());
             UserLogin u = userService.findById(principal.getName());
-            if (u == null){
+            if (u == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid session login");
             }
             request.setUserLoginID(u.getUserLoginId());
@@ -98,31 +103,32 @@ public class ThesisController {
 
         return ResponseEntity.status(HttpStatus.OK).body(thesis);
     }
+
     @PostMapping("/thesis/delete")
     public ResponseEntity<?> deleteThesis(
         Principal principal,
         @RequestBody DeleteThesisIM request
-    ){
+    ) {
         Response res = new Response();
         // TODO: check valid request
         if (request == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request");
         }
-        if (request.getUserLogin() == ""){
+        if (request.getUserLogin() == "") {
             log.info("Session Login , sessionName = " + principal.getName());
             UserLogin u = userService.findById(principal.getName());
-            if (u == null){
+            if (u == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid session login");
             }
             request.setUserLogin(u.getUserLoginId());
         }
-        if (request.getId()==null||request.getUserLogin()==""){
+        if (request.getId() == null || request.getUserLogin() == "") {
             res.setOk(false);
             res.setErr("Thesis id or userLogin Id invalid");
-            return  ResponseEntity.status(HttpStatus.OK).body(res);
+            return ResponseEntity.status(HttpStatus.OK).body(res);
         }
 
-        Response ok = thesisService.deleteThesis(request.getId(),request.getUserLogin());
+        Response ok = thesisService.deleteThesis(request.getId(), request.getUserLogin());
 
         return ResponseEntity.status(HttpStatus.OK).body(ok);
     }
@@ -130,7 +136,7 @@ public class ThesisController {
     @PutMapping("/thesis/edit")
     public ResponseEntity<?> editThesis(
         @RequestBody ThesisIM request
-    ){
+    ) {
 
         // TODO: check valid request
         if (request == null) {
@@ -143,11 +149,11 @@ public class ThesisController {
 
     @GetMapping("/{planId}/thesisBelongPlan")
     public ResponseEntity<?> getAllDefensseJurysBelongPlan(
-        @PathVariable("planId")String planId
-    ){
+        @PathVariable("planId") String planId
+    ) {
         // check input
         System.out.println(planId);
-        if(planId == ""){
+        if (planId == "") {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid plan id");
         }
         // TODO handler
@@ -157,9 +163,9 @@ public class ThesisController {
     }
 
     @GetMapping("/thesis/userlogins")
-    public ResponseEntity<?> getAllUserLogin(Pageable pageable){
+    public ResponseEntity<?> getAllUserLogin(Pageable pageable) {
         List<UserLogin> res = userService.getAllUserLogins();
-        if (res.size() <= 0){
+        if (res.size() <= 0) {
             return ResponseEntity.ok().body("Not found user login");
         }
         return ResponseEntity.ok().body(res);
@@ -168,7 +174,7 @@ public class ThesisController {
     @PostMapping("/thesis/_search")
     public ResponseEntity<?> filterThesis(
         @RequestBody ThesisFilter request
-    ){
+    ) {
         Response res = new Response();
         // TODO: check valid request
         if (request == null) {

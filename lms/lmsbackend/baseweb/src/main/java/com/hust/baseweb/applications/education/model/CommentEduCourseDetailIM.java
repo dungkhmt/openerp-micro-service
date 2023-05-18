@@ -1,4 +1,5 @@
 package com.hust.baseweb.applications.education.model;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentEduCourseDetailIM {
+
     private String comment;
     private UUID eduCourseMaterialId;
 }

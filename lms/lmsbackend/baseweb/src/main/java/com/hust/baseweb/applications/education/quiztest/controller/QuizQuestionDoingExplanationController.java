@@ -24,8 +24,10 @@ public class QuizQuestionDoingExplanationController {
     private final QuizQuestionDoingExplanationService quizDoingExplanationService;
 
     @GetMapping("/{questionId}")
-    public ResponseEntity<?> getParticipantExplanationForQuestion(Principal principal,
-                                                                  @PathVariable UUID questionId) {
+    public ResponseEntity<?> getParticipantExplanationForQuestion(
+        Principal principal,
+        @PathVariable UUID questionId
+    ) {
         return ResponseEntity.ok(
             quizDoingExplanationService.findExplanationByParticipantIdAndQuestionId(principal.getName(), questionId)
         );
@@ -49,9 +51,11 @@ public class QuizQuestionDoingExplanationController {
     }
 
     @PutMapping(value = "/{explanationId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateQuizDoingExplanation(@PathVariable UUID explanationId,
-                                                        @RequestPart(required = false) String solutionExplanation,
-                                                        @RequestPart(required = false) MultipartFile attachment) {
+    public ResponseEntity<?> updateQuizDoingExplanation(
+        @PathVariable UUID explanationId,
+        @RequestPart(required = false) String solutionExplanation,
+        @RequestPart(required = false) MultipartFile attachment
+    ) {
         log.info("Update quiz doing explanation with new explanation = {}", solutionExplanation);
         try {
             return ResponseEntity.ok(
@@ -62,7 +66,7 @@ public class QuizQuestionDoingExplanationController {
             return ResponseEntity.notFound().build();
         } catch (RuntimeException e) {
             log.error("An error occur when update quiz doing explanation with id = {}. Detail: {}",
-                      explanationId,  e.getMessage());
+                      explanationId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -78,7 +82,7 @@ public class QuizQuestionDoingExplanationController {
             return ResponseEntity.notFound().build();
         } catch (RuntimeException e) {
             log.error("An error occur when delete quiz doing explanation with id = {}. Detail: {}",
-                      explanationId,  e.getMessage());
+                      explanationId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

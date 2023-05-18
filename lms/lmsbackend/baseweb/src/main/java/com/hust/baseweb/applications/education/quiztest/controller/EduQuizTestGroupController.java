@@ -44,7 +44,7 @@ public class EduQuizTestGroupController {
     @PostMapping("/generate-quiz-test-group")
     public ResponseEntity<?> generateQuizTestGroup(
         Principal principal, @RequestBody
-        GenerateQuizTestGroupInputModel input
+    GenerateQuizTestGroupInputModel input
     ) {
 
         List<EduTestQuizGroup> eduTestQuizGroups = eduQuizTestGroupService.generateQuizTestGroups(input);
@@ -57,7 +57,7 @@ public class EduQuizTestGroupController {
         List<QuizTestGroupParticipantAssignmentOutputModel> quizTestGroupParticipantAssignmentOutputModels
             = eduTestQuizGroupParticipationAssignmentService.getQuizTestGroupParticipant(testID);
         List<ParticipantAndQuestionsModel> retList = new ArrayList();
-        for(QuizTestGroupParticipantAssignmentOutputModel p : quizTestGroupParticipantAssignmentOutputModels){
+        for (QuizTestGroupParticipantAssignmentOutputModel p : quizTestGroupParticipantAssignmentOutputModels) {
             String userId = p.getParticipantUserLoginId();
             QuizGroupTestDetailModel questions = eduQuizTestGroupService.getTestGroupQuestionDetail(userId, testID);
             ParticipantAndQuestionsModel participantAndQuestionsModel = new ParticipantAndQuestionsModel();
@@ -69,6 +69,7 @@ public class EduQuizTestGroupController {
         }
         return ResponseEntity.ok().body(retList);
     }
+
     @GetMapping("/get-all-quiz-test-group-with-questions-detail/{testID}")
     public ResponseEntity<?> getAllTestGroupWithQuestionsDetail(Principal principal, @PathVariable String testID) {
         List<QuizGroupTestDetailModel> res = eduQuizTestGroupService.getQuizTestGroupWithQuestionsDetail(testID);
@@ -76,7 +77,11 @@ public class EduQuizTestGroupController {
     }
 
     @GetMapping("/get-quiz-questions-assigned-to-participant/{testID}/{participantId}")
-    public ResponseEntity<?> getQuizQuestionsAssignedToParticipant(Principal principal, @PathVariable String testID, @PathVariable String participantId) {
+    public ResponseEntity<?> getQuizQuestionsAssignedToParticipant(
+        Principal principal,
+        @PathVariable String testID,
+        @PathVariable String participantId
+    ) {
         EduQuizTest eduQuizTest = quizTestService.getQuizTestById(testID);
         log.info("getQuizQuestionsAssignedToParticipant, testId = " + testID + " participantId = " + participantId);
 
@@ -94,7 +99,7 @@ public class EduQuizTestGroupController {
         EduTestQuizParticipant testParticipant = eduTestQuizParticipationRepo
             .findEduTestQuizParticipantByParticipantUserLoginIdAndAndTestId(
                 participantId,
-            testID);
+                testID);
 
         if (testParticipant == null ||
             (!testParticipant.getStatusId().equals(EduTestQuizParticipant.STATUS_APPROVED))) {
@@ -126,19 +131,24 @@ public class EduQuizTestGroupController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
         QuizGroupTestDetailModel res = null;
-        if(eduQuizTest.getParticipantQuizGroupAssignmentMode() != null &&
-           eduQuizTest.getParticipantQuizGroupAssignmentMode().equals(EduQuizTest.PARTICIPANT_QUIZ_GROUP_ASSIGNMENT_MODE_ASSIGN_GROUP_BEFORE_HANDOUT)) {
+        if (eduQuizTest.getParticipantQuizGroupAssignmentMode() != null &&
+            eduQuizTest
+                .getParticipantQuizGroupAssignmentMode()
+                .equals(EduQuizTest.PARTICIPANT_QUIZ_GROUP_ASSIGNMENT_MODE_ASSIGN_GROUP_BEFORE_HANDOUT)) {
             res = eduQuizTestGroupService.getTestGroupQuestionDetail(principal, testID);
-        }else{
-            res = eduQuizTestGroupService.getTestGroupQuestionDetailNotUsePermutationConfig(principal.getName(),testID);
+        } else {
+            res = eduQuizTestGroupService.getTestGroupQuestionDetailNotUsePermutationConfig(principal.getName(),
+                                                                                            testID);
         }
 
-        if(eduQuizTest.getQuestionStatementViewTypeId() != null &&
-           eduQuizTest.getQuestionStatementViewTypeId().equals(EduQuizTest.QUESTION_STATEMENT_VIEW_TYPE_HIDDEN)) {
+        if (eduQuizTest.getQuestionStatementViewTypeId() != null &&
+            eduQuizTest.getQuestionStatementViewTypeId().equals(EduQuizTest.QUESTION_STATEMENT_VIEW_TYPE_HIDDEN)) {
             //ìf(res != null && res.getListQuestion() != null){
-            if(res != null) if(res.getListQuestion() != null){
-                for (QuizQuestionDetailModel q : res.getListQuestion()) {
-                    q.setStatement("");
+            if (res != null) {
+                if (res.getListQuestion() != null) {
+                    for (QuizQuestionDetailModel q : res.getListQuestion()) {
+                        q.setStatement("");
+                    }
                 }
             }
         }
@@ -146,6 +156,7 @@ public class EduQuizTestGroupController {
         res.setJudgeMode(eduQuizTest.getJudgeMode());
         return ResponseEntity.ok().body(res);
     }
+
     @GetMapping("/get-quiz-test-participation-group-question-reload-heavy/{testID}")
     public ResponseEntity<?> getTestGroupQuestionByUserReloadHeavy(Principal principal, @PathVariable String testID) {
         EduQuizTest eduQuizTest = quizTestService.getQuizTestById(testID);
@@ -168,19 +179,24 @@ public class EduQuizTestGroupController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
         QuizGroupTestDetailModel res = null;
-        if(eduQuizTest.getParticipantQuizGroupAssignmentMode() != null &&
-           eduQuizTest.getParticipantQuizGroupAssignmentMode().equals(EduQuizTest.PARTICIPANT_QUIZ_GROUP_ASSIGNMENT_MODE_ASSIGN_GROUP_BEFORE_HANDOUT)) {
+        if (eduQuizTest.getParticipantQuizGroupAssignmentMode() != null &&
+            eduQuizTest
+                .getParticipantQuizGroupAssignmentMode()
+                .equals(EduQuizTest.PARTICIPANT_QUIZ_GROUP_ASSIGNMENT_MODE_ASSIGN_GROUP_BEFORE_HANDOUT)) {
             res = eduQuizTestGroupService.getTestGroupQuestionDetailHeavyReload(principal, testID);
-        }else{
-            res = eduQuizTestGroupService.getTestGroupQuestionDetailNotUsePermutationConfigHeavyReload(principal.getName(),testID);
+        } else {
+            res = eduQuizTestGroupService.getTestGroupQuestionDetailNotUsePermutationConfigHeavyReload(principal.getName(),
+                                                                                                       testID);
         }
 
-        if(eduQuizTest.getQuestionStatementViewTypeId() != null &&
-           eduQuizTest.getQuestionStatementViewTypeId().equals(EduQuizTest.QUESTION_STATEMENT_VIEW_TYPE_HIDDEN)) {
+        if (eduQuizTest.getQuestionStatementViewTypeId() != null &&
+            eduQuizTest.getQuestionStatementViewTypeId().equals(EduQuizTest.QUESTION_STATEMENT_VIEW_TYPE_HIDDEN)) {
             //ìf(res != null && res.getListQuestion() != null){
-            if(res != null) if(res.getListQuestion() != null){
-                for (QuizQuestionDetailModel q : res.getListQuestion()) {
-                    q.setStatement("");
+            if (res != null) {
+                if (res.getListQuestion() != null) {
+                    for (QuizQuestionDetailModel q : res.getListQuestion()) {
+                        q.setStatement("");
+                    }
                 }
             }
         }
@@ -188,17 +204,21 @@ public class EduQuizTestGroupController {
     }
 
     @GetMapping("/confirm-update-group-code-quiz-test/{testID}/{groupCode}")
-    public ResponseEntity<?> confirmAndUpdateGroupCodeInQuizTest(Principal principal,
-                                                     @PathVariable String testID, @PathVariable String groupCode) {
+    public ResponseEntity<?> confirmAndUpdateGroupCodeInQuizTest(
+        Principal principal,
+        @PathVariable String testID, @PathVariable String groupCode
+    ) {
         boolean ok = quizTestService.confirmUpdateGroupInQuizTest(principal.getName(), groupCode, testID);
 
         return ResponseEntity.ok().body(ok);
 
     }
 
-        @GetMapping("/check-questions-of-group/{testID}/{groupCode}")
-    public ResponseEntity<?> getCheckQuestionOfGroup(Principal principal,
-                                                        @PathVariable String testID, @PathVariable String groupCode) {
+    @GetMapping("/check-questions-of-group/{testID}/{groupCode}")
+    public ResponseEntity<?> getCheckQuestionOfGroup(
+        Principal principal,
+        @PathVariable String testID, @PathVariable String groupCode
+    ) {
         EduQuizTest eduQuizTest = quizTestService.getQuizTestById(testID);
         Date startDateTime = eduQuizTest.getScheduleDatetime();
         Date currentDate = new Date();
@@ -208,7 +228,11 @@ public class EduQuizTestGroupController {
                  " scheduleDate = " + startDateTime.toString() + " timeTest = " + timeTest);
 
         if (timeTest > eduQuizTest.getDuration() || timeTest < 0) {// out-of-allowed date-time
-            log.info("getCheckQuestionOfGroup, timeTest = " + timeTest + " > duration = " + eduQuizTest.getDuration() + " return");
+            log.info("getCheckQuestionOfGroup, timeTest = " +
+                     timeTest +
+                     " > duration = " +
+                     eduQuizTest.getDuration() +
+                     " return");
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
         }
 
@@ -227,8 +251,8 @@ public class EduQuizTestGroupController {
             principal.getName(), groupCode, testID);
 
         log.info("getCheckQuestionOfGroup, GOT " + res.getListQuestion().size());
-        if(eduQuizTest.getQuestionStatementViewTypeId() != null &&
-           eduQuizTest.getQuestionStatementViewTypeId().equals(EduQuizTest.QUESTION_STATEMENT_VIEW_TYPE_HIDDEN)) {
+        if (eduQuizTest.getQuestionStatementViewTypeId() != null &&
+            eduQuizTest.getQuestionStatementViewTypeId().equals(EduQuizTest.QUESTION_STATEMENT_VIEW_TYPE_HIDDEN)) {
             for (QuizQuestionDetailModel q : res.getListQuestion()) {
                 q.setStatement("");
             }
@@ -245,9 +269,9 @@ public class EduQuizTestGroupController {
     }
 
     @GetMapping("/get-my-quiz-test-group/{testId}")
-    public ResponseEntity<?> getMyQuizTestGroup(Principal principal, @PathVariable String testId){
+    public ResponseEntity<?> getMyQuizTestGroup(Principal principal, @PathVariable String testId) {
         ModelResponseGetQuizTestGroup res = eduTestQuizGroupParticipationAssignmentService
-            .getQuizTestGroupOfUser(principal.getName(),testId);
+            .getQuizTestGroupOfUser(principal.getName(), testId);
         return ResponseEntity.ok().body(res);
     }
 

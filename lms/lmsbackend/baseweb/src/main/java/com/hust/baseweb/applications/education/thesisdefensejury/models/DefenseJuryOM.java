@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DefenseJuryOM {
+
     private String name;
     private String program_name;
     private String userLoginID;

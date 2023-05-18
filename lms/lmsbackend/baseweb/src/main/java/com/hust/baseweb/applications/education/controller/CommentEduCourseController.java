@@ -16,15 +16,17 @@ import java.util.UUID;
 
 @RestController
 @CrossOrigin
-@AllArgsConstructor( onConstructor = @__(@Autowired))
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class CommentEduCourseController {
+
     public CommentsEduCourseMaterialService commentsEduCourseMaterialService;
     public UserService userService;
+
     @PostMapping("/edu/class/comment")
     public ResponseEntity<?> createComment(
         Principal principal,
         @RequestBody CommentsEduCourseMaterial input
-    ){
+    ) {
         UserLogin u = userService.findById(principal.getName());
         CommentsEduCourseMaterial commentsEduCourseMaterial = commentsEduCourseMaterialService.createComment(
             input.getEduCourseMaterialId(),
@@ -39,8 +41,9 @@ public class CommentEduCourseController {
     public ResponseEntity<?> getListCommentsOnEduCourse(
         Principal principal,
         @PathVariable UUID eduCourseMaterialId
-    ){
-        List<CommentEduCourseDetailOM> lst = commentsEduCourseMaterialService.findByEduCourseMaterialId(eduCourseMaterialId);
+    ) {
+        List<CommentEduCourseDetailOM> lst = commentsEduCourseMaterialService.findByEduCourseMaterialId(
+            eduCourseMaterialId);
         return ResponseEntity.ok().body(lst);
     }
 
@@ -48,8 +51,9 @@ public class CommentEduCourseController {
     public ResponseEntity<?> getListMainCommentsOnEduCourse(
         Principal principal,
         @PathVariable UUID eduCourseMaterialId
-    ){
-        List<CommentEduCourseDetailOM> lst = commentsEduCourseMaterialService.findByEduCourseMaterialIdWithoutReplyComment(eduCourseMaterialId);
+    ) {
+        List<CommentEduCourseDetailOM> lst = commentsEduCourseMaterialService.findByEduCourseMaterialIdWithoutReplyComment(
+            eduCourseMaterialId);
         return ResponseEntity.ok().body(lst);
     }
 
@@ -57,7 +61,7 @@ public class CommentEduCourseController {
     public ResponseEntity<?> getListReplyCommentByCommentId(
         Principal principal,
         @PathVariable UUID commentId
-    ){
+    ) {
         List<CommentEduCourseDetailOM> lst = commentsEduCourseMaterialService.findByReplyCommentId(commentId);
         return ResponseEntity.ok().body(lst);
     }
@@ -67,7 +71,7 @@ public class CommentEduCourseController {
         Principal principal,
         @RequestBody CommentsEduCourseMaterial input,
         @PathVariable UUID commentId
-    ){
+    ) {
         CommentsEduCourseMaterial commentsEduCourseMaterial = commentsEduCourseMaterialService.editCommentEduCourse(
             commentId,
             input.getCommentMessage(),
@@ -80,7 +84,7 @@ public class CommentEduCourseController {
     public ResponseEntity<?> deleteCommentOnEduCourse(
         Principal principal,
         @PathVariable UUID commentId
-    ){
+    ) {
         commentsEduCourseMaterialService.deleteCommentEduCourse(commentId);
         return ResponseEntity.ok().body(commentId);
     }

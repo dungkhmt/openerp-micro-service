@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class ModelCreateContest {
+
     private String contestId;
     private String contestName;
     private long contestTime;

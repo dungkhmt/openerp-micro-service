@@ -12,13 +12,14 @@ import java.util.List;
 
 @Slf4j
 public class StringHandler {
-    public static ProblemSubmission handleContestResponseSubmitSolutionOutputOneTestCase(String response, int point){
+
+    public static ProblemSubmission handleContestResponseSubmitSolutionOutputOneTestCase(String response, int point) {
         log.info("handleContestResponseSubmitSolutionOutputOneTestCase, response = " + response);
-        response = response.substring(0, response.length()-1);
+        response = response.substring(0, response.length() - 1);
         int lastIndex = response.lastIndexOf("\n");
         String status = response.substring(lastIndex);
         log.info("status {}", status);
-        if(status.contains("Compile Error")){
+        if (status.contains("Compile Error")) {
             return ProblemSubmission.builder()
                                     .score(0)
                                     .runtime(0L)
@@ -28,26 +29,28 @@ public class StringHandler {
         }
         response = response.substring(0, lastIndex);
         int runTimeIndex = response.lastIndexOf("\n");
-        String runtimeString = response.substring(runTimeIndex+1);
+        String runtimeString = response.substring(runTimeIndex + 1);
         Long runtime = Long.parseLong(runtimeString);
         response = response.substring(0, runTimeIndex);
-        String []ans = response.split(Constants.SPLIT_TEST_CASE); // ans[0] is the score returned by the checker
+        String[] ans = response.split(Constants.SPLIT_TEST_CASE); // ans[0] is the score returned by the checker
         int score = 0;
 
-        try{
-            if(ans != null && ans.length > 0){
+        try {
+            if (ans != null && ans.length > 0) {
                 //score = Integer.valueOf(ans[0]);
                 String[] s = ans[0].split(" ");
-                if(s.length > 0){
+                if (s.length > 0) {
                     score = Integer.valueOf(s[0]);
                     status = "OK ";
-                    for(int i = 1; i < s.length; i++) status = status + s[i] + " ";
-                }else{
+                    for (int i = 1; i < s.length; i++) {
+                        status = status + s[i] + " ";
+                    }
+                } else {
                     score = Integer.valueOf(s[0]);
                     status = "OK";
                 }
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return ProblemSubmission.builder()
@@ -59,10 +62,14 @@ public class StringHandler {
                                 .build();
     }
 
-    public static ProblemSubmission handleContestResponse(String response, List<String> testCaseAns, List<Integer> points){
+    public static ProblemSubmission handleContestResponse(
+        String response,
+        List<String> testCaseAns,
+        List<Integer> points
+    ) {
         // log.info("handleContestResponse, response {}", response);
         String orignalMessage = response;
-        response = response.substring(0, response.length()-1);
+        response = response.substring(0, response.length() - 1);
         int lastIndex = response.lastIndexOf("\n");
         String status;
         if (lastIndex < 0) {
@@ -75,33 +82,35 @@ public class StringHandler {
         }
         response = response.substring(0, lastIndex);
         int runTimeIndex = response.lastIndexOf("\n");
-        String runtimeString = response.substring(runTimeIndex+1);
+        String runtimeString = response.substring(runTimeIndex + 1);
         Long runtime = Long.parseLong(runtimeString);
         response = response.substring(0, runTimeIndex);
-        String []ans = response.split(Constants.SPLIT_TEST_CASE);
+        String[] ans = response.split(Constants.SPLIT_TEST_CASE);
         List<String> participantAns = new ArrayList();
-        if(ans != null)
-        for(int i = 0; i < ans.length; i++)
-            participantAns.add(ans[i]);
+        if (ans != null) {
+            for (int i = 0; i < ans.length; i++) {
+                participantAns.add(ans[i]);
+            }
+        }
         status = null;
         int cnt = 0;
         int score = 0;
-        for(int i = 0; i < testCaseAns.size(); i++){
+        for (int i = 0; i < testCaseAns.size(); i++) {
             String a = replaceSpace(testCaseAns.get(i));
             String b = replaceSpace(ans[i]);
-            if(!a.equals(b)){
-                if(status == null && ans[i].contains(ContestSubmissionEntity.SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED)){
+            if (!a.equals(b)) {
+                if (status == null && ans[i].contains(ContestSubmissionEntity.SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED)) {
                     status = ContestSubmissionEntity.SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED;
-                }else if(!ans[i].contains(ContestSubmissionEntity.SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED)){
+                } else if (!ans[i].contains(ContestSubmissionEntity.SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED)) {
                     status = ContestSubmissionEntity.SUBMISSION_STATUS_WRONG;
                 }
-            }else{
+            } else {
                 score += points.get(i);
                 cnt++;
             }
         }
 
-        if(status == null){
+        if (status == null) {
             status = ContestSubmissionEntity.SUBMISSION_STATUS_ACCEPTED;
         }
         return ProblemSubmission.builder()
@@ -116,9 +125,16 @@ public class StringHandler {
                                 .build();
     }
 
-    public static ProblemSubmission handleContestResponseV2(String response, List<String> testCaseAns, List<Integer> points, String problemEvaluationType) {
+    public static ProblemSubmission handleContestResponseV2(
+        String response,
+        List<String> testCaseAns,
+        List<Integer> points,
+        String problemEvaluationType
+    ) {
         // log.info("handleContestResponse, response {}", response);
-        if (response.length() == 0) throw new IllegalArgumentException("Docker Judging client error");
+        if (response.length() == 0) {
+            throw new IllegalArgumentException("Docker Judging client error");
+        }
 
         String originalMessage = response;
 
@@ -148,27 +164,23 @@ public class StringHandler {
             if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.TIME_LIMIT.getValue())) {
                 status = ContestSubmissionEntity.SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED;
                 ansArray[i] = ContestSubmissionEntity.SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED;
-            }
-            else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.FILE_LIMIT.getValue())) {
+            } else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.FILE_LIMIT.getValue())) {
                 status = ContestSubmissionEntity.SUBMISSION_STATUS_OUTPUT_LIMIT_EXCEEDED;
                 ansArray[i] = ContestSubmissionEntity.SUBMISSION_STATUS_OUTPUT_LIMIT_EXCEEDED;
-            }
-            else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.MEMORY_LIMIT.getValue())) {
+            } else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.MEMORY_LIMIT.getValue())) {
                 status = ContestSubmissionEntity.SUBMISSION_STATUS_MEMORY_ALLOCATION_ERROR;
                 ansArray[i] = ContestSubmissionEntity.SUBMISSION_STATUS_MEMORY_ALLOCATION_ERROR;
-            }
-            else {
+            } else {
                 String correctTestcaseAns = replaceSpaceV2(testCaseAns.get(i));
 
-                if (problemEvaluationType.equals(Constants.ProblemResultEvaluationType.NORMAL.getValue())){
-                    if (!correctTestcaseAns.equals(participantTestcaseAns))
+                if (problemEvaluationType.equals(Constants.ProblemResultEvaluationType.NORMAL.getValue())) {
+                    if (!correctTestcaseAns.equals(participantTestcaseAns)) {
                         status = ContestSubmissionEntity.SUBMISSION_STATUS_WRONG;
-                    else {
+                    } else {
                         score += points.get(i);
                         cnt++;
                     }
-                }
-                else if (problemEvaluationType.equals(Constants.ProblemResultEvaluationType.CUSTOM.getValue())){
+                } else if (problemEvaluationType.equals(Constants.ProblemResultEvaluationType.CUSTOM.getValue())) {
                     status = ContestSubmissionEntity.SUBMISSION_STATUS_WAIT_FOR_CUSTOM_EVALUATION;
                 }
 
@@ -234,20 +246,18 @@ public class StringHandler {
         if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.TIME_LIMIT.getValue())) {
             status = ContestSubmissionEntity.SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED;
             participantAns = status;
-        }
-        else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.FILE_LIMIT.getValue())) {
+        } else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.FILE_LIMIT.getValue())) {
             status = ContestSubmissionEntity.SUBMISSION_STATUS_OUTPUT_LIMIT_EXCEEDED;
             participantAns = status;
-        }
-        else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.MEMORY_LIMIT.getValue())) {
+        } else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.MEMORY_LIMIT.getValue())) {
             status = ContestSubmissionEntity.SUBMISSION_STATUS_MEMORY_ALLOCATION_ERROR;
             participantAns = status;
-        }
-        else {
+        } else {
             String correctTestcaseAns = replaceSpaceV2(testCaseAns);
 //            String correctTestcaseAns = testCaseAns;
-            if(problemEvaluationType == null || problemEvaluationType.equals(""))
+            if (problemEvaluationType == null || problemEvaluationType.equals("")) {
                 problemEvaluationType = Constants.ProblemResultEvaluationType.NORMAL.getValue();
+            }
 
             if (problemEvaluationType.equals(Constants.ProblemResultEvaluationType.NORMAL.getValue())) {
                 if (!correctTestcaseAns.equals(participantTestcaseAns)) {
@@ -283,8 +293,8 @@ public class StringHandler {
                                 .build();
     }
 
-    private static String replaceSpace(String s){
-        if(s == null){
+    private static String replaceSpace(String s) {
+        if (s == null) {
             return null;
         }
 
@@ -294,7 +304,9 @@ public class StringHandler {
     }
 
     private static String replaceSpaceV2(String s) {
-        if (s == null) return null;
+        if (s == null) {
+            return null;
+        }
 
         return StringUtils.replace(s, "\n", " ").trim();
 
@@ -306,13 +318,17 @@ public class StringHandler {
 
     }
 
-    public static String shorthen(String s, int len){
-        if(s == null || s.equals("")) return s;
-        if(len >= s.length()) return s;
-        return s.substring(0,len) + "...";
+    public static String shorthen(String s, int len) {
+        if (s == null || s.equals("")) {
+            return s;
+        }
+        if (len >= s.length()) {
+            return s;
+        }
+        return s.substring(0, len) + "...";
     }
 
-    public static String removeNullCharacter(String s){
+    public static String removeNullCharacter(String s) {
         return s.replaceAll("\u0000", "");
     }
 }

@@ -9,6 +9,7 @@ import lombok.*;
 @Data
 @Builder
 public class ModelProblemGeneralInfo {
+
     private String problemId;
     private String problemName;
     private String levelId;
