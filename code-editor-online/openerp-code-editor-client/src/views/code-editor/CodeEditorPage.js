@@ -52,6 +52,7 @@ const CodeEditorPage = () => {
       socketRef.current = io(
         process.env.REACT_APP_CODE_EDITOR_ONLINE_SERVER_DOMAIN || "http://localhost:7008"
       );
+      // get audio instance of system 
       navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then((stream) => {
         // Create a peer connection
         myPeer.current = new Peer();
@@ -59,6 +60,7 @@ const CodeEditorPage = () => {
         // Get id of peer connection and send to server and broadcast to others user
         myPeer.current.on("open", (id) => {
           if (socketRef.current) {
+            // Send peerId to other users in ther room
             socketRef.current.emit(SOCKET_EVENTS.CONNECT_TO_EDITOR, {
               roomId: roomId,
               fullName: token.name,
@@ -67,6 +69,7 @@ const CodeEditorPage = () => {
           }
         });
         if (socketRef.current) {
+          // if a new user joined then update participants
           socketRef.current.on(SOCKET_EVENTS.JOINED, ({ fullName, socketId, peerId, clients }) => {
             if (socketRef.current.id !== socketId) {
               successNoti(`${fullName} đã tham gia vào phòng`, true);
@@ -87,7 +90,7 @@ const CodeEditorPage = () => {
               remoteAudioRef.current.srcObject = userVideoStream;
             });
           });
-
+          // if a user leave the room, notify other users and update participant list
           socketRef.current.on(SOCKET_EVENTS.LEAVE_ROOM, ({ fullName, socketId, clients }) => {
             errorNoti(`${fullName} đã rời phòng`, true);
             dispatch(setParticipants(clients.filter((client) => client.socketId !== socketId)));
@@ -103,6 +106,7 @@ const CodeEditorPage = () => {
     }
   }, [isAccess]);
 
+  // get the list of users who have access to the current room
   const getAllowedUserList = (roomId) => {
     request("get", `/code-editor/rooms/${roomId}/shared-users`, (response) => {
       if (response && response.status === 200) {
@@ -114,6 +118,7 @@ const CodeEditorPage = () => {
     getAllowedUserList(roomId);
   }, [reloadAllowedUser]);
 
+  // check if the current user has access to the current room
   useEffect(() => {
     const user = allowedUserList.find((item) => item.id.userId === token.preferred_username);
     if (token.preferred_username === roomMasterId) {
@@ -127,6 +132,7 @@ const CodeEditorPage = () => {
 
   useEffect(() => {
     if (socketRef.current) {
+      // if a user is removed, update the room's list of permissions
       socketRef.current.on(SOCKET_EVENTS.REFRESH_DELETE_PERMISSION, ({ userId }) => {
         dispatch(
           setState({
@@ -135,6 +141,7 @@ const CodeEditorPage = () => {
         );
       });
 
+      // if a user is on or off mic, update mic status of user in the room
       socketRef.current.on(SOCKET_EVENTS.ACCEPT_ON_OFF_MIC, ({ socketId, audio }) => {
         dispatch(handleOnOffMicParticipant({ socketId, audio }));
         if (socketId === socketRef.current.id) {
@@ -180,6 +187,7 @@ const CodeEditorPage = () => {
     getRoomById(roomId);
   }, [roomId]);
 
+  // On or off local mic
   useEffect(() => {
     if (
       localAudioRef.current?.srcObject &&
