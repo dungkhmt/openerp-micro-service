@@ -12,7 +12,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode
-public class DefenseJuryTeacherID implements Serializable{
+public class DefenseJuryTeacherID implements Serializable {
+
     private String teacherId;
     private UUID juryId;
 }

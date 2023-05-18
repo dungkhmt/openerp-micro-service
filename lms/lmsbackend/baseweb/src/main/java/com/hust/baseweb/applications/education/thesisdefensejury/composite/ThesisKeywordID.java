@@ -13,6 +13,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode
 public class ThesisKeywordID implements Serializable {
+
     private String keyword;
     private UUID thesis;
 }

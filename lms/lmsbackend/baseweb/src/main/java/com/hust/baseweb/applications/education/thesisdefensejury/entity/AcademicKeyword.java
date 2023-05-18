@@ -15,8 +15,8 @@ import java.time.LocalDateTime;
 public class AcademicKeyword {
 
     @Id
-    @Column(name="keyword")
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @Column(name = "keyword")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private String keyword;
 
     @Column(name = "description")

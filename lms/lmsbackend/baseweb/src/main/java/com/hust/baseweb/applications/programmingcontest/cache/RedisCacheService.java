@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Slf4j
 public class RedisCacheService {
+
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
@@ -60,7 +61,8 @@ public class RedisCacheService {
             Object value = getCachedObject(hashId, key);
             if (value != null) {
                 log.debug("hit cache for hashId " + hashId);
-                return objectMapper.convertValue(value, new TypeReference<List<T>>() { });
+                return objectMapper.convertValue(value, new TypeReference<List<T>>() {
+                });
             }
         } catch (Exception e) {
 //            log.error("Cannot get query cache #{}{}", hashId, key, e);

@@ -13,6 +13,7 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode
 public class ContestUserLoginRoleFromDateId implements Serializable {
+
     private String contestId;
     private String userLoginId;
     private String roleId;

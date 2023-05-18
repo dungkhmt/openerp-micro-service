@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -16,6 +17,7 @@ import java.util.UUID;
 //@Table(name = "user_registration_contest")
 @Table(name = "user_registration_contest_new")
 public class UserRegistrationContestEntity {
+
     public static final String ROLE_MANAGER = "MANAGER";
     public static final String ROLE_PARTICIPANT = "PARTICIPANT";
     public static final String ROLE_OWNER = "OWNER";
@@ -26,19 +28,21 @@ public class UserRegistrationContestEntity {
     public static final String PERMISSION_SUBMIT = "SUBMIT";
     public static final String PERMISSION_FORBIDDEN_SUBMIT = "FORBIDDEN_SUBMIT";
 
-    public static List<String> getListPermissions(){
+    public static List<String> getListPermissions() {
         List<String> lst = new ArrayList();
         lst.add(UserRegistrationContestEntity.PERMISSION_SUBMIT);
         lst.add(UserRegistrationContestEntity.PERMISSION_FORBIDDEN_SUBMIT);
         return lst;
     }
-    public static List<String> getListRoles(){
+
+    public static List<String> getListRoles() {
         List<String> L = new ArrayList();
         L.add(ROLE_MANAGER);
         L.add(ROLE_PARTICIPANT);
         L.add(ROLE_OWNER);
         return L;
     }
+
     @Id
     @Column(name = "user_registration_contest_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -61,19 +65,19 @@ public class UserRegistrationContestEntity {
     @Column(name = "status")
     private String status;
 
-    @Column(name="role_id")
+    @Column(name = "role_id")
     private String roleId;
 
-    @Column(name="created_date")
+    @Column(name = "created_date")
     private Date createdStamp;
 
-    @Column(name="last_updated")
+    @Column(name = "last_updated")
     private Date lastUpdated;
 
-    @Column(name="updated_by_user_login_id")
+    @Column(name = "updated_by_user_login_id")
     private String updatedByUserLogin_id;
 
-    @Column(name="permission_id")
+    @Column(name = "permission_id")
     private String permissionId;
 
 

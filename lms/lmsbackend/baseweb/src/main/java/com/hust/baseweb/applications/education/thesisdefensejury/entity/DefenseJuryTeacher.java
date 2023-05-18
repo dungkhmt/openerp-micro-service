@@ -15,6 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @IdClass(DefenseJuryTeacherID.class)
 public class DefenseJuryTeacher {
+
     @Id
     @Column(name = "teacher_id")
     private String teacherId;

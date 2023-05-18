@@ -18,7 +18,9 @@ public interface QuizTestService {
     public EduQuizTest save(QuizTestCreateInputModel input, UserLogin user);
 
     public EduQuizTest update(EditQuizTestInputModel input);
+
     public EduQuizTest openQuizTest(String testId);
+
     public EduQuizTest hideQuizTest(String testId);
 
     public List<EduQuizTest> getAllTestByCreateUser(String userLoginId);
@@ -58,9 +60,26 @@ public interface QuizTestService {
 
     public boolean confirmUpdateGroupInQuizTest(String userId, String groupCode, String testId);
 
-    public QuizTestExecutionSubmission submitSynchronousQuizTestExecutionChoice(UUID questionId, UUID groupId, String userId, List<UUID> chooseAnsIds);
-    public QuizTestExecutionSubmission submitAsynchronousQuizTestExecutionChoiceUsingRabbitMQ(UUID questionId, UUID groupId, String userId, List<UUID> chooseAnsIds);
-    public QuizTestExecutionSubmission submitQuizTestExecutionChoiceBatchLazyEvaluation(UUID questionId, UUID groupId, String userId, List<UUID> chooseAnsIds);
+    public QuizTestExecutionSubmission submitSynchronousQuizTestExecutionChoice(
+        UUID questionId,
+        UUID groupId,
+        String userId,
+        List<UUID> chooseAnsIds
+    );
+
+    public QuizTestExecutionSubmission submitAsynchronousQuizTestExecutionChoiceUsingRabbitMQ(
+        UUID questionId,
+        UUID groupId,
+        String userId,
+        List<UUID> chooseAnsIds
+    );
+
+    public QuizTestExecutionSubmission submitQuizTestExecutionChoiceBatchLazyEvaluation(
+        UUID questionId,
+        UUID groupId,
+        String userId,
+        List<UUID> chooseAnsIds
+    );
 
     public boolean updateFromQuizTestExecutionSubmission(UUID submissionId);
 

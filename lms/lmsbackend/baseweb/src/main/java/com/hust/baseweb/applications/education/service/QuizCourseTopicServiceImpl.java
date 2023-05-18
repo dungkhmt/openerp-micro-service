@@ -28,16 +28,17 @@ public class QuizCourseTopicServiceImpl implements QuizCourseTopicService {
     private QuizQuestionRepo quizQuestionRepo;
 
     //public static HashMap<String, QuizCourseTopic> mId2QuizCourseTopic = null;
-    public static CacheQuizCourseTopic cacheQuizCourseTopic  = null;
+    public static CacheQuizCourseTopic cacheQuizCourseTopic = null;
+
     @Override
     public List<QuizCourseTopic> findAll() {
         List<QuizCourseTopic> quizCourseTopics = quizCourseTopicRepo.findAll();
-        if(cacheQuizCourseTopic == null){// for the first time
+        if (cacheQuizCourseTopic == null) {// for the first time
             //mId2QuizCourseTopic = new HashMap<String, QuizCourseTopic>();
             cacheQuizCourseTopic = new CacheQuizCourseTopic();
-            for(QuizCourseTopic q: quizCourseTopics){
+            for (QuizCourseTopic q : quizCourseTopics) {
                 //mId2QuizCourseTopic.put(q.getQuizCourseTopicId(),q);
-                cacheQuizCourseTopic.put(q.getQuizCourseTopicId(),q);
+                cacheQuizCourseTopic.put(q.getQuizCourseTopicId(), q);
             }
         }
         return quizCourseTopics;
@@ -46,20 +47,22 @@ public class QuizCourseTopicServiceImpl implements QuizCourseTopicService {
     public List<QuizCourseTopic> findByEduCourse_Id(String courseId) {
         return quizCourseTopicRepo.findByEduCourse_Id(courseId);
     }
-    public List<QuizCourseTopicDetailOM> findTopicByCourseId(String courseId){
+
+    public List<QuizCourseTopicDetailOM> findTopicByCourseId(String courseId) {
         List<QuizCourseTopic> lst = quizCourseTopicRepo.findByEduCourse_Id(courseId);
         List<QuizCourseTopicDetailOM> retList = new ArrayList();
-        for(QuizCourseTopic qt: lst){
+        for (QuizCourseTopic qt : lst) {
             List<QuizQuestion> quizs = quizQuestionRepo.findAllByQuizCourseTopic(qt);
             QuizCourseTopicDetailOM qd = new QuizCourseTopicDetailOM();
             qd.setQuizCourseTopicId(qt.getQuizCourseTopicId());
             qd.setQuizCourseTopicName(qt.getQuizCourseTopicName());
             qd.setQuizQuestions(quizs);
-            int nbPublicQuizs = 0; int nbPrivateQuizs = 0;
-            for(QuizQuestion q: quizs){
-                if(q.getStatusId().equals(QuizQuestion.STATUS_PRIVATE)){
+            int nbPublicQuizs = 0;
+            int nbPrivateQuizs = 0;
+            for (QuizQuestion q : quizs) {
+                if (q.getStatusId().equals(QuizQuestion.STATUS_PRIVATE)) {
                     nbPrivateQuizs += 1;
-                }else if(q.getStatusId().equals(QuizQuestion.STATUS_PUBLIC)){
+                } else if (q.getStatusId().equals(QuizQuestion.STATUS_PUBLIC)) {
                     nbPublicQuizs += 1;
                 }
             }
@@ -69,6 +72,7 @@ public class QuizCourseTopicServiceImpl implements QuizCourseTopicService {
         }
         return retList;
     }
+
     @Override
     public QuizCourseTopic save(QuizCourseTopicCreateInputModel input) {
         QuizCourseTopic quizCourseTopic = new QuizCourseTopic();

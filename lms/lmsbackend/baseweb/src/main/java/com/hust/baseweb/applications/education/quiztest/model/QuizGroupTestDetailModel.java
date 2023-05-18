@@ -12,6 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class QuizGroupTestDetailModel {
+
     private String participantUserId;
 
     private String testId;

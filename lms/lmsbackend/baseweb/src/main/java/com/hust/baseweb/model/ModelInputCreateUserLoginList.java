@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 
 public class ModelInputCreateUserLoginList {
+
     private List<String> roles;
     private List<String> affiliations;
 

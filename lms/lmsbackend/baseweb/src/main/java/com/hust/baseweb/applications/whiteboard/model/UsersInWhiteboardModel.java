@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class UsersInWhiteboardModel {
+
     private String userId;
     private String roleId;
     private String statusId;

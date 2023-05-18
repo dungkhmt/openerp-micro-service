@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelSubmitSolutionOutput {
+
     private String contestId;
     private String problemId;
     private UUID testCaseId;

@@ -142,9 +142,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .solution(modelCreateContestProblem.getSolution())
                                                    .solutionCheckerSourceCode(modelCreateContestProblem.getSolutionChecker())
                                                    .solutionCheckerSourceLanguage(modelCreateContestProblem.getSolutionCheckerLanguage())
-                                                   .scoreEvaluationType(modelCreateContestProblem.getScoreEvaluationType() != null?
-                                                                            modelCreateContestProblem.getScoreEvaluationType():
-                                                       Constants.ProblemResultEvaluationType.NORMAL.getValue())
+                                                   .scoreEvaluationType(modelCreateContestProblem.getScoreEvaluationType() !=
+                                                                        null
+                                                                            ?
+                                                                            modelCreateContestProblem.getScoreEvaluationType()
+                                                                            :
+                                                                                Constants.ProblemResultEvaluationType.NORMAL.getValue())
                                                    .createdAt(new Date())
                                                    .isPublicProblem(modelCreateContestProblem.getIsPublic())
                                                    .levelOrder(constants
@@ -187,7 +190,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
         // grant manager role to user admin
         UserLogin admin = userLoginRepo.findByUserLoginId("admin");
-        if(admin != null) {
+        if (admin != null) {
             upr = new UserContestProblemRole();
             upr.setProblemId(problemEntity.getProblemId());
             upr.setUserId(admin.getUserLoginId());
@@ -826,7 +829,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public ContestProblem saveProblemInfoInContest(ModelProblemInfoInContest modelProblemInfoInContest, String userName) {
+    public ContestProblem saveProblemInfoInContest(
+        ModelProblemInfoInContest modelProblemInfoInContest,
+        String userName
+    ) {
         String contestId = modelProblemInfoInContest.getContestId();
         String problemId = modelProblemInfoInContest.getProblemId();
 
@@ -1077,7 +1083,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             String participantSolutionOutput = e.getParticipantSolutionOtput();
             if (contest != null) {
                 TestCaseEntity tc = testCaseRepo.findTestCaseByTestCaseId(e.getTestCaseId());
-                if (tc == null) break;
+                if (tc == null) {
+                    break;
+                }
 
                 testCase = tc.getTestCase();
                 testCaseOutput = tc.getCorrectAnswer();
@@ -1469,7 +1477,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         UUID submissionId
     ) throws Exception {
 
-        ContestSubmissionEntity submission = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(submissionId);
+        ContestSubmissionEntity submission = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(
+            submissionId);
         ProblemEntity problem = problemService.findProblemWithCache(submission.getProblemId());
         ContestEntity contest = contestService.findContestWithCache(submission.getContestId());
 
@@ -1527,10 +1536,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     @Override
     public void evaluateCustomProblemSubmission(UUID submissionId) throws Exception {
 
-        ContestSubmissionEntity submission = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(submissionId);
+        ContestSubmissionEntity submission = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(
+            submissionId);
         ProblemEntity problemEntity = problemService.findProblemWithCache(submission.getProblemId());
         ContestEntity contest = contestService.findContestWithCache(submission.getContestId());
-        List<ContestSubmissionTestCaseEntity> submissionTestCases = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionId(submissionId);
+        List<ContestSubmissionTestCaseEntity> submissionTestCases = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionId(
+            submissionId);
 
         String userId = submission.getUserId();
 
@@ -2767,7 +2778,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     @Override
     public void evaluateSubmissionUsingQueue(ContestSubmissionEntity submission, ContestEntity contest) {
-        contestService.updateContestSubmissionStatus(submission.getContestSubmissionId(), ContestSubmissionEntity.SUBMISSION_STATUS_EVALUATION_IN_PROGRESS);
+        contestService.updateContestSubmissionStatus(
+            submission.getContestSubmissionId(),
+            ContestSubmissionEntity.SUBMISSION_STATUS_EVALUATION_IN_PROGRESS);
         rabbitTemplate.convertAndSend(
             EXCHANGE,
             JUDGE_PROBLEM,
@@ -2775,7 +2788,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         );
     }
 
-    
+
     @Override
     public void evaluateSubmission(ContestSubmissionEntity sub, ContestEntity contest) {
         if (sub != null) {
@@ -3624,32 +3637,42 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     public List<ModelReponseCodeSimilaritySummaryParticipant> getListModelReponseCodeSimilaritySummaryParticipant(String contestId) {
         List<CodePlagiarism> L = codePlagiarismRepo.findAllByContestId(contestId);
         List<ModelReponseCodeSimilaritySummaryParticipant> res = new ArrayList();
-        List<UserRegistrationContestEntity> UR = userRegistrationContestRepo.findAllByContestIdAndStatus(contestId,UserRegistrationContestEntity.STATUS_SUCCESSFUL);
+        List<UserRegistrationContestEntity> UR = userRegistrationContestRepo.findAllByContestIdAndStatus(contestId,
+                                                                                                         UserRegistrationContestEntity.STATUS_SUCCESSFUL);
         HashMap<String, Double> mUser2HighestSimilarity = new HashMap();
-        for(UserRegistrationContestEntity ur : UR){
-            mUser2HighestSimilarity.put(ur.getUserId(),0.0);
+        for (UserRegistrationContestEntity ur : UR) {
+            mUser2HighestSimilarity.put(ur.getUserId(), 0.0);
         }
-        for(CodePlagiarism cp: L){
+        for (CodePlagiarism cp : L) {
             String u1 = cp.getUserId1();
             String u2 = cp.getUserId2();
             double s = cp.getScore();
-            if(mUser2HighestSimilarity.get(u1) != null && mUser2HighestSimilarity.get(u1) < s)
-                mUser2HighestSimilarity.put(u1,s);
-            if(mUser2HighestSimilarity.get(u2) != null && mUser2HighestSimilarity.get(u2) < s)
-                mUser2HighestSimilarity.put(u2,s);
+            if (mUser2HighestSimilarity.get(u1) != null && mUser2HighestSimilarity.get(u1) < s) {
+                mUser2HighestSimilarity.put(u1, s);
+            }
+            if (mUser2HighestSimilarity.get(u2) != null && mUser2HighestSimilarity.get(u2) < s) {
+                mUser2HighestSimilarity.put(u2, s);
+            }
         }
-        for(String u: mUser2HighestSimilarity.keySet()){
-            ModelReponseCodeSimilaritySummaryParticipant e= new ModelReponseCodeSimilaritySummaryParticipant();
+        for (String u : mUser2HighestSimilarity.keySet()) {
+            ModelReponseCodeSimilaritySummaryParticipant e = new ModelReponseCodeSimilaritySummaryParticipant();
             e.setUserId(u);
             e.setHighestSimilarity(mUser2HighestSimilarity.get(u));
             res.add(e);
         }
-        Collections.sort(res, new Comparator<ModelReponseCodeSimilaritySummaryParticipant>(){
+        Collections.sort(res, new Comparator<ModelReponseCodeSimilaritySummaryParticipant>() {
             @Override
-            public int compare(ModelReponseCodeSimilaritySummaryParticipant u1, ModelReponseCodeSimilaritySummaryParticipant u2){
-                if(u2.getHighestSimilarity() > u1.getHighestSimilarity()) return 1;
-                else if(u2.getHighestSimilarity() < u1.getHighestSimilarity()) return -1;
-                else return 0;
+            public int compare(
+                ModelReponseCodeSimilaritySummaryParticipant u1,
+                ModelReponseCodeSimilaritySummaryParticipant u2
+            ) {
+                if (u2.getHighestSimilarity() > u1.getHighestSimilarity()) {
+                    return 1;
+                } else if (u2.getHighestSimilarity() < u1.getHighestSimilarity()) {
+                    return -1;
+                } else {
+                    return 0;
+                }
             }
         });
         return res;

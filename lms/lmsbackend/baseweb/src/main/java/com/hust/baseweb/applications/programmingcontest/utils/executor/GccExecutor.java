@@ -1,15 +1,15 @@
 package com.hust.baseweb.applications.programmingcontest.utils.executor;
 
 
-
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
 
 import java.util.List;
 
 public class GccExecutor {
+
     private static final String buildCmd = "g++ -w -o main main.cpp";
-    private static final String suffixes =".cpp";
+    private static final String suffixes = ".cpp";
     private static final String SHFileStart = "#!/bin/bash\n";
 
     private static final String TIME_LIMIT_ERROR = Constants.TestCaseSubmissionError.TIME_LIMIT.getValue();
@@ -18,65 +18,120 @@ public class GccExecutor {
 
     private static final int DEFAULT_INITIAL_MEMORY = 10 * 1024;
 
-    public GccExecutor(){
+    public GccExecutor() {
 
     }
 
-    public String generateScriptFileWithTestCaseAndCorrectSolution(String source, String testCase, String tmpName, int timeLimit){
+    public String generateScriptFileWithTestCaseAndCorrectSolution(
+        String source,
+        String testCase,
+        String tmpName,
+        int timeLimit
+    ) {
 
         String sourceSH = SHFileStart
-                          + "mkdir -p " + tmpName +"\n"
-                          + "cd " + tmpName +"\n"
-                          + "cat <<EOF >> main"  + suffixes + "\n"
-                          + source + "\n"
-                          + "EOF" + "\n"
-                          + "cat <<EOF >> testcase.txt \n"
-                          + testCase +"\n"
-                          + "EOF" + "\n"
-                          + buildCmd +"\n"
-                          + "FILE=main" +"\n"
-                          +"if test -f \"$FILE\"; then" +"\n"
-                          + "    cat testcase.txt | timeout " + timeLimit +"s " +"./main && echo -e \"\\nSuccessful\" || echo Time Limit Exceeded" + "\n"
-                          + "else\n"
-                          + "  echo Compile Error\n"
-                          + "fi" + "\n"
-                          + "cd .. \n"
-                          + "rm -rf " + tmpName + " & "+"\n"
-                          + "rm -rf " + tmpName+".sh" + " & "+"\n";
+                          +
+                          "mkdir -p " +
+                          tmpName +
+                          "\n"
+                          +
+                          "cd " +
+                          tmpName +
+                          "\n"
+                          +
+                          "cat <<EOF >> main" +
+                          suffixes +
+                          "\n"
+                          +
+                          source +
+                          "\n"
+                          +
+                          "EOF" +
+                          "\n"
+                          +
+                          "cat <<EOF >> testcase.txt \n"
+                          +
+                          testCase +
+                          "\n"
+                          +
+                          "EOF" +
+                          "\n"
+                          +
+                          buildCmd +
+                          "\n"
+                          +
+                          "FILE=main" +
+                          "\n"
+                          +
+                          "if test -f \"$FILE\"; then" +
+                          "\n"
+                          +
+                          "    cat testcase.txt | timeout " +
+                          timeLimit +
+                          "s " +
+                          "./main && echo -e \"\\nSuccessful\" || echo Time Limit Exceeded" +
+                          "\n"
+                          +
+                          "else\n"
+                          +
+                          "  echo Compile Error\n"
+                          +
+                          "fi" +
+                          "\n"
+                          +
+                          "cd .. \n"
+                          +
+                          "rm -rf " +
+                          tmpName +
+                          " & " +
+                          "\n"
+                          +
+                          "rm -rf " +
+                          tmpName +
+                          ".sh" +
+                          " & " +
+                          "\n";
 
         return sourceSH;
     }
 
-    public String checkCompile(String source, String tmpName){
+    public String checkCompile(String source, String tmpName) {
 
         String sourceSH = SHFileStart
-                          + "mkdir -p " + tmpName +"\n"
-                          + "cd " + tmpName +"\n"
-                          + "cat <<EOF >> main"  + suffixes + "\n"
+                          + "mkdir -p " + tmpName + "\n"
+                          + "cd " + tmpName + "\n"
+                          + "cat <<EOF >> main" + suffixes + "\n"
                           + source + "\n"
                           + "EOF" + "\n"
-                          + buildCmd +"\n"
-                          + "FILE=main" +"\n"
-                          +"if test -f \"$FILE\"; then" +"\n"
+                          + buildCmd + "\n"
+                          + "FILE=main" + "\n"
+                          + "if test -f \"$FILE\"; then" + "\n"
                           + "  echo Successful\n"
                           + "else\n"
                           + "  echo Compile Error\n"
                           + "fi" + "\n"
                           + "cd .. \n"
-                          + "rm -rf " + tmpName + " & "+"\n"
-                          + "rm -rf " + tmpName+".sh" + " & "+"\n";
+                          + "rm -rf " + tmpName + " & " + "\n"
+                          + "rm -rf " + tmpName + ".sh" + " & " + "\n";
 
         return sourceSH;
     }
-    public String genSubmitScriptFileChecker(String sourceChecker, TestCaseEntity testCase, String solutionOutput, String tmpName, int timeLimit){
+
+    public String genSubmitScriptFileChecker(
+        String sourceChecker,
+        TestCaseEntity testCase,
+        String solutionOutput,
+        String tmpName,
+        int timeLimit
+    ) {
         String genTestCase = "";
         //for(int i = 0; i < testCaseEntities.size(); i++){
-            String testcase = "cat <<EOF >> testcase" + 0 + ".txt \n"
-                              + testCase.getTestCase() +"\n"
-                              + testCase.getCorrectAnswer() + "\n"
-                              + solutionOutput + "\n"
-                              +"EOF" + "\n";
-            genTestCase += testcase;
+        String testcase = "cat <<EOF >> testcase" + 0 + ".txt \n"
+                          + testCase.getTestCase() + "\n"
+                          + testCase.getCorrectAnswer() + "\n"
+                          + solutionOutput + "\n"
+                          + "EOF" + "\n";
+        genTestCase += testcase;
         //}
 
         String sourceSH = SHFileStart
@@ -112,7 +167,13 @@ public class GccExecutor {
 
     }
 
-    public String genSubmitScriptFile(List<TestCaseEntity> testCaseEntities, String source, String tmpName, int timeLimit, int memoryLimit){
+    public String genSubmitScriptFile(
+        List<TestCaseEntity> testCaseEntities,
+        String source,
+        String tmpName,
+        int timeLimit,
+        int memoryLimit
+    ) {
         StringBuilder genTestCase = new StringBuilder();
         for (int i = 0; i < testCaseEntities.size(); i++) {
             String testcase = "cat <<EOF >> testcase" + i + ".txt \n"
@@ -138,12 +199,12 @@ public class GccExecutor {
                           + "while [ \"$n\" -lt " + testCaseEntities.size() + " ]" + "\n"
                           + "do\n"
                           + "f=\"testcase\"$n\".txt\"" + "\n"
-                        //   + "cat $f | timeout " + timeLimit + "s " + "./main  || echo Time Limit Exceeded" + "\n"
+                          //   + "cat $f | timeout " + timeLimit + "s " + "./main  || echo Time Limit Exceeded" + "\n"
                           + "cat $f | (ulimit -t " + timeLimit
-                                            + " -v " + (memoryLimit * 1024 + DEFAULT_INITIAL_MEMORY)
-                                            + " -f 30000; "
+                          + " -v " + (memoryLimit * 1024 + DEFAULT_INITIAL_MEMORY)
+                          + " -f 30000; "
                           + "./main > " + outputFileName + "; ) &> " + errorFileName + "\n"
-                          + "ERROR=$(head -1 " + errorFileName +") \n"
+                          + "ERROR=$(head -1 " + errorFileName + ") \n"
                           + "FILE_LIMIT='" + FILE_LIMIT_ERROR + "' \n"
                           + "TIME_LIMIT='" + TIME_LIMIT_ERROR + "' \n"
                           + "MEMORY_LIMIT='" + MEMORY_LIMIT_ERROR + "' \n"

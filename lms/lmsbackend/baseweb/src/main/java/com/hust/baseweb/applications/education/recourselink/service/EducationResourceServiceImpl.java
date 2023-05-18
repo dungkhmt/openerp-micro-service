@@ -20,24 +20,25 @@ import java.util.UUID;
 @Service
 @Transactional
 @Slf4j
-public class EducationResourceServiceImpl implements EducationResourceService{
+public class EducationResourceServiceImpl implements EducationResourceService {
 
     private final EducationResourceRepo resourceRepository;
     private final ResourceDomainRepo resourceDomainRepo;
+
     @Override
-    public Page<EducationResource> findByDomainId(UUID domainId,Pageable pageable) {
-       return resourceRepository.findByDomainId(domainId,pageable);
+    public Page<EducationResource> findByDomainId(UUID domainId, Pageable pageable) {
+        return resourceRepository.findByDomainId(domainId, pageable);
     }
 
     @Override
     public Optional<EducationResource> findByIdAndDomainId(UUID id, UUID domainId) {
-        return resourceRepository.findByIdAndDomainId(id,domainId);
+        return resourceRepository.findByIdAndDomainId(id, domainId);
     }
 
     @Override
     public Boolean createResource(UUID domainId, EducationResource resource) {
         Optional<EducationResourceDomain> rd = resourceDomainRepo.findById(domainId);
-        if (!rd.isPresent()){
+        if (!rd.isPresent()) {
             return false;
         }
         EducationResourceDomain ed = rd.get();
@@ -48,6 +49,6 @@ public class EducationResourceServiceImpl implements EducationResourceService{
 
     @Override
     public List<EducationResource> findResourceWithFilter(EducationResource request, UUID domainId) {
-        return resourceRepository.findAllByDescriptionAndDomainId(request.getDescription(),domainId);
+        return resourceRepository.findAllByDescriptionAndDomainId(request.getDescription(), domainId);
     }
 }

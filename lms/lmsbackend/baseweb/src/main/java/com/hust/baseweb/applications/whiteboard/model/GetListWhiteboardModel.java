@@ -12,6 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetListWhiteboardModel {
+
     private String id;
     private String name;
     private Integer totalPage;

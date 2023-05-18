@@ -18,9 +18,11 @@ import java.util.List;
 @Validated
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class AcademicKeywordController {
+
     private final AcademicKeywordService academicKeywordService;
+
     @GetMapping("/academic_keywords")
-    public ResponseEntity<?> getThesis(Pageable pageable){
+    public ResponseEntity<?> getThesis(Pageable pageable) {
         List<AcademicKeyword> res = academicKeywordService.getAllAcademicKeywords();
         return ResponseEntity.ok().body(res);
     }

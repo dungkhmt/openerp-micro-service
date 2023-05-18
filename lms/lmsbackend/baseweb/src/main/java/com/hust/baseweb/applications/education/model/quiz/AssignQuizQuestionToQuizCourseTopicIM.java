@@ -8,6 +8,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class AssignQuizQuestionToQuizCourseTopicIM {
+
     private UUID questionId;
     private String quiCourseTopicId;
 

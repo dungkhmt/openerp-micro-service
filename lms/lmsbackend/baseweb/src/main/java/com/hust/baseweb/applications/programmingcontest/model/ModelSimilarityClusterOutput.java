@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelSimilarityClusterOutput {
+
     private String problemId;
     private List<List<String>> clusters;
     private String userIds;

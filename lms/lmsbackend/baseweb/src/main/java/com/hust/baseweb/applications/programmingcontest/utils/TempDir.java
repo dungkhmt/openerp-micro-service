@@ -43,25 +43,25 @@ public class TempDir {
     }
 
     @Bean
-    public void initTempDir(){
+    public void initTempDir() {
         File theDir = new File(TEMPDIR);
-        if (!theDir.exists()){
+        if (!theDir.exists()) {
             theDir.mkdirs();
         }
     }
 
     @Bean
-    public void startRemoveTempDirThread(){
+    public void startRemoveTempDirThread() {
         RmTempDirTheard rmTempDirTheard = new RmTempDirTheard();
         rmTempDirTheard.start();
         System.out.println("-------------------------------  done start ---------------------------");
     }
 
-    public void pushToConcurrentLinkedQueue(String dirName){
+    public void pushToConcurrentLinkedQueue(String dirName) {
         concurrentLinkedQueue.add(dirName);
     }
 
-    public String createRandomScriptFileName(String startName){
+    public String createRandomScriptFileName(String startName) {
         //int generateRandom = r.nextInt();
         //String resp = startName + "-" + generateRandom;
         Date date = new Date();
@@ -72,45 +72,71 @@ public class TempDir {
         String[] t = dt[1].split(":");
         String resp = startName + "-" + d[0] + d[1] + d[2] + t[0] + t[1] + t[2];
         resp = resp.replaceAll("\n", " ");
-        resp = resp.replaceAll("&","");
+        resp = resp.replaceAll("&", "");
         return resp.replaceAll("( +)", "-").trim();
     }
 
-    public String createDirInContainer(String startName){
-        return startName+"/"+startName+".sh";
+    public String createDirInContainer(String startName) {
+        return startName + "/" + startName + ".sh";
     }
 
-    public void createScriptFile(String source, String testCase, int timeLimit, ComputerLanguage.Languages languages, String tmpName ) throws IOException {
-        File theDir = new File(TEMPDIR+tmpName);
+    public void createScriptFile(
+        String source,
+        String testCase,
+        int timeLimit,
+        ComputerLanguage.Languages languages,
+        String tmpName
+    ) throws IOException {
+        File theDir = new File(TEMPDIR + tmpName);
         theDir.mkdirs();
         String sourceSh;
-        switch (languages){
+        switch (languages) {
             case CPP:
-                sourceSh = gccExecutor.generateScriptFileWithTestCaseAndCorrectSolution(source, testCase, tmpName, timeLimit);
+                sourceSh = gccExecutor.generateScriptFileWithTestCaseAndCorrectSolution(
+                    source,
+                    testCase,
+                    tmpName,
+                    timeLimit);
                 break;
             case JAVA:
-                sourceSh = javaExecutor.generateScriptFileWithTestCaseAndCorrectSolution(source, testCase, tmpName, timeLimit);
+                sourceSh = javaExecutor.generateScriptFileWithTestCaseAndCorrectSolution(
+                    source,
+                    testCase,
+                    tmpName,
+                    timeLimit);
                 break;
             case PYTHON3:
-                sourceSh = python3Executor.generateScriptFileWithTestCaseAndCorrectSolution(source, testCase, tmpName, timeLimit);
+                sourceSh = python3Executor.generateScriptFileWithTestCaseAndCorrectSolution(
+                    source,
+                    testCase,
+                    tmpName,
+                    timeLimit);
                 break;
             case GOLANG:
-                sourceSh = golangExecutor.generateScriptFileWithTestCaseAndCorrectSolution(source, testCase, tmpName, timeLimit);
+                sourceSh = golangExecutor.generateScriptFileWithTestCaseAndCorrectSolution(
+                    source,
+                    testCase,
+                    tmpName,
+                    timeLimit);
                 break;
             default:
                 sourceSh = null;
         }
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(TEMPDIR + tmpName+"/"+tmpName+".sh"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(TEMPDIR + tmpName + "/" + tmpName + ".sh"));
         writer.write(sourceSh);
         writer.close();
     }
 
-    public void createScriptCompileFile(String source, ComputerLanguage.Languages languages, String tmpName ) throws IOException {
-        File theDir = new File(TEMPDIR+tmpName);
+    public void createScriptCompileFile(
+        String source,
+        ComputerLanguage.Languages languages,
+        String tmpName
+    ) throws IOException {
+        File theDir = new File(TEMPDIR + tmpName);
         theDir.mkdirs();
         String sourceSh;
-        switch (languages){
+        switch (languages) {
             case CPP:
                 sourceSh = gccExecutor.checkCompile(source, tmpName);
                 break;
@@ -127,16 +153,23 @@ public class TempDir {
                 sourceSh = null;
         }
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(TEMPDIR + tmpName+"/"+tmpName+".sh"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(TEMPDIR + tmpName + "/" + tmpName + ".sh"));
         writer.write(sourceSh);
         writer.close();
     }
 
-    public void createScriptSubmissionFile(ComputerLanguage.Languages languages, String tmpName, List<TestCaseEntity> testCases, String source, int timeout, int memoryLimit) throws IOException {
-        File theDir = new File(TEMPDIR+tmpName);
+    public void createScriptSubmissionFile(
+        ComputerLanguage.Languages languages,
+        String tmpName,
+        List<TestCaseEntity> testCases,
+        String source,
+        int timeout,
+        int memoryLimit
+    ) throws IOException {
+        File theDir = new File(TEMPDIR + tmpName);
         theDir.mkdirs();
         String sourceSh;
-        switch (languages){
+        switch (languages) {
             case CPP:
                 sourceSh = gccExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout, memoryLimit);
                 break;
@@ -153,17 +186,30 @@ public class TempDir {
                 sourceSh = null;
         }
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(TEMPDIR + tmpName+"/"+tmpName+".sh"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(TEMPDIR + tmpName + "/" + tmpName + ".sh"));
         writer.write(sourceSh);
         writer.close();
     }
-    public void createScriptSubmissionSolutionOutputFile(ComputerLanguage.Languages languages, String tmpName, String solutionOutput, TestCaseEntity testCase, String sourceChecker, int timeout) throws IOException {
-        File theDir = new File(TEMPDIR+tmpName);
+
+    public void createScriptSubmissionSolutionOutputFile(
+        ComputerLanguage.Languages languages,
+        String tmpName,
+        String solutionOutput,
+        TestCaseEntity testCase,
+        String sourceChecker,
+        int timeout
+    ) throws IOException {
+        File theDir = new File(TEMPDIR + tmpName);
         theDir.mkdirs();
         String sourceSh = "";
-        switch (languages){
+        switch (languages) {
             case CPP:
-                sourceSh = gccExecutor.genSubmitScriptFileChecker(sourceChecker,testCase, solutionOutput, tmpName, timeout);
+                sourceSh = gccExecutor.genSubmitScriptFileChecker(
+                    sourceChecker,
+                    testCase,
+                    solutionOutput,
+                    tmpName,
+                    timeout);
                 break;
             case JAVA:
                 //sourceSh = javaExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout);
@@ -178,21 +224,22 @@ public class TempDir {
                 sourceSh = null;
         }
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(TEMPDIR + tmpName+"/"+tmpName+".sh"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(TEMPDIR + tmpName + "/" + tmpName + ".sh"));
         writer.write(sourceSh);
         writer.close();
     }
 
-    public void removeDir(String dirName){
+    public void removeDir(String dirName) {
         FileSystemUtils.deleteRecursively(new File(TEMPDIR + dirName));
     }
 
 
-    class RmTempDirTheard extends Thread{
-        public void run(){
+    class RmTempDirTheard extends Thread {
+
+        public void run() {
             String dirName;
-            while(true){
-                while ((dirName = concurrentLinkedQueue.poll()) != null){
+            while (true) {
+                while ((dirName = concurrentLinkedQueue.poll()) != null) {
 //                    System.out.println("rm dir " + dirName);
                     FileSystemUtils.deleteRecursively(new File(TEMPDIR + dirName));
                 }

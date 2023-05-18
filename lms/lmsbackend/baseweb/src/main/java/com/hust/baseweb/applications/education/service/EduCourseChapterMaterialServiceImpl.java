@@ -44,7 +44,7 @@ public class EduCourseChapterMaterialServiceImpl implements EduCourseChapterMate
     public EduCourseChapterMaterial saveSlide(
         EduCourseChapterMaterialModelCreate eduCourseChapterMaterialModelCreate,
         String stringIdList
-    ){
+    ) {
         EduCourseChapterMaterial eduCourseChapterMaterial = new EduCourseChapterMaterial();
         EduCourseChapter eduCourseChapter = eduCourseChapterRepo
             .findById(eduCourseChapterMaterialModelCreate.getChapterId())
@@ -82,7 +82,13 @@ public class EduCourseChapterMaterialServiceImpl implements EduCourseChapterMate
     }
 
     @Override
-    public EduCourseChapterMaterial updateMaterial(UUID eduCourseChapterMaterialId, String eduCourseMaterialName, String eduCourseMaterialType, String slideId, UUID sourceId){
+    public EduCourseChapterMaterial updateMaterial(
+        UUID eduCourseChapterMaterialId,
+        String eduCourseMaterialName,
+        String eduCourseMaterialType,
+        String slideId,
+        UUID sourceId
+    ) {
         EduCourseChapterMaterial eduCourseChapterMaterial = eduCourseChapterMaterialRepo
             .findById(eduCourseChapterMaterialId)
             .orElse(null);

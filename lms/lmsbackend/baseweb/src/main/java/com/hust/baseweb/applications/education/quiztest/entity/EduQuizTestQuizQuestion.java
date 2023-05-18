@@ -14,23 +14,24 @@ import java.util.UUID;
 @Table(name = "edu_quiz_test_quiz_question")
 @IdClass(CompositeEduQuizTestQuizQuestionId.class)
 public class EduQuizTestQuizQuestion {
+
     public static final String STATUS_CREATED = "CREATED";
     public static final String STATUS_CANCELLED = "CANCELLED";
 
     @Id
-    @Column(name="test_id")
+    @Column(name = "test_id")
     private String testId;
 
     @Id
-    @Column(name="question_id")
+    @Column(name = "question_id")
     private UUID questionId;
 
-    @Column(name="created_by_user_login_id")
+    @Column(name = "created_by_user_login_id")
     private String createdByUserLoginId;
 
-    @Column(name="status_id")
+    @Column(name = "status_id")
     private String statusId;
 
-    @Column(name="created_stamp")
+    @Column(name = "created_stamp")
     private Date createdStamp;
 }

@@ -4,4 +4,5 @@ import com.hust.baseweb.applications.programmingcontest.entity.ProblemSourceCode
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProblemSourceCodeRepo extends JpaRepository<ProblemSourceCodeEntity, String> {
+
 }

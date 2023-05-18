@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProblemSubmission {
+
     private String status;
     private String message;
     private Long runtime;

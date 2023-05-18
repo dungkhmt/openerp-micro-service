@@ -62,12 +62,12 @@ public class EducationResource {
     private String link;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "domain_id",referencedColumnName="id", nullable = false)
+    @JoinColumn(name = "domain_id", referencedColumnName = "id", nullable = false)
     private EducationResourceDomain domainId;
 
 //     @ManyToOne(fetch = FetchType.EAGER)
 //     @JoinColumn(name = "user_login_id",referencedColumnName="id", nullable = false)
-     //private UserLogin userLogin;
+    //private UserLogin userLogin;
 
     private String description;
 

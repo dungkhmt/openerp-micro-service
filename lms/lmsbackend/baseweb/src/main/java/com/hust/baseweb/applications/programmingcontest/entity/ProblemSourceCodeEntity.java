@@ -13,6 +13,7 @@ import javax.persistence.*;
 //@Table(name = "problem_source_code")
 @Table(name = "problem_source_code_new")
 public class ProblemSourceCodeEntity {
+
     @Id
     @Column(name = "problem_source_code_id")
     private String problemSourceCodeId;
@@ -43,7 +44,7 @@ public class ProblemSourceCodeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private ProblemEntity problem;
 
-    public String createSolutionSourceCode(){
+    public String createSolutionSourceCode() {
         return this.getBaseSource() + "\n" + this.getProblemFunctionSolution() + "\n" + this.getMainSource();
     }
 }

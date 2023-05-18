@@ -47,12 +47,14 @@ export const codeEditorSlice = createSlice({
         ...action.payload,
       };
     },
-    setRoomName: (state, action) => {
-      state.roomName = action.payload;
+    handleOnOffMicParticipant: (state, action) => {
+      const { socketId, audio } = action.payload;
+      const participant = state.participants.find((item) => item.socketId === socketId);
+      if (participant) {
+        participant.audio = audio;
+      }
     },
-    setSelectedLanguage: (state, action) => {
-      state.selectedLanguage = action.payload;
-    },
+
     setIsVisibleParticipants: (state, action) => {
       state.isVisibleParticipants = action.payload;
     },
@@ -90,16 +92,12 @@ export const codeEditorSlice = createSlice({
     setIsAutoComplete: (state, action) => {
       state.isAutoComplete = action.payload;
     },
-    setIsMute: (state, action) => {
-      state.isMute = action.payload;
-    },
   },
 });
 
 export const {
   setState,
-  setRoomName,
-  setSelectedLanguage,
+  handleOnOffMicParticipant,
   setIsVisibleParticipants,
   setParticipants,
   setSource,
@@ -112,7 +110,6 @@ export const {
   setFontSize,
   setTabSpace,
   setIsAutoComplete,
-  setIsMute,
 } = codeEditorSlice.actions;
 
 export const codeEditorSelector = ({ codeEditor }) => codeEditor;

@@ -110,7 +110,7 @@ public class TeacherExtracter implements IExtracter {
                 new Course4Teacher(
                     row.getCell(indexOfColumn.get("course_id")).getStringCellValue(),
                     row.getCell(indexOfColumn.get("course_name")).getStringCellValue(),
-                    (int)row.getCell(indexOfColumn.get("priority")).getNumericCellValue(),
+                    (int) row.getCell(indexOfColumn.get("priority")).getNumericCellValue(),
                     row.getCell(indexOfColumn.get("type")).getStringCellValue()
                 )
             );

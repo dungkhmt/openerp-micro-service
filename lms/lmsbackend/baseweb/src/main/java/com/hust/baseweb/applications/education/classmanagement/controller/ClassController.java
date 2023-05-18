@@ -133,11 +133,13 @@ public class ClassController {
         classService.deleteEduClassUserLoginRole(deletedPermission);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping("/get-all-class")
-    public ResponseEntity<?> getAllClass(Principal principal){
+    public ResponseEntity<?> getAllClass(Principal principal) {
         List<ModelResponseEduClassDetail> res = classService.getAllClass();
         return ResponseEntity.ok().body(res);
     }
+
     @GetMapping("/get-classes-of-user/{userLoginId}")
     public ResponseEntity getClassesOfUser(Principal principal, @PathVariable String userLoginId) {
         String currentUserLoginId = principal.getName();
@@ -181,9 +183,10 @@ public class ClassController {
     public ResponseEntity<List<GetStudentsOfClassOM>> getStudentsOfClass(@PathVariable UUID id) {
         return ResponseEntity.ok().body(classService.getStudentsOfClass(id));
     }
+
     @Secured("ROLE_TEACHER")
     @PostMapping("/add-all-users-to-class")
-    public ResponseEntity<?> addAllUsers2Class(Principal principal, @RequestBody ModelAddUser2ClassInput I){
+    public ResponseEntity<?> addAllUsers2Class(Principal principal, @RequestBody ModelAddUser2ClassInput I) {
         int cnt = classService.addAllUser2Class(I.getClassCode());
         return ResponseEntity.ok().body(cnt);
     }
@@ -332,7 +335,7 @@ public class ClassController {
         try {
 
             log.info("file type = " + eduCourseChapterMaterialModelCreate.getMaterialType());
-            if(eduCourseChapterMaterialModelCreate.getMaterialType().equals("EDU_COURSE_MATERIAL_TYPE_SLIDE") ){
+            if (eduCourseChapterMaterialModelCreate.getMaterialType().equals("EDU_COURSE_MATERIAL_TYPE_SLIDE")) {
 //                List<String> attachmentId = new ArrayList<>();
 //
 //                PDDocument document = PDDocument.load(files[0].getInputStream());
@@ -409,12 +412,15 @@ public class ClassController {
                     e.printStackTrace();
                 }
 
-                eduCourseChapterMaterial = eduCourseChapterMaterialService.saveSlide(eduCourseChapterMaterialModelCreate, id.toString());
-            } else
-                if(eduCourseChapterMaterialModelCreate.getMaterialType().equals("EDU_COURSE_MATERIAL_TYPE_VIDEO")){
+                eduCourseChapterMaterial = eduCourseChapterMaterialService.saveSlide(
+                    eduCourseChapterMaterialModelCreate,
+                    id.toString());
+            } else if (eduCourseChapterMaterialModelCreate.getMaterialType().equals("EDU_COURSE_MATERIAL_TYPE_VIDEO")) {
                 Video video = videoService.create(files[0]);
                 log.info("createChapterMaterialOfCourse, videoId = " + video.getId());
-                eduCourseChapterMaterial = eduCourseChapterMaterialService.save(eduCourseChapterMaterialModelCreate, video);
+                eduCourseChapterMaterial = eduCourseChapterMaterialService.save(
+                    eduCourseChapterMaterialModelCreate,
+                    video);
 
                 log.info("*************************");
                 log.info("slide content mongo db " + eduCourseChapterMaterial.getSlideId());
@@ -424,7 +430,7 @@ public class ClassController {
         } catch (Exception e) {
             //return error to frontend
             e.printStackTrace();
-            Map<String,Boolean> temp = new HashMap<>();
+            Map<String, Boolean> temp = new HashMap<>();
             temp.put("error", true);
             return ResponseEntity.ok().body(temp);
         }
@@ -453,21 +459,24 @@ public class ClassController {
 
     @Secured("ROLE_TEACHER")
     @DeleteMapping("/delete-course-chapter-material-detail-slide-video/{chapterMarialId}")
-    public ResponseEntity<?>deleteCourseChapterMaterialSlideOrVideo(Principal principal, @PathVariable UUID chapterMarialId){
+    public ResponseEntity<?> deleteCourseChapterMaterialSlideOrVideo(
+        Principal principal,
+        @PathVariable UUID chapterMarialId
+    ) {
         log.info("run here");
         EduCourseChapterMaterial eduCourseChapterMaterial = null;
-        try{
+        try {
             eduCourseChapterMaterial = eduCourseChapterMaterialService.findById(chapterMarialId);
             log.info("find successs");
 
             String materialType = eduCourseChapterMaterial.getEduCourseMaterialType();
-            if(materialType.equals("EDU_COURSE_MATERIAL_TYPE_SLIDE")){
+            if (materialType.equals("EDU_COURSE_MATERIAL_TYPE_SLIDE")) {
                 log.info("delete slide");
 
                 String[] fileIds = eduCourseChapterMaterial.getSlideId().split(";");
                 if (fileIds.length != 0) {
                     for (String fileId : fileIds) {
-                        try{
+                        try {
                             mongoContentService.deleteFilesById(fileId);
                             log.info(fileId);
                         } catch (Exception e) {
@@ -498,9 +507,9 @@ public class ClassController {
             } else {
 
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            Map<String,Boolean> temp = new HashMap<>();
+            Map<String, Boolean> temp = new HashMap<>();
             temp.put("error", true);
             ResponseEntity.ok().body(eduCourseChapterMaterial);
         }
@@ -510,13 +519,13 @@ public class ClassController {
 
     @Secured("ROLE_TEACHER")
     @PutMapping("/update-course-chapter-material-detail/{chapterMarialId}")
-    public ResponseEntity<?>updateCourseChapterMaterial(
+    public ResponseEntity<?> updateCourseChapterMaterial(
         Principal principal,
         @PathVariable UUID chapterMarialId,
         @RequestBody EduCourseChapterMaterial eduCourseChapterMaterial
-    ){
+    ) {
         log.info(eduCourseChapterMaterial);
-        try{
+        try {
             eduCourseChapterMaterial = eduCourseChapterMaterialService.findById(chapterMarialId);
             log.info("find successs");
 
@@ -527,9 +536,9 @@ public class ClassController {
                 eduCourseChapterMaterial.getSlideId(),
                 eduCourseChapterMaterial.getSourceId()
             );
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            Map<String,Boolean> temp = new HashMap<>();
+            Map<String, Boolean> temp = new HashMap<>();
             temp.put("error", true);
             ResponseEntity.ok().body(eduCourseChapterMaterial);
         }
@@ -554,13 +563,14 @@ public class ClassController {
             inputJson,
             EduCourseChapterMaterial.class);
 
-        EduCourseChapterMaterial oldEduCourseChapterMaterial = eduCourseChapterMaterialService.findById(eduCourseChapterMaterial.getEduCourseMaterialId());
+        EduCourseChapterMaterial oldEduCourseChapterMaterial = eduCourseChapterMaterialService.findById(
+            eduCourseChapterMaterial.getEduCourseMaterialId());
         String oldListStringId = oldEduCourseChapterMaterial.getSlideId();
         UUID oldSourceId = oldEduCourseChapterMaterial.getSourceId();
         try {
 
             log.info("file type = " + eduCourseChapterMaterial.getEduCourseMaterialType());
-            if(eduCourseChapterMaterial.getEduCourseMaterialType().equals("EDU_COURSE_MATERIAL_TYPE_SLIDE") ){
+            if (eduCourseChapterMaterial.getEduCourseMaterialType().equals("EDU_COURSE_MATERIAL_TYPE_SLIDE")) {
 //                List<String> attachmentId = new ArrayList<>();
 //
 //                PDDocument document = PDDocument.load(files[0].getInputStream());
@@ -640,8 +650,7 @@ public class ClassController {
                     null
                 );
 //                document.close();
-            } else
-            if(eduCourseChapterMaterial.getEduCourseMaterialType().equals("EDU_COURSE_MATERIAL_TYPE_VIDEO")){
+            } else if (eduCourseChapterMaterial.getEduCourseMaterialType().equals("EDU_COURSE_MATERIAL_TYPE_VIDEO")) {
                 Video video = videoService.create(files[0]);
                 log.info("createChapterMaterialOfCourse, videoId = " + video.getId());
 
@@ -659,11 +668,11 @@ public class ClassController {
 
             //delete old file
             //delete slide
-            if(oldListStringId != null){
+            if (oldListStringId != null) {
                 String[] fileIds = oldListStringId.split(";");
                 if (fileIds.length != 0) {
                     for (String fileId : fileIds) {
-                        try{
+                        try {
                             mongoContentService.deleteFilesById(fileId);
                             log.info(fileId);
                         } catch (Exception e) {
@@ -676,7 +685,7 @@ public class ClassController {
                 log.info("delete old slide successful");
             }
             //delete video
-            if(oldSourceId != null) {
+            if (oldSourceId != null) {
                 videoService.deleteVideo(oldSourceId);
                 log.info("delete old video successful");
             }
@@ -685,7 +694,7 @@ public class ClassController {
         } catch (Exception e) {
             //return error to frontend
             e.printStackTrace();
-            Map<String,Boolean> temp = new HashMap<>();
+            Map<String, Boolean> temp = new HashMap<>();
             temp.put("error", true);
             return ResponseEntity.ok().body(temp);
         }
@@ -791,12 +800,14 @@ public class ClassController {
     }
 
     @PostMapping("/add-students-to-class-excel-upload")
-    public ResponseEntity<?> addStudentToClassViaExcelUpload(Principal principal,
-                                                             @RequestParam("inputJson") String inputJson,
-                                                             @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> addStudentToClassViaExcelUpload(
+        Principal principal,
+        @RequestParam("inputJson") String inputJson,
+        @RequestParam("file") MultipartFile file
+    ) {
         Gson gson = new Gson();
         ModelInputAddStudentToClassViaExcelUpload modelUpload = gson.fromJson(
-            inputJson,ModelInputAddStudentToClassViaExcelUpload.class);
+            inputJson, ModelInputAddStudentToClassViaExcelUpload.class);
         log.info("addStudentToClassViaExcelUpload, classId = " + modelUpload.getClassId());
 
         List<String> uploadedUsers = new ArrayList();
@@ -813,7 +824,7 @@ public class ClassController {
                 log.info("addStudentToClassViaExcelUpload, extract userId " + userId);
 
                 UserLogin u = userService.findById(userId);
-                if(u == null){
+                if (u == null) {
                     log.info("addStudentToClassViaExcelUpload, user " + userId + " NOT EXISTS");
                     continue;
                 }
@@ -827,7 +838,7 @@ public class ClassController {
 
                 uploadedUsers.add(userId);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

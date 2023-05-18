@@ -190,7 +190,9 @@ public class SubmissionResponseHandler {
 //                    point = Integer.parseInt(pointString);
                     try {
                         point = Integer.parseInt(pointString);
-                        message = response.substring(response.indexOf(' '), response.indexOf(Constants.SPLIT_TEST_CASE));
+                        message = response.substring(
+                            response.indexOf(' '),
+                            response.indexOf(Constants.SPLIT_TEST_CASE));
                     } catch (NumberFormatException e) {
                         message = "Invalid response";
                     }

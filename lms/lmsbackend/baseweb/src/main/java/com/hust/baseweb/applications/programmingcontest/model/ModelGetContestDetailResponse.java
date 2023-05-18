@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @Builder
 public class ModelGetContestDetailResponse implements Serializable {
+
     private String contestId;
     private String contestName;
     private long contestTime;

@@ -10,5 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelAddUser2ClassInput {
+
     private String classCode;
 }

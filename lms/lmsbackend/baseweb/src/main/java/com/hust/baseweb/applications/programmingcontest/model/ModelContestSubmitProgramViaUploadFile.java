@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelContestSubmitProgramViaUploadFile {
+
     private String contestId;
     private String problemId;
     private String language;

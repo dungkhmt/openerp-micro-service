@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class ModelStudentRegisterContestResponse {
+
     private String status;
     private String message;
 }

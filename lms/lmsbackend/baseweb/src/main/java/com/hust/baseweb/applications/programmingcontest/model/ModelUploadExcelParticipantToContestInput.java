@@ -10,5 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelUploadExcelParticipantToContestInput {
+
     private String contestId;
 }

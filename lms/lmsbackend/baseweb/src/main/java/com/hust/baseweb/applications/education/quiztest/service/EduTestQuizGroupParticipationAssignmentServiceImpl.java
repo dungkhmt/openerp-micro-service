@@ -156,21 +156,21 @@ public class EduTestQuizGroupParticipationAssignmentServiceImpl
     }
 
     @Override
-    public ModelResponseGetQuizTestGroup getQuizTestGroupOfUser(String userId, String testId){
+    public ModelResponseGetQuizTestGroup getQuizTestGroupOfUser(String userId, String testId) {
         List<EduTestQuizGroup> groups = eduQuizTestGroupRepo.findByTestId(testId);
         ModelResponseGetQuizTestGroup res = new ModelResponseGetQuizTestGroup();
         res.setStatusId("NULL");
-        for(EduTestQuizGroup g: groups){
+        for (EduTestQuizGroup g : groups) {
             List<EduTestQuizGroupParticipationAssignment> L = eduTestQuizGroupParticipationAssignmentRepo.findAllByQuizGroupIdAndParticipationUserLoginId(
                 g.getQuizGroupId(),
                 userId);
-            if(L != null && L.size() > 0){
+            if (L != null && L.size() > 0) {
                 //EduTestQuizGroupParticipationAssignment e = L.get(0);
                 //EduTestQuizGroup g = eduQuizTestGroupRepo.findById(e.getQuizGroupId()).orElse(null);
                 //if(g != null) {
-                    res.setGroupId(g.getQuizGroupId());
-                    res.setGroupCode(g.getGroupCode());
-                    res.setStatusId("OK");
+                res.setGroupId(g.getQuizGroupId());
+                res.setGroupCode(g.getGroupCode());
+                res.setStatusId("OK");
                 //}
             }
         }

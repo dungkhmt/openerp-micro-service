@@ -10,5 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SearchDefenseJuryIM {
-   private String name;
+
+    private String name;
 }

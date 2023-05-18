@@ -18,44 +18,47 @@ public interface LogUserLoginQuizQuestionRepo extends JpaRepository<LogUserLogin
 
     @Query(
         nativeQuery = true,
-        value = "SELECT course.id courseId, course.course_name courseName, cls.code classCode, cls.semester_id semester, " +
-                    "CAST(lg.question_topic_id as VARCHAR(60)) topicId, lg.question_topic_name topicName, " +
-                    "CAST(lg.question_id as VARCHAR(60)) questionId, lg.created_stamp doAt, " +
-                    "CASE " +
-                        "WHEN lg.is_correct_answer = 'Y' THEN 1 " +
-                        "WHEN lg.is_correct_answer = 'N' THEN 0 " +
-                    "END grade " +
-                "FROM (SELECT * FROM log_user_login_quiz_question WHERE user_login_id = :studentLoginId) lg " +
-                "LEFT JOIN edu_class cls " +
-                    "ON lg.class_id = cls.id " +
-                "LEFT JOIN edu_course course " +
-                    "ON cls.course_id = course.id " +
-                "WHERE LOWER(course.id) LIKE CONCAT('%', LOWER(:search), '%') " +
-                    "OR LOWER(course.course_name) LIKE CONCAT('%', LOWER(:search), '%') " +
-                    "OR LOWER(CAST(cls.code AS VARCHAR(6))) LIKE CONCAT('%', LOWER(:search), '%') " +
-                    "OR LOWER(CAST(cls.semester_id AS CHAR(5))) LIKE CONCAT('%', LOWER(:search), '%') " +
-                    "OR LOWER(lg.question_topic_name) LIKE CONCAT('%', LOWER(:search), '%') " +
-                    "OR LOWER(CAST(lg.question_id AS VARCHAR(60))) LIKE CONCAT('%', LOWER(:search), '%') " +
-                    "OR LOWER(CAST(lg.created_stamp AS VARCHAR(60))) LIKE CONCAT('%', LOWER(:search), '%') " +
-                    "OR ( (:search = '1' AND lg.is_correct_answer = 'Y') OR (:search = '0' AND lg.is_correct_answer = 'N') ) " +
-                "ORDER BY lg.created_stamp DESC",
+        value =
+            "SELECT course.id courseId, course.course_name courseName, cls.code classCode, cls.semester_id semester, " +
+            "CAST(lg.question_topic_id as VARCHAR(60)) topicId, lg.question_topic_name topicName, " +
+            "CAST(lg.question_id as VARCHAR(60)) questionId, lg.created_stamp doAt, " +
+            "CASE " +
+            "WHEN lg.is_correct_answer = 'Y' THEN 1 " +
+            "WHEN lg.is_correct_answer = 'N' THEN 0 " +
+            "END grade " +
+            "FROM (SELECT * FROM log_user_login_quiz_question WHERE user_login_id = :studentLoginId) lg " +
+            "LEFT JOIN edu_class cls " +
+            "ON lg.class_id = cls.id " +
+            "LEFT JOIN edu_course course " +
+            "ON cls.course_id = course.id " +
+            "WHERE LOWER(course.id) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "OR LOWER(course.course_name) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "OR LOWER(CAST(cls.code AS VARCHAR(6))) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "OR LOWER(CAST(cls.semester_id AS CHAR(5))) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "OR LOWER(lg.question_topic_name) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "OR LOWER(CAST(lg.question_id AS VARCHAR(60))) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "OR LOWER(CAST(lg.created_stamp AS VARCHAR(60))) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "OR ( (:search = '1' AND lg.is_correct_answer = 'Y') OR (:search = '0' AND lg.is_correct_answer = 'N') ) " +
+            "ORDER BY lg.created_stamp DESC",
         countQuery = "SELECT COUNT(*)" +
                      "FROM (SELECT * FROM log_user_login_quiz_question WHERE user_login_id = :studentLoginId) lg " +
                      "LEFT JOIN edu_class cls " +
-                        "ON lg.class_id = cls.id " +
+                     "ON lg.class_id = cls.id " +
                      "LEFT JOIN edu_course course " +
-                        "ON cls.course_id = course.id " +
+                     "ON cls.course_id = course.id " +
                      "WHERE LOWER(course.id) LIKE CONCAT('%', LOWER(:search), '%') " +
-                        "OR LOWER(course.course_name) LIKE CONCAT('%', LOWER(:search), '%') " +
-                        "OR LOWER(CAST(cls.code AS VARCHAR(6))) LIKE CONCAT('%', LOWER(:search), '%') " +
-                        "OR LOWER(CAST(cls.semester_id AS CHAR(5))) LIKE CONCAT('%', LOWER(:search), '%') " +
-                        "OR LOWER(lg.question_topic_name) LIKE CONCAT('%', LOWER(:search), '%') " +
-                        "OR LOWER(CAST(lg.question_id AS VARCHAR(60))) LIKE CONCAT('%', LOWER(:search), '%') " +
-                        "OR LOWER(CAST(lg.created_stamp AS VARCHAR(60))) LIKE CONCAT('%', LOWER(:search), '%') " +
-                        "OR ( (:search = '1' AND lg.is_correct_answer = 'Y') OR (:search = '0' AND lg.is_correct_answer = 'N') ) "
+                     "OR LOWER(course.course_name) LIKE CONCAT('%', LOWER(:search), '%') " +
+                     "OR LOWER(CAST(cls.code AS VARCHAR(6))) LIKE CONCAT('%', LOWER(:search), '%') " +
+                     "OR LOWER(CAST(cls.semester_id AS CHAR(5))) LIKE CONCAT('%', LOWER(:search), '%') " +
+                     "OR LOWER(lg.question_topic_name) LIKE CONCAT('%', LOWER(:search), '%') " +
+                     "OR LOWER(CAST(lg.question_id AS VARCHAR(60))) LIKE CONCAT('%', LOWER(:search), '%') " +
+                     "OR LOWER(CAST(lg.created_stamp AS VARCHAR(60))) LIKE CONCAT('%', LOWER(:search), '%') " +
+                     "OR ( (:search = '1' AND lg.is_correct_answer = 'Y') OR (:search = '0' AND lg.is_correct_answer = 'N') ) "
 
     )
-    Page<DoingPracticeQuizLogsOM> findDoingPracticeQuizLogsOfStudent(@Param("studentLoginId") String studentLoginId,
-                                                                     @Param("search") String search,
-                                                                     Pageable pageable);
+    Page<DoingPracticeQuizLogsOM> findDoingPracticeQuizLogsOfStudent(
+        @Param("studentLoginId") String studentLoginId,
+        @Param("search") String search,
+        Pageable pageable
+    );
 }

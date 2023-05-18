@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelUpdateProblemContestInput {
+
     private String problemId;
     private String contestId;
     private String submissionMode;

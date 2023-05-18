@@ -13,6 +13,7 @@ import java.util.UUID;
 @Setter
 @Table(name = "edu_resource_domain")
 public class EducationResourceDomain {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(updatable = false, nullable = false)
@@ -27,12 +28,16 @@ public class EducationResourceDomain {
     @CreationTimestamp
     @Column(name = "created_stamp")
     private LocalDateTime createDateTime;
-//    @OneToMany(mappedBy= "domainId")
+
+    //    @OneToMany(mappedBy= "domainId")
 //    private List<EducationResource> resourceId;
-    public EducationResourceDomain(){}
-    public EducationResourceDomain(String _recourse_domain_name){
-        this.name  = _recourse_domain_name;
+    public EducationResourceDomain() {
     }
+
+    public EducationResourceDomain(String _recourse_domain_name) {
+        this.name = _recourse_domain_name;
+    }
+
     @Override
     public String toString() {
         return "education_resource_domain{" +

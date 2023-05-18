@@ -15,9 +15,11 @@ public interface EduTeacherRepo extends JpaRepository<EduTeacher, String> {
     @Query(
         "Select t from EduTeacher t where t.teacherName like %:keyword% or t.id like %:keyword% or t.userLoginId like %:keyword%")
     Page<EduTeacher> findAllContain(@Param("keyword") String keyword, Pageable pageable);
-    
+
     Optional<EduTeacher> findByUserLoginId(String userLoginId);
+
     Optional<EduTeacher> findByTeacherName(String teacherName);
+
     @Query(value = "select * from teacher t where t.id = :id", nativeQuery = true)
     EduTeacher findByTeacherID(String id);
 }

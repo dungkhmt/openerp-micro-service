@@ -11,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Response {
+
     private boolean ok;
     private String err;
     private Object result;

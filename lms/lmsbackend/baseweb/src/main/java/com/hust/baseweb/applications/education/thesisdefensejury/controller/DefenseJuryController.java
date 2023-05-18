@@ -36,6 +36,7 @@ import java.util.UUID;
 @Validated
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class DefenseJuryController {
+
     private final DefenseJuryService juryService;
     private final DefenseJuryTeacherRepo defenseJuryTeacherRepo;
     private final ThesisRepo thesisRepo;
@@ -46,16 +47,16 @@ public class DefenseJuryController {
     public ResponseEntity<?> createDefenseJury(
         Principal principal,
         @RequestBody DefenseJuryIM request
-    ){
+    ) {
         logger.debug(request);
         log.info("Session Login , sessionName = " + principal.getName());
         UserLogin u = userService.findById(principal.getName());
-        if (u == null){
+        if (u == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid session login");
         }
         // TODO: check valid request
         if (request == null) {
-           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request");
         }
 
         request.setUserLoginID(u.getUserLoginId());
@@ -69,49 +70,50 @@ public class DefenseJuryController {
     }
 
     @GetMapping("/defense_jurys")
-    public ResponseEntity<?> getAllDefensseJurys(Pageable pageable){
+    public ResponseEntity<?> getAllDefensseJurys(Pageable pageable) {
         try {
-            Map<String,Object> response = new HashMap<>();
+            Map<String, Object> response = new HashMap<>();
             Page<DefenseJury> pageDF;
             pageDF = juryService.findAll(pageable);
-            response.put("DefenseJurys",pageDF.getContent());
-            response.put("currentPagge",pageDF.getNumber());
-            response.put("totalItems",pageDF.getTotalElements());
-            response.put("totalPages",pageDF.getTotalPages());
+            response.put("DefenseJurys", pageDF.getContent());
+            response.put("currentPagge", pageDF.getNumber());
+            response.put("totalItems", pageDF.getTotalElements());
+            response.put("totalPages", pageDF.getTotalPages());
 
-            return new ResponseEntity<>(response,HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/defense_jury/{defenseJuryId}")
-    public  ResponseEntity<?> getDefenseJury(@PathVariable("defenseJuryId")DefenseJury defenseJury){
+    public ResponseEntity<?> getDefenseJury(@PathVariable("defenseJuryId") DefenseJury defenseJury) {
         // check request
-        if (defenseJury.getId()== null) {
+        if (defenseJury.getId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid defense jury id");
         }
         DefenseJuryOM res = juryService.getDefenseJury(defenseJury);
-        if (res == null){
+        if (res == null) {
             return ResponseEntity.ok().body("Not found defense jury");
         }
         return ResponseEntity.ok().body(res);
     }
 
     @GetMapping("/defense_jury/{defenseJuryId}/thesiss")
-    public  ResponseEntity<?> getListThesisById(@PathVariable("defenseJuryId")UUID juryID){
+    public ResponseEntity<?> getListThesisById(@PathVariable("defenseJuryId") UUID juryID) {
         // check request
-        if (juryID== null) {
+        if (juryID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid defense jury id");
         }
         List<Thesis> res = thesisRepo.findAllByJuryID(juryID);
-        if (res == null){
+        if (res == null) {
             return ResponseEntity.ok().body("Not found thesis");
         }
         return ResponseEntity.ok().body(res);
     }
+
     @PostMapping("/jury/search")
-    public ResponseEntity<?> searchByName(@RequestBody SearchDefenseJuryIM input){
+    public ResponseEntity<?> searchByName(@RequestBody SearchDefenseJuryIM input) {
         // check input
 //        if (input == null){
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request");
@@ -125,9 +127,9 @@ public class DefenseJuryController {
     }
 
     @GetMapping("/defense_jury/{defenseJuryId}/teachers")
-    public  ResponseEntity<?> getListDefenseJuryTeachers(@PathVariable("defenseJuryId")UUID juryID){
+    public ResponseEntity<?> getListDefenseJuryTeachers(@PathVariable("defenseJuryId") UUID juryID) {
         // check request
-        if (juryID== null) {
+        if (juryID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid defense jury id");
         }
         Response res = juryService.getListDefenseJuryTeachers(juryID);
@@ -138,8 +140,8 @@ public class DefenseJuryController {
     @PostMapping("/defense_jury/{defenseJuryId}/addTeacher")
     public ResponseEntity<?> addTeachertoDefenseJury(
         @RequestBody AddTeacherToDefenseJuryIM request,
-        @PathVariable("defenseJuryId")UUID juryID
-    ){
+        @PathVariable("defenseJuryId") UUID juryID
+    ) {
         logger.debug(request);
         // TODO: check valid request
         if (request == null || juryID == null) {
@@ -160,9 +162,9 @@ public class DefenseJuryController {
     @PostMapping("/defense_jury/{defenseJuryId}/deleteTeacher")
     public ResponseEntity<?> deleteTeachertoDefenseJury(
         @RequestBody AddTeacherToDefenseJuryIM request,
-        @PathVariable("defenseJuryId")UUID juryID
-    ){
-        logger.debug("Inout Delete Teacher",request);
+        @PathVariable("defenseJuryId") UUID juryID
+    ) {
+        logger.debug("Inout Delete Teacher", request);
         // TODO: check valid request
         if (request.getTeacherId() == "" || juryID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request");
@@ -182,29 +184,30 @@ public class DefenseJuryController {
     @PostMapping("/defense_jury/{defenseJuryId}/deleteJury")
     public ResponseEntity<?> deleteJurytoDefenseJury(
         @RequestBody ThesisWithDefenseJuryIM request,
-        @PathVariable("defenseJuryId")UUID juryID
-    ){
+        @PathVariable("defenseJuryId") UUID juryID
+    ) {
         logger.debug(request);
         // TODO: check valid request
         if (request == null || juryID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request");
         }
-        Response res = juryService.deleteTheisByIdAtIt(request,juryID);
+        Response res = juryService.deleteTheisByIdAtIt(request, juryID);
 
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
+
     @PostMapping("/defense_jury/{defenseJuryId}/addJury")
     public ResponseEntity<?> addJurytoDefenseJury(
         @RequestBody ThesisWithDefenseJuryIM request,
-        @PathVariable("defenseJuryId")UUID juryID
-    ){
+        @PathVariable("defenseJuryId") UUID juryID
+    ) {
         logger.debug(request);
         // TODO: check valid request
         if (request == null || juryID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid body request");
         }
-        Response res = juryService.addTheisByIdAtIt(request,juryID);
+        Response res = juryService.addTheisByIdAtIt(request, juryID);
 
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
@@ -212,10 +215,10 @@ public class DefenseJuryController {
 
     @GetMapping("/{planId}/defenseJurysBelongPlan")
     public ResponseEntity<?> getAllDefensseJurysBelongPlan(
-        @PathVariable("planId")String planId
-    ){
+        @PathVariable("planId") String planId
+    ) {
         // check input
-        if(planId == ""){
+        if (planId == "") {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid plan id");
         }
         // TODO handler
@@ -223,7 +226,6 @@ public class DefenseJuryController {
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
-
 
 
 }

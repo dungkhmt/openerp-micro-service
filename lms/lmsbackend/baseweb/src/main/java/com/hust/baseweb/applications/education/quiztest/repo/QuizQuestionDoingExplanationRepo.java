@@ -9,5 +9,9 @@ import java.util.UUID;
 
 public interface QuizQuestionDoingExplanationRepo extends JpaRepository<QuizQuestionDoingExplanation, UUID> {
 
-    Collection<QuizQuestionDoingExplanation> findByParticipantUserIdAndQuestionId(String userId, UUID questionId, Sort sort);
+    Collection<QuizQuestionDoingExplanation> findByParticipantUserIdAndQuestionId(
+        String userId,
+        UUID questionId,
+        Sort sort
+    );
 }

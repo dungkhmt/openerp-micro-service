@@ -14,6 +14,7 @@ import java.util.UUID;
 @IdClass(ThesisKeywordID.class)
 @NoArgsConstructor
 public class ThesisKeyword {
+
     @Id
     @Column(name = "thesis_id")
     private UUID thesis;

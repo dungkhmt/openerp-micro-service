@@ -16,7 +16,8 @@ import java.util.List;
 @Service
 @Transactional
 @Slf4j
-public class TranningProgramImpl implements TranningProgramService{
+public class TranningProgramImpl implements TranningProgramService {
+
     private final TranningProgramRepo tranningProgramRepo;
 
     @Override
@@ -28,7 +29,7 @@ public class TranningProgramImpl implements TranningProgramService{
     public Response createTranningProgram(TranningProgramIM request) {
         Response res = new Response();
         // check request
-        if (request.getName() == null  || request.getName() == "" ){
+        if (request.getName() == null || request.getName() == "") {
             res.setErr("Invalid tranning program name");
             res.setOk(false);
             return res;

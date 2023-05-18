@@ -22,6 +22,7 @@ function getAllClients(roomId) {
     return {
       socketId,
       fullName: userSocketMap[socketId]?.fullName,
+      audio: userSocketMap[socketId]?.audio,
     };
   });
 }
@@ -29,7 +30,7 @@ io.on("connection", (socket) => {
   console.log(`Connected ${socket.id}`);
   socket.on(SOCKET_IO_EVENTS.CONNECT_TO_EDITOR, ({ fullName, roomId, peerId }) => {
     socket.join(roomId);
-    userSocketMap[socket.id] = { fullName, roomId, peerId };
+    userSocketMap[socket.id] = { fullName, roomId, peerId, audio: true };
     const clients = getAllClients(roomId);
 
     clients.forEach((client) => {
@@ -63,6 +64,10 @@ io.on("connection", (socket) => {
 
     socket.on(SOCKET_IO_EVENTS.DELETE_USER_PERMISSION, ({ userId }) => {
       socket.broadcast.to(roomId).emit(SOCKET_IO_EVENTS.REFRESH_DELETE_PERMISSION, { userId });
+    });
+
+    socket.on(SOCKET_IO_EVENTS.REQUEST_ON_OFF_MIC, ({ socketId, audio }) => {
+      io.to(roomId).emit(SOCKET_IO_EVENTS.ACCEPT_ON_OFF_MIC, { socketId, audio });
     });
   });
 

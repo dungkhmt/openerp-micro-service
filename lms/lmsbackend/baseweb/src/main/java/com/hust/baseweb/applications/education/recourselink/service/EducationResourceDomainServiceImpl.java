@@ -20,7 +20,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @Slf4j
-public class EducationResourceDomainServiceImpl implements EducationResourceDomainService{
+public class EducationResourceDomainServiceImpl implements EducationResourceDomainService {
 
     private final ResourceDomainRepo resourceDomainRepo;
 
@@ -52,9 +52,9 @@ public class EducationResourceDomainServiceImpl implements EducationResourceDoma
     }
 
     @Override
-    public EducationResourceDomain updateDomain(UUID Id, EducationResourceDomain domain){
+    public EducationResourceDomain updateDomain(UUID Id, EducationResourceDomain domain) {
         Optional<EducationResourceDomain> rd = resourceDomainRepo.findById(Id);
-        if (!rd.isPresent()){
+        if (!rd.isPresent()) {
             return null;
         }
         EducationResourceDomain ed = rd.get();

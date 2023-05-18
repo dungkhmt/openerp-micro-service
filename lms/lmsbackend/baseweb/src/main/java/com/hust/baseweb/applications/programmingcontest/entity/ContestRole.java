@@ -16,27 +16,28 @@ import java.util.Date;
 @IdClass(ContestUserLoginRoleFromDateId.class)
 
 public class ContestRole {
+
     public static final String CONTEST_ROLE_OWNER = "OWNER";
     public static final String CONTEST_ROLE_MANAGER = "MANAGER";
     public static final String CONTEST_ROLE_PARTICIPANT = "PARTICIPANT";
 
     @Id
-    @Column(name="contest_id")
+    @Column(name = "contest_id")
     private String contestId;
 
     @Id
-    @Column(name="user_login_id")
+    @Column(name = "user_login_id")
     private String userLoginId;
 
     @Id
-    @Column(name="role_id")
+    @Column(name = "role_id")
     private String roleId;
 
     @Id
-    @Column(name="from_date")
+    @Column(name = "from_date")
     private Date fromDate;
 
-    @Column(name="thru_date")
+    @Column(name = "thru_date")
     private Date thruDate;
 
 

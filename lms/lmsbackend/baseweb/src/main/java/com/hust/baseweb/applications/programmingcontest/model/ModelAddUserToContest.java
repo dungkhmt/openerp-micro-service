@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelAddUserToContest {
+
     private String contestId;
     private String userId;
     private String role;

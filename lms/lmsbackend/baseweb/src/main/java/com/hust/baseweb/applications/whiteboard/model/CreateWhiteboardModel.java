@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateWhiteboardModel {
+
     private String whiteboardId;
     private UUID classSessionId;
     private String whiteboardName;

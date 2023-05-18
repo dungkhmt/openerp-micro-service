@@ -7,11 +7,13 @@ import lombok.Setter;
 
 import java.util.Date;
 import java.util.UUID;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelProblemSubmissionDetailByTestCaseResponse {
+
     private UUID problemSubmissionDetailByTestCaseId;
     private String contestId;
     private String problemId;

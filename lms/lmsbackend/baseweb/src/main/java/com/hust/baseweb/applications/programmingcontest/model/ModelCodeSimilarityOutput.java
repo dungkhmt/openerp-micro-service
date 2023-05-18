@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelCodeSimilarityOutput {
+
     private List<CodeSimilarityElement> codeSimilarityElementList;
 
 }

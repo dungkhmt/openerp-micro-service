@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface WhiteboardRepo extends JpaRepository<Whiteboard, String> {
+
     List<Whiteboard> findAll();
 
     Whiteboard findWhiteboardById(String whiteboardId);

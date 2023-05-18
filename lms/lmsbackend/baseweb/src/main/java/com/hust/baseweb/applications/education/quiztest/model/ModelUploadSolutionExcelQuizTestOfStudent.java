@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelUploadSolutionExcelQuizTestOfStudent {
+
     private String testId;
     private String userId;
 }

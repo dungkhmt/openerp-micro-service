@@ -17,6 +17,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "edu_quiz_test")
 public class EduQuizTest {
+
     public static final String QUIZ_TEST_STATUS_CREATED = "CREATED";
     public static final String QUIZ_TEST_STATUS_DISABLED = "DISABLED";
     public static final String QUIZ_TEST_STATUS_OPEN = "OPEN";
@@ -38,7 +39,7 @@ public class EduQuizTest {
     public static final String JUDGE_MODE_BATCH_LAZY_EVALUATION = "BATCH_LAZY_EVALUATION";
     public static final String JUDGE_MODE_OFFLINE_VIA_EXCEL_UPLOAD = "OFFLINE_VIA_EXCEL_UPLOAD";
 
-    public static List<String> getListJudgeModes(){
+    public static List<String> getListJudgeModes() {
         List<String> L = new ArrayList();
         L.add(JUDGE_MODE_SYNCHRONOUS);
         L.add(JUDGE_MODE_ASYNCHRONOUS_QUEUE);
@@ -46,7 +47,8 @@ public class EduQuizTest {
         L.add(JUDGE_MODE_OFFLINE_VIA_EXCEL_UPLOAD);
         return L;
     }
-    public static List<String> getListStatusIds(){
+
+    public static List<String> getListStatusIds() {
         List<String> L = new ArrayList();
         L.add(QUIZ_TEST_STATUS_CREATED);
         L.add(QUIZ_TEST_STATUS_DISABLED);
@@ -55,24 +57,30 @@ public class EduQuizTest {
         L.add(QUIZ_TEST_STATUS_RUNNING);
         return L;
     }
-    public static List<String> getListParticipantQuizGroupAssignmentModes(){
+
+    public static List<String> getListParticipantQuizGroupAssignmentModes() {
         List<String> L = new ArrayList();
         L.add(PARTICIPANT_QUIZ_GROUP_ASSIGNMENT_MODE_ASSIGN_GROUP_BEFORE_HANDOUT);
         L.add(PARTICIPANT_QUIZ_GROUP_ASSIGNMENT_MODE_HANDOUT_THEN_UPDATE_GROUP);
         return L;
     }
-    public static List<String> getListQuestionStatementViewType(){
+
+    public static List<String> getListQuestionStatementViewType() {
         List<String> L = new ArrayList();
         L.add(EduQuizTest.QUESTION_STATEMENT_VIEW_TYPE_VISIBLE);
         L.add(EduQuizTest.QUESTION_STATEMENT_VIEW_TYPE_HIDDEN);
         return L;
-    };
-    public static List<String> getListQuizTestViewTypes(){
+    }
+
+    ;
+
+    public static List<String> getListQuizTestViewTypes() {
         List<String> L = new ArrayList();
         L.add(QUIZ_TEST_VIEW_TYPE_LIST);
         L.add(QUIZ_TEST_VIEW_TYPE_STEP);
         return L;
     }
+
     @Id
     @Column(name = "test_id")
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -105,18 +113,18 @@ public class EduQuizTest {
     @Column(name = "class_id")
     private UUID classId;
 
-    @Column(name="session_id")
+    @Column(name = "session_id")
     private UUID sessionId;
 
-    @Column(name="participant_quiz_group_assignment_mode")
+    @Column(name = "participant_quiz_group_assignment_mode")
     private String participantQuizGroupAssignmentMode;
 
-    @Column(name="view_type_id")
+    @Column(name = "view_type_id")
     private String viewTypeId;
 
-    @Column(name="question_statement_view_type_id")
+    @Column(name = "question_statement_view_type_id")
     private String questionStatementViewTypeId;
 
-    @Column(name="judge_mode")
+    @Column(name = "judge_mode")
     private String judgeMode;
 }

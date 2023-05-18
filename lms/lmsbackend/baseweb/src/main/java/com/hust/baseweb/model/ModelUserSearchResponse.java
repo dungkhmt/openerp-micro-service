@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class ModelUserSearchResponse {
+
     private String userName;
     private String middleName;
     private String firstName;

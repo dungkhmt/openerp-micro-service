@@ -16,6 +16,7 @@ import java.util.List;
 //@Table(name = "contest_problem")
 @Table(name = "contest_problem_new")
 public class ProblemEntity implements Serializable {
+
     @Id
     @Column(name = "problem_id")
     private String problemId;
@@ -60,7 +61,7 @@ public class ProblemEntity implements Serializable {
     @Column(name = "solution_checker_source_code")
     private String solutionCheckerSourceCode;
 
-    @Column(name="solution_checker_source_language")
+    @Column(name = "solution_checker_source_language")
     private String solutionCheckerSourceLanguage;
 
     @Column(name = "solution")

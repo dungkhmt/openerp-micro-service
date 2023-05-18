@@ -12,6 +12,7 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode
 public class DefensePlanTeacherID implements Serializable {
+
     private String teacherId;
     private String thesisDefensePlanId;
 }

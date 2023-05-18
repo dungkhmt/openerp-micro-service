@@ -33,14 +33,17 @@ public class QuizQuestionDoingExplanationServiceImpl implements QuizQuestionDoin
         UUID questionId
     ) {
         Sort sortDescByCreatedTime = Sort.by(Sort.Direction.DESC, "createdStamp");
-        return quizDoingExplanationRepo.findByParticipantUserIdAndQuestionId(participantLoginId,
-                                                                             questionId,
-                                                                             sortDescByCreatedTime);
+        return quizDoingExplanationRepo.findByParticipantUserIdAndQuestionId(
+            participantLoginId,
+            questionId,
+            sortDescByCreatedTime);
     }
 
     @Override
-    public QuizQuestionDoingExplanation createExplanation(QuizDoingExplanationInputModel quizDoingExplanationIM,
-                                                          MultipartFile attachment) {
+    public QuizQuestionDoingExplanation createExplanation(
+        QuizDoingExplanationInputModel quizDoingExplanationIM,
+        MultipartFile attachment
+    ) {
         QuizQuestionDoingExplanation newQuizDoingExplanation = new QuizQuestionDoingExplanation();
         newQuizDoingExplanation.setQuestionId(quizDoingExplanationIM.getQuestionId());
         newQuizDoingExplanation.setParticipantUserId(quizDoingExplanationIM.getParticipantUserId());
@@ -57,7 +60,9 @@ public class QuizQuestionDoingExplanationServiceImpl implements QuizQuestionDoin
         MultipartFile attachment
     ) {
         QuizQuestionDoingExplanation updatedQuizDoingExplanation = quizDoingExplanationRepo.findById(explanationId)
-            .orElseThrow(() -> new ResourceNotFoundException("Doesn't exist quiz doing explanation with id " + explanationId));
+                                                                                           .orElseThrow(() -> new ResourceNotFoundException(
+                                                                                               "Doesn't exist quiz doing explanation with id " +
+                                                                                               explanationId));
         updatedQuizDoingExplanation.setSolutionExplanation(newSolutionExplanation);
         setAttachment(updatedQuizDoingExplanation, attachment);
         return quizDoingExplanationRepo.save(updatedQuizDoingExplanation);
@@ -66,7 +71,9 @@ public class QuizQuestionDoingExplanationServiceImpl implements QuizQuestionDoin
     @Override
     public void deleteExplanation(UUID explanationId) {
         QuizQuestionDoingExplanation updatedQuizDoingExplanation = quizDoingExplanationRepo.findById(explanationId)
-            .orElseThrow(() -> new ResourceNotFoundException("Doesn't exist quiz doing explanation with id " + explanationId));
+                                                                                           .orElseThrow(() -> new ResourceNotFoundException(
+                                                                                               "Doesn't exist quiz doing explanation with id " +
+                                                                                               explanationId));
         String attachmentStorageId = updatedQuizDoingExplanation.getAttachment();
         quizDoingExplanationRepo.deleteById(explanationId);
         if (attachmentStorageId != null) {
@@ -75,8 +82,10 @@ public class QuizQuestionDoingExplanationServiceImpl implements QuizQuestionDoin
     }
 
     @Override
-    public QuizQuestionDoingExplanation setAttachment(QuizQuestionDoingExplanation savedSolution,
-                                                      MultipartFile attachment) {
+    public QuizQuestionDoingExplanation setAttachment(
+        QuizQuestionDoingExplanation savedSolution,
+        MultipartFile attachment
+    ) {
         if (attachment == null) {
             return savedSolution;
         }

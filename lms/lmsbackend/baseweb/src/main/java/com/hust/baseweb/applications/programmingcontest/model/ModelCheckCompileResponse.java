@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class ModelCheckCompileResponse {
+
     String status;
     String message;
 }

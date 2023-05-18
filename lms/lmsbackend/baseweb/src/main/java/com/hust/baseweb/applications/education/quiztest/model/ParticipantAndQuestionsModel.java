@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ParticipantAndQuestionsModel {
+
     private String participantUserLoginId;
     private String fullName;
     private QuizGroupTestDetailModel quizGroupTestDetailModel;

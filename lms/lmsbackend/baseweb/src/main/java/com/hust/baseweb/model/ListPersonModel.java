@@ -8,5 +8,6 @@ import org.springframework.data.domain.Page;
 @Builder
 
 public class ListPersonModel {
+
     Page<PersonModel> contents;
 }

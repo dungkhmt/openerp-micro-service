@@ -37,14 +37,14 @@ public class LogUserLoginCourseChapterMaterialServiceImpl implements LogUserLogi
     //private UserCache userCache;
     public static HashMap<String, PersonModel> mUserLoginId2PersonModel = new HashMap();
 
-    public PersonModel getPersonModel(String userLoginId){
-        if(mUserLoginId2PersonModel.get(userLoginId) == null){
+    public PersonModel getPersonModel(String userLoginId) {
+        if (mUserLoginId2PersonModel.get(userLoginId) == null) {
             // load data from DB
             List<UserLogin> userLoginList = userService.getAllUserLogins();
             log.info("UserCache, got list " + userLoginList.size() + " users");
-            for(UserLogin u: userLoginList){
+            for (UserLogin u : userLoginList) {
                 PersonModel pm = userService.findPersonByUserLoginId(u.getUserLoginId());
-                mUserLoginId2PersonModel.put(u.getUserLoginId(),pm);
+                mUserLoginId2PersonModel.put(u.getUserLoginId(), pm);
             }
         }
         return mUserLoginId2PersonModel.get(userLoginId);
@@ -61,7 +61,7 @@ public class LogUserLoginCourseChapterMaterialServiceImpl implements LogUserLogi
     }
 
     @Override
-    public void logUserLoginMaterialV2(String userId, UUID classId, UUID eduCourseChapterMaterialId){
+    public void logUserLoginMaterialV2(String userId, UUID classId, UUID eduCourseChapterMaterialId) {
         EduClass eduClass = classRepo.findById(classId).orElse(null);
 
         LogUserLoginCourseChapterMaterial logUserLoginCourseChapterMaterial = new LogUserLoginCourseChapterMaterial();
@@ -97,7 +97,7 @@ public class LogUserLoginCourseChapterMaterialServiceImpl implements LogUserLogi
             // use cache
             PersonModel personModel = getPersonModel(e.getUserLoginId());
             String datetime = "";
-            if(e.getCreateStamp() != null){
+            if (e.getCreateStamp() != null) {
                 datetime = df.format(e.getCreateStamp());
             }
             studentClassParticipationOutputModels.add(new StudentCourseParticipationModel(
@@ -112,7 +112,11 @@ public class LogUserLoginCourseChapterMaterialServiceImpl implements LogUserLogi
         return studentClassParticipationOutputModels;
     }
 
-    public Page<StudentCourseParticipationModel> findDataByClassIdAndPage(UUID classId, String userIdPattern, Pageable pageable) {
+    public Page<StudentCourseParticipationModel> findDataByClassIdAndPage(
+        UUID classId,
+        String userIdPattern,
+        Pageable pageable
+    ) {
         // find log
         Page<LogUserLoginCourseChapterMaterial> logUserLoginCourseChapterMaterialPage = logUserLoginCourseChapterMaterialRepo
             .findByEduClass_IdAndUserLoginIdContaining(classId, userIdPattern, pageable);
@@ -123,12 +127,14 @@ public class LogUserLoginCourseChapterMaterialServiceImpl implements LogUserLogi
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         HashMap<String, PersonModel> personModelMap = new HashMap();
         EduClass eduClass = null;
-        for(LogUserLoginCourseChapterMaterial l : logUserLoginCourseChapterMaterials){
-            if(eduClass == null) eduClass = l.getEduClass();
+        for (LogUserLoginCourseChapterMaterial l : logUserLoginCourseChapterMaterials) {
+            if (eduClass == null) {
+                eduClass = l.getEduClass();
+            }
 
             PersonModel personModel = null;
             String userLoginId = l.getUserLoginId();
-            if(personModelMap.containsKey(userLoginId)){
+            if (personModelMap.containsKey(userLoginId)) {
                 personModel = personModelMap.get(userLoginId);
             } else {
                 personModel = userService.findPersonByUserLoginId(userLoginId);
@@ -138,13 +144,17 @@ public class LogUserLoginCourseChapterMaterialServiceImpl implements LogUserLogi
             Optional<EduCourseChapterMaterial> eduCourseChapterMaterial = eduCourseChapterMaterialRepo
                 .findById(l.getEduCourseMaterialId());
 
-            String fullName = personModel.getFirstName() + " " + personModel.getMiddleName() + " " + personModel.getLastName();
+            String fullName = personModel.getFirstName() +
+                              " " +
+                              personModel.getMiddleName() +
+                              " " +
+                              personModel.getLastName();
             String datetime = "";
-            if(l.getCreateStamp() != null){
+            if (l.getCreateStamp() != null) {
                 datetime = df.format(l.getCreateStamp());
             }
             String classCourseMaterialName = "";
-            if(eduCourseChapterMaterial.isPresent()){
+            if (eduCourseChapterMaterial.isPresent()) {
                 classCourseMaterialName = eduCourseChapterMaterial.get().getEduCourseMaterialName();
             }
 
@@ -159,7 +169,10 @@ public class LogUserLoginCourseChapterMaterialServiceImpl implements LogUserLogi
             );
         }
 
-        Page<StudentCourseParticipationModel> page = new PageImpl<>(data, pageable, logUserLoginCourseChapterMaterialPage.getTotalElements());
+        Page<StudentCourseParticipationModel> page = new PageImpl<>(
+            data,
+            pageable,
+            logUserLoginCourseChapterMaterialPage.getTotalElements());
         return page;
     }
 }

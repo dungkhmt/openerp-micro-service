@@ -23,17 +23,25 @@ import java.util.*;
 @Log4j2
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @Service
-public class EduQuizTestQuizQuestionServiceImpl implements EduQuizTestQuizQuestionService{
+public class EduQuizTestQuizQuestionServiceImpl implements EduQuizTestQuizQuestionService {
+
     private EduQuizTestQuizQuestionRepo eduQuizTestQuizQuestionRepo;
     private QuizQuestionRepo quizQuestionRepo;
     private QuizQuestionService quizQuestionService;
     private EduQuizTestRepo eduQuizTestRepo;
+
     @Override
     public EduQuizTestQuizQuestion createQuizTestQuestion(UserLogin u, CreateQuizTestQuestionInputModel input) {
-        EduQuizTestQuizQuestion eduQuizTestQuizQuestion = eduQuizTestQuizQuestionRepo.findByTestIdAndQuestionId(input.getTestId(), input.getQuestionId());
-        if(eduQuizTestQuizQuestion != null){
-            log.info("createQuizTestQuestion, item (test " + input.getTestId() + ", question " + input.getQuestionId() + ") EXISTS");
-            if(!eduQuizTestQuizQuestion.getStatusId().equals(EduQuizTestQuizQuestion.STATUS_CREATED)){
+        EduQuizTestQuizQuestion eduQuizTestQuizQuestion = eduQuizTestQuizQuestionRepo.findByTestIdAndQuestionId(
+            input.getTestId(),
+            input.getQuestionId());
+        if (eduQuizTestQuizQuestion != null) {
+            log.info("createQuizTestQuestion, item (test " +
+                     input.getTestId() +
+                     ", question " +
+                     input.getQuestionId() +
+                     ") EXISTS");
+            if (!eduQuizTestQuizQuestion.getStatusId().equals(EduQuizTestQuizQuestion.STATUS_CREATED)) {
                 eduQuizTestQuizQuestion.setStatusId(EduQuizTestQuizQuestion.STATUS_CREATED);
                 eduQuizTestQuizQuestion = eduQuizTestQuizQuestionRepo.save(eduQuizTestQuizQuestion);
             }
@@ -55,9 +63,9 @@ public class EduQuizTestQuizQuestionServiceImpl implements EduQuizTestQuizQuesti
     public int createQuizTestQuestion(UserLogin u, String testId, UUID questionId) {
         EduQuizTestQuizQuestion eduQuizTestQuizQuestion = eduQuizTestQuizQuestionRepo
             .findByTestIdAndQuestionId(testId, questionId);
-        if(eduQuizTestQuizQuestion != null){
+        if (eduQuizTestQuizQuestion != null) {
             log.info("createQuizTestQuestion, item (test " + testId + ", question " + questionId + ") EXISTS");
-            if(!eduQuizTestQuizQuestion.getStatusId().equals(EduQuizTestQuizQuestion.STATUS_CREATED)){
+            if (!eduQuizTestQuizQuestion.getStatusId().equals(EduQuizTestQuizQuestion.STATUS_CREATED)) {
                 eduQuizTestQuizQuestion.setStatusId(EduQuizTestQuizQuestion.STATUS_CREATED);
                 eduQuizTestQuizQuestion = eduQuizTestQuizQuestionRepo.save(eduQuizTestQuizQuestion);
             }
@@ -78,9 +86,9 @@ public class EduQuizTestQuizQuestionServiceImpl implements EduQuizTestQuizQuesti
     @Override
     public EduQuizTestQuizQuestion removeQuizTestQuestion(UserLogin u, CreateQuizTestQuestionInputModel input) {
         EduQuizTestQuizQuestion eduQuizTestQuizQuestion = eduQuizTestQuizQuestionRepo
-            .findByTestIdAndQuestionId(input.getTestId(),input.getQuestionId());
+            .findByTestIdAndQuestionId(input.getTestId(), input.getQuestionId());
 
-        if(eduQuizTestQuizQuestion != null){
+        if (eduQuizTestQuizQuestion != null) {
             eduQuizTestQuizQuestion.setStatusId(EduQuizTestQuizQuestion.STATUS_CANCELLED);
             eduQuizTestQuizQuestion = eduQuizTestQuizQuestionRepo.save(eduQuizTestQuizQuestion);
         }
@@ -95,7 +103,7 @@ public class EduQuizTestQuizQuestionServiceImpl implements EduQuizTestQuizQuesti
 
 
         List<UUID> questionIds = new ArrayList();
-        for(EduQuizTestQuizQuestion q: eduQuizTestQuizQuestions){
+        for (EduQuizTestQuizQuestion q : eduQuizTestQuizQuestions) {
             questionIds.add(q.getQuestionId());
         }
         List<QuizQuestion> quizQuestions = quizQuestionRepo.findAllByQuestionIdIn(questionIds);
@@ -134,9 +142,9 @@ public class EduQuizTestQuizQuestionServiceImpl implements EduQuizTestQuizQuesti
     public List<EduQuizTestModel> getQuizTestsUsingQuestion(UUID questionId) {
         List<EduQuizTestQuizQuestion> quizTestQuestions = eduQuizTestQuizQuestionRepo.findAllByQuestionId(questionId);
         List<EduQuizTestModel> eduQuizTestModels = new ArrayList();
-        for(EduQuizTestQuizQuestion qq: quizTestQuestions){
+        for (EduQuizTestQuizQuestion qq : quizTestQuestions) {
             EduQuizTest quizTest = eduQuizTestRepo.findById(qq.getTestId()).orElse(null);
-            if(quizTest != null){
+            if (quizTest != null) {
                 EduQuizTestModel q = new EduQuizTestModel();
                 q.setTestId(quizTest.getTestId());
                 q.setStatusId(quizTest.getStatusId());

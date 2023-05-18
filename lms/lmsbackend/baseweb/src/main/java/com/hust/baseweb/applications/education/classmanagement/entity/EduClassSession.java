@@ -14,36 +14,36 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="edu_class_session")
+@Table(name = "edu_class_session")
 public class EduClassSession {
+
     public static final String STATUS_CREATED = "CREATED";
     public static final String STATUS_DISABLED = "DISABLED";
     public static final String STATUS_OPEN = "OPEN";
     public static final String STATUS_HIDDEN = "HIDDEN";
 
     @Id
-    @Column(name="session_id")
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @Column(name = "session_id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID sessionId;
 
-    @Column(name="session_name")
+    @Column(name = "session_name")
     private String sessionName;
 
-    @Column(name="class_id")
+    @Column(name = "class_id")
     private UUID classId;
 
-    @Column(name="start_datetime")
+    @Column(name = "start_datetime")
     private Date startDatetime;
 
-    @Column(name="created_by_user_login_id")
+    @Column(name = "created_by_user_login_id")
     private String createdByUserLoginId;
 
-    @Column(name="status_id")
+    @Column(name = "status_id")
     private String statusId;
 
-    @Column(name="description")
+    @Column(name = "description")
     private String description;
-
 
 
 }

@@ -15,30 +15,31 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="edu_class_user_login_role")
+@Table(name = "edu_class_user_login_role")
 @IdClass(EduClassUserLoginRoleId.class)
 public class EduClassUserLoginRole {
+
     public static final String ROLE_PARTICIPANT = "PARTICIPANT";
     public static final String ROLE_OWNER = "OWNER";
     public static final String ROLE_MANAGER = "MANAGER";
 
     @Id
-    @Column(name="class_id")
+    @Column(name = "class_id")
     private UUID classId;
 
     @Id
-    @Column(name="user_login_id")
+    @Column(name = "user_login_id")
     private String userLoginId;
 
     @Id
-    @Column(name="role_id")
+    @Column(name = "role_id")
     private String roleId;
 
     @Id
-    @Column(name="from_date")
+    @Column(name = "from_date")
     private Date fromDate;
 
-    @Column(name="thru_date")
+    @Column(name = "thru_date")
     private Date thruDate;
 
     /*

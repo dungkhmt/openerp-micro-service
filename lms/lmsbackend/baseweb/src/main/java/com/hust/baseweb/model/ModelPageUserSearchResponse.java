@@ -8,5 +8,6 @@ import org.springframework.data.domain.Page;
 @Builder
 
 public class ModelPageUserSearchResponse {
+
     Page<PersonModel> contents;
 }

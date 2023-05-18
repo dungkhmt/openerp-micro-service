@@ -37,7 +37,13 @@ public interface QuizQuestionService {
 
     QuizQuestionDetailModel findById(UUID questionId);
 
-    QuizQuestion update(String userId, UUID questionId, String json, MultipartFile[] files, MultipartFile[] addedSolutionAttachments);
+    QuizQuestion update(
+        String userId,
+        UUID questionId,
+        String json,
+        MultipartFile[] files,
+        MultipartFile[] addedSolutionAttachments
+    );
 
     QuizQuestionUserRole addQuizQuestionUserRole(ModelCreateQuizQuestionUserRole input);
 

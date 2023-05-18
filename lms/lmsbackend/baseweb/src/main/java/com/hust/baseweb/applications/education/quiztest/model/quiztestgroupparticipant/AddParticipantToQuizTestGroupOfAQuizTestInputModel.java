@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddParticipantToQuizTestGroupOfAQuizTestInputModel {
+
     private String userLoginId;
     private String testId;
     private String groupCode;

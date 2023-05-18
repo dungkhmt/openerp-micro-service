@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeleteThesisIM {
+
     private UUID id;
     private String userLogin;
 }

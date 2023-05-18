@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddEduClassUserLoginRoleIM {
+
     private UUID classId;
     private String userLoginId;
     private String roleId;
