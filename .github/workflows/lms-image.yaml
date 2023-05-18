@@ -22,7 +22,7 @@ jobs:
       - name: Build & push Docker image
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
-          image: leanhtuan/baseweb
+          image: leanhtuan/lms
           directory: "lms/lmsbackend/baseweb/"
           registry: docker.io
           dockerfile: "lms/lmsbackend/baseweb/Dockerfile"
