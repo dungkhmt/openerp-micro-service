@@ -18,7 +18,8 @@ public class ProductDTO {
     private String brand;
     private long categoryId;
     private String status;
-    private String massType;
+    @Positive(message = "So luong phai la so duong")
+    private int massQuantity;
     private String sku;
     // TODO: Add images
 //    @Positive(message = "So luong phai la so duong")

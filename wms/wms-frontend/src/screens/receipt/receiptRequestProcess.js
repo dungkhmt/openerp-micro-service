@@ -200,15 +200,7 @@ const ReceiptRequestProcess = ( props ) => {
           setWarehouseList(res.data);
         }
       );
-  
-      await request(
-        "get",
-        API_PATH.PRODUCT,
-        (res) => {
-          setProductList(res.data);
-        }
-      );
-  
+
       setLoading(false);
     }
 

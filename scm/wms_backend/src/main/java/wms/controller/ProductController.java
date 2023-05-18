@@ -9,6 +9,9 @@ import org.springframework.web.multipart.MultipartFile;
 import wms.common.constant.DefaultConst;
 import wms.dto.category.ProductCategoryDTO;
 import wms.dto.product.ProductDTO;
+import wms.dto.product.ProductDiscountDTO;
+import wms.dto.product.ProductPriceDTO;
+import wms.entity.ProductPrice;
 import wms.entity.ResultEntity;
 import wms.repo.ProductUnitRepo;
 import wms.service.product.IProductService;
@@ -89,6 +92,27 @@ public class ProductController extends BaseController {
             productService.deleteProductById(id);
             return response(new ResultEntity(1, "Delete product successfully", id));
         } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+
+    @ApiOperation(value = "Setup giá mua")
+    @PostMapping("/set-purchase-price")
+    public ResponseEntity<?> setPurchasePrice(@Valid @RequestBody ProductPriceDTO productPriceDTO) {
+        try {
+            return response(new ResultEntity(1, "Set purchase price successfully", productService.setPurchasePrice(productPriceDTO)));
+        }
+        catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @ApiOperation(value = "Setup giá bán")
+    @PostMapping("/set-sale-price")
+    public ResponseEntity<?> setSalePrice(@Valid @RequestBody ProductDiscountDTO productDiscountDTO) {
+        try {
+            return response(new ResultEntity(1, "Set sale price successfully", productService.setSalePrice(productDiscountDTO)));
+        }
+        catch (Exception ex) {
             return response(error(ex));
         }
     }

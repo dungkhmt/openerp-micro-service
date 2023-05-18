@@ -3,7 +3,11 @@ package wms.service.product;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.product.ProductDTO;
+import wms.dto.product.ProductDiscountDTO;
+import wms.dto.product.ProductPriceDTO;
 import wms.entity.ProductEntity;
+import wms.entity.ProductPrice;
+import wms.entity.ProductSalePrice;
 import wms.exception.CustomException;
 
 
@@ -16,4 +20,6 @@ public interface IProductService {
     ProductEntity getProductBySku(String sku);
     ProductEntity updateProduct(ProductDTO productDTO, long id) throws CustomException;
     void deleteProductById(long id);
+    ProductPrice setPurchasePrice(ProductPriceDTO productPriceDTO) throws CustomException;
+    ProductSalePrice setSalePrice(ProductDiscountDTO productDiscountDTO) throws CustomException;
 }

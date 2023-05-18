@@ -21,6 +21,8 @@ const TodayDeliveryTrip = () => {
           setTripTableData(res.data);
         }
       )
+
+      setLoading(false);
     }
 
     fetchData();

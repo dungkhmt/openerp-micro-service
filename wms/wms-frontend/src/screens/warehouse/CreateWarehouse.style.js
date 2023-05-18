@@ -133,7 +133,7 @@ const useStyles = makeStyles(() => ({
   },
   canvasWrap: {
     padding: 10,
-    height: 800,
+    height: "100%",
     // maxHeight: 800,
     width: "100%",
     display: "flex",

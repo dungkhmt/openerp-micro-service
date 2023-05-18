@@ -278,6 +278,7 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
   React.useEffect(() => {
     setRows(buildTableData(data, columns));
     setOriginalRows(buildTableData(data, columns));
+    setSearchQuery(''); // work around for bug: not re-render table with rows after fetching data from server 
   }, [data]);
 
   const handleRequestSort = (event, property) => {
@@ -468,7 +469,7 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
       />
 
       {
-        options.search == true &&
+        options?.search == true &&
         <Paper>
           <SearchBar setSearchQuery={setSearchQuery} />
         </Paper>

@@ -26,4 +26,6 @@ public class DistributingChannel extends BaseEntity implements Serializable {
     @JsonIgnore
     private Set<ContractType> contractTypes;
 
+    @Column(name = "promotion")
+    private double promotion;
 }

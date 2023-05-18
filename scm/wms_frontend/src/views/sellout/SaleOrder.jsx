@@ -1,20 +1,14 @@
 import AddIcon from "@mui/icons-material/Add";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { Box, Button, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { Action } from "components/action/Action";
-import PrimaryButton from "components/button/PrimaryButton";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
-import CustomizedDialogs from "components/dialog/CustomizedDialogs";
 import CustomModal from "components/modal/CustomModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import {
-  useGetSaleOrderList,
-  useUpdateSaleOrderStatus,
-} from "controllers/query/sale-order-query";
+import { useGetSaleOrderList } from "controllers/query/sale-order-query";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
@@ -32,7 +26,6 @@ function SaleOrderScreen({ screenAuthorization }) {
     page_size: 50,
   });
   const [isAdd, setIsAdd] = useToggle(false);
-  const [isApproved, setIsApproved] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
@@ -47,17 +40,7 @@ function SaleOrderScreen({ screenAuthorization }) {
   };
 
   const { isLoading, data } = useGetSaleOrderList();
-  const updatePurchaseOrderQuery = useUpdateSaleOrderStatus({
-    orderCode: itemSelected?.code,
-  });
 
-  const handleUpdateOrder = async () => {
-    let updateData = {
-      status: "accepted",
-    };
-    if (itemSelected) await updatePurchaseOrderQuery.mutateAsync(updateData);
-    setIsApproved((pre) => !pre);
-  };
   let actions = [
     {
       title: "Mua hộ khách",
@@ -94,15 +77,6 @@ function SaleOrderScreen({ screenAuthorization }) {
       },
       icon: <DeleteIcon />,
       color: AppColors.error,
-    },
-    {
-      title: "Phê duyệt",
-      callback: (item) => {
-        setIsApproved((pre) => !pre);
-        setItemSelected(item);
-      },
-      icon: <CheckCircleIcon />,
-      color: AppColors.green,
     },
   ];
   return (
@@ -153,26 +127,6 @@ function SaleOrderScreen({ screenAuthorization }) {
       >
         <CreateSaleOrderForm setIsAdd={setIsAdd} />
       </CustomModal>
-      <CustomizedDialogs
-        open={isApproved}
-        handleClose={setIsApproved}
-        contentTopDivider
-        contentBottomDivider
-        centerTitle="Phê duyệt đơn hàng này?"
-        content={
-          <Typography color="textSecondary" gutterBottom style={{ padding: 8 }}>
-            Bạn có đồng ý phê duyệt đơn hàng đã tạo này?
-          </Typography>
-        }
-        actions={[
-          <Button onClick={setIsApproved}>Hủy bỏ</Button>,
-          <PrimaryButton onClick={handleUpdateOrder}>Phê duyệt</PrimaryButton>,
-        ]}
-        customStyles={{
-          contents: (theme) => ({ width: "100%" }),
-          actions: (theme) => ({ paddingRight: theme.spacing(2) }),
-        }}
-      />
       <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
         <HeaderModal onClose={setOpenDrawer} title="Sửa thông tin đơn hàng" />
         {/* <UpdateProductForm /> */}
