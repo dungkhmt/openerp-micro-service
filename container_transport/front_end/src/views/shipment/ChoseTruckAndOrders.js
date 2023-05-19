@@ -7,13 +7,13 @@ import DoneIcon from '@mui/icons-material/Done';
 import './styles.scss';
 import { MyContext } from "contextAPI/MyContext";
 
-const ChoseTruckAndOrders = ({ trucks, setTruck, truckSelected , orders, ordersSelect, setOrdersSelect}) => {
+const ChoseTruckAndOrders = ({ trucks, setTruck, truckSelected, setTruckSelect, orders, ordersSelect, setOrdersSelect}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [value, setValue] = useState([]);
     const [pendingValue, setPendingValue] = useState([]);
     const open = Boolean(anchorEl);
     const id = open ? 'github-label' : undefined;
-    const [truckSelect, setTruckSelect] = useState();
+    // const [truckSelect, setTruckSelect] = useState();
     const {tripsCreate, setTripCreate } = useContext(MyContext);
     const [tripTmpId, setTripTmpId] = useState('');
     const [tripTmp, setTripTmp] = useState();
@@ -47,9 +47,9 @@ const ChoseTruckAndOrders = ({ trucks, setTruck, truckSelected , orders, ordersS
                     disablePortal
                     id="combo-box-demo"
                     options={trucks}
-                    value={truckSelect}
-                    renderOption={(props, option) => (<li {...props}>{option.truckCode} - {option.facilityName}</li>)}
-                    getOptionLabel={(option) => `${option.truckCode} - ${option.facilityName}`}
+                    value={truckSelected}
+                    renderOption={(props, option) => (<li {...props}>{option.truckCode} - {option?.facilityResponsiveDTO?.facilityName}</li>)}
+                    getOptionLabel={(option) => `${option.truckCode} - ${option?.facilityResponsiveDTO?.facilityName}`}
                     onChange={(event, values) => {
                         setTruckSelect(values)
                         setTruck(values)

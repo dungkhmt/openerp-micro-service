@@ -88,12 +88,14 @@ const CreateTripDetail = () => {
         })
         tripItems.forEach((item, index) => {
             let tripItem = {
-                seqInTrip: index,
+                seqInTrip: index+1,
                 action: item.action,
                 facilityId: item.facilityId,
-                orderId: item.orderId,
+                orderId: item.orderCode,
                 arrivalTime: item.arrivalTime,
-                departureTime: item.departureTime
+                departureTime: item.departureTime,
+                containerId: item?.container?.id,
+                trailerId: item?.trailerId
                 // time
             }
             tripItemTmp.push(tripItem);
@@ -132,35 +134,15 @@ const CreateTripDetail = () => {
             <Divider className="divider-trip-detail" />
             <Box className="content-trip">
                 <Box className="content-truck-and-orders">
-                    <ChoseTruckAndOrders trucks={trucks} setTruck={setTruck} truckSelected={truckSelect}
+                    <ChoseTruckAndOrders trucks={trucks} setTruck={setTruck} truckSelected={truckSelect} setTruckSelect={setTruckSelect}
                     orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} />
                 </Box>
                 <Box className="order-arrangement">
-                    <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} />
+                    <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} />
                 </Box>
                 <Box className="map-order">
                     <Box>
                         <MapComponent tripItems={tripItems}/>
-                        {/* <MapContainer center={[21.018172, 105.829754]} zoom={13} scrollWheelZoom={false} style={{ height: "70vh" }}
-                            // whenCreated={map => setMap(map)}
-                        >
-                            <TileLayer
-                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            />
-                            <RoutingMachine tripItems={tripItems} /> */}
-                            {/* {(tripItems != null && tripItems.length > 0) ? (
-                                tripItems.map((item) => {
-                                    return (
-                                        <Marker position={[item.latitude, item.longitude]}>
-                                            <Popup>
-                                                A pretty CSS3 popup. <br /> Easily customizable.
-                                            </Popup>
-                                        </Marker>
-                                    )
-                                })
-                            ) : null} */}
-                        {/* </MapContainer> */}
                     </Box>
                     <Box>Thong tin trip</Box>
                 </Box>

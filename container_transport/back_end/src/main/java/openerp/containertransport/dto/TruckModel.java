@@ -18,7 +18,8 @@ public class TruckModel implements Serializable {
     private long facilityId;
 //    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 //    private FacilityModel facility;
-    private String facilityName;
+//    private String facilityName;
+    private FacilityResponsiveDTO facilityResponsiveDTO;
     private Integer driverId;
     private String driverName;
     private String status;

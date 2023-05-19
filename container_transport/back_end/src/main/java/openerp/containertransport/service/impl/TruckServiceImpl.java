@@ -5,6 +5,7 @@ import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.containertransport.dto.FacilityModel;
+import openerp.containertransport.dto.FacilityResponsiveDTO;
 import openerp.containertransport.dto.TruckFilterRequestDTO;
 import openerp.containertransport.dto.TruckModel;
 import openerp.containertransport.entity.Facility;
@@ -87,7 +88,14 @@ public class TruckServiceImpl implements TruckService  {
     public TruckModel convertToModel(Truck truck) {
         ModelMapper modelMapper = new ModelMapper();
         TruckModel truckModel = modelMapper.map(truck, TruckModel.class);
-        truckModel.setFacilityName(truck.getFacility().getFacilityName());
+        FacilityResponsiveDTO facilityResponsiveDTO = new FacilityResponsiveDTO();
+        facilityResponsiveDTO.setFacilityId(truck.getFacility().getId());
+        facilityResponsiveDTO.setFacilityCode(truck.getFacility().getFacilityCode());
+        facilityResponsiveDTO.setFacilityName(truck.getFacility().getFacilityName());
+        facilityResponsiveDTO.setLatitude(truck.getFacility().getLatitude());
+        facilityResponsiveDTO.setLongitude(truck.getFacility().getLongitude());
+        facilityResponsiveDTO.setAddress(truck.getFacility().getAddress());
+        truckModel.setFacilityResponsiveDTO(facilityResponsiveDTO);
         return truckModel;
     }
 }

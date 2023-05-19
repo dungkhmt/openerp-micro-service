@@ -8,6 +8,7 @@ import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import ModalTripItem from "./shipmentCreate.js/ModalTripItem";
 
 
 const TripItem = ({ index, item, facilities, setFacilities }) => {
@@ -16,19 +17,19 @@ const TripItem = ({ index, item, facilities, setFacilities }) => {
     const [departureTime, setDepartureTime] = useState(item.departureTime);
     const handleChangeTime = (time, id, type) => {
         facilities.map((facility, i) => {
-        if (facility.id === item.id) {
-            if (type == "arrivalTime") {
-                facility.arrivalTime = time;
+            if (facility.id === item.id) {
+                if (type == "arrivalTime") {
+                    facility.arrivalTime = time;
+                } else {
+                    facility.departureTime = time;
+                }
+                console.log("facility", dayjs(new Date(time)));
+                return facility;
             } else {
-                facility.departureTime = time;
+                return facility;
             }
-            console.log("facility", dayjs(new Date(time)));
-            return facility;
-        } else {
-          return facility;
-        }
-      });
-    //   setCounters(nextCounters);
+        });
+        //   setCounters(nextCounters);
     }
     return (
         <Draggable key={item.id} index={index} draggableId={item.id}>
@@ -50,47 +51,62 @@ const TripItem = ({ index, item, facilities, setFacilities }) => {
                             ? '8px' : '0'
                     }}
                     className="item-facility"
+                    onClick={() => setOpen(!open)}
                 >
-                    <Box onClick={() => setOpen(!open)}>{item.orderCode} - {item.facilityName} - {item.action}</Box>
+                    <Box>{item.orderCode} - {item.facilityName} - {item.action}</Box>
 
                     {open ?
                         (<Box>
-                            <Box className="trips-item-input">
-                                <Box>Arrival Time</Box>
-                                <Box>
-                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DemoContainer components={['DateTimePicker']}>
-                                            <DateTimePicker label="Early Delivery Time"
-                                            defaultValue={item.arrivalTime ? dayjs(new Date(item.arrivalTime)) : null}
-                                            onChange={(e) => handleChangeTime((new Date(e)).getTime(), item.id, "arrivalTime")}
-                                            />
-                                        </DemoContainer>
-                                    </LocalizationProvider>
-                                </Box>
-                            </Box>
-                            <Box className="trips-item-input">
-                                <Box>Departure Time</Box>
-                                <Box>
-                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DemoContainer components={['DateTimePicker']}>
-                                            <DateTimePicker label="Early Delivery Time"
-                                            defaultValue={item.departureTime ? dayjs(new Date(item.departureTime)) : null}
-                                            onChange={(e) => handleChangeTime((new Date(e)).getTime(), item.id, "departureTime")}
-                                            />
-                                        </DemoContainer>
-                                    </LocalizationProvider>
-                                </Box>
-                            </Box>
+                            {item?.action != "DEPART" && item?.action != "STOP" ? (
+                                <Box className="trips-item-input">
+                                    <Box>Container: {item?.container?.containerCode}</Box>
+                                </Box>) : null}
+                            {index != 0 ? (
+                                < Box className="trips-item-input">
+                                    <Box>Arrival Time:</Box>
+                                    <Box>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DemoContainer components={['DateTimePicker']}>
+                                                <DateTimePicker label="Early Delivery Time"
+                                                    defaultValue={item.arrivalTime ? dayjs(new Date(item.arrivalTime)) : null}
+                                                    onChange={(e) => handleChangeTime((new Date(e)).getTime(), item.id, "arrivalTime")}
+                                                />
+                                            </DemoContainer>
+                                        </LocalizationProvider>
+                                    </Box>
+                                </Box>) : null
+                            }
+                            {index != facilities.length - 1 ? (
+                                <Box className="trips-item-input">
+                                    <Box>Departure Time:</Box>
+                                    <Box>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DemoContainer components={['DateTimePicker']}>
+                                                <DateTimePicker label="Early Delivery Time"
+                                                    defaultValue={item.departureTime ? dayjs(new Date(item.departureTime)) : null}
+                                                    onChange={(e) => handleChangeTime((new Date(e)).getTime(), item.id, "departureTime")}
+                                                />
+                                            </DemoContainer>
+                                        </LocalizationProvider>
+                                    </Box>
+                                </Box>) : null
+                            }
                         </Box>) : null}
                 </div>
-            )}
-        </Draggable>
+            )
+            }
+        </Draggable >
     )
 }
 
-const OrderArrangement = ({ ordersSelect, setTripItem, tripId }) => {
+const OrderArrangement = ({ ordersSelect, setTripItem, truckSelected, tripId }) => {
     const [facilities, setFacilities] = useState([]);
+    const [facilitiesFinal, setFacilitiesFinal] = useState([]);
     const [open, setOpen] = useState(false);
+
+    const handleModal = () => {
+        setOpen(!open);
+    }
 
     const reorder = (list, startIndex, endIndex) => {
         const result = Array.from(list);
@@ -107,6 +123,33 @@ const OrderArrangement = ({ ordersSelect, setTripItem, tripId }) => {
     };
     useEffect(() => {
         let facilitiesTmp = [];
+        if (truckSelected) {
+            let startPoint = {
+                id: truckSelected?.id + "S1",
+                facilityId: truckSelected?.facilityResponsiveDTO?.facilityId,
+                facilityName: truckSelected?.facilityResponsiveDTO?.facilityName,
+                facilityCode: truckSelected?.facilityResponsiveDTO?.facilityCode,
+                action: "DEPART",
+                orderCode: truckSelected?.truckCode,
+                longitude: truckSelected?.facilityResponsiveDTO?.longitude,
+                latitude: truckSelected?.facilityResponsiveDTO?.latitude,
+                arrivalTime: null,
+                departureTime: null
+            }
+            facilitiesTmp.push(startPoint);
+            facilitiesTmp = facilitiesTmp.concat(facilities);
+            setFacilitiesFinal(facilitiesTmp);
+        }
+        if (!truckSelected) {
+            // facilitiesTmp = facilitiesFinal;
+            // facilitiesTmp.splice(0, 1);
+            setFacilitiesFinal(facilities);
+        }
+    }, [truckSelected]);
+    console.log("facilities154", facilitiesFinal);
+    useEffect(() => {
+        let facilitiesTmp = [];
+        let startPoints = [];
         ordersSelect.forEach((item) => {
             let fromFacility = {
                 id: item?.id + "F1",
@@ -118,13 +161,14 @@ const OrderArrangement = ({ ordersSelect, setTripItem, tripId }) => {
                 action: "PICKUP-CONTAINER",
                 orderCode: item?.orderCode,
                 orderId: item.id,
+                container: item?.containers[0],
                 longitude: item?.fromFacility.longitude,
                 latitude: item?.fromFacility.latitude,
                 arrivalTime: null,
                 departureTime: null
             }
             let toFacility = {
-                id: item?.id + "T2",
+                id: item?.id + "F2",
                 facilityId: item?.toFacility.facilityId,
                 facilityName: item?.toFacility.facilityName,
                 facilityCode: item?.toFacility.facilityCode,
@@ -133,6 +177,7 @@ const OrderArrangement = ({ ordersSelect, setTripItem, tripId }) => {
                 action: "DELIVERY-CONTAINER",
                 orderCode: item?.orderCode,
                 orderId: item.id,
+                container: item?.containers[0],
                 longitude: item?.toFacility.longitude,
                 latitude: item?.toFacility.latitude,
                 arrivalTime: null,
@@ -141,14 +186,32 @@ const OrderArrangement = ({ ordersSelect, setTripItem, tripId }) => {
             facilitiesTmp.push(fromFacility);
             facilitiesTmp.push(toFacility);
         });
+        if (truckSelected) {
+            let startPoint = {
+                id: truckSelected?.id + "S1",
+                facilityId: truckSelected?.facilityResponsiveDTO?.facilityId,
+                facilityName: truckSelected?.facilityResponsiveDTO?.facilityName,
+                facilityCode: truckSelected?.facilityResponsiveDTO?.facilityCode,
+                action: "DEPART",
+                orderCode: truckSelected?.truckCode,
+                longitude: truckSelected?.facilityResponsiveDTO?.longitude,
+                latitude: truckSelected?.facilityResponsiveDTO?.latitude,
+                arrivalTime: null,
+                departureTime: null
+            }
+            startPoints.push(startPoint);
+        }
         setFacilities(facilitiesTmp);
-        if (tripId) {
-            setTripItem(facilitiesTmp)
+        startPoints = startPoints.concat(facilitiesTmp);
+        setFacilitiesFinal(startPoints);
+        if (!tripId) {
+            setTripItem(startPoints)
         }
     }, [ordersSelect])
-    console.log("facilities", facilities);
+
+    console.log("truckSelected", truckSelected);
     const handleAddTripItem = () => {
-        
+        setOpen(true);
     }
     return (
         <Box className="facility-arrangment">
@@ -156,20 +219,21 @@ const OrderArrangement = ({ ordersSelect, setTripItem, tripId }) => {
                 <Typography>Facilities Arrangement:</Typography>
                 <Button variant="contained" className="header-trip-detail-btn-save"
                     onClick={handleAddTripItem}
-                    >Add TripItem
+                >Add TripItem
                 </Button>
             </Box>
             <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable droppableId="droppable">
                     {(provided) => (
                         <Box ref={provided.innerRef} {...provided.droppableProps}>
-                            {facilities.map((item, index) => (
-                                <TripItem index={index} item={item} facilities={facilities} setFacilities={setFacilities}/>
-                            ))}
+                            {facilitiesFinal ? facilitiesFinal.map((item, index) => (
+                                <TripItem index={index} item={item} facilities={facilitiesFinal} setFacilities={setFacilitiesFinal} />
+                            )) : null}
                         </Box>
                     )}
                 </Droppable>
             </DragDropContext>
+            <ModalTripItem openModal={open} handleModal={handleModal} />
         </Box>
     )
 }

@@ -42,8 +42,18 @@ public class TripItem {
     @Column(name = "departure_time")
     private Long departureTime;
 
-    @Column(name = "truck_id")
-    private Integer truckId;
+    @ManyToOne()
+    @JoinColumn(name = "container_id", referencedColumnName = "id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Container container;
+
+    @ManyToOne()
+    @JoinColumn(name = "trailer_id", referencedColumnName = "id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Trailer trailer;
+
+    @Column(name = "order_id")
+    private String orderId;
 
     @Column(name = "status")
     private String status;

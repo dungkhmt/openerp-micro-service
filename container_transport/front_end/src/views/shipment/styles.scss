@@ -14,6 +14,19 @@
 
 .container {
     min-width: fit-content;
+    .btn-add {
+        .btn-header {
+            display: flex;
+            align-items: center;
+            float: right;
+            margin-bottom: 16px;
+            .material-icons {
+                height: auto;
+                display: flex;
+                margin-right: 4px;
+            }
+        }
+    }
     .divider {
         margin-top: 8px;
         margin-bottom: 48px;
@@ -69,7 +82,11 @@
     flex-direction: row;
     justify-content: space-between;
     background-color: rgb(246, 246, 246);
-
+    .btn-header {
+        .header-create-shipment-btn-cancel {
+            margin-right: 32px;
+        }
+    }
     .MuiButtonBase-root {
         min-width: 70px;
         line-height: 1.5;
@@ -79,17 +96,6 @@
         .MuiTypography-root {
             font-size: 24px;
             font-weight: 700;
-        }
-    }
-
-    .btn-header {
-        display: flex;
-        align-items: center;
-
-        .material-icons {
-            height: auto;
-            display: flex;
-            margin-right: 4px;
         }
     }
 }
@@ -284,7 +290,10 @@
                 .MuiTypography-root {
                     font-weight: 700;
                 }
-
+                .header-trip-detail-btn-save {
+                    margin-top: 16px;
+                    margin-bottom: 8px;
+                }
             }
         }
 

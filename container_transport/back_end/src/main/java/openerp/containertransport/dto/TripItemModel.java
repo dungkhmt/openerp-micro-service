@@ -19,6 +19,11 @@ public class TripItemModel implements Serializable {
     private String action;
     private Long facilityId;
     private String facilityName;
+    private Long containerId;
+    private String containerCode;
+    private Long trailerId;
+    private String trailerCode;
+    private String orderId;
     @JsonProperty("status")
     private String status;
     private long arrivalTime;

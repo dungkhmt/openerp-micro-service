@@ -19,6 +19,7 @@ const TruckAndOrder = ({ trucks, setTruckSelect, truckSelect, orders, ordersSele
 
     useEffect(() => {
         setValue(ordersSelect);
+        setPendingValue(ordersSelect);
     }, [ordersSelect])
     const handleClick = (event) => {
         setPendingValue(value);
@@ -47,8 +48,8 @@ const TruckAndOrder = ({ trucks, setTruckSelect, truckSelect, orders, ordersSele
                     id="combo-box-demo"
                     options={trucks}
                     value={truckSelect}
-                    renderOption={(props, option) => (<li {...props}>{option.truckCode} - {option.facilityName}</li>)}
-                    getOptionLabel={(option) => `${option.truckCode} - ${option.facilityName}`}
+                    renderOption={(props, option) => (<li {...props}>{option.truckCode} - {option?.facilityResponsiveDTO?.facilityName}</li>)}
+                    getOptionLabel={(option) => `${option.truckCode} - ${option?.facilityResponsiveDTO?.facilityName}`}
                     onChange={(event, values) => {
                         setTruckSelect(values)
                         // setTruckId(values.id)}

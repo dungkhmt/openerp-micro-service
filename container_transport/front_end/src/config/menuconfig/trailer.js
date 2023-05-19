@@ -6,7 +6,7 @@ export const trailer = {
       {
         id: "MENU_CONTAINER.TRAILER",
         path: "/trailer",
-        isPublic: true,
+        isPublic: false,
         text: "Trailer Management",
         child: [],
       },

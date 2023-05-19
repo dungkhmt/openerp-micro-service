@@ -44,16 +44,16 @@ const TripScreen = () => {
             tripList: tripListTmp
         }
         console.log("data", data);
-        // request(
-        //     "post",
-        //     `/shipment/create`, {}, {}, data
-        // ).then((res) => {
-        //     console.log(res);
-        //     setTripCreate([]);
-        //     setTruckScheduler([]);
-        //     setOrderScheduler([]);
-        //     history.push('/shipment');
-        // })
+        request(
+            "post",
+            `/shipment/create`, {}, {}, data
+        ).then((res) => {
+            console.log(res);
+            setTripCreate([]);
+            setTruckScheduler([]);
+            setOrderScheduler([]);
+            history.push('/shipment');
+        })
     }
     console.log("tripsCreate", tripsCreate)
     return (
@@ -63,27 +63,30 @@ const TripScreen = () => {
                     <Box className="title">
                         <Typography >Create Shipment</Typography>
                     </Box>
-                    <Box className="btn-add"
-                        onClick={() => history.push('/shipment/trip/create')}
-                    >
-                        <PrimaryButton className="btn-header">
-                            <Icon className="icon">
-                                {menuIconMap.get("ControlPointIcon")}
-                            </Icon>
-                            <Typography>
-                                New Trip
-                            </Typography>
-                        </PrimaryButton>
+                    <Box className="btn-header">
+                        <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
+                            onClick={handleCancelCreateShipment}
+                        >Cancel</Button>
+                        <Button variant="contained" className="header-submit-shipment-btn-save"
+                            onClick={handleSubmitShipment}
+                        >Save</Button>
                     </Box>
-                    <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                        onClick={handleCancelCreateShipment}
-                    >Cancel</Button>
-                    <Button variant="contained" className="header-submit-shipment-btn-save"
-                    onClick={handleSubmitShipment}
-                    >Save</Button>
+
                 </Box>
                 <Box className="divider">
                     <Divider />
+                </Box>
+                <Box className="btn-add"
+                    onClick={() => history.push('/shipment/trip/create')}
+                >
+                    <PrimaryButton className="btn-header">
+                        <Icon className="icon">
+                            {menuIconMap.get("ControlPointIcon")}
+                        </Icon>
+                        <Typography>
+                            New Trip
+                        </Typography>
+                    </PrimaryButton>
                 </Box>
                 <CreateTripContents trips={tripsCreate} />
             </Container>

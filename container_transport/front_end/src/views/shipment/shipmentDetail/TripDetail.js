@@ -95,7 +95,7 @@ const TripDetail = () => {
                         orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} tripId={tripId} />
                 </Box>
                 <Box className="order-arrangement">
-                    <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} tripId={tripId} />
+                    <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} tripId={tripId} />
                 </Box>
                 <Box className="map-order">
                     <Box>
