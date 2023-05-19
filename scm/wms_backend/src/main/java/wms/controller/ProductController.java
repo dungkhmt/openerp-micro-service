@@ -11,12 +11,14 @@ import wms.dto.category.ProductCategoryDTO;
 import wms.dto.product.ProductDTO;
 import wms.dto.product.ProductDiscountDTO;
 import wms.dto.product.ProductPriceDTO;
+import wms.dto.sale_order.UpdateSaleOrderStatusDTO;
 import wms.entity.ProductPrice;
 import wms.entity.ResultEntity;
 import wms.repo.ProductUnitRepo;
 import wms.service.product.IProductService;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/product")
@@ -98,11 +100,29 @@ public class ProductController extends BaseController {
 
     @ApiOperation(value = "Setup giá mua")
     @PostMapping("/set-purchase-price")
-    public ResponseEntity<?> setPurchasePrice(@Valid @RequestBody ProductPriceDTO productPriceDTO) {
+    public ResponseEntity<?> setPurchasePrice(@Valid @RequestBody List<ProductPriceDTO> productPriceDTO) {
         try {
-            return response(new ResultEntity(1, "Set purchase price successfully", productService.setPurchasePrice(productPriceDTO)));
+            productService.setPurchasePrice(productPriceDTO);
+            return response(new ResultEntity(1, "Set purchase price successfully", null));
         }
         catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @GetMapping("/get-all-sellin-price")
+    public ResponseEntity<?> getSellinPrices() {
+        try {
+            return response(new ResultEntity(1, "Get all sellin prices successfully", productService.getAllSellinPrice()));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @PutMapping("/sellin-price/update")
+    public ResponseEntity<?> updateProductSellinPrice(@RequestBody ProductPriceDTO priceDTO,
+                                                   @RequestParam(value = "productCode", required = true) String productCode) {
+        try {
+            return response(new ResultEntity(1, "Update product successfully", productService.updateSellinPrice(priceDTO, productCode)));
+        } catch (Exception ex) {
             return response(error(ex));
         }
     }

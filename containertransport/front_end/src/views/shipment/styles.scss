@@ -1,0 +1,334 @@
+.fullScreen {
+    background-color: rgb(246, 246, 246);
+    min-height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    .MuiContainer-root {
+        padding: 0;
+    }
+
+    // margin-top: 20px;
+}
+
+.container {
+    min-width: fit-content;
+    .btn-add {
+        .btn-header {
+            display: flex;
+            align-items: center;
+            float: right;
+            margin-bottom: 16px;
+            .material-icons {
+                height: auto;
+                display: flex;
+                margin-right: 4px;
+            }
+        }
+    }
+    .divider {
+        margin-top: 8px;
+        margin-bottom: 48px;
+    }
+
+    .toast {
+        position: absolute;
+        z-index: 100;
+        top: 16px;
+        right: 8px;
+    }
+}
+
+.headerScreen-trip-detail {
+    .headerScreen-trip-detail-go-back {
+        display: flex;
+    }
+
+    .headerScreen-trip-detail-info {
+        padding: 25px 16px 20px 16px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        background-color: rgb(246, 246, 246);
+
+        .MuiButtonBase-root {
+            min-width: 70px;
+            line-height: 1.5;
+        }
+
+        .title {
+            .MuiTypography-root {
+                font-size: 24px;
+                font-weight: 700;
+            }
+        }
+        .btn-header {
+            display: flex;
+            align-items: center;
+    
+            .material-icons {
+                height: auto;
+                display: flex;
+                margin-right: 4px;
+            }
+        }
+    }
+}
+
+.headerScreen {
+    padding: 25px 16px 20px 16px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgb(246, 246, 246);
+    .btn-header {
+        .header-create-shipment-btn-cancel {
+            margin-right: 32px;
+        }
+    }
+    .MuiButtonBase-root {
+        min-width: 70px;
+        line-height: 1.5;
+    }
+
+    .title {
+        .MuiTypography-root {
+            font-size: 24px;
+            font-weight: 700;
+        }
+    }
+}
+
+.modal {
+    position: absolute;
+    margin-top: 10%;
+    margin-left: 35%;
+    min-width: 700px;
+    height: auto;
+    background-color: white;
+    padding: 32px;
+
+    .header-modal {
+        font-weight: 800;
+
+        .header-modal-text {
+            font-weight: 650;
+        }
+    }
+
+    .body-modal {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .body-modal-item {
+            width: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+
+            .body-modal-item-text {
+                font-weight: 600;
+            }
+        }
+
+        .body-modal-item-input {
+            .MuiOutlinedInput-root {
+                height: 40px;
+                width: 300px;
+            }
+
+            .MuiFormLabel-root {
+                font-size: 12px;
+            }
+        }
+    }
+
+    .footer-modal {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 32px;
+
+        .btn-modal {
+            display: flex;
+            justify-content: space-between;
+            width: 25%;
+            margin-right: 32px;
+        }
+    }
+}
+
+.contentModal {
+    .contentModal-item {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 32px;
+        margin-bottom: 32px;
+        align-items: center;
+
+        .contentModal-item-text {
+            width: 40%;
+
+            .MuiTypography-root {
+                font-weight: 600;
+            }
+        }
+
+        .contentModal-item-input {
+            width: 60%;
+            display: flex;
+
+            .MuiOutlinedInput-root {
+                height: 40px;
+                width: 100%;
+            }
+
+            .MuiFormLabel-root {
+                font-size: 12px;
+            }
+
+            .MuiFormControl-root {
+                min-width: 100%;
+            }
+
+            .MuiStack-root {
+                width: 100%;
+                overflow: hidden;
+                padding-top: 12px;
+            }
+
+            .MuiAutocomplete-root {
+                width: 100%;
+                padding-top: 0px;
+            }
+
+            .MuiChip-root {
+                height: 25px;
+                margin-top: -4px;
+            }
+        }
+    }
+}
+
+.bodyContent {
+    background-color: white;
+}
+
+.trip-create {
+    padding: 0px 32px 0px 0px;
+
+    
+
+    .header-trip-detail {
+        display: flex;
+        justify-content: space-between;
+        margin: 32px 0px;
+
+        .header-trip-detail-text {
+            font-weight: 700;
+            margin-left: 40px;
+        }
+
+        .MuiTypography-root {
+            font-size: 22px;
+        }
+
+        .header-trip-detail-btn {
+            .header-trip-detail-btn-cancel {
+                margin-right: 32px;
+            }
+        }
+    }
+
+    .divider-trip-detail {
+        margin-left: 32px;
+    }
+}
+
+.content-trip {
+    display: flex;
+    margin-top: 32px;
+
+    .content-truck-and-orders {
+        min-width: 20%;
+
+        .chose-truck {
+            margin: 0px 0px 16px 32px;
+
+            .MuiTypography-root {
+                font-weight: 700;
+            }
+
+            .chose-truck-text {
+                margin-bottom: 16px;
+            }
+        }
+
+        .chose-orders {
+            margin: 32px 0px 16px 32px;
+
+            .chose-orders-header {
+                .MuiTypography-root {
+                    font-weight: 700;
+                }
+
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+    }
+
+    .order-arrangement {
+        margin-left: 32px;
+        min-width: 30%;
+
+        .facility-arrangment {
+            .facility-arrangment-text {
+                .MuiTypography-root {
+                    font-weight: 700;
+                }
+                .header-trip-detail-btn-save {
+                    margin-top: 16px;
+                    margin-bottom: 8px;
+                }
+            }
+        }
+
+        .item-facility {
+            // width: 50%;
+            margin-top: 16px;
+            border: 1px solid #e5e5e5;
+        }
+    }
+
+    .map-order {
+        width: 48%;
+    }
+}
+.item-facility {
+    width: 350px;
+    margin-top: 32px;
+    border: 1px solid #e5e5e5;
+    .trips-item-input {
+        margin-top: 16px;
+        width: fit-content;
+    }
+}
+.trip-detail {
+    padding: 8px 32px;
+    .header-trip-detail {
+        .headerScreen-trip-detail-go-back {
+            display: flex;
+        }
+        .header-trip-detail-text {
+            margin-top: 16px;
+            font-weight: 700;
+            margin-left: 40px;
+            font-size: 22px;
+        }
+        
+    }
+}

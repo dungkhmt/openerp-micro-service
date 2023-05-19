@@ -10,6 +10,8 @@ import wms.entity.ProductPrice;
 import wms.entity.ProductSalePrice;
 import wms.exception.CustomException;
 
+import java.util.List;
+
 
 public interface IProductService {
 //    List<ProductEntity> createProductFromExcel(MultipartFile file) throws IOException, CustomException;
@@ -20,6 +22,8 @@ public interface IProductService {
     ProductEntity getProductBySku(String sku);
     ProductEntity updateProduct(ProductDTO productDTO, long id) throws CustomException;
     void deleteProductById(long id);
-    ProductPrice setPurchasePrice(ProductPriceDTO productPriceDTO) throws CustomException;
+    void setPurchasePrice(List<ProductPriceDTO> productPriceDTO) throws CustomException;
+    List<ProductPrice> getAllSellinPrice();
+    ProductPrice updateSellinPrice(ProductPriceDTO productPriceDTO, String productCode) throws CustomException;
     ProductSalePrice setSalePrice(ProductDiscountDTO productDiscountDTO) throws CustomException;
 }
