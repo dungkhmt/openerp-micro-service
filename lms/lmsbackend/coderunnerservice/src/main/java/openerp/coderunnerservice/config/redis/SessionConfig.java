@@ -7,15 +7,8 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
-import org.springframework.session.data.redis.RedisSessionRepository;
-import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
-import org.springframework.session.web.http.HttpSessionIdResolver;
-
-import java.time.Duration;
 
 @Configuration
-@EnableSpringHttpSession
 public class SessionConfig {
 
     @Value("${spring.redis.host}")
@@ -44,13 +37,5 @@ public class SessionConfig {
     public RedisOperations<String, Object> redisOperations() {
         return RedisSerializationBuilder.getSnappyRedisTemplate(redisConnectionFactory(), Object.class);
     }
-
-    @Bean
-    public RedisSessionRepository sessionRepository(RedisTemplate<String, Object> redisTemplate) {
-        RedisSessionRepository redisSessionRepository = new RedisSessionRepository(redisTemplate);
-        redisSessionRepository.setDefaultMaxInactiveInterval(Duration.ofHours(24));
-        return redisSessionRepository;
-    }
-
 
 }
