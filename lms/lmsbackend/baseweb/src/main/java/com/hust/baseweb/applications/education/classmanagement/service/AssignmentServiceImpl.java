@@ -109,7 +109,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     @Override
     public String verifyDownloadPermission(UUID assignId, String token) {
-        String username = getUserNameOfAuthUserWithRole(token, "ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER");
+        String username = getUserNameOfAuthUserWithRole(token, "ROLE_TEACHER");
 
         if (null != username) {
             if (0 == assignRepo.hasDownloadingPermission(username, assignId)) {

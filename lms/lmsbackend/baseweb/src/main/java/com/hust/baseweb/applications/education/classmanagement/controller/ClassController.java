@@ -437,7 +437,7 @@ public class ClassController {
 
         // push notification
         List<String> userLoginIds = userService
-            .findAllUserLoginIdOfGroup("ROLE_EDUCATION_LEARNING_MANAGEMENT_STUDENT");
+            .findAllUserLoginIdOfGroup("ROLE_STUDENT");
         for (String userLoginId : userLoginIds) {
             log.info("createChapterMaterialOfCourse, push notif to " + userLoginId);
             notificationsService.create(u.getUserLoginId(), userLoginId,
