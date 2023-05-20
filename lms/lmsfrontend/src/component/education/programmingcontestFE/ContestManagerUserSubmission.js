@@ -11,7 +11,10 @@ import Pagination from "@material-ui/lab/Pagination";
 import {getStatusColor, StyledTableCell, StyledTableRow} from "./lib";
 import ContestManagerViewSubmissionOfAUserDialog from "./ContestManagerViewSubmissionOfAUserDialog";
 import ManagerSubmitCodeOfParticipantDialog from "./ManagerSubmitCodeOfParticipantDialog";
+import ManagerSubmitCodeOfParticipant from "./ManagerSubmitCodeOfParticipant";
 import {request} from "../../../api";
+import StandardTable from "component/table/StandardTable";
+import HustModal from "component/common/HustModal";
 
 export default function ContestManagerUserSubmission(props) {
   const contestId = props.contestId;
@@ -57,6 +60,43 @@ export default function ContestManagerUserSubmission(props) {
         setTotalPageSubmission(res.data.totalPages);
       }
     ).then();
+  }
+
+  const generateColumns = () => {
+    const columns = [
+      {title: "Submission ID", field: "contestSubmissionId"},
+      {title: "UserID", field: "userId"},
+      {title: "FullName", field: "fullname"},
+      {title: "Problem Id", field: "problemId"},
+      {title: "Test Case Pass", field: "testCasePass"},
+      {title: "Lang", field: "sourceCodeLanguage"},
+      {title: "Status", field: "status"},
+      {title: "Message", field: "message"},
+      {title: "Point", field: "point"},
+      {title: "Submitted At", field: "submissionDate"},
+      {title: "Action", render: (rowData) => (
+        <Button
+          onClick={() => {
+            handleRejudge(rowData.contestSubmissionId);
+          }}
+        >
+          {" "}
+          REJUDGE{" "}
+        </Button>
+      )},
+      {title: "Action", render: (rowData) => (
+        <Button
+          onClick={() => {
+            setSelectedUserId(rowData.userId);
+            setIsOpen(true);
+          }}
+        >
+          {" "}
+          ViewByUser{" "}
+        </Button>
+      )},
+    ]
+    return columns;
   }
 
   function handleRejudge(submissionId) {
@@ -105,31 +145,6 @@ export default function ContestManagerUserSubmission(props) {
         >
           User Submission
         </Typography>
-        <TextField
-          autoFocus
-          required
-          id="userId"
-          label="userId"
-          placeholder="userId"
-          value={userId}
-          onChange={(event) => {
-            setUserId(event.target.value);
-          }}
-        ></TextField>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={getSubmissionOfUser}
-        >
-          View of user
-        </Button>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={ViewAllSubmissions}
-        >
-          View All
-        </Button>
 
         <Button
           variant="contained"
@@ -140,109 +155,18 @@ export default function ContestManagerUserSubmission(props) {
         </Button>
       </section>
 
-      <TableContainer component={Paper}>
-        <Table
-          sx={{ minWidth: window.innerWidth - 500 }}
-          aria-label="customized table"
-        >
-          <TableHead>
-            <TableRow>
-              <StyledTableCell align="center">Submission Id</StyledTableCell>
-              <StyledTableCell align="center">UserID</StyledTableCell>
-              <StyledTableCell align="center">FullName</StyledTableCell>
-              <StyledTableCell align="center">Problem Id</StyledTableCell>
-              <StyledTableCell align="center">Test Case Pass</StyledTableCell>
-              <StyledTableCell align="center">Lang</StyledTableCell>
-              <StyledTableCell align="center">Status</StyledTableCell>
-              <StyledTableCell align="center">Message</StyledTableCell>
-              <StyledTableCell align="center">Point</StyledTableCell>
-              <StyledTableCell align="center">Submitted At</StyledTableCell>
-              <StyledTableCell align="center">Action</StyledTableCell>
-              <StyledTableCell align="center">Action</StyledTableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {contestSubmissions.map((s) => (
-              <StyledTableRow>
-                <StyledTableCell align="center">
-                  <Link
-                    to={
-                      "/programming-contest/manager-view-contest-problem-submission-detail/" +
-                      s.contestSubmissionId
-                    }
-                    style={{
-                      textDecoration: "none",
-                      color: "blue",
-                      cursor: "",
-                    }}
-                  >
-                    <b style={{ color: "blue" }}>{s.contestSubmissionId}</b>
-                  </Link>
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  <b>{s.userId}</b>
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  <b>{s.fullname}</b>
-                </StyledTableCell>
-
-                <StyledTableCell align="center">
-                  <b>{s.problemId}</b>
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  <b>{s.testCasePass}</b>
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  <b>{s.sourceCodeLanguage}</b>
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  <b>
-                    <span
-                      style={{ color: getStatusColor(`${s.status}`) }}
-                    >{`${s.status}`}</span>
-                  </b>
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  <b>{s.message}</b>
-                </StyledTableCell>
-
-                <StyledTableCell align="center">
-                  <b>{s.point}</b>
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  <b>{s.createAt}</b>
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  <b>
-                    <Button
-                      onClick={() => {
-                        handleRejudge(s.contestSubmissionId);
-                      }}
-                    >
-                      {" "}
-                      REJUDGE{" "}
-                    </Button>
-                  </b>
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  <b>
-                    <Button
-                      onClick={() => {
-                        setSelectedUserId(s.userId);
-                        setIsOpen(true);
-                      }}
-                    >
-                      {" "}
-                      ViewByUser{" "}
-                    </Button>
-                  </b>
-                </StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <StandardTable
+          // title={"Contest Ranking"}
+        columns={generateColumns()}
+        data={contestSubmissions}
+        hideCommandBar
+        options={{
+          selection: false,
+          pageSize: 10,
+          search: true,
+          sorting: true,
+        }}
+      />
 
       <Grid container spacing={12}>
         <Grid item xs={6}>
@@ -286,11 +210,22 @@ export default function ContestManagerUserSubmission(props) {
         contestId={contestId}
         userId={selectedUserId}
       />
-      <ManagerSubmitCodeOfParticipantDialog
+      {/* <ManagerSubmitCodeOfParticipantDialog
         open={isOpenManagerSubmitCodeOfParticipant}
         onClose={handleCloseManagerSubmitParticipantCode}
         contestId={contestId}
-      />
+      /> */}
+      <HustModal
+        open={isOpenManagerSubmitCodeOfParticipant}
+        textOk={'OK'}
+        onClose={handleCloseManagerSubmitParticipantCode}
+        title={'Submit code of participant'}
+      >
+        <ManagerSubmitCodeOfParticipant
+          contestId={contestId}
+          onClose={handleCloseManagerSubmitParticipantCode}
+        />
+      </HustModal>
     </div>
   );
 }

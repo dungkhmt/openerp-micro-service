@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {request} from "../../../api";
 import {errorNoti, successNoti} from "../../../utils/notification";
 
-import {Button, Chip} from "@mui/material";
+import { Button, Card, CardContent, Chip, Typography } from "@mui/material";
 import PublishIcon from "@mui/icons-material/Publish";
 import SendIcon from "@mui/icons-material/Send";
 import {LoadingButton} from "@mui/lab";
@@ -58,14 +58,6 @@ export default function ManagerSubmitCodeOfParticipant(props) {
             onChange={(event) => setFilename(event.target.files[0])}
           />
         </Button>
-        {filename && (
-          <Chip
-            color="success"
-            variant="outlined"
-            label={filename.name}
-            onDelete={() => setFilename(undefined)}
-          />
-        )}
         <LoadingButton
           loading={isProcessing}
           endIcon={<SendIcon />}
@@ -77,6 +69,15 @@ export default function ManagerSubmitCodeOfParticipant(props) {
           Submit
         </LoadingButton>
       </div>
+      {filename && (
+        <Chip
+        color="success"
+        variant="outlined"
+        label={filename.name}
+        onDelete={() => setFilename(undefined)}
+        />
+        )}
+      <div>File cần có định dạng {"<userID>_<problemcode>.<extension>"} Ví dụ: 20210000_AddNumber.cpp</div>
     </div>
   );
 }

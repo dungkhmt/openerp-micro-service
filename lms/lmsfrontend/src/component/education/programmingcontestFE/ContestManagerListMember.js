@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {request} from "../../../api";
 import StandardTable from "component/table/StandardTable";
 import {Button, CircularProgress} from "@mui/material";
+import PublishIcon from "@mui/icons-material/Publish";
 import {errorNoti, successNoti} from "utils/notification";
 import {toFormattedDateTime} from "utils/dateutils";
 import UpdatePermissionMemberOfContestDialog from "./UpdatePermissionMemberOfContestDialog";
@@ -171,7 +172,10 @@ export default function ContestManagerListMember(props) {
   }, []);
   return (
     <div>
-      <input type="file" id="selected-upload-file" onChange={onFileChange} />
+      <Button color="primary" variant="contained" component="label">
+        <PublishIcon /> Select file to upload
+        <input hidden type="file" id="selected-upload-file" onChange={onFileChange} />
+      </Button>
       <Button onClick={handleUploadExcelStudentList}>Upload</Button>
       {isProcessing ? <CircularProgress /> : ""}
 

@@ -101,6 +101,7 @@ export default function ContestManagerAddMember2Contest(props) {
     ).then();
   }
   useEffect(() => {
+    searchUser(keyword, pageSearchSize, 1);
     getRoles();
   }, []);
   return (
