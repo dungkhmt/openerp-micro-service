@@ -1,20 +1,20 @@
 package wms.dto.product;
 
-import wms.entity.ProductEntity;
+import wms.dto.BaseReturnDTO;
+import wms.entity.ProductCategory;
+import wms.entity.ProductUnit;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
-public class ProductWithPriceDTO {
-    @NotBlank(message = "Name khong duoc de trong")
+public class ProductReturnDTO extends BaseReturnDTO {
+    private String code;
     private String name;
-    @Positive(message = "Don vi so luong phai la so duong")
     private Integer unitPerBox;
-    private long unitId;
+    private ProductUnit productUnit;
     private String brand;
-    private long categoryId;
+    private ProductCategory productCategory;
     private String status;
-    @Positive(message = "So luong phai la so duong")
     private int massQuantity;
     private String sku;
     double vat;

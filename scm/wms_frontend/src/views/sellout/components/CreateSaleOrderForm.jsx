@@ -1,12 +1,16 @@
-import { Button, InputBase, Stack } from "@mui/material";
+import { Box, Button, InputBase, Stack, Typography } from "@mui/material";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomSelect from "components/select/CustomSelect";
 import {
   useGetCustomerList,
   useGetProductList,
 } from "controllers/query/category-query";
-import { useState } from "react";
-import { useCreateSaleOrder } from "../../../controllers/query/sale-order-query";
+import { useMemo, useState } from "react";
+import { useGetSellinPrice } from "../../../controllers/query/purchase-order-query";
+import {
+  useCreateSaleOrder,
+  useGetSelloutPrice,
+} from "../../../controllers/query/sale-order-query";
 import { staticProductFields } from "../LocalConstant";
 
 const {
@@ -42,7 +46,10 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
   });
   const { isLoading: isLoadingCustomer, data: customer } = useGetCustomerList();
   const { isLoading: isLoadingProduct, data: product } = useGetProductList();
-
+  const { isLoading: isLoadingSellinPrice, data: sellinPrice } =
+    useGetSellinPrice();
+  const { isLoading: isLoadingSelloutPrice, data: selloutPrice } =
+    useGetSelloutPrice();
   const createSaleOrderQuery = useCreateSaleOrder();
 
   const onSubmit = async (data) => {
@@ -50,7 +57,9 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
       boughtBy: data?.boughtBy?.code,
       orderItems: data?.products?.map((pro) => {
         return {
-          priceUnit: 35000,
+          priceUnit:
+            (pro?.sellinPrice?.priceBeforeVat * (100 + pro?.sellinPrice?.vat)) /
+            100,
           productCode: pro?.code,
           quantity: pro?.quantity,
         };
@@ -61,26 +70,72 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
     setIsAdd((pre) => !pre);
     reset();
   };
+  // const mergeProductWithPrice = useMemo(() => {
+  //   let result = selloutPrice?.map((price) => {
+  //     let productList = product?.content?.filter((pro) => {
+  //       return pro?.code === price?.productEntity?.code;
+  //     });
+  //     let finalMergedProduct =
+  //       productList?.length > 0
+  //         ? { ...productList?.[0], selloutPrice: price }
+  //         : null;
+  //     if (finalMergedProduct !== null) {
+  //       let currSellinPrice = sellinPrice.find(
+  //         (price) => finalMergedProduct?.code === price?.productEntity?.code
+  //       );
+  //       if (currSellinPrice)
+  //         finalMergedProduct = {
+  //           ...finalMergedProduct,
+  //           sellinPrice: currSellinPrice,
+  //         };
+  //       else return null;
+  //     }
+  //     return finalMergedProduct;
+  //   });
+  //   return result?.every((ele) => ele !== null) ? result : null;
+  // }, [selloutPrice, sellinPrice, product]);
+  const mergeProductWithPrice = useMemo(() => {
+    let result = sellinPrice?.map((price) => {
+      let productList = product?.content?.filter((pro) => {
+        return pro?.code === price?.productEntity?.code;
+      });
+      return productList?.length > 0
+        ? { ...productList?.[0], sellinPrice: price }
+        : null;
+    });
+    return result?.every((ele) => ele !== null) ? result : null;
+  }, [sellinPrice, product]);
+  // const calculateTotalMoney = useMemo(() => {
+  //   let totalMoney = products?.reduce(
+  //     (accum, curr) =>
+  //       accum +
+  //       ((((curr?.sellinPrice?.priceBeforeVat *
+  //         (100 + curr?.sellinPrice?.vat)) /
+  //         100) *
+  //         (100 -
+  //           curr?.selloutPrice?.massDiscount -
+  //           curr?.selloutPrice?.contractDiscount)) /
+  //         100) *
+  //         curr?.quantity,
+  //     0
+  //   );
+  //   return totalMoney ? totalMoney : 0;
+  // }, [products]);
+  const calculateTotalMoney = useMemo(() => {
+    let totalMoney = products?.reduce(
+      (accum, curr) =>
+        accum +
+        ((curr?.sellinPrice?.priceBeforeVat * (100 + curr?.sellinPrice?.vat)) /
+          100) *
+          curr?.quantity,
+      0
+    );
+    return totalMoney ? totalMoney : 0;
+  }, [products]);
+  console.log("Products: ", products);
   return (
     <FormProvider {...methods}>
       <Stack direction="row" justifyContent={"space-around"} spacing={5}>
-        <Controller
-          key={"discount"}
-          control={control}
-          name={"discount"}
-          render={({ field: { onChange, value } }) => (
-            <CustomInput
-              required={true}
-              value={value}
-              type={"number"}
-              onChange={onChange}
-              label={"Khuyến mãi (%)"}
-              isFullWidth={true}
-              error={!!errors["discount"]}
-              message={errors["discount"]?.message}
-            />
-          )}
-        />
         <Controller
           key={"boughtBy"}
           control={control}
@@ -99,6 +154,23 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
             />
           )}
         />
+        <Controller
+          key={"discount"}
+          control={control}
+          name={"discount"}
+          render={({ field: { onChange, value } }) => (
+            <CustomInput
+              required={true}
+              value={value}
+              type={"number"}
+              onChange={onChange}
+              label={"Khuyến mãi (%)"}
+              isFullWidth={true}
+              error={!!errors["discount"]}
+              message={errors["discount"]?.message}
+            />
+          )}
+        />
       </Stack>
       <CustomDataGrid
         isSelectable={true}
@@ -108,7 +180,10 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
         isLoading={isLoadingProduct}
         totalItem={100}
         columns={[
-          ...staticProductFields,
+          staticProductFields[0],
+          staticProductFields[1],
+          // staticProductFields[2],
+          // staticProductFields[3],
           {
             field: "quantity",
             headerName: "Số lượng mua",
@@ -153,13 +228,22 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
               );
             },
           },
+          staticProductFields[4],
         ]}
-        rows={product ? product?.content : []}
+        rows={mergeProductWithPrice ? mergeProductWithPrice : []}
         onSelectionChange={(ids) => {
-          let results = product?.content.filter((pro) => ids.includes(pro?.id));
+          let results = mergeProductWithPrice?.filter((pro) =>
+            ids.includes(pro?.id)
+          );
           setValue("products", results);
         }}
       />
+      <Box>
+        <Typography>
+          Tổng tiền tạm tính (chưa chiết khấu):
+          <span>{calculateTotalMoney}</span>
+        </Typography>
+      </Box>
       <Stack
         direction="row"
         justifyContent={"flex-end"}

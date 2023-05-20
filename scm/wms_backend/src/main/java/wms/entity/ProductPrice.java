@@ -1,5 +1,7 @@
 package wms.entity;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -27,9 +29,9 @@ public class ProductPrice extends BaseEntity implements Serializable {
     @Column(name = "status")
     private String status;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_code", referencedColumnName = "code")
+    @ManyToOne(fetch = FetchType.LAZY)
     @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "product_code", referencedColumnName = "code")
     private ProductEntity productEntity;
 //
 //    @ManyToOne(fetch = FetchType.EAGER)

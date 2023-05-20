@@ -39,8 +39,7 @@ function PurchaseOrderScreen({ screenAuthorization }) {
     });
   };
 
-  const { isLoading, data } = useGetPurchaseOrderList();
-
+  const { isLoading, data: order } = useGetPurchaseOrderList();
   let actions = [
     {
       title: "Đặt mua",
@@ -79,6 +78,7 @@ function PurchaseOrderScreen({ screenAuthorization }) {
       color: AppColors.error,
     },
   ];
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
@@ -117,7 +117,7 @@ function PurchaseOrderScreen({ screenAuthorization }) {
             },
           },
         ]}
-        rows={data ? data?.content : []}
+        rows={order ? order?.content : []}
       />
       <CustomModal
         open={isAdd}

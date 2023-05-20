@@ -24,6 +24,8 @@ public interface IProductService {
     void deleteProductById(long id);
     void setPurchasePrice(List<ProductPriceDTO> productPriceDTO) throws CustomException;
     List<ProductPrice> getAllSellinPrice();
-    ProductPrice updateSellinPrice(ProductPriceDTO productPriceDTO, String productCode) throws CustomException;
-    ProductSalePrice setSalePrice(ProductDiscountDTO productDiscountDTO) throws CustomException;
+    ProductPrice updateSellinPrice(ProductPriceDTO productPriceDTO) throws CustomException;
+    void setSalePrice(List<ProductDiscountDTO> productDiscountDTO) throws CustomException;
+    List<ProductSalePrice> getAllSelloutPrice();
+    ProductSalePrice updateSelloutPrice(ProductDiscountDTO productDiscountDTO) throws CustomException;
 }

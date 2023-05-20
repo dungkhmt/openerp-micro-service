@@ -8,4 +8,5 @@ public class ProductDiscountDTO {
     private double contractDiscount;
     private String contractTypeCode;
     private String productCode;
+    private double priceAfterVat;
 }

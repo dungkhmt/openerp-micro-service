@@ -1,7 +1,7 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import UpdateIcon from "@mui/icons-material/Update";
-import { Box, InputBase } from "@mui/material";
+import { Box, InputBase, Typography } from "@mui/material";
 import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
@@ -9,24 +9,23 @@ import DraggableDeleteDialog from "components/dialog/DraggableDialogs";
 import CustomDrawer from "components/drawer/CustomDrawer";
 import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import moment, { unix } from "moment";
-import { useState } from "react";
-import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
-import { useToggle, useWindowSize } from "react-use";
-import { AppColors } from "shared/AppColors";
-import { CustomDatePicker } from "../../components/datepicker/CustomDatePicker";
 import {
   useGetContractType,
   useGetProductList,
-} from "../../controllers/query/category-query";
+} from "controllers/query/category-query";
+import { useGetSellinPrice } from "controllers/query/purchase-order-query";
+import { useCallback, useMemo, useState } from "react";
+import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
+import { useToggle, useWindowSize } from "react-use";
+import { AppColors } from "shared/AppColors";
 import {
-  useCreateSellinPrice,
-  useGetSellinPrice,
-} from "../../controllers/query/purchase-order-query";
-import { purchaseOrderPrice } from "./LocalConstant";
-import UpdateProductPrice from "./components/UpdateProductPrice";
+  useCreateSelloutPrice,
+  useGetSelloutPrice,
+} from "../../controllers/query/sale-order-query";
+import { saleOrderPrices } from "./LocalConstant";
+import UpdateSalePrice from "./components/UpdateSalePrice";
 
-function PurchasePriceScreen({ screenAuthorization }) {
+function SalePriceScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
     page_size: 50,
@@ -39,7 +38,7 @@ function PurchasePriceScreen({ screenAuthorization }) {
   const methods = useForm({
     mode: "onChange",
     defaultValues: {
-      productPrices: [],
+      productSalePrices: [],
     },
     // resolver: yupResolver(purchaseOrderSchema),
   });
@@ -50,30 +49,30 @@ function PurchasePriceScreen({ screenAuthorization }) {
     setValue,
     control,
   } = methods;
-  const productPrices = useWatch({
+  const productSalePrices = useWatch({
     control,
-    name: "productPrices",
+    name: "productSalePrices",
   });
 
   const { isLoading: isLoadingProduct, data: product } = useGetProductList();
   const { isLoading: isLoadingContract, data: contract } = useGetContractType();
   const { isLoading: isLoadingSellinPrice, data: sellinPrices } =
     useGetSellinPrice();
-  const createPurchasePrices = useCreateSellinPrice();
+  const { isLoading: isLoadingSelloutPrice, data: selloutPrices } =
+    useGetSelloutPrice();
+  const createSalePrices = useCreateSelloutPrice();
 
   const onSubmit = async (data) => {
-    let productPriceParams = data?.productPrices.map((pro) => {
+    let productSalePriceParams = data?.productSalePrices.map((pro) => {
       return {
-        productCode: pro?.code,
-        endedDate: moment(pro?.endedDate),
-        priceBeforeVat: pro?.priceBeforeVat,
-        startedDate: moment(pro?.startedDate),
-        status: "active",
-        vat: pro?.vat,
+        contractDiscount: pro?.contractDiscount,
+        contractTypeCode: pro?.contract?.code,
+        massDiscount: pro?.massDiscount,
+        productCode: pro?.productEntity?.code,
       };
     });
-    if (productPriceParams.length > 0)
-      await createPurchasePrices.mutateAsync(productPriceParams);
+    if (productSalePriceParams.length > 0)
+      await createSalePrices.mutateAsync(productSalePriceParams);
     reset();
   };
 
@@ -92,7 +91,11 @@ function PurchasePriceScreen({ screenAuthorization }) {
       callback: async (item) => {
         setOpenDrawer((pre) => !pre);
         setItemSelected(
-          sellinPrices?.find((el) => el?.productEntity?.code === item?.code)
+          selloutPrices?.find(
+            (el) =>
+              el?.productEntity?.code === item?.productEntity?.code &&
+              el?.contractType?.code === item?.contract?.code
+          )
         );
       },
       icon: <EditIcon />,
@@ -109,6 +112,56 @@ function PurchasePriceScreen({ screenAuthorization }) {
     },
   ];
 
+  const mergedProductContractData = useMemo(() => {
+    let mergedProducts = sellinPrices
+      ?.map((pro) => {
+        return contract?.content?.map((ctr) => {
+          let newPro = { ...pro };
+          newPro["contract"] = ctr;
+          return newPro;
+        });
+      })
+      .flat();
+    return mergedProducts?.map((pro, index) => {
+      return {
+        ...pro,
+        id: index,
+      };
+    });
+  }, [sellinPrices, contract]);
+
+  const renderPriceCell = useCallback(
+    (params) => {
+      const selloutIndex = selloutPrices?.findIndex(
+        (el) =>
+          el?.productEntity?.code === params?.row?.productEntity?.code &&
+          el?.contractType?.code === params?.row?.contract?.code
+      );
+      let contractDiscount = selloutPrices?.[selloutIndex]?.contractDiscount;
+      let massDiscount = selloutPrices?.[selloutIndex]?.massDiscount;
+      const mergedProductIndex = mergedProductContractData?.findIndex(
+        (el) =>
+          el?.productEntity?.code === params?.row?.productEntity?.code &&
+          el?.contract?.code === params?.row?.contract?.code
+      );
+      let priceBeforeVat =
+        mergedProductContractData[mergedProductIndex]?.priceBeforeVat;
+      let vat = mergedProductContractData[mergedProductIndex]?.vat;
+      let priceAfterAll =
+        (((priceBeforeVat * (100 + vat)) / 100) *
+          (100 - contractDiscount - massDiscount)) /
+        100;
+      console.log("Price: ", priceAfterAll, priceBeforeVat, vat, params);
+      return priceAfterAll ? (
+        <Typography>
+          <Typography>{priceAfterAll}</Typography>
+        </Typography>
+      ) : (
+        "Chưa xác định"
+      );
+    },
+    [selloutPrices, mergedProductContractData]
+  );
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
@@ -123,17 +176,21 @@ function PurchasePriceScreen({ screenAuthorization }) {
           totalItem={100}
           isSelectable
           isEditable={(params) => {
-            return !sellinPrices?.find(
-              (el) => el?.productEntity?.code === params?.row?.code
+            return !selloutPrices?.find(
+              (el) =>
+                el?.productEntity?.code === params?.row?.productEntity?.code &&
+                el?.contractType?.code === params?.row?.contract?.code
             );
           }}
           columns={[
-            purchaseOrderPrice[0],
-            purchaseOrderPrice[1],
-            purchaseOrderPrice[2],
+            saleOrderPrices[0],
+            saleOrderPrices[1],
+            saleOrderPrices[2],
+            saleOrderPrices[3],
+            saleOrderPrices[4],
             {
-              field: "priceBeforeVat",
-              headerName: "Giá trước thuế",
+              field: "massDiscount",
+              headerName: "Chiết khấu bán sỉ (%)",
               sortable: false,
               minWidth: 150,
               type: "number",
@@ -141,25 +198,30 @@ function PurchasePriceScreen({ screenAuthorization }) {
               headerAlign: "center",
               align: "center",
               renderCell: (params) => {
-                const price = productPrices?.find((el) => el.id === params.id);
-                const sellinPrice = sellinPrices?.find(
-                  (el) => el?.productEntity?.code === params?.row?.code
+                const price = productSalePrices?.find(
+                  (el) => el.id === params.id
                 );
-                return sellinPrice
-                  ? sellinPrice?.priceBeforeVat
+                const selloutPrice = selloutPrices?.find(
+                  (el) =>
+                    el?.productEntity?.code ===
+                      params?.row?.productEntity?.code &&
+                    el?.contractType?.code === params?.row?.contract?.code
+                );
+                return selloutPrice
+                  ? selloutPrice?.massDiscount
                   : price
-                  ? price?.priceBeforeVat
-                  : "Nhập giá tiền";
+                  ? price?.massDiscount
+                  : "Nhập %";
               },
               renderEditCell: (params) => {
-                const index = productPrices?.findIndex(
+                const index = productSalePrices?.findIndex(
                   (el) => el.id === params.id
                 );
                 const value =
-                  index !== -1 ? productPrices[index]?.priceBeforeVat : null;
+                  index !== -1 ? productSalePrices[index]?.massDiscount : null;
                 return (
                   <Controller
-                    name={`productPrices.${index}.priceBeforeVat`}
+                    name={`productSalePrices.${index}.massDiscount`}
                     control={control}
                     render={({ field: { onChange } }) => (
                       <InputBase
@@ -185,8 +247,8 @@ function PurchasePriceScreen({ screenAuthorization }) {
               },
             },
             {
-              field: "vat",
-              headerName: "Thuế VAT (%)",
+              field: "contractDiscount",
+              headerName: "Chiết khấu hợp đồng (%)",
               sortable: false,
               minWidth: 150,
               type: "number",
@@ -194,24 +256,32 @@ function PurchasePriceScreen({ screenAuthorization }) {
               headerAlign: "center",
               align: "center",
               renderCell: (params) => {
-                const price = productPrices?.find((el) => el.id === params.id);
-                const sellinPrice = sellinPrices?.find(
-                  (el) => el?.productEntity?.code === params?.row?.code
-                );
-                return sellinPrice
-                  ? sellinPrice?.vat
-                  : price
-                  ? price?.vat
-                  : "Nhập thuế ";
-              },
-              renderEditCell: (params) => {
-                const index = productPrices?.findIndex(
+                const price = productSalePrices?.find(
                   (el) => el.id === params.id
                 );
-                const value = index !== -1 ? productPrices[index]?.vat : null;
+                const selloutPrice = selloutPrices?.find(
+                  (el) =>
+                    el?.productEntity?.code ===
+                      params?.row?.productEntity?.code &&
+                    el?.contractType?.code === params?.row?.contract?.code
+                );
+                return selloutPrice
+                  ? selloutPrice?.contractDiscount
+                  : price
+                  ? price?.contractDiscount
+                  : "Nhập %";
+              },
+              renderEditCell: (params) => {
+                const index = productSalePrices?.findIndex(
+                  (el) => el.id === params.id
+                );
+                const value =
+                  index !== -1
+                    ? productSalePrices[index]?.contractDiscount
+                    : null;
                 return (
                   <Controller
-                    name={`productPrices.${index}.vat`}
+                    name={`productSalePrices.${index}.contractDiscount`}
                     control={control}
                     render={({ field: { onChange } }) => (
                       <InputBase
@@ -237,78 +307,14 @@ function PurchasePriceScreen({ screenAuthorization }) {
               },
             },
             {
-              field: "startedDate",
-              headerName: "Ngày bắt đầu",
+              field: "priceAfterAll",
+              headerName: "Giá cuối cùng",
               sortable: false,
               minWidth: 150,
-              type: "date",
-              editable: true,
+              headerAlign: "center",
+              align: "center",
               renderCell: (params) => {
-                const product = productPrices?.find(
-                  (el) => el.id === params.id
-                );
-                const sellinPrice = sellinPrices?.find(
-                  (el) => el?.productEntity?.code === params?.row?.code
-                );
-                return sellinPrice
-                  ? unix(sellinPrice?.startedDate).format("DD-MM-YYYY")
-                  : product
-                  ? moment(product?.startedDate).format("DD-MM-YYYY")
-                  : "Nhập ngày bắt đầu";
-              },
-              renderEditCell: (params) => {
-                const index = productPrices?.findIndex(
-                  (el) => el.id === params.id
-                );
-
-                const value =
-                  index !== -1 ? productPrices[index]?.startedDate : null;
-                return (
-                  <Controller
-                    name={`productPrices.${index}.startedDate`}
-                    control={control}
-                    render={({ field: { onChange } }) => (
-                      <CustomDatePicker value={value} onChange={onChange} />
-                    )}
-                  />
-                );
-              },
-            },
-            {
-              field: "endedDate",
-              headerName: "Ngày hết hạn",
-              sortable: false,
-              minWidth: 150,
-              type: "date",
-              editable: true,
-              renderCell: (params) => {
-                const product = productPrices?.find(
-                  (el) => el.id === params.id
-                );
-                const sellinPrice = sellinPrices?.find(
-                  (el) => el?.productEntity?.code === params?.row?.code
-                );
-                return sellinPrice
-                  ? unix(sellinPrice?.endedDate).format("DD-MM-YYYY")
-                  : product
-                  ? moment(product?.endedDate).format("DD-MM-YYYY")
-                  : "Nhập ngày hết hạn";
-              },
-              renderEditCell: (params) => {
-                const index = productPrices?.findIndex(
-                  (el) => el.id === params.id
-                );
-                const value =
-                  index !== -1 ? productPrices[index]?.endedDate : null;
-                return (
-                  <Controller
-                    name={`productPrices.${index}.endedDate`}
-                    control={control}
-                    render={({ field: { onChange } }) => (
-                      <CustomDatePicker value={value} onChange={onChange} />
-                    )}
-                  />
-                );
+                return renderPriceCell(params);
               },
             },
             {
@@ -317,11 +323,15 @@ function PurchasePriceScreen({ screenAuthorization }) {
               headerAlign: "center",
               align: "center",
               sortable: false,
-              width: 125,
-              minWidth: 150,
-              maxWidth: 200,
+              flex: 1,
               type: "actions",
               getActions: (params) => {
+                let price = selloutPrices?.find(
+                  (el) =>
+                    el?.productEntity?.code ===
+                      params?.row?.productEntity?.code &&
+                    el?.contractType?.code === params?.row?.contract?.code
+                );
                 return [
                   ...extraActions.map((extraAction, index) => (
                     <Action
@@ -329,18 +339,19 @@ function PurchasePriceScreen({ screenAuthorization }) {
                       key={index}
                       extraAction={extraAction}
                       onActionCall={extraAction.callback}
+                      disabled={!price}
                     />
                   )),
                 ];
               },
             },
           ]}
-          rows={product?.content ? product?.content : []}
+          rows={mergedProductContractData ? mergedProductContractData : []}
           onSelectionChange={(ids) => {
-            let results = product?.content?.filter((pro) =>
+            let results = mergedProductContractData.filter((pro) =>
               ids.includes(pro?.id)
             );
-            setValue("productPrices", results);
+            setValue("productSalePrices", results);
           }}
         />
       </FormProvider>
@@ -349,7 +360,7 @@ function PurchasePriceScreen({ screenAuthorization }) {
           onClose={setOpenDrawer}
           title="Sửa thông tin giá sản phẩm"
         />
-        <UpdateProductPrice currPrice={itemSelected} setIsAdd={setOpenDrawer} />
+        <UpdateSalePrice currPrice={itemSelected} setIsAdd={setOpenDrawer} />
       </CustomDrawer>
       <DraggableDeleteDialog
         // disable={isLoadingRemove}
@@ -362,4 +373,4 @@ function PurchasePriceScreen({ screenAuthorization }) {
 }
 
 const SCR_ID = "SCR_PURCHASE_PRICE";
-export default withScreenSecurity(PurchasePriceScreen, SCR_ID, true);
+export default withScreenSecurity(SalePriceScreen, SCR_ID, true);

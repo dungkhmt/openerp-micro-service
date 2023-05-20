@@ -30,4 +30,10 @@ public class ProductSalePrice extends BaseEntity implements Serializable {
 
     @Column(name = "contract_discount")
     private double contractDiscount;
+
+//    @Column(name = "price_after_vat")
+//    private double priceAfterVat;
+//
+//    @Column(name = "price_after_all")
+//    private double priceAfterAll;
 }

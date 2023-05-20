@@ -1,10 +1,13 @@
-import { Button, InputBase, Stack } from "@mui/material";
+import { Box, Button, InputBase, Stack, Typography } from "@mui/material";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomSelect from "components/select/CustomSelect";
 import { useGetProductList } from "controllers/query/category-query";
 import { useGetFacilityList } from "controllers/query/facility-query";
-import { useCreatePurchaseOrder } from "controllers/query/purchase-order-query";
-import { useState } from "react";
+import {
+  useCreatePurchaseOrder,
+  useGetSellinPrice,
+} from "controllers/query/purchase-order-query";
+import { useMemo, useState } from "react";
 import { staticProductFields } from "../LocalConstant";
 
 const {
@@ -40,7 +43,8 @@ const CreatePurOrderForm = ({ setIsAdd }) => {
   });
   const { isLoading: isLoadingFacility, data: facility } = useGetFacilityList();
   const { isLoading: isLoadingProduct, data: product } = useGetProductList();
-
+  const { isLoading: isLoadingSellinPrice, data: sellinPrice } =
+    useGetSellinPrice();
   const createPurchaseOrderQuery = useCreatePurchaseOrder();
 
   const onSubmit = async (data) => {
@@ -48,7 +52,8 @@ const CreatePurOrderForm = ({ setIsAdd }) => {
       boughtBy: data?.boughtBy?.code,
       orderItems: data?.products?.map((pro) => {
         return {
-          priceUnit: 35000,
+          priceUnit:
+            (pro?.price?.priceBeforeVat * (100 + pro?.price?.vat)) / 100,
           productCode: pro?.code,
           quantity: pro?.quantity,
         };
@@ -60,6 +65,27 @@ const CreatePurOrderForm = ({ setIsAdd }) => {
     setIsAdd((pre) => !pre);
     reset();
   };
+  const mergeProductWithPrice = useMemo(() => {
+    let result = sellinPrice?.map((price) => {
+      let productList = product?.content?.filter((pro) => {
+        return pro?.code === price?.productEntity?.code;
+      });
+      return productList?.length > 0
+        ? { ...productList?.[0], price: price }
+        : null;
+    });
+    return result?.every((ele) => ele !== null) ? result : null;
+  }, [sellinPrice, product]);
+  const calculateTotalMoney = useMemo(() => {
+    let totalMoney = products?.reduce(
+      (accum, curr) =>
+        accum +
+        ((curr?.price?.priceBeforeVat * (100 + curr?.price?.vat)) / 100) *
+          curr?.quantity,
+      0
+    );
+    return totalMoney ? totalMoney : 0;
+  }, [products]);
   return (
     <FormProvider {...methods}>
       <Stack direction="row" justifyContent={"space-around"} spacing={5}>
@@ -126,7 +152,9 @@ const CreatePurOrderForm = ({ setIsAdd }) => {
         isLoading={isLoadingProduct}
         totalItem={100}
         columns={[
-          ...staticProductFields,
+          staticProductFields[0],
+          staticProductFields[1],
+          staticProductFields[2],
           {
             field: "quantity",
             headerName: "Số lượng mua",
@@ -138,12 +166,12 @@ const CreatePurOrderForm = ({ setIsAdd }) => {
             align: "center",
             flex: 1,
             renderCell: (params) => {
-              const product = products.find((el) => el.id === params.id);
-              return product ? product.quantity : "Nhập số lượng";
+              const product = products?.find((el) => el?.id === params?.id);
+              return product ? product?.quantity : "Nhập số lượng";
             },
             renderEditCell: (params) => {
-              const index = products?.findIndex((el) => el.id === params.id);
-              const value = index !== -1 ? products[index].quantity : null;
+              const index = products?.findIndex((el) => el?.id === params?.id);
+              const value = index !== -1 ? products?.[index]?.quantity : null;
               return (
                 <Controller
                   name={`products.${index}.quantity`}
@@ -171,13 +199,21 @@ const CreatePurOrderForm = ({ setIsAdd }) => {
               );
             },
           },
+          staticProductFields[3],
         ]}
-        rows={product ? product?.content : []}
+        rows={mergeProductWithPrice ? mergeProductWithPrice : []}
         onSelectionChange={(ids) => {
-          let results = product?.content.filter((pro) => ids.includes(pro?.id));
+          let results = mergeProductWithPrice?.filter((pro) =>
+            ids.includes(pro?.id)
+          );
           setValue("products", results);
         }}
       />
+      <Box>
+        <Typography>
+          Tổng tiền: <span>{calculateTotalMoney}</span>
+        </Typography>
+      </Box>
       <Stack
         direction="row"
         justifyContent={"flex-end"}
