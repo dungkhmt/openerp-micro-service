@@ -90,7 +90,6 @@ export default function ContestManagerUserSubmission(props) {
             onClick={() => {
               handleRejudge(rowData.contestSubmissionId);
             }}
-            sx={{marginBottom: "12px"}}
           >
             {" "}
             REJUDGE{" "}
