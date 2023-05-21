@@ -6,7 +6,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import {Search, SearchIconWrapper} from "./lib";
 import {InputBase} from "@mui/material";
 import StandardTable from "component/table/StandardTable";
-import {Button, MenuItem, TextField} from "@mui/material/";
+import {Button} from "@mui/material/";
 import AddMember2ContestDialog from "./AddMember2ContestDialog";
 import {request} from "../../../api";
 
@@ -30,7 +30,7 @@ export default function ContestManagerAddMember2Contest(props) {
     {
       title: "Action",
       render: (row) => (
-        <Button onClick={() => handleClick(row["userName"])}>Select</Button>
+        <Button variant="contained" onClick={() => handleClick(row["userName"])}>Select</Button>
       ),
     },
   ];
