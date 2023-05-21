@@ -87,34 +87,6 @@ io.on("connection", (socket) => {
   });
 });
 
-app.post("/api/code-editor/execute", async (req, res) => {
-  let language = req.body.language;
-  let input = req.body.input;
-  let source = req.body.source;
-
-  let program = {
-    script: source,
-    language: language,
-    stdin: input,
-    clientId: "22b7c4edab20439cb51b0f0c824a45b",
-    clientSecret: "dee87fb2989c00b374941072f32a5cb2f93de499f53564000fec559204c1f8b4",
-  };
-
-  axios({
-    method: "post",
-    url: "https://api.jdoodle.com/v1/execute",
-    data: program,
-  })
-    .then((response) => {
-      res.send(response.data);
-      //res.send("success")
-    })
-    .catch((err) => {
-      console.log("Error Happening");
-      console.log(err);
-      res.send("Some Error");
-    });
-});
 
 const port = process.env.PORT || 7008;
 server.listen(port, () => console.log(`Server is running on port ${port}`));
