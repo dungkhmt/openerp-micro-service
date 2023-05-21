@@ -118,3 +118,9 @@ app.post("/api/code-editor/execute", async (req, res) => {
 
 const port = process.env.PORT || 7008;
 server.listen(port, () => console.log(`Server is running on port ${port}`));
+
+const { ExpressPeerServer } = require("peer");
+const peerServer = ExpressPeerServer(server, {
+  port: 9000,
+});
+app.use("/api/code-editor/peer-server", peerServer);
