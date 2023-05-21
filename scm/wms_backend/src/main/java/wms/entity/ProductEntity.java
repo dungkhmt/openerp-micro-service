@@ -81,10 +81,9 @@ public class ProductEntity extends BaseEntity implements Serializable {
     @JsonIgnore
     private Set<SaleOrderItem> saleOrderItems;
 
-    @OneToMany(
-            mappedBy = "productEntity",
-            fetch = FetchType.LAZY
-    )
+
+    @OneToMany(mappedBy = "productEntity", fetch = FetchType.LAZY)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JsonIgnore
     private List<ProductPrice> productPrices;
 

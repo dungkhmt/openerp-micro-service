@@ -121,23 +121,53 @@ export const saleOrderCols = [
 
 export const staticProductFields = [
   {
-    field: "code",
-    headerName: "Mã code",
-    sortable: false,
-    pinnable: true,
-    headerAlign: "center",
-    align: "center",
-    minWidth: 150,
-    maxWidth: 200,
-  },
-  {
     field: "name",
     headerName: "Tên sản phẩm",
     sortable: false,
     headerAlign: "center",
     align: "center",
     minWidth: 200,
+    maxWidth: 250,
+  },
+  {
+    field: "price",
+    headerName: "Giá sản phẩm (sau vat)",
+    sortable: false,
+    headerAlign: "center",
+    align: "center",
+    minWidth: 150,
     maxWidth: 200,
+    valueGetter: (params) => {
+      return (
+        (params?.row?.sellinPrice?.priceBeforeVat *
+          (100 + params?.row?.sellinPrice?.vat)) /
+        100
+      );
+    },
+  },
+  {
+    field: "massDiscount",
+    headerName: "Chiết khấu sỉ",
+    sortable: false,
+    headerAlign: "center",
+    align: "center",
+    minWidth: 150,
+    maxWidth: 200,
+    valueGetter: (params) => {
+      return params?.row?.selloutPrice?.massDiscount;
+    },
+  },
+  {
+    field: "contractDiscount",
+    headerName: "Chiết khấu hợp đồng",
+    sortable: false,
+    headerAlign: "center",
+    align: "center",
+    minWidth: 150,
+    maxWidth: 200,
+    valueGetter: (params) => {
+      return params?.row?.selloutPrice?.contractDiscount;
+    },
   },
   {
     field: "status",
@@ -216,6 +246,109 @@ export const deliveryBillCols = [
     minWidth: 200,
     valueGetter: (params) => {
       return params.row?.saleOrder?.code;
+    },
+  },
+];
+
+export const saleOrderPrices = [
+  {
+    field: "productCode",
+    headerName: "Mã sản phẩm",
+    sortable: false,
+    pinnable: true,
+    width: 125,
+    minWidth: 150,
+    maxWidth: 200,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>
+          {params?.row?.productEntity?.code}
+        </Typography>
+      );
+    },
+  },
+  {
+    field: "name",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Tên sản phẩm",
+    sortable: false,
+    minWidth: 150,
+    maxWidth: 200,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ fontWeight: "500" }}>
+          {params?.row?.productEntity?.name}
+        </Typography>
+      );
+    },
+  },
+  {
+    field: "contract",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Tên hợp đồng",
+    sortable: false,
+    minWidth: 150,
+    maxWidth: 200,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ fontWeight: "500" }}>
+          {params?.row?.contract?.name}
+        </Typography>
+      );
+    },
+  },
+  {
+    field: "priceBeforeVat",
+    headerName: "Giá trước thuế",
+    sortable: false,
+    minWidth: 150,
+    headerAlign: "center",
+    align: "center",
+  },
+  {
+    field: "vat",
+    headerName: "Thuế VAT (%)",
+    sortable: false,
+    minWidth: 150,
+    headerAlign: "center",
+    align: "center",
+  },
+  {
+    field: "status",
+    headerName: "Trạng thái",
+    sortable: false,
+    width: 125,
+    minWidth: 150,
+    maxWidth: 200,
+    renderCell: (params) => {
+      return (
+        <Button
+          variant="contained"
+          sx={{
+            borderRadius: "2px",
+            borderWidth: "1px",
+            paddingY: 1,
+            paddingX: 2,
+            height: "24px",
+            background:
+              ITEM_STATUS_COLOR_MAPPING[
+                params?.row?.productEntity?.status.toLowerCase()
+              ],
+          }}
+        >
+          <Typography
+            sx={{
+              textTransform: "lowercase",
+              fontSize: 14,
+              color: "white",
+            }}
+          >
+            {params?.row?.productEntity?.status}
+          </Typography>
+        </Button>
+      );
     },
   },
 ];

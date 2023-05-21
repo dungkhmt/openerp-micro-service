@@ -45,4 +45,7 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
             "where dti.order_id = ?1 and dti.is_deleted = false and dti.status = 'FAIL' " +
             "and p.product_id = ?2 ", nativeQuery = true)
     Long getTotalFailDeliveryItemByOrderIdAndProductId(UUID orderId, UUID productId);
+
+    @Query("select dti from DeliveryTripItem dti join SaleOrderHeader soh on soh.orderId = dti.orderId where soh.userLoginId = ?1 and dti.isDeleted = false ")
+    List<DeliveryTripItem> getDeliveryTripItemByUserLoginId(String userLoginId);
 }

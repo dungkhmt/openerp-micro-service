@@ -8,6 +8,7 @@ import { successNoti } from "utils/notification";
 import { Fragment, useState, useEffect } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const ProductListing =  () => {
   const [productTableData, setProductTableData] = useState([]);
@@ -85,4 +86,5 @@ const ProductListing =  () => {
   );
 }
 
-export default ProductListing;
+const SCR_ID = "SCR_WMSv2_PRODUCT_LISTING";
+export default withScreenSecurity(ProductListing, SCR_ID, true);

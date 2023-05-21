@@ -72,6 +72,7 @@ const CreatePurchaseBill = ({ setIsAdd, currOrder }) => {
         columns={[
           staticProductFields[0],
           staticProductFields[1],
+          staticProductFields[2],
           {
             field: "quantity",
             headerName: "Số lượng mua",

@@ -47,7 +47,7 @@ public class TeacherClassAssignmentController {
         return ResponseEntity.ok().body(classTeacherAssignmentPlanList);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/add-teacher")
     public ResponseEntity<?> addTeacher(Principal principal, @RequestBody EduTeacher teacher) {
         String result = planService.addTeacher(teacher);

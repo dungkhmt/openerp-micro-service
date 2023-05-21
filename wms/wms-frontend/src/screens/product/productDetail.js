@@ -16,6 +16,7 @@ import { request } from 'api';
 import { API_PATH } from '../apiPaths';
 import LoadingScreen from "components/common/loading/loading";
 import StandardTable from "components/StandardTable";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const DetailQuantityTable = ({ 
   isCreateForm, 
@@ -620,4 +621,5 @@ const ProductDetail = ( props ) => {
 
 }
 
-export default ProductDetail;
+const SCR_ID = "SCR_WMSv2_PRODUCT";
+export default withScreenSecurity(ProductDetail, SCR_ID, true);

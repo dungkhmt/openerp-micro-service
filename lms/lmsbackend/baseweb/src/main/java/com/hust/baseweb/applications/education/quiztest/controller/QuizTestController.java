@@ -63,7 +63,7 @@ public class QuizTestController {
     private EduTestQuizParticipantService eduTestQuizParticipantService;
     private QuizGroupQuestionAssignmentRepo quizGroupQuestionAssignmentRepo;
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/create-quiz-test")
     public ResponseEntity<?> createQuizCourseTopic(
         Principal principal,
@@ -79,21 +79,21 @@ public class QuizTestController {
         return ResponseEntity.ok().body(quizTestService.save(input, user));
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/update-quiz-test")
     public ResponseEntity<?> updateQuizTest(Principal principal, @RequestBody EditQuizTestInputModel input) {
         EduQuizTest eduQuizTest = quizTestService.update(input);
         return ResponseEntity.ok().body(eduQuizTest);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/open-quiz-test/{testId}")
     public ResponseEntity<?> openQuizTest(Principal principal, @PathVariable String testId) {
         EduQuizTest eduQuizTest = quizTestService.openQuizTest(testId);
         return ResponseEntity.ok().body(eduQuizTest);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/hide-quiz-test/{testId}")
     public ResponseEntity<?> hideQuizTest(Principal principal, @PathVariable String testId) {
         EduQuizTest eduQuizTest = quizTestService.hideQuizTest(testId);
@@ -163,7 +163,7 @@ public class QuizTestController {
         return ResponseEntity.ok().build();
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/get-all-quiz-test-by-user")
     public ResponseEntity<?> getAllQuizTestByUserLogin(
         Principal principal
@@ -174,7 +174,7 @@ public class QuizTestController {
         return ResponseEntity.ok().body(res);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/get-quiz-test")
     public ResponseEntity<?> getQuizTestByTestId(
         Principal principal,
@@ -290,7 +290,7 @@ public class QuizTestController {
     }
 
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/get-all-student-in-test")
     public ResponseEntity<?> getAllStudentInTest(
         Principal principal, @RequestParam(required = false, name = "testId") String testId
@@ -379,7 +379,7 @@ public class QuizTestController {
 
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/reject-students-in-test")
     public ResponseEntity<?> rejectStudentInTest(
         Principal principal,
@@ -390,7 +390,7 @@ public class QuizTestController {
         return ResponseEntity.ok().body(quizTestService.rejectStudentsInTest(testId, students));
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/accept-students-in-test")
     public ResponseEntity<?> acceptStudentInTest(
         Principal principal,
@@ -401,7 +401,7 @@ public class QuizTestController {
         return ResponseEntity.ok().body(quizTestService.acceptStudentsInTest(testId, students));
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/get-test-groups-info")
     public ResponseEntity<?> getTestGroups(
         @RequestParam(required = false, name = "testId") String testId
@@ -409,7 +409,7 @@ public class QuizTestController {
         return ResponseEntity.ok().body(quizTestService.getQuizTestGroupsInfoByTestId(testId));
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/delete-quiz-test-groups")
     public ResponseEntity<?> deleteQuizTestGroups(
         Principal principal,
@@ -420,7 +420,7 @@ public class QuizTestController {
         return ResponseEntity.ok().body(quizTestService.deleteQuizTestGroups(testId, list));
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/get-quiz-test-participation-execution-result")
     public ResponseEntity<?> getQuizTestParticipationExecutionResult(
         Principal principal, @RequestBody
@@ -433,7 +433,7 @@ public class QuizTestController {
         return ResponseEntity.ok().body(quizTestParticipationExecutionResultOutputModels);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/get-quiz-test-participation-execution-result-of-user-login/{userLoginId}")
     public ResponseEntity<?> getQuizTestParticipationExecutionResultOfAStudent(
         Principal principal, @PathVariable String userLoginId
@@ -445,7 +445,7 @@ public class QuizTestController {
         return ResponseEntity.ok().body(userQuestionExecutions);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/copy-question-from-quiztest-to-quiztest")
     public ResponseEntity<?> copyQuestionFromQuizTestId2QuizTestId(
         Principal principal,

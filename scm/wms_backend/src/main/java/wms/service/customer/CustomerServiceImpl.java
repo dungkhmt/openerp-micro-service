@@ -53,6 +53,9 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
         if (createdBy == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown staff create this customer, can't create");
         }
+        if (customer.getLongitude() == "" || customer.getLatitude() == "") {
+            throw caughtException(ErrorCode.FORMAT.getCode(), "Location didn't validate, can't create");
+        }
 //        if (facility == null) {
 //            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Customer with no specific facility, can't create");
 //        }

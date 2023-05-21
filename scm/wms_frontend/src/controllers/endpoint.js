@@ -48,6 +48,9 @@ export const endPoint = {
   getSaleOrderItems: baseUrl + "/sale-order/get-order-items",
   createSaleOrder: baseUrl + "/sale-order/create",
   updateSaleOrderStatus: baseUrl + "/sale-order/update-status",
+  createSelloutPrice: baseUrl + "/product/set-sale-price",
+  getSelloutPrice: baseUrl + "/product/get-all-sellout-price",
+  updateSelloutPrice: baseUrl + "/product/sellout-price/update",
   // Shipment
   createShipment: baseUrl + "/shipment/create",
   getShipments: baseUrl + "/shipment/get-all",

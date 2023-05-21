@@ -30,9 +30,7 @@ const UpdateProductPrice = ({ setIsAdd, currPrice }) => {
     control,
   } = methods;
 
-  const updateSellinPriceQuery = useUpdateSellinPrice({
-    productCode: currPrice?.productEntity?.code,
-  });
+  const updateSellinPriceQuery = useUpdateSellinPrice();
 
   const onSubmit = async (data) => {
     let updatedSellinPriceParams = {
@@ -40,6 +38,7 @@ const UpdateProductPrice = ({ setIsAdd, currPrice }) => {
       priceBeforeVat: data?.priceBeforeVat,
       startedDate: unix(currPrice?.startedDate),
       vat: data?.vat,
+      productCode: currPrice?.productEntity?.code,
     };
     await updateSellinPriceQuery.mutateAsync(updatedSellinPriceParams);
     setIsAdd((pre) => !pre);

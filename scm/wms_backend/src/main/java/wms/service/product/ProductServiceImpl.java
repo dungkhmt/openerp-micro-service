@@ -2,7 +2,6 @@ package wms.service.product;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Session;
 import org.hibernate.internal.util.StringHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -78,7 +77,6 @@ public class ProductServiceImpl extends BaseService implements IProductService {
         Page<ProductEntity> productList = productRepository.search(pageable);
         return getPaginationResult(productList.getContent(), page, productList.getTotalPages(), productList.getTotalElements());
     }
-
     @Override
     public ProductEntity getProductById(long id) {
         return productRepository.getProductById(id);
@@ -158,8 +156,8 @@ public class ProductServiceImpl extends BaseService implements IProductService {
     }
 
     @Override
-    public ProductPrice updateSellinPrice(ProductPriceDTO productPriceDTO, String productCode) throws CustomException {
-        ProductPrice productPrice = productPriceRepo.getByProductCode(productCode);
+    public ProductPrice updateSellinPrice(ProductPriceDTO productPriceDTO) throws CustomException {
+        ProductPrice productPrice = productPriceRepo.getByProductCode(productPriceDTO.getProductCode());
         if (productPrice == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "None existed product, can't update");
         }
@@ -171,21 +169,44 @@ public class ProductServiceImpl extends BaseService implements IProductService {
     }
 
     @Override
-    public ProductSalePrice setSalePrice(ProductDiscountDTO productDiscountDTO) throws CustomException {
-        ContractType contractType = contractTypeRepo.getContractTypeByCode(productDiscountDTO.getContractTypeCode());
-        ProductEntity product = productRepository.getProductByCode(productDiscountDTO.getProductCode());
-        if (contractType== null) {
-            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product price with no specific contract type, can't set");
+    public void setSalePrice(List<ProductDiscountDTO> productDiscountDTO) throws CustomException {
+        for (ProductDiscountDTO discountDTO : productDiscountDTO) {
+            ContractType contractType = contractTypeRepo.getContractTypeByCode(discountDTO.getContractTypeCode());
+            ProductEntity product = productRepository.getProductByCode(discountDTO.getProductCode());
+            if (contractType == null) {
+                throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product price with no specific contract type, can't set");
+            }
+            if (product == null) {
+                throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product price with no specific, can't set");
+            }
+//            double priceAfterAll = discountDTO.getPriceAfterVat() * (100 - discountDTO.getContractDiscount() - discountDTO.getMassDiscount()) / 100;
+            ProductSalePrice newPrice = ProductSalePrice.builder()
+                    .contractDiscount(discountDTO.getContractDiscount())
+                    .massDiscount(discountDTO.getMassDiscount())
+                    .contractType(contractType)
+                    .productEntity(product)
+//                    .priceAfterVat(discountDTO.getPriceAfterVat())
+//                    .priceAfterAll(priceAfterAll)
+                    .build();
+
+            productSalePriceRepo.save(newPrice);
         }
-        if (product== null) {
-            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product price with no specific, can't set");
+    }
+    @Override
+    public List<ProductSalePrice> getAllSelloutPrice() {
+        return productSalePriceRepo.getAll();
+    }
+
+    @Override
+    public ProductSalePrice updateSelloutPrice(ProductDiscountDTO productDiscountDTO) throws CustomException {
+        ProductSalePrice productSalePrice = productSalePriceRepo.getByProductAndContract(productDiscountDTO.getProductCode(), productDiscountDTO.getContractTypeCode());
+        if (productSalePrice == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "None existed product, can't update");
         }
-        ProductSalePrice newPrice = ProductSalePrice.builder()
-                .contractDiscount(productDiscountDTO.getContractDiscount())
-                .massDiscount(productDiscountDTO.getMassDiscount())
-                .contractType(contractType)
-                .productEntity(product)
-                .build();
-        return productSalePriceRepo.save(newPrice) ;
+        productSalePrice.setContractDiscount(productDiscountDTO.getContractDiscount());
+        productSalePrice.setMassDiscount(productDiscountDTO.getMassDiscount());
+//        double priceAfterAll = productDiscountDTO.getPriceAfterVat() * (100 - productDiscountDTO.getMassDiscount() - productDiscountDTO.getContractDiscount()) / 100;
+//        productSalePrice.setPriceAfterAll(priceAfterAll);
+        return productSalePriceRepo.save(productSalePrice);
     }
 }

@@ -82,3 +82,60 @@ export const useUpdateSaleOrderStatus = (params) => {
     onMutate: (variables) => {},
   });
 };
+export const useCreateSelloutPrice = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.createSelloutPrice,
+        params,
+        data
+      );
+      if (res && res.code === 1) {
+        toast.success("Tạo thành công!");
+        queryClient.invalidateQueries([queryKey.sale_order.sale_price]);
+        return res.data;
+      }
+    },
+    onError: () => {
+      toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+export const useGetSelloutPrice = (params) => {
+  return useQuery({
+    queryKey: [queryKey.sale_order.sale_price, params],
+    queryFn: async () => {
+      const res = await axiosSendRequest("get", endPoint.getSelloutPrice);
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+  });
+};
+
+export const useUpdateSelloutPrice = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "put",
+        endPoint.updateSelloutPrice,
+        params,
+        data
+      );
+      if (res && res.code === 1) {
+        toast.success("Cập nhật thành công!");
+        queryClient.invalidateQueries([queryKey.sale_order.sale_price]);
+        return res.data;
+      }
+    },
+    onError: () => {
+      toast.error("Lỗi , vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};

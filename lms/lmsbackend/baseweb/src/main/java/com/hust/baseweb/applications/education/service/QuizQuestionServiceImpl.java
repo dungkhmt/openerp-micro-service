@@ -299,7 +299,7 @@ public class QuizQuestionServiceImpl implements QuizQuestionService {
         if (quizQuestion.getStatusId().equals(QuizQuestion.STATUS_PRIVATE)) {
             quizQuestion.setStatusId(QuizQuestion.STATUS_PUBLIC);
             List<String> userLoginIds = userService.findAllUserLoginIdOfGroup(
-                "ROLE_EDUCATION_LEARNING_MANAGEMENT_STUDENT");
+                "ROLE_STUDENT");
 
             for (String userLoginId : userLoginIds) {
                 notificationsService.create(u.getUserLoginId(), userLoginId,

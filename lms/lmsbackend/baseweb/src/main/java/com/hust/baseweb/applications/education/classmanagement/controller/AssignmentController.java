@@ -133,7 +133,7 @@ public class AssignmentController {
     }
 
     // CRUD.
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping
     public ResponseEntity<?> createAssign(@RequestBody CreateAssignmentIM im) {
         ResponseFirstType res = assignService.createAssignment(im);
@@ -146,7 +146,7 @@ public class AssignmentController {
         return ResponseEntity.status(res.getStatus()).body(res);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAssign(@PathVariable UUID id) {
         SimpleResponse res;

@@ -16,6 +16,7 @@ import { Fragment, useState, useEffect } from 'react';
 import { useHistory } from 'react-router';
 import { convertToVNDFormat } from 'screens/utils/utils';
 import LoadingScreen from 'components/common/loading/loading';
+import withScreenSecurity from 'components/common/withScreenSecurity';
 
 const ItemDetail = ( { product, cartItems, setCartItems } ) => {
   const [prevQuantity, setPrevQuantity] = useState(product.quantity);
@@ -339,4 +340,5 @@ const CartDetail = () => {
   )
 }
 
-export default CartDetail;
+const SCR_ID = "SCR_WMSv2_ONLINE_CUSTOMER_CART";
+export default withScreenSecurity(CartDetail, SCR_ID, true);

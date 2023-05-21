@@ -5,14 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import wms.common.constant.DefaultConst;
-import wms.dto.category.ProductCategoryDTO;
 import wms.dto.product.ProductDTO;
 import wms.dto.product.ProductDiscountDTO;
 import wms.dto.product.ProductPriceDTO;
-import wms.dto.sale_order.UpdateSaleOrderStatusDTO;
-import wms.entity.ProductPrice;
 import wms.entity.ResultEntity;
 import wms.repo.ProductUnitRepo;
 import wms.service.product.IProductService;
@@ -118,21 +114,37 @@ public class ProductController extends BaseController {
         }
     }
     @PutMapping("/sellin-price/update")
-    public ResponseEntity<?> updateProductSellinPrice(@RequestBody ProductPriceDTO priceDTO,
-                                                   @RequestParam(value = "productCode", required = true) String productCode) {
+    public ResponseEntity<?> updateProductSellinPrice(@RequestBody ProductPriceDTO priceDTO) {
         try {
-            return response(new ResultEntity(1, "Update product successfully", productService.updateSellinPrice(priceDTO, productCode)));
+            return response(new ResultEntity(1, "Update product successfully", productService.updateSellinPrice(priceDTO)));
         } catch (Exception ex) {
             return response(error(ex));
         }
     }
     @ApiOperation(value = "Setup giá bán")
     @PostMapping("/set-sale-price")
-    public ResponseEntity<?> setSalePrice(@Valid @RequestBody ProductDiscountDTO productDiscountDTO) {
+    public ResponseEntity<?> setSalePrice(@Valid @RequestBody List<ProductDiscountDTO> productDiscountDTO) {
         try {
-            return response(new ResultEntity(1, "Set sale price successfully", productService.setSalePrice(productDiscountDTO)));
+            productService.setSalePrice(productDiscountDTO);
+            return response(new ResultEntity(1, "Set sale price successfully",null));
         }
         catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @GetMapping("/get-all-sellout-price")
+    public ResponseEntity<?> getSelloutPrices() {
+        try {
+            return response(new ResultEntity(1, "Get all sellout prices successfully", productService.getAllSelloutPrice()));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @PutMapping("/sellout-price/update")
+    public ResponseEntity<?> updateProductSellinPrice(@RequestBody ProductDiscountDTO discountDTO) {
+        try {
+            return response(new ResultEntity(1, "Update price successfully", productService.updateSelloutPrice(discountDTO)));
+        } catch (Exception ex) {
             return response(error(ex));
         }
     }

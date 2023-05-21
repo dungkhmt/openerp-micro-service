@@ -4,6 +4,7 @@ import CustomMap from "components/map/CustomMap";
 import CustomSelect from "components/select/CustomSelect";
 import { useRef, useState } from "react";
 import { facilitySchema } from "utils/validate";
+import SearchBoxMap from "../../../../components/map/SearchBoxMap";
 import { useCreateFacility } from "../../../../controllers/query/facility-query";
 import { useGetAllUsersExist } from "../../../../controllers/query/user-query";
 import { useGeoLocation } from "../../../../shared/AppHooks";
@@ -14,7 +15,10 @@ const { default: CustomInput } = require("components/input/CustomInput");
 const CreateFacilityForm = ({ setIsAdd }) => {
   const currPos = useGeoLocation();
   const mapRef = useRef();
-  const [currMarker, setCurrMarker] = useState(currPos.coordinates);
+  const [selectPosition, setSelectPosition] = useState({
+    lat: 20.991322,
+    lng: 105.839077,
+  });
   const methods = useForm({
     mode: "onChange",
     defaultValues: {},
@@ -32,8 +36,8 @@ const CreateFacilityForm = ({ setIsAdd }) => {
   const onSubmit = async (data) => {
     let facilityParams = {
       address: data?.address,
-      latitude: data?.map?.lat ? data?.map?.lat : currMarker?.lat,
-      longitude: data?.map?.lng ? data?.map?.lng : currMarker?.lng,
+      latitude: selectPosition?.lat.toString(),
+      longitude: selectPosition?.lng.toString(),
       managedBy: data?.managedBy?.name,
       name: data?.name,
     };
@@ -108,6 +112,10 @@ const CreateFacilityForm = ({ setIsAdd }) => {
         />
       </Stack>
       <Typography>Lấy vị trí</Typography>
+      <SearchBoxMap
+        selectPosition={selectPosition}
+        setSelectPosition={setSelectPosition}
+      />
       <Stack direction={"row"}>
         <Controller
           key={"map"}
@@ -116,11 +124,10 @@ const CreateFacilityForm = ({ setIsAdd }) => {
           render={({ field: { onChange, value } }) => (
             <CustomMap
               style={{ width: "50vw", height: "50vh" }}
-              location={currPos}
+              location={selectPosition}
               mapRef={mapRef}
-              onChange={(currLoc) => {
-                setCurrMarker(currLoc);
-              }}
+              onChange={onChange}
+              setSelectPosition={setSelectPosition}
             />
           )}
         />

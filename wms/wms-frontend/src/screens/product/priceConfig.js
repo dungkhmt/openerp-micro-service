@@ -9,6 +9,7 @@ import { API_PATH } from "../apiPaths";
 import { Fragment, useState, useEffect } from "react";
 import { convertToVNDFormat } from "screens/utils/utils";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const PriceHistory = ( { data } ) => {
   const [historyPricesArr, setHistoryPricesArr] = useState(data?.historyPrices == null ? [] : data?.historyPrices);
@@ -198,4 +199,6 @@ const PriceConfig = () => {
   </Fragment>);
 }
 
-export default PriceConfig;
+
+const SCR_ID = "SCR_WMSv2_PRICE_CONFIG";
+export default withScreenSecurity(PriceConfig, SCR_ID, true);

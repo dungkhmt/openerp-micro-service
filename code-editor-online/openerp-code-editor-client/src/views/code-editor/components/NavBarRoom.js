@@ -41,6 +41,7 @@ import axios from "axios";
 import { errorNoti, successNoti } from "utils/notification";
 import ConfigEditor from "./ConfigEditor";
 import { useKeycloak } from "@react-keycloak/web";
+import { request } from "api";
 
 const NavBarRoom = (props) => {
   const { socket, myPeer } = props;
@@ -85,37 +86,56 @@ const NavBarRoom = (props) => {
     return currentUserId === roomMasterId;
   }
 
-  function getJdoodleLanguage(language) {
+  function getCompileLanguage(language) {
     if (language === PROGRAMMING_LANGUAGES.CPP.value) {
-      return "cpp";
+      return "CPP";
     } else if (language === PROGRAMMING_LANGUAGES.JAVA.value) {
-      return "java";
+      return "JAVA";
     } else if (language === PROGRAMMING_LANGUAGES.PYTHON.value) {
-      return "python3";
+      return "PYTHON3";
     }
     return "";
   }
 
-  const handleRunCode = async (input, source, language) => {
+  const handleRunCode2 = (input, source, language) => {
+    const data = {
+      source: source,
+      input: input,
+      language: language,
+    };
     setLoadingRunCode(true);
     try {
-      const response = await axios({
-        method: "post",
-        url: "http://localhost:7008/api/code-editor/execute",
-        data: {
-          source: source,
-          input: input,
-          language: language,
+      request(
+        "post",
+        `/code-editor/sources/compile`,
+        (response) => {
+          if (response && response.status === 200) {
+            successNoti("Compiled successfully", true);
+            dispatch(setTabKey("output"));
+            dispatch(setOutput(response.data.output));
+            setLoadingRunCode(false);
+          } else {
+            errorNoti("Compiled failed", true);
+            dispatch(setTabKey("output"));
+            dispatch(setOutput(response.data.output));
+            setLoadingRunCode(false);
+          }
         },
-      });
-      if (response && response.status === 200) {
-        successNoti("Compiled successfully", true);
-        dispatch(setTabKey("output"));
-        dispatch(setOutput(response.data.output));
-        setLoadingRunCode(false);
-      } else {
-        errorNoti("Compiled failed", true);
-      }
+        {
+          400: (error) => {
+            errorNoti("Compiled failed", true);
+            dispatch(setTabKey("output"));
+            dispatch(setOutput(error.response.data.output));
+            setLoadingRunCode(false);
+          },
+          500: (error) => {
+            errorNoti("Hệ thống đang bận. Vui lòng thử lại sau", true);
+            setLoadingRunCode(false);
+          },
+        },
+
+        data
+      );
     } catch (error) {
       errorNoti("Compiled failed", true);
       setLoadingRunCode(false);
@@ -134,7 +154,10 @@ const NavBarRoom = (props) => {
 
   const handleMuteMicrophone = () => {
     if (socket.current) {
-      socket.current.emit(SOCKET_EVENTS.REQUEST_ON_OFF_MIC, { socketId: socket.current.id, audio: isMute });
+      socket.current.emit(SOCKET_EVENTS.REQUEST_ON_OFF_MIC, {
+        socketId: socket.current.id,
+        audio: isMute,
+      });
     }
     dispatch(
       setState({
@@ -162,7 +185,7 @@ const NavBarRoom = (props) => {
                 variant="contained"
                 color="success"
                 onClick={() => {
-                  handleRunCode(input, source, getJdoodleLanguage(selectedLanguage));
+                  handleRunCode2(input, source, getCompileLanguage(selectedLanguage));
                 }}
               >
                 Run
