@@ -8,12 +8,8 @@ import ContestManagerViewListContestProblemSubmissionDetailByTestCase
   from "./ContestManagerViewListContestProblemSubmissionDetailByTestCase";
 import CodeSimilarityCheck from "./CodeSimilarityCheck";
 import {ContestManagerListProblem} from "./ContestManagerListProblem";
-import ContestManagerListParticipant from "./ContestManagerListParticipant";
 import ContestManagerListMember from "./ContestManagerListMember";
-import ContestManagerListRequestingParticipant from "./ContestManagerListRequestingParticipant";
 import ContestManagerListRegisteredParticipant from "./ContestManagerListRegisteredParticipant";
-
-import ContestManagerAddMember from "./ContestManagerAddMember";
 import ContestManagerAddMember2Contest from "./ContestManagerAddMember2Contest";
 
 import ContestManagerUserSubmission from "./ContestManagerUserSubmission";
@@ -88,17 +84,17 @@ export function ContestManager() {
 
       <TabPanelVertical value={value} index={1}>
         <ContestManagerListMember contestId={contestId}/>
-        <ContestManagerListParticipant contestId={contestId}/>
+        {/* <ContestManagerListParticipant contestId={contestId}/> */}
       </TabPanelVertical>
 
       <TabPanelVertical value={value} index={2}>
         <ContestManagerListRegisteredParticipant contestId={contestId}/>
-        <ContestManagerListRequestingParticipant contestId={contestId}/>
+        {/* <ContestManagerListRequestingParticipant contestId={contestId}/> */}
       </TabPanelVertical>
 
       <TabPanelVertical value={value} index={3}>
         <ContestManagerAddMember2Contest contestId={contestId}/>
-        <ContestManagerAddMember contestId={contestId}/>
+        {/* <ContestManagerAddMember contestId={contestId}/> */}
       </TabPanelVertical>
 
 
