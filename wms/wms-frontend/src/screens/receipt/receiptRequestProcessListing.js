@@ -4,6 +4,7 @@ import { useRouteMatch } from "react-router-dom";
 import StandardTable from "components/StandardTable";
 import { Fragment, useState, useEffect } from "react";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const ReceiptRequestProcessListing = () => {
 
@@ -84,4 +85,5 @@ const ReceiptRequestProcessListing = () => {
   </Fragment>);
 }
 
-export default ReceiptRequestProcessListing;
+const SCR_ID = "SCR_WMSv2_RECEIPT_REQUEST_PROCESS_LISTING";
+export default withScreenSecurity(ReceiptRequestProcessListing, SCR_ID, true);

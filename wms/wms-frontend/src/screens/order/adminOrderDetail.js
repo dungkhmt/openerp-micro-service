@@ -8,6 +8,7 @@ import { API_PATH } from "screens/apiPaths";
 import useStyles from 'screens/styles';
 import { convertToVNDFormat } from "screens/utils/utils";
 import { errorNoti, successNoti } from "utils/notification";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const AdminOrderDetail = ( props ) => {
   const orderId = props.match?.params?.id;
@@ -430,4 +431,5 @@ const AdminOrderDetail = ( props ) => {
   </Fragment>)
 };
 
-export default AdminOrderDetail;
+const SCR_ID = "SCR_WMSv2_ORDER_DETAIl";
+export default withScreenSecurity(AdminOrderDetail, SCR_ID, true);

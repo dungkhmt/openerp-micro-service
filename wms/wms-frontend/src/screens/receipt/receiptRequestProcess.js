@@ -11,6 +11,7 @@ import { BayDropDown, WarehouseDropDown } from "components/table/DropDown";
 import { errorNoti, successNoti } from "utils/notification";
 import { Grid3x3 } from "@mui/icons-material";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const ProcessItem = ( { rowData, warehousesDetail, setProcessingItems, 
   processingItems, setOpenProcessModal, remainingItems, setRemainingItems } ) => {
@@ -489,4 +490,5 @@ const ReceiptRequestProcess = ( props ) => {
   </Fragment>);
 }
 
-export default ReceiptRequestProcess;
+const SCR_ID = "SCR_WMSv2_RECEIPT_REQUEST_PROCESS";
+export default withScreenSecurity(ReceiptRequestProcess, SCR_ID, true);

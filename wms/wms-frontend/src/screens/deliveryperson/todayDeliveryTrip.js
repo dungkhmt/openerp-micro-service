@@ -4,6 +4,7 @@ import { Fragment, useEffect, useState } from "react"
 import { API_PATH } from "screens/apiPaths";
 import { useRouteMatch } from "react-router-dom";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const TodayDeliveryTrip = () => {
   
@@ -54,4 +55,5 @@ const TodayDeliveryTrip = () => {
   </Fragment>);
 }
 
-export default TodayDeliveryTrip;
+const SCR_ID = "SCR_WMSv2_TODAY_DELIVERY_TRIP";
+export default withScreenSecurity(TodayDeliveryTrip, SCR_ID, true);
