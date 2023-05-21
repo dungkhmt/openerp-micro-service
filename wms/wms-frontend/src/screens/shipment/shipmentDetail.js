@@ -2,6 +2,7 @@ import { Box, Grid, TextField, Typography } from "@mui/material";
 import { request } from "api";
 import StandardTable from "components/StandardTable";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 import { Fragment, useEffect, useState } from "react";
 import { API_PATH } from "screens/apiPaths";
 import useStyles from 'screens/styles.js';
@@ -134,4 +135,5 @@ const ShipmentDetail = ( props ) => {
   </Fragment>);
 };
 
-export default ShipmentDetail;
+const SCR_ID = "SCR_WMSv2_SHIPMENT_DETAIL";
+export default withScreenSecurity(ShipmentDetail, SCR_ID, true);

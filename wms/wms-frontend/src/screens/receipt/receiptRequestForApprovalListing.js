@@ -5,6 +5,7 @@ import { API_PATH } from "../apiPaths";
 
 import { Fragment, useState, useEffect } from "react";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const ReceiptRequestForApprovalListing = () => {
 
@@ -52,4 +53,5 @@ const ReceiptRequestForApprovalListing = () => {
   </Fragment>);
 }
 
-export default ReceiptRequestForApprovalListing;
+const SCR_ID = "SCR_WMSv2_RECEIPT_REQUEST_FOR_APPROVER";
+export default withScreenSecurity(ReceiptRequestForApprovalListing, SCR_ID, true);

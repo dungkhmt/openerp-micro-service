@@ -11,6 +11,7 @@ import { useRouteMatch } from "react-router-dom";
 
 import { Fragment, useState, useEffect } from "react";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const ReceiptRequestForApproval = ( props ) => {
 
@@ -189,4 +190,5 @@ const ReceiptRequestForApproval = ( props ) => {
   </Fragment>);
 }
 
-export default ReceiptRequestForApproval;
+const SCR_ID = "SCR_WMSv2_RECEIPT_REQUEST_DETAIL_FOR_APPROVER";
+export default withScreenSecurity(ReceiptRequestForApproval, SCR_ID, true);

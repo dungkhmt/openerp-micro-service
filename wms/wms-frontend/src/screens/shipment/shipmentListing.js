@@ -8,6 +8,7 @@ import { errorNoti, successNoti } from "utils/notification";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const ShipmentListing = () => {
   const history = useHistory();
@@ -56,7 +57,7 @@ const ShipmentListing = () => {
     <StandardTable
       hideCommandBar={true}
       rowKey="shipmentId"
-      title="Danh sách chuyến giao hàng"
+      title="Danh sách các đợt giao hàng"
       data={shipmentTableData}
       columns={[
         // { title: "Số thứ tự", field: "numOrder", 
@@ -132,4 +133,5 @@ const ShipmentListing = () => {
   </Fragment>);
 }
 
-export default ShipmentListing;
+const SCR_ID = "SCR_WMSv2_SHIPMENT_LISTING";
+export default withScreenSecurity(ShipmentListing, SCR_ID, true);

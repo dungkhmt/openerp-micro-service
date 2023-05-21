@@ -12,6 +12,7 @@ import { API_PATH } from "../apiPaths";
 import { Box, Modal } from '@material-ui/core';
 import { IconButton } from '@mui/material';
 import LoadingScreen from 'components/common/loading/loading';
+import withScreenSecurity from 'components/common/withScreenSecurity';
 
 const ListWarehouse = () => {
   let { path } = useRouteMatch();
@@ -144,4 +145,5 @@ const ListWarehouse = () => {
   );
 }
 
-export default ListWarehouse;
+const SCR_ID = "SCR_WMSv2_WAREHOUSE_LISTING";
+export default withScreenSecurity(ListWarehouse, SCR_ID, true);

@@ -6,6 +6,7 @@ import { ORDER_STATUS_CODE } from "components/constants";
 import { useRouteMatch } from "react-router-dom";
 import { convertToVNDFormat } from "screens/utils/utils";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const AdminOrderListing = () => {
   const { path } = useRouteMatch();
@@ -92,4 +93,5 @@ const AdminOrderListing = () => {
   );
 }
 
-export default AdminOrderListing;
+const SCR_ID = "SCR_WMSv2_ORDER_LISTING";
+export default withScreenSecurity(AdminOrderListing, SCR_ID, true);
