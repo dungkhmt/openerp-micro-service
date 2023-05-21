@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Grid, Typography, useForkRef } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import NavBarRoom from "./components/NavBarRoom";
-import { useHistory, useParams } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { SOCKET_EVENTS } from "utils/constants";
 import { request } from "api";
@@ -23,7 +23,6 @@ import "react-splitter-layout/lib/index.css";
 import InputOutputCard from "./components/InputOuputCard";
 import "./style.css";
 import Peer from "peerjs";
-import NotFound from "views/errors/NotFound";
 import NotAccess from "./components/NotAccess";
 
 const CodeEditorPage = () => {
@@ -52,10 +51,14 @@ const CodeEditorPage = () => {
       socketRef.current = io(
         process.env.REACT_APP_CODE_EDITOR_ONLINE_SERVER_DOMAIN || "http://localhost:7008"
       );
-      // get audio instance of system 
+      // get audio instance of system
       navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then((stream) => {
         // Create a peer connection
-        myPeer.current = new Peer();
+        myPeer.current = new Peer({
+          host: "localhost",
+          port: 7008,
+          path: "/api/code-editor/peer-server",
+        });
 
         // Get id of peer connection and send to server and broadcast to others user
         myPeer.current.on("open", (id) => {
@@ -198,7 +201,7 @@ const CodeEditorPage = () => {
   }, [isMute]);
   return (
     <>
-      {isAccess ? (
+      {isAccess === true && (
         <div>
           <audio ref={localAudioRef} muted autoPlay></audio>
           <audio ref={remoteAudioRef} autoPlay></audio>
@@ -210,11 +213,11 @@ const CodeEditorPage = () => {
             <Grid
               item
               xs={isVisibleParticipants ? 10 : 12}
-              sx={{ position: "relative", height: "100vh" }}
+              sx={{ position: "relative", minHeight: "77vh" }}
             >
               <SplitterLayout vertical>
                 <CodeEditor socket={socketRef} roomId={roomId} roomMasterId={roomMasterId} />
-                <Grid container spacing={2}>
+                <Grid container spacing={2} height="100%">
                   <Grid item xs={12}>
                     <InputOutputCard />
                   </Grid>
@@ -226,9 +229,8 @@ const CodeEditorPage = () => {
             </Grid>
           </Grid>
         </div>
-      ) : (
-        <NotAccess />
       )}
+      {isAccess === false && <NotAccess />}
     </>
   );
 };

@@ -47,7 +47,7 @@ const InputOutputCard = () => {
     dispatch(setOutput(""));
   }, [pathname]);
   return (
-    <Card>
+    <Card sx={{ height: "100%" }}>
       <CardHeader
         title={
           <Tabs
@@ -83,12 +83,13 @@ const InputOutputCard = () => {
           </>
         }
       />
-      <CardContent>
+      <CardContent sx={{ height: "100%" }}>
         {tabKey === "input" && (
           <OutlinedInput
             value={input}
             multiline
             fullWidth
+            sx={{ height: "100%", alignItems: 'start' }}
             minRows={5}
             onChange={(e) => {
               dispatch(setInput(e.target.value));
@@ -98,10 +99,10 @@ const InputOutputCard = () => {
         {tabKey === "output" && (
           <OutlinedInput
             value={output}
-            sx={{ height: "100%" }}
             readOnly
             multiline
             fullWidth
+            sx={{ height: "100%", alignItems: 'start' }}
             minRows={5}
             onChange={(e) => {
               dispatch(setOutput(e.target.value));
