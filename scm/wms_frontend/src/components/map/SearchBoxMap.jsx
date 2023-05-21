@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Divider,
   List,
@@ -8,6 +9,7 @@ import {
   OutlinedInput,
 } from "@mui/material";
 import { useState } from "react";
+import { AppImages } from "../../shared/AppImages";
 
 const NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/search?";
 const params = {
@@ -16,8 +18,7 @@ const params = {
   addressdetails: "addressdetails",
 };
 
-export default function SearchBoxMap(props) {
-  const { selectPosition, setSelectPosition } = props;
+export default function SearchBoxMap({ selectPosition, setSelectPosition }) {
   const [searchText, setSearchText] = useState("");
   const [listPlace, setListPlace] = useState([]);
 
@@ -73,14 +74,23 @@ export default function SearchBoxMap(props) {
                 <ListItem
                   button
                   onClick={() => {
-                    setSelectPosition(item);
+                    setSelectPosition({
+                      lat: item?.lat,
+                      lng: item?.lon,
+                    });
                   }}
                 >
                   <ListItemIcon>
-                    <img
-                      src="./placeholder.png"
-                      alt="Placeholder"
-                      style={{ width: 38, height: 38 }}
+                    <Box
+                      component="img"
+                      sx={{
+                        height: 40,
+                        width: 40,
+                        maxHeight: { xs: 233, md: 167 },
+                        maxWidth: { xs: 350, md: 250 },
+                      }}
+                      alt="Location"
+                      src={AppImages.blue_location}
                     />
                   </ListItemIcon>
                   <ListItemText primary={item?.display_name} />

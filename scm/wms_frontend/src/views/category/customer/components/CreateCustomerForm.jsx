@@ -1,5 +1,4 @@
 import { Button, Stack, Typography } from "@mui/material";
-import CustomMap from "components/map/CustomMap";
 import CustomSelect from "components/select/CustomSelect";
 import {
   useCreateCustomer,
@@ -7,17 +6,19 @@ import {
   useGetCustomerType,
 } from "controllers/query/category-query";
 import { useRef, useState } from "react";
+import CustomMap from "../../../../components/map/CustomMap";
 import SearchBoxMap from "../../../../components/map/SearchBoxMap";
-import { useGeoLocation } from "../../../../shared/AppHooks";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
 
 const CreateCustomerForm = ({ setIsAdd }) => {
   const status = [{ name: "active" }, { name: "inactive" }];
-  const currPos = useGeoLocation();
   const mapRef = useRef();
-  const [currMarker, setCurrMarker] = useState(currPos.coordinates);
+  const [selectPosition, setSelectPosition] = useState({
+    lat: 20.991322,
+    lng: 105.839077,
+  });
   const methods = useForm({
     mode: "onChange",
     defaultValues: {},
@@ -44,8 +45,8 @@ const CreateCustomerForm = ({ setIsAdd }) => {
       status: data?.status?.name,
       name: data?.name,
       phone: data?.phone,
-      latitude: data?.map?.lat ? data?.map?.lat : currMarker?.lat,
-      longitude: data?.map?.lng ? data?.map?.lng : currMarker?.lng,
+      latitude: selectPosition?.lat.toString(),
+      longitude: selectPosition?.lng.toString(),
     };
     await createCustomerQuery.mutateAsync(customerParams);
     setIsAdd((pre) => !pre);
@@ -162,6 +163,10 @@ const CreateCustomerForm = ({ setIsAdd }) => {
         />
       </Stack>
       <Typography>Lấy vị trí</Typography>
+      <SearchBoxMap
+        selectPosition={selectPosition}
+        setSelectPosition={setSelectPosition}
+      />
       <Stack direction={"row"}>
         <Controller
           key={"map"}
@@ -170,16 +175,14 @@ const CreateCustomerForm = ({ setIsAdd }) => {
           render={({ field: { onChange, value } }) => (
             <CustomMap
               style={{ width: "50vw", height: "50vh" }}
-              location={currPos}
+              location={selectPosition}
               mapRef={mapRef}
-              onChange={(currLoc) => {
-                setCurrMarker(currLoc);
-              }}
+              onChange={onChange}
+              setSelectPosition={setSelectPosition}
             />
           )}
         />
       </Stack>
-      <SearchBoxMap />
       <Stack
         direction="row"
         justifyContent={"flex-end"}
