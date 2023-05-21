@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
-import './styles.scss';
+import '../styles.scss';
 import { DragDropContext } from "react-beautiful-dnd";
 import { Droppable } from "react-beautiful-dnd";
 import { Draggable } from "react-beautiful-dnd";
@@ -8,7 +8,7 @@ import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import ModalTripItem from "./shipmentCreate.js/ModalTripItem";
+import ModalTripItem from "../tripCreate/ModalTripItem";
 
 
 const TripItem = ({ index, item, facilities, setFacilities }) => {
@@ -119,7 +119,7 @@ const OrderArrangement = ({ ordersSelect, setTripItem, truckSelected, tripId }) 
         // reorder list
         if (!destination) return;
 
-        setFacilities(reorder(facilities, source.index, destination.index));
+        setFacilitiesFinal(reorder(facilitiesFinal, source.index, destination.index));
     };
     useEffect(() => {
         let facilitiesTmp = [];

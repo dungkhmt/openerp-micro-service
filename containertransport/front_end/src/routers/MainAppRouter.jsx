@@ -12,11 +12,10 @@ import FacilityScreen from "views/facilityManagement/FacilityScreen";
 import OrderScreen from "views/order/OrderScreen";
 import ContainerScreen from "views/containerManagerment/ContainerScreen";
 import ShipmentScreen from "views/shipment/ShipmentScreen";
-import TripScreen from "views/shipment/shipmentCreate.js/CreateTripScreen";
 import { AppProvider } from "contextAPI/MyContext";
-import TripsScreen from "views/shipment/shipmentDetail/TripsScreen";
-import CreateTripDetail from "views/shipment/shipmentCreate.js/CreateTripDetail";
-import TripDetail from "views/shipment/shipmentDetail/TripDetail";
+import CreateTripDetail from "views/shipment/tripCreate/CreateTripDetail";
+import ShipmentDetail from "views/shipment/shipmentDetail/ShipmentDetail";
+import TripDetail from "views/shipment/tripDetail/TripDetail";
 
 const styles = {
   loadingProgress: {
@@ -52,14 +51,12 @@ function MainAppRouter(props) {
           {/* <Route component={ShipmentScreen} path="/trailer" /> */}
           <AppProvider>
             <Route component={ShipmentScreen} exact path="/shipment" />
-            <Route component={TripsScreen} exact path="/shipment/detail/:shipmentId" />
+            <Route component={ShipmentDetail} exact path="/shipment/detail/:shipmentId" />
             <Route component={TripDetail} exact path="/shipment/trip/detail/:tripId" />
-            <Route path="/shipment/create">
+            {/* <Route path="/shipment/create">
               <TripScreen />
-            </Route>
-            <Route path="/shipment/trip/create">
-              <CreateTripDetail />
-            </Route>
+            </Route> */}
+            <Route component={CreateTripDetail} path="/shipment/trip/create/:shipmentId" />
           </AppProvider>
           <Route component={NotFound} />
         </Switch>

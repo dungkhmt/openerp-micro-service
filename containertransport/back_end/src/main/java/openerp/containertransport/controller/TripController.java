@@ -2,6 +2,7 @@ package openerp.containertransport.controller;
 
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.MetaData;
+import openerp.containertransport.dto.TripCreateDTO;
 import openerp.containertransport.dto.TripFilterRequestDTO;
 import openerp.containertransport.dto.TripModel;
 import openerp.containertransport.dto.metaData.MetaDTO;
@@ -33,5 +34,11 @@ public class TripController {
     public ResponseEntity<?> getById(@PathVariable long id) {
         TripModel tripModel = tripService.getById(id);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModel));
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createTrip(@RequestBody TripCreateDTO tripCreateDTO) {
+        TripModel tripModelCreate = tripService.createTrip(tripCreateDTO.getTripContents(), tripCreateDTO.getShipmentId(), tripCreateDTO.getCreateBy());
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModelCreate));
     }
 }
