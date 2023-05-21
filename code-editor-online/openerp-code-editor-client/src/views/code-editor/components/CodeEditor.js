@@ -115,7 +115,7 @@ const CodeEditor = (props) => {
       },
       payload
     );
-  }, 1000);
+  }, 500);
 
   useEffect(() => {
     if (socket.current) {
