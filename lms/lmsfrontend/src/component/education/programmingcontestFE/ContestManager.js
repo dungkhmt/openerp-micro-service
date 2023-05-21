@@ -8,12 +8,8 @@ import ContestManagerViewListContestProblemSubmissionDetailByTestCase
   from "./ContestManagerViewListContestProblemSubmissionDetailByTestCase";
 import CodeSimilarityCheck from "./CodeSimilarityCheck";
 import {ContestManagerListProblem} from "./ContestManagerListProblem";
-import ContestManagerListParticipant from "./ContestManagerListParticipant";
 import ContestManagerListMember from "./ContestManagerListMember";
-import ContestManagerListRequestingParticipant from "./ContestManagerListRequestingParticipant";
 import ContestManagerListRegisteredParticipant from "./ContestManagerListRegisteredParticipant";
-
-import ContestManagerAddMember from "./ContestManagerAddMember";
 import ContestManagerAddMember2Contest from "./ContestManagerAddMember2Contest";
 
 import ContestManagerUserSubmission from "./ContestManagerUserSubmission";

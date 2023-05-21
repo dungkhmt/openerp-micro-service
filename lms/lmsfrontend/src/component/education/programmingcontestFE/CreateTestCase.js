@@ -1,4 +1,5 @@
-import {Box, Button, CircularProgress, Grid, MenuItem, TextField} from "@mui/material";
+import {Box, Button, CircularProgress, Grid, MenuItem, TextField, Chip} from "@mui/material";
+import PublishIcon from "@mui/icons-material/Publish";
 import Typography from "@mui/material/Typography";
 import RichTextEditor from "../../common/editor/RichTextEditor";
 import HustContainerCard from "../../common/HustContainerCard";
@@ -212,13 +213,19 @@ export default function CreateTestCase(props) {
 
         <form onSubmit={handleFormSubmit}>
           <Grid container spacing={1} alignItems="flex-end">
-            <Grid item xs={3}>
-              <input
-                type="file"
-                id="selected-upload-file"
-                onChange={onFileChange}
-              />
-            </Grid>
+          <Button color="primary" variant="contained" component="label">
+            <PublishIcon /> Select file to upload
+            <input hidden type="file" id="selected-upload-file" onChange={onFileChange} />
+          </Button>
+          {filename && (
+            <Chip
+              style={{marginLeft: "20px"}}
+              color="success"
+              variant="outlined"
+              label={filename.name}
+              onDelete={() => setFilename(undefined)}
+            />
+          )}
             <Box>
               <Typography variant="h5" component="div" sx={{marginTop: "12px", marginBottom: "8px"}}>
                 Description

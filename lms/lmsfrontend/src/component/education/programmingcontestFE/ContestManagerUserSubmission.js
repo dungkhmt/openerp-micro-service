@@ -155,7 +155,7 @@ export default function ContestManagerUserSubmission(props) {
           selection: false,
           pageSize: 10,
           search: false,
-          sorting: true,
+          sorting: false,
         }}
 
         page={filterParams.page}

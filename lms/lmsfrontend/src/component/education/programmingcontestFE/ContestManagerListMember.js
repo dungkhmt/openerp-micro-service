@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {request} from "../../../api";
 import StandardTable from "component/table/StandardTable";
-import {Button, CircularProgress} from "@mui/material";
+import {Button, CircularProgress, Chip} from "@mui/material";
 import PublishIcon from "@mui/icons-material/Publish";
 import {errorNoti, successNoti} from "utils/notification";
 import {toFormattedDateTime} from "utils/dateutils";
@@ -29,13 +29,13 @@ export default function ContestManagerListMember(props) {
     {
       title: "Remove",
       render: (row) => (
-        <Button onClick={() => handleRemove(row.id)}>Remove</Button>
+        <Button variant="contained" color="error" onClick={() => handleRemove(row.id)}>Remove</Button>
       ),
     },
     {
       title: "Permission Submit",
       render: (row) => (
-        <Button onClick={() => handleForbidSubmit(row.id)}>
+        <Button variant="contained" color="warning" onClick={() => handleForbidSubmit(row.id)}>
           Update Permission Submit
         </Button>
       ),
@@ -176,6 +176,14 @@ export default function ContestManagerListMember(props) {
         <PublishIcon /> Select file to upload
         <input hidden type="file" id="selected-upload-file" onChange={onFileChange} />
       </Button>
+      {filename && (
+        <Chip
+        color="success"
+        variant="outlined"
+        label={filename.name}
+        onDelete={() => setFilename(undefined)}
+        />
+      )}
       <Button onClick={handleUploadExcelStudentList}>Upload</Button>
       {isProcessing ? <CircularProgress /> : ""}
 
