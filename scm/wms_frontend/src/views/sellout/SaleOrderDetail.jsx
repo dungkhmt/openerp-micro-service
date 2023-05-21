@@ -109,7 +109,7 @@ function SaleOrderDetailScreen() {
   const updateSaleOrderQuery = useUpdateSaleOrderStatus({
     orderCode: currOrder?.code,
   });
-
+  console.log("Curr: ", currOrder);
   const renderCustomTable = useCallback(() => {
     return (
       <CustomOrderTable

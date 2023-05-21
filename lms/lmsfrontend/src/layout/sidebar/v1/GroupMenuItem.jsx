@@ -1,6 +1,6 @@
 import {Downgraded} from "@hookstate/core";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import {Collapse, Icon, List, ListItem, ListItemText} from "@mui/material";
+import {Box, Collapse, Icon, List, ListItem, ListItemText} from "@mui/material";
 import {useEffect, useState} from "react";
 import {useLocation} from "react-router-dom";
 import MenuItem, {hexToRgb} from "./MenuItem";
@@ -147,14 +147,16 @@ function GroupMenuItem(props) {
     }
 
     return (
-      <MenuItem
-        key={childMenuItem.text}
-        menuItem={childMenuItem}
-        color={color}
-        selected={selected[0]}
-        menu={permittedFunctions}
-        icon
-      />
+      <Box sx={{paddingLeft: "6px"}}>
+        <MenuItem
+          key={childMenuItem.text}
+          menuItem={childMenuItem}
+          color={color}
+          selected={selected[0]}
+          menu={permittedFunctions}
+          icon
+        />
+      </Box>
     );
   } else
     return (

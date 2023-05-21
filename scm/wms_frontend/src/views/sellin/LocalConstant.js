@@ -130,23 +130,37 @@ export const purchaseOrderCols = [
 
 export const staticProductFields = [
   {
-    field: "code",
-    headerName: "Mã code",
-    sortable: false,
-    pinnable: true,
-    headerAlign: "center",
-    align: "center",
-    minWidth: 150,
-    maxWidth: 200,
-  },
-  {
     field: "name",
     headerName: "Tên sản phẩm",
     sortable: false,
     headerAlign: "center",
     align: "center",
     minWidth: 200,
+    maxWidth: 250,
+  },
+  {
+    field: "price",
+    headerName: "Giá sản phẩm",
+    sortable: false,
+    headerAlign: "center",
+    align: "center",
+    minWidth: 150,
     maxWidth: 200,
+    valueGetter: (params) => {
+      return params?.row?.price?.priceBeforeVat;
+    },
+  },
+  {
+    field: "vat",
+    headerName: "Thuế VAT",
+    sortable: false,
+    headerAlign: "center",
+    align: "center",
+    minWidth: 150,
+    maxWidth: 200,
+    valueGetter: (params) => {
+      return params?.row?.price?.vat;
+    },
   },
   {
     field: "status",
@@ -154,6 +168,8 @@ export const staticProductFields = [
     sortable: false,
     minWidth: 150,
     maxWidth: 200,
+    headerAlign: "center",
+    align: "center",
     renderCell: (params) => {
       return (
         <Button
@@ -256,18 +272,6 @@ export const purchaseOrderPrice = [
     maxWidth: 200,
   },
   {
-    field: "contractTypeName",
-    headerAlign: "center",
-    align: "center",
-    headerName: "Loại hợp đồng",
-    sortable: false,
-    minWidth: 150,
-    maxWidth: 200,
-    valueGetter: (params) => {
-      return params.row.contract.name;
-    },
-  },
-  {
     field: "status",
     headerName: "Trạng thái",
     sortable: false,
@@ -285,7 +289,7 @@ export const purchaseOrderPrice = [
             paddingX: 2,
             height: "24px",
             background:
-              ORDER_STATUS_COLOR_MAPPING[params?.row?.status.toLowerCase()],
+              ITEM_STATUS_COLOR_MAPPING[params?.row?.status.toLowerCase()],
           }}
         >
           <Typography

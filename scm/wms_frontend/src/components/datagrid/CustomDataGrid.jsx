@@ -67,6 +67,7 @@ const CustomDataGrid = (props) => {
   const {
     isSerial,
     isSelectable = false,
+    isEditable,
     rows,
     columns,
     totalItem,
@@ -96,6 +97,7 @@ const CustomDataGrid = (props) => {
       isRowSelectable={() => {
         return isSelectable;
       }}
+      isCellEditable={isEditable}
       checkboxSelection={isSelectable}
       sortingMode="server"
       // paginationMode="server"

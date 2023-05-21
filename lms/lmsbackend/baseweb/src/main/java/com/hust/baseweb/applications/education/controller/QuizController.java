@@ -107,7 +107,7 @@ public class QuizController {
         return ResponseEntity.ok().body(edittedComment);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/get-all-quiz-course-topics")
     public ResponseEntity<?> getAllQuizCourseTopics(Principal principal) {
         //log.info("getAllQuizCourseTopics");
@@ -115,7 +115,7 @@ public class QuizController {
         return ResponseEntity.ok().body(quizCourseTopics);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/edu/teacher/course/quiz/detail/{questionId}")
     public ResponseEntity<?> getAllQuizCourseTopics(Principal principal, @PathVariable UUID questionId) {
         //log.info("getQuizQuestion" + questionId);
@@ -123,7 +123,7 @@ public class QuizController {
         return ResponseEntity.ok().body(quizQuestionDetailModel);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/update-quiz-question/{questionId}")
     public ResponseEntity<?> updateQuizQuestion(
         Principal principal,
@@ -161,7 +161,7 @@ public class QuizController {
         return ResponseEntity.ok().body(quizQuestion);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/get-quiz-course-topics-of-course/{courseId}")
     public ResponseEntity<?> getQuizCourseTopicsOfCourse(Principal principal, @PathVariable String courseId) {
         log.info("getQuizCourseTopicsOfCourse, courseId = " + courseId);
@@ -170,7 +170,7 @@ public class QuizController {
         return ResponseEntity.ok().body(quizCourseTopics);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/create-quiz-course-topic")
     public ResponseEntity<?> createQuizCourseTopic(
         Principal principal, @RequestBody
@@ -181,7 +181,7 @@ public class QuizController {
         return ResponseEntity.ok().body(quizCourseTopic);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/get-quiz-levels")
     public ResponseEntity<?> getQuizLevelList(Principal principal) {
         List<String> levels = new ArrayList<>();
@@ -191,7 +191,7 @@ public class QuizController {
         return ResponseEntity.ok().body(levels);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/get-yes-no-list")
     public ResponseEntity<?> getYesNoList(Principal principal) {
         List<String> lst = new ArrayList<>();
@@ -200,7 +200,7 @@ public class QuizController {
         return ResponseEntity.ok().body(lst);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/copy-quiz-question-to-course")
     public ResponseEntity<?> copyQuizQuestionToAQuizTopic(
         Principal principal,
@@ -210,7 +210,7 @@ public class QuizController {
         return null;
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/create-quiz-question")
     public ResponseEntity<?> createQuizQuestion(
         Principal principal,
@@ -420,7 +420,7 @@ public class QuizController {
         return ResponseEntity.ok().body(quizQuestionDetailModels);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/create-quiz-choice-answer")
     public ResponseEntity<?> createQuizChoiceAnswer(
         Principal principal,
@@ -434,14 +434,14 @@ public class QuizController {
         return ResponseEntity.ok().body(quizChoiceAnswer);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/generate-choice-answer-code-for-all-quiz-questions")
     public ResponseEntity<?> genChoiceCodeForAllQuizQuestions(Principal principal) {
         int cnt = quizQuestionService.generateChoiceCodesForAllQuizQuestions();
         return ResponseEntity.ok().body(cnt);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/update-quiz-choice-answer/{choiceAnswerId}")
     public ResponseEntity<?> createQuizChoiceAnswer(
         Principal principal,
@@ -469,7 +469,7 @@ public class QuizController {
         return ResponseEntity.ok().body(quizChoiceAnswer);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @DeleteMapping("/delete-quiz-choice-answer/{choiceAnswerId}")
     public ResponseEntity<?> deleteQuizChoiceAnswer(
         Principal principal,
@@ -480,7 +480,7 @@ public class QuizController {
         return ResponseEntity.ok().body(quizChoiceAnswer);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/get-quiz-choice-answer-detail/{choiceAnswerId}")
     public ResponseEntity<?> createQuizChoiceAnswer(
         Principal principal,
@@ -491,7 +491,7 @@ public class QuizController {
         return ResponseEntity.ok().body(quizChoiceAnswer);
     }
 
-    @Secured({"ROLE_EDUCATION_TEACHING_MANAGEMENT_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/get-quiz-choice-answer-of-a-quiz/{quizQuestionId}")
     public ResponseEntity<?> getQuizChoiceAnswerOfAQuizQuestion(
         Principal principal,

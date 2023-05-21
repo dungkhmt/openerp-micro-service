@@ -12,5 +12,4 @@ public class BaseReturnDTO {
     private ZonedDateTime createdDate;
     private ZonedDateTime updatedDate;
     private String uid;
-    private Integer deleted;
 }

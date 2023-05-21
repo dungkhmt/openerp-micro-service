@@ -26,6 +26,8 @@ import wms.utils.GeneralUtils;
 @Slf4j
 public class SaleOrderServiceImpl extends BaseService implements ISaleOrderService {
     @Autowired
+    private ProductSalePriceRepo productSalePriceRepo;
+    @Autowired
     private SaleOrderItemRepo saleOrderItemRepo;
 
     @Autowired
@@ -57,7 +59,6 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
                 .discount(saleOrderDTO.getDiscount())
                 .build();
         saleOrderRepo.save(newOrder);
-
         double total = 0.0;
         int seq = 0;
         for (SaleOrderItemDTO orderItem : saleOrderDTO.getOrderItems()) {
@@ -67,14 +68,17 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
                 log.error("Product with code {} not found", orderItem.getProductCode().toUpperCase());
                 throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product not found");
             }
+            ProductSalePrice salePrice = productSalePriceRepo.getByProductAndContract(orderItem.getProductCode(), boughtBy.getContractType().getCode());
+            double massDiscount = salePrice != null ? salePrice.getMassDiscount() : 0;
+            double contractDiscount = salePrice != null ? salePrice.getContractDiscount() : 0;
             SaleOrderItem item = SaleOrderItem.builder()
                     .saleOrder(newOrder)
-                    .priceUnit(orderItem.getPriceUnit())
+                    .priceUnit(orderItem.getPriceUnit() * (100 - massDiscount - contractDiscount) / 100)
                     .product(product)
                     .seqId("00" + seq)
                     .quantity(orderItem.getQuantity())
                     .build();
-            total += orderItem.getPriceUnit() * orderItem.getQuantity();
+            total += item.getPriceUnit() * orderItem.getQuantity();
             saleOrderItemRepo.save(item);
         }
         newOrder.setTotalMoney(total);

@@ -41,6 +41,7 @@ const CustomInput = (props) => {
       required={required}
       label={label}
       value={value}
+      placeholder="Default Value"
       onChange={onChange}
       error={error}
       helperText={message ? message : ""}

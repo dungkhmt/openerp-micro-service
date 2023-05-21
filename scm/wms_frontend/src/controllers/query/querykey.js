@@ -11,10 +11,12 @@ export const queryKey = {
   purchase_order: {
     order_list: "purchase_order_list",
     order_item: "purchase_order_items",
+    purchase_price: "purchase_price",
   },
   sale_order: {
     order_list: "sale_order_list",
     order_item: "sale_order_items",
+    sale_price: "sale_price",
   },
   facility: {
     facility_list: "facility_list",

@@ -1,21 +1,24 @@
 import {CssBaseline} from "@material-ui/core";
 import {createTheme, MuiThemeProvider} from "@material-ui/core/styles";
+// import {SvgIcon, Typography} from "@mui/material";
+// import {Box} from "@mui/system";
+import {Box, SvgIcon, Typography} from "@material-ui/core";
+import {ReactKeycloakProvider} from "@react-keycloak/web";
+import {request} from "api";
+import {FacebookCircularProgress} from "component/common/progressBar/CustomizedCircularProgress.jsx";
+import keycloak, {initOptions} from "config/keycloak.js";
 import {useEffect} from "react";
 import {I18nextProvider} from "react-i18next";
 import {QueryClient, QueryClientProvider} from "react-query";
 import {Router} from "react-router-dom";
 import {Slide, ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {menuState} from "state/MenuState";
+import {notificationState} from "state/NotificationState";
+import {ReactComponent as Logo} from "./assets/icons/logo.svg";
 import history from "./history.js";
 import Routes from "./Routes";
-import {ReactKeycloakProvider} from "@react-keycloak/web";
 import i18n from "./translation/i18n";
-import keycloak, {initOptions} from "./config/keycloak";
-import {request} from "./api";
-import {menuState} from "./state/MenuState";
-import {notificationState} from "./state/NotificationState";
-import {ReactComponent as Logo} from "./assets/icons/logo.svg";
-import {Box, CircularProgress, SvgIcon, Typography} from "@material-ui/core";
 
 const theme = createTheme({
   typography: {
@@ -26,6 +29,15 @@ const theme = createTheme({
   overrides: {
     MuiCssBaseline: {
       "@global": {},
+    },
+  },
+});
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      keepPreviousData: true,
     },
   },
 });
@@ -49,10 +61,12 @@ const AppLoading = (
         flexGrow: 1,
       }}
     >
-      <SvgIcon sx={{fontSize: 150, mb: 4}} viewBox="0 0 150 150">
+      <SvgIcon style={{fontSize: "150px", marginBottom: "20px"}} viewBox="0 0 150 150">
         <Logo width={132} height={132} x={9} y={9}/>
       </SvgIcon>
-      <CircularProgress/>
+      <Box>
+        <FacebookCircularProgress/>
+      </Box>
     </Box>
     <Box>
       <Typography sx={{mb: 4}}>OpenERP Team</Typography>
@@ -60,17 +74,9 @@ const AppLoading = (
   </Box>
 );
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      keepPreviousData: true,
-    },
-  },
-});
-
 function App() {
 
+  // TODO: Consider remove this logic!
   const logout = () => {
     menuState.permittedFunctions.set(new Set());
     notificationState.merge({
@@ -131,7 +137,6 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <MuiThemeProvider theme={theme}>
             <CssBaseline/>
-            {/* <Router> */}
             <Router history={history}>
               <Routes/>
               <ToastContainer
@@ -148,7 +153,6 @@ function App() {
                 pauseOnHover
               />
             </Router>
-            {/* </Router> */}
           </MuiThemeProvider>
         </QueryClientProvider>
       </I18nextProvider>

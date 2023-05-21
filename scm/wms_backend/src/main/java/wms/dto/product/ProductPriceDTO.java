@@ -10,7 +10,7 @@ public class ProductPriceDTO {
     private ZonedDateTime endedDate;
     private double priceBeforeVat;
     private double vat;
-    private String contractTypeCode;
+//    private String contractTypeCode;
     private String productCode;
     private String status;
 }

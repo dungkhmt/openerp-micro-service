@@ -32,12 +32,12 @@ public class ContractType extends BaseEntity implements Serializable {
     @JsonIgnore
     private Set<Customer> customers;
 
-    @OneToMany(
-            mappedBy = "contractType",
-            fetch = FetchType.LAZY
-    )
-    @JsonIgnore
-    private List<ProductPrice> productPrices;
+//    @OneToMany(
+//            mappedBy = "contractType",
+//            fetch = FetchType.LAZY
+//    )
+//    @JsonIgnore
+//    private List<ProductPrice> productPrices;
 
     @OneToMany(
             mappedBy = "contractType",
