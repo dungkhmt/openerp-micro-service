@@ -23,7 +23,7 @@ import CreatePurOrderForm from "./components/CreatePurOrderForm";
 function PurchaseOrderScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 5,
   });
   const [isAdd, setIsAdd] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
@@ -39,7 +39,7 @@ function PurchaseOrderScreen({ screenAuthorization }) {
     });
   };
 
-  const { isLoading, data: order } = useGetPurchaseOrderList();
+  const { isLoading, data: order } = useGetPurchaseOrderList(params);
   let actions = [
     {
       title: "Đặt mua",
@@ -89,7 +89,14 @@ function PurchaseOrderScreen({ screenAuthorization }) {
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading}
-        totalItem={100}
+        totalItem={order?.totalElements}
+        handlePaginationModelChange={(props) => {
+          console.log("Props:", props);
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           ...purchaseOrderCols,
           {
@@ -98,9 +105,8 @@ function PurchaseOrderScreen({ screenAuthorization }) {
             headerAlign: "center",
             align: "center",
             sortable: false,
-            width: 125,
             minWidth: 150,
-            maxWidth: 200,
+            flex: 1,
             type: "actions",
             getActions: (params) => {
               return [

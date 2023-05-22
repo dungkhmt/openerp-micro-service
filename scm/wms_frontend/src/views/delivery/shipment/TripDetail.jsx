@@ -7,19 +7,19 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
+import CustomDataGrid from "components/datagrid/CustomDataGrid";
+import {
+  useCreateTripRoute,
+  useGetTripRouteList,
+} from "controllers/query/delivery-trip-query";
+import { useGetItemsOfTrip } from "controllers/query/shipment-query";
 import { unix } from "moment";
 import { useEffect, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import { useWindowSize } from "react-use";
-import { Action } from "../../../components/action/Action";
-import CustomDataGrid from "../../../components/datagrid/CustomDataGrid";
-import {
-  useCreateTripRoute,
-  useGetTripRouteList,
-} from "../../../controllers/query/delivery-trip-query";
-import { useGetItemsOfTrip } from "../../../controllers/query/shipment-query";
-import { AppColors } from "../../../shared/AppColors";
+import { AppColors } from "shared/AppColors";
 import { shipmentItemCols } from "../LocalConstant";
 
 // var intervalID;
@@ -84,7 +84,6 @@ function TripScreen({ screenAuthorization }) {
     }
   }, [count]);
 
-  console.log("Trip route: ", tripRoute);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>

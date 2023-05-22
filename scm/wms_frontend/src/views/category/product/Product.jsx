@@ -27,7 +27,8 @@ function ProductScreen({ screenAuthorization }) {
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
-  const { isLoading, data, isRefetching, isPreviousData } = useGetProductList();
+  const { isLoading, data, isRefetching, isPreviousData } =
+    useGetProductList(params);
   let actions = [
     {
       title: "Thêm",
@@ -69,7 +70,13 @@ function ProductScreen({ screenAuthorization }) {
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20 - 35 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom - Page Title
         isLoading={isLoading || isRefetching || isPreviousData}
-        totalItem={100}
+        totalItem={data?.totalElements}
+        handlePaginationModelChange={(props) => {
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           ...productColumns,
           {

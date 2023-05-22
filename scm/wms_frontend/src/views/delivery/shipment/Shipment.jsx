@@ -3,25 +3,25 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box } from "@mui/material";
+import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
+import DraggableDeleteDialog from "components/dialog/DraggableDialogs";
+import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
+import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
 import { useGetShipmentList } from "controllers/query/shipment-query";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
-import { Action } from "../../../components/action/Action";
-import DraggableDeleteDialog from "../../../components/dialog/DraggableDialogs";
-import CustomDrawer from "../../../components/drawer/CustomDrawer";
-import HeaderModal from "../../../components/modal/HeaderModal";
-import { AppColors } from "../../../shared/AppColors";
+import { AppColors } from "shared/AppColors";
 import { shipmentCols } from "../LocalConstant";
 import CreateShipmentForm from "./components/CreateShipmentForm";
 function ShipmentScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 5,
   });
   const { height } = useWindowSize();
 
@@ -31,7 +31,7 @@ function ShipmentScreen({ screenAuthorization }) {
   const [itemSelected, setItemSelected] = useState(null);
   let { path } = useRouteMatch();
 
-  const { isLoading, data } = useGetShipmentList();
+  const { isLoading, data } = useGetShipmentList(params);
   const history = useHistory();
   const handleButtonClick = (params) => {
     history.push(`${path}/shipment-detail`, {
@@ -86,16 +86,22 @@ function ShipmentScreen({ screenAuthorization }) {
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading}
-        totalItem={100}
+        totalItem={data?.totalElements}
+        handlePaginationModelChange={(props) => {
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           ...shipmentCols,
-
           {
             field: "action",
             headerName: "Hành động",
             headerAlign: "center",
             align: "center",
             sortable: false,
+            minWidth: 150,
             flex: 1,
             type: "actions",
             getActions: (params) => {

@@ -26,7 +26,7 @@ import CreateFacilityForm from "./components/CreateFacilityForm";
 function FacilityScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 10,
   });
   const { height } = useWindowSize();
   const [isAdd, setIsAdd] = useToggle(false);
@@ -38,7 +38,7 @@ function FacilityScreen({ screenAuthorization }) {
   const history = useHistory();
   let { path } = useRouteMatch();
 
-  const { isLoading, data: facility } = useGetFacilityList();
+  const { isLoading, data: facility } = useGetFacilityList(params);
   const { isLoading: isLoadingInventory, data: inventory } =
     useGetFacilityInventory({
       code: facilityCode,
@@ -109,7 +109,13 @@ function FacilityScreen({ screenAuthorization }) {
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading}
-        totalItem={100}
+        totalItem={facility?.totalElements}
+        handlePaginationModelChange={(props) => {
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           ...staticWarehouseCols,
           {

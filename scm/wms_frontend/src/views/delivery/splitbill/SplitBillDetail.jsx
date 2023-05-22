@@ -29,7 +29,7 @@ function SplitBillDetailScreen({ screenAuthorization }) {
   const [currShipmentItem, setCurrShipmentItem] = useState("");
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 1,
   });
   const methods = useForm({
     mode: "onChange",
@@ -84,7 +84,6 @@ function SplitBillDetailScreen({ screenAuthorization }) {
         splittedQty: splittedQty,
       };
     });
-    console.log(newdeliveryBillItems);
     return !newdeliveryBillItems?.reduce((accumulator, curr) => {
       return accumulator && curr.effectiveQty === curr.splittedQty;
     }, true);
@@ -215,7 +214,13 @@ function SplitBillDetailScreen({ screenAuthorization }) {
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoadingSplittedBillItem}
-        totalItem={100}
+        totalItem={splittedBillItems?.totalElements}
+        handlePaginationModelChange={(props) => {
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           ...splittedBillCols,
           {

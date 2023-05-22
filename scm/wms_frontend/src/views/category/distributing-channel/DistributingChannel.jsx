@@ -19,7 +19,7 @@ import CreateDistChannel from "./components/CreateDistChannel";
 function DistributingChannelScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 5,
   });
   const { height } = useWindowSize();
   const [isAdd, setIsAdd] = useToggle(false);
@@ -27,7 +27,7 @@ function DistributingChannelScreen({ screenAuthorization }) {
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
 
-  const { isLoading, data } = useGetDistChannelList();
+  const { isLoading, data } = useGetDistChannelList(params);
 
   let actions = [
     {
@@ -69,7 +69,13 @@ function DistributingChannelScreen({ screenAuthorization }) {
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading}
-        totalItem={100}
+        totalItem={data?.totalElements}
+        handlePaginationModelChange={(props) => {
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           ...distChannelCols,
           {

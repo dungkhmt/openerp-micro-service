@@ -7,7 +7,7 @@ import { queryKey } from "./querykey";
 
 export const useGetSaleOrderList = (params) => {
   return useQuery({
-    queryKey: [queryKey.sale_order.order_list],
+    queryKey: [queryKey.sale_order.order_list, params],
     queryFn: async () => {
       const res = await axiosSendRequest("get", endPoint.getSaleOrder, params);
       if (res.data && res.code === 1) {

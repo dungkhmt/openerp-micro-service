@@ -33,7 +33,7 @@ export const useGetShipmentList = (params) => {
   return useQuery({
     queryKey: [queryKey.shipment.shipment_list, params],
     queryFn: async () => {
-      const res = await axiosSendRequest("get", endPoint.getShipments);
+      const res = await axiosSendRequest("get", endPoint.getShipments, params);
       if (res.data && res.code === 1) {
         return res.data;
       }

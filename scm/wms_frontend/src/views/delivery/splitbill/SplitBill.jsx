@@ -13,10 +13,10 @@ import { deliveryBillCols } from "../LocalConstant";
 function SplitBillScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 5,
   });
   const { height } = useWindowSize();
-  const { isLoading, data } = useGetDeliveryBillList();
+  const { isLoading, data } = useGetDeliveryBillList(params);
   const history = useHistory();
   let { path } = useRouteMatch();
 
@@ -80,7 +80,13 @@ function SplitBillScreen({ screenAuthorization }) {
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading}
-        totalItem={100}
+        totalItem={data?.totalElements}
+        handlePaginationModelChange={(props) => {
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           ...deliveryBillCols,
           {

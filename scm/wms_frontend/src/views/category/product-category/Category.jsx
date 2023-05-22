@@ -19,7 +19,7 @@ import CreateProductCate from "./components/CreateProductCate";
 function ProductCategoryScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 5,
   });
   const { height } = useWindowSize();
   const [isAdd, setIsAdd] = useToggle(false);
@@ -27,7 +27,7 @@ function ProductCategoryScreen({ screenAuthorization }) {
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
 
-  const { isLoading, data } = useGetProductCateList();
+  const { isLoading, data } = useGetProductCateList(params);
   let actions = [
     {
       title: "Thêm",
@@ -68,7 +68,13 @@ function ProductCategoryScreen({ screenAuthorization }) {
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading}
-        totalItem={100}
+        totalItem={data?.totalElements}
+        handlePaginationModelChange={(props) => {
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           ...categoryColumns,
           {

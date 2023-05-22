@@ -23,7 +23,8 @@ function DroneScreen({ screenAuthorization }) {
     pageSize: 5,
   });
   const { height } = useWindowSize();
-  const { isLoading, data, isRefetching, isPreviousData } = useGetDroneList();
+  const { isLoading, data, isRefetching, isPreviousData } =
+    useGetDroneList(params);
   const [isAdd, setIsAdd] = useToggle(false);
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
@@ -70,7 +71,13 @@ function DroneScreen({ screenAuthorization }) {
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20 - 35 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom - Page Title
         isLoading={isLoading || isRefetching || isPreviousData}
-        totalItem={100}
+        totalItem={data?.totalElements}
+        handlePaginationModelChange={(props) => {
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           ...droneCols,
           {
