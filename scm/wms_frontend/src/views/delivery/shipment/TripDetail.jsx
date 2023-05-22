@@ -25,6 +25,10 @@ import { shipmentItemCols } from "../LocalConstant";
 // var intervalID;
 
 function TripScreen({ screenAuthorization }) {
+  const [params, setParams] = useState({
+    page: 1,
+    pageSize: 10,
+  });
   const location = useLocation();
   const { height } = useWindowSize();
   const [open, setOpen] = useState(false);
@@ -135,11 +139,17 @@ function TripScreen({ screenAuthorization }) {
         <Typography>4. Đơn hàng:</Typography>
       </Box>
       <CustomDataGrid
-        // params={params}
-        // setParams={setParams}
+        params={params}
+        setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20, marginTop: 2 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading}
-        totalItem={100}
+        totalItem={tripRoute?.totalElements}
+        handlePaginationModelChange={(props) => {
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           ...shipmentItemCols,
           {
