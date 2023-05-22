@@ -9,6 +9,6 @@ import lombok.*;
 @Builder
 public class TrailerFilterRequestDTO {
     private Integer facilityId;
-    private String statusId;
+    private String status;
     private Integer truckId;
 }

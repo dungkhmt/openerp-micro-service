@@ -5,6 +5,7 @@ import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.dto.ContainerFilterRequestDTO;
 import openerp.containertransport.dto.ContainerModel;
+import openerp.containertransport.dto.FacilityResponsiveDTO;
 import openerp.containertransport.dto.TruckModel;
 import openerp.containertransport.entity.Container;
 import openerp.containertransport.entity.Facility;
@@ -30,11 +31,11 @@ public class ContainerServiceImpl implements ContainerService {
     private final EntityManager entityManager;
     @Override
     public ContainerModel createContainer(ContainerModel containerModelDTO) {
-        Facility facility = facilityRepo.findById(containerModelDTO.getFacilityId());
+        Facility facility = facilityRepo.findById(containerModelDTO.getFacilityId()).get();
         Container container = new Container();
         container.setFacility(facility);
         container.setSize(containerModelDTO.getSize());
-        container.setEmpty(false);
+        container.setEmpty(containerModelDTO.getIsEmpty());
         container.setStatus("Available");
         container.setCreatedAt(System.currentTimeMillis());
         container.setUpdatedAt(System.currentTimeMillis());
@@ -54,9 +55,16 @@ public class ContainerServiceImpl implements ContainerService {
     @Override
     public ContainerModel updateContainer(ContainerModel containerModel) {
         Container container = containerRepo.findById(containerModel.getId());
-//        if(containerModel.getFacilityId() != null) {
-//            container.setFacilityId(containerModel.getFacilityId());
-//        }
+        if (containerModel.getFacilityId() != null) {
+            Facility facility = facilityRepo.findById(containerModel.getFacilityId()).get();
+            container.setFacility(facility);
+        }
+        if (containerModel.getStatus() != null) {
+            container.setStatus(containerModel.getStatus());
+        }
+        if (containerModel.getIsEmpty() != null) {
+            container.setEmpty(containerModel.getIsEmpty());
+        }
         container.setUpdatedAt(System.currentTimeMillis());
         containerRepo.save(container);
         ContainerModel containerModelUpdate = convertToModel(container);
@@ -86,7 +94,14 @@ public class ContainerServiceImpl implements ContainerService {
 
     public ContainerModel convertToModel(Container container) {
         ContainerModel containerModel = modelMapper.map(container, ContainerModel.class);
-        containerModel.setFacilityName(container.getFacility().getFacilityName());
+        FacilityResponsiveDTO facilityResponsiveDTO = new FacilityResponsiveDTO();
+        facilityResponsiveDTO.setFacilityId(container.getFacility().getId());
+        facilityResponsiveDTO.setFacilityCode(container.getFacility().getFacilityCode());
+        facilityResponsiveDTO.setFacilityName(container.getFacility().getFacilityName());
+        facilityResponsiveDTO.setLatitude(container.getFacility().getLatitude());
+        facilityResponsiveDTO.setLongitude(container.getFacility().getLongitude());
+        facilityResponsiveDTO.setAddress(container.getFacility().getAddress());
+        containerModel.setFacilityResponsiveDTO(facilityResponsiveDTO);
         return containerModel;
     }
 }

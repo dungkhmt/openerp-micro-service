@@ -13,10 +13,11 @@ public class ContainerModel {
     private long id;
     private String containerCode;
     private Integer size;
-    private long facilityId;
+    private Long facilityId;
     private String facilityName;
+    private FacilityResponsiveDTO facilityResponsiveDTO;
     private String status;
-    private boolean isEmpty;
+    private Boolean isEmpty;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 }
