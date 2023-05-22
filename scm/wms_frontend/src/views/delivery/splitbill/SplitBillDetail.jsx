@@ -29,7 +29,7 @@ function SplitBillDetailScreen({ screenAuthorization }) {
   const [currShipmentItem, setCurrShipmentItem] = useState("");
   const [params, setParams] = useState({
     page: 1,
-    pageSize: 1,
+    pageSize: 10,
   });
   const methods = useForm({
     mode: "onChange",

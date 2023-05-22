@@ -19,7 +19,7 @@ import CreateProductCate from "./components/CreateProductCate";
 function ProductCategoryScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
   });
   const { height } = useWindowSize();
   const [isAdd, setIsAdd] = useToggle(false);

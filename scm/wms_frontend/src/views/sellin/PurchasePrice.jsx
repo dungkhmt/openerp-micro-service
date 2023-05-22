@@ -29,7 +29,7 @@ import UpdateProductPrice from "./components/UpdateProductPrice";
 function PurchasePriceScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
   });
   const [isAdd, setIsAdd] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);

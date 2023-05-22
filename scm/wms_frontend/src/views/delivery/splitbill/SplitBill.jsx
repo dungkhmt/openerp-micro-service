@@ -13,7 +13,7 @@ import { deliveryBillCols } from "../LocalConstant";
 function SplitBillScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
   });
   const { height } = useWindowSize();
   const { isLoading, data } = useGetDeliveryBillList(params);

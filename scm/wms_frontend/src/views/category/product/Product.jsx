@@ -20,7 +20,7 @@ import UpdateProductForm from "./components/UpdateProductForm";
 function ProductScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
   });
   const [isAdd, setIsAdd] = useToggle(false);
   const { height } = useWindowSize();

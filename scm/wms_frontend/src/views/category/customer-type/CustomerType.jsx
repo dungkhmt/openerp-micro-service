@@ -19,7 +19,7 @@ import CreateCustomerType from "./components/CreateCustomerType";
 function CustomerTypeScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
   });
   const { height } = useWindowSize();
   const [isAdd, setIsAdd] = useToggle(false);

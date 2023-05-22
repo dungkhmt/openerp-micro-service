@@ -20,7 +20,7 @@ import CreateDrone from "./components/CreateDrone";
 function DroneScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
   });
   const { height } = useWindowSize();
   const { isLoading, data, isRefetching, isPreviousData } =

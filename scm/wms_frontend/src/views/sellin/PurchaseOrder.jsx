@@ -23,7 +23,7 @@ import CreatePurOrderForm from "./components/CreatePurOrderForm";
 function PurchaseOrderScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
   });
   const [isAdd, setIsAdd] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
