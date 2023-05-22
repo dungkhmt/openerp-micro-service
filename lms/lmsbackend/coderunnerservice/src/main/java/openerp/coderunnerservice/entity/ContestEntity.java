@@ -5,7 +5,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,7 +30,6 @@ public class ContestEntity implements Serializable {
     public static final String CONTEST_PARTICIPANT_VIEW_MODE_NOT_SEE_CORRECT_ANSWER = "NOT_SEE_CORRECT_ANSWER";
     public static final String CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER_AND_PRIVATE_TESTCASE = "SEE_CORRECT_ANSWER_AND_PRIVATE_TEST_CASE";
     public static final String CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER_AND_PRIVATE_TESTCASE_SHORT = "SEE_CORRECT_ANSWER_AND_PRIVATE_TEST_CASE_SHORT";
-
 
 
     public static final String CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_VISIBLE = "VISIBLE";
@@ -89,34 +87,34 @@ public class ContestEntity implements Serializable {
     @Column(name = "end_time")
     private Date endTime;
 
-    @Column(name="status_id")
+    @Column(name = "status_id")
     private String statusId;
 
-    @Column(name="submission_action_type")
+    @Column(name = "submission_action_type")
     private String submissionActionType;
 
-    @Column(name="max_number_submission")
+    @Column(name = "max_number_submission")
     private int maxNumberSubmissions;
 
-    @Column(name="participant_view_result_mode")
+    @Column(name = "participant_view_result_mode")
     private String participantViewResultMode;
 
-    @Column(name="problem_description_view_type")
+    @Column(name = "problem_description_view_type")
     private String problemDescriptionViewType;
 
-    @Column(name="use_cache_contest_problem")
+    @Column(name = "use_cache_contest_problem")
     private String useCacheContestProblem;
 
-    @Column(name="max_source_code_length")
+    @Column(name = "max_source_code_length")
     private int maxSourceCodeLength;
 
-    @Column(name="evaluate_both_public_private_testcase")
+    @Column(name = "evaluate_both_public_private_testcase")
     private String evaluateBothPublicPrivateTestcase;
 
-    @Column(name="min_time_between_two_submissions")
+    @Column(name = "min_time_between_two_submissions")
     private long minTimeBetweenTwoSubmissions;
 
-    @Column(name="judge_mode")
+    @Column(name = "judge_mode")
     private String judgeMode; // synchronous or asynchronous using queue
 
 

@@ -27,11 +27,11 @@ class SnappyMsgPackRedisSerializer<T> implements RedisSerializer<T> {
     }
 
     private ObjectMapper objectMapper = new ObjectMapper(new MessagePackFactory())
-        .registerModules(new Jdk8Module(), new JavaTimeModule())
-        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
-        .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            .registerModules(new Jdk8Module(), new JavaTimeModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
+            .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
     public SnappyMsgPackRedisSerializer(Class<T> type) {
         this.javaType = JavaTypeHandler.getJavaType(type);

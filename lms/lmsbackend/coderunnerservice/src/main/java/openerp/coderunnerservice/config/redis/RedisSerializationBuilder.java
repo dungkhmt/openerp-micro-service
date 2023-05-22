@@ -7,8 +7,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public final class RedisSerializationBuilder {
 
     public static <T> RedisTemplate<String, T> getSnappyRedisTemplate(
-        final LettuceConnectionFactory factory,
-        final Class<T> clazz
+            final LettuceConnectionFactory factory,
+            final Class<T> clazz
     ) {
         SnappyMsgPackRedisSerializer<T> snappyMsgPackSerializer = new SnappyMsgPackRedisSerializer<>(clazz);
         RedisTemplate<String, T> redisTemplate = new RedisTemplate<>();

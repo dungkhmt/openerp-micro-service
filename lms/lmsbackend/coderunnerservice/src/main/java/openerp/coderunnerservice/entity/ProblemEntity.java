@@ -51,7 +51,7 @@ public class ProblemEntity implements Serializable {
     @Column(name = "solution_checker_source_code")
     private String solutionCheckerSourceCode;
 
-    @Column(name="solution_checker_source_language")
+    @Column(name = "solution_checker_source_language")
     private String solutionCheckerSourceLanguage;
 
     @Column(name = "solution")
