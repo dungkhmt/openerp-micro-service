@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public abstract class BaseRabbitListener {
 
     abstract void onMessage(
-        Message message, String messageBody, Channel channel, Integer deliveryCount
+            Message message, String messageBody, Channel channel, Integer deliveryCount
     ) throws Exception;
 
     abstract void retryMessage(Message message, String messageBody, Channel channel) throws Exception;
