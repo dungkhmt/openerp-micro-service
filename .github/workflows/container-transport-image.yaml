@@ -1,11 +1,11 @@
-name: wms Image CI
+name: container-transport Image CI
 
 on:
   push:
     branches:
       - main
     paths:
-      - "wms/wms-backend/**"
+      - "containertransport/back_end/**"
 
 jobs:
   build:
@@ -17,19 +17,19 @@ jobs:
         uses: timheuer/base64-to-file@v1.1
         with:
           fileName: "application.yml"
-          fileDir: "./wms/wms-backend/src/main/resources/"
-          encodedString: ${{ secrets.WMS_B64_SECRET }}
+          fileDir: "./containertransport/back_end/src/main/resources/"
+          encodedString: ${{ secrets.CONTAINER_TRANSPORT_B64_SECRET }}
       - name: Build & push Docker image
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
-          image: leanhtuan/wms
-          directory: "wms/wms-backend/"
+          image: leanhtuan/container-transport
+          directory: "containertransport/back_end/"
           registry: docker.io
-          dockerfile: "wms/wms-backend/Dockerfile"
+          dockerfile: "containertransport/back_end/Dockerfile"
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           addLatest: true
       - name: Remove config file
         uses: JesseTG/rm@v1.0.2
         with:
-          path: "./wms/wms-backend/src/main/resources/application.yml"
+          path: "./containertransport/back_end/src/main/resources/application.yml"
