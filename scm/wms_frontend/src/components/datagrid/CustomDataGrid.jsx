@@ -1,27 +1,7 @@
 import { LinearProgress, Typography, gridClasses } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import React from "react";
 import { AppColors } from "../../shared/AppColors";
-
-// function CustomPagination() {
-//   const apiRef = useGridApiContext();
-//   const page = useGridSelector(apiRef, gridPageSelector);
-//   const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-
-//   return (
-//     <Pagination
-//       color="secondary"
-//       variant="text"
-//       shape="circular"
-//       page={page + 1}
-//       count={pageCount}
-//       showFirstButton
-//       showLastButton
-//       siblingCount={4}
-//       renderItem={(props2) => <PaginationItem {...props2} disableRipple />}
-//       onChange={(event, value) => apiRef.current.setPage(value - 1)}
-//     />
-//   );
-// }
 
 const getColumnsShow = (columns, isSerial, params) => {
   let columnsRaw = columns || [];
@@ -59,6 +39,7 @@ const getColumnsShow = (columns, isSerial, params) => {
  * @property {Function} onSelectionChange
  * @property {any} selectionModel
  * @property {"small" | "other"} size
+ * @property {import("@mui/x-data-grid").GridFeatureMode} paginationMode
  * @property {import("@mui/x-data-grid").GridColumnGroupingModel} columnGroupingModel
  * @property {import("@mui/material").SxProps} sx
  * @param {Prop} props
@@ -77,34 +58,45 @@ const CustomDataGrid = (props) => {
     setParams,
     onSelectionChange,
     selectionModel,
+    paginationMode = "server",
     size,
     columnGroupingModel,
+    handlePaginationModelChange,
     sx,
   } = props;
+
+  const [rowCountState, setRowCountState] = React.useState(totalItem);
+  React.useEffect(() => {
+    setRowCountState((prevRowCountState) =>
+      totalItem !== undefined ? totalItem : prevRowCountState
+    );
+  }, [totalItem, setRowCountState]);
 
   const sizeDefault = size ? size : "small";
   return (
     <DataGrid
-      initialState={initialState}
+      initialState={{
+        ...initialState,
+      }}
       columns={getColumnsShow(columns, isSerial, params)}
       rows={rows}
-      rowCount={totalItem}
-      paginationMode="server"
-      // rowsPerPageOptions={[10, 20, 50, 70]}
-      // pageSize={params.pageSize}
-      // page={params.page - 1}
-      loading={isLoading}
       isRowSelectable={() => {
         return isSelectable;
       }}
+      rowCount={rowCountState}
+      paginationModel={{
+        page: params.page - 1,
+        pageSize: params.pageSize,
+      }}
+      // pageSizeOptions={[params.pageSize]}
+      paginationMode={paginationMode}
+      onPaginationModelChange={handlePaginationModelChange}
+      loading={isLoading}
       isCellEditable={isEditable}
       checkboxSelection={isSelectable}
       sortingMode="server"
-      // paginationMode="server"
-      // checkboxSelection={!!onSelectionChange}
       disableRowSelectionOnClick
       disableColumnMenu
-      pagination
       keepNonExistentRowsSelected
       selectionModel={selectionModel}
       columnGroupingModel={columnGroupingModel}
@@ -115,12 +107,12 @@ const CustomDataGrid = (props) => {
         LoadingOverlay: LinearProgress,
       }}
       onRowSelectionModelChange={onSelectionChange}
-      onPageSizeChange={(page_size) =>
-        setParams((prev) => ({ ...prev, page_size, page: 1 }))
-      }
-      onPageChange={(page) =>
-        setParams((prev) => ({ ...prev, page: page + 1 }))
-      }
+      // onPageSizeChange={(pageSize) =>
+      //   setParams((prev) => ({ ...prev, pageSize, page: 1 }))
+      // }
+      // onPageChange={(page) =>
+      //   setParams((prev) => ({ ...prev, page: page + 1 }))
+      // }
       onSortModelChange={(sort) =>
         setParams((prev) => ({
           ...prev,
@@ -132,11 +124,9 @@ const CustomDataGrid = (props) => {
       slots={
         {
           // toolbar: GridToolbar,
-          // pagination: CustomPagination,
         }
       }
       autoHeight
-      // getRowHeight={() => "auto"}
       rowHeight={sizeDefault === "small" ? 50 : 60}
       headerHeight={sizeDefault === "small" ? 50 : 60}
       sx={{

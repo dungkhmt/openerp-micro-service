@@ -1,5 +1,8 @@
-import {Box, Button, CircularProgress, Grid, MenuItem, TextField,} from "@material-ui/core";
+import {Box, Button, CircularProgress, Grid, MenuItem, TextField, Chip} from "@mui/material";
+import PublishIcon from "@mui/icons-material/Publish";
 import Typography from "@mui/material/Typography";
+import RichTextEditor from "../../common/editor/RichTextEditor";
+import HustContainerCard from "../../common/HustContainerCard";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
@@ -12,7 +15,7 @@ export default function CreateTestCase(props) {
   const [input, setInput] = useState("");
   const [result, setResult] = useState("");
   const {problemId} = useParams();
-  const [description, setDescription] = useState();
+  const [description, setDescription] = useState("");
   const [load, setLoad] = useState(false);
   const [checkTestcaseResult, setCheckTestcaseResult] = useState(false);
   const [point, setPoint] = useState(0);
@@ -148,119 +151,116 @@ export default function CreateTestCase(props) {
   };
 
   return (
-    <Box>
-      <Typography variant={"h4"}>Create new Test case</Typography>
-      <Box
-        style={{
-          width: "400px",
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <TextField
-          autoFocus
-          required
-          id="point"
-          label="Point"
-          placeholder="Point"
-          onChange={(event) => {
-            setPoint(event.target.value);
+    <HustContainerCard title={'Create new Test case'}>
+        <Box
+          style={{
+            width: "600px",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
           }}
-        ></TextField>
-        <TextField
-          autoFocus
-          // required
-          select
-          id="Public TestCase"
-          label="Public TestCase"
-          onChange={(event) => {
-            setIsPublic(event.target.value);
-          }}
-          value={isPublic}
-          style={{width: "140px"}}
         >
-          <MenuItem key={"Y"} value={"Y"}>
-            {"Y"}
-          </MenuItem>
-          <MenuItem key={"N"} value={"N"}>
-            {"N"}
-          </MenuItem>
-        </TextField>
-        <TextField
-          autoFocus
-          // required
-          select
-          id="Mode"
-          label="Upload Mode"
-          onChange={(event) => {
-            setUploadMode(event.target.value);
-          }}
-          value={uploadMode}
-          style={{width: "140px"}}
-        >
-          <MenuItem key={"NOT_EXECUTE"} value={"NOT_EXECUTE"}>
-            {"NOT_EXECUTE"}
-          </MenuItem>
-          <MenuItem key={"EXECUTE"} value={"EXECUTE"}>
-            {"EXECUTE"}
-          </MenuItem>
-        </TextField>
-      </Box>
-      <br/>
+          <TextField
+            autoFocus
+            required
+            id="point"
+            label="Point"
+            placeholder="Point"
+            onChange={(event) => {
+              setPoint(event.target.value);
+            }}
+          ></TextField>
+          <TextField
+            autoFocus
+            // required
+            select
+            id="Public TestCase"
+            label="Public TestCase"
+            onChange={(event) => {
+              setIsPublic(event.target.value);
+            }}
+            value={isPublic}
+            style={{width: "140px"}}
+          >
+            <MenuItem key={"Y"} value={"Y"}>
+              {"Y"}
+            </MenuItem>
+            <MenuItem key={"N"} value={"N"}>
+              {"N"}
+            </MenuItem>
+          </TextField>
+          <TextField
+            autoFocus
+            // required
+            select
+            id="Mode"
+            label="Upload Mode"
+            onChange={(event) => {
+              setUploadMode(event.target.value);
+            }}
+            value={uploadMode}
+            style={{width: "140px"}}
+          >
+            <MenuItem key={"NOT_EXECUTE"} value={"NOT_EXECUTE"}>
+              {"NOT_EXECUTE"}
+            </MenuItem>
+            <MenuItem key={"EXECUTE"} value={"EXECUTE"}>
+              {"EXECUTE"}
+            </MenuItem>
+          </TextField>
+        </Box>
+        <br/>
 
-      <form onSubmit={handleFormSubmit}>
-        <Grid container spacing={1} alignItems="flex-end">
-          <Grid item xs={3}>
-            <input
-              type="file"
-              id="selected-upload-file"
-              onChange={onFileChange}
+        <form onSubmit={handleFormSubmit}>
+          <Grid container spacing={1} alignItems="flex-end">
+          <Button color="primary" variant="contained" component="label">
+            <PublishIcon /> Select file to upload
+            <input hidden type="file" id="selected-upload-file" onChange={onFileChange} />
+          </Button>
+          {filename && (
+            <Chip
+              style={{marginLeft: "20px"}}
+              color="success"
+              variant="outlined"
+              label={filename.name}
+              onDelete={() => setFilename(undefined)}
             />
+          )}
+            <Box>
+              <Typography variant="h5" component="div" sx={{marginTop: "12px", marginBottom: "8px"}}>
+                Description
+              </Typography>
+              <RichTextEditor content={description} onContentChange={text => setDescription(text)}/>
+            </Box>
+            {/* Result
+            <TextField
+              fullWidth
+              style={{
+                marginTop: "10px",
+                marginBottom: "24px",
+              }}
+              multiline
+              maxRows={10}
+              value={result}
+              onChange={(event) => {
+                setResult(event.target.value);
+              }}
+            ></TextField> */}
+            <Grid item xs={2}>
+              <Button
+                color="primary"
+                variant="contained"
+                type="submit"
+                onChange={onInputChange}
+                width="100%"
+              >
+                SUBMIT
+              </Button>
+              <h2> Status: {uploadMessage}</h2>
+            </Grid>
+            {isProcessing ? <CircularProgress/> : ""}
           </Grid>
-          Description
-          <TextField
-            fullWidth
-            style={{
-              marginTop: "10px",
-              marginBottom: "24px",
-            }}
-            multiline
-            maxRows={10}
-            value={description}
-            onChange={(event) => {
-              setDescription(event.target.value);
-            }}
-          ></TextField>
-          Result
-          <TextField
-            fullWidth
-            style={{
-              marginTop: "10px",
-              marginBottom: "24px",
-            }}
-            multiline
-            maxRows={10}
-            value={result}
-            onChange={(event) => {
-              setResult(event.target.value);
-            }}
-          ></TextField>
-          <Grid item xs={2}>
-            <Button
-              color="primary"
-              variant="contained"
-              type="submit"
-              onChange={onInputChange}
-              width="100%"
-            >
-              SUBMIT
-            </Button>
-            <h2> Status: {uploadMessage}</h2>
-          </Grid>
-          {isProcessing ? <CircularProgress/> : ""}
-        </Grid>
-      </form>
-    </Box>
+        </form>
+    </HustContainerCard>
   );
 }

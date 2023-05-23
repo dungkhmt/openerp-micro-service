@@ -1,9 +1,7 @@
 package com.hust.wmsbackend.management.service.impl;
 
-import com.hust.wmsbackend.management.entity.AssignedOrderItem;
-import com.hust.wmsbackend.management.entity.CustomerAddress;
-import com.hust.wmsbackend.management.entity.SaleOrderHeader;
-import com.hust.wmsbackend.management.entity.SaleOrderItem;
+import com.hust.wmsbackend.management.entity.*;
+import com.hust.wmsbackend.management.entity.enumentity.DeliveryTripItemStatus;
 import com.hust.wmsbackend.management.entity.enumentity.OrderStatus;
 import com.hust.wmsbackend.management.model.response.OrderDetailResponse;
 import com.hust.wmsbackend.management.model.response.OrderGeneralResponse;
@@ -69,16 +67,37 @@ public class OrderServiceImpl implements OrderService {
             log.warn(String.format("Order id %s is not exist", orderIdStr));
             return null;
         }
+        Map<UUID, String> productNameMap = productService.getProductNameMap();
 
         SaleOrderHeader saleOrderHeader = saleOrderHeaderOpt.get();
-        List<SaleOrderHeader> successCustomerOrders = saleOrderHeaderRepository
-            .findAllByUserLoginIdAndStatus(saleOrderHeader.getUserLoginId(), OrderStatus.COMPLETED);
-        List<SaleOrderHeader> cancelledCustomerOrders = saleOrderHeaderRepository
-            .findAllByUserLoginIdAndStatus(saleOrderHeader.getUserLoginId(), OrderStatus.CUSTOMER_CANCELLED);
-        BigDecimal totalSuccessOrderCost = successCustomerOrders.stream().map(SaleOrderHeader::getTotalOrderCost)
-                                                                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal totalCancelledOrderCost = cancelledCustomerOrders.stream().map(SaleOrderHeader::getTotalOrderCost)
-                                                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        List<DeliveryTripItem> deliveryTripItems = deliveryTripItemRepository.getDeliveryTripItemByUserLoginId(saleOrderHeader.getUserLoginId());
+        List<OrderDetailResponse.OrderHistoryResponse> successProductHistory = new ArrayList<>();
+        List<OrderDetailResponse.OrderHistoryResponse> failProductHistory = new ArrayList<>();
+        BigDecimal totalSuccessOrderCost = BigDecimal.ZERO;
+        BigDecimal totalFailOrderCost = BigDecimal.ZERO;
+
+        for (DeliveryTripItem item : deliveryTripItems) {
+            AssignedOrderItem assignedOrderItem = assignedOrderItemRepository.findById(item.getAssignedOrderItemId()).get();
+            SaleOrderHeader order = saleOrderHeaderRepository.findById(assignedOrderItem.getOrderId()).get();
+            SaleOrderItem orderItem = saleOrderItemRepository.findSaleOrderItemByOrderIdAndProductId(order.getOrderId(), assignedOrderItem.getProductId()).get();
+            OrderDetailResponse.OrderHistoryResponse adder = OrderDetailResponse.OrderHistoryResponse.builder()
+                    .productId(assignedOrderItem.getProductId().toString())
+                    .productName(productNameMap.get(assignedOrderItem.getProductId()))
+                    .orderId(item.getOrderId().toString())
+                    .quantity(item.getQuantity())
+                    .priceUnit(orderItem.getPriceUnit())
+                    .address(customerAddressRepository.findById(order.getCustomerAddressId()).get().getAddressName())
+                    .createdDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, order.getCreatedStamp()))
+                    .build();
+            if (item.getStatus() == DeliveryTripItemStatus.DONE) {
+                successProductHistory.add(adder);
+                totalSuccessOrderCost = totalSuccessOrderCost.add(orderItem.getPriceUnit());
+            }
+            if (item.getStatus() == DeliveryTripItemStatus.FAIL) {
+                failProductHistory.add(adder);
+                totalFailOrderCost = totalFailOrderCost.add(orderItem.getPriceUnit());
+            }
+        }
 
         Optional<CustomerAddress> customerAddressOpt = customerAddressRepository.findById(saleOrderHeader.getCustomerAddressId());
         if (!customerAddressOpt.isPresent()) {
@@ -88,7 +107,6 @@ public class OrderServiceImpl implements OrderService {
                               saleOrderHeader.getOrderId()));
         }
 
-        Map<UUID, String> productNameMap = productService.getProductNameMap();
         List<SaleOrderItem> saleOrderItems = saleOrderItemRepository.findAllByOrderId(saleOrderHeader.getOrderId());
         List<OrderDetailResponse.OrderItemResponse> items = new ArrayList<>();
         for (SaleOrderItem item : saleOrderItems) {
@@ -160,10 +178,12 @@ public class OrderServiceImpl implements OrderService {
         return OrderDetailResponse.builder()
             .userLoginId(saleOrderHeader.getUserLoginId())
             .customerName(saleOrderHeader.getCustomerName())
-            .totalSuccessOrderCost(totalSuccessOrderCost)
-            .totalSuccessOrderCount(BigDecimal.valueOf(successCustomerOrders.size()))
-            .totalCancelledOrderCost(totalCancelledOrderCost)
-            .totalCancelledOrderCount(BigDecimal.valueOf(cancelledCustomerOrders.size()))
+            .totalSuccessProductCost(totalSuccessOrderCost)
+            .totalSuccessProductCount(BigDecimal.valueOf(successProductHistory.size()))
+            .totalFailProductCost(totalFailOrderCost)
+            .totalFailProductCount(BigDecimal.valueOf(failProductHistory.size()))
+            .failProductHistory(failProductHistory)
+            .successProductHistory(successProductHistory)
             .createdDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, saleOrderHeader.getCreatedStamp()))
             .paymentMethod(saleOrderHeader.getPaymentType().getName())
             .receiptAddress(customerAddressOpt.get().getAddressName())

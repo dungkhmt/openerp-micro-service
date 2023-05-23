@@ -2,11 +2,10 @@ import { request } from "api";
 import { menuIconMap } from "config/menuconfig";
 import { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import ChoseTruckAndOrders from "../ChoseTruckAndOrders";
-import OrderArrangement from "../OrderArrangement";
+import OrderArrangement from "../tripComponent/OrderArrangement";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import TruckAndOrder from "./TruckAndOrder";
 import MapComponent from "../routing/Map";
+import TruckAndOrder from "../tripComponent/TruckAndOrder";
 
 const { Box, Typography, Button, Divider, Icon } = require("@mui/material")
 

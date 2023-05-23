@@ -30,6 +30,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         shipment.setCreatedByUserId(shipmentModel.getCreatedByUserId());
         shipment.setStatus("Waiting");
+        shipment.setDescription(shipmentModel.getDescription());
+        shipment.setExecuted_time(shipmentModel.getExecutedTime());
         shipment.setCreatedAt(System.currentTimeMillis());
         shipment.setUpdatedAt(System.currentTimeMillis());
         shipment = shipmentRepo.save(shipment);
@@ -38,16 +40,16 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         ShipmentModel shipmentModelCreate = convertToModel(shipment);
 
-        List<TripModel> tripModels = new ArrayList<>();
+//        List<TripModel> tripModels = new ArrayList<>();
 
-        if (!shipmentModel.getTripList().isEmpty()) {
-            Shipment finalShipment = shipment;
-            shipmentModel.getTripList().forEach((item) -> {
-                TripModel tripModel = tripService.createTrip(item, finalShipment.getId(), shipmentModel.getCreatedByUserId());
-                tripModels.add(tripModel);
-            });
-        }
-        shipmentModelCreate.setTripList(tripModels);
+//        if (!shipmentModel.getTripList().isEmpty()) {
+//            Shipment finalShipment = shipment;
+//            shipmentModel.getTripList().forEach((item) -> {
+//                TripModel tripModel = tripService.createTrip(item, finalShipment.getId(), shipmentModel.getCreatedByUserId());
+//                tripModels.add(tripModel);
+//            });
+//        }
+//        shipmentModelCreate.setTripList(tripModels);
 
         return shipmentModelCreate;
     }
@@ -71,6 +73,12 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipments.forEach((item) -> shipmentModels.add(convertToModel(item)));
 
         return shipmentModels;
+    }
+
+    @Override
+    public ShipmentModel getShipmentByShipmentId(Long shipmentId) {
+        Shipment shipment = shipmentRepo.findById(shipmentId).get();
+        return convertToModel(shipment);
     }
 
     public ShipmentModel convertToModel (Shipment shipment) {

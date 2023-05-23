@@ -29,7 +29,7 @@ import UpdateProductPrice from "./components/UpdateProductPrice";
 function PurchasePriceScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 10,
   });
   const [isAdd, setIsAdd] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
@@ -55,7 +55,8 @@ function PurchasePriceScreen({ screenAuthorization }) {
     name: "productPrices",
   });
 
-  const { isLoading: isLoadingProduct, data: product } = useGetProductList();
+  const { isLoading: isLoadingProduct, data: product } =
+    useGetProductList(params);
   const { isLoading: isLoadingContract, data: contract } = useGetContractType();
   const { isLoading: isLoadingSellinPrice, data: sellinPrices } =
     useGetSellinPrice();
@@ -120,8 +121,14 @@ function PurchasePriceScreen({ screenAuthorization }) {
           setParams={setParams}
           sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
           isLoading={isLoadingProduct || isLoadingContract}
-          totalItem={100}
+          totalItem={product?.totalElements}
           isSelectable
+          handlePaginationModelChange={(props) => {
+            setParams({
+              page: props?.page + 1,
+              pageSize: props?.pageSize,
+            });
+          }}
           isEditable={(params) => {
             return !sellinPrices?.find(
               (el) => el?.productEntity?.code === params?.row?.code

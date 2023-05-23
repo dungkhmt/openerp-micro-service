@@ -27,6 +27,12 @@ public class Shipment {
     @Column(name = "status")
     private String status;
 
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "executed_time")
+    private Long executed_time;
+
     @Column(name = "created_at")
     private long createdAt;
 

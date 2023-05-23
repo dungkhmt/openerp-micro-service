@@ -1,42 +1,47 @@
-import { Box, Button, Divider, Typography } from "@mui/material";
+import { Alert, Box, Button, Divider, Typography } from "@mui/material";
 import { request } from "api";
 import React, { useContext, useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import '../styles.scss';
-import ChoseTruckAndOrders from "../ChoseTruckAndOrders";
-import OrderArrangement from "../OrderArrangement";
-import { useHistory, useLocation } from "react-router-dom";
+import OrderArrangement from "../tripComponent/OrderArrangement";
+import { useHistory, useLocation, useParams } from "react-router-dom";
 import { MyContext } from "contextAPI/MyContext";
 import { Map } from "leaflet";
 import RoutingMachine from "../routing/RoutingMachine";
 import MapComponent from "../routing/Map";
+import TruckAndOrder from "../tripComponent/TruckAndOrder";
+import { createTrip } from "api/TripAPI";
 
 const CreateTripDetail = () => {
-    const {truckScheduler, setTruckScheduler, tripsCreate, setTripCreate} = useContext(MyContext);
-    const {ordersScheduler, setOrderScheduler, preferred_username} = useContext(MyContext);
+    const { truckScheduler, setTruckScheduler, tripsCreate, setTripCreate } = useContext(MyContext);
+    const { ordersScheduler, setOrderScheduler, preferred_username } = useContext(MyContext);
+    const { shipmentId } = useParams();
     const [truck, setTruck] = useState();
     const [trucks, setTrucks] = useState([]);
     const [orders, setOrders] = useState([]);
     const [ordersSelect, setOrdersSelect] = useState([]);
     const [truckSelect, setTruckSelect] = useState();
-    const [map , setMap] = useState();
+    const [map, setMap] = useState();
     const [test, setTest] = useState("anhvu");
-    
+
     const [tripItems, setTripItem] = useState([]);
     const history = useHistory();
     const location = useLocation();
     const tripsTmpId = useState(location?.search);
 
+    const [toastOpen, setToast] = useState(false);
+    const [toastType, setToastType] = useState();
+
     const checkScheduler = (id, type) => {
         let check = true;
-        if(type === "truck"){
+        if (type === "truck") {
             truckScheduler.forEach((item) => {
-                if(item.id === id) 
+                if (item.id === id)
                     return check = false;
             });
         } else {
             ordersScheduler.forEach((item) => {
-                if(item === id) 
+                if (item === id)
                     return check = false;
             });
         }
@@ -55,16 +60,16 @@ const CreateTripDetail = () => {
             "post",
             `/truck/`, {}, {}, {}, {},
         ).then((res) => {
-            let truckTmp = res.data.filter(item => checkScheduler(item.id, "truck"))
+            // let truckTmp = res.data.filter(item => checkScheduler(item.id, "truck"))
             // console.log("truck", res.data)
-            setTrucks(truckTmp);
+            setTrucks(res.data);
         });
         request(
             "post",
             `/order/`, {}, {}, {}, {},
         ).then((res) => {
-            let orderTmp = res.data.data.filter(item => checkScheduler(item.id, "order"))
-            setOrders(orderTmp);
+            // let orderTmp = res.data.data.filter(item => checkScheduler(item.id, "order"))
+            setOrders(res.data.data);
         });
         // if (tripsTmpId[0] !== null) {
         //     console.log("tripTmp",tripsCreate[tripsTmpId[0].slice(1)]);
@@ -74,7 +79,7 @@ const CreateTripDetail = () => {
         //         }
         //     })
         //     // (tripsTmpId[0].slice(1));
-            
+
         // }
     }, [])
     const handleCancelCreateTrip = () => {
@@ -88,7 +93,7 @@ const CreateTripDetail = () => {
         })
         tripItems.forEach((item, index) => {
             let tripItem = {
-                seqInTrip: index+1,
+                seqInTrip: index + 1,
                 action: item.action,
                 facilityId: item.facilityId,
                 orderId: item.orderCode,
@@ -100,26 +105,46 @@ const CreateTripDetail = () => {
             }
             tripItemTmp.push(tripItem);
         })
-        let trips = tripsCreate;
-        let data = {
-            id: tripsCreate?.length > 0 ? tripsCreate.length + 1 : 0,
-            truck: truck,
-            created_by_user_id: preferred_username,
-            orderIds: orderSubmir,
-            tripItemModelList: tripItemTmp
+        let dataSubmit = {
+            shipmentId: shipmentId,
+            createBy: preferred_username,
+            tripContents: {
+                truckId: truckSelect?.id,
+                orderIds: orderSubmir,
+                tripItemModelList: tripItemTmp
+            }
         }
-        trips.push(data)
-        setTripCreate(trips);
-        updateScheduler(orderSubmir);
-        history.goBack();
-        console.log("data", data);
+        console.log("data", dataSubmit);
+        createTrip(dataSubmit).then((res) => {
+            setToastType("success");
+            setToast(true);
+            setTimeout(() => {
+                setToast(false);
+                history.push({
+                    pathname:`/shipment/detail/${shipmentId}`,
+                })
+            }, "1000");
+        })
     }
-    console.log("tripItems", tripItems);
+    console.log("truckSelect", truckSelect);
     useEffect(() => {
 
     }, [tripItems])
     return (
         <Box className="trip-create">
+            <Box className="toast">
+                {toastOpen ? (
+                    toastType === "success" ? (
+                        <Alert variant="filled" severity={toastType} >
+                            <strong> Created Trip Success !!!</strong >
+                        </Alert >
+                    ) : (
+                        <Alert variant="filled" severity={toastType} >
+                            <strong> Created Trip False !!!</strong >
+                        </Alert >
+                    )) : null
+                }
+            </Box>
             <Box className="header-trip-detail">
                 <Typography className="header-trip-detail-text">Create Trip</Typography>
                 <Box className="header-trip-detail-btn">
@@ -127,22 +152,22 @@ const CreateTripDetail = () => {
                         onClick={handleCancelCreateTrip}
                     >Cancel</Button>
                     <Button variant="contained" className="header-trip-detail-btn-save"
-                    onClick={handleSubmit}
+                        onClick={handleSubmit}
                     >Save</Button>
                 </Box>
             </Box>
             <Divider className="divider-trip-detail" />
             <Box className="content-trip">
                 <Box className="content-truck-and-orders">
-                    <ChoseTruckAndOrders trucks={trucks} setTruck={setTruck} truckSelected={truckSelect} setTruckSelect={setTruckSelect}
-                    orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} />
+                    <TruckAndOrder trucks={trucks} setTruck={setTruck} truckSelected={truckSelect} setTruckSelect={setTruckSelect}
+                        orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} />
                 </Box>
                 <Box className="order-arrangement">
                     <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} />
                 </Box>
                 <Box className="map-order">
                     <Box>
-                        <MapComponent tripItems={tripItems}/>
+                        <MapComponent tripItems={tripItems} />
                     </Box>
                     <Box>Thong tin trip</Box>
                 </Box>

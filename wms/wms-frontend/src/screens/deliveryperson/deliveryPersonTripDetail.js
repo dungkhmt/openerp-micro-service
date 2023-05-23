@@ -10,6 +10,7 @@ import useStyles from 'screens/styles.js';
 import { errorNoti, successNoti } from 'utils/notification';
 import CommandBarButton from "components/button/commandBarButton";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 
 const DeliveryPersonTripDetail = ( props ) => {
@@ -375,4 +376,5 @@ const DeliveryPersonTripDetail = ( props ) => {
   </Fragment>);
 }
 
-export default DeliveryPersonTripDetail;
+const SCR_ID = "SCR_WMSv2_TODAY_DELIVERY_TRIP_DETAIL";
+export default withScreenSecurity(DeliveryPersonTripDetail, SCR_ID, true);

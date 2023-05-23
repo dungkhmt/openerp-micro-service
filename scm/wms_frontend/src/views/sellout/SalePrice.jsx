@@ -28,7 +28,7 @@ import UpdateSalePrice from "./components/UpdateSalePrice";
 function SalePriceScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 10,
   });
   const [isAdd, setIsAdd] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
@@ -151,7 +151,7 @@ function SalePriceScreen({ screenAuthorization }) {
         (((priceBeforeVat * (100 + vat)) / 100) *
           (100 - contractDiscount - massDiscount)) /
         100;
-      console.log("Price: ", priceAfterAll, priceBeforeVat, vat, params);
+      // console.log("Price: ", priceAfterAll, priceBeforeVat, vat, params);
       return priceAfterAll ? (
         <Typography>
           <Typography>{priceAfterAll}</Typography>
@@ -173,7 +173,8 @@ function SalePriceScreen({ screenAuthorization }) {
           setParams={setParams}
           sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
           isLoading={isLoadingProduct || isLoadingContract}
-          totalItem={100}
+          // totalItem={mergedProductContractData.length}
+          paginationMode="client"
           isSelectable
           isEditable={(params) => {
             return !selloutPrices?.find(

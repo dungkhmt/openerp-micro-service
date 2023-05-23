@@ -1,6 +1,7 @@
 package openerp.containertransport.dto;
 
 import lombok.*;
+import openerp.containertransport.entity.Facility;
 
 @Getter
 @Setter
@@ -11,7 +12,8 @@ public class TrailerModel {
     private long id;
     private String trailerCode;
     private Integer facilityId;
-    private String statusId;
+    private FacilityResponsiveDTO facilityResponsiveDTO;
+    private String status;
     private Integer truckId;
     private long createdAt;
     private long updatedAt;

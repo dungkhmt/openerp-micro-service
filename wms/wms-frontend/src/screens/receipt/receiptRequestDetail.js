@@ -14,6 +14,7 @@ import { useRouteMatch } from "react-router-dom";
 
 import { Fragment, useState, useEffect } from "react";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const ReceiptRequestDetail = ( props ) => {
   const history = useHistory();
@@ -263,4 +264,5 @@ const ReceiptRequestDetail = ( props ) => {
   )
 }
 
-export default ReceiptRequestDetail;
+const SCR_ID = "SCR_WMSv2_CREATE_RECEIPT_REQUEST";
+export default withScreenSecurity(ReceiptRequestDetail, SCR_ID, true);

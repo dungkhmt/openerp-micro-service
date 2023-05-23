@@ -30,7 +30,7 @@ public class TruckServiceImpl implements TruckService  {
 
     @Override
     public Truck createTruck(TruckModel truckModel) {
-        Facility facility = facilityRepo.findById(truckModel.getFacilityId());
+        Facility facility = facilityRepo.findById(truckModel.getFacilityId()).get();
         Truck truck = new Truck();
         truck.setFacility(facility);
         truck.setDriverId(truckModel.getDriverId());
@@ -54,6 +54,10 @@ public class TruckServiceImpl implements TruckService  {
             sql += " AND truck_code = :truckCode";
             params.put("truckCode", truckFilterRequestDTO.getTruckCode());
         }
+        if(truckFilterRequestDTO.getStatus() != null) {
+            sql += " AND status = :status";
+            params.put("status", truckFilterRequestDTO.getStatus());
+        }
         sql += " ORDER BY updated_at DESC";
 
         Query query = this.entityManager.createNativeQuery(sql, Truck.class);
@@ -76,7 +80,14 @@ public class TruckServiceImpl implements TruckService  {
     @Override
     public TruckModel updateTruck(TruckModel truckModel) {
         Truck truck = truckRepo.findById(truckModel.getId());
-//        if(truckModel.getFacilityId() != null){
+        if (truckModel.getStatus() != null) {
+            truck.setStatus(truckModel.getStatus());
+        }
+        if (truckModel.getFacilityId() != null) {
+            Facility facility = facilityRepo.findById(truckModel.getFacilityId()).get();
+            truck.setFacility(facility);
+        }
+//        if(truckModel.getDriverId() != null){
 //            truck.setFacilityId(truckModel.getFacilityId());
 //        }
         truck.setUpdatedAt(System.currentTimeMillis());

@@ -8,6 +8,7 @@ import { request } from 'api';
 import { API_PATH } from "../apiPaths";
 import { LOCAL_STORAGE } from "components/constants";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const ProductCustomerDetailView = ( props ) => {
   const classes = useStyles();
@@ -302,4 +303,5 @@ const ProductCustomerDetailView = ( props ) => {
 
 }
 
-export default ProductCustomerDetailView;
+const SCR_ID = "SCR_WMSv2_ONLINE_CUSTOMER_PRODUCT_DETAIL";
+export default withScreenSecurity(ProductCustomerDetailView, SCR_ID, true);

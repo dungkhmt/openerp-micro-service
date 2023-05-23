@@ -20,6 +20,9 @@ public class ShipmentModel implements Serializable {
     private String createdByUserId;
     @JsonProperty("status")
     private String status;
+    private String description;
+    @JsonProperty("executed_time")
+    private long executedTime;
     private List<TripModel> tripList;
     private long createdAt;
     private long updatedAt;

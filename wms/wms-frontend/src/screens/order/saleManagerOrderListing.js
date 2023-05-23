@@ -5,6 +5,7 @@ import { request } from "api";
 import { API_PATH } from "screens/apiPaths";
 import { convertToVNDFormat } from "screens/utils/utils";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const SaleManagerOrderListing = () => {
   const { path } = useRouteMatch();
@@ -59,4 +60,5 @@ const SaleManagerOrderListing = () => {
   </Fragment>);
 }
 
-export default SaleManagerOrderListing;
+const SCR_ID = "SCR_WMSv2_SALE_ORDER_LISTING";
+export default withScreenSecurity(SaleManagerOrderListing, SCR_ID, true);

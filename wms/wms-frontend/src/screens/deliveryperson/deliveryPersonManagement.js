@@ -2,6 +2,7 @@ import { TextField } from "@mui/material";
 import { request } from "api";
 import StandardTable from "components/StandardTable"
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 import { Fragment, useEffect, useState } from "react"
 import { API_PATH } from "screens/apiPaths";
 import { errorNoti, successNoti } from "utils/notification";
@@ -106,4 +107,5 @@ const DeliveryPersonManagement = () => {
   </Fragment>);
 };
 
-export default DeliveryPersonManagement;
+const SCR_ID = "SCR_WMSv2_DELIVERY_PERSON_MANAGEMENT";
+export default withScreenSecurity(DeliveryPersonManagement, SCR_ID, true);

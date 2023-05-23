@@ -7,6 +7,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useHistory } from "react-router";
 import { convertToVNDFormat } from "screens/utils/utils";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const ProductCategories = ({ productCategories, setProductData, allProductData }) => {
   const [selected, setSelected] = useState(null);
@@ -142,4 +143,5 @@ const ProductGeneralView = () => {
   )
 }
 
-export default ProductGeneralView;
+const SCR_ID = "SCR_WMSv2_ONLINE_CUSTOMER_PRODUCT_GENERAL";
+export default withScreenSecurity(ProductGeneralView, SCR_ID, true);

@@ -109,9 +109,9 @@ public class RabbitProgrammingContestConfig {
     @Bean
     public Binding judgeCustomProblemBinding() {
         return BindingBuilder
-            .bind(judgeCustomProblemQueue())
-            .to(exchange())
-            .with(ProblemContestRoutingKey.JUDGE_CUSTOM_PROBLEM);
+                .bind(judgeCustomProblemQueue())
+                .to(exchange())
+                .with(ProblemContestRoutingKey.JUDGE_CUSTOM_PROBLEM);
     }
 
     // DeadLetterExchange & DeadLetterQueue
@@ -145,16 +145,16 @@ public class RabbitProgrammingContestConfig {
     @Bean
     public Binding judgeProblemDeadLetterBinding() {
         return BindingBuilder
-            .bind(judgeProblemDeadLetterQueue())
-            .to(deadLetterExchange())
-            .with(ProblemContestRoutingKey.JUDGE_PROBLEM_DL);
+                .bind(judgeProblemDeadLetterQueue())
+                .to(deadLetterExchange())
+                .with(ProblemContestRoutingKey.JUDGE_PROBLEM_DL);
     }
 
     @Bean
     public Binding judgeCustomProblemDeadLetterBinding() {
         return BindingBuilder
-            .bind(judgeCustomProblemDeadLetterQueue())
-            .to(deadLetterExchange())
-            .with(ProblemContestRoutingKey.JUDGE_CUSTOM_PROBLEM_DL);
+                .bind(judgeCustomProblemDeadLetterQueue())
+                .to(deadLetterExchange())
+                .with(ProblemContestRoutingKey.JUDGE_CUSTOM_PROBLEM_DL);
     }
 }

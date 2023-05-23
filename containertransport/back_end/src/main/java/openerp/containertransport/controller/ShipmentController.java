@@ -10,9 +10,7 @@ import openerp.containertransport.service.ShipmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,4 +31,11 @@ public class ShipmentController {
         List<ShipmentModel> shipmentModels = shipmentService.filterShipment(requestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), shipmentModels));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getShipmentByShipmentId (@PathVariable Long id) {
+        ShipmentModel shipmentModel = shipmentService.getShipmentByShipmentId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), shipmentModel));
+    }
+
 }

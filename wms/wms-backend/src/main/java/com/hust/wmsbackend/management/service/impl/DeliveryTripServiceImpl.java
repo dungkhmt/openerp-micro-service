@@ -28,6 +28,8 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
     private AssignedOrderItemRepository assignedOrderItemRepository;
     private SaleOrderHeaderRepository saleOrderHeaderRepository;
     private CustomerAddressRepository customerAddressRepository;
+    private InventoryItemRepository inventoryItemRepository;
+    private ProductWarehouseRepository productWarehouseRepository;
 
     private WarehouseService warehouseService;
     private BayService bayService;
@@ -229,10 +231,44 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
             }
         }
         int numFailItems = 0;
+        List<InventoryItem> updateInventoryItems = new ArrayList<>();
+        List<ProductWarehouse> updateProductWarehouses = new ArrayList<>();
         for (DeliveryTripItem item : items) {
             if (item.getStatus() == DeliveryTripItemStatus.FAIL) {
                 numFailItems += 1;
-                break;
+                // nếu delivery item trip này giao thất bại
+                // thì cần cập nhật lại quantity của hàng hóa trong kho, với luồng logic là:
+                // cập nhật lại giá trị của inventory item và product warehouse
+                // từ item -> lấy được assignedOrderItemId -> lấy được AssignedOrderItem -> lấy được inventoryItemId
+                // lấy được InventoryItem -> update quantity
+                // từ InventoryItem -> lấy được productId, warehouseId -> update quantity
+
+                // update inventory item
+                UUID assignedOrderItemId = item.getAssignedOrderItemId();
+                Optional<AssignedOrderItem> assignedOrderItemOpt = assignedOrderItemRepository.findById(assignedOrderItemId);
+                if (!assignedOrderItemOpt.isPresent()) {
+                    throw new RuntimeException(String.format("Assigned order item with id %s is not exist", assignedOrderItemId));
+                }
+                Optional<InventoryItem> inventoryItemOpt = inventoryItemRepository.findById(assignedOrderItemOpt.get().getInventoryItemId());
+                if (!inventoryItemOpt.isPresent()) {
+                    throw new RuntimeException(String.format("Inventory item with id %s is not exist", assignedOrderItemOpt.get().getInventoryItemId()));
+                }
+                InventoryItem inventoryItem = inventoryItemOpt.get();
+                BigDecimal newInventoryItemQuantity = inventoryItem.getQuantityOnHandTotal().add(item.getQuantity());
+                inventoryItem.setQuantityOnHandTotal(newInventoryItemQuantity);
+                updateInventoryItems.add(inventoryItem);
+
+                // update product warehouse
+                Optional<ProductWarehouse> productWarehouseOpt = productWarehouseRepository.findProductWarehouseByWarehouseIdAndProductId(
+                    inventoryItem.getWarehouseId(), inventoryItem.getProductId());
+                if (!productWarehouseOpt.isPresent()) {
+                    throw new RuntimeException(String.format("Product warehouse with warehouse id %s and product id %s is not exist",
+                        inventoryItem.getWarehouseId(), inventoryItem.getProductId()));
+                }
+                ProductWarehouse productWarehouse = productWarehouseOpt.get();
+                BigDecimal newProductWarehouseQuantity = productWarehouse.getQuantityOnHand().add(item.getQuantity());
+                productWarehouse.setQuantityOnHand(newProductWarehouseQuantity);
+                updateProductWarehouses.add(productWarehouse);
             }
         }
         if (numFailItems > 0) {
@@ -242,6 +278,8 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
         }
         deliveryTripRepository.save(trip);
         saleOrderService.updateStatusByDeliveryTripItem(items.stream().map(DeliveryTripItem::getOrderId).collect(Collectors.toSet()));
+        inventoryItemRepository.saveAll(updateInventoryItems);
+        productWarehouseRepository.saveAll(updateProductWarehouses);
         return true;
     }
 

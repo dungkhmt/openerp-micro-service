@@ -9,6 +9,7 @@ import { errorNoti, successNoti } from "utils/notification";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
 import LoadingScreen from "components/common/loading/loading";
+import withScreenSecurity from "components/common/withScreenSecurity";
 
 const DeliveryTripListing = () => {
   const [userLoginId, setUserLoginId] = useState(null);
@@ -133,4 +134,5 @@ const DeliveryTripListing = () => {
   </Fragment>)
 }
 
-export default DeliveryTripListing;
+const SCR_ID = "SCR_WMSv2_DELIVERY_TRIP_LISTING";
+export default withScreenSecurity(DeliveryTripListing, SCR_ID, true);

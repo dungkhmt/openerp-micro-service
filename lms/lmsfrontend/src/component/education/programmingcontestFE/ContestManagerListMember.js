@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {request} from "../../../api";
 import StandardTable from "component/table/StandardTable";
-import {Button, CircularProgress} from "@mui/material";
+import {Box, Button, Chip, CircularProgress, IconButton} from "@mui/material";
+import PublishIcon from "@mui/icons-material/Publish";
 import {errorNoti, successNoti} from "utils/notification";
 import {toFormattedDateTime} from "utils/dateutils";
 import UpdatePermissionMemberOfContestDialog from "./UpdatePermissionMemberOfContestDialog";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function ContestManagerListMember(props) {
   const contestId = props.contestId;
@@ -28,14 +30,16 @@ export default function ContestManagerListMember(props) {
     {
       title: "Remove",
       render: (row) => (
-        <Button onClick={() => handleRemove(row.id)}>Remove</Button>
-      ),
+        <IconButton variant="contained" color="error" onClick={() => handleRemove(row.id)}>
+          <DeleteIcon/>
+        </IconButton>
+      )
     },
     {
       title: "Permission Submit",
       render: (row) => (
-        <Button onClick={() => handleForbidSubmit(row.id)}>
-          Update Permission Submit
+        <Button variant="contained" color="info" onClick={() => handleForbidSubmit(row.id)}>
+          Update Permission
         </Button>
       ),
     },
@@ -46,6 +50,7 @@ export default function ContestManagerListMember(props) {
     setSelectedUserRegisId(id);
     setOpenUpdateMemberDialog(true);
   }
+
   function handleRemove(id) {
     // alert("remove " + id);
     setIsProcessing(true);
@@ -69,6 +74,7 @@ export default function ContestManagerListMember(props) {
       body
     );
   }
+
   function getMembersOfContest() {
     request("get", "/get-members-of-contest/" + contestId, (res) => {
       const data = res.data.map((e, i) => ({
@@ -84,6 +90,7 @@ export default function ContestManagerListMember(props) {
       setMembers(data);
     });
   }
+
   function onUpdateInfo(selectedPermission, selectedUserRegisId) {
     setIsProcessing(true);
     let body = {
@@ -110,9 +117,11 @@ export default function ContestManagerListMember(props) {
       body
     );
   }
+
   function handleModelClose() {
     setOpenUpdateMemberDialog(false);
   }
+
   function getPermissions() {
     request("get", "/get-permissions-of-members-of-contest", (res) => {
       setPermissionIds(res.data);
@@ -171,9 +180,23 @@ export default function ContestManagerListMember(props) {
   }, []);
   return (
     <div>
-      <input type="file" id="selected-upload-file" onChange={onFileChange} />
-      <Button onClick={handleUploadExcelStudentList}>Upload</Button>
-      {isProcessing ? <CircularProgress /> : ""}
+      <Box sx={{marginBottom: "12px"}}>
+        <Button color="primary" variant="outlined" component="label" sx={{marginRight: "8px"}}>
+          <PublishIcon/> Upload Excel file
+          <input hidden type="file" id="selected-upload-file" onChange={onFileChange}/>
+        </Button>
+        {filename && (
+          <Chip
+            color="success"
+            variant="outlined"
+            label={filename.name}
+            onDelete={() => setFilename(undefined)}
+          />
+        )}
+        <Button color="primary" variant="contained" onClick={handleUploadExcelStudentList}>Submit</Button>
+        {isProcessing ? <CircularProgress/> : ""}
+      </Box>
+
 
       <StandardTable
         title={"DS Users"}

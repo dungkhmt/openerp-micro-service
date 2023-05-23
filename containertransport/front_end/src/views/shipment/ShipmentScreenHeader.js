@@ -6,24 +6,18 @@ import { useContext, useState } from "react";
 import {useHistory } from 'react-router-dom';
 import { request } from "api";
 import { MyContext } from "contextAPI/MyContext";
+import NewShipmentModal from "./NewShipmentModal";
 
-const HeaderShipmentScreen = () => {
+const HeaderShipmentScreen = ({setToast, setToastType}) => {
     const history = useHistory();
     const [shipment, setShipment] = useState();
     const {preferred_username} = useContext(MyContext);
+    const [open, setOpen] = useState(false);
     const submitShipment = () => {
-        // const data = {
-        //     created_by_user_id: preferred_username
-        // }
-        // request(
-        //     "post",
-        //     `/shipment/create`, {}, {}, data
-        // ).then((res) => {
-        //     console.log("shipment", res.data.data);
+        // history.push({
+        //     pathname: '/shipment/create'
         // })
-        history.push({
-            pathname: '/shipment/create'
-        })
+        setOpen(true);
     }
 
     return (
@@ -43,7 +37,7 @@ const HeaderShipmentScreen = () => {
                     </Typography>
                 </PrimaryButton>
             </Box>
-            {/* {open ? (<NewOrderModal open={open} setOpen={setOpen} setToast={setToast} setToastType={setToastType} />) : null} */}
+            {open ? (<NewShipmentModal open={open} setOpen={setOpen} setToast={setToast} setToastType={setToastType} />) : null}
         </Box>
     );
 }

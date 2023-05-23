@@ -4,6 +4,7 @@ import { Box, Button, Grid, MenuItem, Modal, Select, TextField,
 import { isEditableInput } from '@testing-library/user-event/dist/utils';
 import { request } from "api";
 import LoadingScreen from 'components/common/loading/loading';
+import withScreenSecurity from 'components/common/withScreenSecurity';
 import { RouteMap } from 'components/map/maps';
 import StandardTable from "components/StandardTable";
 import { Fragment, useEffect, useState } from "react";
@@ -599,4 +600,5 @@ const DeliveryTripDetail = ( props ) => {
   </Fragment>)
 }
 
-export default DeliveryTripDetail;
+const SCR_ID = "SCR_WMSv2_DELIVERY_TRIP_DETAIL";
+export default withScreenSecurity(DeliveryTripDetail, SCR_ID, true);

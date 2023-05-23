@@ -31,15 +31,26 @@
         margin-top: 8px;
         margin-bottom: 48px;
     }
-
-    .toast {
-        position: absolute;
-        z-index: 100;
-        top: 16px;
-        right: 8px;
+    .title {
+        .MuiTypography-root {
+            font-size: 18px;
+            font-weight: 650;
+            margin-bottom: 16px;
+        }
+        margin-left: 16px;
+    }
+    .trips-mana {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 16px;
     }
 }
-
+.toast {
+    position: absolute;
+    z-index: 10000;
+    bottom: 32px;
+    right: 32px;
+}
 .headerScreen-trip-detail {
     .headerScreen-trip-detail-go-back {
         display: flex;
@@ -57,7 +68,7 @@
             line-height: 1.5;
         }
 
-        .title {
+        .title-header {
             .MuiTypography-root {
                 font-size: 24px;
                 font-weight: 700;
@@ -66,11 +77,11 @@
         .btn-header {
             display: flex;
             align-items: center;
-    
-            .material-icons {
-                height: auto;
-                display: flex;
-                margin-right: 4px;
+            .header-create-shipment-btn-cancel {
+                margin-right: 32px;
+            }
+            .MuiButtonBase-root {
+                text-transform: none;
             }
         }
     }
@@ -160,7 +171,7 @@
     }
 }
 
-.contentModal {
+.contentModalShipment {
     .contentModal-item {
         display: flex;
         justify-content: space-between;
@@ -181,7 +192,7 @@
             display: flex;
 
             .MuiOutlinedInput-root {
-                height: 40px;
+                min-height: 40px;
                 width: 100%;
             }
 
@@ -330,5 +341,21 @@
             font-size: 22px;
         }
         
+    }
+}
+.shipment-detail {
+    background-color: white;
+    padding: 16px 32px;
+    margin-bottom: 32px;
+    .shipment-detail-item {
+        display: flex;
+
+        .shipment-detail-item-text {
+            width: 20%;
+            margin-bottom: 16px;
+            .MuiTypography-root {
+                font-weight: 550;
+            }
+        }
     }
 }
