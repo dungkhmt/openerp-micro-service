@@ -4,8 +4,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import MapIcon from "@mui/icons-material/Map";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box } from "@mui/material";
+import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
+import DraggableDeleteDialog from "components/dialog/DraggableDialogs";
 import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
@@ -17,9 +19,7 @@ import {
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
-import { Action } from "../../../components/action/Action";
-import DraggableDeleteDialog from "../../../components/dialog/DraggableDialogs";
-import { AppColors } from "../../../shared/AppColors";
+import { AppColors } from "shared/AppColors";
 import { staticProductFields, staticWarehouseCols } from "../LocalConstant";
 import CreateFacilityForm from "./components/CreateFacilityForm";
 

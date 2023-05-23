@@ -15,7 +15,7 @@ public interface ICategoryService {
     ProductUnit getProductUnitById(long id);
     ProductUnit getProductUnitByCode(String code);
     ProductUnit updateProductUnit(ProductUnitDTO productUnitDTO, long id) throws CustomException;
-    void deleteProductUnitByCode(String code);
+    void deleteProductUnitByCode(String code) throws CustomException;
     void deleteProductUnitById(long id);
     // Product Category
     ProductCategory createProductCategory(ProductCategoryDTO category) throws CustomException;
@@ -23,7 +23,7 @@ public interface ICategoryService {
     ProductCategory getProductCategoryById(long id);
     ProductCategory getProductCategoryByCode(String code);
     ProductCategory updateProductCategory(ProductCategoryDTO productCategoryDTO, long id) throws CustomException;
-    void deleteProductCategoryByCode(String code);
+    void deleteProductCategoryByCode(String code) throws CustomException;
     void deleteProductCategoryById(long id);
 
     // Customer Type
@@ -32,7 +32,7 @@ public interface ICategoryService {
     CustomerType getCustomerTypeById(long id);
     CustomerType getCustomerTypeByCode(String code);
     CustomerType updateCustomerType(CustomerTypeDTO productCategoryDTO, long id) throws CustomException;
-    void deleteCustomerTypeByCode(String code);
+    void deleteCustomerTypeByCode(String code) throws CustomException;
     void deleteCustomerTypeById(long id);
 
     // Distributing Channel
@@ -41,7 +41,7 @@ public interface ICategoryService {
     DistributingChannel getDistributingChannelById(long id);
     DistributingChannel getDistributingChannelByCode(String code);
     DistributingChannel updateDistributingChannel(DistributingChannelDTO channelDTO, long id) throws CustomException;
-    void deleteDistributingChannelByCode(String code);
+    void deleteDistributingChannelByCode(String code) throws CustomException;
     void deleteDistributingChannelById(long id);
 
     // Contract Type
@@ -50,6 +50,6 @@ public interface ICategoryService {
     ContractType getContractTypeById(long id);
     ContractType getContractTypeByCode(String code);
     ContractType updateContractType(ContractTypeDTO contractTypeDTO, long id) throws CustomException;
-    void deleteContractTypeByCode(String code);
-    void deleteContractTypeById(long id);
+    void deleteContractTypeByCode(String code) throws CustomException;
+    void deleteContractTypeById(long id) throws CustomException;
 }

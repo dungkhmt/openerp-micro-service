@@ -70,8 +70,13 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     }
 
     @Override
-    public void deleteProductUnitByCode(String code) {
-
+    public void deleteProductUnitByCode(String code) throws CustomException {
+        ProductUnit productUnit = getProductUnitByCode(code);
+        if (productUnit == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product unit not exists, can't delete");
+        }
+        productUnit.setDeleted(1);
+        productUnitRepo.save(productUnit);
     }
 
     @Override
@@ -117,8 +122,13 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     }
 
     @Override
-    public void deleteProductCategoryByCode(String code) {
-
+    public void deleteProductCategoryByCode(String code) throws CustomException {
+        ProductCategory productCategory = getProductCategoryByCode(code);
+        if (productCategory == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product category not exists, can't delete");
+        }
+        productCategory.setDeleted(1);
+        productCategoryRepo.save(productCategory);
     }
 
     @Override
@@ -164,8 +174,13 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     }
 
     @Override
-    public void deleteCustomerTypeByCode(String code) {
-
+    public void deleteCustomerTypeByCode(String code) throws CustomException {
+        CustomerType customerType = getCustomerTypeByCode(code);
+        if (customerType == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Customer type not exists, can't delete");
+        }
+        customerType.setDeleted(1);
+        customerTypeRepo.save(customerType);
     }
 
     @Override
@@ -216,8 +231,13 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     }
 
     @Override
-    public void deleteDistributingChannelByCode(String code) {
-
+    public void deleteDistributingChannelByCode(String code) throws CustomException {
+        DistributingChannel distributingChannel = getDistributingChannelByCode(code);
+        if (distributingChannel == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Distribution channel not exists, can't delete");
+        }
+        distributingChannel.setDeleted(1);
+        distributingChannelRepo.save(distributingChannel);
     }
 
     @Override
@@ -261,7 +281,7 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
 
     @Override
     public ContractType getContractTypeByCode(String code) {
-        return contractTypeRepo.getContractTypeByCode(code.toUpperCase());
+        return contractTypeRepo.getContractTypeByCode(code);
     }
 
     @Override
@@ -277,13 +297,23 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     }
 
     @Override
-    public void deleteContractTypeByCode(String code) {
-
+    public void deleteContractTypeByCode(String code) throws CustomException {
+        ContractType currContract = getContractTypeByCode(code);
+        if (currContract == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Contract type not exists, can't delete");
+        }
+        currContract.setDeleted(1);
+        contractTypeRepo.save(currContract);
     }
 
     @Override
-    public void deleteContractTypeById(long id) {
-        contractTypeRepo.deleteById(id);
+    public void deleteContractTypeById(long id) throws CustomException {
+        ContractType currContract = getContractTypeById(id);
+        if (currContract == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Contract type not exists, can't delete");
+        }
+        currContract.setDeleted(1);
+        contractTypeRepo.save(currContract);
     }
 
 }
