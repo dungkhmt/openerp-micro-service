@@ -86,7 +86,7 @@ public class TrailerServiceImpl implements TrailerService {
             sql += " AND facility_id = :facilityId";
             params.put("facilityId", trailerFilterRequestDTO.getFacilityId());
         }
-        sql += "ORDER BY updated_at DESC";
+        sql += " ORDER BY updated_at DESC";
         Query query = this.entityManager.createNativeQuery(sql, Trailer.class);
         for (String i : params.keySet()) {
             query.setParameter(i, params.get(i));
