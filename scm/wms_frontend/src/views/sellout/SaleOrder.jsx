@@ -6,24 +6,24 @@ import { Box } from "@mui/material";
 import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
+import DraggableDeleteDialog from "components/dialog/DraggableDialogs";
+import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
+import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
 import { useGetSaleOrderList } from "controllers/query/sale-order-query";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
-import DraggableDeleteDialog from "../../components/dialog/DraggableDialogs";
-import CustomDrawer from "../../components/drawer/CustomDrawer";
-import HeaderModal from "../../components/modal/HeaderModal";
-import { ORDERS_STATUS } from "../../shared/AppConstants";
+import { ORDERS_STATUS } from "shared/AppConstants";
 import { saleOrderCols } from "./LocalConstant";
 import CreateSaleOrderForm from "./components/CreateSaleOrderForm";
 
 function SaleOrderScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 10,
   });
   const [isAdd, setIsAdd] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
@@ -39,8 +39,7 @@ function SaleOrderScreen({ screenAuthorization }) {
     });
   };
 
-  const { isLoading, data } = useGetSaleOrderList();
-
+  const { isLoading, data } = useGetSaleOrderList(params);
   let actions = [
     {
       title: "Mua hộ khách",
@@ -89,7 +88,13 @@ function SaleOrderScreen({ screenAuthorization }) {
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading}
-        totalItem={100}
+        totalItem={data?.totalElements}
+        handlePaginationModelChange={(props) => {
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           ...saleOrderCols,
           {
@@ -98,9 +103,8 @@ function SaleOrderScreen({ screenAuthorization }) {
             headerAlign: "center",
             align: "center",
             sortable: false,
-            width: 125,
             minWidth: 150,
-            maxWidth: 200,
+            flex: 1,
             type: "actions",
             getActions: (params) => {
               return [

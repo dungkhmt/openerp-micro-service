@@ -39,7 +39,7 @@ public class CustomerController extends BaseController{
             @RequestParam(value = "sort_asc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc
     ) {
         try {
-            return response(new ResultEntity(1, "Get list product successfully", customerService.getAllCustomers(page, pageSize, sortField, isSortAsc)));
+            return response(new ResultEntity(1, "Get list customer successfully", customerService.getAllCustomers(page, pageSize, sortField, isSortAsc)));
         } catch (Exception ex) {
             return response(error(ex));
         }

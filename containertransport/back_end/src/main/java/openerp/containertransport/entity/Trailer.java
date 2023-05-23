@@ -29,8 +29,10 @@ public class Trailer {
     @Column(name = "status")
     private String status;
 
-    @Column(name = "truck_id")
-    private Integer truckId;
+    @ManyToOne()
+    @JoinColumn(name = "truck_id", referencedColumnName = "id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Truck truck;
 
     @Column(name = "created_at")
     private long createdAt;

@@ -9,7 +9,7 @@ export const useGetProductList = (params) => {
   return useQuery({
     queryKey: [queryKey.category.product_list, params],
     queryFn: async () => {
-      const res = await axiosSendRequest("get", endPoint.getProduct);
+      const res = await axiosSendRequest("get", endPoint.getProduct, params);
       if (res.data && res.code === 1) {
         return res.data;
       }
@@ -21,7 +21,7 @@ export const useGetCustomerList = (params) => {
   return useQuery({
     queryKey: [queryKey.category.customer_list, params],
     queryFn: async () => {
-      const res = await axiosSendRequest("get", endPoint.getCustomer);
+      const res = await axiosSendRequest("get", endPoint.getCustomer, params);
       if (res.data && res.code === 1) {
         return res.data;
       }
@@ -33,7 +33,11 @@ export const useGetProductCateList = (params) => {
   return useQuery({
     queryKey: [queryKey.category.product_cate_list, params],
     queryFn: async () => {
-      const res = await axiosSendRequest("get", endPoint.getProductCategory);
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getProductCategory,
+        params
+      );
       if (res.data && res.code === 1) {
         return res.data;
       }
@@ -46,7 +50,11 @@ export const useGetProductUnitList = (params) => {
   return useQuery({
     queryKey: [queryKey.category.product_unit_list, params],
     queryFn: async () => {
-      const res = await axiosSendRequest("get", endPoint.getProductUnit);
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getProductUnit,
+        params
+      );
       if (res.data && res.code === 1) {
         return res.data;
       }
@@ -59,7 +67,11 @@ export const useGetDistChannelList = (params) => {
   return useQuery({
     queryKey: [queryKey.category.dist_channel_list, params],
     queryFn: async () => {
-      const res = await axiosSendRequest("get", endPoint.getDistChannel);
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getDistChannel,
+        params
+      );
       if (res.data && res.code === 1) {
         return res.data;
       }
@@ -72,7 +84,11 @@ export const useGetCustomerType = (params) => {
   return useQuery({
     queryKey: [queryKey.category.customer_type_list, params],
     queryFn: async () => {
-      const res = await axiosSendRequest("get", endPoint.getCustomerType);
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getCustomerType,
+        params
+      );
       if (res.data && res.code === 1) {
         return res.data;
       }
@@ -85,7 +101,11 @@ export const useGetContractType = (params) => {
   return useQuery({
     queryKey: [queryKey.category.contract_type_list, params],
     queryFn: async () => {
-      const res = await axiosSendRequest("get", endPoint.getContractType);
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getContractType,
+        params
+      );
       if (res.data && res.code === 1) {
         return res.data;
       }

@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class TruckModel implements Serializable {
     private long id;
     private String truckCode;
-    private long facilityId;
+    private Long facilityId;
 //    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 //    private FacilityModel facility;
 //    private String facilityName;

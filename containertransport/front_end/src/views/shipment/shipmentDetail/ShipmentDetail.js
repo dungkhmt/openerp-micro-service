@@ -48,7 +48,7 @@ const ShipmentDetail = () => {
                         <Typography>Go back shipment screen</Typography>
                     </Box>
                     <Box className="headerScreen-trip-detail-info">
-                        <Box className="title">
+                        <Box className="title-header">
                             <Typography >Shipment {shipment?.code}</Typography>
                         </Box>
                         {/* <Box className="btn-add"

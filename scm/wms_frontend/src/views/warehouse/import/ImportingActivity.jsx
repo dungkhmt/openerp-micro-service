@@ -15,13 +15,14 @@ function ImportingActivityScreen({ screenAuthorization }) {
   let { path } = useRouteMatch();
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 10,
   });
   const history = useHistory();
   const { height } = useWindowSize();
 
   const { isLoading, data } = useGetPurchaseOrderList({
     orderStatus: "accepted",
+    ...params,
   });
 
   const handleButtonClick = (params) => {
@@ -62,7 +63,13 @@ function ImportingActivityScreen({ screenAuthorization }) {
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading}
-        totalItem={100}
+        totalItem={data?.totalElements}
+        handlePaginationModelChange={(props) => {
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           ...acceptedOrderCols,
           {

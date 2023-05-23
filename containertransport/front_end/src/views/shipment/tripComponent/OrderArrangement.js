@@ -15,6 +15,7 @@ const TripItem = ({ index, item, facilities, setFacilities }) => {
     const [open, setOpen] = useState(false);
     const [arrivalTime, setArrivalTime] = useState(item.arrivalTime);
     const [departureTime, setDepartureTime] = useState(item.departureTime);
+
     const handleChangeTime = (time, id, type) => {
         facilities.map((facility, i) => {
             if (facility.id === item.id) {
@@ -103,6 +104,7 @@ const OrderArrangement = ({ ordersSelect, setTripItem, truckSelected, tripId }) 
     const [facilities, setFacilities] = useState([]);
     const [facilitiesFinal, setFacilitiesFinal] = useState([]);
     const [open, setOpen] = useState(false);
+    const [addTripItem, setAddTripItem] = useState();
 
     const handleModal = () => {
         setOpen(!open);
@@ -213,6 +215,11 @@ const OrderArrangement = ({ ordersSelect, setTripItem, truckSelected, tripId }) 
     const handleAddTripItem = () => {
         setOpen(true);
     }
+    useEffect(() => {
+        let facilitiesTmp = facilitiesFinal
+        facilitiesTmp = facilitiesTmp.concat(addTripItem);
+        // setFacilitiesFinal(facilitiesTmp);
+    }, addTripItem)
     return (
         <Box className="facility-arrangment">
             <Box className="facility-arrangment-text">
@@ -233,7 +240,7 @@ const OrderArrangement = ({ ordersSelect, setTripItem, truckSelected, tripId }) 
                     )}
                 </Droppable>
             </DragDropContext>
-            <ModalTripItem openModal={open} handleModal={handleModal} />
+            <ModalTripItem openModal={open} handleModal={handleModal} setAddTripItem={setAddTripItem} />
         </Box>
     )
 }

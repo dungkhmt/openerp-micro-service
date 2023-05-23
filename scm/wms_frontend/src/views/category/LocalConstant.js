@@ -46,9 +46,8 @@ export const staticCustomerField = [
     field: "address",
     headerName: "Địa chỉ",
     sortable: false,
-    width: 125,
-    minWidth: 150,
-    maxWidth: 200,
+    minWidth: 250,
+    maxWidth: 350,
   },
   {
     field: "status",
@@ -57,6 +56,8 @@ export const staticCustomerField = [
     width: 125,
     minWidth: 150,
     maxWidth: 200,
+    headerAlign: "center",
+    align: "center",
     renderCell: (params) => {
       return (
         <Button

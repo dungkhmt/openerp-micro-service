@@ -7,7 +7,7 @@ import { queryKey } from "./querykey";
 
 export const useGetPurchaseOrderList = (params) => {
   return useQuery({
-    queryKey: [queryKey.purchase_order.order_list],
+    queryKey: [queryKey.purchase_order.order_list, params],
     queryFn: async () => {
       const res = await axiosSendRequest(
         "get",

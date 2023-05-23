@@ -20,10 +20,11 @@ import CreateTruck from "./components/CreateTruck";
 function TruckScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
   });
   const { height } = useWindowSize();
-  const { isLoading, data, isRefetching, isPreviousData } = useGetListTruck();
+  const { isLoading, data, isRefetching, isPreviousData } =
+    useGetListTruck(params);
   const [isAdd, setIsAdd] = useToggle(false);
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
@@ -69,7 +70,13 @@ function TruckScreen({ screenAuthorization }) {
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20 - 35 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom - Page Title
         isLoading={isLoading || isRefetching || isPreviousData}
-        totalItem={100}
+        totalItem={data?.totalElements}
+        handlePaginationModelChange={(props) => {
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           ...truckCols,
           {
@@ -78,6 +85,7 @@ function TruckScreen({ screenAuthorization }) {
             headerAlign: "center",
             align: "center",
             sortable: false,
+            minWidth: 150,
             flex: 1,
             type: "actions",
             getActions: (params) => [
