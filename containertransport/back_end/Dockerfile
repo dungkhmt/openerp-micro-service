@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1
 
 # JDK is required to provide compiler
-FROM eclipse-temurin:8-jdk-alpine as build
+FROM eclipse-temurin:20-jdk-alpine as build
 WORKDIR /workspace/app
 
 # Split source code into four layers
@@ -19,7 +19,7 @@ RUN ./mvnw install -DskipTests
 # Unpack Spring Boot fat JAR
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
-FROM eclipse-temurin:8-jre-alpine
+FROM eclipse-temurin:20-jre-alpine
 
 ENV JAVA_OPTS=""
 
