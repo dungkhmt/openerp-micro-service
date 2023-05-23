@@ -1,7 +1,7 @@
 import LoadingScreen from "components/common/loading/loading";
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { request } from "api";
-import { BayDropDown, ProductDropDown, WarehouseDropDown } from "components/table/DropDown";
+import { BayDropDown, BayDropDownHavingProduct, ProductDropDown, WarehouseDropDown } from "components/table/DropDown";
 import StandardTable from "components/StandardTable";
 import React, { Fragment, useEffect, useState } from "react"
 import { API_PATH } from "screens/apiPaths";
@@ -9,8 +9,13 @@ import useStyles from 'screens/styles';
 import { convertToVNDFormat } from "screens/utils/utils";
 import { errorNoti, successNoti } from "utils/notification";
 import withScreenSecurity from "components/common/withScreenSecurity";
+import { useHistory } from "react-router";
+import { useRouteMatch } from "react-router-dom";
 
 const AdminOrderDetail = ( props ) => {
+  const history = useHistory();
+  const { path } = useRouteMatch();
+
   const orderId = props.match?.params?.id;
   const classes = useStyles();
 
@@ -33,6 +38,7 @@ const AdminOrderDetail = ( props ) => {
   const [selectedWarehouseId, setSelectedWarehouseId] = useState(null);
   const [selectedWarehouseName, setSelectedWarehouseName] = useState(null);
   const [selectedWarehouse, setSelectedWarehouse] = useState(null);
+  const [selectedWarehouseItems, setSelectedWarehouseItems] = useState([]);
   const [maxQuantity, setMaxQuantity] = useState(0);
 
   const getProductOrderQuantity = ( productId ) => {
@@ -57,7 +63,7 @@ const AdminOrderDetail = ( props ) => {
 
       await request(
         "get",
-        API_PATH.WAREHOUSE_DETAIL_WITH_PRODUCT,
+        `${API_PATH.WAREHOUSE_DETAIL_WITH_PRODUCT}/${orderId}`,
         (res) => {
           setAllWarehouses(res.data);
         }
@@ -86,16 +92,17 @@ const AdminOrderDetail = ( props ) => {
         }
       }
       if (itemCount > 0) {
-        newWarehouseList.push(warehouseDetail.info);
+        newWarehouseList.push(warehouseDetail);
       }
+      setWarehouseList(newWarehouseList);
     }
-    setWarehouseList(newWarehouseList);
   }, [selectedProductId]);
 
   useEffect(() => {
     for (var i = 0; i < warehouseList.length; i++) {
-      if (warehouseList[i]?.id == selectedWarehouseId) {
+      if (warehouseList[i]?.info?.id == selectedWarehouseId) {
         setSelectedWarehouse(warehouseList[i]);
+        setSelectedWarehouseItems(warehouseList[i].items);
         return;
       }
     }
@@ -104,6 +111,9 @@ const AdminOrderDetail = ( props ) => {
   useEffect(() => {
     if (selectedProductId != null && selectedBayId != null) {
       var totalProductOnBay = 0;
+      console.log("All warehouse => ", allWarehouses);
+      console.log("selectedProductId => ", selectedProductId);
+      console.log("selectedBayId => ", selectedBayId);
       for (var i = 0; i < allWarehouses.length; i++) {
         for (var j = 0; j < allWarehouses[i]?.items?.length; j++) {
           const item = allWarehouses[i]?.items[j];
@@ -112,6 +122,7 @@ const AdminOrderDetail = ( props ) => {
           }
         }
       }
+      console.log("Total product on bay => ", totalProductOnBay);
       setMaxQuantity(Math.min(totalProductOnBay, getProductOrderQuantity(selectedProductId)));
     }
   }, [selectedBayId]);
@@ -123,7 +134,7 @@ const AdminOrderDetail = ( props ) => {
       (res) => {
         if (res.status == 200) {
           successNoti("Phân phối hàng hóa thành công");
-          window.location.reload();
+          history.push(`${path.substring(0, path.lastIndexOf('/'))}`);
         }
       },
       {
@@ -339,12 +350,13 @@ const AdminOrderDetail = ( props ) => {
               setSelectedProductName={setSelectedProductName} /> },
           { title: "Kho", field: "warehouseName",
             editComponent: <WarehouseDropDown
-              warehouseList={warehouseList}
+              warehouseList={warehouseList.map(warehouse => warehouse.info)}
               setSelectedWarehouseId={setSelectedWarehouseId}
               setSelectedWarehouseName={setSelectedWarehouseName} />},
           { title: "Vị trí kệ hàng", field: "bayCode",
-            editComponent: <BayDropDown
-              selectedWarehouse={selectedWarehouse} 
+            editComponent: <BayDropDownHavingProduct
+              selectedWarehouseItems={selectedWarehouseItems} 
+              productId={selectedProductId}
               setSelectedBayId={setSelectedBayId}
               setSelectedBayCode={setSelectedBayCode} /> },
           { title: "Số lượng", field: "quantity", 
