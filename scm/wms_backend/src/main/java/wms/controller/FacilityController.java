@@ -47,6 +47,15 @@ public class FacilityController extends BaseController{
             return response(error(ex));
         }
     }
+    @GetMapping("/get-all-without-paging")
+    public ResponseEntity<?> getAllFacilities(
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get list facilities successfully", facilityService.getAllWithoutPaging()));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
     @GetMapping("/get-by-id/{id}")
     public ResponseEntity<?> getFacilityByID(@PathVariable("id") long id) {
         try {

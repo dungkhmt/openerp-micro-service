@@ -10,9 +10,12 @@ import wms.dto.facility.ImportToFacilityDTO;
 import wms.entity.*;
 import wms.exception.CustomException;
 
+import java.util.List;
+
 public interface IFacilityService {
     Facility createFacility(FacilityDTO facilityDTO, JwtAuthenticationToken token) throws CustomException;
     ReturnPaginationDTO<Facility> getAllFacilities(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
+    List<Facility> getAllWithoutPaging();
     Facility getFacilityById(long id);
     Facility getFacilityByCode(String code);
     ReturnPaginationDTO<ProductFacility> getInventoryItems(int page, int pageSize, String sortField, boolean isSortAsc, String facilityCode) throws JsonProcessingException;

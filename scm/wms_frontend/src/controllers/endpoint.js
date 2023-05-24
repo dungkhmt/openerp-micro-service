@@ -42,6 +42,7 @@ export const endPoint = {
   getFacility: baseUrl + "/facility/get-all",
   getFacilityInventory: baseUrl + "/facility/get-inventory",
   createFacility: baseUrl + "/facility/create",
+  getFacilityNoPaging: baseUrl + "/facility/get-all-without-paging",
   // Bill
   getReceiptBills: baseUrl + "/receipt-bill/get-all",
   getBillItemOfPurchaseOrder: baseUrl + "/receipt-bill/get-bill-items-of-order",
@@ -74,7 +75,9 @@ export const endPoint = {
   getTripToAssignBill: baseUrl + "/delivery-trip/get-trip-to-assign",
   createTripRoute: baseUrl + "/delivery-trip/create-trip-route",
   getTruck: baseUrl + "/vehicle/truck/get-all",
+  deleteTruck: baseUrl + "/vehicle/truck/remove",
   getDrone: baseUrl + "/vehicle/drone/get-all",
+  deleteDrone: baseUrl + "/vehicle/drone/remove",
   createTruck: baseUrl + "/vehicle/truck/create",
   createDrone: baseUrl + "/vehicle/drone/create",
   getTripRoutes: baseUrl + "/delivery-trip/get-trip-route",

@@ -19,6 +19,12 @@ public class TruckEntity extends BaseEntity implements Serializable {
     @Column(name = "code")
     private String code;
 
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "size")
+    private String size;
+
     @Column(name = "capacity")
     private double capacity;
 

@@ -17,10 +17,12 @@ public interface IVehicleService {
     TruckEntity getTruckByCode(String code);
     TruckEntity updateTruck(TruckDTO truckDTO, long id) throws CustomException;
     void deleteTruckById(long id);
+    void deleteTruckByCode(String code) throws CustomException;
     DroneEntity createDrone(DroneDTO droneDTO) throws CustomException;
     ReturnPaginationDTO<DroneEntity> getAllDrones(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
     DroneEntity getDroneById(long id);
     DroneEntity getDroneByCode(String code);
     DroneEntity updateDrone(DroneDTO droneDTO, long id) throws CustomException;
     void deleteDroneById(long id);
+    void deleteDroneByCode(String code) throws CustomException;
 }

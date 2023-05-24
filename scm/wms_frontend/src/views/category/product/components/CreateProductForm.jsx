@@ -34,12 +34,12 @@ const CreateProductForm = ({ setIsAdd }) => {
     let productParams = {
       brand: data?.brand,
       categoryId: data?.categoryId?.id,
-      massType: "oke",
+      massQuantity: parseInt(data?.massQuantity),
       name: data?.name,
       sku: data?.sku,
       status: data?.status?.name,
       unitId: data?.unitId?.id,
-      unitPerBox: data?.unitPerBox,
+      unitPerBox: parseInt(data?.unitPerBox),
     };
     setIsAdd((pre) => !pre);
     await createProductQuery.mutateAsync(productParams);
@@ -115,6 +115,23 @@ const CreateProductForm = ({ setIsAdd }) => {
               isFullWidth={true}
               error={!!errors["unitPerBox"]}
               message={errors["unitPerBox"]?.message}
+            />
+          )}
+        />
+        <Controller
+          key={"massQuantity"}
+          control={control}
+          name={"massQuantity"}
+          render={({ field: { onChange, value } }) => (
+            <CustomInput
+              required={true}
+              value={value}
+              type={"number"}
+              onChange={onChange}
+              label={"Số lượng mua sỉ"}
+              isFullWidth={true}
+              error={!!errors["massQuantity"]}
+              message={errors["massQuantity"]?.message}
             />
           )}
         />

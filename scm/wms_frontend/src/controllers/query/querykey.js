@@ -20,6 +20,7 @@ export const queryKey = {
   },
   facility: {
     facility_list: "facility_list",
+    facility_list_no_paging: "facility_list_no_paging",
     facility_inventory: "facility_inventory",
   },
   receipt_bill: {

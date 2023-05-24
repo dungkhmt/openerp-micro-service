@@ -15,6 +15,7 @@ import CustomToolBar from "components/toolbar/CustomToolBar";
 import {
   useGetFacilityInventory,
   useGetFacilityList,
+  useGetFacilityListNoPaging,
 } from "controllers/query/facility-query";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -39,6 +40,8 @@ function FacilityScreen({ screenAuthorization }) {
   let { path } = useRouteMatch();
 
   const { isLoading, data: facility } = useGetFacilityList(params);
+  const { isLoading: isLoadingFacilityList, data: facilityList } =
+    useGetFacilityListNoPaging();
   const { isLoading: isLoadingInventory, data: inventory } =
     useGetFacilityInventory({
       code: facilityCode,
@@ -96,7 +99,7 @@ function FacilityScreen({ screenAuthorization }) {
 
   const handleButtonClick = () => {
     history.push(`${path}/map`, {
-      facility: facility?.content,
+      facility: facilityList,
     });
   };
   return (
