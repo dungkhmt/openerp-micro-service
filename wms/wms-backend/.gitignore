@@ -32,9 +32,5 @@ build/
 ### VS Code ###
 .vscode/
 
-## osm dataset
-src/main/resources/osm
-
-/logs/*
-
-/src/main/resources/application.yml
+/logs/
+/src/main/resources/

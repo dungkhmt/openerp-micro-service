@@ -10,7 +10,10 @@ import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetContractType } from "controllers/query/category-query";
+import {
+  useDeleteContractType,
+  useGetContractType,
+} from "controllers/query/category-query";
 import { useState } from "react";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
@@ -28,6 +31,9 @@ function ContractTypeScreen({ screenAuthorization }) {
   const [itemSelected, setItemSelected] = useState(null);
 
   const { isLoading, data } = useGetContractType(params);
+  const deleteContractQuery = useDeleteContractType({
+    code: itemSelected?.code,
+  });
   let actions = [
     {
       title: "Thêm",
@@ -115,7 +121,12 @@ function ContractTypeScreen({ screenAuthorization }) {
         // disable={isLoadingRemove}
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
-        callback={(flag) => {}}
+        callback={async (flag) => {
+          if (flag) {
+            await deleteContractQuery.mutateAsync();
+          }
+          setIsRemove(false);
+        }}
       />
     </Box>
   );

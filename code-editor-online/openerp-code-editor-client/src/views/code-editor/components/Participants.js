@@ -35,7 +35,7 @@ const Participants = (props) => {
     dispatch(
       handleOnOffMicParticipant({
         socketId: socketId,
-        audio: audio ,
+        audio: audio,
       })
     );
   };
@@ -60,16 +60,24 @@ const Participants = (props) => {
             <ListItem
               key={value.socketId}
               secondaryAction={
-                roomMaster.id === token.preferred_username && (
+                <Tooltip
+                  title={
+                    roomMaster.id === token.preferred_username
+                      ? "Bạn có thể tắt mic của người này"
+                      : "Bạn không thể tắt mic của người này"
+                  }
+                  placement="left"
+                >
                   <IconButton
                     edge="end"
+                    disabled={roomMaster.id !== token.preferred_username}
                     onClick={() => {
                       handleMuteRemoteMic(value.socketId, !value.audio);
                     }}
                   >
                     {value.audio ? <Mic fontSize="small" /> : <MicOff fontSize="small" />}
                   </IconButton>
-                )
+                </Tooltip>
               }
             >
               <ListItemAvatar>

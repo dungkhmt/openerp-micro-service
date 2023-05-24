@@ -5,15 +5,26 @@ export const endPoint = {
   getAuthorization: baseUrl + "",
   // Category
   getProductCategory: baseUrl + "/category/product-category/get-all",
+  deleteProductCategory: baseUrl + "/category/product-category/remove",
+
   getProductUnit: baseUrl + "/category/product-unit/get-all",
+  deleteProductUnit: baseUrl + "/category/product-unit/remove",
+
   getDistChannel: baseUrl + "/category/distributing-channel/get-all",
+  deleteDistChannel: baseUrl + "/category/distributing-channel/remove",
+
   getCustomerType: baseUrl + "/category/customer-type/get-all",
+  deleteCustomerType: baseUrl + "/category/customer-type/remove",
+
   getContractType: baseUrl + "/category/contract-type/get-all",
+  deleteContractType: baseUrl + "/category/customer-type/remove",
+
   getProduct: baseUrl + "/product/get-all",
   getCustomer: baseUrl + "/customer/get-all",
   createCustomer: baseUrl + "/customer/create",
   deleteCustomer: baseUrl + "/customer/delete",
   createProduct: baseUrl + "/product/create",
+
   createProductUnit: baseUrl + "/category/product-unit/create",
   createProductCategory: baseUrl + "/category/product-category/create",
   createCustomerType: baseUrl + "/category/customer-type/create",
