@@ -282,3 +282,12 @@ VALUES('SCR_WMSv2_ONLINE_CUSTOMER_PRODUCT_DETAIL.VIEW', 'ADMIN', null, now(), nu
 INSERT INTO public.entity_authorization
 (id, role_id, last_updated, created, description)
 VALUES('SCR_WMSv2_ONLINE_CUSTOMER_CART.VIEW', 'ADMIN', null, now(), null);
+
+-- xem màn hình chi tiết phê duyệt đơn xin  nhập hàng
+insert into entity_authorization (id, role_id, last_updated, created, description)
+values ('SCR_WMSv2_RECEIPT_REQUEST_DETAIL_FOR_APPROVER.VIEW', 'ADMIN', null, now(), null) ;
+
+-- xem màn hình xử lý đơn nhập hàng
+INSERT INTO public.entity_authorization
+(id, role_id, last_updated, created, description)
+VALUES('SCR_WMSv2_RECEIPT_REQUEST_PROCESS.VIEW', 'ADMIN', null, now(), null);
