@@ -14,5 +14,4 @@ public interface BayRepository extends JpaRepository<Bay, UUID> {
 
     List<Bay> findAllByWarehouseId(UUID warehouseId);
 
-
 }

@@ -71,7 +71,8 @@ const ProductGeneralView = () => {
         (res) => {
           setProductData(res.data);
           setAllProductData(res.data);
-          setPageCount(parseInt(res.data.length / productPerPage));
+          console.log("Page count => ", parseInt(Math.ceil(res.data.length / productPerPage)));
+          setPageCount(parseInt(Math.ceil(res.data.length / productPerPage)));
         }
       );
 

@@ -46,7 +46,7 @@ public class AssignedOrderItemServiceImpl implements AssignedOrderItemService {
             // lấy hàng theo inventory_item theo thứ tự ưu tiên các lô được nhập vào kho sớm nhất sẽ được lấy trước
             for (AssignedOrderItemRequest.AssignedOrderItemRequestDetail detail : request.getItems()) {
                 List<InventoryItem> inventoryItemList = inventoryItemRepository
-                        .getInventoryItemByProductIdAndBayIdAndWarehouseIdOrderByCreatedStamp(
+                        .getInventoryItemByProductIdAndBayIdAndWarehouseIdOrderByCreatedStampHavingQuantity(
                             detail.getProductId(), detail.getBayId(), detail.getWarehouseId());
                 if (inventoryItemList.isEmpty()) {
                     log.warn(String.format("Find Inventory item with detail %s not exist", detail));
@@ -74,6 +74,12 @@ public class AssignedOrderItemServiceImpl implements AssignedOrderItemService {
                             newQuantity = item.getQuantityOnHandTotal().subtract(diffQuantity);
                             assignedOrderItemQuantity = diffQuantity;
                         }
+                        if (newQuantity.compareTo(BigDecimal.ZERO) < 0) {
+                            // nếu newQuantity là số âm
+                            // throw Exception do có thể có hàng tại inventory_item này đã được lấy bởi thread khác
+                            log.error("New quantity must not less than 0");
+                            return false;
+                        }
                         item.setQuantityOnHandTotal(newQuantity);
                         log.info(String.format("Updated inventory_item -> %s", item));
                         if (assignedOrderItemQuantity.compareTo(BigDecimal.ZERO) != 0) {
@@ -98,6 +104,11 @@ public class AssignedOrderItemServiceImpl implements AssignedOrderItemService {
                 if (productWarehouseOpt.isPresent()) {
                     ProductWarehouse productWarehouse = productWarehouseOpt.get();
                     BigDecimal newQuantity = productWarehouse.getQuantityOnHand().subtract(detail.getQuantity());
+
+                    if (newQuantity.compareTo(BigDecimal.ZERO) < 0) {
+                        log.error("New quantity in product warehouse must not be less than 0");
+                        return false;
+                    }
                     productWarehouse.setQuantityOnHand(newQuantity);
                     productWarehouses.add(productWarehouse);
                 }
