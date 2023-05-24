@@ -12,7 +12,9 @@ import java.util.UUID;
 @Repository
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, UUID> {
 
-    List<InventoryItem> getInventoryItemByProductIdAndBayIdAndWarehouseIdOrderByCreatedStamp(UUID productId, UUID bayId, UUID warehouseId);
+    @Query("select ii from InventoryItem ii " +
+            "where ii.quantityOnHandTotal > 0 and ii.productId = ?1 and ii.bayId = ?2 and ii.warehouseId = ?3 ")
+    List<InventoryItem> getInventoryItemByProductIdAndBayIdAndWarehouseIdOrderByCreatedStampHavingQuantity(UUID productId, UUID bayId, UUID warehouseId);
 
     List<InventoryItem> findAllByWarehouseId(UUID warehouseId);
 

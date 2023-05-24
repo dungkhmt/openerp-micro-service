@@ -27,4 +27,14 @@ class InventoryItemRepositoryTest {
                 UUID.fromString("fa15f3af-dcfa-4ffc-9f99-1c7b37b9c3dc"));
         System.out.println(items);
     }
+
+    @Test
+    void getInventoryItemByProductIdAndBayIdAndWarehouseIdOrderByCreatedStampHavingQuantityTest() {
+        List<InventoryItem> items = inventoryItemRepository.getInventoryItemByProductIdAndBayIdAndWarehouseIdOrderByCreatedStampHavingQuantity(
+                UUID.fromString("2da97674-c481-4bd6-9dc4-a073c47bc69a"),
+                UUID.fromString("c7f59fc6-f303-11ed-b1e8-02420a000304"),
+                UUID.fromString("b2990344-3fab-419f-ad9c-32ba44948f03"));
+        System.out.println("Item => ");
+        System.out.println(items);
+    }
 }
