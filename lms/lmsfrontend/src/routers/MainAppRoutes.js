@@ -11,7 +11,6 @@ import NotFound from "../views/errors/NotFound";
 import AdminRoute from "./AdminRoute";
 import ProgrammingContestRoutes from "./ProgrammingContestRoutes";
 import ThesisRoutes from "./ThesisRoutes";
-import TaskManagementRoute from "./TaskManagementRoute";
 import WhiteBoardRoute from "./WhiteBoardRoute";
 import ContestManagerRankingPublic from "../component/education/programmingcontestFE/ContestManagerRankingPublic";
 
@@ -58,10 +57,6 @@ function MainAppRoute(props) {
           {/*<PrivateRoute component={UserLoginRoute} path="/userlogin" />*/}
 
           <PrivateRoute component={EduRoute} path="/edu" />
-          <PrivateRoute
-            component={TaskManagementRoute}
-            path="/taskmanagement"
-          />
           <PrivateRoute component={WhiteBoardRoute} path="/whiteboard" />
 
           <PrivateRoute component={AdminRoute} path="/admin/data" />

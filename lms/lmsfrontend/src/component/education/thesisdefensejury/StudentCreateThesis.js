@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ModalLoading from "./ModalLoading"
-import {boxChildComponent, boxComponentStyle} from "../../taskmanagement/ultis/constant";
+import {boxChildComponent, boxComponentStyle} from "./constant";
 import {useForm} from "react-hook-form";
 import FormError from "./FormError"
 import ListItemText from '@mui/material/ListItemText';
