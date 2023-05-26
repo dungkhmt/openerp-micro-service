@@ -52,8 +52,8 @@ public class TripItem {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Trailer trailer;
 
-    @Column(name = "order_id")
-    private String orderId;
+    @Column(name = "order_code")
+    private String orderCode;
 
     @Column(name = "status")
     private String status;

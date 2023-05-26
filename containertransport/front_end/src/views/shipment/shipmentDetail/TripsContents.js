@@ -157,7 +157,7 @@ function EnhancedTableHead(props) {
   );
 }
 
-export default function TripsContents({trips}) {
+export default function TripsContents({trips, shipmentId}) {
   const [order, setOrder] = React.useState(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
   const [selected, setSelected] = React.useState([]);
@@ -305,7 +305,7 @@ export default function TripsContents({trips}) {
                         <TableCell
                           align="center"
                           onClick={() => history.push({
-                            pathname: `/shipment/trip/detail/${row.id}`
+                            pathname: `/shipment/trip/detail/${shipmentId}/${row.id}`
                         })}
                         >
                           {row.code}

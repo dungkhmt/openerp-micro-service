@@ -8,6 +8,14 @@ export const getShipmentByCode = async (data) => {
     return resData;
 }
 
+export const getShipment = async (data) => {
+    const resData = request(
+        "post",
+        "/shipment/", {}, {}, data, {},
+    );
+    return resData;
+}
+
 export const createShipment = (data) => {
     const resData = request(
         "post",

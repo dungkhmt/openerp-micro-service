@@ -37,11 +37,11 @@ public class TripItemServiceImpl implements TripItemService {
             Trailer trailer = trailerRepo.findById(tripItemModel.getTrailerId()).get();
             tripItem.setTrailer(trailer);
         }
-        if(tripItemModel.getOrderId() != null) {
-            tripItem.setOrderId(tripItemModel.getOrderId());
+        if(tripItemModel.getOrderCode() != null) {
+            tripItem.setOrderCode(tripItemModel.getOrderCode());
         }
         tripItem.setTripId(tripId);
-        tripItem.setSeq((int) tripItemModel.getSeqInTrip());
+        tripItem.setSeq((int) tripItemModel.getSeq());
         tripItem.setAction(tripItemModel.getAction());
         tripItem.setFacility(facility);
         tripItem.setStatus("WAITING");
@@ -67,6 +67,9 @@ public class TripItemServiceImpl implements TripItemService {
         TripItemModel tripItemModel = modelMapper.map(tripItem, TripItemModel.class);
         tripItemModel.setFacilityName(tripItem.getFacility().getFacilityName());
         tripItemModel.setFacilityId(tripItem.getFacility().getId());
+        tripItemModel.setFacilityCode(tripItem.getFacility().getFacilityCode());
+        tripItemModel.setLongitude(tripItem.getFacility().getLongitude());
+        tripItemModel.setLatitude(tripItem.getFacility().getLatitude());
         return tripItemModel;
     }
 }

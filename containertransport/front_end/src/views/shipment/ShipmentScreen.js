@@ -4,21 +4,24 @@ import { Alert, Box, Container, Divider } from "@mui/material";
 import HeaderShipmentScreen from "./ShipmentScreenHeader";
 import { request } from "api";
 import ShipmentScreenContents from "./ShipmentScreenContents";
+import { getShipment } from "api/ShipmentAPI";
 
 const ShipmentScreen = () => {
     const [shipments, setShipments] = useState([]);
     const [toastOpen, setToast] = useState(false);
     const [toastType, setToastType] = useState();
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [count, setCount] = useState(0);
 
     useEffect(() => {
-        request(
-            "post",
-            `/shipment/`, {}, {}, {}, {},
-        ).then((res) => {
+        getShipment({page: page, pageSize: rowsPerPage})
+        .then((res) => {
             console.log("shipment==========", res.data.data)
-            setShipments(res.data.data);
+            setShipments(res.data.data.shipmentModels);
+            setCount(res.data.data.count);
         });
-    }, [toastOpen]);
+    }, [toastOpen, page, rowsPerPage]);
     return (
         <Box className="fullScreen">
             <Container maxWidth="md" className="container">
@@ -39,7 +42,8 @@ const ShipmentScreen = () => {
                 <Box className="divider">
                     <Divider />
                 </Box>
-                <ShipmentScreenContents shipments={shipments} />
+                <ShipmentScreenContents shipments={shipments} page={page} setPage={setPage}
+                rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
             </Container>
         </Box>
 
