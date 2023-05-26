@@ -9,7 +9,10 @@ import wms.dto.product.ProductDTO;
 import wms.entity.Customer;
 import wms.exception.CustomException;
 
+import java.util.List;
+
 public interface ICustomerService {
+//    List<Customer> importCustomer();
     Customer createNewCustomer(CustomerDTO customer,  JwtAuthenticationToken token) throws CustomException;
     ReturnPaginationDTO<Customer> getAllCustomers(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
     Customer getCustomerById(long id);
