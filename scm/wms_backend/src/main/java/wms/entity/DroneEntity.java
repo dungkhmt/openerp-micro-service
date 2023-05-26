@@ -16,6 +16,9 @@ public class DroneEntity extends BaseEntity{
     @Column(name = "code")
     private String code;
 
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "capacity")
     private double capacity;
 

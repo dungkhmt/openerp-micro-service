@@ -30,6 +30,7 @@ const CreateDrone = ({ setIsAdd }) => {
       transportCostPerUnit: data?.transportCostPerUnit,
       userManaged: data?.userManaged?.name,
       waitingCost: data?.waitingCost,
+      name: data?.name,
     };
     await createDroneQuery.mutateAsync(droneParams);
     setIsAdd((pre) => !pre);
@@ -38,6 +39,23 @@ const CreateDrone = ({ setIsAdd }) => {
   return (
     <FormProvider {...methods}>
       <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+        <Controller
+          key={"name"}
+          control={control}
+          name={"name"}
+          render={({ field: { onChange, value } }) => (
+            <CustomInput
+              required={true}
+              value={value}
+              type={"text"}
+              onChange={onChange}
+              label={"Tên drone"}
+              isFullWidth={true}
+              error={!!errors["name"]}
+              message={errors["name"]?.message}
+            />
+          )}
+        />
         <Controller
           key={"capacity"}
           control={control}
@@ -72,6 +90,8 @@ const CreateDrone = ({ setIsAdd }) => {
             />
           )}
         />
+      </Stack>
+      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
         <Controller
           key={"speed"}
           control={control}
@@ -89,8 +109,6 @@ const CreateDrone = ({ setIsAdd }) => {
             />
           )}
         />
-      </Stack>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
         <Controller
           key={"waitingCost"}
           control={control}
