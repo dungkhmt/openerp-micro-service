@@ -7,7 +7,7 @@ import openerp.containertransport.entity.Facility;
 import java.util.List;
 
 public interface FacilityService {
-    Facility createFacility(FacilityModel facilityModel);
+    Facility createFacility(FacilityModel facilityModel) throws Exception;
     FacilityModel getFacilityById(long id);
     List<FacilityModel> filterFacility(FacilityFilterRequestDTO facilityFilterRequestDTO);
     FacilityModel updateFacility(FacilityModel facilityModel);

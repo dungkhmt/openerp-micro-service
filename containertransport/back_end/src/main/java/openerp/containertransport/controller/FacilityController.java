@@ -22,7 +22,7 @@ public class FacilityController {
     private final FacilityService facilityService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createFacility (@RequestBody FacilityModel facilityModel){
+    public ResponseEntity<?> createFacility (@RequestBody FacilityModel facilityModel) throws Exception {
         Facility facility = facilityService.createFacility(facilityModel);
         return ResponseEntity.status(HttpStatus.OK).body(facility);
     }
