@@ -9,8 +9,8 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class OpenAIRestTemplateConfig {
 
-    @Value("${openai.api.key}")
-    private String openaiApiKey = "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";
+    @Value("${openai.api.key:your-openai-api-key}")
+    private String openaiApiKey;
 
     @Bean
     @Qualifier("openaiRestTemplate")
