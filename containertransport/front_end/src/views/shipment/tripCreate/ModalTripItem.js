@@ -64,10 +64,11 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem}) => {
         //     //     departureTime: null
         //     // }
         //     // setAddTripItem(tripItem);
-        } else {
+        }
+        if (type == "Trailer") {
             let id = (action == "PICK TRAILER") ? "TRA1" : "TRA2"; 
             console.log("id", id);
-            let tripItem = {
+            let tripItem = [{
                 id: trailer?.id + id,
                 facilityId: trailer?.facilityResponsiveDTO?.facilityId,
                 facilityName: trailer?.facilityResponsiveDTO?.facilityName,
@@ -78,7 +79,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem}) => {
                 latitude: trailer?.facilityResponsiveDTO?.latitude,
                 arrivalTime: null,
                 departureTime: null
-            }
+            }];
             console.log("tripItem", tripItem);
             setAddTripItem(tripItem);
             handleModal();

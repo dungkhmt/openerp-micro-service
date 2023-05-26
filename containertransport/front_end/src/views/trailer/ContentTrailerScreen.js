@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -21,7 +22,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { request } from 'api';
-import { useHistory } from 'react-router-dom';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -39,6 +39,10 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
+// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
+// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
+// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
+// with exampleArray.slice().sort(exampleComparator)
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -56,13 +60,13 @@ const headCells = [
     id: 'code',
     numeric: false,
     disablePadding: true,
-    label: 'Shipment Code',
+    label: 'Trailer Code',
   },
   {
-    id: 'created_by_user_id',
+    id: 'facility',
     numeric: false,
     disablePadding: false,
-    label: 'Created By User',
+    label: 'Facility Name',
   },
   {
     id: 'status',
@@ -81,11 +85,12 @@ const headCells = [
     numeric: false,
     disablePadding: false,
     label: 'Update At',
-  }
+  },
 ];
 
 const DEFAULT_ORDER = 'asc';
 const DEFAULT_ORDER_BY = 'calories';
+const DEFAULT_ROWS_PER_PAGE = 5;
 
 function EnhancedTableHead(props) {
   const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
@@ -133,13 +138,70 @@ function EnhancedTableHead(props) {
   );
 }
 
-export default function ShipmentScreenContents({shipments, page, setPage, rowsPerPage, setRowsPerPage, count}) {
+function EnhancedTableToolbar(props) {
+  const { numSelected } = props;
+
+  return (
+    <Toolbar
+      sx={{
+        pl: { sm: 2 },
+        pr: { xs: 1, sm: 1 },
+        ...(numSelected > 0 && {
+          bgcolor: (theme) =>
+            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+        }),
+      }}
+    >
+      {numSelected > 0 ? (
+        <Typography
+          sx={{ flex: '1 1 100%' }}
+          color="inherit"
+          variant="subtitle1"
+          component="div"
+        >
+          {numSelected} selected
+        </Typography>
+      ) : (
+        <Typography
+          sx={{ flex: '1 1 100%' }}
+          variant="h6"
+          id="tableTitle"
+          component="div"
+        >
+          Nutrition
+        </Typography>
+      )}
+
+      {numSelected > 0 ? (
+        <Tooltip title="Delete">
+          <IconButton>
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        <Tooltip title="Filter list">
+          <IconButton>
+            <FilterListIcon />
+          </IconButton>
+        </Tooltip>
+      )}
+    </Toolbar>
+  );
+}
+
+EnhancedTableToolbar.propTypes = {
+  numSelected: PropTypes.number.isRequired,
+};
+
+export default function ContentsTrailerScreen({trailer}) {
   const [order, setOrder] = React.useState(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
   const [selected, setSelected] = React.useState([]);
+  const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [visibleRows, setVisibleRows] = React.useState(null);
-  const history = useHistory();
+  const [rowsPerPage, setRowsPerPage] = React.useState(DEFAULT_ROWS_PER_PAGE);
+  const [paddingHeight, setPaddingHeight] = React.useState(0);
 
   const handleRequestSort = React.useCallback(
     (event, newOrderBy) => {
@@ -148,7 +210,7 @@ export default function ShipmentScreenContents({shipments, page, setPage, rowsPe
       setOrder(toggledOrder);
       setOrderBy(newOrderBy);
 
-      const sortedRows = stableSort(shipments, getComparator(toggledOrder, newOrderBy));
+      const sortedRows = stableSort(trailer, getComparator(toggledOrder, newOrderBy));
       const updatedRows = sortedRows.slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage,
@@ -161,7 +223,7 @@ export default function ShipmentScreenContents({shipments, page, setPage, rowsPe
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = shipments.map((n) => n.name);
+      const newSelected = trailer.map((n) => n.name);
       setSelected(newSelected);
       return;
     }
@@ -188,22 +250,48 @@ export default function ShipmentScreenContents({shipments, page, setPage, rowsPe
     setSelected(newSelected);
   };
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = React.useCallback(
+    (event, newPage) => {
       setPage(newPage);
 
-      // const sortedRows = stableSort(shipments, getComparator(order, orderBy));
-      // const updatedRows = sortedRows.slice(
-      //   newPage * rowsPerPage,
-      //   newPage * rowsPerPage + rowsPerPage,
-      // );
-    };
+      const sortedRows = stableSort(trailer, getComparator(order, orderBy));
+      const updatedRows = sortedRows.slice(
+        newPage * rowsPerPage,
+        newPage * rowsPerPage + rowsPerPage,
+      );
 
-  const handleChangeRowsPerPage = (event) => {
+      setVisibleRows(updatedRows);
+
+      // Avoid a layout jump when reaching the last page with empty rows.
+      const numEmptyRows =
+        newPage > 0 ? Math.max(0, (1 + newPage) * rowsPerPage - trailer.length) : 0;
+
+      const newPaddingHeight = (dense ? 33 : 53) * numEmptyRows;
+      setPaddingHeight(newPaddingHeight);
+    },
+    [order, orderBy, dense, rowsPerPage],
+  );
+
+  const handleChangeRowsPerPage = React.useCallback(
+    (event) => {
       const updatedRowsPerPage = parseInt(event.target.value, 10);
       setRowsPerPage(updatedRowsPerPage);
 
       setPage(0);
-    };
+
+      const sortedRows = stableSort(trailer, getComparator(order, orderBy));
+      const updatedRows = sortedRows.slice(
+        0 * updatedRowsPerPage,
+        0 * updatedRowsPerPage + updatedRowsPerPage,
+      );
+
+      setVisibleRows(updatedRows);
+
+      // There is no layout jump to handle on the first page.
+      setPaddingHeight(0);
+    },
+    [order, orderBy],
+  );
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
@@ -223,11 +311,11 @@ export default function ShipmentScreenContents({shipments, page, setPage, rowsPe
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={shipments.length}
+              rowCount={trailer.length}
             />
             <TableBody>
-              {shipments
-                ? shipments.map((row, index) => {
+              {trailer
+                ? trailer.map((row, index) => {
                     const isItemSelected = isSelected(row.id);
                     const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -257,17 +345,10 @@ export default function ShipmentScreenContents({shipments, page, setPage, rowsPe
                           id={labelId}
                           scope="row"
                           padding="none"
-                          onClick={() => history.push({
-                            pathname:`/shipment/detail/${row.id}`,
-                            // state: {
-                            //   type: "detail",
-                            //   shipmentId: row.id
-                            // }
-                        })}
                         >
-                          {row.code}
+                          {row.trailerCode}
                         </TableCell>
-                        <TableCell align="left">{row.created_by_user_id}</TableCell>
+                        <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
                         <TableCell align="left">{row.status}</TableCell>
                         <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                         <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
@@ -275,13 +356,22 @@ export default function ShipmentScreenContents({shipments, page, setPage, rowsPe
                     );
                   })
                 : null}
+              {paddingHeight > 0 && (
+                <TableRow
+                  style={{
+                    height: paddingHeight,
+                  }}
+                >
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={count}
+          count={trailer.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

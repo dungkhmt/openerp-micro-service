@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.MetaData;
 import openerp.containertransport.dto.ShipmentFilterRequestDTO;
 import openerp.containertransport.dto.ShipmentModel;
+import openerp.containertransport.dto.ShipmentRes;
 import openerp.containertransport.dto.metaData.MetaDTO;
 import openerp.containertransport.dto.metaData.ResponseMetaData;
 import openerp.containertransport.service.ShipmentService;
@@ -28,7 +29,7 @@ public class ShipmentController {
 
     @PostMapping("/")
     public ResponseEntity<?> filterShipment (@RequestBody ShipmentFilterRequestDTO requestDTO) {
-        List<ShipmentModel> shipmentModels = shipmentService.filterShipment(requestDTO);
+        ShipmentRes shipmentModels = shipmentService.filterShipment(requestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), shipmentModels));
     }
 
