@@ -91,7 +91,7 @@ const ShipmentDetail = () => {
                         </PrimaryButton>
                     </Box>
                 </Box>
-                {trips.length > 0 ? <TripsContents trips={trips} /> : null}
+                {trips.length > 0 ? <TripsContents trips={trips} shipmentId={shipmentId} /> : null}
             </Container>
         </Box>
     )

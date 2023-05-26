@@ -1,7 +1,5 @@
-import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Stack } from "@mui/material";
 import { useCreateProductUnit } from "controllers/query/category-query";
-import { customerSchema } from "utils/validate";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
@@ -10,7 +8,7 @@ const CreateUnit = ({ setIsAdd }) => {
   const methods = useForm({
     mode: "onChange",
     defaultValues: {},
-    resolver: yupResolver(customerSchema),
+    // resolver: yupResolver(customerSchema),
   });
   const {
     handleSubmit,

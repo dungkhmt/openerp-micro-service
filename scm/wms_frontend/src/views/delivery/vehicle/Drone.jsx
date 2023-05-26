@@ -10,7 +10,10 @@ import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetDroneList } from "controllers/query/delivery-trip-query";
+import {
+  useDeleteDrone,
+  useGetDroneList,
+} from "controllers/query/delivery-trip-query";
 import { useState } from "react";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
@@ -23,12 +26,17 @@ function DroneScreen({ screenAuthorization }) {
     pageSize: 10,
   });
   const { height } = useWindowSize();
-  const { isLoading, data, isRefetching, isPreviousData } =
-    useGetDroneList(params);
+
   const [isAdd, setIsAdd] = useToggle(false);
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
+
+  const { isLoading, data, isRefetching, isPreviousData } =
+    useGetDroneList(params);
+  const deleteDroneQuery = useDeleteDrone({
+    code: itemSelected?.code,
+  });
   let actions = [
     {
       title: "Thêm",
@@ -119,7 +127,12 @@ function DroneScreen({ screenAuthorization }) {
         // disable={isLoadingRemove}
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
-        callback={(flag) => {}}
+        callback={async (flag) => {
+          if (flag) {
+            await deleteDroneQuery.mutateAsync();
+          }
+          setIsRemove(false);
+        }}
       />
     </Box>
   );

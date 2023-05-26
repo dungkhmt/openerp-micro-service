@@ -7,7 +7,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import '../styles.scss';
 import { MyContext } from "contextAPI/MyContext";
 
-const TruckAndOrder = ({ trucks, setTruckSelect, truckSelect, orders, ordersSelect, setOrdersSelect}) => {
+const TruckAndOrder = ({ trucks, setTruckSelect, truckSelect, orders, ordersSelect, setOrdersSelect, setFlag}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [value, setValue] = useState([]);
     const [pendingValue, setPendingValue] = useState([]);
@@ -29,6 +29,7 @@ const TruckAndOrder = ({ trucks, setTruckSelect, truckSelect, orders, ordersSele
     const handleClose = () => {
         setValue(pendingValue);
         setOrdersSelect(pendingValue);
+        setFlag(true);
         if (anchorEl) {
             anchorEl.focus();
         }
@@ -38,6 +39,7 @@ const TruckAndOrder = ({ trucks, setTruckSelect, truckSelect, orders, ordersSele
         let valueTmp = value.filter((item) => item.id !== id);
         setValue(valueTmp);
         setOrdersSelect(valueTmp);
+        setFlag(true);
     }
     return (
         <>
@@ -52,7 +54,7 @@ const TruckAndOrder = ({ trucks, setTruckSelect, truckSelect, orders, ordersSele
                     getOptionLabel={(option) => `${option.truckCode} - ${option?.facilityResponsiveDTO?.facilityName}`}
                     onChange={(event, values) => {
                         setTruckSelect(values)
-                        // setTruckId(values.id)}
+                        setFlag(true);
                     }}
                     renderInput={(params) => {
                         return (

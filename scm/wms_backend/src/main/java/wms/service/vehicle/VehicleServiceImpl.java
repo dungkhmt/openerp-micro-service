@@ -8,9 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.vehicle.DroneDTO;
 import wms.dto.vehicle.TruckDTO;
+import wms.entity.DistributingChannel;
 import wms.entity.DroneEntity;
 import wms.entity.TruckEntity;
 import wms.entity.UserLogin;
@@ -42,6 +44,8 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
         TruckEntity newTruck = TruckEntity.builder()
                 .code("TRUCK" + GeneralUtils.generateCodeFromSysTime())
                 .capacity(truckDTO.getCapacity())
+                .size(truckDTO.getSize())
+                .name(truckDTO.getName())
                 .speed(truckDTO.getSpeed())
                 .transportCostPerUnit(truckDTO.getTransportCostPerUnit())
                 .waitingCost(truckDTO.getWaitingCost())
@@ -77,6 +81,16 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
     @Override
     public void deleteTruckById(long id) {
         truckRepo.deleteById(id);
+    }
+
+    @Override
+    public void deleteTruckByCode(String code) throws CustomException {
+        TruckEntity truck = getTruckByCode(code);
+        if (truck == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Truck does not exists, can't delete");
+        }
+        truck.setDeleted(1);
+        truckRepo.save(truck);
     }
 
     @Override
@@ -122,5 +136,15 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
     @Override
     public void deleteDroneById(long id) {
         droneRepo.deleteById(id);
+    }
+
+    @Override
+    public void deleteDroneByCode(String code) throws CustomException {
+        DroneEntity drone = getDroneByCode(code);
+        if (drone == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Drone does not exists, can't delete");
+        }
+        drone.setDeleted(1);
+        droneRepo.save(drone);
     }
 }

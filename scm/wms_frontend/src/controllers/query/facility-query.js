@@ -9,7 +9,20 @@ export const useGetFacilityList = (params) => {
   return useQuery({
     queryKey: [queryKey.facility.facility_list, params],
     queryFn: async () => {
-      const res = await axiosSendRequest("get", endPoint.getFacility);
+      const res = await axiosSendRequest("get", endPoint.getFacility, params);
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};
+export const useGetFacilityListNoPaging = () => {
+  return useQuery({
+    queryKey: [queryKey.facility.facility_list],
+    queryFn: async () => {
+      const res = await axiosSendRequest("get", endPoint.getFacilityNoPaging);
       if (res.data && res.code === 1) {
         return res.data;
       }

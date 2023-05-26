@@ -363,7 +363,7 @@ export default function ContentsTruckManagement({trucks}) {
                         >
                           {row.truckCode}
                         </TableCell>
-                        <TableCell align="left">{row.facilityName}</TableCell>
+                        <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
                         <TableCell align="left">{row.driverName}</TableCell>
                         <TableCell align="left">{row.licensePlates}</TableCell>
                         <TableCell align="left">{row.brandTruck}</TableCell>

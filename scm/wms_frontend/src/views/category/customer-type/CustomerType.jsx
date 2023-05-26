@@ -10,7 +10,10 @@ import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetCustomerType } from "controllers/query/category-query";
+import {
+  useDeleteCustomerType,
+  useGetCustomerType,
+} from "controllers/query/category-query";
 import { useState } from "react";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
@@ -28,7 +31,9 @@ function CustomerTypeScreen({ screenAuthorization }) {
   const [itemSelected, setItemSelected] = useState(null);
 
   const { isLoading, data } = useGetCustomerType(params);
-
+  const deleteCustomerTypeQuery = useDeleteCustomerType({
+    code: itemSelected?.code,
+  });
   let actions = [
     {
       title: "Thêm",
@@ -119,7 +124,12 @@ function CustomerTypeScreen({ screenAuthorization }) {
         // disable={isLoadingRemove}
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
-        callback={(flag) => {}}
+        callback={async (flag) => {
+          if (flag) {
+            await deleteCustomerTypeQuery.mutateAsync();
+          }
+          setIsRemove(false);
+        }}
       />
     </Box>
   );

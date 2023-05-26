@@ -124,6 +124,11 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
     }
 
     @Override
+    public List<Facility> getAllWithoutPaging() {
+        return facilityRepo.getAllFacility();
+    }
+
+    @Override
     public Facility getFacilityById(long id) {
         return facilityRepo.getFacilityById(id);
     }

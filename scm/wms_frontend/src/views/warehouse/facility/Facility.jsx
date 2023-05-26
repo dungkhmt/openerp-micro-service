@@ -4,8 +4,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import MapIcon from "@mui/icons-material/Map";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box } from "@mui/material";
+import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
+import DraggableDeleteDialog from "components/dialog/DraggableDialogs";
 import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
@@ -13,13 +15,12 @@ import CustomToolBar from "components/toolbar/CustomToolBar";
 import {
   useGetFacilityInventory,
   useGetFacilityList,
+  useGetFacilityListNoPaging,
 } from "controllers/query/facility-query";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
-import { Action } from "../../../components/action/Action";
-import DraggableDeleteDialog from "../../../components/dialog/DraggableDialogs";
-import { AppColors } from "../../../shared/AppColors";
+import { AppColors } from "shared/AppColors";
 import { staticProductFields, staticWarehouseCols } from "../LocalConstant";
 import CreateFacilityForm from "./components/CreateFacilityForm";
 
@@ -39,6 +40,8 @@ function FacilityScreen({ screenAuthorization }) {
   let { path } = useRouteMatch();
 
   const { isLoading, data: facility } = useGetFacilityList(params);
+  const { isLoading: isLoadingFacilityList, data: facilityList } =
+    useGetFacilityListNoPaging();
   const { isLoading: isLoadingInventory, data: inventory } =
     useGetFacilityInventory({
       code: facilityCode,
@@ -96,7 +99,7 @@ function FacilityScreen({ screenAuthorization }) {
 
   const handleButtonClick = () => {
     history.push(`${path}/map`, {
-      facility: facility?.content,
+      facility: facilityList,
     });
   };
   return (

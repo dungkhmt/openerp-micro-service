@@ -1,6 +1,7 @@
 package com.hust.baseweb.applications.programmingcontest.controller;
 
 import com.google.gson.Gson;
+import com.hust.baseweb.applications.chatgpt.ChatGPTService;
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.*;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
@@ -55,6 +56,7 @@ public class ContestProblemController {
     UserRegistrationContestRepo userRegistrationContestRepo;
     UserContestProblemRoleRepo userContestProblemRoleRepo;
     ProblemTestCaseServiceCache cacheService;
+    ChatGPTService chatGPTService;
 
     @PostMapping("/create-problem")
     public ResponseEntity<?> createContestProblem(
@@ -122,6 +124,13 @@ public class ContestProblemController {
         ModelRunCodeFromIDEOutput modelRunCodeFromIDEOutput = new ModelRunCodeFromIDEOutput();
         modelRunCodeFromIDEOutput.setOutput(response);
         return ResponseEntity.status(200).body(modelRunCodeFromIDEOutput);
+    }
+
+    @Secured("ROLE_TEACHER")
+    @GetMapping("/problem/generate-statement")
+    public ResponseEntity<?> suggestProblemStatement(@RequestBody ProblemSuggestionRequest suggestion) throws Exception {
+        String problemStatement = chatGPTService.getChatGPTAnswer(suggestion.generateRequest());
+        return ResponseEntity.status(200).body(problemStatement);
     }
 
     @Secured("ROLE_TEACHER")

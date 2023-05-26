@@ -83,7 +83,7 @@ const CreateTripDetail = () => {
         // }
     }, [])
     const handleCancelCreateTrip = () => {
-        history.goBack();
+        history.push(`/shipment/detail/${shipmentId}`);
     }
     const handleSubmit = () => {
         let orderSubmir = [];

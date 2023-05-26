@@ -49,7 +49,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem}) => {
         setAction(event.target.value);
     };
     const handleSubmit = () => {
-        // if (type == "Truck") {
+        if (type == "Truck") {
         //     // let tripItem = {
         //     //     // id: truck?.id + "E1",
         //     //     type: "Truck",
@@ -64,24 +64,32 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem}) => {
         //     //     departureTime: null
         //     // }
         //     // setAddTripItem(tripItem);
-        // } else {
-        //     let tripItem = {
-        //         id: trailer?.id + (action = "PICK TRAILER" ? "TRA1" : "TRA2"),
-        //         facilityId: trailer?.toFacility.facilityId,
-        //         facilityName: trailer?.toFacility.facilityName,
-        //         facilityCode: trailer?.toFacility.facilityCode,
-        //         action: action,
-        //         orderCode: trailer?.trailerCode,
-        //         longitude: facility?.longitude,
-        //         latitude: facility?.latitude,
-        //         arrivalTime: null,
-        //         departureTime: null
-        //     }
-        //     setAddTripItem(tripItem);
-        //     handleModal();
-        // }
+        }
+        if (type == "Trailer") {
+            let id = (action == "PICK TRAILER") ? "TRA1" : "TRA2"; 
+            console.log("id", id);
+            let tripItem = [{
+                id: trailer?.id + id,
+                facilityId: trailer?.facilityResponsiveDTO?.facilityId,
+                facilityName: trailer?.facilityResponsiveDTO?.facilityName,
+                facilityCode: trailer?.facilityResponsiveDTO?.facilityCode,
+                action: action,
+                orderCode: trailer?.trailerCode,
+                longitude: trailer?.facilityResponsiveDTO?.longitude,
+                latitude: trailer?.facilityResponsiveDTO?.latitude,
+                arrivalTime: null,
+                departureTime: null
+            }];
+            console.log("tripItem", tripItem);
+            setAddTripItem(tripItem);
+            handleModal();
+            setType('');
+            setAction('');
+            setFacility();
+            setTrailer();
+        }
     }
-    console.log("type", type)
+    
     return (
         <Modal
             open={openModal}
@@ -135,7 +143,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem}) => {
                                     {trailers ? (
                                         trailers.map((item, index) => {
                                             return (
-                                                <MenuItem value={item.id}>{item?.trailerCode} - {item?.facilityResponsiveDTO.facilityCode}</MenuItem>
+                                                <MenuItem value={item}>{item?.trailerCode} - {item?.facilityResponsiveDTO.facilityCode}</MenuItem>
                                             );
                                         })
                                     ) : null}

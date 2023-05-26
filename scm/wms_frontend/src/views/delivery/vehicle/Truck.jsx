@@ -10,7 +10,10 @@ import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetListTruck } from "controllers/query/delivery-trip-query";
+import {
+  useDeleteTruck,
+  useGetListTruck,
+} from "controllers/query/delivery-trip-query";
 import { useState } from "react";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
@@ -23,12 +26,17 @@ function TruckScreen({ screenAuthorization }) {
     pageSize: 10,
   });
   const { height } = useWindowSize();
-  const { isLoading, data, isRefetching, isPreviousData } =
-    useGetListTruck(params);
+
   const [isAdd, setIsAdd] = useToggle(false);
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
+
+  const deleteTruckQuery = useDeleteTruck({
+    code: itemSelected?.code,
+  });
+  const { isLoading, data, isRefetching, isPreviousData } =
+    useGetListTruck(params);
   let actions = [
     {
       title: "Thêm",
@@ -118,7 +126,12 @@ function TruckScreen({ screenAuthorization }) {
         // disable={isLoadingRemove}
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
-        callback={(flag) => {}}
+        callback={async (flag) => {
+          if (flag) {
+            await deleteTruckQuery.mutateAsync();
+          }
+          setIsRemove(false);
+        }}
       />
     </Box>
   );

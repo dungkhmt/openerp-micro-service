@@ -39,9 +39,9 @@ public class WarehouseController {
         return ResponseEntity.ok(warehouseService.getAllWarehouseDetail());
     }
 
-    @GetMapping(path = "/detail-with-products")
-    public ResponseEntity<List<WarehouseDetailsResponse>> getAllWarehouseDetailWithProducts() {
-        return ResponseEntity.ok(warehouseService.getAllWarehouseDetailWithProducts());
+    @GetMapping(path = "/detail-with-products/{orderId}")
+    public ResponseEntity<List<WarehouseDetailsResponse>> getAllWarehouseDetailWithProducts(@PathVariable String orderId) {
+        return ResponseEntity.ok(warehouseService.getAllWarehouseDetailWithProducts(orderId));
     }
 
 

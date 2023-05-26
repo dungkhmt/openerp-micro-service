@@ -10,7 +10,10 @@ import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetProductCateList } from "controllers/query/category-query";
+import {
+  useDeleteProductCategory,
+  useGetProductCateList,
+} from "controllers/query/category-query";
 import { useState } from "react";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
@@ -28,6 +31,9 @@ function ProductCategoryScreen({ screenAuthorization }) {
   const [itemSelected, setItemSelected] = useState(null);
 
   const { isLoading, data } = useGetProductCateList(params);
+  const deleteProductCategoryQuery = useDeleteProductCategory({
+    code: itemSelected?.code,
+  });
   let actions = [
     {
       title: "Thêm",
@@ -118,7 +124,12 @@ function ProductCategoryScreen({ screenAuthorization }) {
         // disable={isLoadingRemove}
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
-        callback={(flag) => {}}
+        callback={async (flag) => {
+          if (flag) {
+            await deleteProductCategoryQuery.mutateAsync();
+          }
+          setIsRemove(false);
+        }}
       />
     </Box>
   );

@@ -5,15 +5,26 @@ export const endPoint = {
   getAuthorization: baseUrl + "",
   // Category
   getProductCategory: baseUrl + "/category/product-category/get-all",
+  deleteProductCategory: baseUrl + "/category/product-category/remove",
+
   getProductUnit: baseUrl + "/category/product-unit/get-all",
+  deleteProductUnit: baseUrl + "/category/product-unit/remove",
+
   getDistChannel: baseUrl + "/category/distributing-channel/get-all",
+  deleteDistChannel: baseUrl + "/category/distributing-channel/remove",
+
   getCustomerType: baseUrl + "/category/customer-type/get-all",
+  deleteCustomerType: baseUrl + "/category/customer-type/remove",
+
   getContractType: baseUrl + "/category/contract-type/get-all",
+  deleteContractType: baseUrl + "/category/customer-type/remove",
+
   getProduct: baseUrl + "/product/get-all",
   getCustomer: baseUrl + "/customer/get-all",
   createCustomer: baseUrl + "/customer/create",
   deleteCustomer: baseUrl + "/customer/delete",
   createProduct: baseUrl + "/product/create",
+
   createProductUnit: baseUrl + "/category/product-unit/create",
   createProductCategory: baseUrl + "/category/product-category/create",
   createCustomerType: baseUrl + "/category/customer-type/create",
@@ -31,6 +42,7 @@ export const endPoint = {
   getFacility: baseUrl + "/facility/get-all",
   getFacilityInventory: baseUrl + "/facility/get-inventory",
   createFacility: baseUrl + "/facility/create",
+  getFacilityNoPaging: baseUrl + "/facility/get-all-without-paging",
   // Bill
   getReceiptBills: baseUrl + "/receipt-bill/get-all",
   getBillItemOfPurchaseOrder: baseUrl + "/receipt-bill/get-bill-items-of-order",
@@ -63,7 +75,9 @@ export const endPoint = {
   getTripToAssignBill: baseUrl + "/delivery-trip/get-trip-to-assign",
   createTripRoute: baseUrl + "/delivery-trip/create-trip-route",
   getTruck: baseUrl + "/vehicle/truck/get-all",
+  deleteTruck: baseUrl + "/vehicle/truck/remove",
   getDrone: baseUrl + "/vehicle/drone/get-all",
+  deleteDrone: baseUrl + "/vehicle/drone/remove",
   createTruck: baseUrl + "/vehicle/truck/create",
   createDrone: baseUrl + "/vehicle/drone/create",
   getTripRoutes: baseUrl + "/delivery-trip/get-trip-route",

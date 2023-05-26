@@ -76,6 +76,17 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
+    @DeleteMapping(path = "/product-unit/remove")
+    public ResponseEntity<?> deleteProductUnitByCode(
+            @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code
+    ) {
+        try {
+            categoryService.deleteProductUnitByCode(code);
+            return response(new ResultEntity(1, "Delete product unit successfully", code));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
     /**
      * Product Category
      */
@@ -135,9 +146,19 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-
+    @DeleteMapping(path = "/product-category/remove")
+    public ResponseEntity<?> deleteProductCategoryByCode(
+            @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code
+    ) {
+        try {
+            categoryService.deleteProductCategoryByCode(code);
+            return response(new ResultEntity(1, "Delete product category successfully", code));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
     /**
-     * Customer category
+     * Customer type
      */
     @PostMapping(path = "/customer-type/create")
     public ResponseEntity<?> createUnit(@Valid @RequestBody CustomerTypeDTO customerTypeDTO) {
@@ -191,6 +212,17 @@ public class CategoryController extends BaseController {
         try {
             categoryService.deleteCustomerTypeById(id);
             return response(new ResultEntity(1, "Delete customer type successfully", id));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @DeleteMapping(path = "/customer-type/remove")
+    public ResponseEntity<?> deleteCustomerTypeByCode(
+            @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code
+    ) {
+        try {
+            categoryService.deleteCustomerTypeByCode(code);
+            return response(new ResultEntity(1, "Delete customer type successfully", code));
         } catch (Exception ex) {
             return response(error(ex));
         }
@@ -254,6 +286,17 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
+    @DeleteMapping(path = "/distributing-channel/remove")
+    public ResponseEntity<?> deleteDistChannelByCode(
+            @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code
+    ) {
+        try {
+            categoryService.deleteDistributingChannelByCode(code);
+            return response(new ResultEntity(1, "Delete distribution channel successfully", code));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
     /**
      * Contract Type
      */
@@ -309,6 +352,17 @@ public class CategoryController extends BaseController {
         try {
             categoryService.deleteContractTypeById(id);
             return response(new ResultEntity(1, "Delete contract type successfully", id));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @DeleteMapping(path = "/contract-type/remove")
+    public ResponseEntity<?> deleteContractTypeByCode(
+            @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code
+    ) {
+        try {
+            categoryService.deleteContractTypeByCode(code);
+            return response(new ResultEntity(1, "Delete contract type successfully", code));
         } catch (Exception ex) {
             return response(error(ex));
         }

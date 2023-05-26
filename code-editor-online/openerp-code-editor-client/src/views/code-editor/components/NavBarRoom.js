@@ -2,6 +2,7 @@
 import {
   ContentCopy,
   Download,
+  Edit,
   ExitToApp,
   Groups,
   Mic,
@@ -9,11 +10,13 @@ import {
   PlayArrow,
   Settings,
   Share,
+  Visibility,
 } from "@mui/icons-material";
 import {
   Backdrop,
   Badge,
   Button,
+  Chip,
   CircularProgress,
   FormControl,
   Grid,
@@ -56,6 +59,7 @@ const NavBarRoom = (props) => {
     input,
     isMute,
     roomMaster,
+    isEditCode,
   } = useSelector((state) => state.codeEditor);
   const { keycloak } = useKeycloak();
   const token = keycloak.tokenParsed;
@@ -217,6 +221,13 @@ const NavBarRoom = (props) => {
                 </Button>
               </Grid>
             )}
+            <Grid item>
+              {isEditCode ? (
+                <Chip icon={<Edit />} color="primary" variant="outlined" label="Có thể chỉnh sửa" />
+              ) : (
+                <Chip icon={<Visibility />} color="primary" variant="outlined" label="Chỉ xem" />
+              )}
+            </Grid>
           </Grid>
         </Grid>
         <Grid item>
