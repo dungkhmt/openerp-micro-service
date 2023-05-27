@@ -9,6 +9,8 @@ import com.hust.wmsbackend.management.auto.DistanceCalculator;
 import com.hust.wmsbackend.management.entity.Warehouse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.util.Precision;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -23,7 +25,7 @@ public class GraphHopperCalculator implements DistanceCalculator {
     public GraphHopperCalculator() {
         this.graphHopper = new GraphHopper();
         graphHopper.setProfiles(new Profile("car").setVehicle("car").setWeighting("fastest").setTurnCosts(false));
-        graphHopper.setOSMFile("src/main/resources/osm/vietnam-latest.osm.pbf");
+        graphHopper.setOSMFile(loadVietnamRouteResource());
         graphHopper.setGraphHopperLocation("target/routing-graph-vietnam-latest-cache");
         graphHopper.importOrLoad();
     }
@@ -59,6 +61,14 @@ public class GraphHopperCalculator implements DistanceCalculator {
             throw new PathNotFoundException(String.format("Not path found from Point(lat:%f, lon:%f) to Point(lat:%f, lon:%f)", fromLat, fromLon, toLat, toLon));
         }
         return path;
+    }
+
+    private String loadVietnamRouteResource() {
+        Resource resource =  new ClassPathResource("osm/vietnam-latest.osm.pbf");
+        if (resource.isFile()) {
+            return resource.getFilename();
+        }
+        throw new RuntimeException("Missing viet nam route resource pbf file");
     }
 
     private double roundBigDecimal(BigDecimal b) {
