@@ -1,7 +1,6 @@
 package com.hust.wmsbackend.management.cache;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisCacheService {
     public static final String ALL_PRODUCTS_KEY = "PRODUCTS";
     public static final String ALL_WAREHOUSES_KEY = "WAREHOUSES";
-    public static final int DEFAULT_EXPIRE_TIME_IN_MINUTES = 5;
+    public static final int DEFAULT_EXPIRE_TIME_IN_MINUTES = 15;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
     private final String WMS_CACHE_PREFIX = "WMS:";
