@@ -127,7 +127,7 @@ public class ContestProblemController {
     }
 
     @Secured("ROLE_TEACHER")
-    @GetMapping("/problem/generate-statement")
+    @PostMapping("/problem/generate-statement")
     public ResponseEntity<?> suggestProblemStatement(@RequestBody ProblemSuggestionRequest suggestion) throws Exception {
         String problemStatement = chatGPTService.getChatGPTAnswer(suggestion.generateRequest());
         return ResponseEntity.status(200).body(problemStatement);
