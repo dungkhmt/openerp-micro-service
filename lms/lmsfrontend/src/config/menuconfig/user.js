@@ -24,7 +24,7 @@ export const user = {
     //   text: "Danh sách",
     //   child: [],
     // },
-    {
+    // {
       //   id: "MENU_USER_APPROVE_REGISTRATION",
       //   path: "/user-group/user/approve-register",
       //   isPublic: false,
@@ -32,16 +32,24 @@ export const user = {
       //   text: "Phê duyệt",
       //   child: [],
       // },
-      id: "MENU_USER_APPROVE_REGISTRATION", // TODO: change this
+    {
+      id: "MENU_USER.MENU_USER_LIST",
       onClick: () => {
         window.location.href = `${config.url.KEYCLOAK_BASE_URL}/admin/${KC_REALM}/console/#/${KC_REALM}/users`;
       },
       isPublic: false,
-      text: "Tất cả người dùng",
+      text: "Manage users (Keycloak)",
       child: [],
     },
     {
-      id: "MENU_USER_SEND_MAIL_TO_USERS",
+      id: "MENU_USER.MENU_USER_ADD",
+      path: "/user/upload",
+      isPublic: false,
+      text: "Upload list",
+      child: [],
+    },
+    {
+      id: "MENU_USER.MENU_USER_SEND_MAIL_TO_USERS",
       path: "/user-group/user/send-mail",
       isPublic: false,
       text: "Gửi email",
