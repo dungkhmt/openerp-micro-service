@@ -1,5 +1,6 @@
 package com.hust.wmsbackend.management.service.impl;
 
+import com.hust.wmsbackend.management.cache.RedisCacheService;
 import com.hust.wmsbackend.management.entity.*;
 import com.hust.wmsbackend.management.model.request.ProductPriceRequest;
 import com.hust.wmsbackend.management.model.request.ProductRequest;
@@ -36,6 +37,7 @@ public class ProductServiceImpl implements ProductService {
     private ProductWarehouseRepository productWarehouseRepository;
     private BayRepository bayRepository;
     private InventoryItemRepository inventoryItemRepository;
+    private RedisCacheService redisCacheService;
 
     private WarehouseService warehouseService;
 
@@ -162,9 +164,19 @@ public class ProductServiceImpl implements ProductService {
         return product;
     }
 
+    private List<Product> getAllProductInCacheElseDatabase() {
+        List<Product> products = redisCacheService.getCachedListObject(RedisCacheService.ALL_PRODUCTS_KEY, Product.class);
+        if (products == null) {
+            log.info("Get all products by repository");
+            products = productRepository.findAll();
+            redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_PRODUCTS_KEY, products);
+        }
+        return products;
+    }
+
     @Override
     public List<ProductGeneralResponse> getAllProductGeneral() {
-        List<Product> products = productRepository.findAll();
+        List<Product> products = getAllProductInCacheElseDatabase();
         Map<String, BigDecimal> productOnHandQuantityMap = new HashMap<>();
         for (Product product : products) {
             String productId = product.getProductId().toString();
@@ -188,7 +200,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductGeneralResponse> getAllProductGeneralWithoutImage() {
-        List<Product> products = productRepository.findAll();
+        List<Product> products = getAllProductInCacheElseDatabase();
         Map<String, BigDecimal> productOnHandQuantityMap = new HashMap<>();
         for (Product product : products) {
             String productId = product.getProductId().toString();
@@ -292,7 +304,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductPriceResponse> getAllProductPrices() {
         List<ProductPriceResponse> response = new ArrayList<>();
-        List<Product> products = productRepository.findAll();
+        List<Product> products = getAllProductInCacheElseDatabase();
         for (Product product : products) {
             List<ProductPrice> prices = productPriceRepository.findAllByProductId(product.getProductId());
             BigDecimal currPrice = getCurrPriceByProductId(product.getProductId());
@@ -346,7 +358,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Map<UUID, String> getProductNameMap() {
-        List<Product> products = productRepository.findAll();
+        List<Product> products = getAllProductInCacheElseDatabase();
         Map<UUID, String> map = new HashMap<>();
         for (Product product : products) {
             map.put(product.getProductId(), product.getName());
