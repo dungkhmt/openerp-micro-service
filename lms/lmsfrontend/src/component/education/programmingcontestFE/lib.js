@@ -23,6 +23,17 @@ export function getColorLevel(level) {
   }
 }
 
+export function getColorSuccess(success) {
+  switch (success) {
+    case 'SUCCESS':
+      return 'green';
+    case 'FAIL':
+      return 'red';
+    default:
+      return 'black';
+  }
+}
+
 export function getColorRegisterStatus(status) {
   switch (status) {
     case 'SUCCESSFUL':
