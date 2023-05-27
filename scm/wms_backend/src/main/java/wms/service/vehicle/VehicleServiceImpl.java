@@ -100,6 +100,7 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
         DroneEntity newDrone = DroneEntity.builder()
                 .code("DRONE" + GeneralUtils.generateCodeFromSysTime())
                 .capacity(droneDTO.getCapacity())
+                .name(droneDTO.getName())
                 .speed(droneDTO.getSpeed())
                 .durationTime(droneDTO.getDuration())
                 .transportCostPerUnit(droneDTO.getTransportCostPerUnit())

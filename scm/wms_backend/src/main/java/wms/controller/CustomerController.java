@@ -20,6 +20,17 @@ import javax.validation.Valid;
 public class CustomerController extends BaseController{
     @Autowired
     private ICustomerService customerService;
+    @ApiOperation(value = "Import khách hàng từ file excel")
+    @PostMapping("/import")
+    public ResponseEntity<?> importCustomer(@Valid @RequestBody CustomerDTO customerDTO, JwtAuthenticationToken token) {
+        try {
+            return response(new ResultEntity(1, "Import new customers successfully", customerService.createNewCustomer(customerDTO, token)));
+        }
+        catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+
     @ApiOperation(value = "Thêm mới khách hàng")
     @PostMapping("/create")
     public ResponseEntity<?> create(@Valid @RequestBody CustomerDTO customerDTO, JwtAuthenticationToken token) {

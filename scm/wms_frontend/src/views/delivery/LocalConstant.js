@@ -316,6 +316,17 @@ export const droneCols = [
     },
   },
   {
+    field: "name",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Tên drone",
+    sortable: false,
+    minWidth: 200,
+    // valueFormatter: (params) => {
+    //   return `${params.value} kg`;
+    // },
+  },
+  {
     field: "durationTime",
     headerAlign: "center",
     align: "center",

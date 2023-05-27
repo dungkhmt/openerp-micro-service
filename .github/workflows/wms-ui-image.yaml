@@ -1,0 +1,33 @@
+name: wms-ui Image CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "wms/wms-frontend/**"
+
+env:
+  NODE_OPTIONS: "--max-old-space-size=4096"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Check out code
+      #     - name: Build the Docker image
+      #       run: docker build . --file Dockerfile --tag wms-ui:$(date +%s)
+      - name: Build & push Docker image
+        uses: mr-smithers-excellent/docker-build-push@v5
+        with:
+          image: leanhtuan/wms-ui
+          #         tags: v1, latest
+          directory: "wms/wms-frontend/"
+          registry: docker.io
+          dockerfile: "wms/wms-frontend/Dockerfile"
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          addLatest: true
+#        addTimestamp: true
