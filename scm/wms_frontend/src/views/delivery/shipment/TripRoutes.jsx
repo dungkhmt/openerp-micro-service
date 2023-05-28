@@ -42,7 +42,6 @@ function TripRoutesScreen({ screenAuthorization }) {
       });
     })
     .flat();
-  console.log("Poly points: ", polyPoints);
   return (
     <MapContainer
       center={{ lat: 21.008330038713357, lng: 105.84273632066207 }}

@@ -174,7 +174,6 @@ function SalePriceScreen({ screenAuthorization }) {
           sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
           isLoading={isLoadingProduct || isLoadingContract}
           // totalItem={mergedProductContractData.length}
-          paginationMode="client"
           isSelectable
           isEditable={(params) => {
             return !selloutPrices?.find(

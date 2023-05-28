@@ -41,6 +41,10 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
     @Transactional(rollbackFor = Exception.class)
     public TruckEntity createTruck(TruckDTO truckDTO) throws CustomException {
         UserLogin userLogin = userRepo.getUserByUserLoginId(truckDTO.getUserManaged());
+        TruckEntity truck = truckRepo.getTruckFromUser(truckDTO.getUserManaged());
+        if (truck != null) {
+            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "User has been in charged of another truck");
+        }
         TruckEntity newTruck = TruckEntity.builder()
                 .code("TRUCK" + GeneralUtils.generateCodeFromSysTime())
                 .capacity(truckDTO.getCapacity())
@@ -97,6 +101,10 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
     @Transactional(rollbackFor = Exception.class)
     public DroneEntity createDrone(DroneDTO droneDTO) throws CustomException {
         UserLogin userLogin = userRepo.getUserByUserLoginId(droneDTO.getUserManaged());
+        DroneEntity truck = droneRepo.getDroneFromUser(droneDTO.getUserManaged());
+        if (truck != null) {
+            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "User has been in charged of another drone");
+        }
         DroneEntity newDrone = DroneEntity.builder()
                 .code("DRONE" + GeneralUtils.generateCodeFromSysTime())
                 .capacity(droneDTO.getCapacity())

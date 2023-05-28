@@ -91,14 +91,16 @@ const CustomOrderTable = ({ items, currOrder }) => {
           </StyledTableRow>
           <StyledTableRow>
             <StyledTableCell colSpan={1}>
-              {currOrder?.vat ? "Thuế" : "Khuyến mãi"}
+              {currOrder?.vat !== undefined ? "Thuế" : "Khuyến mãi"}
             </StyledTableCell>
             <StyledTableCell align="right">{`${
-              currOrder?.vat ? currOrder?.vat : currOrder?.discount
+              currOrder?.vat !== undefined
+                ? currOrder?.vat
+                : currOrder?.discount
             } %`}</StyledTableCell>
             <StyledTableCell align="right">
               {currOrder?.totalMoney *
-                (currOrder?.vat
+                (currOrder?.vat !== undefined
                   ? currOrder?.vat / 100
                   : currOrder?.discount / 100)}
             </StyledTableCell>

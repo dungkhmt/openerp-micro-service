@@ -16,7 +16,7 @@ const {
 const CreateDeliveryBill = ({ setIsAdd, currOrder }) => {
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 10,
   });
   const methods = useForm({
     mode: "onChange",
@@ -67,7 +67,7 @@ const CreateDeliveryBill = ({ setIsAdd, currOrder }) => {
         totalItem={100}
         columns={[
           staticProductFields[0],
-          staticProductFields[1],
+          // staticProductFields[1],
           {
             field: "quantity",
             headerName: "Số lượng mua",
@@ -112,7 +112,7 @@ const CreateDeliveryBill = ({ setIsAdd, currOrder }) => {
               );
             },
           },
-          staticProductFields[2],
+          // staticProductFields[2],
         ]}
         rows={
           product?.content

@@ -18,6 +18,20 @@ export const useGetProductList = (params) => {
     keepPreviousData: true,
   });
 };
+
+export const useGetProductListNoPaging = (params) => {
+  return useQuery({
+    queryKey: [queryKey.category.product_list_no_paging, params],
+    queryFn: async () => {
+      const res = await axiosSendRequest("get", endPoint.getProductNoPaging);
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+  });
+};
+
 export const useCreateProduct = (params) => {
   return useMutation({
     mutationFn: async (data) => {
@@ -53,6 +67,41 @@ export const useGetCustomerList = (params) => {
       }
     },
     keepPreviousData: true,
+  });
+};
+export const useGetCustomerWithoutPaging = () => {
+  return useQuery({
+    queryKey: [queryKey.facility.facility_list],
+    queryFn: async () => {
+      const res = await axiosSendRequest("get", endPoint.getCustomerNoPaging);
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};
+export const useImportCustomer = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.importCustomer,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        toast.success("Tạo khách hàng mới thành công!");
+        queryClient.invalidateQueries([queryKey.category.customer_list]);
+        return res.data;
+      }
+    },
+    onError: () => {
+      toast.error("Lỗi khi tạo khách hàng, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
   });
 };
 export const useCreateCustomer = (params) => {

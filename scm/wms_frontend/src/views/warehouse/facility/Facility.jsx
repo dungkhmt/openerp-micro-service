@@ -3,6 +3,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import MapIcon from "@mui/icons-material/Map";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import WarehouseIcon from "@mui/icons-material/Warehouse";
 import { Box } from "@mui/material";
 import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
@@ -87,6 +88,16 @@ function FacilityScreen({ screenAuthorization }) {
     },
     {
       title: "Xem tồn kho",
+      callback: (item) => {
+        setOpenInventoryDrawer();
+        setFacilityCode(item?.code);
+      },
+      icon: <WarehouseIcon />,
+      color: AppColors.info,
+      // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
+    },
+    {
+      title: "Xem chi tiết",
       callback: (item) => {
         setOpenInventoryDrawer();
         setFacilityCode(item?.code);

@@ -82,6 +82,17 @@ export const staticCustomerField = [
     },
   },
   {
+    field: "facility",
+    headerName: "Kho trực thuộc",
+    headerAlign: "center",
+    align: "center",
+    sortable: false,
+    minWidth: 150,
+    valueGetter: (params) => {
+      return params?.row?.facility?.name;
+    },
+  },
+  {
     field: "customerType",
     headerName: "Loại khách hàng",
     headerAlign: "center",
@@ -89,7 +100,7 @@ export const staticCustomerField = [
     sortable: false,
     minWidth: 150,
     valueGetter: (params) => {
-      return params.row.customerType.name;
+      return params?.row?.customerType?.name;
     },
   },
   {
@@ -100,7 +111,7 @@ export const staticCustomerField = [
     sortable: false,
     minWidth: 150,
     valueGetter: (params) => {
-      return params.row.contractType.name;
+      return params?.row?.contractType?.name;
     },
   },
   {
