@@ -20,7 +20,9 @@ export const endPoint = {
   deleteContractType: baseUrl + "/category/customer-type/remove",
 
   getProduct: baseUrl + "/product/get-all",
+  getProductNoPaging: baseUrl + "/product/get-all-without-paging",
   getCustomer: baseUrl + "/customer/get-all",
+  getCustomerNoPaging: baseUrl + "/customer/get-all-without-paging",
   createCustomer: baseUrl + "/customer/create",
   deleteCustomer: baseUrl + "/customer/delete",
   createProduct: baseUrl + "/product/create",
@@ -30,6 +32,8 @@ export const endPoint = {
   createCustomerType: baseUrl + "/category/customer-type/create",
   createDistChannel: baseUrl + "/category/distributing-channel/create",
   createContractType: baseUrl + "/category/contract-type/create",
+  importProduct: baseUrl + "/product/create-from-file",
+  importCustomer: baseUrl + "/customer/create-from-file",
   // Purchase Order
   getPurchaseOrder: baseUrl + "/purchase-order/get-all",
   getPurchaseOrderItems: baseUrl + "/purchase-order/get-order-items",

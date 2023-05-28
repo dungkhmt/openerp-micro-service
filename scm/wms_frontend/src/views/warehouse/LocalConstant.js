@@ -116,9 +116,9 @@ export const staticWarehouseCols = [
     field: "status",
     headerName: "Trạng thái",
     sortable: false,
-    width: 125,
-    minWidth: 150,
-    maxWidth: 200,
+    minWidth: 50,
+    headerAlign: "center",
+    align: "center",
     renderCell: (params) => {
       return (
         <Button

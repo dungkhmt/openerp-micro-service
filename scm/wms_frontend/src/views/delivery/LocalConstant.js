@@ -299,6 +299,20 @@ export const truckCols = [
       return `${params.value} m/s`;
     },
   },
+  {
+    field: "managedBy",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Người phụ trách",
+    sortable: false,
+    minWidth: 200,
+    valueGetter: (params) => {
+      return params?.row?.userLogin?.id;
+    },
+    // valueFormatter: (params) => {
+    //   return `${params.value} kg`;
+    // },
+  },
 ];
 export const droneCols = [
   {
