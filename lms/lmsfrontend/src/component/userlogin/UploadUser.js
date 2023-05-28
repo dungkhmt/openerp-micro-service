@@ -70,7 +70,7 @@ function UploadUser() {
       "firstName": firstName,
       "lastName": lastName,
       "enabled": true,
-      "emailVerified": false,
+      "emailVerified": true,
       "requiredActions": [],
       "groups": [
         "/STUDENT"
@@ -103,7 +103,6 @@ function UploadUser() {
           data.status = "FAIL";
           data.message = err?.response.data.errorMessage || "";
           setResult(result => [...result, data]);
-
         }
       },
       data,
