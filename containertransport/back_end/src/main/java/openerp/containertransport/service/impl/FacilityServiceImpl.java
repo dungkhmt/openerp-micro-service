@@ -43,7 +43,8 @@ public class FacilityServiceImpl implements FacilityService {
         Facility facility = new Facility();
         RestTemplate restTemplate = new RestTemplate();
         if(facilityModel.getAddress() != null) {
-            String url = "https://nominatim.openstreetmap.org/search/"+facilityModel.getAddress()+"?format=json&addressdetails=1&limit=1&polygon_svg=1";
+            String addressTmp = facilityModel.getAddress().replace(",", "");
+            String url = "https://nominatim.openstreetmap.org/search?q="+addressTmp+"&format=json&addressdetails=1&limit=1&polygon_svg=1";
             Object coordinates = restTemplate.getForObject(url, ArrayList.class).get(0);
             MapReqDTO mapReqDTO = modelMapper.map(coordinates, MapReqDTO.class);
             facility.setLongitude(new BigDecimal(mapReqDTO.getLon()));

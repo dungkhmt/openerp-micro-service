@@ -4,15 +4,16 @@ import React, { useEffect, useState } from "react";
 import { request } from "api";
 import { getTraler } from "api/TrailerAPI";
 import { getFacility } from "api/FacilityAPI";
-import { truck } from "config/menuconfig/truck";
 
-const ModalTripItem = ({ openModal, handleModal, setAddTripItem}) => {
+const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, setTrailerSelect, truckSelected }) => {
     const [facilityList, setFacilityList] = useState([]);
     const [facility, setFacility] = useState();
     const [trailers, setTrailerList] = useState([]);
     const [trailer, setTrailer] = useState();
     const [action, setAction] = useState('');
     const [type, setType] = useState('');
+    const [msg, setMsg] = useState('');
+
     const actionConst = [
         { name: "PICK TRAILER", id: "1" },
         { name: "DROP TRAILER", id: "2" },
@@ -49,47 +50,78 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem}) => {
         setAction(event.target.value);
     };
     const handleSubmit = () => {
-        if (type == "Truck") {
-        //     // let tripItem = {
-        //     //     // id: truck?.id + "E1",
-        //     //     type: "Truck",
-        //     //     facilityId: facility?.id,
-        //     //     facilityName: facility?.facilityName,
-        //     //     facilityCode: facility?.facilityCode,
-        //     //     action: "STOP",
-        //     //     // orderCode: truck?.truckCode,
-        //     //     longitude: facility?.longitude,
-        //     //     latitude: facility?.latitude,
-        //     //     arrivalTime: null,
-        //     //     departureTime: null
-        //     // }
-        //     // setAddTripItem(tripItem);
+        if (type === "Truck") {
+            if(!truckSelected) {
+                setMsg("Can't select add STOP action while Truck is not selected")
+            } else {
+                let tripItem = buildTripItem(truckSelected, "E1", "Truck", facility)
+                setAddTripItem(tripItem);
+            }
         }
-        if (type == "Trailer") {
-            let id = (action == "PICK TRAILER") ? "TRA1" : "TRA2"; 
-            console.log("id", id);
-            let tripItem = [{
-                id: trailer?.id + id,
-                facilityId: trailer?.facilityResponsiveDTO?.facilityId,
-                facilityName: trailer?.facilityResponsiveDTO?.facilityName,
-                facilityCode: trailer?.facilityResponsiveDTO?.facilityCode,
-                action: action,
-                orderCode: trailer?.trailerCode,
-                longitude: trailer?.facilityResponsiveDTO?.longitude,
-                latitude: trailer?.facilityResponsiveDTO?.latitude,
-                arrivalTime: null,
-                departureTime: null
-            }];
+        if (type === "Trailer") {
+            let tripItem;
+            if (action === "PICK TRAILER") {
+                tripItem =
+                [{
+                    // xem xet lai id co the trung
+                    code: trailer?.id + "TRA1",
+                    type: "Trailer",
+                    facilityId: trailer?.facilityResponsiveDTO?.facilityId,
+                    facilityName: trailer?.facilityResponsiveDTO?.facilityName,
+                    facilityCode: trailer?.facilityResponsiveDTO?.facilityCode,
+                    action: action,
+                    orderCode: trailer?.trailerCode,
+                    longitude: trailer?.facilityResponsiveDTO?.longitude,
+                    latitude: trailer?.facilityResponsiveDTO?.latitude,
+                    trailerId: trailer?.trailerCode,
+                    arrivalTime: null,
+                    departureTime: null
+                }];
+                setTrailerSelect(trailer);
+            }
+            if (action === "DROP TRAILER") {
+                console.log("trailerSelect", trailerSelect);
+                if (!trailerSelect) {
+                    setMsg("Can't select add DROP TRAILER action while Trailer is not selected before!")
+                } else {
+                    tripItem = buildTripItem(trailerSelect, "TRA2", "Trailer", facility);
+                }
+            }
             console.log("tripItem", tripItem);
             setAddTripItem(tripItem);
             handleModal();
-            setType('');
-            setAction('');
-            setFacility();
-            setTrailer();
+            clearData();
         }
     }
-    
+    const buildTripItem = (obj, id, type, facilityTmp) => {
+        let tripItem = [{
+            code: obj?.id + id,
+            type: type,
+            facilityId: facilityTmp?.id,
+            facilityName: facilityTmp?.facilityName,
+            facilityCode: facilityTmp?.facilityCode,
+            action: action,
+            orderCode: type === "Truck" ? obj?.truckCode : obj?.trailerCode,
+            longitude: facilityTmp?.longitude,
+            latitude: facilityTmp?.latitude,
+            trailerId: type === "Truck" ? obj?.trailerCode : null,
+            arrivalTime: null,
+            departureTime: null
+        }];
+        return tripItem;
+    }
+    const handleCancel = () => {
+        clearData();
+        handleModal()
+    }
+    const clearData = () => {
+        setType('');
+        setMsg('');
+        setAction('');
+        setTrailer();
+        setFacility();
+    }
+
     return (
         <Modal
             open={openModal}
@@ -127,55 +159,6 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem}) => {
                             </FormControl>
                         </Box>
                     </Box>
-                    {type && type === "Trailer" ? (<Box className="body-modal-item">
-                        <Box className="body-modal-item-text">
-                            <Typography>Trailer:</Typography>
-                        </Box>
-                        <Box className="body-modal-item-input">
-                            <FormControl>
-                                <InputLabel id="demo-simple-select-label">trailer</InputLabel>
-                                <Select
-                                    value={trailer}
-                                    onChange={handleChangeTrailer}
-                                    label="facility"
-                                    inputProps={{ 'aria-label': 'Without label' }}
-                                >
-                                    {trailers ? (
-                                        trailers.map((item, index) => {
-                                            return (
-                                                <MenuItem value={item}>{item?.trailerCode} - {item?.facilityResponsiveDTO.facilityCode}</MenuItem>
-                                            );
-                                        })
-                                    ) : null}
-                                </Select>
-                            </FormControl>
-                        </Box>
-                    </Box>) : (
-                        <Box className="body-modal-item">
-                            <Box className="body-modal-item-text">
-                                <Typography>Facility:</Typography>
-                            </Box>
-                            <Box className="body-modal-item-input">
-                                <FormControl>
-                                    <InputLabel id="demo-simple-select-label">facility</InputLabel>
-                                    <Select
-                                        value={facility}
-                                        onChange={handleChange}
-                                        label="facility"
-                                        inputProps={{ 'aria-label': 'Without label' }}
-                                    >
-                                        {facilityList ? (
-                                            facilityList.map((item, key) => {
-                                                return (
-                                                    <MenuItem value={item.id}>{item.facilityName}</MenuItem>
-                                                );
-                                            })
-                                        ) : null}
-                                    </Select>
-                                </FormControl>
-                            </Box>
-                        </Box>
-                    )}
                     <Box className="body-modal-item">
                         <Box className="body-modal-item-text">
                             <Typography>Action:</Typography>
@@ -200,12 +183,89 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem}) => {
                             </FormControl>
                         </Box>
                     </Box>
+                    {type && type === "Trailer" && action && action === "PICK TRAILER" ? (<Box className="body-modal-item">
+                        <Box className="body-modal-item-text">
+                            <Typography>Trailer:</Typography>
+                        </Box>
+                        <Box className="body-modal-item-input">
+                            <FormControl>
+                                <InputLabel id="demo-simple-select-label">trailer</InputLabel>
+                                <Select
+                                    value={trailer}
+                                    onChange={handleChangeTrailer}
+                                    label="facility"
+                                    inputProps={{ 'aria-label': 'Without label' }}
+                                >
+                                    {trailers ? (
+                                        trailers.map((item, index) => {
+                                            return (
+                                                <MenuItem value={item}>{item?.trailerCode} - {item?.facilityResponsiveDTO.facilityCode}</MenuItem>
+                                            );
+                                        })
+                                    ) : null}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    </Box>) : null}
+                    {type && type === "Trailer" && action && action === "DROP TRAILER" ? (
+                        <Box className="body-modal-item">
+                            <Box className="body-modal-item-text">
+                                <Typography>Facility:</Typography>
+                            </Box>
+                            <Box className="body-modal-item-input">
+                                <FormControl>
+                                    <InputLabel id="demo-simple-select-label">facility</InputLabel>
+                                    <Select
+                                        value={facility}
+                                        onChange={handleChange}
+                                        label="facility"
+                                        inputProps={{ 'aria-label': 'Without label' }}
+                                    >
+                                        {facilityList ? (
+                                            facilityList.map((item, key) => {
+                                                return (
+                                                    <MenuItem value={item}>{item.facilityName}</MenuItem>
+                                                );
+                                            })
+                                        ) : null}
+                                    </Select>
+                                </FormControl>
+                            </Box>
+                        </Box>
+                    ) : null}
+                    {type && type === "Truck" && action && action === "STOP" ? (
+                        <Box className="body-modal-item">
+                            <Box className="body-modal-item-text">
+                                <Typography>Facility:</Typography>
+                            </Box>
+                            <Box className="body-modal-item-input">
+                                <FormControl>
+                                    <InputLabel id="demo-simple-select-label">facility</InputLabel>
+                                    <Select
+                                        value={facility}
+                                        onChange={handleChange}
+                                        label="facility"
+                                        inputProps={{ 'aria-label': 'Without label' }}
+                                    >
+                                        {facilityList ? (
+                                            facilityList.map((item, key) => {
+                                                return (
+                                                    <MenuItem value={item}>{item?.facilityName}</MenuItem>
+                                                );
+                                            })
+                                        ) : null}
+                                    </Select>
+                                </FormControl>
+                            </Box>
+                        </Box>
+                    ) : null}
+                    <Box>{msg}</Box>
                 </Box>
                 <Divider />
                 <Box className="footer-modal">
                     <Box className="btn-modal">
                         <Box>
-                            <Button variant="outlined" color="error" onClick={handleModal}>Cancel</Button>
+                            <Button variant="outlined" color="error" onClick={handleCancel}>Cancel</Button>
                         </Box>
                         <Box>
                             <Button variant="contained" onClick={handleSubmit}>Save</Button>

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Icon, Typography } from "@mui/material";
 import '../styles.scss';
 import { DragDropContext } from "react-beautiful-dnd";
 import { Droppable } from "react-beautiful-dnd";
@@ -10,6 +10,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import ModalTripItem from "../tripCreate/ModalTripItem";
 import { getTripItemByTripId } from "api/TripItemAPI";
+import { menuIconMap } from "config/menuconfig";
 
 
 const TripItem = ({ index, item, facilities, setFacilities }) => {
@@ -33,6 +34,10 @@ const TripItem = ({ index, item, facilities, setFacilities }) => {
         });
         //   setCounters(nextCounters);
     }
+    const handleDeleteTripItem = () => {
+        let facilitiesTmp = facilities.filter((tr) => tr?.code != item?.code);
+        setFacilities(facilitiesTmp);
+    }
     return (
         <Draggable key={item?.code} index={index} draggableId={item?.code}>
             {(provided, snapshot) => (
@@ -53,9 +58,17 @@ const TripItem = ({ index, item, facilities, setFacilities }) => {
                             ? '8px' : '0'
                     }}
                     className="item-facility"
-                    onClick={() => setOpen(!open)}
+
                 >
-                    <Box>{item?.orderCode} - {item?.facilityName} - {item?.action}</Box>
+                    <Box className="item-facility-line">
+                        <Box onClick={() => setOpen(!open)}>
+                            {item?.orderCode} - {item?.facilityName} - {item?.action}
+                        </Box>
+                        {(item?.type === "Trailer" || (item?.type === "Truck" && item?.action === "STOP")) ? (
+                        <Box onClick={handleDeleteTripItem}>
+                            <Icon>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                        </Box>) : <Box></Box>}
+                    </Box>
 
                     {open ?
                         (<Box>
@@ -101,12 +114,13 @@ const TripItem = ({ index, item, facilities, setFacilities }) => {
     )
 }
 
-const OrderArrangement = ({ ordersSelect, tripId, truckSelected, tripItems, flag }) => {
+const OrderArrangement = ({ ordersSelect, setTripItem, truckSelected, tripItems, flag }) => {
     const [facilities, setFacilities] = useState([]);
     const [facilitiesFinal, setFacilitiesFinal] = useState([]);
     const [open, setOpen] = useState(false);
     const [addTripItem, setAddTripItem] = useState([]);
     const [truckItem, setTruckItem] = useState([]);
+    const [trailer, setTrailer] = useState();
 
     const handleModal = () => {
         setOpen(!open);
@@ -164,7 +178,7 @@ const OrderArrangement = ({ ordersSelect, tripId, truckSelected, tripItems, flag
         if (flag) {
             console.log("facilitiesBefore111", truckItem);
             if (truckItem.length > 0) {
-                facilitiesTmp.shift()
+                facilitiesTmp.shift() // use filter
             }
             console.log("facilitiesBefore", facilitiesTmp);
             let facilitiesTmp2 = [];
@@ -258,7 +272,7 @@ const OrderArrangement = ({ ordersSelect, tripId, truckSelected, tripItems, flag
 
     useEffect(() => {
 
-        if (tripItems.length > 0) {
+        if (tripItems?.length > 0) {
             setFacilitiesFinal(tripItems);
             let truckItemtmp = [];
             truckItemtmp.push(tripItems[0]);
@@ -270,7 +284,10 @@ const OrderArrangement = ({ ordersSelect, tripId, truckSelected, tripItems, flag
 
         }
     }, [tripItems])
-    console.log("facilitiesFinal", facilitiesFinal)
+    useEffect(() => {
+        setTripItem(facilitiesFinal);
+    }, [facilitiesFinal]);
+    console.log("tripItems", tripItems)
     return (
         <Box className="facility-arrangment">
             <Box className="facility-arrangment-text">
@@ -291,7 +308,8 @@ const OrderArrangement = ({ ordersSelect, tripId, truckSelected, tripItems, flag
                     )}
                 </Droppable>
             </DragDropContext>
-            <ModalTripItem openModal={open} handleModal={handleModal} setAddTripItem={setAddTripItem} />
+            <ModalTripItem openModal={open} handleModal={handleModal} setAddTripItem={setAddTripItem} trailerSelect={trailer}
+                setTrailerSelect={setTrailer} truckSelected={truckSelected} />
         </Box>
     )
 }

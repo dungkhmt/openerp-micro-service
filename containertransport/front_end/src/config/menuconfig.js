@@ -24,6 +24,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import TeachingIcon from "assets/icons/mathematics.svg";
 import ContainerIcon from "assets/icons/container.svg";
 import TrailerIcon from "assets/icons/trailer.svg";
@@ -110,5 +111,6 @@ menuIconMap.set("AddIcon", <AddIcon />);
 menuIconMap.set("ControlPointIcon", <ControlPointIcon />);
 menuIconMap.set("OrderIcon", <ListAltIcon />);
 menuIconMap.set("ArrowBackIosIcon", <ArrowBackIosIcon />);
+menuIconMap.set("DeleteForeverIcon", <DeleteForeverIcon />);
 
 export const mapPathMenu = buildMapPathMenu(MENUS);

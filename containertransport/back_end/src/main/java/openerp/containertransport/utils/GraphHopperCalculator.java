@@ -5,7 +5,6 @@ import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.config.Profile;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.apache.commons.math3.util.Precision;
 
@@ -13,14 +12,15 @@ import java.math.BigDecimal;
 import java.util.Locale;
 
 @Component
-@RequiredArgsConstructor
 public class GraphHopperCalculator {
     private final GraphHopper graphHopper;
+    private final CommonResources commonResources;
 
-    public GraphHopperCalculator() {
+    public GraphHopperCalculator(CommonResources commonResources) {
+        this.commonResources = commonResources;
         this.graphHopper = new GraphHopper();
         graphHopper.setProfiles(new Profile("car").setVehicle("car").setWeighting("fastest").setTurnCosts(false));
-        graphHopper.setOSMFile("src/main/resources/osm/vietnam-latest.osm.pbf");
+        graphHopper.setOSMFile(String.valueOf(this.commonResources.getOsmPath()));
         graphHopper.setGraphHopperLocation("target/routing-graph-vietnam-latest-cache");
         graphHopper.importOrLoad();
     }
