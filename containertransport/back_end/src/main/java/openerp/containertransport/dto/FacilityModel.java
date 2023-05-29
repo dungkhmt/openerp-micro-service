@@ -2,6 +2,7 @@ package openerp.containertransport.dto;
 
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Getter
@@ -14,6 +15,10 @@ public class FacilityModel {
     private String facilityCode;
     private String facilityName;
     private String facilityType;
+    private String address;
+    private BigDecimal longitude;
+    private BigDecimal latitude;
+    private Long processingTime;
     private Integer maxNumberTruck;
     private Integer maxNumberTrailer;
     private Integer maxNumberContainer;

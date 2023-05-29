@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.MetaData;
 import openerp.containertransport.dto.OrderFilterRequestDTO;
 import openerp.containertransport.dto.OrderModel;
+import openerp.containertransport.dto.OrdersRes;
 import openerp.containertransport.dto.metaData.MetaDTO;
 import openerp.containertransport.dto.metaData.ResponseMetaData;
 import openerp.containertransport.entity.Order;
@@ -31,7 +32,7 @@ public class OrderController {
 
     @PostMapping("/")
     public ResponseEntity<?> filterOrder(@RequestBody OrderFilterRequestDTO orderFilterRequestDTO){
-        List<OrderModel> orderModels = orderService.filterOrders(orderFilterRequestDTO);
+        OrdersRes orderModels = orderService.filterOrders(orderFilterRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModels));
     }
 

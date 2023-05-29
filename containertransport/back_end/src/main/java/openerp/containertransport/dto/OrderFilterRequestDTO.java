@@ -6,4 +6,6 @@ import lombok.Data;
 public class OrderFilterRequestDTO {
     private String orderCode;
     private String status;
+    private Integer page;
+    private Integer pageSize;
 }

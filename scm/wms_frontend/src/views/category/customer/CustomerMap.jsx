@@ -1,7 +1,13 @@
 import { Typography } from "@mui/material";
 import { icon } from "leaflet";
 import { useRef } from "react";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Polyline,
+  Popup,
+  TileLayer,
+} from "react-leaflet";
 import { useLocation } from "react-router-dom";
 import withScreenSecurity from "../../../components/common/withScreenSecurity";
 
@@ -12,12 +18,45 @@ const customIcon = icon({
   iconSize: [40, 40], // set the size of the icon
   iconAnchor: [16, 0], // set the anchor point of the icon
 });
-
+const facIcon = icon({
+  iconUrl: require("../../../assets/images/inventory3.png"),
+  iconSize: [40, 40], // set the size of the icon
+  iconAnchor: [16, 0], // set the anchor point of the icon
+});
 function CustomerMapScreen({ screenAuthorization }) {
   const location = useLocation();
   const customer = location.state.customer;
   const markerRef = useRef(null);
 
+  const getAllFacilities = (customer) => {
+    // debugger;
+
+    const uniqueIds = [];
+
+    const uniqueFacilities = customer?.filter((element) => {
+      const isDuplicate = uniqueIds.includes(element?.facility?.id);
+
+      if (!isDuplicate) {
+        uniqueIds.push(element?.facility?.id);
+
+        return true;
+      }
+
+      return false;
+    });
+    return uniqueFacilities.map((cus) => cus?.facility);
+  };
+
+  const polyPoints = customer?.map((cus, index) => {
+    return [
+      [parseFloat(cus?.latitude), parseFloat(cus?.longitude)],
+      [
+        parseFloat(cus?.facility?.latitude),
+        parseFloat(cus?.facility?.longitude),
+      ],
+    ];
+  });
+  var facilities = getAllFacilities(customer);
   return (
     <MapContainer
       center={{ lat: 21.008330038713357, lng: 105.84273632066207 }}
@@ -49,6 +88,28 @@ function CustomerMapScreen({ screenAuthorization }) {
           </Popup>
         </Marker>
       ))}
+      {facilities?.map((fac, index) => (
+        <Marker
+          key={index}
+          position={[fac?.latitude, fac?.longitude]}
+          icon={facIcon}
+          ref={markerRef}
+        >
+          <Popup>
+            <Typography variant="h6"> {fac?.name}</Typography>
+            <Typography variant="body2">{fac?.phone} </Typography>
+          </Popup>
+        </Marker>
+      ))}
+      {polyPoints.map((points, index) => {
+        return (
+          <Polyline
+            key={index}
+            positions={[points ? points : []]}
+            pathOptions={{ color: "red" }}
+          />
+        );
+      })}
     </MapContainer>
   );
 }

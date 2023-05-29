@@ -7,7 +7,7 @@ import { useNotificationState } from "state/NotificationState";
 import NotFound from "views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import TeacherRouter from "./TeacherRouter";
-import TruckScreen from "views/truckManagement/TruckScreen";
+import TruckScreen from "views/truck/TruckScreen";
 import FacilityScreen from "views/facilityManagement/FacilityScreen";
 import OrderScreen from "views/order/OrderScreen";
 import ContainerScreen from "views/containerManagerment/ContainerScreen";
@@ -16,6 +16,7 @@ import { AppProvider } from "contextAPI/MyContext";
 import CreateTripDetail from "views/shipment/tripCreate/CreateTripDetail";
 import ShipmentDetail from "views/shipment/shipmentDetail/ShipmentDetail";
 import TripDetail from "views/shipment/tripDetail/TripDetail";
+import TrailerScreen from "views/trailer/TrailerScreen";
 
 const styles = {
   loadingProgress: {
@@ -48,11 +49,11 @@ function MainAppRouter(props) {
           <PrivateRoute component={FacilityScreen} path="/facility" />
           <PrivateRoute component={OrderScreen} path="/order" />
           <PrivateRoute component={ContainerScreen} path="/container" />
-          {/* <Route component={ShipmentScreen} path="/trailer" /> */}
+          <Route component={TrailerScreen} path="/trailer" />
           <AppProvider>
             <Route component={ShipmentScreen} exact path="/shipment" />
             <Route component={ShipmentDetail} exact path="/shipment/detail/:shipmentId" />
-            <Route component={TripDetail} exact path="/shipment/trip/detail/:tripId" />
+            <Route component={TripDetail} exact path="/shipment/trip/detail/:shipmentId/:tripId" />
             {/* <Route path="/shipment/create">
               <TripScreen />
             </Route> */}

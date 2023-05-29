@@ -5,6 +5,7 @@ import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.dto.ShipmentFilterRequestDTO;
 import openerp.containertransport.dto.ShipmentModel;
+import openerp.containertransport.dto.ShipmentRes;
 import openerp.containertransport.dto.TripModel;
 import openerp.containertransport.entity.Shipment;
 import openerp.containertransport.repo.ShipmentRepo;
@@ -55,15 +56,26 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public List<ShipmentModel> filterShipment(ShipmentFilterRequestDTO requestDTO) {
+    public ShipmentRes filterShipment(ShipmentFilterRequestDTO requestDTO) {
+        ShipmentRes shipmentRes = new ShipmentRes();
         String sql = "SELECT * FROM container_transport_shipment WHERE 1=1";
+        String sqlCount = "SELECT COUNT(id) FROM container_transport_shipment WHERE 1=1";
         HashMap<String, Object> params = new HashMap<>();
         if (requestDTO.getStatus() != null) {
             sql += " AND status = :status";
+            sqlCount += " AND status = :status";
             params.put("status", requestDTO.getStatus());
         }
-
+        Query queryCount = this.entityManager.createNativeQuery(sqlCount);
+        shipmentRes.setCount((Long) queryCount.getSingleResult());
         sql += " ORDER BY updated_at DESC";
+        if (requestDTO.getPage() != null && requestDTO.getPageSize() != null) {
+            sql += " LIMIT :pageSize OFFSET :index";
+            params.put("pageSize", requestDTO.getPageSize());
+            params.put("index", requestDTO.getPage() * requestDTO.getPageSize());
+            shipmentRes.setPage(requestDTO.getPage());
+            shipmentRes.setPageSize(requestDTO.getPageSize());
+        }
         Query query = this.entityManager.createNativeQuery(sql, Shipment.class);
         for (String i : params.keySet()) {
             query.setParameter(i, params.get(i));
@@ -71,8 +83,8 @@ public class ShipmentServiceImpl implements ShipmentService {
         List<Shipment> shipments = query.getResultList();
         List<ShipmentModel> shipmentModels = new ArrayList<>();
         shipments.forEach((item) -> shipmentModels.add(convertToModel(item)));
-
-        return shipmentModels;
+        shipmentRes.setShipmentModels(shipmentModels);
+        return shipmentRes;
     }
 
     @Override

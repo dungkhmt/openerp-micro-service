@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import wms.common.constant.DefaultConst;
 import wms.dto.product.ProductDTO;
 import wms.dto.product.ProductDiscountDTO;
@@ -25,16 +26,16 @@ public class ProductController extends BaseController {
     @Autowired
     private ProductUnitRepo productUnitRepo;
 
-//    @ApiOperation(value = "Thêm mới sản phẩm từ file excel", notes = "{}")
-//    @PostMapping("/create-from-file")
-//    public ResponseEntity<?> createProductFromExcelFile(@RequestParam("file") MultipartFile multipartFile) {
-//        try {
-//            return response(new ResultEntity(1, "Import product successfully", productService.createProductFromExcel(multipartFile)));
-//        } catch (Exception ex) {
-//            log.error("Import products from excel file failed!");
-//            return response(error(ex));
-//        }
-//    }
+    @ApiOperation(value = "Thêm mới sản phẩm từ file excel", notes = "{}")
+    @PostMapping("/create-from-file")
+    public ResponseEntity<?> createProductFromExcelFile(@RequestParam("file") MultipartFile multipartFile) {
+        try {
+            return response(new ResultEntity(1, "Import product successfully", productService.createProductFromExcel(multipartFile)));
+        } catch (Exception ex) {
+            log.error("Import products from excel file failed!");
+            return response(error(ex));
+        }
+    }
     @ApiOperation(value = "Thêm mới sản phẩm")
     @PostMapping("/create")
     public ResponseEntity<?> create(@Valid @RequestBody ProductDTO productDTO) {
@@ -55,6 +56,15 @@ public class ProductController extends BaseController {
     ) {
         try {
             return response(new ResultEntity(1, "Get list product successfully", productService.getAllProducts(page, pageSize, sortField, isSortAsc)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @GetMapping("/get-all-without-paging")
+    public ResponseEntity<?> getAllNoPaging(
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get list products successfully", productService.getAllWithoutPaging()));
         } catch (Exception ex) {
             return response(error(ex));
         }

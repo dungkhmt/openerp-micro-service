@@ -9,6 +9,7 @@ import com.hust.wmsbackend.management.auto.DistanceCalculator;
 import com.hust.wmsbackend.management.entity.Warehouse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.util.Precision;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -20,10 +21,17 @@ public class GraphHopperCalculator implements DistanceCalculator {
 
     private final GraphHopper graphHopper;
 
-    public GraphHopperCalculator() {
+    public GraphHopperCalculator(@Value("${osm-file-path}") String osmFilePath) {
         this.graphHopper = new GraphHopper();
-        graphHopper.setProfiles(new Profile("car").setVehicle("car").setWeighting("fastest").setTurnCosts(false));
-        graphHopper.setOSMFile("src/main/resources/osm/vietnam-latest.osm.pbf");
+
+        graphHopper.setProfiles(
+                new Profile("car")
+                        .setVehicle("car")
+                        .setWeighting("fastest")
+                        .setTurnCosts(false)
+        );
+
+        graphHopper.setOSMFile(osmFilePath);
         graphHopper.setGraphHopperLocation("target/routing-graph-vietnam-latest-cache");
         graphHopper.importOrLoad();
     }
@@ -33,13 +41,13 @@ public class GraphHopperCalculator implements DistanceCalculator {
         Map<UUID, Double> map = new HashMap<>();
         for (Warehouse warehouse : warehouses) {
             GHRequest request = new GHRequest(roundBigDecimal(warehouse.getLatitude()), roundBigDecimal(warehouse.getLongitude()),
-                                              roundDouble(cusAddLat), roundDouble(cusAddLon)).setProfile("car")
-                                                                                             .setLocale(Locale.US);
+                    roundDouble(cusAddLat), roundDouble(cusAddLon)).setProfile("car")
+                    .setLocale(Locale.US);
             GHResponse response = graphHopper.route(request);
             ResponsePath path = response.getBest(); // try catch here
             if (path == null) {
                 log.warn(String.format("Not path found for warehouse %s to CustomerAddress(lon:%f, lat:%f)",
-                                       warehouse.getWarehouseId(), cusAddLon, cusAddLat));
+                        warehouse.getWarehouseId(), cusAddLon, cusAddLat));
                 continue;
             }
             double distance = path.getDistance();
@@ -51,8 +59,8 @@ public class GraphHopperCalculator implements DistanceCalculator {
     @Override
     public ResponsePath calculate(BigDecimal fromLat, BigDecimal fromLon, BigDecimal toLat, BigDecimal toLon) {
         GHRequest request = new GHRequest(roundBigDecimal(fromLat), roundBigDecimal(fromLon),
-                                          roundBigDecimal(toLat), roundBigDecimal(toLon))
-            .setProfile("car").setLocale(Locale.US);
+                roundBigDecimal(toLat), roundBigDecimal(toLon))
+                .setProfile("car").setLocale(Locale.US);
         GHResponse response = graphHopper.route(request);
         ResponsePath path = response.getBest();
         if (path == null) {

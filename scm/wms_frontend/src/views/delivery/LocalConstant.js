@@ -234,6 +234,28 @@ export const truckCols = [
     },
   },
   {
+    field: "name",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Tên xe tải",
+    sortable: false,
+    minWidth: 200,
+    // valueFormatter: (params) => {
+    //   return `${params.value} kg`;
+    // },
+  },
+  {
+    field: "size",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Kích thước (dài, rộng, cao)",
+    sortable: false,
+    minWidth: 200,
+    // valueFormatter: (params) => {
+    //   return `${params.value} kg`;
+    // },
+  },
+  {
     field: "capacity",
     headerAlign: "center",
     align: "center",
@@ -277,6 +299,20 @@ export const truckCols = [
       return `${params.value} m/s`;
     },
   },
+  {
+    field: "managedBy",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Người phụ trách",
+    sortable: false,
+    minWidth: 200,
+    valueGetter: (params) => {
+      return params?.row?.userLogin?.id;
+    },
+    // valueFormatter: (params) => {
+    //   return `${params.value} kg`;
+    // },
+  },
 ];
 export const droneCols = [
   {
@@ -292,6 +328,17 @@ export const droneCols = [
         </Typography>
       );
     },
+  },
+  {
+    field: "name",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Tên drone",
+    sortable: false,
+    minWidth: 200,
+    // valueFormatter: (params) => {
+    //   return `${params.value} kg`;
+    // },
   },
   {
     field: "durationTime",

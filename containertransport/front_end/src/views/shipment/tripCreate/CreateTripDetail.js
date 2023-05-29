@@ -21,8 +21,7 @@ const CreateTripDetail = () => {
     const [orders, setOrders] = useState([]);
     const [ordersSelect, setOrdersSelect] = useState([]);
     const [truckSelect, setTruckSelect] = useState();
-    const [map, setMap] = useState();
-    const [test, setTest] = useState("anhvu");
+    const [flag, setFlag] = useState(false);
 
     const [tripItems, setTripItem] = useState([]);
     const history = useHistory();
@@ -46,13 +45,6 @@ const CreateTripDetail = () => {
             });
         }
         return check;
-    }
-    const updateScheduler = (orderSubmir) => {
-        let truckSchedulerUpdate = truckScheduler
-        truckSchedulerUpdate.push(truck);
-        setTruckScheduler(truckSchedulerUpdate);
-        let ordersSchedulerUpdate = ordersScheduler;
-        setOrderScheduler(ordersSchedulerUpdate.concat(orderSubmir));
     }
 
     useEffect(() => {
@@ -83,7 +75,7 @@ const CreateTripDetail = () => {
         // }
     }, [])
     const handleCancelCreateTrip = () => {
-        history.goBack();
+        history.push(`/shipment/detail/${shipmentId}`);
     }
     const handleSubmit = () => {
         let orderSubmir = [];
@@ -160,10 +152,10 @@ const CreateTripDetail = () => {
             <Box className="content-trip">
                 <Box className="content-truck-and-orders">
                     <TruckAndOrder trucks={trucks} setTruck={setTruck} truckSelected={truckSelect} setTruckSelect={setTruckSelect}
-                        orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} />
+                        orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} setFlag={setFlag}/>
                 </Box>
                 <Box className="order-arrangement">
-                    <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} />
+                    <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} flag={flag} />
                 </Box>
                 <Box className="map-order">
                     <Box>

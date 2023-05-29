@@ -9,10 +9,10 @@ import wms.entity.Customer;
 import java.util.List;
 
 public interface CustomerRepo extends JpaRepository<Customer, Long> {
-    @Query(value = "select * from scm_customer", nativeQuery = true)
+    @Query(value = "select * from scm_customer where is_deleted = 0", nativeQuery = true)
     Page<Customer> search(Pageable pageable);
     Customer getCustomerById(long id);
     Customer getCustomerByCode(String code);
-    @Query(value = "select * from scm_customer", nativeQuery = true)
+    @Query(value = "select * from scm_customer where is_deleted = 0", nativeQuery = true)
     List<Customer> getAllCustomers();
 }

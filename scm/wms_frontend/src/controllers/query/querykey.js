@@ -2,6 +2,7 @@ export const queryKey = {
   category: {
     customer_list: "customer_list",
     product_list: "product_list",
+    product_list_no_paging: "product_list_no_paging",
     product_cate_list: "product_cate_list",
     product_unit_list: "product_unit_list",
     dist_channel_list: "dist_channel_list",
@@ -20,6 +21,7 @@ export const queryKey = {
   },
   facility: {
     facility_list: "facility_list",
+    facility_list_no_paging: "facility_list_no_paging",
     facility_inventory: "facility_inventory",
   },
   receipt_bill: {

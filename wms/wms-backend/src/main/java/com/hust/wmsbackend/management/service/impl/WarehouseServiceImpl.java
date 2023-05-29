@@ -1,16 +1,11 @@
 package com.hust.wmsbackend.management.service.impl;
 
-import com.hust.wmsbackend.management.entity.Bay;
-import com.hust.wmsbackend.management.entity.InventoryItem;
-import com.hust.wmsbackend.management.entity.Product;
-import com.hust.wmsbackend.management.entity.Warehouse;
+import com.hust.wmsbackend.management.cache.RedisCacheService;
+import com.hust.wmsbackend.management.entity.*;
 import com.hust.wmsbackend.management.model.WarehouseWithBays;
 import com.hust.wmsbackend.management.model.response.ProductWarehouseResponse;
 import com.hust.wmsbackend.management.model.response.WarehouseDetailsResponse;
-import com.hust.wmsbackend.management.repository.BayRepository;
-import com.hust.wmsbackend.management.repository.InventoryItemRepository;
-import com.hust.wmsbackend.management.repository.ProductV2Repository;
-import com.hust.wmsbackend.management.repository.WarehouseRepository;
+import com.hust.wmsbackend.management.repository.*;
 import com.hust.wmsbackend.management.service.WarehouseService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +26,18 @@ public class WarehouseServiceImpl implements WarehouseService {
     private WarehouseRepository warehouseRepository;
     private InventoryItemRepository inventoryItemRepository;
     private ProductV2Repository productRepository;
+    private SaleOrderItemRepository saleOrderItemRepository;
+
+    private RedisCacheService redisCacheService;
+
+    private List<Warehouse> getWarehouseInCacheElseDatabase() {
+        List<Warehouse> warehouses = redisCacheService.getCachedListObject(RedisCacheService.ALL_WAREHOUSES_KEY, Warehouse.class);
+        if (warehouses == null) {
+            warehouses = warehouseRepository.findAll();
+            redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_WAREHOUSES_KEY, warehouses);
+        }
+        return warehouses;
+    }
 
     @Transactional
     @Override
@@ -93,7 +100,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public List<Warehouse> getAllWarehouseGeneral() {
         log.info("Start get all warehouse in service");
-        List<Warehouse> response = warehouseRepository.findAll();
+        List<Warehouse> response = getWarehouseInCacheElseDatabase();
         // TODO: Filter by company or something else... user can not view all facility in database
         log.info(String.format("Get %d facilities", response.size()));
         return response;
@@ -160,7 +167,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public List<WarehouseWithBays> getAllWarehouseDetail() {
-        List<Warehouse> warehouseGeneral = warehouseRepository.findAll();
+        List<Warehouse> warehouseGeneral = getWarehouseInCacheElseDatabase() ;
         return warehouseGeneral.stream()
                                .map(general -> getById(general.getWarehouseId().toString()))
                                .collect(Collectors.toList());
@@ -214,7 +221,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public Map<UUID, String> getWarehouseNameMap() {
-        List<Warehouse> warehouses = warehouseRepository.findAll();
+        List<Warehouse> warehouses = getWarehouseInCacheElseDatabase();
         Map<UUID, String> map = new HashMap<>();
         for (Warehouse warehouse : warehouses) {
             map.put(warehouse.getWarehouseId(), warehouse.getName());
@@ -223,24 +230,45 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public List<WarehouseDetailsResponse> getAllWarehouseDetailWithProducts() {
-        List<WarehouseWithBays> warehouses = getAllWarehouseDetail();
+    public List<WarehouseDetailsResponse> getAllWarehouseDetailWithProducts(String orderId) {
+        // chỉ lấy các warehouse có hàng của order
+        List<SaleOrderItem> items = saleOrderItemRepository.findAllByOrderId(UUID.fromString(orderId));
+        Set<UUID> productIds = items.stream().map(SaleOrderItem::getProductId).collect(Collectors.toSet());
+
+        List<WarehouseWithBays> warehouses = getAllWarehouseHavingProducts(productIds);
         List<WarehouseDetailsResponse> response = new ArrayList<>();
         for (WarehouseWithBays warehouse : warehouses) {
+            // chỉ lấy các bay có product của order cần tìm
+            List<ProductWarehouseResponse.ProductWarehouseDetailResponse> products = getProductInWarehouse(warehouse.getId())
+                    .getProducts()
+                    .stream()
+                    .filter(product -> productIds.contains(UUID.fromString(product.getProductId())))
+                    .collect(Collectors.toList());
             WarehouseDetailsResponse adder = WarehouseDetailsResponse
                 .builder()
                 .info(warehouse)
-                .items(getProductInWarehouse(warehouse.getId()).getProducts())
+                .items(products)
                 .build();
             response.add(adder);
         }
         return response;
     }
 
+    private List<WarehouseWithBays> getAllWarehouseHavingProducts(Set<UUID> productIds) {
+        Set<UUID> warehouseIds = new HashSet<>();
+        for (UUID productId : productIds) {
+            List<Warehouse> warehouses = warehouseRepository.getWarehousesByProductId(productId);
+            warehouseIds.addAll(warehouses.stream().map(Warehouse::getWarehouseId).collect(Collectors.toSet()));
+        }
+        return warehouseIds.stream()
+                .map(warehouseId -> getById(warehouseId.toString()))
+                .collect(Collectors.toList());
+    }
+
     @Override
     public List<Warehouse> getAllWarehousesHaveProductIds(List<UUID> productIds) {
         List<Warehouse> response = new ArrayList<>();
-        List<Warehouse> warehouses = warehouseRepository.findAll();
+        List<Warehouse> warehouses = getWarehouseInCacheElseDatabase();
         for (Warehouse warehouse : warehouses) {
             List<InventoryItem> inventoryItems = inventoryItemRepository.findAllByWarehouseId(warehouse.getWarehouseId());
             for (InventoryItem item : inventoryItems) {

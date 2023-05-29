@@ -2,6 +2,7 @@ import { MenuItem, Select } from "@mui/material"
 
 export const ProductDropDown = ({ productList, setSelectedProductId, setSelectedProductName }) => {
   return <Select onChange={(e, v) => {
+        console.log("Selected product id in dro pdown log => ", e.target.value);
         setSelectedProductId(e.target.value);
         setSelectedProductName(v?.props.children);
       }} defaultValue={""}>
@@ -35,6 +36,20 @@ export const BayDropDown = ({ selectedWarehouse, setSelectedBayId, setSelectedBa
       selectedWarehouse?.listShelf?.length > 0 &&
       selectedWarehouse?.listShelf?.map(bay => 
         <MenuItem key={bay.id} value={bay.id}>{bay.code}</MenuItem>)
+    }
+  </Select>
+}
+
+export const BayDropDownHavingProduct = ({ selectedWarehouseItems, setSelectedBayId, setSelectedBayCode, productId }) => {
+  console.log("selectedWarehouseItems: ", selectedWarehouseItems, ", productId: ", productId);
+  return <Select onChange={(e, v) => {
+      setSelectedBayId(e.target.value); 
+      setSelectedBayCode(v?.props?.children);
+      }} defaultValue={""}>
+    {
+      selectedWarehouseItems?.length > 0 &&
+      selectedWarehouseItems.filter(item => item.productId == productId && item.quantity > 0).map(item => 
+        <MenuItem key={item.bayId} value={item.bayId}>{item.bayCode}</MenuItem>)
     }
   </Select>
 }

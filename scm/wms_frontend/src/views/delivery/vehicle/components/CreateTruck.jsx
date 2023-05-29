@@ -29,6 +29,8 @@ const CreateTruck = ({ setIsAdd }) => {
       transportCostPerUnit: data?.transportCostPerUnit,
       userManaged: data?.userManaged?.name,
       waitingCost: data?.waitingCost,
+      size: data?.size,
+      name: data?.name,
     };
     await createTruckQuery.mutateAsync(truckParams);
     setIsAdd((pre) => !pre);
@@ -36,6 +38,42 @@ const CreateTruck = ({ setIsAdd }) => {
   };
   return (
     <FormProvider {...methods}>
+      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+        <Controller
+          key={"name"}
+          control={control}
+          name={"name"}
+          render={({ field: { onChange, value } }) => (
+            <CustomInput
+              required={true}
+              value={value}
+              type={"text"}
+              onChange={onChange}
+              label={"Tên xe"}
+              isFullWidth={true}
+              error={!!errors["name"]}
+              message={errors["name"]?.message}
+            />
+          )}
+        />
+        <Controller
+          key={"size"}
+          control={control}
+          name={"size"}
+          render={({ field: { onChange, value } }) => (
+            <CustomInput
+              required={true}
+              value={value}
+              type={"text"}
+              onChange={onChange}
+              label={"Kích thước (dài, rộng, cao) (m)"}
+              isFullWidth={true}
+              error={!!errors["size"]}
+              message={errors["size"]?.message}
+            />
+          )}
+        />
+      </Stack>
       <Stack direction="row" justifyContent={"space-around"} spacing={5}>
         <Controller
           key={"capacity"}
@@ -47,7 +85,7 @@ const CreateTruck = ({ setIsAdd }) => {
               value={value}
               type={"number"}
               onChange={onChange}
-              label={"Trọng lượng tối đa"}
+              label={"Trọng lượng tối đa (kg)"}
               isFullWidth={true}
               error={!!errors["capacity"]}
               message={errors["capacity"]?.message}
@@ -64,7 +102,7 @@ const CreateTruck = ({ setIsAdd }) => {
               value={value}
               type={"number"}
               onChange={onChange}
-              label={"Tốc độ"}
+              label={"Tốc độ (m/s)"}
               isFullWidth={true}
               error={!!errors["speed"]}
               message={errors["speed"]?.message}
@@ -100,7 +138,7 @@ const CreateTruck = ({ setIsAdd }) => {
               value={value}
               type={"number"}
               onChange={onChange}
-              label={"Phí vận chuyển"}
+              label={"Phí vận chuyển (đ)"}
               isFullWidth={true}
               error={!!errors["transportCostPerUnit"]}
               message={errors["transportCostPerUnit"]?.message}

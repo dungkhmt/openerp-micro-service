@@ -17,4 +17,5 @@ public class DroneDTO {
     @Positive(message = "Phi cho doi phai duong")
     double waitingCost;
     String userManaged;
+    String name;
 }

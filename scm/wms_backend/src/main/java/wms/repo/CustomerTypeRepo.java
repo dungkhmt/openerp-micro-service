@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import wms.entity.CustomerType;
 
 public interface CustomerTypeRepo  extends JpaRepository<CustomerType, Long> {
-    @Query(value = "select * from scm_customer_type", nativeQuery = true)
+    @Query(value = "select * from scm_customer_type where is_deleted = 0", nativeQuery = true)
     Page<CustomerType> search(Pageable pageable);
 
     CustomerType getCustomerTypeById(long id);

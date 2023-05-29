@@ -106,7 +106,7 @@ export default function CustomizedDialogs(props) {
   const {
     open,
     title,
-    styles: customStyles,
+    customStyles,
     centerTitle,
     contentTopDivider,
     contentBottomDivider,

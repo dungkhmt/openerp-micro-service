@@ -271,11 +271,7 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
                 updateProductWarehouses.add(productWarehouse);
             }
         }
-        if (numFailItems > 0) {
-            trip.setStatus(DeliveryTripStatus.FAIL);
-        } else {
-            trip.setStatus(DeliveryTripStatus.DONE);
-        }
+        trip.setStatus(DeliveryTripStatus.DONE);
         deliveryTripRepository.save(trip);
         saleOrderService.updateStatusByDeliveryTripItem(items.stream().map(DeliveryTripItem::getOrderId).collect(Collectors.toSet()));
         inventoryItemRepository.saveAll(updateInventoryItems);

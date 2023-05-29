@@ -8,9 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.vehicle.DroneDTO;
 import wms.dto.vehicle.TruckDTO;
+import wms.entity.DistributingChannel;
 import wms.entity.DroneEntity;
 import wms.entity.TruckEntity;
 import wms.entity.UserLogin;
@@ -39,9 +41,15 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
     @Transactional(rollbackFor = Exception.class)
     public TruckEntity createTruck(TruckDTO truckDTO) throws CustomException {
         UserLogin userLogin = userRepo.getUserByUserLoginId(truckDTO.getUserManaged());
+        TruckEntity truck = truckRepo.getTruckFromUser(truckDTO.getUserManaged());
+        if (truck != null) {
+            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "User has been in charged of another truck");
+        }
         TruckEntity newTruck = TruckEntity.builder()
                 .code("TRUCK" + GeneralUtils.generateCodeFromSysTime())
                 .capacity(truckDTO.getCapacity())
+                .size(truckDTO.getSize())
+                .name(truckDTO.getName())
                 .speed(truckDTO.getSpeed())
                 .transportCostPerUnit(truckDTO.getTransportCostPerUnit())
                 .waitingCost(truckDTO.getWaitingCost())
@@ -80,12 +88,27 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
     }
 
     @Override
+    public void deleteTruckByCode(String code) throws CustomException {
+        TruckEntity truck = getTruckByCode(code);
+        if (truck == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Truck does not exists, can't delete");
+        }
+        truck.setDeleted(1);
+        truckRepo.save(truck);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public DroneEntity createDrone(DroneDTO droneDTO) throws CustomException {
         UserLogin userLogin = userRepo.getUserByUserLoginId(droneDTO.getUserManaged());
+        DroneEntity truck = droneRepo.getDroneFromUser(droneDTO.getUserManaged());
+        if (truck != null) {
+            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "User has been in charged of another drone");
+        }
         DroneEntity newDrone = DroneEntity.builder()
                 .code("DRONE" + GeneralUtils.generateCodeFromSysTime())
                 .capacity(droneDTO.getCapacity())
+                .name(droneDTO.getName())
                 .speed(droneDTO.getSpeed())
                 .durationTime(droneDTO.getDuration())
                 .transportCostPerUnit(droneDTO.getTransportCostPerUnit())
@@ -122,5 +145,15 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
     @Override
     public void deleteDroneById(long id) {
         droneRepo.deleteById(id);
+    }
+
+    @Override
+    public void deleteDroneByCode(String code) throws CustomException {
+        DroneEntity drone = getDroneByCode(code);
+        if (drone == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Drone does not exists, can't delete");
+        }
+        drone.setDeleted(1);
+        droneRepo.save(drone);
     }
 }

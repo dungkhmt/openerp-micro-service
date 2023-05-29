@@ -23,8 +23,8 @@ public class BaseEntity {
     @Column(name = "uid")
     private String uid;
 
-//    @Column(name = "col_deleted", columnDefinition = "integer default 0")
-//    private int deleted;
+    @Column(name = "is_deleted", columnDefinition = "integer default 0")
+    private int deleted;
 
     @PrePersist
     public void prePersist() {

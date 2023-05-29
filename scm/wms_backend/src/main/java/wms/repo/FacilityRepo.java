@@ -9,11 +9,11 @@ import wms.entity.Facility;
 import java.util.List;
 
 public interface FacilityRepo extends JpaRepository<Facility, Long> {
-    @Query(value = "select * from scm_facility", nativeQuery = true)
+    @Query(value = "select * from scm_facility where is_deleted = 0", nativeQuery = true)
     Page<Facility> search(Pageable pageable);
     Facility getFacilityById(long id);
     Facility getFacilityByCode(String code);
 
-    @Query(value = "select * from scm_facility", nativeQuery = true)
+    @Query(value = "select * from scm_facility where is_deleted = 0", nativeQuery = true)
     List<Facility> getAllFacility();
 }

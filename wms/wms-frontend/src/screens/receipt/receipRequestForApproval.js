@@ -128,7 +128,7 @@ const ReceiptRequestForApproval = ( props ) => {
                     InputProps={{
                       readOnly: true,
                     }}
-                    value={convertTimeStampToDate(receiptInfo?.createdDate)} />
+                    value={receiptInfo?.createdDate} />
                 </Grid>
                 <Grid item xs={6}>
                   <Box className={classes.labelInput}>
@@ -143,7 +143,7 @@ const ReceiptRequestForApproval = ( props ) => {
                     InputProps={{
                       readOnly: true,
                     }}
-                    value={convertTimeStampToDate(receiptInfo?.expectedReceiveDate)} />
+                    value={receiptInfo?.expectedReceiveDate} />
                 </Grid>
                 <Grid item xs={12}>
                   <Box className={classes.labelInput}>

@@ -14,5 +14,5 @@ import java.util.List;
 @Builder
 public class WarehouseDetailsResponse {
     private WarehouseWithBays info;
-    private List<ProductWarehouseResponse.ProductWarehouseDetailResponse> items;
+    private List<ProductWarehouseResponse.ProductWarehouseDetailResponse> items; // lưu danh sách các product có trong kho
 }

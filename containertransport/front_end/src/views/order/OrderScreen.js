@@ -4,21 +4,22 @@ import React, { useEffect, useState } from "react";
 import './styles.scss';
 import ContentsOrderManagerment from "./ContentsOrderManagerment";
 import HeaderOrderScreen from "./HeaderOrderScreen";
+import { getOrders } from "api/OrderAPI";
 
 const OrderScreen = () => {
     const [orders, setOrders] = useState([]);
     const [toastOpen, setToast] = useState(false);
     const [toastType, setToastType] = useState();
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [count, setCount] = useState(0);
 
     useEffect(() => {
-        request(
-            "post",
-            `/order/`, {}, {}, {}, {},
-        ).then((res) => {
-            console.log("order==========", res.data)
-            setOrders(res.data.data);
+        getOrders({page: page, pageSize: rowsPerPage}).then((res) => {
+            setOrders(res.data.data.orderModels);
+            setCount(res.data.data.count);
         });
-    }, [toastOpen])
+    }, [toastOpen, page, rowsPerPage])
     return (
         <Box className="fullScreen">
             <Container maxWidth="md" className="container">
@@ -39,7 +40,8 @@ const OrderScreen = () => {
                 <Box className="divider">
                     <Divider />
                 </Box>
-                <ContentsOrderManagerment orders={orders} />
+                <ContentsOrderManagerment orders={orders} page={page} setPage={setPage}
+                rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count}/>
             </Container>
         </Box>
     );

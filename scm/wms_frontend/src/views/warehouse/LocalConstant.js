@@ -74,8 +74,8 @@ export const staticWarehouseCols = [
     align: "center",
     headerName: "Tên kho",
     sortable: false,
-    minWidth: 200,
-    maxWidth: 300,
+    minWidth: 300,
+    maxWidth: 400,
     renderCell: (params) => {
       return (
         <Typography sx={{ fontWeight: "500" }}>{params?.row?.name}</Typography>
@@ -116,9 +116,9 @@ export const staticWarehouseCols = [
     field: "status",
     headerName: "Trạng thái",
     sortable: false,
-    width: 125,
-    minWidth: 150,
-    maxWidth: 200,
+    minWidth: 50,
+    headerAlign: "center",
+    align: "center",
     renderCell: (params) => {
       return (
         <Button

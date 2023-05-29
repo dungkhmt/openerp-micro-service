@@ -117,7 +117,7 @@ export const queryClient = new QueryClient({
   },
 });
 
-function App() {
+function App() { 
   // TODO: Consider remove this logic!
   const logout = () => {
     menuState.permittedFunctions.set(new Set());

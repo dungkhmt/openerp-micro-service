@@ -327,6 +327,13 @@
         margin-top: 16px;
         width: fit-content;
     }
+    .item-facility-line{
+        display: flex;
+        justify-content: space-between;
+        .MuiSvgIcon-root {
+            color: rgb(141, 141, 141);
+        }
+    }
 }
 .trip-detail {
     padding: 8px 32px;

@@ -88,6 +88,17 @@ public class VehicleController extends BaseController {
             return response(error(ex));
         }
     }
+    @DeleteMapping(path = "/truck/remove")
+    public ResponseEntity<?> deleteTruckByCode(
+            @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code
+    ) {
+        try {
+            vehicleService.deleteTruckByCode(code);
+            return response(new ResultEntity(1, "Delete truck successfully", code));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
     /**
      * Drone
      */
@@ -145,6 +156,17 @@ public class VehicleController extends BaseController {
         try {
             vehicleService.deleteDroneById(id);
             return response(new ResultEntity(1, "Delete drone successfully", id));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @DeleteMapping(path = "/drone/remove")
+    public ResponseEntity<?> deleteDroneByCode(
+            @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code
+    ) {
+        try {
+            vehicleService.deleteDroneByCode(code);
+            return response(new ResultEntity(1, "Delete drone successfully", code));
         } catch (Exception ex) {
             return response(error(ex));
         }

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import openerp.containertransport.dto.FacilityResponsiveDTO;
 import openerp.containertransport.dto.OrderFilterRequestDTO;
 import openerp.containertransport.dto.OrderModel;
+import openerp.containertransport.dto.OrdersRes;
 import openerp.containertransport.entity.Container;
 import openerp.containertransport.entity.Facility;
 import openerp.containertransport.entity.Order;
@@ -67,18 +68,34 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderModel> filterOrders(OrderFilterRequestDTO orderFilterRequestDTO) {
+    public OrdersRes filterOrders(OrderFilterRequestDTO orderFilterRequestDTO) {
+        OrdersRes ordersRes = new OrdersRes();
+
         String sql = "SELECT * FROM container_transport_order WHERE 1=1";
+        String sqlCount = "SELECT COUNT(id) FROM container_transport_order WHERE 1=1";
         HashMap<String, Object> params = new HashMap<>();
+
         if(orderFilterRequestDTO.getOrderCode() != null){
             sql += " AND order_code = :orderCode";
+            sqlCount += " AND order_code = :orderCode";
             params.put("orderCode", orderFilterRequestDTO.getOrderCode());
         }
         if(orderFilterRequestDTO.getStatus() != null){
             sql += " AND status = :status";
+            sqlCount += " AND status = :status";
             params.put("status", orderFilterRequestDTO.getStatus());
         }
+        Query queryCount = this.entityManager.createNativeQuery(sqlCount);
+        ordersRes.setCount((Long) queryCount.getSingleResult());
         sql += " ORDER BY updated_at DESC";
+
+        if (orderFilterRequestDTO.getPage() != null && orderFilterRequestDTO.getPageSize() != null) {
+            sql += " LIMIT :pageSize OFFSET :index";
+            params.put("pageSize", orderFilterRequestDTO.getPageSize());
+            params.put("index", orderFilterRequestDTO.getPage() * orderFilterRequestDTO.getPageSize());
+            ordersRes.setPage(orderFilterRequestDTO.getPage());
+            ordersRes.setPageSize(orderFilterRequestDTO.getPageSize());
+        }
 
         Query query = this.entityManager.createNativeQuery(sql, Order.class);
         for (String i : params.keySet()) {
@@ -87,7 +104,8 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orders = query.getResultList();
         List<OrderModel> orderModels = new ArrayList<>();
         orders.forEach((item) -> orderModels.add(convertToModel(item)));
-        return orderModels;
+        ordersRes.setOrderModels(orderModels);
+        return ordersRes;
     }
 
     @Override

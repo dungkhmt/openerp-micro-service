@@ -348,7 +348,7 @@ export default function ContentsContainerMana ({containers}) {
                           {row.containerCode}
                         </TableCell>
                         <TableCell align="left">{row.size}</TableCell>
-                        <TableCell align="left">{row.facilityName}</TableCell>
+                        <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
                         <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                       </TableRow>
                     );

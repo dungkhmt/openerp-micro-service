@@ -10,7 +10,10 @@ import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetDistChannelList } from "controllers/query/category-query";
+import {
+  useDeleteDistChannel,
+  useGetDistChannelList,
+} from "controllers/query/category-query";
 import { useState } from "react";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
@@ -28,7 +31,9 @@ function DistributingChannelScreen({ screenAuthorization }) {
   const [itemSelected, setItemSelected] = useState(null);
 
   const { isLoading, data } = useGetDistChannelList(params);
-
+  const deleteDistChannelQuery = useDeleteDistChannel({
+    code: itemSelected?.code,
+  });
   let actions = [
     {
       title: "Thêm",
@@ -119,7 +124,12 @@ function DistributingChannelScreen({ screenAuthorization }) {
         // disable={isLoadingRemove}
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
-        callback={(flag) => {}}
+        callback={async (flag) => {
+          if (flag) {
+            await deleteDistChannelQuery.mutateAsync();
+          }
+          setIsRemove(false);
+        }}
       />
     </Box>
   );

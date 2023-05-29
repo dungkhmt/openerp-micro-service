@@ -2,8 +2,8 @@ import { Box, Button, InputBase, Stack, Typography } from "@mui/material";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomSelect from "components/select/CustomSelect";
 import {
-  useGetCustomerList,
-  useGetProductList,
+  useGetCustomerWithoutPaging,
+  useGetProductListNoPaging,
 } from "controllers/query/category-query";
 import { useMemo, useState } from "react";
 import { useGetSellinPrice } from "../../../controllers/query/purchase-order-query";
@@ -24,7 +24,7 @@ const { default: CustomInput } = require("components/input/CustomInput");
 const CreateSaleOrderForm = ({ setIsAdd }) => {
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 10,
   });
   const methods = useForm({
     mode: "onChange",
@@ -44,8 +44,10 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
     control,
     name: "products",
   });
-  const { isLoading: isLoadingCustomer, data: customer } = useGetCustomerList();
-  const { isLoading: isLoadingProduct, data: product } = useGetProductList();
+  const { isLoading: isLoadingCustomer, data: customer } =
+    useGetCustomerWithoutPaging();
+  const { isLoading: isLoadingProduct, data: product } =
+    useGetProductListNoPaging();
   const { isLoading: isLoadingSellinPrice, data: sellinPrice } =
     useGetSellinPrice();
   const { isLoading: isLoadingSelloutPrice, data: selloutPrice } =
@@ -96,7 +98,7 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
   // }, [selloutPrice, sellinPrice, product]);
   const mergeProductWithPrice = useMemo(() => {
     let result = sellinPrice?.map((price) => {
-      let productList = product?.content?.filter((pro) => {
+      let productList = product?.filter((pro) => {
         return pro?.code === price?.productEntity?.code;
       });
       return productList?.length > 0
@@ -132,7 +134,6 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
     );
     return totalMoney ? totalMoney : 0;
   }, [products]);
-  console.log("Products: ", products);
   return (
     <FormProvider {...methods}>
       <Stack direction="row" justifyContent={"space-around"} spacing={5}>
@@ -143,7 +144,7 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
           render={({ field: { onChange, value } }) => (
             <CustomSelect
               readOnly={false}
-              options={customer ? customer?.content : []}
+              options={customer ? customer : []}
               fullWidth={true}
               loading={isLoadingCustomer}
               value={value}
@@ -178,7 +179,14 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
         setParams={setParams}
         // sx={{ height: height - 64 - 71 - 24 - 20 - 35 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom - Page Title
         isLoading={isLoadingProduct}
-        totalItem={100}
+        totalItem={mergeProductWithPrice?.length}
+        // paginationMode="client"
+        handlePaginationModelChange={(props) => {
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           staticProductFields[0],
           staticProductFields[1],
