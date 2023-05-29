@@ -128,22 +128,25 @@ public class AutoRouteServiceImpl implements AutoRouteService {
         deliveryTrip.setDistance(BigDecimal.valueOf(routeResponse.getTotalCost()));
         deliveryTripRepository.save(deliveryTrip);
 
-        // TODO: push notifications for user
-//        notificationsService.create("AUTO_ROUTE_SERVICE", principal.getName(),
-//                                    String.format("Tìm hành trình tối ưu cho chuyến giao hàng %s thành công", deliveryTripId),
-//                                    String.format("/delivery-manager/delivery-trips/%s", deliveryTripId));
         ObjectMapper mapper = new ObjectMapper();
+        boolean done = false;
         try {
-            apiCaller.simpleBooleanCall(NOTIFICATION_URI, token, mapper.writeValueAsString(NewNotificationRequest.builder()
+            done = apiCaller.simpleBooleanCall(NOTIFICATION_URI, token, mapper.writeValueAsString(NewNotificationRequest.builder()
                     .toUser(principal.getName())
                     .url(String.format("/delivery-manager/delivery-trips/%s", deliveryTripId))
                     .content(String.format("Tìm hành trình tối ưu cho chuyến giao hàng %s thành công", deliveryTripId))
                     .build()));
-            log.info("Push notification done");
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
+            log.error("Exception when build Notification request");
+        }
+
+        if (done) {
+            log.info("Push notification done");
+        } else {
             log.info("Push notification fail");
         }
+
         log.info("Done auto route");
     }
 

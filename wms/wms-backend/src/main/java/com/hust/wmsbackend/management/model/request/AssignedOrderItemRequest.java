@@ -14,11 +14,11 @@ import java.util.UUID;
 @ToString
 @Builder
 public class AssignedOrderItemRequest {
-
     @NotNull
     private UUID orderId;
     @Valid
     private List<AssignedOrderItemRequestDetail> items;
+    private boolean done;
 
     @Data
     @AllArgsConstructor

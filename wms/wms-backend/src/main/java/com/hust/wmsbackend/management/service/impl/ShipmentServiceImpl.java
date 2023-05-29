@@ -54,7 +54,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             .lastUpdatedStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, shipment.getLastUpdatedStamp()))
             .createdStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, shipment.getCreatedStamp()))
             .createdBy(shipment.getCreatedBy())
-            .expectedDeliveryStamp(shipment.getExpectedDeliveryStamp())
+            .expectedDeliveryStr(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, shipment.getExpectedDeliveryStamp()))
             .build()).collect(Collectors.toList());
     }
 
