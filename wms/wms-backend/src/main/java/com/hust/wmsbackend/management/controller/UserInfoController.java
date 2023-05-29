@@ -14,7 +14,6 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/wmsv2/user")
 @AllArgsConstructor(onConstructor_ = @Autowired)
-@CrossOrigin
 @Validated
 public class UserInfoController {
     @GetMapping

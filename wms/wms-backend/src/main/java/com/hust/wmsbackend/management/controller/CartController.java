@@ -17,7 +17,6 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/wmsv2/customer/cart")
-@CrossOrigin
 @Validated
 @Slf4j
 @AllArgsConstructor(onConstructor_ = @Autowired)
