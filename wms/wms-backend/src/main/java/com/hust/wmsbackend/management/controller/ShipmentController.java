@@ -21,7 +21,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/wmsv2/delivery-manager")
 @AllArgsConstructor(onConstructor_ = @Autowired)
-@CrossOrigin
 @Validated
 public class ShipmentController {
 

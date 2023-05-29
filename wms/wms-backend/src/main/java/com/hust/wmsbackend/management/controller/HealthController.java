@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/wmsv2")
-@CrossOrigin
 @Validated
 @Slf4j
 public class HealthController {
