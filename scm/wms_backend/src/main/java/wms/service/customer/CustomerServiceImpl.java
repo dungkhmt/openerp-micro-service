@@ -2,6 +2,9 @@ package wms.service.customer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.internal.util.StringHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import wms.algorithms.utils.Utils;
 import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
@@ -22,6 +27,12 @@ import wms.repo.*;
 import wms.service.BaseService;
 import wms.utils.GeneralUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -37,13 +48,102 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
     private CustomerTypeRepo customerTypeRepo;
     @Autowired
     private CustomerRepo customerRepo;
+
+    @Override
+    @Transactional
+    public void createCustomerFromFile(MultipartFile file, JwtAuthenticationToken token) throws IOException, CustomException {
+        UserLogin createdBy = userRepo.getUserByUserLoginId(token.getName());
+        if (createdBy == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown staff create this customer, can't create");
+        }
+        Iterator<Row> rowIterator = initWorkbookRow(file);
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            if (row.getRowNum() == 0 || isRowEmpty(row)) continue;
+            saveCustomers(row, createdBy);
+        }
+    }
+    private Iterator<Row> initWorkbookRow(MultipartFile file) throws CustomException, IOException {
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        if (fileName.equals("")) {
+            throw caughtException(ErrorCode.USER_ACTION_FAILED.getCode(), "Hãy tải file lên hệ thống!");
+        }
+        String fileExt = "";
+        if (fileName.contains(".")) {
+            fileExt = fileName.substring(fileName.lastIndexOf("."));
+        }
+        if (!fileExt.contains("xls")) {
+            throw caughtException(ErrorCode.FORMAT.getCode(), "Wrong file type. Only support .xls and .xlsx file extensions");
+        }
+        InputStream fis = file.getInputStream();
+        Workbook workbook = null;
+        Sheet sheet = null;
+        if (fileExt.equals(".xls")) {
+            workbook = new HSSFWorkbook(fis);
+            sheet = workbook.getSheetAt(0);
+        }
+        else {
+            workbook = new XSSFWorkbook(fis);
+            sheet = workbook.getSheetAt(0);
+        }
+        return sheet.iterator();
+    }
+    public static boolean isRowEmpty(Row row) {
+        for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
+            Cell cell = row.getCell(c);
+            if (cell != null && cell.getCellTypeEnum() != CellType.BLANK)
+                return false;
+        }
+        return true;
+    }
+    private List<Customer> saveCustomers(Row row, UserLogin createdBy) {
+        List<Customer> listCustomers = new ArrayList<>();
+        String customerName = row.getCell(6).getStringCellValue().equals("HUB") ? "Bưu cục " + row.getCell(4).getStringCellValue().replace("HUB", "") :
+                "Bưu cục " + row.getCell(4).getStringCellValue();
+        CustomerType customerType =  customerTypeRepo.getCustomerTypeByCode(row.getCell(16).getStringCellValue());
+        ContractType contractType = contractTypeRepo.getContractTypeByCode(row.getCell(17).getStringCellValue());
+        List<Facility> facilities = facilityRepo.getAllFacility();
+        int bestFacilityIndex = 0;
+        double bestDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < facilities.size(); i++) {
+            double cusLat = Double.parseDouble(String.valueOf(row.getCell(9).getNumericCellValue()));
+            double cusLon = Double.parseDouble(String.valueOf(row.getCell(10).getNumericCellValue()));
+            double facLat = Double.parseDouble(facilities.get(i).getLatitude());
+            double facLon = Double.parseDouble(facilities.get(i).getLongitude());
+            double cusFacDistance = Utils.calculateCoordinationDistance(cusLat, cusLon, facLat, facLon);
+            if (cusFacDistance < bestDistance) {
+                bestDistance = cusFacDistance;
+                bestFacilityIndex = i;
+            }
+        }
+        Customer customer = Customer.builder()
+                .code("CUS" + row.getCell(0).getNumericCellValue())
+                .phone(row.getCell(12).getCellTypeEnum().equals(CellType.NUMERIC) ?
+                        String.valueOf(row.getCell(12).getNumericCellValue())
+                        : row.getCell(12).getStringCellValue())
+                .address(row.getCell(11).getStringCellValue())
+                .name(customerName)
+                .longitude(String.valueOf(row.getCell(10).getNumericCellValue()))
+                .latitude(String.valueOf(row.getCell(9).getNumericCellValue()))
+                .status("active")
+                .address(row.getCell(11).getStringCellValue())
+                .customerType(customerType)
+                .contractType(contractType)
+                .user(createdBy)
+                .facility(facilities.get(bestFacilityIndex))
+                .build();
+
+        listCustomers.add(customer);
+        log.info("Num of customers added {}", listCustomers.size());
+        return customerRepo.saveAll(listCustomers);
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Customer createNewCustomer(CustomerDTO customer, JwtAuthenticationToken token) throws CustomException {
         CustomerType customerType = customerTypeRepo.getCustomerTypeByCode(customer.getCustomerTypeCode().toUpperCase());
         ContractType contractType = contractTypeRepo.getContractTypeByCode(customer.getContractTypeCode().toUpperCase());
         UserLogin createdBy = userRepo.getUserByUserLoginId(token.getName());
-//        Facility facility = facilityRepo.getFacilityByCode(customer.getFacilityCode().toUpperCase());
         if (customerType== null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Customer with no specific type, can't create");
         }
@@ -56,9 +156,6 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
         if (customer.getLongitude() == "" || customer.getLatitude() == "") {
             throw caughtException(ErrorCode.FORMAT.getCode(), "Location didn't validate, can't create");
         }
-//        if (facility == null) {
-//            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Customer with no specific facility, can't create");
-//        }
         List<Facility> facilities = facilityRepo.getAllFacility();
         int bestFacilityIndex = 0;
         double bestDistance = Double.POSITIVE_INFINITY;
@@ -98,6 +195,10 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
         Page<Customer> customers = customerRepo.search(pageable);
         return getPaginationResult(customers.getContent(), page, customers.getTotalPages(), customers.getTotalElements());
+    }
+    @Override
+    public List<Customer> getAllWithoutPaging() {
+        return customerRepo.getAllCustomers();
     }
 
     @Override

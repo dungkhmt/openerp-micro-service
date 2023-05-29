@@ -1,22 +1,26 @@
 package wms.service.product;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.web.multipart.MultipartFile;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.product.ProductDTO;
 import wms.dto.product.ProductDiscountDTO;
 import wms.dto.product.ProductPriceDTO;
+import wms.entity.Facility;
 import wms.entity.ProductEntity;
 import wms.entity.ProductPrice;
 import wms.entity.ProductSalePrice;
 import wms.exception.CustomException;
 
+import java.io.IOException;
 import java.util.List;
 
 
 public interface IProductService {
-//    List<ProductEntity> createProductFromExcel(MultipartFile file) throws IOException, CustomException;
+    List<ProductEntity> createProductFromExcel(MultipartFile file) throws IOException, CustomException;
     ProductEntity createProduct(ProductDTO productDTO) throws CustomException;
     ReturnPaginationDTO<ProductEntity> getAllProducts(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
+    List<ProductEntity> getAllWithoutPaging();
     ProductEntity getProductById(long id);
     ProductEntity getProductByCode(String code);
     ProductEntity getProductBySku(String sku);

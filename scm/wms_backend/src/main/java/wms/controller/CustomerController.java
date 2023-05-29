@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import wms.common.constant.DefaultConst;
 import wms.dto.customer.CustomerDTO;
 import wms.dto.customer.CustomerUpdateDTO;
@@ -20,6 +21,17 @@ import javax.validation.Valid;
 public class CustomerController extends BaseController{
     @Autowired
     private ICustomerService customerService;
+    @ApiOperation(value = "Thêm mới khách hàng từ file excel", notes = "{}")
+    @PostMapping("/create-from-file")
+    public ResponseEntity<?> createProductFromExcelFile(@RequestParam("file") MultipartFile multipartFile, JwtAuthenticationToken token) {
+        try {
+            customerService.createCustomerFromFile(multipartFile, token);
+            return response(new ResultEntity(1, "Import customers successfully", null));
+        } catch (Exception ex) {
+            log.error("Import products from excel file failed!");
+            return response(error(ex));
+        }
+    }
     @ApiOperation(value = "Import khách hàng từ file excel")
     @PostMapping("/import")
     public ResponseEntity<?> importCustomer(@Valid @RequestBody CustomerDTO customerDTO, JwtAuthenticationToken token) {
@@ -51,6 +63,15 @@ public class CustomerController extends BaseController{
     ) {
         try {
             return response(new ResultEntity(1, "Get list customer successfully", customerService.getAllCustomers(page, pageSize, sortField, isSortAsc)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @GetMapping("/get-all-without-paging")
+    public ResponseEntity<?> getAllFacilities(
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get list facilities successfully", customerService.getAllWithoutPaging()));
         } catch (Exception ex) {
             return response(error(ex));
         }

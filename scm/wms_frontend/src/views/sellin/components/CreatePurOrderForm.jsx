@@ -1,8 +1,8 @@
 import { Box, Button, InputBase, Stack, Typography } from "@mui/material";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomSelect from "components/select/CustomSelect";
-import { useGetProductList } from "controllers/query/category-query";
-import { useGetFacilityList } from "controllers/query/facility-query";
+import { useGetProductListNoPaging } from "controllers/query/category-query";
+import { useGetFacilityListNoPaging } from "controllers/query/facility-query";
 import {
   useCreatePurchaseOrder,
   useGetSellinPrice,
@@ -21,7 +21,7 @@ const { default: CustomInput } = require("components/input/CustomInput");
 const CreatePurOrderForm = ({ setIsAdd }) => {
   const [params, setParams] = useState({
     page: 1,
-    page_size: 50,
+    pageSize: 50,
   });
   const methods = useForm({
     mode: "onChange",
@@ -41,8 +41,10 @@ const CreatePurOrderForm = ({ setIsAdd }) => {
     control,
     name: "products",
   });
-  const { isLoading: isLoadingFacility, data: facility } = useGetFacilityList();
-  const { isLoading: isLoadingProduct, data: product } = useGetProductList();
+  const { isLoading: isLoadingFacility, data: facility } =
+    useGetFacilityListNoPaging();
+  const { isLoading: isLoadingProduct, data: product } =
+    useGetProductListNoPaging();
   const { isLoading: isLoadingSellinPrice, data: sellinPrice } =
     useGetSellinPrice();
   const createPurchaseOrderQuery = useCreatePurchaseOrder();
@@ -67,7 +69,7 @@ const CreatePurOrderForm = ({ setIsAdd }) => {
   };
   const mergeProductWithPrice = useMemo(() => {
     let result = sellinPrice?.map((price) => {
-      let productList = product?.content?.filter((pro) => {
+      let productList = product?.filter((pro) => {
         return pro?.code === price?.productEntity?.code;
       });
       return productList?.length > 0
@@ -86,6 +88,7 @@ const CreatePurOrderForm = ({ setIsAdd }) => {
     );
     return totalMoney ? totalMoney : 0;
   }, [products]);
+  console.log("merge: ", mergeProductWithPrice);
   return (
     <FormProvider {...methods}>
       <Stack direction="row" justifyContent={"space-around"} spacing={5}>
@@ -132,7 +135,7 @@ const CreatePurOrderForm = ({ setIsAdd }) => {
           render={({ field: { onChange, value } }) => (
             <CustomSelect
               readOnly={false}
-              options={facility ? facility?.content : []}
+              options={facility ? facility : []}
               fullWidth={true}
               loading={isLoadingFacility}
               value={value}
@@ -150,7 +153,14 @@ const CreatePurOrderForm = ({ setIsAdd }) => {
         setParams={setParams}
         // sx={{ height: height - 64 - 71 - 24 - 20 - 35 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom - Page Title
         isLoading={isLoadingProduct}
-        totalItem={100}
+        totalItem={mergeProductWithPrice?.length}
+        // paginationMode="client"
+        handlePaginationModelChange={(props) => {
+          setParams({
+            page: props?.page + 1,
+            pageSize: props?.pageSize,
+          });
+        }}
         columns={[
           staticProductFields[0],
           staticProductFields[1],

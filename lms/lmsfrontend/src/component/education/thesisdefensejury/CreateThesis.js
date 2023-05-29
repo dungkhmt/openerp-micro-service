@@ -19,7 +19,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import {useForm} from "react-hook-form";
 import {useHistory} from "react-router-dom";
 import {request} from "../../../api";
-import {boxChildComponent, boxComponentStyle,} from "../../taskmanagement/ultis/constant";
+import {boxChildComponent, boxComponentStyle,} from "./constant";
 import {SubmitSuccess} from "../programmingcontestFE/SubmitSuccess";
 import FormError from "./FormError";
 import ModalLoading from "./ModalLoading";

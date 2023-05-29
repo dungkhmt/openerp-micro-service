@@ -40,14 +40,15 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     flexWrap: "wrap",
     "& .MuiTextField-root": {
-      marginLeft: theme.spacing(2),
-      marginRight: theme.spacing(2),
-      marginBottom: theme.spacing(2),
+      marginLeft: "1%",
+      marginRight: "1%",
+      marginBottom: "1%",
       width: "28%",
       minWidth: 120,
     },
   },
   description: {
+    marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
   }
 }));
@@ -202,7 +203,7 @@ function CreateProblem() {
       },
       {
         onError: () => {
-          errorNoti(t("error", { ns: "common" }), 3000);
+          errorNoti(t("error", {ns: "common"}), 3000);
           setLoading(false);
         },
       },
@@ -296,7 +297,7 @@ function CreateProblem() {
           </MenuItem>
         </TextField>
 
-        <FormControl sx={{m: 1, width: "90%"}}>
+        <FormControl sx={{m: 1, width: "88%"}}>
           <InputLabel id="select-tag-label">Tags</InputLabel>
           <Select
             labelId="select-tag-label"
@@ -343,8 +344,18 @@ function CreateProblem() {
 
       </Box>
 
+      <Box sx={{marginTop: "12px"}}>
+        <Link href="/programming-contest/suggest-problem" target="_blank" underline="hover">
+          <Typography variant="body1" color="primary"> Struggling to create a fresh and exciting challenge? Try our new <b>Problem
+            Suggestion</b> feature
+            <Chip label="Beta" color="secondary" variant="outlined" size="small"
+                  sx={{marginLeft: "8px", marginBottom: "8px", fontWeight: "bold"}}/></Typography>
+        </Link>
+      </Box>
+
+
       <Box className={classes.description}>
-        <Typography variant="h5" component="div" sx={{marginTop: "12px", marginBottom: "8px"}}>
+        <Typography variant="h5" component="div" sx={{marginTop: "8px", marginBottom: "8px"}}>
           {t("problemDescription")}
         </Typography>
         <RichTextEditor content={description} onContentChange={text => setDescription(text)}/>

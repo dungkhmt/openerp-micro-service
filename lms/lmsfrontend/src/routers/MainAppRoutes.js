@@ -11,9 +11,9 @@ import NotFound from "../views/errors/NotFound";
 import AdminRoute from "./AdminRoute";
 import ProgrammingContestRoutes from "./ProgrammingContestRoutes";
 import ThesisRoutes from "./ThesisRoutes";
-import TaskManagementRoute from "./TaskManagementRoute";
 import WhiteBoardRoute from "./WhiteBoardRoute";
 import ContestManagerRankingPublic from "../component/education/programmingcontestFE/ContestManagerRankingPublic";
+import UploadUser from "../component/userlogin/UploadUser";
 
 const EduRoute = lazy(() => import("./EduRoute"));
 // const UserLoginRoute = lazy(() => import("./UserLoginRoute"));
@@ -58,10 +58,6 @@ function MainAppRoute(props) {
           {/*<PrivateRoute component={UserLoginRoute} path="/userlogin" />*/}
 
           <PrivateRoute component={EduRoute} path="/edu" />
-          <PrivateRoute
-            component={TaskManagementRoute}
-            path="/taskmanagement"
-          />
           <PrivateRoute component={WhiteBoardRoute} path="/whiteboard" />
 
           <PrivateRoute component={AdminRoute} path="/admin/data" />
@@ -71,6 +67,12 @@ function MainAppRoute(props) {
             path="/programming-contest"
           />
           <PrivateRoute component={ThesisRoutes} path="/thesis" />
+
+          <Route
+            component={UploadUser}
+            exact
+            path={`/user/upload`}
+          ></Route>
 
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />

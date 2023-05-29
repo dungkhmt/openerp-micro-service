@@ -1,11 +1,14 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import InsertLinkIcon from "@mui/icons-material/InsertLink";
 import MapIcon from "@mui/icons-material/Map";
-import { Box } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { Action } from "components/action/Action";
+import PrimaryButton from "components/button/PrimaryButton";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
+import CustomizedDialogs from "components/dialog/CustomizedDialogs";
 import DraggableDeleteDialog from "components/dialog/DraggableDialogs";
 import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
@@ -14,8 +17,10 @@ import CustomToolBar from "components/toolbar/CustomToolBar";
 import {
   useDeleteCustomer,
   useGetCustomerList,
+  useGetCustomerWithoutPaging,
+  useImportCustomer,
 } from "controllers/query/category-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
@@ -35,10 +40,26 @@ function CustomerScreen({ screenAuthorization }) {
   const [isAdd, setIsAdd] = useToggle(false);
   const history = useHistory();
   let { path } = useRouteMatch();
-
+  const [isApproved, setIsApproved] = useToggle(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const handleFileChange = (event) => {
+    setSelectedFile(event?.target?.files?.[0]);
+  };
   const { isLoading, data: customer } = useGetCustomerList(params);
   const deleteCustomerQuery = useDeleteCustomer();
+  const importCustomerQuery = useImportCustomer();
+  const { isLoading: isLoadingCustomer, data: customerList } =
+    useGetCustomerWithoutPaging();
 
+  const handleUpload = async () => {
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      importCustomerQuery.mutateAsync(formData);
+      setSelectedFile(null);
+    }
+    setIsApproved(false);
+  };
   let actions = [
     {
       title: "Thêm",
@@ -48,6 +69,16 @@ function CustomerScreen({ screenAuthorization }) {
       icon: <AddIcon />,
       describe: "Thêm bản ghi mới",
       disabled: false,
+    },
+    {
+      title: "Import",
+      callback: (res) => {
+        handleFileChange(res);
+      },
+      icon: <InsertLinkIcon />,
+      describe: "Import từ file",
+      disabled: false,
+      type: "file",
     },
     {
       title: "Bản đồ",
@@ -78,12 +109,17 @@ function CustomerScreen({ screenAuthorization }) {
       color: AppColors.error,
     },
   ];
+
   const handleButtonClick = () => {
     history.push(`${path}/map`, {
-      customer: customer?.content,
+      customer: customerList,
     });
   };
-
+  useEffect(() => {
+    if (selectedFile) {
+      setIsApproved(true);
+    }
+  }, [selectedFile, setIsApproved]);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
@@ -144,6 +180,31 @@ function CustomerScreen({ screenAuthorization }) {
         handleOpen={setIsRemove}
         callback={async () => {
           await deleteCustomerQuery.mutateAsync({ id: itemSelected?.id });
+        }}
+      />
+      <CustomizedDialogs
+        open={isApproved}
+        handleClose={() => {
+          setIsApproved(false, () => {
+            setSelectedFile(null);
+          });
+        }}
+        contentTopDivider
+        title={selectedFile?.name}
+        contentBottomDivider
+        centerTitle="Phê duyệt import cusomter"
+        content={
+          <Typography color="textSecondary" gutterBottom style={{ padding: 8 }}>
+            Bạn có đồng ý phê duyệt tạo khách hàng qua excel file?
+          </Typography>
+        }
+        actions={[
+          <Button onClick={setIsApproved}>Hủy bỏ</Button>,
+          <PrimaryButton onClick={handleUpload}>Phê duyệt</PrimaryButton>,
+        ]}
+        customStyles={{
+          contents: (theme) => ({ width: "100%" }),
+          actions: (theme) => ({ paddingRight: theme.spacing(2) }),
         }}
       />
     </Box>

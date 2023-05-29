@@ -151,15 +151,15 @@ const CustomDataGrid = (props) => {
       }}
       columns={getColumnsShow(columns, isSerial, params)}
       rows={rows}
-      isRowSelectable={() => {
-        return isSelectable;
-      }}
+      // isRowSelectable={() => {
+      //   return isSelectable;          Got bug if turn this thing on: Uncaught Error: No row with id #26 found
+      // }}
+      pageSizeOptions={[5, 10, 25]}
       rowCount={rowCountState}
       paginationModel={{
         page: params.page - 1,
         pageSize: params.pageSize,
       }}
-      // pageSizeOptions={[params.pageSize]}
       paginationMode={paginationMode}
       onPaginationModelChange={handlePaginationModelChange}
       loading={isLoading}

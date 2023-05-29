@@ -1,5 +1,6 @@
 package com.hust.wmsbackend.management.service.impl;
 
+import com.hust.wmsbackend.management.cache.RedisCacheService;
 import com.hust.wmsbackend.management.entity.*;
 import com.hust.wmsbackend.management.model.WarehouseWithBays;
 import com.hust.wmsbackend.management.model.response.ProductWarehouseResponse;
@@ -26,6 +27,17 @@ public class WarehouseServiceImpl implements WarehouseService {
     private InventoryItemRepository inventoryItemRepository;
     private ProductV2Repository productRepository;
     private SaleOrderItemRepository saleOrderItemRepository;
+
+    private RedisCacheService redisCacheService;
+
+    private List<Warehouse> getWarehouseInCacheElseDatabase() {
+        List<Warehouse> warehouses = redisCacheService.getCachedListObject(RedisCacheService.ALL_WAREHOUSES_KEY, Warehouse.class);
+        if (warehouses == null) {
+            warehouses = warehouseRepository.findAll();
+            redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_WAREHOUSES_KEY, warehouses);
+        }
+        return warehouses;
+    }
 
     @Transactional
     @Override
@@ -88,7 +100,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public List<Warehouse> getAllWarehouseGeneral() {
         log.info("Start get all warehouse in service");
-        List<Warehouse> response = warehouseRepository.findAll();
+        List<Warehouse> response = getWarehouseInCacheElseDatabase();
         // TODO: Filter by company or something else... user can not view all facility in database
         log.info(String.format("Get %d facilities", response.size()));
         return response;
@@ -155,7 +167,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public List<WarehouseWithBays> getAllWarehouseDetail() {
-        List<Warehouse> warehouseGeneral = warehouseRepository.findAll();
+        List<Warehouse> warehouseGeneral = getWarehouseInCacheElseDatabase() ;
         return warehouseGeneral.stream()
                                .map(general -> getById(general.getWarehouseId().toString()))
                                .collect(Collectors.toList());
@@ -209,7 +221,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public Map<UUID, String> getWarehouseNameMap() {
-        List<Warehouse> warehouses = warehouseRepository.findAll();
+        List<Warehouse> warehouses = getWarehouseInCacheElseDatabase();
         Map<UUID, String> map = new HashMap<>();
         for (Warehouse warehouse : warehouses) {
             map.put(warehouse.getWarehouseId(), warehouse.getName());
@@ -256,7 +268,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public List<Warehouse> getAllWarehousesHaveProductIds(List<UUID> productIds) {
         List<Warehouse> response = new ArrayList<>();
-        List<Warehouse> warehouses = warehouseRepository.findAll();
+        List<Warehouse> warehouses = getWarehouseInCacheElseDatabase();
         for (Warehouse warehouse : warehouses) {
             List<InventoryItem> inventoryItems = inventoryItemRepository.findAllByWarehouseId(warehouse.getWarehouseId());
             for (InventoryItem item : inventoryItems) {

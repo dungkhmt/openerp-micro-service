@@ -2,6 +2,9 @@ package wms.service.product;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.internal.util.StringHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.product.ProductDTO;
@@ -21,6 +26,11 @@ import wms.repo.*;
 import wms.service.BaseService;
 import wms.utils.GeneralUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -39,6 +49,55 @@ public class ProductServiceImpl extends BaseService implements IProductService {
     private ProductUnitRepo productUnitRepo;
     @Autowired
     private ProductCategoryRepo productCategoryRepo;
+    @Override
+    public List<ProductEntity> createProductFromExcel(MultipartFile file) throws IOException, CustomException {
+        File currDir = new File(".");
+        String path = currDir.getAbsolutePath();
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        if (fileName.equals("")) {
+            throw caughtException(ErrorCode.USER_ACTION_FAILED.getCode(), "Hãy tải file lên hệ thống!");
+        }
+        String fileExt = "";
+        if (fileName.contains(".")) {
+            fileExt = fileName.substring(fileName.lastIndexOf("."));
+        }
+        if (!fileExt.contains("xls")) {
+            throw caughtException(ErrorCode.FORMAT.getCode(), "Wrong file type. Only support .xls and .xlsx file extensions");
+        }
+
+//        FileInputStream fis = new FileInputStream(path.replace(".", "data/file/") + fileName);
+        InputStream fileStream = file.getInputStream();
+        Workbook workbook = null;
+        Sheet sheet = null;
+        if (fileExt.equals(".xls")) {
+            workbook = new HSSFWorkbook(fileStream);
+            sheet = workbook.getSheetAt(0);
+        }
+        else {
+            workbook = new XSSFWorkbook(fileStream);
+            sheet = workbook.getSheetAt(0);
+        }
+        Iterator<Row> rowIterator = sheet.iterator();
+        List<ProductEntity> listProduct = new ArrayList<>();
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            if (row.getRowNum() == 0 || isRowEmpty(row)) continue;
+            ProductEntity productEntity = new ProductEntity();
+            listProduct.add(productEntity);
+        }
+        log.info("Num of product added {}", listProduct.size());
+        productRepository.saveAll(listProduct);
+        return listProduct;
+    }
+
+    public static boolean isRowEmpty(Row row) {
+        for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
+            Cell cell = row.getCell(c);
+            if (cell != null && cell.getCellTypeEnum() != CellType.BLANK)
+                return false;
+        }
+        return true;
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -77,6 +136,12 @@ public class ProductServiceImpl extends BaseService implements IProductService {
         Page<ProductEntity> productList = productRepository.search(pageable);
         return getPaginationResult(productList.getContent(), page, productList.getTotalPages(), productList.getTotalElements());
     }
+
+    @Override
+    public List<ProductEntity> getAllWithoutPaging() {
+        return productRepository.getAllProduct();
+    }
+
     @Override
     public ProductEntity getProductById(long id) {
         return productRepository.getProductById(id);
