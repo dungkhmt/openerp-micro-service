@@ -2,6 +2,7 @@ package com.hust.wmsbackend.management.service.impl;
 
 import com.hust.wmsbackend.management.entity.*;
 import com.hust.wmsbackend.management.entity.enumentity.AssignedOrderItemStatus;
+import com.hust.wmsbackend.management.entity.enumentity.OrderStatus;
 import com.hust.wmsbackend.management.model.AssignedOrderItemDTO;
 import com.hust.wmsbackend.management.model.DeliveryTripDTO;
 import com.hust.wmsbackend.management.model.request.AssignedOrderItemRequest;
@@ -112,6 +113,13 @@ public class AssignedOrderItemServiceImpl implements AssignedOrderItemService {
                     productWarehouse.setQuantityOnHand(newQuantity);
                     productWarehouses.add(productWarehouse);
                 }
+            }
+
+            if (request.isDone()) {
+                Optional<SaleOrderHeader> orderOpt = saleOrderHeaderRepository.findById(orderId);
+                SaleOrderHeader order = orderOpt.get();
+                order.setStatus(OrderStatus.DISTRIBUTED);
+                saleOrderHeaderRepository.save(order);
             }
 
             inventoryItemRepository.saveAll(updateInventoryItems);

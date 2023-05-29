@@ -128,6 +128,7 @@ const AdminOrderDetail = ( props ) => {
   }, [selectedBayId]);
 
   const saveProcessingItems = () => {
+    var isDone = remainingItems.length == 0;
     request(
       "put",
       API_PATH.ASSIGN_ORDER_ITEM,
@@ -142,7 +143,8 @@ const AdminOrderDetail = ( props ) => {
       },
       {
         orderId: orderId,
-        items: processingItems
+        items: processingItems,
+        done: isDone
       }
     )
   }

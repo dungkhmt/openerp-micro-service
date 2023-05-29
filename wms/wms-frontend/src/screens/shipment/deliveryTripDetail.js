@@ -49,6 +49,15 @@ const DeliveryTripDetail = ( props ) => {
     const fetchData = async () => {
       await request(
         "get",
+        API_PATH.DELIVERY_MANAGER_ASSIGN_ORDER_ITEM,
+        (res) => {
+          setRawCreatedItemsTableData(res.data);
+          setCreatedItemsTableData(res.data);
+        }
+      );
+
+      await request(
+        "get",
         `${API_PATH.DELIVERY_MANAGER_DELIVERY_TRIP}/${tripId}`,
         (res) => {
           setTripInfo(res.data);
@@ -85,15 +94,6 @@ const DeliveryTripDetail = ( props ) => {
 
       await request(
         "get",
-        API_PATH.DELIVERY_MANAGER_ASSIGN_ORDER_ITEM,
-        (res) => {
-          setRawCreatedItemsTableData(res.data);
-          setCreatedItemsTableData(res.data);
-        }
-      );
-
-      await request(
-        "get",
         `${API_PATH.DELIVREY_MANAGER_AUTO_ROUTE}/${tripId}`,
         (res) => {
           setRouteDetails(res.data);
@@ -120,10 +120,12 @@ const DeliveryTripDetail = ( props ) => {
     // loại bỏ các items có assignOrderItemId nằm trong deliveryItemsTableData
     // và loại bỏ các items có warehouseId != deliveryTrip warehouseId
     if (selectedWarehouseId != null) {
+      console.log("Selected warehouse id = ", selectedWarehouseId);
       const assignedItemsIdArr = deliveryItemsTableData.map(e => e.assignOrderItemId);
       const filterTableData = createdItemsTableData.filter(
         item => item.warehouseId == selectedWarehouseId && !assignedItemsIdArr.includes(item.assignOrderItemId));
       setCreatedItemsTableData(filterTableData);
+      console.log("Updated created items table data => ", filterTableData);
     }
   }, [selectedWarehouseId]);
 

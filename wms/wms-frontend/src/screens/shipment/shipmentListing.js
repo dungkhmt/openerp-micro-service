@@ -30,7 +30,6 @@ const ShipmentListing = () => {
           var data = res.data;
           for (var i = 0; i < data?.length; i++) {
             data[i].numOrder = i + 1;
-            data[i].expectedDeliveryStamp = convertTimeStampToDate(data[i].expectedDeliveryStamp);
           }
           setShipmentTableData(res.data);
           setNumOrder(data.length + 1);
@@ -68,7 +67,7 @@ const ShipmentListing = () => {
           editComponent: <TextField value={now}/> },
         { title: "Người tạo", field: "createdBy", 
           editComponent: <TextField value={userLoginId}/> }, 
-        { title: "Ngày giao hàng dự kiến", field: "expectedDeliveryStamp", 
+        { title: "Ngày giao hàng dự kiến", field: "expectedDeliveryStr", 
           editComponent: <TextField type="date" value={expectDeliveryDate} 
           onChange={(e) => setExpectDeliveryDate(e.target.value)} /> }
       ]}
