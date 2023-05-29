@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/wmsv2/delivery-manager")
-@CrossOrigin
 @Validated
 @Slf4j
 @AllArgsConstructor(onConstructor_ = @Autowired)

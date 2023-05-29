@@ -18,7 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/wmsv2/admin/warehouse")
 @AllArgsConstructor(onConstructor_ = @Autowired)
-@CrossOrigin
 @Validated
 public class WarehouseController {
 

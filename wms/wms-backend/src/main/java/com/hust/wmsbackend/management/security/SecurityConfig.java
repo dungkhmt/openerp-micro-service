@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -47,23 +46,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
-                .antMatchers("/roles").permitAll()
-                .antMatchers("/actuator/prometheus/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/videos/videos/*").permitAll()
-
-                //permission to access all static resources
-                .antMatchers("/resources/**").permitAll()
-                .antMatchers("/css/**").permitAll()
-                .antMatchers("/image/**").permitAll()
-                .antMatchers("/js/**").permitAll()
-                .antMatchers("/chatSocketHandler/**").permitAll()
-                .antMatchers("/wmsv2/**").permitAll()
-
-                .regexMatchers("/v2/api-docs").permitAll()
-                .regexMatchers("/.*swagger.*").permitAll()
-                .regexMatchers(".*/user/register/*$").permitAll()
-                .antMatchers("/public/**").permitAll()
-                .anyRequest().authenticated()
+//                .antMatchers("/wmsv2/**").permitAll()
+//                .antMatchers("/entity-authorization/**").permitAll()
+//                .antMatchers("/user/**").permitAll()
+                .anyRequest().permitAll()
                 .and()
                 .requestCache()
                 .requestCache(new NullRequestCache())
@@ -72,16 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(basicAuthenticationEndPoint)
                 .and()
                 .exceptionHandling()
-                .accessDeniedHandler(accessDeniedHandler())
-                .and()
-                .csrf()
-                .disable()
-                .headers()
-                .frameOptions()
-                .disable()
-                .and()
-                .logout()
-                .logoutSuccessUrl("/");
+                .accessDeniedHandler(accessDeniedHandler());
 
     }
 }

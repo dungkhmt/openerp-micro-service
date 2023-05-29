@@ -15,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/wmsv2/process/receipt-request")
-@CrossOrigin
 @Validated
 @Slf4j
 @AllArgsConstructor(onConstructor_ = @Autowired)
