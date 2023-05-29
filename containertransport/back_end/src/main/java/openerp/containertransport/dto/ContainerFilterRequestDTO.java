@@ -9,4 +9,6 @@ import lombok.*;
 @Builder
 public class ContainerFilterRequestDTO {
     private String containerCode;
+    private Integer page;
+    private Integer pageSize;
 }

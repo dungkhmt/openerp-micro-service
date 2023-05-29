@@ -1,6 +1,7 @@
 package openerp.containertransport.service;
 
 import openerp.containertransport.dto.ContainerFilterRequestDTO;
+import openerp.containertransport.dto.ContainerFilterRes;
 import openerp.containertransport.dto.ContainerModel;
 import openerp.containertransport.entity.Container;
 
@@ -10,5 +11,5 @@ public interface ContainerService {
     ContainerModel createContainer(ContainerModel containerModel);
     ContainerModel getContainerById (long id);
     ContainerModel updateContainer(ContainerModel containerModel);
-    List<ContainerModel> filterContainer(ContainerFilterRequestDTO containerFilterRequestDTO);
+    ContainerFilterRes filterContainer(ContainerFilterRequestDTO containerFilterRequestDTO);
 }

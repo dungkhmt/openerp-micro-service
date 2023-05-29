@@ -5,6 +5,7 @@ import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.dto.FacilityResponsiveDTO;
 import openerp.containertransport.dto.TrailerFilterRequestDTO;
+import openerp.containertransport.dto.TrailerFilterRes;
 import openerp.containertransport.dto.TrailerModel;
 import openerp.containertransport.entity.Facility;
 import openerp.containertransport.entity.Trailer;
@@ -71,22 +72,44 @@ public class TrailerServiceImpl implements TrailerService {
     }
 
     @Override
-    public List<TrailerModel> filterTrailer(TrailerFilterRequestDTO trailerFilterRequestDTO) {
+    public TrailerFilterRes filterTrailer(TrailerFilterRequestDTO trailerFilterRequestDTO) {
+        TrailerFilterRes trailerFilterRes = new TrailerFilterRes();
+
         String sql = "SELECT * FROM container_transport_trailers WHERE 1=1";
+        String sqlCount = "SELECT COUNT(id) FROM container_transport_trailers WHERE 1=1";
         HashMap<String, Object> params = new HashMap<>();
+
         if(trailerFilterRequestDTO.getStatus() != null){
             sql += " AND status = :status";
+            sqlCount += " AND status = :status";
             params.put("status", trailerFilterRequestDTO.getStatus());
         }
         if(trailerFilterRequestDTO.getTruckId() != null) {
             sql += " AND truck_id = :truckId";
+            sqlCount += " AND truck_id = :truckId";
             params.put("truckId", trailerFilterRequestDTO.getTruckId());
         }
         if(trailerFilterRequestDTO.getFacilityId() != null) {
             sql += " AND facility_id = :facilityId";
+            sqlCount += " AND facility_id = :facilityId";
             params.put("facilityId", trailerFilterRequestDTO.getFacilityId());
         }
+        Query queryCount = this.entityManager.createNativeQuery(sqlCount);
+        for (String i : params.keySet()) {
+            queryCount.setParameter(i, params.get(i));
+        }
+        trailerFilterRes.setCount((Long) queryCount.getSingleResult());
+
         sql += " ORDER BY updated_at DESC";
+
+        if (trailerFilterRequestDTO.getPage() != null && trailerFilterRequestDTO.getPageSize() != null) {
+            sql += " LIMIT :pageSize OFFSET :index";
+            params.put("pageSize", trailerFilterRequestDTO.getPageSize());
+            params.put("index", trailerFilterRequestDTO.getPage() * trailerFilterRequestDTO.getPageSize());
+            trailerFilterRes.setPage(trailerFilterRequestDTO.getPage());
+            trailerFilterRes.setPageSize(trailerFilterRequestDTO.getPageSize());
+        }
+
         Query query = this.entityManager.createNativeQuery(sql, Trailer.class);
         for (String i : params.keySet()) {
             query.setParameter(i, params.get(i));
@@ -94,7 +117,8 @@ public class TrailerServiceImpl implements TrailerService {
         List<Trailer> trailers = query.getResultList();
         List<TrailerModel> trailerModels = new ArrayList<>();
         trailers.forEach((item) -> trailerModels.add(convertToModel(item)));
-        return trailerModels;
+        trailerFilterRes.setTrailerModels(trailerModels);
+        return trailerFilterRes;
     }
 
     public TrailerModel convertToModel(Trailer trailer){

@@ -3,10 +3,7 @@ package openerp.containertransport.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
-import openerp.containertransport.dto.ContainerFilterRequestDTO;
-import openerp.containertransport.dto.ContainerModel;
-import openerp.containertransport.dto.FacilityResponsiveDTO;
-import openerp.containertransport.dto.TruckModel;
+import openerp.containertransport.dto.*;
 import openerp.containertransport.entity.Container;
 import openerp.containertransport.entity.Facility;
 import openerp.containertransport.entity.Truck;
@@ -72,14 +69,35 @@ public class ContainerServiceImpl implements ContainerService {
     }
 
     @Override
-    public List<ContainerModel> filterContainer(ContainerFilterRequestDTO containerFilterRequestDTO) {
+    public ContainerFilterRes filterContainer(ContainerFilterRequestDTO containerFilterRequestDTO) {
+        ContainerFilterRes containerFilterRes = new ContainerFilterRes();
+
         String sql = "SELECT * FROM container_transport_container WHERE 1=1";
+        String sqlCount = "SELECT COUNT(id) FROM container_transport_container WHERE 1=1";
         HashMap<String, Object> params = new HashMap<>();
+
         if(containerFilterRequestDTO.getContainerCode() != null) {
             sql += " AND container_code = :containerCode";
+            sqlCount += " AND container_code = :containerCode";
             params.put("containerCode", containerFilterRequestDTO.getContainerCode());
         }
+
+        Query queryCount = this.entityManager.createNativeQuery(sqlCount);
+        for (String i : params.keySet()) {
+            queryCount.setParameter(i, params.get(i));
+        }
+        containerFilterRes.setCount((Long) queryCount.getSingleResult());
+
         sql += "ORDER BY updated_at DESC";
+
+        if (containerFilterRequestDTO.getPage() != null && containerFilterRequestDTO.getPageSize() != null) {
+            sql += " LIMIT :pageSize OFFSET :index";
+            params.put("pageSize", containerFilterRequestDTO.getPageSize());
+            params.put("index", containerFilterRequestDTO.getPage() * containerFilterRequestDTO.getPageSize());
+            containerFilterRes.setPage(containerFilterRequestDTO.getPage());
+            containerFilterRes.setPageSize(containerFilterRequestDTO.getPageSize());
+        }
+
         Query query = this.entityManager.createNativeQuery(sql, Container.class);
         for (String i : params.keySet()) {
             query.setParameter(i, params.get(i));
@@ -89,7 +107,8 @@ public class ContainerServiceImpl implements ContainerService {
         truckModels.forEach((item) -> {
             containerModelList.add(convertToModel(item));
         });
-        return containerModelList;
+        containerFilterRes.setContainerModels(containerModelList);
+        return containerFilterRes;
     }
 
     public ContainerModel convertToModel(Container container) {

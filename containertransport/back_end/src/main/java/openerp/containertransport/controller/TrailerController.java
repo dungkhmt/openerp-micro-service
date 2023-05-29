@@ -3,6 +3,7 @@ package openerp.containertransport.controller;
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.MetaData;
 import openerp.containertransport.dto.TrailerFilterRequestDTO;
+import openerp.containertransport.dto.TrailerFilterRes;
 import openerp.containertransport.dto.TrailerModel;
 import openerp.containertransport.dto.metaData.MetaDTO;
 import openerp.containertransport.dto.metaData.ResponseMetaData;
@@ -28,7 +29,7 @@ public class TrailerController {
 
     @PostMapping("/")
     public ResponseEntity<?> filterTrailer(@RequestBody TrailerFilterRequestDTO trailerFilterRequestDTO) {
-        List<TrailerModel> trailerModels = trailerService.filterTrailer(trailerFilterRequestDTO);
+        TrailerFilterRes trailerModels = trailerService.filterTrailer(trailerFilterRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), trailerModels));
     }
 

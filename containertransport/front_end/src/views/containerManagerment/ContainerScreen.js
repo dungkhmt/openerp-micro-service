@@ -4,17 +4,19 @@ import { request } from "api";
 import './styles.scss';
 import HeaderContainerMana from "./HeaderContainerMana";
 import ContentsContainerMana from "./ContentsContainerMana";
+import { getContainers } from "api/ContainerAPI";
 
 const ContainerScreen = () => {
     const [containers, setContainers] = useState([]);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [count, setCount] = useState(0);
 
     useEffect(() => {
-        request(
-            "post",
-            `/container/`, {}, {}, {}, {},
-        ).then((res) => {
-            console.log("container==========", res.data)
-            setContainers(res.data);
+        getContainers({page: page, pageSize: rowsPerPage})
+        .then((res) => {
+            console.log("container==========", res?.data.data.containerModels);
+            setContainers(res?.data.data.containerModels);
         });
     }, [])
 
@@ -25,7 +27,8 @@ const ContainerScreen = () => {
                 <Box className="divider">
                     <Divider />
                 </Box>
-                <ContentsContainerMana containers={containers}/>
+                <ContentsContainerMana containers={containers} page={page} setPage={setPage}
+                rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
             </Container>
         </Box>
     )

@@ -1,8 +1,12 @@
 package openerp.containertransport.controller;
 
 import lombok.RequiredArgsConstructor;
+import openerp.containertransport.constants.MetaData;
 import openerp.containertransport.dto.ContainerFilterRequestDTO;
+import openerp.containertransport.dto.ContainerFilterRes;
 import openerp.containertransport.dto.ContainerModel;
+import openerp.containertransport.dto.metaData.MetaDTO;
+import openerp.containertransport.dto.metaData.ResponseMetaData;
 import openerp.containertransport.service.ContainerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +28,8 @@ public class ContainerController {
 
     @PostMapping("/")
     public ResponseEntity<?> filterContainer(@RequestBody ContainerFilterRequestDTO containerFilterRequestDTO){
-        List<ContainerModel> containerModels = containerService.filterContainer(containerFilterRequestDTO);
-        return ResponseEntity.status(HttpStatus.OK).body(containerModels);
+        ContainerFilterRes containerModels = containerService.filterContainer(containerFilterRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), containerModels));
     }
 
     @GetMapping("/{id}")
