@@ -3,7 +3,7 @@
 import { Grid, Typography } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import NavBarRoom from "./components/NavBarRoom";
-import {  useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { SOCKET_EVENTS } from "utils/constants";
 import { request } from "api";
@@ -49,14 +49,15 @@ const CodeEditorPage = () => {
   useEffect(() => {
     if (isAccess) {
       socketRef.current = io(
-        process.env.REACT_APP_CODE_EDITOR_ONLINE_SERVER_DOMAIN || "http://localhost:7008"
+        `${process.env.REACT_APP_SOCKET_SERVER_HOST}:${process.env.REACT_APP_SOCKET_SERVER_PORT}` ||
+          "http://localhost:7008"
       );
       // get audio instance of system
       navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then((stream) => {
         // Create a peer connection
         myPeer.current = new Peer({
-          host: "localhost",
-          port: 7008,
+          host: process.env.REACT_APP_SOCKET_SERVER_HOST || "127.0.0.1",
+          port: process.env.REACT_APP_SOCKET_SERVER_PORT || 7008,
           path: "/api/code-editor/peer-server",
         });
 
