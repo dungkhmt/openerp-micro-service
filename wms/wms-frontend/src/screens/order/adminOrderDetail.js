@@ -179,10 +179,6 @@ const AdminOrderDetail = ( props ) => {
           <Button variant="contained" className={classes.addButton} 
             type="submit" onClick={autoAssignButtonHandle} >Phân phối tự động</Button>
         </Grid>
-        <Grid className={classes.buttonWrap}>
-          <Button variant="contained" className={classes.addButton} 
-            type="submit" >Hủy đơn hàng</Button>
-        </Grid>
       </Grid>
     </Box>
 
