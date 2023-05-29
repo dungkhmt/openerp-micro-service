@@ -20,4 +20,7 @@ public interface DeliveryTripRepo extends JpaRepository<DeliveryTrip, Long> {
 
     @Query(value = "select * from scm_delivery_trip sdt where sdt.facility_code = :facilityCode", nativeQuery = true)
     List<DeliveryTrip> getDeliveryTripsByFacility(String facilityCode);
+
+    @Query(value = "select * from scm_delivery_trip sdt where sdt.facility_code != :facilityCode", nativeQuery = true)
+    List<DeliveryTrip> getAlternativeDeliveryTrips(String facilityCode);
 }

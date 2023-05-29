@@ -110,11 +110,20 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
 
     @Override
     public List<DeliveryTrip> getTripToAssignBill(String billCode) throws JsonProcessingException {
+        /**
+         * Logic: A bill has a customer bought and that customer belongs to a facility
+         * So the optimum is that a bill should be assigned to the trip has stokes come from that customer's facility.
+         * => Seek for facility of that customer, or else chose from trip's list.
+         */
         DeliveryBill deliveryBill = deliveryBillRepo.getBillWithCode(billCode);
         SaleOrder saleOrder = deliveryBill.getSaleOrder();
         Customer customer = saleOrder.getCustomer();
         Facility facility = customer.getFacility();
-        return deliveryTripRepo.getDeliveryTripsByFacility(facility.getCode());
+        List<DeliveryTrip> optimumTrips = deliveryTripRepo.getDeliveryTripsByFacility(facility.getCode());
+        List<DeliveryTrip> listTrips = new ArrayList<>(optimumTrips);
+        List<DeliveryTrip> alternateTrips = deliveryTripRepo.getAlternativeDeliveryTrips(facility.getCode());
+        listTrips.addAll(alternateTrips);
+        return listTrips;
     }
 
     @Override
@@ -144,9 +153,14 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
 
     @Override
     public void createTripRoute(TripRouteDTO tripRouteDTO) throws CustomException {
-        TruckDroneDeliveryInput input = new TruckDroneDeliveryInput();
         DeliveryTrip trip = deliveryTripRepo.getDeliveryTripByCode(tripRouteDTO.getTripCode());
         List<ShipmentItem> shipmentItems = shipmentItemRepo.getShipmentItemOfATrip(tripRouteDTO.getTripCode());
+        TruckDroneDeliveryInput input = setAlgoInput(trip, shipmentItems);
+        TruckDroneDeliverySolutionOutput finalSolution = solveTSPD(input);
+        saveRouteToMongo(finalSolution, trip);
+    }
+    private TruckDroneDeliveryInput setAlgoInput(DeliveryTrip trip, List<ShipmentItem> shipmentItems) {
+        TruckDroneDeliveryInput input = new TruckDroneDeliveryInput();
         List<Node> points = new ArrayList<>(); // All coordinations got
         UserLogin user = trip.getUserInCharge();
         // Set truck properties
@@ -221,6 +235,10 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         }
         input.setDistances(listDistances);
         input.setRequests(listCustomerRequests);
+
+        return input;
+    }
+    private TruckDroneDeliverySolutionOutput solveTSPD(TruckDroneDeliveryInput input) {
         TruckDroneDeliverySolver heuristicSolver = new TruckDroneDeliverySolver(input);
         heuristicSolver.solve();
 
@@ -240,7 +258,9 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
                 log.info("Drone node info {} ({}, {})", node.getName(), node.getX(), node.getY());
             }
         }
-
+        return finalSolution;
+    }
+    private void saveRouteToMongo(TruckDroneDeliverySolutionOutput finalSolution, DeliveryTrip trip) {
         RouteSchedulingOutput output = new RouteSchedulingOutput();
         output.setDroneRoutes(finalSolution.getDroneRoutes());
         output.setTruckRoute(finalSolution.getTruckRoute());

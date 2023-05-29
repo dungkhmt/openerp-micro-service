@@ -22,7 +22,7 @@ public class DeliveryTripController extends BaseController {
     private IDeliveryTripService deliveryTripService;
     @ApiOperation(value = "Thêm mới chuyến giao hàng")
     @PostMapping("/create")
-    public ResponseEntity<?> create(@Valid @RequestBody DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) {
+    public ResponseEntity<?> createTrip(@Valid @RequestBody DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) {
         try {
             return response(new ResultEntity(1, "Create new trip successfully", deliveryTripService.createDeliveryTrip(deliveryTripDTO, token)));
         }
@@ -55,16 +55,6 @@ public class DeliveryTripController extends BaseController {
             return response(error(ex));
         }
     }
-//    @ApiOperation(value = "Phân đơn cho chuyến")
-//    @PostMapping("/assign-bill-to-trip")
-//    public ResponseEntity<?> assignBillToTrip(@Valid @RequestBody DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) {
-//        try {
-//            return response(new ResultEntity(1, "Assign to trip successfully", deliveryTripService.assignBillToTrip(deliveryTripDTO, token)));
-//        }
-//        catch (Exception ex) {
-//            return response(error(ex));
-//        }
-//    }
 
     @ApiOperation(value = "Tạo lộ trình di chuyển")
     @PostMapping("/create-trip-route")

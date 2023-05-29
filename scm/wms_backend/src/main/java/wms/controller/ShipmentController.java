@@ -47,41 +47,6 @@ public class ShipmentController extends BaseController {
         }
     }
 
-//    @GetMapping("/get-by-id/{id}")
-//    public ResponseEntity<?> getCustomerByID(@PathVariable("id") long id) {
-//        try {
-//            return response(new ResultEntity(1, "Get customer by id successfully", customerService.getCustomerById(id)));
-//        } catch (Exception ex) {
-//            return response(error(ex));
-//        }
-//    }
-//    @GetMapping("/get-by-code")
-//    public ResponseEntity<?> getCustomerByCode(
-//            @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code) {
-//        try {
-//            return response(new ResultEntity(1, "Get customer by code successfully", customerService.getCustomerByCode(code)));
-//        } catch (Exception ex) {
-//            return response(error(ex));
-//        }
-//    }
-//    @PutMapping("/update/{id}")
-//    public ResponseEntity<?> updateCustomer(@Valid @RequestBody CustomerUpdateDTO customerDTO, @PathVariable("id") long id) {
-//        try {
-//            return response(new ResultEntity(1, "Update customer successfully", customerService.updateCustomerInfo(customerDTO, id)));
-//        } catch (Exception ex) {
-//            return response(error(ex));
-//        }
-//    }
-//    @DeleteMapping("/delete/{id}")
-//    public ResponseEntity<?> deleteCustomerById(@PathVariable("id") long id) {
-//        try {
-//            customerService.deleteCustomerById(id);
-//            return response(new ResultEntity(1, "Delete customer successfully", id));
-//        } catch (Exception ex) {
-//            return response(error(ex));
-//        }
-//    }
-
     @ApiOperation(value = "Phân đơn thành các shipment từ các spliting order")
     @PostMapping("/create-shipment-item")
     public ResponseEntity<?> createItem(@Valid @RequestBody ShipmentItemDTO shipmentItemDTO) {

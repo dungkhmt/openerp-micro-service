@@ -1,8 +1,8 @@
-import { Button, Stack } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import { CustomDatePicker } from "components/datepicker/CustomDatePicker";
 import CustomSelect from "components/select/CustomSelect";
 import { useCreateDeliveryTrip } from "controllers/query/delivery-trip-query";
-import { useGetFacilityList } from "controllers/query/facility-query";
+import { useGetFacilityListNoPaging } from "controllers/query/facility-query";
 import { useGetAllUsersExist } from "controllers/query/user-query";
 import moment from "moment";
 
@@ -23,7 +23,8 @@ const CreateTripForm = ({ setIsAdd, currShipment }) => {
 
   const { isLoading: isLoadingUser, data: userInCharge } =
     useGetAllUsersExist();
-  const { isLoading: isLoadingFacility, data: facility } = useGetFacilityList();
+  const { isLoading: isLoadingFacility, data: facility } =
+    useGetFacilityListNoPaging();
 
   const createTripQuery = useCreateDeliveryTrip();
 
@@ -41,6 +42,10 @@ const CreateTripForm = ({ setIsAdd, currShipment }) => {
   return (
     <FormProvider {...methods}>
       <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+        <Typography>
+          Nên có thêm phần gợi ý xem lấy kho nào thì trùng với cụm customers
+          đang được phân trip
+        </Typography>
         <Controller
           key={"userInCharge"}
           control={control}
@@ -74,7 +79,7 @@ const CreateTripForm = ({ setIsAdd, currShipment }) => {
           render={({ field: { onChange, value } }) => (
             <CustomSelect
               readOnly={false}
-              options={facility?.content ? facility?.content : []}
+              options={facility ? facility : []}
               fullWidth={true}
               loading={isLoadingFacility}
               value={value}
