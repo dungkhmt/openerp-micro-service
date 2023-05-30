@@ -30,5 +30,9 @@ export const API_PATH = {
   DELIVERY_TRIP_START: "/wmsv2/delivery-manager/delivery-trip/start-delivery",
   DELIVERY_TRIP_ITEM_COMPLETE: "/wmsv2/delivery-manager/delivery-trip-item/complete",
   DELIVERY_TRIP_ITEM_FAIL: "/wmsv2/delivery-manager/delivery-trip-item/fail",
-  DELIVERY_TRIP_COMPLETE: "/wmsv2/delivery-manager/delivery-trip/complete"
+  DELIVERY_TRIP_COMPLETE: "/wmsv2/delivery-manager/delivery-trip/complete",
+  REVENUE_PROFIT_REPORT: "/wmsv2/report/revenue-profit",
+  PRODUCT_CATEGORY_MONTHLY_REPORT: "/wmsv2/report/product-category-monthly",
+  PRODUCTS_REPORT: "/wmsv2/report/products",
+  PRODUCT_HISTORY_REPORT: "/wmsv2/report/products-history"
 }

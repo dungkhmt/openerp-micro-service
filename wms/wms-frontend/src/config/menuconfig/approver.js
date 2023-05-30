@@ -10,5 +10,12 @@ export const approver = {
       text: "Danh sách đơn xin nhập hàng",
       child: [],
     },
+    {
+      id: "MENU_WMSv2_APPROVER.REPORT",
+      path: "/approver/report",
+      isPublic: false,
+      text: "Báo cáo",
+      child: [],
+    },
   ],
 };

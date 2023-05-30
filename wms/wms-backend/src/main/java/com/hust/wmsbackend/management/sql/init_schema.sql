@@ -252,7 +252,9 @@ create table wms_delivery_trip_item
     assigned_order_item_id uuid,
     quantity decimal(18, 2),
     is_deleted boolean default false,
-    status varchar(50)
+    status varchar(50),
+    last_updated_stamp timestamp default current_timestamp,
+    created_stamp timestamp default current_timestamp
 );
 
 create table wms_delivery_trip_path

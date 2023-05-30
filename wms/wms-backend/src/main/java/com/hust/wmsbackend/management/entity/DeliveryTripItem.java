@@ -4,10 +4,13 @@ import com.hust.wmsbackend.management.entity.enumentity.DeliveryTripItemStatus;
 import com.hust.wmsbackend.management.entity.generator.StringPrefixedSequenceCodeGenerator;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -32,10 +35,13 @@ public class DeliveryTripItem {
     private String deliveryTripId;
     private int sequence;
     private UUID orderId;
-    // từ sequence và orderId -> lấy được vị trí cần giao hàng tại vị trí [sequence] của shipper thực hiện delivery_trip này
     private UUID assignedOrderItemId;
     private BigDecimal quantity;
     private boolean isDeleted = false;
     @Enumerated(EnumType.STRING)
     private DeliveryTripItemStatus status = DeliveryTripItemStatus.CREATED;
+    @LastModifiedDate
+    private Date lastUpdatedStamp;
+    @CreatedDate
+    private Date createdStamp;
 }

@@ -144,19 +144,20 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
         for (DeliveryTripItem item : items) {
             AssignedOrderItem assignedOrderItem = assignedOrderItemRepository.findById(item.getAssignedOrderItemId()).get();
             DeliveryTripDTO.DeliveryTripItemDTO dto = DeliveryTripDTO.DeliveryTripItemDTO.builder()
-                                                                                         .assignOrderItemId(item.getAssignedOrderItemId())
-                                                                                         .productId(assignedOrderItem.getProductId())
-                                                                                         .productName(productNameMap.get(assignedOrderItem.getProductId()))
-                                                                                         .bayId(assignedOrderItem.getBayId())
-                                                                                         .bayCode(bayCodeMap.get(assignedOrderItem.getBayId()))
-                                                                                         .warehouseId(assignedOrderItem.getWarehouseId())
-                                                                                         .warehouseName(warehouseNameMap.get(assignedOrderItem.getWarehouseId()))
-                                                                                         .quantity(item.getQuantity())
-                                                                                         .sequence(item.getSequence())
-                                                                                         .lotId(assignedOrderItem.getLotId())
-                                                                                         .deliveryTripItemId(item.getDeliveryTripItemId())
-                                                                                         .statusCode(item.getStatus() != null ? item.getStatus().getName() : null)
-                                                                                         .orderId(item.getOrderId()).build();
+                .assignOrderItemId(item.getAssignedOrderItemId())
+                .productId(assignedOrderItem.getProductId())
+                .productName(productNameMap.get(assignedOrderItem.getProductId()))
+                .bayId(assignedOrderItem.getBayId())
+                .bayCode(bayCodeMap.get(assignedOrderItem.getBayId()))
+                .warehouseId(assignedOrderItem.getWarehouseId())
+                .warehouseName(warehouseNameMap.get(assignedOrderItem.getWarehouseId()))
+                .quantity(item.getQuantity())
+                .sequence(item.getSequence())
+                .lotId(assignedOrderItem.getLotId())
+                .deliveryTripItemId(item.getDeliveryTripItemId())
+                .statusCode(item.getStatus() != null ? item.getStatus().getName() : null)
+                .orderId(item.getOrderId())
+                .build();
             if (assignedOrderItem.getOrderId() != null) {
                 SaleOrderHeader saleOrderHeader = saleOrderHeaderRepository.findById(assignedOrderItem.getOrderId()).get();
                 CustomerAddress customerAddress = customerAddressRepository.findById(saleOrderHeader.getCustomerAddressId()).get();
