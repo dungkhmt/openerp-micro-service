@@ -53,6 +53,11 @@ INSERT INTO public.entity_authorization
 (id, role_id, last_updated, created, description)
 VALUES('SCR_WMSv2_RECEIPT_REQUEST_FOR_APPROVER.VIEW', 'WMS_PRESIDENT', null, now(), null);
 
+    -- Xem màn hình Report
+INSERT INTO public.entity_authorization
+(id, role_id, last_updated, created, description)
+VALUES('MENU_WMSv2_APPROVER.REPORT', 'WMS_PRESIDENT', null, now(), null);
+
 -- permission cho giám đốc kinh doanh
     -- xem danh sách menu
 INSERT INTO public.entity_authorization
@@ -291,3 +296,8 @@ values ('SCR_WMSv2_RECEIPT_REQUEST_DETAIL_FOR_APPROVER.VIEW', 'ADMIN', null, now
 INSERT INTO public.entity_authorization
 (id, role_id, last_updated, created, description)
 VALUES('SCR_WMSv2_RECEIPT_REQUEST_PROCESS.VIEW', 'ADMIN', null, now(), null);
+
+-- xem màn hình report
+INSERT INTO public.entity_authorization
+(id, role_id, last_updated, created, description)
+VALUES('MENU_WMSv2_APPROVER.REPORT', 'ADMIN', null, now(), null);
