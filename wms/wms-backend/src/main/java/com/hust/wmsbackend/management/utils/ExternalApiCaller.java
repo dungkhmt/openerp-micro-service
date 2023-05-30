@@ -14,8 +14,12 @@ public class ExternalApiCaller {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
-        ResponseEntity<Boolean> response = restTemplate.postForEntity(uri, entity, Boolean.class);
-        return response.getStatusCode() == HttpStatus.OK;
+        try {
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(uri, entity, Boolean.class);
+            return response.getStatusCode() == HttpStatus.OK;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }

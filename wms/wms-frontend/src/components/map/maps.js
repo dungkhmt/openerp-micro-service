@@ -58,6 +58,7 @@ export default function Maps(props) {
 
   useEffect(() => {
     if (selectPosition !== null) {
+      console.log("Selected position => ", parseFloat(selectPosition.lat), parseFloat(selectPosition.lon));
       setLocationSelection([parseFloat(selectPosition.lat), parseFloat(selectPosition.lon)]);
     }
   }, [selectPosition]);

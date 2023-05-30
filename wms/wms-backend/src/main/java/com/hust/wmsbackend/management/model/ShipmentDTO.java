@@ -16,6 +16,6 @@ public class ShipmentDTO {
     private String lastUpdatedStamp;
     private String createdBy;
     private Date expectedDeliveryStamp; // for create shipment request -> this field only
-
+    private String expectedDeliveryStr;
     private List<DeliveryTripDTO> trips;
 }

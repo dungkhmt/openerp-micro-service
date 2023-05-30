@@ -12,6 +12,9 @@ import wms.entity.Facility;
 import wms.entity.ProductEntity;
 import wms.exception.CustomException;
 
+import java.io.IOException;
+import java.util.List;
+
 public interface ICustomerService {
     void createCustomerFromFile(MultipartFile file, JwtAuthenticationToken token) throws IOException, CustomException;
 //    List<Customer> importCustomer();

@@ -129,7 +129,7 @@ const OrderApprovalDetail = ( props ) => {
         }}>
           <StandardTable
             title="Lịch sử giao hàng thất bại"
-            data={orderInfo?.successProductHistory}
+            data={orderInfo?.failProductHistory}
             columns={[
               { title: "Sản phẩm", field: "productName" },
               { title: "Giá tiền", field: "priceUnit" },
