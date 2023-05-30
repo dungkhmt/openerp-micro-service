@@ -8,10 +8,6 @@ import lombok.Getter;
 public enum AssignedOrderItemStatus {
 
     CREATED("CREATED", "Khởi tạo"),
-    WAITING_PICK("WAITING_PICK", "Đợi nhân viên vận chuyển tới lấy hàng"),
-    PICK_FAIL("PICK_FAIL", "Lấy hàng thất bại"),
-    DELIVERING("DELIVERING", "Đang giao hàng"),
-    DELIVERY_FAIL("DELIVERY_FAIL", "Giao hàng thất bại"),
     DONE("DONE", "Giao hàng thành công");
 
     private final String code;

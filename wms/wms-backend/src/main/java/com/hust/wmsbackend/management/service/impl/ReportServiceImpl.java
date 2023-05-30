@@ -1,10 +1,9 @@
 package com.hust.wmsbackend.management.service.impl;
 
-import com.hust.wmsbackend.management.model.response.ProductCategoryMonthlyData;
-import com.hust.wmsbackend.management.model.response.ProductCategoryReport;
-import com.hust.wmsbackend.management.model.response.ReportDataPoint;
-import com.hust.wmsbackend.management.model.response.RevenueProfitReportResponse;
+import com.hust.wmsbackend.management.model.response.*;
 import com.hust.wmsbackend.management.repository.DeliveryTripItemRepository;
+import com.hust.wmsbackend.management.repository.ProductV2Repository;
+import com.hust.wmsbackend.management.service.ProductService;
 import com.hust.wmsbackend.management.service.ReportService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -24,6 +20,9 @@ import java.util.Map;
 public class ReportServiceImpl implements ReportService {
 
     private DeliveryTripItemRepository deliveryTripItemRepository;
+    private ProductV2Repository productRepository;
+
+    private ProductService productService;
 
     @Override
     public RevenueProfitReportResponse genRevenueProfitReport() {
@@ -62,5 +61,39 @@ public class ReportServiceImpl implements ReportService {
             }
         }
         return ProductCategoryReport.builder().points(points).months(months).build();
+    }
+
+    @Override
+    public List<ProductReportResponse> genProductsReport() {
+        List<ProductReportResponse> response = productRepository.getProductsDataForReport();
+        for (ProductReportResponse r : response) {
+            UUID productId = UUID.fromString(r.getProductId());
+            BigDecimal price = productService.getCurrPriceByProductId(productId);
+            r.setTotalExportPrice(r.getTotalQuantity().multiply(price));
+            r.setPrice(price);
+        }
+        return response;
+    }
+
+    @Override
+    public Map<String, List<ProductDiffHistory>>  genProductDiffReport() {
+        List<ProductV2Repository.ProductDiffHistoryInterface> historyInterfaces = productRepository.getProductsDiffHistoryData();
+        Map<String, List<ProductDiffHistory>> response = new HashMap<>();
+        for (ProductV2Repository.ProductDiffHistoryInterface history : historyInterfaces) {
+            String productId = history.getProductId();
+            List<ProductDiffHistory> histories;
+            if (response.containsKey(productId)) {
+                histories = response.get(productId);
+            } else {
+                histories = new ArrayList<>();
+            }
+            histories.add(new ProductDiffHistory(history.getProductId(), history.getProductName(), history.getQuantity(),
+                    history.getEffectiveDateStr(), history.getType()));
+            if (productId.equals("8ccfe2ba-2b6a-4029-a29c-58b363951481")) {
+                System.out.println(history.getType());
+            }
+            response.put(productId, histories);
+        }
+        return response;
     }
 }

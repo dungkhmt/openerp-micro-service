@@ -536,7 +536,7 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
                             return <TableCell 
                               children={<Button variant="contained"
                                 onClick={() => column.buttonOnclickHandle(row)}
-                              >Xử lý</Button>}
+                              >{column.buttonOnclickText != null ? column.buttonOnclickText : "Xử lý"}</Button>}
                             />
                           }
                         })

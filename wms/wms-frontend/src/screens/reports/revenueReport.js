@@ -25,7 +25,7 @@ const RevuenueReport = () => {
   const options = {
     theme: "light2",
     title: {
-      text: "Báo cáo Doanh thu - Lợi nhuận"
+      text: "Biểu đồ Doanh thu - Lợi nhuận"
     },
     toolTip: {
       shared: true
