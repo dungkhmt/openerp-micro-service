@@ -67,8 +67,13 @@ public class ShipmentServiceImpl implements ShipmentService {
             params.put("status", requestDTO.getStatus());
         }
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
+        for (String i : params.keySet()) {
+            queryCount.setParameter(i, params.get(i));
+        }
         shipmentRes.setCount((Long) queryCount.getSingleResult());
+
         sql += " ORDER BY updated_at DESC";
+
         if (requestDTO.getPage() != null && requestDTO.getPageSize() != null) {
             sql += " LIMIT :pageSize OFFSET :index";
             params.put("pageSize", requestDTO.getPageSize());

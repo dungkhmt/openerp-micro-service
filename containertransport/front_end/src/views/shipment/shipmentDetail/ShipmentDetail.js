@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import '../styles.scss';
 import { Box, Button, Container, Divider, Icon, Typography } from "@mui/material";
-import { request } from "api";
 import { useHistory, useLocation, useParams } from "react-router-dom";
 import PrimaryButton from "components/button/PrimaryButton";
 import { menuIconMap } from "config/menuconfig";
@@ -9,6 +8,7 @@ import { MyContext } from "contextAPI/MyContext";
 import TripsContents from "./TripsContents";
 import { getShipmentByCode } from "api/ShipmentAPI";
 import ShipmentContents from "./ShipmentContents";
+import { getTrips } from "api/TripAPI";
 
 const ShipmentDetail = () => {
     const history = useHistory();
@@ -20,10 +20,7 @@ const ShipmentDetail = () => {
         let data = {
             shipmentId: shipmentId
         }
-        request(
-            "post",
-            `/trip/`, {}, {}, data, {},
-        ).then((res) => {
+        getTrips(data).then((res) => {
             setTrips(res.data.data);
         });
 

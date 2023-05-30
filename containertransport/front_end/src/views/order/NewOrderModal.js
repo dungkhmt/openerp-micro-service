@@ -11,6 +11,8 @@ import React, { useEffect, useState } from "react";
 import { request } from "api";
 import './styles.scss';
 import { LocalizationProvider } from "@mui/x-date-pickers";
+import { getFacility } from "api/FacilityAPI";
+import { getContainers } from "api/ContainerAPI";
 
 
 const styles = {
@@ -64,19 +66,13 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType }) => {
     const [isBreakRomooc, setIsBreakRomooc] = useState(false);
 
     useEffect(() => {
-        request(
-            "post",
-            `/facility/`, {}, {}, {}, {},
-        ).then((res) => {
+        getFacility({}).then((res) => {
             console.log("facility==========", res.data)
-            setFacilities(res.data.data);
+            setFacilities(res.data.data.facilityModels);
         });
-        request(
-            "post",
-            `/container/`, {}, {}, {}, {},
-        ).then((res) => {
+        getContainers({}).then((res) => {
             console.log("container==========", res.data)
-            setContainers(res.data);
+            setContainers(res.data.data.containerModels);
         });
     }, []);
     const typeConst = [

@@ -3,6 +3,7 @@ package openerp.containertransport.controller;
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.MetaData;
 import openerp.containertransport.dto.FacilityFilterRequestDTO;
+import openerp.containertransport.dto.FacilityFilterRes;
 import openerp.containertransport.dto.FacilityModel;
 import openerp.containertransport.dto.metaData.MetaDTO;
 import openerp.containertransport.dto.metaData.ResponseMetaData;
@@ -35,7 +36,7 @@ public class FacilityController {
 
     @PostMapping("/")
     public ResponseEntity<?> filterFacility(@RequestBody FacilityFilterRequestDTO facilityFilterRequestDTO) {
-        List<FacilityModel> facilityModels = facilityService.filterFacility(facilityFilterRequestDTO);
+        FacilityFilterRes facilityModels = facilityService.filterFacility(facilityFilterRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), facilityModels));
     }
 

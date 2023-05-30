@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import './styles.scss';
 import { Alert, Box, Container, Divider } from "@mui/material";
 import HeaderShipmentScreen from "./ShipmentScreenHeader";
-import { request } from "api";
 import ShipmentScreenContents from "./ShipmentScreenContents";
 import { getShipment } from "api/ShipmentAPI";
 

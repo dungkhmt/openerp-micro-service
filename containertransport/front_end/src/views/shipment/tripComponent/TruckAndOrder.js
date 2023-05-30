@@ -1,5 +1,4 @@
 import { Autocomplete, Box, Button, ClickAwayListener, TextField, Typography } from "@mui/material";
-import { request } from "api";
 import React, { useContext, useEffect, useState } from "react";
 import SettingsIcon from '@mui/icons-material/Settings';
 import CloseIcon from '@mui/icons-material/Close';

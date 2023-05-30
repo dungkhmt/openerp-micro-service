@@ -20,7 +20,6 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { request } from 'api';
 import { useHistory } from 'react-router-dom';
 
 function descendingComparator(a, b, orderBy) {

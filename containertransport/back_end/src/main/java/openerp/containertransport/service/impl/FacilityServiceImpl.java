@@ -6,6 +6,7 @@ import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.containertransport.dto.FacilityFilterRequestDTO;
+import openerp.containertransport.dto.FacilityFilterRes;
 import openerp.containertransport.dto.FacilityModel;
 import openerp.containertransport.dto.map.MapReqDTO;
 import openerp.containertransport.entity.Facility;
@@ -102,13 +103,34 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
-    public List<FacilityModel> filterFacility(FacilityFilterRequestDTO facilityFilterRequestDTO) {
+    public FacilityFilterRes filterFacility(FacilityFilterRequestDTO facilityFilterRequestDTO) {
+        FacilityFilterRes facilityFilterRes = new FacilityFilterRes();
+
         String sql = "SELECT * FROM container_transport_facility WHERE 1=1";
+        String sqlCount = "SELECT COUNT(id) FROM container_transport_facility WHERE 1=1";
         HashMap<String, Object> params = new HashMap<>();
+
         if(facilityFilterRequestDTO.getFacilityName() != null) {
             sql += " AND facility_name = '%:facilityName%'";
+            sqlCount += " AND facility_name = '%:facilityName%'";
             params.put("facilityName", facilityFilterRequestDTO.getFacilityName());
         }
+        Query queryCount = this.entityManager.createNativeQuery(sqlCount);
+        for (String i : params.keySet()) {
+            queryCount.setParameter(i, params.get(i));
+        }
+        facilityFilterRes.setCount((Long) queryCount.getSingleResult());
+
+        sql += " ORDER BY updated_at DESC";
+
+        if (facilityFilterRequestDTO.getPage() != null && facilityFilterRequestDTO.getPageSize() != null) {
+            sql += " LIMIT :pageSize OFFSET :index";
+            params.put("pageSize", facilityFilterRequestDTO.getPageSize());
+            params.put("index", facilityFilterRequestDTO.getPage() * facilityFilterRequestDTO.getPageSize());
+            facilityFilterRes.setPage(facilityFilterRequestDTO.getPage());
+            facilityFilterRes.setPageSize(facilityFilterRequestDTO.getPageSize());
+        }
+
         Query query = this.entityManager.createNativeQuery(sql, Facility.class);
         for (String i : params.keySet()) {
             query.setParameter(i, params.get(i));
@@ -118,7 +140,8 @@ public class FacilityServiceImpl implements FacilityService {
         facilities.forEach((item) -> {
             facilityModels.add(convertToModel(item));
         });
-        return facilityModels;
+        facilityFilterRes.setFacilityModels(facilityModels);
+        return facilityFilterRes;
     }
 
     @Override

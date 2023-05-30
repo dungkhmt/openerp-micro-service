@@ -1,4 +1,3 @@
-import { request } from "api";
 import { menuIconMap } from "config/menuconfig";
 import { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
@@ -7,6 +6,9 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import MapComponent from "../routing/Map";
 import TruckAndOrder from "../tripComponent/TruckAndOrder";
 import { getTripItemByTripId } from "api/TripItemAPI";
+import { getTrucks } from "api/TruckAPI";
+import { getOrders } from "api/OrderAPI";
+import { getTripByTripId } from "api/TripAPI";
 
 const { Box, Typography, Button, Divider, Icon } = require("@mui/material")
 
@@ -23,17 +25,11 @@ const TripDetail = () => {
     const [tripItems, setTripItem] = useState([]);
     const [flag, setFlag] = useState(false);
     useEffect(() => {
-        request(
-            "post",
-            `/truck/`, {}, {}, {}, {},
-        ).then((res) => {
-            setTrucks(res.data);
+        getTrucks({}).then((res) => {
+            setTrucks(res.data.truckModels);
         });
-        request(
-            "post",
-            `/order/`, {}, {}, {}, {},
-        ).then((res) => {
-            setOrders(res.data.data);
+        getOrders({}).then((res) => {
+            setOrders(res.data.data.orderModels);
         });
         getTripItemByTripId(tripId).then((res) => {
             console.log("tripItem1111111", res.data.data)
@@ -41,10 +37,7 @@ const TripDetail = () => {
         });
     }, [])
     useEffect(() => {
-        request(
-            "post",
-            `/trip/${tripId}`, {}, {}, {}, {},
-        ).then((res) => {
+        getTripByTripId(tripId).then((res) => {
             console.log("res", res)
             setOrdersSelect(res.data.data.orders);
             trucks.forEach((item) => {

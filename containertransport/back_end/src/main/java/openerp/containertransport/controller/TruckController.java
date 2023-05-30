@@ -2,6 +2,7 @@ package openerp.containertransport.controller;
 
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.dto.TruckFilterRequestDTO;
+import openerp.containertransport.dto.TruckFilterRes;
 import openerp.containertransport.dto.TruckModel;
 import openerp.containertransport.entity.Truck;
 import openerp.containertransport.service.TruckService;
@@ -25,7 +26,7 @@ public class TruckController {
 
     @PostMapping("/")
     public ResponseEntity<?> filterTruck(@RequestBody TruckFilterRequestDTO truckFilterRequestDTO) {
-        List<TruckModel> truckModels = truckService.filterTruck(truckFilterRequestDTO);
+        TruckFilterRes truckModels = truckService.filterTruck(truckFilterRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(truckModels);
     }
 

@@ -1,5 +1,4 @@
 import { Alert, Box, Button, Divider, Typography } from "@mui/material";
-import { request } from "api";
 import React, { useContext, useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import '../styles.scss';
@@ -11,6 +10,8 @@ import RoutingMachine from "../routing/RoutingMachine";
 import MapComponent from "../routing/Map";
 import TruckAndOrder from "../tripComponent/TruckAndOrder";
 import { createTrip } from "api/TripAPI";
+import { getOrders } from "api/OrderAPI";
+import { getTrucks } from "api/TruckAPI";
 
 const CreateTripDetail = () => {
     const { truckScheduler, setTruckScheduler, tripsCreate, setTripCreate } = useContext(MyContext);
@@ -48,20 +49,14 @@ const CreateTripDetail = () => {
     }
 
     useEffect(() => {
-        request(
-            "post",
-            `/truck/`, {}, {}, {}, {},
-        ).then((res) => {
+        getTrucks({}).then((res) => {
             // let truckTmp = res.data.filter(item => checkScheduler(item.id, "truck"))
             // console.log("truck", res.data)
-            setTrucks(res.data);
+            setTrucks(res.data.truckModels);
         });
-        request(
-            "post",
-            `/order/`, {}, {}, {}, {},
-        ).then((res) => {
+        getOrders({}).then((res) => {
             // let orderTmp = res.data.data.filter(item => checkScheduler(item.id, "order"))
-            setOrders(res.data.data);
+            setOrders(res.data.data.orderModels);
         });
         // if (tripsTmpId[0] !== null) {
         //     console.log("tripTmp",tripsCreate[tripsTmpId[0].slice(1)]);

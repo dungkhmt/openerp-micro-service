@@ -1,7 +1,6 @@
 import { Box, Modal, Icon, Typography, Divider, TextField, Button, FormControl, Select, MenuItem, InputLabel } from "@mui/material";
 import '../styles.scss';
 import React, { useEffect, useState } from "react";
-import { request } from "api";
 import { getTraler } from "api/TrailerAPI";
 import { getFacility } from "api/FacilityAPI";
 

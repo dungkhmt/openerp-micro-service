@@ -1,7 +1,8 @@
 import { Box, Modal, Icon, Typography, Divider, TextField, Button, FormControl, Select, MenuItem, InputLabel } from "@mui/material";
 import './styles.scss';
 import React, { useEffect, useState } from "react";
-import { request } from "api";
+import { getFacility } from "api/FacilityAPI";
+import { createTruck } from "api/TruckAPI";
 
 const ModalTruck = ({ openModal, handleClose, type, truckInfo }) => {
     const [facilityList, setFacilityList] = useState([]);
@@ -11,10 +12,7 @@ const ModalTruck = ({ openModal, handleClose, type, truckInfo }) => {
     const [brandTruck, setBrandTruck] = useState('');
 
     useEffect(() => {
-        request(
-            "post",
-            `/facility/`, {}, {}, {}, {},
-        ).then((res) => {
+        getFacility({}).then((res) => {
             setFacilityList(res.data.data);
         })
     }, []);
@@ -30,10 +28,7 @@ const ModalTruck = ({ openModal, handleClose, type, truckInfo }) => {
             brandTruck: brandTruck
         }
         console.log("avv==========", data);
-        request(
-            "post",
-            `/truck/create`, {}, {}, data
-        ).then((res) => {
+        createTruck(data).then((res) => {
             console.log(res);
             handleClose();
             setFacility();

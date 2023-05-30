@@ -21,7 +21,6 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { request } from 'api';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -39,10 +38,6 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -96,7 +91,6 @@ const headCells = [
 
 const DEFAULT_ORDER = 'asc';
 const DEFAULT_ORDER_BY = 'calories';
-const DEFAULT_ROWS_PER_PAGE = 5;
 
 function EnhancedTableHead(props) {
   const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
@@ -144,14 +138,12 @@ function EnhancedTableHead(props) {
   );
 }
 
-export default function ContentsTruckManagement({trucks}) {
+export default function ContentsTruckManagement({trucks, page, setPage, rowsPerPage, setRowsPerPage, count}) {
   const [order, setOrder] = React.useState(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
   const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [visibleRows, setVisibleRows] = React.useState(null);
-  const [rowsPerPage, setRowsPerPage] = React.useState(DEFAULT_ROWS_PER_PAGE);
   const [paddingHeight, setPaddingHeight] = React.useState(0);
 
   const handleRequestSort = React.useCallback(
@@ -201,55 +193,22 @@ export default function ContentsTruckManagement({trucks}) {
     setSelected(newSelected);
   };
 
-  const handleChangePage = React.useCallback(
-    (event, newPage) => {
-      setPage(newPage);
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
-      const sortedRows = stableSort(trucks, getComparator(order, orderBy));
-      const updatedRows = sortedRows.slice(
-        newPage * rowsPerPage,
-        newPage * rowsPerPage + rowsPerPage,
-      );
+  const handleChangeRowsPerPage = (event) => {
+    const updatedRowsPerPage = parseInt(event.target.value, 10);
+    setRowsPerPage(updatedRowsPerPage);
 
-      setVisibleRows(updatedRows);
-
-      // Avoid a layout jump when reaching the last page with empty rows.
-      const numEmptyRows =
-        newPage > 0 ? Math.max(0, (1 + newPage) * rowsPerPage - trucks.length) : 0;
-
-      const newPaddingHeight = (dense ? 33 : 53) * numEmptyRows;
-      setPaddingHeight(newPaddingHeight);
-    },
-    [order, orderBy, dense, rowsPerPage],
-  );
-
-  const handleChangeRowsPerPage = React.useCallback(
-    (event) => {
-      const updatedRowsPerPage = parseInt(event.target.value, 10);
-      setRowsPerPage(updatedRowsPerPage);
-
-      setPage(0);
-
-      const sortedRows = stableSort(trucks, getComparator(order, orderBy));
-      const updatedRows = sortedRows.slice(
-        0 * updatedRowsPerPage,
-        0 * updatedRowsPerPage + updatedRowsPerPage,
-      );
-
-      setVisibleRows(updatedRows);
-
-      // There is no layout jump to handle on the first page.
-      setPaddingHeight(0);
-    },
-    [order, orderBy],
-  );
+    setPage(0);
+  };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   return (
     <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white"}}>
       <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
-        {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -323,7 +282,7 @@ export default function ContentsTruckManagement({trucks}) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={trucks.length}
+          count={count}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

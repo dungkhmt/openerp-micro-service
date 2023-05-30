@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Divider, Typography } from "@mui/material";
-import { request } from "api";
 import './styles.scss';
 import HeaderContainerMana from "./HeaderContainerMana";
 import ContentsContainerMana from "./ContentsContainerMana";
@@ -17,8 +16,9 @@ const ContainerScreen = () => {
         .then((res) => {
             console.log("container==========", res?.data.data.containerModels);
             setContainers(res?.data.data.containerModels);
+            setCount(res?.data.data.count);
         });
-    }, [])
+    }, [page, rowsPerPage])
 
     return (
         <Box className="fullScreen">

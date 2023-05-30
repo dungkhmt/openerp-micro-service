@@ -7,3 +7,11 @@ export const getOrders = async (data) => {
     );
     return resData;
 }
+
+export const createOrder = async (data) => {
+    const resData = request(
+        "post",
+        `/order/create`, {}, {}, data
+    );
+    return resData;
+}

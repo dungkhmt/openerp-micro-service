@@ -10,4 +10,6 @@ import lombok.*;
 public class TruckFilterRequestDTO {
     private String truckCode;
     private String status;
+    private Integer page;
+    private Integer pageSize;
 }

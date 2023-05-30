@@ -4,7 +4,6 @@ import PrimaryButton from "components/button/PrimaryButton";
 import './styles.scss';
 import { useContext, useState } from "react";
 import {useHistory } from 'react-router-dom';
-import { request } from "api";
 import { MyContext } from "contextAPI/MyContext";
 import NewShipmentModal from "./NewShipmentModal";
 

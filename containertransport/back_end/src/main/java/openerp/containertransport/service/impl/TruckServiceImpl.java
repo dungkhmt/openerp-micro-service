@@ -4,10 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import openerp.containertransport.dto.FacilityModel;
-import openerp.containertransport.dto.FacilityResponsiveDTO;
-import openerp.containertransport.dto.TruckFilterRequestDTO;
-import openerp.containertransport.dto.TruckModel;
+import openerp.containertransport.dto.*;
 import openerp.containertransport.entity.Facility;
 import openerp.containertransport.entity.Truck;
 import openerp.containertransport.repo.FacilityRepo;
@@ -47,18 +44,38 @@ public class TruckServiceImpl implements TruckService  {
     }
 
     @Override
-    public List<TruckModel> filterTruck(TruckFilterRequestDTO truckFilterRequestDTO) {
+    public TruckFilterRes filterTruck(TruckFilterRequestDTO truckFilterRequestDTO) {
+        TruckFilterRes truckFilterRes = new TruckFilterRes();
+
         String sql = "SELECT * FROM container_transport_trucks WHERE 1=1";
+        String sqlCount = "SELECT COUNT(id) FROM container_transport_trucks WHERE 1=1";
         HashMap<String, Object> params = new HashMap<>();
+
         if(truckFilterRequestDTO.getTruckCode() != null) {
             sql += " AND truck_code = :truckCode";
+            sqlCount += " AND truck_code = :truckCode";
             params.put("truckCode", truckFilterRequestDTO.getTruckCode());
         }
         if(truckFilterRequestDTO.getStatus() != null) {
             sql += " AND status = :status";
+            sqlCount += " AND status = :status";
             params.put("status", truckFilterRequestDTO.getStatus());
         }
+        Query queryCount = this.entityManager.createNativeQuery(sqlCount);
+        for (String i : params.keySet()) {
+            queryCount.setParameter(i, params.get(i));
+        }
+        truckFilterRes.setCount((Long) queryCount.getSingleResult());
+
         sql += " ORDER BY updated_at DESC";
+
+        if (truckFilterRequestDTO.getPage() != null && truckFilterRequestDTO.getPageSize() != null) {
+            sql += " LIMIT :pageSize OFFSET :index";
+            params.put("pageSize", truckFilterRequestDTO.getPageSize());
+            params.put("index", truckFilterRequestDTO.getPage() * truckFilterRequestDTO.getPageSize());
+            truckFilterRes.setPage(truckFilterRequestDTO.getPage());
+            truckFilterRes.setPageSize(truckFilterRequestDTO.getPageSize());
+        }
 
         Query query = this.entityManager.createNativeQuery(sql, Truck.class);
         for (String i : params.keySet()) {
@@ -67,7 +84,8 @@ public class TruckServiceImpl implements TruckService  {
         List<Truck> trucks = query.getResultList();
         List<TruckModel> truckModels = new ArrayList<>();
         trucks.forEach((item) -> truckModels.add(convertToModel(item)));
-        return truckModels;
+        truckFilterRes.setTruckModels(truckModels);
+        return truckFilterRes;
     }
 
     @Override
