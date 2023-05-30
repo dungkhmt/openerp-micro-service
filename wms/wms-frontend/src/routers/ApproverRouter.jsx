@@ -1,7 +1,7 @@
 import { Route, Switch, useRouteMatch } from "react-router";
 import ReceiptRequestForApprovalListing from "screens/receipt/receiptRequestForApprovalListing";
 import ReceiptRequestForApproval from "screens/receipt/receipRequestForApproval";
-import RevuenueReport from "screens/reports/revenueReport";
+import PresidentReport from "screens/reports/presidentReport";
 
 export default function ApproverRouter () {
   let { path } = useRouteMatch();
@@ -19,7 +19,7 @@ export default function ApproverRouter () {
           path={`${path}/receipts/:id`}
         ></Route>
         <Route
-          component={RevuenueReport}
+          component={PresidentReport}
           exact
           path={`${path}/report`}
         ></Route>

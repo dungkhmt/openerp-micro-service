@@ -1,5 +1,6 @@
 package com.hust.wmsbackend.management.controller;
 
+import com.hust.wmsbackend.management.model.response.ProductCategoryReport;
 import com.hust.wmsbackend.management.model.response.RevenueProfitReportResponse;
 import com.hust.wmsbackend.management.service.ReportService;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,11 @@ public class ReportController {
     @GetMapping("/revenue-profit")
     public ResponseEntity<RevenueProfitReportResponse> genRevenueProfitReport() {
         return ResponseEntity.ok(reportService.genRevenueProfitReport());
+    }
+
+    @GetMapping("/product-category-monthly")
+    public ResponseEntity<ProductCategoryReport> genProductCategoryMonthlyReport() {
+        return ResponseEntity.ok(reportService.genProductCategoryMonthlyReport());
     }
 
 }

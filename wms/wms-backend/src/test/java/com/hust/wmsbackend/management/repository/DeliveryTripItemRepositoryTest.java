@@ -2,6 +2,7 @@ package com.hust.wmsbackend.management.repository;
 
 import com.hust.wmsbackend.WmsBackendApplication;
 import com.hust.wmsbackend.management.entity.DeliveryTripItem;
+import com.hust.wmsbackend.management.model.response.ProductCategoryMonthlyData;
 import com.hust.wmsbackend.management.model.response.ReportDataPoint;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -36,5 +37,11 @@ class DeliveryTripItemRepositoryTest {
     void getExpenseDataPoints() {
         List<ReportDataPoint> dataPoints = deliveryTripItemRepository.getDataPointsForProfit();
         System.out.println(dataPoints);
+    }
+
+    @Test
+    void getProductCategoryMonthlyData() {
+        List<ProductCategoryMonthlyData> productCategoryMonthlyReports = deliveryTripItemRepository.getProductCategoryMonthlyData();
+        System.out.println(productCategoryMonthlyReports);
     }
 }
