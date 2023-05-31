@@ -25,4 +25,6 @@ public interface IFacilityService {
     void exportFromFacility(ExportFromFacilityDTO exportFromFacilityDTO) throws CustomException;
     void deleteFacilityById(long id);
     void assignStaff(String staffCode, String facilityCode) throws CustomException;
+    List<Customer> getFacilityCustomer(String facilityCode);
+    ReturnPaginationDTO<Customer> getAllFacilityCustomer(int page, int pageSize, String sortField, boolean isSortAsc, String facilityCode) throws JsonProcessingException;
 }

@@ -87,7 +87,7 @@ export const useAssignShipmentToTrip = (params) => {
         params,
         data
       );
-      if (res.data && res.code === 1) {
+      if (res.code === 1) {
         toast.success("Phân thành công!");
         return res.data;
       } else {

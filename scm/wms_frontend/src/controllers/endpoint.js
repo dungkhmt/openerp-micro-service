@@ -47,6 +47,7 @@ export const endPoint = {
   getFacilityInventory: baseUrl + "/facility/get-inventory",
   createFacility: baseUrl + "/facility/create",
   getFacilityNoPaging: baseUrl + "/facility/get-all-without-paging",
+  getFacilityCustomers: baseUrl + "/facility/get-customer-of-facility-paging",
   // Bill
   getReceiptBills: baseUrl + "/receipt-bill/get-all",
   getBillItemOfPurchaseOrder: baseUrl + "/receipt-bill/get-bill-items-of-order",

@@ -61,7 +61,7 @@ function FacilityScreen({ screenAuthorization }) {
     {
       title: "Bản đồ",
       callback: (item) => {
-        handleButtonClick();
+        openMap();
       },
       icon: <MapIcon />,
       describe: "Xem bản đồ vị trí kho hàng",
@@ -99,8 +99,7 @@ function FacilityScreen({ screenAuthorization }) {
     {
       title: "Xem chi tiết",
       callback: (item) => {
-        setOpenInventoryDrawer();
-        setFacilityCode(item?.code);
+        seeDetail(item);
       },
       icon: <VisibilityIcon />,
       color: AppColors.green,
@@ -108,9 +107,14 @@ function FacilityScreen({ screenAuthorization }) {
     },
   ];
 
-  const handleButtonClick = () => {
+  const openMap = () => {
     history.push(`${path}/map`, {
       facility: facilityList,
+    });
+  };
+  const seeDetail = (item) => {
+    history.push(`${path}/detail`, {
+      facility: item,
     });
   };
   return (

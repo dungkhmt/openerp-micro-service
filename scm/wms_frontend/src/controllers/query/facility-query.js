@@ -31,6 +31,25 @@ export const useGetFacilityListNoPaging = () => {
     onSuccess: (data) => {},
   });
 };
+
+export const useGetFacilityCustomersPaging = (params) => {
+  return useQuery({
+    queryKey: [queryKey.facility.facility_customer, params],
+    queryFn: async (data) => {
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getFacilityCustomers,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};
 export const useGetFacilityInventory = (params) => {
   return useQuery({
     queryKey: [queryKey.facility.facility_inventory, params],

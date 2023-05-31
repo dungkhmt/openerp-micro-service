@@ -72,12 +72,10 @@ export const useUpdatePurchaseOrderStatus = (params) => {
         data
       );
       if (res.data && res.code === 1) {
+        toast.success("Phê duyệt đơn mua thành công!");
+        queryClient.invalidateQueries([queryKey.purchase_order.order_list]);
         return res.data;
       }
-    },
-    onSuccess: (res, variables, context) => {
-      toast.success("Phê duyệt đơn mua thành công!");
-      queryClient.invalidateQueries([queryKey.purchase_order.order_list]);
     },
     onError: () => {
       toast.error("Lỗi khi cập nhật, vui lòng kiểm tra lại");

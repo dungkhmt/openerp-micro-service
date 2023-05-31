@@ -146,4 +146,31 @@ public class FacilityController extends BaseController{
             return response(error(ex));
         }
     }
+
+    @ApiOperation(value = "Get all customers of a facility")
+    @GetMapping("/get-customer-of-facility")
+    public ResponseEntity<?> getCustomersOfFacility(
+            @RequestParam(value = "facilityCode", required = true, defaultValue = DefaultConst.STRING) String facilityCode
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get list customers of facility " + facilityCode + " successfully", facilityService.getFacilityCustomer(facilityCode)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @ApiOperation(value = "Get all facilities customers with pagination and sorting and some conditions")
+    @GetMapping("/get-customer-of-facility-paging")
+    public ResponseEntity<?> getFacilityCustomerPaging(
+            @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
+            @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
+            @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
+            @RequestParam(value = "sort_asc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
+            @RequestParam(value = "facilityCode", required = true, defaultValue = DefaultConst.STRING) String facilityCode
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get list facilities successfully", facilityService.getAllFacilityCustomer(page, pageSize, sortField, isSortAsc, facilityCode)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
 }

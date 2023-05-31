@@ -87,6 +87,7 @@ public class ShipmentServiceImpl extends BaseService implements IShipmentService
     }
 
     @Override
+    @Transactional
     public void assignShipmentItem(AssignedItemDTO assignedItemDTO) throws CustomException {
         ShipmentItem shipmentItem = getShipmentItemByCode(assignedItemDTO.getShipmentItemCode());
         DeliveryTrip assignedTrip = deliveryTripService.getDeliveryTripByCode(assignedItemDTO.getTripCode());

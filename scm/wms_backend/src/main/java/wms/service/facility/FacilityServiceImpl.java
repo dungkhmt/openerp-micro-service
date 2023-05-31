@@ -460,4 +460,18 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
         facility.setManager(userLogin);
         facilityRepo.save(facility);
     }
+
+    @Override
+    public List<Customer> getFacilityCustomer(String facilityCode) {
+        return customerRepo.getFacilityCustomers(facilityCode);
+    }
+
+    @Override
+    public ReturnPaginationDTO<Customer> getAllFacilityCustomer(int page, int pageSize, String sortField, boolean isSortAsc, String facilityCode) throws JsonProcessingException {
+        Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
+                : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
+                : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
+        Page<Customer> facilityCustomers = customerRepo.getFacilityCustomersPaging(pageable, facilityCode);
+        return getPaginationResult(facilityCustomers.getContent(), page, facilityCustomers.getTotalPages(), facilityCustomers.getTotalElements());
+    }
 }

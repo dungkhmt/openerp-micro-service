@@ -15,4 +15,8 @@ public interface CustomerRepo extends JpaRepository<Customer, Long> {
     Customer getCustomerByCode(String code);
     @Query(value = "select * from scm_customer where is_deleted = 0", nativeQuery = true)
     List<Customer> getAllCustomers();
+    @Query(value = "select * from scm_customer where is_deleted = 0 and facility_code = :facilityCode", nativeQuery = true)
+    List<Customer> getFacilityCustomers(String facilityCode);
+    @Query(value = "select * from scm_customer where is_deleted = 0 and facility_code = :facilityCode", nativeQuery = true)
+    Page<Customer> getFacilityCustomersPaging(Pageable pageable ,String facilityCode);
 }
