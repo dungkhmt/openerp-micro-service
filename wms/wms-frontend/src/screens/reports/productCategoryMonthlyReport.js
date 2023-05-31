@@ -5,7 +5,6 @@ import { API_PATH } from 'screens/apiPaths';
 import { Box, Grid, MenuItem, Select } from '@mui/material';
 import { convertToVNDFormat } from 'screens/utils/utils';
 
-var CanvasJS = CanvasJSReact.CanvasJS;
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const ProductCategoryMonthlyReport = () => {

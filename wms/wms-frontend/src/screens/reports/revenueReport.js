@@ -3,7 +3,6 @@ import CanvasJSReact from '@canvasjs/react-charts';
 import { request } from 'api';
 import { API_PATH } from 'screens/apiPaths';
 
-var CanvasJS = CanvasJSReact.CanvasJS;
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const RevuenueReport = () => {
