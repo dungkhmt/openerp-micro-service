@@ -28,11 +28,11 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
             status: "AVAILABLE"
         }
         getTraler(trailerFilter).then((res) => {
-            console.log("res.data.data", res?.data.data)
-            setTrailerList(res?.data.data);
+            console.log("res.data.data", res?.data.data.trailerModels)
+            setTrailerList(res?.data.data.trailerModels);
         })
         getFacility({}).then((res) => {
-            setFacilityList(res.data.data);
+            setFacilityList(res?.data.data.facilityModels);
         })
     }, []);
 

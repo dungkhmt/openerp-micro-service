@@ -13,7 +13,7 @@ const ModalTruck = ({ openModal, handleClose, type, truckInfo }) => {
 
     useEffect(() => {
         getFacility({}).then((res) => {
-            setFacilityList(res.data.data);
+            setFacilityList(res?.data.data.facilityModels);
         })
     }, []);
 

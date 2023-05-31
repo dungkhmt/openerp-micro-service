@@ -274,15 +274,6 @@ export default function ContentsFacilityMana ({facilities, page, setPage, rowsPe
                     );
                   })
                 : null}
-              {paddingHeight > 0 && (
-                <TableRow
-                  style={{
-                    height: paddingHeight,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
             </TableBody>
           </Table>
         </TableContainer>
