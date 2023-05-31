@@ -9,6 +9,27 @@ const icon = L.icon({
   iconSize: [38, 38],
 });
 
+const one = L.icon({
+  iconUrl: "../../../../../../../placeholder-with-number/1.png",
+  iconSize: [38, 38],
+});
+
+const iconWithNumber = [];
+const LARGEST_ICON_NUMBER = 20; 
+for (var i = 1; i <= LARGEST_ICON_NUMBER; i++) {
+  iconWithNumber.push(L.icon({
+    iconUrl: `../../../../../../../placeholder-with-number/${i}.png`,
+    iconSize: [38, 38],
+  }))
+}
+
+const getIconBySequence = ( sequence ) => {
+  if (sequence == undefined || sequence == null || sequence < 1 || sequence > 20) {
+    return icon;
+  }
+  return iconWithNumber[sequence - 1];
+}
+
 const bluePlaceHolder = L.icon({
   iconUrl: BLUE_PLACE_HOLDER_ICON_URL,
   iconSize: [38, 38],
@@ -99,6 +120,7 @@ export default function Maps(props) {
 }
 
 export function RouteMap ({ points, customers, warehouse }) {
+  console.log("Route map customers => ", customers);
   return (
     <MapContainer
       center={position}
@@ -113,7 +135,7 @@ export function RouteMap ({ points, customers, warehouse }) {
       {
         customers != null && customers != undefined &&
         customers.length > 0 &&
-        customers.map(customer => <Marker position={customer.position} icon={icon}>
+        customers.map(customer => <Marker position={customer.position} icon={getIconBySequence(customer?.sequence)}>
                                       <Popup>
                                         {customer.name}
                                       </Popup>

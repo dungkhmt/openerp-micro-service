@@ -180,7 +180,7 @@ const DeliveryTripDetail = ( props ) => {
         if (res.status == 200) {
           setTripInfo(res.data);
           successNoti("Lưu thông tin chuyến giao hàng thành công");
-          window.location.reload();
+          // window.location.reload();
         }
       },
       {
@@ -437,15 +437,15 @@ const DeliveryTripDetail = ( props ) => {
             </Box>
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid item xs={3}>
             <Box className={classes.inputWrap}>
               <Box className={classes.labelInput}>
-                Nhân viên giao hàng 
+                Nhân viên giao hàng
               </Box>
               <Select defaultValue={tripInfo?.deliveryPersonId} onChange={(e) => setSelectedDeliveryPersonId(e.target.value)}>
                 {
                   deliveryPersons.length > 0 &&
-                  deliveryPersons.map(person => 
+                  deliveryPersons.map(person =>
                     <MenuItem key={person.userLoginId}
                       value={person.userLoginId}>{person.fullName}</MenuItem>)
                 }

@@ -167,6 +167,12 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
             }
             responseItems.add(dto);
         }
+        responseItems.sort(new Comparator<DeliveryTripDTO.DeliveryTripItemDTO>() {
+            @Override
+            public int compare(DeliveryTripDTO.DeliveryTripItemDTO o1, DeliveryTripDTO.DeliveryTripItemDTO o2) {
+                return Integer.compare(o1.getSequence(), o2.getSequence());
+            }
+        });
         response.setItems(responseItems);
         return response;
     }

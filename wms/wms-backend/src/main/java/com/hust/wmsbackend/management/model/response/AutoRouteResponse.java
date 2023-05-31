@@ -24,6 +24,7 @@ public class AutoRouteResponse {
     @NoArgsConstructor
     public static class Marker {
         private String name;
+        private int sequence;
         private List<BigDecimal> position; // [lat, lon]
     }
 
