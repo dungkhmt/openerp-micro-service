@@ -31,8 +31,8 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartItemResponse calculateCartFee(CartItemRequest request) {
         List<CartItemRequest.Item> itemList = request.getItems();
-        if (itemList.size() < 1) {
-            log.warn("Cart item request is empty....");
+        if (itemList == null || itemList.size() < 1) {
+            log.info("Cart item request is empty....");
             return null;
         }
 
@@ -44,7 +44,7 @@ public class CartServiceImpl implements CartService {
                 Product product = productOpt.get();
                 BigDecimal currPrice = productService.getCurrPriceByProductId(product.getProductId());
                 if (currPrice == null) {
-                    log.warn("Product %s hasn't configed price. Please try another");
+                    log.warn("Product %s hasn't configured price. Please try another");
                     return null;
                 }
                 long quantity = r.getQuantity();

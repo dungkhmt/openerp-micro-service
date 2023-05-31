@@ -124,10 +124,9 @@ const ShipmentDetail = ( props ) => {
         }}
         data={tripTableData}
         columns={[
+          { title: "Mã chuyến", field: "deliveryTripId"},
           { title: "Người giao hàng", field: "deliveryPersonName" },
-          { title: "Xe giao hàng", field: "vehicleId" },
           { title: "Quãng đường", field: "distance" },
-          { title: "Tổng khối lượng hàng", field: "totalWeight" },
           { title: "Số điểm giao hàng", field: "totalLocations" }
         ]}
       />

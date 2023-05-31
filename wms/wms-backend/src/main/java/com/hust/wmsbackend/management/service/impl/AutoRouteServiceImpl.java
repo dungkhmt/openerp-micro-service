@@ -217,8 +217,14 @@ public class AutoRouteServiceImpl implements AutoRouteService {
             }
             String CUSTOMER_NAME_MARKER_TEMPLATE = "STT: %d - %s - %s";
             CustomerAddress customerAddress = customerAddressOpt.get();
-            AutoRouteResponse.Marker adder = AutoRouteResponse.Marker.builder().name(String.format(CUSTOMER_NAME_MARKER_TEMPLATE, item.getSequence(), saleOrderHeader.getCustomerName(), saleOrderHeader.getCustomerPhoneNumber()))
-                .position(Arrays.asList(customerAddress.getLatitude(), customerAddress.getLongitude())).build();
+            AutoRouteResponse.Marker adder = AutoRouteResponse.Marker.builder()
+                .name(String.format(CUSTOMER_NAME_MARKER_TEMPLATE,
+                        item.getSequence(),
+                        saleOrderHeader.getCustomerName(),
+                        saleOrderHeader.getCustomerPhoneNumber()))
+                .position(Arrays.asList(customerAddress.getLatitude(), customerAddress.getLongitude()))
+                .sequence(item.getSequence())
+                .build();
             customers.add(adder);
         }
         return AutoRouteResponse.builder().deliveryTripId(deliveryTripId).points(points)
