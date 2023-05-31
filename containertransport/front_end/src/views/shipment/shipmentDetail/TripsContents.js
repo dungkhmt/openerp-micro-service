@@ -21,6 +21,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { useHistory } from 'react-router-dom';
+import { Icon } from '@mui/material';
+import { menuIconMap } from 'config/menuconfig';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -38,10 +40,6 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -60,48 +58,63 @@ const headCells = [
     numeric: false,
     disablePadding: false,
     label: 'Trip Code',
+    width: '11%'
   },
   {
     id: 'truckCode',
     numeric: false,
     disablePadding: false,
     label: 'Truck Code',
+    width: '12%'
   },
   {
     id: 'driverName',
     numeric: false,
     disablePadding: false,
     label: 'Driver Name',
+    width: '10%'
   },
   {
     id: 'numberOrder',
     numeric: false,
     disablePadding: false,
     label: 'Number Orders',
+    width: '10%'
   },
   {
     id: 'created_by_user_id',
     numeric: false,
     disablePadding: false,
     label: 'Created By User',
+    width: '10%'
   },
   {
     id: 'status',
     numeric: false,
     disablePadding: false,
     label: 'Status',
+    width: '12%'
   },
   {
     id: 'createdAt',
     numeric: false,
     disablePadding: false,
     label: 'Created At',
+    width: '13%'
   },
   {
     id: 'updatedAt',
     numeric: false,
     disablePadding: false,
     label: 'Updated At',
+    width: '13%'
+  },
+  {
+    id: 'view',
+    numeric: false,
+    disablePadding: false,
+    label: '',
+    width: '10%'
   }
  
 ];
@@ -136,6 +149,7 @@ function EnhancedTableHead(props) {
             align={headCell.numeric ? 'right' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
+            width={headCell?.width}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -257,6 +271,10 @@ export default function TripsContents({trips, shipmentId}) {
   );
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
+  const handleDetail = (id) => {
+    history.push({
+      pathname: `/shipment/trip/detail/${shipmentId}/${id}`
+  })};
   console.log("trips", trips)
   return (
     <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white"}}>
@@ -312,11 +330,13 @@ export default function TripsContents({trips, shipmentId}) {
                         <TableCell align="center">{row?.truckCode}</TableCell>
                         <TableCell align="center">{row?.driverName}</TableCell>
                         <TableCell align="center">{row?.orderIds?.length}</TableCell>
-                        <TableCell align="center">{row?.created_by_user_id}</TableCell>
-                        <TableCell align="center">{row?.status}</TableCell>
+                        <TableCell align="left">{row?.created_by_user_id}</TableCell>
+                        <TableCell align="left">{row?.status}</TableCell>
                         <TableCell align="left">{new Date(row?.createdAt).toLocaleDateString()}</TableCell>
                         <TableCell align="left">{new Date(row?.updatedAt).toLocaleDateString()}</TableCell>
-                        <TableCell align="center"></TableCell>
+                        <TableCell onClick={() => {handleDetail(row?.id)}} >
+                          <Icon className='icon-view-shipment-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                        </TableCell>
                       </TableRow>
                     );
                   })

@@ -26,7 +26,7 @@ const TrailerScreen = () => {
 
     return (
         <Box className="fullScreen">
-            <Container maxWidth="md" className="container">
+            <Container maxWidth="lg" className="container">
                 <HeaderTrailerScreen openModal={openModal} handleClose={handleClose} />
                 <Box className="divider">
                     <Divider />

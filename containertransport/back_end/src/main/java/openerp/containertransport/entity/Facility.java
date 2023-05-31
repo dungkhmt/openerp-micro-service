@@ -28,6 +28,19 @@ public class Facility {
 
     private String address;
 
+    private String owner;
+
+    private BigDecimal acreage; // dien tich
+
+    @Column(name = "number_truck")
+    private Integer numberTruck;
+
+    @Column(name = "number_trailer")
+    private Integer numberTrailer;
+
+    @Column(name = "number_container")
+    private Integer numberContainer;
+
     @Column(name = "max_number_truck")
     private Integer maxNumberTruck;
 

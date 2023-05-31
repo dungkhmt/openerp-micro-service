@@ -54,7 +54,7 @@ const headCells = [
   {
     id: 'code',
     numeric: false,
-    disablePadding: true,
+    disablePadding: false,
     label: 'Truck Code',
   },
   {
@@ -254,7 +254,7 @@ export default function ContentsTruckManagement({trucks, page, setPage, rowsPerP
                           component="th"
                           id={labelId}
                           scope="row"
-                          padding="none"
+                          align="left"
                         >
                           {row.truckCode}
                         </TableCell>

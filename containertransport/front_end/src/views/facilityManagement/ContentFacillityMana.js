@@ -22,6 +22,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import './styles.scss';
+import { Icon } from '@mui/material';
+import { menuIconMap } from 'config/menuconfig';
+import { useHistory } from 'react-router-dom';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -55,8 +58,8 @@ const headCells = [
     {
         id: 'code',
         numeric: false,
-        disablePadding: true,
-        label: 'Facility Code',
+        disablePadding: false,
+        label: 'Code',
     },
     {
         id: 'name',
@@ -65,35 +68,62 @@ const headCells = [
         label: 'Name',
     },
     {
-        id: 'type',
-        numeric: false,
-        disablePadding: false,
-        label: 'Type',
+      id: 'address',
+      numeric: false,
+      disablePadding: false,
+      label: 'Address',
     },
     {
-        id: 'numberTruck',
-        numeric: false,
-        disablePadding: false,
-        label: 'Max Number Truck',
+      id: 'owner',
+      numeric: false,
+      disablePadding: false,
+      label: 'Owner',
     },
     {
-        id: 'numberTrailer',
+        id: 'acreage',
         numeric: false,
         disablePadding: false,
-        label: 'Max Number Trailer'
+        label: 'Acreage',
     },
     {
-        id: 'numberContainer',
-        numeric: false,
-        disablePadding: false,
-        label: 'Max Number Container'
+      id: 'type',
+      numeric: false,
+      disablePadding: false,
+      label: 'Type',
     },
+    // {
+    //     id: 'numberTruck',
+    //     numeric: false,
+    //     disablePadding: false,
+    //     label: 'Number Truck',
+    //     width: '8%'
+    // },
+    // {
+    //     id: 'numberTrailer',
+    //     numeric: false,
+    //     disablePadding: false,
+    //     label: 'Number Trailer',
+    //     width: '8%'
+    // },
+    // {
+    //     id: 'numberContainer',
+    //     numeric: false,
+    //     disablePadding: false,
+    //     label: 'Number Container',
+    //     width: '8%'
+    // },
     {
         id: 'createdAt',
         numeric: false,
         disablePadding: false,
         label: 'Created At',
     },
+    {
+      id: 'view',
+      numeric: false,
+      disablePadding: false,
+      label: '',
+  },
 ];
 
 const DEFAULT_ORDER = 'asc';
@@ -125,6 +155,7 @@ function EnhancedTableHead(props) {
                         align={headCell.numeric ? 'right' : 'left'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
+                        width={headCell.width}
                     >
                         <TableSortLabel
                             active={orderBy === headCell.id}
@@ -146,11 +177,12 @@ function EnhancedTableHead(props) {
 }
 
 export default function ContentsFacilityMana ({facilities, page, setPage, rowsPerPage, setRowsPerPage, count}) {
-    const [order, setOrder] = React.useState(DEFAULT_ORDER);
+  const [order, setOrder] = React.useState(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
   const [selected, setSelected] = React.useState([]);
   const [dense, setDense] = React.useState(false);
   const [visibleRows, setVisibleRows] = React.useState(null);
+  const history = useHistory();
 
   const handleRequestSort = React.useCallback(
     (event, newOrderBy) => {
@@ -211,7 +243,11 @@ export default function ContentsFacilityMana ({facilities, page, setPage, rowsPe
   };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
-
+  const handleView = (id) => {
+    history.push({
+      pathname: `/facility/detail/${id}`,
+    })
+  }
   return (
     <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white"}}>
       <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -260,16 +296,19 @@ export default function ContentsFacilityMana ({facilities, page, setPage, rowsPe
                           component="th"
                           id={labelId}
                           scope="row"
-                          padding="none"
+                          align="left"
                         >
                           {row.facilityCode}
                         </TableCell>
                         <TableCell align="left">{row.facilityName}</TableCell>
+                        <TableCell align="left">{row.address}</TableCell>
+                        <TableCell align="left">{row.owner}</TableCell>
+                        <TableCell align="left">{row.acreage}</TableCell>
                         <TableCell align="left">{row.facilityType}</TableCell>
-                        <TableCell align="left">{row.maxNumberTruck}</TableCell>
-                        <TableCell align="left">{row.maxNumberTrailer}</TableCell>
-                        <TableCell align="left">{row.maxNumberTrailer}</TableCell>
                         <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell onClick={() => {handleView(row?.id)}}>
+                          <Icon>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                        </TableCell>
                       </TableRow>
                     );
                   })

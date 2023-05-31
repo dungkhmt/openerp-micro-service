@@ -21,6 +21,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { useHistory } from 'react-router-dom';
+import { Icon } from '@mui/material';
+import { menuIconMap } from 'config/menuconfig';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -54,32 +56,44 @@ const headCells = [
   {
     id: 'code',
     numeric: false,
-    disablePadding: true,
+    disablePadding: false,
     label: 'Shipment Code',
+    width: '20%'
   },
   {
     id: 'created_by_user_id',
     numeric: false,
     disablePadding: false,
     label: 'Created By User',
+    width: '20%'
   },
   {
     id: 'status',
     numeric: false,
     disablePadding: false,
     label: 'Status',
+    width: '18%'
   },
   {
     id: 'createdAt',
     numeric: false,
     disablePadding: false,
     label: 'Created At',
+    width: '18%'
   },
   {
     id: 'updateAt',
     numeric: false,
     disablePadding: false,
     label: 'Update At',
+    width: '18%'
+  },
+  {
+    id: 'view',
+    numeric: false,
+    disablePadding: false,
+    label: '',
+    width: '5%'
   }
 ];
 
@@ -112,6 +126,7 @@ function EnhancedTableHead(props) {
             align={headCell.numeric ? 'right' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
+            width={headCell?.width}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -189,12 +204,6 @@ export default function ShipmentScreenContents({shipments, page, setPage, rowsPe
 
   const handleChangePage = (event, newPage) => {
       setPage(newPage);
-
-      // const sortedRows = stableSort(shipments, getComparator(order, orderBy));
-      // const updatedRows = sortedRows.slice(
-      //   newPage * rowsPerPage,
-      //   newPage * rowsPerPage + rowsPerPage,
-      // );
     };
 
   const handleChangeRowsPerPage = (event) => {
@@ -205,7 +214,15 @@ export default function ShipmentScreenContents({shipments, page, setPage, rowsPe
     };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
-
+  const handleDetail = (id) => {
+    history.push({
+      pathname:`/shipment/detail/${id}`,
+      // state: {
+      //   type: "detail",
+      //   shipmentId: row.id
+      // }
+  })
+  }
   return (
     <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white"}}>
       <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -255,7 +272,7 @@ export default function ShipmentScreenContents({shipments, page, setPage, rowsPe
                           component="th"
                           id={labelId}
                           scope="row"
-                          padding="none"
+                          padding="normal"
                           onClick={() => history.push({
                             pathname:`/shipment/detail/${row.id}`,
                             // state: {
@@ -266,10 +283,13 @@ export default function ShipmentScreenContents({shipments, page, setPage, rowsPe
                         >
                           {row.code}
                         </TableCell>
-                        <TableCell align="left">{row.created_by_user_id}</TableCell>
+                        <TableCell align="left">{row.created_by_user_id} {'  '}</TableCell>
                         <TableCell align="left">{row.status}</TableCell>
                         <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                         <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
+                        <TableCell onClick={() => {handleDetail(row?.id)}} >
+                          <Icon className='icon-view-shipment-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                        </TableCell>
                       </TableRow>
                     );
                   })

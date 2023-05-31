@@ -22,7 +22,7 @@ const ContainerScreen = () => {
 
     return (
         <Box className="fullScreen">
-            <Container maxWidth="md" className="container">
+            <Container maxWidth="lg" className="container">
                 <HeaderContainerMana />
                 <Box className="divider">
                     <Divider />

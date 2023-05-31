@@ -33,7 +33,7 @@ const ShipmentDetail = () => {
     console.log("=========", shipment)
     return (
         <Box className="fullScreen">
-            <Container maxWidth="md" className="container">
+            <Container maxWidth="lg" className="container">
                 <Box className="headerScreen-trip-detail">
                     <Box className="headerScreen-trip-detail-go-back"
                         onClick={() => history.push('/shipment')}

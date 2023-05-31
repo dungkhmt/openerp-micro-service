@@ -23,10 +23,15 @@ const MapComponent = ({tripItems}) => {
     console.log("point", point)
     return (
         <Box>
-            <MapContainer center={[21.018172, 105.829754]} zoom={13} scrollWheelZoom={false} style={{ height: "70vh" }}
+            <MapContainer 
+            center={[21.018172, 105.829754]} 
+            zoom={13}
+            scrollWheelZoom={true} style={{ height: "70vh" }}
             whenCreated={map => setMap(map)}
             >
                 <TileLayer
+                // url="https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+                // attribution="Map data © Google"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />

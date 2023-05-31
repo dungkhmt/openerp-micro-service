@@ -17,6 +17,7 @@ import CreateTripDetail from "views/shipment/tripCreate/CreateTripDetail";
 import ShipmentDetail from "views/shipment/shipmentDetail/ShipmentDetail";
 import TripDetail from "views/shipment/tripDetail/TripDetail";
 import TrailerScreen from "views/trailer/TrailerScreen";
+import FacilityDetail from "views/facilityManagement/detail/FacilityDetail";
 
 const styles = {
   loadingProgress: {
@@ -45,18 +46,16 @@ function MainAppRouter(props) {
         <Switch>
           <Route component={() => <></>} exact path="/" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
-          <PrivateRoute component={TruckScreen} path="/truck" />
-          <PrivateRoute component={FacilityScreen} path="/facility" />
-          <PrivateRoute component={OrderScreen} path="/order" />
-          <PrivateRoute component={ContainerScreen} path="/container" />
-          <Route component={TrailerScreen} path="/trailer" />
+          <PrivateRoute component={TruckScreen} exact path="/truck" />
+          <PrivateRoute component={FacilityScreen} exact path="/facility" />
+          <PrivateRoute component={FacilityDetail} exact path="/facility/detail/:facilityId" />
+          <PrivateRoute component={OrderScreen} exact path="/order" />
+          <PrivateRoute component={ContainerScreen} exact path="/container" />
+          <Route component={TrailerScreen} exact path="/trailer" />
           <AppProvider>
             <Route component={ShipmentScreen} exact path="/shipment" />
             <Route component={ShipmentDetail} exact path="/shipment/detail/:shipmentId" />
             <Route component={TripDetail} exact path="/shipment/trip/detail/:shipmentId/:tripId" />
-            {/* <Route path="/shipment/create">
-              <TripScreen />
-            </Route> */}
             <Route component={CreateTripDetail} path="/shipment/trip/create/:shipmentId" />
           </AppProvider>
           <Route component={NotFound} />

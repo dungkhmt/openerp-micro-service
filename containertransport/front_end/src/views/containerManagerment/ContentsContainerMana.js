@@ -55,7 +55,7 @@ const headCells = [
     {
         id: 'code',
         numeric: false,
-        disablePadding: true,
+        disablePadding: false,
         label: 'Container Code',
     },
     {
@@ -71,11 +71,23 @@ const headCells = [
         label: 'Facility Name',
     },
     {
+      id: 'status',
+      numeric: false,
+      disablePadding: false,
+      label: 'Status',
+  },
+    {
         id: 'createdAt',
         numeric: false,
         disablePadding: false,
         label: 'Created At',
     },
+    {
+      id: 'updateAt',
+      numeric: false,
+      disablePadding: false,
+      label: 'Update At',
+  },
 ];
 
 const DEFAULT_ORDER = 'asc';
@@ -133,7 +145,6 @@ export default function ContentsContainerMana ({containers, page, setPage, rowsP
   const [selected, setSelected] = React.useState([]);
   const [dense, setDense] = React.useState(false);
   const [visibleRows, setVisibleRows] = React.useState(null);
-  const [paddingHeight, setPaddingHeight] = React.useState(0);
 
   const handleRequestSort = React.useCallback(
     (event, newOrderBy) => {
@@ -243,26 +254,19 @@ export default function ContentsContainerMana ({containers, page, setPage, rowsP
                           component="th"
                           id={labelId}
                           scope="row"
-                          padding="none"
+                          align="left"
                         >
                           {row.containerCode}
                         </TableCell>
                         <TableCell align="left">{row.size}</TableCell>
                         <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
+                        <TableCell align="left">{row.status}</TableCell>
                         <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
                       </TableRow>
                     );
                   })
                 : null}
-              {paddingHeight > 0 && (
-                <TableRow
-                  style={{
-                    height: paddingHeight,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
             </TableBody>
           </Table>
         </TableContainer>

@@ -16,6 +16,11 @@ public class FacilityModel {
     private String facilityName;
     private String facilityType;
     private String address;
+    private String owner;
+    private BigDecimal acreage;
+    private Integer numberTruck;
+    private Integer numberTrailer;
+    private Integer numberContainer;
     private BigDecimal longitude;
     private BigDecimal latitude;
     private Long processingTime;

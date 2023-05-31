@@ -8,6 +8,14 @@ export const getFacility = async (data) => {
     return resData;
 }
 
+export const getFacilityById = async (data) => {
+    const resData = request(
+        "get",
+        `/facility/${data}`, {},{}, {}, {},
+      )
+    return resData;
+}
+
 export const createFacility = (data) => {
     const resData = request(
         "post",

@@ -8,7 +8,7 @@ import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import { useKeycloak } from "@react-keycloak/web";
 import { ReactComponent as Logo } from "assets/icons/logo.svg";
-import bgImage from "assets/img/sidebar-2.webp";
+import bgImage from "assets/img/sidebar-tms3.jpg";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import AccountButton from "./account/AccountButton";

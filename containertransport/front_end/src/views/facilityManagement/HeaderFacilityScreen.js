@@ -2,14 +2,22 @@ import { Box, Modal, Icon, Typography, Divider, TextField, Button } from "@mui/m
 import './styles.scss';
 import PrimaryButton from "components/button/PrimaryButton";
 import { menuIconMap } from "config/menuconfig";
+import { useState } from "react";
+import FacilityModal from "./create/NewFacilityModal";
 
 const HeaderFacilityScreen = () => {
+    const [open, setOpen] = useState(false);
+    const handleNewFacility = () => {
+        setOpen(true);
+    }
+
     return (
         <Box className="headerScreen">
             <Box className="title">
                 <Typography >Facility Management</Typography>
             </Box>
             <Box className="btn-add"
+            onClick={handleNewFacility}
             >
                 <PrimaryButton className="btn-header">
                     <Icon className="icon">
@@ -20,6 +28,7 @@ const HeaderFacilityScreen = () => {
                     </Typography>
                 </PrimaryButton>
             </Box>
+            {open ? (<FacilityModal open={open} setOpen={setOpen} />) : null}
         </Box>
     );
 }

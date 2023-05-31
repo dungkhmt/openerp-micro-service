@@ -14,10 +14,14 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import './styles.scss';
+import { Icon } from '@mui/material';
+import { menuIconMap } from 'config/menuconfig';
+import { useHistory } from 'react-router-dom';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -47,63 +51,11 @@ function stableSort(array, comparator) {
     return stabilizedThis.map((el) => el[0]);
 }
 
-const headCells = [
-    {
-        id: 'code',
-        numeric: false,
-        disablePadding: true,
-        label: 'Order Code',
-        with: "13%"
-    },
-    {
-        id: 'customer',
-        numeric: false,
-        disablePadding: false,
-        label: 'Customer',
-        with: "12%"
-    },
-    {
-        id: 'fromFacility',
-        numeric: false,
-        disablePadding: false,
-        label: 'From Facility',
-        with: "13%"
-    },
-    {
-        id: 'toFacility',
-        numeric: false,
-        disablePadding: false,
-        label: 'To Facility',
-        with: "13%"
-    },
-    {
-        id: 'numberContainer',
-        numeric: false,
-        disablePadding: false,
-        label: 'Number Container',
-        with: "18%"
-    },
-    {
-        id: 'status',
-        numeric: false,
-        disablePadding: false,
-        label: 'Status',
-        with: "20%"
-    },
-    {
-        id: 'createdAt',
-        numeric: false,
-        disablePadding: false,
-        label: 'Created At',
-        with: "20%"
-    },
-];
-
 const DEFAULT_ORDER = 'asc';
 const DEFAULT_ORDER_BY = 'calories';
 
 function EnhancedTableHead(props) {
-    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, headCells } = props;
     const createSortHandler = (newOrderBy) => (event) => {
         onRequestSort(event, newOrderBy);
     };
@@ -128,7 +80,7 @@ function EnhancedTableHead(props) {
                         align={headCell.numeric ? 'right' : 'left'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
-                        width={headCell.with}
+                        width={headCell.width}
                     >
                         <TableSortLabel
                             active={orderBy === headCell.id}
@@ -149,13 +101,14 @@ function EnhancedTableHead(props) {
     );
 }
 
-export default function ContentsOrderManagerment({ orders, page, setPage, rowsPerPage, setRowsPerPage, count }) {
+export default function TableComponent(props) {
+    const { children, data, page, setPage, rowsPerPage, setRowsPerPage, count, headCells } = props;
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
     const [selected, setSelected] = React.useState([]);
     const [dense, setDense] = React.useState(false);
     const [visibleRows, setVisibleRows] = React.useState(null);
-    const [paddingHeight, setPaddingHeight] = React.useState(0);
+    const history = useHistory();
 
     const handleRequestSort = React.useCallback(
         (event, newOrderBy) => {
@@ -164,7 +117,7 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
             setOrder(toggledOrder);
             setOrderBy(newOrderBy);
 
-            const sortedRows = stableSort(orders, getComparator(toggledOrder, newOrderBy));
+            const sortedRows = stableSort(data, getComparator(toggledOrder, newOrderBy));
             const updatedRows = sortedRows.slice(
                 page * rowsPerPage,
                 page * rowsPerPage + rowsPerPage,
@@ -177,7 +130,7 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = orders.map((n) => n.name);
+            const newSelected = data.map((n) => n.name);
             setSelected(newSelected);
             return;
         }
@@ -216,7 +169,11 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
     };
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
-
+    const handleView = (id) => {
+        history.push({
+            pathname: `/facility/detail/${id}`,
+        })
+    }
     return (
         <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
             <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -232,11 +189,12 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
                             onRequestSort={handleRequestSort}
-                            rowCount={orders.length}
+                            rowCount={data.length}
+                            headCells={headCells}
                         />
                         <TableBody>
-                            {orders
-                                ? orders.map((row, index) => {
+                            {data
+                                ? data.map((row, index) => {
                                     const isItemSelected = isSelected(row.id);
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -251,43 +209,11 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                                             selected={isItemSelected}
                                             sx={{ cursor: 'pointer' }}
                                         >
-                                            <TableCell padding="checkbox">
-                                                <Checkbox
-                                                    color="primary"
-                                                    checked={isItemSelected}
-                                                    inputProps={{
-                                                        'aria-labelledby': labelId,
-                                                    }}
-                                                    onClick={(event) => handleClick(event, row.id)}
-                                                />
-                                            </TableCell>
-                                            <TableCell
-                                                component="th"
-                                                id={labelId}
-                                                scope="row"
-                                                padding="none"
-                                            >
-                                                {row?.orderCode}
-                                            </TableCell>
-                                            <TableCell align="left">{row?.customerId}</TableCell>
-                                            <TableCell align="left">{row?.fromFacility.facilityName}</TableCell>
-                                            <TableCell align="left">{row?.toFacility.facilityName}</TableCell>
-                                            <TableCell align="left">{row.containers.length}</TableCell>
-                                            <TableCell align="left">{row.status}</TableCell>
-                                            <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
+                                            {children}
                                         </TableRow>
                                     );
                                 })
                                 : null}
-                            {paddingHeight > 0 && (
-                                <TableRow
-                                    style={{
-                                        height: paddingHeight,
-                                    }}
-                                >
-                                    <TableCell colSpan={6} />
-                                </TableRow>
-                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
