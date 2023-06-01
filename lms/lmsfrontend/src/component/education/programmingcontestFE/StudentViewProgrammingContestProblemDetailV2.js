@@ -14,6 +14,12 @@ import FileUploadZone from "../../../utils/FileUpload/FileUploadZone";
 import HustContainerCard from "../../common/HustContainerCard";
 import HustCodeEditor from "../../common/HustCodeEditor";
 import {request} from "../../../api";
+import {
+  COMPUTER_LANGUAGES,
+  DEFAULT_CODE_SEGMENT_CPP,
+  DEFAULT_CODE_SEGMENT_JAVA,
+  DEFAULT_CODE_SEGMENT_PYTHON
+} from "./Constant";
 
 const editorStyle = {
   toolbar: {
@@ -32,7 +38,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
   const [problem, setProblem] = useState(null);
   const [testCases, setTestCases] = useState([]);
   const [file, setFile] = useState(null);
-  const [language, setLanguage] = useState("CPP");
+  const [language, setLanguage] = useState(COMPUTER_LANGUAGES.CPP);
   const [status, setStatus] = useState("");
   const [message, setMessage] = useState("");
   const [codeSolution, setCodeSolution] = useState("");
@@ -165,6 +171,20 @@ export default function StudentViewProgrammingContestProblemDetail() {
   useEffect(() => {
     getProblemDetail();
   }, []);
+
+  useEffect(() => {
+    switch (language) {
+      case COMPUTER_LANGUAGES.CPP:
+        setCodeSolution(DEFAULT_CODE_SEGMENT_CPP);
+        break;
+      case COMPUTER_LANGUAGES.JAVA:
+        setCodeSolution(DEFAULT_CODE_SEGMENT_JAVA);
+        break;
+      case COMPUTER_LANGUAGES.PYTHON:
+        setCodeSolution(DEFAULT_CODE_SEGMENT_PYTHON);
+        break;
+    }
+  }, [language])
 
   const ModalPreview = (chosenTestcase) => {
     return (
