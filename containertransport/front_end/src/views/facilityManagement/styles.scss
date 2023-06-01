@@ -37,78 +37,79 @@
             font-weight: 700;
         }
     }
-
-    .btn-header {
-        display: flex;
-        align-items: center;
-
-        .material-icons {
-            height: auto;
-            display: flex;
-            margin-right: 4px;
-        }
-    }
-}
-
-.modal {
-    position: absolute;
-    margin-top: 10%;
-    margin-left: 35%;
-    min-width: 700px;
-    height: auto;
-    background-color: white;
-    padding: 32px;
-
-    .header-modal {
-        font-weight: 800;
-
-        .header-modal-text {
-            font-weight: 650;
-        }
-    }
-
-    .body-modal {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-
-        .body-modal-item {
-            width: 90%;
+    .btn-add {
+        .btn-headerScreen {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-
-            .body-modal-item-text {
-                font-weight: 600;
+    
+            .material-icons {
+                height: auto;
+                display: flex;
+                margin-right: 4px;
             }
-        }
-
-        .body-modal-item-input {
-            .MuiOutlinedInput-root {
-                height: 40px;
-                width: 300px;
-            }
-
-            .MuiFormLabel-root {
-                font-size: 12px;
-            }
-        }
-    }
-
-    .footer-modal {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 32px;
-
-        .btn-modal {
-            display: flex;
-            justify-content: space-between;
-            width: 25%;
-            margin-right: 32px;
         }
     }
 }
+
+// .modal {
+//     position: absolute;
+//     margin-top: 10%;
+//     margin-left: 35%;
+//     min-width: 700px;
+//     height: auto;
+//     background-color: white;
+//     padding: 32px;
+
+//     .header-modal {
+//         font-weight: 800;
+
+//         .header-modal-text {
+//             font-weight: 650;
+//         }
+//     }
+
+//     .body-modal {
+//         display: flex;
+//         flex-direction: column;
+//         align-items: center;
+
+//         .body-modal-item {
+//             width: 90%;
+//             display: flex;
+//             align-items: center;
+//             justify-content: space-between;
+//             margin-bottom: 24px;
+
+//             .body-modal-item-text {
+//                 font-weight: 600;
+//             }
+//         }
+
+//         .body-modal-item-input {
+//             .MuiOutlinedInput-root {
+//                 height: 40px;
+//                 width: 300px;
+//             }
+
+//             .MuiFormLabel-root {
+//                 font-size: 12px;
+//             }
+//         }
+//     }
+
+//     .footer-modal {
+//         display: flex;
+//         justify-content: flex-end;
+//         margin-top: 32px;
+
+//         .btn-modal {
+//             display: flex;
+//             justify-content: space-between;
+//             width: 25%;
+//             margin-right: 32px;
+//         }
+//     }
+// }
 
 .bodyContent {
     background-color: white;

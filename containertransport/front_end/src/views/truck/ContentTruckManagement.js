@@ -21,6 +21,8 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
+import { Icon } from '@mui/material';
+import { menuIconMap } from 'config/menuconfig';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -56,36 +58,56 @@ const headCells = [
     numeric: false,
     disablePadding: false,
     label: 'Truck Code',
+    width: '12%'
   },
   {
     id: 'facility',
     numeric: false,
     disablePadding: false,
     label: 'Facility Name',
+    width: '13%'
   },
   {
     id: 'driver',
     numeric: false,
     disablePadding: false,
     label: 'Driver Name',
+    width: '13%'
+  },
+  {
+    id: 'status',
+    numeric: false,
+    disablePadding: false,
+    label: 'Status',
+    width: '13%'
   },
   {
     id: 'licensePlates',
     numeric: false,
     disablePadding: false,
     label: 'License Plates',
+    width: '13%'
   },
   {
     id: 'brand',
     numeric: false,
     disablePadding: false,
-    label: 'Brand'
+    label: 'Brand',
+    width: '10%'
   },
   {
     id: 'createdAt',
     numeric: false,
     disablePadding: false,
     label: 'Created At',
+    width: '12%'
+  },
+  {
+    id: 'view',
+    numeric: false,
+    disablePadding: false,
+    label: '',
+    width: '10%'
   },
 ];
 
@@ -118,6 +140,7 @@ function EnhancedTableHead(props) {
             align={headCell.numeric ? 'right' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
+            width={headCell?.width}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -260,22 +283,19 @@ export default function ContentsTruckManagement({trucks, page, setPage, rowsPerP
                         </TableCell>
                         <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
                         <TableCell align="left">{row.driverName}</TableCell>
+                        <TableCell align="left">{row.status}</TableCell>
                         <TableCell align="left">{row.licensePlates}</TableCell>
                         <TableCell align="left">{row.brandTruck}</TableCell>
                         <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell 
+                        // onClick={() => {handleDetail(row?.id)}} 
+                        >
+                          <Icon className='icon-view-shipment-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                        </TableCell>
                       </TableRow>
                     );
                   })
                 : null}
-              {paddingHeight > 0 && (
-                <TableRow
-                  style={{
-                    height: paddingHeight,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
             </TableBody>
           </Table>
         </TableContainer>

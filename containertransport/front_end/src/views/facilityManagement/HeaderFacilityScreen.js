@@ -19,7 +19,7 @@ const HeaderFacilityScreen = () => {
             <Box className="btn-add"
             onClick={handleNewFacility}
             >
-                <PrimaryButton className="btn-header">
+                <PrimaryButton className="btn-headerScreen">
                     <Icon className="icon">
                         {menuIconMap.get("ControlPointIcon")}
                     </Icon>
