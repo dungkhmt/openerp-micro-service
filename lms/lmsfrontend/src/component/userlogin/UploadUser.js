@@ -48,8 +48,8 @@ function UploadUser() {
 
       const [headerRow, ...dataRows] = jsonData;
 
-      dataRows.forEach((row) => {
-        addUser(row);
+      dataRows.forEach((row, index) => {
+        setTimeout(() => {addUser(row);}, index * 1000);
       });
     };
 
