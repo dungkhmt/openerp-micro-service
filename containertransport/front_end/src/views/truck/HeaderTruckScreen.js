@@ -4,7 +4,7 @@ import PrimaryButton from "components/button/PrimaryButton";
 import { menuIconMap } from "config/menuconfig";
 import ModalTruck from "./ModalTruck";
 
-const HeaderTruckScreen = ({openModal, handleClose}) => {
+const HeaderTruckScreen = ({openModal, handleClose, setToast, setToastType, setToastMsg}) => {
     return (
         <Box className="headerTruckScreen">
             <Box className="title">
@@ -21,7 +21,8 @@ const HeaderTruckScreen = ({openModal, handleClose}) => {
                     </Typography>
                 </PrimaryButton>
             </Box>
-            {openModal ? (<ModalTruck openModal={openModal} handleClose={handleClose} />) : null}
+            {openModal ? (<ModalTruck openModal={openModal} handleClose={handleClose} 
+            setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
         </Box>
     );
 };

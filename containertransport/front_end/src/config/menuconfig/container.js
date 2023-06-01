@@ -10,5 +10,12 @@ export const container = {
         text: "Container Management",
         child: [],
       },
+      {
+        id: "MENU_CONTAINER.TYPE_CONTAINER",
+        path: "/type/container",
+        isPublic: false,
+        text: "Type Container Management",
+        child: [],
+      },
     ],
   };

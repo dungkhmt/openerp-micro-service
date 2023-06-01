@@ -23,6 +23,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Icon } from '@mui/material';
 import { menuIconMap } from 'config/menuconfig';
+import { useHistory } from 'react-router-dom';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -161,13 +162,13 @@ function EnhancedTableHead(props) {
   );
 }
 
-export default function ContentsTruckManagement({trucks, page, setPage, rowsPerPage, setRowsPerPage, count}) {
+export default function ContentsTruckManagement({ trucks, page, setPage, rowsPerPage, setRowsPerPage, count }) {
   const [order, setOrder] = React.useState(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
   const [selected, setSelected] = React.useState([]);
   const [dense, setDense] = React.useState(false);
   const [visibleRows, setVisibleRows] = React.useState(null);
-  const [paddingHeight, setPaddingHeight] = React.useState(0);
+  const history = useHistory();
 
   const handleRequestSort = React.useCallback(
     (event, newOrderBy) => {
@@ -228,9 +229,13 @@ export default function ContentsTruckManagement({trucks, page, setPage, rowsPerP
   };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
-
+  const handleDetail = (id) => {
+    history.push({
+      pathname: `/truck/detail/${id}`,
+    })
+  }
   return (
-    <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white"}}>
+    <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
       <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
         <TableContainer>
           <Table
@@ -249,52 +254,55 @@ export default function ContentsTruckManagement({trucks, page, setPage, rowsPerP
             <TableBody>
               {trucks
                 ? trucks.map((row, index) => {
-                    const isItemSelected = isSelected(row.id);
-                    const labelId = `enhanced-table-checkbox-${index}`;
+                  const isItemSelected = isSelected(row.id);
+                  const labelId = `enhanced-table-checkbox-${index}`;
 
-                    return (
-                      <TableRow
-                        hover
-                        // onClick={(event) => handleClick(event, row.name)}
-                        role="checkbox"
-                        aria-checked={isItemSelected}
-                        tabIndex={-1}
-                        key={row.id}
-                        selected={isItemSelected}
-                        sx={{ cursor: 'pointer' }}
+                  return (
+                    <TableRow
+                      hover
+                      // onClick={(event) => handleClick(event, row.name)}
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row.id}
+                      selected={isItemSelected}
+                      sx={{ cursor: 'pointer' }}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          inputProps={{
+                            'aria-labelledby': labelId,
+                          }}
+                          onClick={(event) => handleClick(event, row.id)}
+                        />
+                      </TableCell>
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        align="left"
                       >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            color="primary"
-                            checked={isItemSelected}
-                            inputProps={{
-                              'aria-labelledby': labelId,
-                            }}
-                            onClick={(event) => handleClick(event, row.id)}
-                          />
-                        </TableCell>
-                        <TableCell
-                          component="th"
-                          id={labelId}
-                          scope="row"
-                          align="left"
-                        >
-                          {row.truckCode}
-                        </TableCell>
-                        <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
-                        <TableCell align="left">{row.driverName}</TableCell>
-                        <TableCell align="left">{row.status}</TableCell>
-                        <TableCell align="left">{row.licensePlates}</TableCell>
-                        <TableCell align="left">{row.brandTruck}</TableCell>
-                        <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
-                        <TableCell 
-                        // onClick={() => {handleDetail(row?.id)}} 
-                        >
-                          <Icon className='icon-view-shipment-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
+                        {row.truckCode}
+                      </TableCell>
+                      <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
+                      <TableCell align="left">{row.driverName}</TableCell>
+                      <TableCell align="left">{row.status}</TableCell>
+                      <TableCell align="left">{row.licensePlates}</TableCell>
+                      <TableCell align="left">{row.brandTruck}</TableCell>
+                      <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell sx={{display: 'flex'}}>
+                        <Box onClick={() => { handleDetail(row?.id) }} >
+                          <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                        </Box>
+                        <Box>
+                          <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
                 : null}
             </TableBody>
           </Table>

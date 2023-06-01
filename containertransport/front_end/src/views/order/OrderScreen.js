@@ -30,7 +30,7 @@ const OrderScreen = () => {
                             </Alert >
                         ) : (
                             <Alert variant="filled" severity={toastType} >
-                                <strong> Created Order False !!!</strong >
+                                <strong> Created Order Fail !!!</strong >
                             </Alert >
                         )) : null
                     }

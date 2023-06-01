@@ -116,3 +116,9 @@ menuIconMap.set("DeleteForeverIcon", <DeleteForeverIcon />);
 menuIconMap.set("RemoveRedEyeIcon", <RemoveRedEyeIcon />);
 
 export const mapPathMenu = buildMapPathMenu(MENUS);
+
+export const typeOrderMap = new Map();
+typeOrderMap.set("IF", "Inbound Full");
+typeOrderMap.set("OF", "Outbound Full");
+typeOrderMap.set("IE", "Inbound Empty");
+typeOrderMap.set("OE", "Outbound Empty");

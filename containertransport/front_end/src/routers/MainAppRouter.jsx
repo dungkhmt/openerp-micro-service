@@ -18,6 +18,7 @@ import ShipmentDetail from "views/shipment/shipmentDetail/ShipmentDetail";
 import TripDetail from "views/shipment/tripDetail/TripDetail";
 import TrailerScreen from "views/trailer/TrailerScreen";
 import FacilityDetail from "views/facilityManagement/detail/FacilityDetail";
+import TruckDetail from "views/truck/detail/TruckDetail";
 
 const styles = {
   loadingProgress: {
@@ -47,6 +48,7 @@ function MainAppRouter(props) {
           <Route component={() => <></>} exact path="/" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
           <PrivateRoute component={TruckScreen} exact path="/truck" />
+          <PrivateRoute component={TruckDetail} exact path="/truck/detail/:truckId" />
           <PrivateRoute component={FacilityScreen} exact path="/facility" />
           <PrivateRoute component={FacilityDetail} exact path="/facility/detail/:facilityId" />
           <PrivateRoute component={OrderScreen} exact path="/order" />

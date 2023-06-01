@@ -1,20 +1,29 @@
 import { Box, Modal, Icon, Typography, Divider, TextField, Button, FormControl, Select, MenuItem, InputLabel } from "@mui/material";
 import './styles.scss';
 import React, { useEffect, useState } from "react";
-import { getFacility } from "api/FacilityAPI";
-import { createTruck } from "api/TruckAPI";
+import { getFacility, getFacilityById } from "api/FacilityAPI";
+import { createTruck, updateTruck } from "api/TruckAPI";
+import { trip } from "config/menuconfig/trip";
 
-const ModalTruck = ({ openModal, handleClose, type, truckInfo }) => {
+const ModalTruck = ({ openModal, handleClose, truckId, truck, setToast, setToastType, setToastMsg }) => {
     const [facilityList, setFacilityList] = useState([]);
-    const [facility, setFacility] = useState();
+    const [facility, setFacility] = useState({});
     const [driverName, setDriverName] = useState('');
     const [licensePlates, setLicensePlates] = useState('');
     const [brandTruck, setBrandTruck] = useState('');
 
     useEffect(() => {
-        getFacility({}).then((res) => {
+        getFacility({ type: "Truck" }).then((res) => {
             setFacilityList(res?.data.data.facilityModels);
-        })
+            if(truckId) {
+                setFacility(res?.data.data.facilityModels.find((item) => item.id === truck?.facilityResponsiveDTO.facilityId))
+            }
+        });
+        if(truckId) {
+            setBrandTruck(truck?.brandTruck);
+            setLicensePlates(truck?.licensePlates);
+            setDriverName(truck?.driverName);
+        }
     }, []);
 
     const handleChange = (event) => {
@@ -22,22 +31,44 @@ const ModalTruck = ({ openModal, handleClose, type, truckInfo }) => {
     };
     const handleSubmit = () => {
         const data = {
-            facilityId: facility,
+            facilityId: facility?.id,
             driverName: driverName,
             licensePlates: licensePlates,
             brandTruck: brandTruck
         }
         console.log("avv==========", data);
-        createTruck(data).then((res) => {
-            console.log(res);
-            handleClose();
-            setFacility();
-            setBrandTruck('');
-            setDriverName('');
-            setLicensePlates('');
-        })
+        if (truckId) {
+            updateTruck(truckId, data).then((res) => {
+                console.log(res);
+                setToastMsg("Update Info Truck Success");
+                setToastType("success");
+                setToast(true);
+                setTimeout(() => {
+                    setToast(false);
+                }, "2000");
+                handleClose();
+                clearData();
+            })
+        } else {
+            createTruck(data).then((res) => {
+                console.log(res);
+                setToastMsg("Create Truck Success");
+                setToastType("success");
+                setToast(true);
+                setTimeout(() => {
+                    setToast(false);
+                }, "2000");
+                handleClose();
+                clearData();
+            })
+        }
     }
-
+    const clearData = () => {
+        setFacility();
+        setBrandTruck('');
+        setDriverName('');
+        setLicensePlates('');
+    }
     return (
         <Modal
             open={openModal}
@@ -47,7 +78,8 @@ const ModalTruck = ({ openModal, handleClose, type, truckInfo }) => {
         >
             <Box className="modal">
                 <Box className="header-modal">
-                    <Typography className="header-modal-text">New Truck</Typography>
+                    <Typography className="header-modal-text">
+                    {truckId ? "Update Truck" : "New Truck"}</Typography>
                 </Box>
                 <Divider sx={{ mb: 4, mt: 4 }} />
                 <Box className="body-modal">
@@ -62,12 +94,11 @@ const ModalTruck = ({ openModal, handleClose, type, truckInfo }) => {
                                     value={facility}
                                     onChange={handleChange}
                                     label="facility"
-                                    inputProps={{ 'aria-label': 'Without label' }}
                                 >
                                     {facilityList ? (
                                         facilityList.map((item, key) => {
                                             return (
-                                                <MenuItem value={item.id}>{item.facilityName}</MenuItem>
+                                                <MenuItem key={key} value={item}>{item.facilityName}</MenuItem>
                                             );
                                         })
                                     ) : null}
@@ -81,7 +112,8 @@ const ModalTruck = ({ openModal, handleClose, type, truckInfo }) => {
                         </Box>
                         <Box className="body-modal-item-input">
                             <TextField id="outlined-basic" label="driver" variant="outlined"
-                            onChange={(e) => setDriverName(e.target.value)} />
+                                value={driverName}
+                                onChange={(e) => setDriverName(e.target.value)} />
                         </Box>
                     </Box>
                     <Box className="body-modal-item">
@@ -89,8 +121,9 @@ const ModalTruck = ({ openModal, handleClose, type, truckInfo }) => {
                             <Typography>License Plates:</Typography>
                         </Box>
                         <Box className="body-modal-item-input">
-                            <TextField id="outlined-basic" label="license plates" variant="outlined" 
-                            onChange={(e) => setLicensePlates(e.target.value)}/>
+                            <TextField id="outlined-basic" label="license plates" variant="outlined"
+                                value={licensePlates}
+                                onChange={(e) => setLicensePlates(e.target.value)} />
                         </Box>
                     </Box>
                     <Box className="body-modal-item">
@@ -99,7 +132,8 @@ const ModalTruck = ({ openModal, handleClose, type, truckInfo }) => {
                         </Box>
                         <Box className="body-modal-item-input">
                             <TextField id="outlined-basic" label="brand" variant="outlined" type="search"
-                            onChange={(e) => setBrandTruck(e.target.value)} />
+                                value={brandTruck}
+                                onChange={(e) => setBrandTruck(e.target.value)} />
                         </Box>
                     </Box>
                 </Box>

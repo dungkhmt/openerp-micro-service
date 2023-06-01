@@ -18,6 +18,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import './styles.scss';
+import { Icon } from '@mui/material';
+import { menuIconMap, typeOrderMap } from 'config/menuconfig';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -53,49 +55,62 @@ const headCells = [
         numeric: false,
         disablePadding: true,
         label: 'Order Code',
-        with: "13%"
+        with: '14%'
     },
     {
         id: 'customer',
         numeric: false,
-        disablePadding: false,
+        disablePadding: true,
         label: 'Customer',
-        with: "12%"
+        with: '12%'
     },
     {
         id: 'fromFacility',
         numeric: false,
-        disablePadding: false,
+        disablePadding: true,
         label: 'From Facility',
-        with: "13%"
+        with: '13%'
     },
     {
         id: 'toFacility',
         numeric: false,
-        disablePadding: false,
+        disablePadding: true,
         label: 'To Facility',
-        with: "13%"
+        with: '13%'
     },
     {
-        id: 'numberContainer',
+        id: 'type',
         numeric: false,
-        disablePadding: false,
-        label: 'Number Container',
-        with: "18%"
+        disablePadding: true,
+        label: 'Type',
+        with: '13%'
     },
     {
         id: 'status',
         numeric: false,
         disablePadding: false,
         label: 'Status',
-        with: "20%"
+        with: '20%'
     },
     {
         id: 'createdAt',
         numeric: false,
-        disablePadding: false,
+        disablePadding: true,
         label: 'Created At',
-        with: "20%"
+        with: '13%'
+    },
+    {
+        id: 'updaetAt',
+        numeric: false,
+        disablePadding: true,
+        label: 'Update At',
+        with: '13%'
+    },
+    {
+        id: 'view',
+        numeric: false,
+        disablePadding: true,
+        label: '',
     },
 ];
 
@@ -155,7 +170,6 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
     const [selected, setSelected] = React.useState([]);
     const [dense, setDense] = React.useState(false);
     const [visibleRows, setVisibleRows] = React.useState(null);
-    const [paddingHeight, setPaddingHeight] = React.useState(0);
 
     const handleRequestSort = React.useCallback(
         (event, newOrderBy) => {
@@ -265,29 +279,31 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                                                 component="th"
                                                 id={labelId}
                                                 scope="row"
-                                                padding="none"
+                                                align="left"
                                             >
                                                 {row?.orderCode}
                                             </TableCell>
                                             <TableCell align="left">{row?.customerId}</TableCell>
                                             <TableCell align="left">{row?.fromFacility.facilityName}</TableCell>
                                             <TableCell align="left">{row?.toFacility.facilityName}</TableCell>
-                                            <TableCell align="left">{row.containers.length}</TableCell>
+                                            <TableCell align="left">{typeOrderMap.get(row.type)}</TableCell>
                                             <TableCell align="left">{row.status}</TableCell>
                                             <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
+                                            <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
+                                            <TableCell sx={{ display: 'flex' }}>
+                                                <Box 
+                                                // onClick={() => { handleDetail(row?.id) }} 
+                                                >
+                                                    <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                                                </Box>
+                                                <Box>
+                                                    <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                                                </Box>
+                                            </TableCell>
                                         </TableRow>
                                     );
                                 })
                                 : null}
-                            {paddingHeight > 0 && (
-                                <TableRow
-                                    style={{
-                                        height: paddingHeight,
-                                    }}
-                                >
-                                    <TableCell colSpan={6} />
-                                </TableRow>
-                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
