@@ -49,7 +49,7 @@ const CodeEditorPage = () => {
   useEffect(() => {
     if (isAccess) {
       socketRef.current = io(
-        `${process.env.REACT_APP_SOCKET_SERVER_HOST}:${process.env.REACT_APP_SOCKET_SERVER_PORT}` ||
+        `https://${process.env.REACT_APP_SOCKET_SERVER_HOST}:${process.env.REACT_APP_SOCKET_SERVER_PORT}` ||
           "http://localhost:7008",
         { debug: true }
       );
