@@ -95,6 +95,7 @@ const CodeEditor = (props) => {
   }, [socket.current, token, isPublic, roomAccessPermission]);
 
   const handleSaveSource = debounce((value) => {
+    dispatch(setSource(value));
     const payload = {
       language: selectedLanguage,
       source: value,
@@ -105,7 +106,7 @@ const CodeEditor = (props) => {
       `/code-editor/sources`,
       (response) => {
         if (response && response.status === 200) {
-          dispatch(setSource(value));
+          // dispatch(setSource(value));
         }
       },
       {

@@ -60,9 +60,11 @@ const CodeEditorPage = () => {
           port: process.env.REACT_APP_SOCKET_SERVER_PORT || 7008,
           path: "/api/code-editor/peer-server",
         });
+        console.log("🚀 ~ file: CodeEditorPage.js:59 ~ navigator.mediaDevices.getUserMedia ~ myPeer.current:", myPeer.current)
 
         // Get id of peer connection and send to server and broadcast to others user
         myPeer.current.on("open", (id) => {
+          console.log("🚀 ~ file: CodeEditorPage.js:67 ~ myPeer.current.on ~ id:", id)
           if (socketRef.current) {
             // Send peerId to other users in ther room
             socketRef.current.emit(SOCKET_EVENTS.CONNECT_TO_EDITOR, {
@@ -132,7 +134,7 @@ const CodeEditorPage = () => {
     } else {
       setIsAccess(true);
     }
-  }, [isPublic, roomAccessPermission, allowedUserList, token]);
+  }, [isPublic, roomAccessPermission, allowedUserList, token,roomMasterId ]);
 
   useEffect(() => {
     if (socketRef.current) {
