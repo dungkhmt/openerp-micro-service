@@ -58,7 +58,7 @@ const CodeEditorPage = () => {
         myPeer.current = new Peer({
           host: process.env.REACT_APP_SOCKET_SERVER_HOST || "127.0.0.1",
           port: process.env.REACT_APP_SOCKET_SERVER_PORT || 7008,
-          path: "/api/code-editor/peer-server",
+          path: "/api/socket-server/peer-server",
         });
         console.log("🚀 ~ file: CodeEditorPage.js:59 ~ navigator.mediaDevices.getUserMedia ~ myPeer.current:", myPeer.current)
 
