@@ -9,7 +9,7 @@ RUN apk add dumb-init
 ENV NODE_ENV=production
 
 # This app will run on this port
-ENV PORT 3001
+ENV PORT 7008
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -28,4 +28,4 @@ EXPOSE ${PORT}
 
 USER node
 
-CMD ["dumb-init", "node", "app.js"]
+CMD ["dumb-init", "node", "index.js"]
