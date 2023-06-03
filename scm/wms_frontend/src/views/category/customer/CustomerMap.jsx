@@ -113,5 +113,5 @@ function CustomerMapScreen({ screenAuthorization }) {
     </MapContainer>
   );
 }
-const SCR_ID = "SCR_CUSTOMER_LOC";
+const SCR_ID = "SCR_SCM_CUSTOMER_MAP";
 export default withScreenSecurity(CustomerMapScreen, SCR_ID, true);

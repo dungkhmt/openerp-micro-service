@@ -96,5 +96,5 @@ function TripRoutesScreen({ screenAuthorization }) {
     </MapContainer>
   );
 }
-const SCR_ID = "SCR_TRIP_ROUTE";
+const SCR_ID = "SCR_SCM_TRIP_ROUTE";
 export default withScreenSecurity(TripRoutesScreen, SCR_ID, true);

@@ -116,5 +116,5 @@ function SplitBillScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_ADD_SHIPMENT_ORDER";
+const SCR_ID = "SCR_SCM_SPLIT_BILL";
 export default withScreenSecurity(SplitBillScreen, SCR_ID, true);

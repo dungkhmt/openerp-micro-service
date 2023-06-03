@@ -101,5 +101,5 @@ function ImportingActivityScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_IMPORTING_ACTIVITY";
+const SCR_ID = "SCR_SCM_IMPORTING_ACTIVITY";
 export default withScreenSecurity(ImportingActivityScreen, SCR_ID, true);

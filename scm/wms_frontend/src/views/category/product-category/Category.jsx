@@ -135,5 +135,5 @@ function ProductCategoryScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_PRODUCT_CATEGORY";
+const SCR_ID = "SCR_SCM_PRODUCT_CATEGORY";
 export default withScreenSecurity(ProductCategoryScreen, SCR_ID, true);

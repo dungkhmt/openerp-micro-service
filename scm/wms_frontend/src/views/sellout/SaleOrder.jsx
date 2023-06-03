@@ -145,5 +145,5 @@ function SaleOrderScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_PURCHASE_ORDER";
+const SCR_ID = "SCR_SCM_SALE_ORDER";
 export default withScreenSecurity(SaleOrderScreen, SCR_ID, true);
