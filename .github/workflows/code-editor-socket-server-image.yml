@@ -1,0 +1,33 @@
+name: code-editor-socket-server Image CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "code-editor-online/openerp-code-editor-socker-server/**"
+
+env:
+  NODE_OPTIONS: "--max-old-space-size=4096"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Check out code
+      #     - name: Build the Docker image
+      #       run: docker build . --file Dockerfile --tag socket-server:$(date +%s)
+      - name: Build & push Docker image
+        uses: mr-smithers-excellent/docker-build-push@v5
+        with:
+          image: leanhtuan/code-editor-socket-server
+          #         tags: v1, latest
+          directory: "code-editor-online/openerp-code-editor-socker-server/"
+          registry: docker.io
+          dockerfile: "code-editor-online/openerp-code-editor-socker-server/Dockerfile"
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          addLatest: true
+#        addTimestamp: true

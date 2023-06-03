@@ -163,7 +163,7 @@ const ShareForm = (props) => {
                 <MenuItem value={true}>Bất kỳ ai có mã phòng</MenuItem>
               </Select>
               {isPublic ? (
-                <div>Bất kỳ ai có mã phòng đều có thể xem</div>
+                <div>Bất kỳ ai có mã phòng đều có thể {roomAccessPermission === ACCESS_PERMISSION.VIEWER.value ? 'xem' :'chỉnh sửa' }</div>
               ) : (
                 <div>Chỉ những người có quyền truy cập mới có thể tham gia phòng</div>
               )}
