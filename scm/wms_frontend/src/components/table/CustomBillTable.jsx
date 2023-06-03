@@ -29,7 +29,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 const CustomBillTable = ({ orderItem, billItem }) => {
-  console.log(orderItem, billItem);
   const rows = orderItem?.map((item) => {
     let mappedBill = billItem.filter(
       (bill) => bill?.product?.code === item?.product?.code
@@ -64,7 +63,7 @@ const CustomBillTable = ({ orderItem, billItem }) => {
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {rows?.map((row) => (
             <StyledTableRow
               key={row.name}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}

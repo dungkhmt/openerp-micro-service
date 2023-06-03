@@ -81,4 +81,16 @@ public class DeliveryTripController extends BaseController {
             return response(error(ex));
         }
     }
+    @DeleteMapping("/delete-trip-route")
+    public ResponseEntity<?> deleteTripRoute(
+            @RequestParam(value = "tripCode", required = true, defaultValue = DefaultConst.STRING) String tripCode
+    ) {
+        try {
+            deliveryTripService.deleteTripRoute(tripCode);
+            return response(new ResultEntity(1, "Delete trip route successfully", null));
+        }
+        catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
 }

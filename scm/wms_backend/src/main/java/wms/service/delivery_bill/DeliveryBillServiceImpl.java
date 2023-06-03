@@ -100,7 +100,9 @@ public class DeliveryBillServiceImpl extends BaseService implements IDeliveryBil
         if (deliveryBill == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Can't find referenced bill, can't split");
         }
+        int index = 0;
         for (SplitBillItemDTO splitBillItemDTO : splitBillDTO.getBillItemDTOS()) {
+            index++;
             List<DeliveryBillItem> currBillItems = deliveryBill.getDeliveryBillItems().stream().filter(item -> {
                 return item.getSeqId().equals(splitBillItemDTO.getDeliveryBillItemSeqId());
             }).collect(Collectors.toList());
@@ -110,20 +112,19 @@ public class DeliveryBillServiceImpl extends BaseService implements IDeliveryBil
             }
             List<ShipmentItem> sameBillShipmentItem = shipmentItemRepo.getItemOfSameBillAndProduct(deliveryBill.getCode(), splitBillItemDTO.getDeliveryBillItemSeqId());
             // Check if total quantity of all items that are in the same bill and of the same product.
-            int totalSameBillItemQty = sameBillShipmentItem.stream().mapToInt(ob -> (ob.getQuantity())).reduce(0, (pre, curr) -> pre + curr);
+            int totalSameBillItemQty = sameBillShipmentItem.stream().mapToInt(ShipmentItem::getQuantity).reduce(0, Integer::sum);
             if (totalSameBillItemQty + splitBillItemDTO.getQuantity() > currBillItems.get(0).getEffectiveQty()) {
                 throw caughtException(ErrorCode.USER_ACTION_FAILED.getCode(), "Exceed quantity limit, can't split anymore");
             }
             ShipmentItem shipmentItem = ShipmentItem.builder()
-                    .code("SHIT" + GeneralUtils.generateCodeFromSysTime())
+                    .code("SHIT" + GeneralUtils.generateCodeFromSysTime() + "_" + index)
                     .deliveryBill(deliveryBill)
                     .deliveryBillItemSeqId(splitBillItemDTO.getDeliveryBillItemSeqId())
                     .quantity(splitBillItemDTO.getQuantity())
                     .build();
             shipmentItemRepo.save(shipmentItem);
 
-            List<InventoryItem> inventoryItems = inventoryItemRepo.getAllItemsOfSameProduct(splitBillItemDTO.getProductCode());
-            List<ExportInventoryItem> exportInventoryItems = exportInventoryItemRepo.getAllItemsOfSameProduct(splitBillItemDTO.getDeliveryBillItemSeqId());
+            List<InventoryItem> inventoryItems = inventoryItemRepo.getAllItemsOfSameProductOrderByDate(splitBillItemDTO.getProductCode());
             int cumulativeInventoryQty = 0;
             int selectiveInventoryIndex = 0;
             // Phải liệt kê hết các inventory_item của cùng 1 sản phẩm.
@@ -138,7 +139,7 @@ public class DeliveryBillServiceImpl extends BaseService implements IDeliveryBil
                 }
             }
             ExportInventoryItem newExpInventoryItem = ExportInventoryItem.builder()
-                    .code("EXINV" + GeneralUtils.generateCodeFromSysTime() + "_" + selectiveInventoryIndex)
+                    .code("EXINV" + GeneralUtils.generateCodeFromSysTime() + "_" + index)
                     .effective_date(ZonedDateTime.now().toString())
                     .deliveryBill(deliveryBill)
                     .deliveryBillItemSeqId(splitBillItemDTO.getDeliveryBillItemSeqId())

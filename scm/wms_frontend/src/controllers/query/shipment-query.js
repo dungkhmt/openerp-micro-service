@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { queryClient } from "../../App";
 import axiosSendRequest from "../axiosSendRequest";
 import { endPoint } from "../endpoint";
 import { queryKey } from "./querykey";
@@ -94,17 +95,11 @@ export const useAssignShipmentToTrip = (params) => {
         toast.error("Lỗi khi phân, vui lòng kiểm tra lại");
       }
     },
-    // onSuccess: (res, variables, context) => {
-    //   toast.success("Phân thành công!");
-    //   queryClient.invalidateQueries([
-    //     queryKey.shipment.shipment_list,
-    //     queryKey.delivery_bill.splitted_bill_item,
-    //   ]);
-    // },
-    // onError: () => {
-    //   toast.error("Lỗi khi phân, vui lòng kiểm tra lại");
-    // },
-    // befor mutation function actually triggers.
+    onSuccess: (res, variables, context) => {
+      queryClient.invalidateQueries({
+        queryKey: [queryKey.delivery_bill.splitted_bill_item],
+      });
+    },
     onMutate: (variables) => {},
   });
 };

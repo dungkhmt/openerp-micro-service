@@ -46,7 +46,6 @@ export const useGetDeliveryTripList = (params) => {
     onSuccess: (data) => {},
   });
 };
-
 export const useGetDeliveryTripToAssignBill = (params) => {
   return useQuery({
     queryKey: [queryKey.delivery_trip.trip_assign_bill, params],
@@ -79,10 +78,51 @@ export const useCreateTripRoute = (params) => {
     },
     onSuccess: (res, variables, context) => {
       toast.success("Tạo thành công!");
-      queryClient.invalidateQueries([queryKey.delivery_trip.trip_route]);
+      queryClient.invalidateQueries({
+        queryKey: [queryKey.delivery_trip.trip_route_list],
+      });
     },
     onError: () => {
       toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+export const useGetTripRouteList = (params) => {
+  return useQuery({
+    queryKey: [queryKey.delivery_trip.trip_route_list, params],
+    queryFn: async () => {
+      const res = await axiosSendRequest("get", endPoint.getTripRoutes, params);
+      if (res.code === 1) {
+        return res.data ? res.data : null;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};
+export const useDeleteTripRoute = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "delete",
+        endPoint.deleteTripRoute,
+        params,
+        data
+      );
+      if (res.code === 1) {
+        return res.data;
+      }
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Xóa chuyến giao hàng thành công!");
+      queryClient.invalidateQueries({
+        queryKey: [queryKey.delivery_trip.trip_route_list],
+      });
+    },
+    onError: () => {
+      toast.error("Lỗi khi xóa chuyến, vui lòng kiểm tra lại");
     },
     // befor mutation function actually triggers.
     onMutate: (variables) => {},
@@ -207,18 +247,5 @@ export const useDeleteDrone = (params) => {
     },
     // befor mutation function actually triggers.
     onMutate: (variables) => {},
-  });
-};
-export const useGetTripRouteList = (params) => {
-  return useQuery({
-    queryKey: [queryKey.delivery_trip.trip_route_list, params],
-    queryFn: async () => {
-      const res = await axiosSendRequest("get", endPoint.getTripRoutes, params);
-      if (res.data && res.code === 1) {
-        return res.data;
-      }
-    },
-    keepPreviousData: true,
-    onSuccess: (data) => {},
   });
 };
