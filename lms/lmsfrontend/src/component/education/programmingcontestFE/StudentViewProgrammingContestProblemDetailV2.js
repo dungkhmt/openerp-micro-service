@@ -22,12 +22,10 @@ import {
 } from "./Constant";
 
 const editorStyle = {
-  toolbar: {
-    background: "#FFFFFF",
-  },
   editor: {
-    border: "1px solid black",
-    minHeight: "300px",
+    border: "1px solid lightgray",
+    paddingLeft: "12px",
+    minHeight: "200px",
   },
 };
 
@@ -236,7 +234,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
         <Editor
           editorState={editorStateDescription}
           handlePastedText={() => false}
-          toolbarStyle={editorStyle.toolbar}
+          readOnly
           editorStyle={editorStyle.editor}
         />
         {fetchedImageArray.length !== 0 &&

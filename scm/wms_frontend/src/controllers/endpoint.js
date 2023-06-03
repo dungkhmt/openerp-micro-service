@@ -79,6 +79,7 @@ export const endPoint = {
   getDeliveryTrips: baseUrl + "/delivery-trip/get-all",
   getTripToAssignBill: baseUrl + "/delivery-trip/get-trip-to-assign",
   createTripRoute: baseUrl + "/delivery-trip/create-trip-route",
+  deleteTripRoute: baseUrl + "/delivery-trip/delete-trip-route",
   getTruck: baseUrl + "/vehicle/truck/get-all",
   deleteTruck: baseUrl + "/vehicle/truck/remove",
   getDrone: baseUrl + "/vehicle/drone/get-all",

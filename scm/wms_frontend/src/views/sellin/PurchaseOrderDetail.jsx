@@ -39,6 +39,7 @@ import CreatePurchaseBill from "./components/CreatePurchaseBill";
 function PurchaseOrderDetailScreen({}) {
   const location = useLocation();
   const [isApproved, setIsApproved] = useToggle(false);
+  const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
   const [orderApproved, setOrderApprove] = useState(false);
   const currOrder = location.state.order;
@@ -53,7 +54,6 @@ function PurchaseOrderDetailScreen({}) {
   const toggleTables = () => {
     setShowTable1((prev) => !prev);
   };
-
   const actions = useMemo(() => {
     return [
       {
@@ -86,10 +86,17 @@ function PurchaseOrderDetailScreen({}) {
       },
     ];
   }, [previous, currOrder, orderApproved]);
+
   const extraActions = [
     {
       title: "Xem chi tiết",
-      callback: (item) => {},
+      callback: (item) => {
+        let billItemsOfBill = billItem?.filter(
+          (bill) => bill?.receiptBill?.code === item?.code
+        );
+        setItemSelected(billItemsOfBill);
+        setOpenDrawer();
+      },
       icon: <VisibilityIcon />,
       color: AppColors.green,
       // permission: PERMISSIONS.MANAGE_CATEGORY_EDIT,
@@ -263,6 +270,19 @@ function PurchaseOrderDetailScreen({}) {
         </IconButton>
         <CreatePurchaseBill currOrder={currOrder} setIsAdd={setIsAdd} />
       </CustomModal>
+      {/* <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
+        <HeaderModal onClose={setOpenDrawer} title="Thông tin phiếu nhập" />
+        <Box>
+          {itemSelected?.map((item) => {
+            return (
+              <Box>
+                <Typography>Name: {item?.product?.name}</Typography>
+                <Typography>Quantity: {item?.effectiveQty}</Typography>
+              </Box>
+            );
+          })}
+        </Box>
+      </CustomDrawer> */}
       <CustomizedDialogs
         open={isApproved}
         handleClose={setIsApproved}

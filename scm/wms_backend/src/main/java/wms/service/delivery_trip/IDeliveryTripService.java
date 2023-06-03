@@ -22,6 +22,7 @@ public interface IDeliveryTripService {
     DeliveryTrip updateDeliveryTrip(ProductDTO productDTO, long id) throws CustomException;
     void deleteDeliveryTripById(long id);
     ShipmentItem assignBillToTrip(DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) throws CustomException;
-    void createTripRoute(TripRouteDTO tripRouteDTO) throws CustomException;
+    void createTripRoute(TripRouteDTO tripRouteDTO) throws Exception;
     RouteSchedulingOutput getTripRoute(String tripCode);
+    void deleteTripRoute(String tripCode);
 }

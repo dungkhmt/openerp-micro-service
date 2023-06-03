@@ -152,14 +152,15 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
     }
 
     @Override
-    public void createTripRoute(TripRouteDTO tripRouteDTO) throws CustomException {
+    @Transactional(rollbackFor = Exception.class)
+    public void createTripRoute(TripRouteDTO tripRouteDTO) throws Exception {
         DeliveryTrip trip = deliveryTripRepo.getDeliveryTripByCode(tripRouteDTO.getTripCode());
         List<ShipmentItem> shipmentItems = shipmentItemRepo.getShipmentItemOfATrip(tripRouteDTO.getTripCode());
         TruckDroneDeliveryInput input = setAlgoInput(trip, shipmentItems);
         TruckDroneDeliverySolutionOutput finalSolution = solveTSPD(input);
         saveRouteToMongo(finalSolution, trip);
     }
-    private TruckDroneDeliveryInput setAlgoInput(DeliveryTrip trip, List<ShipmentItem> shipmentItems) {
+    private TruckDroneDeliveryInput setAlgoInput(DeliveryTrip trip, List<ShipmentItem> shipmentItems) throws Exception {
         TruckDroneDeliveryInput input = new TruckDroneDeliveryInput();
         List<Node> points = new ArrayList<>(); // All coordinations got
         UserLogin user = trip.getUserInCharge();
@@ -216,8 +217,11 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
                 distanceElement.setFromLocationId(points.get(i).getName());
                 distanceElement.setToLocationId(points.get(j).getName());
 //              double distance = Utils.calculateEuclideanDistance(points.get(i), points.get(j));
-                double distance = Utils.calculateCoordinationDistance(points.get(i).getX(), points.get(i).getY(),
+                double distance = Utils.getDistanceGraphhopperApi(points.get(i).getX(), points.get(i).getY(),
                         points.get(j).getX(), points.get(j).getY());
+                if (distance < 0) {
+                    throw new Exception("Got problem retrieving distance from internet");
+                }
                 distanceElement.setDistance(distance);
                 distanceElement.setTravelTime(distance / input.getTruck().getSpeed());
                 distanceElement.setFlyingTime(distance / input.getDrone().getSpeed());
@@ -278,5 +282,12 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         Query query = new Query();
         query.addCriteria(Criteria.where("tripCode").is(tripCode));
         return mongoTemplate.findOne(query, RouteSchedulingOutput.class);
+    }
+
+    @Override
+    public void deleteTripRoute(String tripCode) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("tripCode").is(tripCode));
+        mongoTemplate.remove(query, RouteSchedulingOutput.class);
     }
 }
