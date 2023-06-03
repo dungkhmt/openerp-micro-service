@@ -13,12 +13,17 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
         name: Check out code
       #     - name: Build the Docker image
       #       run: docker build . --file Dockerfile --tag lms-ui:$(date +%s)
+      - name: Create file .env
+        uses: timheuer/base64-to-file@v1.1
+        with:
+          fileName: ".env"
+          fileDir: "./code-editor-online/openerp-code-editor-client/"
+          encodedString: ${{ secrets.CODE_EDITOR_UI_B64_SECRET }}
       - name: Build & push Docker image
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
@@ -30,4 +35,8 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           addLatest: true
-#        addTimestamp: true
+      #        addTimestamp: true
+      - name: Remove config file
+        uses: JesseTG/rm@v1.0.2
+        with:
+          path: "./code-editor-online/openerp-code-editor-client/.env"
