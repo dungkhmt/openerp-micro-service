@@ -3,7 +3,7 @@ name: code-editor-socket-server Image CI
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - "code-editor-online/openerp-code-editor-socker-server/**"
 
