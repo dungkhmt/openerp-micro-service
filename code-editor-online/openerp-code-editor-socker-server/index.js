@@ -117,6 +117,6 @@ server.listen(port, () => console.log(`Server is running on port ${port}`));
 
 const { ExpressPeerServer } = require("peer");
 const peerServer = ExpressPeerServer(server, {
-  port: 9000,
+  port: port,
 });
-app.use("/api/code-editor/peer-server", peerServer);
+app.use("/api/socket-server/peer-server", peerServer);
