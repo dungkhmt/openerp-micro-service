@@ -1,0 +1,10 @@
+.dockerignore
+node_modules
+npm-debug.log
+Dockerfile*
+docker-compose*
+.git
+.gitignore
+LICENSE
+.vscode
+.env.dev
