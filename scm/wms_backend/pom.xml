@@ -19,6 +19,11 @@
 		<swagger2.version>2.8.0</swagger2.version>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.13</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/net.sourceforge.jexcelapi/jxl -->
 		<dependency>
 			<groupId>net.sourceforge.jexcelapi</groupId>

@@ -41,8 +41,8 @@ MENUS.push(general);
 MENUS.push(warehouse);
 MENUS.push(sellin);
 MENUS.push(sellout);
-MENUS.push(category);
 MENUS.push(delivery);
+MENUS.push(category);
 MENUS.push(user);
 
 export const menuIconMap = new Map();

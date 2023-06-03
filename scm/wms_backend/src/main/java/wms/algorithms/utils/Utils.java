@@ -1,5 +1,13 @@
 package wms.algorithms.utils;
 
+import com.google.gson.Gson;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
+import wms.algorithms.entity.DistanceMatrix;
 import wms.algorithms.entity.Node;
 
 public class Utils {
@@ -24,10 +32,26 @@ public class Utils {
 
         return distance*1000;
     }
-//    public static double calculateEuclideanDistance(String lat1, String lon1, lat2, lon2) {
-//        double dx = lat1 - lat2;
-//        double dy = n1.getY() - n2.getY();
-//        return Math.sqrt(dx * dx + dy * dy);
-//    }
-    // TODO: should have function to calculate distanceMatrix for whole set of node with (lat, long)
+    public static double getDistanceGraphhopperApi(double sourceLat, double sourceLon, double targetLat, double targetLon) {
+        String apiKey = "f1ca6ef8-2158-46e7-82ca-749cea4be153";
+        String apiUrl = String.format("https://graphhopper.com/api/1/route?point=%.6f,%.6f&point=%.6f,%.6f&type=json&key=%s",
+                sourceLat, sourceLon, targetLat, targetLon, apiKey);
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet httpGet = new HttpGet(apiUrl);
+        try {
+            HttpResponse response = httpClient.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            entity.getContent();
+            String jsonResult = EntityUtils.toString(entity);
+            Gson gson = new Gson();
+            DistanceMatrix distanceMatrix = gson.fromJson(jsonResult, DistanceMatrix.class);
+
+
+            return distanceMatrix.getPaths().size() > 0 ? distanceMatrix.getPaths().get(0).getDistance() : -1.0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1; // Return a negative value to indicate failure
+    }
 }

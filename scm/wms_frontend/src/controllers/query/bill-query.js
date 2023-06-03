@@ -70,12 +70,16 @@ export const useCreateReceiptBill = (params) => {
       );
       if (res.code === 1) {
         toast.success(res.message);
-        queryClient.invalidateQueries([
-          queryKey.receipt_bill.bill_item_of_purchase_order,
-          queryKey.receipt_bill.receipt_bill_list,
-        ]);
         return res.data;
       }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [queryKey.receipt_bill.bill_item_of_purchase_order],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [queryKey.receipt_bill.receipt_bill_list],
+      });
     },
   });
 };
@@ -179,13 +183,20 @@ export const useCreateSplitBillItem = (params) => {
       );
       if (res.code === 1) {
         toast.success(res.message);
-        queryClient.invalidateQueries([
-          queryKey.delivery_bill.splitted_bill_item,
-          queryKey.facility.facility_inventory,
-          queryKey.delivery_bill.bill_item_of_bill,
-        ]);
+
         return res.data;
       }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [queryKey.delivery_bill.splitted_bill_item],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [queryKey.facility.facility_inventory],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [queryKey.delivery_bill.bill_item_of_bill],
+      });
     },
   });
 };
