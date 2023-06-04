@@ -150,5 +150,5 @@ function FacilityDetailScreen() {
   );
 }
 
-const SCR_ID = "SCR_FACILITY_DETAIL";
+const SCR_ID = "SCR_SCM_FACILITY_DETAIL";
 export default withScreenSecurity(FacilityDetailScreen, SCR_ID, true);

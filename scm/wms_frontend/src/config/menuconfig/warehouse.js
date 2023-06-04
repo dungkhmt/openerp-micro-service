@@ -1,26 +1,26 @@
 export const warehouse = {
-  id: "MENU_WMS_WAREHOUSE",
+  id: "MENU_SCM_WAREHOUSE",
   icon: "WarehouseIcon",
   text: "Warehouse",
   child: [
     {
-      id: "MENU_WMS_WAREHOUSE.INVENTORY",
+      id: "MENU_SCM_WAREHOUSE.INVENTORY",
       path: "/warehouse/inventory",
-      isPublic: true,
+      isPublic: false,
       text: "Inventory",
       child: [],
     },
     {
-      id: "MENU_WMS_WAREHOUSE.IMPORTING",
+      id: "MENU_SCM_WAREHOUSE.IMPORTING",
       path: "/warehouse/importing",
-      isPublic: true,
+      isPublic: false,
       text: "Importing",
       child: [],
     },
     {
-      id: "MENU_WMS_WAREHOUSE.EXPORTING",
+      id: "MENU_SCM_WAREHOUSE.EXPORTING",
       path: "/warehouse/exporting",
-      isPublic: true,
+      isPublic: false,
       text: "Exporting",
       child: [],
     },

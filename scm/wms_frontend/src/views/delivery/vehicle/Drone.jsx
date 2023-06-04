@@ -138,5 +138,5 @@ function DroneScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_DRONE";
+const SCR_ID = "SCR_SCM_DRONE";
 export default withScreenSecurity(DroneScreen, SCR_ID, true);

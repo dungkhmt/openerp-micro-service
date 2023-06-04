@@ -196,5 +196,5 @@ function FacilityScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_WAREHOUSE";
+const SCR_ID = "SCR_SCM_FACILITY";
 export default withScreenSecurity(FacilityScreen, SCR_ID, true);

@@ -135,5 +135,5 @@ function DistributingChannelScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_DISTRIBUTING_CHANNEL";
+const SCR_ID = "SCR_SCM_DISTRIBUTING_CHANNEL";
 export default withScreenSecurity(DistributingChannelScreen, SCR_ID, true);

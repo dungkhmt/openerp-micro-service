@@ -300,5 +300,5 @@ function TripScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_TRIP";
+const SCR_ID = "SCR_SCM_TRIP";
 export default withScreenSecurity(TripScreen, SCR_ID, true);

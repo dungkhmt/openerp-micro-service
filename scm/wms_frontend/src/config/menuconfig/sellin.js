@@ -1,26 +1,26 @@
 export const sellin = {
-  id: "MENU_WMS_SELLIN",
+  id: "MENU_SCM_SELLIN",
   icon: "Sellin",
   text: "Sellin",
   child: [
     {
-      id: "MENU_WMS_SELLIN.PURCHASE_ORDER",
+      id: "MENU_SCM_SELLIN.PURCHASE_ORDER",
       path: "/sellin/purchase-order",
-      isPublic: true,
+      isPublic: false,
       text: "Purchase Order",
       child: [],
     },
     {
-      id: "MENU_WMS_SELLIN.PURCHASE_STAFF",
+      id: "MENU_SCM_SELLIN.PURCHASE_STAFF",
       path: "/sellin/purchase-staff",
-      isPublic: true,
+      isPublic: false,
       text: "Purchase Staff",
       child: [],
     },
     {
-      id: "MENU_WMS_SELLIN.PURCHASE_PRICE",
+      id: "MENU_SCM_SELLIN.PURCHASE_PRICE",
       path: "/sellin/purchase-price",
-      isPublic: true,
+      isPublic: false,
       text: "Purchase price",
       child: [],
     },

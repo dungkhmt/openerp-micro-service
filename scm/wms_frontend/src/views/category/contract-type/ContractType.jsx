@@ -132,5 +132,5 @@ function ContractTypeScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_CONTRACT_TYPE";
+const SCR_ID = "SCR_SCM_CONTRACT_TYPE";
 export default withScreenSecurity(ContractTypeScreen, SCR_ID, true);

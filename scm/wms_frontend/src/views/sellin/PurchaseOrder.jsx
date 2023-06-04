@@ -148,5 +148,5 @@ function PurchaseOrderScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_PURCHASE_ORDER";
+const SCR_ID = "SCR_SCM_PURCHASE_ORDER";
 export default withScreenSecurity(PurchaseOrderScreen, SCR_ID, true);

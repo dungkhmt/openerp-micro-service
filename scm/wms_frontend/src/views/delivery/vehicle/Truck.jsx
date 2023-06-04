@@ -137,5 +137,5 @@ function TruckScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_TRUCK";
+const SCR_ID = "SCR_SCM_TRUCK";
 export default withScreenSecurity(TruckScreen, SCR_ID, true);

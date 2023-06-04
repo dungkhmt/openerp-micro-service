@@ -199,5 +199,5 @@ function ShipmentDetailScreen() {
   );
 }
 
-const SCR_ID = "SCR_SHIPMENT_DETAIL";
+const SCR_ID = "SCR_SCM_SHIPMENT_DETAIL";
 export default withScreenSecurity(ShipmentDetailScreen, SCR_ID, true);
