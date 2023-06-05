@@ -211,5 +211,5 @@ function CustomerScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_CUSTOMER";
+const SCR_ID = "SCR_SCM_CUSTOMER";
 export default withScreenSecurity(CustomerScreen, SCR_ID, true);

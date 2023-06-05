@@ -1,5 +1,6 @@
 import React from "react";
 import {MenuItem, TextField} from "@mui/material";
+import {COMPUTER_LANGUAGES} from "../education/programmingcontestFE/Constant";
 
 const HustCodeLanguagePicker = (props) => {
   const {
@@ -8,8 +9,6 @@ const HustCodeLanguagePicker = (props) => {
     classRoot,
     ...remainProps
   } = props;
-
-  const computerLanguageList = ["CPP", "JAVA", "PYTHON3"];
 
   return (
     <TextField
@@ -23,7 +22,7 @@ const HustCodeLanguagePicker = (props) => {
       id="computerLanguage"
       onChange={onChangeLanguage}
     >
-      {computerLanguageList.map((item) => (
+      {Object.values(COMPUTER_LANGUAGES).map((item) => (
         <MenuItem key={item} value={item}>
           {item}
         </MenuItem>

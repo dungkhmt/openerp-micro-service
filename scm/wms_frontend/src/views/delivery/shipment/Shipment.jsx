@@ -144,5 +144,5 @@ function ShipmentScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_SHIPMENT";
+const SCR_ID = "SCR_SCM_SHIPMENT";
 export default withScreenSecurity(ShipmentScreen, SCR_ID, true);

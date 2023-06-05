@@ -17,7 +17,7 @@ public class ChatGPTService {
     @Value("${openai.model:gpt-3.5-turbo}")
     private String model;
 
-    @Value("${openai.api.url:'https://api.openai.com/v1/chat/completions'}")
+    @Value("${openai.api.url:https://api.openai.com/v1/chat/completions}")
     private String apiUrl;
 
     public String getChatGPTAnswer(String prompt) {

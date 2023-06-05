@@ -285,5 +285,5 @@ function SaleOrderDetailScreen() {
   );
 }
 
-const SCR_ID = "SCR_PURCHASE_ORDER_DETAIL";
+const SCR_ID = "SCR_SCM_SALE_ORDER_DETAIL";
 export default withScreenSecurity(SaleOrderDetailScreen, SCR_ID, true);

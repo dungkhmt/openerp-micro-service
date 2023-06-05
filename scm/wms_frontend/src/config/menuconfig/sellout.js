@@ -1,26 +1,26 @@
 export const sellout = {
-  id: "MENU_WMS_SELLOUT",
+  id: "MENU_SCM_SELLOUT",
   icon: "Sellout",
   text: "Sellout",
   child: [
     {
-      id: "MENU_WMS_SELLOUT.SALE_ORDER",
+      id: "MENU_SCM_SELLOUT.SALE_ORDER",
       path: "/sellout/sale-order",
-      isPublic: true,
+      isPublic: false,
       text: "Sale Order",
       child: [],
     },
     {
-      id: "MENU_WMS_SELLOUT.SALE_STAFF",
+      id: "MENU_SCM_SELLOUT.SALE_STAFF",
       path: "/sellout/sale-staff",
-      isPublic: true,
+      isPublic: false,
       text: "Sale staff",
       child: [],
     },
     {
-      id: "MENU_WMS_SELLOUT.SALE_PRICE",
+      id: "MENU_SCM_SELLOUT.SALE_PRICE",
       path: "/sellout/sale-price",
-      isPublic: true,
+      isPublic: false,
       text: "Sale price",
       child: [],
     },

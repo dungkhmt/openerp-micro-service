@@ -54,5 +54,5 @@ function FacilityMapScreen({ screenAuthorization }) {
     </MapContainer>
   );
 }
-const SCR_ID = "SCR_CUSTOMER_LOC";
+const SCR_ID = "SCR_SCM_FACILITY_MAP";
 export default withScreenSecurity(FacilityMapScreen, SCR_ID, true);

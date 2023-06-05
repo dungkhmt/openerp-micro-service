@@ -11,14 +11,14 @@ export const user = {
       onClick: () => {
         window.location.href = `${config.url.KEYCLOAK_BASE_URL}/admin/${KC_REALM}/console/#/${KC_REALM}/users`;
       },
-      isPublic: true,
+      isPublic: false,
       text: "All users",
       child: [],
     },
     {
       id: "MENU_USER_SEND_MAIL_TO_USERS",
       path: "/user-group/user/send-mail",
-      isPublic: true,
+      isPublic: false,
       text: "Gửi email",
       child: [],
     },

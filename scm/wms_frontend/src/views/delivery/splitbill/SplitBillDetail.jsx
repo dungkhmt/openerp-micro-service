@@ -316,5 +316,5 @@ function SplitBillDetailScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_SPLIT_BILL_DETAIL";
+const SCR_ID = "SCR_SCM_SPLIT_BILL_DETAIL";
 export default withScreenSecurity(SplitBillDetailScreen, SCR_ID, true);

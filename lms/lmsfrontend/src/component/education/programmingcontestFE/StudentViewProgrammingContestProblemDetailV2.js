@@ -1,8 +1,5 @@
 import {Box, Button, CircularProgress, Divider, Grid, Typography,} from "@mui/material";
-import {ContentState, EditorState} from "draft-js";
-import htmlToDraft from "html-to-draftjs";
 import React, {useEffect, useRef, useState} from "react";
-import {Editor} from "react-draft-wysiwyg";
 import {useParams} from "react-router";
 import HustModal from "component/common/HustModal";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
@@ -14,16 +11,13 @@ import FileUploadZone from "../../../utils/FileUpload/FileUploadZone";
 import HustContainerCard from "../../common/HustContainerCard";
 import HustCodeEditor from "../../common/HustCodeEditor";
 import {request} from "../../../api";
-
-const editorStyle = {
-  toolbar: {
-    background: "#FFFFFF",
-  },
-  editor: {
-    border: "1px solid black",
-    minHeight: "300px",
-  },
-};
+import {
+  COMPUTER_LANGUAGES,
+  DEFAULT_CODE_SEGMENT_CPP,
+  DEFAULT_CODE_SEGMENT_JAVA,
+  DEFAULT_CODE_SEGMENT_PYTHON
+} from "./Constant";
+import ReactHtmlParser from 'react-html-parser';
 
 export default function StudentViewProgrammingContestProblemDetail() {
   const params = useParams();
@@ -32,7 +26,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
   const [problem, setProblem] = useState(null);
   const [testCases, setTestCases] = useState([]);
   const [file, setFile] = useState(null);
-  const [language, setLanguage] = useState("CPP");
+  const [language, setLanguage] = useState(COMPUTER_LANGUAGES.CPP);
   const [status, setStatus] = useState("");
   const [message, setMessage] = useState("");
   const [codeSolution, setCodeSolution] = useState("");
@@ -41,8 +35,8 @@ export default function StudentViewProgrammingContestProblemDetail() {
   const [openModalPreview, setOpenModalPreview] = useState(false);
   const [selectedTestcase, setSelectedTestcase] = useState();
   const [isProcessing, setIsProcessing] = React.useState(false);
-  const [editorStateDescription, setEditorStateDescription] = useState(
-    EditorState.createEmpty()
+  const [problemDescription, setProblemDescription] = useState(
+    ""
   );
   const [fetchedImageArray, setFetchedImageArray] = useState([]);
 
@@ -135,7 +129,6 @@ export default function StudentViewProgrammingContestProblemDetail() {
       (res) => {
         res = res.data;
         setProblem(res);
-        //setProblemStatement(res.data.problemStatement);
         if (res.attachment && res.attachment.length !== 0) {
           const newFileURLArray = res.attachment.map((url) => ({
             id: randomImageName(),
@@ -147,16 +140,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
           setFetchedImageArray(newFileURLArray);
         }
 
-        let problemDescriptionHtml = htmlToDraft(res.problemStatement);
-        let {contentBlocks, entityMap} = problemDescriptionHtml;
-        let contentDescriptionState = ContentState.createFromBlockArray(
-          contentBlocks,
-          entityMap
-        );
-        let statementDescription = EditorState.createWithContent(
-          contentDescriptionState
-        );
-        setEditorStateDescription(statementDescription);
+        setProblemDescription(res?.problemStatement || "");
       },
       {onError: (e) => console.log(e)}
     );
@@ -165,6 +149,20 @@ export default function StudentViewProgrammingContestProblemDetail() {
   useEffect(() => {
     getProblemDetail();
   }, []);
+
+  useEffect(() => {
+    switch (language) {
+      case COMPUTER_LANGUAGES.CPP:
+        setCodeSolution(DEFAULT_CODE_SEGMENT_CPP);
+        break;
+      case COMPUTER_LANGUAGES.JAVA:
+        setCodeSolution(DEFAULT_CODE_SEGMENT_JAVA);
+        break;
+      case COMPUTER_LANGUAGES.PYTHON:
+        setCodeSolution(DEFAULT_CODE_SEGMENT_PYTHON);
+        break;
+    }
+  }, [language])
 
   const ModalPreview = (chosenTestcase) => {
     return (
@@ -210,15 +208,8 @@ export default function StudentViewProgrammingContestProblemDetail() {
   return (
     <HustContainerCard title={"Problem: " + (problem ? problem.problemName : "")}>
       <Box>
-        <Typography>
-          <h3>Description</h3>
-        </Typography>
-        <Editor
-          editorState={editorStateDescription}
-          handlePastedText={() => false}
-          toolbarStyle={editorStyle.toolbar}
-          editorStyle={editorStyle.editor}
-        />
+        <Typography variant="h5">Description</Typography>
+        {ReactHtmlParser(problemDescription)}
         {fetchedImageArray.length !== 0 &&
           fetchedImageArray.map((file) => (
             <FileUploadZone file={file} removable={false}/>

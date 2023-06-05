@@ -135,5 +135,5 @@ function ProductUnitScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_PRODUCT_UNIT";
+const SCR_ID = "SCR_SCM_PRODUCT_UNIT";
 export default withScreenSecurity(ProductUnitScreen, SCR_ID, true);

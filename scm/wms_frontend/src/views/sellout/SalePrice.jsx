@@ -372,5 +372,5 @@ function SalePriceScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_PURCHASE_PRICE";
+const SCR_ID = "SCR_SCM_SALE_PRICE";
 export default withScreenSecurity(SalePriceScreen, SCR_ID, true);

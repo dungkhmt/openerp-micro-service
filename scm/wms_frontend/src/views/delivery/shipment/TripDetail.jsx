@@ -12,6 +12,7 @@ import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import {
   useCreateTripRoute,
+  useDeleteTripRoute,
   useGetTripRouteList,
 } from "controllers/query/delivery-trip-query";
 import { useGetItemsOfTrip } from "controllers/query/shipment-query";
@@ -45,6 +46,9 @@ function TripScreen({ screenAuthorization }) {
       tripCode: currTrip?.code,
     });
   const createTripRouteQuery = useCreateTripRoute();
+  const deleteTripRouteQuery = useDeleteTripRoute({
+    tripCode: currTrip?.code,
+  });
   const extraActions = [
     {
       title: "Xem",
@@ -142,7 +146,7 @@ function TripScreen({ screenAuthorization }) {
         params={params}
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20, marginTop: 2 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
-        isLoading={isLoading}
+        isLoading={isLoading || isLoadingTripRoute}
         totalItem={tripRoute?.totalElements}
         handlePaginationModelChange={(props) => {
           setParams({
@@ -235,7 +239,7 @@ function TripScreen({ screenAuthorization }) {
               handleButtonClick();
             }}
             variant={"contained"}
-            sx={{ marginY: 2 }}
+            sx={{ marginY: 2, marginRight: 5 }}
           >
             <Typography
               sx={{
@@ -243,6 +247,24 @@ function TripScreen({ screenAuthorization }) {
               }}
             >
               XEM LỘ TRÌNH ĐÃ TẠO
+            </Typography>
+          </Button>
+        )}
+        {tripRoute && (
+          <Button
+            onClick={async () => {
+              await deleteTripRouteQuery.mutateAsync();
+            }}
+            variant={"contained"}
+            color={"error"}
+            sx={{ marginY: 2 }}
+          >
+            <Typography
+              sx={{
+                color: "white",
+              }}
+            >
+              XÓA LỘ TRÌNH ĐÃ TẠO
             </Typography>
           </Button>
         )}
@@ -278,5 +300,5 @@ function TripScreen({ screenAuthorization }) {
   );
 }
 
-const SCR_ID = "SCR_TRIP";
+const SCR_ID = "SCR_SCM_TRIP";
 export default withScreenSecurity(TripScreen, SCR_ID, true);
