@@ -7,8 +7,10 @@ import openerp.containertransport.dto.*;
 import openerp.containertransport.entity.Container;
 import openerp.containertransport.entity.Facility;
 import openerp.containertransport.entity.Truck;
+import openerp.containertransport.entity.TypeContainer;
 import openerp.containertransport.repo.ContainerRepo;
 import openerp.containertransport.repo.FacilityRepo;
+import openerp.containertransport.repo.TypeContainerRepo;
 import openerp.containertransport.service.ContainerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -26,12 +28,15 @@ public class ContainerServiceImpl implements ContainerService {
     private final FacilityRepo facilityRepo;
     private final ModelMapper modelMapper;
     private final EntityManager entityManager;
+    private final TypeContainerRepo typeContainerRepo;
     @Override
     public ContainerModel createContainer(ContainerModel containerModelDTO) {
+        TypeContainer typeContainer = typeContainerRepo.findByTypeContainerCode(containerModelDTO.getTypeContainerCode());
+
         Facility facility = facilityRepo.findById(containerModelDTO.getFacilityId()).get();
         Container container = new Container();
         container.setFacility(facility);
-        container.setSize(containerModelDTO.getSize());
+        container.setTypeContainer(typeContainer);
         container.setEmpty(containerModelDTO.getIsEmpty());
         container.setStatus("Available");
         container.setCreatedAt(System.currentTimeMillis());
@@ -121,6 +126,7 @@ public class ContainerServiceImpl implements ContainerService {
         facilityResponsiveDTO.setLongitude(container.getFacility().getLongitude());
         facilityResponsiveDTO.setAddress(container.getFacility().getAddress());
         containerModel.setFacilityResponsiveDTO(facilityResponsiveDTO);
+        containerModel.setSize(container.getTypeContainer().getSize());
         return containerModel;
     }
 }

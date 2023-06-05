@@ -24,9 +24,6 @@ public class Container implements Serializable {
     @Column(name = "container_code")
     private String containerCode;
 
-    @Column(name = "size")
-    private Integer size;
-
     @Column(name = "status")
     private String status;
 
@@ -37,6 +34,11 @@ public class Container implements Serializable {
     @JoinColumn(name = "facility_id", referencedColumnName = "id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Facility facility;
+
+    @ManyToOne()
+    @JoinColumn(name = "type", referencedColumnName = "id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private TypeContainer typeContainer;
 
     @Column(name = "created_at")
     private long createdAt;

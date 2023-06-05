@@ -36,9 +36,9 @@ public class TruckController {
         return ResponseEntity.status(HttpStatus.OK).body(truckModel);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<?> updateTruck(@RequestBody TruckModel truckModel) {
-        TruckModel truckModelUpdate = truckService.updateTruck(truckModel);
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateTruck(@PathVariable long id, @RequestBody TruckModel truckModel) {
+        TruckModel truckModelUpdate = truckService.updateTruck(truckModel, id);
         return ResponseEntity.status(HttpStatus.OK).body(truckModelUpdate);
     }
 }

@@ -28,6 +28,8 @@ public class TruckServiceImpl implements TruckService  {
     @Override
     public Truck createTruck(TruckModel truckModel) {
         Facility facility = facilityRepo.findById(truckModel.getFacilityId()).get();
+        facility.setNumberTruck(facility.getNumberTruck() + 1);
+        facilityRepo.save(facility);
         Truck truck = new Truck();
         truck.setFacility(facility);
         truck.setDriverId(truckModel.getDriverId());
@@ -96,18 +98,28 @@ public class TruckServiceImpl implements TruckService  {
     }
 
     @Override
-    public TruckModel updateTruck(TruckModel truckModel) {
-        Truck truck = truckRepo.findById(truckModel.getId());
+    public TruckModel updateTruck(TruckModel truckModel, long id) {
+        Truck truck = truckRepo.findById(id);
         if (truckModel.getStatus() != null) {
             truck.setStatus(truckModel.getStatus());
         }
-        if (truckModel.getFacilityId() != null) {
-            Facility facility = facilityRepo.findById(truckModel.getFacilityId()).get();
-            truck.setFacility(facility);
+        if (truckModel.getFacilityId() != null && truckModel.getFacilityId() != truck.getFacility().getId()) {
+            Facility facilityOld = facilityRepo.findById(truck.getFacility().getId()).get();
+            facilityOld.setNumberTruck(facilityOld.getNumberTruck() - 1);
+            facilityRepo.save(facilityOld);
+            Facility facilityNew = facilityRepo.findById(truckModel.getFacilityId()).get();
+            facilityNew.setNumberTruck(facilityNew.getNumberTruck() + 1);
+            truck.setFacility(facilityNew);
         }
-//        if(truckModel.getDriverId() != null){
-//            truck.setFacilityId(truckModel.getFacilityId());
-//        }
+        if(truckModel.getDriverName() != null){
+            truck.setDriverName(truckModel.getDriverName());
+        }
+        if(truckModel.getBrandTruck() != null){
+            truck.setBrandTruck(truckModel.getBrandTruck());
+        }
+        if(truckModel.getLicensePlates() != null){
+            truck.setLicensePlates(truckModel.getLicensePlates());
+        }
         truck.setUpdatedAt(System.currentTimeMillis());
         truckRepo.save(truck);
         TruckModel truckModelUpdate = convertToModel(truck);

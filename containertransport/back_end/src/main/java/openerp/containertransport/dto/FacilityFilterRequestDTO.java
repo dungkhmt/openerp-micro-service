@@ -8,6 +8,7 @@ import lombok.*;
 @Builder
 public class FacilityFilterRequestDTO {
     private String facilityName;
+    private String type;
     private Integer page;
     private Integer pageSize;
 }

@@ -39,7 +39,7 @@ public class OrderServiceImpl implements OrderService {
             orderModel.getContainerIds().forEach((item) -> {
                 Container container = containerRepo.findById(item);
                 containers.add(container);
-                weight.addAndGet(container.getSize());
+                weight.addAndGet(container.getTypeContainer().getSize());
             });
         }
         if(!containers.isEmpty()) {

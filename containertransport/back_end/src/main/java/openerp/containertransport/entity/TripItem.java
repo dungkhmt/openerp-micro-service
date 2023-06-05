@@ -58,6 +58,9 @@ public class TripItem {
     @Column(name = "status")
     private String status;
 
+    @Column(name = "type")
+    private String type;
+
     @Column(name = "created_at")
     private long createdAt;
 

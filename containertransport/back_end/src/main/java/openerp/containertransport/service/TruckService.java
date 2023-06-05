@@ -11,5 +11,5 @@ public interface TruckService {
     Truck createTruck(TruckModel truckModel);
     TruckFilterRes filterTruck(TruckFilterRequestDTO truckFilterRequestDTO);
     TruckModel getTruckById(long id);
-    TruckModel updateTruck(TruckModel truckModel);
+    TruckModel updateTruck(TruckModel truckModel, long id);
 }

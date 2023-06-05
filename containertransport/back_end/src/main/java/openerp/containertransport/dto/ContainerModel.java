@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 public class ContainerModel {
     private long id;
     private String containerCode;
+    private String typeContainerCode;
     private Integer size;
     private Long facilityId;
     private String facilityName;

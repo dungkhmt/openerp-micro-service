@@ -15,8 +15,10 @@ import openerp.containertransport.repo.FacilityRepo;
 import openerp.containertransport.repo.RelationshipRepo;
 import openerp.containertransport.service.FacilityService;
 import openerp.containertransport.utils.GraphHopperCalculator;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -42,12 +44,8 @@ public class FacilityServiceImpl implements FacilityService {
     @Override
     public Facility createFacility(FacilityModel facilityModel) throws Exception {
         Facility facility = new Facility();
-        RestTemplate restTemplate = new RestTemplate();
         if(facilityModel.getAddress() != null) {
-            String addressTmp = facilityModel.getAddress().replace(",", "");
-            String url = "https://nominatim.openstreetmap.org/search?q="+addressTmp+"&format=json&addressdetails=1&limit=1&polygon_svg=1";
-            Object coordinates = restTemplate.getForObject(url, ArrayList.class).get(0);
-            MapReqDTO mapReqDTO = modelMapper.map(coordinates, MapReqDTO.class);
+            MapReqDTO mapReqDTO = convertAddressToCoordinates(facilityModel.getAddress());
             facility.setLongitude(new BigDecimal(mapReqDTO.getLon()));
             facility.setLatitude(new BigDecimal(mapReqDTO.getLat()));
             facility.setAddress(facilityModel.getAddress());
@@ -72,20 +70,10 @@ public class FacilityServiceImpl implements FacilityService {
                 List<Facility> facilityModels = getAllFacility();
                 facilityModels.forEach((item) -> {
                     if(item.getId() != facility.getId()) {
-                        Relationship relationship = new Relationship();
-                        relationship.setFromFacility(facility.getId());
-                        relationship.setToFacility(item.getId());
-                        ResponsePath responsePath = null;
-                        try {
-                            responsePath = graphHopperCalculator.calculate(facility.getLatitude(), facility.getLongitude(),
-                                    item.getLatitude(), item.getLongitude());
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                        relationship.setDistant(BigDecimal.valueOf(responsePath.getDistance()));
-                        relationship.setTime(responsePath.getTime());
-                        relationshipRepo.save(relationship);
-
+                        Relationship relationship1 = createRelationship(facility, item);
+                        Relationship relationship2 = createRelationship(item, facility);
+                        relationshipRepo.save(relationship1);
+                        relationshipRepo.save(relationship2);
                     }
                 });
             } catch (Exception e) {
@@ -110,10 +98,15 @@ public class FacilityServiceImpl implements FacilityService {
         String sqlCount = "SELECT COUNT(id) FROM container_transport_facility WHERE 1=1";
         HashMap<String, Object> params = new HashMap<>();
 
-        if(facilityFilterRequestDTO.getFacilityName() != null) {
+        if(!StringUtils.isEmpty(facilityFilterRequestDTO.getFacilityName())) {
             sql += " AND facility_name = '%:facilityName%'";
             sqlCount += " AND facility_name = '%:facilityName%'";
             params.put("facilityName", facilityFilterRequestDTO.getFacilityName());
+        }
+        if(!StringUtils.isEmpty(facilityFilterRequestDTO.getType())) {
+            sql += " AND facility_type = :type";
+            sqlCount += " AND facility_type = :type";
+            params.put("type", facilityFilterRequestDTO.getType());
         }
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
         for (String i : params.keySet()) {
@@ -159,5 +152,30 @@ public class FacilityServiceImpl implements FacilityService {
     }
     List<Facility> getAllFacility () {
         return facilityRepo.findAll();
+    }
+
+    public MapReqDTO convertAddressToCoordinates (String address) {
+        RestTemplate restTemplate = new RestTemplate();
+        String addressTmp = address.replace(",", "");
+        String url = "https://nominatim.openstreetmap.org/search?q="+addressTmp+"&format=json&addressdetails=1&limit=1&polygon_svg=1";
+        Object coordinates = restTemplate.getForObject(url, ArrayList.class).get(0);
+        MapReqDTO mapReqDTO = modelMapper.map(coordinates, MapReqDTO.class);
+        return mapReqDTO;
+    }
+
+    public Relationship createRelationship (Facility fromFacility, Facility toFacility) {
+        Relationship relationship = new Relationship();
+        relationship.setFromFacility(fromFacility.getId());
+        relationship.setToFacility(toFacility.getId());
+        ResponsePath responsePath = null;
+        try {
+            responsePath = graphHopperCalculator.calculate(fromFacility.getLatitude(), fromFacility.getLongitude(),
+                    toFacility.getLatitude(), toFacility.getLongitude());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        relationship.setDistant(BigDecimal.valueOf(responsePath.getDistance()));
+        relationship.setTime(responsePath.getTime());
+        return relationship;
     }
 }

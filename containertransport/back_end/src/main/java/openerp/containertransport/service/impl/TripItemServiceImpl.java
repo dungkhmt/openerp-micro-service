@@ -70,6 +70,12 @@ public class TripItemServiceImpl implements TripItemService {
         tripItemModel.setFacilityCode(tripItem.getFacility().getFacilityCode());
         tripItemModel.setLongitude(tripItem.getFacility().getLongitude());
         tripItemModel.setLatitude(tripItem.getFacility().getLatitude());
+        if(tripItem.getContainer() != null) {
+            tripItemModel.setContainerCode(tripItem.getContainer().getContainerCode());
+        }
+        if (tripItem.getTrailer() != null) {
+            tripItemModel.setTrailerCode(tripItem.getTrailer().getTrailerCode());
+        }
         return tripItemModel;
     }
 }

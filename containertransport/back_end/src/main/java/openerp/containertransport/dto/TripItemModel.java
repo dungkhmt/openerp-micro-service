@@ -30,6 +30,7 @@ public class TripItemModel implements Serializable {
     private String orderCode;
     @JsonProperty("status")
     private String status;
+    private String type;
     private long arrivalTime;
     private long departureTime;
     private long createdAt;
