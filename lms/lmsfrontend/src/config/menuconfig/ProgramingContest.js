@@ -1,7 +1,7 @@
 export const ProgrammingContestMenuTeacher = {
   id: "MENU_PROGRAMMING_CONTEST_MANAGER",
-  icon: "LocalLibraryIcon",
-  text: "Programming Contest Teacher",
+  icon: "ProgrammingIcon",
+  text: "Programming Teacher",
   child: [
     // {
     //   id: "MENU_PROGRAMMING_CONTEST_MANAGER.MENU_PROGRAMMING_CONTEST_MANAGER_CREATE_PROBLEM",
@@ -48,8 +48,8 @@ export const ProgrammingContestMenuTeacher = {
 
 export const ProgrammingContestMenuStudent = {
   id: "MENU_PROGRAMMING_CONTEST_PARTICIPANT",
-  icon: "LocalLibraryIcon",
-  text: "Programming Contest Student",
+  icon: "CodeIcon",
+  text: "Programming Student",
   child: [
     {
       id: "MENU_PROGRAMMING_CONTEST_PARTICIPANT.MENU_PROGRAMMING_CONTEST_PARTICIPANT_LIST_NOT_REGISTERED_CONTEST",

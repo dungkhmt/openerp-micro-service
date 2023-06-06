@@ -178,7 +178,7 @@ function GroupMenuItem(props) {
             })}
             style={{
               marginLeft: 3,
-              marginRight: 27,
+              marginRight: 20,
             }}
           >
             {menuIconMap.get(group.icon)}
