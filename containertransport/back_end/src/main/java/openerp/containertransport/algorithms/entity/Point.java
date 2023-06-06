@@ -19,7 +19,7 @@ public class Point implements Serializable {
     @JsonProperty("departure_time")
     public Long departureTime;
     @JsonProperty("container_id")
-    public Integer containerId;
+    public Long containerId;
     public Integer weightContainer;
     @JsonProperty("trailer_id")
     public Integer trailerId;

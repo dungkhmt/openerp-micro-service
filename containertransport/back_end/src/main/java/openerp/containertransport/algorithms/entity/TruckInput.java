@@ -8,7 +8,7 @@ import java.io.Serializable;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Truck implements Serializable {
+public class TruckInput implements Serializable {
     private Integer locationId;
     private Integer truckID;
     private int trailerTruck;

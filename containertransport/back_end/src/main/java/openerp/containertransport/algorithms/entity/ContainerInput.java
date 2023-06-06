@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Container {
+public class ContainerInput {
     private String containerID;
     private int size; // 20, 40
 }

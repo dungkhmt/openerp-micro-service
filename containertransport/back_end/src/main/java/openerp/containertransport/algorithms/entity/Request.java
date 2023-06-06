@@ -23,7 +23,7 @@ public class Request {
     private int toLocationID;
 
     private Constants.RequestType type;
-    private int containerID;
+    private long containerID;
     private int weightContainer;
     private String orderCode;
 }

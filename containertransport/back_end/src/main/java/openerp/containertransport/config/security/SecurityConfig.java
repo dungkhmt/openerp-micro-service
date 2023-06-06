@@ -61,6 +61,7 @@ public class SecurityConfig {
                         .requestMatchers("/trailer/*").permitAll()
                         .requestMatchers("/tripItem/*").permitAll()
                         .requestMatchers("/type/container/*").permitAll()
+                        .requestMatchers("/solution/*").permitAll()
                         .anyRequest().authenticated())
                 .requestCache()
                 .requestCache(new NullRequestCache()) // Not cache request because of having frontend

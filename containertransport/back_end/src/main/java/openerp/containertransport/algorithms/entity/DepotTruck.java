@@ -1,6 +1,9 @@
 package openerp.containertransport.algorithms.entity;
 
+import lombok.Data;
+
+@Data
 public class DepotTruck {
-    private String depotTruckId;
-    private String truckId;
+    private int depotTruckId;
+    private int truckId;
 }

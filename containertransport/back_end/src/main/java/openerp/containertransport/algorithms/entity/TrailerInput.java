@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Trailer {
+public class TrailerInput {
     private int trailerID;
     private String trailerCode;
     private int facilityId;
