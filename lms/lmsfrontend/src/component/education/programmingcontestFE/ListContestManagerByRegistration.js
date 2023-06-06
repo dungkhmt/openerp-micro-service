@@ -4,6 +4,7 @@ import {Link} from "react-router-dom";
 import StandardTable from "../../table/StandardTable";
 import Typography from "@mui/material/Typography";
 import {toFormattedDateTime} from "../../../utils/dateutils";
+import AddIcon from "@material-ui/icons/Add";
 
 export function ListContestManagerByRegistration() {
   const [contests, setContests] = useState([]);
@@ -35,7 +36,7 @@ export function ListContestManagerByRegistration() {
     },
     {title: "Status", field: "statusId"},
     {title: "Role", field: "roleId"},
-    {title: "Reg. Status", field: "registrationStatusId"},
+    {title: "Registration Status", field: "registrationStatusId"},
   ];
 
   function getContestListByUserRole() {
@@ -51,7 +52,7 @@ export function ListContestManagerByRegistration() {
   return (
     <div>
       <StandardTable
-        title="DS Contests được phân quyền"
+        title="Contests"
         columns={columns}
         data={contests}
         hideCommandBar
@@ -61,6 +62,18 @@ export function ListContestManagerByRegistration() {
           search: true,
           sorting: true,
         }}
+        actions={[
+          {
+            icon: () => {
+              return <AddIcon fontSize="large"/>;
+            },
+            tooltip: "Create new Contest",
+            isFreeAction: true,
+            onClick: () => {
+              window.open("/programming-contest/create-contest")
+            }
+          }
+        ]}
       />
     </div>
   );

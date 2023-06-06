@@ -7,6 +7,7 @@ import {Box, Chip, IconButton} from "@mui/material";
 import {GetApp} from "@material-ui/icons";
 import {getColorLevel} from "./lib";
 import {StandardTable} from "erp-hust/lib/StandardTable";
+import AddIcon from "@material-ui/icons/Add";
 
 function ListProblem() {
   const [problems, setProblems] = useState([]);
@@ -94,7 +95,6 @@ function ListProblem() {
         levelId: problem.levelId,
         tags: problem.tags,
       }));
-      //setProblems(res.data);
       setProblems(data);
     }).then();
   }
@@ -117,136 +117,19 @@ function ListProblem() {
           search: true,
           sorting: true,
         }}
+        actions={[
+          {
+            icon: () => {
+              return <AddIcon fontSize="large"/>;
+            },
+            tooltip: t("addNewProblem"),
+            isFreeAction: true,
+            onClick: () => {
+              window.open("/programming-contest/create-problem")
+            }
+          }
+        ]}
       />
-      {/*
-      <div>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 750 }} aria-label="customized table">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>{t("index")}</StyledTableCell>
-                <StyledTableCell align="left">{t("title")}</StyledTableCell>
-                <StyledTableCell align="left">
-                  {t("created by User")}
-                </StyledTableCell>
-                <StyledTableCell align="left">
-                  {t("created date")}
-                </StyledTableCell>
-                <StyledTableCell align="left">
-                  {t("difficulty")}
-                </StyledTableCell>
-                <StyledTableCell align="left">
-                  {t("addTestCase")}
-                </StyledTableCell>
-                <StyledTableCell align="left">{t("edit")}</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {contestProblems.map((problem, index) => (
-                <StyledTableRow>
-                  <StyledTableCell component="th" scope="row">
-                    {index + 1}
-                  </StyledTableCell>
-
-                  <StyledTableCell align="left">
-                    <Link
-                      to={
-                        "/programming-contest/manager-view-problem-detail/" +
-                        problem.problemId
-                      }
-                      style={{
-                        textDecoration: "none",
-                        color: "#000000",
-                        hover: { color: "#00D8FF", textPrimary: "#00D8FF" },
-                      }}
-                    >
-                      {problem.problemName}
-                    </Link>
-                  </StyledTableCell>
-
-                  <StyledTableCell align="left">
-                    <span>{`${problem.userId}`}</span>
-                  </StyledTableCell>
-                  <StyledTableCell align="left">
-                    <span>{`${toFormattedDateTime(problem.createdAt)}`}</span>
-                  </StyledTableCell>
-
-                  <StyledTableCell align="left">
-                    <span
-                      style={{ color: getColorLevel(`${problem.levelId}`) }}
-                    >{`${problem.levelId}`}</span>
-                  </StyledTableCell>
-
-                  <StyledTableCell align="left">
-                    <Link
-                      to={
-                        "/programming-contest/problem-detail-create-test-case/" +
-                        problem.problemId
-                      }
-                      style={{ textDecoration: "none", color: "black" }}
-                    >
-                      <Button variant="contained" color="light">
-                        ADD
-                      </Button>
-                    </Link>
-                  </StyledTableCell>
-                  <StyledTableCell align="left">
-                    <Link
-                      to={
-                        "/programming-contest/edit-problem/" + problem.problemId
-                      }
-                      style={{
-                        textDecoration: "none",
-                        color: "black",
-                        cursor: "",
-                      }}
-                    >
-                      <Button variant="contained" color="light">
-                        Edit
-                      </Button>
-                    </Link>
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
-      <br />
-      <Grid container spacing={12}>
-        <Grid item xs={6}>
-          <TextField
-            variant={"outlined"}
-            autoFocus
-            size={"small"}
-            required
-            select
-            id="pageSize"
-            value={pageSize}
-            onChange={handlePageSizeChange}
-          >
-            {pageSizes.map((item) => (
-              <MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-
-        <Grid item>
-          <Pagination
-            className="my-3"
-            count={totalPages}
-            page={page}
-            siblingCount={1}
-            boundaryCount={1}
-            variant="outlined"
-            shape="rounded"
-            onChange={handlePageChange}
-          />
-        </Grid>
-      </Grid>
-      */}
     </div>
   );
 }
