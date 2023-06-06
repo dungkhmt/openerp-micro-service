@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class DepotTrailer {
-    private String depotTrailerId;
+    private int depotTrailerId;
     private List<String> trailerIds;
     private int numberTrailer;
 }
