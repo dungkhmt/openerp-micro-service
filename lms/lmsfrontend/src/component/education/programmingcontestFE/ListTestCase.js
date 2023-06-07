@@ -20,7 +20,6 @@ const useStyles = makeStyles((theme) => ({}));
 
 export default function ListTestCase() {
   const params = useParams();
-  const classes = useStyles();
 
   const history = useHistory();
 
@@ -184,6 +183,7 @@ export default function ListTestCase() {
           title="Input"
           text={chosenTestcase?.chosenTestcase?.testCase}
         />
+        <Box sx={{height: "18px"}}/>
         <HustCopyCodeBlock
           title="Output"
           text={chosenTestcase?.chosenTestcase?.correctAns}
@@ -280,7 +280,7 @@ export default function ListTestCase() {
   }
 
   return (
-    <Box sx={{marginTop: "24px"}}>
+    <Box sx={{marginTop: "36px"}}>
       <StandardTable
         title={"Problem's testcases"}
         columns={testcaseColumns}

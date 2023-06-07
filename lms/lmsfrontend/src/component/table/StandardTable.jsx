@@ -143,7 +143,7 @@ export default function StandardTable(props) {
             Container: (props) => (
               <Paper
                 {...props}
-                elevation={3}
+                elevation={2}
               />
             ),
             Toolbar: (props) => (

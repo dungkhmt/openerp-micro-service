@@ -3723,6 +3723,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             ContestEntity contest = contestRepo.findContestByContestId(cp.getContestId());
             ModelGetContestResponse m = ModelGetContestResponse.builder()
                                                                .contestId(contest.getContestId())
+                                                               .userId(contest.getUserId())
+                                                               .createdAt(contest.getCreatedAt())
                                                                .statusId(contest.getStatusId())
                                                                .build();
             res.add(m);
