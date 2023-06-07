@@ -18,6 +18,16 @@ import {
   DEFAULT_CODE_SEGMENT_PYTHON
 } from "./Constant";
 import ReactHtmlParser from 'react-html-parser';
+import {ContentState, EditorState} from "draft-js";
+import htmlToDraft from "html-to-draftjs";
+import {Editor} from "react-draft-wysiwyg";
+
+const editorStyle = {
+  editor: {
+    // border: "1px solid black",
+    // minHeight: "300px",
+  },
+};
 
 export default function StudentViewProgrammingContestProblemDetail() {
   const params = useParams();
@@ -35,8 +45,11 @@ export default function StudentViewProgrammingContestProblemDetail() {
   const [openModalPreview, setOpenModalPreview] = useState(false);
   const [selectedTestcase, setSelectedTestcase] = useState();
   const [isProcessing, setIsProcessing] = React.useState(false);
-  const [problemDescription, setProblemDescription] = useState(
-    ""
+  // const [problemDescription, setProblemDescription] = useState(
+  //   ""
+  // );
+  const [editorStateDescription, setEditorStateDescription] = useState(
+    EditorState.createEmpty()
   );
   const [fetchedImageArray, setFetchedImageArray] = useState([]);
 
@@ -140,7 +153,17 @@ export default function StudentViewProgrammingContestProblemDetail() {
           setFetchedImageArray(newFileURLArray);
         }
 
-        setProblemDescription(res?.problemStatement || "");
+        // setProblemDescription(res?.problemStatement || "");
+        let problemDescriptionHtml = htmlToDraft(res.problemStatement);
+        let {contentBlocks, entityMap} = problemDescriptionHtml;
+        let contentDescriptionState = ContentState.createFromBlockArray(
+          contentBlocks,
+          entityMap
+        );
+        let statementDescription = EditorState.createWithContent(
+          contentDescriptionState
+        );
+        setEditorStateDescription(statementDescription);
       },
       {onError: (e) => console.log(e)}
     );
@@ -209,7 +232,14 @@ export default function StudentViewProgrammingContestProblemDetail() {
     <HustContainerCard title={"Problem: " + (problem ? problem.problemName : "")}>
       <Box>
         <Typography variant="h5">Description</Typography>
-        {ReactHtmlParser(problemDescription)}
+        {/*{ReactHtmlParser(problemDescription)}*/}
+        <Editor
+          toolbarHidden
+          editorState={editorStateDescription}
+          handlePastedText={() => false}
+          readOnly
+          editorStyle={editorStyle.editor}
+        />
         {fetchedImageArray.length !== 0 &&
           fetchedImageArray.map((file) => (
             <FileUploadZone file={file} removable={false}/>
