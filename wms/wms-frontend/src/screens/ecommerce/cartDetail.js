@@ -127,6 +127,14 @@ const CartDetail = () => {
         cartRequestBody
       );
 
+      await request(
+        'get',
+        API_PATH.SYNC_USER,
+        (res) => {
+          console.log("Synchonized user from keycloak");
+        }
+      );
+
       setLoading(false);
     }
 

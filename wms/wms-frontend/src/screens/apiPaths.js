@@ -34,5 +34,6 @@ export const API_PATH = {
   REVENUE_PROFIT_REPORT: "/wmsv2/report/revenue-profit",
   PRODUCT_CATEGORY_MONTHLY_REPORT: "/wmsv2/report/product-category-monthly",
   PRODUCTS_REPORT: "/wmsv2/report/products",
-  PRODUCT_HISTORY_REPORT: "/wmsv2/report/products-history"
+  PRODUCT_HISTORY_REPORT: "/wmsv2/report/products-history",
+  SYNC_USER: "/user"
 }
