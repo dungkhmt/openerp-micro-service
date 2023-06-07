@@ -68,12 +68,12 @@ export function ContestManager() {
         {/*/>*/}
         <Tab
           label="Check Plagiarism"
-          {...a11yProps(8)}
+          {...a11yProps(7)}
           style={{width: "11%"}}
         />
         <Tab
           label="Manage Problems"
-          {...a11yProps(9)}
+          {...a11yProps(8)}
           style={{width: "11%"}}
         />
       </Tabs>
@@ -114,11 +114,11 @@ export function ContestManager() {
       {/*  <ContestManagerViewListContestProblemSubmissionDetailByTestCase/>*/}
       {/*</TabPanelVertical>*/}
 
-      <TabPanelVertical value={value} index={8}>
+      <TabPanelVertical value={value} index={7}>
         <CodeSimilarityCheck contestId={contestId}/>
       </TabPanelVertical>
 
-      <TabPanelVertical value={value} index={9}>
+      <TabPanelVertical value={value} index={8}>
         <ContestManagerManageProblem contestId={contestId}/>
       </TabPanelVertical>
     </div>
