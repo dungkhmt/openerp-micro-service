@@ -16,7 +16,7 @@ const PresidentReport = () => {
     <Box sx={{ width: '100%', typography: 'body1' }}>
       <TabContext value={value}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleChange} aria-label="lab API tabs example">
+          <TabList onChange={handleChange} >
             <Tab label="Doanh thu - Lợi nhuận" value="1" />
             <Tab label="Lợi nhuận theo nhóm hàng" value="2" />
             <Tab label="Hàng tồn kho" value="3" />

@@ -200,7 +200,7 @@ const EnhancedTableToolbar = (props) => {
       )}
 
       {
-        actions == undefined &&
+        actions == undefined && isEditable &&
         <Tooltip title="Thêm mới">
           <IconButton onClick={openNewRow}> 
             <AddIcon />
