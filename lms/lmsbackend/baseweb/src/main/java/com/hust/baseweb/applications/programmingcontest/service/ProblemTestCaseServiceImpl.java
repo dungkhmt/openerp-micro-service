@@ -2294,7 +2294,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             List<ContestSubmissionsByUserCustom> mapProblemsToPoints = new ArrayList<>();
             for (Map.Entry entry : mapProblemToPoint.entrySet()) {
                 ContestSubmissionsByUserCustom tmp = new ContestSubmissionsByUserCustom();
-                tmp.setProblemId(entry.getKey().toString());
+                String problemId = entry.getKey().toString();
+                String problemName = contestEntity.getProblems()
+                                                  .stream().filter(p -> Objects.equals(p.getProblemId(), problemId))
+                                                  .collect(Collectors.toList()).get(0)
+                                                  .getProblemName();
+                tmp.setProblemId(problemName);
                 tmp.setPoint(Integer.valueOf(entry.getValue().toString()));
                 mapProblemsToPoints.add(tmp);
                 totalPoint += tmp.getPoint();
