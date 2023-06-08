@@ -8,10 +8,9 @@ export default function ContestStudentList() {
   const [contests, setContests] = useState([]);
 
   const columns = [
-    {title: "Index", field: "index"},
-
+    // {title: "No.", field: "index"},
     {
-      title: "ContestName",
+      title: "Contest",
       field: "contestName",
       render: (rowData) => (
         <Link
@@ -26,16 +25,18 @@ export default function ContestStudentList() {
       ),
     },
     {title: "Status", field: "status"},
-    {title: "Created Date", field: "date"},
+    {title: "Created By", field: "createdBy"},
+    {title: "Created At", field: "date"},
   ];
 
   function getContestList() {
     request("get", "/get-contest-registered-student", (res) => {
       const data = res.data.contests.map((e, index) => ({
-        index: index,
+        index: index + 1,
         contestId: e.contestId,
         contestName: e.contestName,
-        status: e.status,
+        status: e.statusId,
+        createdBy: e.userId,
         date: toFormattedDateTime(e.createdAt),
       }));
       setContests(data);
@@ -48,7 +49,7 @@ export default function ContestStudentList() {
   return (
     <div>
       <StandardTable
-        title={"DS contest"}
+        title={"Registered Contest"}
         columns={columns}
         data={contests}
         hideCommandBar
