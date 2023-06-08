@@ -2,9 +2,8 @@ import React, {useEffect, useState} from "react";
 import TextField from "@mui/material/TextField";
 import DateFnsUtils from "@date-io/date-fns";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
-import {LinearProgress, MenuItem} from "@mui/material";
+import {Grid, InputAdornment, LinearProgress, MenuItem} from "@mui/material";
 import {useParams} from "react-router-dom";
-import {makeStyles} from "@material-ui/core/styles";
 
 import DateTimePicker from "@mui/lab/DateTimePicker";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
@@ -15,17 +14,6 @@ import {request} from "../../../api";
 import {LoadingButton} from "@mui/lab";
 import HustContainerCard from "../../common/HustContainerCard";
 import Box from "@mui/material/Box";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    padding: theme.spacing(4), "& .MuiTextField-root": {
-      margin: theme.spacing(1), width: "30%", minWidth: 120,
-    },
-  }, formControl: {
-    margin: theme.spacing(1), minWidth: 120, maxWidth: 300,
-  },
-}));
-
 
 export default function EditContest() {
   const {t} = useTranslation(
@@ -61,9 +49,6 @@ export default function EditContest() {
 
   const [minTimeBetweenTwoSubmissions, setMinTimeBetweenTwoSubmissions] = useState(0);
   const [judgeMode, setJudgeMode] = useState("");
-  const [listJudgeModes, setListJudgeModes] = useState([]);
-
-  const classes = useStyles();
 
   const handleSubmit = () => {
     setLoading(true);
@@ -117,9 +102,6 @@ export default function EditContest() {
       setEvaluateBothPublicPrivateTestcase(res.data.evaluateBothPublicPrivateTestcase);
       setMaxSourceCodeLength(res.data.maxSourceCodeLength);
       setListEvaluateBothPublicPrivateTestcases(res.data.listEvaluateBothPublicPrivateTestcases);
-      setListJudgeModes(res.data.listJudgeModes);
-
-      console.log("res ", res.data);
     }).then(() => setLoading(false));
   }
 
@@ -133,165 +115,167 @@ export default function EditContest() {
       <HustContainerCard title={"Edit Contest " + contestId}>
         {loading && <LinearProgress/>}
         {!loading && <Box>
-          <form className={classes.root} noValidate autoComplete="off">
-            <TextField
-              autoFocus
-              required
-              value={contestName}
-              id="contestName"
-              label="Contest Name"
-              placeholder="Contest Name"
-              onChange={(event) => {
-                setContestName(event.target.value);
-              }}
-            />
+          <Grid container rowSpacing={3} spacing={2}>
+            <Grid item xs={9}>
+              <TextField
+                fullWidth
+                autoFocus
+                required
+                value={contestName}
+                id="contestName"
+                label="Contest Name"
+                onChange={(event) => {
+                  setContestName(event.target.value);
+                }}
+              />
+            </Grid>
 
-            <TextField
-              type="number"
-              value={contestTime}
-              required
-              id="timeLimit"
-              label="Time Limit"
-              onChange={(event) => {
-                setContestTime(Number(event.target.value));
-              }}
-            />
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                select
+                id="statusId"
+                label="Status"
+                onChange={(event) => {
+                  setStatusId(event.target.value);
+                }}
+                value={statusId}
+              >
+                {listStatusIds.map((item) => (<MenuItem key={item} value={item}>
+                  {item}
+                </MenuItem>))}
+              </TextField>
+            </Grid>
 
-            <TextField
-              required
-              id="Count Down"
-              label="Count Down"
-              onChange={(event) => {
-                setCountDown(Number(event.target.value));
-              }}
-            />
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                select
+                id="Public"
+                label="Public"
+                onChange={(event) => {
+                  setIsPublic(event.target.value);
+                }}
+                value={isPublic}
+              >
+                <MenuItem key={"true"} value={true}>
+                  Yes
+                </MenuItem>
+                <MenuItem key={"false"} value={false}>
+                  No
+                </MenuItem>
+              </TextField>
+            </Grid>
 
-            <TextField
-              select
-              id="Public Contest"
-              label="Public Contest"
-              onChange={(event) => {
-                setIsPublic(event.target.value);
-              }}
-              value={isPublic}
-            >
-              <MenuItem key={"true"} value={true}>
-                {"true"}
-              </MenuItem>
-              <MenuItem key={"false"} value={false}>
-                {"false"}
-              </MenuItem>
-            </TextField>
-            <TextField
-              select
-              id="statusId"
-              label="Status"
-              onChange={(event) => {
-                setStatusId(event.target.value);
-              }}
-              value={statusId}
-            >
-              {listStatusIds.map((item) => (<MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>))}
-            </TextField>
-            <TextField
-              select
-              id="submissionActionType"
-              label="Action on Submission"
-              onChange={(event) => {
-                setSubmissionActionType(event.target.value);
-              }}
-              value={submissionActionType}
-            >
-              {listSubmissionActionType.map((item) => (<MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>))}
-            </TextField>
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                type="number"
+                required
+                id="maxNumberSubmission"
+                label="Max number of Submissions"
+                onChange={(event) => {
+                  setMaxNumberSubmission(event.target.value);
+                }}
+                value={maxNumberSubmission}
+              />
+            </Grid>
 
-            <TextField
-              type="number"
-              required
-              id="maxNumberSubmission"
-              label="Max number of Submissions"
-              onChange={(event) => {
-                setMaxNumberSubmission(event.target.value);
-              }}
-              value={maxNumberSubmission}
-            />
-            <TextField
-              type="number"
-              id="Max Source Code Length"
-              label="Source Length Limit (characters)"
-              onChange={(event) => {
-                setMaxSourceCodeLength(event.target.value);
-              }}
-              value={maxSourceCodeLength}
-            />
-            <TextField
-              type="number"
-              id="Submission Interval"
-              label="Submission Interval (s)"
-              onChange={(event) => {
-                setMinTimeBetweenTwoSubmissions(Number(event.target.value));
-              }}
-              value={minTimeBetweenTwoSubmissions}
-            />
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                type="number"
+                id="Max Source Code Length"
+                label="Source Length Limit"
+                onChange={(event) => {
+                  setMaxSourceCodeLength(event.target.value);
+                }}
+                value={maxSourceCodeLength}
+                InputProps={{endAdornment: <InputAdornment position="end">chars</InputAdornment>}}
+              />
+            </Grid>
 
-            <TextField
-              select
-              id="participantViewResultMode"
-              label="Participant View Result Mode"
-              onChange={(event) => {
-                setParticipantViewResultMode(event.target.value);
-              }}
-              value={participantViewResultMode}
-            >
-              {listParticipantViewResultModes.map((item) => (<MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>))}
-            </TextField>
-            <TextField
-              select
-              id="judgeMode"
-              label="Judge Mode"
-              onChange={(event) => {
-                setJudgeMode(event.target.value);
-              }}
-              value={judgeMode}
-            >
-              {listJudgeModes.map((item) => (<MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>))}
-            </TextField>
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                type="number"
+                id="Submission Interval"
+                label="Submission Interval"
+                onChange={(event) => {
+                  setMinTimeBetweenTwoSubmissions(Number(event.target.value));
+                }}
+                value={minTimeBetweenTwoSubmissions}
+                InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>}}
+              />
+            </Grid>
 
-            <TextField
-              select
-              id="evaluateBothPublicPrivateTestcase"
-              label="Evaluate Private Testcases"
-              onChange={(event) => {
-                setEvaluateBothPublicPrivateTestcase(event.target.value);
-              }}
-              value={evaluateBothPublicPrivateTestcase}
-            >
-              {listEvaluateBothPublicPrivateTestcases.map((item) => (<MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>))}
-            </TextField>
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                select
+                id="evaluateBothPublicPrivateTestcase"
+                label="Evaluate Private Testcases"
+                onChange={(event) => {
+                  setEvaluateBothPublicPrivateTestcase(event.target.value);
+                }}
+                value={evaluateBothPublicPrivateTestcase}
+              >
+                {listEvaluateBothPublicPrivateTestcases.map((item) => (<MenuItem key={item} value={item}>
+                  {item}
+                </MenuItem>))}
+              </TextField>
+            </Grid>
 
-            <TextField
-              select
-              id="problemDescriptionViewType"
-              label="Problem Description View Mode"
-              onChange={(event) => {
-                setProblemDescriptionViewType(event.target.value);
-              }}
-              value={problemDescriptionViewType}
-            >
-              {listProblemDescriptionViewTypes.map((item) => (<MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>))}
-            </TextField>
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                select
+                id="participantViewResultMode"
+                label="Participant View Result Mode"
+                onChange={(event) => {
+                  setParticipantViewResultMode(event.target.value);
+                }}
+                value={participantViewResultMode}
+              >
+                {listParticipantViewResultModes.map((item) => (<MenuItem key={item} value={item}>
+                  {item}
+                </MenuItem>))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                select
+                id="submissionActionType"
+                label="Action on Submission"
+                onChange={(event) => {
+                  setSubmissionActionType(event.target.value);
+                }}
+                value={submissionActionType}
+              >
+                {listSubmissionActionType.map((item) => (<MenuItem key={item} value={item}>
+                  {item}
+                </MenuItem>))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                select
+                id="problemDescriptionViewType"
+                label="Problem Description View Mode"
+                onChange={(event) => {
+                  setProblemDescriptionViewType(event.target.value);
+                }}
+                value={problemDescriptionViewType}
+              >
+                {listProblemDescriptionViewTypes.map((item) => (<MenuItem key={item} value={item}>
+                  {item}
+                </MenuItem>))}
+              </TextField>
+            </Grid>
 
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DateTimePicker
@@ -303,14 +287,13 @@ export default function EditContest() {
                 renderInput={(params) => <TextField {...params} />}
               />
             </LocalizationProvider>
-          </form>
-
+          </Grid>
         </Box>}
 
         <LoadingButton
           loading={loading}
           variant="contained"
-          style={{marginLeft: "45px"}}
+          style={{marginTop: "36px"}}
           onClick={handleSubmit}
         >
           Save

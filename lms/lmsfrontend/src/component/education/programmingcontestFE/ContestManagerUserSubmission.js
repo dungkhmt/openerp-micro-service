@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button} from "@mui/material";
+import {Box, IconButton} from "@mui/material";
 import ContestManagerViewSubmissionOfAUserDialog from "./ContestManagerViewSubmissionOfAUserDialog";
 import ManagerSubmitCodeOfParticipant from "./ManagerSubmitCodeOfParticipant";
 import {request} from "../../../api";
@@ -7,6 +7,13 @@ import StandardTable from "component/table/StandardTable";
 import HustModal from "component/common/HustModal";
 import {Link} from "react-router-dom";
 import {getStatusColor} from "./lib";
+import {successNoti} from "../../../utils/notification";
+import {LoadingButton} from "@mui/lab";
+import CodeIcon from '@mui/icons-material/Code';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import {pdf} from "@react-pdf/renderer";
+import SubmissionOfParticipantPDFDocument from "./template/SubmissionOfParticipantPDFDocument";
+import FileSaver from "file-saver";
 
 export default function ContestManagerUserSubmission(props) {
   const contestId = props.contestId;
@@ -21,6 +28,8 @@ export default function ContestManagerUserSubmission(props) {
 
   const [filterParams, setFilterParams] = useState({page: 0, size: 10});
   const [totalSizeSubmission, setTotalSizeSubmission] = useState(0);
+
+  const [isProcessing, setIsProcessing] = useState(false);
 
   function handleCloseManagerSubmitParticipantCode() {
     setIsOpenManagerSubmitCodeOfParticipant(false);
@@ -47,6 +56,53 @@ export default function ContestManagerUserSubmission(props) {
     ).then();
   }
 
+  function handleRejudgeAll() {
+    setIsProcessing(true);
+    request(
+      "post",
+      "/evaluate-batch-submission-of-contest/" + contestId,
+      (res) => {
+        setIsProcessing(false);
+        successNoti("Submissions will be rejudged", 5000)
+      }
+    ).then();
+  }
+
+  function handleJudgeAll() {
+    setIsProcessing(true);
+    request(
+      "post",
+      "/evaluate-batch-not-evaluated-submission-of-contest/" + contestId,
+      (res) => {
+        setIsProcessing(false);
+        successNoti("Submissions will be judged", 5000)
+      }
+    ).then();
+  }
+
+  const generatePdfDocument = async (documentData, fileName) => {
+    const blob = await pdf(
+      <SubmissionOfParticipantPDFDocument data={documentData}/>
+    ).toBlob();
+
+    FileSaver.saveAs(blob, fileName);
+  };
+
+  function handleExportParticipantSubmission() {
+    request(
+      "get",
+      "/get-user-judged-problem-submission/" + contestId,
+      (res) => {
+        console.log("handleJudgeContest", res.data);
+        setIsProcessing(false);
+        generatePdfDocument(
+          res.data,
+          `USER_JUDGED_SUBMISSION-${contestId}.pdf`
+        );
+      }
+    ).then();
+  }
+
   const generateColumns = () => {
     const columns = [
       {
@@ -59,7 +115,7 @@ export default function ContestManagerUserSubmission(props) {
               rowData.contestSubmissionId
             }
           >
-            {rowData.contestSubmissionId.substring(0,6)}
+            {rowData.contestSubmissionId.substring(0, 6)}
           </Link>
         )
       },
@@ -83,32 +139,34 @@ export default function ContestManagerUserSubmission(props) {
       {title: "Point", field: "point"},
       {title: "Submitted At", field: "createAt"},
       {
+        title: "Rejudge",
+        sortable: "false",
         render: (rowData) => (
-          <Button
+          <IconButton
             variant="contained"
-            color="success"
+            color="primary"
             onClick={() => {
               handleRejudge(rowData.contestSubmissionId);
             }}
           >
-            {" "}
-            REJUDGE{" "}
-          </Button>
+            <CodeIcon/>
+          </IconButton>
         )
       },
       {
+        title: "View By User",
+        sortable: false,
         render: (rowData) => (
-          <Button
+          <IconButton
             variant="contained"
-            color="primary"
+            color="success"
             onClick={() => {
               setSelectedUserId(rowData.userId);
               setIsOpen(true);
             }}
           >
-            {" "}
-            ViewByUser{" "}
-          </Button>
+            <VisibilityIcon/>
+          </IconButton>
         )
       },
     ]
@@ -135,17 +193,7 @@ export default function ContestManagerUserSubmission(props) {
   }, [filterParams]);
 
   return (
-    <div>
-      <section id={"#submission"}>
-        <Button
-          variant="contained"
-          onClick={handleSubmitCodeParticipant}
-          sx={{marginBottom: "12px"}}
-        >
-          Submit Code Of Participant
-        </Button>
-      </section>
-
+    <Box sx={{marginTop: "12px"}}>
       <StandardTable
         title={"User Submissions"}
         columns={generateColumns()}
@@ -157,10 +205,59 @@ export default function ContestManagerUserSubmission(props) {
           search: false,
           sorting: false,
         }}
-
         page={filterParams.page}
         totalCount={totalSizeSubmission}
         onChangePage={(page, size) => setFilterParams({...filterParams, page, size})}
+        actions={[
+          {
+            icon: () => {
+              return (
+                <LoadingButton loading={isProcessing} loadingPosition="center" variant="contained"
+                               onClick={handleSubmitCodeParticipant} color="primary">
+                  Submit Participant Code
+                </LoadingButton>
+              )
+            },
+            tooltip: 'Submit code as a participant',
+            isFreeAction: true
+          },
+          {
+            icon: () => {
+              return (
+                <LoadingButton loading={isProcessing} loadingPosition="center" variant="contained"
+                               onClick={handleJudgeAll} color="primary">
+                  Judge All
+                </LoadingButton>
+              )
+            },
+            tooltip: 'Judge all submissions that are NOT EVALUATED',
+            isFreeAction: true
+          },
+          {
+            icon: () => {
+              return (
+                <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
+                               onClick={handleRejudgeAll} color="primary">
+                  Rejudge All
+                </LoadingButton>
+              )
+            },
+            tooltip: 'Rejudge all submissions in this contest',
+            isFreeAction: true
+          },
+          {
+            icon: () => {
+              return (
+                <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
+                               onClick={handleExportParticipantSubmission} color="primary">
+                  Export
+                </LoadingButton>
+              )
+            },
+            tooltip: 'Export all submissions in this contest',
+            isFreeAction: true
+          }
+        ]}
       />
 
       <ContestManagerViewSubmissionOfAUserDialog
@@ -184,6 +281,6 @@ export default function ContestManagerUserSubmission(props) {
           contestId={contestId}
         />
       </HustModal>
-    </div>
+    </Box>
   );
 }

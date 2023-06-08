@@ -94,7 +94,7 @@ function ManagerViewProblemDetailV2() {
         >
           Edit
         </Button>
-    }
+      }
     >
       <Grid container spacing={2}>
         <Grid item xs={4}>
