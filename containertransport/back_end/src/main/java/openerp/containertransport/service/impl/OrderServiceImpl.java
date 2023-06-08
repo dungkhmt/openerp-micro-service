@@ -86,6 +86,9 @@ public class OrderServiceImpl implements OrderService {
             params.put("status", orderFilterRequestDTO.getStatus());
         }
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
+        for (String i : params.keySet()) {
+            queryCount.setParameter(i, params.get(i));
+        }
         ordersRes.setCount((Long) queryCount.getSingleResult());
         sql += " ORDER BY updated_at DESC";
 

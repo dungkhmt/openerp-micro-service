@@ -6,6 +6,7 @@ import openerp.containertransport.algorithms.entity.output.TransportContainerSol
 import openerp.containertransport.algorithms.solver.HeuristicSolver;
 import openerp.containertransport.algorithms.solver.TransportContainerInput;
 import openerp.containertransport.dto.*;
+import openerp.containertransport.entity.Relationship;
 import openerp.containertransport.service.*;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
     private final ContainerServiceImpl containerService;
     private final FacilityService facilityService;
     private final OrderService orderService;
+    private final RelationshipService relationshipService;
     private final HeuristicSolver heuristicSolver;
 
     @Override
@@ -27,17 +29,25 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         TransportContainerInput transportContainerInput = new TransportContainerInput();
 
         // get Trucks
-        List<TruckModel> truckList = truckService.filterTruck(new TruckFilterRequestDTO()).getTruckModels();
+        TruckFilterRequestDTO truckFilterRequestDTO = new TruckFilterRequestDTO();
+        truckFilterRequestDTO.setStatus("AVAILABLE");
+        truckFilterRequestDTO.setPage(0);
+        truckFilterRequestDTO.setPageSize(3);
+        List<TruckModel> truckList = truckService.filterTruck(truckFilterRequestDTO).getTruckModels();
         List<TruckInput> truckInputs = convertToTruckInput(truckList);
         transportContainerInput.setTruckInputs(truckInputs);
 
         // get Trailers
-        List<TrailerModel> trailerModels = trailerService.filterTrailer(new TrailerFilterRequestDTO()).getTrailerModels();
+        TrailerFilterRequestDTO trailerFilterRequestDTO = new TrailerFilterRequestDTO();
+        trailerFilterRequestDTO.setStatus("AVAILABLE");
+        List<TrailerModel> trailerModels = trailerService.filterTrailer(trailerFilterRequestDTO).getTrailerModels();
         List<TrailerInput> trailerInputs = convertToTrailerInput(trailerModels);
         transportContainerInput.setTrailerInputs(trailerInputs);
 
         // request
-        List<OrderModel> orderModels = orderService.filterOrders(new OrderFilterRequestDTO()).getOrderModels();
+        OrderFilterRequestDTO orderFilterRequestDTO = new OrderFilterRequestDTO();
+        orderFilterRequestDTO.setStatus("ORDERED");
+        List<OrderModel> orderModels = orderService.filterOrders(orderFilterRequestDTO).getOrderModels();
         List<Request> requests = convertToRequest(orderModels);
         transportContainerInput.setRequests(requests);
 
@@ -56,7 +66,9 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         transportContainerInput.setDepotTrailer(depotTrailers);
 
         // distant
-
+        List<Relationship> relationships = relationshipService.getAllRelationShip();
+        List<DistanceElement> distanceElements = convertToDistantInput(relationships);
+        transportContainerInput.setDistances(distanceElements);
 
         TransportContainerSolutionOutput transportContainerSolutionOutput = heuristicSolver.solve(transportContainerInput);
         return null;
@@ -81,6 +93,7 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
             trailerInput.setTrailerID((int) trailerModel.getId());
             trailerInput.setTrailerCode(trailerModel.getTrailerCode());
             trailerInput.setFacilityId((int) trailerModel.getFacilityResponsiveDTO().getFacilityId());
+            trailerInputs.add(trailerInput);
         });
         return trailerInputs;
     }
@@ -118,5 +131,18 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
             depotTrailers.add(depotTrailer);
         });
         return depotTrailers;
+    }
+
+    public List<DistanceElement> convertToDistantInput(List<Relationship> relationships) {
+        List<DistanceElement> distanceElements = new ArrayList<>();
+        relationships.forEach(relationship -> {
+            DistanceElement distanceElement = new DistanceElement();
+            distanceElement.setFromFacility((int) relationship.getFromFacility().longValue());
+            distanceElement.setToFacility((int) relationship.getToFacility().longValue());
+            distanceElement.setDistance(relationship.getDistant());
+            distanceElement.setTravelTime(relationship.getTime());
+            distanceElements.add(distanceElement);
+        });
+        return distanceElements;
     }
 }

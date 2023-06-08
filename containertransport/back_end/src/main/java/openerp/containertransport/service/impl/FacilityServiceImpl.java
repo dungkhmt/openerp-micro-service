@@ -18,16 +18,13 @@ import openerp.containertransport.utils.GraphHopperCalculator;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -87,6 +84,13 @@ public class FacilityServiceImpl implements FacilityService {
     public FacilityModel getFacilityById(long id) {
         Facility facility = facilityRepo.findById(id);
         FacilityModel facilityModel = convertToModel(facility);
+        List<Facility> facilities = getAllFacility();
+        facilities = facilities.stream().filter((item) -> item.getId() != id).collect(Collectors.toList());
+        facilities.forEach((facility1) -> {
+            Relationship relationship = createRelationship(facility, facility1);
+            relationshipRepo.save(relationship);
+        });
+
         return facilityModel;
     }
 
