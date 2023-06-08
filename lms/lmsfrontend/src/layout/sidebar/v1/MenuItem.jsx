@@ -113,7 +113,7 @@ function MenuItem(props) {
           })}
           style={{
             paddingLeft: 3,
-            marginRight: 30,
+            marginRight: 24,
           }}
         >
           {menuIconMap.get(menuItem.icon)}

@@ -5,6 +5,7 @@ import {
   Chip,
   FormControl,
   FormControlLabel,
+  Grid,
   InputAdornment,
   InputLabel,
   Link as MuiLink,
@@ -37,15 +38,10 @@ import ModelAddNewTag from "./ModelAddNewTag";
 import FileUploadZone from "../../../utils/FileUpload/FileUploadZone";
 
 const useStyles = makeStyles((theme) => ({
-  main: {
-    display: "flex",
-    justifyContent: "space-between",
-    flexWrap: "wrap",
-    "& .MuiTextField-root": {
-      marginBottom: theme.spacing(2),
-      minWidth: 80,
-    },
-  },
+  description: {
+    marginTop: theme.spacing(3),
+    marginBottom: theme.spacing(2),
+  }
 }));
 
 function EditProblem() {
@@ -144,6 +140,7 @@ function EditProblem() {
       computerLanguage: languageSolution,
     };
 
+    setShowCompile(false);
     setLoading(true);
     request(
       "post",
@@ -252,127 +249,139 @@ function EditProblem() {
 
   return (
     <HustContainerCard title={t("editProblem")}>
-      <Box className={classes.main}>
-        <TextField
-          required
-          id="problemName"
-          label={t("problemName")}
-          placeholder="Problem Name"
-          value={problemName}
-          onChange={(event) => {
-            setProblemName(event.target.value);
-          }}
-          sx={{width: "30%"}}
-        />
-        <TextField
-          select
-          id="isPublicProblem"
-          label={t("public", {ns: "common"})}
-          onChange={(event) => {
-            setIsPublic(event.target.value);
-          }}
-          value={isPublic}
-          sx={{width: "15%"}}
-        >
-          <MenuItem key={"true"} value={true}>
-            {t("yes", {ns: "common"})}
-          </MenuItem>
-          <MenuItem key={"false"} value={false}>
-            {t("no", {ns: "common"})}
-          </MenuItem>
-        </TextField>
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
+          <TextField
+            fullWidth
+            required
+            id="problemName"
+            label={t("problemName")}
+            placeholder="Problem Name"
+            value={problemName}
+            onChange={(event) => {
+              setProblemName(event.target.value);
+            }}
+          />
+        </Grid>
 
-        <TextField
-          required
-          select
-          id="levelId"
-          label={t("level")}
-          value={levelId}
-          onChange={(event) => {
-            setLevelId(event.target.value);
-          }}
-          sx={{width: "15%"}}
-        >
-          {defaultLevel.map((item) => (
-            <MenuItem key={item} value={item}>
-              {item}
-            </MenuItem>
-          ))}
-        </TextField>
-
-        <TextField
-          required
-          id="timeLimit"
-          label={t("timeLimit")}
-          placeholder="Time Limit"
-          type="number"
-          value={timeLimit}
-          onChange={(event) => {
-            setTimeLimit(event.target.value);
-          }}
-          InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>,}}
-          sx={{width: "15%"}}
-        />
-
-        <TextField
-          required
-          id="memoryLimit"
-          label={t("memoryLimit")}
-          type="number"
-          value={memoryLimit}
-          onChange={(event) => {
-            setMemoryLimit(event.target.value);
-          }}
-          InputProps={{endAdornment: <InputAdornment position="end">MB</InputAdornment>,}}
-          sx={{width: "15%"}}
-        />
-
-        <FormControl sx={{m: 1, width: "90%"}}>
-          <InputLabel id="select-tag-label">Tags</InputLabel>
-          <Select
-            labelId="select-tag-label"
-            id="select-tag"
-            multiple
-            value={selectedTags}
-            onChange={handleSelectTags}
-            input={<OutlinedInput label="Tags"/>}
-            renderValue={(selectedTags) => (
-              <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.8}}>
-                {selectedTags?.map((selectedTag) => (
-                  <Chip size="small" label={selectedTag.name} sx={{
-                    marginRight: "6px",
-                    marginBottom: "6px",
-                    border: "1px solid lightgray",
-                    fontStyle: "italic"
-                  }}/>
-                ))}
-
-              </Box>
-            )}
+        <Grid item xs={2}>
+          <TextField
+            fullWidth
+            required
+            select
+            id="levelId"
+            label={t("level")}
+            value={levelId}
+            onChange={(event) => {
+              setLevelId(event.target.value);
+            }}
           >
-            <Button
-              sx={{marginLeft: "20px"}}
-              startIcon={<AddCircleIcon/>}
-              onClick={() => setOpenModalAddNewTag(true)}
-            >
-              {t("common:addNew")}
-            </Button>
-            <ModelAddNewTag
-              isOpen={openModalAddNewTag}
-              handleSuccess={() => {
-                getAllTags(handleGetTagsSuccess)
-              }}
-              handleClose={() => setOpenModalAddNewTag(false)}
-            />
-            {tags.map((tag) => (
-              <MenuItem key={tag.tagId} value={tag}>
-                <Checkbox checked={selectedTags.some(selectedTag => selectedTag.tagId === tag.tagId)}/>
-                <ListItemText primary={tag.name} secondary={tag?.description}/>
+            {defaultLevel.map((item) => (
+              <MenuItem key={item} value={item}>
+                {item}
               </MenuItem>
             ))}
-          </Select>
-        </FormControl>
-      </Box>
+          </TextField>
+        </Grid>
+
+        <Grid item xs={2}>
+          <TextField
+            fullWidth
+            required
+            id="timeLimit"
+            label={t("timeLimit")}
+            placeholder="Time Limit"
+            type="number"
+            value={timeLimit}
+            onChange={(event) => {
+              setTimeLimit(event.target.value);
+            }}
+            InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>}}
+          />
+        </Grid>
+
+        <Grid item xs={2}>
+          <TextField
+            fullWidth
+            required
+            id="memoryLimit"
+            label={t("memoryLimit")}
+            type="number"
+            value={memoryLimit}
+            onChange={(event) => {
+              setMemoryLimit(event.target.value);
+            }}
+            InputProps={{endAdornment: <InputAdornment position="end">MB</InputAdornment>}}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <TextField
+            fullWidth
+            select
+            id="isPublicProblem"
+            label={t("public", {ns: "common"})}
+            onChange={(event) => {
+              setIsPublic(event.target.value);
+            }}
+            value={isPublic}
+          >
+            <MenuItem key={"true"} value={true}>
+              {t("yes", {ns: "common"})}
+            </MenuItem>
+            <MenuItem key={"false"} value={false}>
+              {t("no", {ns: "common"})}
+            </MenuItem>
+          </TextField>
+        </Grid>
+
+        <Grid item xs={12}>
+          <FormControl sx={{width: "100%"}}>
+            <InputLabel id="select-tag-label">Tags</InputLabel>
+            <Select
+              labelId="select-tag-label"
+              id="select-tag"
+              multiple
+              value={selectedTags}
+              onChange={handleSelectTags}
+              input={<OutlinedInput label="Tags"/>}
+              renderValue={(selectedTags) => (
+                <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.8}}>
+                  {selectedTags?.map((selectedTag) => (
+                    <Chip size="small" label={selectedTag.name} sx={{
+                      marginRight: "6px",
+                      marginBottom: "6px",
+                      border: "1px solid lightgray",
+                      fontStyle: "italic"
+                    }}/>
+                  ))}
+
+                </Box>
+              )}
+            >
+              <Button
+                sx={{marginLeft: "20px"}}
+                startIcon={<AddCircleIcon/>}
+                onClick={() => setOpenModalAddNewTag(true)}
+              >
+                {t("common:addNew")}
+              </Button>
+              <ModelAddNewTag
+                isOpen={openModalAddNewTag}
+                handleSuccess={() => {
+                  getAllTags(handleGetTagsSuccess)
+                }}
+                handleClose={() => setOpenModalAddNewTag(false)}
+              />
+              {tags.map((tag) => (
+                <MenuItem key={tag.tagId} value={tag}>
+                  <Checkbox checked={selectedTags.some(selectedTag => selectedTag.tagId === tag.tagId)}/>
+                  <ListItemText primary={tag.name} secondary={tag?.description}/>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
 
       <Box className={classes.description}>
         <Typography variant="h5" component="div" sx={{marginTop: "12px", marginBottom: "8px"}}>
@@ -398,6 +407,7 @@ function EditProblem() {
               </Box>
               */}
 
+      <Box sx={{marginTop: "32px"}}/>
       <HustCodeEditor
         title={t("correctSourceCode")}
         language={languageSolution}
@@ -424,33 +434,35 @@ function EditProblem() {
         message={compileMessage}
       />
 
-      <FormControlLabel
-        label={t("isCustomEvaluated")}
-        control={
-          <Checkbox
-            checked={isCustomEvaluated}
-            onChange={() => setIsCustomEvaluated(!isCustomEvaluated)}
-          />}
-      />
-      <Typography variant="body2" color="gray">{t("customEvaluationNote1")}</Typography>
-      <MuiLink href="#" underline="hover">
-        <Typography variant="body2" color="gray">{t("customEvaluationNote2")}</Typography>
-      </MuiLink>
-
-      {isCustomEvaluated &&
-        <HustCodeEditor
-          title={t("checkerSourceCode")}
-          language={solutionCheckerLanguage}
-          onChangeLanguage={(event) => {
-            setSolutionCheckerLanguage(event.target.value);
-          }}
-          sourceCode={solutionChecker}
-          onChangeSourceCode={(code) => {
-            setSolutionChecker(code);
-          }}
-          placeholder={t("checkerSourceCodePlaceholder")}
+      <Box sx={{marginTop: "12px"}}>
+        <FormControlLabel
+          label={t("isCustomEvaluated")}
+          control={
+            <Checkbox
+              checked={isCustomEvaluated}
+              onChange={() => setIsCustomEvaluated(!isCustomEvaluated)}
+            />}
         />
-      }
+        <Typography variant="body2" color="gray">{t("customEvaluationNote1")}</Typography>
+        <MuiLink href="#" underline="hover">
+          <Typography variant="body2" color="gray">{t("customEvaluationNote2")}</Typography>
+        </MuiLink>
+
+        {isCustomEvaluated &&
+          <HustCodeEditor
+            title={t("checkerSourceCode")}
+            language={solutionCheckerLanguage}
+            onChangeLanguage={(event) => {
+              setSolutionCheckerLanguage(event.target.value);
+            }}
+            sourceCode={solutionChecker}
+            onChangeSourceCode={(code) => {
+              setSolutionChecker(code);
+            }}
+            placeholder={t("checkerSourceCodePlaceholder")}
+          />
+        }
+      </Box>
 
       <ListTestCase/>
 

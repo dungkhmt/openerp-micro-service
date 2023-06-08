@@ -45,36 +45,36 @@ export function ContestManager() {
         <Tab
           label="Contest Detail"
           {...a11yProps(0)}
-          style={{width: "10%"}}
+          style={{width: "11%"}}
         />
-        <Tab label="List User" {...a11yProps(1)} style={{width: "10%"}}/>
-        <Tab label="Register User" {...a11yProps(2)} style={{width: "10%"}}/>
-        <Tab label="Add User" {...a11yProps(3)} style={{width: "10%"}}/>
-        <Tab label="Ranking" {...a11yProps(4)} style={{width: "10%"}}/>
+        <Tab label="List User" {...a11yProps(1)} style={{width: "11%"}}/>
+        <Tab label="Register User" {...a11yProps(2)} style={{width: "11%"}}/>
+        <Tab label="Add User" {...a11yProps(3)} style={{width: "11%"}}/>
+        <Tab label="Ranking" {...a11yProps(4)} style={{width: "11%"}}/>
         <Tab
           label="Result Distribution"
           {...a11yProps(5)}
-          style={{width: "10%"}}
+          style={{width: "11%"}}
         />
         <Tab
           label="User Submission"
           {...a11yProps(6)}
-          style={{width: "10%"}}
+          style={{width: "11%"}}
         />
+        {/*<Tab*/}
+        {/*  label="Submission Detail by TestCase"*/}
+        {/*  {...a11yProps(7)}*/}
+        {/*  style={{width: "11%"}}*/}
+        {/*/>*/}
         <Tab
-          label="Submission Detail by TestCase"
+          label="Check Plagiarism"
           {...a11yProps(7)}
-          style={{width: "10%"}}
-        />
-        <Tab
-          label="Check Code Plagiarism"
-          {...a11yProps(8)}
-          style={{width: "10%"}}
+          style={{width: "11%"}}
         />
         <Tab
           label="Manage Problems"
-          {...a11yProps(9)}
-          style={{width: "10%"}}
+          {...a11yProps(8)}
+          style={{width: "11%"}}
         />
       </Tabs>
 
@@ -110,15 +110,15 @@ export function ContestManager() {
         <ContestManagerUserSubmission contestId={contestId}/>
       </TabPanelVertical>
 
-      <TabPanelVertical value={value} index={7}>
-        <ContestManagerViewListContestProblemSubmissionDetailByTestCase/>
-      </TabPanelVertical>
+      {/*<TabPanelVertical value={value} index={7}>*/}
+      {/*  <ContestManagerViewListContestProblemSubmissionDetailByTestCase/>*/}
+      {/*</TabPanelVertical>*/}
 
-      <TabPanelVertical value={value} index={8}>
+      <TabPanelVertical value={value} index={7}>
         <CodeSimilarityCheck contestId={contestId}/>
       </TabPanelVertical>
 
-      <TabPanelVertical value={value} index={9}>
+      <TabPanelVertical value={value} index={8}>
         <ContestManagerManageProblem contestId={contestId}/>
       </TabPanelVertical>
     </div>

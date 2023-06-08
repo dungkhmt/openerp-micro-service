@@ -23,6 +23,7 @@ import StudentViewProgrammingContestProblemDetailV2
 import ManagerViewProblemDetail from "../component/education/programmingcontestFE/ManagerViewProblemDetail";
 import SubmitSolutionOutput from "../component/education/programmingcontestFE/SubmitSolutionOutput";
 import SuggestProblem from "../component/education/programmingcontestFE/SuggestProblem";
+import ManagerViewProblemDetailV2 from "../component/education/programmingcontestFE/ManagerViewProblemDetailV2";
 
 export default function ProgrammingContestRoutes() {
   let { path } = useRouteMatch();
@@ -58,7 +59,7 @@ export default function ProgrammingContestRoutes() {
           path={`${path}/student-view-contest-problem-detail/:contestId/:problemId`}
         />
         <Route
-          component={ManagerViewProblemDetail}
+          component={ManagerViewProblemDetailV2}
           path={`${path}/manager-view-problem-detail/:problemId`}
         />
 

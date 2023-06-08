@@ -1,38 +1,38 @@
 export const ProgrammingContestMenuTeacher = {
   id: "MENU_PROGRAMMING_CONTEST_MANAGER",
-  icon: "LocalLibraryIcon",
-  text: "Programming Contest Teacher",
+  icon: "ProgrammingIcon",
+  text: "Programming Teacher",
   child: [
-    {
-      id: "MENU_PROGRAMMING_CONTEST_MANAGER.MENU_PROGRAMMING_CONTEST_MANAGER_CREATE_PROBLEM",
-      path: "/programming-contest/create-problem",
-      isPublic: false,
-      icon: null,
-      text: "Create Problem",
-      child: [],
-    },
+    // {
+    //   id: "MENU_PROGRAMMING_CONTEST_MANAGER.MENU_PROGRAMMING_CONTEST_MANAGER_CREATE_PROBLEM",
+    //   path: "/programming-contest/create-problem",
+    //   isPublic: false,
+    //   icon: null,
+    //   text: "Create Problem",
+    //   child: [],
+    // },
     {
       id: "MENU_PROGRAMMING_CONTEST_MANAGER.MENU_PROGRAMMING_CONTEST_MANAGER_LIST_PROBLEM",
       path: "/programming-contest/list-problems",
       isPublic: false,
       icon: null,
-      text: "List Problem",
+      text: "Manage Problem",
       child: [],
     },
-    {
-      id: "MENU_PROGRAMMING_CONTEST_MANAGER.MENU_PROGRAMMING_CONTEST_MANAGER_CREATE_CONTEST",
-      path: "/programming-contest/create-contest",
-      isPublic: false,
-      icon: null,
-      text: "Create Contest",
-      child: [],
-    },
+    // {
+    //   id: "MENU_PROGRAMMING_CONTEST_MANAGER.MENU_PROGRAMMING_CONTEST_MANAGER_CREATE_CONTEST",
+    //   path: "/programming-contest/create-contest",
+    //   isPublic: false,
+    //   icon: null,
+    //   text: "Create Contest",
+    //   child: [],
+    // },
     {
       id: "MENU_PROGRAMMING_CONTEST_MANAGER.MENU_PROGRAMMING_CONTEST_MANAGER_LIST_CONTEST",
       path: "/programming-contest/teacher-list-contest-manager",
       isPublic: false,
       icon: null,
-      text: "List Contest Manager",
+      text: "Manage Contest",
       child: [],
     },
     {
@@ -48,8 +48,8 @@ export const ProgrammingContestMenuTeacher = {
 
 export const ProgrammingContestMenuStudent = {
   id: "MENU_PROGRAMMING_CONTEST_PARTICIPANT",
-  icon: "LocalLibraryIcon",
-  text: "Programming Contest Student",
+  icon: "CodeIcon",
+  text: "Programming Student",
   child: [
     {
       id: "MENU_PROGRAMMING_CONTEST_PARTICIPANT.MENU_PROGRAMMING_CONTEST_PARTICIPANT_LIST_NOT_REGISTERED_CONTEST",
