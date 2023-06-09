@@ -65,16 +65,20 @@ const TripItem = ({ index, item, facilities, setFacilities }) => {
                             {item?.orderCode} - {item?.facilityName} - {item?.action}
                         </Box>
                         {(item?.type === "Trailer" || (item?.type === "Truck" && item?.action === "STOP")) ? (
-                        <Box onClick={handleDeleteTripItem}>
-                            <Icon>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                        </Box>) : <Box></Box>}
+                            <Box onClick={handleDeleteTripItem}>
+                                <Icon>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                            </Box>) : <Box></Box>}
                     </Box>
 
                     {open ?
                         (<Box>
-                            {item?.action != "DEPART" && item?.action != "STOP" ? (
+                            {item?.type === "Order" ? (
                                 <Box className="trips-item-input">
-                                    <Box>Container: {item?.container?.containerCode}</Box>
+                                    <Box>Container: {item?.containerCode}</Box>
+                                </Box>) : null}
+                            {item?.type === "Trailer" ? (
+                                <Box className="trips-item-input">
+                                    <Box>Trailer: {item?.trailerCode}</Box>
                                 </Box>) : null}
                             {index != 0 ? (
                                 < Box className="trips-item-input">
@@ -155,6 +159,8 @@ const OrderArrangement = ({ ordersSelect, setTripItem, truckSelected, tripItems,
                     longitude: truckSelected?.facilityResponsiveDTO?.longitude,
                     latitude: truckSelected?.facilityResponsiveDTO?.latitude,
                     arrivalTime: null,
+                    container: null,
+                    trailerId: null,
                     departureTime: null,
                     type: "truck"
                 }
@@ -205,6 +211,7 @@ const OrderArrangement = ({ ordersSelect, setTripItem, truckSelected, tripItems,
                             orderCode: item?.orderCode,
                             orderId: item.id,
                             container: item?.containers[0],
+                            containerCode: item?.containers[0].containerCode,
                             longitude: item?.fromFacility.longitude,
                             latitude: item?.fromFacility.latitude,
                             arrivalTime: null,
@@ -222,6 +229,7 @@ const OrderArrangement = ({ ordersSelect, setTripItem, truckSelected, tripItems,
                             orderCode: item?.orderCode,
                             orderId: item.id,
                             container: item?.containers[0],
+                            containerCode: item?.containers[0].containerCode,
                             longitude: item?.toFacility.longitude,
                             latitude: item?.toFacility.latitude,
                             arrivalTime: null,

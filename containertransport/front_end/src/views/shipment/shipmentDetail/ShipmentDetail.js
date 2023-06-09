@@ -73,20 +73,31 @@ const ShipmentDetail = () => {
                     <Box className="title">
                         <Typography>Trips Management</Typography>
                     </Box>
-                    <Box className="btn-add"
-                        onClick={() => history.push({
-                            pathname: `/shipment/trip/create/${shipmentId}`,
-                        })}
-                    >
-                        <PrimaryButton className="btn-header">
-                            <Icon className="icon">
-                                {menuIconMap.get("ControlPointIcon")}
-                            </Icon>
-                            <Typography>
-                                New Trip
-                            </Typography>
-                        </PrimaryButton>
+                    <Box className="trips-btn">
+                    {/* {trips.length > 0 ? */}
+                        <Box className="auto-create-trips">
+                            <PrimaryButton className="btn-header">
+                                <Typography>
+                                    Auto Create Trips
+                                </Typography>
+                            </PrimaryButton>
+                        </Box>
+                        <Box className="btn-add"
+                            onClick={() => history.push({
+                                pathname: `/shipment/trip/create/${shipmentId}`,
+                            })}
+                        >
+                            <PrimaryButton className="btn-header">
+                                <Icon className="icon">
+                                    {menuIconMap.get("ControlPointIcon")}
+                                </Icon>
+                                <Typography>
+                                    New Trip
+                                </Typography>
+                            </PrimaryButton>
+                        </Box>
                     </Box>
+
                 </Box>
                 {trips.length > 0 ? <TripsContents trips={trips} shipmentId={shipmentId} /> : null}
             </Container>

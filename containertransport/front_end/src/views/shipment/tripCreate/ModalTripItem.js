@@ -72,7 +72,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                     orderCode: trailer?.trailerCode,
                     longitude: trailer?.facilityResponsiveDTO?.longitude,
                     latitude: trailer?.facilityResponsiveDTO?.latitude,
-                    trailerId: trailer?.trailerCode,
+                    trailerId: trailer?.id,
                     arrivalTime: null,
                     departureTime: null
                 }];
@@ -103,7 +103,8 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
             orderCode: type === "Truck" ? obj?.truckCode : obj?.trailerCode,
             longitude: facilityTmp?.longitude,
             latitude: facilityTmp?.latitude,
-            trailerId: type === "Truck" ? obj?.trailerCode : null,
+            trailerId: type === "Trailer" ? obj?.id : null,
+            trailerCode: type === "Trailer" ? obj?.trailerCode : null,
             arrivalTime: null,
             departureTime: null
         }];
