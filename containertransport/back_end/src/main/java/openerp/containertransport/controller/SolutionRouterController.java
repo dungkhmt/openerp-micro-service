@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -17,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/solution")
 public class SolutionRouterController {
     private final AutoSolutionRouterService autoSolutionRouterService;
-    @GetMapping("/create")
-    public ResponseEntity<?> autoCreatedSolution() {
-        ShipmentModel shipmentModelCreate = autoSolutionRouterService.autoSolutionRouter();
+    @GetMapping("/{shipmentId}")
+    public ResponseEntity<?> autoCreatedSolution(@PathVariable long shipmentId) {
+        ShipmentModel shipmentModelCreate = autoSolutionRouterService.autoSolutionRouter(shipmentId);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), shipmentModelCreate));
     }
 }

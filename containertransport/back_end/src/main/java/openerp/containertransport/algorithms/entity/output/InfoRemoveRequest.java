@@ -8,6 +8,6 @@ import openerp.containertransport.algorithms.entity.Request;
 @NoArgsConstructor
 @Builder
 public class InfoRemoveRequest {
-    private int requestId;
+    private long requestId;
     private int truckId;
 }

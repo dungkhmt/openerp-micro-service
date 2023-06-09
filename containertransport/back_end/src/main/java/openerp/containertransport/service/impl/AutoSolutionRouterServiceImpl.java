@@ -3,6 +3,7 @@ package openerp.containertransport.service.impl;
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.algorithms.entity.*;
 import openerp.containertransport.algorithms.entity.output.TransportContainerSolutionOutput;
+import openerp.containertransport.algorithms.entity.output.TripOutput;
 import openerp.containertransport.algorithms.solver.HeuristicSolver;
 import openerp.containertransport.algorithms.solver.TransportContainerInput;
 import openerp.containertransport.dto.*;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -22,10 +24,15 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
     private final FacilityService facilityService;
     private final OrderService orderService;
     private final RelationshipService relationshipService;
+    private final ShipmentService shipmentService;
+    private final TripService tripService;
     private final HeuristicSolver heuristicSolver;
 
     @Override
-    public ShipmentModel autoSolutionRouter() {
+    public ShipmentModel autoSolutionRouter(long shipmentId) {
+
+        ShipmentModel shipmentModel = shipmentService.getShipmentByShipmentId(shipmentId);
+
         TransportContainerInput transportContainerInput = new TransportContainerInput();
 
         // get Trucks
@@ -71,7 +78,42 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         transportContainerInput.setDistances(distanceElements);
 
         TransportContainerSolutionOutput transportContainerSolutionOutput = heuristicSolver.solve(transportContainerInput);
-        return null;
+
+        for (Map.Entry<Integer, TripOutput> tripOutput : transportContainerSolutionOutput.getTripOutputs().entrySet()) {
+            if(tripOutput.getValue().getPoints() != null && tripOutput.getValue().getPoints().size() != 0) {
+
+                List<TripItemModel> tripItemModelList = new ArrayList<>();
+                List<Long> orderIds = new ArrayList<>();
+                int seq = 1;
+                for (Point point : tripOutput.getValue().getPoints()) {
+
+                    TripItemModel tripItemModel = new TripItemModel();
+                    tripItemModel.setSeq(seq);
+                    tripItemModel.setAction(point.getAction());
+                    tripItemModel.setFacilityId(Long.valueOf(point.getFacilityId()));
+                    tripItemModel.setOrderCode(point.getOrderCode());
+                    tripItemModel.setContainerId(point.getContainerId());
+                    tripItemModel.setTrailerId(point.getTrailerId() != null ? Long.valueOf(point.getTrailerId()) : null);
+                    tripItemModel.setType(point.getType());
+                    if (point.getId() != null) {
+                        if(!orderIds.contains(point.getId())) {
+                            orderIds.add(point.getId());
+                        }
+                    }
+                    tripItemModelList.add(tripItemModel);
+                    seq += 1;
+                }
+
+                TripModel tripModel = new TripModel();
+                tripModel.setTruckId(tripOutput.getKey().longValue());
+                tripModel.setTripItemModelList(tripItemModelList);
+                tripModel.setOrderIds(orderIds);
+
+                TripModel tripModelCreate = tripService.createTrip(tripModel, shipmentId, shipmentModel.getCreatedByUserId());
+            }
+        }
+
+        return shipmentModel;
     }
 
     public List<TruckInput> convertToTruckInput(List<TruckModel> truckModels) {
@@ -102,7 +144,7 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         List<Request> requests = new ArrayList<>();
         orderModels.forEach(orderModel -> {
             Request request = new Request();
-            request.setRequestId((int) orderModel.getId());
+            request.setRequestId(orderModel.getId());
             request.setOrderCode(orderModel.getOrderCode());
             request.setContainerID(orderModel.getContainers().get(0).getId());
             request.setWeightContainer(orderModel.getContainers().get(0).getTypeContainer().getSize());

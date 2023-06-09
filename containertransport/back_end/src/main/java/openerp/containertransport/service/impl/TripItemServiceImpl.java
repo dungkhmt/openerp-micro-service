@@ -45,6 +45,7 @@ public class TripItemServiceImpl implements TripItemService {
         tripItem.setAction(tripItemModel.getAction());
         tripItem.setFacility(facility);
         tripItem.setStatus("WAITING");
+        tripItem.setType(tripItemModel.getType());
         tripItem.setArrivalTime(tripItemModel.getArrivalTime());
         tripItem.setDepartureTime(tripItemModel.getDepartureTime());
         tripItem.setCreatedAt(System.currentTimeMillis());

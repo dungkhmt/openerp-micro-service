@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 @Data
 public class Point implements Serializable {
-    public int id;
+    public Long id;
     public int facilityId;
     public BigDecimal longitude;
     public BigDecimal latitude;

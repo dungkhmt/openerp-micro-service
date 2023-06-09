@@ -259,6 +259,7 @@ public class HeuristicSolver {
 
     public Point createdPointFromRequest(String action, Request request) {
         Point point = new Point();
+        point.setId(request.getRequestId());
         point.setAction(action);
         point.setFacilityId( action.equals(Constants.ACTION.PICKUP_CONTAINER.getAction()) ? request.getFromLocationID() : request.getToLocationID());
         point.setOrderCode(request.getOrderCode());
@@ -543,7 +544,7 @@ public class HeuristicSolver {
         InfoRemoveRequest infoRemoveRequest = new InfoRemoveRequest();
 
         BigDecimal totalDistantBest = new BigDecimal(String.valueOf(this.transportContainerSolutionOutput.getTotalDistant()));
-        int requestSelect = 0;
+        long requestSelect = 0;
         int truckSelect = 0;
         TripOutput tripOutputLoopTmp = new TripOutput();
 
