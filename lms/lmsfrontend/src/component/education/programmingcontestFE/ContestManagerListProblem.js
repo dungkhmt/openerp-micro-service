@@ -47,7 +47,7 @@ export function ContestManagerListProblem(props) {
 
   return (
     <HustContainerCard
-      title={"Contest: " + contestName}
+      title={"Contest: " + contestId}
       action={
         <Button
           variant="contained"

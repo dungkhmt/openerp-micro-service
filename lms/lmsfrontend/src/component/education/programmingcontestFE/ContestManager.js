@@ -60,7 +60,7 @@ export function ContestManager() {
           style={{width: "11%"}}
         />
         <Tab
-          label="User Submission"
+          label="User Submissions"
           {...a11yProps(7)}
           style={{width: "11%"}}
         />
