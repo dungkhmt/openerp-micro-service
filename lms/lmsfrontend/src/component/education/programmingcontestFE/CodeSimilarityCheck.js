@@ -2,7 +2,8 @@ import React, {useEffect, useState} from "react";
 import {request} from "../../../api";
 import {toFormattedDateTime} from "../../../utils/dateutils";
 import MaterialTable from "material-table";
-import {Button, CircularProgress, TextField} from "@material-ui/core";
+import {Button, CircularProgress, TextField} from "@mui/material";
+import {Box, Divider, InputAdornment} from "@mui/material";
 
 export default function CodeSimilarityCheck(props) {
   const contestId = props.contestId;
@@ -101,6 +102,22 @@ export default function CodeSimilarityCheck(props) {
       }
     );
   }
+
+  function handleCheckPlagiarism(event) {
+    event.preventDefault();
+    setIsProcessing(true);
+    let body = {
+      threshold: threshold,
+    };
+    request(
+      "post",
+      "/check-code-similarity/" + contestId,
+      {},
+      {},
+      body
+    ).then(() => setIsProcessing(false))
+  }
+
   function computeSimilarity(event) {
     event.preventDefault();
     setIsProcessing(true);
@@ -129,44 +146,81 @@ export default function CodeSimilarityCheck(props) {
   useEffect(() => {}, []);
   return (
     <div>
-      <TextField
-        autoFocus
-        required
-        id="Threshold"
-        label="Threshold"
-        placeholder="Threshold"
-        value={threshold}
-        onChange={(event) => {
-          setThreshold(event.target.value);
-        }}
-      ></TextField>
-      (%)
-      <TextField
-        autoFocus
-        required
-        id="userId"
-        label="userId"
-        placeholder="UserId"
-        value={userId}
-        onChange={(event) => {
-          setUserId(event.target.value);
-        }}
-      ></TextField>
-      <TextField
-        autoFocus
-        required
-        id="problemId"
-        label="problemId"
-        placeholder="ProblemId"
-        value={problemId}
-        onChange={(event) => {
-          setProblemId(event.target.value);
-        }}
-      ></TextField>
-      <Button variant="contained" color="secondary" onClick={getCodeChecking}>
-        View Code Similarity
-      </Button>
-      {isProcessing ? <CircularProgress /> : ""}
+      <Box sx={{display: "flex", flexDirection: "row", alignItems: "center"}}>
+        <TextField
+          type="number"
+          id="Threshold"
+          label="Threshold"
+          size="small"
+          InputProps={{
+            endAdornment: <InputAdornment position="end">%</InputAdornment>,
+          }}
+          value={threshold}
+          onChange={(event) => {
+            setThreshold(event.target.value);
+          }}
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleCheckPlagiarism}
+          sx={{marginLeft: "24px"}}
+        >
+          Check Plagiarism
+        </Button>
+      </Box>
+
+      {isProcessing ? <CircularProgress/> : ""}
+
+      <Divider sx={{marginTop: "24px", marginBottom: "24px"}}/>
+
+      <Box sx={{display: "flex", flexDirection: "row", alignItems: "center", marginBottom: "36px"}}>
+        <TextField
+          autoFocus
+          required
+          size="small"
+          sx={{width: "120px", marginRight: "12px"}}
+          id="Threshold"
+          label="Threshold"
+          placeholder="Threshold"
+          value={threshold}
+          onChange={(event) => {
+            setThreshold(event.target.value);
+          }}
+          InputProps={{
+            endAdornment: <InputAdornment position="end">%</InputAdornment>,
+          }}
+        />
+        <TextField
+          required
+          size="small"
+          sx={{width: "120px", marginRight: "12px"}}
+          id="userId"
+          label="userId"
+          placeholder="UserId"
+          value={userId}
+          onChange={(event) => {
+            setUserId(event.target.value);
+          }}
+        />
+        <TextField
+          required
+          size="small"
+          sx={{width: "120px", marginRight: "12px"}}
+          id="problemId"
+          label="problemId"
+          placeholder="ProblemId"
+          value={problemId}
+          onChange={(event) => {
+            setProblemId(event.target.value);
+          }}
+        />
+        <Button variant="contained" color="secondary" onClick={getCodeChecking}>
+          View Code Similarity
+        </Button>
+        {isProcessing ? <CircularProgress /> : ""}
+      </Box>
+
       <MaterialTable columns={columns} data={codeSimilarity}></MaterialTable>
       <MaterialTable columns={columnCluster} data={clusters}></MaterialTable>
       <MaterialTable

@@ -18,7 +18,7 @@ export default function ContestManagerViewSubmissionOfAUser(props) {
   const [pageSubmissionSize, setPageSubmissionSize] = useState(10);
   const [totalPageSubmission, setTotalPageSubmission] = useState(0);
   const [pageSubmission, setPageSubmission] = useState(1);
-  const pageSizes = [10, 20, 50, 100, 150];
+  const pageSizes = [10, 20, 50];
 
   const handlePageSubmissionSizeChange = (event) => {
     setPageSubmissionSize(event.target.value);
@@ -56,31 +56,19 @@ export default function ContestManagerViewSubmissionOfAUser(props) {
   }, []);
   return (
     <div>
-      <section id={"#submission"}>
-        <Typography
-          variant="h5"
-          component="h2"
-          style={{ marginTop: 10, marginBottom: 10 }}
-        >
-          User Submission
-        </Typography>
-      </section>
-
       <TableContainer component={Paper}>
         <Table
-          sx={{ minWidth: window.innerWidth - 500 }}
+          // sx={{ minWidth: window.innerWidth - 600 }}
           aria-label="customized table"
         >
           <TableHead>
             <TableRow>
               <StyledTableCell align="center">Submission Id</StyledTableCell>
-              <StyledTableCell align="center">UserID</StyledTableCell>
-              <StyledTableCell align="center">FullName</StyledTableCell>
+              <StyledTableCell align="center">User Id</StyledTableCell>
               <StyledTableCell align="center">Problem Id</StyledTableCell>
-              <StyledTableCell align="center">Test Case Pass</StyledTableCell>
+              <StyledTableCell align="center">Testcases Passed</StyledTableCell>
               <StyledTableCell align="center">Lang</StyledTableCell>
               <StyledTableCell align="center">Status</StyledTableCell>
-              <StyledTableCell align="center">Message</StyledTableCell>
               <StyledTableCell align="center">Point</StyledTableCell>
               <StyledTableCell align="center">Submitted At</StyledTableCell>
               <StyledTableCell align="center">Action</StyledTableCell>
@@ -102,14 +90,11 @@ export default function ContestManagerViewSubmissionOfAUser(props) {
                       cursor: "",
                     }}
                   >
-                    <b style={{ color: "blue" }}>{s.contestSubmissionId}</b>
+                    <b style={{ color: "blue" }}>{s.contestSubmissionId.substring(0,6)}</b>
                   </Link>
                 </StyledTableCell>
                 <StyledTableCell align="center">
                   <b>{s.userId}</b>
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  <b>{s.fullname}</b>
                 </StyledTableCell>
 
                 <StyledTableCell align="center">
@@ -127,9 +112,6 @@ export default function ContestManagerViewSubmissionOfAUser(props) {
                       style={{ color: getStatusColor(`${s.status}`) }}
                     >{`${s.status}`}</span>
                   </b>
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  <b>{s.message}</b>
                 </StyledTableCell>
 
                 <StyledTableCell align="center">

@@ -1,38 +1,39 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {useHistory} from "react-router-dom";
-import Typography from "@mui/material/Typography";
-import {Button, CircularProgress, Divider, InputAdornment, TextField} from "@mui/material";
-import {pdf} from "@react-pdf/renderer";
-import FileSaver from "file-saver";
-import SubmissionOfParticipantPDFDocument from "./template/SubmissionOfParticipantPDFDocument";
-import Box from "@mui/material/Box";
+import {Button, Grid, InputAdornment} from "@mui/material";
 import HustContainerCard from "../../common/HustContainerCard";
 import {request} from "../../../api";
-import {ContestManagerManageProblem} from "./ContestManagerManageProblem";
+import EditIcon from "@mui/icons-material/Edit";
+import TextField from "@mui/material/TextField";
 
 export function ContestManagerListProblem(props) {
   const contestId = props.contestId;
-  const [contestName, setContestName] = useState();
-  const [contestTime, setContestTime] = useState();
-  const [timeLimit, setTimeLimit] = useState();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [threshold, setThreshold] = useState(50);
+  const [contestName, setContestName] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
+  const [statusId, setStatusId] = useState("");
+  const [submissionActionType, setSubmissionActionType] = useState("");
+  const [maxNumberSubmission, setMaxNumberSubmission] = useState(10);
+  const [participantViewResultMode, setParticipantViewResultMode] = useState("");
+  const [problemDescriptionViewType, setProblemDescriptionViewType] = useState("");
+  const [evaluateBothPublicPrivateTestcase, setEvaluateBothPublicPrivateTestcase,] = useState("");
+  const [maxSourceCodeLength, setMaxSourceCodeLength] = useState(50000);
+
+  const [minTimeBetweenTwoSubmissions, setMinTimeBetweenTwoSubmissions] = useState(0);
   const history = useHistory();
-
-  const generatePdfDocument = async (documentData, fileName) => {
-    const blob = await pdf(
-      <SubmissionOfParticipantPDFDocument data={documentData}/>
-    ).toBlob();
-
-    FileSaver.saveAs(blob, fileName);
-  };
 
   function getContestDetail() {
     request("get", "/get-contest-detail/" + contestId, (res) => {
-      setContestTime(res.data.contestTime);
       setContestName(res.data.contestName);
-      setTimeLimit(res.data.contestTime);
+      setIsPublic(res.data.isPublic);
+      setStatusId(res.data.statusId);
+      setSubmissionActionType(res.data.submissionActionType);
+      setParticipantViewResultMode(res.data.participantViewResultMode);
+      setMaxNumberSubmission(res.data.maxNumberSubmission);
+      setProblemDescriptionViewType(res.data.problemDescriptionViewType);
+      setMinTimeBetweenTwoSubmissions(res.data.minTimeBetweenTwoSubmissions);
+      setEvaluateBothPublicPrivateTestcase(res.data.evaluateBothPublicPrivateTestcase);
+      setMaxSourceCodeLength(res.data.maxSourceCodeLength);
     }).then();
   }
 
@@ -44,148 +45,128 @@ export function ContestManagerListProblem(props) {
     history.push("/programming-contest/contest-edit/" + contestId);
   }
 
-  function handleRejudgeContest(event) {
-    event.preventDefault();
-    setIsProcessing(true);
-    request(
-      "post",
-      "/evaluate-batch-submission-of-contest/" + contestId,
-      (res) => {
-        console.log("handleRejudgeContest", res.data);
-        //alert("Rejudge DONE!!!");
-        setIsProcessing(false);
-        //setSuccessful(res.data.contents.content);
-        //setTotalPageSuccessful(res.data.contents.totalPages);
-      }
-    ).then();
-  }
-
-  function handleJudgeContest(event) {
-    event.preventDefault();
-    setIsProcessing(true);
-    request(
-      "post",
-      "/evaluate-batch-not-evaluated-submission-of-contest/" + contestId,
-      (res) => {
-        console.log("handleJudgeContest", res.data);
-
-        setIsProcessing(false);
-        //setSuccessful(res.data.contents.content);
-        //setTotalPageSuccessful(res.data.contents.totalPages);
-      }
-    ).then();
-  }
-
-  function handleExportParticipantSubmission() {
-    // TODO
-    request(
-      "get",
-      "/get-user-judged-problem-submission/" + contestId,
-      (res) => {
-        console.log("handleJudgeContest", res.data);
-        //alert("Rejudge DONE!!!");
-        setIsProcessing(false);
-        generatePdfDocument(
-          res.data,
-          `USER_JUDGED_SUBMISSION-${contestId}.pdf`
-        );
-        //setSuccessful(res.data.contents.content);
-        //setTotalPageSuccessful(res.data.contents.totalPages);
-      }
-    ).then();
-
-    // build and download PDF from data userSubmissions
-  }
-
-  function handleCheckPlagiarism(event) {
-    event.preventDefault();
-    setIsProcessing(true);
-    let body = {
-      threshold: threshold,
-    };
-    request(
-      "post",
-      "/check-code-similarity/" + contestId,
-
-      (res) => {
-        console.log("handleCheckPlagiarism, res = ", res.data);
-      },
-      {},
-      body
-    );
-  }
-
   return (
-    <HustContainerCard title={"Contest: " + contestName}>
-      <Typography variant="h5" component="h2">
-        Time Limit: {timeLimit} minutes
-      </Typography>
-      <Box component="div" sx={{width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-        <Box sx={{width: "90%", height: "2.5rem", marginTop: "1rem"}}>
-          <Button
-            sx={{marginRight: "4px"}}
-            variant="contained"
-            color="primary"
-            onClick={handleEdit}
-          >
-            EDIT
-          </Button>
-          <Button
-            sx={{marginRight: "4px"}}
-            variant="contained"
-            color="primary"
-            onClick={handleRejudgeContest}
-          >
-            Rejudge
-          </Button>
-          <Button
-            sx={{marginRight: "4px"}}
-            variant="contained"
-            color="primary"
-            onClick={handleJudgeContest}
-          >
-            Judge
-          </Button>
-          <Button
-            sx={{marginRight: "4px"}}
-            variant="contained"
-            color="primary"
-            onClick={handleExportParticipantSubmission}
-          >
-            Export participant submissions
-          </Button>
-          <Button
-            sx={{marginRight: "4px"}}
-            variant="contained"
-            color="primary"
-            onClick={handleCheckPlagiarism}
-          >
-            Check Plagiarism
-          </Button>
-        </Box>
+    <HustContainerCard
+      title={"Contest: " + contestName}
+      action={
+        <Button
+          variant="contained"
+          color="info"
+          onClick={handleEdit}
+          startIcon={<EditIcon sx={{marginRight: "4px"}}/>}
+        >
+          Edit
+        </Button>
+      }
+    >
+      <Grid container rowSpacing={3} spacing={2} mb="16px">
+        <Grid item xs={9}>
+          <TextField
+            fullWidth
+            autoFocus
+            required
+            value={contestName}
+            id="contestName"
+            label="Contest Name"
+          />
+        </Grid>
 
-        <TextField
-          autoFocus
-          required
-          type="number"
-          id="Threshold"
-          label="Threshold"
-          InputProps={{
-            endAdornment: <InputAdornment position="end">%</InputAdornment>,
-          }}
-          value={threshold}
-          onChange={(event) => {
-            setThreshold(event.target.value);
-          }}
-          sx={{width: "10%"}}
-        />
-        {isProcessing ? <CircularProgress/> : ""}
-      </Box>
+        <Grid item xs={3}>
+          <TextField
+            fullWidth
+            id="statusId"
+            label="Status"
+            value={statusId}
+          >
+          </TextField>
+        </Grid>
 
-      <Divider sx={{marginTop: "14px"}}/>
-      <Box sx={{margin: "14px 0"}}>
-        <ContestManagerManageProblem contestId={contestId} />
-      </Box>
+        <Grid item xs={3}>
+          <TextField
+            fullWidth
+            id="Public"
+            label="Public"
+            value={isPublic ? "Yes" : "No"}
+          >
+          </TextField>
+        </Grid>
+
+        <Grid item xs={3}>
+          <TextField
+            fullWidth
+            type="number"
+            required
+            id="maxNumberSubmission"
+            label="Max number of Submissions"
+            value={maxNumberSubmission}
+          />
+        </Grid>
+
+        <Grid item xs={3}>
+          <TextField
+            fullWidth
+            type="number"
+            id="Max Source Code Length"
+            label="Source Length Limit"
+            value={maxSourceCodeLength}
+            InputProps={{endAdornment: <InputAdornment position="end">chars</InputAdornment>}}
+          />
+        </Grid>
+
+        <Grid item xs={3}>
+          <TextField
+            fullWidth
+            type="number"
+            id="Submission Interval"
+            label="Submission Interval"
+            value={minTimeBetweenTwoSubmissions}
+            InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>}}
+          />
+        </Grid>
+
+        <Grid item xs={3}>
+          <TextField
+            fullWidth
+            id="evaluateBothPublicPrivateTestcase"
+            label="Evaluate Private Testcases"
+            value={evaluateBothPublicPrivateTestcase}
+          >
+          </TextField>
+        </Grid>
+
+        <Grid item xs={3}>
+          <TextField
+            fullWidth
+            id="participantViewResultMode"
+            label="Participant View Result Mode"
+            value={participantViewResultMode}
+          >
+          </TextField>
+        </Grid>
+
+        <Grid item xs={3}>
+          <TextField
+            fullWidth
+            id="submissionActionType"
+            label="Action on Submission"
+            value={submissionActionType}
+          >
+          </TextField>
+        </Grid>
+
+        <Grid item xs={3}>
+          <TextField
+            fullWidth
+            id="problemDescriptionViewType"
+            label="Problem Description View Mode"
+            value={problemDescriptionViewType}
+          >
+          </TextField>
+        </Grid>
+      </Grid>
+      {/*<Box sx={{margin: "14px 0"}}>*/}
+      {/*  <ContestManagerManageProblem contestId={contestId}/>*/}
+      {/*</Box>*/}
     </HustContainerCard>
   );
 }
