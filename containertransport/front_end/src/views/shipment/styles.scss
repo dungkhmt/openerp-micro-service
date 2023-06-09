@@ -44,9 +44,21 @@
         justify-content: space-between;
         margin-bottom: 16px;
     }
-    .icon-view-shipment-screen {
-        .MuiSvgIcon-root {
-            color: #747474;
+    .trips-btn {
+        display: flex;
+        .auto-create-trips {
+            margin-right: 16px;
+            .btn-header {
+                display: flex;
+                align-items: center;
+                float: right;
+                margin-bottom: 16px;
+                .material-icons {
+                    height: auto;
+                    display: flex;
+                    margin-right: 4px;
+                }
+            }
         }
     }
 }
@@ -369,5 +381,19 @@
                 font-weight: 550;
             }
         }
+    }
+}
+.loading {
+    text-align: center;
+    margin: auto;
+}
+.icon-view-screen {
+    .MuiSvgIcon-root {
+        color: #747474;
+    }
+}
+.icon-view-screen:hover {
+    .MuiSvgIcon-root {
+        color: #c82a2a;
     }
 }

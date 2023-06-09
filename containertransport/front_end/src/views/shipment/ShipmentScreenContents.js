@@ -93,7 +93,7 @@ const headCells = [
     numeric: false,
     disablePadding: false,
     label: '',
-    width: '5%'
+    width: '10%'
   }
 ];
 
@@ -147,7 +147,7 @@ function EnhancedTableHead(props) {
   );
 }
 
-export default function ShipmentScreenContents({shipments, page, setPage, rowsPerPage, setRowsPerPage, count}) {
+export default function ShipmentScreenContents({ shipments, page, setPage, rowsPerPage, setRowsPerPage, count }) {
   const [order, setOrder] = React.useState(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
   const [selected, setSelected] = React.useState([]);
@@ -203,28 +203,28 @@ export default function ShipmentScreenContents({shipments, page, setPage, rowsPe
   };
 
   const handleChangePage = (event, newPage) => {
-      setPage(newPage);
-    };
+    setPage(newPage);
+  };
 
   const handleChangeRowsPerPage = (event) => {
-      const updatedRowsPerPage = parseInt(event.target.value, 10);
-      setRowsPerPage(updatedRowsPerPage);
+    const updatedRowsPerPage = parseInt(event.target.value, 10);
+    setRowsPerPage(updatedRowsPerPage);
 
-      setPage(0);
-    };
+    setPage(0);
+  };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
   const handleDetail = (id) => {
     history.push({
-      pathname:`/shipment/detail/${id}`,
+      pathname: `/shipment/detail/${id}`,
       // state: {
       //   type: "detail",
       //   shipmentId: row.id
       // }
-  })
+    })
   }
   return (
-    <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white"}}>
+    <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
       <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
         {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
         <TableContainer>
@@ -244,55 +244,60 @@ export default function ShipmentScreenContents({shipments, page, setPage, rowsPe
             <TableBody>
               {shipments
                 ? shipments.map((row, index) => {
-                    const isItemSelected = isSelected(row.id);
-                    const labelId = `enhanced-table-checkbox-${index}`;
+                  const isItemSelected = isSelected(row.id);
+                  const labelId = `enhanced-table-checkbox-${index}`;
 
-                    return (
-                      <TableRow
-                        hover
-                        // onClick={(event) => handleClick(event, row.name)}
-                        role="checkbox"
-                        aria-checked={isItemSelected}
-                        tabIndex={-1}
-                        key={row.id}
-                        selected={isItemSelected}
-                        sx={{ cursor: 'pointer' }}
-                      >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            color="primary"
-                            checked={isItemSelected}
-                            inputProps={{
-                              'aria-labelledby': labelId,
-                            }}
-                            onClick={(event) => handleClick(event, row.id)}
-                          />
-                        </TableCell>
-                        <TableCell
-                          component="th"
-                          id={labelId}
-                          scope="row"
-                          padding="normal"
-                          onClick={() => history.push({
-                            pathname:`/shipment/detail/${row.id}`,
-                            // state: {
-                            //   type: "detail",
-                            //   shipmentId: row.id
-                            // }
+                  return (
+                    <TableRow
+                      hover
+                      // onClick={(event) => handleClick(event, row.name)}
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row.id}
+                      selected={isItemSelected}
+                      sx={{ cursor: 'pointer' }}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          inputProps={{
+                            'aria-labelledby': labelId,
+                          }}
+                          onClick={(event) => handleClick(event, row.id)}
+                        />
+                      </TableCell>
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        padding="normal"
+                        onClick={() => history.push({
+                          pathname: `/shipment/detail/${row.id}`,
+                          // state: {
+                          //   type: "detail",
+                          //   shipmentId: row.id
+                          // }
                         })}
-                        >
-                          {row.code}
-                        </TableCell>
-                        <TableCell align="left">{row.created_by_user_id} {'  '}</TableCell>
-                        <TableCell align="left">{row.status}</TableCell>
-                        <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
-                        <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
-                        <TableCell onClick={() => {handleDetail(row?.id)}} >
-                          <Icon className='icon-view-shipment-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
+                      >
+                        {row.code}
+                      </TableCell>
+                      <TableCell align="left">{row.created_by_user_id} {'  '}</TableCell>
+                      <TableCell align="left">{row.status}</TableCell>
+                      <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
+                      <TableCell sx={{display: 'flex'}} >
+                        <Box onClick={() => { handleDetail(row?.id) }} >
+                          <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                        </Box>
+                        <Box>
+                          <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
                 : null}
             </TableBody>
           </Table>

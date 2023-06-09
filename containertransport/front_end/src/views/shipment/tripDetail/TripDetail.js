@@ -32,8 +32,8 @@ const TripDetail = () => {
             setOrders(res.data.data.orderModels);
         });
         getTripItemByTripId(tripId).then((res) => {
-            console.log("tripItem1111111", res.data.data)
-            setTripItem(res.data.data);
+            console.log("tripItem1111111", res.data.data.sort((a, b) => a.id - b.id))
+            setTripItem(res.data.data.sort((a, b) => a.id - b.id));
         });
     }, [])
     useEffect(() => {

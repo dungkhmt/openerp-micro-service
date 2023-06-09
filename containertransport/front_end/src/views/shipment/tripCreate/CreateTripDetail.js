@@ -80,15 +80,15 @@ const CreateTripDetail = () => {
         })
         tripItems.forEach((item, index) => {
             let tripItem = {
-                seqInTrip: index + 1,
+                seq: index + 1,
                 action: item.action,
                 facilityId: item.facilityId,
-                orderId: item.orderCode,
+                orderCode: item.orderCode,
                 arrivalTime: item.arrivalTime,
                 departureTime: item.departureTime,
                 containerId: item?.container?.id,
-                trailerId: item?.trailerId
-                // time
+                trailerId: item?.trailerId,
+                type: item?.type
             }
             tripItemTmp.push(tripItem);
         })

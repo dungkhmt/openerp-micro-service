@@ -335,7 +335,7 @@ export default function TripsContents({trips, shipmentId}) {
                         <TableCell align="left">{new Date(row?.createdAt).toLocaleDateString()}</TableCell>
                         <TableCell align="left">{new Date(row?.updatedAt).toLocaleDateString()}</TableCell>
                         <TableCell onClick={() => {handleDetail(row?.id)}} >
-                          <Icon className='icon-view-shipment-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                          <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                         </TableCell>
                       </TableRow>
                     );

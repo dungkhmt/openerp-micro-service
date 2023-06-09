@@ -58,7 +58,7 @@ const headCells = [
   {
     id: 'code',
     numeric: false,
-    disablePadding: true,
+    disablePadding: false,
     label: 'Trailer Code',
   },
   {
@@ -251,7 +251,7 @@ export default function ContentsTrailerScreen({trailer, page, setPage, rowsPerPa
                           component="th"
                           id={labelId}
                           scope="row"
-                          padding="none"
+                          
                         >
                           {row.trailerCode}
                         </TableCell>

@@ -1,6 +1,7 @@
 package openerp.containertransport.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import openerp.containertransport.constants.Constants;
 import openerp.containertransport.dto.TripItemModel;
 import openerp.containertransport.entity.Container;
 import openerp.containertransport.entity.Facility;
@@ -31,11 +32,17 @@ public class TripItemServiceImpl implements TripItemService {
         Facility facility = facilityRepo.findById(tripItemModel.getFacilityId()).get();
         if(tripItemModel.getContainerId() != null) {
             Container container = containerRepo.findById(tripItemModel.getContainerId()).get();
+            container.setStatus(Constants.ContainerStatus.SCHEDULED.getStatus());
+
             tripItem.setContainer(container);
+            containerRepo.save(container);
         }
         if(tripItemModel.getTrailerId() != null) {
             Trailer trailer = trailerRepo.findById(tripItemModel.getTrailerId()).get();
+            trailer.setStatus(Constants.TrailerStatus.SCHEDULED.getStatus());
+
             tripItem.setTrailer(trailer);
+            trailerRepo.save(trailer);
         }
         if(tripItemModel.getOrderCode() != null) {
             tripItem.setOrderCode(tripItemModel.getOrderCode());
@@ -45,6 +52,7 @@ public class TripItemServiceImpl implements TripItemService {
         tripItem.setAction(tripItemModel.getAction());
         tripItem.setFacility(facility);
         tripItem.setStatus("WAITING");
+        tripItem.setType(tripItemModel.getType());
         tripItem.setArrivalTime(tripItemModel.getArrivalTime());
         tripItem.setDepartureTime(tripItemModel.getDepartureTime());
         tripItem.setCreatedAt(System.currentTimeMillis());

@@ -23,3 +23,11 @@ export const createShipment = (data) => {
     )
     return resData;
 }
+
+export const autoCreateRouter = (data) => {
+    const resData = request(
+        "get",
+        `/solution/${data}`, {},{}, {}, {},
+    )
+    return resData;
+}

@@ -55,33 +55,33 @@ const headCells = [
         numeric: false,
         disablePadding: true,
         label: 'Order Code',
-        with: '14%'
+        with: '10%'
     },
     {
         id: 'customer',
         numeric: false,
         disablePadding: true,
         label: 'Customer',
-        with: '12%'
+        with: '8%'
     },
     {
         id: 'fromFacility',
         numeric: false,
         disablePadding: true,
         label: 'From Facility',
-        with: '13%'
+        with: '12%'
     },
     {
         id: 'toFacility',
         numeric: false,
         disablePadding: true,
         label: 'To Facility',
-        with: '13%'
+        with: '12%'
     },
     {
         id: 'type',
         numeric: false,
-        disablePadding: true,
+        disablePadding: false,
         label: 'Type',
         with: '13%'
     },
@@ -90,20 +90,20 @@ const headCells = [
         numeric: false,
         disablePadding: false,
         label: 'Status',
-        with: '20%'
+        with: '18%'
     },
     {
         id: 'createdAt',
         numeric: false,
-        disablePadding: true,
+        disablePadding: false,
         label: 'Created At',
         with: '13%'
     },
     {
-        id: 'updaetAt',
+        id: 'updateAt',
         numeric: false,
-        disablePadding: true,
-        label: 'Update At',
+        disablePadding: false,
+        label: 'Updated At',
         with: '13%'
     },
     {
@@ -290,7 +290,8 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                                             <TableCell align="left">{row.status}</TableCell>
                                             <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                                             <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
-                                            <TableCell sx={{ display: 'flex' }}>
+                                            <TableCell >
+                                                <Box sx={{ display: 'flex' }}>
                                                 <Box 
                                                 // onClick={() => { handleDetail(row?.id) }} 
                                                 >
@@ -298,6 +299,7 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                                                 </Box>
                                                 <Box>
                                                     <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                                                </Box>
                                                 </Box>
                                             </TableCell>
                                         </TableRow>

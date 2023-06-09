@@ -26,6 +26,7 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import TeachingIcon from "assets/icons/mathematics.svg";
 import ContainerIcon from "assets/icons/container.svg";
 import TrailerIcon from "assets/icons/trailer.svg";
@@ -114,6 +115,7 @@ menuIconMap.set("OrderIcon", <ListAltIcon />);
 menuIconMap.set("ArrowBackIosIcon", <ArrowBackIosIcon />);
 menuIconMap.set("DeleteForeverIcon", <DeleteForeverIcon />);
 menuIconMap.set("RemoveRedEyeIcon", <RemoveRedEyeIcon />);
+menuIconMap.set("AutoFixHighIcon", <AutoFixHighIcon />);
 
 export const mapPathMenu = buildMapPathMenu(MENUS);
 

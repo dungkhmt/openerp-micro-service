@@ -3,6 +3,7 @@ package openerp.containertransport.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
+import openerp.containertransport.constants.Constants;
 import openerp.containertransport.dto.TripFilterRequestDTO;
 import openerp.containertransport.dto.TripItemModel;
 import openerp.containertransport.dto.TripModel;
@@ -34,6 +35,8 @@ public class TripServiceImpl implements TripService {
     public TripModel createTrip(TripModel tripModel, long shipmentId, String createBy) {
         Trip trip = new Trip();
         Truck truck = truckRepo.findById(tripModel.getTruckId()).get();
+        truck.setStatus(Constants.TruckStatus.SCHEDULED.getStatus());
+        truckRepo.save(truck);
         List<Order> orders = new ArrayList<>();
         tripModel.getOrderIds().forEach((item) -> {
             Order order = orderRepo.findById(item).get();

@@ -6,15 +6,17 @@ import PrimaryButton from "components/button/PrimaryButton";
 import { menuIconMap } from "config/menuconfig";
 import { MyContext } from "contextAPI/MyContext";
 import TripsContents from "./TripsContents";
-import { getShipmentByCode } from "api/ShipmentAPI";
+import { autoCreateRouter, getShipmentByCode } from "api/ShipmentAPI";
 import ShipmentContents from "./ShipmentContents";
 import { getTrips } from "api/TripAPI";
+import ReactLoading from "react-loading";
 
 const ShipmentDetail = () => {
     const history = useHistory();
     const { shipmentId } = useParams();
     const [shipment, setShipment] = useState();
     const [trips, setTrips] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         let data = {
@@ -30,9 +32,23 @@ const ShipmentDetail = () => {
 
 
     }, [])
+
+    const autoCreateTrip = () => {
+        setLoading(true);
+        autoCreateRouter(shipmentId).then((res) => {
+            setLoading(false);
+        })
+        .catch((error) => {
+            console.log(error);
+        })
+    }
     console.log("=========", shipment)
     return (
         <Box className="fullScreen">
+            {loading ? (
+                <ReactLoading type="spin" color="#0000FF" className="loading"
+                height='6%' width='6%' />
+            ) : (
             <Container maxWidth="lg" className="container">
                 <Box className="headerScreen-trip-detail">
                     <Box className="headerScreen-trip-detail-go-back"
@@ -73,23 +89,40 @@ const ShipmentDetail = () => {
                     <Box className="title">
                         <Typography>Trips Management</Typography>
                     </Box>
-                    <Box className="btn-add"
-                        onClick={() => history.push({
-                            pathname: `/shipment/trip/create/${shipmentId}`,
-                        })}
-                    >
-                        <PrimaryButton className="btn-header">
-                            <Icon className="icon">
-                                {menuIconMap.get("ControlPointIcon")}
-                            </Icon>
-                            <Typography>
-                                New Trip
-                            </Typography>
-                        </PrimaryButton>
+                    <Box className="trips-btn">
+                        {/* {trips.length > 0 ? */}
+                        <Box className="auto-create-trips"
+                            onClick={autoCreateTrip}
+                        >
+                            <PrimaryButton className="btn-header">
+                                <Icon className="icon">
+                                    {menuIconMap.get("AutoFixHighIcon")}
+                                </Icon>
+                                <Typography>
+                                    Auto Create Trips
+                                </Typography>
+                            </PrimaryButton>
+                        </Box>
+                        <Box className="btn-add"
+                            onClick={() => history.push({
+                                pathname: `/shipment/trip/create/${shipmentId}`,
+                            })}
+                        >
+                            <PrimaryButton className="btn-header">
+                                <Icon className="icon">
+                                    {menuIconMap.get("ControlPointIcon")}
+                                </Icon>
+                                <Typography>
+                                    New Trip
+                                </Typography>
+                            </PrimaryButton>
+                        </Box>
                     </Box>
+
                 </Box>
                 {trips.length > 0 ? <TripsContents trips={trips} shipmentId={shipmentId} /> : null}
             </Container>
+           )}
         </Box>
     )
 }

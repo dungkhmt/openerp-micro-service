@@ -6,14 +6,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import openerp.containertransport.algorithms.constants.Constants;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Request {
-    private int requestId;
+public class Request implements Serializable {
+    private Long requestId;
     private long earliestTimePickup; // 2023-02-03 10:30:00
     private long latestTimePickup; // 2023-02-03 11:00:00
     private int fromLocationID;

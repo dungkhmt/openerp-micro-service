@@ -10,6 +10,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class TruckInput implements Serializable {
     private Integer locationId;
+    private String truckCode;
     private Integer truckID;
     private int trailerTruck;
     private int weightContainer;
