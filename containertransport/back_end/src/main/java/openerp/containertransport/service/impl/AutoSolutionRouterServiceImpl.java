@@ -80,7 +80,7 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
             TruckInput truckInput = new TruckInput();
             truckInput.setTruckID((int) item.getId());
             truckInput.setLocationId((int) item.getFacilityResponsiveDTO().getFacilityId());
-
+            truckInput.setTruckCode(item.getTruckCode());
             truckInputs.add(truckInput);
         });
         return truckInputs;

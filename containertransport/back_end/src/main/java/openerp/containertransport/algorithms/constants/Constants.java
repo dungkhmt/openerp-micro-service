@@ -22,7 +22,9 @@ public class Constants implements Serializable {
         PICKUP_TRAILER("PICKUP_TRAILER"),
         DELIVERY_TRAILER("DELIVERY_TRAILER"),
         PICKUP_CONTAINER("PICKUP_CONTAINER"),
-        DELIVERY_CONTAINER("DELIVERY_CONTAINER");
+        DELIVERY_CONTAINER("DELIVERY_CONTAINER"),
+        STOP("STOP"),
+        DEPART("DEPART");
         private final String action;
         ACTION(String action) {
             this.action = action;

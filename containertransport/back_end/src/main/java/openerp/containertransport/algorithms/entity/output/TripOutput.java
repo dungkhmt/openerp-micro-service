@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 public class TripOutput implements Serializable {
     private Integer truckId;
+    private String truckCode;
     private List<Request> requests;
     private BigDecimal totalTime;
     private BigDecimal totalTimeTmp;

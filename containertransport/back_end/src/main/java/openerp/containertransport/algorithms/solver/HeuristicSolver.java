@@ -40,7 +40,23 @@ public class HeuristicSolver {
 
         convertInput(input);
         greedyAlgorithmTms();
-        return transportContainerSolutionOutput;
+
+        // update endPoint
+        for (TruckInput truckInput : this.trucks.values().toArray(new TruckInput[0])) {
+            TripOutput tripOutput = SerializationUtils.clone(this.transportContainerSolutionOutput.getTripOutputs().get(truckInput.getTruckID()));
+            tripOutput.setTruckId(truckInput.getTruckID());
+            tripOutput.setTruckCode(truckInput.getTruckCode());
+            if (tripOutput.getPoints() == null || tripOutput.getPoints().size() == 0) {
+                continue;
+            }
+            else {
+                TripOutput tripOutputUpdate = updateEndPoint(tripOutput);
+                this.transportContainerSolutionOutput.getTripOutputs().put(truckInput.getTruckID(), tripOutputUpdate);
+                TripOutput tripOutputUpdateTmp = SerializationUtils.clone(tripOutputUpdate);
+                this.transportContainerSolutionOutput.getTripOutputsTmp().put(truckInput.getTruckID(), tripOutputUpdateTmp);
+            }
+        }
+        return this.transportContainerSolutionOutput;
     }
 
     public void convertInput(TransportContainerInput input) {
@@ -83,46 +99,85 @@ public class HeuristicSolver {
     public void greedyAlgorithmTms() {
         initRouters();
         createRouter();
-        int loop = 5;
+        int loop = 2;
 
-        BigDecimal bestTotalDistant = new BigDecimal(String.valueOf(transportContainerSolutionOutput.getTotalDistant()));
         while (loop > 0) {
-
+            BigDecimal bestTotalDistant = new BigDecimal(String.valueOf(this.transportContainerSolutionOutput.getTotalDistant()));
 
             // Find request when remove it, return total distant min (tong quang duong giam nhat)
             InfoRemoveRequest infoRemoveRequest = removeRequestInTrip(); // cap nhat distant and router trong tmp
+            log.info("Remove request: {} in router truck: {}", infoRemoveRequest.getRequestId(), infoRemoveRequest.getTruckId());
 
             // Add request vao cho thich hop sao cho tong quang duong la nho nhat
-            Request requestAdd = requestList.stream().filter((item) -> item.getRequestId() == infoRemoveRequest.getRequestId()).findFirst().get();
+            Request requestAdd = SerializationUtils.clone(this.requestList.stream().filter((item) -> item.getRequestId() == infoRemoveRequest.getRequestId()).findFirst().get());
             Point pick = createdPointFromRequest(Constants.ACTION.PICKUP_CONTAINER.getAction(), requestAdd);
             Point delivery = createdPointFromRequest(Constants.ACTION.DELIVERY_CONTAINER.getAction(), requestAdd);
 
+            BigDecimal totalDistantSolutionLoop = new BigDecimal(String.valueOf(this.transportContainerSolutionOutput.getTotalDistantTmp()));
 
+            int truckRouterSelected = 0;
+            TripOutput tripOutputLoop = null;
+
+            List<TruckInput> truckInputList = Arrays.stream(this.trucks.values().toArray(new TruckInput[0])).filter(truckInput -> truckInput.getTruckID() != infoRemoveRequest.getTruckId()).collect(Collectors.toList());
             // approval each router
-            for(TruckInput truckInput : trucks.values().toArray(new TruckInput[0])) {
+            for(TruckInput truckInput : truckInputList) {
                 log.info("add request = {} after removed in router of truck = {}", requestAdd.getOrderCode(), truckInput.getTruckID());
-                TripOutput tripOutputTmp = insertRequest(truckInput, requestAdd, pick, delivery);
+                TripOutput tripOutputTmp = SerializationUtils.clone(insertRequest(truckInput, requestAdd, pick, delivery));
 
                 // Must insert to check
-                List<Point> pointsBeforeInsert = transportContainerSolutionOutput.getTripOutputsTmp().get(truckInput.getTruckID()).getPoints();
+                TripOutput tripOutput = SerializationUtils.clone(this.transportContainerSolutionOutput.getTripOutputsTmp().get(truckInput.getTruckID()));
+                int nbPointsBeforeInsert = tripOutput.getPoints() == null ? 0 : tripOutput.getPoints().size();
                 List<Point> pointsAfterInsert = tripOutputTmp.getPoints();
 
-                if(pointsBeforeInsert.size() < pointsAfterInsert.size()) {
 
-                    BigDecimal distantInTripTmp = transportContainerSolutionOutput.getTripOutputsTmp().get(truckInput.getTruckID()).getTotalDistant();
-                    BigDecimal distantAfterSwitch = transportContainerSolutionOutput.getTotalDistantTmp().subtract(distantInTripTmp).add(tripOutputTmp.getTotalDistantTmp());
+
+                if(nbPointsBeforeInsert < pointsAfterInsert.size()) {
+
+                    BigDecimal distantInTripTmp = new BigDecimal(String.valueOf(this.transportContainerSolutionOutput.getTripOutputsTmp().get(truckInput.getTruckID()).getTotalDistant()));
+
+                    BigDecimal distantAfterSwitch;
+                    if (distantInTripTmp.compareTo(BigDecimal.valueOf(Double.MAX_VALUE)) == 0) {
+                        distantAfterSwitch = totalDistantSolutionLoop.add(tripOutputTmp.getTotalDistant());
+                    }
+                    else {
+                        distantAfterSwitch = totalDistantSolutionLoop.subtract(distantInTripTmp).add(tripOutputTmp.getTotalDistant());
+                    }
+
                     if(distantAfterSwitch.compareTo(bestTotalDistant) < 0) {
+                        log.info("chose router truck: {}", truckInput.getTruckID());
                         // update best solution
-                        bestTotalDistant = distantAfterSwitch;
-                        transportContainerSolutionOutput.setTotalDistant(distantAfterSwitch);
-                        if(truckInput.getTruckID() != infoRemoveRequest.getTruckId()) {
-                            TripOutput tripOutputInRouterRemoved = transportContainerSolutionOutput.getTripOutputsTmp().get(infoRemoveRequest.getTruckId());
-                            transportContainerSolutionOutput.getTripOutputs().put(infoRemoveRequest.getTruckId(), tripOutputInRouterRemoved);
+                        totalDistantSolutionLoop = distantAfterSwitch;
+                        if (truckRouterSelected != 0 &&
+                                (this.transportContainerSolutionOutput.getTripOutputsTmp().get(truckRouterSelected).getPoints() == null
+                                || this.transportContainerSolutionOutput.getTripOutputsTmp().get(truckRouterSelected).getPoints().size() == 0)) {
+                            int trailerId = tripOutputLoop.getPoints().stream().filter(item -> item.getType().equals("Trailer")).findFirst().get().getTrailerId();
+                            removeToTrailerScheduler(trailerId);
                         }
-                        transportContainerSolutionOutput.getTripOutputs().put(truckInput.getTruckID(), tripOutputTmp);
+                        truckRouterSelected = truckInput.getTruckID();
+                        tripOutputLoop = SerializationUtils.clone(tripOutputTmp);
+                    }
+                    else if (nbPointsBeforeInsert == 0) {
+                        int trailerId = tripOutputTmp.getPoints().stream().filter(item -> item.getType().equals("Trailer")).findFirst().get().getTrailerId();
+                        removeToTrailerScheduler(trailerId);
                     }
                 }
             }
+
+            log.info("truck Router Selected Add: {}", truckRouterSelected);
+            // neu ko them vao dc vi tri khac tot hon
+            if(truckRouterSelected == 0) {
+                TripOutput tripOutputOld = SerializationUtils.clone(this.transportContainerSolutionOutput.getTripOutputs().get(infoRemoveRequest.getTruckId()));
+                this.transportContainerSolutionOutput.getTripOutputsTmp().put(infoRemoveRequest.getTruckId(), tripOutputOld);
+            }
+            else {
+                this.transportContainerSolutionOutput.setTotalDistant(totalDistantSolutionLoop);
+                if(truckRouterSelected != infoRemoveRequest.getTruckId()) {
+                    TripOutput tripOutputInRouterRemoved = SerializationUtils.clone(this.transportContainerSolutionOutput.getTripOutputsTmp().get(infoRemoveRequest.getTruckId()));
+                    this.transportContainerSolutionOutput.getTripOutputs().put(infoRemoveRequest.getTruckId(), tripOutputInRouterRemoved);
+                }
+                this.transportContainerSolutionOutput.getTripOutputs().put(truckRouterSelected, tripOutputLoop);
+            }
+
             // update solutionTmp
             updateSolutionTmp();
 
@@ -209,6 +264,8 @@ public class HeuristicSolver {
         point.setOrderCode(request.getOrderCode());
         point.setContainerId(request.getContainerID());
         point.setSizeContainer(request.getWeightContainer());
+        // can check neu break
+        point.setNbTrailer(1);
         point.setType("Order");
 
         return point;
@@ -247,7 +304,7 @@ public class HeuristicSolver {
         TripOutput tripOutputLoop = SerializationUtils.clone(this.transportContainerSolutionOutput.getTripOutputsTmp().get(truckInput.getTruckID()));
 
         // neu router rong
-        if(transportContainerSolutionOutput.getTripOutputs().get(truckInput.getTruckID()).getPoints() == null) {
+        if(transportContainerSolutionOutput.getTripOutputsTmp().get(truckInput.getTruckID()).getPoints() == null) {
             // Lay ra diem trailer tot nhat
             Point pickTrailer = getBestTrailer(truckInput.getLocationId(), pick.getFacilityId());
             pickTrailer.setNbTrailer(1);
@@ -294,6 +351,7 @@ public class HeuristicSolver {
                 for (int y = x+1; y <= nbPoint; y++) {
                     TripOutput tripOutputLoopItem = SerializationUtils.clone(tripOutput);
                     List<Point> pointsInTrip = tripOutputLoopItem.getPoints();
+                    // check lai vi tri add cuoi
                     pointsInTrip.add(x, pick);
                     pointsInTrip.add(y, delivery);
 
@@ -484,14 +542,23 @@ public class HeuristicSolver {
     public InfoRemoveRequest removeRequestInTrip() {
         InfoRemoveRequest infoRemoveRequest = new InfoRemoveRequest();
 
-        BigDecimal totalDistantLoop = new BigDecimal(String.valueOf(transportContainerSolutionOutput.getTotalDistant()));
+        BigDecimal totalDistantBest = new BigDecimal(String.valueOf(this.transportContainerSolutionOutput.getTotalDistant()));
         int requestSelect = 0;
         int truckSelect = 0;
-        for (Request request : requestList) {
-            for (TruckInput truckInput : trucks.values().toArray(new TruckInput[0])) {
-                BigDecimal totalDistantTripBefore = new BigDecimal(String.valueOf(transportContainerSolutionOutput.getTripOutputs().get(truckInput.getTruckID()).getTotalDistant()));
+        TripOutput tripOutputLoopTmp = new TripOutput();
 
-                List<Point> points = transportContainerSolutionOutput.getTripOutputs().get(truckInput.getTruckID()).getPoints().stream()
+        for (Request request : this.requestList) {
+            BigDecimal totalDistantLoop = new BigDecimal(String.valueOf(this.transportContainerSolutionOutput.getTotalDistant()));
+            for (TruckInput truckInput : this.trucks.values().toArray(new TruckInput[0])) {
+
+                BigDecimal totalDistantTripBefore = new BigDecimal(String.valueOf(this.transportContainerSolutionOutput.getTripOutputs().get(truckInput.getTruckID()).getTotalDistant()));
+
+                TripOutput tripOutput = SerializationUtils.clone(this.transportContainerSolutionOutput.getTripOutputs().get(truckInput.getTruckID()));
+
+                if(tripOutput.getPoints() == null) {
+                    continue;
+                }
+                List<Point> points = tripOutput.getPoints().stream()
                         .filter((item) -> !item.getOrderCode().equals(request.getOrderCode())).collect(Collectors.toList());
                 List<Point> pointsInTrip = new ArrayList<>();
                 points.forEach((item) -> {
@@ -500,32 +567,48 @@ public class HeuristicSolver {
                 });
 
                 // if request in router -> calc again distant
-                if (points.size() < transportContainerSolutionOutput.getTripOutputs().get(truckInput.getTruckID()).getPoints().size()) {
-                    BigDecimal distantTmp = calcDistantRouter(truckInput.getLocationId(), pointsInTrip);
-                    BigDecimal totalDistantTripAfter = totalDistantLoop.subtract(totalDistantTripBefore).add(distantTmp);
+                if (points.size() < this.transportContainerSolutionOutput.getTripOutputs().get(truckInput.getTruckID()).getPoints().size()) {
+
+                    BigDecimal distantTmp;
+                    BigDecimal totalDistantTripAfter;
+                    if (pointsInTrip.size() == 0) {
+                        distantTmp = new BigDecimal(Double.MAX_VALUE);
+                        totalDistantTripAfter = totalDistantLoop.subtract(totalDistantTripBefore);
+                    }
+                    else {
+                        distantTmp = calcDistantRouter(truckInput.getLocationId(), pointsInTrip);
+                        totalDistantTripAfter = totalDistantLoop.subtract(totalDistantTripBefore).add(distantTmp);
+                    }
+
                     if (totalDistantTripAfter.compareTo(totalDistantLoop) < 0) {
                         requestSelect = request.getRequestId();
                         truckSelect = truckInput.getTruckID();
+                        totalDistantLoop = totalDistantTripAfter;
 
-                        TripOutput tripOutput = transportContainerSolutionOutput.getTripOutputsTmp().get(truckInput.getTruckID());
                         tripOutput.setPoints(pointsInTrip);
-                        tripOutput.setTotalDistantTmp(distantTmp);
-
-                        // update router and distant
-                        transportContainerSolutionOutput.setTotalDistantTmp(totalDistantTripAfter);
-                        transportContainerSolutionOutput.getTripOutputsTmp().put(truckInput.getTruckID(), tripOutput);
+                        tripOutput.setTotalDistant(distantTmp);
+                        tripOutputLoopTmp = tripOutput;
                     }
                     break;
                 }
             }
+
+            if(totalDistantLoop.compareTo(totalDistantBest) < 0) {
+                totalDistantBest = totalDistantLoop;
+            }
         }
 
+        if (tripOutputLoopTmp.getPoints() == null || tripOutputLoopTmp.getPoints().size() == 0) {
+            TripOutput tripOutputBeforeRemove = SerializationUtils.clone(this.transportContainerSolutionOutput.getTripOutputs().get(truckSelect));
+            List<Point> points = tripOutputBeforeRemove.getPoints();
+            int trailerId = points.stream().filter(item -> item.getType().equals("Trailer")).findFirst().get().getTrailerId();
+            removeToTrailerScheduler(trailerId);
+        }
         // update weight container in point of router remove request
-        TripOutput tripOutputTmp = transportContainerSolutionOutput.getTripOutputsTmp().get(truckSelect);
-        List<Point> pointsRemoved = updateWeightContainer(tripOutputTmp.getPoints(), 0, tripOutputTmp.getPoints().size());
-        TripOutput tripOutput = transportContainerSolutionOutput.getTripOutputs().get(truckSelect);
-        tripOutput.setPoints(pointsRemoved);
-        transportContainerSolutionOutput.getTripOutputs().put(truckSelect, tripOutput);
+        List<Point> pointsRemoved = updateWeightContainer(tripOutputLoopTmp.getPoints(), 0, tripOutputLoopTmp.getPoints().size()-1);
+        this.transportContainerSolutionOutput.getTripOutputsTmp().get(truckSelect).setPoints(pointsRemoved);
+        this.transportContainerSolutionOutput.getTripOutputsTmp().get(truckSelect).setTotalDistant(tripOutputLoopTmp.getTotalDistant());
+        this.transportContainerSolutionOutput.setTotalDistantTmp(totalDistantBest);
 
         infoRemoveRequest.setRequestId(requestSelect);
         infoRemoveRequest.setTruckId(truckSelect);
@@ -535,7 +618,7 @@ public class HeuristicSolver {
 
     // can kiem tra lai ham nay voi truong hop bij break trailer
     public Boolean checkValidateAddPoint(int x, int y, List<Point> pointsInTrip) {
-        for (int i = x; i <= y; i++) {
+        for (int i = x+1; i < y; i++) {
             if (pointsInTrip.get(i).getNbTrailer() == 0) {
                 return false;
             }
@@ -544,7 +627,7 @@ public class HeuristicSolver {
         // bo trailer di
         if(x == 0 || pointsInTrip.get(x-1).getNbTrailer() == 0) {
             int weightAllow = pointsInTrip.get(x).getSizeContainer();
-            for(int i = x+1; i <= y; i++) {
+            for(int i = x+1; i < y; i++) {
                 if(weightAllow + pointsInTrip.get(i).getWeightContainer() > 40) {
                     return false;
                 }
@@ -557,7 +640,7 @@ public class HeuristicSolver {
                 return false;
             }
             int weightAllow = pointsInTrip.get(x).getSizeContainer();
-            for(int i = x+1; i <= y; i++) {
+            for(int i = x+1; i < y; i++) {
                 if(weightAllow + pointsInTrip.get(i).getWeightContainer() > 40) {
                     return false;
                 }
@@ -569,10 +652,71 @@ public class HeuristicSolver {
     public void updateSolutionTmp() {
         for (TruckInput truckInput : this.trucks.values().toArray(new TruckInput[0])) {
             TripOutput tripOutput = SerializationUtils.clone(this.transportContainerSolutionOutput.getTripOutputs().get(truckInput.getTruckID()));
-            BigDecimal totalDistant = this.transportContainerSolutionOutput.getTotalDistant();
+            BigDecimal totalDistant = new BigDecimal(String.valueOf(this.transportContainerSolutionOutput.getTotalDistant()));
             this.transportContainerSolutionOutput.getTripOutputsTmp().put(truckInput.getTruckID(), tripOutput);
             this.transportContainerSolutionOutput.setTotalDistantTmp(totalDistant);
         }
+    }
+
+    public TripOutput updateEndPoint(TripOutput tripOutput) {
+        List<Point> pointList = tripOutput.getPoints();
+        Point endPoint = pointList.get(pointList.size()-1);
+        AtomicInteger depotTrailerID = new AtomicInteger();
+        AtomicInteger depotTruckID = new AtomicInteger();
+        AtomicInteger trailerId = new AtomicInteger();
+
+        Point pointDepart = new Point();
+        pointDepart.setType("Truck");
+        pointDepart.setAction(Constants.ACTION.DEPART.getAction());
+        pointDepart.setOrderCode(tripOutput.getTruckCode());
+        pointDepart.setFacilityId(this.trucks.get(tripOutput.getTruckId()).getLocationId());
+
+        pointList.add(0, pointDepart);
+
+        if (endPoint.getNbTrailer() != 0) {
+            AtomicReference<BigDecimal> distantEndRouter = new AtomicReference<>(BigDecimal.valueOf(Long.MAX_VALUE));
+            this.depotTrailers.forEach((depotTrailer) -> {
+                DistantKey distantKeyPoint2Trailer = new DistantKey(endPoint.getFacilityId(), depotTrailer.getDepotTrailerId());
+                BigDecimal distantPoint2Trailer = distanceElementMap.get(distantKeyPoint2Trailer).getDistance();
+                this.depotTrucks.forEach((depotTruck) -> {
+                    DistantKey distantKeyTrailer2Truck = new DistantKey(depotTrailer.getDepotTrailerId(), depotTruck.getDepotTruckId());
+                    BigDecimal distantTrailer2Truck = distanceElementMap.get(distantKeyTrailer2Truck).getDistance();
+
+                    BigDecimal distantEndRouterTmp = distantPoint2Trailer.add(distantTrailer2Truck);
+                    if (distantEndRouterTmp.compareTo(distantEndRouter.get()) < 0) {
+                        distantEndRouter.set(distantEndRouterTmp);
+                        depotTrailerID.set(depotTrailer.getDepotTrailerId());
+                        depotTruckID.set(depotTruck.getDepotTruckId());
+                    }
+                });
+            });
+
+            for (int i = pointList.size() - 1; i >=0 ; i--) {
+                if (pointList.get(i).getTrailerId() != null) {
+                    trailerId.set(pointList.get(i).getTrailerId());
+                    break;
+                }
+            }
+            Point pointDepotTrailer = new Point();
+            pointDepotTrailer.setAction(Constants.ACTION.DELIVERY_TRAILER.getAction());
+            pointDepotTrailer.setTrailerId(trailerId.get());
+            pointDepotTrailer.setOrderCode(this.trailerScheduler.get(trailerId.get()).getTrailerCode());
+            pointDepotTrailer.setType("Trailer");
+            pointDepotTrailer.setFacilityId(depotTrailerID.get());
+
+            pointList.add(pointDepotTrailer);
+        }
+
+        Point pointStop = new Point();
+        pointStop.setType("Truck");
+        pointStop.setAction(Constants.ACTION.STOP.getAction());
+        pointStop.setOrderCode(tripOutput.getTruckCode());
+        pointStop.setFacilityId(depotTruckID.get());
+
+        pointList.add(pointStop);
+        tripOutput.setPoints(pointList);
+
+        return tripOutput;
     }
 
     public static void main(String[] args)
