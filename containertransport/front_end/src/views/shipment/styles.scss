@@ -48,6 +48,17 @@
         display: flex;
         .auto-create-trips {
             margin-right: 16px;
+            .btn-header {
+                display: flex;
+                align-items: center;
+                float: right;
+                margin-bottom: 16px;
+                .material-icons {
+                    height: auto;
+                    display: flex;
+                    margin-right: 4px;
+                }
+            }
         }
     }
 }
@@ -371,6 +382,10 @@
             }
         }
     }
+}
+.loading {
+    text-align: center;
+    margin: auto;
 }
 .icon-view-screen {
     .MuiSvgIcon-root {
