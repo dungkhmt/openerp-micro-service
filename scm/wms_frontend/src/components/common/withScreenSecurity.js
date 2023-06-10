@@ -51,7 +51,7 @@ function withScreenSecurity(SecuredComponent, id, viewError) {
         />
       );
     // TODO: Change this thing back by removing exclamation syntax
-    else if (!screenAuthorization.has(`${id}.VIEW`))
+    else if (screenAuthorization.has(`${id}.VIEW`))
       return (
         <SecuredComponent
           {...props}

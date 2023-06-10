@@ -19,9 +19,11 @@ import {
   useGetFacilityListNoPaging,
 } from "controllers/query/facility-query";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
+import { useGetAllUsersExist } from "../../../controllers/query/user-query";
 import { staticProductFields, staticWarehouseCols } from "../LocalConstant";
 import CreateFacilityForm from "./components/CreateFacilityForm";
 
@@ -39,6 +41,11 @@ function FacilityScreen({ screenAuthorization }) {
   const [itemSelected, setItemSelected] = useState(null);
   const history = useHistory();
   let { path } = useRouteMatch();
+  const methods = useForm({
+    mode: "onChange",
+    defaultValues: {},
+    // resolver: yupResolver(facilitySchema),
+  });
 
   const { isLoading, data: facility } = useGetFacilityList(params);
   const { isLoading: isLoadingFacilityList, data: facilityList } =
@@ -47,7 +54,7 @@ function FacilityScreen({ screenAuthorization }) {
     useGetFacilityInventory({
       code: facilityCode,
     });
-
+  const { isLoading: isUserLoading, data: users } = useGetAllUsersExist();
   let actions = [
     {
       title: "Thêm",
@@ -106,7 +113,68 @@ function FacilityScreen({ screenAuthorization }) {
       // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
     },
   ];
-
+  const fields = [
+    {
+      component: "select",
+      name: "createdBy",
+      type: "text",
+      label: "Người tạo",
+      readOnly: false,
+      require: true,
+      options: users
+        ? users?.map((user) => {
+            return {
+              name: user?.id,
+            };
+          })
+        : [],
+    },
+    {
+      component: "select",
+      name: "managedBy",
+      type: "text",
+      label: "Thủ kho",
+      readOnly: false,
+      require: true,
+      options: users
+        ? users?.map((user) => {
+            return {
+              name: user?.id,
+            };
+          })
+        : [],
+    },
+    {
+      component: "switch",
+      name: "status",
+      label: "Trạng thái",
+      readOnly: false,
+      require: true,
+    },
+    {
+      component: "input",
+      name: "facilityName",
+      label: "Tên kho",
+      readOnly: false,
+      require: true,
+    },
+    // {
+    //   component: "date",
+    //   name: "fromDate",
+    //   label: "Tạo lúc",
+    //   readOnly: false,
+    //   require: true,
+    // },
+  ];
+  const onSubmit = (data) => {
+    setParams({
+      ...params,
+      createdBy: data?.createdBy?.name,
+      managedBy: data?.managedBy?.name,
+      facilityName: data?.facilityName,
+      status: data?.status ? "ACTIVE" : "INACTIVE",
+    });
+  };
   const openMap = () => {
     history.push(`${path}/map`, {
       facility: facilityList,
@@ -120,7 +188,29 @@ function FacilityScreen({ screenAuthorization }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} />
+        <CustomToolBar
+          actions={actions}
+          onSearch={(keyword) => {
+            if (keyword) {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: keyword,
+                };
+              });
+            } else {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: "",
+                };
+              });
+            }
+          }}
+          fields={fields}
+          methods={methods}
+          onSubmit={onSubmit}
+        />
       </Box>
       <CustomDataGrid
         params={params}
@@ -130,6 +220,7 @@ function FacilityScreen({ screenAuthorization }) {
         totalItem={facility?.totalElements}
         handlePaginationModelChange={(props) => {
           setParams({
+            ...params,
             page: props?.page + 1,
             pageSize: props?.pageSize,
           });

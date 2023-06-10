@@ -20,10 +20,10 @@ import { CustomSlider } from "../slider/CustomSlider";
  * @property {boolean=} readOnly
  * @property {any} field_type
  * @typedef Prop
- * @property {any[]} fields
+ * @property {FieldControls[]} fields
  * @property {Function} handleSearch
  * @property {any} control
- * @property {any[]} erros
+ * @property {any[]} errors
  * @param {Prop} props
  */
 const CustomFormControl = (props) => {

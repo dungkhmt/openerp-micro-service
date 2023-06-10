@@ -14,7 +14,9 @@ import java.util.List;
 
 public interface IFacilityService {
     Facility createFacility(FacilityDTO facilityDTO, JwtAuthenticationToken token) throws CustomException;
-    ReturnPaginationDTO<Facility> getAllFacilities(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
+    ReturnPaginationDTO<Facility> getAllFacilities(int page, int pageSize, String sortField, boolean isSortAsc,
+    String facilityName, String status, String createdBy, String managedBy, String textSearch
+    ) throws JsonProcessingException;
     List<Facility> getAllWithoutPaging();
     Facility getFacilityById(long id);
     Facility getFacilityByCode(String code);

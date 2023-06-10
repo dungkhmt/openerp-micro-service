@@ -5,12 +5,12 @@ import {
   useGetCustomerWithoutPaging,
   useGetProductListNoPaging,
 } from "controllers/query/category-query";
-import { useMemo, useState } from "react";
-import { useGetSellinPrice } from "../../../controllers/query/purchase-order-query";
+import { useGetSellinPrice } from "controllers/query/purchase-order-query";
 import {
   useCreateSaleOrder,
   useGetSelloutPrice,
-} from "../../../controllers/query/sale-order-query";
+} from "controllers/query/sale-order-query";
+import { useMemo, useState } from "react";
 import { staticProductFields } from "../LocalConstant";
 
 const {
@@ -164,11 +164,11 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
               required={true}
               value={value}
               type={"number"}
-              onChange={onChange}
               label={"Khuyến mãi (%)"}
               isFullWidth={true}
               error={!!errors["discount"]}
               message={errors["discount"]?.message}
+              onChange={onChange}
             />
           )}
         />
@@ -190,8 +190,6 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
         columns={[
           staticProductFields[0],
           staticProductFields[1],
-          // staticProductFields[2],
-          // staticProductFields[3],
           {
             field: "quantity",
             headerName: "Số lượng mua",

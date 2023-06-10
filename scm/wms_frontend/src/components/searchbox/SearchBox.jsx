@@ -13,9 +13,13 @@ const Search = styled("div")(({ theme }) => ({
   borderBottomLeftRadius: 0,
   borderColor: "gray",
   position: "relative",
-  [theme.breakpoints.up("sm")]: {
-    width: "30%",
-  },
+  width: "100%",
+  // [theme.breakpoints.up("sm")]: {
+  //   width: "30%",
+  // },
+  // [theme.breakpoints.up("md")]: {
+  //   width: "30%",
+  // },
 }));
 const SearchIconWrapper = styled("div")(({ theme }) => ({
   height: "100%",
