@@ -19,7 +19,6 @@ import {
   useGetFacilityListNoPaging,
 } from "controllers/query/facility-query";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
@@ -41,11 +40,6 @@ function FacilityScreen({ screenAuthorization }) {
   const [itemSelected, setItemSelected] = useState(null);
   const history = useHistory();
   let { path } = useRouteMatch();
-  const methods = useForm({
-    mode: "onChange",
-    defaultValues: {},
-    // resolver: yupResolver(facilitySchema),
-  });
 
   const { isLoading, data: facility } = useGetFacilityList(params);
   const { isLoading: isLoadingFacilityList, data: facilityList } =
@@ -208,7 +202,6 @@ function FacilityScreen({ screenAuthorization }) {
             }
           }}
           fields={fields}
-          methods={methods}
           onSubmit={onSubmit}
         />
       </Box>

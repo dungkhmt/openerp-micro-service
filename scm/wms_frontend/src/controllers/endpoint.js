@@ -91,4 +91,7 @@ export const endPoint = {
   // createNewUser: base
   getAllUsers: baseUrl + "/user/get-all",
   getAllUsersWithoutPagination: baseUrl + "/user/get-all-exists",
+  // Dashboard
+  getNewFacilityMonthly: baseUrl + "/dashboard/facility/new-facility",
+  getImportedProduct: baseUrl + "/dashboard/facility/import-product-category",
 };

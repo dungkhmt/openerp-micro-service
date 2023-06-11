@@ -52,4 +52,8 @@ export const queryKey = {
     user_list: "user_list",
     user_list_all: "user_list_all",
   },
+  dashboard: {
+    new_facility_month: "new_facility_month",
+    imported_product_cate: "imported_product_cate",
+  },
 };

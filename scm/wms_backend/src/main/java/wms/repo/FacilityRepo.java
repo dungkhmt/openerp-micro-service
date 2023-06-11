@@ -25,4 +25,10 @@ public interface FacilityRepo extends JpaRepository<Facility, Long> {
 
     @Query(value = "select * from scm_facility where is_deleted = 0", nativeQuery = true)
     List<Facility> getAllFacility();
+
+    @Query(value = "SELECT *\n" +
+            "FROM scm_facility\n" +
+            "where EXTRACT(YEAR FROM created_date) = :year and\n" +
+            "       EXTRACT(MONTH FROM created_date) = :month", nativeQuery = true)
+    List<Facility> getFacilityCreatedMonthly(int month, int year);
 }

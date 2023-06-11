@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useDebounce, useMeasure } from "react-use";
 import CustomFilter from "../filter/CustomFilter";
 import SearchBox from "../searchbox/SearchBox";
@@ -16,10 +17,16 @@ const CustomToolBar = ({
   actions,
   containSearch = true,
   fields,
-  methods,
+  resolver = null,
+  defaultValues = {},
   onSubmit = () => {},
   onSearch = () => {},
 }) => {
+  const methods = useForm({
+    mode: "onChange",
+    defaultValues: defaultValues,
+    resolver: resolver,
+  });
   const {
     handleSubmit,
     formState: { errors },
@@ -195,11 +202,6 @@ const CustomToolBar = ({
               />
               <Stack direction="row" justifyContent={"flex-end"}>
                 <Button
-                  // onClick={() => {
-                  //   handleSubmit(onSubmit);
-                  //   handleClose();
-                  //   // reset();
-                  // }}
                   onClick={handleSubmit(onSubmit)}
                   variant="contained"
                   style={{ color: "white" }}
