@@ -113,8 +113,8 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
 
     @Override
     public List<DeliveryTripDTO> getAll() {
-        List<DeliveryTrip> trips = deliveryTripRepository.findAll();
-        return trips.stream().map(trip -> new DeliveryTripDTO(trip)).collect(Collectors.toList());
+        List<DeliveryTrip> trips = deliveryTripRepository.findAllByIsDeletedIsFalseOrderByCreatedStampDesc();
+        return trips.stream().map(DeliveryTripDTO::new).collect(Collectors.toList());
     }
 
     @Override

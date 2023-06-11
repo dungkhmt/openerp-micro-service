@@ -6,12 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.UUID;
 
 @Repository
 public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, String> {
 
-//    List<DeliveryTrip> findAllByDeletedIsFalse();
+    List<DeliveryTrip> findAllByIsDeletedIsFalseOrderByCreatedStampDesc();
 
     List<DeliveryTrip> findAllByShipmentIdAndIsDeletedIsFalse(String shipmentId);
 

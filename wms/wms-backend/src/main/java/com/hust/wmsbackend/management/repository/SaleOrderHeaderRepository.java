@@ -11,8 +11,8 @@ import java.util.UUID;
 @Repository
 public interface SaleOrderHeaderRepository extends JpaRepository<SaleOrderHeader, UUID> {
 
-    List<SaleOrderHeader> findAllByStatusIn(List<OrderStatus> orderStatuses);
+    List<SaleOrderHeader> findAllByOrderByOrderDateDesc();
 
-    List<SaleOrderHeader> findAllByUserLoginIdAndStatus(String userLoginId, OrderStatus orderStatus);
+    List<SaleOrderHeader> findAllByStatusInOrderByOrderDateDesc(List<OrderStatus> orderStatuses);
 
 }

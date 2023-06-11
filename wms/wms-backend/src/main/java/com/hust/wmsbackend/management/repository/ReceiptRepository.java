@@ -11,12 +11,10 @@ import java.util.UUID;
 @Repository
 public interface ReceiptRepository extends JpaRepository<Receipt, UUID> {
 
-    List<Receipt> findAllByCreatedBy(String createdBy);
+    List<Receipt> findAllByStatusOrderByCreatedStampDesc(ReceiptStatus status);
 
-    List<Receipt> findAllByCreatedByAndStatus(String createdBy, ReceiptStatus status);
+    List<Receipt> findAllByStatusInOrderByCreatedStampDesc(List<ReceiptStatus> statuses);
 
-    List<Receipt> findAllByStatus(ReceiptStatus status);
-
-    List<Receipt> findAllByStatusIn(List<ReceiptStatus> statuses);
+    List<Receipt> findAllByOrderByCreatedStampDesc();
 
 }

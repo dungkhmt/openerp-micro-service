@@ -20,7 +20,6 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,7 +47,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     public List<ShipmentDTO> getAllShipments(Principal principal) {
-        List<Shipment> shipments =  shipmentRepository.findAllByIsDeletedIsFalse();
+        List<Shipment> shipments =  shipmentRepository.findAllByIsDeletedIsFalseOrderByCreatedStampDesc();
         return shipments.stream().map(shipment -> ShipmentDTO.builder()
             .shipmentId(shipment.getShipmentId())
             .lastUpdatedStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, shipment.getLastUpdatedStamp()))
