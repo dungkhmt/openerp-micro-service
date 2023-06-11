@@ -142,7 +142,15 @@ const CartDetail = () => {
   }, []);
 
   const payOderHandle = (data) => {
-    data.items = cartItems?.items;
+    const dataItems = [];
+    for (var i = 0; i < cartItems?.items.length; i++) {
+      const item = {
+        productId: cartItems?.items[i].productId ,
+        quantity: cartItems?.items[i].quantity
+      };
+      dataItems.push(item);
+    }
+    data.items = dataItems;
     data.paymentTypeCode = paymentType;
     data.orderTypeCode = ORDER_TYPE.ONLINE;
     data.longitude = selectPosition?.lon;
