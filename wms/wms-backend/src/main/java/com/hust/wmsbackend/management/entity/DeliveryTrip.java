@@ -49,4 +49,5 @@ public class DeliveryTrip {
     private UUID warehouseId;
     @Enumerated(EnumType.STRING)
     private DeliveryTripStatus status = DeliveryTripStatus.CREATED;
+    private String description;
 }

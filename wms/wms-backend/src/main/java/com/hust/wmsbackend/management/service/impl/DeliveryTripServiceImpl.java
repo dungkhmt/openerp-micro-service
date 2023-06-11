@@ -64,6 +64,7 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
         trip.setDeliveryPersonId(request.getDeliveryPersonId());
         trip.setTotalLocations(request.getTotalLocations());
         trip.setWarehouseId(request.getWarehouseId());
+        trip.setDescription(request.getDescription());
 
         List<DeliveryTripItem> items = new ArrayList<>();
         List<AssignedOrderItem> updateAssignedOrderItems = new ArrayList<>();

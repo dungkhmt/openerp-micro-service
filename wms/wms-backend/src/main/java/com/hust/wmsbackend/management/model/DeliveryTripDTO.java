@@ -32,6 +32,7 @@ public class DeliveryTripDTO {
     private List<DeliveryTripItemDTO> items;
     private String deliveryTripStatus;
     private String deliveryTripStatusCode;
+    private String description;
 
     @Data
     @NoArgsConstructor
@@ -79,5 +80,6 @@ public class DeliveryTripDTO {
                 this.deliveryTripStatusCode = trip.getStatus().getCode();
             }
         }
+        this.description = trip.getDescription();
     }
 }

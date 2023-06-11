@@ -6,7 +6,6 @@ import withScreenSecurity from "components/common/withScreenSecurity";
 import { Fragment, useEffect, useState } from "react";
 import { API_PATH } from "screens/apiPaths";
 import useStyles from 'screens/styles.js';
-import { convertTimeStampToDate } from "screens/utils/utils";
 
 const ShipmentDetail = ( props ) => {
   const shipmentId = props.match?.params?.id;
@@ -104,7 +103,7 @@ const ShipmentDetail = ( props ) => {
                 fullWidth
                 variant="outlined"
                 size="small"
-                value={convertTimeStampToDate(shipmentInfo?.expectedDeliveryStamp)}
+                value={shipmentInfo?.expectedDeliveryStr}
                 InputProps={{
                   readOnly: true,
                 }}
