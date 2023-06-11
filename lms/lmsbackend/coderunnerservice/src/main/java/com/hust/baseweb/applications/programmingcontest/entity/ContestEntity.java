@@ -5,7 +5,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Builder
-//@Table(name = "contest")
 @Table(name = "contest_new")
 public class ContestEntity implements Serializable {
     private static final long serialVersionUID = 3487495895819802L;
@@ -48,79 +46,12 @@ public class ContestEntity implements Serializable {
     public static final String SYNCHRONOUS_JUDGE_MODE = "SYNCHRONOUS_JUDGE_MODE";
     public static final String ASYNCHRONOUS_JUDGE_MODE_QUEUE = "ASYNCHRONOUS_JUDGE_MODE_QUEUE";
 
-    public static List<String> getJudgeModes() {
-        List<String> L = new ArrayList();
-        L.add(SYNCHRONOUS_JUDGE_MODE);
-        L.add(ASYNCHRONOUS_JUDGE_MODE_QUEUE);
-        return L;
-    }
-
-    public static List<String> getListUseCacheContestProblems() {
-        List<String> L = new ArrayList();
-        L.add(ContestEntity.USE_CACHE_CONTEST_PROBLEM_YES);
-        L.add(ContestEntity.USE_CACHE_CONTEST_PROBLEM_NO);
-        return L;
-    }
-
-    public static List<String> getListEvaluateBothPublicPrivateTestcases() {
-        List<String> L = new ArrayList();
-        L.add(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES);
-        L.add(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_NO);
-        return L;
-    }
-
-    public static List<String> getProblemDescriptionViewTypes() {
-        List<String> L = new ArrayList();
-        L.add(CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_VISIBLE);
-        L.add(CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_HIDDEN);
-        return L;
-    }
-
-    public static List<String> getStatusIds() {
-        List<String> L = new ArrayList();
-        L.add(ContestEntity.CONTEST_STATUS_CREATED);
-        L.add(ContestEntity.CONTEST_STATUS_OPEN);
-        L.add(ContestEntity.CONTEST_STATUS_CLOSED);
-        L.add(ContestEntity.CONTEST_STATUS_DISABLED);
-        L.add(ContestEntity.CONTEST_STATUS_RUNNING);
-        L.add(ContestEntity.CONTEST_STATUS_COMPLETED);
-        return L;
-    }
-
-    public static List<String> getSubmissionActionTypes() {
-        List<String> L = new ArrayList();
-        L.add(ContestEntity.CONTEST_SUBMISSION_ACTION_TYPE_STORE_AND_EXECUTE);
-        L.add(ContestEntity.CONTEST_SUBMISSION_ACTION_TYPE_STORE_ONLY);
-        return L;
-    }
-
-    public static List<String> getParticipantViewResultModes() {
-        List<String> L = new ArrayList();
-        L.add(CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER);
-        L.add(CONTEST_PARTICIPANT_VIEW_MODE_NOT_SEE_CORRECT_ANSWER);
-        L.add(CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER_AND_PRIVATE_TESTCASE);
-        L.add(CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER_AND_PRIVATE_TESTCASE_SHORT);
-        return L;
-    }
-
-    public static List<Integer> getListMaxNumberSubmissions() {
-        List<Integer> L = new ArrayList();
-        for (int i = 0; i <= 200; i++) {
-            L.add(i);
-        }
-        return L;
-    }
-
     @Id
     @Column(name = "contest_id")
     private String contestId;
 
     @Column(name = "contest_name")
     private String contestName;
-
-//    @OneToOne
-//    @JoinColumn(name = "user_create_id", referencedColumnName = "user_login_id")
-//    private UserLogin userCreatedContest;
 
     @Column(name = "user_create_id")
     private String userId;
@@ -129,9 +60,9 @@ public class ContestEntity implements Serializable {
     private long contestSolvingTime;
 
     @JoinTable(
-        name = "contest_contest_problem_new",
-        joinColumns = @JoinColumn(name = "contest_id", referencedColumnName = "contest_id"),
-        inverseJoinColumns = @JoinColumn(name = "problem_id", referencedColumnName = "problem_id")
+            name = "contest_contest_problem_new",
+            joinColumns = @JoinColumn(name = "contest_id", referencedColumnName = "contest_id"),
+            inverseJoinColumns = @JoinColumn(name = "problem_id", referencedColumnName = "problem_id")
     )
     @OneToMany(fetch = FetchType.LAZY)
     @JsonIgnore

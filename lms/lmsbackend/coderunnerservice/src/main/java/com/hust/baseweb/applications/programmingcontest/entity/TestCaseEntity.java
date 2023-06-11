@@ -12,7 +12,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Builder
-//@Table(name = "test_case")
 @Table(name = "test_case_new")
 public class TestCaseEntity implements Serializable {
     private static final long serialVersionUID = 3487495895819801L;
@@ -46,35 +45,4 @@ public class TestCaseEntity implements Serializable {
     @Column(name = "status_id")
     private String statusId;
 
-    public String getTestCaseShort(int sz) {
-        String res = "";
-        if (sz > testCase.length()) {
-            sz = testCase.length();
-        }
-        for (int i = 0; i < sz; i++) {
-            res += testCase.charAt(i);
-        }
-        return res;
-    }
-
-    public String getCorrectAnswerShort(int sz) {
-        String res = "";
-        if (sz > correctAnswer.length()) {
-            sz = correctAnswer.length();
-        }
-        for (int i = 0; i < sz; i++) {
-            res += correctAnswer.charAt(i);
-        }
-        return res;
-    }
-//    @JoinColumn(name = "contest_problem_id", referencedColumnName = "problem_id")
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    private ProblemEntity problem;
-
-//    @JoinTable(name = "contest_problem_test_case",
-//            joinColumns = @JoinColumn(name = "test_case_id", referencedColumnName = "test_case_id"),
-//            inverseJoinColumns = @JoinColumn(name = "problem_id", referencedColumnName = "problem_id")
-//    )
-//    @OneToOne(fetch = FetchType.LAZY)
-//    private ContestProblem contestProblem;
 }
