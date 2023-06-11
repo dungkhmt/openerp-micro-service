@@ -376,33 +376,6 @@ const ProductDetail = ( props ) => {
   return (
     isLoading ? <LoadingScreen /> :
     <Fragment>
-      <Modal open={isShowDetailQuantityModal}
-        onClose={() => setShowDetailQuantityModal(!isShowDetailQuantityModal)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          width: '50%',
-          height: '50%',
-          transform: 'translate(-50%, -50%)',
-          bgcolor: 'background.paper',
-          border: '2px solid #000',
-          boxShadow: 24,
-          p: 4,
-        }}>
-          <DetailQuantityTable
-            isCreateForm={isCreateForm}
-            warehouseDetails={warehouseDetails} 
-            setShowDetailQuantityModal={setShowDetailQuantityModal} 
-            initQuantityArray={initQuantityArray} 
-            setInitQuantityArray={setInitQuantityArray} 
-            classes={classes}
-            totalQuantity={totalQuantity} />
-        </Box>
-      </Modal>
 
       <Box>
         <Grid container justifyContent="space-between" 
