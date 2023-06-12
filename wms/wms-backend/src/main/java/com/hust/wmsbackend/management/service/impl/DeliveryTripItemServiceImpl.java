@@ -78,7 +78,7 @@ public class DeliveryTripItemServiceImpl implements DeliveryTripItemService {
     public boolean fail(String[] itemIds) {
         List<String> itemIdList = Arrays.asList(itemIds);
         if (itemIdList.isEmpty()) {
-            log.info("Item id list to update comple is empty");
+            log.info("Item id list to update complete is empty");
             return false;
         }
         List<DeliveryTripItem> updateItems = new ArrayList<>();
