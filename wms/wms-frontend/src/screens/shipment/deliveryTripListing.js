@@ -87,9 +87,10 @@ const DeliveryTripListing = () => {
                     deliveryTripId: res.data.deliveryTripId,
                     createdStamp: now,
                     createdBy: userLoginId,
-                    shipmentId: selectedShipmentId
+                    shipmentId: selectedShipmentId,
+                    deliveryTripStatus: "Khởi tạo"
                   };
-                  setTripTableData([...tripTableData, adder]);
+                  setTripTableData([adder, tripTableData]);
                 }
               },
               {
@@ -125,7 +126,7 @@ const DeliveryTripListing = () => {
         window.location.href = `${path}/${rowData.deliveryTripId}`;
       }}
       options={{
-        selection: false,
+        selection: true,
         pageSize: 10,
         search: true,
         sorting: true,

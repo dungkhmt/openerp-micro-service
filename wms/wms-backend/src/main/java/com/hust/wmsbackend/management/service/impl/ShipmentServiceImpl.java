@@ -65,24 +65,14 @@ public class ShipmentServiceImpl implements ShipmentService {
             return null;
         }
         Shipment shipment = shipmentOpt.get();
-        List<DeliveryTrip> trips = deliveryTripRepository.findAllByShipmentIdAndIsDeletedIsFalse(shipmentId);
+        List<DeliveryTrip> trips = deliveryTripRepository.findAllByShipmentIdAndIsDeletedIsFalseOrderByCreatedStampDesc(shipmentId);
         List<DeliveryTripDTO> tripDTOS = new ArrayList<>();
         for (DeliveryTrip trip : trips) {
             Optional<DeliveryPerson> person = Optional.empty();
             if (trip.getDeliveryPersonId() != null) {
                 person = deliveryPersonRepository.findById(trip.getDeliveryPersonId());
             }
-            DeliveryTripDTO dto = DeliveryTripDTO.builder()
-                .deliveryTripId(trip.getDeliveryTripId())
-                .vehicleId(trip.getVehicleId())
-                .deliveryPersonId(trip.getDeliveryPersonId())
-                .distance(trip.getDistance())
-                .totalWeight(trip.getTotalWeight())
-                .totalLocations(trip.getTotalLocations())
-                .lastUpdatedStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, trip.getLastUpdatedStamp()))
-                .createdBy(trip.getCreatedBy())
-                .createdStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, trip.getCreatedStamp()))
-                .build();
+            DeliveryTripDTO dto = new DeliveryTripDTO(trip);
             if (person.isPresent()) {
                 dto.setDeliveryPersonName(person.get().getFullName());
             } else {

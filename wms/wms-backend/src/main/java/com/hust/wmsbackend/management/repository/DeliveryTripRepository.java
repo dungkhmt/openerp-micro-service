@@ -12,7 +12,7 @@ public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, Stri
 
     List<DeliveryTrip> findAllByIsDeletedIsFalseOrderByCreatedStampDesc();
 
-    List<DeliveryTrip> findAllByShipmentIdAndIsDeletedIsFalse(String shipmentId);
+    List<DeliveryTrip> findAllByShipmentIdAndIsDeletedIsFalseOrderByCreatedStampDesc(String shipmentId);
 
     @Query(value = "select dt.delivery_trip_id  , dt.vehicle_id  , dt.delivery_person_id  , " +
         "dt.distance  , dt.total_weight  , dt.total_locations , dt.last_updated_stamp  , " +
