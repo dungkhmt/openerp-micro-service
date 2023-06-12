@@ -64,6 +64,7 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
         trip.setDeliveryPersonId(request.getDeliveryPersonId());
         trip.setTotalLocations(request.getTotalLocations());
         trip.setWarehouseId(request.getWarehouseId());
+        trip.setDescription(request.getDescription());
 
         List<DeliveryTripItem> items = new ArrayList<>();
         List<AssignedOrderItem> updateAssignedOrderItems = new ArrayList<>();
@@ -113,8 +114,8 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
 
     @Override
     public List<DeliveryTripDTO> getAll() {
-        List<DeliveryTrip> trips = deliveryTripRepository.findAll();
-        return trips.stream().map(trip -> new DeliveryTripDTO(trip)).collect(Collectors.toList());
+        List<DeliveryTrip> trips = deliveryTripRepository.findAllByIsDeletedIsFalseOrderByCreatedStampDesc();
+        return trips.stream().map(DeliveryTripDTO::new).collect(Collectors.toList());
     }
 
     @Override

@@ -1,5 +1,5 @@
 import LoadingScreen from "components/common/loading/loading";
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, Tab, TextField, Typography } from "@mui/material";
 import { request } from "api";
 import { BayDropDown, BayDropDownHavingProduct, ProductDropDown, WarehouseDropDown } from "components/table/DropDown";
 import StandardTable from "components/StandardTable";
@@ -11,6 +11,7 @@ import { errorNoti, successNoti } from "utils/notification";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
 
 const AdminOrderDetail = ( props ) => {
   const history = useHistory();
@@ -41,10 +42,12 @@ const AdminOrderDetail = ( props ) => {
   const [selectedWarehouseItems, setSelectedWarehouseItems] = useState([]);
   const [maxQuantity, setMaxQuantity] = useState(0);
 
+  const [tabValue, setTabValue] = useState('1');
+
   const getProductOrderQuantity = ( productId ) => {
-    for (var i = 0; i < orderInfo?.items?.length; i++) {
-      if (orderInfo?.items[i]?.productId == productId) {
-        return orderInfo?.items[i]?.quantity;
+    for (var i = 0; i < orderInfo?.remainingItems?.length; i++) {
+      if (orderInfo?.remainingItems[i]?.productId == productId) {
+        return orderInfo?.remainingItems[i]?.quantity;
       }
     }
     return Number.MAX_SAFE_INTEGER;
@@ -122,7 +125,6 @@ const AdminOrderDetail = ( props ) => {
           }
         }
       }
-      console.log("Total product on bay => ", totalProductOnBay);
       setMaxQuantity(Math.min(totalProductOnBay, getProductOrderQuantity(selectedProductId)));
     }
   }, [selectedBayId]);
@@ -320,123 +322,136 @@ const AdminOrderDetail = ( props ) => {
         </Grid>
       </Box>
 
-      <StandardTable
-        title="Danh sách sản phẩm cần phân phối giao hàng"
-        hideCommandBar={true}
-        columns={[
-          { title: "Tên sản phẩm", field: "productName" },
-          { title: "Số lượng", field: "quantity" }
-        ]}
-        data={remainingItems}
-        options={{
-          selection: false,
-          pageSize: 5,
-          search: true,
-          sorting: true,
-        }}
-      />
+      <TabContext value={tabValue}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <TabList onChange={(event, newValue) => setTabValue(newValue)} >
+            <Tab label="Sản phẩm cần phân phối giao hàng" value="1" />
+            <Tab label="Sản phẩm đang phân phối" value="2" />
+            <Tab label="Sản phẩm đã phân phối" value="3" />
+          </TabList>
+        </Box>
+        <TabPanel value="1">
+          <StandardTable
+            title="Danh sách sản phẩm cần phân phối giao hàng"
+            hideCommandBar={true}
+            columns={[
+              { title: "Tên sản phẩm", field: "productName" },
+              { title: "Số lượng", field: "quantity" }
+            ]}
+            data={remainingItems}
+            options={{
+              selection: false,
+              pageSize: 5,
+              search: true,
+              sorting: true,
+            }}
+          />
+        </TabPanel>
+        <TabPanel value="2">
+          <StandardTable
+            rowKey="productId"
+            title="Danh sách sản phẩm đang phân phối"
+            hideCommandBar={true}
+            columns={[
+              { title: "Tên sản phẩm", field: "productName",
+                editComponent: <ProductDropDown 
+                  productList={orderInfo?.items} 
+                  setSelectedProductId={setSelectedProductId}
+                  setSelectedProductName={setSelectedProductName} /> },
+              { title: "Kho", field: "warehouseName",
+                editComponent: <WarehouseDropDown
+                  warehouseList={warehouseList.map(warehouse => warehouse.info)}
+                  setSelectedWarehouseId={setSelectedWarehouseId}
+                  setSelectedWarehouseName={setSelectedWarehouseName} />},
+              { title: "Vị trí kệ hàng", field: "bayCode",
+                editComponent: <BayDropDownHavingProduct
+                  selectedWarehouseItems={selectedWarehouseItems} 
+                  productId={selectedProductId}
+                  setSelectedBayId={setSelectedBayId}
+                  setSelectedBayCode={setSelectedBayCode} /> },
+              { title: "Số lượng", field: "quantity", 
+                editComponent: <TextField
+                  type="number"
+                  InputProps={{
+                    inputProps: { 
+                        max: maxQuantity, min: 1 
+                    }
+                  }}
+                  value={selectedQuantity}
+                  onChange={(e) => setSelectedQuantity(e.target.value)}
+                  /> },
+            ]}
+            data={processingItems}
+            options={{
+              selection: false,
+              pageSize: 5,
+              search: true,
+              sorting: true,
+            }}
+            editable={{
+              onRowAdd: newData => new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  const adder = {
+                    productId: selectedProductId,
+                    productName: selectedProductName,
+                    warehouseId: selectedWarehouseId,
+                    warehouseName: selectedWarehouseName,
+                    bayId: selectedBayId,
+                    bayCode: selectedBayCode,
+                    quantity: selectedQuantity
+                  };
+                  setProcessingItems([...processingItems, adder]);
 
-      <StandardTable
-        rowKey="productId"
-        title="Danh sách sản phẩm đang xử lý"
-        hideCommandBar={true}
-        columns={[
-          { title: "Tên sản phẩm", field: "productName",
-            editComponent: <ProductDropDown 
-              productList={orderInfo?.items} 
-              setSelectedProductId={setSelectedProductId}
-              setSelectedProductName={setSelectedProductName} /> },
-          { title: "Kho", field: "warehouseName",
-            editComponent: <WarehouseDropDown
-              warehouseList={warehouseList.map(warehouse => warehouse.info)}
-              setSelectedWarehouseId={setSelectedWarehouseId}
-              setSelectedWarehouseName={setSelectedWarehouseName} />},
-          { title: "Vị trí kệ hàng", field: "bayCode",
-            editComponent: <BayDropDownHavingProduct
-              selectedWarehouseItems={selectedWarehouseItems} 
-              productId={selectedProductId}
-              setSelectedBayId={setSelectedBayId}
-              setSelectedBayCode={setSelectedBayCode} /> },
-          { title: "Số lượng", field: "quantity", 
-            editComponent: <TextField
-              type="number"
-              InputProps={{
-                inputProps: { 
-                    max: maxQuantity, min: 0 
-                }
-              }}
-              value={selectedQuantity}
-              onChange={(e) => setSelectedQuantity(e.target.value)}
-               /> },
-        ]}
-        data={processingItems}
-        options={{
-          selection: false,
-          pageSize: 5,
-          search: true,
-          sorting: true,
-        }}
-        editable={{
-          onRowAdd: newData => new Promise((resolve, reject) => {
-            setTimeout(() => {
-              const adder = {
-                productId: selectedProductId,
-                productName: selectedProductName,
-                warehouseId: selectedWarehouseId,
-                warehouseName: selectedWarehouseName,
-                bayId: selectedBayId,
-                bayCode: selectedBayCode,
-                quantity: selectedQuantity
-              };
-              setProcessingItems([...processingItems, adder]);
-
-              // update số lượng sản phẩm cần phân phối
-              var newOrderInfo = {...orderInfo};
-              for (var i = 0; i < newOrderInfo?.remainingItems?.length; i++) {
-                if (newOrderInfo?.remainingItems[i]?.productId == selectedProductId) {
-                  const newQuantity = newOrderInfo?.remainingItems[i]?.quantity - selectedQuantity;
-                  newOrderInfo.remainingItems[i].quantity = newQuantity;
-                  if (newQuantity == 0) {
-                    newOrderInfo.remainingItems.splice(i, 1);
+                  // update số lượng sản phẩm cần phân phối
+                  var newOrderInfo = {...orderInfo};
+                  for (var i = 0; i < newOrderInfo?.remainingItems?.length; i++) {
+                    if (newOrderInfo?.remainingItems[i]?.productId == selectedProductId) {
+                      const newQuantity = newOrderInfo?.remainingItems[i]?.quantity - selectedQuantity;
+                      newOrderInfo.remainingItems[i].quantity = newQuantity;
+                      if (newQuantity == 0) {
+                        newOrderInfo.remainingItems.splice(i, 1);
+                      }
+                      break;
+                    }
                   }
-                  break;
-                }
-              }
-              setOrderInfo(newOrderInfo);
-              setRemainingItems(newOrderInfo.remainingItems);
-              setSelectedQuantity(0);
-              resolve();
-            })
-          }),
-          onRowDelete: oldData => new Promise((resolve, reject) => {
-            setTimeout(() => {
-              console.log("Old data => ", oldData);
-              // TODO: on row delete implementation....
-            })
-          })
-        }}
-      />
-
-      <StandardTable
-        title="Danh sách sản phẩm đã phân phối"
-        hideCommandBar={true}
-        columns={[
-          { title: "Tên sản phẩm", field: "productName" },
-          { title: "Số lượng", field: "quantity" },
-          { title: "Kho", field: "warehouseName" },
-          { title: "Vị trí kệ hàng", field: "bayCode" },
-          { title: "Trạng thái", field: "status"},
-          { title: "Số lô", field: "lotId" },
-          { title: "Ngày phân phối", field: "createdDate"}
-        ]}
-        data={orderInfo?.processedItems}
-        options={{
-          selection: false,
-          pageSize: 5,
-          search: true,
-          sorting: true,
-        }}
-      />
+                  setOrderInfo(newOrderInfo);
+                  setRemainingItems(newOrderInfo.remainingItems);
+                  setSelectedQuantity(0);
+                  resolve();
+                })
+              }),
+              onRowDelete: oldData => new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  console.log("Old data => ", oldData);
+                  // TODO: on row delete implementation....
+                })
+              })
+            }}
+          />
+        </TabPanel>
+        <TabPanel value="3">
+          <StandardTable
+            title="Danh sách sản phẩm đã phân phối"
+            hideCommandBar={true}
+            columns={[
+              { title: "Tên sản phẩm", field: "productName" },
+              { title: "Số lượng", field: "quantity" },
+              { title: "Kho", field: "warehouseName" },
+              { title: "Vị trí kệ hàng", field: "bayCode" },
+              { title: "Trạng thái", field: "status"},
+              { title: "Số lô", field: "lotId" },
+              { title: "Ngày phân phối", field: "createdDate"}
+            ]}
+            data={orderInfo?.processedItems}
+            options={{
+              selection: false,
+              pageSize: 5,
+              search: true,
+              sorting: true,
+            }}
+          />
+        </TabPanel>
+      </TabContext>
     </Box>
   </Fragment>)
 };

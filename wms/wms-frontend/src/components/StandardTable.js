@@ -200,7 +200,7 @@ const EnhancedTableToolbar = (props) => {
       )}
 
       {
-        actions == undefined &&
+        actions == undefined && isEditable &&
         <Tooltip title="Thêm mới">
           <IconButton onClick={openNewRow}> 
             <AddIcon />
@@ -357,6 +357,7 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
     // delete data from UI
     const newTableData = rows.filter(row => !selected.includes(row[rowKey]));
     setRows(newTableData);
+    window.location.reload();
   }
 
   const isSelected = (name) => selected.indexOf(name) !== -1;

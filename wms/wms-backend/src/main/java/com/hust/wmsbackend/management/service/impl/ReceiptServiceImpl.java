@@ -80,7 +80,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     @Override
     public List<ReceiptGeneralResponse> getAllReceiptGeneral() {
-        List<Receipt> receipts = receiptRepository.findAll();
+        List<Receipt> receipts = receiptRepository.findAllByOrderByCreatedStampDesc();
         String pattern = "dd-MM-yyyy HH:mm:ss";
         SimpleDateFormat format = new SimpleDateFormat(pattern);
         Map<String, String> warehouseIdNameMap = new HashMap<>();
@@ -142,9 +142,9 @@ public class ReceiptServiceImpl implements ReceiptService {
                                                 .collect(Collectors.toList());;
         List<Receipt> receipts;
         if (statusCodes.size() != 0) {
-            receipts = receiptRepository.findAllByStatusIn(statusCodes);
+            receipts = receiptRepository.findAllByStatusInOrderByCreatedStampDesc(statusCodes);
         } else {
-            receipts = receiptRepository.findAll();
+            receipts = receiptRepository.findAllByOrderByCreatedStampDesc();
         }
         return receipts.stream().map(receipt -> ReceiptRequestResponse.builder()
             .receiptRequestId(receipt.getReceiptId())
@@ -164,9 +164,9 @@ public class ReceiptServiceImpl implements ReceiptService {
         ReceiptStatus status = ReceiptStatus.findByCode(statusCode);
         List<Receipt> receipts;
         if (status != null) {
-            receipts = receiptRepository.findAllByStatus(status);
+            receipts = receiptRepository.findAllByStatusOrderByCreatedStampDesc(status);
         } else {
-            receipts = receiptRepository.findAll();
+            receipts = receiptRepository.findAllByOrderByCreatedStampDesc();
         }
         return receipts.stream().map(receipt -> ReceiptRequestResponse.builder()
             .receiptRequestId(receipt.getReceiptId())

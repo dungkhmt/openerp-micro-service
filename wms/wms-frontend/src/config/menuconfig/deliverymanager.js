@@ -24,12 +24,12 @@ export const deliverymanager = {
       text: "Danh sách các chuyến giao hàng",
       child: [],
     },
-    // {
-    //   id: "MENU_WMSv2_DELIVERY_MANAGER.APPROVAL_ORDERS",
-    //   path: "/delivery-manager/orders",
-    //   isPublic: false,
-    //   text: "Danh sách các đơn hàng cần xử lý",
-    //   child: [],
-    // }
+    {
+      id: "MENU_WMSv2_DELIVERY_MANAGER.ITEMS",
+      path: "/delivery-manager/items",
+      isPublic: false,
+      text: "Danh sách các sản phẩm cần xử lý",
+      child: [],
+    }
   ],
 };

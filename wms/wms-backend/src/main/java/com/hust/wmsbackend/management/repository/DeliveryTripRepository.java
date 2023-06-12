@@ -6,14 +6,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.UUID;
 
 @Repository
 public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, String> {
 
-//    List<DeliveryTrip> findAllByDeletedIsFalse();
+    List<DeliveryTrip> findAllByIsDeletedIsFalseOrderByCreatedStampDesc();
 
-    List<DeliveryTrip> findAllByShipmentIdAndIsDeletedIsFalse(String shipmentId);
+    List<DeliveryTrip> findAllByShipmentIdAndIsDeletedIsFalseOrderByCreatedStampDesc(String shipmentId);
 
     @Query(value = "select dt.delivery_trip_id  , dt.vehicle_id  , dt.delivery_person_id  , " +
         "dt.distance  , dt.total_weight  , dt.total_locations , dt.last_updated_stamp  , " +

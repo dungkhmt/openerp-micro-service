@@ -32,24 +32,24 @@ public interface ProductV2Repository extends JpaRepository<Product, UUID> {
     List<ProductReportResponse> getProductsDataForReport();
 
     @Query(value = "( select cast(wri.product_id as varchar) as productId , wp.\"name\" as productName , wri.quantity as quantity , " +
-            "to_char(wri.created_stamp, 'HH:mm:SS dd-MM-yyyy')  as effectiveDateStr , 'IMPORT' as type " +
+            "to_char(wri.created_stamp, 'HH24:mm:SS dd-MM-yyyy')  as effectiveDateStr , 'IMPORT' as type " +
             "from wms_receipt_item wri  " +
             "join wms_product wp on wri.product_id = wp.product_id ) " +
             "union all " +
             "( select cast(wp.product_id as varchar) as productId , wp.\"name\" as productName , wiid.quantity_on_hand_diff as quantity , " +
-            "to_char(wiid.effective_date, 'HH:mm:SS dd-MM-yyyy')  as effectiveDateStr , 'EXPORT' as type " +
+            "to_char(wiid.effective_date, 'HH24:mm:SS dd-MM-yyyy')  as effectiveDateStr , 'EXPORT' as type " +
             "from wms_inventory_item_detail wiid  " +
             "join wms_inventory_item wii on wiid.inventory_item_id = wii.inventory_item_id " +
             "join wms_product wp on wp.product_id = wii.product_id ) " +
             "union all " +
             "( select cast(wp.product_id as varchar) as productId , wp.\"name\" as productName , waoi.quantity as quantity , " +
-            "to_char(waoi.created_stamp, 'HH:mm:SS dd-MM-yyyy')  as effectiveDateStr , 'ASSIGNED' as type " +
+            "to_char(waoi.created_stamp, 'HH24:mm:SS dd-MM-yyyy')  as effectiveDateStr , 'ASSIGNED' as type " +
             "from wms_assigned_order_item waoi  " +
             "join wms_product wp on wp.product_id = waoi.product_id " +
             "where waoi.quantity > 0 ) " +
             "union all " +
             "( select cast(wp.product_id as varchar) as productId , wp.\"name\" as productName , wdti.quantity as quantity , " +
-            "to_char(wdti.created_stamp, 'HH:mm:SS dd-MM-yyyy')  as effectiveDateStr ,  " +
+            "to_char(wdti.created_stamp, 'HH24:mm:SS dd-MM-yyyy')  as effectiveDateStr ,  " +
             "case when wdti.status = 'CREATED' then 'WAIT_DELIVERY' " +
             "else 'DELIVERING' end as type " +
             "from wms_delivery_trip_item wdti  " +

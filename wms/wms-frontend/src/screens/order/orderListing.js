@@ -7,6 +7,8 @@ import { useRouteMatch } from "react-router-dom";
 import { convertToVNDFormat } from "screens/utils/utils";
 import LoadingScreen from "components/common/loading/loading";
 import withScreenSecurity from "components/common/withScreenSecurity";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
+import { Box, Tab } from "@mui/material";
 
 const AdminOrderListing = () => {
   const { path } = useRouteMatch();
@@ -14,6 +16,12 @@ const AdminOrderListing = () => {
   const [orderTableData, setOrderTableData] = useState([]);
   const [processedOrderTableData, setProcessedOrderTableData] = useState([]);
   const [isLoading, setLoading] = useState(true);
+
+  const [value, setValue] = useState('1');
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  }
 
   useEffect(() => {
     async function fetchData() {
@@ -61,34 +69,45 @@ const AdminOrderListing = () => {
   return (
     isLoading ? <LoadingScreen /> :
     <Fragment>
-      <StandardTable 
-        title="Danh sách đơn xuất hàng cần xử lý"
-        columns={columns}
-        data={orderTableData}
-        hideCommandBar={true}
-        options={{
-          selection: false,
-          pageSize: 5,
-          search: true,
-          sorting: true,
-        }}
-        onRowClick={(event, rowData) => {
-          window.location.href = `${path}/${rowData.orderId}`;
-        }}
-      />
-
-      <StandardTable 
-        title="Danh sách đơn xuất hàng đã xử lý"
-        columns={columns}
-        data={processedOrderTableData}
-        hideCommandBar={true}
-        options={{
-          selection: false,
-          pageSize: 5,
-          search: true,
-          sorting: true,
-        }}
-      />
+      <TabContext value={value}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <TabList onChange={(event, newValue) => setValue(newValue)} >
+            <Tab label="Đơn xuất hàng cần xử lý" value="1" />
+            <Tab label="Đơn xuất hàng đã xử lý" value="2" />
+          </TabList>
+        </Box>
+        <TabPanel value="1">
+          <StandardTable 
+            title="Danh sách đơn xuất hàng cần xử lý"
+            columns={columns}
+            data={orderTableData}
+            hideCommandBar={true}
+            options={{
+              selection: false,
+              pageSize: 5,
+              search: true,
+              sorting: true,
+            }}
+            onRowClick={(event, rowData) => {
+              window.location.href = `${path}/${rowData.orderId}`;
+            }}
+          />
+        </TabPanel>
+        <TabPanel value="2">
+          <StandardTable 
+            title="Danh sách đơn xuất hàng đã xử lý"
+            columns={columns}
+            data={processedOrderTableData}
+            hideCommandBar={true}
+            options={{
+              selection: false,
+              pageSize: 5,
+              search: true,
+              sorting: true,
+            }}
+          />
+        </TabPanel>
+      </TabContext>
     </Fragment>
   );
 }
