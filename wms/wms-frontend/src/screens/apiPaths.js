@@ -35,5 +35,8 @@ export const API_PATH = {
   PRODUCT_CATEGORY_MONTHLY_REPORT: "/wmsv2/report/product-category-monthly",
   PRODUCTS_REPORT: "/wmsv2/report/products",
   PRODUCT_HISTORY_REPORT: "/wmsv2/report/products-history",
-  SYNC_USER: "/user"
+  SYNC_USER: "/user",
+  RECEIPT_BILL_BY_RECEIPT_ID: "/wmsv2/admin/receipt-bill/receipt",
+  RECEIPT_BILL_BY_RECEIPT_BILL_ID: "/wmsv2/admin/receipt-bill/receipt-bill",
+  ALL_RECEIPT_BILLS: "/wmsv2/admin/receipt-bill",
 }

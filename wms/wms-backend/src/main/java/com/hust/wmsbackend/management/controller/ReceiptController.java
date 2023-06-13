@@ -2,6 +2,7 @@ package com.hust.wmsbackend.management.controller;
 
 import com.hust.wmsbackend.management.entity.Receipt;
 import com.hust.wmsbackend.management.model.ReceiptRequest;
+import com.hust.wmsbackend.management.model.response.ReceiptBillWithItems;
 import com.hust.wmsbackend.management.model.response.ReceiptGeneralResponse;
 import com.hust.wmsbackend.management.service.ReceiptService;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.ws.Response;
 import java.security.Principal;
 import java.util.List;
 

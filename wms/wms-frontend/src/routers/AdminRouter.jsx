@@ -7,6 +7,7 @@ import ProductDetail from "screens/product/productDetail";
 import ListWarehouse from "screens/warehouse/listWarehouses";
 import AdminOrderListing from "screens/order/orderListing";
 import AdminOrderDetail from "screens/order/adminOrderDetail";
+import ReceiptBilLDetail from "screens/receipt/receiptBillDetail";
 
 export default function AdminRouter () {
   let { path } = useRouteMatch();
@@ -62,6 +63,11 @@ export default function AdminRouter () {
           component={AdminOrderDetail}
           exact
           path={`${path}/orders/:id`}
+        ></Route>
+        <Route
+          component={ReceiptBilLDetail}
+          exact
+          path={`${path}/receipt-bill/:id`}
         ></Route>
       </Switch>
     </div>

@@ -2,10 +2,7 @@ package com.hust.wmsbackend.management.service;
 
 import com.hust.wmsbackend.management.entity.Receipt;
 import com.hust.wmsbackend.management.model.ReceiptRequest;
-import com.hust.wmsbackend.management.model.response.ProcessedItemModel;
-import com.hust.wmsbackend.management.model.response.ReceiptGeneralResponse;
-import com.hust.wmsbackend.management.model.response.ReceiptProcessResponse;
-import com.hust.wmsbackend.management.model.response.ReceiptRequestResponse;
+import com.hust.wmsbackend.management.model.response.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -30,5 +27,7 @@ public interface ReceiptService {
 
     ReceiptProcessResponse getForProcessingById(String receiptId);
 
-    boolean process(String receiptId, List<ProcessedItemModel> items, boolean isDone);
+    boolean process(String receiptId, List<ProcessedItemModel> items, boolean isDone, Principal principal);
+
+    List<ReceiptBillWithItems> getReceiptBills(String receiptId);
 }

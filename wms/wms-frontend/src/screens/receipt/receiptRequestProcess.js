@@ -181,6 +181,7 @@ const ReceiptRequestProcess = (props) => {
   const { path } = useRouteMatch();
   const [isLoading, setLoading] = useState(true);
   const [tabValue, setTabValue] = useState(isDoneReceipt ? '3' : '1');
+  const [receiptBills, setReceiptBills] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -211,6 +212,14 @@ const ReceiptRequestProcess = (props) => {
           setWarehouseList(res.data);
         }
       );
+
+      await request(
+        'get',
+        `${API_PATH.RECEIPT_BILL_BY_RECEIPT_ID}/${receiptId}`,
+        (res) => {
+          setReceiptBills(res.data);
+        }
+      )
 
       setLoading(false);
     }
@@ -396,6 +405,7 @@ const ReceiptRequestProcess = (props) => {
                             <Tab label="Hàng hóa đang xử lý" value="2" />
                           }
                           <Tab label="Hàng hóa đã xử lý" value="3" />
+                          <Tab label="Phiếu nhập hàng" value="4" />
                         </TabList>
                       </Box>
                       {
@@ -479,6 +489,27 @@ const ReceiptRequestProcess = (props) => {
                             search: true,
                             sorting: true,
                           }}
+                        />
+                      </TabPanel>
+                      <TabPanel value='4'>
+                        <StandardTable
+                          hideCommandBar={true}
+                          columns={[
+                            { title: "Mã phiếu", field: "receiptBillId" }, 
+                            { title: "Tổng giá trị", field: "totalPrice" },
+                            { title: "Ngày tạo", field: "createdStampStr" }
+                          ]}
+                          title="Danh sách phiếu nhập hàng"
+                          data={receiptBills}
+                          options={{
+                            selection: false,
+                            pageSize: 5,
+                            search: true,
+                            sorting: true,
+                          }}
+                          onRowClick={ (event, rowData) => {
+                            window.location.href = `${path.replace('process-receipts', 'receipt-bill').replace(':id', '').substring(0, path.lastIndexOf('/'))}/${rowData.receiptBillId}`;
+                          } }
                         />
                       </TabPanel>
                     </TabContext>
