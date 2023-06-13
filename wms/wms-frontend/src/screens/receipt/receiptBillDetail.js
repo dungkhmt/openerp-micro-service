@@ -1,4 +1,4 @@
-import { Box, Grid, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { request } from "api";
 import StandardTable from "components/StandardTable";
 import LoadingScreen from "components/common/loading/loading";
@@ -7,6 +7,133 @@ import { Fragment, useEffect, useState } from "react";
 import { API_PATH } from "screens/apiPaths";
 import useStyles from "screens/styles";
 import { convertToVNDFormat } from "screens/utils/utils";
+import { pdf, Page, Text, View, Document, Font } from '@react-pdf/renderer';
+import { saveAs } from "file-saver";
+import { StyleSheet } from "@react-pdf/renderer";
+
+Font.register({
+  family: "Roboto",
+  src:
+    "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-light-webfont.ttf"
+});
+
+const ReceiptBillDocument = ( { receiptBillInfo } ) => {
+  const styles = StyleSheet.create({
+    page: {
+      fontFamily: "Roboto",
+      fontSize: 18
+    },
+    centerView: {
+      textAlign: 'center',
+      marginTop: 20,
+      fontSize: 24
+    },
+    wrapView: {
+      justifyContent: 'space-around',
+      flex: '1',
+      flexDirection: 'row'
+    },
+    view: {
+      marginLeft: 15,
+      marginTop: 10,
+      fontSize: 18
+    },
+    table: { 
+      marginTop: 5,
+      display: "table", 
+      width: "auto"
+    }, 
+    tableRow: { 
+      margin: "auto", 
+      flexDirection: "row",
+    }, 
+    tableCol: { 
+      width: "15%", 
+      borderStyle: "solid", 
+      borderWidth: 1, 
+      borderLeftWidth: 1, 
+      borderTopWidth: 1 
+    }, 
+    tableCell: { 
+      margin: "auto", 
+      marginTop: 5, 
+      fontSize: 18 
+    }
+  });
+
+  return <Document>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.centerView}>
+        <Text>Phiếu xuất kho</Text>
+      </View>
+      <View style={styles.view}>
+        <Text>Mã phiếu: {receiptBillInfo.receiptBillId}</Text>
+      </View>
+      <View style={styles.view}>
+        <Text>Tổng giá trị hàng: {convertToVNDFormat(receiptBillInfo.totalPrice)}</Text>
+      </View>
+      <View style={styles.view}>
+        <Text>Ngày tạo phiếu: {receiptBillInfo.createdStampStr}</Text>
+      </View>
+      <View style={styles.view}>
+        <Text>Ngày cập nhật: {receiptBillInfo.lastUpdateStampStr}</Text>
+      </View>
+      <View style={styles.view}>
+        <Text>Người xử lý: {receiptBillInfo.createdBy}</Text>
+      </View>
+      <View style={styles.view}>
+        <Text>Danh sách sản phẩm:</Text>
+      </View>
+      <View style={styles.table}> 
+        <View style={styles.tableRow}> 
+          <View style={styles.tableCol}> 
+            <Text style={styles.tableCell}>Sản phẩm</Text> 
+          </View> 
+          <View style={styles.tableCol}> 
+            <Text style={styles.tableCell}>Số lượng</Text> 
+          </View> 
+          <View style={styles.tableCol}> 
+            <Text style={styles.tableCell}>Kho nhận</Text> 
+          </View> 
+          <View style={styles.tableCol}> 
+            <Text style={styles.tableCell}>Kệ hàng</Text> 
+          </View> 
+          <View style={styles.tableCol}> 
+            <Text style={styles.tableCell}>Số lô</Text> 
+          </View> 
+          <View style={styles.tableCol}> 
+            <Text style={styles.tableCell}>Giá nhập hàng</Text> 
+          </View> 
+        </View>
+        {
+          receiptBillInfo?.processedItems != null && receiptBillInfo?.processedItems.length > 0 &&
+          receiptBillInfo?.processedItems.map(item =>
+            <View style={styles.tableRow}> 
+              <View style={styles.tableCol}> 
+                <Text style={styles.tableCell}>{item.productName}</Text> 
+              </View> 
+              <View style={styles.tableCol}> 
+                <Text style={styles.tableCell}>{item.quantity}</Text> 
+              </View> 
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{item.warehouseName}</Text> 
+              </View>
+              <View style={styles.tableCol}> 
+                <Text style={styles.tableCell}>{item.bayCode}</Text> 
+              </View> 
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{item.lotId}</Text> 
+              </View>
+              <View style={styles.tableCol}> 
+                <Text style={styles.tableCell}>{convertToVNDFormat(item.importPrice)}</Text> 
+              </View> 
+            </View> 
+          )
+        }
+      </View>
+    </Page>
+  </Document>
+}
 
 const ReceiptBilLDetail = ( props ) => {
 
@@ -30,6 +157,12 @@ const ReceiptBilLDetail = ( props ) => {
 
     fetchData();
   }, []);
+
+  const exportPDF = async () => {
+    const blob = await pdf(<ReceiptBillDocument receiptBillInfo={receiptBillInfo} />).toBlob();
+    saveAs(blob, `${receiptBillId}.pdf`);
+  }
+
   return (
     loading ? <LoadingScreen /> : 
     <Fragment>
@@ -39,6 +172,9 @@ const ReceiptBilLDetail = ( props ) => {
             <Typography variant="h5">
               Thông tin phiếu nhập hàng
             </Typography>
+          </Grid>
+          <Grid className={classes.buttonWrap}>
+            <Button variant="contained" className={classes.addButton} onClick={exportPDF}>Tải xuống phiếu</Button>
           </Grid>
         </Grid>
       </Box>
@@ -98,13 +234,13 @@ const ReceiptBilLDetail = ( props ) => {
                     </Grid>
                     <Grid item xs={6}>
                       <Box className={classes.labelInput}>
-                        Ngày cập nhật cuối</Box>
+                        Ngày cập nhật</Box>
                         <TextField
                           fullWidth
                           variant="outlined"
                           size="small"
                           name="receiptName"
-                          value={receiptBillInfo?.createdStampStr}
+                          value={receiptBillInfo?.lastUpdateStampStr}
                           InputProps={{
                             readOnly: true,
                           }}
@@ -143,7 +279,6 @@ const ReceiptBilLDetail = ( props ) => {
             </Grid>
           </Box>
         </Box>
-
     </Fragment>
   )
 }
