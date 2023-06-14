@@ -18,6 +18,6 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Long>  {
     @Query(value = "SELECT *\n" +
             "FROM scm_purchase_order\n" +
             "where EXTRACT(YEAR FROM created_date) = :year and\n" +
-            "       EXTRACT(MONTH FROM created_date) = :month)\n", nativeQuery = true)
+            "       EXTRACT(MONTH FROM created_date) = :month\n", nativeQuery = true)
     List<PurchaseOrder> getOrderByMonth(int month, int year);
 }

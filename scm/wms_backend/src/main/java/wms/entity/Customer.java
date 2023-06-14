@@ -33,6 +33,9 @@ public class Customer extends BaseEntity implements Serializable {
     @Column(name = "address")
     private String address;
 
+    @Column(name = "province")
+    private String province;
+
     @Column(name = "status")
     private String status;
 
