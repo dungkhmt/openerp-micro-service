@@ -93,6 +93,9 @@ VALUES('MENU_WMSv2_DELIVERY_MANAGER.SHIPMENTS', 'WMS_DELIVERY_MANAGER', null, no
 INSERT INTO public.entity_authorization
 (id, role_id, last_updated, created, description)
 VALUES('MENU_WMSv2_DELIVERY_MANAGER.DELIVERY_TRIPS', 'WMS_DELIVERY_MANAGER', null, now(), null);
+INSERT INTO public.entity_authorization
+(id, role_id, last_updated, created, description)
+VALUES('MENU_WMSv2_DELIVERY_MANAGER.ITEMSS', 'WMS_DELIVERY_MANAGER', null, now(), null);
     -- Xem màn hình quản lý nhân viên giao hàng
 INSERT INTO public.entity_authorization
 (id, role_id, last_updated, created, description)
@@ -198,6 +201,10 @@ VALUES('MENU_WMSv2_CUSTOMER.PRODUCTS', 'ADMIN', null, now(), null);
 INSERT INTO public.entity_authorization
 (id, role_id, last_updated, created, description)
 VALUES('MENU_WMSv2_CUSTOMER.CART', 'ADMIN', null, now(), null);
+
+INSERT INTO public.entity_authorization
+(id, role_id, last_updated, created, description)
+VALUES('MENU_WMSv2_DELIVERY_MANAGER.ITEMS', 'ADMIN', null, now(), null);
 -- xem màn hình danh sách kho
 INSERT INTO public.entity_authorization
 (id, role_id, last_updated, created, description)

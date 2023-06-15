@@ -240,7 +240,8 @@ create table wms_delivery_trip
     is_deleted boolean default false,
     shipment_id varchar(50),
     warehouse_id uuid,
-    status varchar(50)
+    status varchar(50),
+    description varchar(250)
 );
 
 create table wms_delivery_trip_item

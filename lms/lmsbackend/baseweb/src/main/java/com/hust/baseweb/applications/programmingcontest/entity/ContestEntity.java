@@ -18,6 +18,7 @@ import java.util.List;
 //@Table(name = "contest")
 @Table(name = "contest_new")
 public class ContestEntity implements Serializable {
+    private static final long serialVersionUID = 3487495895819802L;
 
     public static final String CONTEST_STATUS_CREATED = "CREATED";
     public static final String CONTEST_STATUS_OPEN = "OPEN";

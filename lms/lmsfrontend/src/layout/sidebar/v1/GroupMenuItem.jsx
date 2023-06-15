@@ -1,12 +1,20 @@
-import {Downgraded} from "@hookstate/core";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import {Box, Collapse, Icon, List, ListItem, ListItemText} from "@mui/material";
-import {useEffect, useState} from "react";
-import {useLocation} from "react-router-dom";
-import MenuItem, {hexToRgb} from "./MenuItem";
-import {whiteColor} from "../../../assets/jss/material-dashboard-react";
-import {useMenuState} from "../../../state/MenuState";
-import {menuIconMap} from "../../../config/menuconfig";
+import { Downgraded } from "@hookstate/core";
+import {
+  Collapse,
+  Icon,
+  List,
+  ListItem,
+  ListItemText,
+} from "@material-ui/core";
+import makeStyles from "@material-ui/core/styles/makeStyles";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import classNames from "classnames";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { whiteColor } from "../../../assets/jss/material-dashboard-react";
+import { menuIconMap } from "../../../config/menuconfig";
+import { useMenuState } from "../../../state/MenuState";
+import MenuItem, { hexToRgb } from "./MenuItem";
 
 export const menuItemBaseStyle = (theme) => ({
   whiteFont: {
@@ -31,9 +39,7 @@ export const menuItemBaseStyle = (theme) => ({
     float: "left",
     marginRight: "15px",
     textAlign: "center",
-    // verticalAlign: "middle",
-    display: "flex",
-    alignItems: "center",
+    verticalAlign: "middle",
     color: "rgba(" + hexToRgb(whiteColor) + ", 0.8)",
   },
   menuItemText: {
@@ -44,7 +50,7 @@ export const menuItemBaseStyle = (theme) => ({
   },
 });
 
-const styles = {
+const useStyles = makeStyles((theme) => ({
   childSelected: {
     "&.MuiListItem-button": {
       backgroundColor: "rgba(200, 200, 200, 0.2)",
@@ -52,24 +58,24 @@ const styles = {
   },
   iconExpand: { transform: "rotate(-180deg)", transition: "0.3s" },
   iconCollapse: { transition: "0.3s" },
-  whiteFont: (theme) => ({
+  whiteFont: {
     ...menuItemBaseStyle(theme).whiteFont,
-  }),
-  menuItemIcon: (theme) => ({
+  },
+  menuItemIcon: {
     ...menuItemBaseStyle(theme).menuItemIcon,
-  }),
-  menuItemText: (theme) => ({
+  },
+  menuItemText: {
     ...menuItemBaseStyle(theme).menuItemText,
-  }),
-  menuItem: (theme) => ({
+  },
+  menuItem: {
     ...menuItemBaseStyle(theme).menuItem,
     color: whiteColor,
 
     "&.MuiListItem-button:hover": {
       backgroundColor: "rgba(200, 200, 200, 0.2)",
     },
-  }),
-};
+  },
+}));
 
 const activeRoute = (route) => {
   if (route === "/" || route === "") {
@@ -90,6 +96,7 @@ const findFirstElementStartingWith = (str, set) => {
 };
 
 function GroupMenuItem(props) {
+  const classes = useStyles();
   const { color, group } = props;
   const location = useLocation();
 
@@ -147,16 +154,14 @@ function GroupMenuItem(props) {
     }
 
     return (
-      <Box sx={{paddingLeft: "6px"}}>
-        <MenuItem
-          key={childMenuItem.text}
-          menuItem={childMenuItem}
-          color={color}
-          selected={selected[0]}
-          menu={permittedFunctions}
-          icon
-        />
-      </Box>
+      <MenuItem
+        key={childMenuItem.text}
+        menuItem={childMenuItem}
+        color={color}
+        selected={selected[0]}
+        menu={permittedFunctions}
+        icon
+      />
     );
   } else
     return (
@@ -164,22 +169,15 @@ function GroupMenuItem(props) {
         <ListItem
           button
           key={group.text}
-          sx={(theme) => ({
-            ...styles.menuItem(theme),
-            ...(hasChildSelected ? styles.childSelected : {}),
+          className={classNames(classes.menuItem, {
+            [classes.childSelected]: hasChildSelected,
           })}
           onClick={() => setExpanded(!expanded)}
         >
           {/* Icon */}
           <Icon
-            sx={(theme) => ({
-              ...styles.menuItemIcon(theme),
-              ...styles.whiteFont(theme),
-            })}
-            style={{
-              marginLeft: 3,
-              marginRight: 20,
-            }}
+            className={classNames(classes.menuItemIcon, classes.whiteFont)}
+            style={{ marginLeft: 3, marginRight: 27 }}
           >
             {menuIconMap.get(group.icon)}
           </Icon>
@@ -187,28 +185,16 @@ function GroupMenuItem(props) {
           {/* Label */}
           <ListItemText
             primary={group.text}
-            sx={(theme) => ({
-              ...styles.menuItemText(theme),
-              ...styles.whiteFont(theme),
-
-              // limited lines text
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            })}
+            className={classNames(classes.menuItemText, classes.whiteFont)}
             disableTypography={true}
           />
 
           <Icon
-            sx={(theme) => ({
-              ...styles.menuItemIcon(theme),
-              ...styles.whiteFont(theme),
-              ...(expanded ? styles.iconExpand : styles.iconCollapse),
+            className={classNames(classes.menuItemIcon, classes.whiteFont, {
+              [classes.iconExpand]: expanded,
+              [classes.iconCollapse]: !expanded,
             })}
-            style={{
-              marginRight: 0,
-              marginLeft: 6,
-            }}
+            style={{ marginRight: 0, marginLeft: 6 }}
           >
             <ArrowDropDownIcon />
           </Icon>

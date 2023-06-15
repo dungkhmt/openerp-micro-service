@@ -13,6 +13,7 @@ public class CustomerDTO {
     private String phone;
     @NotBlank(message = "Dia chi khong duoc de trong")
     private String address;
+    private String province;
     private String status;
 //    @NotBlank(message = "Ma kho hang khong duoc de trong")
 //    private String facilityCode;

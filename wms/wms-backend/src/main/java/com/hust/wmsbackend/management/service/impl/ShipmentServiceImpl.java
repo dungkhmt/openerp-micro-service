@@ -20,7 +20,6 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,7 +47,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     public List<ShipmentDTO> getAllShipments(Principal principal) {
-        List<Shipment> shipments =  shipmentRepository.findAllByIsDeletedIsFalse();
+        List<Shipment> shipments =  shipmentRepository.findAllByIsDeletedIsFalseOrderByCreatedStampDesc();
         return shipments.stream().map(shipment -> ShipmentDTO.builder()
             .shipmentId(shipment.getShipmentId())
             .lastUpdatedStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, shipment.getLastUpdatedStamp()))
@@ -66,24 +65,14 @@ public class ShipmentServiceImpl implements ShipmentService {
             return null;
         }
         Shipment shipment = shipmentOpt.get();
-        List<DeliveryTrip> trips = deliveryTripRepository.findAllByShipmentIdAndIsDeletedIsFalse(shipmentId);
+        List<DeliveryTrip> trips = deliveryTripRepository.findAllByShipmentIdAndIsDeletedIsFalseOrderByCreatedStampDesc(shipmentId);
         List<DeliveryTripDTO> tripDTOS = new ArrayList<>();
         for (DeliveryTrip trip : trips) {
             Optional<DeliveryPerson> person = Optional.empty();
             if (trip.getDeliveryPersonId() != null) {
                 person = deliveryPersonRepository.findById(trip.getDeliveryPersonId());
             }
-            DeliveryTripDTO dto = DeliveryTripDTO.builder()
-                .deliveryTripId(trip.getDeliveryTripId())
-                .vehicleId(trip.getVehicleId())
-                .deliveryPersonId(trip.getDeliveryPersonId())
-                .distance(trip.getDistance())
-                .totalWeight(trip.getTotalWeight())
-                .totalLocations(trip.getTotalLocations())
-                .lastUpdatedStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, trip.getLastUpdatedStamp()))
-                .createdBy(trip.getCreatedBy())
-                .createdStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, trip.getCreatedStamp()))
-                .build();
+            DeliveryTripDTO dto = new DeliveryTripDTO(trip);
             if (person.isPresent()) {
                 dto.setDeliveryPersonName(person.get().getFullName());
             } else {
@@ -93,6 +82,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         }
         return ShipmentDTO.builder().shipmentId(shipment.getShipmentId())
             .expectedDeliveryStamp(shipment.getExpectedDeliveryStamp())
+            .expectedDeliveryStr(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, shipment.getExpectedDeliveryStamp()))
             .createdStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, shipment.getCreatedStamp()))
             .createdBy(shipment.getCreatedBy())
             .lastUpdatedStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, shipment.getLastUpdatedStamp()))

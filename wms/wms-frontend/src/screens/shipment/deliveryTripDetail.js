@@ -42,6 +42,8 @@ const DeliveryTripDetail = ( props ) => {
 
   const [isLoading, setLoading] = useState(true);
 
+  const [description, setDescription] = useState(null);
+
   // chọn danh sách sản phẩm (phải cùng một warehouse)
   // nếu danh sách sản phẩm của delivery trip khác rỗng -> không thể update warehouse
 
@@ -64,6 +66,7 @@ const DeliveryTripDetail = ( props ) => {
           setMaxSequence(res.data.totalLocations);
           setSelectedWarehouseId(res.data.warehouseId);
           setDeliveryItemsTableData(res.data.items);
+          setDescription(res.data.description);
           if (res.data.deliveryTripStatusCode != 'CREATED') {
             setUpdatable(false);
           }
@@ -173,6 +176,7 @@ const DeliveryTripDetail = ( props ) => {
   }
 
   const saveDeliveryTripButtonHandle = () => {
+    console.log("Description => ", description);
     request(
       "put",
       API_PATH.DELIVERY_MANAGER_DELIVERY_TRIP,
@@ -193,7 +197,8 @@ const DeliveryTripDetail = ( props ) => {
         totalLocations: maxSequence,
         items: [
           ...deliveryItemsTableData
-        ]
+        ],
+        description: description
       }
     )
   }
@@ -517,6 +522,21 @@ const DeliveryTripDetail = ( props ) => {
                 InputProps={{
                   readOnly: true,
                 }}
+              />
+            </Box>
+          </Grid>
+
+          <Grid item xs={6}>
+            <Box className={classes.inputWrap}>
+              <Box className={classes.labelInput}>
+                Ghi chú 
+              </Box>
+              <TextField
+                fullWidth
+                variant="outlined"
+                size="small"
+                value={description}
+                onChange={(event) => {setDescription(event.target.value);}}
               />
             </Box>
           </Grid>

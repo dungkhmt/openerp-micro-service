@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import wms.dto.shipment.ReturnShipmentItemDTO;
+import wms.entity.Facility;
 import wms.entity.ShipmentItem;
 
 import java.util.List;
@@ -26,4 +27,10 @@ public interface ShipmentItemRepo extends JpaRepository<ShipmentItem, Long> {
 
     @Query(value = "select * from scm_shipment_item where delivery_trip_code = :tripCode", nativeQuery = true)
     List<ShipmentItem> getShipmentItemOfATrip(String tripCode);
+
+    @Query(value = "SELECT *\n" +
+            "FROM scm_shipment_item\n" +
+            "where EXTRACT(YEAR FROM created_date) = :year and\n" +
+            "       EXTRACT(MONTH FROM created_date) = :month", nativeQuery = true)
+    List<ShipmentItem> getShipmentItemsOfMonth(int month, int year);
 }

@@ -40,11 +40,11 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderGeneralResponse> getAllOrdersByStatus(String[] orderStatusStr) {
         List<SaleOrderHeader> orders;
         if (orderStatusStr == null) {
-            orders = saleOrderHeaderRepository.findAll();
+            orders = saleOrderHeaderRepository.findAllByOrderByOrderDateDesc();
         } else {
             List<OrderStatus> orderStatuses = Arrays.stream(orderStatusStr).map(OrderStatus::findByCode)
                                                     .collect(Collectors.toList());
-            orders = saleOrderHeaderRepository.findAllByStatusIn(orderStatuses);
+            orders = saleOrderHeaderRepository.findAllByStatusInOrderByOrderDateDesc(orderStatuses);
         }
         return orders
             .stream()

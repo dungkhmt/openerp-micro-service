@@ -23,6 +23,8 @@
     "date-fns": "^2.29.3",
     "event-source-polyfill": "^1.0.24",
     "framer-motion": "^2.9.5",
+    "highcharts": "^11.1.0",
+    "highcharts-react-official": "^3.2.0",
     "keycloak-js": "^21.0.2",
     "leaflet": "^1.9.3",
     "leaflet-routing-machine": "^3.2.12",

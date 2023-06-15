@@ -115,11 +115,11 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
 
     }
     @Override
-    public ReturnPaginationDTO<Facility> getAllFacilities(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
+    public ReturnPaginationDTO<Facility> getAllFacilities(int page, int pageSize, String sortField, boolean isSortAsc, String facilityName, String status, String createdBy, String managedBy, String textSearch) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
-        Page<Facility> facilities = facilityRepo.search(pageable);
+        Page<Facility> facilities = facilityRepo.search(pageable, facilityName, status, createdBy, managedBy, textSearch);
         return getPaginationResult(facilities.getContent(), page, facilities.getTotalPages(), facilities.getTotalElements());
     }
 

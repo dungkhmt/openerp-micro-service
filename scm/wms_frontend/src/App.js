@@ -44,6 +44,7 @@ export const theme = createTheme(
       },
     },
     palette: {
+      mode: "light",
       primary: {
         main: AppColors.primary,
         light: AppColors.primary,
@@ -117,7 +118,7 @@ export const queryClient = new QueryClient({
   },
 });
 
-function App() { 
+function App() {
   // TODO: Consider remove this logic!
   const logout = () => {
     menuState.permittedFunctions.set(new Set());

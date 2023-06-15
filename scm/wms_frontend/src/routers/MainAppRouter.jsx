@@ -6,6 +6,7 @@ import { Route, Switch, useLocation } from "react-router-dom";
 import { useNotificationState } from "state/NotificationState";
 import NotFound from "views/errors/NotFound";
 import TestComponent from "../test/TestComponent";
+import DashBoard from "../views/dashboard/Dashboard";
 import CategoryRouter from "./CategoryRouter";
 import DeliveryRouter from "./DeliveryRouter";
 import PrivateRoute from "./PrivateRoute";
@@ -38,7 +39,7 @@ function MainAppRouter(props) {
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
-          <Route component={() => <></>} exact path="/" />
+          <Route component={DashBoard} exact path="/" />
           <Route component={TestComponent} exact path="/test" />
           <Route component={CategoryRouter} path="/category" />
           <PrivateRoute component={SellinRouter} path="/sellin" />

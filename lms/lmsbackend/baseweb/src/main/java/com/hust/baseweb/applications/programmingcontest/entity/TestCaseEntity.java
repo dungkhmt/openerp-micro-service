@@ -15,6 +15,7 @@ import java.util.UUID;
 //@Table(name = "test_case")
 @Table(name = "test_case_new")
 public class TestCaseEntity implements Serializable {
+    private static final long serialVersionUID = 3487495895819801L;
 
     public static final String STATUS_DISABLED = "DISABLED";
     public static final String STATUS_ENABLED = "ENABLED";

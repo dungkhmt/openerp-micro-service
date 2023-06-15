@@ -34,7 +34,7 @@ public class CustomContestSubmissionListener extends BaseRabbitListener {
     }
 
     @Override
-    @RabbitListener(queues = JUDGE_CUSTOM_PROBLEM_QUEUE)
+//    @RabbitListener(queues = JUDGE_CUSTOM_PROBLEM_QUEUE) --all listeners for programming contest are moved to coderunnerservice
     public void onMessage(
         Message message, String messageBody, Channel channel,
         @Header(required = false, name = "x-delivery-count") Integer deliveryCount

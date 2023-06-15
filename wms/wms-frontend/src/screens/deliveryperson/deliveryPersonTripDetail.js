@@ -333,6 +333,23 @@ const DeliveryPersonTripDetail = ( props ) => {
               />
             </Box>
           </Grid>
+
+          <Grid item xs={6}>
+            <Box className={classes.inputWrap}>
+              <Box className={classes.labelInput}>
+                Ghi chú 
+              </Box>
+              <TextField
+                fullWidth
+                variant="outlined"
+                size="small"
+                value={tripInfo?.description}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+            </Box>
+          </Grid>
         </Grid>
       </Box>
 
