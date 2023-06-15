@@ -10,6 +10,8 @@ import {
   PlayArrow,
   Settings,
   Share,
+  Videocam,
+  VideocamOff,
   Visibility,
 } from "@mui/icons-material";
 import {
@@ -31,6 +33,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { PROGRAMMING_LANGUAGES, SOCKET_EVENTS } from "utils/constants";
 import {
+  handleTurnOffCamera,
   setIsVisibleConfigEditor,
   setIsVisibleParticipants,
   setIsVisibleShareForm,
@@ -47,7 +50,7 @@ import { useKeycloak } from "@react-keycloak/web";
 import { request } from "api";
 
 const NavBarRoom = (props) => {
-  const { socket, myPeer } = props;
+  const { socket, myPeer, localVideo } = props;
   const dispatch = useDispatch();
   const history = useHistory();
   const [loadingRunCode, setLoadingRunCode] = useState(false);
@@ -58,6 +61,7 @@ const NavBarRoom = (props) => {
     source,
     input,
     isMute,
+    isShowCamera,
     roomMaster,
     isEditCode,
   } = useSelector((state) => state.codeEditor);
@@ -69,9 +73,16 @@ const NavBarRoom = (props) => {
   };
 
   const handleLeaveRoom = () => {
-    myPeer.current.disconnect();
-    myPeer.current.destroy();
-    socket.current.disconnect();
+    if (localVideo) {
+      localVideo.getTracks().forEach((track) => track.stop());
+    }
+    if (myPeer.current) {
+      myPeer.current.disconnect();
+      myPeer.current.destroy();
+    }
+    if (socket.current) {
+      socket.current.disconnect();
+    }
     dispatch(setState({ isMute: false }));
     history.push("/code-editor/create-join-room");
   };
@@ -169,6 +180,19 @@ const NavBarRoom = (props) => {
       })
     );
   };
+  const handleShowCamera = async () => {
+    // if (socket.current) {
+    //   socket.current.emit(SOCKET_EVENTS.REQUEST_ON_OFF_MIC, {
+    //     socketId: socket.current.id,
+    //     audio: isMute,
+    //   });
+    // }
+    dispatch(
+      setState({
+        isShowCamera: !isShowCamera,
+      })
+    );
+  };
   return (
     <div>
       <ShareForm socket={socket} />
@@ -188,6 +212,7 @@ const NavBarRoom = (props) => {
                 startIcon={<PlayArrow />}
                 variant="contained"
                 color="success"
+                sx={{ lineHeight: "0" }}
                 onClick={() => {
                   handleRunCode2(input, source, getCompileLanguage(selectedLanguage));
                 }}
@@ -200,6 +225,7 @@ const NavBarRoom = (props) => {
                 size="small"
                 startIcon={<Download />}
                 variant="contained"
+                sx={{ lineHeight: "0" }}
                 onClick={() => {
                   handleDownloadSource(selectedLanguage);
                 }}
@@ -213,6 +239,7 @@ const NavBarRoom = (props) => {
                   size="small"
                   startIcon={<Share />}
                   variant="contained"
+                  sx={{ lineHeight: "0" }}
                   onClick={() => {
                     dispatch(setIsVisibleShareForm(true));
                   }}
@@ -223,9 +250,21 @@ const NavBarRoom = (props) => {
             )}
             <Grid item>
               {isEditCode ? (
-                <Chip icon={<Edit />} color="primary" variant="outlined" label="Có thể chỉnh sửa" />
+                <Chip
+                  icon={<Edit />}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  label="Có thể chỉnh sửa"
+                />
               ) : (
-                <Chip icon={<Visibility />} color="primary" variant="outlined" label="Chỉ xem" />
+                <Chip
+                  icon={<Visibility />}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  label="Chỉ xem"
+                />
               )}
             </Grid>
           </Grid>
@@ -260,11 +299,24 @@ const NavBarRoom = (props) => {
           </FormControl>
         </Grid>
         <Grid item>
-          <Grid container spacing={2} alignItems="center">
+          <Grid container spacing={0.2} alignItems="center">
             <Grid item>
-              <IconButton onClick={handleMuteMicrophone}>
-                {isMute ? <MicOff fontSize="large" /> : <Mic fontSize="large" />}
-              </IconButton>
+              <Tooltip title="Camera">
+                <IconButton onClick={handleShowCamera}>
+                  {isShowCamera ? (
+                    <Videocam fontSize="medium" />
+                  ) : (
+                    <VideocamOff fontSize="medium" />
+                  )}
+                </IconButton>
+              </Tooltip>
+            </Grid>
+            <Grid item>
+              <Tooltip title="Micro">
+                <IconButton onClick={handleMuteMicrophone}>
+                  {isMute ? <MicOff fontSize="medium" /> : <Mic fontSize="medium" />}
+                </IconButton>
+              </Tooltip>
             </Grid>
             <Grid item>
               <Tooltip title="Người tham gia">
@@ -274,7 +326,7 @@ const NavBarRoom = (props) => {
                   }}
                 >
                   <Badge badgeContent={participants.length} color="primary">
-                    <Groups fontSize="large" />
+                    <Groups fontSize="medium" />
                   </Badge>
                 </IconButton>
               </Tooltip>
@@ -282,7 +334,7 @@ const NavBarRoom = (props) => {
             <Grid item>
               <Tooltip title="Cài đặt">
                 <IconButton onClick={handleConfigEditor}>
-                  <Settings fontSize="large" />
+                  <Settings fontSize="medium" />
                 </IconButton>
               </Tooltip>
             </Grid>
@@ -292,6 +344,7 @@ const NavBarRoom = (props) => {
                 size="small"
                 startIcon={<ExitToApp />}
                 variant="contained"
+                sx={{ lineHeight: "0" }}
                 color="error"
                 onClick={() => {
                   handleLeaveRoom();

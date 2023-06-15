@@ -24,6 +24,7 @@ function getAllClients(roomId) {
         socketId,
         fullName: userSocketMap[socketId]?.fullName,
         audio: userSocketMap[socketId]?.audio,
+        peerId: userSocketMap[socketId]?.peerId,
       };
     }
   );
@@ -34,12 +35,11 @@ io.on("connection", (socket) => {
     SOCKET_IO_EVENTS.CONNECT_TO_EDITOR,
     ({ fullName, roomId, peerId }) => {
       socket.join(roomId);
-      userSocketMap[socket.id] = { fullName, roomId, peerId, audio: true };
+      userSocketMap[socket.id] = { fullName, roomId, peerId, audio: true, video: true };
       const clients = getAllClients(roomId);
 
       clients.forEach((client) => {
         let socketId = client.socketId;
-
         io.to(socketId).emit(SOCKET_IO_EVENTS.JOINED, {
           fullName: fullName,
           socketId: socket.id,
