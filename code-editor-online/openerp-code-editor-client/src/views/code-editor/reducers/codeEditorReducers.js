@@ -23,7 +23,7 @@ const initialState = {
   isEditCode: false,
 
   // participants
-  isVisibleParticipants: false,
+  isVisibleParticipants: true,
   participants: [],
 
   // setting editor
@@ -35,6 +35,10 @@ const initialState = {
 
   // mic
   isMute: false,
+  isShowCamera: true,
+
+  remoteUsers: [],
+  localVideo: null,
 };
 
 export const codeEditorSlice = createSlice({
@@ -46,6 +50,58 @@ export const codeEditorSlice = createSlice({
         ...state,
         ...action.payload,
       };
+    },
+    handleTurnOffCamera: (state, action) => {
+      state.localVideo?.getTracks().forEach((track) => track.stop());
+    },
+    handleOnOffMic: (state, action) => {
+      const { isMute } = action.payload;
+      if (state.localVideo) {
+        state.localVideo.getAudioTracks()[0].enabled = isMute;
+      }
+    },
+    handleOnOffCamera: (state, action) => {
+      const { isShowCamera } = action.payload;
+      if (state.localVideo) {
+        state.localVideo.getVideoTracks().forEach((track) => {
+          track.enabled = isShowCamera;
+        });
+      }
+    },
+    handleAddRemoteUser: (state, action) => {
+      const { media, peerId } = action.payload;
+      const remoteUser = state.remoteUsers.find((item) => item.peerId === peerId);
+      const participant = state.participants.find((item) => item.peerId === peerId);
+      if (remoteUser) {
+        remoteUser.media = media;
+        remoteUser.socketId = participant?.socketId;
+        remoteUser.fullName = participant?.fullName;
+        remoteUser.audio = participant?.audio;
+        remoteUser.video = participant?.video;
+      } else {
+        state.remoteUsers.push({
+          socketId: participant?.socketId,
+          audio: participant?.audio,
+          video: participant?.video,
+          media,
+          peerId,
+          fullName: participant?.fullName,
+        });
+      }
+    },
+    handleRemoveRemoteUser: (state, action) => {
+      const { socketId } = action.payload;
+      const index = state.remoteUsers.findIndex((item) => item.socketId === socketId);
+      if (index !== -1) {
+        state.remoteUsers.splice(index, 1);
+      }
+    },
+    handleOnOffMicRemoteUser: (state, action) => {
+      const { socketId, audio } = action.payload;
+      const remoteUser = state.remoteUsers.find((item) => item.socketId === socketId);
+      if (remoteUser) {
+        remoteUser.audio = audio;
+      }
     },
     handleOnOffMicParticipant: (state, action) => {
       const { socketId, audio } = action.payload;
@@ -97,6 +153,12 @@ export const codeEditorSlice = createSlice({
 
 export const {
   setState,
+  handleTurnOffCamera,
+  handleOnOffMic,
+  handleOnOffCamera,
+  handleAddRemoteUser,
+  handleRemoveRemoteUser,
+  handleOnOffMicRemoteUser,
   handleOnOffMicParticipant,
   setIsVisibleParticipants,
   setParticipants,
