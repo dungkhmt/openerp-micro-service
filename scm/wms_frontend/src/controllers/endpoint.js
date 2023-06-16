@@ -93,5 +93,12 @@ export const endPoint = {
   getAllUsersWithoutPagination: baseUrl + "/user/get-all-exists",
   // Dashboard
   getNewFacilityMonthly: baseUrl + "/dashboard/facility/new-facility",
+  getNewcustomerMonthly: baseUrl + "/dashboard/customer/new-customer",
   getImportedProduct: baseUrl + "/dashboard/facility/import-product-category",
+  getQuarterPurchaseProduct:
+    baseUrl + "/dashboard/sell-in/purchase-order-quarter",
+  getTopCustomerBuying: baseUrl + "/dashboard/sell-out/top-buying-customer",
+  getTripCustomerPerProvince:
+    baseUrl + "/dashboard/delivery/trip-customer-of-province",
+  getProductCategoryRate: baseUrl + "/dashboard/category/product-category-rate",
 };

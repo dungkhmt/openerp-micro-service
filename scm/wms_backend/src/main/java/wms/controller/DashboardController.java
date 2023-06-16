@@ -29,6 +29,17 @@ public class DashboardController extends BaseController{
             return response(error(ex));
         }
     }
+    @ApiOperation(value = "Thong ke khach hang tao moi moi thang trong 1 nam duong lich")
+    @GetMapping(path = "/customer/new-customer")
+    public ResponseEntity<?> getNewCustomerMonthly(
+            @RequestParam(value = "year", required = true, defaultValue = DefaultConst.NUMBER) int year
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get customers list successfully", dashBoardService.newCustomerMonthly(year)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
     @ApiOperation(value = "Thong ke ti le san pham nhap") // tuong tu voi ti le san pham xuat
     @GetMapping(path = "/facility/import-product-category")
     public ResponseEntity<?> getImportProductCategory(

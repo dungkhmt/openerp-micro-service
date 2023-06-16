@@ -12,8 +12,8 @@ const AreaChart = ({ color }) => {
   const [options, setOptions] = useState({
     chart: {
       type: "area",
-      width: 200,
-      height: 130,
+      width: 400,
+      height: 400,
     },
     title: {
       text: null,

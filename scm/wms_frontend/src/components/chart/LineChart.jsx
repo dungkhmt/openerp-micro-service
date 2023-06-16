@@ -1,10 +1,11 @@
+import { Box, CircularProgress } from "@mui/material";
 import Highcharts from "highcharts";
 import { HighchartsReact } from "highcharts-react-official";
 import { useEffect, useState } from "react";
 
-const colors = ["#F58E6A", "#FFCC7E", "#293977", "#F9FBFC", "#FFDBCC"];
+const colors = ["#F58E6A", "#FFCC7E", "#293977", "#FFDBCC", "#F9FBFC"];
 
-const LineChart = ({ categories, series }) => {
+const LineChart = ({ categories, series, loading }) => {
   const [options, setOptions] = useState({
     chart: {
       type: "spline",
@@ -64,9 +65,13 @@ const LineChart = ({ categories, series }) => {
     });
   }, [categories, series]);
   return (
-    <div>
-      <HighchartsReact highcharts={Highcharts} options={options} />
-    </div>
+    <Box>
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <HighchartsReact highcharts={Highcharts} options={options} />
+      )}
+    </Box>
   );
 };
 
