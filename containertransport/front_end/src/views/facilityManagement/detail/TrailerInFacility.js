@@ -18,11 +18,10 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { visuallyHidden } from '@mui/utils';
 import { Icon } from '@mui/material';
 import { menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
-import { getTrucks } from 'api/TruckAPI';
+import { getTraler } from 'api/TrailerAPI';
 
 const DEFAULT_ORDER = 'asc';
 const DEFAULT_ORDER_BY = 'calories';
@@ -31,57 +30,31 @@ const headCells = [
         id: 'code',
         numeric: false,
         disablePadding: false,
-        label: 'Truck Code',
-        width: '12%'
+        label: 'Trailer Code',
     },
     {
         id: 'facility',
         numeric: false,
         disablePadding: false,
         label: 'Facility Name',
-        width: '13%'
-    },
-    {
-        id: 'driver',
-        numeric: false,
-        disablePadding: false,
-        label: 'Driver Name',
-        width: '13%'
     },
     {
         id: 'status',
         numeric: false,
         disablePadding: false,
         label: 'Status',
-        width: '13%'
-    },
-    {
-        id: 'licensePlates',
-        numeric: false,
-        disablePadding: false,
-        label: 'License Plates',
-        width: '13%'
-    },
-    {
-        id: 'brand',
-        numeric: false,
-        disablePadding: false,
-        label: 'Brand',
-        width: '10%'
     },
     {
         id: 'createdAt',
         numeric: false,
         disablePadding: false,
         label: 'Created At',
-        width: '12%'
     },
     {
-        id: 'view',
+        id: 'updateAt',
         numeric: false,
         disablePadding: false,
-        label: '',
-        width: '10%'
+        label: 'Update At',
     },
 ];
 function EnhancedTableHead(props) {
@@ -117,7 +90,7 @@ function EnhancedTableHead(props) {
     );
 }
 
-export default function TruckInFacility(props) {
+export default function TrailerInFacility(props) {
     const { facilityId } = props;
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
@@ -128,18 +101,17 @@ export default function TruckInFacility(props) {
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const [count, setCount] = React.useState(0);
 
-    const [trucks, setTrucks] = React.useState([]);
+    const [trailers, setTrailers] = React.useState([]);
 
     React.useEffect(() => {
-        getTrucks({ page: page, pageSize: rowsPerPage, facilityId: facilityId }).then((res) => {
-            console.log("truck==========", res.data.truckModels)
-            setTrucks(res.data.truckModels);
-            setCount(res?.data.count);
+        getTraler({ page: page, pageSize: rowsPerPage, facilityId: facilityId }).then((res) => {
+            setTrailers(res?.data.data.trailerModels);
+            setCount(res?.data.data.count);
         });
     }, [page, rowsPerPage, count])
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = trucks.map((n) => n.name);
+            const newSelected = trailers.map((n) => n.name);
             setSelected(newSelected);
             return;
         }
@@ -180,9 +152,9 @@ export default function TruckInFacility(props) {
     const isSelected = (name) => selected.indexOf(name) !== -1;
     const handleDetail = (id) => {
         history.push({
-          pathname: `/truck/detail/${id}`,
+            pathname: `/container/detail/${id}`,
         })
-      }
+    }
     return (
         <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
             <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -196,12 +168,12 @@ export default function TruckInFacility(props) {
                             order={order}
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
-                            rowCount={trucks?.length}
+                            rowCount={trailers?.length}
                             headCells={headCells}
                         />
                         <TableBody>
-                            {trucks
-                                ? trucks.map((row, index) => {
+                            {trailers
+                                ? trailers.map((row, index) => {
                                     const isItemSelected = isSelected(row.id);
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -232,20 +204,16 @@ export default function TruckInFacility(props) {
                                                 scope="row"
                                                 align="left"
                                             >
-                                                {row.truckCode}
+                                                {row.trailerCode}
                                             </TableCell>
                                             <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
-                                            <TableCell align="left">{row.driverName}</TableCell>
                                             <TableCell align="left">{row.status}</TableCell>
-                                            <TableCell align="left">{row.licensePlates}</TableCell>
-                                            <TableCell align="left">{row.brandTruck}</TableCell>
                                             <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
-                                            <TableCell >
+                                            <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
+                                            <TableCell>
                                                 <Box sx={{ display: 'flex' }}>
                                                     <Tooltip title="View">
-                                                        <Box
-                                                          onClick={() => { handleDetail(row?.id) }} 
-                                                        >
+                                                        <Box onClick={() => { handleDetail(row?.id) }} >
                                                             <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                                                         </Box>
                                                     </Tooltip>
@@ -255,6 +223,7 @@ export default function TruckInFacility(props) {
                                                         </Box>
                                                     </Tooltip>
                                                 </Box>
+
                                             </TableCell>
                                         </TableRow>
                                     );

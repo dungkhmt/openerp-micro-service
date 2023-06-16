@@ -292,12 +292,18 @@ export default function ContentsTruckManagement({ trucks, page, setPage, rowsPer
                       <TableCell align="left">{row.licensePlates}</TableCell>
                       <TableCell align="left">{row.brandTruck}</TableCell>
                       <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell sx={{display: 'flex'}}>
-                        <Box onClick={() => { handleDetail(row?.id) }} >
-                          <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
-                        </Box>
-                        <Box>
-                          <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                      <TableCell>
+                        <Box  sx={{ display: 'flex' }}>
+                          <Tooltip title="View">
+                            <Box onClick={() => { handleDetail(row?.id) }} >
+                              <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                            </Box>
+                          </Tooltip>
+                          <Tooltip title="Delete">
+                            <Box>
+                              <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                            </Box>
+                          </Tooltip>
                         </Box>
                       </TableCell>
                     </TableRow>

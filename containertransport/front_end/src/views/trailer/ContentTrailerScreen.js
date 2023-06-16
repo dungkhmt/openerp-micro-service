@@ -21,6 +21,8 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
+import { Icon } from '@mui/material';
+import { menuIconMap } from 'config/menuconfig';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -38,10 +40,6 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -84,6 +82,12 @@ const headCells = [
     numeric: false,
     disablePadding: false,
     label: 'Update At',
+  },
+  {
+    id: 'view',
+    numeric: false,
+    disablePadding: false,
+    label: '',
   },
 ];
 
@@ -136,7 +140,7 @@ function EnhancedTableHead(props) {
   );
 }
 
-export default function ContentsTrailerScreen({trailer, page, setPage, rowsPerPage, setRowsPerPage, count}) {
+export default function ContentsTrailerScreen({ trailer, page, setPage, rowsPerPage, setRowsPerPage, count }) {
   const [order, setOrder] = React.useState(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
   const [selected, setSelected] = React.useState([]);
@@ -204,7 +208,7 @@ export default function ContentsTrailerScreen({trailer, page, setPage, rowsPerPa
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   return (
-    <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white"}}>
+    <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
       <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
         <TableContainer>
           <Table
@@ -223,45 +227,61 @@ export default function ContentsTrailerScreen({trailer, page, setPage, rowsPerPa
             <TableBody>
               {trailer
                 ? trailer.map((row, index) => {
-                    const isItemSelected = isSelected(row.id);
-                    const labelId = `enhanced-table-checkbox-${index}`;
+                  const isItemSelected = isSelected(row.id);
+                  const labelId = `enhanced-table-checkbox-${index}`;
 
-                    return (
-                      <TableRow
-                        hover
-                        // onClick={(event) => handleClick(event, row.name)}
-                        role="checkbox"
-                        aria-checked={isItemSelected}
-                        tabIndex={-1}
-                        key={row.id}
-                        selected={isItemSelected}
-                        sx={{ cursor: 'pointer' }}
+                  return (
+                    <TableRow
+                      hover
+                      // onClick={(event) => handleClick(event, row.name)}
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row.id}
+                      selected={isItemSelected}
+                      sx={{ cursor: 'pointer' }}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          inputProps={{
+                            'aria-labelledby': labelId,
+                          }}
+                          onClick={(event) => handleClick(event, row.id)}
+                        />
+                      </TableCell>
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+
                       >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            color="primary"
-                            checked={isItemSelected}
-                            inputProps={{
-                              'aria-labelledby': labelId,
-                            }}
-                            onClick={(event) => handleClick(event, row.id)}
-                          />
-                        </TableCell>
-                        <TableCell
-                          component="th"
-                          id={labelId}
-                          scope="row"
-                          
-                        >
-                          {row.trailerCode}
-                        </TableCell>
-                        <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
-                        <TableCell align="left">{row.status}</TableCell>
-                        <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
-                        <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
-                      </TableRow>
-                    );
-                  })
+                        {row.trailerCode}
+                      </TableCell>
+                      <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
+                      <TableCell align="left">{row.status}</TableCell>
+                      <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex' }}>
+                          <Tooltip title="View">
+                            <Box
+                              // onClick={() => { handleDetail(row?.id) }}
+                            >
+                              <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                            </Box>
+                          </Tooltip>
+                          <Tooltip title="Delete">
+                            <Box>
+                              <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                            </Box>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
                 : null}
             </TableBody>
           </Table>

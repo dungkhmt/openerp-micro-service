@@ -6,54 +6,34 @@ import { AnimatePresence, motion } from "framer-motion";
 import { getFacility } from "api/FacilityAPI";
 import TertiaryButton from "components/button/TertiaryButton";
 import PrimaryButton from "components/button/PrimaryButton";
-import { createContainer, getTypeContainer, updateContainer } from "api/ContainerAPI";
+import { createTrailer, updateTrailer } from "api/TrailerAPI";
 
 
-const ModalContainer = ({ open, handleClose, container, setToast, setToastType, setToastMsg }) => {
+const ModalTrailer = ({ open, handleClose, trailer, setToast, setToastType, setToastMsg }) => {
     const [facilityList, setFacilityList] = useState([]);
     const [facility, setFacility] = useState('');
-    const [size, setSize] = useState('');
-    const [isBreakRomooc, setIsBreakRomooc] = useState(false);
-
-    const [typeContainers, setTypeContainers] = useState([]);
 
     useEffect(() => {
         getFacility({ type: "Depot" }).then((res) => {
             setFacilityList(res?.data.data.facilityModels);
-            // if(truckId) {
-            //     setFacility(res?.data.data.facilityModels.find((item) => item.id === truck?.facilityResponsiveDTO.facilityId))
-            // }
         });
-        getTypeContainer({}).then((res) => {
-            console.log("res", res);
-            setTypeContainers(res?.data.data.typeContainers);
-            if(container) {
-                setSize(res?.data.data.typeContainers.find((item) => item.size === container?.size));
-            }
-        })
-        if(container) {
-            setFacility(container?.facilityResponsiveDTO.facilityId);
-            setIsBreakRomooc(container.isEmpty);
+        if(trailer) {
+            setFacility(trailer?.facilityResponsiveDTO?.facilityId)
         }
     }, []);
 
     const handleChange = (event) => {
         setFacility(event.target.value);
     };
-    const handleChangeSize = (event) => {
-        setSize(event.target.value);
-    };
     const handleSubmit = () => {
-        if(container) {
+        if(trailer) {
             let data = {
-                id: container.id,
+                id: trailer.id,
                 facilityId: facility,
-                typeContainerCode: size?.typeContainerCode,
-                isEmpty: isBreakRomooc
             };
             console.log("data", data)
-            updateContainer(data).then((res) => {
-                setToastMsg("Update Container Success");
+            updateTrailer(data).then((res) => {
+                setToastMsg("Update Trailer Success");
                 setToastType("success");
                 setToast(true);
                 setTimeout(() => {
@@ -66,12 +46,10 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
         else {
             let data = {
                 facilityId: facility,
-                typeContainerCode: size?.typeContainerCode,
-                isEmpty: isBreakRomooc
             };
             console.log("data", data)
-            createContainer(data).then((res) => {
-                setToastMsg("Create Container Success");
+            createTrailer(data).then((res) => {
+                setToastMsg("Create Trailer Success");
                 setToastType("success");
                 setToast(true);
                 setTimeout(() => {
@@ -81,26 +59,20 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
                 clearData();
             });
         }
-        
     }
     const clearData = () => {
         setFacility('');
-        setSize('');
-        setIsBreakRomooc(false);
         setFacilityList([]);
-        setTypeContainers([]);
     }
-    const handleChangeBreakRomooc = (e) => {
-        setIsBreakRomooc(e.target.checked);
-    }
+
     return (
         <Box>
             <CustomizedDialogs
                 open={open}
                 handleClose={handleClose}
                 contentTopDivider
-                title={container ? "Update Container" : "New Container"}
-                className="modalContainer"
+                title={trailer ? "Update Trailer" : "New Trailer"}
+                className="modalTrailer"
                 content={
                     <AnimatePresence>
                         <motion.div>
@@ -134,43 +106,6 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
                                                     ) : null}
                                                 </Select>
                                             </FormControl>
-                                        </Box>
-                                    </Box>
-                                    <Box className="contentModal-item">
-                                        <Box className="contentModal-item-text">
-                                            <Typography>Size:</Typography>
-                                        </Box>
-                                        <Box className="contentModal-item-input">
-                                            <FormControl>
-                                                <InputLabel id="demo-simple-select-label">size</InputLabel>
-                                                <Select
-                                                    value={size}
-                                                    onChange={handleChangeSize}
-                                                    label="size"
-                                                    disabled={container ? true : false}
-                                                >
-                                                    {typeContainers ? (
-                                                        typeContainers.map((item, key) => {
-                                                            return (
-                                                                <MenuItem key={key} value={item}>{item.size}</MenuItem>
-                                                            );
-                                                        })
-                                                    ) : null}
-                                                </Select>
-                                            </FormControl>
-                                        </Box>
-                                    </Box>
-                                    <Box className="contentModal-item">
-                                        <Box className="contentModal-item-text">
-                                            <Typography>Break Romooc:</Typography>
-                                        </Box>
-                                        <Box className="contentModal-item-input">
-                                            <Switch
-                                                value={isBreakRomooc}
-                                                checked={isBreakRomooc}
-                                                onChange={handleChangeBreakRomooc}
-                                                inputProps={{ 'aria-label': 'controlled' }}
-                                            />
                                         </Box>
                                     </Box>
 
@@ -207,4 +142,4 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
         </Box>
     )
 }
-export default ModalContainer;
+export default ModalTrailer;

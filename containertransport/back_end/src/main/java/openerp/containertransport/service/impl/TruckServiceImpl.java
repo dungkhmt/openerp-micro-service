@@ -58,6 +58,11 @@ public class TruckServiceImpl implements TruckService  {
             sqlCount += " AND truck_code = :truckCode";
             params.put("truckCode", truckFilterRequestDTO.getTruckCode());
         }
+        if(truckFilterRequestDTO.getFacilityId() != null) {
+            sql += " AND facility_id = :facilityId";
+            sqlCount += " AND facility_id = :facilityId";
+            params.put("facilityId", truckFilterRequestDTO.getFacilityId());
+        }
         if(truckFilterRequestDTO.getStatus() != null) {
             sql += " AND status = :status";
             sqlCount += " AND status = :status";

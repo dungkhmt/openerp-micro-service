@@ -2,9 +2,9 @@ import { Box, Modal, Icon, Typography, Divider, TextField, Button } from "@mui/m
 import './styles.scss';
 import PrimaryButton from "components/button/PrimaryButton";
 import { menuIconMap } from "config/menuconfig";
-// import ModalTruck from "./ModalTruck";
+import ModalTrailer from "./modal/ModalTrailer";
 
-const HeaderTrailerScreen = ({openModal, handleClose}) => {
+const HeaderTrailerScreen = ({openModal, handleClose, setToast, setToastType, setToastMsg}) => {
     return (
         <Box className="headerTruckScreen">
             <Box className="title">
@@ -17,11 +17,12 @@ const HeaderTrailerScreen = ({openModal, handleClose}) => {
                         {menuIconMap.get("ControlPointIcon")}
                     </Icon>
                     <Typography>
-                        New Truck
+                        New Trailer
                     </Typography>
                 </PrimaryButton>
             </Box>
-            {/* {openModal ? (<ModalTruck openModal={openModal} handleClose={handleClose} />) : null} */}
+            {openModal ? (<ModalTrailer open={openModal} handleClose={handleClose}
+            setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
         </Box>
     );
 };

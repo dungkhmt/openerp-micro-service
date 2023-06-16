@@ -22,28 +22,28 @@ const TruckScreen = () => {
     }
 
     useEffect(() => {
-        getTrucks({page: page, pageSize: rowsPerPage}).then((res) => {
-          console.log("truck==========", res.data.truckModels)
-          setTrucks(res.data.truckModels);
-          setCount(res?.data.count);
+        getTrucks({ page: page, pageSize: rowsPerPage }).then((res) => {
+            console.log("truck==========", res.data.truckModels)
+            setTrucks(res.data.truckModels);
+            setCount(res?.data.count);
         });
-      }, [openModal, page, rowsPerPage]);
+    }, [openModal, page, rowsPerPage]);
     return (
         <Box className="fullScreen">
             <Container maxWidth="lg" className="container">
-            <Box className="toast">
+                <Box className="toast">
                     {toastOpen ? (
-                    <Alert variant="filled" severity={toastType} >
-                        <strong>{toastMsg}</strong >
-                    </Alert > ) : null}
+                        <Alert variant="filled" severity={toastType} >
+                            <strong>{toastMsg}</strong >
+                        </Alert >) : null}
                 </Box>
                 <HeaderTruckScreen openModal={openModal} handleClose={handleClose}
-                setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
+                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
                 <Box className="divider">
                     <Divider />
                 </Box>
                 <ContentsTruckManagement trucks={trucks} page={page} setPage={setPage}
-                rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
+                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
             </Container>
         </Box>
     );

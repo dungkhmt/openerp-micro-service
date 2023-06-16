@@ -235,7 +235,7 @@ export default function ContentsContainerMana({ containers, page, setPage, rowsP
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={containers.length}
+              rowCount={containers?.length}
             />
             <TableBody>
               {containers
@@ -279,12 +279,16 @@ export default function ContentsContainerMana({ containers, page, setPage, rowsP
                       <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex' }}>
-                          <Box onClick={() => { handleDetail(row?.id) }} >
-                            <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
-                          </Box>
-                          <Box>
-                            <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                          </Box>
+                          <Tooltip title="View">
+                            <Box onClick={() => { handleDetail(row?.id) }} >
+                              <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                            </Box>
+                          </Tooltip>
+                          <Tooltip title="Delete">
+                            <Box>
+                              <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                            </Box>
+                          </Tooltip>
                         </Box>
 
                       </TableCell>

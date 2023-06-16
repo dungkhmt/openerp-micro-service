@@ -288,7 +288,7 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                                             >
                                                 {row?.orderCode}
                                             </TableCell>
-                                            <TableCell align="left" sx={{paddingLeft: '0px !important'}}>{row?.customerId}</TableCell>
+                                            <TableCell align="left" sx={{ paddingLeft: '0px !important' }}>{row?.customerId}</TableCell>
                                             <TableCell align="left">{row?.fromFacility.facilityName}</TableCell>
                                             <TableCell align="left">{row?.toFacility.facilityName}</TableCell>
                                             <TableCell align="left">{typeOrderMap.get(row.type)}</TableCell>
@@ -297,14 +297,18 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                                             <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
                                             <TableCell >
                                                 <Box sx={{ display: 'flex' }}>
-                                                <Box 
-                                                    onClick={() => { handleDetail(row?.orderCode) }} 
-                                                >
-                                                    <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
-                                                </Box>
-                                                <Box>
-                                                    <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                                                </Box>
+                                                    <Tooltip title="View">
+                                                        <Box
+                                                            onClick={() => { handleDetail(row?.orderCode) }}
+                                                        >
+                                                            <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                                                        </Box>
+                                                    </Tooltip>
+                                                    <Tooltip title="Delete">
+                                                        <Box>
+                                                            <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                                                        </Box>
+                                                    </Tooltip>
                                                 </Box>
                                             </TableCell>
                                         </TableRow>

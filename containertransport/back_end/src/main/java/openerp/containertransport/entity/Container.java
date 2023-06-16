@@ -40,6 +40,9 @@ public class Container implements Serializable {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private TypeContainer typeContainer;
 
+    @Column(name = "size")
+    private int size;
+
     @Column(name = "created_at")
     private long createdAt;
 

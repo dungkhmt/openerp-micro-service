@@ -126,3 +126,12 @@ typeOrderMap.set("IF", "Inbound Full");
 typeOrderMap.set("OF", "Outbound Full");
 typeOrderMap.set("IE", "Inbound Empty");
 typeOrderMap.set("OE", "Outbound Empty");
+
+export const roles = new Map();
+roles.set("Customer", "TMS_CUSTOMER");
+roles.set("Driver", "TMS_DRIVER");
+
+export const facilityType = new Map();
+facilityType.set("Depot", "Depot");
+facilityType.set("Truck", "Truck");
+facilityType.set("Trailer", "Trailer");

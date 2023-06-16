@@ -6,6 +6,12 @@ import { menuIconMap } from "config/menuconfig";
 import { getFacilityById } from "api/FacilityAPI";
 import ContentsTruckManagement from "views/truck/ContentTruckManagement";
 import { getTrucks } from "api/TruckAPI";
+import TruckInFacility from "./TrucksInFacility";
+import { truck } from "config/menuconfig/truck";
+import { getContainers } from "api/ContainerAPI";
+import ContainerInFacility from "./ContainerInFacility";
+import TrailerInFacility from "./TrailerInFacility";
+import { getTraler } from "api/TrailerAPI";
 
 const FacilityDetail = () => {
     const history = useHistory();
@@ -14,12 +20,25 @@ const FacilityDetail = () => {
 
     const [type, setType] = useState('');
 
+    const [trucks, setTrucks] = useState([]);
+    const [trailers, setTrailers] = useState([]);
+    const [containers, setContainers] = useState([]);
+
 
     useEffect(() => {
         getFacilityById(facilityId).then((res) => {
             setFacility(res?.data);
             setType(res?.data.facilityType)
         })
+        getTrucks({ facilityId: facilityId }).then((res) => {
+            setTrucks(res.data.truckModels);
+        });
+        getContainers({ facilityId: facilityId }).then((res) => {
+            setContainers(res?.data.data.containerModels);
+        });
+        getTraler({facilityId: facilityId }).then((res) => {
+            setTrailers(res?.data.data.trailerModels);
+        });
     }, [])
 
     console.log("facility", facility);
@@ -94,13 +113,13 @@ const FacilityDetail = () => {
                             <Typography>Max number trailer:</Typography>
                         </Box>
                         <Typography>{facility?.maxNumberTrailer}</Typography>
-                    </Box>) : null}                    
+                    </Box>) : null}
                     {facility?.facilityType === "Truck" ? (<Box className="facility-info-item">
                         <Box className="facility-info-item-text">
                             <Typography>Max number trucks:</Typography>
                         </Box>
                         <Typography>{facility?.maxNumberTruck}</Typography>
-                    </Box>) : null}                    
+                    </Box>) : null}
                     {facility?.facilityType === "Container" ? (<Box className="facility-info-item">
                         <Box className="facility-info-item-text">
                             <Typography>Max number containers:</Typography>
@@ -128,9 +147,31 @@ const FacilityDetail = () => {
                     </Box>
                 </Box>
 
-                {facility?.facilityType === "Truck" ? (
-                    <Box></Box>
-                    // <ContentsTruckManagement />
+                {trucks?.length > 0 ? (
+                    <Box>
+                        <Box className="title">
+                            <Typography>Trucks In Facility</Typography>
+                        </Box>
+                        <TruckInFacility facilityId={facilityId} />
+                    </Box>
+                ) : null}
+
+                {containers?.length > 0 ? (
+                    <Box>
+                        <Box className="title">
+                            <Typography>Containers In Facility</Typography>
+                        </Box>
+                        <ContainerInFacility facilityId={facilityId} />
+                    </Box>
+                ) : null}
+
+                {trailers?.length > 0 ? (
+                    <Box>
+                        <Box className="title">
+                            <Typography>Trailers In Facility</Typography>
+                        </Box>
+                        <TrailerInFacility facilityId={facilityId} />
+                    </Box>
                 ) : null}
             </Container>
         </Box>

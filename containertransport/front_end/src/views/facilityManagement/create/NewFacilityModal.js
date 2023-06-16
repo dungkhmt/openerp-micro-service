@@ -4,8 +4,10 @@ import TertiaryButton from "components/button/TertiaryButton";
 import CustomizedDialogs from "components/dialog/CustomizedDialogs";
 import { AnimatePresence, motion } from "framer-motion";
 import { grey } from "@mui/material/colors";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import '../styles.scss';
+import { MyContext } from "contextAPI/MyContext";
+import { facilityType, roles } from "config/menuconfig";
 
 
 const styles = {
@@ -20,6 +22,13 @@ const FacilityModal = ({ open, setOpen }) => {
     const [maxTrailer, setMaxTrailer] = useState();
     const [maxContainer, setMaxContainer] = useState();
 
+    const { role, preferred_username } = useContext(MyContext);
+
+    useEffect(() => {
+        if(role === roles.get("Customer")) {
+            setType(facilityType.get("Depot"));
+        }
+    }, [])
     const typeConst = [
         { name: "Truck", id: "1" },
         { name: "Trailer", id: "2" },
@@ -77,6 +86,7 @@ const FacilityModal = ({ open, setOpen }) => {
                                 }}
                             >
                                 <Box pt="7px" pb={1} pl={1} pr={1} sx={{ width: "650px" }} className="contentModalFacility">
+                                    {role === roles.get("Customer") ? null : (
                                     <Box className="contentModal-item">
                                         <Box className="contentModal-item-text">
                                             <Typography>Type:</Typography>
@@ -99,7 +109,7 @@ const FacilityModal = ({ open, setOpen }) => {
                                                 </Select>
                                             </FormControl>
                                         </Box>
-                                    </Box>
+                                    </Box>)}
                                     <Box className="contentModal-item">
                                         <Box className="contentModal-item-text">
                                             <Typography>Facility Name: </Typography>
@@ -137,8 +147,8 @@ const FacilityModal = ({ open, setOpen }) => {
                                             <Box className="contentModal-item-input">
                                                 <TextField
                                                     id="outlined-textarea"
-                                                    label="Address"
-                                                    placeholder="address"
+                                                    label="Max total truck"
+                                                    placeholder="max total truck"
                                                     value={maxTruck}
                                                     onChange={(e) => setMaxTruck(e.target.value)}
                                                 />
@@ -153,8 +163,8 @@ const FacilityModal = ({ open, setOpen }) => {
                                             <Box className="contentModal-item-input">
                                                 <TextField
                                                     id="outlined-textarea"
-                                                    label="Address"
-                                                    placeholder="address"
+                                                    label="Max total trailer"
+                                                    placeholder="max total trailer"
                                                     value={maxTrailer}
                                                     onChange={(e) => setMaxTrailer(e.target.value)}
                                                 />
@@ -169,8 +179,8 @@ const FacilityModal = ({ open, setOpen }) => {
                                             <Box className="contentModal-item-input">
                                                 <TextField
                                                     id="outlined-textarea"
-                                                    label="Address"
-                                                    placeholder="address"
+                                                    label="Max total container"
+                                                    placeholder="max total container"
                                                     value={maxContainer}
                                                     onChange={(e) => setMaxContainer(e.target.value)}
                                                 />

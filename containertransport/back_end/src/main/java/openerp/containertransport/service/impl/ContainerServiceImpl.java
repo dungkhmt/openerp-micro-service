@@ -36,9 +36,10 @@ public class ContainerServiceImpl implements ContainerService {
         Facility facility = facilityRepo.findById(containerModelDTO.getFacilityId()).get();
         Container container = new Container();
         container.setFacility(facility);
+        container.setSize(typeContainer.getSize());
         container.setTypeContainer(typeContainer);
         container.setEmpty(containerModelDTO.getIsEmpty());
-        container.setStatus("Available");
+        container.setStatus("AVAILABLE");
         container.setCreatedAt(System.currentTimeMillis());
         container.setUpdatedAt(System.currentTimeMillis());
         containerRepo.save(container);
@@ -104,7 +105,7 @@ public class ContainerServiceImpl implements ContainerService {
         }
         containerFilterRes.setCount((Long) queryCount.getSingleResult());
 
-        sql += "ORDER BY updated_at DESC";
+        sql += " ORDER BY updated_at DESC";
 
         if (containerFilterRequestDTO.getPage() != null && containerFilterRequestDTO.getPageSize() != null) {
             sql += " LIMIT :pageSize OFFSET :index";

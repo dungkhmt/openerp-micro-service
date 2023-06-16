@@ -27,102 +27,102 @@ import { menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 
 function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
 }
 
 function getComparator(order, orderBy) {
-    return order === 'desc'
-        ? (a, b) => descendingComparator(a, b, orderBy)
-        : (a, b) => -descendingComparator(a, b, orderBy);
+  return order === 'desc'
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
 function stableSort(array, comparator) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
-        const order = comparator(a[0], b[0]);
-        if (order !== 0) {
-            return order;
-        }
-        return a[1] - b[1];
-    });
-    return stabilizedThis.map((el) => el[0]);
+  const stabilizedThis = array.map((el, index) => [el, index]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) {
+      return order;
+    }
+    return a[1] - b[1];
+  });
+  return stabilizedThis.map((el) => el[0]);
 }
 
 const headCells = [
-    {
-        id: 'code',
-        numeric: false,
-        disablePadding: false,
-        label: 'Code',
-    },
-    {
-        id: 'name',
-        numeric: false,
-        disablePadding: false,
-        label: 'Name',
-    },
-    {
-      id: 'address',
-      numeric: false,
-      disablePadding: false,
-      label: 'Address',
-    },
-    {
-      id: 'owner',
-      numeric: false,
-      disablePadding: false,
-      label: 'Owner',
-    },
-    {
-        id: 'acreage',
-        numeric: false,
-        disablePadding: false,
-        label: 'Acreage',
-    },
-    {
-      id: 'type',
-      numeric: false,
-      disablePadding: false,
-      label: 'Type',
-    },
-    // {
-    //     id: 'numberTruck',
-    //     numeric: false,
-    //     disablePadding: false,
-    //     label: 'Number Truck',
-    //     width: '8%'
-    // },
-    // {
-    //     id: 'numberTrailer',
-    //     numeric: false,
-    //     disablePadding: false,
-    //     label: 'Number Trailer',
-    //     width: '8%'
-    // },
-    // {
-    //     id: 'numberContainer',
-    //     numeric: false,
-    //     disablePadding: false,
-    //     label: 'Number Container',
-    //     width: '8%'
-    // },
-    {
-        id: 'createdAt',
-        numeric: false,
-        disablePadding: false,
-        label: 'Created At',
-    },
-    {
-      id: 'view',
-      numeric: false,
-      disablePadding: false,
-      label: '',
+  {
+    id: 'code',
+    numeric: false,
+    disablePadding: false,
+    label: 'Code',
+  },
+  {
+    id: 'name',
+    numeric: false,
+    disablePadding: false,
+    label: 'Name',
+  },
+  {
+    id: 'address',
+    numeric: false,
+    disablePadding: false,
+    label: 'Address',
+  },
+  {
+    id: 'owner',
+    numeric: false,
+    disablePadding: false,
+    label: 'Owner',
+  },
+  {
+    id: 'acreage',
+    numeric: false,
+    disablePadding: false,
+    label: 'Acreage',
+  },
+  {
+    id: 'type',
+    numeric: false,
+    disablePadding: false,
+    label: 'Type',
+  },
+  // {
+  //     id: 'numberTruck',
+  //     numeric: false,
+  //     disablePadding: false,
+  //     label: 'Number Truck',
+  //     width: '8%'
+  // },
+  // {
+  //     id: 'numberTrailer',
+  //     numeric: false,
+  //     disablePadding: false,
+  //     label: 'Number Trailer',
+  //     width: '8%'
+  // },
+  // {
+  //     id: 'numberContainer',
+  //     numeric: false,
+  //     disablePadding: false,
+  //     label: 'Number Container',
+  //     width: '8%'
+  // },
+  {
+    id: 'createdAt',
+    numeric: false,
+    disablePadding: false,
+    label: 'Created At',
+  },
+  {
+    id: 'view',
+    numeric: false,
+    disablePadding: false,
+    label: '',
   },
 ];
 
@@ -130,53 +130,53 @@ const DEFAULT_ORDER = 'asc';
 const DEFAULT_ORDER_BY = 'calories';
 
 function EnhancedTableHead(props) {
-    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
-    const createSortHandler = (newOrderBy) => (event) => {
-        onRequestSort(event, newOrderBy);
-    };
+  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+  const createSortHandler = (newOrderBy) => (event) => {
+    onRequestSort(event, newOrderBy);
+  };
 
-    return (
-        <TableHead>
-            <TableRow>
-                <TableCell padding="checkbox">
-                    <Checkbox
-                        color="primary"
-                        indeterminate={numSelected > 0 && numSelected < rowCount}
-                        checked={rowCount > 0 && numSelected === rowCount}
-                        onChange={onSelectAllClick}
-                        inputProps={{
-                            'aria-label': 'select all desserts',
-                        }}
-                    />
-                </TableCell>
-                {headCells.map((headCell) => (
-                    <TableCell
-                        key={headCell.id}
-                        align={headCell.numeric ? 'right' : 'left'}
-                        padding={headCell.disablePadding ? 'none' : 'normal'}
-                        sortDirection={orderBy === headCell.id ? order : false}
-                        width={headCell.width}
-                    >
-                        <TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : 'asc'}
-                            onClick={createSortHandler(headCell.id)}
-                        >
-                            {headCell.label}
-                            {orderBy === headCell.id ? (
-                                <Box component="span" sx={visuallyHidden}>
-                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                </Box>
-                            ) : null}
-                        </TableSortLabel>
-                    </TableCell>
-                ))}
-            </TableRow>
-        </TableHead>
-    );
+  return (
+    <TableHead>
+      <TableRow>
+        <TableCell padding="checkbox">
+          <Checkbox
+            color="primary"
+            indeterminate={numSelected > 0 && numSelected < rowCount}
+            checked={rowCount > 0 && numSelected === rowCount}
+            onChange={onSelectAllClick}
+            inputProps={{
+              'aria-label': 'select all desserts',
+            }}
+          />
+        </TableCell>
+        {headCells.map((headCell) => (
+          <TableCell
+            key={headCell.id}
+            align={headCell.numeric ? 'right' : 'left'}
+            padding={headCell.disablePadding ? 'none' : 'normal'}
+            sortDirection={orderBy === headCell.id ? order : false}
+            width={headCell.width}
+          >
+            <TableSortLabel
+              active={orderBy === headCell.id}
+              direction={orderBy === headCell.id ? order : 'asc'}
+              onClick={createSortHandler(headCell.id)}
+            >
+              {headCell.label}
+              {orderBy === headCell.id ? (
+                <Box component="span" sx={visuallyHidden}>
+                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                </Box>
+              ) : null}
+            </TableSortLabel>
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+  );
 }
 
-export default function ContentsFacilityMana ({facilities, page, setPage, rowsPerPage, setRowsPerPage, count}) {
+export default function ContentsFacilityMana({ facilities, page, setPage, rowsPerPage, setRowsPerPage, count }) {
   const [order, setOrder] = React.useState(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
   const [selected, setSelected] = React.useState([]);
@@ -249,7 +249,7 @@ export default function ContentsFacilityMana ({facilities, page, setPage, rowsPe
     })
   }
   return (
-    <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white"}}>
+    <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
       <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
         <TableContainer>
           <Table
@@ -268,50 +268,63 @@ export default function ContentsFacilityMana ({facilities, page, setPage, rowsPe
             <TableBody>
               {facilities
                 ? facilities.map((row, index) => {
-                    const isItemSelected = isSelected(row.id);
-                    const labelId = `enhanced-table-checkbox-${index}`;
+                  const isItemSelected = isSelected(row.id);
+                  const labelId = `enhanced-table-checkbox-${index}`;
 
-                    return (
-                      <TableRow
-                        hover
-                        // onClick={(event) => handleClick(event, row.name)}
-                        role="checkbox"
-                        aria-checked={isItemSelected}
-                        tabIndex={-1}
-                        key={row.id}
-                        selected={isItemSelected}
-                        sx={{ cursor: 'pointer' }}
+                  return (
+                    <TableRow
+                      hover
+                      // onClick={(event) => handleClick(event, row.name)}
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row.id}
+                      selected={isItemSelected}
+                      sx={{ cursor: 'pointer' }}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          inputProps={{
+                            'aria-labelledby': labelId,
+                          }}
+                          onClick={(event) => handleClick(event, row.id)}
+                        />
+                      </TableCell>
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        align="left"
                       >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            color="primary"
-                            checked={isItemSelected}
-                            inputProps={{
-                              'aria-labelledby': labelId,
-                            }}
-                            onClick={(event) => handleClick(event, row.id)}
-                          />
-                        </TableCell>
-                        <TableCell
-                          component="th"
-                          id={labelId}
-                          scope="row"
-                          align="left"
-                        >
-                          {row.facilityCode}
-                        </TableCell>
-                        <TableCell align="left">{row.facilityName}</TableCell>
-                        <TableCell align="left">{row.address}</TableCell>
-                        <TableCell align="left">{row.owner}</TableCell>
-                        <TableCell align="left">{row.acreage}</TableCell>
-                        <TableCell align="left">{row.facilityType}</TableCell>
-                        <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
-                        <TableCell onClick={() => {handleView(row?.id)}}>
-                          <Icon>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
+                        {row.facilityCode}
+                      </TableCell>
+                      <TableCell align="left">{row.facilityName}</TableCell>
+                      <TableCell align="left">{row.address}</TableCell>
+                      <TableCell align="left">{row.owner}</TableCell>
+                      <TableCell align="left">{row.acreage}</TableCell>
+                      <TableCell align="left">{row.facilityType}</TableCell>
+                      <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell >
+                        <Box sx={{ display: 'flex' }}>
+                          <Tooltip title="View">
+                            <Box
+                              onClick={() => { handleView(row?.id) }}
+                            >
+                              <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                            </Box>
+                          </Tooltip>
+                          <Tooltip title="Delete">
+                            <Box>
+                              <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                            </Box>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
                 : null}
             </TableBody>
           </Table>

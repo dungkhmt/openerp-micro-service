@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container, Divider, Typography } from "@mui/material";
+import { Alert, Box, Container, Divider, Typography } from "@mui/material";
 import './styles.scss';
 import HeaderTrailerScreen from "./HeaderTrailerScreen";
 import { getTraler } from "api/TrailerAPI";
@@ -7,10 +7,15 @@ import ContentsTrailerScreen from "./ContentTrailerScreen";
 
 const TrailerScreen = () => {
     const [trailer, setTrailer] = useState([]);
-    const [openModal, setOpenModal] = useState(false);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [count, setCount] = useState(0);
+
+    const [toastOpen, setToast] = useState(false);
+    const [toastType, setToastType] = useState();
+    const [toastMsg, setToastMsg] = useState('');
+
+    const [openModal, setOpenModal] = useState(false);
 
     const handleClose = () => {
         setOpenModal(!openModal);
@@ -22,17 +27,24 @@ const TrailerScreen = () => {
             setCount(res?.data.data.count);
         })
     }, [page, rowsPerPage])
-    
+
 
     return (
         <Box className="fullScreen">
             <Container maxWidth="lg" className="container">
-                <HeaderTrailerScreen openModal={openModal} handleClose={handleClose} />
+                <Box className="toast">
+                    {toastOpen ? (
+                        <Alert variant="filled" severity={toastType} >
+                            <strong>{toastMsg}</strong >
+                        </Alert >) : null}
+                </Box>
+                <HeaderTrailerScreen openModal={openModal} handleClose={handleClose}
+                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
                 <Box className="divider">
                     <Divider />
                 </Box>
                 <ContentsTrailerScreen trailer={trailer} page={page} setPage={setPage}
-                rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count}/>
+                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
             </Container>
         </Box>
     )

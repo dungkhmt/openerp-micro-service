@@ -5,12 +5,7 @@ import { menuIconMap } from "config/menuconfig";
 import { useState } from "react";
 import ModalContainer from "./modal/ModalContainer";
 
-const HeaderContainerMana = () => {
-    const [open, setOpen] = useState(false);
-
-    const handleClose = () => {
-        setOpen(!open)
-    }
+const HeaderContainerMana = ({openModal, handleClose, setToast, setToastType, setToastMsg}) => {
     return (
         <Box className="headerScreen">
             <Box className="title">
@@ -28,7 +23,8 @@ const HeaderContainerMana = () => {
                     </Typography>
                 </PrimaryButton>
             </Box>
-            {open ? (<ModalContainer open={open} handleClose={handleClose} />) : null}
+            {openModal ? (<ModalContainer open={openModal} handleClose={handleClose}
+            setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
         </Box>
     )
 }

@@ -4,6 +4,7 @@ import { Alert, Box, Button, Container, Divider, Icon, Typography } from "@mui/m
 import { useHistory, useParams } from "react-router-dom";
 import { menuIconMap } from "config/menuconfig";
 import { getContainerById } from "api/ContainerAPI";
+import ModalContainer from "../modal/ModalContainer";
 
 const DetailContainerScreen = () => {
 
@@ -21,7 +22,7 @@ const DetailContainerScreen = () => {
 
     useEffect(() => {
         getContainerById(containerId).then((res) => {
-            setContainer(res.data);
+            setContainer(res?.data);
         })
     }, [open]);
     const handleClose = () => {
@@ -111,6 +112,9 @@ const DetailContainerScreen = () => {
                         <Typography>{new Date(container?.updatedAt).toLocaleString()}</Typography>
                     </Box>
                 </Box>
+
+                {open ? (<ModalContainer open={open} handleClose={handleClose} container={container}
+                setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
             </Container>
         </Box>
     )
