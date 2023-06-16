@@ -175,14 +175,6 @@ const AdminOrderDetail = ( props ) => {
           <Typography variant="h5">
             Thông tin đơn hàng</Typography>
         </Grid>
-        <Grid className={classes.buttonWrap}>
-          <Button variant="contained" className={classes.addButton} 
-            type="submit" onClick={saveProcessingItems} >Lưu</Button>
-        </Grid>
-        <Grid className={classes.buttonWrap}>
-          <Button variant="contained" className={classes.addButton} 
-            type="submit" onClick={autoAssignButtonHandle} >Phân phối tự động</Button>
-        </Grid>
       </Grid>
     </Box>
 
@@ -427,6 +419,16 @@ const AdminOrderDetail = ( props ) => {
                 })
               })
             }}
+            actions={[
+              {
+                tooltip: "Lưu",
+                iconOnClickHandle: saveProcessingItems
+              },
+              {
+                tooltip: "Phân phối tự động",
+                iconOnClickHandle: autoAssignButtonHandle
+              }
+            ]}
           />
         </TabPanel>
         <TabPanel value="3">

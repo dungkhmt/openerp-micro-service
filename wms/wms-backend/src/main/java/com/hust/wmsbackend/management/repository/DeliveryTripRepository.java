@@ -16,7 +16,8 @@ public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, Stri
 
     @Query(value = "select dt.delivery_trip_id  , dt.vehicle_id  , dt.delivery_person_id  , " +
         "dt.distance  , dt.total_weight  , dt.total_locations , dt.last_updated_stamp  , " +
-        "dt.created_stamp  , dt.created_by  , dt.is_deleted  , dt.warehouse_id  , dt.shipment_id , dt.status  " +
+        "dt.created_stamp  , dt.created_by  , dt.is_deleted  , dt.warehouse_id  , dt.shipment_id , dt.status , " +
+        "dt.description " +
         "from wms_delivery_trip dt  " +
         "join wms_shipment s on dt.shipment_id = s.shipment_id " +
         "where (extract (EPOCH from (now() - s.expected_delivery_stamp) ) < 61200 or extract (EPOCH from (s.expected_delivery_stamp - now()) ) > 25200) " +

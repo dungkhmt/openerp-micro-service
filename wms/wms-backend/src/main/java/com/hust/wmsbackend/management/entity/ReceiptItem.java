@@ -33,6 +33,7 @@ public class ReceiptItem {
     private BigDecimal importPrice;
     private Date expiredDate;
     private UUID receiptItemRequestId;
+    private String receiptBillId;
 
     @LastModifiedDate
     private Date lastUpdatedStamp;

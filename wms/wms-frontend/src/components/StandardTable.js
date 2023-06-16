@@ -166,7 +166,7 @@ EnhancedTableHead.propTypes = {
 
 const EnhancedTableToolbar = (props) => {
   const { numSelected, tableTitle, openNewRow, isEditable, deleteButtonHandle,
-  actions, deletable, selectedIds } = props;
+  actions, deletable, selectedIds, editable } = props;
 
   return (
     <Toolbar
@@ -200,7 +200,7 @@ const EnhancedTableToolbar = (props) => {
       )}
 
       {
-        actions == undefined && isEditable &&
+        isEditable && editable?.onRowAdd != null && editable?.onRowAdd != undefined &&
         <Tooltip title="Thêm mới">
           <IconButton onClick={openNewRow}> 
             <AddIcon />
@@ -254,7 +254,8 @@ EnhancedTableToolbar.propTypes = {
   openNewRow: PropTypes.func,
   isEditable: PropTypes.bool,
   deleteButtonHandle: PropTypes.func,
-  selectedIds: PropTypes.array
+  selectedIds: PropTypes.array,
+  editable: PropTypes.object
 };
 
 const StandardTable = ({ columns, data, title, options, editable, onRowClick, 
@@ -467,6 +468,7 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
         deleteButtonHandle={deleteButtonHandle} actions={actions}
         deletable={deletable} 
         selectedIds={selected}
+        editable={editable}
       />
 
       {

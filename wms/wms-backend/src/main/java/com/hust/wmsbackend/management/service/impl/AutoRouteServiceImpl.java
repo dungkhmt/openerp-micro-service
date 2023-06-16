@@ -181,6 +181,10 @@ public class AutoRouteServiceImpl implements AutoRouteService {
             return null;
         }
         DeliveryTrip deliveryTrip = deliveryTripOpt.get();
+        if (deliveryTrip.getWarehouseId() == null) {
+            log.info("Delivery trip %s has no path");
+            return null;
+        }
         Optional<Warehouse> warehouseOpt = warehouseRepository.findById(deliveryTrip.getWarehouseId());
         if (!warehouseOpt.isPresent()) {
             log.warn(String.format("Warehouse with id %s is not exist", deliveryTrip.getWarehouseId()));

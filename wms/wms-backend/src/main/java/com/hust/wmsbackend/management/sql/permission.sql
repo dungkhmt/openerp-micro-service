@@ -41,6 +41,9 @@ VALUES('SCR_WMSv2_ORDER_DETAIl.VIEW', 'WMS_WAREHOUSE_MANAGER', null, now(), null
 INSERT INTO public.entity_authorization
 (id, role_id, last_updated, created, description)
 VALUES('SCR_WMSv2_RECEIPT_REQUEST_PROCESS_LISTING.VIEW', 'WMS_WAREHOUSE_MANAGER', null, now(), null);
+    -- xem màn hình phiếu nhập hàng chi tiết
+insert into entity_authorization (id, role_id, last_updated, created, description)
+values ('SCR_WMSv2_RECEIPT_BILL_DETAIL.VIEW', 'WMS_WAREHOUSE_MANAGER', null, now(), null) ;
 
 -- permission cho giám đốc doanh nghiệp
     -- xem danh sách menu
@@ -308,3 +311,7 @@ VALUES('SCR_WMSv2_RECEIPT_REQUEST_PROCESS.VIEW', 'ADMIN', null, now(), null);
 INSERT INTO public.entity_authorization
 (id, role_id, last_updated, created, description)
 VALUES('MENU_WMSv2_APPROVER.REPORT', 'ADMIN', null, now(), null);
+
+-- xem màn hình phiếu nhập hàng chi tiết
+insert into entity_authorization (id, role_id, last_updated, created, description)
+values ('SCR_WMSv2_RECEIPT_BILL_DETAIL.VIEW', 'ADMIN', null, now(), null) ;
