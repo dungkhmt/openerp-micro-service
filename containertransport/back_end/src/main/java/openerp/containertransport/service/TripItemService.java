@@ -9,4 +9,6 @@ public interface TripItemService {
     TripItemModel createTripItem(TripItemModel tripItemModel, long tripId);
 
     List<TripItemModel> getTripItemByTripId(long id);
+
+    TripItemModel updateTripItem(Long id, TripItemModel tripItemModel);
 }

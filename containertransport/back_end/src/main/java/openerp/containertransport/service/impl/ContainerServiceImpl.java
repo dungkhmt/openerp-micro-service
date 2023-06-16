@@ -86,6 +86,17 @@ public class ContainerServiceImpl implements ContainerService {
             sqlCount += " AND container_code = :containerCode";
             params.put("containerCode", containerFilterRequestDTO.getContainerCode());
         }
+        if (containerFilterRequestDTO.getContainerSize() != null) {
+            sql += " AND size = :size";
+            sqlCount += " AND size = :size";
+            params.put("size", containerFilterRequestDTO.getContainerSize());
+        }
+
+        if (containerFilterRequestDTO.getFacilityId() != null) {
+            sql += " AND facility_id = :facilityId";
+            sqlCount += " AND facility_id = :facilityId";
+            params.put("facilityId", containerFilterRequestDTO.getFacilityId());
+        }
 
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
         for (String i : params.keySet()) {
@@ -127,6 +138,7 @@ public class ContainerServiceImpl implements ContainerService {
         facilityResponsiveDTO.setAddress(container.getFacility().getAddress());
         containerModel.setFacilityResponsiveDTO(facilityResponsiveDTO);
         containerModel.setSize(container.getTypeContainer().getSize());
+        containerModel.setIsEmpty(container.isEmpty());
         return containerModel;
     }
 }

@@ -11,4 +11,5 @@ public class FacilityFilterRequestDTO {
     private String type;
     private Integer page;
     private Integer pageSize;
+    private String owner;
 }

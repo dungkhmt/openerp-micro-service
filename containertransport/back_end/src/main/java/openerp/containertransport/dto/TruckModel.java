@@ -20,7 +20,7 @@ public class TruckModel implements Serializable {
 //    private FacilityModel facility;
 //    private String facilityName;
     private FacilityResponsiveDTO facilityResponsiveDTO;
-    private Integer driverId;
+    private String driverId;
     private String driverName;
     private String status;
     private String licensePlates;

@@ -32,7 +32,7 @@ public class Truck implements Serializable {
     private String driverName;
 
     @Column(name = "driver_id")
-    private Integer driverId;
+    private String driverId;
 
     @Column(name = "status")
     private String status;

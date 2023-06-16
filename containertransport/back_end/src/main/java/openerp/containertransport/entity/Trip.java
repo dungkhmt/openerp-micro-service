@@ -44,6 +44,9 @@ public class Trip {
     @Column(name = "status")
     private String status;
 
+    @Column(name = "driver_id")
+    private String driverId;
+
     @Column(name = "created_at")
     private long createdAt;
 

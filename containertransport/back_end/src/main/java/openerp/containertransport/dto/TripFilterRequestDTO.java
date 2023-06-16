@@ -6,4 +6,5 @@ import lombok.Data;
 public class TripFilterRequestDTO {
     private Long shipmentId;
     private String status;
+    private String username;
 }

@@ -3,19 +3,14 @@ package openerp.containertransport.service.impl;
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.Constants;
 import openerp.containertransport.dto.TripItemModel;
-import openerp.containertransport.entity.Container;
-import openerp.containertransport.entity.Facility;
-import openerp.containertransport.entity.Trailer;
-import openerp.containertransport.entity.TripItem;
-import openerp.containertransport.repo.ContainerRepo;
-import openerp.containertransport.repo.FacilityRepo;
-import openerp.containertransport.repo.TrailerRepo;
-import openerp.containertransport.repo.TripItemRepo;
+import openerp.containertransport.entity.*;
+import openerp.containertransport.repo.*;
 import openerp.containertransport.service.TripItemService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -26,6 +21,7 @@ public class TripItemServiceImpl implements TripItemService {
     private final FacilityRepo facilityRepo;
     private final ContainerRepo containerRepo;
     private final TrailerRepo trailerRepo;
+    private final TripRepo tripRepo;
     @Override
     public TripItemModel createTripItem(TripItemModel tripItemModel, long tripId) {
         TripItem tripItem = new TripItem();
@@ -47,11 +43,12 @@ public class TripItemServiceImpl implements TripItemService {
         if(tripItemModel.getOrderCode() != null) {
             tripItem.setOrderCode(tripItemModel.getOrderCode());
         }
-        tripItem.setTripId(tripId);
+        Trip trip = tripRepo.findById(tripId).get();
+        tripItem.setTrip(trip);
         tripItem.setSeq((int) tripItemModel.getSeq());
         tripItem.setAction(tripItemModel.getAction());
         tripItem.setFacility(facility);
-        tripItem.setStatus("WAITING");
+        tripItem.setStatus("SCHEDULED");
         tripItem.setType(tripItemModel.getType());
         tripItem.setArrivalTime(tripItemModel.getArrivalTime());
         tripItem.setDepartureTime(tripItemModel.getDepartureTime());
@@ -66,9 +63,22 @@ public class TripItemServiceImpl implements TripItemService {
     @Override
     public List<TripItemModel> getTripItemByTripId(long id) {
         List<TripItem> tripItems = tripItemRepo.findByTripId(id);
+        Collections.sort(tripItems, (t1, t2) -> {
+            return Math.toIntExact(t1.getId() - t2.getId());
+        });
         List<TripItemModel> tripItemModels = new ArrayList<>();
         tripItems.forEach((tripItem -> tripItemModels.add(convertToModel(tripItem))));
         return tripItemModels;
+    }
+
+    @Override
+    public TripItemModel updateTripItem(Long id, TripItemModel tripItemModel) {
+        TripItem tripItem = tripItemRepo.findById(id).get();
+        if(tripItemModel.getStatus() != null) {
+            tripItem.setStatus(tripItemModel.getStatus());
+        }
+        tripItem = tripItemRepo.save(tripItem);
+        return convertToModel(tripItem);
     }
 
     public TripItemModel convertToModel (TripItem tripItem) {
@@ -78,6 +88,7 @@ public class TripItemServiceImpl implements TripItemService {
         tripItemModel.setFacilityCode(tripItem.getFacility().getFacilityCode());
         tripItemModel.setLongitude(tripItem.getFacility().getLongitude());
         tripItemModel.setLatitude(tripItem.getFacility().getLatitude());
+        tripItemModel.setTruckId(tripItem.getTrip().getTruck().getId());
         if(tripItem.getContainer() != null) {
             tripItemModel.setContainerCode(tripItem.getContainer().getContainerCode());
         }

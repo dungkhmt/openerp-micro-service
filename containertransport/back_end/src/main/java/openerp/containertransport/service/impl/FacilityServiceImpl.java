@@ -52,6 +52,7 @@ public class FacilityServiceImpl implements FacilityService {
         facility.setMaxNumberContainer(facilityModel.getMaxNumberTrailer());
         facility.setMaxNumberTrailer(facilityModel.getMaxNumberContainer());
         facility.setMaxNumberTruck(facilityModel.getMaxNumberTruck());
+        facility.setOwner(facilityModel.getOwner());
         facility.setCreatedAt(System.currentTimeMillis());
         facility.setUpdatedAt(System.currentTimeMillis());
         facility.setStatus("available");
@@ -102,6 +103,11 @@ public class FacilityServiceImpl implements FacilityService {
         String sqlCount = "SELECT COUNT(id) FROM container_transport_facility WHERE 1=1";
         HashMap<String, Object> params = new HashMap<>();
 
+        if(!StringUtils.isEmpty(facilityFilterRequestDTO.getOwner())) {
+            sql += " AND owner = :owner";
+            sqlCount += " AND owner = :owner";
+            params.put("owner", facilityFilterRequestDTO.getOwner());
+        }
         if(!StringUtils.isEmpty(facilityFilterRequestDTO.getFacilityName())) {
             sql += " AND facility_name = '%:facilityName%'";
             sqlCount += " AND facility_name = '%:facilityName%'";

@@ -8,7 +8,10 @@ import openerp.containertransport.entity.Order;
 import java.util.List;
 
 public interface OrderService {
-    OrderModel createOrder(OrderModel orderModel);
+    List<OrderModel> createOrder(OrderModel orderModel);
     OrdersRes filterOrders(OrderFilterRequestDTO orderFilterRequestDTO);
     OrderModel updateOrder(OrderModel orderModel);
+    OrderModel getOrderByOrderCode(String orderCode, String username);
+    OrderModel updateOrder(long id, OrderModel orderModel);
+    OrderModel updateOrderByCode(String orderCode, OrderModel orderModel);
 }

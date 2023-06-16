@@ -10,11 +10,9 @@ import openerp.containertransport.dto.metaData.ResponseMetaData;
 import openerp.containertransport.service.TripService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -40,5 +38,19 @@ public class TripController {
     public ResponseEntity<?> createTrip(@RequestBody TripCreateDTO tripCreateDTO) {
         TripModel tripModelCreate = tripService.createTrip(tripCreateDTO.getTripContents(), tripCreateDTO.getShipmentId(), tripCreateDTO.getCreateBy());
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModelCreate));
+    }
+
+    @PostMapping ("/get-by-driver")
+    public ResponseEntity<?> getTripsByDriver(@RequestBody TripFilterRequestDTO requestDTO, JwtAuthenticationToken token) {
+        String username = token.getName();
+        requestDTO.setUsername(username);
+        List<TripModel> tripModels = tripService.getTripsByDriver(requestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModels));
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateTrip(@PathVariable Long id ,@RequestBody TripModel tripModel) {
+        TripModel tripModelUpdate = tripService.updateTrip(id, tripModel);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModelUpdate));
     }
 }

@@ -46,6 +46,7 @@ public class TripServiceImpl implements TripService {
         });
         trip.setShipmentId(shipmentId);
         trip.setTruck(truck);
+        trip.setDriverId(truck.getDriverId());
         trip.setStatus("Waiting");
         trip.setCreatedByUserId(createBy);
         trip.setOrders(orders);
@@ -97,6 +98,49 @@ public class TripServiceImpl implements TripService {
     @Override
     public TripModel getById(long id) {
         Trip trip = tripRepo.findById(id).get();
+        return convertToModel(trip);
+    }
+
+    @Override
+    public List<TripModel> getTripsByDriver(TripFilterRequestDTO requestDTO) {
+        String sql = "SELECT * FROM container_transport_trip WHERE 1=1";
+        HashMap<String, Object> params = new HashMap<>();
+
+        sql += " AND driver_id = :driverId";
+        params.put("driverId", requestDTO.getUsername());
+
+        if (requestDTO.getStatus() != null) {
+            if(requestDTO.getStatus().equals("Pending")) {
+                List<String> status = new ArrayList<>();
+                status.add("SCHEDULED");
+                status.add("EXECUTING");
+                sql += " AND status in :status";
+                params.put("status", status);
+            }
+            else {
+                sql += " AND status = :status";
+                params.put("status", requestDTO.getStatus());
+            }
+        }
+
+        sql += " ORDER BY updated_at DESC";
+        Query query = this.entityManager.createNativeQuery(sql, Trip.class);
+        for (String i : params.keySet()) {
+            query.setParameter(i, params.get(i));
+        }
+        List<Trip> trips = query.getResultList();
+        List<TripModel> tripModels = new ArrayList<>();
+        trips.forEach((item) -> tripModels.add(convertToModel(item)));
+        return tripModels;
+    }
+
+    @Override
+    public TripModel updateTrip(Long id, TripModel tripModel) {
+        Trip trip = tripRepo.findById(id).get();
+        if(tripModel.getStatus() != null) {
+            trip.setStatus(tripModel.getStatus());
+        }
+        trip = tripRepo.save(trip);
         return convertToModel(trip);
     }
 

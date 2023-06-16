@@ -22,8 +22,10 @@ public class TripItem {
 
     private String code;
 
-    @Column(name = "trip_id")
-    private Long tripId;
+    @ManyToOne()
+    @JoinColumn(name = "trip_id", referencedColumnName = "id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Trip trip;
 
     @Column(name = "seq")
     private Integer seq;

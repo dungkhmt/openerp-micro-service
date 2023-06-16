@@ -11,10 +11,9 @@ import openerp.containertransport.entity.Order;
 import openerp.containertransport.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,15 +25,34 @@ public class OrderController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createOrder(@RequestBody OrderModel orderModel) {
-        OrderModel order = orderService.createOrder(orderModel);
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), order));
+        List<OrderModel> orders = orderService.createOrder(orderModel);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orders));
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> filterOrder(@RequestBody OrderFilterRequestDTO orderFilterRequestDTO){
+    public ResponseEntity<?> filterOrder(@RequestBody OrderFilterRequestDTO orderFilterRequestDTO, JwtAuthenticationToken token){
+        String username = token.getName();
+        orderFilterRequestDTO.setOwner(username);
         OrdersRes orderModels = orderService.filterOrders(orderFilterRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModels));
     }
 
+    @GetMapping("/{orderCode}")
+    public ResponseEntity<?> getOrderByOrderCode(@PathVariable String orderCode, JwtAuthenticationToken token) {
+        String username = token.getName();
+        OrderModel orderModel = orderService.getOrderByOrderCode(orderCode, username);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModel));
+    }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateOrder(@PathVariable long id, @RequestBody OrderModel orderModel) {
+        OrderModel orderModelUpdate = orderService.updateOrder(id, orderModel);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModelUpdate));
+    }
+
+    @PutMapping("/update/{orderCode}")
+    public ResponseEntity<?> updateOrderByCode(@PathVariable String orderCode, @RequestBody OrderModel orderModel) {
+        OrderModel orderModelUpdate = orderService.updateOrderByCode(orderCode, orderModel);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModelUpdate));
+    }
 }

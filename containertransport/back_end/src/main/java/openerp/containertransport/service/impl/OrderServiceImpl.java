@@ -3,68 +3,103 @@ package openerp.containertransport.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
-import openerp.containertransport.dto.FacilityResponsiveDTO;
-import openerp.containertransport.dto.OrderFilterRequestDTO;
-import openerp.containertransport.dto.OrderModel;
-import openerp.containertransport.dto.OrdersRes;
+import openerp.containertransport.dto.*;
 import openerp.containertransport.entity.Container;
 import openerp.containertransport.entity.Facility;
 import openerp.containertransport.entity.Order;
+import openerp.containertransport.entity.Relationship;
 import openerp.containertransport.repo.ContainerRepo;
 import openerp.containertransport.repo.FacilityRepo;
 import openerp.containertransport.repo.OrderRepo;
+import openerp.containertransport.service.ContainerService;
+import openerp.containertransport.service.FacilityService;
 import openerp.containertransport.service.OrderService;
+import openerp.containertransport.service.RelationshipService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepo orderRepo;
     private final FacilityRepo facilityRepo;
+    private final FacilityService facilityService;
     private final ContainerRepo containerRepo;
+    private final ContainerService containerService;
+    private final ContainerServiceImpl containerServiceImpl;
+    private final RelationshipService relationshipService;
     private final ModelMapper modelMapper;
     private final EntityManager entityManager;
     @Override
-    public OrderModel createOrder(OrderModel orderModel) {
-        Order order = new Order();
-        AtomicLong weight = new AtomicLong();
-        List<Container> containers = new ArrayList<>();
-        if(!orderModel.getContainerIds().isEmpty()){
-            orderModel.getContainerIds().forEach((item) -> {
-                Container container = containerRepo.findById(item);
-                containers.add(container);
-                weight.addAndGet(container.getTypeContainer().getSize());
-            });
+    public List<OrderModel> createOrder(OrderModel orderModel) {
+        List<OrderModel> orderModels = new ArrayList<>();
+
+        if(orderModel.getType().equals("OE")) {
+            Order order = new Order();
+            Container container = getContainerNearest(orderModel.getToFacilityId(), orderModel.getWeight());
+            Facility fromFacility = facilityRepo.findById(container.getFacility().getId()).get();
+            Facility facilityTo = facilityRepo.findById(orderModel.getToFacilityId()).get();
+            order.setToFacility(facilityTo);
+            order.setFromFacility(fromFacility);
+            order.setContainer(container);
+            order.setWeight(Long.valueOf(container.getTypeContainer().getSize()));
+            order = createAttribute(orderModel, order);
+            order = orderRepo.save(order);
+            order.setOrderCode("ORD" + order.getId());
+            order = orderRepo.save(order);
+            orderModels.add(convertToModel(order));
         }
-        if(!containers.isEmpty()) {
-            order.setContainers(containers);
+        else {
+            if(!orderModel.getContainerIds().isEmpty()){
+                orderModel.getContainerIds().forEach((item) -> {
+                    Container container = containerRepo.findById(item);
+                    Order order = new Order();
+                    order.setContainer(container);
+                    order.setWeight(Long.valueOf(container.getTypeContainer().getSize()));
+
+                    if(orderModel.getFromFacilityId() != null) {
+                        Facility facilityFrom = facilityRepo.findById(orderModel.getFromFacilityId()).get();
+                        order.setFromFacility(facilityFrom);
+                    }
+                    if(orderModel.getToFacilityId() != null) {
+                        Facility facilityTo = facilityRepo.findById(orderModel.getToFacilityId()).get();
+                        order.setToFacility(facilityTo);
+                    }
+
+                    if(orderModel.getType().equals("IE")) {
+                        Long facilityId = getFacilityNearest(orderModel.getFromFacilityId());
+                        Facility toFacility = facilityRepo.findById(facilityId).get();
+                        order.setToFacility(toFacility);
+                    }
+                    order = createAttribute(orderModel, order);
+                    order = orderRepo.save(order);
+                    order.setOrderCode("ORD" + order.getId());
+                    order = orderRepo.save(order);
+                    orderModels.add(convertToModel(order));
+                });
+            }
         }
+
+        return orderModels;
+    }
+    public Order createAttribute(OrderModel orderModel, Order order) {
         order.setCustomerId(orderModel.getCustomerId());
-        Facility facilityFrom = facilityRepo.findById(orderModel.getFromFacilityId()).get();
-        Facility facilityTo = facilityRepo.findById(orderModel.getToFacilityId()).get();
-        order.setFromFacility(facilityFrom);
-        order.setToFacility(facilityTo);
         order.setEarlyDeliveryTime(orderModel.getEarlyDeliveryTime());
         order.setLateDeliveryTime(orderModel.getLateDeliveryTime());
         order.setEarlyPickupTime(orderModel.getEarlyPickupTime());
         order.setLatePickupTime(orderModel.getLatePickupTime());
         order.setType(orderModel.getType());
-        order.setWeight(weight.get());
         order.setIsBreakRomooc(orderModel.isBreakRomooc());
-        order.setStatus("WAITING PICKUP");
+        order.setStatus("ORDERED");
         order.setCreatedAt(System.currentTimeMillis());
         order.setUpdatedAt(System.currentTimeMillis());
-        order = orderRepo.save(order);
-        order.setOrderCode("ORD" + order.getId());
-        order = orderRepo.save(order);
-
-        return convertToModel(order);
+        return order;
     }
 
     @Override
@@ -74,6 +109,12 @@ public class OrderServiceImpl implements OrderService {
         String sql = "SELECT * FROM container_transport_order WHERE 1=1";
         String sqlCount = "SELECT COUNT(id) FROM container_transport_order WHERE 1=1";
         HashMap<String, Object> params = new HashMap<>();
+
+        if(orderFilterRequestDTO.getOwner() != null) {
+            sql += " AND customer_id = :owner";
+            sqlCount += " AND customer_id = :owner";
+            params.put("owner", orderFilterRequestDTO.getOwner());
+        }
 
         if(orderFilterRequestDTO.getOrderCode() != null){
             sql += " AND order_code = :orderCode";
@@ -121,14 +162,52 @@ public class OrderServiceImpl implements OrderService {
         return convertToModel(order);
     }
 
+    @Override
+    public OrderModel getOrderByOrderCode(String orderCode, String username) {
+        Order order = orderRepo.findByOrderCode(orderCode, username);
+        return convertToModel(order);
+    }
+
+    @Override
+    public OrderModel updateOrder(long id, OrderModel orderModel) {
+        Order order = orderRepo.findById(id).get();
+        if(orderModel.getStatus() != null) {
+            order.setStatus(orderModel.getStatus());
+        }
+        if(orderModel.getEarlyPickupTime() > 0) {
+            order.setEarlyPickupTime(orderModel.getEarlyPickupTime());
+        }
+        if(orderModel.getLatePickupTime() > 0) {
+            order.setLatePickupTime(orderModel.getLatePickupTime());
+        }
+        if(orderModel.getEarlyDeliveryTime() > 0) {
+            order.setEarlyDeliveryTime(orderModel.getEarlyDeliveryTime());
+        }
+        if(orderModel.getLateDeliveryTime() > 0) {
+            order.setLateDeliveryTime(orderModel.getLateDeliveryTime());
+        }
+        order.setUpdatedAt(System.currentTimeMillis());
+        order = orderRepo.save(order);
+        return convertToModel(order);
+    }
+
+    @Override
+    public OrderModel updateOrderByCode(String orderCode, OrderModel orderModel) {
+        Order order = orderRepo.findByOrderCode(orderCode);
+        OrderModel orderModelUpdate = updateOrder(order.getId(), orderModel);
+        return orderModelUpdate;
+    }
+
     public OrderModel convertToModel(Order order){
         OrderModel orderModel = modelMapper.map(order, OrderModel.class);
         FacilityResponsiveDTO fromFacility = buildFacilityResponse(order.getFromFacility());
         FacilityResponsiveDTO toFacility = buildFacilityResponse(order.getToFacility());
         orderModel.setFromFacility(fromFacility);
         orderModel.setToFacility(toFacility);
+        orderModel.setContainerModel(containerServiceImpl.convertToModel(order.getContainer()));
         return orderModel;
     }
+
     public FacilityResponsiveDTO buildFacilityResponse(Facility facility) {
         FacilityResponsiveDTO facilityResponsive =  FacilityResponsiveDTO.builder()
                 .facilityName(facility.getFacilityName())
@@ -140,5 +219,72 @@ public class OrderServiceImpl implements OrderService {
                 .address(facility.getAddress())
                 .build();
         return facilityResponsive;
+    }
+
+    public Long getFacilityNearest(Long facilityId) {
+        AtomicReference<Long> facilityRes = null;
+
+        List<FacilityModel> facilityModels = getAllFacilityAdmin();
+
+        AtomicReference<BigDecimal> distant = new AtomicReference<>(new BigDecimal(Long.MAX_VALUE));
+        List<Relationship> relationships = relationshipService.getAllRelationShip();
+
+        facilityModels.forEach((facilityModel) -> {
+            relationships.forEach(relationship -> {
+                if(relationship.getFromFacility() == facilityId && relationship.getToFacility() == facilityModel.getId()) {
+                    if(relationship.getDistant().compareTo(distant.get()) < 0) {
+                        distant.set(relationship.getDistant());
+                        facilityRes.set(facilityModel.getId());
+                    }
+                }
+            });
+        });
+        return facilityRes.get();
+    }
+
+    public Container getContainerNearest(Long toFacility, long containerSize) {
+        List<FacilityModel> facilityModels = getAllFacilityAdmin();
+
+        AtomicReference<BigDecimal> distant = new AtomicReference<>(new BigDecimal(Long.MAX_VALUE));
+        List<Relationship> relationships = relationshipService.getAllRelationShip();
+
+        AtomicReference<Long> containerId = null;
+
+        facilityModels.forEach((facilityModel) -> {
+            relationships.forEach(relationship -> {
+                if(relationship.getFromFacility() == facilityModel.getId()
+                        && relationship.getToFacility() == toFacility
+                        && checkContainerInDepot(facilityModel.getId(), containerSize) != null
+                ) {
+                    if(relationship.getDistant().compareTo(distant.get()) < 0) {
+                        distant.set(relationship.getDistant());
+                        containerId.set(checkContainerInDepot(facilityModel.getId(), containerSize).getId());
+                    }
+                }
+            });
+        });
+        if(containerId.get() != null) {
+            return containerRepo.findById(containerId.get()).get();
+        }
+        return null;
+    }
+
+    public ContainerModel checkContainerInDepot (Long facilityId, long containerSize) {
+        ContainerFilterRequestDTO requestDTO = new ContainerFilterRequestDTO();
+        requestDTO.setContainerSize(containerSize);
+        requestDTO.setFacilityId(facilityId);
+        List<ContainerModel> containerModels = containerService.filterContainer(requestDTO).getContainerModels();
+        if(containerModels != null && containerModels.size() != 0) {
+            return containerModels.get(0);
+        }
+        return null;
+    }
+
+    public List<FacilityModel> getAllFacilityAdmin() {
+        FacilityFilterRequestDTO requestDTO = new FacilityFilterRequestDTO();
+        requestDTO.setOwner("dungpq");
+        requestDTO.setType("Container");
+        List<FacilityModel> facilityModels = facilityService.filterFacility(requestDTO).getFacilityModels();
+        return facilityModels;
     }
 }

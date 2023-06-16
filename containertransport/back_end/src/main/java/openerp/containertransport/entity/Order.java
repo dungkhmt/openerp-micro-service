@@ -37,11 +37,10 @@ public class Order {
     @Column(name = "is_break_romooc")
     private Boolean isBreakRomooc;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(	name = "container_transport_order_container",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "container_id"))
-    private List<Container> containers = new ArrayList<>();
+    @ManyToOne()
+    @JoinColumn(name = "container_id", referencedColumnName = "id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Container container;
 
     @ManyToOne()
     @JoinColumn(name = "from_facility", referencedColumnName = "id")
