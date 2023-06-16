@@ -21,7 +21,6 @@ const colors = [
   orange[800],
 ];
 const PieChart = ({ categories, series: data, loading }) => {
-  console.log("Series: ", data);
   const [options, setOptions] = useState({
     chart: {
       type: "variablepie",

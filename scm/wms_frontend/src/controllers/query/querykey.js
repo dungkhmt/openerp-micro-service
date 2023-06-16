@@ -55,5 +55,10 @@ export const queryKey = {
   dashboard: {
     new_facility_month: "new_facility_month",
     imported_product_cate: "imported_product_cate",
+    quarter_purchase_order: "quarter_purchase_order",
+    top_customer: "top_customer",
+    trip_per_province: "trip_per_province",
+    product_category_rate: "product_category_rate",
+    new_customer_month: "new_customer_month",
   },
 };

@@ -141,7 +141,8 @@ create table wms_receipt_item
     expired_date       TIMESTAMP,
     last_updated_stamp TIMESTAMP,
     created_stamp      TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
-    receipt_item_request_id uuid not null
+    receipt_item_request_id uuid not null,
+    receipt_bill_id varchar(50)
 );
 
 create table wms_product_price
@@ -267,6 +268,20 @@ create table wms_delivery_trip_path
     created_stamp timestamp default current_timestamp
 );
 
+create table wms_receipt_bill
+(
+    receipt_bill_id varchar(50) primary key not null,
+    total_price decimal(20, 5),
+    description varchar(200),
+    receipt_id uuid not null,
+    created_by varchar(50),
+    created_stamp timestamp default current_timestamp,
+    last_update_stamp timestamp default current_timestamp
+);
+
+alter table wms_receipt_bill
+add constraint fk_receipt_bill_receipt foreign key (receipt_id) references wms_receipt (receipt_id) on delete cascade ;
+
 alter table wms_inventory_item
 add constraint fk_inventory_item_product foreign key (product_id) references wms_product (product_id) on delete cascade;
 alter table wms_inventory_item
@@ -361,3 +376,4 @@ create sequence wms_delivery_trip_item_seq ;
 create sequence wms_delivery_trip_path_seq ;
 create sequence wms_delivery_trip_seq ;
 create sequence wms_shipment_seq ;
+create sequence wms_receipt_bill_seq ;

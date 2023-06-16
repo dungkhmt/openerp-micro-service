@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -30,8 +31,9 @@ public class ProcessReceiptController {
     @PostMapping(path = "/{receiptId}")
     public ResponseEntity<String> saveReceiptItemProcessed(@PathVariable String receiptId,
                                                            @RequestParam(name = "isDone") boolean isDone,
-                                                           @RequestBody List<ProcessedItemModel> items) {
-        return receiptService.process(receiptId, items, isDone) ?
+                                                           @RequestBody List<ProcessedItemModel> items,
+                                                           Principal principal) {
+        return receiptService.process(receiptId, items, isDone, principal) ?
             ResponseEntity.ok("OK") :
             new ResponseEntity<>("FAIL", HttpStatus.INTERNAL_SERVER_ERROR);
     }

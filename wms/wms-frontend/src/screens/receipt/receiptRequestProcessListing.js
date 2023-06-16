@@ -12,6 +12,7 @@ const ReceiptRequestProcessListing = () => {
 
   const [receiptTableData, setReceiptTableData] = useState([]);
   const [processedReceiptTableData, setProcessedReceiptTableData] = useState([]);
+  const [receiptBillTableData, setReceiptBillTableData] = useState([]);
   const { path } = useRouteMatch();
   const [isLoading, setLoading] = useState(true);
 
@@ -35,6 +36,14 @@ const ReceiptRequestProcessListing = () => {
         }
       );
 
+      await request(
+        'get',
+        API_PATH.ALL_RECEIPT_BILLS,
+        (res) => {
+          setReceiptBillTableData(res.data);
+        }
+      )
+
       setLoading(false);
     }
 
@@ -50,6 +59,7 @@ const ReceiptRequestProcessListing = () => {
           <TabList onChange={(event, value) => setTabValue(value)}>
             <Tab label="Đơn nhập hàng cần xử lý" value='1'></Tab>
             <Tab label="Đơn nhập hàng đã xử lý" value='2'></Tab>
+            <Tab label="Phiếu nhập hàng" value='3'></Tab>
           </TabList>
         </Box>
         <TabPanel value="1">
@@ -94,6 +104,26 @@ const ReceiptRequestProcessListing = () => {
             }}
             onRowClick={ (event, rowData) => {
               window.location.href = `${path}/${rowData.receiptRequestId}`;
+            } }
+          />
+        </TabPanel>
+        <TabPanel value="3">
+          <StandardTable 
+            title="Danh sách phiếu nhập hàng"
+            columns={[
+              { title: "Mã phiếu", field: "receiptBillId" }, 
+              { title: "Tổng giá trị", field: "totalPrice" },
+              { title: "Ngày tạo", field: "createdStampStr" }
+            ]}
+            data={receiptBillTableData}
+            options={{
+              selection: false,
+              pageSize: 5,
+              search: true,
+              sorting: true,
+            }}
+            onRowClick={ (event, rowData) => {
+              window.location.href = `${path.replace('process-receipts', 'receipt-bill')}/${rowData.receiptBillId}`;
             } }
           />
         </TabPanel>

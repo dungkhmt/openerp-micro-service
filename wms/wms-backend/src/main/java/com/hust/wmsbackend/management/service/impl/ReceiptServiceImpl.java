@@ -4,10 +4,7 @@ import com.hust.wmsbackend.management.entity.*;
 import com.hust.wmsbackend.management.entity.enumentity.CurrencyUom;
 import com.hust.wmsbackend.management.entity.enumentity.ReceiptStatus;
 import com.hust.wmsbackend.management.model.ReceiptRequest;
-import com.hust.wmsbackend.management.model.response.ProcessedItemModel;
-import com.hust.wmsbackend.management.model.response.ReceiptGeneralResponse;
-import com.hust.wmsbackend.management.model.response.ReceiptProcessResponse;
-import com.hust.wmsbackend.management.model.response.ReceiptRequestResponse;
+import com.hust.wmsbackend.management.model.response.*;
 import com.hust.wmsbackend.management.repository.*;
 import com.hust.wmsbackend.management.service.ProductService;
 import com.hust.wmsbackend.management.service.ReceiptService;
@@ -37,6 +34,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     private ProductWarehouseRepository productWarehouseRepository;
     private WarehouseRepository warehouseRepository;
     private ProductV2Repository productRepository;
+    private ReceiptBillRepository receiptBillRepository;
 
     private ProductService productService;
     private WarehouseService warehouseService;
@@ -305,11 +303,20 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     @Override
     @Transactional
-    public boolean process(String receiptId, List<ProcessedItemModel> items, boolean isDone) {
+    public boolean process(String receiptId, List<ProcessedItemModel> items, boolean isDone, Principal principal) {
         if (items == null) {
             log.warn("Receipt items for processing is null");
             return false;
         }
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        for (ProcessedItemModel model : items) {
+            totalPrice = totalPrice.add(model.getQuantity().multiply(model.getImportPrice()));
+        }
+        // create receipt bill
+        ReceiptBill bill = ReceiptBill.builder().receiptId(UUID.fromString(receiptId)).totalPrice(totalPrice).build();
+        bill.setCreatedBy(principal.getName());
+        receiptBillRepository.save(bill);
+        String billId = bill.getReceiptBillId();
         for (ProcessedItemModel model : items) {
             try {
                 // update receipt status to IN_PROCESS
@@ -332,7 +339,8 @@ public class ReceiptServiceImpl implements ReceiptService {
                     .lotId(model.getLotId())
                     .importPrice(model.getImportPrice())
                     .receiptItemRequestId(model.getReceiptItemRequestId())
-                    .build();;
+                    .receiptBillId(billId)
+                    .build();
                 receiptItemRepository.save(receiptItem);
                 // create inventory_item
                 InventoryItem inventoryItem = InventoryItem
@@ -372,6 +380,22 @@ public class ReceiptServiceImpl implements ReceiptService {
             }
         }
         return true;
+    }
+
+    @Override
+    public List<ReceiptBillWithItems> getReceiptBills(String receiptId) {
+        List<ReceiptBill> bills;
+        if (receiptId == null) {
+            bills = receiptBillRepository.findAll();
+        } else {
+            bills = receiptBillRepository.findAllByReceiptId(UUID.fromString(receiptId));
+        }
+        List<ReceiptBillWithItems> response = new ArrayList<>();
+        for (ReceiptBill bill : bills) {
+            ReceiptBillWithItems billWithItems = new ReceiptBillWithItems(bill);
+            response.add(billWithItems);
+        }
+        return response;
     }
 
     private void updateInventoryItem(

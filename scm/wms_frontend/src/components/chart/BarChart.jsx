@@ -36,7 +36,7 @@ const BarChart = ({ categories, series, loading }) => {
     yAxis: {
       series,
       title: {
-        text: "Facilities number",
+        text: "Monthly figures",
       },
     },
     plotOptions: {

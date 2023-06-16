@@ -8,8 +8,6 @@ import wms.repo.*;
 import wms.service.BaseService;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,6 +51,16 @@ public class DashboardServiceImpl extends BaseService implements IDashBoardServi
     }
 
     @Override
+    public List<Integer> newCustomerMonthly(int year) {
+        List<Integer> customersMonthly = new ArrayList<>();
+        for (int i = 1; i < 13; i++) {
+            List<Customer> facilities = customerRepo.getCustomerCreatedMonthly(i, year);
+            customersMonthly.add(facilities.size());
+        }
+        return customersMonthly;
+    }
+
+    @Override
     public List<List<Object>> getImportProductList(int month, int year) {
         List<InventoryItem> inventoryItems = inventoryItemRepo.getAllItemsOfMonthAndYear(month, year);
         return inventoryItems.stream()
@@ -71,7 +79,7 @@ public class DashboardServiceImpl extends BaseService implements IDashBoardServi
     }
 
     @Override
-    public    Map<Integer, List<Map<String, Integer>>> getPurchaseOrderQuarterly(int quarter, int year) {
+    public Map<Integer, List<Map<String, Integer>>> getPurchaseOrderQuarterly(int quarter, int year) {
         Map<Integer, List<Map<String, Integer>>> result = new HashMap<>();
         Map<Integer, List<Integer>> quarterMapping = initQuarterMapping();
         List<Integer> months = quarterMapping.get(quarter);

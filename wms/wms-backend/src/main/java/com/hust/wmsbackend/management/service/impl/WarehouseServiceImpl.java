@@ -130,7 +130,6 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public WarehouseWithBays getById(String id) {
-        log.info(String.format("Start get warehouse information with id %s", id));
         UUID uuid = UUID.fromString(id);
         Optional<Warehouse> warehouseOpt = warehouseRepository.findById(uuid);
         if (warehouseOpt.isPresent()) {
