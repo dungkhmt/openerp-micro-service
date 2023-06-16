@@ -1,5 +1,5 @@
 export const container = {
-    id: "MENU_CONTAINER",
+    id: "MENU_CONTAINER_CONTAINER",
     icon: "Container",
     text: "Container",
     child: [

@@ -43,8 +43,9 @@ import { truck } from "./menuconfig/truck";
 import { trailer } from "./menuconfig/trailer";
 import { container } from "./menuconfig/container";
 import { facility } from "./menuconfig/facility";
-import { trip } from "./menuconfig/trip";
+import { shipment } from "./menuconfig/shipment";
 import { order } from "./menuconfig/order";
+import { trip } from "./menuconfig/trip";
 
 export const MENUS = [];
 
@@ -56,6 +57,7 @@ MENUS.push(truck);
 MENUS.push(trailer);
 MENUS.push(container);
 MENUS.push(facility);
+MENUS.push(shipment);
 MENUS.push(trip)
 
 

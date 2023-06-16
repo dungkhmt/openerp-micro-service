@@ -15,3 +15,27 @@ export const createOrder = async (data) => {
     );
     return resData;
 }
+
+export const getOrderByOrderCode = async (data) => {
+    const resData = request(
+        "get",
+        `/order/${data}`, {}, {}, {}, {}
+    );
+    return resData;
+}
+
+export const updateOrder = async (id, data) => {
+    const resData = request(
+        "put",
+        `/order/update/${id}`, {}, {}, data, {}
+    );
+    return resData;
+}
+
+export const updateOrderByOrderCode = async (orderCode, data) => {
+    const resData = request(
+        "put",
+        `/order/update/${orderCode}`, {}, {}, data, {}
+    );
+    return resData;
+}

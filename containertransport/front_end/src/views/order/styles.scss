@@ -173,3 +173,49 @@
         color: #c82a2a;
     }
 }
+.order-info {
+    background-color: white;
+    padding: 16px 16px 8px 32px;
+    margin-bottom: 16px;
+
+}
+.order-info-item {
+    display: flex;
+    padding-bottom: 16px;
+}
+.text-head {
+    width: 20%;
+    .MuiTypography-root {
+        font-weight: 600;
+    }
+}
+.text-head-item {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 16px;
+    margin-left: 32px;
+}
+.order-info-transport {
+    display: flex;
+    background-color: white;
+    padding: 16px 16px 8px 32px;
+    margin-bottom: 16px;
+    .from-facility {
+        width: 50%;
+        margin-right: 5%;
+    }
+    .text-head {
+        width: 25% !important;
+    }
+    .to-facility {
+        width: 45%;
+    }
+    .text-head-facility {
+        margin-bottom: 36px;
+        
+        .MuiTypography-root {
+            font-weight: 600;
+            font-weight: 18px;
+        }
+    }
+}

@@ -19,6 +19,10 @@ import TripDetail from "views/shipment/tripDetail/TripDetail";
 import TrailerScreen from "views/trailer/TrailerScreen";
 import FacilityDetail from "views/facilityManagement/detail/FacilityDetail";
 import TruckDetail from "views/truck/detail/TruckDetail";
+import OrderDetail from "views/order/detail/OrderDetail";
+import TripPendingScreen from "views/trip/tripPending/TripPendingScreen";
+import TripManaDetail from "views/trip/component/TripManaDetail";
+import DetailContainerScreen from "views/containerManagerment/detail/DetailContainersScreen";
 
 const styles = {
   loadingProgress: {
@@ -45,20 +49,30 @@ function MainAppRouter(props) {
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
+        
           <Route component={() => <></>} exact path="/" />
+          <AppProvider>
           <PrivateRoute component={TeacherRouter} path="/teacher" />
           <PrivateRoute component={TruckScreen} exact path="/truck" />
           <PrivateRoute component={TruckDetail} exact path="/truck/detail/:truckId" />
+          
           <PrivateRoute component={FacilityScreen} exact path="/facility" />
           <PrivateRoute component={FacilityDetail} exact path="/facility/detail/:facilityId" />
+          
           <PrivateRoute component={OrderScreen} exact path="/order" />
+          <PrivateRoute component={OrderDetail} exact path="/order/:orderCode" />
+
           <PrivateRoute component={ContainerScreen} exact path="/container" />
-          <Route component={TrailerScreen} exact path="/trailer" />
-          <AppProvider>
-            <Route component={ShipmentScreen} exact path="/shipment" />
-            <Route component={ShipmentDetail} exact path="/shipment/detail/:shipmentId" />
-            <Route component={TripDetail} exact path="/shipment/trip/detail/:shipmentId/:tripId" />
-            <Route component={CreateTripDetail} path="/shipment/trip/create/:shipmentId" />
+          <PrivateRoute component={DetailContainerScreen} exact path="/container/detail/:containerId" />
+
+          <PrivateRoute component={TrailerScreen} exact path="/trailer" />
+          <PrivateRoute component={TripPendingScreen} exact path="/trip/pending" />
+          <PrivateRoute component={TripManaDetail} exact path="/trip/detail/:tripId" />
+          
+            <PrivateRoute component={ShipmentScreen} exact path="/shipment" />
+            <PrivateRoute component={ShipmentDetail} exact path="/shipment/detail/:shipmentId" />
+            <PrivateRoute component={TripDetail} exact path="/shipment/trip/detail/:shipmentId/:tripId" />
+            <PrivateRoute component={CreateTripDetail} path="/shipment/trip/create/:shipmentId" />
           </AppProvider>
           <Route component={NotFound} />
         </Switch>

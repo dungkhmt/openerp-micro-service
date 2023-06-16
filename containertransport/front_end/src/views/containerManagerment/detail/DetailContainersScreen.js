@@ -3,52 +3,54 @@ import '../styles.scss';
 import { Alert, Box, Button, Container, Divider, Icon, Typography } from "@mui/material";
 import { useHistory, useParams } from "react-router-dom";
 import { menuIconMap } from "config/menuconfig";
-import { getTruckById, getTrucks } from "api/TruckAPI";
-import ModalTruck from "../ModalTruck";
+import { getContainerById } from "api/ContainerAPI";
 
-const TruckDetail = () => {
+const DetailContainerScreen = () => {
+
     const history = useHistory();
-    const { truckId } = useParams();
-    const [truck, setTruck] = useState();
+    const { containerId } = useParams();
 
     const [toastOpen, setToast] = useState(false);
     const [toastType, setToastType] = useState();
     const [toastMsg, setToastMsg] = useState('');
 
+    const [container, setContainer] = useState('');
+
     const [open, setOpen] = useState(false);
 
 
     useEffect(() => {
-        getTruckById(truckId).then((res) => {
-            setTruck(res.data);
+        getContainerById(containerId).then((res) => {
+            setContainer(res.data);
         })
     }, [open]);
     const handleClose = () => {
         setOpen(!open);
     }
-    console.log("Truck", truck)
+    console.log("container", container)
     return (
         <Box className="fullScreen">
             <Container maxWidth="lg" className="container">
                 <Box className="toast">
                     {toastOpen ? (
-                    <Alert variant="filled" severity={toastType} >
-                        <strong>{toastMsg}</strong >
-                    </Alert > ) : null}
+                        <Alert variant="filled" severity={toastType} >
+                            <strong>{toastMsg}</strong >
+                        </Alert >) : null}
                 </Box>
+
                 <Box className="header-detail">
                     <Box className="headerScreen-go-back"
-                        onClick={() => history.push('/truck')}
+                        onClick={() => history.push('/container')}
                         sx={{ cursor: "pointer" }}
                     >
                         <Icon>
                             {menuIconMap.get("ArrowBackIosIcon")}
                         </Icon>
-                        <Typography>Go back Truck screen</Typography>
+                        <Typography>Go back containers screen</Typography>
                     </Box>
                     <Box className="headerScreen-detail-info">
                         <Box className="title-header">
-                            <Typography >Truck {truck?.truckCode}</Typography>
+                            <Typography >Container</Typography>
                         </Box>
                         <Box className="btn-header">
                             <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
@@ -60,74 +62,57 @@ const TruckDetail = () => {
                         </Box>
                     </Box>
                 </Box>
+
                 <Box className="divider">
                     <Divider />
                 </Box>
 
-                {/* <Box className="title">
-                    <Typography>Truck Info</Typography>
-                </Box> */}
                 <Box className="facility-info">
                     <Box className="facility-info-item">
                         <Box className="facility-info-item-text">
-                            <Typography>Truck Code:</Typography>
+                            <Typography>Container Code:</Typography>
                         </Box>
-                        <Typography>{truck?.truckCode}</Typography>
+                        <Typography>{container?.containerCode}</Typography>
                     </Box>
                     <Box className="facility-info-item">
                         <Box className="facility-info-item-text">
-                            <Typography>Driver Name:</Typography>
+                            <Typography>Facility:</Typography>
                         </Box>
-                        <Typography>{truck?.driverName}</Typography>
+                        <Typography>{container?.facilityResponsiveDTO?.facilityCode}</Typography>
+                    </Box>
+                    <Box className="facility-info-item">
+                        <Box className="facility-info-item-text">
+                            <Typography>Size:</Typography>
+                        </Box>
+                        <Typography>{container?.size}</Typography>
                     </Box>
                     <Box className="facility-info-item">
                         <Box className="facility-info-item-text">
                             <Typography>Status:</Typography>
                         </Box>
-                        <Typography>{truck?.status}</Typography>
+                        <Typography>{container?.status}</Typography>
                     </Box>
                     <Box className="facility-info-item">
                         <Box className="facility-info-item-text">
-                            <Typography>Facility Name:</Typography>
+                            <Typography>Empty:</Typography>
                         </Box>
-                        <Typography>{truck?.facilityResponsiveDTO.facilityName}</Typography>
-                    </Box>
-                    <Box className="facility-info-item">
-                        <Box className="facility-info-item-text">
-                            <Typography>License Plates:</Typography>
-                        </Box>
-                        <Typography>{truck?.licensePlates}</Typography>
-                    </Box>
-
-                    <Box className="facility-info-item">
-                        <Box className="facility-info-item-text">
-                            <Typography>Brand:</Typography>
-                        </Box>
-                        <Typography>{truck?.brandTruck}</Typography>
-                    </Box>
-                    <Box className="facility-info-item">
-                        <Box className="facility-info-item-text">
-                            <Typography>Year Of Manufacture:</Typography>
-                        </Box>
-                        <Typography>{truck?.yearOfManufacture}</Typography>
+                        <Typography>{container?.isEmpty ? "True" : "False"}</Typography>
                     </Box>
                     <Box className="facility-info-item">
                         <Box className="facility-info-item-text">
                             <Typography>Create At:</Typography>
                         </Box>
-                        <Typography>{new Date(truck?.createdAt).toLocaleString()}</Typography>
+                        <Typography>{new Date(container?.createdAt).toLocaleString()}</Typography>
                     </Box>
                     <Box className="facility-info-item">
                         <Box className="facility-info-item-text">
                             <Typography>Update At:</Typography>
                         </Box>
-                        <Typography>{new Date(truck?.updatedAt).toLocaleString()}</Typography>
+                        <Typography>{new Date(container?.updatedAt).toLocaleString()}</Typography>
                     </Box>
                 </Box>
-                {open ? (<ModalTruck openModal={open} handleClose={handleClose} truckId={truckId} truck={truck} 
-                setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
             </Container>
         </Box>
     )
 }
-export default TruckDetail;
+export default DetailContainerScreen;

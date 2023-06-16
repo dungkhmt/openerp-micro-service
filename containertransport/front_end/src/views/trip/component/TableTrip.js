@@ -14,104 +14,72 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import './styles.scss';
-import { Icon } from '@mui/material';
-import { menuIconMap, typeOrderMap } from 'config/menuconfig';
+import { Button, Icon } from '@mui/material';
+import { menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
+import { updateTrip } from 'api/TripAPI';
 
-function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
-}
+// function descendingComparator(a, b, orderBy) {
+//   if (b[orderBy] < a[orderBy]) {
+//     return -1;
+//   }
+//   if (b[orderBy] > a[orderBy]) {
+//     return 1;
+//   }
+//   return 0;
+// }
 
-function getComparator(order, orderBy) {
-    return order === 'desc'
-        ? (a, b) => descendingComparator(a, b, orderBy)
-        : (a, b) => -descendingComparator(a, b, orderBy);
-}
+// function getComparator(order, orderBy) {
+//   return order === 'desc'
+//     ? (a, b) => descendingComparator(a, b, orderBy)
+//     : (a, b) => -descendingComparator(a, b, orderBy);
+// }
 
-function stableSort(array, comparator) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
-        const order = comparator(a[0], b[0]);
-        if (order !== 0) {
-            return order;
-        }
-        return a[1] - b[1];
-    });
-    return stabilizedThis.map((el) => el[0]);
-}
+// function stableSort(array, comparator) {
+//   const stabilizedThis = array.map((el, index) => [el, index]);
+//   stabilizedThis.sort((a, b) => {
+//     const order = comparator(a[0], b[0]);
+//     if (order !== 0) {
+//       return order;
+//     }
+//     return a[1] - b[1];
+//   });
+//   return stabilizedThis.map((el) => el[0]);
+// }
 
 const headCells = [
     {
         id: 'code',
         numeric: false,
-        disablePadding: true,
-        label: 'Order Code',
-        with: '12%'
+        disablePadding: false,
+        label: 'Trip Code',
+        width: '20%'
     },
     {
-        id: 'customer',
-        numeric: false,
-        disablePadding: true,
-        label: 'Customer',
-        with: '8%'
-    },
-    {
-        id: 'fromFacility',
-        numeric: false,
-        disablePadding: true,
-        label: 'From Facility',
-        with: '12%'
-    },
-    {
-        id: 'toFacility',
-        numeric: false,
-        disablePadding: true,
-        label: 'To Facility',
-        with: '12%'
-    },
-    {
-        id: 'type',
+        id: 'totalOrder',
         numeric: false,
         disablePadding: false,
-        label: 'Type',
-        with: '13%'
+        label: 'Total order',
+        width: '20%'
     },
     {
         id: 'status',
         numeric: false,
         disablePadding: false,
         label: 'Status',
-        with: '18%'
+        width: '20%'
     },
     {
-        id: 'createdAt',
+        id: 'action',
         numeric: false,
         disablePadding: false,
-        label: 'Created At',
-        with: '13%'
-    },
-    {
-        id: 'updateAt',
-        numeric: false,
-        disablePadding: false,
-        label: 'Updated At',
-        with: '13%'
-    },
-    {
-        id: 'view',
-        numeric: false,
-        disablePadding: true,
         label: '',
+        width: '20%'
     },
 ];
 
@@ -119,10 +87,7 @@ const DEFAULT_ORDER = 'asc';
 const DEFAULT_ORDER_BY = 'calories';
 
 function EnhancedTableHead(props) {
-    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
-    const createSortHandler = (newOrderBy) => (event) => {
-        onRequestSort(event, newOrderBy);
-    };
+    const { onSelectAllClick, order, orderBy, numSelected, rowCount } = props;
 
     return (
         <TableHead>
@@ -143,21 +108,22 @@ function EnhancedTableHead(props) {
                         key={headCell.id}
                         align={headCell.numeric ? 'right' : 'left'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
-                        sortDirection={orderBy === headCell.id ? order : false}
-                        width={headCell.with}
+                        // sortDirection={orderBy === headCell.id ? order : false}
+                        width={headCell?.width}
                     >
-                        <TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : 'asc'}
-                            onClick={createSortHandler(headCell.id)}
-                        >
-                            {headCell.label}
-                            {orderBy === headCell.id ? (
-                                <Box component="span" sx={visuallyHidden}>
-                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                </Box>
-                            ) : null}
-                        </TableSortLabel>
+                        {headCell.label}
+                        {/* <TableSortLabel
+              active={orderBy === headCell.id}
+            //   direction={orderBy === headCell.id ? order : 'asc'}
+            //   onClick={createSortHandler(headCell.id)}
+            >
+              {headCell.label}
+               {orderBy === headCell.id ? (
+                <Box component="span" sx={visuallyHidden}>
+                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                </Box>
+              ) : null} 
+            </TableSortLabel> */}
                     </TableCell>
                 ))}
             </TableRow>
@@ -165,7 +131,7 @@ function EnhancedTableHead(props) {
     );
 }
 
-export default function ContentsOrderManagerment({ orders, page, setPage, rowsPerPage, setRowsPerPage, count }) {
+export default function TableTrip({ trips, setExecutes, executed }) {
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
     const [selected, setSelected] = React.useState([]);
@@ -173,27 +139,27 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
     const [visibleRows, setVisibleRows] = React.useState(null);
     const history = useHistory();
 
-    const handleRequestSort = React.useCallback(
-        (event, newOrderBy) => {
-            const isAsc = orderBy === newOrderBy && order === 'asc';
-            const toggledOrder = isAsc ? 'desc' : 'asc';
-            setOrder(toggledOrder);
-            setOrderBy(newOrderBy);
+    //   const handleRequestSort = React.useCallback(
+    //     (event, newOrderBy) => {
+    //       const isAsc = orderBy === newOrderBy && order === 'asc';
+    //       const toggledOrder = isAsc ? 'desc' : 'asc';
+    //       setOrder(toggledOrder);
+    //       setOrderBy(newOrderBy);
 
-            const sortedRows = stableSort(orders, getComparator(toggledOrder, newOrderBy));
-            const updatedRows = sortedRows.slice(
-                page * rowsPerPage,
-                page * rowsPerPage + rowsPerPage,
-            );
+    //       const sortedRows = stableSort(trucks, getComparator(toggledOrder, newOrderBy));
+    //       const updatedRows = sortedRows.slice(
+    //         page * rowsPerPage,
+    //         page * rowsPerPage + rowsPerPage,
+    //       );
 
-            setVisibleRows(updatedRows);
-        },
-        [order, orderBy, page, rowsPerPage],
-    );
+    //       setVisibleRows(updatedRows);
+    //     },
+    //     [order, orderBy, page, rowsPerPage],
+    //   );
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = orders.map((n) => n.name);
+            const newSelected = trips.map((n) => n.name);
             setSelected(newSelected);
             return;
         }
@@ -220,22 +186,31 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
         setSelected(newSelected);
     };
 
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
+    //   const handleChangePage = (event, newPage) => {
+    //     setPage(newPage);
+    //   };
 
-    const handleChangeRowsPerPage = (event) => {
-        const updatedRowsPerPage = parseInt(event.target.value, 10);
-        setRowsPerPage(updatedRowsPerPage);
+    //   const handleChangeRowsPerPage = (event) => {
+    //     const updatedRowsPerPage = parseInt(event.target.value, 10);
+    //     setRowsPerPage(updatedRowsPerPage);
 
-        setPage(0);
-    };
+    //     setPage(0);
+    //   };
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
-    const handleDetail = (orderCode) => {
-        history.push(`/order/${orderCode}`)
+    const handleDetail = (id) => {
+        history.push({
+          pathname: `/trip/detail/${id}`,
+        })
     }
-
+    const handleExecuted = (id) => {
+        let data = {
+            status: "EXECUTING"
+        }
+        updateTrip(id, data).then((res) => {
+            setExecutes(!executed);
+        })
+    }
     return (
         <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
             <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -250,12 +225,12 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                             order={order}
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
-                            onRequestSort={handleRequestSort}
-                            rowCount={orders.length}
+                            //   onRequestSort={handleRequestSort}
+                            rowCount={trips.length}
                         />
                         <TableBody>
-                            {orders
-                                ? orders.map((row, index) => {
+                            {trips
+                                ? trips.map((row, index) => {
                                     const isItemSelected = isSelected(row.id);
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -270,7 +245,8 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                                             selected={isItemSelected}
                                             sx={{ cursor: 'pointer' }}
                                         >
-                                            <TableCell padding="checkbox">
+                                            <TableCell padding="checkbox"
+                                                sx={{ width: '10%' }}>
                                                 <Checkbox
                                                     color="primary"
                                                     checked={isItemSelected}
@@ -286,26 +262,25 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                                                 scope="row"
                                                 align="left"
                                             >
-                                                {row?.orderCode}
+                                                {row.code}
                                             </TableCell>
-                                            <TableCell align="left" sx={{paddingLeft: '0px !important'}}>{row?.customerId}</TableCell>
-                                            <TableCell align="left">{row?.fromFacility.facilityName}</TableCell>
-                                            <TableCell align="left">{row?.toFacility.facilityName}</TableCell>
-                                            <TableCell align="left">{typeOrderMap.get(row.type)}</TableCell>
+                                            <TableCell align="left">{row?.orderIds.length}</TableCell>
                                             <TableCell align="left">{row.status}</TableCell>
-                                            <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
-                                            <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
-                                            <TableCell >
+                                            <TableCell>
                                                 <Box sx={{ display: 'flex' }}>
-                                                <Box 
-                                                    onClick={() => { handleDetail(row?.orderCode) }} 
-                                                >
-                                                    <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                                                    <Button
+                                                        disabled={row.status !== "SCHEDULED" ? true : false}
+                                                        variant="contained"
+                                                        onClick={() => {handleExecuted(row.id)}}
+                                                    >
+                                                        Executing
+                                                    </Button>
+                                                    <Box sx={{ marginLeft: '16px' }}
+                                                        onClick={() => { handleDetail(row?.id) }} >
+                                                        <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                                                    </Box>
                                                 </Box>
-                                                <Box>
-                                                    <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                                                </Box>
-                                                </Box>
+
                                             </TableCell>
                                         </TableRow>
                                     );
@@ -314,18 +289,7 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                         </TableBody>
                     </Table>
                 </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    component="div"
-                    count={count}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
             </Paper>
         </Box>
     );
-
 }
-

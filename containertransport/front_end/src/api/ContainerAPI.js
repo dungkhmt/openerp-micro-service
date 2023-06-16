@@ -7,3 +7,11 @@ export const getContainers = async (data) => {
     );
     return resData;
 }
+
+export const getContainerById = async (data) => {
+    const resData = request(
+        "get",
+        `/container/${data}`, {}, {}, {}, {},
+    );
+    return resData;
+}

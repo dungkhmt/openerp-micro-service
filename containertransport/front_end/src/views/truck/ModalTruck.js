@@ -3,7 +3,7 @@ import './styles.scss';
 import React, { useEffect, useState } from "react";
 import { getFacility, getFacilityById } from "api/FacilityAPI";
 import { createTruck, updateTruck } from "api/TruckAPI";
-import { trip } from "config/menuconfig/trip";
+import { trip } from "config/menuconfig/shipment";
 
 const ModalTruck = ({ openModal, handleClose, truckId, truck, setToast, setToastType, setToastMsg }) => {
     const [facilityList, setFacilityList] = useState([]);

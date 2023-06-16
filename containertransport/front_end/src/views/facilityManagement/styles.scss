@@ -134,9 +134,10 @@
     }
 }
 
-.header-facility-detail {
+.header-detail {
     .headerScreen-go-back {
         display: flex;
+        align-items: center;
     }
 
     .headerScreen-detail-info {

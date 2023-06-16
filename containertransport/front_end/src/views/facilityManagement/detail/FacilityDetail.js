@@ -26,7 +26,7 @@ const FacilityDetail = () => {
     return (
         <Box className="fullScreen">
             <Container maxWidth="lg" className="container">
-                <Box className="header-facility-detail">
+                <Box className="header-detail">
                     <Box className="headerScreen-go-back"
                         onClick={() => history.push('/facility')}
                         sx={{ cursor: "pointer" }}

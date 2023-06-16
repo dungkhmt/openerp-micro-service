@@ -15,3 +15,11 @@ export const createTrailer = (data) => {
     )
     return resData;
 }
+
+export const updateTrailer = (data) => {
+    const resData = request(
+        "put",
+        `/trailer/update`, {},{}, data, {},
+    )
+    return resData;
+}

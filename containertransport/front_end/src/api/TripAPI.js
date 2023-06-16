@@ -23,3 +23,19 @@ export const getTripByTripId = async (data) => {
     )
     return resData;
 }
+
+export const getTripByDriver = async (data) => {
+    const resData = request(
+        "post",
+        `/trip/get-by-driver`, {},{}, data, {},
+    )
+    return resData;
+}
+
+export const updateTrip = async (id, data) => {
+    const resData = request(
+        "put",
+        `/trip/update/${id}`, {},{}, data, {},
+    )
+    return resData;
+}
