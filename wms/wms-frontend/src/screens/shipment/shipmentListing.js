@@ -96,7 +96,7 @@ const ShipmentListing = () => {
                     expectedDeliveryStamp: convertTimeStampToDate(expectDeliveryDate),
                     shipmentId: res.data
                   };
-                  setShipmentTableData([...shipmentTableData, adder]);
+                  setShipmentTableData([adder, ...shipmentTableData]);
                   resolve();
                 }
               },
