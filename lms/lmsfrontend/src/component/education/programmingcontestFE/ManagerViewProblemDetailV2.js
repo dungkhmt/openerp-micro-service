@@ -27,6 +27,22 @@ import FileUploadZone from "../../../utils/FileUpload/FileUploadZone";
 import ContestsUsingAProblem from "./ContestsUsingAProblem";
 import EditIcon from "@mui/icons-material/Edit";
 import {useHistory} from "react-router-dom";
+import {styled} from "@mui/material/styles";
+
+const CssTextField = styled(TextField)({
+  ".MuiInputBase-input.Mui-disabled": {
+    WebkitTextFillColor: "gray",
+    color: "gray"
+  },
+  '& label.Mui-disabled': {
+    color: 'gray',
+  },
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': {
+      borderColor: 'darkgray',
+    },
+  },
+});
 
 function ManagerViewProblemDetailV2() {
   const {t} = useTranslation(
@@ -98,9 +114,9 @@ function ManagerViewProblemDetailV2() {
     >
       <Grid container spacing={2}>
         <Grid item xs={4}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
-            required
             id="problemName"
             label={t("problemName")}
             value={problemName}
@@ -108,9 +124,9 @@ function ManagerViewProblemDetailV2() {
         </Grid>
 
         <Grid item xs={2}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
-            required
             id="levelId"
             label={t("level")}
             value={levelId}
@@ -118,9 +134,9 @@ function ManagerViewProblemDetailV2() {
         </Grid>
 
         <Grid item xs={2}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
-            required
             id="timeLimit"
             label={t("timeLimit")}
             placeholder="Time Limit"
@@ -131,9 +147,9 @@ function ManagerViewProblemDetailV2() {
         </Grid>
 
         <Grid item xs={2}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
-            required
             id="memoryLimit"
             label={t("memoryLimit")}
             type="number"
@@ -142,7 +158,8 @@ function ManagerViewProblemDetailV2() {
           />
         </Grid>
         <Grid item xs={2}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
             id="isPublicProblem"
             label={t("public", {ns: "common"})}
