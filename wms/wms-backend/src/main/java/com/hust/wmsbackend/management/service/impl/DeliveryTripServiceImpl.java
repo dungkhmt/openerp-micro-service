@@ -28,8 +28,7 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
     private AssignedOrderItemRepository assignedOrderItemRepository;
     private SaleOrderHeaderRepository saleOrderHeaderRepository;
     private CustomerAddressRepository customerAddressRepository;
-    private InventoryItemRepository inventoryItemRepository;
-    private ProductWarehouseRepository productWarehouseRepository;
+    private DeliveryBillRepository deliveryBillRepository;
 
     private WarehouseService warehouseService;
     private BayService bayService;
@@ -304,7 +303,7 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
 
     @Override
     @Transactional
-    public boolean startDelivery(String deliveryTripId) {
+    public boolean startDelivery(String deliveryTripId, Principal principal) {
         DeliveryTrip trip = findOrThrow(deliveryTripId);
         trip.setStatus(DeliveryTripStatus.DELIVERING);
         deliveryTripRepository.save(trip);
@@ -313,6 +312,12 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
             item.setStatus(DeliveryTripItemStatus.DELIVERING);
         }
         deliveryTripItemRepository.saveAll(items);
+        // create delivery bill
+        DeliveryBill deliveryBill = DeliveryBill.builder()
+            .deliveryTripId(deliveryTripId)
+            .createdBy(principal.getName())
+            .build();
+        deliveryBillRepository.save(deliveryBill);
         return true;
     }
 

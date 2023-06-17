@@ -113,7 +113,8 @@ const ReceiptRequestProcessListing = () => {
             columns={[
               { title: "Mã phiếu", field: "receiptBillId" }, 
               { title: "Tổng giá trị", field: "totalPrice" },
-              { title: "Ngày tạo", field: "createdStampStr" }
+              { title: "Ngày tạo", field: "createdStampStr" },
+              { title: "Mô tả", field: "description" }
             ]}
             data={receiptBillTableData}
             options={{

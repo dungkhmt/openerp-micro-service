@@ -18,6 +18,8 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
 
     List<DeliveryTripItem> findAllByDeliveryTripIdAndIsDeleted(String deliveryTripId, boolean isDeleted);
 
+    List<DeliveryTripItem> findAllByDeliveryTripId(String deliveryTripId);
+
     Optional<DeliveryTripItem> findByDeliveryTripItemIdAndIsDeletedIsFalse(String id);
 
     @Query(value = "select sum(dti.quantity) from wms_delivery_trip_item dti " +

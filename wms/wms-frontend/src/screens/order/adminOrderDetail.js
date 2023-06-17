@@ -41,6 +41,7 @@ const AdminOrderDetail = ( props ) => {
   const [selectedWarehouse, setSelectedWarehouse] = useState(null);
   const [selectedWarehouseItems, setSelectedWarehouseItems] = useState([]);
   const [maxQuantity, setMaxQuantity] = useState(0);
+  const [isDoneOrder, setIsDoneOrder] = useState(false);
 
   const [tabValue, setTabValue] = useState('1');
 
@@ -61,6 +62,9 @@ const AdminOrderDetail = ( props ) => {
         (res) => {
           setOrderInfo(res.data);
           setRemainingItems(res.data.remainingItems)
+          if (res.data.statusCode == 'COMPLETED' || res.data.statusCode == 'CANCELLED') {
+            setIsDoneOrder(true);
+          }
         }
       );
 
@@ -114,9 +118,6 @@ const AdminOrderDetail = ( props ) => {
   useEffect(() => {
     if (selectedProductId != null && selectedBayId != null) {
       var totalProductOnBay = 0;
-      console.log("All warehouse => ", allWarehouses);
-      console.log("selectedProductId => ", selectedProductId);
-      console.log("selectedBayId => ", selectedBayId);
       for (var i = 0; i < allWarehouses.length; i++) {
         for (var j = 0; j < allWarehouses[i]?.items?.length; j++) {
           const item = allWarehouses[i]?.items[j];
@@ -346,8 +347,8 @@ const AdminOrderDetail = ( props ) => {
             hideCommandBar={true}
             columns={[
               { title: "Tên sản phẩm", field: "productName",
-                editComponent: <ProductDropDown 
-                  productList={orderInfo?.items} 
+                editComponent: <ProductDropDown
+                  productList={orderInfo?.items}
                   setSelectedProductId={setSelectedProductId}
                   setSelectedProductName={setSelectedProductName} /> },
               { title: "Kho", field: "warehouseName",
@@ -357,16 +358,16 @@ const AdminOrderDetail = ( props ) => {
                   setSelectedWarehouseName={setSelectedWarehouseName} />},
               { title: "Vị trí kệ hàng", field: "bayCode",
                 editComponent: <BayDropDownHavingProduct
-                  selectedWarehouseItems={selectedWarehouseItems} 
+                  selectedWarehouseItems={selectedWarehouseItems}
                   productId={selectedProductId}
                   setSelectedBayId={setSelectedBayId}
                   setSelectedBayCode={setSelectedBayCode} /> },
-              { title: "Số lượng", field: "quantity", 
+              { title: "Số lượng", field: "quantity",
                 editComponent: <TextField
                   type="number"
                   InputProps={{
-                    inputProps: { 
-                        max: maxQuantity, min: 1 
+                    inputProps: {
+                        max: maxQuantity, min: 1
                     }
                   }}
                   value={selectedQuantity}
@@ -380,7 +381,7 @@ const AdminOrderDetail = ( props ) => {
               search: true,
               sorting: true,
             }}
-            editable={{
+            editable={!isDoneOrder && {
               onRowAdd: newData => new Promise((resolve, reject) => {
                 setTimeout(() => {
                   const adder = {
@@ -393,7 +394,6 @@ const AdminOrderDetail = ( props ) => {
                     quantity: selectedQuantity
                   };
                   setProcessingItems([...processingItems, adder]);
-
                   // update số lượng sản phẩm cần phân phối
                   var newOrderInfo = {...orderInfo};
                   for (var i = 0; i < newOrderInfo?.remainingItems?.length; i++) {
@@ -419,7 +419,7 @@ const AdminOrderDetail = ( props ) => {
                 })
               })
             }}
-            actions={[
+            actions={!isDoneOrder && [
               {
                 tooltip: "Lưu",
                 iconOnClickHandle: saveProcessingItems

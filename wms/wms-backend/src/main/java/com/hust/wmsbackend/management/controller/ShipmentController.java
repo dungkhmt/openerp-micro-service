@@ -62,8 +62,8 @@ public class ShipmentController {
     }
 
     @PutMapping("/delivery-trip/start-delivery/{deliveryTripId}")
-    public ResponseEntity<String> startDelivery(@PathVariable String deliveryTripId) {
-        return deliveryTripService.startDelivery(deliveryTripId) ? ResponseEntity.ok("OK") :
+    public ResponseEntity<String> startDelivery(@PathVariable String deliveryTripId, Principal principal) {
+        return deliveryTripService.startDelivery(deliveryTripId, principal) ? ResponseEntity.ok("OK") :
             new ResponseEntity<>("FAIL", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

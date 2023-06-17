@@ -10,13 +10,9 @@ public enum OrderStatus {
     CREATED("Khởi tạo", "CREATED"),
     APPROVED("Đã phê duyệt", "APPROVED"),
     DISTRIBUTED("Đã phân phối", "DISTRIBUTED"),
-    LAST_DELIVERING("Đang giao hàng", "LAST_DELIVERING"),
     DELIVERING_A_PART("Đang giao hàng một phần", "DELIVERING_A_PART"),
     CANCELLED("Đã hủy", "CANCELLED"),
-    CUSTOMER_CANCELLED("Khách hàng hủy", "CUSTOMER_CANCELLED"),
-    SUCCESS("Giao hàng thành công", "SUCCESS"),
-    FAIL("Giao hàng thất bại", "FAIL"),
-    COMPLETED("Đã hoàn thành", "COMPLETED");
+    COMPLETED("Đã hoàn thành giao hàng", "COMPLETED");
 
     private final String name;
     private final String code;
