@@ -16,7 +16,7 @@ const ShipmentContents = ({ shipment }) => {
                 <Box className="shipment-detail-item-text">
                     <Typography>Executed Time:</Typography>
                 </Box>
-                <Typography>{new Date(shipment?.executedTime).toLocaleString()}</Typography>
+                <Typography>{new Date(shipment?.executed_time).toLocaleString()}</Typography>
             </Box>
             <Box className="shipment-detail-item">
                 <Box className="shipment-detail-item-text">

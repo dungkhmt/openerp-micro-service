@@ -5,9 +5,9 @@ import './styles.scss';
 import { useContext, useState } from "react";
 import {useHistory } from 'react-router-dom';
 import { MyContext } from "contextAPI/MyContext";
-import NewShipmentModal from "./NewShipmentModal";
+import ModalShipment from "./ModalShipment";
 
-const HeaderShipmentScreen = ({setToast, setToastType}) => {
+const HeaderShipmentScreen = ({setToast, setToastType, setToastMsg}) => {
     const history = useHistory();
     const [shipment, setShipment] = useState();
     const {preferred_username} = useContext(MyContext);
@@ -36,7 +36,7 @@ const HeaderShipmentScreen = ({setToast, setToastType}) => {
                     </Typography>
                 </PrimaryButton>
             </Box>
-            {open ? (<NewShipmentModal open={open} setOpen={setOpen} setToast={setToast} setToastType={setToastType} />) : null}
+            {open ? (<ModalShipment open={open} setOpen={setOpen} setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
         </Box>
     );
 }
