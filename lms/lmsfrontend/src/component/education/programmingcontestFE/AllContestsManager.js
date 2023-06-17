@@ -2,17 +2,17 @@ import React, {useEffect, useState} from "react";
 import {request} from "../../../api";
 import {Box, Button, IconButton,} from "@mui/material";
 import {Link} from "react-router-dom";
-import {ListContestManagerByRegistration} from "./ListContestManagerByRegistration";
 import {successNoti} from "../../../utils/notification";
 import EditIcon from "@mui/icons-material/Edit";
 import StandardTable, {TablePaginationActions} from "../../table/StandardTable";
 import TablePagination from "@mui/material/TablePagination";
+import {defaultDatetimeFormat} from "../../../utils/dateutils";
 
 export default function AllContestsManager() {
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPage] = useState(0);
-  const pageSizes = [10, 20, 50, 100];
+  const pageSizes = [10, 20, 50];
   const [contests, setContests] = useState([]);
 
   const switchJudgeMode = (mode) => {
@@ -58,7 +58,7 @@ export default function AllContestsManager() {
           <Link
             to={
               "/programming-contest/contest-manager/" +
-              encodeURIComponent(contest.contestId) 
+              encodeURIComponent(contest.contestId)
             }
             style={{
               textDecoration: "none",
@@ -71,7 +71,11 @@ export default function AllContestsManager() {
       },
       {title: "Status", field: "statusId"},
       {title: "Created By", field: "userId"},
-      {title: "Created At", field: "createdAt"},
+      {
+        title: "Created At",
+        field: "createdAt",
+        render: (contest) => defaultDatetimeFormat(contest.createdAt)
+      },
       {
         title: "Edit",
         render: (contest) => (
@@ -136,7 +140,6 @@ export default function AllContestsManager() {
           }}
         />
       </Box>
-      <ListContestManagerByRegistration/>
     </>
   );
 }
