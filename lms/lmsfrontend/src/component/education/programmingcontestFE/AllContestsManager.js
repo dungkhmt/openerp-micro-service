@@ -58,7 +58,7 @@ export default function AllContestsManager() {
           <Link
             to={
               "/programming-contest/contest-manager/" +
-              contest.contestId
+              encodeURIComponent(contest.contestId) 
             }
             style={{
               textDecoration: "none",
@@ -78,7 +78,7 @@ export default function AllContestsManager() {
           <Link
             to={
               "/programming-contest/contest-edit/" +
-              contest.contestId
+              encodeURIComponent(contest.contestId)
             }
           >
             <IconButton variant="contained" color="success">
@@ -115,10 +115,11 @@ export default function AllContestsManager() {
           hideCommandBar
           options={{
             selection: false,
-            pageSize: 10,
+            pageSize,
             search: true,
             sorting: true,
           }}
+          key={contests.length}
           components={{
             Pagination: props => (
               <TablePagination

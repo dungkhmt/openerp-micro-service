@@ -86,10 +86,11 @@ export function StudentContestNotRegistered() {
         hideCommandBar
         options={{
           selection: false,
-          pageSize: 10,
+          pageSize,
           search: true,
           sorting: true,
         }}
+        key={contests.length}
         components={{
           Pagination: props => (
             <TablePagination
