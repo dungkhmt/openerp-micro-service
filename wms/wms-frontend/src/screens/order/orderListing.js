@@ -15,13 +15,10 @@ const AdminOrderListing = () => {
 
   const [orderTableData, setOrderTableData] = useState([]);
   const [processedOrderTableData, setProcessedOrderTableData] = useState([]);
+  const [deliveryBillTableData, setDeliveryBillTableData] = useState([]);
   const [isLoading, setLoading] = useState(true);
 
   const [value, setValue] = useState('1');
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  }
 
   useEffect(() => {
     async function fetchData() {
@@ -53,6 +50,14 @@ const AdminOrderListing = () => {
         }
       );
 
+      await request(
+        'get',
+        API_PATH.DELIVERY_BILL,
+        (res) => {
+          setDeliveryBillTableData(res.data);
+        }
+      )
+
       setLoading(false);
     }
 
@@ -74,6 +79,7 @@ const AdminOrderListing = () => {
           <TabList onChange={(event, newValue) => setValue(newValue)} >
             <Tab label="Đơn xuất hàng cần xử lý" value="1" />
             <Tab label="Đơn xuất hàng đã xử lý" value="2" />
+            <Tab label="Phiếu xuất hàng" value="3" />
           </TabList>
         </Box>
         <TabPanel value="1">
@@ -104,6 +110,30 @@ const AdminOrderListing = () => {
               pageSize: 5,
               search: true,
               sorting: true,
+            }}
+            onRowClick={(event, rowData) => {
+              window.location.href = `${path}/${rowData.orderId}`;
+            }}
+          />
+        </TabPanel>
+        <TabPanel value="3">
+          <StandardTable 
+            title="Danh sách phiếu xuất hàng"
+            columns={[
+              { title: "Mã phiếu", field: "deliveryBillId" }, 
+              { title: "Người tạo", field: "createdBy" },
+              { title: "Ngày tạo phiếu", field: "createdStampStr" }
+            ]}
+            data={deliveryBillTableData}
+            hideCommandBar={true}
+            options={{
+              selection: false,
+              pageSize: 5,
+              search: true,
+              sorting: true,
+            }}
+            onRowClick={(event, rowData) => {
+              window.location.href = `${path.replace('/orders', '/delivery-bill')}/${rowData.deliveryBillId}`;
             }}
           />
         </TabPanel>

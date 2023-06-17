@@ -39,4 +39,5 @@ export const API_PATH = {
   RECEIPT_BILL_BY_RECEIPT_ID: "/wmsv2/admin/receipt-bill/receipt",
   RECEIPT_BILL_BY_RECEIPT_BILL_ID: "/wmsv2/admin/receipt-bill/receipt-bill",
   ALL_RECEIPT_BILLS: "/wmsv2/admin/receipt-bill",
+  DELIVERY_BILL: "/wmsv2/admin/delivery-bill"
 }

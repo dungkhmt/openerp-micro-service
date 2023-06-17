@@ -135,7 +135,7 @@ public class OrderServiceImpl implements OrderService {
                          .builder()
                          .productId(item.getProductId())
                          .productName(productNameMap.get(item.getProductId()))
-                         .quantity(item.getQuantity())
+                         .quantity(item.getOriginalQuantity())
                          .bayId(item.getBayId())
                          .bayCode(bayCodeMap.get(item.getBayId()))
                          .warehouseId(item.getWarehouseId())
@@ -152,7 +152,7 @@ public class OrderServiceImpl implements OrderService {
         }
         for (AssignedOrderItem item : assignedItems) {
             BigDecimal prevQuantity = remainItemsMap.get(item.getProductId());
-            BigDecimal newQuantity = prevQuantity.subtract(item.getQuantity());
+            BigDecimal newQuantity = prevQuantity.subtract(item.getOriginalQuantity());
             if (newQuantity.compareTo(BigDecimal.ZERO) > 0){
                 remainItemsMap.put(item.getProductId(), newQuantity);
             } else {

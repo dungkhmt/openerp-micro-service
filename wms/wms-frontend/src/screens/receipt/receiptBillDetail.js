@@ -48,7 +48,7 @@ const ReceiptBillDocument = ( { receiptBillInfo } ) => {
       flexDirection: "row",
     }, 
     tableCol: { 
-      width: "15%", 
+      width: "16.66%", 
       borderStyle: "solid", 
       borderWidth: 1, 
       borderLeftWidth: 1, 
@@ -64,7 +64,7 @@ const ReceiptBillDocument = ( { receiptBillInfo } ) => {
   return <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.centerView}>
-        <Text>Phiếu xuất kho</Text>
+        <Text>Phiếu nhập hàng</Text>
       </View>
       <View style={styles.view}>
         <Text>Mã phiếu: {receiptBillInfo.receiptBillId}</Text>

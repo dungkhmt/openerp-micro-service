@@ -207,6 +207,7 @@ create table wms_assigned_order_item
     order_id uuid not null,
     product_id uuid not null ,
     quantity decimal(18, 2) not null ,
+    original_quantity decimal(18, 2) ,
     bay_id uuid not null ,
     warehouse_id uuid not null ,
     assigned_by varchar(50),
@@ -274,6 +275,17 @@ create table wms_receipt_bill
     total_price decimal(20, 5),
     description varchar(200),
     receipt_id uuid not null,
+    created_by varchar(50),
+    created_stamp timestamp default current_timestamp,
+    last_update_stamp timestamp default current_timestamp
+);
+
+create table wms_delivery_bill
+(
+    delivery_bill_id varchar(50) primary key not null,
+    total_price decimal(20, 5),
+    description varchar(200),
+    delivery_trip_id varchar(50) not null,
     created_by varchar(50),
     created_stamp timestamp default current_timestamp,
     last_update_stamp timestamp default current_timestamp
@@ -377,3 +389,4 @@ create sequence wms_delivery_trip_path_seq ;
 create sequence wms_delivery_trip_seq ;
 create sequence wms_shipment_seq ;
 create sequence wms_receipt_bill_seq ;
+create sequence wms_delivery_bill_seq ;

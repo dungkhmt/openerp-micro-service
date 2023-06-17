@@ -21,6 +21,6 @@ public interface DeliveryTripService {
 
     boolean complete(String deliveryTripId);
 
-    boolean startDelivery(String deliveryTripId);
+    boolean startDelivery(String deliveryTripId, Principal principal);
 
 }

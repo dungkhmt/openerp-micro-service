@@ -29,6 +29,7 @@ public class AssignedOrderItem {
     private UUID orderId;
     private UUID productId;
     private BigDecimal quantity;
+    private BigDecimal originalQuantity;
     private UUID bayId;
     private UUID warehouseId;
     private String lotId;
