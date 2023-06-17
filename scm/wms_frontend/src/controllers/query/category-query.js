@@ -190,6 +190,32 @@ export const useCreateProductCategory = (params) => {
     onMutate: (variables) => {},
   });
 };
+
+export const useUpdateProductCategory = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "put",
+        endPoint.updateProductCategory,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      } else throw Error;
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Thay đổi thành công!");
+      queryClient.invalidateQueries([queryKey.category.product_cate_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi thay đổi, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
 export const useDeleteProductCategory = (params) => {
   return useMutation({
     mutationFn: async (data) => {
@@ -254,6 +280,31 @@ export const useCreateProductUnit = (params) => {
     onMutate: (variables) => {},
   });
 };
+export const useUpdateProductUnit = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "put",
+        endPoint.updateProductUnit,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      } else throw Error;
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Thay đổi thành công!");
+      queryClient.invalidateQueries([queryKey.category.product_unit_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi thay đổi, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
 export const useDeleteProductUnit = (params) => {
   return useMutation({
     mutationFn: async (data) => {
@@ -316,6 +367,31 @@ export const useCreateDistChannel = (params) => {
     onMutate: (variables) => {},
   });
 };
+export const useUpdateDistChannel = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "put",
+        endPoint.updateDistChannel,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      } else throw Error;
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Thay đổi thành công!");
+      queryClient.invalidateQueries([queryKey.category.dist_channel_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi thay đổi, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
 export const useDeleteDistChannel = (params) => {
   return useMutation({
     mutationFn: async (data) => {
@@ -380,6 +456,32 @@ export const useCreateCustomerType = (params) => {
     onMutate: (variables) => {},
   });
 };
+
+export const useUpdateCustomerType = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "put",
+        endPoint.updateCustomerType,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      } else throw Error;
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Thay đổi thành công!");
+      queryClient.invalidateQueries([queryKey.category.customer_type_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi thay đổi, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
 export const useDeleteCustomerType = (params) => {
   return useMutation({
     mutationFn: async (data) => {
@@ -444,6 +546,33 @@ export const useCreateContractType = (params) => {
     onMutate: (variables) => {},
   });
 };
+
+export const useUpdateContractType = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "put",
+        endPoint.updateContractType,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      } else throw Error;
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Thay đổi thành công!");
+      queryClient.invalidateQueries([queryKey.category.contract_type_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi thay đổi, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
+
 export const useDeleteContractType = (params) => {
   return useMutation({
     mutationFn: async (data) => {

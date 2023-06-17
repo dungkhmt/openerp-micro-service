@@ -60,5 +60,6 @@ export const queryKey = {
     trip_per_province: "trip_per_province",
     product_category_rate: "product_category_rate",
     new_customer_month: "new_customer_month",
+    sale_annually: "sale_annually",
   },
 };

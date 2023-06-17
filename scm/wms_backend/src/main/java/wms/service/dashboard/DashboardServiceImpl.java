@@ -7,6 +7,7 @@ import wms.entity.*;
 import wms.repo.*;
 import wms.service.BaseService;
 
+import java.time.Year;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -197,5 +198,17 @@ public class DashboardServiceImpl extends BaseService implements IDashBoardServi
             results.add(resultList);
         }
         return results;
+    }
+
+    @Override
+    public List<Integer> getSaleAnnual() {
+        Year currentYear = Year.now();
+        int yearValue = currentYear.getValue();
+        List<Integer> result = new ArrayList<>();
+        for (int i = 1; i < 13; i++) {
+            List<SaleOrder> saleOrders = saleOrderRepo.getOrderByMonth(i, yearValue);
+            result.add(saleOrders.size());
+        }
+        return result;
     }
 }

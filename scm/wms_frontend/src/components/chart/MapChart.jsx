@@ -4,17 +4,11 @@ import { HighchartsReact } from "highcharts-react-official";
 import Highcharts from "highcharts/highmaps";
 import { useEffect, useState } from "react";
 const MapChart = ({ data: addedData, loading }) => {
-  console.log(
-    "data: ",
-    addedData,
-    addedData.map((el) => [el[0], el[1]])
-  );
   const { data: topology, isLoading } = useQuery(["get-map"], () =>
     fetch("https://code.highcharts.com/mapdata/countries/vn/vn-all.topo.json", {
       method: "get",
     }).then((res) => res.json())
   );
-  console.log(topology);
   const [options, setOptions] = useState({
     chart: {
       map: topology,
@@ -40,7 +34,6 @@ const MapChart = ({ data: addedData, loading }) => {
     colorAxis: {
       min: 0,
     },
-
     series: [
       {
         data: addedData.map((el) => [el[0], el[1]]),
@@ -81,8 +74,7 @@ const MapChart = ({ data: addedData, loading }) => {
         },
       ],
     });
-  }, [topology, isLoading]);
-  if (isLoading) return <CircularProgress />;
+  }, [topology, isLoading, addedData]);
   return (
     <Box>
       {loading ? (

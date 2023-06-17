@@ -1,14 +1,14 @@
+import { Box, CircularProgress } from "@mui/material";
 import Highcharts from "highcharts";
 import { HighchartsReact } from "highcharts-react-official";
 import _ from "lodash";
 import { useState } from "react";
-import { getRandomIntInclusive } from "../../layout/notification/Notification";
 const raw = Array.from(
-  Array(10),
+  Array(12),
   (el, i) => `${_.padStart(String(i + 1), 2, "0")}/12`
 );
 
-const AreaChart = ({ color }) => {
+const AreaChart = ({ color, data, loading }) => {
   const [options, setOptions] = useState({
     chart: {
       type: "area",
@@ -76,16 +76,22 @@ const AreaChart = ({ color }) => {
     },
     series: [
       {
-        name: "USA",
-        data: [...raw.map(() => getRandomIntInclusive(1000, 3000))],
+        name: "Sales",
+        data: data,
         color,
       },
     ],
   });
   return (
-    <div>
-      <HighchartsReact highcharts={Highcharts} options={options} />
-    </div>
+    <Box>
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <div>
+          <HighchartsReact highcharts={Highcharts} options={options} />
+        </div>
+      )}
+    </Box>
   );
 };
 

@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import highcharts3d from "highcharts/highcharts-3d";
 import drilldown from "highcharts/modules/drilldown.js";
 
+import { Box, CircularProgress } from "@mui/material";
 import { HighchartsReact } from "highcharts-react-official";
 let series = [
   {
@@ -54,7 +55,7 @@ HC_more(Highcharts);
 highcharts3d(Highcharts);
 drilldown(Highcharts);
 
-function PieChart2({ series }) {
+function PieChart2({ series, loading }) {
   let chart = null;
 
   var offset = 180;
@@ -118,14 +119,18 @@ function PieChart2({ series }) {
 
   return (
     <div>
-      <div>
-        <HighchartsReact
-          ref={elementRef}
-          highcharts={Highcharts}
-          allowChartUpdate={true}
-          options={sample_options}
-        />
-      </div>
+      <Box>
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <HighchartsReact
+            ref={elementRef}
+            highcharts={Highcharts}
+            allowChartUpdate={true}
+            options={sample_options}
+          />
+        )}
+      </Box>
     </div>
   );
 }

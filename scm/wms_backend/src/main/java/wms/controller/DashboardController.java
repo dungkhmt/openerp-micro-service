@@ -98,4 +98,14 @@ public class DashboardController extends BaseController{
             return response(error(ex));
         }
     }
+    @ApiOperation(value = "Doanh so ban hang ca nam")
+    @GetMapping(path = "/sell-out/sale-annual")
+    public ResponseEntity<?> getSaleAnnual(
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get sale annual successfully", dashBoardService.getSaleAnnual()));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
 }

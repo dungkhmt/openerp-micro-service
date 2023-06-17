@@ -19,6 +19,7 @@ import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { categoryColumns } from "../LocalConstant";
 import CreateProductCate from "./components/CreateProductCate";
+import UpdateProductCate from "./components/UpdateProductCate";
 function ProductCategoryScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
@@ -50,6 +51,7 @@ function ProductCategoryScreen({ screenAuthorization }) {
       title: "Sửa",
       callback: (item) => {
         setOpenDrawer((pre) => !pre);
+        setItemSelected(item);
       },
       icon: <EditIcon />,
       color: AppColors.secondary,
@@ -119,6 +121,7 @@ function ProductCategoryScreen({ screenAuthorization }) {
           onClose={setOpenDrawer}
           title="Sửa thông tin danh mục sản phẩm"
         />
+        <UpdateProductCate currCate={itemSelected} />
       </CustomDrawer>
       <DraggableDeleteDialog
         // disable={isLoadingRemove}
