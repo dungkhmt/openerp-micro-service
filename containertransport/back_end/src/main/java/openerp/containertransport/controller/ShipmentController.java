@@ -39,4 +39,9 @@ public class ShipmentController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), shipmentModel));
     }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateShipment(@PathVariable Long id, @RequestBody ShipmentModel shipmentModel) {
+        ShipmentModel shipmentModelUpdate = shipmentService.updateShipment(id, shipmentModel);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), shipmentModelUpdate));
+    }
 }

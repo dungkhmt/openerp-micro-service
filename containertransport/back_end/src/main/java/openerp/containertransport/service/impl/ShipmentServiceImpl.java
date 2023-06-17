@@ -11,6 +11,7 @@ import openerp.containertransport.entity.Shipment;
 import openerp.containertransport.repo.ShipmentRepo;
 import openerp.containertransport.service.ShipmentService;
 import openerp.containertransport.service.TripService;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -98,8 +99,24 @@ public class ShipmentServiceImpl implements ShipmentService {
         return convertToModel(shipment);
     }
 
+    @Override
+    public ShipmentModel updateShipment(Long id, ShipmentModel shipmentModel) {
+        Shipment shipment = shipmentRepo.findById(id).get();
+        if(!StringUtils.isEmpty(shipmentModel.getDescription())) {
+            shipment.setDescription(shipmentModel.getDescription());
+        }
+        if(shipment.getExecuted_time() != null) {
+            shipment.setExecuted_time(shipmentModel.getExecutedTime());
+        }
+        shipment = shipmentRepo.save(shipment);
+        return convertToModel(shipment);
+    }
+
     public ShipmentModel convertToModel (Shipment shipment) {
         ShipmentModel shipmentModel = modelMapper.map(shipment, ShipmentModel.class);
+        if(shipment.getExecuted_time() != null) {
+            shipmentModel.setExecutedTime(shipment.getExecuted_time());
+        }
         return shipmentModel;
     }
 }

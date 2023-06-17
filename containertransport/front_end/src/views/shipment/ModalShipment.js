@@ -13,34 +13,54 @@ import { useKeycloak } from "@react-keycloak/web";
 import { MyContext } from "contextAPI/MyContext";
 import './styles.scss';
 import { createShipment } from "api/ShipmentAPI";
+import dayjs from "dayjs";
 
-const NewShipmentModal = ({ open, setOpen, setToast, setToastType }) => {
+const ModalShipment = ({ open, setOpen, shipment, setToast, setToastType, setToastMsg }) => {
     const [description, setDescription] = useState("");
     const [executedTime, setExecutedTime] = useState();
     const { preferred_username } = useContext(MyContext);
 
+    useEffect(() => {
+        if(shipment) {
+            setDescription(shipment?.description);
+            setExecutedTime(dayjs(new Date(shipment?.executed_time)))
+        }
+    }, [])
     const handleClose = () => {
-        setOpen(false);
+        setOpen(!open);
     }
     const handleSubmit = () => {
-        let dataSubmit = {
-            created_by_user_id: preferred_username,
-            description: description,
-            executed_time: executedTime
+        if (shipment) {
+
         }
-        createShipment(dataSubmit).then((res) => {
-            console.log("res", res)
-            if(!res) {
-                setToastType("error");
-            } else {
-                setToastType("success");
+        else {
+            let dataSubmit = {
+                created_by_user_id: preferred_username,
+                description: description,
+                executed_time: executedTime
             }
-            handleClose();
-            setToast(true);
-            setTimeout(() => {
-                setToast(false);
-            }, "2000");
-        })
+            createShipment(dataSubmit).then((res) => {
+                console.log("res", res)
+                if(!res) {
+                    setToastType("error");
+                    setToastMsg("Create Shipment Fail !!!")
+                } else {
+                    setToastType("success");
+                    setToastMsg("Create Shipment Success !!!");
+                   
+                }
+                handleClose();
+                clearData();
+                setToast(true);
+                setTimeout(() => {
+                    setToast(false);
+                }, "2000");
+            })
+        }
+    }
+    const clearData = () => {
+        setDescription('');
+        setExecutedTime();
     }
     return (
         <Box>
@@ -68,6 +88,7 @@ const NewShipmentModal = ({ open, setOpen, setToast, setToastType }) => {
                                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                                 <DemoContainer components={['DateTimePicker']}>
                                                     <DateTimePicker label="Executed Time"
+                                                        value={executedTime}
                                                         onChange={(e) => setExecutedTime((new Date(e)).getTime())} />
                                                 </DemoContainer>
                                             </LocalizationProvider>
@@ -119,4 +140,4 @@ const NewShipmentModal = ({ open, setOpen, setToast, setToastType }) => {
         </Box>
     )
 }
-export default NewShipmentModal;
+export default ModalShipment;

@@ -2,7 +2,7 @@ import { config } from "config/constant";
 import { KC_REALM } from "config/keycloak";
 
 export const user = {
-  id: "MENU_USER",
+  id: "MENU_USER_CONTAINER",
   icon: "ManageAccountsIcon",
   text: "User",
   child: [
@@ -15,12 +15,12 @@ export const user = {
       text: "All users",
       child: [],
     },
-    // {
-    //   id: "MENU_USER_SEND_MAIL_TO_USERS",
-    //   path: "/user-group/user/send-mail",
-    //   isPublic: true,
-    //   text: "Gửi email",
-    //   child: [],
-    // },
+    {
+      id: "MENU_USER.CONTAINER.CUSTOMER",
+      path: "/user/customer",
+      isPublic: false,
+      text: "Customer",
+      child: [],
+    },
   ],
 };
