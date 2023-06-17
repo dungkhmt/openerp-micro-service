@@ -25,6 +25,8 @@
     "keycloak-js": "^21.0.2",
     "konva": "^8.3.8",
     "leaflet": "^1.9.3",
+    "leaflet-arrowheads": "^1.4.0",
+    "leaflet-polylinedecorator": "^1.6.0",
     "material-table": "^1.68.1",
     "overlayscrollbars": "^1.13.1",
     "overlayscrollbars-react": "^0.2.3",
