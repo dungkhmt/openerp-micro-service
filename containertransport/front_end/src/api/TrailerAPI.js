@@ -8,6 +8,14 @@ export const getTraler = async (data) => {
     return resData;
 }
 
+export const getTralerById = async (data) => {
+    const resData = request(
+        "get",
+        `/trailer/${data}`, {},{}, {},{},
+      )
+    return resData;
+}
+
 export const createTrailer = (data) => {
     const resData = request(
         "post",

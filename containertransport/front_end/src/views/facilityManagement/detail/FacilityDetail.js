@@ -148,7 +148,7 @@ const FacilityDetail = () => {
                 </Box>
 
                 {trucks?.length > 0 ? (
-                    <Box>
+                    <Box sx={{marginBottom: '16px'}}>
                         <Box className="title">
                             <Typography>Trucks In Facility</Typography>
                         </Box>
@@ -157,7 +157,7 @@ const FacilityDetail = () => {
                 ) : null}
 
                 {containers?.length > 0 ? (
-                    <Box>
+                    <Box sx={{marginBottom: '16px'}}>
                         <Box className="title">
                             <Typography>Containers In Facility</Typography>
                         </Box>
@@ -166,7 +166,7 @@ const FacilityDetail = () => {
                 ) : null}
 
                 {trailers?.length > 0 ? (
-                    <Box>
+                    <Box sx={{marginBottom: '16px'}}>
                         <Box className="title">
                             <Typography>Trailers In Facility</Typography>
                         </Box>

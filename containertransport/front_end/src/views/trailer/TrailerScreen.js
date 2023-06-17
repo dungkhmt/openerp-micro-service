@@ -26,7 +26,7 @@ const TrailerScreen = () => {
             setTrailer(res?.data.data.trailerModels);
             setCount(res?.data.data.count);
         })
-    }, [page, rowsPerPage])
+    }, [openModal, page, rowsPerPage])
 
 
     return (

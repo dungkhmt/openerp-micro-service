@@ -23,6 +23,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Icon } from '@mui/material';
 import { menuIconMap } from 'config/menuconfig';
+import { useHistory } from 'react-router-dom';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -147,6 +148,8 @@ export default function ContentsTrailerScreen({ trailer, page, setPage, rowsPerP
   const [dense, setDense] = React.useState(false);
   const [visibleRows, setVisibleRows] = React.useState(null);
 
+  const history = useHistory();
+
   const handleRequestSort = React.useCallback(
     (event, newOrderBy) => {
       const isAsc = orderBy === newOrderBy && order === 'asc';
@@ -206,6 +209,9 @@ export default function ContentsTrailerScreen({ trailer, page, setPage, rowsPerP
   };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
+  const handleDetail = (id) => {
+    history.push(`/trailer/detail/${id}`)
+  }
 
   return (
     <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
@@ -267,7 +273,7 @@ export default function ContentsTrailerScreen({ trailer, page, setPage, rowsPerP
                         <Box sx={{ display: 'flex' }}>
                           <Tooltip title="View">
                             <Box
-                              // onClick={() => { handleDetail(row?.id) }}
+                              onClick={() => { handleDetail(row?.id) }}
                             >
                               <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                             </Box>

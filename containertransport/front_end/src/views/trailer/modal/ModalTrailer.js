@@ -14,10 +14,11 @@ const ModalTrailer = ({ open, handleClose, trailer, setToast, setToastType, setT
     const [facility, setFacility] = useState('');
 
     useEffect(() => {
-        getFacility({ type: "Depot" }).then((res) => {
+        getFacility({ type: "Trailer" }).then((res) => {
             setFacilityList(res?.data.data.facilityModels);
         });
         if(trailer) {
+            console.log("trailer", trailer)
             setFacility(trailer?.facilityResponsiveDTO?.facilityId)
         }
     }, []);

@@ -51,7 +51,7 @@ const DetailContainerScreen = () => {
                     </Box>
                     <Box className="headerScreen-detail-info">
                         <Box className="title-header">
-                            <Typography >Container</Typography>
+                            <Typography >Container {container?.containerCode}</Typography>
                         </Box>
                         <Box className="btn-header">
                             <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
