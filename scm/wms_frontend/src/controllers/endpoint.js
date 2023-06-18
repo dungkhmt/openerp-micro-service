@@ -28,10 +28,20 @@ export const endPoint = {
   createProduct: baseUrl + "/product/create",
 
   createProductUnit: baseUrl + "/category/product-unit/create",
+  updateProductUnit: baseUrl + "/category/product-unit/update",
+
   createProductCategory: baseUrl + "/category/product-category/create",
+  updateProductCategory: baseUrl + "/category/product-category/update",
+
   createCustomerType: baseUrl + "/category/customer-type/create",
+  updateCustomerType: baseUrl + "/category/customer-type/update",
+
   createDistChannel: baseUrl + "/category/distributing-channel/create",
+  updateDistChannel: baseUrl + "/category/distributing-channel/update",
+
   createContractType: baseUrl + "/category/contract-type/create",
+  updateContractType: baseUrl + "/category/contract-type/update",
+
   importProduct: baseUrl + "/product/create-from-file",
   importCustomer: baseUrl + "/customer/create-from-file",
   // Purchase Order
@@ -101,4 +111,5 @@ export const endPoint = {
   getTripCustomerPerProvince:
     baseUrl + "/dashboard/delivery/trip-customer-of-province",
   getProductCategoryRate: baseUrl + "/dashboard/category/product-category-rate",
+  getSaleAnnually: baseUrl + "/dashboard/sell-out/sale-annual",
 };

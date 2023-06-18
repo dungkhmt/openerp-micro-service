@@ -19,6 +19,7 @@ import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { customerTypeCols } from "../LocalConstant";
 import CreateCustomerType from "./components/CreateCustomerType";
+import UpdateCustomerType from "./components/UpdateCustomerType";
 function CustomerTypeScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
@@ -50,6 +51,7 @@ function CustomerTypeScreen({ screenAuthorization }) {
       title: "Sửa",
       callback: (item) => {
         setOpenDrawer((pre) => !pre);
+        setItemSelected(item);
       },
       icon: <EditIcon />,
       color: AppColors.secondary,
@@ -119,6 +121,7 @@ function CustomerTypeScreen({ screenAuthorization }) {
           onClose={setOpenDrawer}
           title="Sửa thông tin kiểu khách hàng"
         />
+        <UpdateCustomerType currCustomerType={itemSelected} />
       </CustomDrawer>
       <DraggableDeleteDialog
         // disable={isLoadingRemove}

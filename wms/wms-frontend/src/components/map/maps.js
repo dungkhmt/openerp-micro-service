@@ -3,14 +3,12 @@ import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap, useMapEvents 
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { PLACE_HOLDER_ICON_URL, BLUE_PLACE_HOLDER_ICON_URL } from "components/constants";
+import "leaflet-polylinedecorator";
+import "leaflet-polylinedecorator";
+import ArrowPolyline from "./polylineDecorator";
 
 const icon = L.icon({
   iconUrl: PLACE_HOLDER_ICON_URL,
-  iconSize: [38, 38],
-});
-
-const one = L.icon({
-  iconUrl: "../../../../../../../placeholder-with-number/1.png",
   iconSize: [38, 38],
 });
 
@@ -120,7 +118,17 @@ export default function Maps(props) {
 }
 
 export function RouteMap ({ points, customers, warehouse }) {
-  console.log("Route map customers => ", customers);
+  const arrow = [{
+    offset: 25,
+    repeat: 50,
+    symbol: L.Symbol.arrowHead({
+      pixelSize: 15,
+      pathOptions: {
+        fillOpacity: 1,
+        weight: 0
+      }
+    })
+  }];
   return (
     <MapContainer
       center={position}
@@ -131,15 +139,15 @@ export function RouteMap ({ points, customers, warehouse }) {
         attribution={TILE_LAYER_ATTRIBUTE}
         url={TILE_LAYER_URL}
       />
-      <Polyline positions={points} />
+      <ArrowPolyline patterns={arrow} polyline={points} />
       {
         customers != null && customers != undefined &&
         customers.length > 0 &&
         customers.map(customer => <Marker position={customer.position} icon={getIconBySequence(customer?.sequence)}>
-                                      <Popup>
-                                        {customer.name}
-                                      </Popup>
-                                    </Marker>)
+                                    <Popup>
+                                      {customer.name}
+                                    </Popup>
+                                  </Marker>)
       }
       {
         warehouse != null && warehouse != undefined &&

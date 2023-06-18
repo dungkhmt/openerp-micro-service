@@ -123,3 +123,20 @@ export const useGetProductCategoryRate = (params) => {
     onSuccess: (data) => {},
   });
 };
+export const useGetSaleAnnually = (params) => {
+  return useQuery({
+    queryKey: [queryKey.dashboard.sale_annually, params],
+    queryFn: async () => {
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getSaleAnnually,
+        params
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};

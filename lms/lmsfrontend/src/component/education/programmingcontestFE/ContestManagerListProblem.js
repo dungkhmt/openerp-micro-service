@@ -6,6 +6,22 @@ import HustContainerCard from "../../common/HustContainerCard";
 import {request} from "../../../api";
 import EditIcon from "@mui/icons-material/Edit";
 import TextField from "@mui/material/TextField";
+import {styled} from "@mui/material/styles";
+
+const CssTextField = styled(TextField)({
+  ".MuiInputBase-input.Mui-disabled": {
+    WebkitTextFillColor: "gray",
+    color: "gray"
+  },
+  '& label.Mui-disabled': {
+    color: 'gray',
+  },
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': {
+      borderColor: 'darkgray',
+    },
+  },
+});
 
 export function ContestManagerListProblem(props) {
   const contestId = props.contestId;
@@ -61,10 +77,9 @@ export function ContestManagerListProblem(props) {
     >
       <Grid container rowSpacing={3} spacing={2} mb="16px">
         <Grid item xs={9}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
-            autoFocus
-            required
             value={contestName}
             id="contestName"
             label="Contest Name"
@@ -72,30 +87,32 @@ export function ContestManagerListProblem(props) {
         </Grid>
 
         <Grid item xs={3}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
             id="statusId"
             label="Status"
             value={statusId}
           >
-          </TextField>
+          </CssTextField>
         </Grid>
 
         <Grid item xs={3}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
             id="Public"
             label="Public"
             value={isPublic ? "Yes" : "No"}
           >
-          </TextField>
+          </CssTextField>
         </Grid>
 
         <Grid item xs={3}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
             type="number"
-            required
             id="maxNumberSubmission"
             label="Max number of Submissions"
             value={maxNumberSubmission}
@@ -103,7 +120,8 @@ export function ContestManagerListProblem(props) {
         </Grid>
 
         <Grid item xs={3}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
             type="number"
             id="Max Source Code Length"
@@ -114,7 +132,8 @@ export function ContestManagerListProblem(props) {
         </Grid>
 
         <Grid item xs={3}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
             type="number"
             id="Submission Interval"
@@ -125,43 +144,47 @@ export function ContestManagerListProblem(props) {
         </Grid>
 
         <Grid item xs={3}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
             id="evaluateBothPublicPrivateTestcase"
             label="Evaluate Private Testcases"
             value={evaluateBothPublicPrivateTestcase}
           >
-          </TextField>
+          </CssTextField>
         </Grid>
 
         <Grid item xs={3}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
             id="participantViewResultMode"
             label="Participant View Result Mode"
             value={participantViewResultMode}
           >
-          </TextField>
+          </CssTextField>
         </Grid>
 
         <Grid item xs={3}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
             id="submissionActionType"
             label="Action on Submission"
             value={submissionActionType}
           >
-          </TextField>
+          </CssTextField>
         </Grid>
 
         <Grid item xs={3}>
-          <TextField
+          <CssTextField
+            disabled
             fullWidth
             id="problemDescriptionViewType"
             label="Problem Description View Mode"
             value={problemDescriptionViewType}
           >
-          </TextField>
+          </CssTextField>
         </Grid>
       </Grid>
       {/*<Box sx={{margin: "14px 0"}}>*/}

@@ -59,8 +59,8 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @PutMapping(path = "/product-unit/update/{id}")
-    public ResponseEntity<?> updateProductUnit(@Valid @RequestBody ProductUnitDTO productUnitDTO, @PathVariable("id") long id) {
+    @PutMapping(path = "/product-unit/update")
+    public ResponseEntity<?> updateProductUnit(@Valid @RequestBody ProductUnitDTO productUnitDTO, @RequestParam(value = "id") Long id) {
         try {
             return response(new ResultEntity(1, "Update product unit successfully", categoryService.updateProductUnit(productUnitDTO, id)));
         } catch (Exception ex) {
@@ -129,8 +129,8 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @PutMapping(path = "/product-category/update/{id}")
-    public ResponseEntity<?> updateProductCategory(@Valid @RequestBody ProductCategoryDTO productCategoryDTO, @PathVariable("id") long id) {
+    @PutMapping(path = "/product-category/update")
+    public ResponseEntity<?> updateProductCategory(@Valid @RequestBody ProductCategoryDTO productCategoryDTO, @RequestParam(value = "id") Long id) {
         try {
             return response(new ResultEntity(1, "Update product category successfully", categoryService.updateProductCategory(productCategoryDTO, id)));
         } catch (Exception ex) {
@@ -199,8 +199,8 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @PutMapping(path = "/customer-type/update/{id}")
-    public ResponseEntity<?> updateCustomerType(@Valid @RequestBody CustomerTypeDTO customerTypeDTO, @PathVariable("id") long id) {
+    @PutMapping(path = "/customer-type/update")
+    public ResponseEntity<?> updateCustomerType(@Valid @RequestBody CustomerTypeDTO customerTypeDTO, @RequestParam(value = "id") Long id) {
         try {
             return response(new ResultEntity(1, "Update customer type successfully", categoryService.updateCustomerType(customerTypeDTO, id)));
         } catch (Exception ex) {
@@ -269,8 +269,8 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @PutMapping(path = "/distributing-channel/update/{id}")
-    public ResponseEntity<?> updateChannel(@Valid @RequestBody DistributingChannelDTO channelDTO, @PathVariable("id") long id) {
+    @PutMapping(path = "/distributing-channel/update")
+    public ResponseEntity<?> updateChannel(@Valid @RequestBody DistributingChannelDTO channelDTO, @RequestParam(value = "id") Long id) {
         try {
             return response(new ResultEntity(1, "Update distributing channel successfully", categoryService.updateDistributingChannel(channelDTO, id)));
         } catch (Exception ex) {
@@ -340,7 +340,7 @@ public class CategoryController extends BaseController {
         }
     }
     @PutMapping(path = "/contract-type/update/{id}")
-    public ResponseEntity<?> updateContract(@Valid @RequestBody ContractTypeDTO contractTypeDTO, @PathVariable("id") long id) {
+    public ResponseEntity<?> updateContract(@Valid @RequestBody ContractTypeDTO contractTypeDTO, @RequestParam(value = "id") Long id) {
         try {
             return response(new ResultEntity(1, "Update contract type successfully", categoryService.updateContractType(contractTypeDTO, id)));
         } catch (Exception ex) {

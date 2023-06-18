@@ -13,4 +13,5 @@ public interface IDashBoardService {
     List<List<Object> > getTopFiveOrderedCustomer(int month, int year);
     List<List<Object>> getTripCustomerOfEveryProvince(int month, int year);
     List<List<Object>> getProductCategoryRate();
+    List<Integer> getSaleAnnual();
 }
