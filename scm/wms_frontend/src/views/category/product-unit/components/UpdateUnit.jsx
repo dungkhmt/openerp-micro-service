@@ -1,10 +1,10 @@
 import { Box, Button, Stack } from "@mui/material";
-import { useUpdateProductCategory } from "../../../../controllers/query/category-query";
+import { useUpdateProductUnit } from "../../../../controllers/query/category-query";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
 
-const UpdateProductCate = ({ currCate, setOpenDrawer }) => {
+const UpdateProductUnit = ({ currCate, setOpenDrawer }) => {
   const methods = useForm({
     mode: "onChange",
     defaultValues: {
@@ -19,7 +19,7 @@ const UpdateProductCate = ({ currCate, setOpenDrawer }) => {
     control,
   } = methods;
 
-  const updateProductCategory = useUpdateProductCategory({
+  const updateProductUnit = useUpdateProductUnit({
     id: currCate?.id,
   });
 
@@ -27,7 +27,7 @@ const UpdateProductCate = ({ currCate, setOpenDrawer }) => {
     let params = {
       name: data?.name.trim(),
     };
-    await updateProductCategory.mutateAsync(params);
+    await updateProductUnit.mutateAsync(params);
     setOpenDrawer((pre) => !pre);
     reset();
   };
@@ -70,4 +70,4 @@ const UpdateProductCate = ({ currCate, setOpenDrawer }) => {
     </FormProvider>
   );
 };
-export default UpdateProductCate;
+export default UpdateProductUnit;

@@ -86,8 +86,8 @@ public class ProductController extends BaseController {
             return response(error(ex));
         }
     }
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateProductCategory(@Valid @RequestBody ProductDTO productDTO, @PathVariable("id") long id) {
+    @PutMapping("/update")
+    public ResponseEntity<?> updateProductCategory(@Valid @RequestBody ProductDTO productDTO, @RequestParam(value = "id") Long id) {
         try {
             return response(new ResultEntity(1, "Update product successfully", productService.updateProduct(productDTO, id)));
         } catch (Exception ex) {

@@ -2,7 +2,7 @@ import { Box, CircularProgress } from "@mui/material";
 import Highcharts from "highcharts";
 import { HighchartsReact } from "highcharts-react-official";
 import _ from "lodash";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 const raw = Array.from(
   Array(12),
   (el, i) => `${_.padStart(String(i + 1), 2, "0")}/12`
@@ -82,6 +82,23 @@ const AreaChart = ({ color, data, loading }) => {
       },
     ],
   });
+  useEffect(() => {
+    setOptions({
+      ...options,
+      chart: {
+        type: "area",
+        width: 400,
+        height: 400,
+      },
+      series: [
+        {
+          name: "Sales",
+          data: data,
+          color,
+        },
+      ],
+    });
+  }, [data, options]);
   return (
     <Box>
       {loading ? (

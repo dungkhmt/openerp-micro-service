@@ -6,41 +6,39 @@ export const endPoint = {
   // Category
   getProductCategory: baseUrl + "/category/product-category/get-all",
   deleteProductCategory: baseUrl + "/category/product-category/remove",
-
-  getProductUnit: baseUrl + "/category/product-unit/get-all",
-  deleteProductUnit: baseUrl + "/category/product-unit/remove",
-
-  getDistChannel: baseUrl + "/category/distributing-channel/get-all",
-  deleteDistChannel: baseUrl + "/category/distributing-channel/remove",
-
-  getCustomerType: baseUrl + "/category/customer-type/get-all",
-  deleteCustomerType: baseUrl + "/category/customer-type/remove",
-
-  getContractType: baseUrl + "/category/contract-type/get-all",
-  deleteContractType: baseUrl + "/category/customer-type/remove",
-
-  getProduct: baseUrl + "/product/get-all",
-  getProductNoPaging: baseUrl + "/product/get-all-without-paging",
-  getCustomer: baseUrl + "/customer/get-all",
-  getCustomerNoPaging: baseUrl + "/customer/get-all-without-paging",
-  createCustomer: baseUrl + "/customer/create",
-  deleteCustomer: baseUrl + "/customer/delete",
-  createProduct: baseUrl + "/product/create",
-
-  createProductUnit: baseUrl + "/category/product-unit/create",
-  updateProductUnit: baseUrl + "/category/product-unit/update",
-
   createProductCategory: baseUrl + "/category/product-category/create",
   updateProductCategory: baseUrl + "/category/product-category/update",
 
-  createCustomerType: baseUrl + "/category/customer-type/create",
-  updateCustomerType: baseUrl + "/category/customer-type/update",
+  getProductUnit: baseUrl + "/category/product-unit/get-all",
+  deleteProductUnit: baseUrl + "/category/product-unit/remove",
+  createProductUnit: baseUrl + "/category/product-unit/create",
+  updateProductUnit: baseUrl + "/category/product-unit/update",
 
+  getDistChannel: baseUrl + "/category/distributing-channel/get-all",
+  deleteDistChannel: baseUrl + "/category/distributing-channel/remove",
   createDistChannel: baseUrl + "/category/distributing-channel/create",
   updateDistChannel: baseUrl + "/category/distributing-channel/update",
 
+  getCustomerType: baseUrl + "/category/customer-type/get-all",
+  deleteCustomerType: baseUrl + "/category/customer-type/remove",
+  createCustomerType: baseUrl + "/category/customer-type/create",
+  updateCustomerType: baseUrl + "/category/customer-type/update",
+
+  getContractType: baseUrl + "/category/contract-type/get-all",
+  deleteContractType: baseUrl + "/category/customer-type/remove",
   createContractType: baseUrl + "/category/contract-type/create",
   updateContractType: baseUrl + "/category/contract-type/update",
+
+  getProduct: baseUrl + "/product/get-all",
+  createProduct: baseUrl + "/product/create",
+  updateProduct: baseUrl + "/product/update",
+  getProductNoPaging: baseUrl + "/product/get-all-without-paging",
+
+  getCustomer: baseUrl + "/customer/get-all",
+  getCustomerNoPaging: baseUrl + "/customer/get-all-without-paging",
+  createCustomer: baseUrl + "/customer/create",
+  updateCustomer: baseUrl + "/customer/update",
+  deleteCustomer: baseUrl + "/customer/delete",
 
   importProduct: baseUrl + "/product/create-from-file",
   importCustomer: baseUrl + "/customer/create-from-file",

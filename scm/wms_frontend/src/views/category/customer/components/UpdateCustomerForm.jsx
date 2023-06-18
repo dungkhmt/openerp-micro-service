@@ -1,27 +1,36 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Stack, Typography } from "@mui/material";
-import CustomMap from "components/map/CustomMap";
 import CustomSelect from "components/select/CustomSelect";
 import {
-  useCreateCustomer,
   useGetContractType,
   useGetCustomerType,
+  useUpdateCustomer,
 } from "controllers/query/category-query";
 import { useRef, useState } from "react";
 import { customerSchema } from "utils/validate";
-import { useGeoLocation } from "../../../../shared/AppHooks";
+import CustomMap from "../../../../components/map/CustomMap";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
 
-const UpdateCustomerForm = ({ setIsAdd }) => {
+const UpdateCustomerForm = ({ setOpenDrawer, currCustomer }) => {
   const status = [{ name: "active" }, { name: "inactive" }];
-  const currPos = useGeoLocation();
   const mapRef = useRef();
-  const [currMarker, setCurrMarker] = useState(currPos.coordinates);
+  const [currMarker, setCurrMarker] = useState();
   const methods = useForm({
     mode: "onChange",
-    defaultValues: {},
+    defaultValues: {
+      address: currCustomer?.address,
+      name: currCustomer?.name,
+      phone: currCustomer?.phone,
+      customerType: currCustomer?.customerType,
+      status: currCustomer?.status === "active" ? status[0] : status[1],
+      contractType: currCustomer?.contractType,
+      map: {
+        lat: currCustomer?.latitude,
+        lng: currCustomer?.longitude,
+      },
+    },
     resolver: yupResolver(customerSchema),
   });
   const {
@@ -35,7 +44,7 @@ const UpdateCustomerForm = ({ setIsAdd }) => {
     useGetCustomerType();
   const { isLoading: isLoadingContractType, data: contractType } =
     useGetContractType();
-  const createCustomerQuery = useCreateCustomer();
+  const updateCustomerQuery = useUpdateCustomer();
 
   const onSubmit = async (data) => {
     let customerParams = {
@@ -48,10 +57,15 @@ const UpdateCustomerForm = ({ setIsAdd }) => {
       latitude: data?.map?.lat ? data?.map?.lat : currMarker?.lat,
       longitude: data?.map?.lng ? data?.map?.lng : currMarker?.lng,
     };
-    await createCustomerQuery.mutateAsync(customerParams);
-    setIsAdd((pre) => !pre);
-    reset();
+    console.log("Params: ", customerParams);
+    // await updateCustomerQuery.mutateAsync(customerParams);
+    // setOpenDrawer((pre) => !pre);
+    // reset();
   };
+  const [selectPosition, setSelectPosition] = useState({
+    lat: 20.991322,
+    lng: 105.839077,
+  });
   return (
     <FormProvider {...methods}>
       <Stack
@@ -124,7 +138,7 @@ const UpdateCustomerForm = ({ setIsAdd }) => {
             loading={isLoadingCustomerType}
             value={value}
             onChange={onChange}
-            label={"Ngành hàng"}
+            label={"Loại khách hàng"}
             error={!!errors["customerType"]}
             message={errors["customerType"]?.message}
           />
@@ -159,7 +173,7 @@ const UpdateCustomerForm = ({ setIsAdd }) => {
             loading={isLoadingContractType}
             value={value}
             onChange={onChange}
-            label={"Đơn vị tính"}
+            label={"Loại hợp đồng"}
             error={!!errors["contractType"]}
             message={errors["contractType"]?.message}
           />
@@ -174,17 +188,18 @@ const UpdateCustomerForm = ({ setIsAdd }) => {
           render={({ field: { onChange, value } }) => (
             <CustomMap
               style={{ width: "30vw", height: "30vh" }}
-              location={currPos}
+              location={value}
               mapRef={mapRef}
+              setSelectPosition={setSelectPosition}
               onChange={(currLoc) => {
                 setCurrMarker(currLoc);
               }}
             />
           )}
         />
-        <Stack direction={"column"}>
+        {/* <Stack direction={"column"}>
           <Typography>{`${currMarker.lat}, ${currMarker.lng}`}</Typography>
-        </Stack>
+        </Stack> */}
       </Stack>
       <Stack
         direction="row"

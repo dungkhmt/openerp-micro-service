@@ -4,7 +4,7 @@ import { useUpdateCustomerType } from "../../../../controllers/query/category-qu
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
 
-const UpdateCustomerType = ({ currCustomerType }) => {
+const UpdateCustomerType = ({ currCustomerType, openDrawer }) => {
   const methods = useForm({
     mode: "onChange",
     defaultValues: {
@@ -28,6 +28,7 @@ const UpdateCustomerType = ({ currCustomerType }) => {
       name: data?.name.trim(),
     };
     await updateCustomerType.mutateAsync(params);
+    openDrawer((pre) => !pre);
     reset();
   };
   return (

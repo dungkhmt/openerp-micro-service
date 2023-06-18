@@ -1,14 +1,19 @@
 import { Box, Button, Stack } from "@mui/material";
-import { useUpdateProductCategory } from "../../../../controllers/query/category-query";
+import CustomSelect from "../../../../components/select/CustomSelect";
+import {
+  useGetDistChannelList,
+  useUpdateContractType,
+} from "../../../../controllers/query/category-query";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
 
-const UpdateProductCate = ({ currCate, setOpenDrawer }) => {
+const UpdateContractType = ({ currContract, setOpenDrawer }) => {
   const methods = useForm({
     mode: "onChange",
     defaultValues: {
-      name: currCate?.name,
+      name: currContract?.name,
+      distributionChannel: currContract?.channel,
     },
     // resolver: yupResolver(productCategorySchema),
   });
@@ -19,15 +24,18 @@ const UpdateProductCate = ({ currCate, setOpenDrawer }) => {
     control,
   } = methods;
 
-  const updateProductCategory = useUpdateProductCategory({
-    id: currCate?.id,
+  const { isLoading: isLoadingDistChannel, data: distChannel } =
+    useGetDistChannelList();
+  const updateContractType = useUpdateContractType({
+    id: currContract?.id,
   });
 
   const onSubmit = async (data) => {
     let params = {
       name: data?.name.trim(),
+      channelCode: data?.distributionChannel?.code,
     };
-    await updateProductCategory.mutateAsync(params);
+    await updateContractType.mutateAsync(params);
     setOpenDrawer((pre) => !pre);
     reset();
   };
@@ -45,10 +53,28 @@ const UpdateProductCate = ({ currCate, setOpenDrawer }) => {
               value={value}
               type={"text"}
               onChange={onChange}
-              label={"Tên danh mục"}
+              label={"Tên hợp đồng"}
               isFullWidth={true}
               error={!!errors["name"]}
               message={errors["name"]?.message}
+            />
+          )}
+        />
+        <Controller
+          key={"distributionChannel"}
+          control={control}
+          name={"distributionChannel"}
+          render={({ field: { onChange, value } }) => (
+            <CustomSelect
+              readOnly={false}
+              options={distChannel ? distChannel?.content : []}
+              fullWidth={true}
+              loading={isLoadingDistChannel}
+              value={value}
+              onChange={onChange}
+              label={"Kênh phân phối"}
+              error={!!errors["distributionChannel"]}
+              message={errors["distributionChannel"]?.message}
             />
           )}
         />
@@ -70,4 +96,4 @@ const UpdateProductCate = ({ currCate, setOpenDrawer }) => {
     </FormProvider>
   );
 };
-export default UpdateProductCate;
+export default UpdateContractType;

@@ -93,8 +93,8 @@ public class CustomerController extends BaseController{
             return response(error(ex));
         }
     }
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateCustomer(@Valid @RequestBody CustomerUpdateDTO customerDTO, @PathVariable("id") long id) {
+    @PutMapping("/update")
+    public ResponseEntity<?> updateCustomer(@Valid @RequestBody CustomerUpdateDTO customerDTO, @RequestParam(value = "id") Long id) {
         try {
             return response(new ResultEntity(1, "Update customer successfully", customerService.updateCustomerInfo(customerDTO, id)));
         } catch (Exception ex) {

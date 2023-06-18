@@ -339,7 +339,7 @@ public class CategoryController extends BaseController {
             return response(error(ex));
         }
     }
-    @PutMapping(path = "/contract-type/update/{id}")
+    @PutMapping(path = "/contract-type/update")
     public ResponseEntity<?> updateContract(@Valid @RequestBody ContractTypeDTO contractTypeDTO, @RequestParam(value = "id") Long id) {
         try {
             return response(new ResultEntity(1, "Update contract type successfully", categoryService.updateContractType(contractTypeDTO, id)));

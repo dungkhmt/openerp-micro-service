@@ -169,7 +169,7 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     @Override
     public CustomerType updateCustomerType(CustomerTypeDTO productCategoryDTO, long id) throws CustomException {
         CustomerType typeToUpdate = customerTypeRepo.getCustomerTypeById(id);
-        typeToUpdate.setName(productCategoryDTO.getName().toLowerCase());
+        typeToUpdate.setName(productCategoryDTO.getName());
         return customerTypeRepo.save(typeToUpdate);
     }
 
@@ -225,7 +225,7 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     @Override
     public DistributingChannel updateDistributingChannel(DistributingChannelDTO channelDTO, long id) throws CustomException {
         DistributingChannel channelToUpdate = distributingChannelRepo.getDistributingChannelById(id);
-        channelToUpdate.setName(channelDTO.getName().toLowerCase());
+        channelToUpdate.setName(channelDTO.getName());
         channelToUpdate.setPromotion(channelDTO.getPromotion());
         return distributingChannelRepo.save(channelToUpdate);
     }
@@ -292,7 +292,7 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Contract type with no specific distributing channel, can't create");
         }
         typeToUpdate.setChannel(channel);
-        typeToUpdate.setName(contractTypeDTO.getName().toLowerCase());
+        typeToUpdate.setName(contractTypeDTO.getName());
         return contractTypeRepo.save(typeToUpdate);
     }
 

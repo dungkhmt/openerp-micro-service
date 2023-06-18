@@ -19,6 +19,7 @@ import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { contractTypeCols } from "../LocalConstant";
 import CreateContractTypeForm from "./components/CreateContractTypeForm";
+import UpdateContractType from "./components/UpdateContractType";
 function ContractTypeScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
@@ -50,6 +51,7 @@ function ContractTypeScreen({ screenAuthorization }) {
       title: "Sửa",
       callback: (item) => {
         setOpenDrawer((pre) => !pre);
+        setItemSelected(item);
       },
       icon: <EditIcon />,
       color: AppColors.secondary,
@@ -116,6 +118,10 @@ function ContractTypeScreen({ screenAuthorization }) {
       </CustomModal>
       <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
         <HeaderModal onClose={setOpenDrawer} title="Sửa thông tin hợp đồng" />
+        <UpdateContractType
+          currContract={itemSelected}
+          setOpenDrawer={setOpenDrawer}
+        />
       </CustomDrawer>
       <DraggableDeleteDialog
         // disable={isLoadingRemove}
