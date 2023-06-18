@@ -19,6 +19,7 @@ import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { distChannelCols } from "../LocalConstant";
 import CreateDistChannel from "./components/CreateDistChannel";
+import UpdateDistChannel from "./components/UpdateDistChannel";
 function DistributingChannelScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
@@ -50,6 +51,7 @@ function DistributingChannelScreen({ screenAuthorization }) {
       title: "Sửa",
       callback: (item) => {
         setOpenDrawer((pre) => !pre);
+        setItemSelected(item);
       },
       icon: <EditIcon />,
       color: AppColors.secondary,
@@ -118,6 +120,10 @@ function DistributingChannelScreen({ screenAuthorization }) {
         <HeaderModal
           onClose={setOpenDrawer}
           title="Sửa thông tin kênh phân phối"
+        />
+        <UpdateDistChannel
+          currChannel={itemSelected}
+          setOpenDrawer={setOpenDrawer}
         />
       </CustomDrawer>
       <DraggableDeleteDialog

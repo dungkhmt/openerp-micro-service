@@ -121,7 +121,10 @@ function ProductCategoryScreen({ screenAuthorization }) {
           onClose={setOpenDrawer}
           title="Sửa thông tin danh mục sản phẩm"
         />
-        <UpdateProductCate currCate={itemSelected} />
+        <UpdateProductCate
+          currCate={itemSelected}
+          setOpenDrawer={setOpenDrawer}
+        />
       </CustomDrawer>
       <DraggableDeleteDialog
         // disable={isLoadingRemove}

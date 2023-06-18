@@ -1,14 +1,15 @@
 import { Box, Button, Stack } from "@mui/material";
-import { useUpdateProductCategory } from "../../../../controllers/query/category-query";
+import { useUpdateDistChannel } from "../../../../controllers/query/category-query";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
 
-const UpdateProductCate = ({ currCate, setOpenDrawer }) => {
+const UpdateDistChannel = ({ currChannel, setOpenDrawer }) => {
   const methods = useForm({
     mode: "onChange",
     defaultValues: {
-      name: currCate?.name,
+      name: currChannel?.name,
+      discount: currChannel?.promotion,
     },
     // resolver: yupResolver(productCategorySchema),
   });
@@ -19,15 +20,16 @@ const UpdateProductCate = ({ currCate, setOpenDrawer }) => {
     control,
   } = methods;
 
-  const updateProductCategory = useUpdateProductCategory({
-    id: currCate?.id,
+  const updateDistChannel = useUpdateDistChannel({
+    id: currChannel?.id,
   });
 
   const onSubmit = async (data) => {
     let params = {
       name: data?.name.trim(),
+      promotion: data?.discount,
     };
-    await updateProductCategory.mutateAsync(params);
+    await updateDistChannel.mutateAsync(params);
     setOpenDrawer((pre) => !pre);
     reset();
   };
@@ -45,10 +47,27 @@ const UpdateProductCate = ({ currCate, setOpenDrawer }) => {
               value={value}
               type={"text"}
               onChange={onChange}
-              label={"Tên danh mục"}
+              label={"Tên kênh phân phối"}
               isFullWidth={true}
               error={!!errors["name"]}
               message={errors["name"]?.message}
+            />
+          )}
+        />
+        <Controller
+          key={"discount"}
+          control={control}
+          name={"discount"}
+          render={({ field: { onChange, value } }) => (
+            <CustomInput
+              required={true}
+              value={value}
+              type={"number"}
+              onChange={onChange}
+              label={"Chiết khấu"}
+              isFullWidth={true}
+              error={!!errors["discount"]}
+              message={errors["discount"]?.message}
             />
           )}
         />
@@ -70,4 +89,4 @@ const UpdateProductCate = ({ currCate, setOpenDrawer }) => {
     </FormProvider>
   );
 };
-export default UpdateProductCate;
+export default UpdateDistChannel;

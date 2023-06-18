@@ -68,6 +68,7 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
                 log.error("Product with code {} not found", orderItem.getProductCode().toUpperCase());
                 throw caughtException(ErrorCode.NON_EXIST.getCode(), "Product not found");
             }
+            // TODO: Add distribution channel as one of the discount factors here
             ProductSalePrice salePrice = productSalePriceRepo.getByProductAndContract(orderItem.getProductCode(), boughtBy.getContractType().getCode());
             double massDiscount = salePrice != null ? salePrice.getMassDiscount() : 0;
             double contractDiscount = salePrice != null ? salePrice.getContractDiscount() : 0;

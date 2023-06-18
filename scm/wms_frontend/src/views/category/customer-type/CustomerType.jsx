@@ -121,7 +121,10 @@ function CustomerTypeScreen({ screenAuthorization }) {
           onClose={setOpenDrawer}
           title="Sửa thông tin kiểu khách hàng"
         />
-        <UpdateCustomerType currCustomerType={itemSelected} />
+        <UpdateCustomerType
+          currCustomerType={itemSelected}
+          openDrawer={setOpenDrawer}
+        />
       </CustomDrawer>
       <DraggableDeleteDialog
         // disable={isLoadingRemove}

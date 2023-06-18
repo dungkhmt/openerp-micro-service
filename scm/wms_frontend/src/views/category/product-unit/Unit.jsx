@@ -19,6 +19,7 @@ import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { unitColumns } from "../LocalConstant";
 import CreateUnit from "./components/CreateUnit";
+import UpdateProductUnit from "./components/UpdateUnit";
 function ProductUnitScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
@@ -50,6 +51,7 @@ function ProductUnitScreen({ screenAuthorization }) {
       title: "Sửa",
       callback: (item) => {
         setOpenDrawer((pre) => !pre);
+        setItemSelected(item);
       },
       icon: <EditIcon />,
       color: AppColors.secondary,
@@ -118,6 +120,10 @@ function ProductUnitScreen({ screenAuthorization }) {
         <HeaderModal
           onClose={setOpenDrawer}
           title="Sửa thông tin đơn vị sản phẩm"
+        />
+        <UpdateProductUnit
+          currCate={itemSelected}
+          setOpenDrawer={setOpenDrawer}
         />
       </CustomDrawer>
       <DraggableDeleteDialog

@@ -2,21 +2,30 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Stack } from "@mui/material";
 import CustomSelect from "components/select/CustomSelect";
 import {
-  useCreateProduct,
   useGetProductCateList,
   useGetProductUnitList,
+  useUpdateProduct,
 } from "controllers/query/category-query";
 import { productSchema } from "utils/validate";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
 
-const UpdateProductForm = ({ setIsAdd }) => {
+const UpdateProductForm = ({ setOpenDrawer, currProduct }) => {
   const status = [{ name: "active" }, { name: "inactive" }];
 
   const methods = useForm({
     mode: "onChange",
-    defaultValues: {},
+    defaultValues: {
+      name: currProduct?.name,
+      sku: currProduct?.sku,
+      brand: currProduct?.brand,
+      unitPerBox: currProduct?.unitPerBox,
+      status: currProduct?.status === "active" ? status[0] : status[1],
+      unitId: currProduct?.productUnit,
+      categoryId: currProduct?.productCategory,
+      massQuantity: currProduct?.massQuantity,
+    },
     resolver: yupResolver(productSchema),
   });
   const {
@@ -30,21 +39,23 @@ const UpdateProductForm = ({ setIsAdd }) => {
     useGetProductCateList();
   const { isLoading: isLoadingProductUnit, data: productUnit } =
     useGetProductUnitList();
-  const createProductQuery = useCreateProduct();
+  const updateProductQuery = useUpdateProduct({
+    id: currProduct?.id,
+  });
 
   const onSubmit = async (data) => {
     let productParams = {
       brand: data?.brand,
       categoryId: data?.categoryId?.id,
-      massType: "oke",
       name: data?.name,
       sku: data?.sku,
       status: data?.status?.name,
       unitId: data?.unitId?.id,
       unitPerBox: data?.unitPerBox,
+      massQuantity: data?.massQuantity,
     };
-    setIsAdd((pre) => !pre);
-    await createProductQuery.mutateAsync(productParams);
+    setOpenDrawer((pre) => !pre);
+    await updateProductQuery.mutateAsync(productParams);
     reset();
   };
   return (
@@ -173,6 +184,23 @@ const UpdateProductForm = ({ setIsAdd }) => {
               label={"Đơn vị tính"}
               error={!!errors["unitId"]}
               message={errors["unitId"]?.message}
+            />
+          )}
+        />
+        <Controller
+          key={"massQuantity"}
+          control={control}
+          name={"massQuantity"}
+          render={({ field: { onChange, value } }) => (
+            <CustomInput
+              required={true}
+              value={value}
+              type={"number"}
+              onChange={onChange}
+              label={"Số lượng mua sỉ"}
+              isFullWidth={true}
+              error={!!errors["massQuantity"]}
+              message={errors["massQuantity"]?.message}
             />
           )}
         />

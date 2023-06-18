@@ -95,6 +95,7 @@ function CustomerScreen({ screenAuthorization }) {
       title: "Sửa",
       callback: (item) => {
         setOpenDrawer((pre) => !pre);
+        setItemSelected(item);
       },
       icon: <EditIcon />,
       color: AppColors.secondary,
@@ -172,7 +173,10 @@ function CustomerScreen({ screenAuthorization }) {
       </CustomModal>
       <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
         <HeaderModal onClose={setOpenDrawer} title="Sửa thông tin khách hàng" />
-        <UpdateCustomerForm />
+        <UpdateCustomerForm
+          setOpenDrawer={setOpenDrawer}
+          currCustomer={itemSelected}
+        />
       </CustomDrawer>
       <DraggableDeleteDialog
         // disable={isLoadingRemove}
