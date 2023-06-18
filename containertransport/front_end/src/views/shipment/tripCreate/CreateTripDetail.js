@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Divider, Typography } from "@mui/material";
+import { Alert, Box, Button, Container, Divider, Typography } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import '../styles.scss';
@@ -12,6 +12,8 @@ import TruckAndOrder from "../tripComponent/TruckAndOrder";
 import { createTrip } from "api/TripAPI";
 import { getOrders } from "api/OrderAPI";
 import { getTrucks } from "api/TruckAPI";
+import TruckAndOrdersInTrip from "../tripComponent/TruckAndOrdersInTrip";
+import OrderArrangementInTrip from "../tripComponent/OrderArrangementInTrip";
 
 const CreateTripDetail = () => {
     const { truckScheduler, setTruckScheduler, tripsCreate, setTripCreate } = useContext(MyContext);
@@ -108,7 +110,7 @@ const CreateTripDetail = () => {
             setTimeout(() => {
                 setToast(false);
                 history.push({
-                    pathname:`/shipment/detail/${shipmentId}`,
+                    pathname: `/shipment/detail/${shipmentId}`,
                 })
             }, "1000");
         })
@@ -118,47 +120,58 @@ const CreateTripDetail = () => {
 
     }, [tripItems])
     return (
-        <Box className="trip-create">
-            <Box className="toast">
-                {toastOpen ? (
-                    toastType === "success" ? (
-                        <Alert variant="filled" severity={toastType} >
-                            <strong> Created Trip Success !!!</strong >
-                        </Alert >
-                    ) : (
-                        <Alert variant="filled" severity={toastType} >
-                            <strong> Created Trip False !!!</strong >
-                        </Alert >
-                    )) : null
-                }
-            </Box>
-            <Box className="header-trip-detail">
-                <Typography className="header-trip-detail-text">Create Trip</Typography>
-                <Box className="header-trip-detail-btn">
-                    <Button variant="outlined" color="error" className="header-trip-detail-btn-cancel"
-                        onClick={handleCancelCreateTrip}
-                    >Cancel</Button>
-                    <Button variant="contained" className="header-trip-detail-btn-save"
-                        onClick={handleSubmit}
-                    >Save</Button>
-                </Box>
-            </Box>
-            <Divider className="divider-trip-detail" />
-            <Box className="content-trip">
-                <Box className="content-truck-and-orders">
-                    <TruckAndOrder trucks={trucks} setTruck={setTruck} truckSelected={truckSelect} setTruckSelect={setTruckSelect}
-                        orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} setFlag={setFlag}/>
-                </Box>
-                <Box className="order-arrangement">
-                    <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} flag={flag} />
-                </Box>
-                <Box className="map-order">
-                    <Box>
-                        <MapComponent tripItems={tripItems} />
+        <Box className="fullScreen">
+            <Container maxWidth="xl" className="container">
+                <Box className="trip-create">
+                    <Box className="toast">
+                        {toastOpen ? (
+                            toastType === "success" ? (
+                                <Alert variant="filled" severity={toastType} >
+                                    <strong> Created Trip Success !!!</strong >
+                                </Alert >
+                            ) : (
+                                <Alert variant="filled" severity={toastType} >
+                                    <strong> Created Trip False !!!</strong >
+                                </Alert >
+                            )) : null
+                        }
                     </Box>
-                    <Box>Thong tin trip</Box>
+                    <Box className="header-trip-detail">
+                        <Typography className="header-trip-detail-text">Create Trip</Typography>
+                        <Box className="header-trip-detail-btn">
+                            <Button variant="outlined" color="error" className="header-trip-detail-btn-cancel"
+                                onClick={handleCancelCreateTrip}
+                            >Cancel</Button>
+                            <Button variant="contained" className="header-trip-detail-btn-save"
+                                onClick={handleSubmit}
+                            >Save</Button>
+                        </Box>
+                    </Box>
+                    <Divider className="divider-trip-detail" />
+                    <Box className="content-trip-v2">
+                        {/* <Box className="content-truck-and-orders">
+                            <TruckAndOrder trucks={trucks} setTruck={setTruck} truckSelected={truckSelect} setTruckSelect={setTruckSelect}
+                                orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} setFlag={setFlag}/>
+                            </Box> */}
+                        <Box className="content-truck-and-orders-v2">
+                            <TruckAndOrdersInTrip trucks={trucks} setTruckSelect={setTruckSelect} truckSelect={truckSelect}
+                                orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} setFlag={setFlag} />
+                        </Box>
+                        {/* <Box className="order-arrangement-v2">
+                            <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} flag={flag} />
+                        </Box> */}
+                        <Box className="order-arrangement-v2">
+                            <OrderArrangementInTrip ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} flag={flag} />
+                        </Box>
+                        <Box className="map-order-v2">
+                            <Box>
+                                <MapComponent tripItems={tripItems} />
+                            </Box>
+                            <Box>Thong tin trip</Box>
+                        </Box>
+                    </Box>
                 </Box>
-            </Box>
+            </Container>
         </Box>
     )
 }

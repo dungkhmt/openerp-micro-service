@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Box, Button, Icon, Typography } from "@mui/material";
+import { Box, Button, Icon, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import '../styles.scss';
 import { DragDropContext } from "react-beautiful-dnd";
 import { Droppable } from "react-beautiful-dnd";
@@ -10,7 +10,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import ModalTripItem from "../tripCreate/ModalTripItem";
 import { getTripItemByTripId } from "api/TripItemAPI";
-import { menuIconMap } from "config/menuconfig";
+import { menuIconMap, tripItemType } from "config/menuconfig";
+import { SortableContainer, SortableHandle, SortableElement, arrayMove } from 'react-sortable-hoc'
 
 
 const TripItem = ({ index, item, facilities, setFacilities }) => {
@@ -60,15 +61,23 @@ const TripItem = ({ index, item, facilities, setFacilities }) => {
                     className="item-facility"
 
                 >
-                    <Box className="item-facility-line">
-                        <Box onClick={() => setOpen(!open)}>
-                            {item?.orderCode} - {item?.facilityName} - {item?.action}
-                        </Box>
-                        {(item?.type === "Trailer" || (item?.type === "Truck" && item?.action === "STOP")) ? (
-                            <Box onClick={handleDeleteTripItem}>
-                                <Icon>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                            </Box>) : <Box></Box>}
-                    </Box>
+                    <TableRow>
+                        <TableCell>
+                            {item?.orderCode}
+                        </TableCell>
+                        <TableCell>
+                            <Box className="item-facility-line">
+                                <Box onClick={() => setOpen(!open)}>
+                                    {item?.orderCode} - {item?.facilityName} - {item?.action}
+                                </Box>
+                                {(item?.type === "Trailer" || (item?.type === "Truck" && item?.action === "STOP")) ? (
+                                    <Box onClick={handleDeleteTripItem}>
+                                        <Icon>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                                    </Box>) : <Box></Box>}
+                            </Box>
+                        </TableCell>
+                    </TableRow>
+
 
                     {open ?
                         (<Box>
@@ -118,7 +127,118 @@ const TripItem = ({ index, item, facilities, setFacilities }) => {
     )
 }
 
-const OrderArrangement = ({ ordersSelect, setTripItem, truckSelected, tripItems, flag }) => {
+const headCells = [
+    {
+        id: 'drag',
+        numeric: false,
+        disablePadding: false,
+        label: '',
+        width: '10%'
+    },
+    {
+        id: 'code',
+        numeric: false,
+        disablePadding: false,
+        label: 'Code',
+        width: '15%'
+    },
+    {
+        id: 'facility',
+        numeric: false,
+        disablePadding: false,
+        label: 'Facility',
+        width: '15%'
+    },
+    {
+        id: 'action',
+        numeric: false,
+        disablePadding: false,
+        label: 'Action',
+        width: '20%'
+    },
+    {
+        id: 'entity',
+        numeric: false,
+        disablePadding: false,
+        label: 'Entity',
+        width: '15%'
+    },
+    {
+        id: 'status',
+        numeric: false,
+        disablePadding: false,
+        label: 'Status',
+        width: '20%'
+    },
+    {
+        id: 'impl',
+        numeric: false,
+        disablePadding: false,
+        label: '',
+        width: '5%'
+    },
+];
+
+function EnhancedTableHead(props) {
+    const { onSelectAllClick, order, orderBy, numSelected, rowCount } = props;
+
+    return (
+        <TableHead>
+            <TableRow>
+                {headCells.map((headCell) => (
+                    <TableCell
+                        key={headCell.id}
+                        align={headCell.numeric ? 'right' : 'left'}
+                        padding={headCell.disablePadding ? 'none' : 'normal'}
+                        // sortDirection={orderBy === headCell.id ? order : false}
+                        width={headCell?.width}
+                    >
+                        {headCell.label}
+                    </TableCell>
+                ))}
+            </TableRow>
+        </TableHead>
+    );
+}
+
+const TableBodySortable = SortableContainer(({ children, displayRowCheckbox }) => (
+    <TableBody displayRowCheckbox={displayRowCheckbox} >
+        {children}
+    </TableBody >
+))
+
+const DragHandle = SortableHandle(({ style }) => (
+    <span style={{ ...style, ...{ cursor: 'move' } }}> {':::'} </span>)
+)
+
+const Row = SortableElement(({ data, ...other }) => {
+    console.log("data", data);
+    return (
+        <TableRow {...other}>
+            {/* { other.children[0]} */}
+            <TableCell style={{ width: '5%' }} >
+                <DragHandle />
+            </TableCell>
+            <TableCell>
+                {data.orderCode}
+            </TableCell>
+            <TableCell>
+                {data.facilityCode}
+            </TableCell>
+            <TableCell>
+                {data.action}
+            </TableCell>
+            {data?.type === tripItemType.get("Truck") ? (<TableCell>{data?.orderCode}</TableCell>) : null}
+            {data?.type === tripItemType.get("Trailer") ? (<TableCell>{data?.trailerCode}</TableCell>) : null}
+            {data?.type === tripItemType.get("Order") ? (<TableCell>{data?.containerCode}</TableCell>) : null}
+            <TableCell>
+                {data.status ? data.status : "SCHEDULED"}
+            </TableCell>
+        </TableRow >
+    )
+})
+
+const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, tripItems, flag }) => {
     const [facilities, setFacilities] = useState([]);
     const [facilitiesFinal, setFacilitiesFinal] = useState([]);
     const [open, setOpen] = useState(false);
@@ -162,7 +282,7 @@ const OrderArrangement = ({ ordersSelect, setTripItem, truckSelected, tripItems,
                     container: null,
                     trailerId: null,
                     departureTime: null,
-                    type: "truck"
+                    type: tripItemType.get("Truck")
                 }
                 facilitiesTmp.push(startPoint);
                 setTruckItem(facilitiesTmp);
@@ -216,7 +336,7 @@ const OrderArrangement = ({ ordersSelect, setTripItem, truckSelected, tripItems,
                             latitude: item?.fromFacility.latitude,
                             arrivalTime: null,
                             departureTime: null,
-                            type: "order"
+                            type: tripItemType.get("Order")
                         }
                         let toFacility = {
                             code: item?.id + "F2",
@@ -234,7 +354,7 @@ const OrderArrangement = ({ ordersSelect, setTripItem, truckSelected, tripItems,
                             latitude: item?.toFacility.latitude,
                             arrivalTime: null,
                             departureTime: null,
-                            type: "order"
+                            type: tripItemType.get("Order")
                         }
                         facilitiesTmp.push(fromFacility);
                         facilitiesTmp.push(toFacility);
@@ -295,30 +415,43 @@ const OrderArrangement = ({ ordersSelect, setTripItem, truckSelected, tripItems,
     useEffect(() => {
         setTripItem(facilitiesFinal);
     }, [facilitiesFinal]);
+
+    const onSortEnd = ({ oldIndex, newIndex }) => {
+
+        setFacilitiesFinal(arrayMove(facilitiesFinal, oldIndex, newIndex))
+
+    };
     console.log("tripItems", tripItems)
     return (
-        <Box className="facility-arrangment">
-            <Box className="facility-arrangment-text">
-                <Typography>Facilities Arrangement:</Typography>
+        <Box className="facility-arrangment-v2">
+            <Box className="facility-arrangment-head">
+                <Box className="facility-arrangment-head-title">
+                    <Typography>Facilities Arrangement:</Typography>
+                </Box>
                 <Button variant="contained" className="header-trip-detail-btn-save"
                     onClick={handleAddTripItem}
                 >Add TripItem
                 </Button>
             </Box>
-            <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId="droppable">
-                    {(provided) => (
-                        <Box ref={provided.innerRef} {...provided.droppableProps}>
-                            {facilitiesFinal ? facilitiesFinal.map((item, index) => (
-                                <TripItem index={index} item={item} facilities={facilitiesFinal} setFacilities={setFacilitiesFinal} />
-                            )) : null}
-                        </Box>
-                    )}
-                </Droppable>
-            </DragDropContext>
+            <Table className="table-trip-items">
+                <EnhancedTableHead
+                    rowCount={facilitiesFinal.length}
+                />
+                <TableBodySortable onSortEnd={onSortEnd} useDragHandle displayRowCheckbox={false}>
+                    {facilitiesFinal ? facilitiesFinal.map((row, index) => {
+                        return (
+                            <Row
+                                index={index}
+                                key={row.id}
+                                data={row}
+                            />
+                        )
+                    }) : null}
+                </TableBodySortable>
+            </Table>
             <ModalTripItem openModal={open} handleModal={handleModal} setAddTripItem={setAddTripItem} trailerSelect={trailer}
                 setTrailerSelect={setTrailer} truckSelected={truckSelected} />
         </Box>
     )
 }
-export default OrderArrangement;
+export default OrderArrangementInTrip;

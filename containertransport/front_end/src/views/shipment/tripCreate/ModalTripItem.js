@@ -3,6 +3,7 @@ import '../styles.scss';
 import React, { useEffect, useState } from "react";
 import { getTraler } from "api/TrailerAPI";
 import { getFacility } from "api/FacilityAPI";
+import { tripItemType } from "config/menuconfig";
 
 const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, setTrailerSelect, truckSelected }) => {
     const [facilityList, setFacilityList] = useState([]);
@@ -64,7 +65,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                 [{
                     // xem xet lai id co the trung
                     code: trailer?.id + "TRA1",
-                    type: "Trailer",
+                    type: tripItemType.get("Trailer"),
                     facilityId: trailer?.facilityResponsiveDTO?.facilityId,
                     facilityName: trailer?.facilityResponsiveDTO?.facilityName,
                     facilityCode: trailer?.facilityResponsiveDTO?.facilityCode,

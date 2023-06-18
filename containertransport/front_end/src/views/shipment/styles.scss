@@ -245,8 +245,6 @@
 }
 
 .trip-create {
-    padding: 0px 32px 0px 0px;
-
     
 
     .header-trip-detail {
@@ -256,7 +254,6 @@
 
         .header-trip-detail-text {
             font-weight: 700;
-            margin-left: 40px;
         }
 
         .MuiTypography-root {
@@ -271,7 +268,94 @@
     }
 
     .divider-trip-detail {
-        margin-left: 32px;
+        // margin-left: 32px;
+    }
+}
+.content-trip-v2 {
+    margin-top: 32px;
+    .content-truck-and-orders-v2 {
+        .header-info {
+            margin-bottom: 16px;
+            .MuiTypography-root {
+                font-weight: 700;
+                font-size: 20px;
+            }
+        }
+        .truck-order {
+            display: flex;
+            margin-bottom: 48px;
+            background-color: white;
+            padding: 16px 32px 48px 32px;
+            .chose-truck-v2 {
+                margin: 0px 0px 16px 0px;
+                width: 30%;
+                
+                .truck-select-info {
+                    margin-top: 32px;
+                    .truck-info-item {
+                        display: flex;
+                        .truck-info-item-title {
+                            min-width: 40%;
+                            
+                            .MuiTypography-root {
+                                font-weight: 600;
+                                line-height: 2rem;
+                            }
+                        }
+                    }
+                }
+            }
+    
+            .chose-orders-v2 {
+                margin: 0px 0px 16px 64px;
+                width: 70%;
+                .table-order {
+                    padding: 0px 20px 16px 0px;
+                }
+                .chose-orders-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+            }
+        }
+    }
+    .order-arrangement-v2 {
+        margin-bottom: 32px;
+        min-width: 30%;
+        background-color: white;
+        padding: 16px 32px 16px 32px;
+        .facility-arrangment-v2 {
+            .facility-arrangment-head {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 16px;
+                .facility-arrangment-head-title {
+                    .MuiTypography-root {
+                        font-weight: 700;
+                        font-size: 20px;
+                    }
+                }
+
+                .header-trip-detail-btn-save {
+                    margin-top: 16px;
+                    margin-bottom: 8px;
+                }
+            }
+            .table-trip-items {
+                margin-bottom: 32px;
+            }
+        }
+
+        .item-facility {
+            // width: 50%;
+            // margin-top: 16px;
+            // border: 1px solid #e5e5e5;
+        }
+    }
+    .map-order-v2 {
+        
     }
 }
 
@@ -354,6 +438,7 @@
 }
 .trip-detail {
     padding: 8px 32px;
+    background-color: rgb(246, 246, 246);
     .header-trip-detail {
         .headerScreen-trip-detail-go-back {
             display: flex;

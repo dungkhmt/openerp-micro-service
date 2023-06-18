@@ -9,6 +9,8 @@ import { getTripItemByTripId } from "api/TripItemAPI";
 import { getTrucks } from "api/TruckAPI";
 import { getOrders } from "api/OrderAPI";
 import { getTripByTripId } from "api/TripAPI";
+import TruckAndOrdersInTrip from "../tripComponent/TruckAndOrdersInTrip";
+import OrderArrangementInTrip from "../tripComponent/OrderArrangementInTrip";
 
 const { Box, Typography, Button, Divider, Icon } = require("@mui/material")
 
@@ -73,13 +75,20 @@ const TripDetail = () => {
                 </Box> */}
             </Box>
             <Divider className="divider-trip-detail" />
-            <Box className="content-trip">
-                <Box className="content-truck-and-orders">
+            <Box className="content-trip-v2">
+                {/* <Box className="content-truck-and-orders">
                     <TruckAndOrder trucks={trucks} setTruckSelect={setTruckSelect} truckSelect={truckSelect}
                         orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} tripId={tripId} setFlag={setFlag}/>
+                </Box> */}
+                <Box className="content-truck-and-orders-v2">
+                    <TruckAndOrdersInTrip trucks={trucks} setTruckSelect={setTruckSelect} truckSelect={truckSelect}
+                        orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} tripId={tripId} setFlag={setFlag}/>
                 </Box>
-                <Box className="order-arrangement">
+                {/* <Box className="order-arrangement">
                     <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} tripItems={tripItems} flag={flag}/>
+                </Box> */}
+                <Box className="order-arrangement-v2">
+                    <OrderArrangementInTrip ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} tripItems={tripItems} flag={flag}/>
                 </Box>
                 <Box className="map-order">
                     <Box>

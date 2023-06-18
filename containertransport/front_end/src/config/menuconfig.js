@@ -135,3 +135,8 @@ export const facilityType = new Map();
 facilityType.set("Depot", "Depot");
 facilityType.set("Truck", "Truck");
 facilityType.set("Trailer", "Trailer");
+
+export const tripItemType = new Map();
+tripItemType.set("Order", "Order");
+tripItemType.set("Truck", "Truck");
+tripItemType.set("Trailer", "Trailer");
