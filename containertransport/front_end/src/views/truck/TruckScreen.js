@@ -4,6 +4,7 @@ import HeaderTruckScreen from "./HeaderTruckScreen";
 import './styles.scss';
 import ContentsTruckManagement from "./ContentTruckManagement";
 import { getTrucks } from "api/TruckAPI";
+import SearchBar from "./SearchBar";
 
 const TruckScreen = () => {
 
@@ -17,17 +18,31 @@ const TruckScreen = () => {
     const [toastType, setToastType] = useState();
     const [toastMsg, setToastMsg] = useState('');
 
+    const [filters, setFilters] = useState([]);
+
     const handleClose = () => {
         setOpenModal(!openModal);
     }
 
     useEffect(() => {
-        getTrucks({ page: page, pageSize: rowsPerPage }).then((res) => {
+        let data = { 
+            page: page,
+            pageSize: rowsPerPage,
+        }
+        let code = filters.find((item) => item.type === "code");
+        if(code) {
+            data.truckCode = code.value;
+        }
+        let status = filters.find((item) => item.type === "status");
+        if(status) {
+            data.status = status.value;
+        }
+        getTrucks(data).then((res) => {
             console.log("truck==========", res.data.truckModels)
             setTrucks(res.data.truckModels);
             setCount(res?.data.count);
         });
-    }, [openModal, page, rowsPerPage]);
+    }, [openModal, page, rowsPerPage, filters]);
     return (
         <Box className="fullScreen">
             <Container maxWidth="lg" className="container">
@@ -41,6 +56,9 @@ const TruckScreen = () => {
                     setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
                 <Box className="divider">
                     <Divider />
+                </Box>
+                <Box>
+                    <SearchBar filters={filters} setFilters={setFilters} />
                 </Box>
                 <ContentsTruckManagement trucks={trucks} page={page} setPage={setPage}
                     rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
