@@ -27,4 +27,5 @@ public class Request implements Serializable {
     private long containerID;
     private int weightContainer;
     private String orderCode;
+    private Boolean isBreakRomooc;
 }

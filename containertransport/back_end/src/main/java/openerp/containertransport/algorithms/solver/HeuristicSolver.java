@@ -110,8 +110,8 @@ public class HeuristicSolver {
 
             // Add request vao cho thich hop sao cho tong quang duong la nho nhat
             Request requestAdd = SerializationUtils.clone(this.requestList.stream().filter((item) -> item.getRequestId() == infoRemoveRequest.getRequestId()).findFirst().get());
-            Point pick = createdPointFromRequest(Constants.ACTION.PICKUP_CONTAINER.getAction(), requestAdd);
-            Point delivery = createdPointFromRequest(Constants.ACTION.DELIVERY_CONTAINER.getAction(), requestAdd);
+            Point pick = createdPointFromRequest(Constants.ACTION.PICKUP_CONTAINER.getAction(), requestAdd, false);
+            Point delivery = createdPointFromRequest(Constants.ACTION.DELIVERY_CONTAINER.getAction(), requestAdd, true);
 
             BigDecimal totalDistantSolutionLoop = new BigDecimal(String.valueOf(this.transportContainerSolutionOutput.getTotalDistantTmp()));
 
@@ -188,8 +188,8 @@ public class HeuristicSolver {
         log.info("Create init solution");
         for(Request request : this.requestList) {
             log.info("create router with request: {}", request.getOrderCode());
-            Point pick = createdPointFromRequest(Constants.ACTION.PICKUP_CONTAINER.getAction(), request);
-            Point delivery = createdPointFromRequest(Constants.ACTION.DELIVERY_CONTAINER.getAction(), request);
+            Point pick = createdPointFromRequest(Constants.ACTION.PICKUP_CONTAINER.getAction(), request, false);
+            Point delivery = createdPointFromRequest(Constants.ACTION.DELIVERY_CONTAINER.getAction(), request, true);
 
             BigDecimal distantSolution = this.transportContainerSolutionOutput.getTotalDistant();
             AtomicReference<BigDecimal> distantSolutionLoop = new AtomicReference<>(BigDecimal.valueOf(Double.MAX_VALUE));
@@ -209,6 +209,8 @@ public class HeuristicSolver {
                         || (tripOutputBefore.getPoints().size() < tripOutputTmp.getPoints().size())) {
 
                     AtomicReference<BigDecimal> distantSolutionTmp = new AtomicReference<>(BigDecimal.valueOf(0));
+
+                    // update distant router truck after add request
                     if (distantTrip.compareTo(BigDecimal.valueOf(Double.MAX_VALUE)) == 0) {
                         if (distantSolution.compareTo(BigDecimal.valueOf(Double.MAX_VALUE)) == 0) {
                             distantSolutionTmp.set(tripOutputTmp.getTotalDistant());
@@ -221,6 +223,7 @@ public class HeuristicSolver {
                         distantSolutionTmp.set(distantSolution.subtract(distantTrip).add(tripOutputTmp.getTotalDistant()));
                     }
 
+                    // check distant to determine add request to router truck
                     if(distantSolutionTmp.get().compareTo(distantSolutionLoop.get()) < 0) {
                         log.info("chose router: {}", truckInput.getTruckID());
                         distantSolutionLoop.set(distantSolutionTmp.get());
@@ -242,6 +245,7 @@ public class HeuristicSolver {
 
             log.info("Router is selecte: {}", truckSelect);
 
+            // update truck router best, tmp
             for (TruckInput truckInput : this.trucks.values().toArray(new TruckInput[0])) {
                 if(truckInput.getTruckID() != truckSelect) {
                     TripOutput tripOutput = SerializationUtils.clone(this.transportContainerSolutionOutput.getTripOutputsTmp().get(truckInput.getTruckID()));
@@ -257,7 +261,7 @@ public class HeuristicSolver {
         }
     }
 
-    public Point createdPointFromRequest(String action, Request request) {
+    public Point createdPointFromRequest(String action, Request request, boolean checkToPoint) {
         Point point = new Point();
         point.setId(request.getRequestId());
         point.setAction(action);
@@ -266,7 +270,12 @@ public class HeuristicSolver {
         point.setContainerId(request.getContainerID());
         point.setSizeContainer(request.getWeightContainer());
         // can check neu break
-        point.setNbTrailer(1);
+        point.setIsBreakRomooc(request.getIsBreakRomooc());
+        if(checkToPoint && request.getIsBreakRomooc()) {
+            point.setNbTrailer(0);
+        } else {
+            point.setNbTrailer(1);
+        }
         point.setType("Order");
 
         return point;
@@ -295,6 +304,7 @@ public class HeuristicSolver {
             this.transportContainerSolutionOutput.setTripOutputsTmp(tripOutputsTmp);
             this.transportContainerSolutionOutput.setTotalTime(BigDecimal.valueOf(Double.MAX_VALUE));
             this.transportContainerSolutionOutput.setTotalDistant(BigDecimal.valueOf(Double.MAX_VALUE));
+            this.transportContainerSolutionOutput.setTotalDistantTmp(BigDecimal.valueOf(Double.MAX_VALUE));
         }
     }
 
@@ -330,7 +340,7 @@ public class HeuristicSolver {
             pick.setWeightContainer(request.getWeightContainer());
             pointsInTrip.add(pick);
 
-            delivery.setNbTrailer(1);
+//            delivery.setNbTrailer(1);
             delivery.setWeightContainer(0);
             pointsInTrip.add(delivery);
 
@@ -348,8 +358,8 @@ public class HeuristicSolver {
             TripOutput tripOutput = removePickTrailer(SerializationUtils.clone(tripOutputLoopTmp));
 
             int nbPoint = tripOutput.getPoints().size();
-            for (int x = 0; x < nbPoint; x++) {
-                for (int y = x+1; y <= nbPoint; y++) {
+            for (int x = 0; x <= nbPoint; x++) {
+                for (int y = x+1; y <= nbPoint+1; y++) {
                     TripOutput tripOutputLoopItem = SerializationUtils.clone(tripOutput);
                     List<Point> pointsInTrip = tripOutputLoopItem.getPoints();
                     // check lai vi tri add cuoi
@@ -362,7 +372,6 @@ public class HeuristicSolver {
                     }
 
                     // Update weightContainer everyone Point
-                    // check
                     updateWeightContainer(pointsInTrip, x, y);
 
                     // insert Pickup Trailer point
@@ -617,6 +626,21 @@ public class HeuristicSolver {
         return infoRemoveRequest;
     }
 
+    // xoa ngau nhien
+    public InfoRemoveRequest removeRequestInTripV2() {
+        InfoRemoveRequest infoRemoveRequest = new InfoRemoveRequest();
+        int size = this.requestList.size();
+        Random random = new Random();
+        long requestSelect = 0;
+        int truckSelect = 0;
+        int indexRequest = random.nextInt(size);
+        requestSelect = this.requestList.get(indexRequest).getRequestId();
+        // can check lai truck router
+        infoRemoveRequest.setRequestId(requestSelect);
+        infoRemoveRequest.setTruckId(truckSelect);
+        return infoRemoveRequest;
+    }
+
     // can kiem tra lai ham nay voi truong hop bij break trailer
     public Boolean checkValidateAddPoint(int x, int y, List<Point> pointsInTrip) {
         for (int i = x+1; i < y; i++) {
@@ -625,28 +649,43 @@ public class HeuristicSolver {
             }
         }
 
-        // bo trailer di
-        if(x == 0 || pointsInTrip.get(x-1).getNbTrailer() == 0) {
-            int weightAllow = pointsInTrip.get(x).getSizeContainer();
-            for(int i = x+1; i < y; i++) {
-                if(weightAllow + pointsInTrip.get(i).getWeightContainer() > 40) {
-                    return false;
-                }
-            }
-        }
-        else {
+        // version2
+        if(x != 0 && pointsInTrip.get(x-1).getNbTrailer() != 0) {
             Point prevPick = pointsInTrip.get(x-1);
-            Point prevDelivery = pointsInTrip.get(y-1);
             if (pointsInTrip.get(x).getSizeContainer() + prevPick.getWeightContainer() > 40) {
                 return false;
             }
-            int weightAllow = pointsInTrip.get(x).getSizeContainer();
-            for(int i = x+1; i < y; i++) {
-                if(weightAllow + pointsInTrip.get(i).getWeightContainer() > 40) {
-                    return false;
-                }
+        }
+
+        int weightAllow = pointsInTrip.get(x).getSizeContainer();
+        for(int i = x+1; i < y; i++) {
+            if(weightAllow + pointsInTrip.get(i).getWeightContainer() > 40) {
+                return false;
             }
         }
+
+        // version 1
+//        if(x == 0 || pointsInTrip.get(x-1).getNbTrailer() == 0) {
+//            int weightAllow = pointsInTrip.get(x).getSizeContainer();
+//            for(int i = x+1; i < y; i++) {
+//                if(weightAllow + pointsInTrip.get(i).getWeightContainer() > 40) {
+//                    return false;
+//                }
+//            }
+//        }
+//        else {
+//            Point prevPick = pointsInTrip.get(x-1);
+//            Point prevDelivery = pointsInTrip.get(y-1);
+//            if (pointsInTrip.get(x).getSizeContainer() + prevPick.getWeightContainer() > 40) {
+//                return false;
+//            }
+//            int weightAllow = pointsInTrip.get(x).getSizeContainer();
+//            for(int i = x+1; i < y; i++) {
+//                if(weightAllow + pointsInTrip.get(i).getWeightContainer() > 40) {
+//                    return false;
+//                }
+//            }
+//        }
         return true;
     }
 

@@ -146,10 +146,11 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
             Request request = new Request();
             request.setRequestId(orderModel.getId());
             request.setOrderCode(orderModel.getOrderCode());
-            request.setContainerID(orderModel.getContainers().get(0).getId());
-            request.setWeightContainer(orderModel.getContainers().get(0).getTypeContainer().getSize());
+            request.setContainerID(orderModel.getContainerModel().getId());
+            request.setWeightContainer(orderModel.getContainerModel().getSize());
             request.setFromLocationID((int) orderModel.getFromFacility().getFacilityId());
             request.setToLocationID((int) orderModel.getToFacility().getFacilityId());
+            request.setIsBreakRomooc(orderModel.isBreakRomooc());
             requests.add(request);
         });
         return requests;

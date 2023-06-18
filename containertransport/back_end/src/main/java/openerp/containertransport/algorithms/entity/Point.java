@@ -23,9 +23,12 @@ public class Point implements Serializable {
     public Integer weightContainer;
     @JsonProperty("trailer_id")
     public Integer trailerId;
+
     @JsonProperty("order_code")
     public String orderCode;
+
     public String type;
+    public Boolean isBreakRomooc;
     public int prevPoint;
     public int nextPoint;
     public int nbTrailer;
