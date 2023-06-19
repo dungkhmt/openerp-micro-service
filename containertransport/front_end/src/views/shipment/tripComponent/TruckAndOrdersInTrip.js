@@ -200,7 +200,7 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                     </Box>
                 </Box>
                 {open ?
-                    <Box id={id} anchorEl={anchorEl} placement="bottom-start" sx={{ zIndex: 10000 }}>
+                    <Box id={id} anchorEl={anchorEl} placement="bottom-start" sx={{width: '50%', float: 'right', zIndex: 10000 }}>
                         <ClickAwayListener onClickAway={handleClose}>
                             <div>
                                 <Autocomplete

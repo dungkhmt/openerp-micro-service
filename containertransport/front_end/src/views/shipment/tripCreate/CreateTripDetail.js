@@ -56,7 +56,7 @@ const CreateTripDetail = () => {
             // console.log("truck", res.data)
             setTrucks(res.data.truckModels);
         });
-        getOrders({}).then((res) => {
+        getOrders({status: 'ORDERED'}).then((res) => {
             // let orderTmp = res.data.data.filter(item => checkScheduler(item.id, "order"))
             setOrders(res.data.data.orderModels);
         });

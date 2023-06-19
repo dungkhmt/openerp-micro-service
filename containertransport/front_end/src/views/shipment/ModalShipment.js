@@ -12,7 +12,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useKeycloak } from "@react-keycloak/web";
 import { MyContext } from "contextAPI/MyContext";
 import './styles.scss';
-import { createShipment } from "api/ShipmentAPI";
+import { createShipment, updateShipment } from "api/ShipmentAPI";
 import dayjs from "dayjs";
 
 const ModalShipment = ({ open, setOpen, shipment, setToast, setToastType, setToastMsg }) => {
@@ -31,7 +31,26 @@ const ModalShipment = ({ open, setOpen, shipment, setToast, setToastType, setToa
     }
     const handleSubmit = () => {
         if (shipment) {
-
+            let dataSubmit = {
+                description: description,
+                executed_time: new Date(executedTime).getTime()
+            }
+            updateShipment(shipment?.id ,dataSubmit).then((res) => {
+                if(!res) {
+                    setToastType("error");
+                    setToastMsg("Update Shipment Fail !!!")
+                } else {
+                    setToastType("success");
+                    setToastMsg("Update Shipment Success !!!");
+                   
+                }
+                handleClose();
+                clearData();
+                setToast(true);
+                setTimeout(() => {
+                    setToast(false);
+                }, "2000");
+            })
         }
         else {
             let dataSubmit = {
@@ -68,7 +87,7 @@ const ModalShipment = ({ open, setOpen, shipment, setToast, setToastType, setToa
                 open={open}
                 handleClose={handleClose}
                 contentTopDivider
-                title="New Shipment"
+                title={shipment ? "Update Shipment" : "New Shipment"}
                 className="modalOrder"
                 content={
                     <AnimatePresence>
@@ -100,10 +119,12 @@ const ModalShipment = ({ open, setOpen, shipment, setToast, setToastType, setToa
                                         </Box>
                                         <Box className="contentModal-item-input">
                                             <TextField
+                                                value={description}
                                                 id="outlined-textarea"
                                                 label="Description"
                                                 placeholder="description"
                                                 multiline
+                                                onChange={(e) => setDescription(e.target.value)}
                                             />
                                         </Box>
                                     </Box>

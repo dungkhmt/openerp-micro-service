@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -32,7 +33,20 @@ public class OrderController {
     @PostMapping("/")
     public ResponseEntity<?> filterOrder(@RequestBody OrderFilterRequestDTO orderFilterRequestDTO, JwtAuthenticationToken token){
         String username = token.getName();
-        orderFilterRequestDTO.setOwner(username);
+        List<String> roleIds = token
+                .getAuthorities()
+                .stream()
+                .filter(grantedAuthority -> !grantedAuthority
+                        .getAuthority()
+                        .startsWith("ROLE_GR")) // remove all composite roles
+                .map(grantedAuthority -> { // convert role to permission
+                    String roleId = grantedAuthority.getAuthority().substring(5); // remove prefix "ROLE_"
+                    return roleId;
+                })
+                .collect(Collectors.toList());
+        if(roleIds.contains("TMS_CUSTOMER")) {
+            orderFilterRequestDTO.setOwner(username);
+        }
         OrdersRes orderModels = orderService.filterOrders(orderFilterRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModels));
     }

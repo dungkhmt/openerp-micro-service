@@ -24,6 +24,14 @@ export const createShipment = (data) => {
     return resData;
 }
 
+export const updateShipment = (id, data) => {
+    const resData = request(
+        "put",
+        `/shipment/update/${id}`, {},{}, data, {},
+    )
+    return resData;
+}
+
 export const autoCreateRouter = (data) => {
     const resData = request(
         "get",

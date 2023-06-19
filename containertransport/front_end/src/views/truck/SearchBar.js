@@ -4,7 +4,6 @@ import { menuIconMap } from "config/menuconfig";
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import { theme } from "App";
-import { getTrucks } from "api/TruckAPI";
 
 const styles = {
     root: (theme) => ({
@@ -79,7 +78,13 @@ const SearchBar = ({ filters, setFilters }) => {
         setFilters(prevState => [...prevState, data])
     }
     const handleRemoveFilter = (type) => {
-        let data = filters.filter((item) => item.type != type);
+        let data = filters.filter((item) => item.type !== type);
+        if(type === "code") {
+            setCode('');
+        }
+        if(type === "status") {
+            setStatusTruck('');
+        }
         setFilters(data);
     }
     console.log("filters", filters);
