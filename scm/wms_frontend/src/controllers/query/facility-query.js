@@ -91,3 +91,28 @@ export const useCreateFacility = (params) => {
     onMutate: (variables) => {},
   });
 };
+
+export const useUpdateFacility = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "put",
+        endPoint.updateFacility,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      } else throw Error;
+    },
+    onSuccess: (res, variables, context) => {
+      toast.success("Thay đổi thành công!");
+      queryClient.invalidateQueries([queryKey.facility.facility_list]);
+    },
+    onError: () => {
+      toast.error("Lỗi khi thay đổi, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};

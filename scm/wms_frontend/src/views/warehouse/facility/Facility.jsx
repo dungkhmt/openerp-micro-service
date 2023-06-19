@@ -25,6 +25,7 @@ import { AppColors } from "shared/AppColors";
 import { useGetAllUsersExist } from "../../../controllers/query/user-query";
 import { staticProductFields, staticWarehouseCols } from "../LocalConstant";
 import CreateFacilityForm from "./components/CreateFacilityForm";
+import UpdateFacilityForm from "./components/UpdateFacilityForm";
 
 function FacilityScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
@@ -74,6 +75,7 @@ function FacilityScreen({ screenAuthorization }) {
       title: "Sửa",
       callback: (item) => {
         setOpenEditDrawer((pre) => !pre);
+        setItemSelected(item);
       },
       icon: <EditIcon />,
       color: AppColors.secondary,
@@ -268,7 +270,10 @@ function FacilityScreen({ screenAuthorization }) {
       </CustomModal>
       <CustomDrawer open={isOpenEditDrawer} onClose={setOpenEditDrawer}>
         <HeaderModal onClose={setOpenEditDrawer} title="Sửa thông tin kho" />
-        {/* <UpdateProductForm /> */}
+        <UpdateFacilityForm
+          setOpenDrawer={setOpenEditDrawer}
+          currFacility={itemSelected}
+        />
       </CustomDrawer>
       <DraggableDeleteDialog
         // disable={isLoadingRemove}

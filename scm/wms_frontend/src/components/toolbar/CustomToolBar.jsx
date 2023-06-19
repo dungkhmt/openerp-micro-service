@@ -16,6 +16,7 @@ import SearchBox from "../searchbox/SearchBox";
 const CustomToolBar = ({
   actions,
   containSearch = true,
+  containFilter = true,
   fields,
   resolver = null,
   defaultValues = {},

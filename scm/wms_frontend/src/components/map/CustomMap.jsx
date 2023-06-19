@@ -12,7 +12,7 @@ import {
 const googleTileLayerUrl = "https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}";
 const googleAttribution = "Map data © Google";
 
-function DraggableMarker({ currPos, getPos, setSelectPosition }) {
+function DraggableMarker({ currPos, setSelectPosition }) {
   const markerRef = useRef(null);
   const map = useMapEvent({
     click() {
@@ -34,7 +34,6 @@ function DraggableMarker({ currPos, getPos, setSelectPosition }) {
     }),
     []
   );
-  // getPos(currPos);
   return (
     <Marker
       draggable={true}
@@ -66,14 +65,7 @@ function ResetCenterView(props) {
 
   return null;
 }
-const CustomMap = ({
-  value,
-  onChange,
-  style,
-  location,
-  mapRef,
-  setSelectPosition,
-}) => {
+const CustomMap = ({ style, location, mapRef, setSelectPosition }) => {
   const locationSelection = [location?.lat, location?.lng];
   return (
     <MapContainer
@@ -98,7 +90,6 @@ const CustomMap = ({
       {location && (
         <DraggableMarker
           currPos={locationSelection}
-          getPos={onChange}
           setSelectPosition={setSelectPosition}
         />
       )}

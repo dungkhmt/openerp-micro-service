@@ -80,7 +80,7 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
                 .name(facilityDTO.getName())
                 .code("FAC" + GeneralUtils.generateCodeFromSysTime())
                 .address(facilityDTO.getAddress())
-                .status(CommonStatus.ACTIVE.getStatus())
+                .status(CommonStatus.ACTIVE.getStatus().toLowerCase())
                 .latitude(facilityDTO.getLatitude())
                 .longitude(facilityDTO.getLongitude())
                 .creator(createdBy)
@@ -149,17 +149,18 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
 
     @Override
     public Facility updateFacility(FacilityUpdateDTO facilityDTO, long id) throws CustomException {
-        Facility facilityByCode = facilityRepo.getFacilityByCode(facilityDTO.getCode());
-        if (facilityByCode != null && facilityByCode.getId() != id) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Exist facility with same code, can't update");
+        Facility facility = facilityRepo.getFacilityById(id);
+        if (facility == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Facility does not exist, can't update");
         }
+        UserLogin manager = userRepo.getUserByUserLoginId(facilityDTO.getManagedBy());
         Facility facilityToUpdate = facilityRepo.getFacilityById(id);
         facilityToUpdate.setName(facilityDTO.getName());
-        facilityToUpdate.setCode(facilityToUpdate.getCode());
         facilityToUpdate.setAddress(facilityDTO.getAddress());
         facilityToUpdate.setStatus(facilityDTO.getStatus());
         facilityToUpdate.setLatitude(facilityToUpdate.getLatitude());
         facilityToUpdate.setLongitude(facilityToUpdate.getLongitude());
+        facilityToUpdate.setManager(manager);
         // Don't update user_created
         return facilityRepo.save(facilityToUpdate);
     }
