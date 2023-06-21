@@ -1,17 +1,17 @@
-import {Box, Button, CircularProgress, Grid, MenuItem, TextField, Chip} from "@mui/material";
+import {Box, Button, Chip, CircularProgress, Grid, MenuItem, TextField} from "@mui/material";
 import PublishIcon from "@mui/icons-material/Publish";
-import Typography from "@mui/material/Typography";
-import RichTextEditor from "../../common/editor/RichTextEditor";
 import HustContainerCard from "../../common/HustContainerCard";
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {successNoti, warningNoti} from "../../../utils/notification";
 import {request} from "../../../api";
 
+//TODO: improve this screen
+// 1. Add sample file: When user choose upload -> open a modal with sample file to download
+// 2. Show the output of the testcase after submitting
 export default function CreateTestCase(props) {
   const history = useHistory();
-  const [value, setValue] = useState(0);
   const [input, setInput] = useState("");
   const [result, setResult] = useState("");
   const {problemId} = useParams();
@@ -25,10 +25,6 @@ export default function CreateTestCase(props) {
   const [uploadMode, setUploadMode] = useState("EXECUTE");
 
   const [uploadMessage, setUploadMessage] = useState("");
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
 
   const getTestCaseResult = () => {
     console.log("get test case result");
@@ -82,18 +78,6 @@ export default function CreateTestCase(props) {
     ).then();
   };
 
-  useEffect(() => {
-    console.log("problemId ", problemId);
-
-    /*
-    request("GET", "/problem-details/" + problemId, (res) => {
-      console.log("res ", res);
-      setDescription(res.data.problemDescription);
-      setSolution(res.data.solution);
-    }).then();
-    */
-  }, []);
-
   const handleFormSubmit = (event) => {
     event.preventDefault();
     setIsProcessing(true);
@@ -122,18 +106,13 @@ export default function CreateTestCase(props) {
       (res) => {
         res = res.data;
         setIsProcessing(false);
-        console.log("handleFormSubmit, res = ", res);
         setUploadMessage(res.message);
-        //if (res.status == "TIME_OUT") {
-        //  alert("Time Out!!!");
-        //} else {
-        //}
       },
       {
         onError: (e) => {
           setIsProcessing(false);
+          setUploadMessage("Upload failed");
           console.error(e);
-          //alert("Time Out!!!");
         },
       },
       formData,
@@ -152,87 +131,89 @@ export default function CreateTestCase(props) {
 
   return (
     <HustContainerCard title={'Create new Test case'}>
-        <Box
-          style={{
-            width: "600px",
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
+      <Button color="primary" variant="outlined" component="label">
+        <PublishIcon/> Upload testcase file
+        <input hidden type="file" id="selected-upload-file" onChange={onFileChange}/>
+      </Button>
+      {filename && (
+        <Chip
+          style={{marginLeft: "20px"}}
+          color="success"
+          variant="outlined"
+          label={filename.name}
+          onDelete={() => setFilename(undefined)}
+        />
+      )}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: "24px"
+        }}
+      >
+        <TextField
+          autoFocus
+          required
+          type="number"
+          id="point"
+          label="Point"
+          placeholder="Point"
+          value={point}
+          onChange={(event) => {
+            setPoint(event.target.value);
           }}
+          sx={{width: "10%"}}
+        />
+        <TextField
+          select
+          id="public"
+          label="Public"
+          onChange={(event) => {
+            setIsPublic(event.target.value);
+          }}
+          value={isPublic}
+          sx={{width: "10%"}}
         >
-          <TextField
-            autoFocus
-            required
-            id="point"
-            label="Point"
-            placeholder="Point"
-            onChange={(event) => {
-              setPoint(event.target.value);
-            }}
-          ></TextField>
-          <TextField
-            autoFocus
-            // required
-            select
-            id="Public TestCase"
-            label="Public TestCase"
-            onChange={(event) => {
-              setIsPublic(event.target.value);
-            }}
-            value={isPublic}
-            style={{width: "140px"}}
-          >
-            <MenuItem key={"Y"} value={"Y"}>
-              {"Y"}
-            </MenuItem>
-            <MenuItem key={"N"} value={"N"}>
-              {"N"}
-            </MenuItem>
-          </TextField>
-          <TextField
-            autoFocus
-            // required
-            select
-            id="Mode"
-            label="Upload Mode"
-            onChange={(event) => {
-              setUploadMode(event.target.value);
-            }}
-            value={uploadMode}
-            style={{width: "140px"}}
-          >
-            <MenuItem key={"NOT_EXECUTE"} value={"NOT_EXECUTE"}>
-              {"NOT_EXECUTE"}
-            </MenuItem>
-            <MenuItem key={"EXECUTE"} value={"EXECUTE"}>
-              {"EXECUTE"}
-            </MenuItem>
-          </TextField>
-        </Box>
-        <br/>
+          <MenuItem key={"Y"} value={"Y"}>
+            {"Yes"}
+          </MenuItem>
+          <MenuItem key={"N"} value={"N"}>
+            {"No"}
+          </MenuItem>
+        </TextField>
+        <TextField
+          autoFocus
+          select
+          id="Mode"
+          label="Upload Mode"
+          onChange={(event) => {
+            setUploadMode(event.target.value);
+          }}
+          value={uploadMode}
+          sx={{width: "15%"}}
+        >
+          <MenuItem key={"NOT_EXECUTE"} value={"NOT_EXECUTE"}>
+            {"NOT_EXECUTE"}
+          </MenuItem>
+          <MenuItem key={"EXECUTE"} value={"EXECUTE"}>
+            {"EXECUTE"}
+          </MenuItem>
+        </TextField>
+        <TextField
+          id="description"
+          label="Description (optional)"
+          placeholder="Description for the testcase (Optional)"
+          onChange={(event) => {
+            setDescription(event.target.value);
+          }}
+          sx={{width: "60%"}}
+        />
+      </Box>
 
-        <form onSubmit={handleFormSubmit}>
-          <Grid container spacing={1} alignItems="flex-end">
-          <Button color="primary" variant="contained" component="label">
-            <PublishIcon /> Select file to upload
-            <input hidden type="file" id="selected-upload-file" onChange={onFileChange} />
-          </Button>
-          {filename && (
-            <Chip
-              style={{marginLeft: "20px"}}
-              color="success"
-              variant="outlined"
-              label={filename.name}
-              onDelete={() => setFilename(undefined)}
-            />
-          )}
-            <Box>
-              <Typography variant="h5" component="div" sx={{marginTop: "12px", marginBottom: "8px"}}>
-                Description
-              </Typography>
-              <RichTextEditor content={description} onContentChange={text => setDescription(text)}/>
-            </Box>
-            {/* Result
+      <form onSubmit={handleFormSubmit}>
+        <Grid container spacing={2} mt={2}>
+          {/* Result
             <TextField
               fullWidth
               style={{
@@ -246,21 +227,20 @@ export default function CreateTestCase(props) {
                 setResult(event.target.value);
               }}
             ></TextField> */}
-            <Grid item xs={2}>
-              <Button
-                color="primary"
-                variant="contained"
-                type="submit"
-                onChange={onInputChange}
-                width="100%"
-              >
-                SUBMIT
-              </Button>
-              <h2> Status: {uploadMessage}</h2>
-            </Grid>
-            {isProcessing ? <CircularProgress/> : ""}
+          <Grid item xs={8}>
+            <Button
+              color="primary"
+              variant="contained"
+              type="submit"
+              onChange={onInputChange}
+              width="100%"
+            >
+              SUBMIT
+            </Button>
+            {isProcessing ? <CircularProgress/> : <h2> Status: {uploadMessage}</h2>}
           </Grid>
-        </form>
+        </Grid>
+      </form>
     </HustContainerCard>
   );
 }
