@@ -59,20 +59,20 @@ const Participants = (props) => {
     <Paper elevation={3} sx={{ marginTop: "8px" }}>
       <Grid container spacing={1} justifyContent="center" alignItems="center" flexWrap="nowrap">
         <CircleIcon color="success" fontSize="10px" />
-        <strong
+        <div
           style={{
-            fontSize: "1rem",
+            // fontSize: "1rem",
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
+            fontWeight: 600
           }}
         >
           Người tham gia
-        </strong>
+        </div>
       </Grid>
 
       <List>
-        {/* <video ref={localVideo} muted autoPlay style={{ width: "100%" }}></video> */}
         <VideoCard
           socket={socket}
           stream={localVideo}
@@ -80,15 +80,8 @@ const Participants = (props) => {
           audio={!isMute}
           video={isShowCamera}
           socketId={socket.current?.id}
+          isLocal
         />
-        {/* <VideoCard
-          socket={socket}
-          stream={localVideo}
-          muted={true}
-          audio={!isMute}
-          video={isShowCamera}
-          socketId={socket.current?.id}
-        /> */}
         {remoteUsers?.map((user) => {
           return (
             <VideoCard
@@ -99,6 +92,7 @@ const Participants = (props) => {
               audio={user?.audio}
               video={user?.video}
               socketId={user?.socketId}
+              isLocal={false}
             />
           );
         })}

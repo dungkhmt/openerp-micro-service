@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
+// import { LoadingButton } from "@mui/lab";
 import { LoadingButton } from "@mui/lab";
 import { Button, Card, CardActionArea, Grid, TextField, Typography } from "@mui/material";
 import { request } from "api";
 import React from "react";
 import { useState } from "react";
-import {  useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
 import { errorNoti, successNoti } from "utils/notification";
 
@@ -60,61 +61,65 @@ const CreateJoinRoomPage = () => {
   };
   return (
     <div>
-      <Grid container sx={{ height: "80vh" }} justifyContent="center" alignContent="center">
+      <Grid
+        container
+        sx={{ height: "80vh" }}
+        spacing={2}
+        justifyContent="center"
+        alignContent="center"
+      >
         <Grid item xs={12} md={6} container justifyContent="center">
-          <Card>
-            <CardActionArea sx={{ padding: "20px" }}>
-              <Typography variant="h5" textAlign="center">
-                Tạo phòng mới
-              </Typography>
-              <br />
-              <form
-                id="create-code-editor-room"
-                onSubmit={handleSubmitCreateRoom(handleCreateRoom)}
+          <Card sx={{ padding: "2rem" }}>
+            <Typography variant="h5" textAlign="center">
+              Tạo phòng mới
+            </Typography>
+            <br />
+            <form id="create-code-editor-room" onSubmit={handleSubmitCreateRoom(handleCreateRoom)}>
+              <TextField
+                {...registerCreateRoom("roomName", { required: "Vui lòng nhập tên phòng" })}
+                error={!!errorsCreateRoom?.roomName}
+                aria-invalid={errorsCreateRoom?.roomName ? "true" : "false"}
+                helperText={errorsCreateRoom?.roomName?.message}
+                fullWidth
+                label="Tên phòng"
+              />
+              <LoadingButton
+                variant="contained"
+                fullWidth
+                type="submit"
+                sx={{ marginTop: "20px" }}
+                loading={loadingCreateRoom}
               >
-                <TextField
-                  {...registerCreateRoom("roomName", { required: "Vui lòng nhập tên phòng" })}
-                  error={!!errorsCreateRoom?.roomName}
-                  aria-invalid={errorsCreateRoom?.roomName ? "true" : "false"}
-                  helperText={errorsCreateRoom?.roomName?.message}
-                  fullWidth
-                  label="Tên phòng"
-                />
-                <Button variant="contained" fullWidth type="submit" sx={{ marginTop: "20px" }}>
-                  Tạo phòng ngay
-                </Button>
-              </form>
-            </CardActionArea>
+                Tạo phòng ngay
+              </LoadingButton>
+            </form>
           </Card>
         </Grid>
         <Grid item xs={12} md={6} container justifyContent="center">
-          <Card>
-            <CardActionArea sx={{ padding: "20px" }}>
-              <Typography variant="h5" textAlign="center">
-                Tham gia phòng
-              </Typography>
-              <br />
-              <form id="create-code-editor-room" onSubmit={handleSubmitJoinRoom(handleJoinRoom)}>
-                <TextField
-                  {...registerJoinRoom("roomId",{ required: "Vui lòng nhập id phòng" })}
-                  error={!!errorsJoinRoom?.roomId}
-                  aria-invalid={errorsCreateRoom?.roomId ? "true" : "false"}
-                  helperText={errorsJoinRoom?.roomId?.message}
-                  fullWidth
-                  label="Id phòng"
-                />
-
-                <LoadingButton
-                  variant="contained"
-                  fullWidth
-                  type="submit"
-                  sx={{ marginTop: "20px" }}
-                  loading={loadingJoinRoom}
-                >
-                  Tham gia ngay
-                </LoadingButton>
-              </form>
-            </CardActionArea>
+          <Card sx={{ padding: "2rem" }}>
+            <Typography variant="h5" textAlign="center">
+              Tham gia phòng
+            </Typography>
+            <br />
+            <form id="create-code-editor-room" onSubmit={handleSubmitJoinRoom(handleJoinRoom)}>
+              <TextField
+                {...registerJoinRoom("roomId", { required: "Vui lòng nhập id phòng" })}
+                error={!!errorsJoinRoom?.roomId}
+                aria-invalid={errorsCreateRoom?.roomId ? "true" : "false"}
+                helperText={errorsJoinRoom?.roomId?.message}
+                fullWidth
+                label="Id phòng"
+              />
+              <LoadingButton
+                variant="contained"
+                fullWidth
+                type="submit"
+                sx={{ marginTop: "20px" }}
+                loading={loadingJoinRoom}
+              >
+                Tham gia ngay
+              </LoadingButton>
+            </form>
           </Card>
         </Grid>
       </Grid>
