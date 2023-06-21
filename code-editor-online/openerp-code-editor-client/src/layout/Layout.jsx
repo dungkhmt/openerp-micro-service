@@ -92,6 +92,7 @@ function Layout({ children }) {
 
   //
   const [open, setOpen] = React.useState(true);
+  const [isVisibleAppBar, setIsVisibleAppBar] = React.useState(true);
   const [image] = useState(bgImage);
   const [color] = useState("blue");
 
@@ -101,45 +102,50 @@ function Layout({ children }) {
   useEffect(() => {
     if (pathname.startsWith("/code-editor/room/")) {
       setOpen(false);
+      setIsVisibleAppBar(false);
+    }else{
+      setIsVisibleAppBar(true);
     }
   }, [pathname]);
 
   return (
     <Box sx={styles.root}>
-      <AppBar position="fixed" color="inherit" sx={styles.appBar}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={() => setOpen(!open)}
-            edge="start"
-            sx={styles.menuButton}
-          >
-            <MenuIcon />
-          </IconButton>
-          <SvgIcon fontSize="large">
-            <Logo width={20} height={20} x={2} y={2} />
-          </SvgIcon>
+      {isVisibleAppBar && (
+        <AppBar position="fixed" color="inherit" sx={styles.appBar}>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={() => setOpen(!open)}
+              edge="start"
+              sx={styles.menuButton}
+            >
+              <MenuIcon />
+            </IconButton>
+            <SvgIcon fontSize="large">
+              <Logo width={20} height={20} x={2} y={2} />
+            </SvgIcon>
 
-          <Typography sx={styles.appName} variant="h6" noWrap>
-            Open ERP
-          </Typography>
+            <Typography sx={styles.appName} variant="h6" noWrap>
+              Open ERP
+            </Typography>
 
-          {/* Use this div tag to push the icons to the right */}
-          <div style={{ flexGrow: 1 }} />
-          <Box sx={styles.sectionDesktop}>
-            {keycloak.authenticated && (
-              <>
-                <NotificationButton />
-                <AccountButton />
-              </>
-            )}
-          </Box>
-        </Toolbar>
-      </AppBar>
+            {/* Use this div tag to push the icons to the right */}
+            <div style={{ flexGrow: 1 }} />
+            <Box sx={styles.sectionDesktop}>
+              {keycloak.authenticated && (
+                <Box>
+                  <NotificationButton />
+                  <AccountButton />
+                </Box>
+              )}
+            </Box>
+          </Toolbar>
+        </AppBar>
+      )}
       <SideBar open={open} image={image} color={color} />
       <Main isOpen={open}>
-        <Offset />
+        {isVisibleAppBar && <Offset />}
         {children}
       </Main>
     </Box>

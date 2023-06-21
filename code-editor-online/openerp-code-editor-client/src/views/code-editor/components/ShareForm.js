@@ -9,6 +9,7 @@ import {
   ListItemAvatar,
   MenuItem,
   Select,
+  styled,
 } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,6 +26,9 @@ import AddAllowedUserForm from "./AddAllowedUserForm";
 import { SOCKET_EVENTS } from "utils/constants";
 import { useEffect } from "react";
 
+const MyButton = styled(Button)(`
+  text-transform: none;
+`);
 const ShareForm = (props) => {
   const { socket } = props;
   const dispatch = useDispatch();
@@ -90,8 +94,9 @@ const ShareForm = (props) => {
               Chia sẻ "{roomName}"
             </Grid>
             <Grid item xs={3} container justifyContent="end">
-              <Button
+              <MyButton
                 variant="contained"
+                // className="my-button"
                 color="success"
                 onClick={() => {
                   setOpenAddUserForm(true);
@@ -99,14 +104,14 @@ const ShareForm = (props) => {
                 }}
               >
                 Thêm người
-              </Button>
+              </MyButton>
             </Grid>
           </Grid>
         </DialogTitle>
         <DialogContent>
-          <b>Những người có quyền truy cập</b>
+          <div style={{ fontWeight: 600 }}>Những người có quyền truy cập</div>
           <AllowedUserList socket={socket} />
-          <b>Quyền truy cập chung</b>
+          <div style={{ fontWeight: 600 }}>Quyền truy cập chung</div>
           <ListItem
             secondaryAction={
               isPublic && (
@@ -163,7 +168,10 @@ const ShareForm = (props) => {
                 <MenuItem value={true}>Bất kỳ ai có mã phòng</MenuItem>
               </Select>
               {isPublic ? (
-                <div>Bất kỳ ai có mã phòng đều có thể {roomAccessPermission === ACCESS_PERMISSION.VIEWER.value ? 'xem' :'chỉnh sửa' }</div>
+                <div>
+                  Bất kỳ ai có mã phòng đều có thể{" "}
+                  {roomAccessPermission === ACCESS_PERMISSION.VIEWER.value ? "xem" : "chỉnh sửa"}
+                </div>
               ) : (
                 <div>Chỉ những người có quyền truy cập mới có thể tham gia phòng</div>
               )}
@@ -173,22 +181,22 @@ const ShareForm = (props) => {
 
         <DialogActions sx={{ padding: "0 20px 20px 20px" }}>
           <Grid container justifyContent="space-between">
-            <Button
+            <MyButton
               variant="outlined"
               onClick={() => {
                 handleShare(roomId);
               }}
             >
               Sao chép mã phòng
-            </Button>
-            <Button
+            </MyButton>
+            <MyButton
               variant="contained"
               onClick={() => {
                 handleClose();
               }}
             >
               Lưu
-            </Button>
+            </MyButton>
           </Grid>
         </DialogActions>
       </Dialog>

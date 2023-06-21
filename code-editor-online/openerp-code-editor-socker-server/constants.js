@@ -13,6 +13,8 @@ const SOCKET_IO_EVENTS = {
   REFRESH_DELETE_PERMISSION: "refresh-delete-permission", // broadcast user is deleted to room
   REQUEST_ON_OFF_MIC: "request-on-off-mic", // room master on or off mic of other users in the room
   ACCEPT_ON_OFF_MIC: "accept-on-off-mic", // broadcast event to all users and update status of mic for user
+  REQUEST_REMOVE_PARTICIPANT: "request-remove-participant",
+  ACCEPT_REMOVE_PARTICIPANT: "accept-remove-participant",
 };
 
 module.exports = {

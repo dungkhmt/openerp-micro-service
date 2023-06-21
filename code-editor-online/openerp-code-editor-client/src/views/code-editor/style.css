@@ -1,3 +1,6 @@
 .splitter-layout {
   width: 99% !important;
 }
+.my-button {
+  text-transform: 5 !important;
+}
