@@ -18,7 +18,6 @@ export default function ViewProgrammingContestSubmission() {
 
   return (
     <div>
-      ViewProgrammingContestSubmission
       <MaterialTable
         columns={columns}
         data={(query) =>
@@ -33,7 +32,6 @@ export default function ViewProgrammingContestSubmission() {
               "get",
               url,
               (res) => {
-                console.log("get log view video, res = ", res);
                 const data = res.data;
                 const content = data.content.map((c) => ({
                   ...c,

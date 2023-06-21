@@ -541,4 +541,4 @@ function MainDashBoard(props) {
 }
 
 const screenName = "SCREEN_DATA_ADMIN_VIEW_MAIN_DASHBOARD";
-export default withScreenSecurity(MainDashBoard, screenName, true);
+export default MainDashBoard;
