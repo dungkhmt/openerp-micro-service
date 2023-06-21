@@ -19,9 +19,9 @@ public class TestCaseService {
 
     private static final String HASH = "TEST_CASE";
 
-    @Cacheable(value = HASH, key = "#problemId + '_' + #isPublicTestCase")
-    public List<TestCaseEntity> findListTestCaseWithCache(String problemId, boolean isPublicTestCase) {
-        return findListTestCase(problemId, isPublicTestCase);
+    @Cacheable(value = HASH, key = "#problemId + '_' + #evaluatePrivateTestcase")
+    public List<TestCaseEntity> findListTestCaseWithCache(String problemId, boolean evaluatePrivateTestcase) {
+        return findListTestCase(problemId, evaluatePrivateTestcase);
     }
 
     @Caching(evict = {
@@ -32,12 +32,12 @@ public class TestCaseService {
         return saveTestCase(testCase);
     }
 
-    public List<TestCaseEntity> findListTestCase(String problemId, boolean isPublicTestCase) {
+    public List<TestCaseEntity> findListTestCase(String problemId, boolean evaluatePrivateTestcase) {
         List<TestCaseEntity> testCaseEntityList;
-        if (isPublicTestCase) {
+        if (evaluatePrivateTestcase) {
             testCaseEntityList = testCaseRepo.findAllByProblemId(problemId);
         } else {
-            testCaseEntityList = testCaseRepo.findAllByProblemIdAndIsPublic(problemId, "N");
+            testCaseEntityList = testCaseRepo.findAllByProblemIdAndIsPublic(problemId, "Y");
         }
         return testCaseEntityList;
     }
