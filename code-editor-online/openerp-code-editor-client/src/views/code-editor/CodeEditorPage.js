@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Grid, Typography } from "@mui/material";
+import { Card, Grid, Typography } from "@mui/material";
 import { request } from "api";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +14,7 @@ import SplitterLayout from "react-splitter-layout";
 import "react-splitter-layout/lib/index.css";
 import { io } from "socket.io-client";
 import { errorNoti, infoNoti, successNoti } from "utils/notification";
+import { useHistory } from "react-router";
 import CodeEditor from "./components/CodeEditor";
 import InputOutputCard from "./components/InputOuputCard";
 import NotAccess from "./components/NotAccess";
@@ -39,7 +40,8 @@ const CodeEditorPage = () => {
     isPublic,
     roomAccessPermission,
     allowedUserList,
-    localVideoTest,
+    // localVideoTest,
+    isVisibleInput,
   } = useSelector((state) => state.codeEditor);
   const [roomMasterId, setRoomMasterId] = useState();
   const { keycloak } = useKeycloak();
@@ -49,6 +51,7 @@ const CodeEditorPage = () => {
   const [isAccess, setIsAccess] = useState();
   // const [localVideo, setLocalVideo] = useState(null);
   const [remoteVideos, setRemoteVideos] = useState([]);
+  const history = useHistory();
 
   useEffect(() => {
     if (isAccess) {
@@ -186,6 +189,17 @@ const CodeEditorPage = () => {
           );
         }
       });
+      socketRef.current.on(SOCKET_EVENTS.ACCEPT_REMOVE_PARTICIPANT, ({ socketId }) => {
+        if (socketId === socketRef.current.id) {
+          socketRef.current.disconnect();
+          if (myPeer.current) {
+            myPeer.current.disconnect();
+            myPeer.current.destroy();
+          }
+          infoNoti("Bạn đã bị loại ra khỏi phòng", true)
+          history.push("/code-editor/create-join-room");
+        }
+      });
     }
   }, [socketRef.current]);
 
@@ -225,21 +239,23 @@ const CodeEditorPage = () => {
     <>
       {isAccess === true && (
         <div>
-          <Typography variant="h5">{roomName}</Typography>
+          <Typography variant="body">{roomName}</Typography>
           <NavBarRoom socket={socketRef} myPeer={myPeer} />
-          <Grid container spacing={2}>
+          <Grid container spacing={1} sx={{ marginTop: "1px" }}>
             <Grid
               item
               xs={isVisibleParticipants ? 10 : 12}
-              sx={{ position: "relative", minHeight: "77vh" }}
+              sx={{ position: "relative", minHeight: "100vh" }}
             >
-              <SplitterLayout vertical>
+              <SplitterLayout percentage vertical>
                 <CodeEditor socket={socketRef} roomId={roomId} roomMasterId={roomMasterId} />
-                <Grid container spacing={2} height="100%">
-                  <Grid item xs={12}>
-                    <InputOutputCard />
+                {isVisibleInput && (
+                  <Grid container spacing={2} height="100%">
+                    <Grid item xs={12}>
+                      <InputOutputCard />
+                    </Grid>
                   </Grid>
-                </Grid>
+                )}
               </SplitterLayout>
             </Grid>
             <Grid hidden={!isVisibleParticipants} item xs={isVisibleParticipants ? 2 : 0}>

@@ -22,8 +22,10 @@ const initialState = {
 
   isEditCode: false,
 
+  isVisibleInput: false,
+
   // participants
-  isVisibleParticipants: true,
+  isVisibleParticipants: false,
   participants: [],
 
   // setting editor
