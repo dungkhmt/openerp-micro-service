@@ -91,8 +91,8 @@ public class FacilityController extends BaseController{
             return response(error(ex));
         }
     }
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateProductCategory(@Valid @RequestBody FacilityUpdateDTO facilityDTO, @PathVariable("id") long id) {
+    @PutMapping("/update")
+    public ResponseEntity<?> updateFacility(@Valid @RequestBody FacilityUpdateDTO facilityDTO, @RequestParam(value = "id") Long id) {
         try {
             return response(new ResultEntity(1, "Update facility successfully", facilityService.updateFacility(facilityDTO, id)));
         } catch (Exception ex) {

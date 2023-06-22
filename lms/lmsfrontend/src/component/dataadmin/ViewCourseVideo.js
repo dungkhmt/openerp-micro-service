@@ -84,4 +84,4 @@ function ViewCourseVideo() {
 }
 
 const screenName = "SCREEN_DATA_ADMIN_VIEW_COURSE_VIDEO";
-export default withScreenSecurity(ViewCourseVideo, screenName, true);
+export default ViewCourseVideo;

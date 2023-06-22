@@ -10,6 +10,7 @@ import {
   PlayArrow,
   Settings,
   Share,
+  Splitscreen,
   Videocam,
   VideocamOff,
   Visibility,
@@ -27,6 +28,7 @@ import {
   MenuItem,
   Select,
   Tooltip,
+  styled,
 } from "@mui/material";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -49,6 +51,9 @@ import ConfigEditor from "./ConfigEditor";
 import { useKeycloak } from "@react-keycloak/web";
 import { request } from "api";
 
+const MyButton = styled(Button)(`
+  text-transform: none;
+`);
 const NavBarRoom = (props) => {
   const { socket, myPeer, localVideo } = props;
   const dispatch = useDispatch();
@@ -64,6 +69,7 @@ const NavBarRoom = (props) => {
     isShowCamera,
     roomMaster,
     isEditCode,
+    isVisibleInput,
   } = useSelector((state) => state.codeEditor);
   const { keycloak } = useKeycloak();
   const token = keycloak.tokenParsed;
@@ -181,12 +187,6 @@ const NavBarRoom = (props) => {
     );
   };
   const handleShowCamera = async () => {
-    // if (socket.current) {
-    //   socket.current.emit(SOCKET_EVENTS.REQUEST_ON_OFF_MIC, {
-    //     socketId: socket.current.id,
-    //     audio: isMute,
-    //   });
-    // }
     dispatch(
       setState({
         isShowCamera: !isShowCamera,
@@ -207,7 +207,7 @@ const NavBarRoom = (props) => {
         <Grid item>
           <Grid container spacing={2}>
             <Grid item>
-              <Button
+              <MyButton
                 size="small"
                 startIcon={<PlayArrow />}
                 variant="contained"
@@ -218,10 +218,10 @@ const NavBarRoom = (props) => {
                 }}
               >
                 Run
-              </Button>
+              </MyButton>
             </Grid>
             <Grid item>
-              <Button
+              <MyButton
                 size="small"
                 startIcon={<Download />}
                 variant="contained"
@@ -231,11 +231,11 @@ const NavBarRoom = (props) => {
                 }}
               >
                 Download
-              </Button>
+              </MyButton>
             </Grid>
             {checkRoomMaster(token.preferred_username, roomMaster?.id) && (
               <Grid item>
-                <Button
+                <MyButton
                   size="small"
                   startIcon={<Share />}
                   variant="contained"
@@ -245,7 +245,7 @@ const NavBarRoom = (props) => {
                   }}
                 >
                   Share
-                </Button>
+                </MyButton>
               </Grid>
             )}
             <Grid item>
@@ -332,6 +332,17 @@ const NavBarRoom = (props) => {
               </Tooltip>
             </Grid>
             <Grid item>
+              <Tooltip title={isVisibleInput ? `Ẩn input, output` : `Hiển thị input, output`}>
+                <IconButton
+                  onClick={() => {
+                    dispatch(setState({ isVisibleInput: !isVisibleInput }));
+                  }}
+                >
+                  <Splitscreen fontSize="medium" />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+            <Grid item>
               <Tooltip title="Cài đặt">
                 <IconButton onClick={handleConfigEditor}>
                   <Settings fontSize="medium" />
@@ -340,7 +351,7 @@ const NavBarRoom = (props) => {
             </Grid>
 
             <Grid item>
-              <Button
+              <MyButton
                 size="small"
                 startIcon={<ExitToApp />}
                 variant="contained"
@@ -351,7 +362,7 @@ const NavBarRoom = (props) => {
                 }}
               >
                 Leave room
-              </Button>
+              </MyButton>
             </Grid>
           </Grid>
         </Grid>

@@ -89,7 +89,7 @@ const InputOutputCard = () => {
             value={input}
             multiline
             fullWidth
-            sx={{ height: "100%", alignItems: 'start' }}
+            sx={{ height: "100%", alignItems: "start" }}
             minRows={5}
             onChange={(e) => {
               dispatch(setInput(e.target.value));
@@ -102,7 +102,7 @@ const InputOutputCard = () => {
             readOnly
             multiline
             fullWidth
-            sx={{ height: "100%", alignItems: 'start' }}
+            sx={{ height: "100%", alignItems: "start" }}
             minRows={5}
             onChange={(e) => {
               dispatch(setOutput(e.target.value));

@@ -1,32 +1,27 @@
 import { Button, Stack, Typography } from "@mui/material";
 import CustomSelect from "components/select/CustomSelect";
-import {
-  useGetContractType,
-  useGetCustomerType,
-  useUpdateCustomer,
-} from "controllers/query/category-query";
 import { useRef, useState } from "react";
 import CustomMap from "../../../../components/map/CustomMap";
+import { useUpdateFacility } from "../../../../controllers/query/facility-query";
+import { useGetAllUsersExist } from "../../../../controllers/query/user-query";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
 
-const UpdateCustomerForm = ({ setOpenDrawer, currCustomer }) => {
+const UpdateFacilityForm = ({ setOpenDrawer, currFacility }) => {
   const status = [{ name: "active" }, { name: "inactive" }];
   const mapRef = useRef();
-  const [currMarker, setCurrMarker] = useState();
   const methods = useForm({
     mode: "onChange",
     defaultValues: {
-      address: currCustomer?.address,
-      name: currCustomer?.name,
-      phone: currCustomer?.phone,
-      customerType: currCustomer?.customerType,
-      status: currCustomer?.status === "active" ? status[0] : status[1],
-      contractType: currCustomer?.contractType,
+      address: currFacility?.address,
+      name: currFacility?.name,
+      status:
+        currFacility?.status.toLowerCase() === "active" ? status[0] : status[1],
+      managedBy: currFacility?.managedBy?.id,
       map: {
-        lat: currCustomer?.latitude,
-        lng: currCustomer?.longitude,
+        lat: currFacility?.latitude,
+        lng: currFacility?.longitude,
       },
     },
     // resolver: yupResolver(customerSchema),
@@ -38,33 +33,28 @@ const UpdateCustomerForm = ({ setOpenDrawer, currCustomer }) => {
     control,
   } = methods;
 
-  const { isLoading: isLoadingCustomerType, data: customerType } =
-    useGetCustomerType();
-  const { isLoading: isLoadingContractType, data: contractType } =
-    useGetContractType();
-  const updateCustomerQuery = useUpdateCustomer({
-    id: currCustomer?.id,
+  const { isLoading: isLoadingManagedBy, data: managedBy } =
+    useGetAllUsersExist();
+  const updateFacilityQuery = useUpdateFacility({
+    id: currFacility?.id,
   });
 
   const onSubmit = async (data) => {
     let customerParams = {
       address: data?.address,
-      contractTypeCode: data?.contractType?.code,
-      customerTypeCode: data?.customerType?.code,
       status: data?.status?.name,
       name: data?.name,
-      phone: data?.phone,
       latitude: selectPosition?.lat.toString(),
       longitude: selectPosition?.lng.toString(),
+      managedBy: data?.managedBy?.name,
     };
-    console.log("Params: ", customerParams);
-    await updateCustomerQuery.mutateAsync(customerParams);
+    await updateFacilityQuery.mutateAsync(customerParams);
     setOpenDrawer((pre) => !pre);
     reset();
   };
   const [selectPosition, setSelectPosition] = useState({
-    lat: currCustomer?.latitude,
-    lng: currCustomer?.longitude,
+    lat: currFacility?.latitude,
+    lng: currFacility?.longitude,
   });
   return (
     <FormProvider {...methods}>
@@ -101,49 +91,14 @@ const UpdateCustomerForm = ({ setOpenDrawer, currCustomer }) => {
               value={value}
               type={"text"}
               onChange={onChange}
-              label={"Tên khách hàng"}
+              label={"Tên kho"}
               isFullWidth={true}
               error={!!errors["name"]}
               message={errors["name"]?.message}
             />
           )}
         />
-        <Controller
-          key={"phone"}
-          control={control}
-          name={"phone"}
-          render={({ field: { onChange, value } }) => (
-            <CustomInput
-              required={true}
-              value={value}
-              type={"text"}
-              onChange={onChange}
-              label={"Số điện thoại"}
-              isFullWidth={true}
-              error={!!errors["phone"]}
-              message={errors["phone"]?.message}
-            />
-          )}
-        />
       </Stack>
-      <Controller
-        key={"customerType"}
-        control={control}
-        name={"customerType"}
-        render={({ field: { onChange, value } }) => (
-          <CustomSelect
-            readOnly={false}
-            options={customerType ? customerType?.content : []}
-            fullWidth={true}
-            loading={isLoadingCustomerType}
-            value={value}
-            onChange={onChange}
-            label={"Loại khách hàng"}
-            error={!!errors["customerType"]}
-            message={errors["customerType"]?.message}
-          />
-        )}
-      />
       <Controller
         key={"status"}
         control={control}
@@ -162,20 +117,28 @@ const UpdateCustomerForm = ({ setOpenDrawer, currCustomer }) => {
         )}
       />
       <Controller
-        key={"contractType"}
+        key={"managedBy"}
         control={control}
-        name={"contractType"}
+        name={"managedBy"}
         render={({ field: { onChange, value } }) => (
           <CustomSelect
             readOnly={false}
-            options={contractType ? contractType?.content : []}
+            options={
+              managedBy
+                ? managedBy.map((u) => {
+                    return {
+                      name: u?.id,
+                    };
+                  })
+                : []
+            }
             fullWidth={true}
-            loading={isLoadingContractType}
+            loading={isLoadingManagedBy}
             value={value}
             onChange={onChange}
-            label={"Loại hợp đồng"}
-            error={!!errors["contractType"]}
-            message={errors["contractType"]?.message}
+            label={"Người phụ trách"}
+            error={!!errors["managedBy"]}
+            message={errors["managedBy"]?.message}
           />
         )}
       />
@@ -215,4 +178,4 @@ const UpdateCustomerForm = ({ setOpenDrawer, currCustomer }) => {
     </FormProvider>
   );
 };
-export default UpdateCustomerForm;
+export default UpdateFacilityForm;

@@ -1,6 +1,5 @@
 import React from "react";
 import {Route, Switch, useRouteMatch} from "react-router";
-import Notifications from "../component/dataadmin/Notifications";
 import ViewCourseVideo from "../component/dataadmin/ViewCourseVideo";
 import ViewLogUserDoPraticeQuizs from "../component/dataadmin/ViewLogUserDoPraticeQuizs";
 import MainDashBoard from "../component/dataadmin/MainDashBoard";
@@ -9,15 +8,10 @@ import StudentLearningProfiles from "../views/dataadmin/viewlearningprofiles/Stu
 import LearningProfileList from "../views/dataadmin/viewlearningprofiles/LearningProfileList";
 
 export default function AdminRoute() {
-  let { path } = useRouteMatch();
+  let {path} = useRouteMatch();
   return (
     <div>
       <Switch>
-        <Route
-          component={Notifications}
-          exact
-          path={`${path}/notifications/list`}
-        ></Route>
         <Route
           component={MainDashBoard}
           exact
@@ -42,7 +36,7 @@ export default function AdminRoute() {
 
         <Route path={`${path}/view-learning-profiles/users`}
                component={LearningProfileList}
-               exact />
+               exact/>
         <Route path={`${path}/view-learning-profiles/users/:studentLoginId`}
                component={StudentLearningProfiles}
                exact/>

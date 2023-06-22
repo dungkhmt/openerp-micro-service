@@ -214,13 +214,10 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
     }
 
     @Override
+    @Transactional
     public Customer updateCustomerInfo(CustomerUpdateDTO customerDTO, long id) throws CustomException {
-        Customer customer = customerRepo.getCustomerByCode(customerDTO.getCode());
-        if (customer != null && customer.getId() != id) {
-            throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "Exist customer with same code, can't update");
-        }
-        CustomerType customerType = customerTypeRepo.getCustomerTypeById(customerDTO.getCustomerTypeId());
-        ContractType contractType = contractTypeRepo.getContractTypeByCode(customerDTO.getCode().toUpperCase());
+        CustomerType customerType = customerTypeRepo.getCustomerTypeByCode(customerDTO.getCustomerTypeCode());
+        ContractType contractType = contractTypeRepo.getContractTypeByCode(customerDTO.getContractTypeCode());
         if (customerType== null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Customer with no specific type, can't update");
         }
@@ -228,13 +225,14 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Customer with no specific contract, can't update");
         }
         Customer customerToUpdate = customerRepo.getCustomerById(id);
-        customerToUpdate.setCode(customerDTO.getCode());
         customerToUpdate.setName(customerDTO.getName());
         customerToUpdate.setPhone(customerDTO.getPhone());
         customerToUpdate.setAddress(customerDTO.getAddress());
         customerToUpdate.setStatus(customerDTO.getStatus());
         customerToUpdate.setLatitude(customerToUpdate.getLatitude());
         customerToUpdate.setLongitude(customerToUpdate.getLongitude());
+        customerToUpdate.setContractType(contractType);
+        customerToUpdate.setCustomerType(customerType);
         // Don't update user_created
         return customerRepo.save(customerToUpdate);
     }

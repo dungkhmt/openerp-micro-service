@@ -64,4 +64,4 @@ function ViewLogUserDoPraticeQuizs() {
 }
 
 const screenName = "SCREEN_DATA_ADMIN_VIEW_USER_DO_QUIZS";
-export default withScreenSecurity(ViewLogUserDoPraticeQuizs, screenName, true);
+export default ViewLogUserDoPraticeQuizs;

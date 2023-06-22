@@ -1485,14 +1485,14 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         String userId = submission.getUserId();
 
         List<TestCaseEntity> testCaseEntityList = null;
-        boolean evaluatePrivatePublic = contest != null &&
+        boolean evaluatePrivateTestcase = contest != null &&
                                         contest.getEvaluateBothPublicPrivateTestcase() != null &&
                                         contest.getEvaluateBothPublicPrivateTestcase()
                                                .equals(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES);
 
         testCaseEntityList = testCaseService.findListTestCaseWithCache(
             submission.getProblemId(),
-            evaluatePrivatePublic);
+            evaluatePrivateTestcase);
 
         List<TestCaseEntity> listTestCaseAvailable = new ArrayList<>();
         for (TestCaseEntity tc : testCaseEntityList) {
@@ -1546,14 +1546,14 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         String userId = submission.getUserId();
 
         List<TestCaseEntity> testCaseEntityList;
-        boolean evaluatePrivatePublic = contest != null &&
+        boolean evaluatePrivateTestcase = contest != null &&
                                         contest.getEvaluateBothPublicPrivateTestcase() != null &&
                                         contest.getEvaluateBothPublicPrivateTestcase()
                                                .equals(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES);
 
         testCaseEntityList = testCaseService.findListTestCaseWithCache(
             submission.getProblemId(),
-            evaluatePrivatePublic);
+            evaluatePrivateTestcase);
 
         List<TestCaseEntity> listTestCaseAvailable = new ArrayList<>();
         for (TestCaseEntity tc : testCaseEntityList) {

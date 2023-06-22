@@ -74,7 +74,7 @@ const AllowedUserList = (props) => {
             whiteSpace: "nowrap",
           }}
         >
-          <div style={{ fontWeight: "bold" }}>
+          <div style={{ fontWeight: 600 }}>
             {roomMaster.firstName} {roomMaster.lastName}
           </div>
           <div>{roomMaster.email}</div>

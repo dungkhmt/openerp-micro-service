@@ -7,13 +7,11 @@ import { facilitySchema } from "utils/validate";
 import SearchBoxMap from "../../../../components/map/SearchBoxMap";
 import { useCreateFacility } from "../../../../controllers/query/facility-query";
 import { useGetAllUsersExist } from "../../../../controllers/query/user-query";
-import { useGeoLocation } from "../../../../shared/AppHooks";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
 
 const CreateFacilityForm = ({ setIsAdd }) => {
-  const currPos = useGeoLocation();
   const mapRef = useRef();
   const [selectPosition, setSelectPosition] = useState({
     lat: 20.991322,
@@ -126,7 +124,6 @@ const CreateFacilityForm = ({ setIsAdd }) => {
               style={{ width: "50vw", height: "50vh" }}
               location={selectPosition}
               mapRef={mapRef}
-              onChange={onChange}
               setSelectPosition={setSelectPosition}
             />
           )}

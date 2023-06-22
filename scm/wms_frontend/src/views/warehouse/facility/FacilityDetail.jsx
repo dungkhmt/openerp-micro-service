@@ -24,7 +24,11 @@ function FacilityDetailScreen() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={[]} containSearch={false} />
+        <CustomToolBar
+          actions={[]}
+          containSearch={false}
+          containFilter={false}
+        />
       </Box>
       <Box>
         <Stack direction={"row"} spacing={2} alignItems={"center"}>

@@ -6,7 +6,6 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 public class CustomerUpdateDTO {
-    private String code;
     private String name;
     private String phone;
     private String address;
@@ -14,6 +13,6 @@ public class CustomerUpdateDTO {
     private String facilityCode;
     private String latitude;
     private String longitude;
-    private long customerTypeId;
+    private String customerTypeCode;
     private String contractTypeCode;
 }
