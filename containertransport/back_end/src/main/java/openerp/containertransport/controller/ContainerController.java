@@ -32,9 +32,9 @@ public class ContainerController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), containerModels));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getContainerById (@PathVariable long id) {
-        ContainerModel containerModel = containerService.getContainerById(id);
+    @GetMapping("/{uid}")
+    public ResponseEntity<?> getContainerById (@PathVariable String uid) {
+        ContainerModel containerModel = containerService.getContainerByUid(uid);
         return ResponseEntity.status(HttpStatus.OK).body(containerModel);
     }
 

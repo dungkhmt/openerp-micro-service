@@ -40,6 +40,7 @@ public class TrailerServiceImpl implements TrailerService {
         trailer.setFacility(facility);
         trailer.setStatus("AVAILABLE");
         trailer.setUid(RandomUtils.getRandomId());
+        trailer.setUid(RandomUtils.getRandomId());
         trailer.setCreatedAt(System.currentTimeMillis());
         trailer.setUpdatedAt(System.currentTimeMillis());
         trailerRepo.save(trailer);

@@ -20,10 +20,13 @@ public class TripItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
+    @Column(name = "uid")
+    private String uid;
+
     private String code;
 
     @ManyToOne()
-    @JoinColumn(name = "trip_id", referencedColumnName = "id")
+    @JoinColumn(name = "trip_id", referencedColumnName = "uid")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Trip trip;
 

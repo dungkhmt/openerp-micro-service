@@ -3,5 +3,5 @@ package openerp.containertransport.service;
 import openerp.containertransport.dto.ShipmentModel;
 
 public interface AutoSolutionRouterService {
-    ShipmentModel autoSolutionRouter(long shipmentId);
+    ShipmentModel autoSolutionRouter(String shipmentUid);
 }

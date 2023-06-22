@@ -39,3 +39,11 @@ export const updateOrderByOrderCode = async (orderCode, data) => {
     );
     return resData;
 }
+
+export const updateOrderList = async (data) => {
+    const resData = request(
+        "put",
+        `/order/update/`, {}, {}, data, {}
+    );
+    return resData;
+}

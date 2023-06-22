@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TripRepo extends JpaRepository<Trip, Long> {
+    Trip findByUid(String uid);
 }

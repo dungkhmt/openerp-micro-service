@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/solution")
 public class SolutionRouterController {
     private final AutoSolutionRouterService autoSolutionRouterService;
-    @GetMapping("/{shipmentId}")
-    public ResponseEntity<?> autoCreatedSolution(@PathVariable long shipmentId) {
-        ShipmentModel shipmentModelCreate = autoSolutionRouterService.autoSolutionRouter(shipmentId);
+    @GetMapping("/{shipmentUid}")
+    public ResponseEntity<?> autoCreatedSolution(@PathVariable String shipmentUid) {
+        ShipmentModel shipmentModelCreate = autoSolutionRouterService.autoSolutionRouter(shipmentUid);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), shipmentModelCreate));
     }
 }

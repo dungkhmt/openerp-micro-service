@@ -310,7 +310,7 @@ export default function ContentsFacilityMana({ facilities, page, setPage, rowsPe
                         <Box sx={{ display: 'flex' }}>
                           <Tooltip title="View">
                             <Box
-                              onClick={() => { handleView(row?.id) }}
+                              onClick={() => { handleView(row?.uid) }}
                             >
                               <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                             </Box>

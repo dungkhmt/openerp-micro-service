@@ -6,7 +6,7 @@ import PrimaryButton from "components/button/PrimaryButton";
 import { menuIconMap } from "config/menuconfig";
 import { MyContext } from "contextAPI/MyContext";
 import TripsContents from "./TripsContents";
-import { autoCreateRouter, getShipmentByCode } from "api/ShipmentAPI";
+import { autoCreateRouter, getShipmentById } from "api/ShipmentAPI";
 import ShipmentContents from "./ShipmentContents";
 import { getTrips } from "api/TripAPI";
 import ReactLoading from "react-loading";
@@ -30,10 +30,10 @@ const ShipmentDetail = () => {
             shipmentId: shipmentId
         }
         getTrips(data).then((res) => {
-            setTrips(res.data.data);
+            setTrips(res?.data.data);
         });
 
-        getShipmentByCode(shipmentId).then((res) => {
+        getShipmentById(shipmentId).then((res) => {
             setShipment(res.data.data);
         });
 

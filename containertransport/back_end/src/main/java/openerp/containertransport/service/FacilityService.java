@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface FacilityService {
     Facility createFacility(FacilityModel facilityModel) throws Exception;
-    FacilityModel getFacilityById(long id);
+    FacilityModel getFacilityByUid(String uid);
     FacilityFilterRes filterFacility(FacilityFilterRequestDTO facilityFilterRequestDTO);
     FacilityModel updateFacility(FacilityModel facilityModel);
 }

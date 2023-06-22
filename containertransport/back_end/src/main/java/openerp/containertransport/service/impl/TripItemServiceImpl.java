@@ -6,6 +6,7 @@ import openerp.containertransport.dto.TripItemModel;
 import openerp.containertransport.entity.*;
 import openerp.containertransport.repo.*;
 import openerp.containertransport.service.TripItemService;
+import openerp.containertransport.utils.RandomUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class TripItemServiceImpl implements TripItemService {
     private final TrailerRepo trailerRepo;
     private final TripRepo tripRepo;
     @Override
-    public TripItemModel createTripItem(TripItemModel tripItemModel, long tripId) {
+    public TripItemModel createTripItem(TripItemModel tripItemModel, String tripUid) {
         TripItem tripItem = new TripItem();
         Facility facility = facilityRepo.findById(tripItemModel.getFacilityId()).get();
         if(tripItemModel.getContainerId() != null) {
@@ -43,12 +44,13 @@ public class TripItemServiceImpl implements TripItemService {
         if(tripItemModel.getOrderCode() != null) {
             tripItem.setOrderCode(tripItemModel.getOrderCode());
         }
-        Trip trip = tripRepo.findById(tripId).get();
+        Trip trip = tripRepo.findByUid(tripUid);
         tripItem.setTrip(trip);
         tripItem.setSeq((int) tripItemModel.getSeq());
         tripItem.setAction(tripItemModel.getAction());
         tripItem.setFacility(facility);
         tripItem.setStatus("SCHEDULED");
+        tripItem.setUid(RandomUtils.getRandomId());
         tripItem.setType(tripItemModel.getType());
         tripItem.setArrivalTime(tripItemModel.getArrivalTime());
         tripItem.setDepartureTime(tripItemModel.getDepartureTime());
@@ -61,8 +63,8 @@ public class TripItemServiceImpl implements TripItemService {
     }
 
     @Override
-    public List<TripItemModel> getTripItemByTripId(long id) {
-        List<TripItem> tripItems = tripItemRepo.findByTripId(id);
+    public List<TripItemModel> getTripItemByTripId(String tripId) {
+        List<TripItem> tripItems = tripItemRepo.findByTripId(tripId);
         Collections.sort(tripItems, (t1, t2) -> {
             return Math.toIntExact(t1.getId() - t2.getId());
         });
@@ -72,8 +74,8 @@ public class TripItemServiceImpl implements TripItemService {
     }
 
     @Override
-    public TripItemModel updateTripItem(Long id, TripItemModel tripItemModel) {
-        TripItem tripItem = tripItemRepo.findById(id).get();
+    public TripItemModel updateTripItem(String uid, TripItemModel tripItemModel) {
+        TripItem tripItem = tripItemRepo.findByUid(uid);
         if(tripItemModel.getStatus() != null) {
             tripItem.setStatus(tripItemModel.getStatus());
         }

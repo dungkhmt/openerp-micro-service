@@ -97,7 +97,7 @@ public class OrderServiceImpl implements OrderService {
         order.setLatePickupTime(orderModel.getLatePickupTime());
         order.setType(orderModel.getType());
         order.setIsBreakRomooc(orderModel.isBreakRomooc());
-        order.setStatus("ORDERED");
+        order.setStatus("WAIT_APPROVE");
         order.setUid(RandomUtils.getRandomId());
         order.setCreatedAt(System.currentTimeMillis());
         order.setUpdatedAt(System.currentTimeMillis());
@@ -213,6 +213,20 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepo.findByUid(uid);
         OrderModel orderModelUpdate = updateOrder(order.getId(), orderModel);
         return orderModelUpdate;
+    }
+
+    @Override
+    public List<OrderModel> updateListOrder(OrderUpdateDTO orderUpdateDTO) {
+        List<OrderModel> orderModels = new ArrayList<>();
+        String status = orderUpdateDTO.getStatus();
+        List<String> uidList = orderUpdateDTO.getUidList();
+        uidList.forEach((item) -> {
+            Order order = orderRepo.findByUid(item);
+            order.setStatus(status);
+            orderRepo.save(order);
+            orderModels.add(convertToModel(order));
+        });
+        return orderModels;
     }
 
     public OrderModel convertToModel(Order order){

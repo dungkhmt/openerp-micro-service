@@ -280,7 +280,7 @@ export default function ContentsContainerMana({ containers, page, setPage, rowsP
                       <TableCell>
                         <Box sx={{ display: 'flex' }}>
                           <Tooltip title="View">
-                            <Box onClick={() => { handleDetail(row?.id) }} >
+                            <Box onClick={() => { handleDetail(row?.uid) }} >
                               <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                             </Box>
                           </Tooltip>

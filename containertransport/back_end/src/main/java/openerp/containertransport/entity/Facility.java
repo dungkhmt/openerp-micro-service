@@ -17,6 +17,9 @@ public class Facility {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
+    @Column(name = "uid")
+    private String uid;
+
     @Column(name = "facility_code")
     private String facilityCode;
 

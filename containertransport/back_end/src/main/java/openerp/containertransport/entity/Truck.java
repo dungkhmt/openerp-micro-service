@@ -27,7 +27,7 @@ public class Truck implements Serializable {
     private String truckCode;
 
     @ManyToOne()
-    @JoinColumn(name = "facility_id", referencedColumnName = "id")
+    @JoinColumn(name = "facility_id", referencedColumnName = "uid")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Facility facility;
 

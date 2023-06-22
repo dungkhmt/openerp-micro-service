@@ -288,7 +288,7 @@ export default function ShipmentScreenContents({ shipments, page, setPage, rowsP
                       <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
                       <TableCell sx={{display: 'flex'}} >
-                        <Box onClick={() => { handleDetail(row?.id) }} >
+                        <Box onClick={() => { handleDetail(row?.uid) }} >
                           <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                         </Box>
                         <Box>

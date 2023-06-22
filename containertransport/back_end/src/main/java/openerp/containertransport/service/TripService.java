@@ -7,13 +7,13 @@ import openerp.containertransport.entity.Trip;
 import java.util.List;
 
 public interface TripService {
-    TripModel createTrip (TripModel tripModel, long shipmentId, String createBy);
+    TripModel createTrip (TripModel tripModel, String shipmentId, String createBy);
 
     List<TripModel> filterTrip (TripFilterRequestDTO requestDTO);
 
-    TripModel getById(long id);
+    TripModel getByUid(String uid);
 
     List<TripModel> getTripsByDriver(TripFilterRequestDTO requestDTO);
 
-    TripModel updateTrip(Long id, TripModel tripModel);
+    TripModel updateTrip(String uid, TripModel tripModel);
 }

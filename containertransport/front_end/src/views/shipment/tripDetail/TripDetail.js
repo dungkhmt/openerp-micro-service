@@ -28,14 +28,14 @@ const TripDetail = () => {
     const [flag, setFlag] = useState(false);
     useEffect(() => {
         getTrucks({}).then((res) => {
-            setTrucks(res.data.truckModels);
+            setTrucks(res?.data.truckModels);
         });
         getOrders({}).then((res) => {
-            setOrders(res.data.data.orderModels);
+            setOrders(res?.data.data.orderModels);
         });
         getTripItemByTripId(tripId).then((res) => {
-            console.log("tripItem1111111", res.data.data.sort((a, b) => a.id - b.id))
-            setTripItem(res.data.data.sort((a, b) => a.id - b.id));
+            console.log("tripItem1111111", res?.data.data.sort((a, b) => a.id - b.id))
+            setTripItem(res?.data.data.sort((a, b) => a.id - b.id));
         });
     }, [])
     useEffect(() => {

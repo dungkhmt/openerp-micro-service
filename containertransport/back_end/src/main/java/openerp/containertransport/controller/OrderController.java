@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.MetaData;
 import openerp.containertransport.dto.OrderFilterRequestDTO;
 import openerp.containertransport.dto.OrderModel;
+import openerp.containertransport.dto.OrderUpdateDTO;
 import openerp.containertransport.dto.OrdersRes;
 import openerp.containertransport.dto.metaData.MetaDTO;
 import openerp.containertransport.dto.metaData.ResponseMetaData;
@@ -83,5 +84,11 @@ public class OrderController {
     public ResponseEntity<?> updateOrderByCode(@PathVariable String orderUid, @RequestBody OrderModel orderModel) {
         OrderModel orderModelUpdate = orderService.updateOrderByUid(orderUid, orderModel);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModelUpdate));
+    }
+
+    @PutMapping("/update/")
+    public ResponseEntity<?> updateOrderByCode(@RequestBody OrderUpdateDTO orderUpdateDTO) {
+        List<OrderModel> orderModelsUpdate = orderService.updateListOrder(orderUpdateDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModelsUpdate));
     }
 }

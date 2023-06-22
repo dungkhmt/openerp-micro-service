@@ -12,6 +12,7 @@ import openerp.containertransport.repo.ContainerRepo;
 import openerp.containertransport.repo.FacilityRepo;
 import openerp.containertransport.repo.TypeContainerRepo;
 import openerp.containertransport.service.ContainerService;
+import openerp.containertransport.utils.RandomUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -40,6 +41,7 @@ public class ContainerServiceImpl implements ContainerService {
         container.setTypeContainer(typeContainer);
         container.setEmpty(containerModelDTO.getIsEmpty());
         container.setStatus("AVAILABLE");
+        container.setUid(RandomUtils.getRandomId());
         container.setCreatedAt(System.currentTimeMillis());
         container.setUpdatedAt(System.currentTimeMillis());
         containerRepo.save(container);
@@ -49,15 +51,15 @@ public class ContainerServiceImpl implements ContainerService {
     }
 
     @Override
-    public ContainerModel getContainerById(long id) {
-        Container container = containerRepo.findById(id);
+    public ContainerModel getContainerByUid(String uid) {
+        Container container = containerRepo.findByUid(uid);
         ContainerModel containerModel = convertToModel(container);
         return containerModel;
     }
 
     @Override
     public ContainerModel updateContainer(ContainerModel containerModel) {
-        Container container = containerRepo.findById(containerModel.getId());
+        Container container = containerRepo.findByUid(containerModel.getUid());
         if (containerModel.getFacilityId() != null) {
             Facility facility = facilityRepo.findById(containerModel.getFacilityId()).get();
             container.setFacility(facility);

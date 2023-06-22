@@ -18,6 +18,8 @@ const OrderWaitApprove = () => {
     const [count, setCount] = useState(0);
     const { role, preferred_username } = useContext(MyContext);
 
+    const [flag, setFlag] = useState(false);
+
     useEffect(() => {
         let data = {
             page: page, 
@@ -28,7 +30,7 @@ const OrderWaitApprove = () => {
             setOrders(res?.data.data.orderModels);
             setCount(res?.data.data.count);
         });
-    }, [toastOpen, page, rowsPerPage])
+    }, [toastOpen, page, rowsPerPage, flag])
     return (
         <Box className="fullScreen">
             <Container maxWidth="lg" className="container">
@@ -45,7 +47,8 @@ const OrderWaitApprove = () => {
                     <Divider />
                 </Box>
                 <ContentsOrderManagerment orders={orders} page={page} setPage={setPage}
-                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} type="WaitApprove" />
+                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count}
+                    flag={flag} setFlag={setFlag} type="WaitApprove" />
             </Container>
         </Box>
     );

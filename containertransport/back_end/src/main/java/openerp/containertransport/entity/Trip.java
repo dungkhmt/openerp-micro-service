@@ -22,6 +22,9 @@ public class Trip {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
+    @Column(name = "uid")
+    private String uid;
+
     private String code;
 
     @ManyToOne()
@@ -38,8 +41,10 @@ public class Trip {
     @Column(name = "created_by_user_id")
     private String createdByUserId;
 
-    @Column(name = "shipment_id")
-    private Long shipmentId;
+    @ManyToOne()
+    @JoinColumn(name = "shipment_id", referencedColumnName = "uid")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Shipment shipment;
 
     @Column(name = "status")
     private String status;

@@ -28,9 +28,9 @@ public class TripController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModels));
     }
 
-    @PostMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable long id) {
-        TripModel tripModel = tripService.getById(id);
+    @PostMapping("/{uid}")
+    public ResponseEntity<?> getById(@PathVariable String uid) {
+        TripModel tripModel = tripService.getByUid(uid);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModel));
     }
 
@@ -48,9 +48,9 @@ public class TripController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModels));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateTrip(@PathVariable Long id ,@RequestBody TripModel tripModel) {
-        TripModel tripModelUpdate = tripService.updateTrip(id, tripModel);
+    @PutMapping("/update/{uid}")
+    public ResponseEntity<?> updateTrip(@PathVariable String uid ,@RequestBody TripModel tripModel) {
+        TripModel tripModelUpdate = tripService.updateTrip(uid, tripModel);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModelUpdate));
     }
 }

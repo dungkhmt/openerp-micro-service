@@ -15,6 +15,7 @@ import openerp.containertransport.repo.FacilityRepo;
 import openerp.containertransport.repo.RelationshipRepo;
 import openerp.containertransport.service.FacilityService;
 import openerp.containertransport.utils.GraphHopperCalculator;
+import openerp.containertransport.utils.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -55,7 +56,8 @@ public class FacilityServiceImpl implements FacilityService {
         facility.setOwner(facilityModel.getOwner());
         facility.setCreatedAt(System.currentTimeMillis());
         facility.setUpdatedAt(System.currentTimeMillis());
-        facility.setStatus("available");
+        facility.setStatus("AVAILABLE");
+        facility.setUid(RandomUtils.getRandomId());
         facility.setProcessingTime(facilityModel.getProcessingTime());
 //        ResponsePath responsePath = graphHopperCalculator.calculate(facility.getLatitude(), facility.getLongitude(),
 //                new BigDecimal(21.032188), new BigDecimal(105.778867));
@@ -82,15 +84,15 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
-    public FacilityModel getFacilityById(long id) {
-        Facility facility = facilityRepo.findById(id);
+    public FacilityModel getFacilityByUid(String uid) {
+        Facility facility = facilityRepo.findByUid(uid);
         FacilityModel facilityModel = convertToModel(facility);
-        List<Facility> facilities = getAllFacility();
-        facilities = facilities.stream().filter((item) -> item.getId() != id).collect(Collectors.toList());
-        facilities.forEach((facility1) -> {
-            Relationship relationship = createRelationship(facility, facility1);
-            relationshipRepo.save(relationship);
-        });
+//        List<Facility> facilities = getAllFacility();
+//        facilities = facilities.stream().filter((item) -> item.getId() != id).collect(Collectors.toList());
+//        facilities.forEach((facility1) -> {
+//            Relationship relationship = createRelationship(facility, facility1);
+//            relationshipRepo.save(relationship);
+//        });
 
         return facilityModel;
     }
@@ -149,7 +151,7 @@ public class FacilityServiceImpl implements FacilityService {
 
     @Override
     public FacilityModel updateFacility(FacilityModel facilityModel) {
-        Facility facility = facilityRepo.findById(facilityModel.getId());
+        Facility facility = facilityRepo.findByUid(facilityModel.getUid());
         facility.setFacilityName(facilityModel.getFacilityName());
         facility.setUpdatedAt(System.currentTimeMillis());
         facilityRepo.save(facility);

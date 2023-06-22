@@ -31,7 +31,7 @@ const FacilityDetail = () => {
             setType(res?.data.facilityType)
         })
         getTrucks({ facilityId: facilityId }).then((res) => {
-            setTrucks(res.data.truckModels);
+            setTrucks(res?.data.truckModels);
         });
         getContainers({ facilityId: facilityId }).then((res) => {
             setContainers(res?.data.data.containerModels);

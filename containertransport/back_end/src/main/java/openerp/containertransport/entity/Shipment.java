@@ -19,6 +19,9 @@ public class Shipment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
+    @Column(name = "uid")
+    private String uid;
+
     private String code;
 
     @Column(name = "created_by_user_id")

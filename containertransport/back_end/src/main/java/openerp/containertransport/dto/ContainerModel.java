@@ -1,5 +1,6 @@
 package openerp.containertransport.dto;
 
+import jakarta.persistence.Column;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -11,6 +12,7 @@ import java.sql.Timestamp;
 @Builder
 public class ContainerModel {
     private long id;
+    private String uid;
     private String containerCode;
     private String typeContainerCode;
     private Integer size;

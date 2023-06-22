@@ -30,7 +30,7 @@ const OrderDetail = () => {
     }, [open])
 
     const handleBackScreen = () => {
-        if(type === "wait") {
+        if (type === "wait") {
             history.push('/wait-approve/order')
         }
         else {
@@ -60,20 +60,22 @@ const OrderDetail = () => {
                         ) : (
                             <Typography>Go back approved orders screen</Typography>
                         )}
-                        
+
                     </Box>
                     <Box className="headerScreen-detail-info">
                         <Box className="title-header">
                             <Typography >Order {order?.orderCode}</Typography>
                         </Box>
-                        <Box className="btn-header">
-                            <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                            // onClick={handleCancelCreateShipment}
-                            >Delete</Button>
-                            <Button variant="contained" className="header-submit-shipment-btn-save"
-                                onClick={handleClose}
-                            >Modify</Button>
-                        </Box>
+                        {type === "wait" ? null : (
+                            <Box className="btn-header">
+                                <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
+                                // onClick={handleCancelCreateShipment}
+                                >Delete</Button>
+                                <Button variant="contained" className="header-submit-shipment-btn-save"
+                                    onClick={handleClose}
+                                >Modify</Button>
+                            </Box>
+                        )}
                     </Box>
                 </Box>
 
@@ -202,8 +204,8 @@ const OrderDetail = () => {
                 </Box>
 
                 {open ? (
-                    <NewOrderModal open={open} setOpen={setOpen} 
-                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} order={order} />
+                    <NewOrderModal open={open} setOpen={setOpen}
+                        setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} order={order} />
                 ) : null}
             </Container>
         </Box>

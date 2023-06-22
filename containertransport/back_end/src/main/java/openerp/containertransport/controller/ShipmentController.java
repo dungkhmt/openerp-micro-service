@@ -33,9 +33,9 @@ public class ShipmentController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), shipmentModels));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getShipmentByShipmentId (@PathVariable Long id) {
-        ShipmentModel shipmentModel = shipmentService.getShipmentByShipmentId(id);
+    @GetMapping("/{uid}")
+    public ResponseEntity<?> getShipmentByShipmentId (@PathVariable String uid) {
+        ShipmentModel shipmentModel = shipmentService.getShipmentByUid(uid);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), shipmentModel));
     }
 

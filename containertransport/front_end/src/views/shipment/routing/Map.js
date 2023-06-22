@@ -19,16 +19,16 @@ const MapComponent = ({ tripItems }) => {
         tripItems.forEach(element => {
             let pointLoop = L.latLng(element.latitude, element.longitude);
             pointTmp.push(pointLoop);
-            console.log("pointMap", pointMap.get(element.facilityId))
-            if (!pointMap.get(element.facilityId)) {
-                pointMap.set(element.facilityId, [element]);
+            // console.log("pointMap", pointMap.get(element.facilityId))
+            // if (!pointMap.get(element.facilityId)) {
+            //     pointMap.set(element.facilityId, [element]);
                 
-            }
-            else {
-                let pointInMap = pointMap.get(element.facilityId);
-                pointInMap.push(element);
-                pointMap.set(element.facilityId, pointInMap)
-            }
+            // }
+            // else {
+            //     let pointInMap = pointMap.get(element.facilityId);
+            //     pointInMap.push(element);
+            //     pointMap.set(element.facilityId, pointInMap)
+            // }
         });
         setPoint(pointTmp);
         rMachine.current?.setWaypoints(pointTmp);

@@ -8,13 +8,16 @@ import openerp.containertransport.dto.TripFilterRequestDTO;
 import openerp.containertransport.dto.TripItemModel;
 import openerp.containertransport.dto.TripModel;
 import openerp.containertransport.entity.Order;
+import openerp.containertransport.entity.Shipment;
 import openerp.containertransport.entity.Trip;
 import openerp.containertransport.entity.Truck;
 import openerp.containertransport.repo.OrderRepo;
+import openerp.containertransport.repo.ShipmentRepo;
 import openerp.containertransport.repo.TripRepo;
 import openerp.containertransport.repo.TruckRepo;
 import openerp.containertransport.service.TripItemService;
 import openerp.containertransport.service.TripService;
+import openerp.containertransport.utils.RandomUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -30,9 +33,10 @@ public class TripServiceImpl implements TripService {
     private final TruckRepo truckRepo;
     private final ModelMapper modelMapper;
     private final OrderRepo orderRepo;
+    private final ShipmentRepo shipmentRepo;
     private final EntityManager entityManager;
     @Override
-    public TripModel createTrip(TripModel tripModel, long shipmentId, String createBy) {
+    public TripModel createTrip(TripModel tripModel, String shipmentId, String createBy) {
         Trip trip = new Trip();
         Truck truck = truckRepo.findById(tripModel.getTruckId()).get();
         truck.setStatus(Constants.TruckStatus.SCHEDULED.getStatus());
@@ -44,10 +48,12 @@ public class TripServiceImpl implements TripService {
             order = orderRepo.save(order);
             orders.add(order);
         });
-        trip.setShipmentId(shipmentId);
+        Shipment shipment = shipmentRepo.findByUid(shipmentId);
+        trip.setShipment(shipment);
         trip.setTruck(truck);
         trip.setDriverId(truck.getDriverId());
         trip.setStatus("Waiting");
+        trip.setUid(RandomUtils.getRandomId());
         trip.setCreatedByUserId(createBy);
         trip.setOrders(orders);
         trip.setCreatedAt(System.currentTimeMillis());
@@ -61,7 +67,7 @@ public class TripServiceImpl implements TripService {
         if (!tripModel.getTripItemModelList().isEmpty()) {
             Trip finalTrip = trip;
             tripModel.getTripItemModelList().forEach((item) -> {
-                TripItemModel tripItemModel = tripItemService.createTripItem(item, finalTrip.getId());
+                TripItemModel tripItemModel = tripItemService.createTripItem(item, finalTrip.getUid());
                 tripItemModels.add(tripItemModel);
             });
         }
@@ -96,8 +102,8 @@ public class TripServiceImpl implements TripService {
     }
 
     @Override
-    public TripModel getById(long id) {
-        Trip trip = tripRepo.findById(id).get();
+    public TripModel getByUid(String uid) {
+        Trip trip = tripRepo.findByUid(uid);
         return convertToModel(trip);
     }
 
@@ -135,8 +141,8 @@ public class TripServiceImpl implements TripService {
     }
 
     @Override
-    public TripModel updateTrip(Long id, TripModel tripModel) {
-        Trip trip = tripRepo.findById(id).get();
+    public TripModel updateTrip(String uid, TripModel tripModel) {
+        Trip trip = tripRepo.findByUid(uid);
         if(tripModel.getStatus() != null) {
             trip.setStatus(tripModel.getStatus());
         }

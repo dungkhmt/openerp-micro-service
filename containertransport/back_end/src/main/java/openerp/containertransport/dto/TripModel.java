@@ -15,6 +15,7 @@ import java.util.List;
 @Builder
 public class TripModel implements Serializable {
     private long id;
+    private String uid;
     private String code;
     private Long shipmentId;
     private Long truckId;

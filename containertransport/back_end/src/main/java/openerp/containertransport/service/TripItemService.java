@@ -6,9 +6,9 @@ import openerp.containertransport.entity.TripItem;
 import java.util.List;
 
 public interface TripItemService {
-    TripItemModel createTripItem(TripItemModel tripItemModel, long tripId);
+    TripItemModel createTripItem(TripItemModel tripItemModel, String tripUid);
 
-    List<TripItemModel> getTripItemByTripId(long id);
+    List<TripItemModel> getTripItemByTripId(String uid);
 
-    TripItemModel updateTripItem(Long id, TripItemModel tripItemModel);
+    TripItemModel updateTripItem(String uid, TripItemModel tripItemModel);
 }

@@ -21,6 +21,9 @@ public class Container implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
+    @Column(name = "uid")
+    private String uid;
+
     @Column(name = "container_code")
     private String containerCode;
 

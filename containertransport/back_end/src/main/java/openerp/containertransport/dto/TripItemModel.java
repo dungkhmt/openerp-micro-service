@@ -1,6 +1,7 @@
 package openerp.containertransport.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
 import lombok.*;
 
 import java.io.Serializable;
@@ -14,8 +15,9 @@ import java.sql.Timestamp;
 @Builder
 public class TripItemModel implements Serializable {
     private long id;
+    private String uid;
     private String code;
-    private Long tripId;
+    private String tripId;
     private long seq;
     private String action;
     private Long facilityId;

@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class TripCreateDTO {
-    private Long shipmentId;
+    private String shipmentId;
     private String createBy;
     private TripModel tripContents;
 }

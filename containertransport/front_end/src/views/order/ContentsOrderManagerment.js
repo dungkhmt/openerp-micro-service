@@ -23,6 +23,7 @@ import { menuIconMap, typeOrderMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EditIcon from '@mui/icons-material/Edit';
+import { updateOrderList } from 'api/OrderAPI';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -167,7 +168,7 @@ function EnhancedTableHead(props) {
     );
 }
 
-export default function ContentsOrderManagerment({ orders, page, setPage, rowsPerPage, setRowsPerPage, count, type }) {
+export default function ContentsOrderManagerment({ orders, page, setPage, rowsPerPage, setRowsPerPage, count, flag, setFlag, type }) {
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
     const [selected, setSelected] = React.useState([]);
@@ -178,6 +179,7 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
     const [openButton, setOpenButton] = React.useState(false);
+    const [status, setStatus] = React.useState('');
 
     const handleRequestSort = React.useCallback(
         (event, newOrderBy) => {
@@ -254,7 +256,19 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
     const handleCloseAction = () => {
         setAnchorEl(null);
     };
-    console.log("orderSelect", selected);
+    const handleChangeAction = (value) => {
+        setAnchorEl(null);
+        setStatus(value);
+        let data = {
+            status: value,
+            uidList: selected
+        }
+        updateOrderList(data).then((res) => {
+            console.log("res", res);
+            setFlag(!flag);
+        })
+    };
+    console.log("status", status);
     return (
         <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
             <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -282,14 +296,13 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                             onClose={handleCloseAction}
                         >
                             <MenuItem
-                                onClick={handleCloseAction}
-                                disableRipple>
-
+                                onClick={() => handleChangeAction("ORDERED")}
+                            >
                                 Approve
                             </MenuItem>
                             <MenuItem
-                                onClick={handleCloseAction}
-                                disableRipple>
+                                onClick={() => handleChangeAction("REJECT")}   
+                            >
                                 Reject
                             </MenuItem>
                         </Menu>

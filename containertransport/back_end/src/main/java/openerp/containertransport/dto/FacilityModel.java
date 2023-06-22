@@ -1,5 +1,6 @@
 package openerp.containertransport.dto;
 
+import jakarta.persistence.Column;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.sql.Timestamp;
 @Builder
 public class FacilityModel {
     private long id;
+    private String uid;
     private String facilityCode;
     private String facilityName;
     private String facilityType;

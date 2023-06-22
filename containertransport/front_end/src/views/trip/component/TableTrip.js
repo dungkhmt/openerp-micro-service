@@ -276,7 +276,7 @@ export default function TableTrip({ trips, setExecutes, executed }) {
                                                         Executing
                                                     </Button>
                                                     <Box sx={{ marginLeft: '16px' }}
-                                                        onClick={() => { handleDetail(row?.id) }} >
+                                                        onClick={() => { handleDetail(row?.uid) }} >
                                                         <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                                                     </Box>
                                                 </Box>

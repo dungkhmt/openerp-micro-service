@@ -2,9 +2,10 @@ package openerp.containertransport.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class TripFilterRequestDTO {
-    private String shipmentId;
+public class OrderUpdateDTO {
     private String status;
-    private String username;
+    private List<String> uidList;
 }

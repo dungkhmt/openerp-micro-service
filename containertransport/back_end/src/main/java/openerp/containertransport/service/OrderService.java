@@ -2,6 +2,7 @@ package openerp.containertransport.service;
 
 import openerp.containertransport.dto.OrderFilterRequestDTO;
 import openerp.containertransport.dto.OrderModel;
+import openerp.containertransport.dto.OrderUpdateDTO;
 import openerp.containertransport.dto.OrdersRes;
 import openerp.containertransport.entity.Order;
 
@@ -14,4 +15,5 @@ public interface OrderService {
     OrderModel getOrderByUid(String uid, String username, boolean isCustomer);
     OrderModel updateOrder(long id, OrderModel orderModel);
     OrderModel updateOrderByUid(String orderCode, OrderModel orderModel);
+    List<OrderModel> updateListOrder(OrderUpdateDTO orderUpdateDTO);
 }

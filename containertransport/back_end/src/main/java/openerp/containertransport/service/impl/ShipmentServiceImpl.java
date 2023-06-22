@@ -11,6 +11,7 @@ import openerp.containertransport.entity.Shipment;
 import openerp.containertransport.repo.ShipmentRepo;
 import openerp.containertransport.service.ShipmentService;
 import openerp.containertransport.service.TripService;
+import openerp.containertransport.utils.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,8 @@ public class ShipmentServiceImpl implements ShipmentService {
         Shipment shipment = new Shipment();
 
         shipment.setCreatedByUserId(shipmentModel.getCreatedByUserId());
-        shipment.setStatus("Waiting");
+        shipment.setStatus("WAITING_SCHEDULER");
+        shipment.setUid(RandomUtils.getRandomId());
         shipment.setDescription(shipmentModel.getDescription());
         shipment.setExecuted_time(shipmentModel.getExecutedTime());
         shipment.setCreatedAt(System.currentTimeMillis());
@@ -94,8 +96,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public ShipmentModel getShipmentByShipmentId(Long shipmentId) {
-        Shipment shipment = shipmentRepo.findById(shipmentId).get();
+    public ShipmentModel getShipmentByUid(String uid) {
+        Shipment shipment = shipmentRepo.findByUid(uid);
         return convertToModel(shipment);
     }
 

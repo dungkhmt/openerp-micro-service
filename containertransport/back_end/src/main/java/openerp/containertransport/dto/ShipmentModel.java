@@ -1,6 +1,7 @@
 package openerp.containertransport.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
 import lombok.*;
 import openerp.containertransport.entity.Trip;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @Builder
 public class ShipmentModel implements Serializable {
     private long id;
+    private String uid;
     private String code;
     @JsonProperty("created_by_user_id")
     private String createdByUserId;

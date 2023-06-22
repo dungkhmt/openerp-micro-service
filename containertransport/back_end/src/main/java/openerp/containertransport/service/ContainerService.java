@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ContainerService {
     ContainerModel createContainer(ContainerModel containerModel);
-    ContainerModel getContainerById (long id);
+    ContainerModel getContainerByUid (String uid);
     ContainerModel updateContainer(ContainerModel containerModel);
     ContainerFilterRes filterContainer(ContainerFilterRequestDTO containerFilterRequestDTO);
 }

@@ -1,6 +1,6 @@
 import { request } from "api"
 
-export const getShipmentByCode = async (data) => {
+export const getShipmentById = async (data) => {
     const resData = request(
         "get",
         `/shipment/${data}`, {},{}, {},{},

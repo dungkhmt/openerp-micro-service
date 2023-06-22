@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FacilityRepo extends JpaRepository<Facility, Long> {
     Facility findById(long id);
+    Facility findByUid(String uid);
 }

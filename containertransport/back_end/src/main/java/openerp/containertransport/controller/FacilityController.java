@@ -28,9 +28,9 @@ public class FacilityController {
         return ResponseEntity.status(HttpStatus.OK).body(facility);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getFacilityById(@PathVariable long id) {
-        FacilityModel facilityModel = facilityService.getFacilityById(id);
+    @GetMapping("/{uid}")
+    public ResponseEntity<?> getFacilityById(@PathVariable String uid) {
+        FacilityModel facilityModel = facilityService.getFacilityByUid(uid);
         return ResponseEntity.status(HttpStatus.OK).body(facilityModel);
     }
 

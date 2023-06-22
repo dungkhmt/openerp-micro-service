@@ -29,9 +29,9 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
     private final HeuristicSolver heuristicSolver;
 
     @Override
-    public ShipmentModel autoSolutionRouter(long shipmentId) {
+    public ShipmentModel autoSolutionRouter(String shipmentUid) {
 
-        ShipmentModel shipmentModel = shipmentService.getShipmentByShipmentId(shipmentId);
+        ShipmentModel shipmentModel = shipmentService.getShipmentByUid(shipmentUid);
 
         TransportContainerInput transportContainerInput = new TransportContainerInput();
 
@@ -109,7 +109,7 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
                 tripModel.setTripItemModelList(tripItemModelList);
                 tripModel.setOrderIds(orderIds);
 
-                TripModel tripModelCreate = tripService.createTrip(tripModel, shipmentId, shipmentModel.getCreatedByUserId());
+                TripModel tripModelCreate = tripService.createTrip(tripModel, shipmentUid, shipmentModel.getCreatedByUserId());
             }
         }
 

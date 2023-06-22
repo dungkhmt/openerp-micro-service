@@ -19,15 +19,15 @@ import java.util.List;
 public class TripItemController {
     private final TripItemService tripItemService;
 
-    @PostMapping("/{id}")
-    public ResponseEntity<?> getTripItemByTripId (@PathVariable long id) {
-        List<TripItemModel> tripItemModels = tripItemService.getTripItemByTripId(id);
+    @PostMapping("/{tripId}")
+    public ResponseEntity<?> getTripItemByTripId (@PathVariable String tripId) {
+        List<TripItemModel> tripItemModels = tripItemService.getTripItemByTripId(tripId);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripItemModels));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateTripItem (@PathVariable Long id, @RequestBody TripItemModel tripItemModel) {
-        TripItemModel tripItemModelUpdate = tripItemService.updateTripItem(id, tripItemModel);
+    public ResponseEntity<?> updateTripItem (@PathVariable String uid, @RequestBody TripItemModel tripItemModel) {
+        TripItemModel tripItemModelUpdate = tripItemService.updateTripItem(uid, tripItemModel);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripItemModelUpdate));
     }
 }
