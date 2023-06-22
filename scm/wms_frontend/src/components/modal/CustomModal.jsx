@@ -33,7 +33,6 @@ const CustomModal = (props) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: 20,
       }}
     >
       <Slide direction="up" in={open} mountOnEnter unmountOnExit>
@@ -58,7 +57,7 @@ const CustomModal = (props) => {
               justifyContent: "space-between",
               // boxShadow: 3,
               paddingLeft: 2,
-              margin: "0px -16px 10px -16px",
+              margin: "10px -16px 10px -16px",
               position: "sticky",
               backgroundColor: "white",
               zIndex: 1000,

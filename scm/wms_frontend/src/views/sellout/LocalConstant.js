@@ -5,6 +5,7 @@ import {
   ITEM_STATUS_COLOR_MAPPING,
   ORDER_STATUS_COLOR_MAPPING,
 } from "../../shared/AppConstants";
+import { formatVietnameseCurrency } from "../../utils/GlobalUtils";
 
 export const saleOrderCols = [
   {
@@ -29,7 +30,14 @@ export const saleOrderCols = [
     align: "center",
     headerName: "Tổng tiền đặt",
     sortable: false,
-    minWidth: 150,
+    minWidth: 130,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ fontSize: 14 }}>
+          {`${formatVietnameseCurrency(params?.row?.totalMoney)}`}
+        </Typography>
+      );
+    },
   },
   {
     field: "totalPayment",
@@ -37,17 +45,28 @@ export const saleOrderCols = [
     align: "center",
     headerName: "Tổng tiền trả",
     sortable: false,
-    minWidth: 150,
+    minWidth: 130,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ fontSize: 14 }}>
+          {`${formatVietnameseCurrency(params?.row?.totalPayment)}`}
+        </Typography>
+      );
+    },
   },
   {
     field: "discount",
     headerAlign: "center",
     align: "center",
-    headerName: "Khuyến mãi (%)",
+    headerName: "Khuyến mãi",
     sortable: false,
-    minWidth: 150,
+    minWidth: 130,
     renderCell: (params) => {
-      return <Typography>{`${params?.row?.discount} %`}</Typography>;
+      return (
+        <Typography
+          sx={{ fontSize: 14 }}
+        >{`${params?.row?.discount} %`}</Typography>
+      );
     },
   },
   {
@@ -131,17 +150,17 @@ export const staticProductFields = [
   },
   {
     field: "price",
-    headerName: "Giá sản phẩm (sau vat)",
+    headerName: "Giá sản phẩm",
     sortable: false,
     headerAlign: "center",
     align: "center",
     minWidth: 150,
     maxWidth: 200,
     valueGetter: (params) => {
-      return (
+      return formatVietnameseCurrency(
         (params?.row?.sellinPrice?.priceBeforeVat *
           (100 + params?.row?.sellinPrice?.vat)) /
-        100
+          100
       );
     },
   },
@@ -172,6 +191,8 @@ export const staticProductFields = [
   {
     field: "status",
     headerName: "Trạng thái",
+    headerAlign: "center",
+    align: "center",
     sortable: false,
     minWidth: 150,
     maxWidth: 200,
@@ -306,14 +327,26 @@ export const saleOrderPrices = [
     minWidth: 150,
     headerAlign: "center",
     align: "center",
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ fontSize: 14 }}>
+          {`${formatVietnameseCurrency(params?.row?.priceBeforeVat)}`}
+        </Typography>
+      );
+    },
   },
   {
     field: "vat",
-    headerName: "Thuế VAT (%)",
+    headerName: "Thuế VAT",
     sortable: false,
-    minWidth: 150,
+    minWidth: 120,
     headerAlign: "center",
     align: "center",
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ fontSize: 14 }}>{`${params?.row?.vat} %`}</Typography>
+      );
+    },
   },
   {
     field: "status",

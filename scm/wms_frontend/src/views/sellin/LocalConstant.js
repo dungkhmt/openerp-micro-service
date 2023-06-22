@@ -5,6 +5,7 @@ import {
   ITEM_STATUS_COLOR_MAPPING,
   ORDER_STATUS_COLOR_MAPPING,
 } from "../../shared/AppConstants";
+import { formatVietnameseCurrency } from "../../utils/GlobalUtils";
 
 export const purchaseOrderCols = [
   {
@@ -33,12 +34,30 @@ export const purchaseOrderCols = [
     maxWidth: 200,
   },
   {
+    field: "facility",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Kho trực thuộc",
+    sortable: false,
+    minWidth: 250,
+    valueGetter: (params) => {
+      return params.row.facility.name;
+    },
+  },
+  {
     field: "totalMoney",
     headerAlign: "center",
     align: "center",
     headerName: "Tổng tiền đặt",
     sortable: false,
-    minWidth: 150,
+    minWidth: 130,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ fontSize: 14 }}>
+          {`${formatVietnameseCurrency(params?.row?.totalMoney)}`}
+        </Typography>
+      );
+    },
   },
   {
     field: "totalPayment",
@@ -46,7 +65,14 @@ export const purchaseOrderCols = [
     align: "center",
     headerName: "Tổng tiền trả",
     sortable: false,
-    minWidth: 150,
+    minWidth: 130,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ fontSize: 14 }}>{`${formatVietnameseCurrency(
+          params?.row?.totalPayment
+        )}`}</Typography>
+      );
+    },
   },
   {
     field: "vat",
@@ -56,36 +82,15 @@ export const purchaseOrderCols = [
     sortable: false,
     minWidth: 150,
     renderCell: (params) => {
-      return <Typography>{`${params?.row?.vat} %`}</Typography>;
-    },
-  },
-  {
-    field: "createdBy",
-    headerAlign: "center",
-    align: "center",
-    headerName: "Tạo bởi",
-    sortable: false,
-    minWidth: 150,
-    valueGetter: (params) => {
-      return params.row.user.id;
-    },
-  },
-  {
-    field: "createdDate",
-    headerAlign: "center",
-    align: "center",
-    headerName: "Thời điểm tạo",
-    sortable: false,
-    minWidth: 150,
-    valueGetter: (params) => {
-      return unix(params?.row?.createdDate).format("DD-MM-YYYY");
+      return (
+        <Typography sx={{ fontSize: 14 }}>{`${params?.row?.vat} %`}</Typography>
+      );
     },
   },
   {
     field: "status",
     headerName: "Trạng thái",
     sortable: false,
-    width: 125,
     minWidth: 150,
     maxWidth: 200,
     renderCell: (params) => {
@@ -116,14 +121,25 @@ export const purchaseOrderCols = [
     },
   },
   {
-    field: "facility",
+    field: "createdBy",
     headerAlign: "center",
     align: "center",
-    headerName: "Kho trực thuộc",
+    headerName: "Tạo bởi",
     sortable: false,
     minWidth: 150,
     valueGetter: (params) => {
-      return params.row.facility.name;
+      return params.row.user.id;
+    },
+  },
+  {
+    field: "createdDate",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Thời điểm tạo",
+    sortable: false,
+    minWidth: 150,
+    valueGetter: (params) => {
+      return unix(params?.row?.createdDate).format("DD-MM-YYYY");
     },
   },
 ];
@@ -147,7 +163,7 @@ export const staticProductFields = [
     minWidth: 150,
     maxWidth: 200,
     valueGetter: (params) => {
-      return params?.row?.price?.priceBeforeVat;
+      return formatVietnameseCurrency(params?.row?.price?.priceBeforeVat);
     },
   },
   {
@@ -159,7 +175,7 @@ export const staticProductFields = [
     minWidth: 150,
     maxWidth: 200,
     valueGetter: (params) => {
-      return params?.row?.price?.vat;
+      return `${params?.row?.price?.vat} %`;
     },
   },
   {
@@ -273,6 +289,8 @@ export const purchaseOrderPrice = [
   },
   {
     field: "status",
+    headerAlign: "center",
+    align: "center",
     headerName: "Trạng thái",
     sortable: false,
     width: 125,

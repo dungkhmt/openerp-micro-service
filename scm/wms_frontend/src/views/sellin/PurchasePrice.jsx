@@ -24,6 +24,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
+import { formatVietnameseCurrency } from "../../utils/GlobalUtils";
 import { purchaseOrderPrice } from "./LocalConstant";
 import UpdateProductPrice from "./components/UpdateProductPrice";
 
@@ -172,10 +173,9 @@ function PurchasePriceScreen({ screenAuthorization }) {
                   const sellinPrice = sellinPrices?.find(
                     (el) => el?.productEntity?.code === params?.row?.code
                   );
-                  console.log("Price: ", productPrices, sellinPrice);
 
                   return sellinPrice
-                    ? sellinPrice?.priceBeforeVat
+                    ? formatVietnameseCurrency(sellinPrice?.priceBeforeVat)
                     : price
                     ? price?.priceBeforeVat
                     : "Nhập giá tiền";
@@ -230,7 +230,7 @@ function PurchasePriceScreen({ screenAuthorization }) {
                     (el) => el?.productEntity?.code === params?.row?.code
                   );
                   return sellinPrice
-                    ? sellinPrice?.vat
+                    ? `${sellinPrice?.vat} %`
                     : price
                     ? price?.vat
                     : "Nhập thuế ";

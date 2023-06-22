@@ -1,9 +1,10 @@
-import { Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import CustomSelect from "components/select/CustomSelect";
 import { useRef, useState } from "react";
 import CustomMap from "../../../../components/map/CustomMap";
 import { useUpdateFacility } from "../../../../controllers/query/facility-query";
 import { useGetAllUsersExist } from "../../../../controllers/query/user-query";
+import { AppColors } from "../../../../shared/AppColors";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
@@ -142,7 +143,11 @@ const UpdateFacilityForm = ({ setOpenDrawer, currFacility }) => {
           />
         )}
       />
-      <Typography>Lấy vị trí</Typography>
+      <Box>
+        <Typography style={{ color: AppColors.error, fontSize: 14 }}>
+          Lấy vị trí
+        </Typography>
+      </Box>
       <Stack direction={"row"}>
         <Controller
           key={"map"}
@@ -150,22 +155,19 @@ const UpdateFacilityForm = ({ setOpenDrawer, currFacility }) => {
           name={"map"}
           render={({ field: { onChange, value } }) => (
             <CustomMap
-              style={{ width: "30vw", height: "30vh" }}
+              style={{ width: "100%", height: "50vh" }}
               location={selectPosition}
               mapRef={mapRef}
               setSelectPosition={setSelectPosition}
             />
           )}
         />
-        {/* <Stack direction={"column"}>
-          <Typography>{`${currMarker.lat}, ${currMarker.lng}`}</Typography>
-        </Stack> */}
       </Stack>
       <Stack
         direction="row"
         justifyContent={"flex-end"}
         spacing={2}
-        sx={{ marginBottom: 2 }}
+        sx={{ marginY: 2 }}
       >
         <Button
           onClick={handleSubmit(onSubmit)}

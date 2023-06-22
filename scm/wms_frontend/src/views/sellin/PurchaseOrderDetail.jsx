@@ -183,7 +183,11 @@ function PurchaseOrderDetailScreen({}) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} containSearch={false} />
+        <CustomToolBar
+          actions={actions}
+          containSearch={false}
+          containFilter={false}
+        />
       </Box>
       <Box>
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
@@ -209,21 +213,124 @@ function PurchaseOrderDetailScreen({}) {
             THÔNG TIN ĐƠN HÀNG
           </Typography>
         </Stack>
-        <Typography
-          sx={{
-            fontSize: 16,
-            marginTop: 2,
-          }}
-        >
-          1. Mã đơn: {currOrder?.code}
-        </Typography>
-        <Typography>2. Nhà sản xuất: {currOrder?.supplierCode}</Typography>
-        <Typography>3. Người tạo: {currOrder?.user?.id}</Typography>
-        <Typography>
-          4. Thời gian tạo: {unix(currOrder?.createdDate).format("DD-MM-YYYY")}
-        </Typography>
-        <Typography>5. Kho trực thuộc: {currOrder?.facility?.name}</Typography>
-        <Typography sx={{ marginBottom: 2 }}>6. Chi tiết</Typography>
+        <Stack sx={{ flexDirection: "row", marginTop: 2 }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            1. Mã đơn:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {currOrder?.code}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            2. Nhà sản xuất
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {currOrder?.supplierCode}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            3. Người tạo:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {currOrder?.user?.id}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            4. Thời gian tạo:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {unix(currOrder?.createdDate).format("DD-MM-YYYY")}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            5. Kho trực thuộc:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {currOrder?.facility?.name}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            6. Chi tiết
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          ></Typography>
+        </Stack>
       </Box>
       <Stack direction={"row"} alignItems={"center"} justifyContent={"center"}>
         {renderCustomTable(currOrder)}

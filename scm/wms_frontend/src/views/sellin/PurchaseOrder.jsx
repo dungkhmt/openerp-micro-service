@@ -91,7 +91,6 @@ function PurchaseOrderScreen({ screenAuthorization }) {
         isLoading={isLoading}
         totalItem={order?.totalElements}
         handlePaginationModelChange={(props) => {
-          console.log("Props:", props);
           setParams({
             page: props?.page + 1,
             pageSize: props?.pageSize,

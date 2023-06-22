@@ -48,9 +48,10 @@ function TripRoutesScreen({ screenAuthorization }) {
       zoom={13}
       scrollWheelZoom={true}
       style={{
-        width: "calc(100vw - 250px)",
+        // width: "calc(100vw)",
         height: "calc(100vh - 64px)",
         marginLeft: "-16px",
+        marginRight: "-16px",
       }}
     >
       <TileLayer

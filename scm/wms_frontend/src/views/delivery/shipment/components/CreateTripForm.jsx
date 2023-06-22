@@ -1,4 +1,4 @@
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, Stack } from "@mui/material";
 import { CustomDatePicker } from "components/datepicker/CustomDatePicker";
 import CustomSelect from "components/select/CustomSelect";
 import { useCreateDeliveryTrip } from "controllers/query/delivery-trip-query";
@@ -42,10 +42,10 @@ const CreateTripForm = ({ setIsAdd, currShipment }) => {
   return (
     <FormProvider {...methods}>
       <Stack direction="row" justifyContent={"space-around"} spacing={5}>
-        <Typography>
+        {/* <Typography>
           Nên có thêm phần gợi ý xem lấy kho nào thì trùng với cụm customers
           đang được phân trip
-        </Typography>
+        </Typography> */}
         <Controller
           key={"userInCharge"}
           control={control}

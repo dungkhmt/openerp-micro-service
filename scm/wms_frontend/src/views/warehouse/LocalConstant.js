@@ -5,6 +5,7 @@ import {
   ITEM_STATUS_COLOR_MAPPING,
   ORDER_STATUS_COLOR_MAPPING,
 } from "../../shared/AppConstants";
+import { formatVietnameseCurrency } from "../../utils/GlobalUtils";
 
 export const staticProductFields = [
   {
@@ -13,24 +14,18 @@ export const staticProductFields = [
     headerAlign: "center",
     align: "center",
     sortable: false,
-    maxWidth: 300,
-    minWidth: 200,
+    maxWidth: 400,
+    minWidth: 300,
     valueGetter: (params) => {
       return params?.row?.product?.name;
     },
     renderCell: (params) => {
       return (
-        <Typography sx={{ fontWeight: "500" }}>
+        <Typography sx={{ fontWeight: "bold" }}>
           {params?.row?.product?.name}
         </Typography>
       );
     },
-  },
-  {
-    field: "status",
-    headerName: "Trạng thái",
-    sortable: false,
-    minWidth: 150,
   },
   {
     field: "inventoryQty",
@@ -282,6 +277,18 @@ export const acceptedOrderCols = [
     headerName: "Mã nhà sản xuất",
     sortable: false,
     minWidth: 150,
+    maxWidth: 200,
+  },
+  {
+    field: "facility",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Kho trực thuộc",
+    sortable: false,
+    minWidth: 250,
+    valueGetter: (params) => {
+      return params.row.facility.name;
+    },
   },
   {
     headerAlign: "center",
@@ -289,7 +296,14 @@ export const acceptedOrderCols = [
     field: "totalMoney",
     headerName: "Tổng tiền đặt",
     sortable: false,
-    minWidth: 150,
+    minWidth: 130,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ fontSize: 14 }}>
+          {`${formatVietnameseCurrency(params?.row?.totalMoney)}`}{" "}
+        </Typography>
+      );
+    },
   },
   {
     headerAlign: "center",
@@ -297,7 +311,14 @@ export const acceptedOrderCols = [
     field: "totalPayment",
     headerName: "Tổng tiền trả",
     sortable: false,
-    minWidth: 150,
+    minWidth: 130,
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ fontSize: 14 }}>{`${formatVietnameseCurrency(
+          params?.row?.totalPayment
+        )}`}</Typography>
+      );
+    },
   },
   {
     field: "vat",
@@ -305,35 +326,17 @@ export const acceptedOrderCols = [
     align: "center",
     headerName: "VAT",
     sortable: false,
-    minWidth: 150,
+    minWidth: 100,
     renderCell: (params) => {
-      return <Typography>{`${params?.row?.vat} %`}</Typography>;
-    },
-  },
-  {
-    field: "createdBy",
-    headerName: "Tạo bởi",
-    headerAlign: "center",
-    align: "center",
-    sortable: false,
-    minWidth: 150,
-    valueGetter: (params) => {
-      return params.row.user.id;
-    },
-  },
-  {
-    field: "createdDate",
-    headerAlign: "center",
-    align: "center",
-    headerName: "Thời điểm tạo",
-    sortable: false,
-    minWidth: 150,
-    valueGetter: (params) => {
-      return unix(params?.row?.createdDate).format("DD-MM-YYYY");
+      return (
+        <Typography sx={{ fontSize: 14 }}>{`${params?.row?.vat} %`}</Typography>
+      );
     },
   },
   {
     field: "status",
+    headerAlign: "center",
+    align: "center",
     headerName: "Trạng thái",
     sortable: false,
     width: 125,
@@ -367,14 +370,25 @@ export const acceptedOrderCols = [
     },
   },
   {
-    field: "facility",
+    field: "createdBy",
+    headerName: "Tạo bởi",
     headerAlign: "center",
     align: "center",
-    headerName: "Kho trực thuộc",
     sortable: false,
     minWidth: 150,
     valueGetter: (params) => {
-      return params.row.facility.name;
+      return params.row.user.id;
+    },
+  },
+  {
+    field: "createdDate",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Thời điểm tạo",
+    sortable: false,
+    minWidth: 150,
+    valueGetter: (params) => {
+      return unix(params?.row?.createdDate).format("DD-MM-YYYY");
     },
   },
 ];

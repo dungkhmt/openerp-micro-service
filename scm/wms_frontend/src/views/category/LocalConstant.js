@@ -23,11 +23,10 @@ export const staticCustomerField = [
     field: "name",
     headerName: "Tên khách hàng",
     headerAlign: "center",
-    align: "center",
+    // align: "center",
     sortable: false,
-    width: 125,
-    minWidth: 150,
-    maxWidth: 200,
+    minWidth: 250,
+    maxWidth: 400,
     renderCell: (params) => {
       return (
         <Typography sx={{ fontWeight: "500" }}>{params?.row?.name}</Typography>
@@ -43,6 +42,7 @@ export const staticCustomerField = [
     maxWidth: 200,
   },
   {
+    headerAlign: "center",
     field: "address",
     headerName: "Địa chỉ",
     sortable: false,
@@ -87,7 +87,7 @@ export const staticCustomerField = [
     headerAlign: "center",
     align: "center",
     sortable: false,
-    minWidth: 150,
+    minWidth: 250,
     valueGetter: (params) => {
       return params?.row?.facility?.name;
     },
@@ -152,9 +152,8 @@ export const productColumns = [
     align: "center",
     headerName: "Tên sản phẩm",
     sortable: false,
-    width: 125,
-    minWidth: 150,
-    maxWidth: 200,
+    minWidth: 200,
+    maxWidth: 300,
     renderCell: (params) => {
       return (
         <Typography sx={{ fontWeight: "500" }}>{params?.row?.name}</Typography>
@@ -167,25 +166,17 @@ export const productColumns = [
     align: "center",
     headerName: "Nhãn hiệu",
     sortable: false,
-    width: 125,
-    minWidth: 150,
-    maxWidth: 200,
-  },
-  {
-    field: "sku",
-    headerName: "Mã SKU",
-    sortable: false,
-    width: 125,
-    minWidth: 150,
-    maxWidth: 200,
+    minWidth: 200,
+    maxWidth: 300,
   },
   {
     field: "status",
+    headerAlign: "center",
+    align: "center",
     headerName: "Trạng thái",
     sortable: false,
-    width: 125,
     minWidth: 150,
-    maxWidth: 200,
+    // maxWidth: 200,
     renderCell: (params) => {
       return (
         <Button
@@ -208,6 +199,14 @@ export const productColumns = [
         </Button>
       );
     },
+  },
+  {
+    field: "sku",
+    headerName: "Mã SKU",
+    sortable: false,
+    // width: 125,
+    minWidth: 150,
+    maxWidth: 200,
   },
   {
     field: "product_category_name",
@@ -263,7 +262,7 @@ export const unitColumns = [
     align: "center",
     headerName: "Tên đơn vị sản phẩm",
     sortable: false,
-    minWidth: 200,
+    flex: 1,
   },
 ];
 export const categoryColumns = [
@@ -287,7 +286,7 @@ export const categoryColumns = [
     align: "center",
     headerName: "Tên danh mục sản phẩm",
     sortable: false,
-    minWidth: 250,
+    flex: 1,
   },
 ];
 export const distChannelCols = [
@@ -311,7 +310,7 @@ export const distChannelCols = [
     align: "center",
     headerName: "Tên kênh phân phối",
     sortable: false,
-    minWidth: 250,
+    flex: 1,
   },
   {
     field: "promotion",
@@ -346,7 +345,7 @@ export const customerTypeCols = [
     align: "center",
     headerName: "Tên loại khách hàng",
     sortable: false,
-    minWidth: 250,
+    flex: 1,
   },
 ];
 export const contractTypeCols = [
@@ -371,7 +370,7 @@ export const contractTypeCols = [
     align: "center",
     headerName: "Tên hợp đồng giao dịch",
     sortable: false,
-    minWidth: 250,
+    flex: 1,
   },
   {
     field: "channel",
@@ -379,7 +378,7 @@ export const contractTypeCols = [
     headerAlign: "center",
     align: "center",
     sortable: false,
-    minWidth: 200,
+    flex: 1,
     valueGetter: (params) => {
       return params?.row?.channel?.name;
     },

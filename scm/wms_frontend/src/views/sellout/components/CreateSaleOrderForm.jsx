@@ -1,4 +1,4 @@
-import { Box, Button, InputBase, Stack, Typography } from "@mui/material";
+import { Button, InputBase, Stack, Typography } from "@mui/material";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomSelect from "components/select/CustomSelect";
 import {
@@ -11,6 +11,8 @@ import {
   useGetSelloutPrice,
 } from "controllers/query/sale-order-query";
 import { useMemo, useState } from "react";
+import { AppColors } from "../../../shared/AppColors";
+import { formatVietnameseCurrency } from "../../../utils/GlobalUtils";
 import { staticProductFields } from "../LocalConstant";
 
 const {
@@ -183,6 +185,7 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
         // paginationMode="client"
         handlePaginationModelChange={(props) => {
           setParams({
+            ...params,
             page: props?.page + 1,
             pageSize: props?.pageSize,
           });
@@ -244,12 +247,30 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
           setValue("products", results);
         }}
       />
-      <Box>
-        <Typography>
-          Tổng tiền tạm tính (chưa chiết khấu):
-          <span>{calculateTotalMoney}</span>
+      <Stack
+        flexDirection={"row"}
+        sx={{
+          marginTop: 2,
+          justifyContent: "flex-start",
+          alignItems: "center",
+        }}
+      >
+        <Typography
+          sx={{ fontSize: 18, fontWeight: "bold", color: AppColors.secondary }}
+        >
+          TỔNG TIỀN TẠM TÍNH (CHƯA CHIẾT KHẤU):
         </Typography>
-      </Box>
+        <Typography
+          sx={{
+            fontSize: 20,
+            marginLeft: 2,
+            fontWeight: "bold",
+            color: AppColors.secondary,
+          }}
+        >
+          {formatVietnameseCurrency(calculateTotalMoney)}
+        </Typography>
+      </Stack>
       <Stack
         direction="row"
         justifyContent={"flex-end"}

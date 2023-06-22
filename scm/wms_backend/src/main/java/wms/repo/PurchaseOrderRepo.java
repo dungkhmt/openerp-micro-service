@@ -9,9 +9,20 @@ import wms.entity.PurchaseOrder;
 import java.util.List;
 
 public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Long>  {
-    @Query(value = "select po.* from scm_purchase_order po" +
-            "         where po.status != 'DELETED' and (po.status = :orderStatus or :orderStatus = '')\n", nativeQuery = true)
-    Page<PurchaseOrder> search(Pageable pageable, String orderStatus);
+    @Query(value = "select spo.*, sf.name\n" +
+            "from scm_purchase_order spo\n" +
+            "         left join scm_facility sf on spo.bought_by = sf.code\n" +
+            "where spo.is_deleted = 0\n" +
+            "  and spo.status != 'DELETED'\n" +
+            "  and (sf.name ilike concat('%', :facilityName, '%'))\n" +
+            "  and (spo.status = :orderStatus or :orderStatus = '')\n" +
+            "  and (spo.supplier_code ilike concat('%', :supplierCode, '%'))\n" +
+            "  and (spo.created_by = :createdBy or :createdBy = '')\n" +
+            "  and (sf.name ilike concat('%', :text, '%')\n" +
+            "    or spo.supplier_code ilike concat('%', :text, '%')\n" +
+            "    or spo.created_by ilike concat('%', :text, '%')\n" +
+            "    )", nativeQuery = true)
+    Page<PurchaseOrder> search(Pageable pageable, String orderStatus, String facilityName, String createdBy, String supplierCode, String text);
     PurchaseOrder getOrderById(long id);
     PurchaseOrder getOrderByCode(String code);
 

@@ -54,31 +54,126 @@ function FacilityDetailScreen() {
             THÔNG TIN KHO HÀNG
           </Typography>
         </Stack>
-        <Typography
-          sx={{
-            fontSize: 16,
-            marginTop: 2,
-          }}
-        >
-          1. Mã kho: {facility?.code}
-        </Typography>
-        <Typography>
-          2. Tên kho:
-          {facility?.name}
-        </Typography>
-        <Typography>
-          3. Người quản lý:
-          {facility?.manager?.firstName || "" + facility?.creator?.lastName}
-        </Typography>
-        <Typography>
-          4. Người tạo:
-          {facility?.creator?.firstName || "" + facility?.creator?.lastName}
-        </Typography>
-        <Typography>
-          5. Thời gian tạo: {unix(facility?.createdDate).format("DD-MM-YYYY")}
-        </Typography>
-        <Typography>6. Địa chỉ: {facility?.address}</Typography>
-        <Typography sx={{ marginBottom: 2 }}>7. Chi tiết</Typography>
+        <Stack sx={{ flexDirection: "row", marginTop: 2 }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            1. Mã kho:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {facility?.code}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            2. Tên kho:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {facility?.name}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            3. Người quản lý:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {facility?.manager?.firstName || "" + facility?.creator?.lastName}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            4. Người tạo:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {facility?.creator?.firstName || "" + facility?.creator?.lastName}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            5. Thời gian tạo:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {unix(facility?.createdDate).format("DD-MM-YYYY")}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            6. Địa chỉ:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {facility?.address}
+          </Typography>
+        </Stack>
       </Box>
       <Stack
         direction={"row"}
@@ -123,30 +218,7 @@ function FacilityDetailScreen() {
               pageSize: props?.pageSize,
             });
           }}
-          columns={[
-            ...staticCustomerField,
-            // {
-            //   field: "action",
-            //   headerName: "Hành động",
-            //   headerAlign: "center",
-            //   align: "center",
-            //   sortable: false,
-            //   flex: 1,
-            //   type: "actions",
-            //   getActions: (params) => {
-            //     return [
-            //       ...extraActions.map((extraAction, index) => (
-            //         <Action
-            //           item={params.row}
-            //           key={index}
-            //           extraAction={extraAction}
-            //           onActionCall={extraAction.callback}
-            //         />
-            //       )),
-            //     ];
-            //   },
-            // },
-          ]}
+          columns={[...staticCustomerField]}
           rows={facilityCustomers?.content ? facilityCustomers?.content : []}
         />
       </Box>

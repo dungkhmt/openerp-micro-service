@@ -1,4 +1,4 @@
-import { Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import CustomSelect from "components/select/CustomSelect";
 import {
   useGetContractType,
@@ -7,6 +7,7 @@ import {
 } from "controllers/query/category-query";
 import { useRef, useState } from "react";
 import CustomMap from "../../../../components/map/CustomMap";
+import { AppColors } from "../../../../shared/AppColors";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
@@ -179,7 +180,11 @@ const UpdateCustomerForm = ({ setOpenDrawer, currCustomer }) => {
           />
         )}
       />
-      <Typography>Lấy vị trí</Typography>
+      <Box>
+        <Typography style={{ color: AppColors.error, fontSize: 14 }}>
+          Lấy vị trí
+        </Typography>
+      </Box>
       <Stack direction={"row"}>
         <Controller
           key={"map"}
@@ -187,16 +192,13 @@ const UpdateCustomerForm = ({ setOpenDrawer, currCustomer }) => {
           name={"map"}
           render={({ field: { onChange, value } }) => (
             <CustomMap
-              style={{ width: "30vw", height: "30vh" }}
+            style={{ width: "100%", height: "50vh" }}
               location={selectPosition}
               mapRef={mapRef}
               setSelectPosition={setSelectPosition}
             />
           )}
         />
-        {/* <Stack direction={"column"}>
-          <Typography>{`${currMarker.lat}, ${currMarker.lng}`}</Typography>
-        </Stack> */}
       </Stack>
       <Stack
         direction="row"
