@@ -18,6 +18,9 @@ public class Trailer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
+    @Column(name = "uid")
+    private String uid;
+
     @Column(name = "trailer_code")
     private String trailerCode;
 

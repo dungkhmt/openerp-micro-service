@@ -4,12 +4,12 @@ import { Alert, Box, Button, Container, Divider, Icon, Typography } from "@mui/m
 import { useHistory, useParams } from "react-router-dom";
 import { MyContext } from "contextAPI/MyContext";
 import { menuIconMap, typeOrderMap } from "config/menuconfig";
-import { getOrderByOrderCode } from "api/OrderAPI";
+import { getOrderByUid } from "api/OrderAPI";
 import NewOrderModal from "../NewOrderModal";
 
 const OrderDetail = () => {
     const history = useHistory();
-    const { orderCode } = useParams();
+    const { uid, type } = useParams();
     const [order, setOrder] = useState();
     const { role, preferred_username } = useContext(MyContext);
 
@@ -24,11 +24,19 @@ const OrderDetail = () => {
     }
 
     useEffect(() => {
-        getOrderByOrderCode(orderCode).then((res) => {
+        getOrderByUid(uid).then((res) => {
             setOrder(res?.data.data)
         })
     }, [open])
 
+    const handleBackScreen = () => {
+        if(type === "wait") {
+            history.push('/wait-approve/order')
+        }
+        else {
+            history.push('/order')
+        }
+    }
     return (
         <Box className="fullScreen">
             <Container maxWidth="lg" className="container">
@@ -41,13 +49,18 @@ const OrderDetail = () => {
 
                 <Box className="header-detail">
                     <Box className="headerScreen-go-back"
-                        onClick={() => history.push('/order')}
+                        onClick={handleBackScreen}
                         sx={{ cursor: "pointer" }}
                     >
                         <Icon>
                             {menuIconMap.get("ArrowBackIosIcon")}
                         </Icon>
-                        <Typography>Go back orders screen</Typography>
+                        {type === "wait" ? (
+                            <Typography>Go back orders wait approve screen</Typography>
+                        ) : (
+                            <Typography>Go back approved orders screen</Typography>
+                        )}
+                        
                     </Box>
                     <Box className="headerScreen-detail-info">
                         <Box className="title-header">

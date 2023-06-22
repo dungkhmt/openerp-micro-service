@@ -273,7 +273,7 @@ export default function ContentsTrailerScreen({ trailer, page, setPage, rowsPerP
                         <Box sx={{ display: 'flex' }}>
                           <Tooltip title="View">
                             <Box
-                              onClick={() => { handleDetail(row?.id) }}
+                              onClick={() => { handleDetail(row?.uid) }}
                             >
                               <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                             </Box>

@@ -22,6 +22,9 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
+    @Column(name = "uid")
+    private String uid;
+
     @Column(name = "order_code")
     private String orderCode;
 

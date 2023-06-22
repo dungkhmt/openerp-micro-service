@@ -33,22 +33,7 @@ const CreateTripDetail = () => {
 
     const [toastOpen, setToast] = useState(false);
     const [toastType, setToastType] = useState();
-
-    const checkScheduler = (id, type) => {
-        let check = true;
-        if (type === "truck") {
-            truckScheduler.forEach((item) => {
-                if (item.id === id)
-                    return check = false;
-            });
-        } else {
-            ordersScheduler.forEach((item) => {
-                if (item === id)
-                    return check = false;
-            });
-        }
-        return check;
-    }
+    const [toastMsg, setToastMsg] = useState('');
 
     useEffect(() => {
         getTrucks({}).then((res) => {
@@ -75,6 +60,8 @@ const CreateTripDetail = () => {
         history.push(`/shipment/detail/${shipmentId}`);
     }
     const handleSubmit = () => {
+        let checkValidate = checkTripItems();
+        console.log("checkValidate", checkValidate);
         let orderSubmir = [];
         let tripItemTmp = [];
         ordersSelect.forEach((item) => {
@@ -104,21 +91,74 @@ const CreateTripDetail = () => {
             }
         }
         console.log("data", dataSubmit);
-        createTrip(dataSubmit).then((res) => {
-            setToastType("success");
-            setToast(true);
-            setTimeout(() => {
-                setToast(false);
-                history.push({
-                    pathname: `/shipment/detail/${shipmentId}`,
-                })
-            }, "1000");
-        })
+        // createTrip(dataSubmit).then((res) => {
+        //     setToastType("success");
+        //     setToast(true);
+        //     setTimeout(() => {
+        //         setToast(false);
+        //         history.push({
+        //             pathname: `/shipment/detail/${shipmentId}`,
+        //         })
+        //     }, "1000");
+        // })
     }
     console.log("truckSelect", truckSelect);
     useEffect(() => {
 
     }, [tripItems])
+    const checkTripItems = () => {
+        if(!truckSelect) {
+            setToastMsg("Please chose truck in trip")
+            appearToast();
+            return false;
+        }
+        if(ordersSelect.length === 0) {
+            setToastMsg("Please chose orders in trip")
+            appearToast();
+            return false;
+        }
+        let nbTrailer = 0;
+        // check nbTrailer
+        for(let i = 1; i< tripItems.length-1; i++) {
+            if(tripItems[i].action === "PICKUP-TRAILER") {
+                nbTrailer = Number(nbTrailer) + 1;
+            }
+            if(tripItems[i].action === "DELIVERY-TRAILER") {
+                nbTrailer = Number(nbTrailer) - 1;
+            }
+            if(tripItems[i].action === "DELIVERY-CONTAINER" && nbTrailer === 0) {
+                setToastMsg(`Please view again at before ${tripItems[i].action} ${tripItems[i].orderCode}`)
+                appearToast();
+                return false;
+            }
+            if(tripItems[i].action === "DELIVERY-CONTAINER" && tripItems[i].isBreakRomooc) {
+                nbTrailer = Number(nbTrailer) - 1;
+            }
+            console.log("nbTrailer", nbTrailer)
+            if(nbTrailer >= 2 || nbTrailer < 0) {
+                setToastMsg(`Please view again Trailer at before ${tripItems[i].action} ${tripItems[i].orderCode}`)
+                appearToast();
+                return false;
+            }
+
+            if(tripItems[i].action === "PICKUP-CONTAINER" && nbTrailer === 0) {
+                setToastMsg(`Please chose Trailer before Pickup Container in Order ${tripItems[i].orderCode}`)
+                appearToast();
+                return false;
+            }
+        }
+
+        // check weight
+
+        // check time
+    }
+    const appearToast = () => {
+        setToast(true);
+        setToastType("error");
+        setTimeout(() => {
+            setToast(false);
+        }, 3000)
+    }
     return (
         <Box className="fullScreen">
             <Container maxWidth="xl" className="container">
@@ -127,11 +167,11 @@ const CreateTripDetail = () => {
                         {toastOpen ? (
                             toastType === "success" ? (
                                 <Alert variant="filled" severity={toastType} >
-                                    <strong> Created Trip Success !!!</strong >
+                                    <strong>{toastMsg}</strong >
                                 </Alert >
                             ) : (
                                 <Alert variant="filled" severity={toastType} >
-                                    <strong> Created Trip False !!!</strong >
+                                    <strong>{toastMsg}</strong >
                                 </Alert >
                             )) : null
                         }

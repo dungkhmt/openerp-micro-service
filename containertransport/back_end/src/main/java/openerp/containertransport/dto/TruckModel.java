@@ -2,6 +2,7 @@ package openerp.containertransport.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.Column;
 import lombok.*;
 import openerp.containertransport.entity.Facility;
 
@@ -14,6 +15,7 @@ import java.io.Serializable;
 @Builder
 public class TruckModel implements Serializable {
     private long id;
+    private String uid;
     private String truckCode;
     private Long facilityId;
 //    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})

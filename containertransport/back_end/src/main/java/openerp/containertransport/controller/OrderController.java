@@ -51,10 +51,25 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModels));
     }
 
-    @GetMapping("/{orderCode}")
-    public ResponseEntity<?> getOrderByOrderCode(@PathVariable String orderCode, JwtAuthenticationToken token) {
+    @GetMapping("/{uid}")
+    public ResponseEntity<?> getOrderByUid(@PathVariable String uid, JwtAuthenticationToken token) {
         String username = token.getName();
-        OrderModel orderModel = orderService.getOrderByOrderCode(orderCode, username);
+        boolean isCustomer = false;
+        List<String> roleIds = token
+                .getAuthorities()
+                .stream()
+                .filter(grantedAuthority -> !grantedAuthority
+                        .getAuthority()
+                        .startsWith("ROLE_GR")) // remove all composite roles
+                .map(grantedAuthority -> { // convert role to permission
+                    String roleId = grantedAuthority.getAuthority().substring(5); // remove prefix "ROLE_"
+                    return roleId;
+                })
+                .collect(Collectors.toList());
+        if(roleIds.contains("TMS_CUSTOMER")) {
+            isCustomer = true;
+        }
+        OrderModel orderModel = orderService.getOrderByUid(uid, username, isCustomer);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModel));
     }
 
@@ -64,9 +79,9 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModelUpdate));
     }
 
-    @PutMapping("/update/{orderCode}")
-    public ResponseEntity<?> updateOrderByCode(@PathVariable String orderCode, @RequestBody OrderModel orderModel) {
-        OrderModel orderModelUpdate = orderService.updateOrderByCode(orderCode, orderModel);
+    @PutMapping("/update/{orderUid}")
+    public ResponseEntity<?> updateOrderByCode(@PathVariable String orderUid, @RequestBody OrderModel orderModel) {
+        OrderModel orderModelUpdate = orderService.updateOrderByUid(orderUid, orderModel);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModelUpdate));
     }
 }

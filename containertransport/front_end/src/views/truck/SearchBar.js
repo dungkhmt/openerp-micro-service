@@ -43,6 +43,9 @@ const styles = {
                 },
                 '& .btn-filter': {
                     marginTop: '32px'
+                },
+                '& .MuiInputBase-root': {
+                    height: '40px'
                 }
             },
         },

@@ -20,6 +20,9 @@ public class Truck implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
+    @Column(name = "uid")
+    private String uid;
+
     @Column(name = "truck_code")
     private String truckCode;
 

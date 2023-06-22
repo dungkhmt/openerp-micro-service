@@ -1,5 +1,6 @@
 package openerp.containertransport.dto;
 
+import jakarta.persistence.Column;
 import lombok.*;
 import openerp.containertransport.entity.Facility;
 
@@ -10,11 +11,12 @@ import openerp.containertransport.entity.Facility;
 @Builder
 public class TrailerModel {
     private long id;
+    private String uid;
     private String trailerCode;
     private Integer facilityId;
     private FacilityResponsiveDTO facilityResponsiveDTO;
     private String status;
-    private Integer truckId;
+    private String truckUid;
     private long createdAt;
     private long updatedAt;
 }

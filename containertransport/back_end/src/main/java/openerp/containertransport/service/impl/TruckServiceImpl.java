@@ -10,6 +10,7 @@ import openerp.containertransport.entity.Truck;
 import openerp.containertransport.repo.FacilityRepo;
 import openerp.containertransport.repo.TruckRepo;
 import openerp.containertransport.service.TruckService;
+import openerp.containertransport.utils.RandomUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,7 @@ public class TruckServiceImpl implements TruckService  {
         truck.setLicensePlates(truckModel.getLicensePlates());
         truck.setBrandTruck(truckModel.getBrandTruck());
         truck.setStatus("AVAILABLE");
+        truck.setUid(RandomUtils.getRandomId());
         truck.setYearOfManufacture(truckModel.getYearOfManufacture());
         truck.setCreatedAt(System.currentTimeMillis());
         truck.setUpdatedAt(System.currentTimeMillis());
@@ -96,15 +98,15 @@ public class TruckServiceImpl implements TruckService  {
     }
 
     @Override
-    public TruckModel getTruckById(long id) {
-        Truck truck = truckRepo.findById(id);
+    public TruckModel getTruckByUid(String uid) {
+        Truck truck = truckRepo.findByUid(uid);
         TruckModel truckModel = convertToModel(truck);
         return truckModel;
     }
 
     @Override
-    public TruckModel updateTruck(TruckModel truckModel, long id) {
-        Truck truck = truckRepo.findById(id);
+    public TruckModel updateTruck(TruckModel truckModel, String uid) {
+        Truck truck = truckRepo.findByUid(uid);
         if (truckModel.getStatus() != null) {
             truck.setStatus(truckModel.getStatus());
         }

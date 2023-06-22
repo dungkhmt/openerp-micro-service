@@ -14,6 +14,7 @@ import openerp.containertransport.repo.FacilityRepo;
 import openerp.containertransport.repo.TrailerRepo;
 import openerp.containertransport.repo.TruckRepo;
 import openerp.containertransport.service.TrailerService;
+import openerp.containertransport.utils.RandomUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,7 @@ public class TrailerServiceImpl implements TrailerService {
         }
         trailer.setFacility(facility);
         trailer.setStatus("AVAILABLE");
+        trailer.setUid(RandomUtils.getRandomId());
         trailer.setCreatedAt(System.currentTimeMillis());
         trailer.setUpdatedAt(System.currentTimeMillis());
         trailerRepo.save(trailer);
@@ -47,14 +49,14 @@ public class TrailerServiceImpl implements TrailerService {
     }
 
     @Override
-    public TrailerModel getTrailerById(long id) {
-        Trailer trailer = trailerRepo.findById(id);
+    public TrailerModel getTrailerByUid(String uid) {
+        Trailer trailer = trailerRepo.findByUid(uid);
         return convertToModel(trailer);
     }
 
     @Override
     public TrailerModel updateTrailer(TrailerModel trailerModel) {
-        Trailer trailer = trailerRepo.findById(trailerModel.getId());
+        Trailer trailer = trailerRepo.findByUid(trailerModel.getUid());
         if(trailerModel.getStatus() != null){
             trailer.setStatus(trailerModel.getStatus());
         }
@@ -62,8 +64,8 @@ public class TrailerServiceImpl implements TrailerService {
             Facility facility = facilityRepo.findById(trailerModel.getFacilityId());
             trailer.setFacility(facility);
         }
-        if(trailerModel.getTruckId() != null) {
-            Truck truck = truckRepo.findById(trailerModel.getTruckId());
+        if(trailerModel.getTruckUid() != null) {
+            Truck truck = truckRepo.findByUid(trailerModel.getTruckUid());
             trailer.setTruck(truck);
         }
         trailer.setUpdatedAt(System.currentTimeMillis());

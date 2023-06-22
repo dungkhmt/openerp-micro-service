@@ -1,12 +1,12 @@
 import { Alert, Box, Container, Divider } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
-import './styles.scss';
-import ContentsOrderManagerment from "./ContentsOrderManagerment";
-import HeaderOrderScreen from "./HeaderOrderScreen";
+import '../styles.scss';
 import { getOrders } from "api/OrderAPI";
 import { MyContext } from "contextAPI/MyContext";
+import HeaderOrderScreen from "../HeaderOrderScreen";
+import ContentsOrderManagerment from "../ContentsOrderManagerment";
 
-const OrderScreen = () => {
+const OrderWaitApprove = () => {
     const [orders, setOrders] = useState([]);
 
     const [toastOpen, setToast] = useState(false);
@@ -19,9 +19,14 @@ const OrderScreen = () => {
     const { role, preferred_username } = useContext(MyContext);
 
     useEffect(() => {
-        getOrders({ page: page, pageSize: rowsPerPage, status: "APPROVED" }).then((res) => {
-            setOrders(res.data.data.orderModels);
-            setCount(res.data.data.count);
+        let data = {
+            page: page, 
+            pageSize: rowsPerPage,
+            status: "WAIT_APPROVE"
+        }
+        getOrders(data).then((res) => {
+            setOrders(res?.data.data.orderModels);
+            setCount(res?.data.data.count);
         });
     }, [toastOpen, page, rowsPerPage])
     return (
@@ -35,14 +40,14 @@ const OrderScreen = () => {
                         ) : null
                     }
                 </Box>
-                <HeaderOrderScreen setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
+                <HeaderOrderScreen setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} type="WaitApprove" />
                 <Box className="divider">
                     <Divider />
                 </Box>
                 <ContentsOrderManagerment orders={orders} page={page} setPage={setPage}
-                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
+                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} type="WaitApprove" />
             </Container>
         </Box>
     );
 }
-export default OrderScreen;
+export default OrderWaitApprove;

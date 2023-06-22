@@ -18,9 +18,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import './styles.scss';
-import { Icon } from '@mui/material';
+import { Button, Divider, Icon, Menu, MenuItem } from '@mui/material';
 import { menuIconMap, typeOrderMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import EditIcon from '@mui/icons-material/Edit';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -165,13 +167,17 @@ function EnhancedTableHead(props) {
     );
 }
 
-export default function ContentsOrderManagerment({ orders, page, setPage, rowsPerPage, setRowsPerPage, count }) {
+export default function ContentsOrderManagerment({ orders, page, setPage, rowsPerPage, setRowsPerPage, count, type }) {
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
     const [selected, setSelected] = React.useState([]);
     const [dense, setDense] = React.useState(false);
     const [visibleRows, setVisibleRows] = React.useState(null);
     const history = useHistory();
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
+    const [openButton, setOpenButton] = React.useState(false);
 
     const handleRequestSort = React.useCallback(
         (event, newOrderBy) => {
@@ -193,11 +199,13 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = orders.map((n) => n.name);
+            const newSelected = orders.map((n) => n.uid);
             setSelected(newSelected);
+            setOpenButton(true);
             return;
         }
         setSelected([]);
+        setOpenButton(false);
     };
 
     const handleClick = (event, id) => {
@@ -232,13 +240,61 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
     };
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
-    const handleDetail = (orderCode) => {
-        history.push(`/order/${orderCode}`)
+    const handleDetail = (uid) => {
+        if (type === "WaitApprove") {
+            history.push(`/wait-approve/order/wait/${uid}`)
+        }
+        else {
+            history.push(`/order/${uid}`)
+        }
     }
-
+    const handleClickAction = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleCloseAction = () => {
+        setAnchorEl(null);
+    };
+    console.log("orderSelect", selected);
     return (
         <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
             <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
+                {type === "WaitApprove" && selected.length > 0 ? (
+                    <Box sx={{ marginTop: '8px' }}>
+                        <Button
+                            id="demo-customized-button"
+                            aria-controls={open ? 'demo-customized-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={open ? 'true' : undefined}
+                            variant="contained"
+                            disableElevation
+                            onClick={handleClickAction}
+                            endIcon={<KeyboardArrowDownIcon />}
+                        >
+                            Action
+                        </Button>
+                        <Menu
+                            id="demo-customized-menu"
+                            MenuListProps={{
+                                'aria-labelledby': 'demo-customized-button',
+                            }}
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleCloseAction}
+                        >
+                            <MenuItem
+                                onClick={handleCloseAction}
+                                disableRipple>
+
+                                Approve
+                            </MenuItem>
+                            <MenuItem
+                                onClick={handleCloseAction}
+                                disableRipple>
+                                Reject
+                            </MenuItem>
+                        </Menu>
+                    </Box>
+                ) : null}
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
@@ -256,7 +312,7 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                         <TableBody>
                             {orders
                                 ? orders.map((row, index) => {
-                                    const isItemSelected = isSelected(row.id);
+                                    const isItemSelected = isSelected(row.uid);
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
                                     return (
@@ -277,7 +333,7 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                                                     inputProps={{
                                                         'aria-labelledby': labelId,
                                                     }}
-                                                    onClick={(event) => handleClick(event, row.id)}
+                                                    onClick={(event) => handleClick(event, row.uid)}
                                                 />
                                             </TableCell>
                                             <TableCell
@@ -299,16 +355,18 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                                                 <Box sx={{ display: 'flex' }}>
                                                     <Tooltip title="View">
                                                         <Box
-                                                            onClick={() => { handleDetail(row?.orderCode) }}
+                                                            onClick={() => { handleDetail(row?.uid) }}
                                                         >
                                                             <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                                                         </Box>
                                                     </Tooltip>
-                                                    <Tooltip title="Delete">
-                                                        <Box>
-                                                            <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                                                        </Box>
-                                                    </Tooltip>
+                                                    {type === "WaitApprove" ? null : (
+                                                        <Tooltip title="Delete">
+                                                            <Box>
+                                                                <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                                                            </Box>
+                                                        </Tooltip>
+                                                    )}
                                                 </Box>
                                             </TableCell>
                                         </TableRow>

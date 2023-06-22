@@ -32,6 +32,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
             console.log("res.data.data", res?.data.data.trailerModels)
             setTrailerList(res?.data.data.trailerModels);
         })
+        // xem xet lay dung facility
         getFacility({}).then((res) => {
             setFacilityList(res?.data.data.facilityModels);
         })
@@ -56,6 +57,8 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
             } else {
                 let tripItem = buildTripItem(truckSelected, "E1", "Truck", facility)
                 setAddTripItem(tripItem);
+                handleModal();
+                clearData();
             }
         }
         if (type === "Trailer") {
@@ -74,6 +77,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                     longitude: trailer?.facilityResponsiveDTO?.longitude,
                     latitude: trailer?.facilityResponsiveDTO?.latitude,
                     trailerId: trailer?.id,
+                    trailerCode: trailer?.trailerCode,
                     arrivalTime: null,
                     departureTime: null
                 }];

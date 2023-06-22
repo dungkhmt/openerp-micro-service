@@ -14,6 +14,7 @@ import java.util.List;
 @Builder
 public class OrderModel implements Serializable {
     private long id;
+    private String uid;
     private String orderCode;
     private String type;
     private long weight;

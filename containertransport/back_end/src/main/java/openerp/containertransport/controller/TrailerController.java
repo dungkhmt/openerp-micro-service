@@ -33,9 +33,9 @@ public class TrailerController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), trailerModels));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getTrailerById(@PathVariable long id) {
-        TrailerModel trailerModel = trailerService.getTrailerById(id);
+    @GetMapping("/{uid}")
+    public ResponseEntity<?> getTrailerById(@PathVariable String uid) {
+        TrailerModel trailerModel = trailerService.getTrailerByUid(uid);
         return ResponseEntity.status(HttpStatus.OK).body(trailerModel);
     }
 

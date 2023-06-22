@@ -15,6 +15,7 @@ import openerp.containertransport.service.ContainerService;
 import openerp.containertransport.service.FacilityService;
 import openerp.containertransport.service.OrderService;
 import openerp.containertransport.service.RelationshipService;
+import openerp.containertransport.utils.RandomUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -97,6 +98,7 @@ public class OrderServiceImpl implements OrderService {
         order.setType(orderModel.getType());
         order.setIsBreakRomooc(orderModel.isBreakRomooc());
         order.setStatus("ORDERED");
+        order.setUid(RandomUtils.getRandomId());
         order.setCreatedAt(System.currentTimeMillis());
         order.setUpdatedAt(System.currentTimeMillis());
         return order;
@@ -121,10 +123,18 @@ public class OrderServiceImpl implements OrderService {
             sqlCount += " AND order_code = :orderCode";
             params.put("orderCode", orderFilterRequestDTO.getOrderCode());
         }
-        if(orderFilterRequestDTO.getStatus() != null){
+        if(orderFilterRequestDTO.getStatus() != null && !orderFilterRequestDTO.getStatus().equals("APPROVED")){
             sql += " AND status = :status";
             sqlCount += " AND status = :status";
             params.put("status", orderFilterRequestDTO.getStatus());
+        }
+        if(orderFilterRequestDTO.getStatus() != null && orderFilterRequestDTO.getStatus().equals("APPROVED")){
+            List<String> status = new ArrayList<>();
+            status.add("WAIT_APPROVE");
+            status.add("DELETED");
+            sql += " AND status NOT IN :status";
+            sqlCount += " AND status NOT IN :status";
+            params.put("status", status);
         }
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
         for (String i : params.keySet()) {
@@ -163,8 +173,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderModel getOrderByOrderCode(String orderCode, String username) {
-        Order order = orderRepo.findByOrderCode(orderCode, username);
+    public OrderModel getOrderByUid(String uid, String username, boolean isCustomer) {
+        Order order = new Order();
+        if(isCustomer) {
+            order = orderRepo.findByUid(uid, username);
+        }
+        else {
+            order = orderRepo.findByUid(uid);
+        }
+
         return convertToModel(order);
     }
 
@@ -192,8 +209,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderModel updateOrderByCode(String orderCode, OrderModel orderModel) {
-        Order order = orderRepo.findByOrderCode(orderCode);
+    public OrderModel updateOrderByUid(String uid, OrderModel orderModel) {
+        Order order = orderRepo.findByUid(uid);
         OrderModel orderModelUpdate = updateOrder(order.getId(), orderModel);
         return orderModelUpdate;
     }

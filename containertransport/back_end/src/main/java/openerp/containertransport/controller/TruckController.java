@@ -30,15 +30,15 @@ public class TruckController {
         return ResponseEntity.status(HttpStatus.OK).body(truckModels);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getTruckById(@PathVariable long id) {
-        TruckModel truckModel = truckService.getTruckById(id);
+    @GetMapping("/{uid}")
+    public ResponseEntity<?> getTruckById(@PathVariable String uid) {
+        TruckModel truckModel = truckService.getTruckByUid(uid);
         return ResponseEntity.status(HttpStatus.OK).body(truckModel);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateTruck(@PathVariable long id, @RequestBody TruckModel truckModel) {
-        TruckModel truckModelUpdate = truckService.updateTruck(truckModel, id);
+    @PutMapping("/update/{uid}")
+    public ResponseEntity<?> updateTruck(@PathVariable String uid, @RequestBody TruckModel truckModel) {
+        TruckModel truckModelUpdate = truckService.updateTruck(truckModel, uid);
         return ResponseEntity.status(HttpStatus.OK).body(truckModelUpdate);
     }
 }

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TrailerRepo extends JpaRepository<Trailer, Long> {
     Trailer findById(long id);
+    Trailer findByUid(String uid);
 }

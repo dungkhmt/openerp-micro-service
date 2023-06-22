@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface TrailerService {
     TrailerModel createTrailer(TrailerModel trailerModel);
-    TrailerModel getTrailerById(long id);
+    TrailerModel getTrailerByUid(String uid);
     TrailerModel updateTrailer(TrailerModel trailerModel);
     TrailerFilterRes filterTrailer(TrailerFilterRequestDTO trailerFilterRequestDTO);
 }

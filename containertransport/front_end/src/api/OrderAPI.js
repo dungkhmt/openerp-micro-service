@@ -16,7 +16,7 @@ export const createOrder = async (data) => {
     return resData;
 }
 
-export const getOrderByOrderCode = async (data) => {
+export const getOrderByUid = async (data) => {
     const resData = request(
         "get",
         `/order/${data}`, {}, {}, {}, {}

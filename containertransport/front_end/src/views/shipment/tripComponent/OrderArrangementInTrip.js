@@ -239,7 +239,7 @@ const Row = SortableElement(({ data, ...other }) => {
 })
 
 const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, tripItems, flag }) => {
-    const [facilities, setFacilities] = useState([]);
+    // const [facilities, setFacilities] = useState([]);
     const [facilitiesFinal, setFacilitiesFinal] = useState([]);
     const [open, setOpen] = useState(false);
     const [addTripItem, setAddTripItem] = useState([]);
@@ -268,7 +268,8 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
         if (flag) {
             if (truckSelected) {
                 console.log("start");
-                console.log("truckSelected", truckSelected)
+                console.log("truckSelected", truckSelected);
+                facilitiesTmp = facilitiesFinal.filter((faci) => (faci.action !== "DEPART"));
                 let startPoint = {
                     code: truckSelected?.id + "S1",
                     facilityId: truckSelected?.facilityResponsiveDTO?.facilityId,
@@ -284,15 +285,17 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                     departureTime: null,
                     type: tripItemType.get("Truck")
                 }
-                facilitiesTmp.push(startPoint);
-                setTruckItem(facilitiesTmp);
-                facilitiesTmp = facilitiesTmp.concat(facilities);
+                facilitiesTmp.unshift(startPoint);
+                setTruckItem([startPoint]);
+                // facilitiesTmp = facilitiesTmp.concat(facilities);
+                facilitiesTmp = updateSeqInTrip(facilitiesTmp);
                 setFacilitiesFinal(facilitiesTmp);
             }
             if (!truckSelected) {
-                facilitiesTmp = facilitiesFinal.filter((faci) => (faci.action != "DEPART"));
-                facilitiesTmp = facilitiesTmp.filter((faci) => (faci.action != "STOP"));
-                setFacilities(facilitiesTmp);
+                facilitiesTmp = facilitiesFinal.filter((faci) => (faci.action !== "DEPART"));
+                facilitiesTmp = facilitiesTmp.filter((faci) => (faci.action !== "STOP"));
+                // setFacilities(facilitiesTmp);
+                facilitiesTmp = updateSeqInTrip(facilitiesTmp);
                 setFacilitiesFinal(facilitiesTmp);
                 setTruckItem([]);
             }
@@ -302,10 +305,9 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
     useEffect(() => {
         let facilitiesTmp = facilitiesFinal;
         if (flag) {
-            console.log("facilitiesBefore111", truckItem);
-            if (truckItem.length > 0) {
-                facilitiesTmp.shift() // use filter
-            }
+            // if (truckItem.length > 0) {
+            //     facilitiesTmp.shift() // use filter
+            // }
             console.log("facilitiesBefore", facilitiesTmp);
             let facilitiesTmp2 = [];
             if (ordersSelect) {
@@ -314,7 +316,7 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                     // let facilitiesOrder = facilities.filter((item) => item.type = "order")
                     // neu da ton tai order trong router
                     facilitiesTmp?.forEach((faci) => {
-                        if (faci.orderCode == item.orderCode) {
+                        if (faci.orderCode === item.orderCode) {
                             check = true;
                         }
                     })
@@ -362,24 +364,25 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                 });
                 facilitiesTmp2 = facilitiesTmp;
                 console.log("facilitiesTmp", facilitiesTmp);
-                facilitiesTmp.forEach((faci, index) => {
-                    if (faci.type == "order") {
+                facilitiesTmp.forEach((faci) => {
+                    if (faci.type === "Order") {
                         let check = false;
                         ordersSelect.forEach((item) => {
-                            if (item.orderCode == faci.orderCode) {
+                            if (item.orderCode === faci.orderCode) {
                                 check = true;
                             }
                         });
                         if (!check) {
-                            facilitiesTmp2 = facilitiesTmp2.filter((req) => req.orderId != faci.orderId);
+                            facilitiesTmp2 = facilitiesTmp2.filter((req) => req.orderId !== faci.orderId);
                         }
                     }
                 })
                 console.log("facilitiesTmp2", facilitiesTmp2);
             }
-            setFacilities(facilitiesTmp2);
-            let facilitiesAdd = truckItem?.concat(facilitiesTmp2);
-            setFacilitiesFinal(facilitiesAdd);
+            // setFacilities(facilitiesTmp2);
+            // let facilitiesAdd = truckItem?.concat(facilitiesTmp2);
+            facilitiesTmp2 = updateSeqInTrip(facilitiesTmp2);
+            setFacilitiesFinal(facilitiesTmp2);
         }
     }, [ordersSelect])
     console.log("facilities151", facilitiesFinal);
@@ -388,12 +391,16 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
         setOpen(true);
     }
     useEffect(() => {
-        let facilitiesTmp = facilities;
+        let facilitiesTmp = facilitiesFinal;
+
+        // console.log("fa", facilities);
         if (addTripItem.length > 0) {
+            console.log("add", addTripItem);
             facilitiesTmp = facilitiesTmp.concat(addTripItem);
-            setFacilities(facilitiesTmp);
-            let facilitiesFinalTmp = truckItem.concat(facilitiesTmp);
-            setFacilitiesFinal(facilitiesFinalTmp);
+            // setFacilities(facilitiesTmp);
+            // let facilitiesFinalTmp = truckItem.concat(facilitiesTmp);
+            facilitiesTmp = updateSeqInTrip(facilitiesTmp);
+            setFacilitiesFinal(facilitiesTmp);
             setAddTripItem([]);
         }
     }, [addTripItem])
@@ -406,9 +413,9 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
             truckItemtmp.push(tripItems[0]);
             console.log("tripUtem", tripItems[0]);
             setTruckItem(truckItemtmp);
-            let facilitiesTmp = tripItems.filter((item, index) => index != 0);
+            // let facilitiesTmp = tripItems.filter((item, index) => index != 0);
             // facilitiesTmp.splice(0, 1);
-            setFacilities(facilitiesTmp)
+            // setFacilities(facilitiesTmp)
 
         }
     }, [tripItems])
@@ -417,10 +424,19 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
     }, [facilitiesFinal]);
 
     const onSortEnd = ({ oldIndex, newIndex }) => {
-
-        setFacilitiesFinal(arrayMove(facilitiesFinal, oldIndex, newIndex))
+        let facilitiesFinalTmp = arrayMove(facilitiesFinal, oldIndex, newIndex);
+        facilitiesFinalTmp = updateSeqInTrip(facilitiesFinalTmp);
+        setFacilitiesFinal(facilitiesFinalTmp);
 
     };
+    const updateSeqInTrip = (facilitiesFinalTmp) => {
+        facilitiesFinalTmp = facilitiesFinalTmp.map((item, index) => {
+
+            item['seq'] = (index + 1);
+            return item;
+        });
+        return facilitiesFinalTmp;
+    }
     console.log("tripItems", tripItems)
     return (
         <Box className="facility-arrangment-v2">
@@ -439,13 +455,39 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                 />
                 <TableBodySortable onSortEnd={onSortEnd} useDragHandle displayRowCheckbox={false}>
                     {facilitiesFinal ? facilitiesFinal.map((row, index) => {
-                        return (
-                            <Row
-                                index={index}
-                                key={row.id}
-                                data={row}
-                            />
-                        )
+                        if (row.action === "DEPART") {
+                            return (
+                                <TableRow >
+                                    <TableCell style={{ width: '5%' }} >
+                                        <DragHandle />
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.orderCode}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.facilityCode}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.action}
+                                    </TableCell>
+                                    {row?.type === tripItemType.get("Truck") ? (<TableCell>{row?.orderCode}</TableCell>) : null}
+                                    {row?.type === tripItemType.get("Trailer") ? (<TableCell>{row?.trailerCode}</TableCell>) : null}
+                                    {row?.type === tripItemType.get("Order") ? (<TableCell>{row?.containerCode}</TableCell>) : null}
+                                    <TableCell>
+                                        {row.status ? row.status : "SCHEDULED"}
+                                    </TableCell>
+                                </TableRow >
+                            )
+                        }
+                        else {
+                            return (
+                                <Row
+                                    index={index}
+                                    key={row.id}
+                                    data={row}
+                                />
+                            )
+                        }
                     }) : null}
                 </TableBodySortable>
             </Table>

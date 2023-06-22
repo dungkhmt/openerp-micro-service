@@ -11,7 +11,7 @@ public interface OrderService {
     List<OrderModel> createOrder(OrderModel orderModel);
     OrdersRes filterOrders(OrderFilterRequestDTO orderFilterRequestDTO);
     OrderModel updateOrder(OrderModel orderModel);
-    OrderModel getOrderByOrderCode(String orderCode, String username);
+    OrderModel getOrderByUid(String uid, String username, boolean isCustomer);
     OrderModel updateOrder(long id, OrderModel orderModel);
-    OrderModel updateOrderByCode(String orderCode, OrderModel orderModel);
+    OrderModel updateOrderByUid(String orderCode, OrderModel orderModel);
 }
