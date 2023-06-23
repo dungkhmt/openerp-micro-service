@@ -34,7 +34,7 @@ public class Container implements Serializable {
     private boolean isEmpty;
 
     @ManyToOne()
-    @JoinColumn(name = "facility_id", referencedColumnName = "id")
+    @JoinColumn(name = "facility_id", referencedColumnName = "uid")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Facility facility;
 

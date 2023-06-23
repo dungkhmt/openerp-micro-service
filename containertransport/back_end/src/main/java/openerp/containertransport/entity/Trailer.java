@@ -25,7 +25,7 @@ public class Trailer {
     private String trailerCode;
 
     @ManyToOne()
-    @JoinColumn(name = "facility_id", referencedColumnName = "id")
+    @JoinColumn(name = "facility_id", referencedColumnName = "uid")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Facility facility;
 

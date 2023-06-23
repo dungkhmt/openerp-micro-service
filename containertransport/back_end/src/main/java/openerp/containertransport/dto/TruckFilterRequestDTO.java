@@ -12,5 +12,5 @@ public class TruckFilterRequestDTO {
     private String status;
     private Integer page;
     private Integer pageSize;
-    private Long facilityId;
+    private String facilityId;
 }

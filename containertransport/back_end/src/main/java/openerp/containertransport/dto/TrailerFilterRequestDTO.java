@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class TrailerFilterRequestDTO {
-    private Integer facilityId;
+    private String facilityId;
     private String status;
     private Integer truckId;
     private Integer page;

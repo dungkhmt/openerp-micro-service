@@ -286,11 +286,11 @@ public class OrderServiceImpl implements OrderService {
             relationships.forEach(relationship -> {
                 if(relationship.getFromFacility() == facilityModel.getId()
                         && relationship.getToFacility() == toFacility
-                        && checkContainerInDepot(facilityModel.getId(), containerSize) != null
+                        && checkContainerInDepot(facilityModel.getUid(), containerSize) != null
                 ) {
                     if(relationship.getDistant().compareTo(distant.get()) < 0) {
                         distant.set(relationship.getDistant());
-                        containerId.set(checkContainerInDepot(facilityModel.getId(), containerSize).getId());
+                        containerId.set(checkContainerInDepot(facilityModel.getUid(), containerSize).getId());
                     }
                 }
             });
@@ -301,10 +301,10 @@ public class OrderServiceImpl implements OrderService {
         return null;
     }
 
-    public ContainerModel checkContainerInDepot (Long facilityId, long containerSize) {
+    public ContainerModel checkContainerInDepot (String facilityUid, long containerSize) {
         ContainerFilterRequestDTO requestDTO = new ContainerFilterRequestDTO();
         requestDTO.setContainerSize(containerSize);
-        requestDTO.setFacilityId(facilityId);
+        requestDTO.setFacilityId(facilityUid);
         List<ContainerModel> containerModels = containerService.filterContainer(requestDTO).getContainerModels();
         if(containerModels != null && containerModels.size() != 0) {
             return containerModels.get(0);

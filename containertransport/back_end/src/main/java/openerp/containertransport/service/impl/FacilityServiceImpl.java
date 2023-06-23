@@ -49,8 +49,8 @@ public class FacilityServiceImpl implements FacilityService {
         }
         facility.setFacilityName(facilityModel.getFacilityName());
         facility.setFacilityType(facilityModel.getFacilityType());
-        facility.setMaxNumberContainer(facilityModel.getMaxNumberTrailer());
-        facility.setMaxNumberTrailer(facilityModel.getMaxNumberContainer());
+        facility.setMaxNumberContainer(facilityModel.getMaxNumberContainer());
+        facility.setMaxNumberTrailer(facilityModel.getNumberTrailer());
         facility.setMaxNumberTruck(facilityModel.getMaxNumberTruck());
         facility.setOwner(username);
         facility.setAcreage(facilityModel.getAcreage());
