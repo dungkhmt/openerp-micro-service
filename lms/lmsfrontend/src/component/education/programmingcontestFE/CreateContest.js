@@ -81,7 +81,7 @@ export default function CreateContest(props) {
                 error={isValidContestId()}
                 helperText={
                   isValidContestId()
-                    ? "Invalid character. Contest id must not contain any special include %^/\\|.?;[]"
+                    ? "Contest ID must not contain special characters including %^/\\|.?;[]"
                     : ""
                 }
               />

@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import {Autocomplete, Button, Grid, IconButton, TextField} from "@mui/material";
 import StandardTable from "component/table/StandardTable";
 import Box from "@mui/material/Box";
-import {errorNoti} from "../../../utils/notification";
+import {errorNoti, successNoti} from "../../../utils/notification";
 import ModalAddProblemToContest from "./ModalAddProblemToContest";
 import EditIcon from "@mui/icons-material/Edit";
 import ModalUpdateProblemInfoInContest from "./ModalUpdateProblemInfoInContest";
@@ -92,7 +92,8 @@ export function ContestManagerManageProblem(props) {
               "delete",
               "/remove-problem-from-contest?contestId=" + contestId + "&problemId=" + problem.problemId,
               () => {
-                getAllProblemsInContest()
+                successNoti("Problem removed from contest", 5000);
+                getAllProblemsInContest();
               },
               {}
             ).then();
@@ -133,6 +134,7 @@ export function ContestManagerManageProblem(props) {
   }
 
   const handleAddProblemToContestSuccess = () => {
+    successNoti("Problem saved to contest successfully", 5000);
     getAllProblemsInContest();
   }
   const handleCloseModal = () => {
