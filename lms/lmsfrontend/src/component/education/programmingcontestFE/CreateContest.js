@@ -23,7 +23,10 @@ export default function CreateContest(props) {
   const [minTimeBetweenTwoSubmissions, setMinTimeBetweenTwoSubmissions] = useState(0);
 
   const [loading, setLoading] = useState(false);
-
+  
+  const isValidContestId = () => {
+    return new RegExp(/[%^/\\|.?;[\]]/g).test(contestId);
+  };
 
   function handleSubmit() {
     setLoading(true);
@@ -75,6 +78,12 @@ export default function CreateContest(props) {
                 onChange={(event) => {
                   setContestId(event.target.value);
                 }}
+                error={isValidContestId()}
+                helperText={
+                  isValidContestId()
+                    ? "Invalid character. Contest id must not contain any special include %^/\\|.?;[]"
+                    : ""
+                }
               />
             </Grid>
             <Grid item xs={6}>
@@ -160,6 +169,7 @@ export default function CreateContest(props) {
           variant="contained"
           style={{marginTop: "36px"}}
           onClick={handleSubmit}
+          disabled={isValidContestId() || loading}
         >
           Save
         </LoadingButton>

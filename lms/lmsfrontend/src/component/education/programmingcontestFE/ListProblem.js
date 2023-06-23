@@ -83,6 +83,7 @@ function ListProblem() {
         );
       },
     },
+    {title: "Appearances in Contests", field: "appearances"},
   ];
 
   function getProblems() {
@@ -94,6 +95,7 @@ function ListProblem() {
         createdAt: toFormattedDateTime(problem.createdAt),
         levelId: problem.levelId,
         tags: problem.tags,
+        appearances: problem.appearances,
       }));
       setProblems(data);
     }).then();

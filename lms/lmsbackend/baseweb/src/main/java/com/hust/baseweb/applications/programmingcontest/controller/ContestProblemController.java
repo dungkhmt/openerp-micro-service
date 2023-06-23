@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.io.InputStream;
 import java.security.Principal;
@@ -308,7 +309,7 @@ public class ContestProblemController {
     }
 
     @PostMapping("/create-contest")
-    public ResponseEntity<?> createContest(@RequestBody ModelCreateContest modelCreateContest, Principal principal)
+    public ResponseEntity<?> createContest(@RequestBody @Valid ModelCreateContest modelCreateContest, Principal principal)
         throws Exception {
         log.info("createContest {}", modelCreateContest);
         ContestEntity contest = problemTestCaseService.createContest(modelCreateContest, principal.getName());
