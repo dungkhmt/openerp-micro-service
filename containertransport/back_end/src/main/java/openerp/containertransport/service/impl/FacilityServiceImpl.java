@@ -40,12 +40,11 @@ public class FacilityServiceImpl implements FacilityService {
     private final RelationshipRepo relationshipRepo;
 
     @Override
-    public Facility createFacility(FacilityModel facilityModel) throws Exception {
+    public Facility createFacility(FacilityModel facilityModel, String username) throws Exception {
         Facility facility = new Facility();
         if(facilityModel.getAddress() != null) {
-            MapReqDTO mapReqDTO = convertAddressToCoordinates(facilityModel.getAddress());
-            facility.setLongitude(new BigDecimal(mapReqDTO.getLon()));
-            facility.setLatitude(new BigDecimal(mapReqDTO.getLat()));
+            facility.setLongitude(facilityModel.getLongitude());
+            facility.setLatitude(facilityModel.getLatitude());
             facility.setAddress(facilityModel.getAddress());
         }
         facility.setFacilityName(facilityModel.getFacilityName());
@@ -53,12 +52,14 @@ public class FacilityServiceImpl implements FacilityService {
         facility.setMaxNumberContainer(facilityModel.getMaxNumberTrailer());
         facility.setMaxNumberTrailer(facilityModel.getMaxNumberContainer());
         facility.setMaxNumberTruck(facilityModel.getMaxNumberTruck());
-        facility.setOwner(facilityModel.getOwner());
+        facility.setOwner(username);
+        facility.setAcreage(facilityModel.getAcreage());
         facility.setCreatedAt(System.currentTimeMillis());
         facility.setUpdatedAt(System.currentTimeMillis());
         facility.setStatus("AVAILABLE");
         facility.setUid(RandomUtils.getRandomId());
-        facility.setProcessingTime(facilityModel.getProcessingTime());
+        facility.setProcessingTimePickUp(facilityModel.getProcessingTimePickUp());
+        facility.setProcessingTimeDrop(facilityModel.getProcessingTimeDrop());
 //        ResponsePath responsePath = graphHopperCalculator.calculate(facility.getLatitude(), facility.getLongitude(),
 //                new BigDecimal(21.032188), new BigDecimal(105.778867));
         facilityRepo.save(facility);
@@ -74,6 +75,14 @@ public class FacilityServiceImpl implements FacilityService {
                         Relationship relationship2 = createRelationship(item, facility);
                         relationshipRepo.save(relationship1);
                         relationshipRepo.save(relationship2);
+                    }
+                    else {
+                        Relationship relationship = new Relationship();
+                        relationship.setFromFacility(facility.getId());
+                        relationship.setToFacility(facility.getId());
+                        relationship.setTime(0L);
+                        relationship.setDistant(BigDecimal.valueOf(0));
+                        relationshipRepo.save(relationship);
                     }
                 });
             } catch (Exception e) {
@@ -153,6 +162,13 @@ public class FacilityServiceImpl implements FacilityService {
     public FacilityModel updateFacility(FacilityModel facilityModel) {
         Facility facility = facilityRepo.findByUid(facilityModel.getUid());
         facility.setFacilityName(facilityModel.getFacilityName());
+        facility.setProcessingTimeDrop(facilityModel.getProcessingTimeDrop());
+        facility.setProcessingTimePickUp(facilityModel.getProcessingTimePickUp());
+        facility.setAcreage(facilityModel.getAcreage());
+        facility.setMaxNumberContainer(facilityModel.getMaxNumberContainer());
+        facility.setMaxNumberTrailer(facilityModel.getMaxNumberTrailer());
+        facility.setMaxNumberTruck(facilityModel.getMaxNumberTruck());
+
         facility.setUpdatedAt(System.currentTimeMillis());
         facilityRepo.save(facility);
         return convertToModel(facility);

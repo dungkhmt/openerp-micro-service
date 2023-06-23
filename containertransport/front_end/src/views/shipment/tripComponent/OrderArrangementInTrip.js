@@ -212,7 +212,6 @@ const DragHandle = SortableHandle(({ style }) => (
 )
 
 const Row = SortableElement(({ data, ...other }) => {
-    console.log("data", data);
     return (
         <TableRow {...other}>
             {/* { other.children[0]} */}

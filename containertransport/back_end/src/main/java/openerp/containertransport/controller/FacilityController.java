@@ -11,6 +11,7 @@ import openerp.containertransport.entity.Facility;
 import openerp.containertransport.service.FacilityService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +24,9 @@ public class FacilityController {
     private final FacilityService facilityService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createFacility (@RequestBody FacilityModel facilityModel) throws Exception {
-        Facility facility = facilityService.createFacility(facilityModel);
+    public ResponseEntity<?> createFacility (@RequestBody FacilityModel facilityModel, JwtAuthenticationToken token) throws Exception {
+        String username = token.getName();
+        Facility facility = facilityService.createFacility(facilityModel, username);
         return ResponseEntity.status(HttpStatus.OK).body(facility);
     }
 

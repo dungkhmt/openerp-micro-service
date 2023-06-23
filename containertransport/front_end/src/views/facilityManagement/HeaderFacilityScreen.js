@@ -5,7 +5,7 @@ import { menuIconMap } from "config/menuconfig";
 import { useState } from "react";
 import FacilityModal from "./create/NewFacilityModal";
 
-const HeaderFacilityScreen = () => {
+const HeaderFacilityScreen = ({openModal, handleClose, setToast, setToastType, setToastMsg}) => {
     const [open, setOpen] = useState(false);
     const handleNewFacility = () => {
         setOpen(true);
@@ -17,7 +17,7 @@ const HeaderFacilityScreen = () => {
                 <Typography >Facility Management</Typography>
             </Box>
             <Box className="btn-add"
-            onClick={handleNewFacility}
+            onClick={handleClose}
             >
                 <PrimaryButton className="btn-headerScreen">
                     <Icon className="icon">
@@ -28,7 +28,8 @@ const HeaderFacilityScreen = () => {
                     </Typography>
                 </PrimaryButton>
             </Box>
-            {open ? (<FacilityModal open={open} setOpen={setOpen} />) : null}
+            {openModal ? (<FacilityModal open={openModal} handleClose={handleClose}
+            setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
         </Box>
     );
 }

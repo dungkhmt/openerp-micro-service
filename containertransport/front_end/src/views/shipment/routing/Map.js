@@ -1,10 +1,9 @@
-import { Box } from "@mui/material";
+import { Box, Fab, Typography } from "@mui/material";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, Tooltip } from "react-leaflet";
 import RoutingMachine from "./RoutingMachine";
-import L, { MarkerCluster } from "leaflet";
-import MarkerClusterGroup from "react-leaflet-markercluster";
-
+import L from "leaflet";
+import '../styles.scss';
 
 const MapComponent = ({ tripItems }) => {
     // create a ref
@@ -12,37 +11,38 @@ const MapComponent = ({ tripItems }) => {
     const [map, setMap] = useState(null);
     const [point, setPoint] = useState([]);
     const [makers, setMaker] = useState([]);
-    const pointMap = new Map();
+    const [pointsMap, setPointsMap] = useState(new Map());
+    // let pointsMap = new Map();
     useEffect(() => {
         let pointTmp = [];
-        console.log("tripItems===map", tripItems)
-        tripItems.forEach(element => {
+        console.log("tripItems===map", tripItems);
+        if (!pointsMap) {
+        } else {
+            setPointsMap(pointsMap.clear())
+        }
+        let pointMapTmp = new Map();
+        tripItems?.forEach(element => {
             let pointLoop = L.latLng(element.latitude, element.longitude);
             pointTmp.push(pointLoop);
-            // console.log("pointMap", pointMap.get(element.facilityId))
-            // if (!pointMap.get(element.facilityId)) {
-            //     pointMap.set(element.facilityId, [element]);
-                
-            // }
-            // else {
-            //     let pointInMap = pointMap.get(element.facilityId);
-            //     pointInMap.push(element);
-            //     pointMap.set(element.facilityId, pointInMap)
-            // }
+
+            if (!pointMapTmp || !pointMapTmp?.get(element.facilityId)) {
+                console.log("11");
+                pointMapTmp?.set(element.facilityId, [element]);
+            }
+            else {
+                let pointInMap = pointMapTmp?.get(element.facilityId);
+                pointInMap.push(element);
+                console.log("22")
+                pointMapTmp?.set(element.facilityId, pointInMap);
+            }
         });
+        setPointsMap(pointMapTmp);
         setPoint(pointTmp);
         rMachine.current?.setWaypoints(pointTmp);
 
     }, [tripItems, rMachine])
 
-    const createClusterCustomIcon = function (cluster) {
-        return L.divIcon({
-            html: `<span>${cluster.getChildCount()}</span>`,
-            className: 'custom-marker-cluster',
-            iconSize: L.point(33, 33, true),
-        })
-    }
-    
+    console.log("pointMap", pointsMap)
     return (
         <Box>
             <MapContainer
@@ -57,18 +57,27 @@ const MapComponent = ({ tripItems }) => {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                {/* {pointMap.forEach((value, key, map) => {
-                    console.log("value", value)
+                {/* {pointsMap?.forEach((value, key, map) => {
+                    console.log("value", value);
                     if (value.length > 1) {
                         return (
                             <MarkerClusterGroup
                                 iconCreateFunction={createClusterCustomIcon}
+                                spiderfyOnMaxZoom={true}
+                                polygonOptions={{
+                                    fillColor: '#ffffff',
+                                    color: '#f00800',
+                                    weight: 5,
+                                    opacity: 1,
+                                    fillOpacity: 0.8,
+                                  }}
+                                  showCoverageOnHover={true}
                             >
                                 {value.map((item) => {
                                     return (
                                         <Marker position={L.latLng(item.latitude, item.longitude)}>
                                             <Popup>
-                                                A pretty CSS3 popup. <br /> Easily customizable.
+                                                {item.orderCode}
                                             </Popup>
                                             <Tooltip>Tooltip for Marker</Tooltip>
                                         </Marker>
@@ -76,29 +85,41 @@ const MapComponent = ({ tripItems }) => {
                                 })}
                             </MarkerClusterGroup>
                         );
-                    } else {
-                        return (
-                            <Marker position={L.latLng(value.latitude, value.longitude)}>
-                                <Popup>
-                                    A pretty CSS3 popup. <br /> Easily customizable.
-                                </Popup>
-                                <Tooltip>Tooltip for Marker</Tooltip>
-                            </Marker>
-                        )
                     }
                 })} */}
+
                 <RoutingMachine ref={rMachine} waypoints={point} />
-                {/* {point.map((item) => {
-                    return(
-                        <Marker position={item}>
-                                <Popup>
-                                    A pretty CSS3 popup. <br /> Easily customizable.
-                                </Popup>
-                                <Tooltip>Tooltip for Marker</Tooltip>
-                            </Marker>
+                {tripItems?.map((item) => {
+                    let listPointSame = pointsMap?.get(item.facilityId);
+                    return (
+                        <Marker position={L.latLng(item.latitude, item.longitude)}
+                            icon={new L.DivIcon({
+                                html: `<Box size="small" class="number" variant="extended">${item.seq}</Box>`,
+                                iconSize: L.point(33, 33, true),
+                            })}
+                        >
+                            <Popup>
+                                {listPointSame?.length > 1 ? (
+                                    <Box>
+                                        {listPointSame?.map(item => {
+                                            return (
+                                                <Typography>{item.seq} - {item.facilityCode} - {item.orderCode} - {item.action}</Typography>
+                                            )
+                                        })
+                                        }
+                                    </Box>
+                                ) : (
+                                    <Box>
+                                        <Typography>{item.seq} - {item.facilityCode} - {item.orderCode} - {item.action}</Typography>
+                                    </Box>
+
+                                )}
+                            </Popup>
+                            <Tooltip>Tooltip for Marker</Tooltip>
+                        </Marker>
                     )
-                })} */}
-                
+                })}
+
             </MapContainer>
         </Box>
     )

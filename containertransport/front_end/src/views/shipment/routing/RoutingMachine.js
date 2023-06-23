@@ -26,29 +26,6 @@ const createRoutineMachineLayer = (props) => {
       lineOptions: {
         styles: [{ color: "#6FA1EC", weight: 4 }]
       },
-      // createMarker: function (i, start, n){
-      //   var marker_icon = null
-      //   if (i == 0) {
-      //       // This is the first marker, indicating start
-      //       marker_icon = icon
-      //   } else if (i == n -1) {
-      //       //This is the last marker indicating destination
-      //       marker_icon = icon
-      //   }
-      //   var marker = L.marker (start.latLng, {
-      //               draggable: true,
-      //               bounceOnAdd: false,
-      //               bounceOnAddOptions: {
-      //                   duration: 1000,
-      //                   height: 800, 
-      //                   // function(){
-      //                   //     (bindPopup(myPopup).openOn(map))
-      //                   // }
-      //               },
-      //               icon: marker_icon
-      //   })
-      //   return marker
-      // },
       show: false,
       addWaypoints: false,
       routeWhileDragging: false,

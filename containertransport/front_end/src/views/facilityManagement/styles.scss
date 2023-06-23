@@ -192,7 +192,7 @@
 
         .contentModal-item-input {
             width: 60%;
-            display: flex;
+            // display: flex;
 
             .MuiOutlinedInput-root {
                 min-height: 40px;
@@ -201,8 +201,16 @@
             .MuiFormControl-root {
                 min-width: 100%;
             }
+            // .MuiFormControl-root {
+            //     .MuiFormLabel-root {
+            //         top: -10px;
+            //     }
+            // }
         }
     }
+}
+.list-place {
+
 }
 .icon-view-screen {
     .MuiSvgIcon-root {

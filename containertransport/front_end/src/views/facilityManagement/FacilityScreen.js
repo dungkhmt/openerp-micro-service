@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Container, Divider, Typography } from "@mui/material";
+import { Alert, Box, Container, Divider, Typography } from "@mui/material";
 import ContentsFacilityMana from "./ContentFacillityMana";
 import './styles.scss';
 import HeaderFacilityScreen from "./HeaderFacilityScreen";
@@ -13,24 +13,42 @@ const FacilityScreen = () => {
     const [count, setCount] = useState(0);
     const { role, preferred_username } = useContext(MyContext);
 
+    const [toastOpen, setToast] = useState(false);
+    const [toastType, setToastType] = useState();
+    const [toastMsg, setToastMsg] = useState('');
+
+    const [openModal, setOpenModal] = useState(false);
+
+    //owner: preferred_username
     useEffect(() => {
-        getFacility({page: page, pageSize: rowsPerPage, owner: preferred_username})
-        .then((res) => {
-            console.log("facility==========", res?.data.data.facilityModels)
-            setFacilities(res?.data.data.facilityModels);
-            setCount(res.data.data.count);
-          });
-          console.log("role", role);
-    }, [page, rowsPerPage])
-    return(
+        getFacility({ page: page, pageSize: rowsPerPage })
+            .then((res) => {
+                console.log("facility==========", res?.data.data.facilityModels)
+                setFacilities(res?.data.data.facilityModels);
+                setCount(res.data.data.count);
+            });
+        console.log("role", role);
+    }, [page, rowsPerPage, openModal]);
+
+    const handleClose = () => {
+        setOpenModal(!openModal);
+    }
+    return (
         <Box className="fullScreen">
             <Container maxWidth="lg" className="container">
-                <HeaderFacilityScreen />
+                <Box className="toast">
+                    {toastOpen ? (
+                        <Alert variant="filled" severity={toastType} >
+                            <strong>{toastMsg}</strong >
+                        </Alert >) : null}
+                </Box>
+                <HeaderFacilityScreen openModal={openModal} handleClose={handleClose}
+                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
                 <Box className="divider">
                     <Divider />
                 </Box>
                 <ContentsFacilityMana facilities={facilities} page={page} setPage={setPage}
-                rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count}/>
+                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
             </Container>
         </Box>
     );

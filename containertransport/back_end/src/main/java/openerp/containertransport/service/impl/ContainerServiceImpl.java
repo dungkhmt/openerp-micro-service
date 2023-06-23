@@ -37,6 +37,7 @@ public class ContainerServiceImpl implements ContainerService {
         Facility facility = facilityRepo.findById(containerModelDTO.getFacilityId()).get();
         Container container = new Container();
         container.setFacility(facility);
+        container.setContainerCode(containerModelDTO.getContainerCode());
         container.setSize(typeContainer.getSize());
         container.setTypeContainer(typeContainer);
         container.setEmpty(containerModelDTO.getIsEmpty());
@@ -44,8 +45,6 @@ public class ContainerServiceImpl implements ContainerService {
         container.setUid(RandomUtils.getRandomId());
         container.setCreatedAt(System.currentTimeMillis());
         container.setUpdatedAt(System.currentTimeMillis());
-        containerRepo.save(container);
-        container.setContainerCode("CONT" + container.getId());
         containerRepo.save(container);
         return convertToModel(container);
     }

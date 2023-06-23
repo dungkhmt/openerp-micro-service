@@ -25,7 +25,8 @@ public class FacilityModel {
     private Integer numberContainer;
     private BigDecimal longitude;
     private BigDecimal latitude;
-    private Long processingTime;
+    private Long processingTimePickUp;
+    private Long processingTimeDrop;
     private Integer maxNumberTruck;
     private Integer maxNumberTrailer;
     private Integer maxNumberContainer;

@@ -60,8 +60,11 @@ public class Facility {
 
     private BigDecimal latitude;
 
-    @Column(name = "processing_time")
-    private Long processingTime;
+    @Column(name = "processing_time_pickup")
+    private Long processingTimePickUp;
+
+    @Column(name = "processing_time_drop")
+    private Long processingTimeDrop;
 
     @Column(name = "created_at")
     private long createdAt;

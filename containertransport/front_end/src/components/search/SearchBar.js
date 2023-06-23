@@ -44,9 +44,12 @@ const styles = {
                 '& .btn-filter': {
                     marginTop: '32px'
                 },
-                '& .MuiInputBase-root': {
-                    height: '40px'
+                '& .MuiFormLabel-root': {
+                    top: '-10px'
                 }
+                // '& .MuiInputBase-root': {
+                //     height: '40px'
+                // }
             },
         },
         '& .input-search': {
@@ -58,16 +61,12 @@ const styles = {
         }
     })
 }
-const SearchBar = ({ filters, setFilters }) => {
+const SearchBar = ({ filters, setFilters, status }) => {
     const [open, setOpen] = useState(false);
 
     const [code, setCode] = useState('');
     const [statusTruck, setStatusTruck] = useState('');
 
-    const status = [
-        { name: "AVAILABLE" },
-        { name: "EXECUTING" }
-    ]
     const handleSwitch = () => {
         setOpen(!open)
     }
@@ -117,6 +116,7 @@ const SearchBar = ({ filters, setFilters }) => {
                                     labelId="demo-simple-select-label"
                                     id="demo-simple-select"
                                     label="Status"
+                                    size="small"
                                     onChange={(e) => setStatusTruck(e.target.value)}
                                 >
                                     {status.map((item) => {

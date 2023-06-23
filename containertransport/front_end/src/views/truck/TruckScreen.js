@@ -4,7 +4,7 @@ import HeaderTruckScreen from "./HeaderTruckScreen";
 import './styles.scss';
 import ContentsTruckManagement from "./ContentTruckManagement";
 import { getTrucks } from "api/TruckAPI";
-import SearchBar from "./SearchBar";
+import SearchBar from "../../components/search/SearchBar";
 
 const TruckScreen = () => {
 
@@ -19,6 +19,11 @@ const TruckScreen = () => {
     const [toastMsg, setToastMsg] = useState('');
 
     const [filters, setFilters] = useState([]);
+
+    const status = [
+        { name: "AVAILABLE" },
+        { name: "EXECUTING" }
+    ]
 
     const handleClose = () => {
         setOpenModal(!openModal);
@@ -58,7 +63,7 @@ const TruckScreen = () => {
                     <Divider />
                 </Box>
                 <Box>
-                    <SearchBar filters={filters} setFilters={setFilters} />
+                    <SearchBar filters={filters} setFilters={setFilters} status={status} />
                 </Box>
                 <ContentsTruckManagement trucks={trucks} page={page} setPage={setPage}
                     rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />

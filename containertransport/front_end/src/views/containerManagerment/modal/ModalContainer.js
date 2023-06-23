@@ -13,6 +13,7 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
     const [facilityList, setFacilityList] = useState([]);
     const [facility, setFacility] = useState('');
     const [size, setSize] = useState('');
+    const [containerCode, setContainerCode] = useState('');
     const [isBreakRomooc, setIsBreakRomooc] = useState(false);
 
     const [typeContainers, setTypeContainers] = useState([]);
@@ -49,6 +50,7 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
                 id: container.id,
                 facilityId: facility,
                 typeContainerCode: size?.typeContainerCode,
+                containerCode: containerCode,
                 isEmpty: isBreakRomooc
             };
             console.log("data", data)
@@ -158,6 +160,21 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
                                                     ) : null}
                                                 </Select>
                                             </FormControl>
+                                        </Box>
+                                    </Box>
+                                    <Box className="contentModal-item">
+                                        <Box className="contentModal-item-text">
+                                            <Typography>Container Code: </Typography>
+                                        </Box>
+                                        <Box className="contentModal-item-input">
+                                            <TextField
+                                                id="outlined-textarea"
+                                                label="Container Code"
+                                                placeholder="container code"
+                                                value={containerCode}
+                                                size="small"
+                                                onChange={(e) => setContainerCode(e.target.value)}
+                                            />
                                         </Box>
                                     </Box>
                                     <Box className="contentModal-item">
