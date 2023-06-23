@@ -118,6 +118,10 @@ function CreateProblem() {
     ).then(() => setLoading(false));
   }
 
+  const isValidProblemId = () => {
+    return new RegExp(/[%^/\\|.?;[\]]/g).test(problemId);
+  };
+
   const validateSubmit = () => {
     if (problemId === "") {
       errorNoti(t("missingField", {ns: "validation", fieldName: t("problemId")}), 3000);
@@ -218,6 +222,12 @@ function CreateProblem() {
             onChange={(event) => {
               setProblemID(event.target.value);
             }}
+            error={isValidProblemId()}
+            helperText={
+              isValidProblemId()
+                ? "Problem ID must not contain special characters including %^/\\|.?;[]"
+                : ""
+            }
             sx={{marginBottom: "12px"}}
           />
         </Grid>
