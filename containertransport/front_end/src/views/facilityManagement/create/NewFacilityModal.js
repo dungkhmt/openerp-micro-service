@@ -11,7 +11,7 @@ import { facilityType, roles } from "config/menuconfig";
 import debounce from 'lodash.debounce';
 import SearchIcon from '@mui/icons-material/Search';
 import PlaceIcon from '@mui/icons-material/Place';
-import { createFacility } from "api/FacilityAPI";
+import { createFacility, updateFacility } from "api/FacilityAPI";
 
 
 const styles = {
@@ -19,8 +19,8 @@ const styles = {
 };
 const NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/search?";
 
-const FacilityModal = ({ open, handleClose, setToast, setToastType, setToastMsg }) => {
-    const [type, setType] = useState();
+const FacilityModal = ({ open, handleClose, facility, setToast, setToastType, setToastMsg }) => {
+    const [type, setType] = useState('');
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
     const [maxTruck, setMaxTruck] = useState('');
@@ -36,6 +36,17 @@ const FacilityModal = ({ open, handleClose, setToast, setToastType, setToastMsg 
     const { role, preferred_username } = useContext(MyContext);
 
     useEffect(() => {
+        if (facility) {
+            setName(facility?.facilityName);
+            setAddress(facility?.address);
+            setAcreage(facility?.acreage);
+            setType(facility?.facilityType);
+            setTimePickup(facility?.processingTimePickUp);
+            setTimeDrop(facility?.processingTimeDrop);
+            setMaxContainer(facility?.maxNumberContainer);
+            setMaxTrailer(facility?.maxNumberTrailer);
+            setMaxTruck(facility?.maxNumberTruck);
+        }
         if (role === roles.get("Customer")) {
             setType(facilityType.get("Depot"));
         }
@@ -60,24 +71,45 @@ const FacilityModal = ({ open, handleClose, setToast, setToastType, setToastMsg 
             maxNumberContainer: type === "Container" ? maxContainer : null,
         }
         console.log("data", data);
-        createFacility(data).then((res) => {
-            console.log("res", res);
-            if (!res) {
-                setToastType("error");
-                setToastMsg("Create Facility Fail !!!");
-            } else {
-                setToastType("success");
-                setToastMsg("Create Facility Succsess !!!")
-            }
-            handleClose();
-            setToast(true);
-            setTimeout(() => {
-                setToast(false);
-            }, "2000");
-        }).catch(err => {
-            console.log("err", err);
+        if (facility) {
+            updateFacility(facility?.uid, data).then((res) => {
+                if (!res) {
+                    setToastType("error");
+                    setToastMsg("Update Facility Fail !!!");
+                } else {
+                    setToastType("success");
+                    setToastMsg("Update Facility Succsess !!!")
+                }
+                handleClose();
+                setToast(true);
+                setTimeout(() => {
+                    setToast(false);
+                }, "3000");
+            })
+            .catch(err => {
+                console.log("err", err);
+            })
+        }
+        else {
+            createFacility(data).then((res) => {
+                console.log("res", res);
+                if (!res) {
+                    setToastType("error");
+                    setToastMsg("Create Facility Fail !!!");
+                } else {
+                    setToastType("success");
+                    setToastMsg("Create Facility Succsess !!!")
+                }
+                handleClose();
+                setToast(true);
+                setTimeout(() => {
+                    setToast(false);
+                }, "3000");
+            }).catch(err => {
+                console.log("err", err);
 
-        })
+            })
+        }
     }
 
     const onChangeAddress = (event) => {
@@ -118,7 +150,7 @@ const FacilityModal = ({ open, handleClose, setToast, setToastType, setToastMsg 
                 open={open}
                 handleClose={handleClose}
                 contentTopDivider
-                title="New Facility"
+                title={facility ? "Update Facility" : "New Facility"}
                 className="modalFacility"
                 content={
                     <AnimatePresence>
@@ -176,11 +208,12 @@ const FacilityModal = ({ open, handleClose, setToast, setToastType, setToastMsg 
                                             <Typography>Acreage: </Typography>
                                         </Box>
                                         <Box className="contentModal-item-input">
-                                            <TextField
+                                            <OutlinedInput
                                                 id="outlined-textarea"
                                                 label="Acreage"
                                                 placeholder="acreage"
                                                 value={acreage}
+                                                endAdornment={<InputAdornment position="end">(m2)</InputAdornment>}
                                                 size="small"
                                                 onChange={(e) => setAcreage(e.target.value)}
                                             />
@@ -286,11 +319,12 @@ const FacilityModal = ({ open, handleClose, setToast, setToastType, setToastMsg 
                                                     <Typography>Processing Time Pick Up:</Typography>
                                                 </Box>
                                                 <Box className="contentModal-item-input">
-                                                    <TextField
+                                                    <OutlinedInput
                                                         id="outlined-textarea"
                                                         label="Processing Time Pickup"
                                                         placeholder="processing time pickup"
                                                         value={timePickup}
+                                                        endAdornment={<InputAdornment position="end">(s)</InputAdornment>}
                                                         size="small"
                                                         onChange={(e) => setTimePickup(e.target.value)}
                                                     />
@@ -301,11 +335,12 @@ const FacilityModal = ({ open, handleClose, setToast, setToastType, setToastMsg 
                                                     <Typography>Processing Time Drop Off:</Typography>
                                                 </Box>
                                                 <Box className="contentModal-item-input">
-                                                    <TextField
+                                                    <OutlinedInput
                                                         id="outlined-textarea"
                                                         label="Processing Time Drop Off"
                                                         placeholder="processing time drop off"
                                                         value={timeDrop}
+                                                        endAdornment={<InputAdornment position="end">(s)</InputAdornment>}
                                                         size="small"
                                                         onChange={(e) => setTimeDrop(e.target.value)}
                                                     />
@@ -329,33 +364,33 @@ const FacilityModal = ({ open, handleClose, setToast, setToastType, setToastMsg 
                                         </>
                                     ) : null}
 
-                                            <Divider />
-                                            <Box
-                                                display="flex"
-                                                justifyContent="flex-end"
-                                                pt={2}
-                                                ml={-1}
-                                                mr={-1}
-                                            >
-                                                <TertiaryButton
-                                                    onClick={handleClose}
-                                                    sx={styles.btn}
-                                                    style={{ width: 100 }}
-                                                >
-                                                    Cancel
-                                                </TertiaryButton>
-                                                <PrimaryButton
-                                                    // disabled={
-                                                    //     isEmpty(feature) || isEmpty(detail) || isSubmitting
-                                                    // }
-                                                    sx={styles.btn}
-                                                    style={{ width: 100 }}
-                                                    onClick={handleSubmit}
-                                                >
-                                                    {false ? "Đang gửi..." : "Submit"}
-                                                </PrimaryButton>
-                                            </Box>
-                                        </Box>
+                                    <Divider />
+                                    <Box
+                                        display="flex"
+                                        justifyContent="flex-end"
+                                        pt={2}
+                                        ml={-1}
+                                        mr={-1}
+                                    >
+                                        <TertiaryButton
+                                            onClick={handleClose}
+                                            sx={styles.btn}
+                                            style={{ width: 100 }}
+                                        >
+                                            Cancel
+                                        </TertiaryButton>
+                                        <PrimaryButton
+                                            // disabled={
+                                            //     isEmpty(feature) || isEmpty(detail) || isSubmitting
+                                            // }
+                                            sx={styles.btn}
+                                            style={{ width: 100 }}
+                                            onClick={handleSubmit}
+                                        >
+                                            {false ? "Đang gửi..." : "Submit"}
+                                        </PrimaryButton>
+                                    </Box>
+                                </Box>
                             </motion.div>
                         </motion.div>
                     </AnimatePresence>

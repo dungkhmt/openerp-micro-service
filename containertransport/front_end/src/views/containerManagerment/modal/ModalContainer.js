@@ -51,7 +51,7 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
                 facilityId: facility,
                 typeContainerCode: size?.typeContainerCode,
                 containerCode: containerCode,
-                isEmpty: isBreakRomooc
+                // isEmpty: isBreakRomooc
             };
             console.log("data", data)
             updateContainer(data).then((res) => {
@@ -177,7 +177,7 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
                                             />
                                         </Box>
                                     </Box>
-                                    <Box className="contentModal-item">
+                                    {/* <Box className="contentModal-item">
                                         <Box className="contentModal-item-text">
                                             <Typography>Break Romooc:</Typography>
                                         </Box>
@@ -189,7 +189,7 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
                                                 inputProps={{ 'aria-label': 'controlled' }}
                                             />
                                         </Box>
-                                    </Box>
+                                    </Box> */}
 
                                     <Divider />
                                     <Box

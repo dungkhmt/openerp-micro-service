@@ -42,9 +42,9 @@ public class FacilityController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), facilityModels));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<?> updateFacility(@RequestBody FacilityModel facilityModel) {
-        FacilityModel facilityModelUpdate = facilityService.updateFacility(facilityModel);
+    @PutMapping("/update/{uid}")
+    public ResponseEntity<?> updateFacility(@PathVariable String uid, @RequestBody FacilityModel facilityModel) {
+        FacilityModel facilityModelUpdate = facilityService.updateFacility(facilityModel, uid);
         return ResponseEntity.status(HttpStatus.OK).body(facilityModelUpdate);
     }
 }

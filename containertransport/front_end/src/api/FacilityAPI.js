@@ -23,3 +23,11 @@ export const createFacility = (data) => {
     )
     return resData;
 }
+
+export const updateFacility = (id, data) => {
+    const resData = request(
+        "put",
+        `/facility/update/${id}`, {},{}, data, {},
+    )
+    return resData;
+}

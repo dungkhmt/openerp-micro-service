@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import '../styles.scss';
-import { Box, Button, Container, Divider, Icon, Typography } from "@mui/material";
+import { Alert, Box, Button, Container, Divider, Icon, Typography } from "@mui/material";
 import { useHistory, useParams } from "react-router-dom";
 import { menuIconMap } from "config/menuconfig";
 import { getFacilityById } from "api/FacilityAPI";
@@ -12,6 +12,7 @@ import { getContainers } from "api/ContainerAPI";
 import ContainerInFacility from "./ContainerInFacility";
 import TrailerInFacility from "./TrailerInFacility";
 import { getTraler } from "api/TrailerAPI";
+import FacilityModal from "../create/NewFacilityModal";
 
 const FacilityDetail = () => {
     const history = useHistory();
@@ -24,6 +25,10 @@ const FacilityDetail = () => {
     const [trailers, setTrailers] = useState([]);
     const [containers, setContainers] = useState([]);
 
+    const [openModify, setOpenModify] = useState(false);
+    const [toastOpen, setToast] = useState(false);
+    const [toastType, setToastType] = useState();
+    const [toastMsg, setToastMsg] = useState('');
 
     useEffect(() => {
         getFacilityById(facilityId).then((res) => {
@@ -36,15 +41,25 @@ const FacilityDetail = () => {
         getContainers({ facilityId: facilityId }).then((res) => {
             setContainers(res?.data.data.containerModels);
         });
-        getTraler({facilityId: facilityId }).then((res) => {
+        getTraler({ facilityId: facilityId }).then((res) => {
             setTrailers(res?.data.data.trailerModels);
         });
-    }, [])
+    }, [openModify])
+
+    const handleClose = () => {
+        setOpenModify(!openModify);
+    }
 
     console.log("facility", facility);
     return (
         <Box className="fullScreen">
             <Container maxWidth="lg" className="container">
+                <Box className="toast">
+                    {toastOpen ? (
+                        <Alert variant="filled" severity={toastType} >
+                            <strong>{toastMsg}</strong >
+                        </Alert >) : null}
+                </Box>
                 <Box className="header-detail">
                     <Box className="headerScreen-go-back"
                         onClick={() => history.push('/facility')}
@@ -64,7 +79,7 @@ const FacilityDetail = () => {
                             // onClick={handleCancelCreateShipment}
                             >Delete</Button>
                             <Button variant="contained" className="header-submit-shipment-btn-save"
-                            // onClick={handleSubmitShipment}
+                            onClick={handleClose}
                             >Modify</Button>
                         </Box>
                     </Box>
@@ -107,6 +122,18 @@ const FacilityDetail = () => {
                         </Box>
                         <Typography>{facility?.facilityType}</Typography>
                     </Box>
+                    <Box className="facility-info-item">
+                        <Box className="facility-info-item-text">
+                            <Typography>Processing Time Pick Up:</Typography>
+                        </Box>
+                        <Typography>{facility?.processingTimePickUp} s</Typography>
+                    </Box>
+                    <Box className="facility-info-item">
+                        <Box className="facility-info-item-text">
+                            <Typography>Processing Time Drop:</Typography>
+                        </Box>
+                        <Typography>{facility?.processingTimeDrop} s</Typography>
+                    </Box>
 
                     {facility?.facilityType === "Trailer" ? (<Box className="facility-info-item">
                         <Box className="facility-info-item-text">
@@ -148,7 +175,7 @@ const FacilityDetail = () => {
                 </Box>
 
                 {trucks?.length > 0 ? (
-                    <Box sx={{marginBottom: '16px'}}>
+                    <Box sx={{ marginBottom: '16px' }}>
                         <Box className="title">
                             <Typography>Trucks In Facility</Typography>
                         </Box>
@@ -157,7 +184,7 @@ const FacilityDetail = () => {
                 ) : null}
 
                 {containers?.length > 0 ? (
-                    <Box sx={{marginBottom: '16px'}}>
+                    <Box sx={{ marginBottom: '16px' }}>
                         <Box className="title">
                             <Typography>Containers In Facility</Typography>
                         </Box>
@@ -166,13 +193,15 @@ const FacilityDetail = () => {
                 ) : null}
 
                 {trailers?.length > 0 ? (
-                    <Box sx={{marginBottom: '16px'}}>
+                    <Box sx={{ marginBottom: '16px' }}>
                         <Box className="title">
                             <Typography>Trailers In Facility</Typography>
                         </Box>
                         <TrailerInFacility facilityId={facilityId} />
                     </Box>
                 ) : null}
+                {openModify ? <FacilityModal open={openModify} handleClose={handleClose} facility={facility}
+                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} /> : null}
             </Container>
         </Box>
     )

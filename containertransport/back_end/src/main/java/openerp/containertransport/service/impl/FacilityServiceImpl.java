@@ -159,8 +159,8 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
-    public FacilityModel updateFacility(FacilityModel facilityModel) {
-        Facility facility = facilityRepo.findByUid(facilityModel.getUid());
+    public FacilityModel updateFacility(FacilityModel facilityModel, String uid) {
+        Facility facility = facilityRepo.findByUid(uid);
         facility.setFacilityName(facilityModel.getFacilityName());
         facility.setProcessingTimeDrop(facilityModel.getProcessingTimeDrop());
         facility.setProcessingTimePickUp(facilityModel.getProcessingTimePickUp());
