@@ -94,6 +94,12 @@ public class WarehouseServiceImpl implements WarehouseService {
             log.info(String.format("Saved bay list for warehouse id %s", warehouseId));
         }
         log.info(String.format("Saved warehouse entity with id %s", warehouse.getWarehouseId()));
+        // update redis
+        List<Warehouse> warehouses = redisCacheService.getCachedListObject(RedisCacheService.ALL_WAREHOUSES_KEY, Warehouse.class);
+        if (warehouses != null && !warehouses.isEmpty()) {
+            warehouses.add(warehouse);
+        }
+        redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_WAREHOUSES_KEY, warehouses);
         return warehouse;
     }
 
@@ -121,6 +127,12 @@ public class WarehouseServiceImpl implements WarehouseService {
                 warehouseRepository.deleteById(id);
             }
             log.info("Deleted warehouse ids: " + warehouseIds);
+            // update redis
+            List<Warehouse> warehouses = redisCacheService.getCachedListObject(RedisCacheService.ALL_WAREHOUSES_KEY, Warehouse.class);
+            if (warehouses != null && !warehouses.isEmpty()) {
+                warehouses.removeIf(warehouse -> warehouseIds.contains(warehouse.getWarehouseId().toString()));
+            }
+            redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_WAREHOUSES_KEY, warehouses);
             return true;
         } catch (Exception e) {
             log.info("Error when deleting warehouse ids: " + warehouseIds);

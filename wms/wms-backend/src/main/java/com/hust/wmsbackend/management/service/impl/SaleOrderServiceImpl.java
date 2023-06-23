@@ -125,7 +125,7 @@ public class SaleOrderServiceImpl implements SaleOrderService {
             List<SaleOrderItem> items = saleOrderItemRepository.findAllByOrderId(orderId);
             for (SaleOrderItem item : items) {
                 long orderQuantity = item.getQuantity();
-                Long totalComplete = deliveryTripItemRepository.getTotalCompleteDeliveryItemByOrderIdAndProductId(orderId, item.getProductId());
+                Long totalComplete = deliveryTripItemRepository.getTotalDoneDeliveryItemByOrderIdAndProductId(orderId, item.getProductId());
                 if (totalComplete == null || orderQuantity != totalComplete) {
                     isComplete = false;
                     break;

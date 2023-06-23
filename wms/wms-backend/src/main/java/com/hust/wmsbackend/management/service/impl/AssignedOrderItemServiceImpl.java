@@ -94,9 +94,15 @@ public class AssignedOrderItemServiceImpl implements AssignedOrderItemService {
                                 .bayId(detail.getBayId())
                                 .warehouseId(detail.getWarehouseId())
                                 .status(AssignedOrderItemStatus.CREATED)
+                                .originalQuantity(assignedOrderItemQuantity)
                                 .lotId(item.getLotId()).build());
                         }
                     }
+                }
+
+                if (totalAssignedProductQuantity.compareTo(BigDecimal.ZERO) < 0) {
+                    log.error(String.format("Not enough inventory item for this assignedOrderItemRequest %s", request));
+                    return false;
                 }
 
                 // update product warehouse quantity
