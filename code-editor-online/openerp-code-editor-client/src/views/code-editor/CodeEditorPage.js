@@ -118,6 +118,7 @@ const CodeEditorPage = () => {
           });
           // if a user leave the room, notify other users and update participant list
           socketRef.current.on(SOCKET_EVENTS.LEAVE_ROOM, ({ fullName, socketId, clients }) => {
+            console.log("🚀 ~ file: CodeEditorPage.js:121 ~ socketRef.current.on ~ socketId:", socketId)
             // errorNoti(`${fullName} đã rời phòng`, true);
             infoNoti(`${fullName} đã rời phòng`, true);
             dispatch(setParticipants(clients.filter((client) => client.socketId !== socketId)));
