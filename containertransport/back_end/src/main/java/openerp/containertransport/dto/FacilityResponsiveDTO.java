@@ -17,6 +17,7 @@ public class FacilityResponsiveDTO {
     private String facilityName;
     private BigDecimal longitude;
     private BigDecimal latitude;
-    private Long processingTime;
+    private Long processingTimePickUp;
+    private Long processingTimeDrop;
     private String address;
 }

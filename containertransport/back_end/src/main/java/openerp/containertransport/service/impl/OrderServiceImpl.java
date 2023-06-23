@@ -246,7 +246,8 @@ public class OrderServiceImpl implements OrderService {
                 .facilityId(facility.getId())
                 .longitude(facility.getLongitude())
                 .latitude(facility.getLatitude())
-                .processingTime(facility.getProcessingTime())
+                .processingTimePickUp(facility.getProcessingTimePickUp())
+                .processingTimeDrop(facility.getProcessingTimeDrop())
                 .address(facility.getAddress())
                 .build();
         return facilityResponsive;
