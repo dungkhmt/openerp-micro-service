@@ -73,6 +73,16 @@ function ListProblem() {
         </Box>
       ),
     },
+    {title: "Contests Used",
+      field: "appearances",
+      render: (rowData) => {
+        return (
+          <span style={{marginLeft: "24px"}}>
+            {rowData.appearances}
+          </span>
+        );
+      },
+    },
     {
       title: "Export",
       render: (rowData) => {
@@ -83,7 +93,6 @@ function ListProblem() {
         );
       },
     },
-    {title: "Appearances in Contests", field: "appearances"},
   ];
 
   function getProblems() {
