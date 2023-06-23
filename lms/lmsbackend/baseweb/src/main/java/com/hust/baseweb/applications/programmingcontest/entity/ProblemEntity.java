@@ -17,6 +17,9 @@ import java.util.List;
 @Table(name = "contest_problem_new")
 public class ProblemEntity implements Serializable {
     private static final long serialVersionUID = 3487495895819800L;
+    public static final String PROBLEM_STATUS_CREATED = "CREATED";
+    public static final String PROBLEM_STATUS_OPEN = "OPEN";
+    public static final String PROBLEM_STATUS_HIDDEN = "HIDDEN";
 
     @Id
     @Column(name = "problem_id")
@@ -101,4 +104,7 @@ public class ProblemEntity implements Serializable {
     )
     @OneToMany(fetch = FetchType.LAZY)
     private List<TagEntity> tags;
+
+    @Column(name = "status_id")
+    private String statusId;
 }
