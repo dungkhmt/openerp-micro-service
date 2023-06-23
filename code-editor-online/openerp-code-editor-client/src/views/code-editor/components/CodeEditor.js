@@ -13,6 +13,11 @@ import "ace-builds/src-noconflict/ext-language_tools";
 import { setSource, setState } from "../reducers/codeEditorReducers";
 import { useKeycloak } from "@react-keycloak/web";
 import { ACCESS_PERMISSION } from "../utils/constants";
+import { useRef } from "react";
+import { AceMultiCursorManager } from "@convergencelabs/ace-collab-ext";
+import "@convergencelabs/ace-collab-ext/dist/css/ace-collab-ext.css";
+import { useState } from "react";
+import randomColor from "randomcolor";
 
 const CodeEditor = (props) => {
   const { socket, roomId, roomMasterId } = props;
@@ -30,13 +35,44 @@ const CodeEditor = (props) => {
     isPublic,
     roomAccessPermission,
     allowedUserList,
+    participants,
   } = useSelector((state) => state.codeEditor);
+  const editorRef = useRef(null);
+  const cursorMgr = useRef(null);
+  useEffect(() => {
+    if (editorRef.current) {
+      const editor = editorRef.current.editor;
+      cursorMgr.current = new AceMultiCursorManager(editor.getSession());
+    }
+  }, []);
+  useEffect(() => {
+    if (cursorMgr.current) {
+      participants?.map((participant) => {
+        try {
+          cursorMgr.current.addCursor(participant?.socketId, participant?.fullName, randomColor(), {
+            row: 0,
+            column: 0,
+          });
+        } catch (error) {
+        }
+      });
+    }
+  }, [participants]);
   const onChange = (value) => {
-    socket.current.emit(SOCKET_EVENTS.SEND_CODE_CHANGES, {
-      language: selectedLanguage,
-      source: value,
-    });
-    handleSaveSource(value);
+    if (editorRef.current) {
+      const editor = editorRef.current.editor;
+      const cursorPosition = editor.getCursorPosition();
+      socket.current.emit(SOCKET_EVENTS.SEND_CODE_CHANGES, {
+        language: selectedLanguage,
+        source: value,
+        cursor: {
+          id: socket.current.id,
+          label: token.name,
+          position: cursorPosition,
+        },
+      });
+      handleSaveSource(value);
+    }
   };
 
   /**
@@ -69,6 +105,14 @@ const CodeEditor = (props) => {
       });
     }
   }, [socket.current]);
+  useEffect(() => {
+    if (socket.current && cursorMgr.current) {
+      socket.current.on(SOCKET_EVENTS.LEAVE_ROOM, ({ socketId }) => {
+        cursorMgr.current.clearCursor(socketId);
+        cursorMgr.current.removeCursor(socketId);
+      });
+    }
+  }, [socket.current, cursorMgr.current]);
 
   useEffect(() => {
     if (socket.current) {
@@ -120,9 +164,10 @@ const CodeEditor = (props) => {
 
   useEffect(() => {
     if (socket.current) {
-      socket.current.on(SOCKET_EVENTS.RECEIVE_CODE_CHANGES, ({ language, source }) => {
+      socket.current.on(SOCKET_EVENTS.RECEIVE_CODE_CHANGES, ({ language, source, cursor }) => {
         if (language === selectedLanguage) {
           dispatch(setSource(source));
+          cursorMgr.current.setCursor(cursor?.id, cursor?.position);
         }
       });
     }
@@ -176,6 +221,7 @@ const CodeEditor = (props) => {
   }
   return (
     <AceEditor
+      ref={editorRef}
       mode={`${getModeLanguage(selectedLanguage)}`}
       theme={getTheme(theme)}
       onChange={onChange}

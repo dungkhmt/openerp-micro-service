@@ -44,10 +44,11 @@ io.on("connection", (socket) => {
       });
     });
 
-    socket.on(SOCKET_IO_EVENTS.SEND_CODE_CHANGES, ({ language, source }) => {
+    socket.on(SOCKET_IO_EVENTS.SEND_CODE_CHANGES, ({ language, source, cursor }) => {
       socket.broadcast.to(roomId).emit(SOCKET_IO_EVENTS.RECEIVE_CODE_CHANGES, {
         language: language,
         source: source,
+        cursor: cursor,
       });
     });
 
