@@ -15,6 +15,7 @@ import {copyTestCasesWithPublicMode, downloadAllTestCasesWithPublicMode} from ".
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import AddIcon from "@material-ui/icons/Add";
 import {RiCodeSSlashLine} from "react-icons/ri";
+import {errorNoti} from "../../../utils/notification";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -159,7 +160,9 @@ export default function ListTestCase() {
                     {}
                   ).then();
                 },
-                {}
+                {onError: (e) => {
+                  errorNoti(e?.response?.data?.message || "An error happened", 5000)
+                }}
               ).then();
             }}
           >
