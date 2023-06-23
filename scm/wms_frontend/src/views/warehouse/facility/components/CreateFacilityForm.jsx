@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import CustomMap from "components/map/CustomMap";
 import CustomSelect from "components/select/CustomSelect";
 import { useRef, useState } from "react";
@@ -7,6 +7,7 @@ import { facilitySchema } from "utils/validate";
 import SearchBoxMap from "../../../../components/map/SearchBoxMap";
 import { useCreateFacility } from "../../../../controllers/query/facility-query";
 import { useGetAllUsersExist } from "../../../../controllers/query/user-query";
+import { AppColors } from "../../../../shared/AppColors";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
@@ -109,19 +110,23 @@ const CreateFacilityForm = ({ setIsAdd }) => {
           )}
         />
       </Stack>
-      <Typography>Lấy vị trí</Typography>
-      <SearchBoxMap
-        selectPosition={selectPosition}
-        setSelectPosition={setSelectPosition}
-      />
-      <Stack direction={"row"}>
+      <Box>
+        <Typography style={{ color: AppColors.error, fontSize: 14 }}>
+          Lấy vị trí
+        </Typography>
+        <SearchBoxMap
+          selectPosition={selectPosition}
+          setSelectPosition={setSelectPosition}
+        />
+      </Box>
+      <Stack direction={"row"} justifyContent={"center"}>
         <Controller
           key={"map"}
           control={control}
           name={"map"}
           render={({ field: { onChange, value } }) => (
             <CustomMap
-              style={{ width: "50vw", height: "50vh" }}
+              style={{ width: "100%", height: "50vh" }}
               location={selectPosition}
               mapRef={mapRef}
               setSelectPosition={setSelectPosition}

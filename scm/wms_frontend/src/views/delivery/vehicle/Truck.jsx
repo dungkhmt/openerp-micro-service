@@ -73,7 +73,7 @@ function TruckScreen({ screenAuthorization }) {
         <CustomToolBar actions={actions} />
       </Box>
       <CustomDataGrid
-        isSerial
+        // isSerial
         params={params}
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20 - 35 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom - Page Title

@@ -348,7 +348,7 @@ const AdminOrderDetail = ( props ) => {
             columns={[
               { title: "Tên sản phẩm", field: "productName",
                 editComponent: <ProductDropDown
-                  productList={orderInfo?.items}
+                  productList={orderInfo?.remainingItems}
                   setSelectedProductId={setSelectedProductId}
                   setSelectedProductName={setSelectedProductName} /> },
               { title: "Kho", field: "warehouseName",
@@ -406,6 +406,7 @@ const AdminOrderDetail = ( props ) => {
                       break;
                     }
                   }
+                  console.log("New order info => ", newOrderInfo);
                   setOrderInfo(newOrderInfo);
                   setRemainingItems(newOrderInfo.remainingItems);
                   setSelectedQuantity(0);

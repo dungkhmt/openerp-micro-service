@@ -80,6 +80,7 @@ const CustomDataGrid = (props) => {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+    width: "100%",
     height: "100%",
     "& .ant-empty-img-1": {
       fill: theme.palette.mode === "light" ? "#aeb8c2" : "#262626",
@@ -102,8 +103,8 @@ const CustomDataGrid = (props) => {
     return (
       <StyledGridOverlay>
         <svg
-          width="120"
-          height="100"
+          width="300"
+          height="250"
           viewBox="0 0 184 152"
           aria-hidden
           focusable="false"
@@ -140,7 +141,7 @@ const CustomDataGrid = (props) => {
             </g>
           </g>
         </svg>
-        <Box sx={{ mt: 1 }}>Không có dữ liệu</Box>
+        <Box sx={{ margin: 0 }}>Không có dữ liệu</Box>
       </StyledGridOverlay>
     );
   }
@@ -152,7 +153,7 @@ const CustomDataGrid = (props) => {
       columns={getColumnsShow(columns, isSerial, params)}
       rows={rows}
       // isRowSelectable={() => {
-      //   return isSelectable;          Got bug if turn this thing on: Uncaught Error: No row with id #26 found
+      //   return isSelectable;          Got bug if turn this thing on: Uncaught Error: No row with id #... found
       // }}
       pageSizeOptions={[5, 10, 25]}
       rowCount={rowCountState}

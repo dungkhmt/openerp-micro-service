@@ -27,7 +27,7 @@ export default function SearchBoxMap({ selectPosition, setSelectPosition }) {
       <div style={{ display: "flex" }}>
         <div style={{ flex: 1 }}>
           <OutlinedInput
-            style={{ width: "100%" }}
+            style={{ width: "100%", height: 40 }}
             value={searchText}
             onChange={(event) => {
               setSearchText(event.target.value);
@@ -35,11 +35,12 @@ export default function SearchBoxMap({ selectPosition, setSelectPosition }) {
           />
         </div>
         <div
-          style={{ display: "flex", alignItems: "center", padding: "0px 20px" }}
+          style={{ display: "flex", alignItems: "center", padding: "0px 10px" }}
         >
           <Button
-            variant="contained"
-            color="primary"
+            // variant="contained"
+            variant="outlined"
+            // color="primary"
             onClick={() => {
               // Search
               const params = {
@@ -84,8 +85,8 @@ export default function SearchBoxMap({ selectPosition, setSelectPosition }) {
                     <Box
                       component="img"
                       sx={{
-                        height: 40,
-                        width: 40,
+                        height: 30,
+                        width: 30,
                         maxHeight: { xs: 233, md: 167 },
                         maxWidth: { xs: 350, md: 250 },
                       }}

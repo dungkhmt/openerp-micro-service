@@ -146,6 +146,7 @@ function CustomerScreen({ screenAuthorization }) {
             headerAlign: "center",
             align: "center",
             sortable: false,
+            minWidth: 200,
             flex: 1,
             type: "actions",
             getActions: (params) => [

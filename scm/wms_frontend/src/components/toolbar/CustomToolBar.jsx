@@ -144,75 +144,77 @@ const CustomToolBar = ({
             <SearchBox value={keyword} setValue={setKeyword} />
           </Box>
         )}
-        <Box>
-          {width < 900 ? (
-            <IconButton
-              size="small"
-              color="primary"
-              aria-describedby={id}
-              variant="contained"
-              onClick={handleClick}
-            >
-              <TuneIcon />
-            </IconButton>
-          ) : (
-            <Button
-              component="label"
-              startIcon={<TuneIcon />}
-              variant="contained"
-              color={"primary"}
-              onClick={handleClick}
-              sx={{
-                fontSize: 12,
-                textTransform: "uppercase",
-                fontWeight: 600,
-                boxShadow: 0,
-                color: "white",
+        {containFilter && (
+          <Box>
+            {width < 900 ? (
+              <IconButton
+                size="small"
+                color="primary"
+                aria-describedby={id}
+                variant="contained"
+                onClick={handleClick}
+              >
+                <TuneIcon />
+              </IconButton>
+            ) : (
+              <Button
+                component="label"
+                startIcon={<TuneIcon />}
+                variant="contained"
+                color={"primary"}
+                onClick={handleClick}
+                sx={{
+                  fontSize: 12,
+                  textTransform: "uppercase",
+                  fontWeight: 600,
+                  boxShadow: 0,
+                  color: "white",
+                }}
+              >
+                <Tooltip title={"Filter"}>
+                  <>
+                    <Typography
+                      sx={{
+                        fontSize: 14,
+                        fontWeight: "bold",
+                        color: "white",
+                      }}
+                    >
+                      {"Filter"}
+                    </Typography>
+                  </>
+                </Tooltip>
+              </Button>
+            )}
+            <Popover
+              id={id}
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
               }}
             >
-              <Tooltip title={"Filter"}>
-                <>
-                  <Typography
-                    sx={{
-                      fontSize: 14,
-                      fontWeight: "bold",
-                      color: "white",
-                    }}
+              <Box sx={{ width: 300, padding: 2 }}>
+                <CustomFilter
+                  fields={fields ? fields : []}
+                  control={control}
+                  errors={errors}
+                />
+                <Stack direction="row" justifyContent={"flex-end"}>
+                  <Button
+                    onClick={handleSubmit(onSubmit)}
+                    variant="contained"
+                    style={{ color: "white" }}
                   >
-                    {"Filter"}
-                  </Typography>
-                </>
-              </Tooltip>
-            </Button>
-          )}
-          <Popover
-            id={id}
-            open={open}
-            anchorEl={anchorEl}
-            onClose={handleClose}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
-            }}
-          >
-            <Box sx={{ width: 300, padding: 2 }}>
-              <CustomFilter
-                fields={fields ? fields : []}
-                control={control}
-                errors={errors}
-              />
-              <Stack direction="row" justifyContent={"flex-end"}>
-                <Button
-                  onClick={handleSubmit(onSubmit)}
-                  variant="contained"
-                  style={{ color: "white" }}
-                >
-                  Submit
-                </Button>
-              </Stack>
-            </Box>
-          </Popover>
-        </Box>
+                    Submit
+                  </Button>
+                </Stack>
+              </Box>
+            </Popover>
+          </Box>
+        )}
       </Stack>
     </Box>
   );

@@ -154,13 +154,6 @@ function FacilityScreen({ screenAuthorization }) {
       readOnly: false,
       require: true,
     },
-    // {
-    //   component: "date",
-    //   name: "fromDate",
-    //   label: "Tạo lúc",
-    //   readOnly: false,
-    //   require: true,
-    // },
   ];
   const onSubmit = (data) => {
     setParams({

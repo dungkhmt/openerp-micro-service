@@ -30,7 +30,14 @@ function ExportingActivityScreen({ screenAuthorization }) {
       order: params,
     });
   };
-
+  const onSubmit = (data) => {
+    setParams({
+      ...params,
+      createdBy: data?.createdBy?.name,
+      facilityName: data?.facilityName,
+      // supplierCode: data?.supplierCode,
+    });
+  };
   const extraActions = [
     {
       title: "Xem chi tiết",
@@ -55,7 +62,28 @@ function ExportingActivityScreen({ screenAuthorization }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={[]} />
+        <CustomToolBar
+          actions={[]}
+          containFilter={false}
+          onSearch={(keyword) => {
+            if (keyword) {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: keyword,
+                };
+              });
+            } else {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: "",
+                };
+              });
+            }
+          }}
+          onSubmit={onSubmit}
+        />
       </Box>
       <CustomDataGrid
         params={params}

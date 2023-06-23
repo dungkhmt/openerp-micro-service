@@ -22,6 +22,7 @@ import {
   useCreateSelloutPrice,
   useGetSelloutPrice,
 } from "../../controllers/query/sale-order-query";
+import { formatVietnameseCurrency } from "../../utils/GlobalUtils";
 import { saleOrderPrices } from "./LocalConstant";
 import UpdateSalePrice from "./components/UpdateSalePrice";
 
@@ -151,10 +152,9 @@ function SalePriceScreen({ screenAuthorization }) {
         (((priceBeforeVat * (100 + vat)) / 100) *
           (100 - contractDiscount - massDiscount)) /
         100;
-      // console.log("Price: ", priceAfterAll, priceBeforeVat, vat, params);
       return priceAfterAll ? (
         <Typography>
-          <Typography>{priceAfterAll}</Typography>
+          <Typography>{formatVietnameseCurrency(priceAfterAll)}</Typography>
         </Typography>
       ) : (
         "Chưa xác định"
@@ -207,11 +207,15 @@ function SalePriceScreen({ screenAuthorization }) {
                       params?.row?.productEntity?.code &&
                     el?.contractType?.code === params?.row?.contract?.code
                 );
-                return selloutPrice
-                  ? selloutPrice?.massDiscount
-                  : price
-                  ? price?.massDiscount
-                  : "Nhập %";
+                return (
+                  <Typography sx={{ fontSize: 14 }}>
+                    {selloutPrice
+                      ? `${selloutPrice?.massDiscount} %`
+                      : price
+                      ? price?.massDiscount
+                      : "Nhập %"}
+                  </Typography>
+                );
               },
               renderEditCell: (params) => {
                 const index = productSalePrices?.findIndex(
@@ -265,11 +269,15 @@ function SalePriceScreen({ screenAuthorization }) {
                       params?.row?.productEntity?.code &&
                     el?.contractType?.code === params?.row?.contract?.code
                 );
-                return selloutPrice
-                  ? selloutPrice?.contractDiscount
-                  : price
-                  ? price?.contractDiscount
-                  : "Nhập %";
+                return (
+                  <Typography sx={{ fontSize: 14 }}>
+                    {selloutPrice
+                      ? selloutPrice?.contractDiscount
+                      : price
+                      ? price?.contractDiscount
+                      : "Nhập %"}
+                  </Typography>
+                );
               },
               renderEditCell: (params) => {
                 const index = productSalePrices?.findIndex(

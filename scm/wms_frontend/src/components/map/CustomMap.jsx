@@ -74,9 +74,9 @@ const CustomMap = ({ style, location, mapRef, setSelectPosition }) => {
       scrollWheelZoom={true}
       ref={mapRef}
       style={{
-        width: "calc(100vw - 250px)",
-        height: "calc(100vh - 64px)",
-        marginLeft: "-16px",
+        // width: "calc(100vw - 250px)",
+        // height: "calc(100vh - 64px)",
+        // marginLeft: "-16px",
         ...style,
       }}
     >

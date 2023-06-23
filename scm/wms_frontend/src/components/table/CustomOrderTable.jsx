@@ -9,6 +9,7 @@ import {
   styled,
   tableCellClasses,
 } from "@mui/material";
+import { formatVietnameseCurrency } from "../../utils/GlobalUtils";
 
 function createData(code, name, quantity, price_unit) {
   return { code, name, quantity, price_unit };
@@ -76,9 +77,11 @@ const CustomOrderTable = ({ items, currOrder }) => {
               </StyledTableCell>
               <StyledTableCell>{row.name}</StyledTableCell>
               <StyledTableCell align="right">{row.quantity}</StyledTableCell>
-              <StyledTableCell align="right">{row.price_unit}</StyledTableCell>
               <StyledTableCell align="right">
-                {row.quantity * row.price_unit}
+                {formatVietnameseCurrency(row.price_unit)}
+              </StyledTableCell>
+              <StyledTableCell align="right">
+                {formatVietnameseCurrency(row.quantity * row.price_unit)}
               </StyledTableCell>
             </StyledTableRow>
           ))}
@@ -86,7 +89,7 @@ const CustomOrderTable = ({ items, currOrder }) => {
             <StyledTableCell rowSpan={3} colSpan={2} />
             <StyledTableCell colSpan={2}>Tổng cộng</StyledTableCell>
             <StyledTableCell align="right">
-              {currOrder?.totalMoney}
+              {formatVietnameseCurrency(currOrder?.totalMoney)}
             </StyledTableCell>
           </StyledTableRow>
           <StyledTableRow>
@@ -99,16 +102,18 @@ const CustomOrderTable = ({ items, currOrder }) => {
                 : currOrder?.discount
             } %`}</StyledTableCell>
             <StyledTableCell align="right">
-              {currOrder?.totalMoney *
-                (currOrder?.vat !== undefined
-                  ? currOrder?.vat / 100
-                  : currOrder?.discount / 100)}
+              {formatVietnameseCurrency(
+                currOrder?.totalMoney *
+                  (currOrder?.vat !== undefined
+                    ? currOrder?.vat / 100
+                    : currOrder?.discount / 100)
+              )}
             </StyledTableCell>
           </StyledTableRow>
           <StyledTableRow>
             <StyledTableCell colSpan={2}>Tổng phải trả</StyledTableCell>
             <StyledTableCell align="right">
-              {currOrder?.totalPayment}
+              {formatVietnameseCurrency(currOrder?.totalPayment)}
             </StyledTableCell>
           </StyledTableRow>
         </TableBody>

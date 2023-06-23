@@ -91,6 +91,13 @@ public class ProductServiceImpl implements ProductService {
             return product;
         }
 
+        // update redis
+        List<Product> products = redisCacheService.getCachedListObject(RedisCacheService.ALL_PRODUCTS_KEY, Product.class);
+        if (products != null && !products.isEmpty()) {
+            products.add(product);
+            redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_PRODUCTS_KEY, products);
+        }
+
         List<ProductRequest.InitProductQuantity> quantityList = request.getInitProductQuantityList();
         Map<String, BigDecimal> normQuantityMap = new HashMap<>();
         if (quantityList != null && !quantityList.isEmpty()) {
@@ -234,6 +241,12 @@ public class ProductServiceImpl implements ProductService {
                 log.info("Start delete product with id " + productId);
                 productRepository.deleteById(UUID.fromString(productId));
             }
+            // update redis
+            List<Product> products = redisCacheService.getCachedListObject(RedisCacheService.ALL_PRODUCTS_KEY, Product.class);
+            if (products != null && !products.isEmpty()) {
+                products.removeIf(product -> productIds.contains(product.getProductId().toString()));
+            }
+            redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_PRODUCTS_KEY, products);
             return true;
         } catch (Exception e) {
             log.info("Error when deleting product ids list");

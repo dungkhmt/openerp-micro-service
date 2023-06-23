@@ -82,7 +82,11 @@ function ShipmentDetailScreen() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} containSearch={false} />
+        <CustomToolBar
+          actions={actions}
+          containSearch={false}
+          containFilter={false}
+        />
       </Box>
       <Box>
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
@@ -108,23 +112,86 @@ function ShipmentDetailScreen() {
             THÔNG TIN CƠ BẢN
           </Typography>
         </Stack>
-        <Typography
-          sx={{
-            fontSize: 16,
-            marginTop: 2,
-          }}
-        >
-          1. Mã đợt: {currShipment?.code}
-        </Typography>
-        <Typography>
-          2. Ngày bắt đầu:
-          {unix(currShipment?.startedDate).format("DD-MM-YYYY")}
-        </Typography>
-        <Typography>
-          3. Dự kiến kết thúc:
-          {unix(currShipment?.endedDate).format("DD-MM-YYYY")}
-        </Typography>
-        <Typography>4. Số đơn: {currShipment?.maxSize}</Typography>
+        <Stack sx={{ flexDirection: "row", marginTop: 2 }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            1. Mã đợt:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {currShipment?.code}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            2. Ngày bắt đầu:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {unix(currShipment?.startedDate).format("DD-MM-YYYY")}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            3. Dự kiến kết thúc:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {unix(currShipment?.endedDate).format("DD-MM-YYYY")}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            4. Số đơn:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {currShipment?.maxSize}
+          </Typography>
+        </Stack>
       </Box>
       <Divider variant="fullWidth" sx={{ marginY: 2 }} />
       <Stack direction={"row"} spacing={2} alignItems={"center"}>

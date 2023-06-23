@@ -4,7 +4,6 @@ import { useRef } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { useLocation } from "react-router-dom";
 import withScreenSecurity from "../../../components/common/withScreenSecurity";
-import SearchBoxMap from "../../../components/map/SearchBoxMap";
 
 const googleTileLayerUrl = "https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}";
 const googleAttribution = "Map data © Google";
@@ -50,7 +49,6 @@ function FacilityMapScreen({ screenAuthorization }) {
           </Popup>
         </Marker>
       ))}
-      <SearchBoxMap />
     </MapContainer>
   );
 }

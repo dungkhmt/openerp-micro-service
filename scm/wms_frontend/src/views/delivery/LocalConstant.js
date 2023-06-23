@@ -1,6 +1,7 @@
 import { Button, Typography } from "@mui/material";
 import { unix } from "moment";
 import { AppColors } from "../../shared/AppColors";
+import { formatVietnameseCurrency } from "../../utils/GlobalUtils";
 
 export const shipmentCols = [
   {
@@ -240,9 +241,6 @@ export const truckCols = [
     headerName: "Tên xe tải",
     sortable: false,
     minWidth: 200,
-    // valueFormatter: (params) => {
-    //   return `${params.value} kg`;
-    // },
   },
   {
     field: "size",
@@ -251,9 +249,6 @@ export const truckCols = [
     headerName: "Kích thước (dài, rộng, cao)",
     sortable: false,
     minWidth: 200,
-    // valueFormatter: (params) => {
-    //   return `${params.value} kg`;
-    // },
   },
   {
     field: "capacity",
@@ -274,7 +269,7 @@ export const truckCols = [
     sortable: false,
     minWidth: 200,
     valueFormatter: (params) => {
-      return `${params.value} đ`;
+      return formatVietnameseCurrency(params?.value);
     },
   },
   {
@@ -285,7 +280,7 @@ export const truckCols = [
     sortable: false,
     minWidth: 200,
     valueFormatter: (params) => {
-      return `${params.value} đ`;
+      return formatVietnameseCurrency(params?.value);
     },
   },
   {
@@ -336,9 +331,6 @@ export const droneCols = [
     headerName: "Tên drone",
     sortable: false,
     minWidth: 200,
-    // valueFormatter: (params) => {
-    //   return `${params.value} kg`;
-    // },
   },
   {
     field: "durationTime",
@@ -370,7 +362,7 @@ export const droneCols = [
     sortable: false,
     minWidth: 200,
     valueFormatter: (params) => {
-      return `${params.value} đ`;
+      return formatVietnameseCurrency(params?.value);
     },
   },
   {
@@ -381,7 +373,7 @@ export const droneCols = [
     sortable: false,
     minWidth: 200,
     valueFormatter: (params) => {
-      return `${params.value} đ`;
+      return formatVietnameseCurrency(params?.value);
     },
   },
   {

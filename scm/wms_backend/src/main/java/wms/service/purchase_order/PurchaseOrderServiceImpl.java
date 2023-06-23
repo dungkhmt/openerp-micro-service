@@ -86,11 +86,14 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
     }
 
     @Override
-    public ReturnPaginationDTO<PurchaseOrder> getAllOrders(int page, int pageSize, String sortField, boolean isSortAsc, String orderStatus) throws JsonProcessingException {
+    public ReturnPaginationDTO<PurchaseOrder> getAllOrders(int page, int pageSize, String sortField, boolean isSortAsc, String orderStatus
+    ,String facilityName, String createdBy, String supplierCode, String textSearch
+    ) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
-        Page<PurchaseOrder> purchaseOrders = purchaseOrderRepo.search(pageable, orderStatus.toUpperCase());
+        Page<PurchaseOrder> purchaseOrders = purchaseOrderRepo.search(pageable, orderStatus.toUpperCase(),
+                facilityName, createdBy, supplierCode, textSearch);
         return getPaginationResult(purchaseOrders.getContent(), page, purchaseOrders.getTotalPages(), purchaseOrders.getTotalElements());
     }
 

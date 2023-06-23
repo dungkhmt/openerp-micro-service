@@ -39,10 +39,17 @@ public class PurchaseOrderController extends BaseController {
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
             @RequestParam(value = "sortAsc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
-            @RequestParam(value = "orderStatus", required = false, defaultValue = DefaultConst.STRING) String orderStatus
+            @RequestParam(value = "orderStatus", required = false, defaultValue = DefaultConst.STRING) String orderStatus,
+            @RequestParam(value = "facilityName", required = false, defaultValue = DefaultConst.STRING) String facilityName,
+            @RequestParam(value = "createdBy", required = false, defaultValue = DefaultConst.STRING) String createdBy,
+            @RequestParam(value = "supplierCode", required = false, defaultValue = DefaultConst.STRING) String supplierCode,
+            @RequestParam(value = "textSearch", required = false, defaultValue = DefaultConst.STRING) String textSearch
+
     ) {
         try {
-            return response(new ResultEntity(1, "Get list orders successfully", purchaseOrderService.getAllOrders(page, pageSize, sortField, isSortAsc, orderStatus)));
+            return response(new ResultEntity(1, "Get list orders successfully", purchaseOrderService.getAllOrders(page, pageSize, sortField, isSortAsc, orderStatus
+            , facilityName, createdBy, supplierCode, textSearch
+            )));
         } catch (Exception ex) {
             return response(error(ex));
         }

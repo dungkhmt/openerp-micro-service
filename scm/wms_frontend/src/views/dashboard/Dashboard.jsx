@@ -278,35 +278,6 @@ const DashBoard = () => {
             />
           </Box>
         </Stack>
-        <Box sx={{ p: 2, width: "100%" }}>
-          <Stack
-            direction="column"
-            spacing={2}
-            sx={{ alignItems: "center", mb: 2 }}
-          >
-            <Typography
-              sx={{ textTransform: "uppercase", fontWeight: 600, mb: 1 }}
-            >
-              {"Chuyến giao hàng toàn quốc"}
-            </Typography>
-          </Stack>
-          <MapChart
-            loading={loadTripCustomers}
-            data={
-              tripCustomers
-                ? tripCustomers?.map((res) => {
-                    let mapping = mappingData?.map((a, idx) => {
-                      return a[1].toLowerCase() === res[0].toLowerCase()
-                        ? idx
-                        : -1;
-                    });
-                    let index = mapping?.findIndex((a) => a !== -1);
-                    return [mappingData[index][0], res[1]];
-                  })
-                : []
-            }
-          />
-        </Box>
         <Stack direction="row">
           <Box sx={{ p: 2, width: "50%" }}>
             <Stack
@@ -353,6 +324,35 @@ const DashBoard = () => {
             />
           </Box>
         </Stack>
+        <Box sx={{ p: 2, width: "100%" }}>
+          <Stack
+            direction="column"
+            spacing={2}
+            sx={{ alignItems: "center", mb: 2 }}
+          >
+            <Typography
+              sx={{ textTransform: "uppercase", fontWeight: 600, mb: 1 }}
+            >
+              {"Chuyến giao hàng toàn quốc"}
+            </Typography>
+          </Stack>
+          <MapChart
+            loading={loadTripCustomers}
+            data={
+              tripCustomers
+                ? tripCustomers?.map((res) => {
+                    let mapping = mappingData?.map((a, idx) => {
+                      return a[1].toLowerCase() === res[0].toLowerCase()
+                        ? idx
+                        : -1;
+                    });
+                    let index = mapping?.findIndex((a) => a !== -1);
+                    return [mappingData[index][0], res[1]];
+                  })
+                : []
+            }
+          />
+        </Box>
       </Box>
     </ErrorBoundary>
   );
