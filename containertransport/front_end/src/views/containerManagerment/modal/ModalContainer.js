@@ -34,7 +34,7 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
         })
         if(container) {
             setFacility(container?.facilityResponsiveDTO.facilityId);
-            setIsBreakRomooc(container.isEmpty);
+            setContainerCode(container?.containerCode);
         }
     }, []);
 
@@ -68,8 +68,7 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
         else {
             let data = {
                 facilityId: facility,
-                typeContainerCode: size?.typeContainerCode,
-                isEmpty: isBreakRomooc
+                typeContainerCode: size?.typeContainerCode
             };
             console.log("data", data)
             createContainer(data).then((res) => {

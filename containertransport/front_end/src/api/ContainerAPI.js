@@ -23,6 +23,15 @@ export const createContainer = async (data) => {
     );
     return resData;
 }
+
+export const updateContainer = async (data) => {
+    const resData = request(
+        "put",
+        "/container/update", {}, {}, data, {},
+    );
+    return resData;
+}
+
 export const getTypeContainer = async (data) => {
     const resData = request(
         "post",
@@ -31,10 +40,10 @@ export const getTypeContainer = async (data) => {
     return resData;
 }
 
-export const updateContainer = async (data) => {
+export const createTypeContainer = async (data) => {
     const resData = request(
-        "put",
-        "/container/update", {}, {}, data, {},
+        "post",
+        "/type/container/create", {}, {}, data, {},
     );
     return resData;
 }

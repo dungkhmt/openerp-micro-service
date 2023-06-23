@@ -91,33 +91,52 @@ const MapComponent = ({ tripItems }) => {
                 <RoutingMachine ref={rMachine} waypoints={point} />
                 {tripItems?.map((item) => {
                     let listPointSame = pointsMap?.get(item.facilityId);
-                    return (
-                        <Marker position={L.latLng(item.latitude, item.longitude)}
-                            icon={new L.DivIcon({
-                                html: `<Box size="small" class="number" variant="extended">${item.seq}</Box>`,
-                                iconSize: L.point(33, 33, true),
-                            })}
-                        >
-                            <Popup>
-                                {listPointSame?.length > 1 ? (
-                                    <Box>
-                                        {listPointSame?.map(item => {
+                    if (listPointSame?.length > 1) {
+                        return (
+                            <Marker position={L.latLng(item.latitude, item.longitude)}
+                                icon={new L.DivIcon({
+                                    html: `<Box size="small" class="number" variant="extended">Group</Box>`,
+                                    iconSize: L.point(33, 33, true),
+                                })}
+                            >
+                                <Popup>
+                                    <Box sx={{ height: '400px' }}>
+                                        {listPointSame?.map(pointTrip => {
                                             return (
-                                                <Typography>{item.seq} - {item.facilityCode} - {item.orderCode} - {item.action}</Typography>
+                                                <Box sx={{ marginBottom: '16px' }}>
+                                                    <Typography sx={{ margin: '0px' }}>Seq: {pointTrip.seq}</Typography>
+                                                    <Typography>Facility: {pointTrip.facilityCode}</Typography>
+                                                    <Typography>Entity: {pointTrip.orderCode}</Typography>
+                                                    <Typography>Action: {pointTrip.action}</Typography>
+                                                </Box>
                                             )
-                                        })
-                                        }
+                                        })}
                                     </Box>
-                                ) : (
+                                </Popup>
+                                <Tooltip>Group Action In Point</Tooltip>
+                            </Marker>
+                        )
+                    }
+                    else {
+                        return (
+                            <Marker position={L.latLng(item.latitude, item.longitude)}
+                                icon={new L.DivIcon({
+                                    html: `<Box size="small" class="number" variant="extended">${item.seq}</Box>`,
+                                    iconSize: L.point(33, 33, true),
+                                })}
+                            >
+                                <Popup>
                                     <Box>
-                                        <Typography>{item.seq} - {item.facilityCode} - {item.orderCode} - {item.action}</Typography>
+                                        <Typography sx={{ margin: '0px' }}>Seq: {item.seq}</Typography>
+                                        <Typography>Facility: {item.facilityCode}</Typography>
+                                        <Typography>Entity: {item.orderCode}</Typography>
+                                        <Typography>Action: {item.action}</Typography>
                                     </Box>
-
-                                )}
-                            </Popup>
-                            <Tooltip>Tooltip for Marker</Tooltip>
-                        </Marker>
-                    )
+                                </Popup>
+                                <Tooltip>At Facility {item.facilityCode}</Tooltip>
+                            </Marker>
+                        )
+                    }
                 })}
 
             </MapContainer>

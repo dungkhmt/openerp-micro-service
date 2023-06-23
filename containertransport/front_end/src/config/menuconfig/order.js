@@ -14,7 +14,7 @@ export const order = {
         id: "MENU_CONTAINER.ORDER_APPROVED",
         path: "/order",
         isPublic: false,
-        text: "Approved Order Management",
+        text: "Order Management",
         child: [],
       },
     ],

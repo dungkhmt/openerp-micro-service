@@ -111,24 +111,24 @@ const OrderDetail = () => {
                         </Box>
                         <Typography>{order?.breakRomooc ? "True" : "False"}</Typography>
                     </Box>
-                    <Box className="order-info-item">
+                    {/* <Box className="order-info-item">
                         <Box className="text-head">
                             <Typography>Early Pickup Time:</Typography>
                         </Box>
                         <Typography>{new Date(order?.earlyPickupTime).toLocaleString()}</Typography>
-                    </Box>
+                    </Box> */}
                     <Box className="order-info-item">
                         <Box className="text-head">
                             <Typography>Late Pickup Time:</Typography>
                         </Box>
                         <Typography>{new Date(order?.latePickupTime).toLocaleString()}</Typography>
                     </Box>
-                    <Box className="order-info-item">
+                    {/* <Box className="order-info-item">
                         <Box className="text-head">
                             <Typography>Early Delivery Time:</Typography>
                         </Box>
                         <Typography>{new Date(order?.earlyDeliveryTime).toLocaleString()}</Typography>
-                    </Box>
+                    </Box> */}
                     <Box className="order-info-item">
                         <Box className="text-head">
                             <Typography>Late Delivery Time:</Typography>

@@ -118,9 +118,9 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             type: type,
             fromFacilityId: fromFacility,
             toFacilityId: toFacility,
-            earlyDeliveryTime: (new Date(earlyDeliveryTime)).getTime(),
+            // earlyDeliveryTime: (new Date(earlyDeliveryTime)).getTime(),
             lateDeliveryTime: (new Date(lateDeliveryTime)).getTime(),
-            earlyPickupTime: (new Date(earlyPickUpTime)).getTime(),
+            // earlyPickupTime: (new Date(earlyPickUpTime)).getTime(),
             latePickupTime: (new Date(latePickUpTime)).getTime(),
             isBreakRomooc: isBreakRomooc,
             containerIds: containerSelect
@@ -315,7 +315,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                             />
                                         </Box>
                                     </Box>
-                                    <Box className="contentModal-item">
+                                    {/* <Box className="contentModal-item">
                                         <Box className="contentModal-item-text">
                                             <Typography>Early Delivery Time:</Typography>
                                         </Box>
@@ -328,7 +328,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                                 </DemoContainer>
                                             </LocalizationProvider>
                                         </Box>
-                                    </Box>
+                                    </Box> */}
                                     <Box className="contentModal-item">
                                         <Box className="contentModal-item-text">
                                             <Typography>Late Delivery Time:</Typography>
@@ -343,7 +343,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                             </LocalizationProvider>
                                         </Box>
                                     </Box>
-                                    <Box className="contentModal-item">
+                                    {/* <Box className="contentModal-item">
                                         <Box className="contentModal-item-text">
                                             <Typography>Early PickUp Time:</Typography>
                                         </Box>
@@ -356,7 +356,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                                 </DemoContainer>
                                             </LocalizationProvider>
                                         </Box>
-                                    </Box>
+                                    </Box> */}
                                     <Box className="contentModal-item">
                                         <Box className="contentModal-item-text">
                                             <Typography>Late PickUp Time:</Typography>
