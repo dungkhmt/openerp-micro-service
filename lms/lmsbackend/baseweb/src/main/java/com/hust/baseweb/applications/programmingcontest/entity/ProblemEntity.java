@@ -83,6 +83,9 @@ public class ProblemEntity implements Serializable {
     @Column(name = "score_evaluation_type")
     private String scoreEvaluationType;
 
+    @Column(name = "appearances")
+    private int appearances;
+    
 //    @OneToMany(mappedBy = "contestProblem")
 //    private Set<TestCase> testCases;
 //    @JoinTable(name = "contest_problem_test_case",
