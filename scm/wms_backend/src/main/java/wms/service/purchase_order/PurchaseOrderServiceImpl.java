@@ -43,7 +43,7 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
     @Transactional(rollbackFor = Exception.class)
     public PurchaseOrder createOrder(PurchaseOrderDTO purchaseOrderDTO, JwtAuthenticationToken token) throws CustomException {
         Facility boughtBy = facilityRepo.getFacilityByCode(purchaseOrderDTO.getBoughtBy());
-        UserLogin createdBy = userRepo.getUserByUserLoginId(token.getName());
+        UserRegister createdBy = userRepo.getUserByUserLoginId(token.getName());
 
         if (boughtBy== null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Order belongs to no facility, can't create");

@@ -1,4 +1,5 @@
 import { Route, Switch, useRouteMatch } from "react-router";
+import DeliveryStaff from "../views/delivery/DeliveryStaff";
 import Shipment from "../views/delivery/shipment/Shipment";
 import ShipmentDetail from "../views/delivery/shipment/ShipmentDetail";
 import Trip from "../views/delivery/shipment/TripDetail";
@@ -41,6 +42,11 @@ export default function DeliveryRouter() {
         ></Route>
         <Route component={Truck} exact path={`${path}/vehicle/truck`}></Route>
         <Route component={Drone} exact path={`${path}/vehicle/drone`}></Route>
+        <Route
+          component={DeliveryStaff}
+          exact
+          path={`${path}/delivery-staff`}
+        ></Route>
       </Switch>
     </div>
   );

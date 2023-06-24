@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ public class ShipmentController extends BaseController {
     @Autowired
     private IShipmentService shipmentService;
     @ApiOperation(value = "Thêm mới kế hoạch (đợt) giao hàng")
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/create")
     public ResponseEntity<?> create(@Valid @RequestBody ShipmentDTO shipmentDTO, JwtAuthenticationToken token) {
         try {
@@ -47,6 +49,17 @@ public class ShipmentController extends BaseController {
         }
     }
 
+    @ApiOperation(value = "Update shipment")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/update")
+    public ResponseEntity<?> updateShipmentInfo(@Valid @RequestBody ShipmentDTO shipmentDTO, @RequestParam(value = "id") Long id) {
+        try {
+            return response(new ResultEntity(1, "Create new shipment successfully", shipmentService.updateShipment(shipmentDTO, id)));
+        }
+        catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
     @ApiOperation(value = "Phân đơn thành các shipment từ các spliting order")
     @PostMapping("/create-shipment-item")
     public ResponseEntity<?> createItem(@Valid @RequestBody ShipmentItemDTO shipmentItemDTO) {

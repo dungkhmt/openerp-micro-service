@@ -5,10 +5,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.product.ProductDTO;
 import wms.dto.shipment.AssignedItemDTO;
-import wms.dto.shipment.ReturnShipmentItemDTO;
 import wms.dto.shipment.ShipmentDTO;
 import wms.dto.shipment.ShipmentItemDTO;
-import wms.entity.ProductEntity;
 import wms.entity.Shipment;
 import wms.entity.ShipmentItem;
 import wms.exception.CustomException;
@@ -16,6 +14,7 @@ import wms.exception.CustomException;
 public interface IShipmentService {
     Shipment createShipment(ShipmentDTO shipmentDTO, JwtAuthenticationToken token) throws CustomException;
     ShipmentItem createShipmentItem(ShipmentItemDTO shipmentItemDTO) throws CustomException;
+    Shipment updateShipment(ShipmentDTO shipmentDTO, Long id) throws CustomException;
     void assignShipmentItem(AssignedItemDTO assignedItemDTO) throws CustomException;
     ReturnPaginationDTO<Shipment> getAllShipments(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
     ReturnPaginationDTO<ShipmentItem> getAllShipmentItems(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;

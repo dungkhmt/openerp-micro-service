@@ -7,18 +7,25 @@ export const user = {
   text: "User",
   child: [
     {
-      id: "MENU_USER.ALL_USER", // TODO: change this
-      onClick: () => {
-        window.location.href = `${config.url.KEYCLOAK_BASE_URL}/admin/${KC_REALM}/console/#/${KC_REALM}/users`;
-      },
+      id: "MENU_USER.ALL_USER",
+      path: "/all-user",
       isPublic: false,
       text: "All users",
       child: [],
     },
     {
+      id: "MENU_USER.SETTINGS", // TODO: change this
+      onClick: () => {
+        window.location.href = `${config.url.KEYCLOAK_BASE_URL}/admin/${KC_REALM}/console/#/${KC_REALM}/users`;
+      },
+      isPublic: false,
+      text: "Settings",
+      child: [],
+    },
+    {
       id: "MENU_USER_SEND_MAIL_TO_USERS",
       path: "/user-group/user/send-mail",
-      isPublic: false,
+      isPublic: true,
       text: "Gửi email",
       child: [],
     },

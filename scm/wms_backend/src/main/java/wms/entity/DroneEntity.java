@@ -38,5 +38,5 @@ public class DroneEntity extends BaseEntity{
     @OneToOne(cascade = CascadeType.PERSIST)
     @JsonIgnore
     @JoinColumn(name = "user_id", referencedColumnName = "user_login_id")
-    private UserLogin userLogin;
+    private UserRegister userLogin;
 }

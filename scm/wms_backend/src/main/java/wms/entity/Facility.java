@@ -44,12 +44,12 @@ public class Facility extends BaseEntity implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by", referencedColumnName = "user_login_id")
     @NotFound(action = NotFoundAction.IGNORE)
-    private UserLogin creator;
+    private UserRegister creator;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "managed_by", referencedColumnName = "user_login_id")
     @NotFound(action = NotFoundAction.IGNORE)
-    private UserLogin manager;
+    private UserRegister manager;
 
     @OneToMany(mappedBy = "facility",fetch = FetchType.LAZY)
     // Add JsonIgnore: https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed

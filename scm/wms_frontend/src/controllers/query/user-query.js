@@ -3,14 +3,29 @@ import axiosSendRequest from "../axiosSendRequest";
 import { endPoint } from "../endpoint";
 import { queryKey } from "./querykey";
 
-export const useGetAllUsersExist = () => {
+export const useGetAllUsersExist = (params) => {
   return useQuery({
     queryKey: [queryKey.user.user_list_all],
     queryFn: async () => {
       const res = await axiosSendRequest(
         "get",
-        endPoint.getAllUsersWithoutPagination
+        endPoint.getAllUsersWithoutPagination,
+        params
       );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};
+
+export const useGetUserPagination = (params) => {
+  return useQuery({
+    queryKey: [queryKey.user.user_list_pagination, params],
+    queryFn: async () => {
+      const res = await axiosSendRequest("get", endPoint.getAllUsers, params);
       if (res.data && res.code === 1) {
         return res.data;
       }

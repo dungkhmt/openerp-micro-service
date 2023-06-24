@@ -15,7 +15,6 @@ import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.product.ProductDTO;
 import wms.dto.shipment.AssignedItemDTO;
-import wms.dto.shipment.ReturnShipmentItemDTO;
 import wms.dto.shipment.ShipmentDTO;
 import wms.dto.shipment.ShipmentItemDTO;
 import wms.entity.*;
@@ -27,10 +26,6 @@ import wms.service.BaseService;
 import wms.service.delivery_bill.IDeliveryBillService;
 import wms.service.delivery_trip.IDeliveryTripService;
 import wms.utils.GeneralUtils;
-
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -56,7 +51,7 @@ public class ShipmentServiceImpl extends BaseService implements IShipmentService
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Shipment createShipment(ShipmentDTO shipmentDTO, JwtAuthenticationToken token) throws CustomException {
-        UserLogin createdBy = userRepo.getUserByUserLoginId(token.getName());
+        UserRegister createdBy = userRepo.getUserByUserLoginId(token.getName());
         if (createdBy == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown staff create this shipment, can't create");
         }
@@ -84,6 +79,19 @@ public class ShipmentServiceImpl extends BaseService implements IShipmentService
                 .deliveryBillItemSeqId(shipmentItemDTO.getDeliveryBillItemSeqId())
                 .build();
         return shipmentItemRepo.save(newShipmentItem);
+    }
+
+    @Override
+    public Shipment updateShipment(ShipmentDTO shipmentDTO, Long id) throws CustomException {
+        Shipment shipment = shipmentRepo.getShipmentById(id);
+        if (shipment == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(),  "Can not find shipment with this id: " + id);
+        }
+        shipment.setTitle(shipmentDTO.getTitle());
+        shipment.setMaxSize(shipmentDTO.getMaxSize());
+        shipment.setStartedDate(GeneralUtils.convertFromStringToDate(shipmentDTO.getStartedDate()));
+        shipment.setEndedDate(GeneralUtils.convertFromStringToDate(shipmentDTO.getEndedDate()));
+        return shipmentRepo.save(shipment);
     }
 
     @Override

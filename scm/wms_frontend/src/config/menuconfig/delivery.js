@@ -31,27 +31,12 @@ export const delivery = {
       text: "Drone",
       child: [],
     },
-    // {
-    //   id: "MENU_SCM_DELIVERY.VEHICLE",
-    //   path: "/delivery/vehicle",
-    //   isPublic: true,
-    //   text: "Vehicles",
-    //   child: [
-    //     {
-    //       id: "MENU_SCM_DELIVERY.VEHICLE.TRUCK",
-    //       path: "/delivery/vehicle/truck",
-    //       isPublic: true,
-    //       text: "Truck",
-    //       child: [],
-    //     },
-    //     {
-    //       id: "MENU_SCM_DELIVERY.VEHICLE.DRONE",
-    //       path: "/delivery/vehicle/drone",
-    //       isPublic: true,
-    //       text: "Drone",
-    //       child: [],
-    //     },
-    //   ],
-    // },
+    {
+      id: "MENU_SCM_DELIVERY.DELIVERY_STAFF",
+      path: "/delivery/delivery-staff",
+      isPublic: false,
+      text: "Delivery Staff",
+      child: [],
+    },
   ],
 };

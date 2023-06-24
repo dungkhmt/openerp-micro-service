@@ -28,12 +28,12 @@ public class DeliveryTrip extends BaseEntity implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by", referencedColumnName = "user_login_id")
     @NotFound(action = NotFoundAction.IGNORE)
-    private UserLogin creator;
+    private UserRegister creator;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_in_charge", referencedColumnName = "user_login_id")
     @NotFound(action = NotFoundAction.IGNORE)
-    private UserLogin userInCharge;
+    private UserRegister userInCharge;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "shipment_code", referencedColumnName = "code")

@@ -10,8 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.product.ProductDTO;
-import wms.entity.DeliveryTrip;
-import wms.entity.UserLogin;
+import wms.entity.UserRegister;
 import wms.exception.CustomException;
 import wms.repo.UserRepo;
 import wms.service.BaseService;
@@ -27,32 +26,29 @@ public class UserServiceImpl extends BaseService implements IUserService {
         this.userRepo = userRepo;
     }
 
-    @Override
-    public ReturnPaginationDTO<UserLogin> getAllUserLogins(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
+    public ReturnPaginationDTO<UserRegister> getAllUsersPaging(int page, int pageSize, String sortField, boolean isSortAsc, String role) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? PageRequest.of(page - 1, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
-        Page<UserLogin> users = userRepo.search(pageable);
+        Page<UserRegister> users = userRepo.search(pageable, role);
         return getPaginationResult(users.getContent(), page, users.getTotalPages(), users.getTotalElements());
     }
 
     @Override
-    public List<UserLogin> getAllUsers() {
+    public List<UserRegister> getAllUsers() {
         return userRepo.findAll();
     }
 
-    @Override
-    public UserLogin getUserLoginById(long id) {
+    public UserRegister getUserById(long id) {
+        return null;
+    }
+
+    public UserRegister getUserByCode(String code) {
         return null;
     }
 
     @Override
-    public UserLogin getUserLoginByCode(String code) {
-        return null;
-    }
-
-    @Override
-    public UserLogin updateUserLogin(ProductDTO productDTO, long id) throws CustomException {
+    public UserRegister updateUserLogin(ProductDTO productDTO, long id) throws CustomException {
         return null;
     }
 

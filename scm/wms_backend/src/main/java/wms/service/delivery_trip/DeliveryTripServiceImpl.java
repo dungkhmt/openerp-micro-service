@@ -75,8 +75,8 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
     @Override
     @Transactional(rollbackFor = Exception.class)
     public DeliveryTrip createDeliveryTrip(DeliveryTripDTO deliveryTripDTO, JwtAuthenticationToken token) throws CustomException {
-        UserLogin createdBy = userRepo.getUserByUserLoginId(token.getName());
-        UserLogin userInCharge = userRepo.getUserByUserLoginId(deliveryTripDTO.getUserInCharge());
+        UserRegister createdBy = userRepo.getUserByUserLoginId(token.getName());
+        UserRegister userInCharge = userRepo.getUserByUserLoginId(deliveryTripDTO.getUserInCharge());
         Shipment shipment = shipmentRepo.getShipmentByCode(deliveryTripDTO.getShipmentCode());
         Facility facility = facilityRepo.getFacilityByCode(deliveryTripDTO.getFacilityCode());
         if (createdBy == null) {
@@ -163,7 +163,7 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
     private TruckDroneDeliveryInput setAlgoInput(DeliveryTrip trip, List<ShipmentItem> shipmentItems) throws Exception {
         TruckDroneDeliveryInput input = new TruckDroneDeliveryInput();
         List<Node> points = new ArrayList<>(); // All coordinations got
-        UserLogin user = trip.getUserInCharge();
+        UserRegister user = trip.getUserInCharge();
         // Set truck properties
         TruckEntity truckEntity = truckRepo.getTruckFromUser(user.getId());
         Truck truck = new Truck();
