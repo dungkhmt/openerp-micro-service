@@ -11,4 +11,6 @@ public interface DeliveryBillRepository extends JpaRepository<DeliveryBill, Stri
 
     List<DeliveryBill> findAllByDeliveryTripId(String deliveryTripId);
 
+    List<DeliveryBill> findAllByOrderByCreatedStampDesc();
+
 }

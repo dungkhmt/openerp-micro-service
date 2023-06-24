@@ -386,7 +386,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     public List<ReceiptBillWithItems> getReceiptBills(String receiptId) {
         List<ReceiptBill> bills;
         if (receiptId == null) {
-            bills = receiptBillRepository.findAll();
+            bills = receiptBillRepository.findAllByOrderByCreatedStampDesc();
         } else {
             bills = receiptBillRepository.findAllByReceiptId(UUID.fromString(receiptId));
         }
