@@ -100,16 +100,31 @@ function ManagerViewProblemDetailV2() {
     <HustContainerCard
       title={"Problem Detail"}
       action={
-        <Button
-          variant="contained"
-          color="info"
-          onClick={() => {
-            history.push("/programming-contest/edit-problem/" + problemId);
-          }}
-          startIcon={<EditIcon sx={{marginRight: "4px"}}/>}
-        >
-          Edit
-        </Button>
+        <>
+          <Button
+            variant="contained"
+            color="info"
+            onClick={() => {
+              history.push("/programming-contest/edit-problem/" + problemId);
+            }}
+            startIcon={<EditIcon sx={{ marginRight: "4px" }} />}
+            sx={{ marginRight: "8px" }}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="contained"
+            color="info"
+            onClick={() => {
+              history.push(
+                "/programming-contest/user-contest-problem-role-management/" +
+                  problemId
+              );
+            }}
+          >
+            Manage Role
+          </Button>
+        </>
       }
     >
       <Grid container spacing={2}>

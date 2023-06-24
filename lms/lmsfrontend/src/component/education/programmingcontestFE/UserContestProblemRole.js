@@ -8,6 +8,7 @@ import {Button, InputBase} from "@mui/material";
 import StandardTable from "component/table/StandardTable";
 import {useParams} from "react-router-dom";
 import {request} from "../../../api";
+import AddMemberProblemDialog from "./AddMemberProblemDialog";
 
 export default function UserContestProblemRole() {
   const {problemId} = useParams();
@@ -18,6 +19,8 @@ export default function UserContestProblemRole() {
   const [totalPageSearch, setTotalPageSearch] = useState(0);
   const [pageSearch, setPageSearch] = useState(1);
   const [userRoles, setUserRoles] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   const columnUserRoles = [
     {title: "UserId", field: "userLoginId"},
@@ -37,7 +40,33 @@ export default function UserContestProblemRole() {
   ];
 
   function handleClick(u) {
-    alert("add role to user " + u);
+    setSelectedUserId(u);
+    setOpen(true);
+  }
+
+  function handleModalClose() {
+    setOpen(false);
+  }
+
+  function onUpdateInfo(selectRole, selectedUserId) {
+    //alert("onUpdateInfo " + selectRole + ":" + selectedUserId);
+    let body = {
+      problemId: problemId,
+      userId: selectedUserId,
+      roleId: selectRole,
+    };
+
+    request(
+      "post",
+      "/add-contest-problem-role-to-user/",
+      (res) => {
+        if (res.data) alert("Add successully");
+        else alert("You have already added this user to this problem before");
+        setOpen(false);
+      },
+      {},
+      body
+    ).then();
   }
 
   function getRoles() {
@@ -90,10 +119,10 @@ export default function UserContestProblemRole() {
           <Toolbar>
             <Search>
               <SearchIconWrapper>
-                <SearchIcon/>
+                <SearchIcon />
               </SearchIconWrapper>
               <InputBase
-                style={{paddingLeft: 50}}
+                style={{ paddingLeft: 50 }}
                 placeholder={"search..."}
                 onChange={(event) => {
                   setKeyword(event.target.value);
@@ -128,6 +157,13 @@ export default function UserContestProblemRole() {
           search: true,
           sorting: true,
         }}
+      />
+      <AddMemberProblemDialog
+        open={open}
+        onClose={handleModalClose}
+        onUpdateInfo={onUpdateInfo}
+        selectedUserId={selectedUserId}
+        rolesList={["VIEW", "MANAGER"]}
       />
     </div>
   );

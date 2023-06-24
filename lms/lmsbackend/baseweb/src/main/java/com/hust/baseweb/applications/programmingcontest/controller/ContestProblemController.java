@@ -1754,14 +1754,28 @@ public class ContestProblemController {
 
     @PostMapping("/add-contest-problem-role-to-user/")
     public ResponseEntity<?> addContestProblemRole(Principal principal, @RequestBody ModelUserProblemRole input) {
-        boolean ok = problemTestCaseService.addUserProblemRole(principal.getName(), input);
-        return ResponseEntity.ok().body(ok);
+        try {
+            boolean ok = problemTestCaseService.addUserProblemRole(principal.getName(), input);
+            return ResponseEntity.ok().body(ok);
+        } catch (Exception e) {
+            if (e instanceof MiniLeetCodeException)
+                return ResponseEntity.status(((MiniLeetCodeException) e).getCode()).body(e.getMessage());
+            else
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping("/remove-contest-problem-role-to-user/")
-    public ResponseEntity<?> removeContestProblemRole(Principal principal, @RequestBody ModelUserProblemRole input) {
-        boolean ok = problemTestCaseService.removeUserProblemRole(principal.getName(), input);
-        return ResponseEntity.ok().body(ok);
+    public ResponseEntity<?> removeContestProblemRole(Principal principal, @RequestBody ModelUserProblemRole input) {   
+        try {
+            boolean ok = problemTestCaseService.removeUserProblemRole(principal.getName(), input);
+            return ResponseEntity.ok().body(ok);
+        } catch (Exception e) {
+            if (e instanceof MiniLeetCodeException)
+                return ResponseEntity.status(((MiniLeetCodeException) e).getCode()).body(e.getMessage());
+            else
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @GetMapping("/grant-manager-role-all-problems/{userId}/{roleId}")
