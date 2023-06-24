@@ -136,10 +136,14 @@ public class ContestProblemController {
 
     @Secured("ROLE_TEACHER")
     @GetMapping("/problem-details/{problemId}")
-    public ResponseEntity<?> getProblemDetails(@PathVariable("problemId") String problemId) throws Exception {
+    public ResponseEntity<?> getProblemDetails(@PathVariable("problemId") String problemId, Principal teacher) throws Exception {
         log.info("getProblemDetails problemId {}", problemId);
-        ModelCreateContestProblemResponse problemResponse = problemTestCaseService.getContestProblem(problemId);
-        return ResponseEntity.status(200).body(problemResponse);
+        try {
+            ModelCreateContestProblemResponse problemResponse = problemTestCaseService.getContestProblemDetailByIdAndTeacher(problemId, teacher.getName());
+            return ResponseEntity.status(200).body(problemResponse);
+        } catch (MiniLeetCodeException e) {
+            return ResponseEntity.status(e.getCode()).body(e.getMessage());
+        }
     }
 
     @GetMapping("/get-problem-detail-view-by-student/{problemId}")
@@ -1984,5 +1988,23 @@ public class ContestProblemController {
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + id + ".zip");
 
         return ResponseEntity.ok().headers(headers).body(stream);
+    }
+
+    @Secured("ROLE_TEACHER")
+    @GetMapping("/get-all-my-problems")
+    public Page<ProblemEntity> getAllMyProblems(
+        Pageable pageable,
+        Principal owner
+    ) {
+        return this.problemTestCaseService.getOwnerProblemsPaging(pageable, owner.getName());
+    }
+
+    @Secured("ROLE_TEACHER")
+    @GetMapping("/get-all-shared-problems")
+    public Page<ProblemEntity> getAllSharedProblems(
+        Pageable pageable,
+        Principal owner
+    ) {
+        return this.problemTestCaseService.getSharedProblemsPaging(pageable, owner.getName());
     }
 }

@@ -4,11 +4,12 @@ import com.hust.baseweb.applications.programmingcontest.entity.ProblemEntity;
 import com.hust.baseweb.applications.programmingcontest.model.ModelProblemGeneralInfo;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface ProblemRepo extends JpaRepository<ProblemEntity, String> {
+public interface ProblemRepo extends JpaRepository<ProblemEntity, String>, JpaSpecificationExecutor<ProblemEntity> {
 
     ProblemEntity findByProblemId(String problemId);
 

@@ -45,6 +45,7 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.persistence.criteria.Predicate;
 import static com.hust.baseweb.config.rabbitmq.ProblemContestRoutingKey.JUDGE_PROBLEM;
 import static com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestConfig.EXCHANGE;
 
@@ -4103,7 +4104,14 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public boolean addUserProblemRole(String userName, ModelUserProblemRole input) {
+    public boolean addUserProblemRole(String userName, ModelUserProblemRole input) throws Exception {
+        boolean isOwner = this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(
+            input.getProblemId(),
+            userName,
+            UserContestProblemRole.ROLE_OWNER);
+        if (!isOwner) {
+            throw new MiniLeetCodeException("You are not owner of this problem.", 403);
+        }
         List<UserContestProblemRole> L = userContestProblemRoleRepo.findAllByProblemIdAndUserIdAndRoleId(
             input.getProblemId(),
             input.getUserId(),
@@ -4122,7 +4130,14 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public boolean removeUserProblemRole(String userName, ModelUserProblemRole input) {
+    public boolean removeUserProblemRole(String userName, ModelUserProblemRole input) throws Exception {
+        boolean isOwner = this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(
+            input.getProblemId(),
+            userName,
+            UserContestProblemRole.ROLE_OWNER);
+        if (!isOwner) {
+            throw new MiniLeetCodeException("You are not owner of this problem.", 403);
+        }
         List<UserContestProblemRole> L = userContestProblemRoleRepo.findAllByProblemIdAndUserIdAndRoleId(
             input.getProblemId(),
             input.getUserId(),
@@ -4261,4 +4276,36 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         }
     }
 
+    public ModelCreateContestProblemResponse getContestProblemDetailByIdAndTeacher(String problemId, String teacherId)
+            throws Exception {
+        boolean hasPermission = this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
+                teacherId, UserContestProblemRole.ROLE_VIEW);
+        if (!hasPermission) {
+            throw new MiniLeetCodeException("You don't have permission to view this problem", 403);
+        }
+
+        return this.getContestProblem(problemId);
+    }
+
+    public Page<ProblemEntity> getOwnerProblemsPaging(Pageable pageable, String ownerId) {
+        return this.problemRepo.findAll((root, query, criteriaBuilder) -> {
+                List<Predicate> predicates = new ArrayList<>();
+                predicates.add(criteriaBuilder.equal(root.get("userId"), ownerId));
+                return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+            } , pageable);
+    }
+
+    public Page<ProblemEntity> getSharedProblemsPaging(Pageable pageable, String userId) {
+        List<String> problemIds = this.userContestProblemRoleRepo.getProblemIdsShared(userId);
+
+        return this.problemRepo.findAll((root, query, criteriaBuilder) -> {
+                List<Predicate> predicates = new ArrayList<>();
+                if (problemIds != null && problemIds.size() > 0) {
+                    predicates.add(criteriaBuilder.in(root.get("problemId")).value(problemIds));
+                } else {
+                    predicates.add(criteriaBuilder.equal(root.get("problemId"), ""));
+                }
+                return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+            } , pageable);
+    }
 }

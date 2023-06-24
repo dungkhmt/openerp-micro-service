@@ -14,7 +14,7 @@ import EditProblem from "../component/education/programmingcontestFE/EditProblem
 import EditTestCase from "../component/education/programmingcontestFE/EditTestCase";
 import {ListContestManager} from "../component/education/programmingcontestFE/ListContestManager";
 import ListPracticalProblem from "../component/education/programmingcontestFE/ListPracticalProblem";
-import ListProblem from "../component/education/programmingcontestFE/ListProblem";
+import ListProblemV2 from "../component/education/programmingcontestFE/ListProblemV2";
 import {StudentContestNotRegistered} from "../component/education/programmingcontestFE/StudentContestNotRegistered";
 import {StudentContestRegistered} from "../component/education/programmingcontestFE/StudentContestRegistered";
 import StudentViewContestDetail from "../component/education/programmingcontestFE/StudentViewContestDetail";
@@ -30,7 +30,7 @@ export default function ProgrammingContestRoutes() {
   return (
     <div>
       <Switch>
-        <Route component={ListProblem} path={`${path}/list-problems`} />
+        <Route component={ListProblemV2} path={`${path}/list-problems`} />
         <Route component={CreateProblem} path={`${path}/create-problem`} />
         <Route component={SuggestProblem} path={`${path}/suggest-problem`} />
         <Route
