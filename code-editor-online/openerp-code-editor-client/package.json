@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@convergencelabs/ace-collab-ext": "^0.6.0",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@hookstate/core": "^3.0.8",
@@ -68,7 +69,5 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-    "@convergencelabs/ace-collab-ext": "^0.6.0"
-  }
+  "devDependencies": {}
 }
