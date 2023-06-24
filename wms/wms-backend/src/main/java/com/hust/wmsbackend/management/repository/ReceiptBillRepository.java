@@ -13,6 +13,8 @@ public interface ReceiptBillRepository extends JpaRepository<ReceiptBill, String
 
     List<ReceiptBill> findAllByReceiptId(UUID receiptID);
 
+    List<ReceiptBill> findAllByOrderByCreatedStampDesc();
+
     Optional<ReceiptBill> findFirstByReceiptIdOrderByCreatedStampDesc(UUID receiptId);
 
 }
