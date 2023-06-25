@@ -15,8 +15,8 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
     const [msg, setMsg] = useState('');
 
     const actionConst = [
-        { name: "PICK TRAILER", id: "1" },
-        { name: "DROP TRAILER", id: "2" },
+        { name: "PICKUP-TRAILER", id: "1" },
+        { name: "DROP-TRAILER", id: "2" },
         { name: "STOP", id: "3" },
     ];
     const typeConst = [
@@ -48,6 +48,12 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
         setTrailer(event.target.value);
     };
     const handleChangeAction = (event) => {
+        if(event.target.value === "PICKUP-TRAILER" || event.target.value === "DROP-TRAILER") {
+            setType("Trailer");
+        }
+        if(event.target.value === "STOP") {
+            setType("Truck");
+        }
         setAction(event.target.value);
     };
     const handleSubmit = () => {
@@ -63,7 +69,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
         }
         if (type === "Trailer") {
             let tripItem;
-            if (action === "PICK TRAILER") {
+            if (action === "PICKUP-TRAILER") {
                 tripItem =
                 [{
                     // xem xet lai id co the trung
@@ -83,7 +89,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                 }];
                 setTrailerSelect(trailer);
             }
-            if (action === "DROP TRAILER") {
+            if (action === "DROP-TRAILER") {
                 console.log("trailerSelect", trailerSelect);
                 if (!trailerSelect) {
                     setMsg("Can't select add DROP TRAILER action while Trailer is not selected before!")
@@ -140,7 +146,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                 </Box>
                 <Divider sx={{ mb: 4, mt: 4 }} />
                 <Box className="body-modal">
-                    <Box className="body-modal-item">
+                    {/* <Box className="body-modal-item">
                         <Box className="body-modal-item-text">
                             <Typography>Type:</Typography>
                         </Box>
@@ -163,7 +169,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                                 </Select>
                             </FormControl>
                         </Box>
-                    </Box>
+                    </Box> */}
                     <Box className="body-modal-item">
                         <Box className="body-modal-item-text">
                             <Typography>Action:</Typography>
@@ -188,7 +194,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                             </FormControl>
                         </Box>
                     </Box>
-                    {type && type === "Trailer" && action && action === "PICK TRAILER" ? (<Box className="body-modal-item">
+                    {type && type === "Trailer" && action && action === "PICKUP-TRAILER" ? (<Box className="body-modal-item">
                         <Box className="body-modal-item-text">
                             <Typography>Trailer:</Typography>
                         </Box>
@@ -212,7 +218,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                             </FormControl>
                         </Box>
                     </Box>) : null}
-                    {type && type === "Trailer" && action && action === "DROP TRAILER" ? (
+                    {type && type === "Trailer" && action && action === "DROP-TRAILER" ? (
                         <Box className="body-modal-item">
                             <Box className="body-modal-item-text">
                                 <Typography>Facility:</Typography>

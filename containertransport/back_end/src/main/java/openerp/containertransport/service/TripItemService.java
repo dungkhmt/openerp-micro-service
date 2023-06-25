@@ -11,4 +11,5 @@ public interface TripItemService {
     List<TripItemModel> getTripItemByTripId(String uid);
 
     TripItemModel updateTripItem(String uid, TripItemModel tripItemModel);
+    TripItemModel deleteTripItem(String uid);
 }

@@ -31,3 +31,11 @@ export const updateTruck = (id, data) => {
     )
     return resData;
 }
+
+export const deleteTruck = (uid) => {
+    const resData = request(
+        "delete",
+        `/truck/delete/${uid}`, {},{}, {}, {},
+    )
+    return resData;
+}

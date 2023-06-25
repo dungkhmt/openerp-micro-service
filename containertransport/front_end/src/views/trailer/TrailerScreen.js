@@ -17,6 +17,8 @@ const TrailerScreen = () => {
 
     const [openModal, setOpenModal] = useState(false);
 
+    const [flag, setFlag] = useState(false); 
+
     const handleClose = () => {
         setOpenModal(!openModal);
     }
@@ -26,7 +28,7 @@ const TrailerScreen = () => {
             setTrailer(res?.data.data.trailerModels);
             setCount(res?.data.data.count);
         })
-    }, [openModal, page, rowsPerPage])
+    }, [openModal, page, rowsPerPage, flag])
 
 
     return (
@@ -44,7 +46,9 @@ const TrailerScreen = () => {
                     <Divider />
                 </Box>
                 <ContentsTrailerScreen trailer={trailer} page={page} setPage={setPage}
-                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
+                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count}
+                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg}
+                    flag={flag} setFlag={setFlag} />
             </Container>
         </Box>
     )

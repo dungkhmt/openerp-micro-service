@@ -11,4 +11,5 @@ public interface TrailerService {
     TrailerModel getTrailerByUid(String uid);
     TrailerModel updateTrailer(TrailerModel trailerModel);
     TrailerFilterRes filterTrailer(TrailerFilterRequestDTO trailerFilterRequestDTO);
+    TrailerModel deleteTrailer(String uid);
 }

@@ -17,28 +17,28 @@ const ShipmentScreen = () => {
     const [count, setCount] = useState(0);
 
     useEffect(() => {
-        getShipment({page: page, pageSize: rowsPerPage})
-        .then((res) => {
-            console.log("shipment==========", res.data.data)
-            setShipments(res?.data.data.shipmentModels);
-            setCount(res?.data.data.count);
-        });
+        getShipment({ page: page, pageSize: rowsPerPage })
+            .then((res) => {
+                console.log("shipment==========", res.data.data)
+                setShipments(res?.data.data.shipmentModels);
+                setCount(res?.data.data.count);
+            });
     }, [toastOpen, page, rowsPerPage]);
     return (
         <Box className="fullScreen">
             <Container maxWidth="lg" className="container">
-            <Box className="toast">
+                <Box className="toast">
                     {toastOpen ? (
-                    <Alert variant="filled" severity={toastType} >
-                        <strong>{toastMsg}</strong >
-                    </Alert > ) : null}
+                        <Alert variant="filled" severity={toastType} >
+                            <strong>{toastMsg}</strong >
+                        </Alert >) : null}
                 </Box>
                 <HeaderShipmentScreen setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
                 <Box className="divider">
                     <Divider />
                 </Box>
                 <ShipmentScreenContents shipments={shipments} page={page} setPage={setPage}
-                rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
+                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
             </Container>
         </Box>
 

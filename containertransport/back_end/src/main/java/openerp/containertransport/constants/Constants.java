@@ -25,7 +25,8 @@ public class Constants implements Serializable {
         AVAILABLE("AVAILABLE"),
         SCHEDULED("SCHEDULED"),
         UNAVAILABLE("UNAVAILABLE"),
-        EXECUTING("EXECUTING");
+        EXECUTING("EXECUTING"),
+        DELETE("DELETE");
         private final String status;
         TruckStatus(String status) {
             this.status = status;
@@ -37,7 +38,8 @@ public class Constants implements Serializable {
         AVAILABLE("AVAILABLE"),
         SCHEDULED("SCHEDULED"),
         UNAVAILABLE("UNAVAILABLE"),
-        EXECUTING("EXECUTING");
+        EXECUTING("EXECUTING"),
+        DELETE("DELETE");
         private final String status;
         TrailerStatus(String status) {
             this.status = status;
@@ -64,6 +66,30 @@ public class Constants implements Serializable {
         EXECUTING("EXECUTING");
         private final String status;
         ContainerStatus(String status) {
+            this.status = status;
+        }
+    }
+
+    @Getter
+    public enum TripStatus {
+        SCHEDULED("SCHEDULED"),
+        DONE("DONE"),
+        EXECUTING("EXECUTING");
+        private final String status;
+        TripStatus(String status) {
+            this.status = status;
+        }
+    }
+
+    @Getter
+    public enum ShipmentStatus {
+        WAITING_SCHEDULED("WAITING_SCHEDULED"),
+        SCHEDULED("SCHEDULED"),
+        DONE("DONE"),
+        DELETE("DELETE"),
+        EXECUTING("EXECUTING");
+        private final String status;
+        ShipmentStatus(String status) {
             this.status = status;
         }
     }

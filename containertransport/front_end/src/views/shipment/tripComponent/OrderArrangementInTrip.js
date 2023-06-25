@@ -211,7 +211,11 @@ const DragHandle = SortableHandle(({ style }) => (
     <span style={{ ...style, ...{ cursor: 'move' } }}> {':::'} </span>)
 )
 
-const Row = SortableElement(({ data, ...other }) => {
+const Row = SortableElement(({ data, facilitiesTmp, setFacilitiesTmp,...other }) => {
+    const handleDeleteTripItem = (code) => {
+        let facis = facilitiesTmp.filter((tr) => tr?.code !== code);
+        setFacilitiesTmp(facis);
+    }
     return (
         <TableRow {...other}>
             {/* { other.children[0]} */}
@@ -233,6 +237,15 @@ const Row = SortableElement(({ data, ...other }) => {
             <TableCell>
                 {data.status ? data.status : "SCHEDULED"}
             </TableCell>
+            {(data?.type === "Trailer" || (data?.type === "Truck" && data?.action === "STOP")) ? (
+                <TableCell>
+                    <Box className="icon-view-screen"
+                    onClick={() => handleDeleteTripItem(data.code)}
+                    >
+                        <Icon>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                    </Box>
+                </TableCell>) : 
+                <TableCell><Box></Box></TableCell>}
         </TableRow >
     )
 })
@@ -475,6 +488,7 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                                     <TableCell>
                                         {row.status ? row.status : "SCHEDULED"}
                                     </TableCell>
+                                    <TableCell><Box></Box></TableCell>
                                 </TableRow >
                             )
                         }
@@ -484,6 +498,8 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                                     index={index}
                                     key={row.id}
                                     data={row}
+                                    facilitiesTmp={facilitiesFinal}
+                                    setFacilitiesTmp={setFacilitiesFinal}
                                 />
                             )
                         }

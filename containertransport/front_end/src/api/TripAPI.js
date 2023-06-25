@@ -39,3 +39,11 @@ export const updateTrip = async (id, data) => {
     )
     return resData;
 }
+
+export const deleteTrip = async (data) => {
+    const resData = request(
+        "delete",
+        `/trip/delete`, {},{}, data, {},
+    )
+    return resData;
+}

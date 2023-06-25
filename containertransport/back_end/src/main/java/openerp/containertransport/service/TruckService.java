@@ -12,4 +12,5 @@ public interface TruckService {
     TruckFilterRes filterTruck(TruckFilterRequestDTO truckFilterRequestDTO);
     TruckModel getTruckByUid(String uid);
     TruckModel updateTruck(TruckModel truckModel, String uid);
+    TruckModel deleteTruck(String uid);
 }

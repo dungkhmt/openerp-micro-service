@@ -3,6 +3,7 @@ package openerp.containertransport.controller;
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.MetaData;
 import openerp.containertransport.dto.TripCreateDTO;
+import openerp.containertransport.dto.TripDeleteDTO;
 import openerp.containertransport.dto.TripFilterRequestDTO;
 import openerp.containertransport.dto.TripModel;
 import openerp.containertransport.dto.metaData.MetaDTO;
@@ -52,5 +53,11 @@ public class TripController {
     public ResponseEntity<?> updateTrip(@PathVariable String uid ,@RequestBody TripModel tripModel) {
         TripModel tripModelUpdate = tripService.updateTrip(uid, tripModel);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModelUpdate));
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody TripDeleteDTO tripDeleteDTO) {
+        List<TripModel> tripModels = tripService.deleteTrips(tripDeleteDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModels));
     }
 }

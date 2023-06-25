@@ -83,6 +83,12 @@ public class TripItemServiceImpl implements TripItemService {
         return convertToModel(tripItem);
     }
 
+    @Override
+    public TripItemModel deleteTripItem(String uid) {
+        TripItem tripItemDelete = tripItemRepo.deleteByUid(uid);
+        return convertToModel(tripItemDelete);
+    }
+
     public TripItemModel convertToModel (TripItem tripItem) {
         TripItemModel tripItemModel = modelMapper.map(tripItem, TripItemModel.class);
         tripItemModel.setFacilityName(tripItem.getFacility().getFacilityName());

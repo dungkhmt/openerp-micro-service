@@ -24,6 +24,7 @@ import { visuallyHidden } from '@mui/utils';
 import { Icon } from '@mui/material';
 import { menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
+import { deleteTruck } from 'api/TruckAPI';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -162,7 +163,7 @@ function EnhancedTableHead(props) {
   );
 }
 
-export default function ContentsTruckManagement({ trucks, page, setPage, rowsPerPage, setRowsPerPage, count }) {
+export default function ContentsTruckManagement({ trucks, page, setPage, rowsPerPage, setRowsPerPage, count, setToast, setToastType, setToastMsg, flag, setFlag }) {
   const [order, setOrder] = React.useState(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
   const [selected, setSelected] = React.useState([]);
@@ -234,6 +235,18 @@ export default function ContentsTruckManagement({ trucks, page, setPage, rowsPer
       pathname: `/truck/detail/${id}`,
     })
   }
+  const handleDelete = (uid) => {
+    deleteTruck(uid).then((res) => {
+      console.log(res);
+      setToastMsg("Delete Truck Success");
+      setToastType("success");
+      setToast(true);
+      setTimeout(() => {
+          setToast(false);
+      }, "3000");
+      setFlag(!flag);
+    })
+  }
   return (
     <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
       <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -300,7 +313,7 @@ export default function ContentsTruckManagement({ trucks, page, setPage, rowsPer
                             </Box>
                           </Tooltip>
                           <Tooltip title="Delete">
-                            <Box>
+                            <Box onClick={() => { handleDelete(row?.uid) }}>
                               <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
                             </Box>
                           </Tooltip>

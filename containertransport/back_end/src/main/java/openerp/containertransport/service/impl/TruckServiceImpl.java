@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import openerp.containertransport.constants.Constants;
 import openerp.containertransport.dto.*;
 import openerp.containertransport.entity.Facility;
 import openerp.containertransport.entity.Truck;
@@ -70,6 +71,10 @@ public class TruckServiceImpl implements TruckService  {
             sqlCount += " AND status = :status";
             params.put("status", truckFilterRequestDTO.getStatus());
         }
+        sql += " AND status != :statusNotEqual";
+        sqlCount += " AND status = :statusNotEqual";
+        params.put("statusNotEqual", Constants.TruckStatus.DELETE.getStatus());
+
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
         for (String i : params.keySet()) {
             queryCount.setParameter(i, params.get(i));
@@ -131,6 +136,14 @@ public class TruckServiceImpl implements TruckService  {
         truckRepo.save(truck);
         TruckModel truckModelUpdate = convertToModel(truck);
         return truckModelUpdate;
+    }
+
+    @Override
+    public TruckModel deleteTruck(String uid) {
+        Truck truck = truckRepo.findByUid(uid);
+        truck.setStatus(Constants.TruckStatus.DELETE.getStatus());
+        truck = truckRepo.save(truck);
+        return convertToModel(truck);
     }
 
     public TruckModel convertToModel(Truck truck) {

@@ -44,4 +44,10 @@ public class TrailerController {
         TrailerModel trailerModelUpdate = trailerService.updateTrailer(trailerModel);
         return ResponseEntity.status(HttpStatus.OK).body(trailerModelUpdate);
     }
+
+    @DeleteMapping("/delete/{uid}")
+    public ResponseEntity<?> deleteTrailer(@PathVariable String uid) {
+        TrailerModel trailerModelDelete = trailerService.deleteTrailer(uid);
+        return ResponseEntity.status(HttpStatus.OK).body(trailerModelDelete);
+    }
 }

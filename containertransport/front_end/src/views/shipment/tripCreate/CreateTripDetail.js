@@ -91,22 +91,24 @@ const CreateTripDetail = () => {
             }
         }
         console.log("data", dataSubmit);
-        // createTrip(dataSubmit).then((res) => {
-        //     setToastType("success");
-        //     setToast(true);
-        //     setTimeout(() => {
-        //         setToast(false);
-        //         history.push({
-        //             pathname: `/shipment/detail/${shipmentId}`,
-        //         })
-        //     }, "1000");
-        // })
+        createTrip(dataSubmit).then((res) => {
+            setToastType("success");
+            setToast(true);
+            setToastMsg("Create Trip Success !!!")
+            setTimeout(() => {
+                setToast(false);
+                history.push({
+                    pathname: `/shipment/detail/${shipmentId}`,
+                })
+            }, "1000");
+        })
     }
-    console.log("truckSelect", truckSelect);
+    
     useEffect(() => {
 
     }, [tripItems])
     const checkTripItems = () => {
+        console.log("tripItems", tripItems);
         if(!truckSelect) {
             setToastMsg("Please chose truck in trip")
             appearToast();

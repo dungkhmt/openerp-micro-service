@@ -24,6 +24,7 @@ import { visuallyHidden } from '@mui/utils';
 import { Icon } from '@mui/material';
 import { menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
+import { deleteTrailer } from 'api/TrailerAPI';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -141,7 +142,7 @@ function EnhancedTableHead(props) {
   );
 }
 
-export default function ContentsTrailerScreen({ trailer, page, setPage, rowsPerPage, setRowsPerPage, count }) {
+export default function ContentsTrailerScreen({ trailer, page, setPage, rowsPerPage, setRowsPerPage, count, setToast, setToastType, setToastMsg, flag, setFlag }) {
   const [order, setOrder] = React.useState(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
   const [selected, setSelected] = React.useState([]);
@@ -212,6 +213,18 @@ export default function ContentsTrailerScreen({ trailer, page, setPage, rowsPerP
   const handleDetail = (id) => {
     history.push(`/trailer/detail/${id}`)
   }
+  const handleDelete = (uid) => {
+    deleteTrailer(uid).then((res) => {
+      console.log(res);
+      setToastMsg("Delete Trailer Success");
+      setToastType("success");
+      setToast(true);
+      setTimeout(() => {
+        setToast(false);
+      }, "3000");
+      setFlag(!flag);
+    })
+  }
 
   return (
     <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
@@ -279,7 +292,7 @@ export default function ContentsTrailerScreen({ trailer, page, setPage, rowsPerP
                             </Box>
                           </Tooltip>
                           <Tooltip title="Delete">
-                            <Box>
+                            <Box onClick={() => { handleDelete(row?.uid) }}>
                               <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
                             </Box>
                           </Tooltip>

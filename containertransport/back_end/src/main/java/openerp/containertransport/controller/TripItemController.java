@@ -25,9 +25,15 @@ public class TripItemController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripItemModels));
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update/{uid}")
     public ResponseEntity<?> updateTripItem (@PathVariable String uid, @RequestBody TripItemModel tripItemModel) {
         TripItemModel tripItemModelUpdate = tripItemService.updateTripItem(uid, tripItemModel);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripItemModelUpdate));
+    }
+
+    @DeleteMapping("/delete/{uid}")
+    public ResponseEntity<?> deleteTripItem (@PathVariable String uid) {
+        TripItemModel tripItemModelDelete = tripItemService.deleteTripItem(uid);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripItemModelDelete));
     }
 }
