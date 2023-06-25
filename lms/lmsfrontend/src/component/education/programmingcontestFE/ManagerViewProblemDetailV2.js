@@ -65,6 +65,8 @@ function ManagerViewProblemDetailV2() {
   const [isPublic, setIsPublic] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [fetchedImageArray, setFetchedImageArray] = useState([]);
+  const [status, setStatus] = useState("");
+  const [roles, setRoles] = useState([]);
 
 
   useEffect(() => {
@@ -93,6 +95,8 @@ function ManagerViewProblemDetailV2() {
       setIsCustomEvaluated(res.scoreEvaluationType === CUSTOM_EVALUATION);
       setDescription(res.problemDescription);
       setSelectedTags(res.tags);
+      setRoles(res.roles);
+      setStatus(res.status);
     });
   }, [problemId]);
 
@@ -109,10 +113,14 @@ function ManagerViewProblemDetailV2() {
             }}
             startIcon={<EditIcon sx={{ marginRight: "4px" }} />}
             sx={{ marginRight: "8px" }}
+            disabled={!roles.includes('OWNER') && (
+              !roles.includes('MANAGER') || status !== 'OPEN'
+            )}
           >
             Edit
           </Button>
-          <Button
+          {
+          roles.includes('OWNER') && <Button
             variant="contained"
             color="info"
             onClick={() => {
@@ -124,6 +132,7 @@ function ManagerViewProblemDetailV2() {
           >
             Manage Role
           </Button>
+          }
         </>
       }
     >

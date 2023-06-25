@@ -28,4 +28,5 @@ public class ModelUpdateContestProblem {
     private String[] fileId;
     private Integer[] tagIds;
     private List<String> removedFilesId;
+    private String status;
 }

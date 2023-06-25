@@ -73,8 +73,11 @@ function EditProblem() {
   const [attachmentFiles, setAttachmentFiles] = useState([]);
   const [fetchedImageArray, setFetchedImageArray] = useState([]);
   const [removedFilesId, setRemovedFileIds] = useState([]);
+  const [status, setStatus] = useState("");
+  const [isOwner, setIsOwner] = useState(false);
 
   const defaultLevel = ["easy", "medium", "hard"];
+  const STATUS = ["OPEN", "HIDDEN", "CREATED"];
 
   const [loading, setLoading] = useState(false);
 
@@ -131,6 +134,8 @@ function EditProblem() {
       setIsCustomEvaluated(res.scoreEvaluationType === CUSTOM_EVALUATION);
       setDescription(res.problemDescription);
       setSelectedTags(res.tags);
+      setStatus(res.status);
+      setIsOwner(res.roles?.includes("OWNER"));
     });
   }, [problemId]);
 
@@ -213,6 +218,7 @@ function EditProblem() {
       removedFilesId: removedFilesId,
       scoreEvaluationType: isCustomEvaluated ? CUSTOM_EVALUATION : NORMAL_EVALUATION,
       tagIds: tagIds,
+      status: status,
     };
 
     let formData = new FormData();
@@ -333,8 +339,27 @@ function EditProblem() {
             </MenuItem>
           </TextField>
         </Grid>
-
-        <Grid item xs={12}>
+        <Grid item xs={2}>
+          <TextField
+            fullWidth
+            required
+            id="status"
+            label={t("status")}
+            select
+            value={status}
+            onChange={(event) => {
+              setStatus(event.target.value);
+            }}
+            disabled={!isOwner}
+          >
+            {STATUS.map((item) => (
+              <MenuItem key={item} value={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid item xs={10}>
           <FormControl sx={{width: "100%"}}>
             <InputLabel id="select-tag-label">Tags</InputLabel>
             <Select

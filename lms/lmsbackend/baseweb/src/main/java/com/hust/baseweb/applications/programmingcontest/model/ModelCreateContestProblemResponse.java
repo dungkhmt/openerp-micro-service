@@ -54,4 +54,8 @@ public class ModelCreateContestProblemResponse {
     private List<String> attachmentNames;
 
     private List<TagEntity> tags;
+
+    private String status;
+
+    private List<String> roles;
 }

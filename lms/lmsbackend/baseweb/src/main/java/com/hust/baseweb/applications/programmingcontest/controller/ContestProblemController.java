@@ -236,8 +236,8 @@ public class ContestProblemController {
             }
         }
         if (!hasPermission) {
-            //return ResponseEntity.status(401).body("No permission");
-            return ResponseEntity.status(HttpStatus.OK).body("No permission");
+            return ResponseEntity.status(403).body("No permission");
+            // return ResponseEntity.status(HttpStatus.OK).body("No permission");
         }
         ProblemEntity problemResponse = problemTestCaseService.updateContestProblem(
             problemId,

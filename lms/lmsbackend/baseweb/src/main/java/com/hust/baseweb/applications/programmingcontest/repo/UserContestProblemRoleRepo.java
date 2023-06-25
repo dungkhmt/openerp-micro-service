@@ -21,4 +21,7 @@ public interface UserContestProblemRoleRepo extends JpaRepository<UserContestPro
     List<String> getProblemIdsShared(String userId);
 
     boolean existsByProblemIdAndUserIdAndRoleId(String problemId, String userId, String roleId);
+
+    @Query(value = "SELECT role_id FROM user_contest_problem_role WHERE problem_id = ?1 AND user_id = ?2", nativeQuery = true)
+    List<String> getRolesByProblemIdAndUserId(String problemId, String userId);
 }
