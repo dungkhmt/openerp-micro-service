@@ -21,8 +21,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { useHistory } from 'react-router-dom';
-import { Icon } from '@mui/material';
+import { Button, Icon } from '@mui/material';
 import { menuIconMap } from 'config/menuconfig';
+import { deleteTrip } from 'api/TripAPI';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -116,7 +117,7 @@ const headCells = [
     label: '',
     width: '10%'
   }
- 
+
 ];
 
 const DEFAULT_ORDER = 'asc';
@@ -170,7 +171,7 @@ function EnhancedTableHead(props) {
   );
 }
 
-export default function TripsContents({trips, shipmentId}) {
+export default function TripsContents({ trips, shipmentId, setToast, setToastType, setToastMsg, flag, setFlag }) {
   const [order, setOrder] = React.useState(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
   const [selected, setSelected] = React.useState([]);
@@ -200,7 +201,7 @@ export default function TripsContents({trips, shipmentId}) {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = trips.map((n) => n.name);
+      const newSelected = trips.map((n) => n.uid);
       setSelected(newSelected);
       return;
     }
@@ -243,8 +244,8 @@ export default function TripsContents({trips, shipmentId}) {
       const numEmptyRows =
         newPage > 0 ? Math.max(0, (1 + newPage) * rowsPerPage - trips.length) : 0;
 
-    //   const newPaddingHeight = (dense ? 33 : 53) * numEmptyRows;
-    //   setPaddingHeight(newPaddingHeight);
+      //   const newPaddingHeight = (dense ? 33 : 53) * numEmptyRows;
+      //   setPaddingHeight(newPaddingHeight);
     },
     [order, orderBy, rowsPerPage],
   );
@@ -274,11 +275,45 @@ export default function TripsContents({trips, shipmentId}) {
   const handleDetail = (id) => {
     history.push({
       pathname: `/shipment/trip/detail/${shipmentId}/${id}`
-  })};
+    })
+  };
+  const handleDelete = (uid) => {
+    let data = [];
+    data.push(uid);
+    deleteTrip({ listUidTrip: data }).then((res) => {
+      console.log(res);
+      setToastMsg("Delete Trip Success");
+      setToastType("success");
+      setToast(true);
+      setTimeout(() => {
+        setToast(false);
+      }, "3000");
+      setFlag(!flag);
+    })
+  }
+  const handleDeleteTrips = () => {
+    deleteTrip({ listUidTrip: selected }).then((res) => {
+      console.log(res);
+      setToastMsg("Delete Trips Success");
+      setToastType("success");
+      setToast(true);
+      setTimeout(() => {
+        setToast(false);
+      }, "3000");
+      setFlag(!flag);
+    })
+  }
   console.log("trips", trips)
   return (
-    <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white"}}>
+    <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
       <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
+        {selected.length > 0 ? (
+          <Box sx={{ marginTop: '16px' }} className="btn-not-upcase-text"
+            onClick={handleDeleteTrips}
+          >
+            <Button variant="contained">Delete Selected Trip </Button>
+          </Box>) : null}
+
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -295,51 +330,62 @@ export default function TripsContents({trips, shipmentId}) {
             <TableBody>
               {trips
                 ? trips.map((row, index) => {
-                    const isItemSelected = isSelected(row.id);
-                    const labelId = `enhanced-table-checkbox-${index}`;
+                  const isItemSelected = isSelected(row.uid);
+                  const labelId = `enhanced-table-checkbox-${index}`;
 
-                    return (
-                      <TableRow
-                        hover
-                        // onClick={(event) => handleClick(event, row.name)}
-                        role="checkbox"
-                        aria-checked={isItemSelected}
-                        tabIndex={-1}
-                        key={row.id}
-                        selected={isItemSelected}
-                        sx={{ cursor: 'pointer' }}
-                      >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            color="primary"
-                            checked={isItemSelected}
-                            inputProps={{
-                              'aria-labelledby': labelId,
-                            }}
-                            onClick={(event) => handleClick(event, row.id)}
-                          />
-                        </TableCell>
-                        <TableCell
-                          align="center"
-                          onClick={() => history.push({
-                            pathname: `/shipment/trip/detail/${shipmentId}/${row.id}`
+                  return (
+                    <TableRow
+                      hover
+                      // onClick={(event) => handleClick(event, row.name)}
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row.id}
+                      selected={isItemSelected}
+                      sx={{ cursor: 'pointer' }}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          inputProps={{
+                            'aria-labelledby': labelId,
+                          }}
+                          onClick={(event) => handleClick(event, row.uid)}
+                        />
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        onClick={() => history.push({
+                          pathname: `/shipment/trip/detail/${shipmentId}/${row.id}`
                         })}
-                        >
-                          {row.code}
-                        </TableCell>
-                        <TableCell align="center">{row?.truckCode}</TableCell>
-                        <TableCell align="center">{row?.driverName}</TableCell>
-                        <TableCell align="center">{row?.orderIds?.length}</TableCell>
-                        <TableCell align="left">{row?.created_by_user_id}</TableCell>
-                        <TableCell align="left">{row?.status}</TableCell>
-                        <TableCell align="left">{new Date(row?.createdAt).toLocaleDateString()}</TableCell>
-                        <TableCell align="left">{new Date(row?.updatedAt).toLocaleDateString()}</TableCell>
-                        <TableCell onClick={() => {handleDetail(row?.uid)}} >
-                          <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
+                      >
+                        {row.code}
+                      </TableCell>
+                      <TableCell align="center">{row?.truckCode}</TableCell>
+                      <TableCell align="center">{row?.driverName}</TableCell>
+                      <TableCell align="center">{row?.orderIds?.length}</TableCell>
+                      <TableCell align="left">{row?.created_by_user_id}</TableCell>
+                      <TableCell align="left">{row?.status}</TableCell>
+                      <TableCell align="left">{new Date(row?.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell align="left">{new Date(row?.updatedAt).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex' }}>
+                          <Tooltip title="View">
+                            <Box onClick={() => { handleDetail(row?.uid) }} >
+                              <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
+                            </Box>
+                          </Tooltip>
+                          <Tooltip title="Delete">
+                            <Box onClick={() => { handleDelete(row?.uid) }}>
+                              <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                            </Box>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
                 : null}
               {paddingHeight > 0 && (
                 <TableRow

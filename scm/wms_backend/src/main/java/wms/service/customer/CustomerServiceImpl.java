@@ -52,7 +52,7 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
     @Override
     @Transactional
     public void createCustomerFromFile(MultipartFile file, JwtAuthenticationToken token) throws IOException, CustomException {
-        UserLogin createdBy = userRepo.getUserByUserLoginId(token.getName());
+        UserRegister createdBy = userRepo.getUserByUserLoginId(token.getName());
         if (createdBy == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown staff create this customer, can't create");
         }
@@ -96,7 +96,7 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
         }
         return true;
     }
-    private List<Customer> saveCustomers(Row row, UserLogin createdBy) {
+    private List<Customer> saveCustomers(Row row, UserRegister createdBy) {
         List<Customer> listCustomers = new ArrayList<>();
         String customerName = row.getCell(6).getStringCellValue().equals("HUB") ? "Bưu cục " + row.getCell(4).getStringCellValue().replace("HUB", "") :
                 "Bưu cục " + row.getCell(4).getStringCellValue();
@@ -144,7 +144,7 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
     public Customer createNewCustomer(CustomerDTO customer, JwtAuthenticationToken token) throws CustomException {
         CustomerType customerType = customerTypeRepo.getCustomerTypeByCode(customer.getCustomerTypeCode().toUpperCase());
         ContractType contractType = contractTypeRepo.getContractTypeByCode(customer.getContractTypeCode().toUpperCase());
-        UserLogin createdBy = userRepo.getUserByUserLoginId(token.getName());
+        UserRegister createdBy = userRepo.getUserByUserLoginId(token.getName());
         if (customerType== null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Customer with no specific type, can't create");
         }

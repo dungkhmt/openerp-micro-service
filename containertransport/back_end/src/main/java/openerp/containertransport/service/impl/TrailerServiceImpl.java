@@ -3,6 +3,7 @@ package openerp.containertransport.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
+import openerp.containertransport.constants.Constants;
 import openerp.containertransport.dto.FacilityResponsiveDTO;
 import openerp.containertransport.dto.TrailerFilterRequestDTO;
 import openerp.containertransport.dto.TrailerFilterRes;
@@ -97,6 +98,10 @@ public class TrailerServiceImpl implements TrailerService {
             sqlCount += " AND facility_id = :facilityId";
             params.put("facilityId", trailerFilterRequestDTO.getFacilityId());
         }
+        sql += " AND status != :statusNotEqual";
+        sqlCount += " AND status = :statusNotEqual";
+        params.put("statusNotEqual", Constants.TrailerStatus.DELETE.getStatus());
+
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
         for (String i : params.keySet()) {
             queryCount.setParameter(i, params.get(i));
@@ -122,6 +127,14 @@ public class TrailerServiceImpl implements TrailerService {
         trailers.forEach((item) -> trailerModels.add(convertToModel(item)));
         trailerFilterRes.setTrailerModels(trailerModels);
         return trailerFilterRes;
+    }
+
+    @Override
+    public TrailerModel deleteTrailer(String uid) {
+        Trailer trailer = trailerRepo.findByUid(uid);
+        trailer.setStatus(Constants.TrailerStatus.DELETE.getStatus());
+        trailer = trailerRepo.save(trailer);
+        return convertToModel(trailer);
     }
 
     public TrailerModel convertToModel(Trailer trailer){

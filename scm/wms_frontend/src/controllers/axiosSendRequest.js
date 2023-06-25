@@ -129,7 +129,9 @@ export const handleRequestError = (data) => {
     );
   }
   if (code === 401) {
-    toast.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
+    // toast.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại", {
+    // });
+    // toast.dismiss();
   }
   return data;
 };

@@ -2,6 +2,7 @@ import { Route, Switch, useRouteMatch } from "react-router";
 import PurchaseOrder from "../views/sellin/PurchaseOrder";
 import PurchaseOrderDetail from "../views/sellin/PurchaseOrderDetail";
 import PurchasePrice from "../views/sellin/PurchasePrice";
+import PurchaseStaff from "../views/sellin/PurchaseStaff";
 
 export default function SellinRouter() {
   let { path } = useRouteMatch();
@@ -22,6 +23,11 @@ export default function SellinRouter() {
           component={PurchasePrice}
           exact
           path={`${path}/purchase-price`}
+        ></Route>
+        <Route
+          component={PurchaseStaff}
+          exact
+          path={`${path}/purchase-staff`}
         ></Route>
       </Switch>
     </div>

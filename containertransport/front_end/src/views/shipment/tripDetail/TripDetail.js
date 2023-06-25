@@ -8,11 +8,11 @@ import TruckAndOrder from "../tripComponent/TruckAndOrder";
 import { getTripItemByTripId } from "api/TripItemAPI";
 import { getTrucks } from "api/TruckAPI";
 import { getOrders } from "api/OrderAPI";
-import { getTripByTripId } from "api/TripAPI";
+import { deleteTrip, getTripByTripId } from "api/TripAPI";
 import TruckAndOrdersInTrip from "../tripComponent/TruckAndOrdersInTrip";
 import OrderArrangementInTrip from "../tripComponent/OrderArrangementInTrip";
 
-const { Box, Typography, Button, Divider, Icon } = require("@mui/material")
+const { Box, Typography, Button, Divider, Icon, Alert } = require("@mui/material")
 
 
 
@@ -26,6 +26,11 @@ const TripDetail = () => {
     const [ordersSelect, setOrdersSelect] = useState([]);
     const [tripItems, setTripItem] = useState([]);
     const [flag, setFlag] = useState(false);
+
+    const [toastOpen, setToast] = useState(false);
+    const [toastType, setToastType] = useState();
+    const [toastMsg, setToastMsg] = useState('');
+
     useEffect(() => {
         getTrucks({}).then((res) => {
             setTrucks(res?.data.truckModels);
@@ -49,9 +54,30 @@ const TripDetail = () => {
             })
         });
     }, [trucks])
+    const handleCancelTrip = () => {
+        let data = [];
+        data.push(tripId);
+        deleteTrip({ listUidTrip: data }).then((res) => {
+            console.log(res);
+            setToastMsg("Delete Trip Success");
+            setToastType("success");
+            setToast(true);
+            setTimeout(() => {
+                setToast(false);
+            }, "3000");
+            setFlag(!flag);
+            history.push(`/shipment/detail/${shipmentId}`);
+        })
+    }
     return (
         <Box className="trip-detail">
-            <Box className="header-trip-detail">
+            <Box className="toast">
+                {toastOpen ? (
+                    <Alert variant="filled" severity={toastType} >
+                        <strong>{toastMsg}</strong >
+                    </Alert >) : null}
+            </Box>
+            <Box className="headerScreen-trip-detail">
                 <Box className="headerScreen-trip-detail-go-back"
                     onClick={() => history.push(`/shipment/detail/${shipmentId}`)}
                     sx={{ cursor: "pointer" }}
@@ -59,20 +85,21 @@ const TripDetail = () => {
                     <Icon>
                         {menuIconMap.get("ArrowBackIosIcon")}
                     </Icon>
-                    <Typography>Go back shipment Screen</Typography>
+                    <Typography>Go back shipment detail</Typography>
                 </Box>
-                <Box className="header-trip-detail-text">
-                    Trip Detail
-                </Box>
-
-                {/* <Box className="header-trip-detail-btn">
-                    <Button variant="outlined" color="error" className="header-trip-detail-btn-cancel"
-                        onClick={handleCancelCreateTrip}
-                    >Cancel</Button>
-                    <Button variant="contained" className="header-trip-detail-btn-save"
+                <Box className="headerScreen-trip-detail-info">
+                    <Box className="title-header">
+                        <Typography >Trip detail</Typography>
+                    </Box>
+                    <Box className="btn-header">
+                        <Button variant="outlined" color="error" className="header-trip-detail-btn-cancel"
+                            onClick={handleCancelTrip}
+                        >Cancel</Button>
+                        {/* <Button variant="contained" className="header-trip-detail-btn-save"
                     onClick={handleSubmit}
-                    >Save</Button>
-                </Box> */}
+                    >Save</Button> */}
+                    </Box>
+                </Box>
             </Box>
             <Divider className="divider-trip-detail" />
             <Box className="content-trip-v2">
@@ -82,13 +109,13 @@ const TripDetail = () => {
                 </Box> */}
                 <Box className="content-truck-and-orders-v2">
                     <TruckAndOrdersInTrip trucks={trucks} setTruckSelect={setTruckSelect} truckSelect={truckSelect}
-                        orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} tripId={tripId} setFlag={setFlag}/>
+                        orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} tripId={tripId} setFlag={setFlag} />
                 </Box>
                 {/* <Box className="order-arrangement">
                     <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} tripItems={tripItems} flag={flag}/>
                 </Box> */}
                 <Box className="order-arrangement-v2">
-                    <OrderArrangementInTrip ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} tripItems={tripItems} flag={flag}/>
+                    <OrderArrangementInTrip ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} tripItems={tripItems} flag={flag} />
                 </Box>
                 <Box className="map-order">
                     <Box>

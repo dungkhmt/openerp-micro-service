@@ -53,7 +53,7 @@ public class Customer extends BaseEntity implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by", referencedColumnName = "user_login_id")
     @NotFound(action = NotFoundAction.IGNORE)
-    private UserLogin user;
+    private UserRegister user;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "contract_type_code", referencedColumnName = "code")

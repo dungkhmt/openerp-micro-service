@@ -36,7 +36,7 @@ public class Shipment extends BaseEntity implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by", referencedColumnName = "user_login_id")
     @NotFound(action = NotFoundAction.IGNORE)
-    private UserLogin user;
+    private UserRegister user;
 
     @OneToMany(mappedBy = "shipment",fetch = FetchType.LAZY)
     @JsonIgnore

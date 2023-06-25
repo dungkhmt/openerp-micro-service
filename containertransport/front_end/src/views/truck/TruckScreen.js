@@ -20,6 +20,8 @@ const TruckScreen = () => {
 
     const [filters, setFilters] = useState([]);
 
+    const [flag, setFlag] = useState(false);
+
     const status = [
         { name: "AVAILABLE" },
         { name: "EXECUTING" }
@@ -47,7 +49,7 @@ const TruckScreen = () => {
             setTrucks(res.data.truckModels);
             setCount(res?.data.count);
         });
-    }, [openModal, page, rowsPerPage, filters]);
+    }, [openModal, page, rowsPerPage, filters, flag]);
     return (
         <Box className="fullScreen">
             <Container maxWidth="lg" className="container">
@@ -66,7 +68,9 @@ const TruckScreen = () => {
                     <SearchBar filters={filters} setFilters={setFilters} status={status} />
                 </Box>
                 <ContentsTruckManagement trucks={trucks} page={page} setPage={setPage}
-                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
+                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count}
+                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg}
+                    flag={flag} setFlag={setFlag} />
             </Container>
         </Box>
     );

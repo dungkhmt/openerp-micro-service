@@ -3,7 +3,7 @@ import '../styles.scss';
 import { Alert, Box, Button, Container, Divider, Icon, Typography } from "@mui/material";
 import { useHistory, useParams } from "react-router-dom";
 import { menuIconMap } from "config/menuconfig";
-import { getTruckById, getTrucks } from "api/TruckAPI";
+import { deleteTruck, getTruckById, getTrucks } from "api/TruckAPI";
 import ModalTruck from "../ModalTruck";
 
 const TruckDetail = () => {
@@ -25,6 +25,18 @@ const TruckDetail = () => {
     }, [open]);
     const handleClose = () => {
         setOpen(!open);
+    }
+    const handleDeleteTruck = () => {
+        deleteTruck(truckId).then((res) => {
+            console.log(res);
+            setToastMsg("Delete Truck Success");
+            setToastType("success");
+            setToast(true);
+            setTimeout(() => {
+                setToast(false);
+            }, "3000");
+            history.push('/truck');
+        })
     }
     console.log("Truck", truck)
     return (
@@ -52,7 +64,7 @@ const TruckDetail = () => {
                         </Box>
                         <Box className="btn-header">
                             <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                            // onClick={handleCancelCreateShipment}
+                            onClick={handleDeleteTruck}
                             >Delete</Button>
                             <Button variant="contained" className="header-submit-shipment-btn-save"
                                 onClick={handleClose}

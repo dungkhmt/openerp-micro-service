@@ -6,7 +6,8 @@ import { Route, Switch, useLocation } from "react-router-dom";
 import { useNotificationState } from "state/NotificationState";
 import NotFound from "views/errors/NotFound";
 import TestComponent from "../test/TestComponent";
-import DashBoard from "../views/dashboard/Dashboard";
+import AllUsers from "../views/general/AllUsers";
+import DashBoard from "../views/general/Dashboard";
 import CategoryRouter from "./CategoryRouter";
 import DeliveryRouter from "./DeliveryRouter";
 import PrivateRoute from "./PrivateRoute";
@@ -46,6 +47,7 @@ function MainAppRouter(props) {
           <PrivateRoute component={SelloutRouter} path="/sellout" />
           <PrivateRoute component={WarehouseRouter} path="/warehouse" />
           <PrivateRoute component={DeliveryRouter} path="/delivery" />
+          <Route component={AllUsers} path="/all-user" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>

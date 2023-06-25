@@ -3,6 +3,7 @@ package openerp.containertransport.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
+import openerp.containertransport.constants.Constants;
 import openerp.containertransport.dto.ShipmentFilterRequestDTO;
 import openerp.containertransport.dto.ShipmentModel;
 import openerp.containertransport.dto.ShipmentRes;
@@ -102,8 +103,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public ShipmentModel updateShipment(Long id, ShipmentModel shipmentModel) {
-        Shipment shipment = shipmentRepo.findById(id).get();
+    public ShipmentModel updateShipment(String uid, ShipmentModel shipmentModel) {
+        Shipment shipment = shipmentRepo.findByUid(uid);
         if(!StringUtils.isEmpty(shipmentModel.getDescription())) {
             shipment.setDescription(shipmentModel.getDescription());
         }
@@ -111,6 +112,16 @@ public class ShipmentServiceImpl implements ShipmentService {
             shipment.setExecuted_time(shipmentModel.getExecutedTime());
         }
         shipment = shipmentRepo.save(shipment);
+        return convertToModel(shipment);
+    }
+
+    @Override
+    public ShipmentModel deleteShipment(String uid) {
+        Shipment shipment = shipmentRepo.findByUid(uid);
+        if(shipment.getStatus().equals(Constants.ShipmentStatus.WAITING_SCHEDULED.getStatus())) {
+            shipment.setStatus(Constants.ShipmentStatus.DELETE.getStatus());
+            shipment = shipmentRepo.save(shipment);
+        }
         return convertToModel(shipment);
     }
 

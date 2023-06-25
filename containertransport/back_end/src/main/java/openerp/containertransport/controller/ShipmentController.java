@@ -39,9 +39,15 @@ public class ShipmentController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), shipmentModel));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateShipment(@PathVariable Long id, @RequestBody ShipmentModel shipmentModel) {
-        ShipmentModel shipmentModelUpdate = shipmentService.updateShipment(id, shipmentModel);
+    @PutMapping("/update/{uid}")
+    public ResponseEntity<?> updateShipment(@PathVariable String uid, @RequestBody ShipmentModel shipmentModel) {
+        ShipmentModel shipmentModelUpdate = shipmentService.updateShipment(uid, shipmentModel);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), shipmentModelUpdate));
+    }
+
+    @DeleteMapping("/delete/{uid}")
+    public ResponseEntity<?> deleteShipment(@PathVariable String uid) {
+        ShipmentModel shipmentModelDelete = shipmentService.deleteShipment(uid);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), shipmentModelDelete));
     }
 }

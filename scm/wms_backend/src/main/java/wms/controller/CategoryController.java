@@ -12,6 +12,15 @@ import wms.service.category.ICategoryService;
 
 import javax.validation.Valid;
 
+/**
+ * Rules to establish APIs:
+ * Use hyphens instead of underscores.
+ * A trailing forward slash (/) should not be included in URIs
+ * Forward slash separator (/) must be used to indicate a hierarchical relationship
+ * Lowercase letters should be preferred in URI paths
+ * File extensions should not be included in URIs
+ * 
+ */
 @Controller
 @RequestMapping("/category")
 public class CategoryController extends BaseController {

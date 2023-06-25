@@ -12,10 +12,7 @@ import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.vehicle.DroneDTO;
 import wms.dto.vehicle.TruckDTO;
-import wms.entity.DistributingChannel;
-import wms.entity.DroneEntity;
-import wms.entity.TruckEntity;
-import wms.entity.UserLogin;
+import wms.entity.*;
 import wms.exception.CustomException;
 import wms.repo.DroneRepo;
 import wms.repo.TruckRepo;
@@ -40,7 +37,7 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TruckEntity createTruck(TruckDTO truckDTO) throws CustomException {
-        UserLogin userLogin = userRepo.getUserByUserLoginId(truckDTO.getUserManaged());
+        UserRegister userLogin = userRepo.getUserByUserLoginId(truckDTO.getUserManaged());
         TruckEntity truck = truckRepo.getTruckFromUser(truckDTO.getUserManaged());
         if (truck != null) {
             throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "User has been in charged of another truck");
@@ -100,7 +97,7 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public DroneEntity createDrone(DroneDTO droneDTO) throws CustomException {
-        UserLogin userLogin = userRepo.getUserByUserLoginId(droneDTO.getUserManaged());
+        UserRegister userLogin = userRepo.getUserByUserLoginId(droneDTO.getUserManaged());
         DroneEntity truck = droneRepo.getDroneFromUser(droneDTO.getUserManaged());
         if (truck != null) {
             throw caughtException(ErrorCode.ALREADY_EXIST.getCode(), "User has been in charged of another drone");

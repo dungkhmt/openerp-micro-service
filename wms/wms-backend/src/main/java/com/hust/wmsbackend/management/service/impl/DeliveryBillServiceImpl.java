@@ -33,7 +33,7 @@ public class DeliveryBillServiceImpl implements DeliveryBillService {
 
     @Override
     public List<DeliveryBillWithItems> getAll() {
-        List<DeliveryBill> bills = deliveryBillRepository.findAll();
+        List<DeliveryBill> bills = deliveryBillRepository.findAllByOrderByCreatedStampDesc();
         return bills.stream().map(DeliveryBillWithItems::new).collect(Collectors.toList());
     }
 

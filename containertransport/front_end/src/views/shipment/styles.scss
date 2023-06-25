@@ -103,6 +103,11 @@
         }
     }
 }
+.btn-not-upcase-text {
+    .MuiButtonBase-root {
+        text-transform: none;
+    }
+}
 
 .headerScreen {
     padding: 25px 16px 20px 16px;
@@ -498,6 +503,7 @@
     }
 }
 .leaflet-popup-content-wrapper {
+    overflow: auto;
     .leaflet-popup-content {
         min-width: max-content;
     }

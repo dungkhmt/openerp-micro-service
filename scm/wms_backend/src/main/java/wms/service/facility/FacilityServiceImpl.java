@@ -71,8 +71,8 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Facility createFacility(FacilityDTO facilityDTO, JwtAuthenticationToken token) throws CustomException {
-        UserLogin createdBy = userRepo.getUserByUserLoginId(token.getName());
-        UserLogin manager = userRepo.getUserByUserLoginId(facilityDTO.getManagedBy());
+        UserRegister createdBy = userRepo.getUserByUserLoginId(token.getName());
+        UserRegister manager = userRepo.getUserByUserLoginId(facilityDTO.getManagedBy());
         if (createdBy == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown staff create this facility, can't create");
         }
@@ -153,7 +153,7 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
         if (facility == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Facility does not exist, can't update");
         }
-        UserLogin manager = userRepo.getUserByUserLoginId(facilityDTO.getManagedBy());
+        UserRegister manager = userRepo.getUserByUserLoginId(facilityDTO.getManagedBy());
         Facility facilityToUpdate = facilityRepo.getFacilityById(id);
         facilityToUpdate.setName(facilityDTO.getName());
         facilityToUpdate.setAddress(facilityDTO.getAddress());
@@ -453,7 +453,7 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void assignStaff(String staffCode, String facilityCode) throws CustomException {
-        UserLogin userLogin = userRepo.getUserByUserLoginId(staffCode);
+        UserRegister userLogin = userRepo.getUserByUserLoginId(staffCode);
         if (userLogin == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown staff to assign this facility, can't create");
         }

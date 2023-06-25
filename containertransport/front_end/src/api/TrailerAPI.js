@@ -31,3 +31,11 @@ export const updateTrailer = (data) => {
     )
     return resData;
 }
+
+export const deleteTrailer = (uid) => {
+    const resData = request(
+        "delete",
+        `/trailer/delete/${uid}`, {},{}, {}, {},
+    )
+    return resData;
+}

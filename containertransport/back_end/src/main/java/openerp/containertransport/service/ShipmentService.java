@@ -11,5 +11,6 @@ public interface ShipmentService {
     ShipmentModel createShipment(ShipmentModel shipmentModel);
     ShipmentRes filterShipment(ShipmentFilterRequestDTO requestDTO);
     ShipmentModel getShipmentByUid(String uid);
-    ShipmentModel updateShipment(Long id, ShipmentModel shipmentModel);
+    ShipmentModel updateShipment(String uid, ShipmentModel shipmentModel);
+    ShipmentModel deleteShipment(String uid);
 }

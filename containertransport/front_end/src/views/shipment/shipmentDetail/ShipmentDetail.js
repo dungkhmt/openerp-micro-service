@@ -25,6 +25,8 @@ const ShipmentDetail = () => {
 
     const [open, setOpen] = useState(false);
 
+    const [flag, setFlag] = useState(false);
+
     useEffect(() => {
         let data = {
             shipmentId: shipmentId
@@ -38,7 +40,7 @@ const ShipmentDetail = () => {
         });
 
 
-    }, [open]);
+    }, [open, flag]);
 
     const autoCreateTrip = () => {
         setLoading(true);
@@ -136,7 +138,10 @@ const ShipmentDetail = () => {
                         </Box>
 
                     </Box>
-                    {trips.length > 0 ? <TripsContents trips={trips} shipmentId={shipmentId} /> : null}
+                    {trips.length > 0 ? 
+                    <TripsContents trips={trips} shipmentId={shipmentId}
+                        setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} flag={flag} setFlag={setFlag}
+                    /> : null}
 
                     {open ? (
                         <ModalShipment open={open} setOpen={setOpen} shipment={shipment}

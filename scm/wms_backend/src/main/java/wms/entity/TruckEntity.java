@@ -43,5 +43,5 @@ public class TruckEntity extends BaseEntity implements Serializable {
     @JsonInclude
     @JsonBackReference
     @JoinColumn(name = "user_id", referencedColumnName = "user_login_id")
-    private UserLogin userLogin;
+    private UserRegister userLogin;
 }

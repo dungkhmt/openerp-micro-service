@@ -41,7 +41,7 @@ const CreateTripDetail = () => {
             // console.log("truck", res.data)
             setTrucks(res.data.truckModels);
         });
-        getOrders({status: 'ORDERED'}).then((res) => {
+        getOrders({ status: 'ORDERED' }).then((res) => {
             // let orderTmp = res.data.data.filter(item => checkScheduler(item.id, "order"))
             setOrders(res.data.data.orderModels);
         });
@@ -91,57 +91,61 @@ const CreateTripDetail = () => {
             }
         }
         console.log("data", dataSubmit);
-        // createTrip(dataSubmit).then((res) => {
-        //     setToastType("success");
-        //     setToast(true);
-        //     setTimeout(() => {
-        //         setToast(false);
-        //         history.push({
-        //             pathname: `/shipment/detail/${shipmentId}`,
-        //         })
-        //     }, "1000");
-        // })
+        if (checkValidate) {
+            createTrip(dataSubmit).then((res) => {
+                setToastType("success");
+                setToast(true);
+                setToastMsg("Create Trip Success !!!")
+                setTimeout(() => {
+                    setToast(false);
+                    history.push({
+                        pathname: `/shipment/detail/${shipmentId}`,
+                    })
+                }, "1000");
+            })
+        }
     }
-    console.log("truckSelect", truckSelect);
+
     useEffect(() => {
 
     }, [tripItems])
     const checkTripItems = () => {
-        if(!truckSelect) {
+        console.log("tripItems", tripItems);
+        if (!truckSelect) {
             setToastMsg("Please chose truck in trip")
             appearToast();
             return false;
         }
-        if(ordersSelect.length === 0) {
+        if (ordersSelect.length === 0) {
             setToastMsg("Please chose orders in trip")
             appearToast();
             return false;
         }
         let nbTrailer = 0;
         // check nbTrailer
-        for(let i = 1; i< tripItems.length-1; i++) {
-            if(tripItems[i].action === "PICKUP-TRAILER") {
+        for (let i = 1; i < tripItems.length - 1; i++) {
+            if (tripItems[i].action === "PICKUP-TRAILER") {
                 nbTrailer = Number(nbTrailer) + 1;
             }
-            if(tripItems[i].action === "DELIVERY-TRAILER") {
+            if (tripItems[i].action === "DELIVERY-TRAILER") {
                 nbTrailer = Number(nbTrailer) - 1;
             }
-            if(tripItems[i].action === "DELIVERY-CONTAINER" && nbTrailer === 0) {
+            if (tripItems[i].action === "DELIVERY-CONTAINER" && nbTrailer === 0) {
                 setToastMsg(`Please view again at before ${tripItems[i].action} ${tripItems[i].orderCode}`)
                 appearToast();
                 return false;
             }
-            if(tripItems[i].action === "DELIVERY-CONTAINER" && tripItems[i].isBreakRomooc) {
+            if (tripItems[i].action === "DELIVERY-CONTAINER" && tripItems[i].isBreakRomooc) {
                 nbTrailer = Number(nbTrailer) - 1;
             }
             console.log("nbTrailer", nbTrailer)
-            if(nbTrailer >= 2 || nbTrailer < 0) {
+            if (nbTrailer >= 2 || nbTrailer < 0) {
                 setToastMsg(`Please view again Trailer at before ${tripItems[i].action} ${tripItems[i].orderCode}`)
                 appearToast();
                 return false;
             }
 
-            if(tripItems[i].action === "PICKUP-CONTAINER" && nbTrailer === 0) {
+            if (tripItems[i].action === "PICKUP-CONTAINER" && nbTrailer === 0) {
                 setToastMsg(`Please chose Trailer before Pickup Container in Order ${tripItems[i].orderCode}`)
                 appearToast();
                 return false;
@@ -151,6 +155,7 @@ const CreateTripDetail = () => {
         // check weight
 
         // check time
+        return true;
     }
     const appearToast = () => {
         setToast(true);

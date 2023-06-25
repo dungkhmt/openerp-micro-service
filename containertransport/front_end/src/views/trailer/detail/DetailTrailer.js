@@ -3,7 +3,7 @@ import '../styles.scss';
 import { Alert, Box, Button, Container, Divider, Icon, Typography } from "@mui/material";
 import { useHistory, useParams } from "react-router-dom";
 import { menuIconMap } from "config/menuconfig";
-import { getTralerById } from "api/TrailerAPI";
+import { deleteTrailer, getTralerById } from "api/TrailerAPI";
 import ModalTrailer from "../modal/ModalTrailer";
 
 const DetailTrailer = () => {
@@ -27,6 +27,18 @@ const DetailTrailer = () => {
     }, [open]);
     const handleClose = () => {
         setOpen(!open);
+    }
+    const handleDeleteTrailer = () => {
+        deleteTrailer(trailerId).then((res) => {
+            console.log(res);
+            setToastMsg("Delete Trailer Success");
+            setToastType("success");
+            setToast(true);
+            setTimeout(() => {
+                setToast(false);
+            }, "3000");
+            history.push('/trailer');
+        })
     }
     console.log("trailer", trailer)
     return (
@@ -55,7 +67,7 @@ const DetailTrailer = () => {
                         </Box>
                         <Box className="btn-header">
                             <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                            // onClick={handleCancelCreateShipment}
+                            onClick={handleDeleteTrailer}
                             >Delete</Button>
                             <Button variant="contained" className="header-submit-shipment-btn-save"
                                 onClick={handleClose}

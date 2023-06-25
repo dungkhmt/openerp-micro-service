@@ -51,6 +51,7 @@ export const queryKey = {
   user: {
     user_list: "user_list",
     user_list_all: "user_list_all",
+    user_list_pagination: "user_list_pagination",
   },
   dashboard: {
     new_facility_month: "new_facility_month",

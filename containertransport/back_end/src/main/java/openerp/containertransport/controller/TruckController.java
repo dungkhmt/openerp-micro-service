@@ -41,4 +41,10 @@ public class TruckController {
         TruckModel truckModelUpdate = truckService.updateTruck(truckModel, uid);
         return ResponseEntity.status(HttpStatus.OK).body(truckModelUpdate);
     }
+
+    @DeleteMapping("/delete/{uid}")
+    public ResponseEntity<?> deleteTruck(@PathVariable String uid) {
+        TruckModel truckModelDelete = truckService.deleteTruck(uid);
+        return ResponseEntity.status(HttpStatus.OK).body(truckModelDelete);
+    }
 }

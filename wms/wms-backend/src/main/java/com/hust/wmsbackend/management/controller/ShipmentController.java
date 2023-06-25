@@ -74,7 +74,7 @@ public class ShipmentController {
     }
 
     @GetMapping("/delivery-trip/today")
-    public ResponseEntity<List<DeliveryTripDTO>> getToayTripForDeliveryPerson(Principal principal) {
+    public ResponseEntity<List<DeliveryTripDTO>> getTodayTripForDeliveryPerson(Principal principal) {
         return ResponseEntity.ok(deliveryTripService.getTodayDeliveryTrip(principal));
     }
 

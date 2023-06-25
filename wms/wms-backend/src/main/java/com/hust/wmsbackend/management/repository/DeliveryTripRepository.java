@@ -20,7 +20,7 @@ public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, Stri
         "dt.description " +
         "from wms_delivery_trip dt  " +
         "join wms_shipment s on dt.shipment_id = s.shipment_id " +
-        "where (extract (EPOCH from (now() - s.expected_delivery_stamp) ) < 61200 or extract (EPOCH from (s.expected_delivery_stamp - now()) ) > 25200) " +
+        "where date(now()) = date(s.expected_delivery_stamp) " +
         "and dt.delivery_person_id = ?1 " +
         "and dt.status in ?2 ", nativeQuery = true)
     List<DeliveryTrip> findTodayDeliveryTripsByPerson(String deliveryPersonId, List<String> deliveryStatus);

@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.Constants;
+import openerp.containertransport.dto.TripDeleteDTO;
 import openerp.containertransport.dto.TripFilterRequestDTO;
 import openerp.containertransport.dto.TripItemModel;
 import openerp.containertransport.dto.TripModel;
@@ -11,10 +12,7 @@ import openerp.containertransport.entity.Order;
 import openerp.containertransport.entity.Shipment;
 import openerp.containertransport.entity.Trip;
 import openerp.containertransport.entity.Truck;
-import openerp.containertransport.repo.OrderRepo;
-import openerp.containertransport.repo.ShipmentRepo;
-import openerp.containertransport.repo.TripRepo;
-import openerp.containertransport.repo.TruckRepo;
+import openerp.containertransport.repo.*;
 import openerp.containertransport.service.TripItemService;
 import openerp.containertransport.service.TripService;
 import openerp.containertransport.utils.RandomUtils;
@@ -30,6 +28,7 @@ import java.util.List;
 public class TripServiceImpl implements TripService {
     private final TripRepo tripRepo;
     private final TripItemService tripItemService;
+    private final TripItemRepo tripItemRepo;
     private final TruckRepo truckRepo;
     private final ModelMapper modelMapper;
     private final OrderRepo orderRepo;
@@ -52,7 +51,7 @@ public class TripServiceImpl implements TripService {
         trip.setShipment(shipment);
         trip.setTruck(truck);
         trip.setDriverId(truck.getDriverId());
-        trip.setStatus("Waiting");
+        trip.setStatus("SCHEDULED");
         trip.setUid(RandomUtils.getRandomId());
         trip.setCreatedByUserId(createBy);
         trip.setOrders(orders);
@@ -148,6 +147,28 @@ public class TripServiceImpl implements TripService {
         }
         trip = tripRepo.save(trip);
         return convertToModel(trip);
+    }
+
+    @Override
+    public List<TripModel> deleteTrips(TripDeleteDTO tripDeleteDTO) {
+        List<TripModel> tripModels = new ArrayList<>();
+        List<String> uidList = tripDeleteDTO.getListUidTrip();
+        uidList.forEach((tripUid) -> {
+            Trip trip = tripRepo.findByUid(tripUid);
+            if(trip.getStatus().equals(Constants.TripStatus.SCHEDULED.getStatus())
+//                    && trip.getShipment().getStatus().equals(Constants.ShipmentStatus.SCHEDULED.getStatus())
+            ) {
+                tripItemRepo.deleteByTripUid(tripUid);
+                List<Order> orders = trip.getOrders();
+                orders.forEach((order) -> {
+                    order.setStatus(Constants.OrderStatus.ORDERED.getStatus());
+                    orderRepo.save(order);
+                });
+                Trip tripDelete = tripRepo.deleteTripByUid(tripUid);
+                tripModels.add(convertToModel(tripDelete));
+            }
+        });
+        return tripModels;
     }
 
     public TripModel convertToModel(Trip trip) {

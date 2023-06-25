@@ -43,7 +43,7 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
     @Transactional(rollbackFor = Exception.class)
     public SaleOrder createOrder(SaleOrderDTO saleOrderDTO, JwtAuthenticationToken token) throws CustomException {
         Customer boughtBy = customerRepo.getCustomerByCode(saleOrderDTO.getBoughtBy());
-        UserLogin createdBy = userRepo.getUserByUserLoginId(token.getName());
+        UserRegister createdBy = userRepo.getUserByUserLoginId(token.getName());
 
         if (boughtBy== null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Order belongs to no customer, can't create");
