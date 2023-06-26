@@ -1,20 +1,24 @@
 package com.hust.wmsbackend.management.service.impl;
 
-import com.hust.wmsbackend.management.entity.AssignedOrderItem;
-import com.hust.wmsbackend.management.entity.DeliveryTripItem;
-import com.hust.wmsbackend.management.entity.InventoryItemDetail;
+import com.hust.wmsbackend.management.entity.*;
+import com.hust.wmsbackend.management.entity.enumentity.AssignedOrderItemStatus;
 import com.hust.wmsbackend.management.entity.enumentity.DeliveryTripItemStatus;
-import com.hust.wmsbackend.management.repository.AssignedOrderItemRepository;
-import com.hust.wmsbackend.management.repository.DeliveryTripItemRepository;
-import com.hust.wmsbackend.management.repository.InventoryItemDetailRepository;
+import com.hust.wmsbackend.management.model.AssignedOrderItemDTO;
+import com.hust.wmsbackend.management.model.request.DeliveryTripItemSuggestRequest;
+import com.hust.wmsbackend.management.repository.*;
+import com.hust.wmsbackend.management.service.AssignedOrderItemService;
+import com.hust.wmsbackend.management.service.CustomerAddressService;
 import com.hust.wmsbackend.management.service.DeliveryTripItemService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.spel.ast.Assign;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -24,6 +28,11 @@ public class DeliveryTripItemServiceImpl implements DeliveryTripItemService {
     private DeliveryTripItemRepository deliveryTripItemRepository;
     private AssignedOrderItemRepository assignedOrderItemRepository;
     private InventoryItemDetailRepository inventoryItemDetailRepository;
+    private CustomerAddressRepository customerAddressRepository;
+    private SaleOrderHeaderRepository saleOrderHeaderRepository;
+
+    private AssignedOrderItemService assignedOrderItemService;
+    private CustomerAddressService customerAddressService;
 
     @Override
     public boolean updateItemStatus(String itemId, String newStatusCodeStr) {
@@ -92,6 +101,88 @@ public class DeliveryTripItemServiceImpl implements DeliveryTripItemService {
         }
         deliveryTripItemRepository.saveAll(updateItems);
         return true;
+    }
+
+    @Override
+    public List<AssignedOrderItemDTO> getDeliveryTripItemSuggest(DeliveryTripItemSuggestRequest request) {
+        if (request.getWarehouseId() == null || request.getWarehouseId().isEmpty()
+            || request.getCustomerAddressIds() == null || request.getCustomerAddressIds().isEmpty()) {
+            return assignedOrderItemService.getAllCreatedItems();
+        }
+        // lấy tất cả assigned_order_item có cùng warehouseId và status = CREATED
+        UUID warehouseId = UUID.fromString(request.getWarehouseId());
+        List<AssignedOrderItem> assignedOrderItems = assignedOrderItemRepository.findAllByWarehouseIdAndStatus(
+                warehouseId, AssignedOrderItemStatus.CREATED);
+        if (assignedOrderItems.isEmpty()) {
+            return new ArrayList<>();
+        }
+        // lấy customer_address từ assigned_order_item
+        List<CustomerAddress> selectedAddresses = new ArrayList<>();
+        List<SaleOrderHeader> orders = new ArrayList<>(); // với mỗi item sẽ tìm được order tương ứng từ orderId
+        for (AssignedOrderItem item : assignedOrderItems) {
+            Optional<SaleOrderHeader> orderOpt = saleOrderHeaderRepository.findById(item.getOrderId());
+            if (!orderOpt.isPresent()) {
+                throw new RuntimeException(String.format("Order id %s not found", item.getOrderId()));
+            }
+            SaleOrderHeader order = orderOpt.get();
+            orders.add(order);
+            Optional<CustomerAddress> customerAddressOpt = customerAddressRepository.findById(order.getCustomerAddressId());
+            if (!customerAddressOpt.isPresent()) {
+                throw new RuntimeException(String.format("Customer address id %s not found", order.getCustomerAddressId()));
+            }
+            selectedAddresses.add(customerAddressOpt.get());
+        }
+
+        // lấy cluster từ danh sách selected assigned_order_item được truyền lên từ request
+        List<CustomerAddress> cluster = new ArrayList<>();
+        for (String customerAddressIdStr : request.getCustomerAddressIds()) {
+            Optional<CustomerAddress> opt = customerAddressRepository.findById(UUID.fromString(customerAddressIdStr));
+            if (!opt.isPresent()) {
+                throw new RuntimeException(String.format("Customer address id %s not found", customerAddressIdStr));
+            }
+            cluster.add(opt.get());
+        }
+
+        // tính toán và lưu khoảng cách từ các assigned_order_item tới cluster
+        Map<UUID, BigDecimal> distanceMap = new HashMap<>();
+        for (CustomerAddress from : selectedAddresses) {
+            BigDecimal distance = customerAddressService.getDistanceToCluster(from, cluster);
+            UUID key = from.getCustomerAddressId();
+            if (!distanceMap.containsKey(key)) {
+                distanceMap.put(key, distance);
+            }
+        }
+
+        // sắp xếp assigned_order_item theo khoảng cách tới cluster
+        List<AssignedOrderItem> sortedByCluster = new ArrayList<>();
+        LinkedHashMap<UUID, BigDecimal> sortedDistanceMap = distanceMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(/* Optional: Comparator.reverseOrder() */))
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1, LinkedHashMap::new));
+        for (Map.Entry<UUID, BigDecimal> entry : sortedDistanceMap.entrySet()) {
+            UUID key = entry.getKey();
+            List<Integer> indexes = new ArrayList<>();
+            List<UUID> selectedCustomerAddressIds = request.getCustomerAddressIds().stream().map(UUID::fromString).collect(Collectors.toList());
+            for (int i = 0 ; i < orders.size() ; i++) {
+                if (key.compareTo(orders.get(i).getCustomerAddressId()) == 0 &&
+                        !selectedCustomerAddressIds.contains(key)) { // loại những item có customer address nằm trong selected customer address id ở request
+                    indexes.add(i);
+                }
+            }
+            for (Integer index : indexes) {
+                sortedByCluster.add(assignedOrderItems.get(index));
+
+            }
+            log.info(String.format("Distance from customerAddressId = %s to cluster is %.10f", key, entry.getValue()));
+        }
+
+        // build response
+        List<AssignedOrderItemDTO> response = new ArrayList<>();
+        for (AssignedOrderItem item : sortedByCluster) {
+            response.add(assignedOrderItemService.buildAssignedOrderItemDTO(item));
+        }
+        return response;
     }
 
     public DeliveryTripItem getByIdOrThrow(String itemId) {
