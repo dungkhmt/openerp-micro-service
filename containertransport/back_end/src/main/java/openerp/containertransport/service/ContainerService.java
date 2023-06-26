@@ -11,5 +11,6 @@ public interface ContainerService {
     ContainerModel createContainer(ContainerModel containerModel);
     ContainerModel getContainerByUid (String uid);
     ContainerModel updateContainer(ContainerModel containerModel);
+    ContainerModel deleteContainer(String uid);
     ContainerFilterRes filterContainer(ContainerFilterRequestDTO containerFilterRequestDTO);
 }

@@ -3,7 +3,7 @@ import '../styles.scss';
 import { Alert, Box, Button, Container, Divider, Icon, Typography } from "@mui/material";
 import { useHistory, useParams } from "react-router-dom";
 import { menuIconMap } from "config/menuconfig";
-import { getContainerById } from "api/ContainerAPI";
+import { deleteContainer, getContainerById } from "api/ContainerAPI";
 import ModalContainer from "../modal/ModalContainer";
 
 const DetailContainerScreen = () => {
@@ -27,6 +27,18 @@ const DetailContainerScreen = () => {
     }, [open]);
     const handleClose = () => {
         setOpen(!open);
+    }
+    const handleDetail = () => {
+        deleteContainer(containerId).then((res) => {
+            console.log(res);
+            setToastMsg("Delete Container Success !!!");
+            setToastType("success");
+            setToast(true);
+            setTimeout(() => {
+                setToast(false);
+            }, "3000");
+            history.push('/container');
+          })
     }
     console.log("container", container)
     return (
@@ -55,7 +67,7 @@ const DetailContainerScreen = () => {
                         </Box>
                         <Box className="btn-header">
                             <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                            // onClick={handleCancelCreateShipment}
+                                onClick={handleDetail}
                             >Delete</Button>
                             <Button variant="contained" className="header-submit-shipment-btn-save"
                                 onClick={handleClose}

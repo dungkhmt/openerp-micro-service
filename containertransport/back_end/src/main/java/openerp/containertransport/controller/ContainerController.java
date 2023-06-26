@@ -43,4 +43,10 @@ public class ContainerController {
         ContainerModel containerModelUpdate = containerService.updateContainer(containerModel);
         return ResponseEntity.status(HttpStatus.OK).body(containerModelUpdate);
     }
+
+    @DeleteMapping("/delete/{uid}")
+    public ResponseEntity<?> deleteContainer(@PathVariable String uid) {
+        ContainerModel containerModelDelete = containerService.deleteContainer(uid);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), containerModelDelete));
+    }
 }

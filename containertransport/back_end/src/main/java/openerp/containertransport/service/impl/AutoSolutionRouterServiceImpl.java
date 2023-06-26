@@ -87,39 +87,39 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
 
         TransportContainerSolutionOutput transportContainerSolutionOutput = heuristicSolver.solve(transportContainerInput);
 
-//        for (Map.Entry<Integer, TripOutput> tripOutput : transportContainerSolutionOutput.getTripOutputs().entrySet()) {
-//            if(tripOutput.getValue().getPoints() != null && tripOutput.getValue().getPoints().size() != 0) {
-//
-//                List<TripItemModel> tripItemModelList = new ArrayList<>();
-//                List<Long> orderIds = new ArrayList<>();
-//                int seq = 1;
-//                for (Point point : tripOutput.getValue().getPoints()) {
-//
-//                    TripItemModel tripItemModel = new TripItemModel();
-//                    tripItemModel.setSeq(seq);
-//                    tripItemModel.setAction(point.getAction());
-//                    tripItemModel.setFacilityId(Long.valueOf(point.getFacilityId()));
-//                    tripItemModel.setOrderCode(point.getOrderCode());
-//                    tripItemModel.setContainerId(point.getContainerId());
-//                    tripItemModel.setTrailerId(point.getTrailerId() != null ? Long.valueOf(point.getTrailerId()) : null);
-//                    tripItemModel.setType(point.getType());
-//                    if (point.getId() != null) {
-//                        if(!orderIds.contains(point.getId())) {
-//                            orderIds.add(point.getId());
-//                        }
-//                    }
-//                    tripItemModelList.add(tripItemModel);
-//                    seq += 1;
-//                }
-//
-//                TripModel tripModel = new TripModel();
-//                tripModel.setTruckId(tripOutput.getKey().longValue());
-//                tripModel.setTripItemModelList(tripItemModelList);
-//                tripModel.setOrderIds(orderIds);
-//
-//                TripModel tripModelCreate = tripService.createTrip(tripModel, shipmentUid, shipmentModel.getCreatedByUserId());
-//            }
-//        }
+        for (Map.Entry<Integer, TripOutput> tripOutput : transportContainerSolutionOutput.getTripOutputs().entrySet()) {
+            if(tripOutput.getValue().getPoints() != null && tripOutput.getValue().getPoints().size() != 0) {
+
+                List<TripItemModel> tripItemModelList = new ArrayList<>();
+                List<Long> orderIds = new ArrayList<>();
+                int seq = 1;
+                for (Point point : tripOutput.getValue().getPoints()) {
+
+                    TripItemModel tripItemModel = new TripItemModel();
+                    tripItemModel.setSeq(seq);
+                    tripItemModel.setAction(point.getAction());
+                    tripItemModel.setFacilityId(Long.valueOf(point.getFacilityId()));
+                    tripItemModel.setOrderCode(point.getOrderCode());
+                    tripItemModel.setContainerId(point.getContainerId());
+                    tripItemModel.setTrailerId(point.getTrailerId() != null ? Long.valueOf(point.getTrailerId()) : null);
+                    tripItemModel.setType(point.getType());
+                    if (point.getId() != null) {
+                        if(!orderIds.contains(point.getId())) {
+                            orderIds.add(point.getId());
+                        }
+                    }
+                    tripItemModelList.add(tripItemModel);
+                    seq += 1;
+                }
+
+                TripModel tripModel = new TripModel();
+                tripModel.setTruckId(tripOutput.getKey().longValue());
+                tripModel.setTripItemModelList(tripItemModelList);
+                tripModel.setOrderIds(orderIds);
+
+                TripModel tripModelCreate = tripService.createTrip(tripModel, shipmentUid, shipmentModel.getCreatedByUserId());
+            }
+        }
 
         return shipmentModel;
     }

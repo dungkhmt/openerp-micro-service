@@ -3,6 +3,7 @@ package openerp.containertransport.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
+import openerp.containertransport.constants.Constants;
 import openerp.containertransport.dto.*;
 import openerp.containertransport.entity.Container;
 import openerp.containertransport.entity.Facility;
@@ -41,7 +42,7 @@ public class ContainerServiceImpl implements ContainerService {
         container.setSize(typeContainer.getSize());
         container.setTypeContainer(typeContainer);
         container.setEmpty(containerModelDTO.getIsEmpty());
-        container.setStatus("AVAILABLE");
+        container.setStatus(Constants.ContainerStatus.AVAILABLE.getStatus());
         container.setUid(RandomUtils.getRandomId());
         container.setCreatedAt(System.currentTimeMillis());
         container.setUpdatedAt(System.currentTimeMillis());
@@ -76,6 +77,14 @@ public class ContainerServiceImpl implements ContainerService {
     }
 
     @Override
+    public ContainerModel deleteContainer(String uid) {
+        Container container = containerRepo.findByUid(uid);
+        container.setStatus(Constants.ContainerStatus.DELETE.getStatus());
+        container = containerRepo.save(container);
+        return convertToModel(container);
+    }
+
+    @Override
     public ContainerFilterRes filterContainer(ContainerFilterRequestDTO containerFilterRequestDTO) {
         ContainerFilterRes containerFilterRes = new ContainerFilterRes();
 
@@ -99,6 +108,9 @@ public class ContainerServiceImpl implements ContainerService {
             sqlCount += " AND facility_id = :facilityId";
             params.put("facilityId", containerFilterRequestDTO.getFacilityId());
         }
+        sql += " AND status != :statusNotEqual";
+        sqlCount += " AND status = :statusNotEqual";
+        params.put("statusNotEqual", Constants.ContainerStatus.DELETE.getStatus());
 
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
         for (String i : params.keySet()) {
