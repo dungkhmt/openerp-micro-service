@@ -15,4 +15,5 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 
     List<AssignedOrderItem> findAllByStatus(AssignedOrderItemStatus status);
 
+    List<AssignedOrderItem> findAllByWarehouseIdAndStatus(UUID warehouseId, AssignedOrderItemStatus status);
 }
