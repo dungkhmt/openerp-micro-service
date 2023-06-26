@@ -142,11 +142,8 @@ public class AssignedOrderItemServiceImpl implements AssignedOrderItemService {
     public List<AssignedOrderItemDTO> getAllCreatedItems() {
         List<AssignedOrderItem> items = assignedOrderItemRepository.findAllByStatus(AssignedOrderItemStatus.CREATED);
         List<AssignedOrderItemDTO> response = new ArrayList<>();
-        Map<UUID, String> warehouseNameMap = warehouseService.getWarehouseNameMap();
-        Map<UUID, String> productNameMap = productService.getProductNameMap();
-        Map<UUID, String> bayCodeMap = bayService.getBayCodeMap();
         for (AssignedOrderItem item : items) {
-            AssignedOrderItemDTO dto = buildAssignedOrderItemDTO(warehouseNameMap, productNameMap, bayCodeMap, item);
+            AssignedOrderItemDTO dto = buildAssignedOrderItemDTO(item);
             response.add(dto);
         }
         return response;
@@ -160,10 +157,7 @@ public class AssignedOrderItemServiceImpl implements AssignedOrderItemService {
             return null;
         }
 
-        Map<UUID, String> warehouseNameMap = warehouseService.getWarehouseNameMap();
-        Map<UUID, String> productNameMap = productService.getProductNameMap();
-        Map<UUID, String> bayCodeMap = bayService.getBayCodeMap();
-        return buildAssignedOrderItemDTO(warehouseNameMap, productNameMap, bayCodeMap, assignedOrderItemOpt.get());
+        return buildAssignedOrderItemDTO(assignedOrderItemOpt.get());
     }
 
     @Override
@@ -191,14 +185,13 @@ public class AssignedOrderItemServiceImpl implements AssignedOrderItemService {
         assignedOrderItem.setStatus(AssignedOrderItemStatus.CREATED);
         assignedOrderItemRepository.save(assignedOrderItem);
 
+        return buildAssignedOrderItemDTO(assignedOrderItem);
+    }
+
+    private AssignedOrderItemDTO buildAssignedOrderItemDTO(AssignedOrderItem item) {
         Map<UUID, String> warehouseNameMap = warehouseService.getWarehouseNameMap();
         Map<UUID, String> productNameMap = productService.getProductNameMap();
         Map<UUID, String> bayCodeMap = bayService.getBayCodeMap();
-        return buildAssignedOrderItemDTO(warehouseNameMap, productNameMap, bayCodeMap, assignedOrderItem);
-    }
-
-    private AssignedOrderItemDTO buildAssignedOrderItemDTO(Map<UUID, String> warehouseNameMap,
-    Map<UUID, String> productNameMap, Map<UUID, String> bayCodeMap, AssignedOrderItem item) {
         AssignedOrderItemDTO dto = AssignedOrderItemDTO.builder()
            .assignOrderItemId(item.getAssignedOrderItemId())
            .productId(item.getProductId())
