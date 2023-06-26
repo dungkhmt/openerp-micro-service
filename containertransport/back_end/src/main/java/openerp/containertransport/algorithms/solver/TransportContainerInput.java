@@ -16,5 +16,6 @@ public class TransportContainerInput {
     private List<DepotTrailer> depotTrailer;
     private List<ContainerInput> containerInputs;
     private List<DistanceElement> distances;
+    private List<FacilityInput> facilityInputs;
     private Long startTime;
 }

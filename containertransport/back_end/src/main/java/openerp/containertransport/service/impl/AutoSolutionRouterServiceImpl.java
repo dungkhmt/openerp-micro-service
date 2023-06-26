@@ -34,6 +34,7 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         ShipmentModel shipmentModel = shipmentService.getShipmentByUid(shipmentUid);
 
         TransportContainerInput transportContainerInput = new TransportContainerInput();
+        transportContainerInput.setStartTime(shipmentModel.getExecutedTime());
 
         // get Trucks
         TruckFilterRequestDTO truckFilterRequestDTO = new TruckFilterRequestDTO();
@@ -72,46 +73,53 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         List<DepotTrailer> depotTrailers = convertTrailerDepot(facilityModelsTrailer);
         transportContainerInput.setDepotTrailer(depotTrailers);
 
-        // distant
+        // facility
+        FacilityFilterRequestDTO facilityFilter = new FacilityFilterRequestDTO();
+//        facilityFilter.setType("Container");
+        List<FacilityModel> facilityModels = facilityService.filterFacility(facilityFilter).getFacilityModels();
+        List<FacilityInput> facilities = convertFacilityInput(facilityModels);
+        transportContainerInput.setFacilityInputs(facilities);
+
+        // relationship
         List<Relationship> relationships = relationshipService.getAllRelationShip();
         List<DistanceElement> distanceElements = convertToDistantInput(relationships);
         transportContainerInput.setDistances(distanceElements);
 
         TransportContainerSolutionOutput transportContainerSolutionOutput = heuristicSolver.solve(transportContainerInput);
 
-        for (Map.Entry<Integer, TripOutput> tripOutput : transportContainerSolutionOutput.getTripOutputs().entrySet()) {
-            if(tripOutput.getValue().getPoints() != null && tripOutput.getValue().getPoints().size() != 0) {
-
-                List<TripItemModel> tripItemModelList = new ArrayList<>();
-                List<Long> orderIds = new ArrayList<>();
-                int seq = 1;
-                for (Point point : tripOutput.getValue().getPoints()) {
-
-                    TripItemModel tripItemModel = new TripItemModel();
-                    tripItemModel.setSeq(seq);
-                    tripItemModel.setAction(point.getAction());
-                    tripItemModel.setFacilityId(Long.valueOf(point.getFacilityId()));
-                    tripItemModel.setOrderCode(point.getOrderCode());
-                    tripItemModel.setContainerId(point.getContainerId());
-                    tripItemModel.setTrailerId(point.getTrailerId() != null ? Long.valueOf(point.getTrailerId()) : null);
-                    tripItemModel.setType(point.getType());
-                    if (point.getId() != null) {
-                        if(!orderIds.contains(point.getId())) {
-                            orderIds.add(point.getId());
-                        }
-                    }
-                    tripItemModelList.add(tripItemModel);
-                    seq += 1;
-                }
-
-                TripModel tripModel = new TripModel();
-                tripModel.setTruckId(tripOutput.getKey().longValue());
-                tripModel.setTripItemModelList(tripItemModelList);
-                tripModel.setOrderIds(orderIds);
-
-                TripModel tripModelCreate = tripService.createTrip(tripModel, shipmentUid, shipmentModel.getCreatedByUserId());
-            }
-        }
+//        for (Map.Entry<Integer, TripOutput> tripOutput : transportContainerSolutionOutput.getTripOutputs().entrySet()) {
+//            if(tripOutput.getValue().getPoints() != null && tripOutput.getValue().getPoints().size() != 0) {
+//
+//                List<TripItemModel> tripItemModelList = new ArrayList<>();
+//                List<Long> orderIds = new ArrayList<>();
+//                int seq = 1;
+//                for (Point point : tripOutput.getValue().getPoints()) {
+//
+//                    TripItemModel tripItemModel = new TripItemModel();
+//                    tripItemModel.setSeq(seq);
+//                    tripItemModel.setAction(point.getAction());
+//                    tripItemModel.setFacilityId(Long.valueOf(point.getFacilityId()));
+//                    tripItemModel.setOrderCode(point.getOrderCode());
+//                    tripItemModel.setContainerId(point.getContainerId());
+//                    tripItemModel.setTrailerId(point.getTrailerId() != null ? Long.valueOf(point.getTrailerId()) : null);
+//                    tripItemModel.setType(point.getType());
+//                    if (point.getId() != null) {
+//                        if(!orderIds.contains(point.getId())) {
+//                            orderIds.add(point.getId());
+//                        }
+//                    }
+//                    tripItemModelList.add(tripItemModel);
+//                    seq += 1;
+//                }
+//
+//                TripModel tripModel = new TripModel();
+//                tripModel.setTruckId(tripOutput.getKey().longValue());
+//                tripModel.setTripItemModelList(tripItemModelList);
+//                tripModel.setOrderIds(orderIds);
+//
+//                TripModel tripModelCreate = tripService.createTrip(tripModel, shipmentUid, shipmentModel.getCreatedByUserId());
+//            }
+//        }
 
         return shipmentModel;
     }
@@ -150,6 +158,8 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
             request.setWeightContainer(orderModel.getContainerModel().getSize());
             request.setFromLocationID((int) orderModel.getFromFacility().getFacilityId());
             request.setToLocationID((int) orderModel.getToFacility().getFacilityId());
+            request.setLatestTimePickup(orderModel.getLatePickupTime());
+            request.setLatestTimeDelivery(orderModel.getLateDeliveryTime());
             request.setIsBreakRomooc(orderModel.isBreakRomooc());
             requests.add(request);
         });
@@ -174,6 +184,18 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
             depotTrailers.add(depotTrailer);
         });
         return depotTrailers;
+    }
+
+    public List<FacilityInput> convertFacilityInput(List<FacilityModel> facilityModels) {
+        List<FacilityInput> facilityInputs = new ArrayList<>();
+        facilityModels.forEach(facilityModel -> {
+            FacilityInput facilityInput = new FacilityInput();
+            facilityInput.setFacilityId((int) facilityModel.getId());
+            facilityInput.setTimeProcessPickup(facilityModel.getProcessingTimePickUp());
+            facilityInput.setTimeProcessDrop(facilityModel.getProcessingTimeDrop());
+            facilityInputs.add(facilityInput);
+        });
+        return facilityInputs;
     }
 
     public List<DistanceElement> convertToDistantInput(List<Relationship> relationships) {

@@ -21,6 +21,9 @@ public class Point implements Serializable {
     @JsonProperty("container_id")
     public Long containerId;
     public Integer weightContainer;
+    public Long totalTime;
+    public Long latePickupContainer;
+    public Long lateDeliveryContainer;
     @JsonProperty("trailer_id")
     public Integer trailerId;
 
