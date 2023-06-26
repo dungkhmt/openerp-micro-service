@@ -30,7 +30,7 @@ const DeliveryTripDetail = ( props ) => {
   const [selectedAssignedItem, setSelectedAssignItem] = useState({});
   const [isShowQuantityModal, setShowQuantityModal] = useState(false);
   const [maxQuantity, setMaxQuantity] = useState(0);
-  const [selectedQuantity, setSelectedQuantity] = useState(0);
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [createdItemsTableData, setCreatedItemsTableData] = useState([]);
   const [rawCreatedItemsTableData, setRawCreatedItemsTableData] = useState([]);
   const [maxSequence, setMaxSequence] = useState(0);
@@ -131,7 +131,7 @@ const DeliveryTripDetail = ( props ) => {
     }
   }, [selectedWarehouseId]);
 
-  const saveQuantityButtonHandle = () => {
+  const saveQuantityButtonHandle = async () => {
     setShowQuantityModal(false);
     setShowAssignedItemsModal(false);
     const newDeliveryItem = {
@@ -140,38 +140,40 @@ const DeliveryTripDetail = ( props ) => {
       sequence: maxSequence + 1
     };
     var updated = false;
-    // for (var i = 0; i < deliveryItemsTableData.length; i++) {
-    //   if (deliveryItemsTableData[i].assignOrderItemId 
-    //     == newDeliveryItem.assignOrderItemId) {
-    //       var localDeliveryItem = deliveryItemsTableData[i];
-    //       const newQuantity = parseInt(localDeliveryItem.quantity) + parseInt(newDeliveryItem.quantity);
-    //       localDeliveryItem.quantity = newQuantity;
-    //       var newDeliveryItemsTableData = deliveryItemsTableData;
-    //       newDeliveryItemsTableData.splice(i, 1);
-    //       setDeliveryItemsTableData([...newDeliveryItemsTableData, localDeliveryItem]);
-    //       updated = true;
-    //       break;
-    //     }
-    // }
     if (!updated) {
       setDeliveryItemsTableData([...deliveryItemsTableData, newDeliveryItem]);
       setMaxSequence(maxSequence + 1);
     }
     setSelectedWarehouseId(selectedAssignedItem.warehouseId);
     setSelectedWarehouseName(selectedAssignedItem.warehouseName);
-    setSelectedQuantity(0);
+    setSelectedQuantity(1);
+
+    await request(
+      'post',
+      API_PATH.SUGGEST_ITEM,
+      (res) => {
+        setCreatedItemsTableData(res.data);
+      },
+      {
+
+      },
+      {
+        warehouseId: newDeliveryItem.warehouseId,
+        customerAddressIds: [...deliveryItemsTableData, newDeliveryItem].map(item => item.customerAddressId)
+      }
+    )
 
     // remove các createdOrderItem có assignOrderItem trùng với newDeliveryItem
-    var newCreatedItemsTableData = createdItemsTableData;
-    var removeItemIndex;
-    for (var i = 0; i < newCreatedItemsTableData.length; i++) {
-      if (newCreatedItemsTableData[i].assignOrderItemId == newDeliveryItem.assignOrderItemId) {
-        removeItemIndex = i;
-        break;
-      }
-    }
-    newCreatedItemsTableData.splice(removeItemIndex, 1);
-    setCreatedItemsTableData(newCreatedItemsTableData);
+    // var newCreatedItemsTableData = createdItemsTableData;
+    // var removeItemIndex;
+    // for (var i = 0; i < newCreatedItemsTableData.length; i++) {
+    //   if (newCreatedItemsTableData[i].assignOrderItemId == newDeliveryItem.assignOrderItemId) {
+    //     removeItemIndex = i;
+    //     break;
+    //   }
+    // }
+    // newCreatedItemsTableData.splice(removeItemIndex, 1);
+    // setCreatedItemsTableData(newCreatedItemsTableData);
   }
 
   const saveDeliveryTripButtonHandle = () => {

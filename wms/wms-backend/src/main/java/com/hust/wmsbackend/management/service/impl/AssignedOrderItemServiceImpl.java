@@ -188,7 +188,9 @@ public class AssignedOrderItemServiceImpl implements AssignedOrderItemService {
         return buildAssignedOrderItemDTO(assignedOrderItem);
     }
 
-    private AssignedOrderItemDTO buildAssignedOrderItemDTO(AssignedOrderItem item) {
+    @Override
+    @Transactional
+    public AssignedOrderItemDTO buildAssignedOrderItemDTO(AssignedOrderItem item) {
         Map<UUID, String> warehouseNameMap = warehouseService.getWarehouseNameMap();
         Map<UUID, String> productNameMap = productService.getProductNameMap();
         Map<UUID, String> bayCodeMap = bayService.getBayCodeMap();

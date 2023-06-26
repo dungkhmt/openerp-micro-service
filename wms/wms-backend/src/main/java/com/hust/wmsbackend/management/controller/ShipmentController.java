@@ -3,6 +3,7 @@ package com.hust.wmsbackend.management.controller;
 import com.hust.wmsbackend.management.model.AssignedOrderItemDTO;
 import com.hust.wmsbackend.management.model.DeliveryTripDTO;
 import com.hust.wmsbackend.management.model.ShipmentDTO;
+import com.hust.wmsbackend.management.model.request.DeliveryTripItemSuggestRequest;
 import com.hust.wmsbackend.management.model.response.AutoRouteResponse;
 import com.hust.wmsbackend.management.service.*;
 import lombok.AllArgsConstructor;
@@ -144,5 +145,10 @@ public class ShipmentController {
     public ResponseEntity<String> failDeliveryTripItem(@PathVariable String[] itemIds) {
         return deliveryTripItemService.fail(itemIds) ?
             ResponseEntity.ok("OK") : new ResponseEntity<>("FAIL", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @PostMapping("/delivery-trip-item/suggest")
+    public ResponseEntity<List<AssignedOrderItemDTO>> getDeliveryTripItemSuggest(@RequestBody DeliveryTripItemSuggestRequest request) {
+        return ResponseEntity.ok(deliveryTripItemService.getDeliveryTripItemSuggest(request));
     }
 }
