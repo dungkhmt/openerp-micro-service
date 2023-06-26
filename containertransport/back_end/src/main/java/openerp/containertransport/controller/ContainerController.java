@@ -10,10 +10,12 @@ import openerp.containertransport.dto.metaData.ResponseMetaData;
 import openerp.containertransport.service.ContainerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,13 +23,29 @@ import java.util.List;
 public class ContainerController {
     private final ContainerService containerService;
     @PostMapping("/create")
-    public ResponseEntity<?> createContainer(@RequestBody ContainerModel containerModelDTO) {
-        ContainerModel containerModel = containerService.createContainer(containerModelDTO);
+    public ResponseEntity<?> createContainer(@RequestBody ContainerModel containerModelDTO, JwtAuthenticationToken token) {
+        String username = token.getName();
+        ContainerModel containerModel = containerService.createContainer(containerModelDTO, username);
         return ResponseEntity.status(HttpStatus.OK).body(containerModel);
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> filterContainer(@RequestBody ContainerFilterRequestDTO containerFilterRequestDTO){
+    public ResponseEntity<?> filterContainer(@RequestBody ContainerFilterRequestDTO containerFilterRequestDTO, JwtAuthenticationToken token){
+        String username = token.getName();
+        List<String> roleIds = token
+                .getAuthorities()
+                .stream()
+                .filter(grantedAuthority -> !grantedAuthority
+                        .getAuthority()
+                        .startsWith("ROLE_GR")) // remove all composite roles
+                .map(grantedAuthority -> { // convert role to permission
+                    String roleId = grantedAuthority.getAuthority().substring(5); // remove prefix "ROLE_"
+                    return roleId;
+                })
+                .collect(Collectors.toList());
+        if(roleIds.contains("TMS_CUSTOMER")) {
+            containerFilterRequestDTO.setOwner(username);
+        }
         ContainerFilterRes containerModels = containerService.filterContainer(containerFilterRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), containerModels));
     }
