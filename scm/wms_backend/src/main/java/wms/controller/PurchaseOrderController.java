@@ -44,7 +44,6 @@ public class PurchaseOrderController extends BaseController {
             @RequestParam(value = "createdBy", required = false, defaultValue = DefaultConst.STRING) String createdBy,
             @RequestParam(value = "supplierCode", required = false, defaultValue = DefaultConst.STRING) String supplierCode,
             @RequestParam(value = "textSearch", required = false, defaultValue = DefaultConst.STRING) String textSearch
-
     ) {
         try {
             return response(new ResultEntity(1, "Get list orders successfully", purchaseOrderService.getAllOrders(page, pageSize, sortField, isSortAsc, orderStatus
@@ -111,6 +110,17 @@ public class PurchaseOrderController extends BaseController {
         try {
             purchaseOrderService.deleteOrderById(id);
             return response(new ResultEntity(1, "Delete order successfully", id));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+
+    @GetMapping("/export-order-pdf")
+    public ResponseEntity<?> exportOrderPdf(
+            @RequestParam(value = "orderCode", required = true) String orderCode
+    ) {
+        try {
+            return purchaseOrderService.exportOrderPdf(orderCode);
         } catch (Exception ex) {
             return response(error(ex));
         }

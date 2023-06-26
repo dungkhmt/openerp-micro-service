@@ -1,6 +1,8 @@
 package wms.service.purchase_order;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.purchase_order.PurchaseOrderDTO;
@@ -8,6 +10,8 @@ import wms.dto.purchase_order.UpdatePurchaseOrderDTO;
 import wms.entity.PurchaseOrder;
 import wms.entity.PurchaseOrderItem;
 import wms.exception.CustomException;
+
+import java.io.IOException;
 
 public interface IPurchaseOrderService {
     PurchaseOrder createOrder(PurchaseOrderDTO purchaseOrderDTO,  JwtAuthenticationToken token) throws CustomException;
@@ -19,4 +23,5 @@ public interface IPurchaseOrderService {
     PurchaseOrder updateOrder(UpdatePurchaseOrderDTO updatePurchaseOrderDTO, long id) throws CustomException;
     PurchaseOrder updateOrderStatus(String status, String orderCode) throws CustomException;
     void deleteOrderById(long id);
+    ResponseEntity<InputStreamResource> exportOrderPdf(String orderCode) throws IOException;
 }
