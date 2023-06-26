@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import openerp.containertransport.constants.Constants;
 import openerp.containertransport.dto.FacilityFilterRequestDTO;
 import openerp.containertransport.dto.FacilityFilterRes;
 import openerp.containertransport.dto.FacilityModel;
@@ -56,7 +57,7 @@ public class FacilityServiceImpl implements FacilityService {
         facility.setAcreage(facilityModel.getAcreage());
         facility.setCreatedAt(System.currentTimeMillis());
         facility.setUpdatedAt(System.currentTimeMillis());
-        facility.setStatus("AVAILABLE");
+        facility.setStatus(Constants.FacilityStatus.AVAILABLE.getStatus());
         facility.setUid(RandomUtils.getRandomId());
         facility.setProcessingTimePickUp(facilityModel.getProcessingTimePickUp());
         facility.setProcessingTimeDrop(facilityModel.getProcessingTimeDrop());
@@ -124,6 +125,10 @@ public class FacilityServiceImpl implements FacilityService {
             sqlCount += " AND facility_name = '%:facilityName%'";
             params.put("facilityName", facilityFilterRequestDTO.getFacilityName());
         }
+        sql += " AND status != :statusNotEqual";
+        sqlCount += " AND status = :statusNotEqual";
+        params.put("statusNotEqual", Constants.FacilityStatus.DELETE.getStatus());
+
         if(!StringUtils.isEmpty(facilityFilterRequestDTO.getType())) {
             sql += " AND facility_type = :type";
             sqlCount += " AND facility_type = :type";
@@ -171,6 +176,14 @@ public class FacilityServiceImpl implements FacilityService {
 
         facility.setUpdatedAt(System.currentTimeMillis());
         facilityRepo.save(facility);
+        return convertToModel(facility);
+    }
+
+    @Override
+    public FacilityModel deleteFacility(String uid) {
+        Facility facility = facilityRepo.findByUid(uid);
+        facility.setStatus(Constants.FacilityStatus.DELETE.getStatus());
+        facility = facilityRepo.save(facility);
         return convertToModel(facility);
     }
 

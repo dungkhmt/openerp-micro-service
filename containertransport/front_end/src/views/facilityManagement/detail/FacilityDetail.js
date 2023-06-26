@@ -3,7 +3,7 @@ import '../styles.scss';
 import { Alert, Box, Button, Container, Divider, Icon, Typography } from "@mui/material";
 import { useHistory, useParams } from "react-router-dom";
 import { menuIconMap } from "config/menuconfig";
-import { getFacilityById } from "api/FacilityAPI";
+import { deleteFacility, getFacilityById } from "api/FacilityAPI";
 import ContentsTruckManagement from "views/truck/ContentTruckManagement";
 import { getTrucks } from "api/TruckAPI";
 import TruckInFacility from "./TrucksInFacility";
@@ -50,6 +50,18 @@ const FacilityDetail = () => {
         setOpenModify(!openModify);
     }
 
+    const handleDelete = () => {
+        deleteFacility(facilityId).then((res) => {
+            setToastMsg("Delete Facility Success");
+            setToastType("success");
+            setToast(true);
+            setTimeout(() => {
+                setToast(false);
+            }, "3000");
+            history.push('/facility');
+          })
+    }
+
     console.log("facility", facility);
     return (
         <Box className="fullScreen">
@@ -76,7 +88,7 @@ const FacilityDetail = () => {
                         </Box>
                         <Box className="btn-header">
                             <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                            // onClick={handleCancelCreateShipment}
+                            onClick={handleDelete}
                             >Delete</Button>
                             <Button variant="contained" className="header-submit-shipment-btn-save"
                             onClick={handleClose}

@@ -86,9 +86,9 @@ const FacilityModal = ({ open, handleClose, facility, setToast, setToastType, se
                     setToast(false);
                 }, "3000");
             })
-            .catch(err => {
-                console.log("err", err);
-            })
+                .catch(err => {
+                    console.log("err", err);
+                })
         }
         else {
             createFacility(data).then((res) => {
@@ -319,15 +319,18 @@ const FacilityModal = ({ open, handleClose, facility, setToast, setToastType, se
                                                     <Typography>Processing Time Pick Up:</Typography>
                                                 </Box>
                                                 <Box className="contentModal-item-input">
-                                                    <OutlinedInput
-                                                        id="outlined-textarea"
-                                                        label="Processing Time Pickup"
-                                                        placeholder="processing time pickup"
-                                                        value={timePickup}
-                                                        endAdornment={<InputAdornment position="end">(s)</InputAdornment>}
-                                                        size="small"
-                                                        onChange={(e) => setTimePickup(e.target.value)}
-                                                    />
+                                                    <FormControl>
+                                                        <InputLabel htmlFor="outlined-text-time">processing time pickup</InputLabel>
+                                                        <OutlinedInput
+                                                            id="outlined-text-time"
+                                                            label="Processing Time Pickup"
+                                                            placeholder="processing time pickup"
+                                                            value={timePickup}
+                                                            endAdornment={<InputAdornment position="end">(s)</InputAdornment>}
+                                                            size="small"
+                                                            onChange={(e) => setTimePickup(e.target.value)}
+                                                        />
+                                                    </FormControl>
                                                 </Box>
                                             </Box>
                                             <Box className="contentModal-item">
@@ -335,15 +338,18 @@ const FacilityModal = ({ open, handleClose, facility, setToast, setToastType, se
                                                     <Typography>Processing Time Drop Off:</Typography>
                                                 </Box>
                                                 <Box className="contentModal-item-input">
-                                                    <OutlinedInput
-                                                        id="outlined-textarea"
-                                                        label="Processing Time Drop Off"
-                                                        placeholder="processing time drop off"
-                                                        value={timeDrop}
-                                                        endAdornment={<InputAdornment position="end">(s)</InputAdornment>}
-                                                        size="small"
-                                                        onChange={(e) => setTimeDrop(e.target.value)}
-                                                    />
+                                                    <FormControl>
+                                                        <InputLabel htmlFor="outlined-text-time">processing time drop off</InputLabel>
+                                                        <OutlinedInput
+                                                            id="outlined-text-time"
+                                                            label="Processing Time Drop Off"
+                                                            placeholder="processing time drop off"
+                                                            value={timeDrop}
+                                                            endAdornment={<InputAdornment position="end">(s)</InputAdornment>}
+                                                            size="small"
+                                                            onChange={(e) => setTimeDrop(e.target.value)}
+                                                        />
+                                                    </FormControl>
                                                 </Box>
                                             </Box>
                                             <Box className="contentModal-item">

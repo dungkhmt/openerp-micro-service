@@ -17,6 +17,8 @@ const FacilityScreen = () => {
     const [toastType, setToastType] = useState();
     const [toastMsg, setToastMsg] = useState('');
 
+    const [flag, setFlag] = useState(false);
+
     const [openModal, setOpenModal] = useState(false);
 
     //owner: preferred_username
@@ -28,7 +30,7 @@ const FacilityScreen = () => {
                 setCount(res.data.data.count);
             });
         console.log("role", role);
-    }, [page, rowsPerPage, openModal]);
+    }, [page, rowsPerPage, openModal, flag]);
 
     const handleClose = () => {
         setOpenModal(!openModal);
@@ -48,7 +50,9 @@ const FacilityScreen = () => {
                     <Divider />
                 </Box>
                 <ContentsFacilityMana facilities={facilities} page={page} setPage={setPage}
-                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
+                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} 
+                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg}
+                    flag={flag} setFlag={setFlag}/>
             </Container>
         </Box>
     );

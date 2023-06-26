@@ -47,4 +47,10 @@ public class FacilityController {
         FacilityModel facilityModelUpdate = facilityService.updateFacility(facilityModel, uid);
         return ResponseEntity.status(HttpStatus.OK).body(facilityModelUpdate);
     }
+
+    @DeleteMapping("/delete/{uid}")
+    public ResponseEntity<?> deleteFacility(@PathVariable String uid) {
+        FacilityModel facilityDelete = facilityService.deleteFacility(uid);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), facilityDelete));
+    }
 }

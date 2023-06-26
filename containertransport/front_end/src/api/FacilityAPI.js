@@ -31,3 +31,11 @@ export const updateFacility = (id, data) => {
     )
     return resData;
 }
+
+export const deleteFacility = (id) => {
+    const resData = request(
+        "delete",
+        `/facility/delete/${id}`, {},{}, {}, {},
+    )
+    return resData;
+}
