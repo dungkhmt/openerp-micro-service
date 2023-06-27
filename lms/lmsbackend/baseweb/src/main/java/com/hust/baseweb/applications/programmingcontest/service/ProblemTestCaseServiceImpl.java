@@ -1073,39 +1073,29 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         }
 
         List<ContestSubmissionTestCaseEntity> L = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionId((submissionId));
-        //log.info("getContestProblemSubmissionDetailByTestCaseOfASubmission, submissionId  = " + submissionId + " retList = " + L.size());
         List<ModelProblemSubmissionDetailByTestCaseResponse> retLst = new ArrayList();
         for (ContestSubmissionTestCaseEntity e : L) {
 
             String testCase = "";
             String testCaseOutput = "";
-            String participantSolutionOutput = e.getParticipantSolutionOtput();
+            String participantSolutionOutput = "";
             if (contest != null) {
                 TestCaseEntity tc = testCaseRepo.findTestCaseByTestCaseId(e.getTestCaseId());
                 if (tc == null) {
                     break;
                 }
 
-                testCase = tc.getTestCase();
-                testCaseOutput = tc.getCorrectAnswer();
-//                switch (contest.getParticipantViewResultMode()) {
-//                    case ContestEntity.CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER_AND_PRIVATE_TESTCASE: {
-////                        testCaseOutput = tc.getCorrectAnswer();
-//                        break;
-//                    }
-//                    case ContestEntity.CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER_AND_PRIVATE_TESTCASE_SHORT: {
-////                        testCaseOutput = tc.getCorrectAnswer();
-//                        //testCase = StringHandler.shorthen(testCase,100);
-//                        testCaseOutput = StringHandler.shorthen(testCaseOutput, 100);
-//                        participantSolutionOutput = StringHandler.shorthen(participantSolutionOutput, 100);
-//                        break;
-//                    }
-//                    case ContestEntity.CONTEST_PARTICIPANT_VIEW_MODE_NOT_SEE_CORRECT_ANSWER: {
-//                        testCaseOutput = "HIDDEN";//StringHandler.shorthen(testCaseOutput,100);
-//                        participantSolutionOutput = StringHandler.shorthen(participantSolutionOutput, 100);
-//                        break;
-//                    }
-//                }
+                if (tc.getIsPublic().equals("Y")){
+                    testCase = tc.getTestCase();
+                    testCaseOutput = tc.getCorrectAnswer();
+                    participantSolutionOutput = e.getParticipantSolutionOtput();
+                }
+                else {
+                    testCase = "--HIDDEN--";
+                    testCaseOutput = "--HIDDEN--";
+                    participantSolutionOutput = "--HIDDEN--";
+                }
+
             }
 
             retLst.add(new ModelProblemSubmissionDetailByTestCaseResponse(
@@ -1117,10 +1107,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 testCase,
                 e.getStatus(),
                 e.getPoint(),
-                //e.getTestCaseOutput(),
                 testCaseOutput,
-
-                //e.getParticipantSolutionOtput(),
                 participantSolutionOutput,
                 e.getCreatedStamp(),
                 viewSubmitSolutionOutputMode
