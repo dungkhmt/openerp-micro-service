@@ -26,6 +26,7 @@ export default function EditContest() {
 
   const [contestName, setContestName] = useState("");
   const [contestTime, setContestTime] = useState(Number(0));
+
   const [isPublic, setIsPublic] = useState(false);
   const [startDate, setStartDate] = React.useState(new Date());
   const [countDown, setCountDown] = useState(Number(0));
