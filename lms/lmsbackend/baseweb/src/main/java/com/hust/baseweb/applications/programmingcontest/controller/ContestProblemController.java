@@ -1822,7 +1822,6 @@ public class ContestProblemController {
                 //if(cnt == 1){
                 uploadedUsers.add(userId);
                 //}
-                //System.out.print("get user " + userId);
             }
         } catch (Exception e) {
             e.printStackTrace();
