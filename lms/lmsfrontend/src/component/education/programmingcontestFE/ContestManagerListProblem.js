@@ -30,7 +30,6 @@ export function ContestManagerListProblem(props) {
   const [statusId, setStatusId] = useState("");
   const [submissionActionType, setSubmissionActionType] = useState("");
   const [maxNumberSubmission, setMaxNumberSubmission] = useState(10);
-  const [participantViewResultMode, setParticipantViewResultMode] = useState("");
   const [problemDescriptionViewType, setProblemDescriptionViewType] = useState("");
   const [evaluateBothPublicPrivateTestcase, setEvaluateBothPublicPrivateTestcase,] = useState("");
   const [maxSourceCodeLength, setMaxSourceCodeLength] = useState(50000);
@@ -44,7 +43,6 @@ export function ContestManagerListProblem(props) {
       setIsPublic(res.data.isPublic);
       setStatusId(res.data.statusId);
       setSubmissionActionType(res.data.submissionActionType);
-      setParticipantViewResultMode(res.data.participantViewResultMode);
       setMaxNumberSubmission(res.data.maxNumberSubmission);
       setProblemDescriptionViewType(res.data.problemDescriptionViewType);
       setMinTimeBetweenTwoSubmissions(res.data.minTimeBetweenTwoSubmissions);
@@ -150,17 +148,6 @@ export function ContestManagerListProblem(props) {
             id="evaluateBothPublicPrivateTestcase"
             label="Evaluate Private Testcases"
             value={evaluateBothPublicPrivateTestcase}
-          >
-          </CssTextField>
-        </Grid>
-
-        <Grid item xs={3}>
-          <CssTextField
-            disabled
-            fullWidth
-            id="participantViewResultMode"
-            label="Participant View Result Mode"
-            value={participantViewResultMode}
           >
           </CssTextField>
         </Grid>

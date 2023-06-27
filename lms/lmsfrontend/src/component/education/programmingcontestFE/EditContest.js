@@ -34,8 +34,6 @@ export default function EditContest() {
   const [submissionActionType, setSubmissionActionType] = useState("");
   const [listSubmissionActionType, setListSubmissionActionType] = useState([]);
   const [maxNumberSubmission, setMaxNumberSubmission] = useState(10);
-  const [participantViewResultMode, setParticipantViewResultMode] = useState("");
-  const [listParticipantViewResultModes, setListParticipantViewResultModes] = useState([]);
 
   const [problemDescriptionViewType, setProblemDescriptionViewType] = useState("");
   const [listProblemDescriptionViewTypes, setListProblemDescriptionViewTypes] = useState([]);
@@ -61,7 +59,6 @@ export default function EditContest() {
       statusId: statusId,
       submissionActionType: submissionActionType,
       maxNumberSubmission: maxNumberSubmission,
-      participantViewResultMode: participantViewResultMode,
       problemDescriptionViewType: problemDescriptionViewType,
       maxSourceCodeLength: maxSourceCodeLength,
       evaluateBothPublicPrivateTestcase: evaluateBothPublicPrivateTestcase,
@@ -89,8 +86,6 @@ export default function EditContest() {
       setListStatusIds(res.data.listStatusIds);
       setSubmissionActionType(res.data.submissionActionType);
       setListSubmissionActionType(res.data.listSubmissionActionTypes);
-      setParticipantViewResultMode(res.data.participantViewResultMode);
-      setListParticipantViewResultModes(res.data.listParticipantViewModes);
       setMaxNumberSubmission(res.data.maxNumberSubmission);
       setProblemDescriptionViewType(res.data.problemDescriptionViewType);
       setMinTimeBetweenTwoSubmissions(res.data.minTimeBetweenTwoSubmissions);
@@ -218,23 +213,6 @@ export default function EditContest() {
                 value={evaluateBothPublicPrivateTestcase}
               >
                 {listEvaluateBothPublicPrivateTestcases.map((item) => (<MenuItem key={item} value={item}>
-                  {item}
-                </MenuItem>))}
-              </TextField>
-            </Grid>
-
-            <Grid item xs={3}>
-              <TextField
-                fullWidth
-                select
-                id="participantViewResultMode"
-                label="Participant View Result Mode"
-                onChange={(event) => {
-                  setParticipantViewResultMode(event.target.value);
-                }}
-                value={participantViewResultMode}
-              >
-                {listParticipantViewResultModes.map((item) => (<MenuItem key={item} value={item}>
                   {item}
                 </MenuItem>))}
               </TextField>

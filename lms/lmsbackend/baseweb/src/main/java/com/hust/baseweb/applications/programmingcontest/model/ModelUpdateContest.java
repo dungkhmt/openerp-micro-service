@@ -17,7 +17,7 @@ public class ModelUpdateContest {
     private String statusId;
     private String submissionActionType;
     private int maxNumberSubmission;
-    private String participantViewResultMode;
+//    private String participantViewResultMode;
     private String problemDescriptionViewType;
     private String useCacheContestProblem;
     private String evaluateBothPublicPrivateTestcase;
