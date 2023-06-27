@@ -47,7 +47,7 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
     List<DeliveryTripItem> getDeliveryTripItemByUserLoginId(String userLoginId);
 
     @Query("select new com.hust.wmsbackend.management.model.response.ReportDataPoint " +
-            "(to_char(date_trunc('month', ws.expectedDeliveryStamp), 'yyyy- MM- dd') , sum(wsoi.priceUnit)) " +
+            "(to_char(date_trunc('month', ws.expectedDeliveryStamp), 'yyyy- MM- dd') , sum(wdti.quantity * wsoi.priceUnit)) " +
             "from DeliveryTripItem wdti " +
             "join DeliveryTrip wdt on wdti.deliveryTripId = wdt.deliveryTripId and wdt.isDeleted = false " +
             "join Shipment ws on wdt.shipmentId = ws.shipmentId and ws.isDeleted = false " +
@@ -59,7 +59,7 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
     List<ReportDataPoint> getDataPointsForRevenue();
 
     @Query("select new com.hust.wmsbackend.management.model.response.ReportDataPoint" +
-            "(to_char(date_trunc('month', ws.expectedDeliveryStamp), 'yyyy- MM- dd') , sum(wsoi.priceUnit - wii.importPrice)) " +
+            "(to_char(date_trunc('month', ws.expectedDeliveryStamp), 'yyyy- MM- dd') , sum(wdti.quantity * wsoi.priceUnit - wdti.quantity * wii.importPrice)) " +
             "from DeliveryTripItem wdti " +
             "join DeliveryTrip wdt on wdti.deliveryTripId = wdt.deliveryTripId and wdt.isDeleted = false " +
             "join Shipment ws on wdt.shipmentId = ws.shipmentId and ws.isDeleted = false " +
@@ -72,7 +72,7 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
     List<ReportDataPoint> getDataPointsForProfit();
 
     @Query("select new com.hust.wmsbackend.management.model.response.ProductCategoryMonthlyData " +
-            "(to_char(date_trunc('month', ws.expectedDeliveryStamp), 'MM-yyyy' ), wpc.name , sum(wsoi.priceUnit - wii.importPrice)) " +
+            "(to_char(date_trunc('month', ws.expectedDeliveryStamp), 'MM-yyyy' ), wpc.name , sum(wdti.quantity * wsoi.priceUnit - wdti.quantity * wii.importPrice)) " +
             "from DeliveryTripItem wdti " +
             "join AssignedOrderItem waoi on wdti.assignedOrderItemId = waoi.assignedOrderItemId " +
             "join InventoryItem wii on waoi.inventoryItemId = wii.inventoryItemId " +
