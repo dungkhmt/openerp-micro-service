@@ -150,7 +150,6 @@ public class ContestService {
             .listParticipantViewModes(ContestEntity.getParticipantViewResultModes())
             .listMaxNumberSubmissions(ContestEntity.getListMaxNumberSubmissions())
             .listProblemDescriptionViewTypes(ContestEntity.getProblemDescriptionViewTypes())
-            .listUseCacheContestProblems(ContestEntity.getListUseCacheContestProblems())
             .listJudgeModes(ContestEntity.getJudgeModes())
             .listEvaluateBothPublicPrivateTestcases(ContestEntity.getListEvaluateBothPublicPrivateTestcases())
             .submissionActionType(contestEntity.getSubmissionActionType())
