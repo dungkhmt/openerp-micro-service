@@ -39,8 +39,8 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         // get Trucks
         TruckFilterRequestDTO truckFilterRequestDTO = new TruckFilterRequestDTO();
         truckFilterRequestDTO.setStatus("AVAILABLE");
-        truckFilterRequestDTO.setPage(0);
-        truckFilterRequestDTO.setPageSize(3);
+//        truckFilterRequestDTO.setPage(0);
+//        truckFilterRequestDTO.setPageSize(3);
         List<TruckModel> truckList = truckService.filterTruck(truckFilterRequestDTO).getTruckModels();
         List<TruckInput> truckInputs = convertToTruckInput(truckList);
         transportContainerInput.setTruckInputs(truckInputs);
@@ -68,8 +68,8 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
 
         // depot trailer
         FacilityFilterRequestDTO facilityFilterTrailer = new FacilityFilterRequestDTO();
-        facilityFilterTruck.setType("Trailer");
-        List<FacilityModel> facilityModelsTrailer = facilityService.filterFacility(facilityFilterTruck).getFacilityModels();
+        facilityFilterTrailer.setType("Trailer");
+        List<FacilityModel> facilityModelsTrailer = facilityService.filterFacility(facilityFilterTrailer).getFacilityModels();
         List<DepotTrailer> depotTrailers = convertTrailerDepot(facilityModelsTrailer);
         transportContainerInput.setDepotTrailer(depotTrailers);
 
