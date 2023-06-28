@@ -17,6 +17,8 @@ const ContainerScreen = () => {
 
     const [openModal, setOpenModal] = useState(false);
 
+    const [flag, setFlag] = useState(false);
+
     useEffect(() => {
         getContainers({ page: page, pageSize: rowsPerPage })
             .then((res) => {
@@ -24,7 +26,7 @@ const ContainerScreen = () => {
                 setContainers(res?.data.data.containerModels);
                 setCount(res?.data.data.count);
             });
-    }, [openModal, page, rowsPerPage])
+    }, [openModal, page, rowsPerPage, flag])
 
     const handleClose = () => {
         setOpenModal(!openModal);
@@ -44,7 +46,9 @@ const ContainerScreen = () => {
                     <Divider />
                 </Box>
                 <ContentsContainerMana containers={containers} page={page} setPage={setPage}
-                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
+                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count}
+                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg}
+                    flag={flag} setFlag={setFlag} />
             </Container>
         </Box>
     )

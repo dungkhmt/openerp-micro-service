@@ -8,8 +8,9 @@ import openerp.containertransport.entity.Container;
 import java.util.List;
 
 public interface ContainerService {
-    ContainerModel createContainer(ContainerModel containerModel);
+    ContainerModel createContainer(ContainerModel containerModel, String username);
     ContainerModel getContainerByUid (String uid);
     ContainerModel updateContainer(ContainerModel containerModel);
+    ContainerModel deleteContainer(String uid);
     ContainerFilterRes filterContainer(ContainerFilterRequestDTO containerFilterRequestDTO);
 }

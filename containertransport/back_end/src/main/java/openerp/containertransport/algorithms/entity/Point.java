@@ -31,6 +31,7 @@ public class Point implements Serializable {
     public String orderCode;
 
     public String type;
+    public String typeRequest;
     public Boolean isBreakRomooc;
     public int prevPoint;
     public int nextPoint;

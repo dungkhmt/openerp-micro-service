@@ -275,7 +275,7 @@ export default function ContentsFacilityMana({ facilities, page, setPage, rowsPe
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={facilities.length}
+              rowCount={facilities?.length}
             />
             <TableBody>
               {facilities

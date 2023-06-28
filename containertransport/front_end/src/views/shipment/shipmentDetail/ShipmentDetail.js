@@ -46,6 +46,7 @@ const ShipmentDetail = () => {
         setLoading(true);
         autoCreateRouter(shipmentId).then((res) => {
             setLoading(false);
+            setFlag(!flag)
         })
             .catch((error) => {
                 console.log(error);

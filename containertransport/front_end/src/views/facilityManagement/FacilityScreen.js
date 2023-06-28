@@ -3,7 +3,7 @@ import { Alert, Box, Container, Divider, Typography } from "@mui/material";
 import ContentsFacilityMana from "./ContentFacillityMana";
 import './styles.scss';
 import HeaderFacilityScreen from "./HeaderFacilityScreen";
-import { getFacility } from "api/FacilityAPI";
+import {getFacilityOwner } from "api/FacilityAPI";
 import { MyContext } from "contextAPI/MyContext";
 
 const FacilityScreen = () => {
@@ -23,11 +23,11 @@ const FacilityScreen = () => {
 
     //owner: preferred_username
     useEffect(() => {
-        getFacility({ page: page, pageSize: rowsPerPage })
+        getFacilityOwner({ page: page, pageSize: rowsPerPage })
             .then((res) => {
                 console.log("facility==========", res?.data.data.facilityModels)
                 setFacilities(res?.data.data.facilityModels);
-                setCount(res.data.data.count);
+                setCount(res?.data.data.count);
             });
         console.log("role", role);
     }, [page, rowsPerPage, openModal, flag]);

@@ -74,7 +74,8 @@ public class Constants implements Serializable {
         ORDERED("ORDERED"),
         SCHEDULED("SCHEDULED"),
         AVAILABLE("AVAILABLE"),
-        EXECUTING("EXECUTING");
+        EXECUTING("EXECUTING"),
+        DELETE("DELETE");
         private final String status;
         ContainerStatus(String status) {
             this.status = status;

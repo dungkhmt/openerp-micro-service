@@ -25,6 +25,7 @@ import './styles.scss';
 import { Icon } from '@mui/material';
 import { menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
+import { deleteContainer } from 'api/ContainerAPI';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -148,7 +149,7 @@ function EnhancedTableHead(props) {
   );
 }
 
-export default function ContentsContainerMana({ containers, page, setPage, rowsPerPage, setRowsPerPage, count }) {
+export default function ContentsContainerMana({ containers, page, setPage, rowsPerPage, setRowsPerPage, count, setToast, setToastType, setToastMsg, flag, setFlag }) {
   const [order, setOrder] = React.useState(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
   const [selected, setSelected] = React.useState([]);
@@ -220,6 +221,18 @@ export default function ContentsContainerMana({ containers, page, setPage, rowsP
   const handleDetail = (id) => {
     history.push(`/container/detail/${id}`)
   }
+  const handleDelete = (uid) => {
+    deleteContainer(uid).then((res) => {
+      console.log(res);
+      setToastMsg("Delete Container Success !!!");
+      setToastType("success");
+      setToast(true);
+      setTimeout(() => {
+          setToast(false);
+      }, "3000");
+      setFlag(!flag);
+    })
+  }
   return (
     <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
       <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -285,7 +298,7 @@ export default function ContentsContainerMana({ containers, page, setPage, rowsP
                             </Box>
                           </Tooltip>
                           <Tooltip title="Delete">
-                            <Box>
+                            <Box onClick={() => { handleDelete(row?.uid) }}>
                               <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
                             </Box>
                           </Tooltip>

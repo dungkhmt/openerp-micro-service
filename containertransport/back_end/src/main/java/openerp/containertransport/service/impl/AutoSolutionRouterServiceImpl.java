@@ -39,8 +39,8 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         // get Trucks
         TruckFilterRequestDTO truckFilterRequestDTO = new TruckFilterRequestDTO();
         truckFilterRequestDTO.setStatus("AVAILABLE");
-        truckFilterRequestDTO.setPage(0);
-        truckFilterRequestDTO.setPageSize(3);
+//        truckFilterRequestDTO.setPage(0);
+//        truckFilterRequestDTO.setPageSize(3);
         List<TruckModel> truckList = truckService.filterTruck(truckFilterRequestDTO).getTruckModels();
         List<TruckInput> truckInputs = convertToTruckInput(truckList);
         transportContainerInput.setTruckInputs(truckInputs);
@@ -68,8 +68,8 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
 
         // depot trailer
         FacilityFilterRequestDTO facilityFilterTrailer = new FacilityFilterRequestDTO();
-        facilityFilterTruck.setType("Trailer");
-        List<FacilityModel> facilityModelsTrailer = facilityService.filterFacility(facilityFilterTruck).getFacilityModels();
+        facilityFilterTrailer.setType("Trailer");
+        List<FacilityModel> facilityModelsTrailer = facilityService.filterFacility(facilityFilterTrailer).getFacilityModels();
         List<DepotTrailer> depotTrailers = convertTrailerDepot(facilityModelsTrailer);
         transportContainerInput.setDepotTrailer(depotTrailers);
 
@@ -87,39 +87,41 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
 
         TransportContainerSolutionOutput transportContainerSolutionOutput = heuristicSolver.solve(transportContainerInput);
 
-//        for (Map.Entry<Integer, TripOutput> tripOutput : transportContainerSolutionOutput.getTripOutputs().entrySet()) {
-//            if(tripOutput.getValue().getPoints() != null && tripOutput.getValue().getPoints().size() != 0) {
-//
-//                List<TripItemModel> tripItemModelList = new ArrayList<>();
-//                List<Long> orderIds = new ArrayList<>();
-//                int seq = 1;
-//                for (Point point : tripOutput.getValue().getPoints()) {
-//
-//                    TripItemModel tripItemModel = new TripItemModel();
-//                    tripItemModel.setSeq(seq);
-//                    tripItemModel.setAction(point.getAction());
-//                    tripItemModel.setFacilityId(Long.valueOf(point.getFacilityId()));
-//                    tripItemModel.setOrderCode(point.getOrderCode());
-//                    tripItemModel.setContainerId(point.getContainerId());
-//                    tripItemModel.setTrailerId(point.getTrailerId() != null ? Long.valueOf(point.getTrailerId()) : null);
-//                    tripItemModel.setType(point.getType());
-//                    if (point.getId() != null) {
-//                        if(!orderIds.contains(point.getId())) {
-//                            orderIds.add(point.getId());
-//                        }
-//                    }
-//                    tripItemModelList.add(tripItemModel);
-//                    seq += 1;
-//                }
-//
-//                TripModel tripModel = new TripModel();
-//                tripModel.setTruckId(tripOutput.getKey().longValue());
-//                tripModel.setTripItemModelList(tripItemModelList);
-//                tripModel.setOrderIds(orderIds);
-//
-//                TripModel tripModelCreate = tripService.createTrip(tripModel, shipmentUid, shipmentModel.getCreatedByUserId());
-//            }
-//        }
+        for (Map.Entry<Integer, TripOutput> tripOutput : transportContainerSolutionOutput.getTripOutputs().entrySet()) {
+            if(tripOutput.getValue().getPoints() != null && tripOutput.getValue().getPoints().size() != 0) {
+
+                List<TripItemModel> tripItemModelList = new ArrayList<>();
+                List<Long> orderIds = new ArrayList<>();
+                int seq = 1;
+                for (Point point : tripOutput.getValue().getPoints()) {
+
+                    TripItemModel tripItemModel = new TripItemModel();
+                    tripItemModel.setSeq(seq);
+                    tripItemModel.setAction(point.getAction());
+                    tripItemModel.setFacilityId(Long.valueOf(point.getFacilityId()));
+                    tripItemModel.setOrderCode(point.getOrderCode());
+                    tripItemModel.setContainerId(point.getContainerId());
+                    tripItemModel.setTrailerId(point.getTrailerId() != null ? Long.valueOf(point.getTrailerId()) : null);
+                    tripItemModel.setType(point.getType());
+                    if (point.getId() != null) {
+                        if(!orderIds.contains(point.getId())) {
+                            orderIds.add(point.getId());
+                        }
+                    }
+                    tripItemModelList.add(tripItemModel);
+                    seq += 1;
+                }
+
+                TripModel tripModel = new TripModel();
+                tripModel.setTruckId(tripOutput.getKey().longValue());
+                tripModel.setTripItemModelList(tripItemModelList);
+                tripModel.setOrderIds(orderIds);
+                tripModel.setTotalDistant(tripOutput.getValue().getTotalDistant());
+                tripModel.setTotalTime(tripOutput.getValue().getTotalTime());
+
+                TripModel tripModelCreate = tripService.createTrip(tripModel, shipmentUid, shipmentModel.getCreatedByUserId());
+            }
+        }
 
         return shipmentModel;
     }
@@ -161,6 +163,7 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
             request.setLatestTimePickup(orderModel.getLatePickupTime());
             request.setLatestTimeDelivery(orderModel.getLateDeliveryTime());
             request.setIsBreakRomooc(orderModel.isBreakRomooc());
+            request.setType(orderModel.getType());
             requests.add(request);
         });
         return requests;

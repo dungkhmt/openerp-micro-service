@@ -3,6 +3,7 @@ package openerp.containertransport.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
+import openerp.containertransport.constants.Constants;
 import openerp.containertransport.dto.*;
 import openerp.containertransport.entity.Container;
 import openerp.containertransport.entity.Facility;
@@ -13,9 +14,9 @@ import openerp.containertransport.repo.FacilityRepo;
 import openerp.containertransport.repo.TypeContainerRepo;
 import openerp.containertransport.service.ContainerService;
 import openerp.containertransport.utils.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +32,7 @@ public class ContainerServiceImpl implements ContainerService {
     private final EntityManager entityManager;
     private final TypeContainerRepo typeContainerRepo;
     @Override
-    public ContainerModel createContainer(ContainerModel containerModelDTO) {
+    public ContainerModel createContainer(ContainerModel containerModelDTO, String username) {
         TypeContainer typeContainer = typeContainerRepo.findByTypeContainerCode(containerModelDTO.getTypeContainerCode());
 
         Facility facility = facilityRepo.findById(containerModelDTO.getFacilityId()).get();
@@ -41,7 +42,8 @@ public class ContainerServiceImpl implements ContainerService {
         container.setSize(typeContainer.getSize());
         container.setTypeContainer(typeContainer);
         container.setEmpty(containerModelDTO.getIsEmpty());
-        container.setStatus("AVAILABLE");
+        container.setStatus(Constants.ContainerStatus.AVAILABLE.getStatus());
+        container.setOwner(username);
         container.setUid(RandomUtils.getRandomId());
         container.setCreatedAt(System.currentTimeMillis());
         container.setUpdatedAt(System.currentTimeMillis());
@@ -69,10 +71,21 @@ public class ContainerServiceImpl implements ContainerService {
         if (containerModel.getIsEmpty() != null) {
             container.setEmpty(containerModel.getIsEmpty());
         }
+        if (containerModel.getOwner() != null) {
+            container.setOwner(containerModel.getOwner());
+        }
         container.setUpdatedAt(System.currentTimeMillis());
         containerRepo.save(container);
         ContainerModel containerModelUpdate = convertToModel(container);
         return containerModelUpdate;
+    }
+
+    @Override
+    public ContainerModel deleteContainer(String uid) {
+        Container container = containerRepo.findByUid(uid);
+        container.setStatus(Constants.ContainerStatus.DELETE.getStatus());
+        container = containerRepo.save(container);
+        return convertToModel(container);
     }
 
     @Override
@@ -83,6 +96,11 @@ public class ContainerServiceImpl implements ContainerService {
         String sqlCount = "SELECT COUNT(id) FROM container_transport_container WHERE 1=1";
         HashMap<String, Object> params = new HashMap<>();
 
+        if(!StringUtils.isEmpty(containerFilterRequestDTO.getOwner())) {
+            sql += " AND owner = :owner";
+            sqlCount += " AND owner = :owner";
+            params.put("owner", containerFilterRequestDTO.getOwner());
+        }
         if(containerFilterRequestDTO.getContainerCode() != null) {
             sql += " AND container_code = :containerCode";
             sqlCount += " AND container_code = :containerCode";
@@ -99,6 +117,9 @@ public class ContainerServiceImpl implements ContainerService {
             sqlCount += " AND facility_id = :facilityId";
             params.put("facilityId", containerFilterRequestDTO.getFacilityId());
         }
+        sql += " AND status != :statusNotEqual";
+        sqlCount += " AND status = :statusNotEqual";
+        params.put("statusNotEqual", Constants.ContainerStatus.DELETE.getStatus());
 
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
         for (String i : params.keySet()) {

@@ -23,7 +23,7 @@ public class Request implements Serializable {
     private long latestTimeDelivery; // 2023-02-03 11:00:00
     private int toLocationID;
 
-    private Constants.RequestType type;
+    private String type;
     private long containerID;
     private int weightContainer;
     private String orderCode;

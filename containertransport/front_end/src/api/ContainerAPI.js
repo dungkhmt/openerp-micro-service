@@ -32,6 +32,14 @@ export const updateContainer = async (data) => {
     return resData;
 }
 
+export const deleteContainer = async (uid) => {
+    const resData = request(
+        "delete",
+        `/container/delete/${uid}`, {}, {}, {}, {},
+    );
+    return resData;
+}
+
 export const getTypeContainer = async (data) => {
     const resData = request(
         "post",

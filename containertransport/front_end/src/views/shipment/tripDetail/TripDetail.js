@@ -94,7 +94,7 @@ const TripDetail = () => {
                     <Box className="btn-header">
                         <Button variant="outlined" color="error" className="header-trip-detail-btn-cancel"
                             onClick={handleCancelTrip}
-                        >Cancel</Button>
+                        >Delete</Button>
                         {/* <Button variant="contained" className="header-trip-detail-btn-save"
                     onClick={handleSubmit}
                     >Save</Button> */}
