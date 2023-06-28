@@ -55,6 +55,8 @@ public class TripServiceImpl implements TripService {
         trip.setUid(RandomUtils.getRandomId());
         trip.setCreatedByUserId(createBy);
         trip.setOrders(orders);
+        trip.setTotalDistant(tripModel.getTotalDistant());
+        trip.setTotalTime(tripModel.getTotalTime());
         trip.setCreatedAt(System.currentTimeMillis());
         trip.setUpdatedAt(System.currentTimeMillis());
         trip = tripRepo.save(trip);

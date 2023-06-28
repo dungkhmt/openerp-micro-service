@@ -5,6 +5,7 @@ import lombok.*;
 import openerp.containertransport.entity.Order;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -25,6 +26,10 @@ public class TripModel implements Serializable {
     private List<Long> orderIds;
     private List<Order> orders;
     private String status;
+    @JsonProperty("total_distant")
+    private BigDecimal totalDistant;
+    @JsonProperty("total_time")
+    private BigDecimal totalTime;
     @JsonProperty("created_by_user_id")
     private String createdByUserId;
     private long createdAt;

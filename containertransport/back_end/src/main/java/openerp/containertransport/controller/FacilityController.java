@@ -37,8 +37,8 @@ public class FacilityController {
         return ResponseEntity.status(HttpStatus.OK).body(facilityModel);
     }
 
-    @PostMapping("/")
-    public ResponseEntity<?> filterFacility(@RequestBody FacilityFilterRequestDTO facilityFilterRequestDTO, JwtAuthenticationToken token) {
+    @PostMapping("/owner")
+    public ResponseEntity<?> filterFacilityOwner(@RequestBody FacilityFilterRequestDTO facilityFilterRequestDTO, JwtAuthenticationToken token) {
         String username = token.getName();
         List<String> roleIds = token
                 .getAuthorities()
@@ -54,6 +54,12 @@ public class FacilityController {
         if(roleIds.contains("TMS_CUSTOMER")) {
             facilityFilterRequestDTO.setOwner(username);
         }
+        FacilityFilterRes facilityModels = facilityService.filterFacility(facilityFilterRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), facilityModels));
+    }
+
+    @PostMapping("/")
+    public ResponseEntity<?> filterFacility(@RequestBody FacilityFilterRequestDTO facilityFilterRequestDTO) {
         FacilityFilterRes facilityModels = facilityService.filterFacility(facilityFilterRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), facilityModels));
     }

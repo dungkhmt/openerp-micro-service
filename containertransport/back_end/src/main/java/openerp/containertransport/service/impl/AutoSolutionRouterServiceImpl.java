@@ -116,6 +116,8 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
                 tripModel.setTruckId(tripOutput.getKey().longValue());
                 tripModel.setTripItemModelList(tripItemModelList);
                 tripModel.setOrderIds(orderIds);
+                tripModel.setTotalDistant(tripOutput.getValue().getTotalDistant());
+                tripModel.setTotalTime(tripOutput.getValue().getTotalTime());
 
                 TripModel tripModelCreate = tripService.createTrip(tripModel, shipmentUid, shipmentModel.getCreatedByUserId());
             }
@@ -161,6 +163,7 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
             request.setLatestTimePickup(orderModel.getLatePickupTime());
             request.setLatestTimeDelivery(orderModel.getLateDeliveryTime());
             request.setIsBreakRomooc(orderModel.isBreakRomooc());
+            request.setType(orderModel.getType());
             requests.add(request);
         });
         return requests;
