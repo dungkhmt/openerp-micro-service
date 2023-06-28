@@ -227,7 +227,6 @@ public class DockerClientBase {
         } catch (DockerException | InterruptedException e) {
             log.error("Failed to exec commands '{}' in container '{}'", runCommand, containerId, e);
         }
-
         //log.info("runExecutable, dirName = " +   dirName +   " language = " +   languages + " copyToContainer OK -> runExecCreation OK -> execStart to get output OK");
         return output;
     }

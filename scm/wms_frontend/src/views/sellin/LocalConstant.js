@@ -331,8 +331,8 @@ export const purchaseStaff = [
     headerName: "Mã nhân viên",
     sortable: false,
     pinnable: true,
-    minWidth: 150,
-    maxWidth: 200,
+    minWidth: 200,
+    maxWidth: 250,
     renderCell: (params) => {
       return (
         <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>

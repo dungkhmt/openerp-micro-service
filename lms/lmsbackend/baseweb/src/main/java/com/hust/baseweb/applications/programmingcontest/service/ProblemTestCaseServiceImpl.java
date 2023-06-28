@@ -638,7 +638,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .maxSourceCodeLength(modelCreateContest.getMaxSourceCodeLength())
                                              .minTimeBetweenTwoSubmissions(modelCreateContest.getMinTimeBetweenTwoSubmissions())
                                              .judgeMode(ContestEntity.ASYNCHRONOUS_JUDGE_MODE_QUEUE)
-                                             .useCacheContestProblem(ContestEntity.USE_CACHE_CONTEST_PROBLEM_YES)
                                              .submissionActionType(ContestEntity.CONTEST_SUBMISSION_ACTION_TYPE_STORE_AND_EXECUTE)
                                              .problemDescriptionViewType(ContestEntity.CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_VISIBLE)
                                              //.participantViewResultMode(ContestEntity.CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER)

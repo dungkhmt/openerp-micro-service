@@ -1,6 +1,7 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box } from "@mui/material";
 import { Action } from "components/action/Action";
@@ -48,6 +49,13 @@ function PurchaseOrderScreen({ screenAuthorization }) {
       },
       icon: <AddIcon />,
       describe: "Thêm bản ghi mới",
+      disabled: false,
+    },
+    {
+      title: "Xuất pdf",
+      callback: (pre) => {},
+      icon: <PictureAsPdfIcon />,
+      describe: "Xuất báo cáo pdf",
       disabled: false,
     },
   ];

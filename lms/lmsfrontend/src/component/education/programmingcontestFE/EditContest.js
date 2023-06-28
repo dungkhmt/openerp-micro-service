@@ -26,6 +26,7 @@ export default function EditContest() {
 
   const [contestName, setContestName] = useState("");
   const [contestTime, setContestTime] = useState(Number(0));
+
   const [isPublic, setIsPublic] = useState(false);
   const [startDate, setStartDate] = React.useState(new Date());
   const [countDown, setCountDown] = useState(Number(0));
@@ -40,7 +41,6 @@ export default function EditContest() {
   const [problemDescriptionViewType, setProblemDescriptionViewType] = useState("");
   const [listProblemDescriptionViewTypes, setListProblemDescriptionViewTypes] = useState([]);
 
-  const [useCacheContestProblem, setUseCacheContestProblem] = useState("");
   const [evaluateBothPublicPrivateTestcase, setEvaluateBothPublicPrivateTestcase,] = useState("");
 
   const [listEvaluateBothPublicPrivateTestcases, setListEvaluateBothPublicPrivateTestcases,] = useState([]);
@@ -64,7 +64,6 @@ export default function EditContest() {
       maxNumberSubmission: maxNumberSubmission,
       participantViewResultMode: participantViewResultMode,
       problemDescriptionViewType: problemDescriptionViewType,
-      useCacheContestProblem: useCacheContestProblem,
       maxSourceCodeLength: maxSourceCodeLength,
       evaluateBothPublicPrivateTestcase: evaluateBothPublicPrivateTestcase,
       minTimeBetweenTwoSubmissions: minTimeBetweenTwoSubmissions,
@@ -98,7 +97,6 @@ export default function EditContest() {
       setMinTimeBetweenTwoSubmissions(res.data.minTimeBetweenTwoSubmissions);
       setJudgeMode(res.data.judgeMode);
       setListProblemDescriptionViewTypes(res.data.listProblemDescriptionViewTypes);
-      setUseCacheContestProblem(res.data.useCacheContestProblem);
       setEvaluateBothPublicPrivateTestcase(res.data.evaluateBothPublicPrivateTestcase);
       setMaxSourceCodeLength(res.data.maxSourceCodeLength);
       setListEvaluateBothPublicPrivateTestcases(res.data.listEvaluateBothPublicPrivateTestcases);

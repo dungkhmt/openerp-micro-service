@@ -116,13 +116,21 @@ export const staticCustomerField = [
   },
   {
     field: "createdBy",
-    headerName: "Mã người tạo",
+    headerName: "Người tạo",
     headerAlign: "center",
     align: "center",
     sortable: false,
     minWidth: 150,
-    valueGetter: (params) => {
-      return params.row.user.id;
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ color: AppColors.warning, fontWeight: "500" }}>
+          {params?.row?.user?.firstName +
+            " " +
+            params?.row?.user?.middleName +
+            " " +
+            params?.row?.user?.lastName}
+        </Typography>
+      );
     },
   },
 ];

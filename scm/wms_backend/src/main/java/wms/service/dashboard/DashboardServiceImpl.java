@@ -41,6 +41,7 @@ public class DashboardServiceImpl extends BaseService implements IDashBoardServi
         quarterMapping.put(4, monthInQuarter.subList(9, 12));
         return quarterMapping;
     }
+    // TODO: Methods should have verb or verb phrase names
     @Override
     public List<Integer> newFacilityMonthly(int year) {
         List<Integer> facilityMonthlyOfYear = new ArrayList<>();
@@ -50,7 +51,7 @@ public class DashboardServiceImpl extends BaseService implements IDashBoardServi
         }
         return facilityMonthlyOfYear;
     }
-
+    // TODO: Methods should have verb or verb phrase names
     @Override
     public List<Integer> newCustomerMonthly(int year) {
         List<Integer> customersMonthly = new ArrayList<>();

@@ -39,9 +39,6 @@ public class ContestEntity implements Serializable {
     public static final String CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_VISIBLE = "VISIBLE";
     public static final String CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_HIDDEN = "HIDDEN";
 
-    public static final String USE_CACHE_CONTEST_PROBLEM_YES = "Y";
-    public static final String USE_CACHE_CONTEST_PROBLEM_NO = "N";
-
     public static final String EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES = "Y";
     public static final String EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_NO = "N";
 
@@ -52,13 +49,6 @@ public class ContestEntity implements Serializable {
         List<String> L = new ArrayList();
         L.add(SYNCHRONOUS_JUDGE_MODE);
         L.add(ASYNCHRONOUS_JUDGE_MODE_QUEUE);
-        return L;
-    }
-
-    public static List<String> getListUseCacheContestProblems() {
-        List<String> L = new ArrayList();
-        L.add(ContestEntity.USE_CACHE_CONTEST_PROBLEM_YES);
-        L.add(ContestEntity.USE_CACHE_CONTEST_PROBLEM_NO);
         return L;
     }
 
