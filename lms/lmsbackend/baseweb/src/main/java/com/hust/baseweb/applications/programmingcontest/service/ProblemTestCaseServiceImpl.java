@@ -641,7 +641,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .submissionActionType(ContestEntity.CONTEST_SUBMISSION_ACTION_TYPE_STORE_AND_EXECUTE)
                                              .problemDescriptionViewType(ContestEntity.CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_VISIBLE)
                                              //.participantViewResultMode(ContestEntity.CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER)
-                                             .participantViewResultMode(ContestEntity.CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER_AND_PRIVATE_TESTCASE_SHORT)
+                                             .participantViewResultMode(ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_ENABLED)
                                              .evaluateBothPublicPrivateTestcase(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_NO)
                                              .createdAt(new Date())
                                              .build();
@@ -1015,18 +1015,11 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             TestCaseEntity tc = testCaseRepo.findTestCaseByTestCaseId(e.getTestCaseId());
             String testCase = "";
             String testCaseOutput = "";
-            String participantSolutionOutput = e.getParticipantSolutionOtput();
-            if (tc != null) {
+            String participantSolutionOutput = "";
+            if (contest != null && tc != null) {
                 testCase = tc.getTestCase();
                 testCaseOutput = tc.getCorrectAnswer();
-            }
-            if (contest != null) {
-                if (contest
-                    .getParticipantViewResultMode()
-                    .equals(ContestEntity.CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER_AND_PRIVATE_TESTCASE_SHORT)) {
-                    testCaseOutput = StringHandler.shorthen(testCaseOutput, 100);
-                    participantSolutionOutput = StringHandler.shorthen(participantSolutionOutput, 100);
-                }
+                participantSolutionOutput = e.getParticipantSolutionOtput();
             }
             retLst.add(new ModelProblemSubmissionDetailByTestCaseResponse(
                 e.getContestSubmissionTestcaseId(),
@@ -1079,52 +1072,39 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
             String testCase = "";
             String testCaseOutput = "";
-            String participantSolutionOutput = e.getParticipantSolutionOtput();
-            if (contest != null) {
-                TestCaseEntity tc = testCaseRepo.findTestCaseByTestCaseId(e.getTestCaseId());
-                if (tc == null) {
-                    break;
-                }
+            String participantSolutionOutput = "";
 
-                testCase = tc.getTestCase();
-                testCaseOutput = tc.getCorrectAnswer();
+            TestCaseEntity tc = testCaseRepo.findTestCaseByTestCaseId(e.getTestCaseId());
+            if (contest != null && tc != null) {
                 switch (contest.getParticipantViewResultMode()) {
-                    case ContestEntity.CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER_AND_PRIVATE_TESTCASE: {
-//                        testCaseOutput = tc.getCorrectAnswer();
+                    case ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_ENABLED:
+                        testCase = tc.getTestCase();
+                        testCaseOutput = tc.getCorrectAnswer();
+                        participantSolutionOutput = e.getParticipantSolutionOtput();
                         break;
-                    }
-                    case ContestEntity.CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER_AND_PRIVATE_TESTCASE_SHORT: {
-//                        testCaseOutput = tc.getCorrectAnswer();
-                        //testCase = StringHandler.shorthen(testCase,100);
-                        testCaseOutput = StringHandler.shorthen(testCaseOutput, 100);
-                        participantSolutionOutput = StringHandler.shorthen(participantSolutionOutput, 100);
+
+                    case ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_DISABLED:
+                        testCase = "---HIDDEN---";
+                        testCaseOutput = "---HIDDEN---";
+                        participantSolutionOutput = "---HIDDEN---";
                         break;
-                    }
-                    case ContestEntity.CONTEST_PARTICIPANT_VIEW_MODE_NOT_SEE_CORRECT_ANSWER: {
-                        testCaseOutput = "HIDDEN";//StringHandler.shorthen(testCaseOutput,100);
-                        participantSolutionOutput = StringHandler.shorthen(participantSolutionOutput, 100);
-                        break;
-                    }
                 }
+
+                retLst.add(new ModelProblemSubmissionDetailByTestCaseResponse(
+                    e.getContestSubmissionTestcaseId(),
+                    e.getContestId(),
+                    e.getProblemId(),
+                    e.getSubmittedByUserLoginId(),
+                    e.getTestCaseId(),
+                    testCase,
+                    e.getStatus(),
+                    e.getPoint(),
+                    testCaseOutput,
+                    participantSolutionOutput,
+                    e.getCreatedStamp(),
+                    viewSubmitSolutionOutputMode
+                ));
             }
-
-            retLst.add(new ModelProblemSubmissionDetailByTestCaseResponse(
-                e.getContestSubmissionTestcaseId(),
-                e.getContestId(),
-                e.getProblemId(),
-                e.getSubmittedByUserLoginId(),
-                e.getTestCaseId(),
-                testCase,
-                e.getStatus(),
-                e.getPoint(),
-                //e.getTestCaseOutput(),
-                testCaseOutput,
-
-                //e.getParticipantSolutionOtput(),
-                participantSolutionOutput,
-                e.getCreatedStamp(),
-                viewSubmitSolutionOutputMode
-            ));
         }
         return retLst;
     }

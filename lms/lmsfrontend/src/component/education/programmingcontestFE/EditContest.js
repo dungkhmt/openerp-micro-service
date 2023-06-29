@@ -229,7 +229,7 @@ export default function EditContest() {
                 fullWidth
                 select
                 id="participantViewResultMode"
-                label="Participant View Result Mode"
+                label="Allow viewing testcase detail"
                 onChange={(event) => {
                   setParticipantViewResultMode(event.target.value);
                 }}

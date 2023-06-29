@@ -159,7 +159,7 @@ export function ContestManagerListProblem(props) {
             disabled
             fullWidth
             id="participantViewResultMode"
-            label="Participant View Result Mode"
+            label="Allow viewing testcase detail"
             value={participantViewResultMode}
           >
           </CssTextField>
