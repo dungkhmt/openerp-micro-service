@@ -140,6 +140,10 @@ facilityType.set("Depot", "Depot");
 facilityType.set("Truck", "Truck");
 facilityType.set("Trailer", "Trailer");
 
+export const facilityStatus = new Map();
+facilityStatus.set("AVAILABLE", "AVAILABLE");
+facilityStatus.set("UNAVAILABLE", "UNAVAILABLE");
+
 export const tripItemType = new Map();
 tripItemType.set("Order", "Order");
 tripItemType.set("Truck", "Truck");

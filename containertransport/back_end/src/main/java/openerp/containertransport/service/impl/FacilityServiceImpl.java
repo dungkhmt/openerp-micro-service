@@ -120,6 +120,16 @@ public class FacilityServiceImpl implements FacilityService {
             sqlCount += " AND owner = :owner";
             params.put("owner", facilityFilterRequestDTO.getOwner());
         }
+        if(facilityFilterRequestDTO.getFacilityCode() != null) {
+            sql += " AND facility_code = :facilityCode";
+            sqlCount += " AND facility_code = :facilityCode";
+            params.put("facilityCode", facilityFilterRequestDTO.getFacilityCode());
+        }
+        if(facilityFilterRequestDTO.getStatus() != null) {
+            sql += " AND status = :status";
+            sqlCount += " AND status = :status";
+            params.put("status", facilityFilterRequestDTO.getStatus());
+        }
         if(!StringUtils.isEmpty(facilityFilterRequestDTO.getFacilityName())) {
             sql += " AND facility_name = '%:facilityName%'";
             sqlCount += " AND facility_name = '%:facilityName%'";

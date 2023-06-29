@@ -65,13 +65,13 @@ const SearchBar = ({ filters, setFilters, status }) => {
     const [open, setOpen] = useState(false);
 
     const [code, setCode] = useState('');
-    const [statusTruck, setStatusTruck] = useState('');
+    const [statusChose, setStatusChose] = useState('');
 
     const handleSwitch = () => {
         setOpen(!open)
     }
     const handleFilterStatus = () => {
-        let data = { type: "status", value: statusTruck }
+        let data = { type: "status", value: statusChose }
         setFilters(prevState => [...prevState, data]);
         handleSwitch();
     }
@@ -81,15 +81,16 @@ const SearchBar = ({ filters, setFilters, status }) => {
     }
     const handleRemoveFilter = (type) => {
         let data = filters.filter((item) => item.type !== type);
-        if(type === "code") {
+        if (type === "code") {
             setCode('');
         }
-        if(type === "status") {
-            setStatusTruck('');
+        if (type === "status") {
+            setStatusChose('');
         }
         setFilters(data);
     }
     console.log("filters", filters);
+    console.log("status", status);
     return (
         <Box>
             <Box sx={(them) => ({
@@ -117,9 +118,9 @@ const SearchBar = ({ filters, setFilters, status }) => {
                                     id="demo-simple-select"
                                     label="Status"
                                     size="small"
-                                    onChange={(e) => setStatusTruck(e.target.value)}
+                                    onChange={(e) => setStatusChose(e.target.value)}
                                 >
-                                    {status.map((item) => {
+                                    {status?.map((item) => {
                                         return (
                                             <MenuItem value={item?.name}>{item?.name}</MenuItem>
                                         )
@@ -164,10 +165,14 @@ const SearchBar = ({ filters, setFilters, status }) => {
                 {filters.length > 0 ? (
                     filters.map((item) => {
                         return (
-                            <Box sx={{ display: 'flex' }}>
-                                <Typography>{item.value}</Typography>
+                            <Box sx={{ display: 'flex', marginRight: '8px',  width: 'fit-content',
+                            border: '1px solid gray', borderRadius: '10px', padding: '2px 4px' }}>
+                                <Box sx={{}}>
+                                    <Typography>{item.value}</Typography>
+                                </Box>
+
                                 <Box onClick={() => handleRemoveFilter(item.type)}
-                                sx={{cursor: 'pointer'}}>
+                                    sx={{ cursor: 'pointer', marginLeft: '4px' }}>
                                     <CloseIcon />
                                 </Box>
                             </Box>
