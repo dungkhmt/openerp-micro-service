@@ -36,7 +36,7 @@ const ShipmentDetail = () => {
         });
 
         getShipmentById(shipmentId).then((res) => {
-            setShipment(res.data.data);
+            setShipment(res?.data.data);
         });
 
 

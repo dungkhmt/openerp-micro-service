@@ -159,7 +159,7 @@ public class TripServiceImpl implements TripService {
             trip.setDriverId(truckUpdate.getDriverId());
         }
         if(tripModel.getOrderIds().size() != trip.getOrders().size()
-                || Arrays.deepEquals(tripModel.getOrderIds().toArray(new Long[0]), trip.getOrders().stream().map(Order::getId).toArray())
+                || !Arrays.deepEquals(tripModel.getOrderIds().toArray(new Long[0]), trip.getOrders().stream().map(Order::getId).toArray())
                 || !checkSameTripItem(tripItemModelsOld, tripModel.getTripItemModelList())) {
 
             // update status oldOrder
