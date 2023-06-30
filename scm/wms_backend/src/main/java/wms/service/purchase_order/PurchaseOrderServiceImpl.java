@@ -176,6 +176,7 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
     @Override
     public ResponseEntity<InputStreamResource> exportOrderPdf(String orderCode) throws IOException {
         PurchaseOrder order = purchaseOrderRepo.getOrderByCode(orderCode);
-        return exportPDFService.createPdfOrder(order);
+        String dest = "sample.pdf";
+        return exportPDFService.createPdfOrder(order, dest);
     }
 }
