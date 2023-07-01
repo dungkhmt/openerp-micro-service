@@ -8,7 +8,7 @@ import TruckAndOrder from "../tripComponent/TruckAndOrder";
 import { getTripItemByTripId } from "api/TripItemAPI";
 import { getTrucks } from "api/TruckAPI";
 import { getOrders } from "api/OrderAPI";
-import { deleteTrip, getTripByTripId } from "api/TripAPI";
+import { deleteTrip, getTripByTripId, updateTrip } from "api/TripAPI";
 import TruckAndOrdersInTrip from "../tripComponent/TruckAndOrdersInTrip";
 import OrderArrangementInTrip from "../tripComponent/OrderArrangementInTrip";
 
@@ -31,6 +31,8 @@ const TripDetail = () => {
     const [toastType, setToastType] = useState();
     const [toastMsg, setToastMsg] = useState('');
 
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         getTrucks({}).then((res) => {
             setTrucks(res?.data.truckModels);
@@ -42,13 +44,16 @@ const TripDetail = () => {
             console.log("tripItem1111111", res?.data.data.sort((a, b) => a.id - b.id))
             setTripItem(res?.data.data.sort((a, b) => a.id - b.id));
         });
-    }, [])
+        getTripByTripId(tripId).then((res) => {
+            setTrip(res?.data.data);
+        });
+    }, [loading])
     useEffect(() => {
         getTripByTripId(tripId).then((res) => {
             console.log("res", res)
             setOrdersSelect(res.data.data.orders);
             trucks.forEach((item) => {
-                if (item.id == res.data.data.truckId) {
+                if (item.id === res?.data.data.truckId) {
                     setTruckSelect(item)
                 }
             })
@@ -65,10 +70,47 @@ const TripDetail = () => {
             setTimeout(() => {
                 setToast(false);
             }, "3000");
-            setFlag(!flag);
+            // setFlag(!flag);
             history.push(`/shipment/detail/${shipmentId}`);
         })
     }
+    const handleSubmit = () => {
+        let tripItemTmp = [];
+        tripItems.forEach((item, index) => {
+            let tripItem = {
+                seq: index + 1,
+                action: item.action,
+                facilityId: item.facilityId,
+                orderCode: item.orderCode,
+                arrivalTime: item.arrivalTime,
+                departureTime: item.departureTime,
+                containerId: item?.containerId,
+                trailerId: item?.trailerId,
+                type: item?.type
+            }
+            tripItemTmp.push(tripItem);
+        })
+        let orderSubmit = [];
+        ordersSelect.forEach((item) => {
+            orderSubmit.push(item.id);
+        })
+        let dataSubmit = {
+            truckId: truckSelect?.id,
+            orderIds: orderSubmit,
+            tripItemModelList: tripItemTmp
+        }
+        updateTrip(tripId, dataSubmit).then((res) => {
+            setToastType("success");
+            setToast(true);
+            setToastMsg("Update Trip Success !!!")
+            setTimeout(() => {
+                setToast(false);
+            }, "3000");
+            setFlag(false);
+            setLoading(!loading);
+        })
+    }
+    console.log("tripItems113", tripItems)
     return (
         <Box className="trip-detail">
             <Box className="toast">
@@ -92,12 +134,14 @@ const TripDetail = () => {
                         <Typography >Trip detail</Typography>
                     </Box>
                     <Box className="btn-header">
+                        {trip?.status === "SCHEDULED" ? (
                         <Button variant="outlined" color="error" className="header-trip-detail-btn-cancel"
+                            sx={{marginRight: '32px'}}
                             onClick={handleCancelTrip}
-                        >Cancel</Button>
-                        {/* <Button variant="contained" className="header-trip-detail-btn-save"
-                    onClick={handleSubmit}
-                    >Save</Button> */}
+                        >Delete</Button>) : null }
+                        <Button variant="contained" className="header-trip-detail-btn-save"
+                            onClick={handleSubmit}
+                        >Save</Button>
                     </Box>
                 </Box>
             </Box>

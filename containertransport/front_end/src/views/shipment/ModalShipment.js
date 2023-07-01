@@ -108,6 +108,7 @@ const ModalShipment = ({ open, setOpen, shipment, setToast, setToastType, setToa
                                                 <DemoContainer components={['DateTimePicker']}>
                                                     <DateTimePicker label="Executed Time"
                                                         value={executedTime}
+                                                        
                                                         onChange={(e) => setExecutedTime((new Date(e)).getTime())} />
                                                 </DemoContainer>
                                             </LocalizationProvider>
@@ -124,6 +125,7 @@ const ModalShipment = ({ open, setOpen, shipment, setToast, setToastType, setToa
                                                 label="Description"
                                                 placeholder="description"
                                                 multiline
+                                                size="small"
                                                 onChange={(e) => setDescription(e.target.value)}
                                             />
                                         </Box>

@@ -46,6 +46,8 @@ public class Container implements Serializable {
     @Column(name = "size")
     private int size;
 
+    private String owner;
+
     @Column(name = "created_at")
     private long createdAt;
 

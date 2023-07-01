@@ -28,7 +28,6 @@ export default function StudentLearningProgressDetailProgrammingSubmissionResult
         //res.data.map((e) => {
         //  lst.push(e);s
         //});
-        console.log("getClassesOfUser, res.data = ", res.data);
         //console.log("getClassesOfUser, lst = ", lst);
         setContestSubmissions(res.data);
       }

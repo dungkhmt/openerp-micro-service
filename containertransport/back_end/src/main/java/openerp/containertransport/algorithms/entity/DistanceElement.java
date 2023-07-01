@@ -15,5 +15,5 @@ public class DistanceElement {
     private int fromFacility;
     private int toFacility;
     private BigDecimal distance; // in meters
-    private long travelTime;// in seconds
+    private Long travelTime;// in miliseconds
 }

@@ -3,8 +3,10 @@ import { Alert, Box, Container, Divider, Typography } from "@mui/material";
 import ContentsFacilityMana from "./ContentFacillityMana";
 import './styles.scss';
 import HeaderFacilityScreen from "./HeaderFacilityScreen";
-import { getFacility } from "api/FacilityAPI";
+import {getFacilityOwner } from "api/FacilityAPI";
 import { MyContext } from "contextAPI/MyContext";
+import SearchBar from "components/search/SearchBar";
+import { facilityStatus } from "config/menuconfig";
 
 const FacilityScreen = () => {
     const [facilities, setFacilities] = useState([]);
@@ -17,22 +19,46 @@ const FacilityScreen = () => {
     const [toastType, setToastType] = useState();
     const [toastMsg, setToastMsg] = useState('');
 
+    const [flag, setFlag] = useState(false);
+
     const [openModal, setOpenModal] = useState(false);
+
+    const [filters, setFilters] = useState([]);
+
+    const [status, setStatus] = useState([])
 
     //owner: preferred_username
     useEffect(() => {
-        getFacility({ page: page, pageSize: rowsPerPage })
+        let data = { 
+            page: page,
+            pageSize: rowsPerPage,
+        }
+        let code = filters.find((item) => item.type === "code");
+        if(code) {
+            data.facilityCode = code.value;
+        }
+        let status = filters.find((item) => item.type === "status");
+        if(status) {
+            data.status = status.value;
+        }
+        getFacilityOwner(data)
             .then((res) => {
                 console.log("facility==========", res?.data.data.facilityModels)
                 setFacilities(res?.data.data.facilityModels);
-                setCount(res.data.data.count);
+                setCount(res?.data.data.count);
             });
         console.log("role", role);
-    }, [page, rowsPerPage, openModal]);
+        let statusTmp = [];
+        for(let [key, value] of facilityStatus.entries()) {
+            statusTmp.push({name: value});
+        }
+        setStatus(statusTmp);
+    }, [page, rowsPerPage, openModal, flag, filters]);
 
     const handleClose = () => {
         setOpenModal(!openModal);
     }
+    console.log("filters", filters);
     return (
         <Box className="fullScreen">
             <Container maxWidth="lg" className="container">
@@ -47,8 +73,13 @@ const FacilityScreen = () => {
                 <Box className="divider">
                     <Divider />
                 </Box>
+                <Box>
+                    <SearchBar filters={filters} setFilters={setFilters} status={status} />
+                </Box>
                 <ContentsFacilityMana facilities={facilities} page={page} setPage={setPage}
-                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
+                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} 
+                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg}
+                    flag={flag} setFlag={setFlag}/>
             </Container>
         </Box>
     );

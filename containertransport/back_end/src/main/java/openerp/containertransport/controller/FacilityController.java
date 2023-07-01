@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -36,6 +37,27 @@ public class FacilityController {
         return ResponseEntity.status(HttpStatus.OK).body(facilityModel);
     }
 
+    @PostMapping("/owner")
+    public ResponseEntity<?> filterFacilityOwner(@RequestBody FacilityFilterRequestDTO facilityFilterRequestDTO, JwtAuthenticationToken token) {
+        String username = token.getName();
+        List<String> roleIds = token
+                .getAuthorities()
+                .stream()
+                .filter(grantedAuthority -> !grantedAuthority
+                        .getAuthority()
+                        .startsWith("ROLE_GR")) // remove all composite roles
+                .map(grantedAuthority -> { // convert role to permission
+                    String roleId = grantedAuthority.getAuthority().substring(5); // remove prefix "ROLE_"
+                    return roleId;
+                })
+                .collect(Collectors.toList());
+        if(roleIds.contains("TMS_CUSTOMER")) {
+            facilityFilterRequestDTO.setOwner(username);
+        }
+        FacilityFilterRes facilityModels = facilityService.filterFacility(facilityFilterRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), facilityModels));
+    }
+
     @PostMapping("/")
     public ResponseEntity<?> filterFacility(@RequestBody FacilityFilterRequestDTO facilityFilterRequestDTO) {
         FacilityFilterRes facilityModels = facilityService.filterFacility(facilityFilterRequestDTO);
@@ -46,5 +68,11 @@ public class FacilityController {
     public ResponseEntity<?> updateFacility(@PathVariable String uid, @RequestBody FacilityModel facilityModel) {
         FacilityModel facilityModelUpdate = facilityService.updateFacility(facilityModel, uid);
         return ResponseEntity.status(HttpStatus.OK).body(facilityModelUpdate);
+    }
+
+    @DeleteMapping("/delete/{uid}")
+    public ResponseEntity<?> deleteFacility(@PathVariable String uid) {
+        FacilityModel facilityDelete = facilityService.deleteFacility(uid);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), facilityDelete));
     }
 }

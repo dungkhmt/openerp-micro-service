@@ -344,8 +344,8 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                             action: "PICKUP-CONTAINER",
                             orderCode: item?.orderCode,
                             orderId: item.id,
-                            container: item?.containerModel,
-                            containerCode: item?.containerModel.containerCode,
+                            containerId: item?.container.id,
+                            containerCode: item?.container.containerCode,
                             longitude: item?.fromFacility.longitude,
                             latitude: item?.fromFacility.latitude,
                             arrivalTime: null,
@@ -362,8 +362,8 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                             action: "DELIVERY-CONTAINER",
                             orderCode: item?.orderCode,
                             orderId: item.id,
-                            container: item?.containerModel,
-                            containerCode: item?.containerModel.containerCode,
+                            containerId: item?.container.id,
+                            containerCode: item?.container.containerCode,
                             longitude: item?.toFacility.longitude,
                             latitude: item?.toFacility.latitude,
                             arrivalTime: null,
@@ -449,7 +449,7 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
         });
         return facilitiesFinalTmp;
     }
-    console.log("tripItems", tripItems)
+    console.log("ordersSelect", ordersSelect)
     return (
         <Box className="facility-arrangment-v2">
             <Box className="facility-arrangment-head">
@@ -483,8 +483,8 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                                         {row.action}
                                     </TableCell>
                                     {row?.type === tripItemType.get("Truck") ? (<TableCell>{row?.orderCode}</TableCell>) : null}
-                                    {row?.type === tripItemType.get("Trailer") ? (<TableCell>{row?.trailerCode}</TableCell>) : null}
-                                    {row?.type === tripItemType.get("Order") ? (<TableCell>{row?.containerCode}</TableCell>) : null}
+                                    {row?.type === tripItemType.get("Trailer") ? (<TableCell>{row?.trailerCode ? row?.trailerCode : row?.orderCode}</TableCell>) : null}
+                                    {row?.type === tripItemType.get("Order") ? (<TableCell>{row?.orderCode}</TableCell>) : null}
                                     <TableCell>
                                         {row.status ? row.status : "SCHEDULED"}
                                     </TableCell>

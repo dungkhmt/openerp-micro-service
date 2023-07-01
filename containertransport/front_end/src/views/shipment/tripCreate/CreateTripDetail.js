@@ -62,10 +62,10 @@ const CreateTripDetail = () => {
     const handleSubmit = () => {
         let checkValidate = checkTripItems();
         console.log("checkValidate", checkValidate);
-        let orderSubmir = [];
+        let orderSubmit = [];
         let tripItemTmp = [];
         ordersSelect.forEach((item) => {
-            orderSubmir.push(item.id);
+            orderSubmit.push(item.id);
         })
         tripItems.forEach((item, index) => {
             let tripItem = {
@@ -75,7 +75,7 @@ const CreateTripDetail = () => {
                 orderCode: item.orderCode,
                 arrivalTime: item.arrivalTime,
                 departureTime: item.departureTime,
-                containerId: item?.container?.id,
+                containerId: item?.containerId,
                 trailerId: item?.trailerId,
                 type: item?.type
             }
@@ -86,7 +86,7 @@ const CreateTripDetail = () => {
             createBy: preferred_username,
             tripContents: {
                 truckId: truckSelect?.id,
-                orderIds: orderSubmir,
+                orderIds: orderSubmit,
                 tripItemModelList: tripItemTmp
             }
         }

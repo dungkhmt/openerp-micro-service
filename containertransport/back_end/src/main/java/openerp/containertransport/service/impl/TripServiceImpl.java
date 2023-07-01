@@ -19,9 +19,7 @@ import openerp.containertransport.utils.RandomUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +53,8 @@ public class TripServiceImpl implements TripService {
         trip.setUid(RandomUtils.getRandomId());
         trip.setCreatedByUserId(createBy);
         trip.setOrders(orders);
+        trip.setTotalDistant(tripModel.getTotalDistant());
+        trip.setTotalTime(tripModel.getTotalTime());
         trip.setCreatedAt(System.currentTimeMillis());
         trip.setUpdatedAt(System.currentTimeMillis());
         trip = tripRepo.save(trip);
@@ -142,8 +142,53 @@ public class TripServiceImpl implements TripService {
     @Override
     public TripModel updateTrip(String uid, TripModel tripModel) {
         Trip trip = tripRepo.findByUid(uid);
+        List<TripItemModel> tripItemModelsOld = tripItemService.getTripItemByTripId(trip.getUid());
+
         if(tripModel.getStatus() != null) {
             trip.setStatus(tripModel.getStatus());
+        }
+        if(tripModel.getTruckId() != null && tripModel.getTruckId() != trip.getTruck().getId()) {
+            Truck truckOld = truckRepo.findByUid(trip.getTruck().getUid());
+            truckOld.setStatus(Constants.TruckStatus.AVAILABLE.getStatus());
+            truckRepo.save(truckOld);
+
+            Truck truckUpdate = truckRepo.findByUid(tripModel.getTruckUid());
+            truckUpdate.setStatus(Constants.TruckStatus.SCHEDULED.getStatus());
+            truckRepo.save(truckUpdate);
+            trip.setTruck(truckUpdate);
+            trip.setDriverId(truckUpdate.getDriverId());
+        }
+        if(tripModel.getOrderIds().size() != trip.getOrders().size()
+                || !Arrays.deepEquals(tripModel.getOrderIds().toArray(new Long[0]), trip.getOrders().stream().map(Order::getId).toArray())
+                || !checkSameTripItem(tripItemModelsOld, tripModel.getTripItemModelList())) {
+
+            // update status oldOrder
+            List<Order> ordersOld = trip.getOrders();
+            ordersOld.forEach((order) -> {
+                Order orderOld = orderRepo.findByUid(order.getUid());
+                orderOld.setStatus(Constants.OrderStatus.ORDERED.getStatus());
+                orderRepo.save(orderOld);
+            });
+
+            // update status OrderUpdate
+            List<Order> ordersUpdate = new ArrayList<>();
+            tripModel.getOrderIds().forEach((orderId) -> {
+                Order order = orderRepo.findById(orderId).get();
+                order.setStatus("SCHEDULED");
+                order = orderRepo.save(order);
+                ordersUpdate.add(order);
+            });
+            trip.setOrders(ordersUpdate);
+
+            // delete old tripItem
+            tripItemRepo.deleteByTripUid(trip.getUid());
+
+            // create new tripItem
+            Trip finalTrip = trip;
+            tripModel.getTripItemModelList().forEach((item) -> {
+                TripItemModel tripItemModel = tripItemService.createTripItem(item, finalTrip.getUid());
+            });
+
         }
         trip = tripRepo.save(trip);
         return convertToModel(trip);
@@ -175,11 +220,25 @@ public class TripServiceImpl implements TripService {
         TripModel tripModel = modelMapper.map(trip, TripModel.class);
         List<Long> orderIds = new ArrayList<>();
         tripModel.setTruckId(trip.getTruck().getId());
+        tripModel.setTruckUid(trip.getTruck().getUid());
         tripModel.setDriverName(trip.getTruck().getDriverName());
         tripModel.setTruckCode(trip.getTruck().getTruckCode());
         trip.getOrders().forEach((item) -> orderIds.add(item.getId()));
         tripModel.setOrderIds(orderIds);
         tripModel.setOrders(trip.getOrders());
         return tripModel;
+    }
+
+    public boolean checkSameTripItem(List<TripItemModel> tripItemModelsOld, List<TripItemModel> tripItemModelsNew) {
+        if(tripItemModelsOld.size() != tripItemModelsNew.size()) {
+            return false;
+        }
+        for (int i = 0; i < tripItemModelsOld.size(); i++){
+            if(!Objects.equals(tripItemModelsOld.get(i).getAction(), tripItemModelsNew.get(i).getAction())
+            || tripItemModelsOld.get(i).getOrderCode() != tripItemModelsNew.get(i).getOrderCode()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

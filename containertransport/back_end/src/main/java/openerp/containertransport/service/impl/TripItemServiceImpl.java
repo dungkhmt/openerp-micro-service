@@ -99,9 +99,11 @@ public class TripItemServiceImpl implements TripItemService {
         tripItemModel.setTruckId(tripItem.getTrip().getTruck().getId());
         if(tripItem.getContainer() != null) {
             tripItemModel.setContainerCode(tripItem.getContainer().getContainerCode());
+            tripItemModel.setContainerId(tripItem.getContainer().getId());
         }
         if (tripItem.getTrailer() != null) {
             tripItemModel.setTrailerCode(tripItem.getTrailer().getTrailerCode());
+            tripItemModel.setTrailerId(tripItem.getTrailer().getId());
         }
         return tripItemModel;
     }

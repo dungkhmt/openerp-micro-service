@@ -1,5 +1,6 @@
 package com.hust.wmsbackend.management.service;
 
+import com.hust.wmsbackend.management.entity.AssignedOrderItem;
 import com.hust.wmsbackend.management.model.AssignedOrderItemDTO;
 import com.hust.wmsbackend.management.model.DeliveryTripDTO;
 import com.hust.wmsbackend.management.model.request.AssignedOrderItemRequest;
@@ -17,4 +18,5 @@ public interface AssignedOrderItemService {
 
     AssignedOrderItemDTO update(DeliveryTripDTO.DeliveryTripItemDTO request);
 
+    AssignedOrderItemDTO buildAssignedOrderItemDTO(AssignedOrderItem item);
 }

@@ -25,7 +25,6 @@ export default function ContestProblemSubmissionDetail() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    console.log("problemSubmissionId ", problemSubmissionId);
     request(
       "get",
       "/get-contest-problem-submission-detail-viewed-by-participant/" +

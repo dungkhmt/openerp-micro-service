@@ -63,9 +63,9 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
     const [containerSelect, setContainerSelect] = useState([]);
     const [containerOrder, setContainerOrder] = useState([]);
     const [earlyDeliveryTime, setEarlyDeliveryTime] = useState();
-    const [lateDeliveryTime, setLateDeliveryTime] = useState();
+    const [lateDeliveryTime, setLateDeliveryTime] = useState(null);
     const [earlyPickUpTime, setEarlyPickUpTime] = useState();
-    const [latePickUpTime, setLatePickUpTime] = useState();
+    const [latePickUpTime, setLatePickUpTime] = useState(null);
     const [isBreakRomooc, setIsBreakRomooc] = useState(false);
 
     useEffect(() => {
@@ -74,7 +74,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
 
             let typeTmp = typeConst.find((item) => item.id === order.type);
             setType(typeTmp.id);
-            getContainerById(order.containerModel.id).then((res) => {
+            getContainerById(order.containerModel.uid).then((res) => {
                 console.log("order====", res.data);
                 let containerSelectTmp = [];
                 containerSelectTmp.push(res.data);
@@ -82,13 +82,17 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             });
 
 
-            setFromFacility(order.fromFacility.facilityId);
-            setToFaciity(order.toFacility.facilityId)
+            setFromFacility(order?.fromFacility.facilityId);
+            setToFaciity(order?.toFacility.facilityId)
             setIsBreakRomooc(order.breakRomooc);
-            setEarlyPickUpTime(dayjs(new Date(order?.earlyPickupTime)));
-            setLatePickUpTime(dayjs(new Date(order?.latePickupTime)));
-            setEarlyDeliveryTime(dayjs(new Date(order?.earlyDeliveryTime)));
-            setLateDeliveryTime(dayjs(new Date(order?.lateDeliveryTime)));
+            // setEarlyPickUpTime(dayjs(new Date(order?.earlyPickupTime)));
+            if(order.latePickupTime) {
+                setLatePickUpTime(dayjs(new Date(order?.latePickupTime)));
+            }
+            if(order.lateDeliveryTime) {
+                setLateDeliveryTime(dayjs(new Date(order?.lateDeliveryTime)));
+            }
+            // setEarlyDeliveryTime(dayjs(new Date(order?.earlyDeliveryTime)));
         }
         getFacility({}).then((res) => {
             console.log("facility==========", res.data)
@@ -119,11 +123,17 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             fromFacilityId: fromFacility,
             toFacilityId: toFacility,
             // earlyDeliveryTime: (new Date(earlyDeliveryTime)).getTime(),
-            lateDeliveryTime: (new Date(lateDeliveryTime)).getTime(),
+            // lateDeliveryTime: (new Date(lateDeliveryTime)).getTime(),
             // earlyPickupTime: (new Date(earlyPickUpTime)).getTime(),
             latePickupTime: (new Date(latePickUpTime)).getTime(),
             isBreakRomooc: isBreakRomooc,
             containerIds: containerSelect
+        }
+        if(type !== "IE") {
+            data["lateDeliveryTime"] = (new Date(lateDeliveryTime)).getTime();
+        }
+        if(type !== "OE") {
+            data["latePickupTime"] = (new Date(latePickUpTime)).getTime();
         }
         console.log("data", data);
         if (!order) {
@@ -329,6 +339,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                             </LocalizationProvider>
                                         </Box>
                                     </Box> */}
+                                    {((order && order?.type !== "IE")  || (!order && type !== "IE")) ? (
                                     <Box className="contentModal-item">
                                         <Box className="contentModal-item-text">
                                             <Typography>Late Delivery Time:</Typography>
@@ -342,7 +353,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                                 </DemoContainer>
                                             </LocalizationProvider>
                                         </Box>
-                                    </Box>
+                                    </Box>) : null}
                                     {/* <Box className="contentModal-item">
                                         <Box className="contentModal-item-text">
                                             <Typography>Early PickUp Time:</Typography>
@@ -357,6 +368,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                             </LocalizationProvider>
                                         </Box>
                                     </Box> */}
+                                    {((order && order?.type !== "OE")  || (!order && type !== "OE")) ? (
                                     <Box className="contentModal-item">
                                         <Box className="contentModal-item-text">
                                             <Typography>Late PickUp Time:</Typography>
@@ -370,7 +382,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                                 </DemoContainer>
                                             </LocalizationProvider>
                                         </Box>
-                                    </Box>
+                                    </Box>) : null}
                                     <Divider />
                                     <Box
                                         display="flex"

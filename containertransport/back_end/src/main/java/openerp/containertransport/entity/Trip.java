@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,12 @@ public class Trip {
 
     @Column(name = "driver_id")
     private String driverId;
+
+    @Column(name = "total_distant")
+    private BigDecimal totalDistant;
+
+    @Column(name = "total_time")
+    private BigDecimal totalTime;
 
     @Column(name = "created_at")
     private long createdAt;

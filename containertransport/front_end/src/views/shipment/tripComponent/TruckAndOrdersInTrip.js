@@ -127,7 +127,7 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
         setOrdersSelect(valueTmp);
         setFlag(true);
     }
-
+    console.log("value", value)
     return (
         <Box className="truck-order">
             <Box className="chose-truck-v2">
@@ -303,7 +303,7 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                                                 <TableCell align="left">{row?.fromFacility.facilityName}</TableCell>
                                                 <TableCell align="left">{row?.toFacility.facilityName}</TableCell>
                                                 <TableCell align="left">{typeOrderMap.get(row.type)}</TableCell>
-                                                <TableCell align="left">{row?.containerModel?.size}</TableCell>
+                                                <TableCell align="left">{row?.container?.size}</TableCell>
                                                 <TableCell align="left">{row?.status}</TableCell>
                                                 <TableCell align="left">{new Date(row?.createdAt).toLocaleDateString()}</TableCell>
                                                 <TableCell >

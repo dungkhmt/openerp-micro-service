@@ -20,6 +20,7 @@ public class ContainerModel {
     private String facilityName;
     private FacilityResponsiveDTO facilityResponsiveDTO;
     private String status;
+    private String owner;
     private Boolean isEmpty;
     private Timestamp createdAt;
     private Timestamp updatedAt;

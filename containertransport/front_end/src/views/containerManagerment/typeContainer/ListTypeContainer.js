@@ -279,11 +279,11 @@ export default function ListTypeContainer({ typeContainers, page, setPage, rowsP
                               <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                             </Box>
                           </Tooltip>
-                          <Tooltip title="Delete">
+                          {/* <Tooltip title="Delete">
                             <Box>
                               <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
                             </Box>
-                          </Tooltip>
+                          </Tooltip> */}
                         </Box>
 
                       </TableCell>

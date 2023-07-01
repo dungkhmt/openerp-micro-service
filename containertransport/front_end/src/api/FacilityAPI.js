@@ -8,6 +8,14 @@ export const getFacility = async (data) => {
     return resData;
 }
 
+export const getFacilityOwner = async (data) => {
+    const resData = request(
+        "post",
+        `/facility/owner`, {},{}, data,{},
+      )
+    return resData;
+}
+
 export const getFacilityById = async (data) => {
     const resData = request(
         "get",
@@ -28,6 +36,14 @@ export const updateFacility = (id, data) => {
     const resData = request(
         "put",
         `/facility/update/${id}`, {},{}, data, {},
+    )
+    return resData;
+}
+
+export const deleteFacility = (id) => {
+    const resData = request(
+        "delete",
+        `/facility/delete/${id}`, {},{}, {}, {},
     )
     return resData;
 }

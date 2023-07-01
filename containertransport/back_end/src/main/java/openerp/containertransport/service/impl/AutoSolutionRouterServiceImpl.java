@@ -34,12 +34,13 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         ShipmentModel shipmentModel = shipmentService.getShipmentByUid(shipmentUid);
 
         TransportContainerInput transportContainerInput = new TransportContainerInput();
+        transportContainerInput.setStartTime(shipmentModel.getExecutedTime());
 
         // get Trucks
         TruckFilterRequestDTO truckFilterRequestDTO = new TruckFilterRequestDTO();
         truckFilterRequestDTO.setStatus("AVAILABLE");
-        truckFilterRequestDTO.setPage(0);
-        truckFilterRequestDTO.setPageSize(3);
+//        truckFilterRequestDTO.setPage(0);
+//        truckFilterRequestDTO.setPageSize(3);
         List<TruckModel> truckList = truckService.filterTruck(truckFilterRequestDTO).getTruckModels();
         List<TruckInput> truckInputs = convertToTruckInput(truckList);
         transportContainerInput.setTruckInputs(truckInputs);
@@ -67,12 +68,19 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
 
         // depot trailer
         FacilityFilterRequestDTO facilityFilterTrailer = new FacilityFilterRequestDTO();
-        facilityFilterTruck.setType("Trailer");
-        List<FacilityModel> facilityModelsTrailer = facilityService.filterFacility(facilityFilterTruck).getFacilityModels();
+        facilityFilterTrailer.setType("Trailer");
+        List<FacilityModel> facilityModelsTrailer = facilityService.filterFacility(facilityFilterTrailer).getFacilityModels();
         List<DepotTrailer> depotTrailers = convertTrailerDepot(facilityModelsTrailer);
         transportContainerInput.setDepotTrailer(depotTrailers);
 
-        // distant
+        // facility
+        FacilityFilterRequestDTO facilityFilter = new FacilityFilterRequestDTO();
+//        facilityFilter.setType("Container");
+        List<FacilityModel> facilityModels = facilityService.filterFacility(facilityFilter).getFacilityModels();
+        List<FacilityInput> facilities = convertFacilityInput(facilityModels);
+        transportContainerInput.setFacilityInputs(facilities);
+
+        // relationship
         List<Relationship> relationships = relationshipService.getAllRelationShip();
         List<DistanceElement> distanceElements = convertToDistantInput(relationships);
         transportContainerInput.setDistances(distanceElements);
@@ -108,6 +116,8 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
                 tripModel.setTruckId(tripOutput.getKey().longValue());
                 tripModel.setTripItemModelList(tripItemModelList);
                 tripModel.setOrderIds(orderIds);
+                tripModel.setTotalDistant(tripOutput.getValue().getTotalDistant());
+                tripModel.setTotalTime(tripOutput.getValue().getTotalTime());
 
                 TripModel tripModelCreate = tripService.createTrip(tripModel, shipmentUid, shipmentModel.getCreatedByUserId());
             }
@@ -150,7 +160,10 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
             request.setWeightContainer(orderModel.getContainerModel().getSize());
             request.setFromLocationID((int) orderModel.getFromFacility().getFacilityId());
             request.setToLocationID((int) orderModel.getToFacility().getFacilityId());
+            request.setLatestTimePickup(orderModel.getLatePickupTime());
+            request.setLatestTimeDelivery(orderModel.getLateDeliveryTime());
             request.setIsBreakRomooc(orderModel.isBreakRomooc());
+            request.setType(orderModel.getType());
             requests.add(request);
         });
         return requests;
@@ -174,6 +187,18 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
             depotTrailers.add(depotTrailer);
         });
         return depotTrailers;
+    }
+
+    public List<FacilityInput> convertFacilityInput(List<FacilityModel> facilityModels) {
+        List<FacilityInput> facilityInputs = new ArrayList<>();
+        facilityModels.forEach(facilityModel -> {
+            FacilityInput facilityInput = new FacilityInput();
+            facilityInput.setFacilityId((int) facilityModel.getId());
+            facilityInput.setTimeProcessPickup(facilityModel.getProcessingTimePickUp());
+            facilityInput.setTimeProcessDrop(facilityModel.getProcessingTimeDrop());
+            facilityInputs.add(facilityInput);
+        });
+        return facilityInputs;
     }
 
     public List<DistanceElement> convertToDistantInput(List<Relationship> relationships) {

@@ -36,7 +36,7 @@ const ShipmentDetail = () => {
         });
 
         getShipmentById(shipmentId).then((res) => {
-            setShipment(res.data.data);
+            setShipment(res?.data.data);
         });
 
 
@@ -46,6 +46,7 @@ const ShipmentDetail = () => {
         setLoading(true);
         autoCreateRouter(shipmentId).then((res) => {
             setLoading(false);
+            setFlag(!flag)
         })
             .catch((error) => {
                 console.log(error);

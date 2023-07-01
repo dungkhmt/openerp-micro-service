@@ -7,10 +7,26 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import wms.algorithms.entity.DistanceMatrix;
 import wms.algorithms.entity.Node;
+import wms.common.CommonResource;
 
+@Component
 public class Utils {
+    public static String graphhopperUrl;
+    public static String apiKey;
+    // https://mkyong.com/spring/spring-inject-a-value-into-static-variables/
+    @Value("${graphhopper.url}")
+    public void setUrl(String url) {
+        graphhopperUrl = url;
+    }
+    @Value("${graphhopper.apiKey}")
+    public void setKey(String key) {
+        apiKey = key;
+    }
     public static double calculateEuclideanDistance(Node n1, Node n2) {
         double dx = n1.getX() - n2.getX();
         double dy = n1.getY() - n2.getY();
@@ -33,8 +49,10 @@ public class Utils {
         return distance*1000;
     }
     public static double getDistanceGraphhopperApi(double sourceLat, double sourceLon, double targetLat, double targetLon) {
-        String apiKey = "f1ca6ef8-2158-46e7-82ca-749cea4be153";
-        String apiUrl = String.format("https://graphhopper.com/api/1/route?point=%.6f,%.6f&point=%.6f,%.6f&type=json&key=%s",
+//        String apiKey = "f1ca6ef8-2158-46e7-82ca-749cea4be153";
+//        String apiUrl = String.format("https://graphhopper.com/api/1/route?point=%.6f,%.6f&point=%.6f,%.6f&type=json&key=%s",
+//                sourceLat, sourceLon, targetLat, targetLon, apiKey);
+        String apiUrl = String.format(graphhopperUrl,
                 sourceLat, sourceLon, targetLat, targetLon, apiKey);
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet httpGet = new HttpGet(apiUrl);

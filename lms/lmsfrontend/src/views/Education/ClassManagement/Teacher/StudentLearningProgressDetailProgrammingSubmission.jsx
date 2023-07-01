@@ -40,7 +40,6 @@ export default function StudentLearningProgressDetailProgrammingSubmission(
               "get",
               url,
               (res) => {
-                console.log("get log user do practice, res = ", res);
                 const data = res.data;
                 const content = data.content.map((c) => ({
                   ...c,

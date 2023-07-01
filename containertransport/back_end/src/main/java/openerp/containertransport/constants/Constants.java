@@ -47,6 +47,17 @@ public class Constants implements Serializable {
     }
 
     @Getter
+    public enum FacilityStatus {
+        AVAILABLE("AVAILABLE"),
+        UNAVAILABLE("UNAVAILABLE"),
+        DELETE("DELETE");
+        private final String status;
+        FacilityStatus(String status) {
+            this.status = status;
+        }
+    }
+
+    @Getter
     public enum OrderStatus {
         ORDERED("ORDERED"),
         SCHEDULED("SCHEDULED"),
@@ -63,7 +74,8 @@ public class Constants implements Serializable {
         ORDERED("ORDERED"),
         SCHEDULED("SCHEDULED"),
         AVAILABLE("AVAILABLE"),
-        EXECUTING("EXECUTING");
+        EXECUTING("EXECUTING"),
+        DELETE("DELETE");
         private final String status;
         ContainerStatus(String status) {
             this.status = status;

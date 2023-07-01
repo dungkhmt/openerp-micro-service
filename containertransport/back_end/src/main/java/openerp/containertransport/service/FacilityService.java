@@ -12,4 +12,5 @@ public interface FacilityService {
     FacilityModel getFacilityByUid(String uid);
     FacilityFilterRes filterFacility(FacilityFilterRequestDTO facilityFilterRequestDTO);
     FacilityModel updateFacility(FacilityModel facilityModel, String uid);
+    FacilityModel deleteFacility(String uid);
 }

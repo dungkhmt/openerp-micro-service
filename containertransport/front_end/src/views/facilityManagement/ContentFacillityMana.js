@@ -25,6 +25,7 @@ import './styles.scss';
 import { Icon } from '@mui/material';
 import { menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
+import { deleteFacility } from 'api/FacilityAPI';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -176,7 +177,7 @@ function EnhancedTableHead(props) {
   );
 }
 
-export default function ContentsFacilityMana({ facilities, page, setPage, rowsPerPage, setRowsPerPage, count }) {
+export default function ContentsFacilityMana({ facilities, page, setPage, rowsPerPage, setRowsPerPage, count, setToast, setToastType, setToastMsg, flag, setFlag }) {
   const [order, setOrder] = React.useState(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
   const [selected, setSelected] = React.useState([]);
@@ -248,6 +249,17 @@ export default function ContentsFacilityMana({ facilities, page, setPage, rowsPe
       pathname: `/facility/detail/${id}`,
     })
   }
+  const handleDelete = (uid) => {
+    deleteFacility(uid).then((res) => {
+      setToastMsg("Delete Facility Success");
+      setToastType("success");
+      setToast(true);
+      setTimeout(() => {
+          setToast(false);
+      }, "3000");
+      setFlag(!flag);
+    })
+  }
   return (
     <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
       <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -263,7 +275,7 @@ export default function ContentsFacilityMana({ facilities, page, setPage, rowsPe
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={facilities.length}
+              rowCount={facilities?.length}
             />
             <TableBody>
               {facilities
@@ -316,7 +328,7 @@ export default function ContentsFacilityMana({ facilities, page, setPage, rowsPe
                             </Box>
                           </Tooltip>
                           <Tooltip title="Delete">
-                            <Box>
+                            <Box onClick={() => { handleDelete(row?.uid) }}>
                               <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
                             </Box>
                           </Tooltip>

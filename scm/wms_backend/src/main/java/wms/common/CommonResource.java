@@ -14,4 +14,8 @@ public class CommonResource {
 
     @Value("${redis.port}")
     private int redisPort;
+    @Value("${graphhopper.apiKey}")
+    private String apiKey;
+    @Value("${graphhopper.url}")
+    private String graphhopperUrl;
 }

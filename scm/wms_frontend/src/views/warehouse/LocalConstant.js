@@ -84,8 +84,16 @@ export const staticWarehouseCols = [
     align: "center",
     sortable: false,
     minWidth: 150,
-    valueGetter: (params) => {
-      return params?.row?.creator?.id;
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ color: AppColors.warning, fontWeight: "500" }}>
+          {params?.row?.creator?.firstName +
+            " " +
+            params?.row?.creator?.middleName +
+            " " +
+            params?.row?.creator?.lastName}
+        </Typography>
+      );
     },
   },
   {
@@ -103,8 +111,16 @@ export const staticWarehouseCols = [
     headerName: "Thủ kho",
     sortable: false,
     minWidth: 150,
-    valueGetter: (params) => {
-      return params?.row?.manager?.id ? params?.row?.manager?.id : "Chưa có";
+    renderCell: (params) => {
+      return (
+        <Typography sx={{ color: AppColors.warning, fontWeight: "500" }}>
+          {params?.row?.manager?.firstName +
+            " " +
+            params?.row?.manager?.middleName +
+            " " +
+            params?.row?.manager?.lastName}
+        </Typography>
+      );
     },
   },
   {
