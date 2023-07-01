@@ -36,6 +36,7 @@ import {getAllTags} from "./service/TagService";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ModelAddNewTag from "./ModelAddNewTag";
 import FileUploadZone from "../../../utils/FileUpload/FileUploadZone";
+import { PROBLEM_STATUS } from "utils/constants";
 
 const useStyles = makeStyles((theme) => ({
   description: {
@@ -77,7 +78,6 @@ function EditProblem() {
   const [isOwner, setIsOwner] = useState(false);
 
   const defaultLevel = ["easy", "medium", "hard"];
-  const STATUS = ["OPEN", "HIDDEN", "CREATED"];
 
   const [loading, setLoading] = useState(false);
 
@@ -352,7 +352,7 @@ function EditProblem() {
             }}
             disabled={!isOwner}
           >
-            {STATUS.map((item) => (
+            {Object.values(PROBLEM_STATUS).map((item) => (
               <MenuItem key={item} value={item}>
                 {item}
               </MenuItem>

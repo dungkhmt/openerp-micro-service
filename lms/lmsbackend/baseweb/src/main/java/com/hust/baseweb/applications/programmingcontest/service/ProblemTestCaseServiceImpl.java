@@ -157,7 +157,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .attachment(String.join(";", attachmentId))
                                                    .tags(tags)
                                                    .userId(userID)
-                                                   .statusId(ProblemEntity.PROBLEM_STATUS_CREATED)
+                                                   .statusId(ProblemEntity.PROBLEM_STATUS_HIDDEN)
                                                    .build();
         problemEntity = problemService.saveProblemWithCache(problemEntity);
 
@@ -174,7 +174,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         upr = new UserContestProblemRole();
         upr.setProblemId(problemEntity.getProblemId());
         upr.setUserId(userID);
-        upr.setRoleId(UserContestProblemRole.ROLE_MANAGER);
+        upr.setRoleId(UserContestProblemRole.ROLE_EDITOR);
         upr.setUpdateByUserId(userID);
         upr.setCreatedStamp(new Date());
         upr.setLastUpdated(new Date());
@@ -183,7 +183,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         upr = new UserContestProblemRole();
         upr.setProblemId(problemEntity.getProblemId());
         upr.setUserId(userID);
-        upr.setRoleId(UserContestProblemRole.ROLE_VIEW);
+        upr.setRoleId(UserContestProblemRole.ROLE_VIEWER);
         upr.setUpdateByUserId(userID);
         upr.setCreatedStamp(new Date());
         upr.setLastUpdated(new Date());
@@ -196,7 +196,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             upr = new UserContestProblemRole();
             upr.setProblemId(problemEntity.getProblemId());
             upr.setUserId(admin.getUserLoginId());
-            upr.setRoleId(UserContestProblemRole.ROLE_MANAGER);
+            upr.setRoleId(UserContestProblemRole.ROLE_EDITOR);
             upr.setUpdateByUserId(userID);
             upr.setCreatedStamp(new Date());
             upr.setLastUpdated(new Date());
@@ -205,7 +205,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             upr = new UserContestProblemRole();
             upr.setProblemId(problemEntity.getProblemId());
             upr.setUserId(admin.getUserLoginId());
-            upr.setRoleId(UserContestProblemRole.ROLE_VIEW);
+            upr.setRoleId(UserContestProblemRole.ROLE_VIEWER);
             upr.setUpdateByUserId(userID);
             upr.setCreatedStamp(new Date());
             upr.setLastUpdated(new Date());
@@ -238,7 +238,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
         ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
         if (!userId.equals(problemEntity.getUserId())
-        && !userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId, userId, UserContestProblemRole.ROLE_MANAGER)) {
+        && !userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId, userId, UserContestProblemRole.ROLE_EDITOR)) {
             throw new MiniLeetCodeException("permission denied", 403);
         }
 
@@ -4289,7 +4289,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     public ModelCreateContestProblemResponse getContestProblemDetailByIdAndTeacher(String problemId, String teacherId)
             throws Exception {
         boolean hasPermission = this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
-                teacherId, UserContestProblemRole.ROLE_VIEW);
+                teacherId, UserContestProblemRole.ROLE_VIEWER);
         if (!hasPermission) {
             throw new MiniLeetCodeException("You don't have permission to view this problem", 403);
         }

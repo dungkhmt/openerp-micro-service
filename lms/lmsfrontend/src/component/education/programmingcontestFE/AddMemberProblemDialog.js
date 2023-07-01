@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { MenuItem, TextField } from "@mui/material";
 import PrimaryButton from "component/button/PrimaryButton";
 import TertiaryButton from "component/button/TertiaryButton";
-import CustomizedDialogs from "component/dialog/CustomizedDialogs";
+import { HustModal } from "erp-hust/lib/HustModal/HustModal";
 import React, { useState } from "react";
 
 const useStyles = makeStyles((theme) => ({
@@ -20,7 +20,7 @@ export default function AddMemberProblemDialog(props) {
   const [selectRole, setSelectRole] = useState(null);
   console.log("rolesList", rolesList);
   return (
-    <CustomizedDialogs
+    <HustModal
       open={open}
       handleClose={onClose}
       title={`Add member ${selectedUserId}`}
@@ -53,13 +53,13 @@ export default function AddMemberProblemDialog(props) {
       actions={
         <>
           <TertiaryButton className={classes.btn} onClick={onClose}>
-            Huỷ
+            Cancel
           </TertiaryButton>
           <PrimaryButton
             className={classes.btn}
             onClick={() => onUpdateInfo(selectRole, selectedUserId)}
           >
-            Cập nhật
+            Add
           </PrimaryButton>
         </>
       }

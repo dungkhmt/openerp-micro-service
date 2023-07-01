@@ -28,6 +28,7 @@ import ContestsUsingAProblem from "./ContestsUsingAProblem";
 import EditIcon from "@mui/icons-material/Edit";
 import {useHistory} from "react-router-dom";
 import {styled} from "@mui/material/styles";
+import { PROBLEM_ROLE, PROBLEM_STATUS } from "utils/constants";
 
 const CssTextField = styled(TextField)({
   ".MuiInputBase-input.Mui-disabled": {
@@ -113,14 +114,14 @@ function ManagerViewProblemDetailV2() {
             }}
             startIcon={<EditIcon sx={{ marginRight: "4px" }} />}
             sx={{ marginRight: "8px" }}
-            disabled={!roles.includes('OWNER') && (
-              !roles.includes('MANAGER') || status !== 'OPEN'
+            disabled={!roles.includes(PROBLEM_ROLE.OWNER) && (
+              !roles.includes(PROBLEM_ROLE.EDITOR) || status !== PROBLEM_STATUS.OPEN
             )}
           >
             Edit
           </Button>
           {
-          roles.includes('OWNER') && <Button
+          roles.includes(PROBLEM_ROLE.OWNER) && <Button
             variant="contained"
             color="info"
             onClick={() => {

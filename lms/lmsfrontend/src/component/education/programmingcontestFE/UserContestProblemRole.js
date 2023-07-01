@@ -9,6 +9,8 @@ import StandardTable from "component/table/StandardTable";
 import {useParams} from "react-router-dom";
 import {request} from "../../../api";
 import AddMemberProblemDialog from "./AddMemberProblemDialog";
+import { PROBLEM_ROLE } from "utils/constants";
+import { errorNoti, successNoti } from "utils/notification";
 
 export default function UserContestProblemRole() {
   const {problemId} = useParams();
@@ -60,11 +62,16 @@ export default function UserContestProblemRole() {
       "post",
       "/add-contest-problem-role-to-user/",
       (res) => {
-        if (res.data) alert("Add successully");
-        else alert("You have already added this user to this problem before");
+        if (res.data) successNoti("Add user to problem successfully", 3000);
+        else errorNoti("You have already added this user to this problem before", 3000);
         setOpen(false);
       },
-      {},
+      {
+        500: () => { 
+          errorNoti("Server error", 3000);
+          setOpen(false);
+        },
+      },
       body
     ).then();
   }
@@ -163,7 +170,7 @@ export default function UserContestProblemRole() {
         onClose={handleModalClose}
         onUpdateInfo={onUpdateInfo}
         selectedUserId={selectedUserId}
-        rolesList={["VIEW", "MANAGER"]}
+        rolesList={Object.values(PROBLEM_ROLE)}
       />
     </div>
   );

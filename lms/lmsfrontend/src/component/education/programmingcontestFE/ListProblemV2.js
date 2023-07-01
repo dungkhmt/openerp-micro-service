@@ -9,8 +9,17 @@ import { getColorLevel } from "./lib";
 import { StandardTable } from "erp-hust/lib/StandardTable";
 import AddIcon from "@material-ui/icons/Add";
 import { TablePaginationActions } from "component/table/StandardTable";
+import { a11yProps } from "component/tab";
+import { TabPanelVertical } from "./TabPanel";
+import { Tab, Tabs } from "@mui/material";
+import { useKeycloak } from "@react-keycloak/web";
+import { PROBLEM_STATUS } from "utils/constants";
+import { errorNoti } from "utils/notification";
 
 function ListProblemV2() {
+  const { keycloak } = useKeycloak();
+  console.log(keycloak.profile);
+  const [value, setValue] = useState(0);
   const [myProblems, setMyProblems] = useState([]);
   const [pageMyProblems, setPageMyProblems] = useState(0);
   const [sizeMyProblems, setSizeMyProblems] = useState(10);
@@ -48,6 +57,12 @@ function ListProblemV2() {
             pathname:
               "/programming-contest/manager-view-problem-detail/" +
               encodeURIComponent(rowData["problemId"]),
+          }}
+          onClick={(e) => {
+            if (rowData["userId"] !== keycloak.tokenParsed.preferred_username && rowData["statusId"] !== PROBLEM_STATUS.OPEN) {
+              errorNoti("Problem is not open", 3000);
+              e.preventDefault();
+            }
           }}
           style={{
             textDecoration: "none",
@@ -157,80 +172,105 @@ function ListProblemV2() {
 
   return (
     <div>
-      <StandardTable
-        title="My Problems"
-        columns={COLUMNS}
-        data={myProblems}
-        hideCommandBar
-        key="my-problems"
-        options={{
-          selection: false,
-          pageSize: sizeMyProblems,
-          search: true,
-          sorting: true,
+      <Tabs
+        value={value}
+        onChange={(e, value) => setValue(value)}
+        indicatorColor={"primary"}
+        autoFocus
+        sx={{
+          width: "100%",
+          display: "inline-table",
+          border: "1px solid transparent ",
+          position: "relative",
+          borderBottom: "none",
+          marginBottom: "6px",
         }}
-        actions={[
-          {
-            icon: () => {
-              return <AddIcon fontSize="large" />;
-            },
-            tooltip: t("addNewProblem"),
-            isFreeAction: true,
-            onClick: () => {
-              window.open("/programming-contest/create-problem");
-            },
-          },
-        ]}
-        components={{
-          Pagination: (props) => (
-            <TablePagination
-              {...props}
-              rowsPerPageOptions={PAGE_SIZES}
-              rowsPerPage={sizeMyProblems}
-              count={totalMyProblems}
-              page={pageMyProblems}
-              onPageChange={(e, value) => setPageMyProblems(value)}
-              onRowsPerPageChange={(e) => {
-                setSizeMyProblems(e.target.value);
-                setPageMyProblems(0);
-              }}
-              ActionsComponent={TablePaginationActions}
-            />
-          ),
-        }}
-      />
-      <br />
+        aria-label="basic tabs example"
+      >
+        <Tab label="My problems" {...a11yProps(0)} style={{ width: "11%" }} />
+        <Tab
+          label="Shared problems"
+          {...a11yProps(1)}
+          style={{ width: "11%" }}
+        />
+      </Tabs>
 
-      <StandardTable
-        title="Shared Problems"
-        columns={COLUMNS}
-        data={sharedProblems}
-        hideCommandBar
-        key="sharedProblems"
-        options={{
-          selection: false,
-          pageSize: sizeSharedProblems,
-          search: true,
-          sorting: true,
-        }}
-        components={{
-          Pagination: (props) => (
-            <TablePagination
-              {...props}
-              rowsPerPageOptions={PAGE_SIZES}
-              rowsPerPage={sizeSharedProblems}
-              count={totalSharedProblems}
-              page={pageSharedProblems}
-              onPageChange={(e, value) => setPageSharedProblems(value)}
-              onRowsPerPageChange={(e) => {
-                setSizeSharedProblems(e.target.value);
-                setPageSharedProblems(0);
-              }}
-              ActionsComponent={TablePaginationActions}
-            />
-          ),
-        }}
-      />
+      <TabPanelVertical value={value} index={0}>
+        <StandardTable
+          title="My Problems"
+          columns={COLUMNS}
+          data={myProblems}
+          hideCommandBar
+          key="my-problems"
+          options={{
+            selection: false,
+            pageSize: sizeMyProblems,
+            search: true,
+            sorting: true,
+          }}
+          actions={[
+            {
+              icon: () => {
+                return <AddIcon fontSize="large" />;
+              },
+              tooltip: t("addNewProblem"),
+              isFreeAction: true,
+              onClick: () => {
+                window.open("/programming-contest/create-problem");
+              },
+            },
+          ]}
+          components={{
+            Pagination: (props) => (
+              <TablePagination
+                {...props}
+                rowsPerPageOptions={PAGE_SIZES}
+                rowsPerPage={sizeMyProblems}
+                count={totalMyProblems}
+                page={pageMyProblems}
+                onPageChange={(e, value) => setPageMyProblems(value)}
+                onRowsPerPageChange={(e) => {
+                  setSizeMyProblems(e.target.value);
+                  setPageMyProblems(0);
+                }}
+                ActionsComponent={TablePaginationActions}
+              />
+            ),
+          }}
+        />
+      </TabPanelVertical>
+      <TabPanelVertical value={value} index={1}>
+        <StandardTable
+          title="Shared Problems"
+          columns={COLUMNS}
+          data={sharedProblems}
+          hideCommandBar
+          key="sharedProblems"
+          options={{
+            selection: false,
+            pageSize: sizeSharedProblems,
+            search: true,
+            sorting: true,
+          }}
+          components={{
+            Pagination: (props) => (
+              <TablePagination
+                {...props}
+                rowsPerPageOptions={PAGE_SIZES}
+                rowsPerPage={sizeSharedProblems}
+                count={totalSharedProblems}
+                page={pageSharedProblems}
+                onPageChange={(e, value) => setPageSharedProblems(value)}
+                onRowsPerPageChange={(e) => {
+                  setSizeSharedProblems(e.target.value);
+                  setPageSharedProblems(0);
+                }}
+                ActionsComponent={TablePaginationActions}
+              />
+            ),
+          }}
+        />
+      </TabPanelVertical>
     </div>
   );
 }
