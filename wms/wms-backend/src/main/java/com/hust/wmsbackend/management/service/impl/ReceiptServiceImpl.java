@@ -317,17 +317,17 @@ public class ReceiptServiceImpl implements ReceiptService {
         bill.setCreatedBy(principal.getName());
         receiptBillRepository.save(bill);
         String billId = bill.getReceiptBillId();
+        // update receipt status to IN_PROCESS
+        Optional<Receipt> receiptOpt = receiptRepository.findById(UUID.fromString(receiptId));
+        if (!receiptOpt.isPresent()) {
+            log.warn(String.format("Receipt id %s is not exist", receiptId));
+            return false;
+        }
+        Receipt receipt = receiptOpt.get();
+        receipt.setStatus(isDone ? ReceiptStatus.COMPLETED : ReceiptStatus.IN_PROGRESS);
+        receiptRepository.save(receipt);
         for (ProcessedItemModel model : items) {
             try {
-                // update receipt status to IN_PROCESS
-                Optional<Receipt> receiptOpt = receiptRepository.findById(UUID.fromString(receiptId));
-                if (!receiptOpt.isPresent()) {
-                    log.warn(String.format("Receipt id %s is not exist", receiptId));
-                    return false;
-                }
-                Receipt receipt = receiptOpt.get();
-                receipt.setStatus(isDone ? ReceiptStatus.COMPLETED : ReceiptStatus.IN_PROGRESS);
-                receiptRepository.save(receipt);
                 // create receipt_item record
                 ReceiptItem receiptItem = ReceiptItem
                     .builder()
