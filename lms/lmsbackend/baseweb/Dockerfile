@@ -11,7 +11,11 @@ COPY mvnw .
 RUN chmod +x mvnw
 
 COPY .mvn .mvn
+
+# Copy pom and get dependencies
 COPY pom.xml .
+RUN ./mvnw install -DskipTests
+
 COPY src src
 
 RUN ./mvnw install -DskipTests
