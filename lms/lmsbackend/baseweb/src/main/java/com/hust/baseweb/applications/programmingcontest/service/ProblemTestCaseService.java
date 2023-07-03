@@ -291,9 +291,9 @@ public interface ProblemTestCaseService {
 
     List<ModelResponseUserProblemRole> getUserProblemRoles(String problemId);
 
-    boolean addUserProblemRole(String userName, ModelUserProblemRole input);
+    boolean addUserProblemRole(String userName, ModelUserProblemRole input)  throws Exception;
 
-    boolean removeUserProblemRole(String userName, ModelUserProblemRole input);
+    boolean removeUserProblemRole(String userName, ModelUserProblemRole input)  throws Exception;
 
     boolean grantRole2AllProblems(String userLoginId, String userId, String roleId);
 
@@ -310,4 +310,10 @@ public interface ProblemTestCaseService {
     void switchAllContestJudgeMode(String judgeMode);
 
     void exportProblem(String id, OutputStream outputStream);
+
+    Page<ProblemEntity> getOwnerProblemsPaging(Pageable pageable, String ownerId);
+
+    Page<ProblemEntity> getSharedProblemsPaging(Pageable pageable, String userId);
+
+    ModelCreateContestProblemResponse getContestProblemDetailByIdAndTeacher(String problemId, String teacherId) throws Exception;
 }
