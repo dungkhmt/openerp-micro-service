@@ -28,6 +28,7 @@ import ContestsUsingAProblem from "./ContestsUsingAProblem";
 import EditIcon from "@mui/icons-material/Edit";
 import {useHistory} from "react-router-dom";
 import {styled} from "@mui/material/styles";
+import { PROBLEM_ROLE, PROBLEM_STATUS } from "utils/constants";
 
 const CssTextField = styled(TextField)({
   ".MuiInputBase-input.Mui-disabled": {
@@ -65,6 +66,8 @@ function ManagerViewProblemDetailV2() {
   const [isPublic, setIsPublic] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [fetchedImageArray, setFetchedImageArray] = useState([]);
+  const [status, setStatus] = useState("");
+  const [roles, setRoles] = useState([]);
 
 
   useEffect(() => {
@@ -93,6 +96,8 @@ function ManagerViewProblemDetailV2() {
       setIsCustomEvaluated(res.scoreEvaluationType === CUSTOM_EVALUATION);
       setDescription(res.problemDescription);
       setSelectedTags(res.tags);
+      setRoles(res.roles);
+      setStatus(res.status);
     });
   }, [problemId]);
 
@@ -100,16 +105,36 @@ function ManagerViewProblemDetailV2() {
     <HustContainerCard
       title={"Problem Detail"}
       action={
-        <Button
-          variant="contained"
-          color="info"
-          onClick={() => {
-            history.push("/programming-contest/edit-problem/" + problemId);
-          }}
-          startIcon={<EditIcon sx={{marginRight: "4px"}}/>}
-        >
-          Edit
-        </Button>
+        <>
+          <Button
+            variant="contained"
+            color="info"
+            onClick={() => {
+              history.push("/programming-contest/edit-problem/" + problemId);
+            }}
+            startIcon={<EditIcon sx={{ marginRight: "4px" }} />}
+            sx={{ marginRight: "8px" }}
+            disabled={!roles.includes(PROBLEM_ROLE.OWNER) && (
+              !roles.includes(PROBLEM_ROLE.EDITOR) || status !== PROBLEM_STATUS.OPEN
+            )}
+          >
+            Edit
+          </Button>
+          {
+          roles.includes(PROBLEM_ROLE.OWNER) && <Button
+            variant="contained"
+            color="info"
+            onClick={() => {
+              history.push(
+                "/programming-contest/user-contest-problem-role-management/" +
+                  problemId
+              );
+            }}
+          >
+            Manage Role
+          </Button>
+          }
+        </>
       }
     >
       <Grid container spacing={2}>

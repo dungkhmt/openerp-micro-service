@@ -45,6 +45,7 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.persistence.criteria.Predicate;
 import static com.hust.baseweb.config.rabbitmq.ProblemContestRoutingKey.JUDGE_PROBLEM;
 import static com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestConfig.EXCHANGE;
 
@@ -156,6 +157,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .attachment(String.join(";", attachmentId))
                                                    .tags(tags)
                                                    .userId(userID)
+                                                   .statusId(ProblemEntity.PROBLEM_STATUS_HIDDEN)
                                                    .build();
         problemEntity = problemService.saveProblemWithCache(problemEntity);
 
@@ -172,7 +174,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         upr = new UserContestProblemRole();
         upr.setProblemId(problemEntity.getProblemId());
         upr.setUserId(userID);
-        upr.setRoleId(UserContestProblemRole.ROLE_MANAGER);
+        upr.setRoleId(UserContestProblemRole.ROLE_EDITOR);
         upr.setUpdateByUserId(userID);
         upr.setCreatedStamp(new Date());
         upr.setLastUpdated(new Date());
@@ -181,7 +183,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         upr = new UserContestProblemRole();
         upr.setProblemId(problemEntity.getProblemId());
         upr.setUserId(userID);
-        upr.setRoleId(UserContestProblemRole.ROLE_VIEW);
+        upr.setRoleId(UserContestProblemRole.ROLE_VIEWER);
         upr.setUpdateByUserId(userID);
         upr.setCreatedStamp(new Date());
         upr.setLastUpdated(new Date());
@@ -194,7 +196,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             upr = new UserContestProblemRole();
             upr.setProblemId(problemEntity.getProblemId());
             upr.setUserId(admin.getUserLoginId());
-            upr.setRoleId(UserContestProblemRole.ROLE_MANAGER);
+            upr.setRoleId(UserContestProblemRole.ROLE_EDITOR);
             upr.setUpdateByUserId(userID);
             upr.setCreatedStamp(new Date());
             upr.setLastUpdated(new Date());
@@ -203,7 +205,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             upr = new UserContestProblemRole();
             upr.setProblemId(problemEntity.getProblemId());
             upr.setUserId(admin.getUserLoginId());
-            upr.setRoleId(UserContestProblemRole.ROLE_VIEW);
+            upr.setRoleId(UserContestProblemRole.ROLE_VIEWER);
             upr.setUpdateByUserId(userID);
             upr.setCreatedStamp(new Date());
             upr.setLastUpdated(new Date());
@@ -235,8 +237,14 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         ModelUpdateContestProblem modelUpdateContestProblem = gson.fromJson(json, ModelUpdateContestProblem.class);
 
         ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
-        if (!userId.equals(problemEntity.getUserId())) {
-            throw new MiniLeetCodeException("permission denied");
+        if (!userId.equals(problemEntity.getUserId())
+        && !userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId, userId, UserContestProblemRole.ROLE_EDITOR)) {
+            throw new MiniLeetCodeException("permission denied", 403);
+        }
+
+        if (!userId.equals(problemEntity.getUserId())
+        && !problemEntity.getStatusId().equals(ProblemEntity.PROBLEM_STATUS_OPEN)) {
+            throw new MiniLeetCodeException("Problem is not opened for edit", 400);
         }
 
         List<TagEntity> tags = new ArrayList<>();
@@ -297,6 +305,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         problemEntity.setPublicProblem(modelUpdateContestProblem.getIsPublic());
         problemEntity.setAttachment(String.join(";", attachmentId));
         problemEntity.setTags(tags);
+        if (userId.equals(problemEntity.getUserId())) {
+            problemEntity.setStatusId(modelUpdateContestProblem.getStatus());
+        }
 
         problemEntity = problemService.saveProblemWithCache(problemEntity);
         return problemEntity;
@@ -4082,7 +4093,14 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public boolean addUserProblemRole(String userName, ModelUserProblemRole input) {
+    public boolean addUserProblemRole(String userName, ModelUserProblemRole input) throws Exception {
+        boolean isOwner = this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(
+            input.getProblemId(),
+            userName,
+            UserContestProblemRole.ROLE_OWNER);
+        if (!isOwner) {
+            throw new MiniLeetCodeException("You are not owner of this problem.", 403);
+        }
         List<UserContestProblemRole> L = userContestProblemRoleRepo.findAllByProblemIdAndUserIdAndRoleId(
             input.getProblemId(),
             input.getUserId(),
@@ -4101,7 +4119,14 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public boolean removeUserProblemRole(String userName, ModelUserProblemRole input) {
+    public boolean removeUserProblemRole(String userName, ModelUserProblemRole input) throws Exception {
+        boolean isOwner = this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(
+            input.getProblemId(),
+            userName,
+            UserContestProblemRole.ROLE_OWNER);
+        if (!isOwner) {
+            throw new MiniLeetCodeException("You are not owner of this problem.", 403);
+        }
         List<UserContestProblemRole> L = userContestProblemRoleRepo.findAllByProblemIdAndUserIdAndRoleId(
             input.getProblemId(),
             input.getUserId(),
@@ -4240,4 +4265,96 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         }
     }
 
+    public ModelCreateContestProblemResponse getContestProblemDetailByIdAndTeacher(String problemId, String teacherId)
+            throws Exception {
+        boolean hasPermission = this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
+                teacherId, UserContestProblemRole.ROLE_VIEWER);
+        if (!hasPermission) {
+            throw new MiniLeetCodeException("You don't have permission to view this problem", 403);
+        }
+
+        ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
+        if (problemEntity == null) {
+            throw new MiniLeetCodeException("Problem not found", 404);
+        }
+
+        if (!problemEntity.getUserId().equals(teacherId) && !problemEntity.getStatusId().equals(ProblemEntity.PROBLEM_STATUS_OPEN)) {
+            throw new MiniLeetCodeException("Problem is not open", 400);
+        }
+
+        ModelCreateContestProblemResponse problemResponse = new ModelCreateContestProblemResponse();
+        problemResponse.setProblemId(problemEntity.getProblemId());
+        problemResponse.setProblemName(problemEntity.getProblemName());
+        problemResponse.setProblemDescription(problemEntity.getProblemDescription());
+        problemResponse.setUserId(problemEntity.getUserId());
+        problemResponse.setTimeLimit(problemEntity.getTimeLimit());
+        problemResponse.setMemoryLimit(problemEntity.getMemoryLimit());
+        problemResponse.setLevelId(problemEntity.getLevelId());
+        problemResponse.setCategoryId(problemEntity.getCategoryId());
+        problemResponse.setCorrectSolutionSourceCode(problemEntity.getCorrectSolutionSourceCode());
+        problemResponse.setCorrectSolutionLanguage(problemEntity.getCorrectSolutionLanguage());
+        problemResponse.setSolutionCheckerSourceCode(problemEntity.getSolutionCheckerSourceCode());
+        problemResponse.setSolutionCheckerSourceLanguage(problemEntity.getSolutionCheckerSourceLanguage());
+        problemResponse.setScoreEvaluationType(problemEntity.getScoreEvaluationType());
+        problemResponse.setSolution(problemEntity.getSolution());
+        problemResponse.setLevelOrder(problemEntity.getLevelOrder());
+        problemResponse.setCreatedAt(problemEntity.getCreatedAt());
+        problemResponse.setPublicProblem(problemEntity.isPublicProblem());
+        problemResponse.setTags(problemEntity.getTags());
+        problemResponse.setStatus(problemEntity.getStatusId());
+
+        if (problemEntity.getAttachment() != null) {
+            String[] fileId = problemEntity.getAttachment().split(";", -1);
+            if (fileId.length != 0) {
+                List<byte[]> fileArray = new ArrayList<>();
+                List<String> fileNames = new ArrayList<>();
+                for (String s : fileId) {
+                    try {
+                        GridFsResource content = mongoContentService.getById(s);
+                        if (content != null) {
+                            InputStream inputStream = content.getInputStream();
+                            fileArray.add(IOUtils.toByteArray(inputStream));
+                            fileNames.add(content.getFilename());
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                problemResponse.setAttachment(fileArray);
+                problemResponse.setAttachmentNames(fileNames);
+            } else {
+                problemResponse.setAttachment(null);
+                problemResponse.setAttachmentNames(null);
+            }
+        } else {
+            problemResponse.setAttachment(null);
+            problemResponse.setAttachmentNames(null);
+        }
+
+        problemResponse.setRoles(userContestProblemRoleRepo.getRolesByProblemIdAndUserId(problemId, teacherId));
+
+        return problemResponse;
+    }
+
+    public Page<ProblemEntity> getOwnerProblemsPaging(Pageable pageable, String ownerId) {
+        return this.problemRepo.findAll((root, query, criteriaBuilder) -> {
+                List<Predicate> predicates = new ArrayList<>();
+                predicates.add(criteriaBuilder.equal(root.get("userId"), ownerId));
+                return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+            } , pageable);
+    }
+
+    public Page<ProblemEntity> getSharedProblemsPaging(Pageable pageable, String userId) {
+        List<String> problemIds = this.userContestProblemRoleRepo.getProblemIdsShared(userId);
+
+        return this.problemRepo.findAll((root, query, criteriaBuilder) -> {
+                List<Predicate> predicates = new ArrayList<>();
+                if (problemIds != null && problemIds.size() > 0) {
+                    predicates.add(criteriaBuilder.in(root.get("problemId")).value(problemIds));
+                } else {
+                    predicates.add(criteriaBuilder.equal(root.get("problemId"), ""));
+                }
+                return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+            } , pageable);
+    }
 }

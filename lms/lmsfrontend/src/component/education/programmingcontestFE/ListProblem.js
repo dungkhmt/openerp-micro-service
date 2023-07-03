@@ -60,6 +60,7 @@ function ListProblem() {
         <span style={{color: getColorLevel(`${rowData.levelId}`)}}>{`${rowData.levelId}`}</span>
       )
     },
+    {title: "Status", field: "statusId"},
     {
       title: "Tags",
       render: (rowData) => (
@@ -105,6 +106,7 @@ function ListProblem() {
         levelId: problem.levelId,
         tags: problem.tags,
         appearances: problem.appearances,
+        statusId: problem.statusId,
       }));
       setProblems(data);
     }).then();
