@@ -186,7 +186,7 @@ const DeliveryTripDetail = ( props ) => {
         if (res.status == 200) {
           setTripInfo(res.data);
           successNoti("Lưu thông tin chuyến giao hàng thành công");
-          // window.location.reload();
+          window.location.reload();
         }
       },
       {
