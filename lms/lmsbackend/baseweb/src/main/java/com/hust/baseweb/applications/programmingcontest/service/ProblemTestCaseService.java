@@ -38,12 +38,6 @@ public interface ProblemTestCaseService {
 
     ModelCreateContestProblemResponse getContestProblem(String problemId) throws Exception;
 
-    ModelProblemDetailRunCodeResponse problemDetailRunCode(
-        String problemId,
-        ModelProblemDetailRunCode modelProblemDetailRunCode,
-        String userName
-    ) throws Exception;
-
     ModelGetTestCaseResultResponse getTestCaseResult(
         String problemId,
         String userName,
@@ -53,12 +47,6 @@ public interface ProblemTestCaseService {
     ModelCheckCompileResponse checkCompile(ModelCheckCompile modelCheckCompile, String userName) throws Exception;
 
     TestCaseEntity saveTestCase(String problemId, ModelSaveTestcase modelSaveTestcase);
-
-    ModelContestSubmissionResponse problemDetailSubmission(
-        ModelProblemDetailSubmission modelProblemDetailSubmission,
-        String problemId,
-        String userName
-    ) throws Exception;
 
     ListProblemSubmissionResponse getListProblemSubmissionResponse(String problemId, String userId) throws Exception;
 

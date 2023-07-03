@@ -57,7 +57,10 @@ function EditProblem() {
   const [problemName, setProblemName] = useState("");
   const [description, setDescription] = useState("");
   const [solution, setSolution] = useState("");
-  const [timeLimit, setTimeLimit] = useState(1);
+  // const [timeLimit, setTimeLimit] = useState(1);
+  const [timeLimitCPP, setTimeLimitCPP] = useState(1);
+  const [timeLimitJAVA, setTimeLimitJAVA] = useState(1);
+  const [timeLimitPYTHON, setTimeLimitPYTHON] = useState(1);
   const [memoryLimit, setMemoryLimit] = useState(1);
   const [levelId, setLevelId] = useState("");
   const [codeSolution, setCodeSolution] = useState("");
@@ -124,7 +127,10 @@ function EditProblem() {
 
       setProblemName(res.problemName);
       setLevelId(res.levelId);
-      setTimeLimit(res.timeLimit);
+      // setTimeLimit(res.timeLimit);
+      setTimeLimitCPP(res.timeLimitCPP);
+      setTimeLimitJAVA(res.timeLimitJAVA);
+      setTimeLimitPYTHON(res.timeLimitPYTHON);
       setMemoryLimit(res.memoryLimit);
       setIsPublic(res.publicProblem);
       setLanguageSolution(res.correctSolutionLanguage);
@@ -170,11 +176,11 @@ function EditProblem() {
       errorNoti(t("missingField", {ns: "validation", fieldName: t("problemName")}), 3000);
       return false;
     }
-    if (timeLimit <= 0 || timeLimit > 60) {
+    if (timeLimitCPP <= 0 || timeLimitJAVA <= 0 || timeLimitPYTHON <=0 || timeLimitCPP > 60 || timeLimitJAVA > 60 || timeLimitPYTHON > 60) {
       errorNoti(t("numberBetween", {ns: "validation", fieldName: t("timeLimit"), min: 1, max: 60}), 3000);
       return false;
     }
-    if (memoryLimit <= 0 || timeLimit > 1024) {
+    if (memoryLimit <= 0 || memoryLimit > 1024) {
       errorNoti(t("numberBetween", {ns: "validation", fieldName: t("memoryLimit"), min: 1, max: 1024}), 3000);
       return false;
     }
@@ -206,7 +212,10 @@ function EditProblem() {
     let body = {
       problemName: problemName,
       problemDescription: description,
-      timeLimit: timeLimit,
+      // timeLimit: timeLimit,
+      timeLimitCPP: timeLimitCPP,
+      timeLimitJAVA: timeLimitJAVA,
+      timeLimitPYTHON: timeLimitPYTHON,
       levelId: levelId,
       memoryLimit: memoryLimit,
       correctSolutionLanguage: languageSolution,
@@ -256,7 +265,7 @@ function EditProblem() {
   return (
     <HustContainerCard title={t("editProblem")}>
       <Grid container spacing={2}>
-        <Grid item xs={4}>
+        <Grid item xs={10}>
           <TextField
             fullWidth
             required
@@ -268,6 +277,27 @@ function EditProblem() {
               setProblemName(event.target.value);
             }}
           />
+        </Grid>
+
+        <Grid item xs={2}>
+          <TextField
+            fullWidth
+            required
+            id="status"
+            label={t("status")}
+            select
+            value={status}
+            onChange={(event) => {
+              setStatus(event.target.value);
+            }}
+            disabled={!isOwner}
+          >
+            {Object.values(PROBLEM_STATUS).map((item) => (
+              <MenuItem key={item} value={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </TextField>
         </Grid>
 
         <Grid item xs={2}>
@@ -294,15 +324,65 @@ function EditProblem() {
           <TextField
             fullWidth
             required
-            id="timeLimit"
-            label={t("timeLimit")}
-            placeholder="Time Limit"
-            type="number"
-            value={timeLimit}
+            select
+            id="isPublicProblem"
+            label={t("public", {ns: "common"})}
             onChange={(event) => {
-              setTimeLimit(event.target.value);
+              setIsPublic(event.target.value);
             }}
-            InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>}}
+            value={isPublic}
+          >
+            <MenuItem key={"true"} value={true}>
+              {t("yes", {ns: "common"})}
+            </MenuItem>
+            <MenuItem key={"false"} value={false}>
+              {t("no", {ns: "common"})}
+            </MenuItem>
+          </TextField>
+        </Grid>
+
+        <Grid item xs={2}>
+          <TextField
+            fullWidth
+            required
+            id="timeLimitCPP"
+            label={t("timeLimit") + " - CPP"}
+            type="number"
+            value={timeLimitCPP}
+            onChange={(event) => {
+              setTimeLimitCPP(event.target.value);
+            }}
+            InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>,}}
+          />
+        </Grid>
+
+        <Grid item xs={2}>
+          <TextField
+            fullWidth
+            required
+            id="timeLimitJAVA"
+            label={t("timeLimit") + " - JAVA"}
+            type="number"
+            value={timeLimitJAVA}
+            onChange={(event) => {
+              setTimeLimitJAVA(event.target.value);
+            }}
+            InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>,}}
+          />
+        </Grid>
+
+        <Grid item xs={2}>
+          <TextField
+            fullWidth
+            required
+            id="timeLimitPYTHON"
+            label={t("timeLimit") + " - PYTHON"}
+            type="number"
+            value={timeLimitPYTHON}
+            onChange={(event) => {
+              setTimeLimitPYTHON(event.target.value);
+            }}
+            InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>,}}
           />
         </Grid>
 
@@ -320,46 +400,8 @@ function EditProblem() {
             InputProps={{endAdornment: <InputAdornment position="end">MB</InputAdornment>}}
           />
         </Grid>
-        <Grid item xs={2}>
-          <TextField
-            fullWidth
-            select
-            id="isPublicProblem"
-            label={t("public", {ns: "common"})}
-            onChange={(event) => {
-              setIsPublic(event.target.value);
-            }}
-            value={isPublic}
-          >
-            <MenuItem key={"true"} value={true}>
-              {t("yes", {ns: "common"})}
-            </MenuItem>
-            <MenuItem key={"false"} value={false}>
-              {t("no", {ns: "common"})}
-            </MenuItem>
-          </TextField>
-        </Grid>
-        <Grid item xs={2}>
-          <TextField
-            fullWidth
-            required
-            id="status"
-            label={t("status")}
-            select
-            value={status}
-            onChange={(event) => {
-              setStatus(event.target.value);
-            }}
-            disabled={!isOwner}
-          >
-            {Object.values(PROBLEM_STATUS).map((item) => (
-              <MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid item xs={10}>
+
+        <Grid item xs={12}>
           <FormControl sx={{width: "100%"}}>
             <InputLabel id="select-tag-label">Tags</InputLabel>
             <Select
