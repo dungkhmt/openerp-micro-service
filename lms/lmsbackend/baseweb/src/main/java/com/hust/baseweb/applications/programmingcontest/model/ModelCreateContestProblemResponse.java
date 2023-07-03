@@ -25,6 +25,12 @@ public class ModelCreateContestProblemResponse {
 
     private int timeLimit;
 
+    private int timeLimitCPP;
+
+    private int timeLimitJAVA;
+
+    private int timeLimitPYTHON;
+
     private int memoryLimit;
 
     private String levelId;

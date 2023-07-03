@@ -247,17 +247,6 @@ public class ContestProblemController {
         return ResponseEntity.status(HttpStatus.OK).body(problemResponse);
     }
 
-    @PostMapping("/problem-detail-run-code/{problemId}")
-    public ResponseEntity<?> problemDetailsRunCode(
-        @PathVariable("problemId") String problemId,
-        @RequestBody ModelProblemDetailRunCode modelProblemDetailRunCode, Principal principal
-    ) throws Exception {
-        ModelProblemDetailRunCodeResponse resp = problemTestCaseService.problemDetailRunCode(problemId,
-                                                                                             modelProblemDetailRunCode,
-                                                                                             principal.getName());
-        return ResponseEntity.ok(resp);
-    }
-
     @PostMapping("/check-compile")
     public ResponseEntity<?> checkCompile(@RequestBody ModelCheckCompile modelCheckCompile, Principal principal)
         throws Exception {
@@ -272,18 +261,6 @@ public class ContestProblemController {
     ) {
         TestCaseEntity testCaseEntity = problemTestCaseService.saveTestCase(problemId, modelSaveTestcase);
         return ResponseEntity.status(200).body(testCaseEntity);
-    }
-
-    @PostMapping("/problem-details-submission/{problemId}")
-    public ResponseEntity<?> problemDetailsSubmission(
-        @PathVariable("problemId") String problemId,
-        @RequestBody ModelProblemDetailSubmission modelProblemDetailSubmission, Principal principal
-    )
-        throws Exception {
-        log.info("problemDetailsSubmission {}", problemId);
-        ModelContestSubmissionResponse response = problemTestCaseService
-            .problemDetailSubmission(modelProblemDetailSubmission, problemId, principal.getName());
-        return ResponseEntity.status(200).body(response);
     }
 
     @GetMapping("/get-all-problem-submission-by-user/{problemId}")

@@ -55,7 +55,10 @@ function ManagerViewProblemDetailV2() {
 
   const [problemName, setProblemName] = useState("");
   const [description, setDescription] = useState("");
-  const [timeLimit, setTimeLimit] = useState(1);
+  // const [timeLimit, setTimeLimit] = useState(1);
+  const [timeLimitCPP, setTimeLimitCPP] = useState(1);
+  const [timeLimitJAVA, setTimeLimitJAVA] = useState(1);
+  const [timeLimitPYTHON, setTimeLimitPYTHON] = useState(1);
   const [memoryLimit, setMemoryLimit] = useState(1);
   const [levelId, setLevelId] = useState("");
   const [languageSolution, setLanguageSolution] = useState("CPP");
@@ -86,7 +89,10 @@ function ManagerViewProblemDetailV2() {
 
       setProblemName(res.problemName);
       setLevelId(res.levelId);
-      setTimeLimit(res.timeLimit);
+      // setTimeLimit(res.timeLimit);
+      setTimeLimitCPP(res.timeLimitCPP);
+      setTimeLimitJAVA(res.timeLimitJAVA);
+      setTimeLimitPYTHON(res.timeLimitPYTHON);
       setMemoryLimit(res.memoryLimit);
       setIsPublic(res.publicProblem);
       setLanguageSolution(res.correctSolutionLanguage);
@@ -138,13 +144,23 @@ function ManagerViewProblemDetailV2() {
       }
     >
       <Grid container spacing={2}>
-        <Grid item xs={4}>
+        <Grid item xs={10}>
           <CssTextField
             disabled
             fullWidth
             id="problemName"
             label={t("problemName")}
             value={problemName}
+          />
+        </Grid>
+
+        <Grid item xs={2}>
+          <CssTextField
+            disabled
+            fullWidth
+            id="status"
+            label={t("status")}
+            value={status}
           />
         </Grid>
 
@@ -162,11 +178,44 @@ function ManagerViewProblemDetailV2() {
           <CssTextField
             disabled
             fullWidth
-            id="timeLimit"
-            label={t("timeLimit")}
-            placeholder="Time Limit"
+            id="isPublicProblem"
+            label={t("public", {ns: "common"})}
+            value={isPublic ? t("yes", {ns: "common"}) : t("no", {ns: "common"})}
+          />
+        </Grid>
+
+        <Grid item xs={2}>
+          <CssTextField
+            disabled
+            fullWidth
+            id="timeLimitCPP"
+            label={t("timeLimit") + " - CPP"}
             type="number"
-            value={timeLimit}
+            value={timeLimitCPP}
+            InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>}}
+          />
+        </Grid>
+
+        <Grid item xs={2}>
+          <CssTextField
+            disabled
+            fullWidth
+            id="timeLimitJAVA"
+            label={t("timeLimit") + " - JAVA"}
+            type="number"
+            value={timeLimitJAVA}
+            InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>}}
+          />
+        </Grid>
+
+        <Grid item xs={2}>
+          <CssTextField
+            disabled
+            fullWidth
+            id="timeLimitPYTHON"
+            label={t("timeLimit") + " - PYTHON"}
+            type="number"
+            value={timeLimitPYTHON}
             InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>}}
           />
         </Grid>
@@ -180,15 +229,6 @@ function ManagerViewProblemDetailV2() {
             type="number"
             value={memoryLimit}
             InputProps={{endAdornment: <InputAdornment position="end">MB</InputAdornment>}}
-          />
-        </Grid>
-        <Grid item xs={2}>
-          <CssTextField
-            disabled
-            fullWidth
-            id="isPublicProblem"
-            label={t("public", {ns: "common"})}
-            value={isPublic ? t("yes", {ns: "common"}) : t("no", {ns: "common"})}
           />
         </Grid>
 
