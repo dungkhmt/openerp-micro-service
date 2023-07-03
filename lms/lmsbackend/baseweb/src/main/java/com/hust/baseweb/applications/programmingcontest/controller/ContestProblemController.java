@@ -229,7 +229,7 @@ public class ContestProblemController {
             principal.getName());
         boolean hasPermission = false;
         for (UserContestProblemRole e : L) {
-            if (e.getRoleId().equals(UserContestProblemRole.ROLE_MANAGER) ||
+            if (e.getRoleId().equals(UserContestProblemRole.ROLE_EDITOR) ||
                 e.getRoleId().equals(UserContestProblemRole.ROLE_OWNER)) {
                 hasPermission = true;
                 break;
