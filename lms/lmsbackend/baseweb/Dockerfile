@@ -11,14 +11,10 @@ COPY mvnw .
 RUN chmod +x mvnw
 
 COPY .mvn .mvn
-
-# Copy pom and get dependencies
 COPY pom.xml .
-RUN ./mvnw install -DskipTests
-
 COPY src src
 
-RUN ./mvnw install -DskipTests
+RUN --mount=type=cache,target=/root/.m2 ./mvnw install -DskipTests
 
 # Unpack Spring Boot fat JAR
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
