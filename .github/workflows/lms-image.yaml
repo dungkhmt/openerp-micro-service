@@ -40,8 +40,8 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/lms:${{ steps.construct-tag.outputs.TAG_NAME }}
             ${{ secrets.DOCKER_USERNAME }}/lms:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=$GITHUB_REF_NAME-lms
+          cache-to: type=gha,mode=max,scope=$GITHUB_REF_NAME-lms
       - name: Remove config file
         uses: JesseTG/rm@v1.0.2
         with:
