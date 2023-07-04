@@ -113,20 +113,6 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(contestProblemPage);
     }
 
-    @PostMapping("/ide/{computerLanguage}")
-    public ResponseEntity<?> runCode(
-        @PathVariable("computerLanguage") String computerLanguage,
-        @RequestBody ModelRunCodeFromIDE modelRunCodeFromIDE, Principal principal
-    ) throws Exception {
-        String response = problemTestCaseService.executableIDECode(
-            modelRunCodeFromIDE,
-            principal.getName(),
-            computerLanguage);
-        ModelRunCodeFromIDEOutput modelRunCodeFromIDEOutput = new ModelRunCodeFromIDEOutput();
-        modelRunCodeFromIDEOutput.setOutput(response);
-        return ResponseEntity.status(200).body(modelRunCodeFromIDEOutput);
-    }
-
     @Secured("ROLE_TEACHER")
     @PostMapping("/problem/generate-statement")
     public ResponseEntity<?> suggestProblemStatement(@RequestBody ProblemSuggestionRequest suggestion) throws Exception {

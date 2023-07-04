@@ -336,24 +336,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public String executableIDECode(
-        ModelRunCodeFromIDE modelRunCodeFromIDE,
-        String userName,
-        String computerLanguage
-    ) throws Exception {
-        String tempName = tempDir.createRandomScriptFileName(userName + "-" + computerLanguage);
-        String response = runCode(
-            modelRunCodeFromIDE.getSource(),
-            computerLanguage,
-            tempName,
-            modelRunCodeFromIDE.getInput(),
-            10,
-            "Language Not Found");
-        tempDir.pushToConcurrentLinkedQueue(tempName);
-        return response;
-    }
-
-    @Override
     public ModelCreateContestProblemResponse getContestProblem(String problemId) throws Exception {
         ProblemEntity problemEntity;
         ModelCreateContestProblemResponse problemResponse = new ModelCreateContestProblemResponse();

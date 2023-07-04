@@ -30,12 +30,6 @@ public interface ProblemTestCaseService {
 
     List<ModelProblemGeneralInfo> getAllProblemsGeneralInfo();
 
-    String executableIDECode(
-        ModelRunCodeFromIDE modelRunCodeFromIDE,
-        String userName,
-        String computerLanguage
-    ) throws Exception;
-
     ModelCreateContestProblemResponse getContestProblem(String problemId) throws Exception;
 
     ModelGetTestCaseResultResponse getTestCaseResult(
