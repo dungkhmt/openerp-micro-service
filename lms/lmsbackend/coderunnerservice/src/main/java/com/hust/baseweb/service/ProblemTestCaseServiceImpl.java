@@ -122,7 +122,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     tempName,
                     L,
                     "language not found",
-                    problem.getTimeLimit(),
+//                    problem.getTimeLimit(),
+                    getTimeLimitByLanguage(problem, submission.getSourceCodeLanguage()),
                     problem.getMemoryLimit());
 
             listSubmissionResponse.add(response);
@@ -185,7 +186,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     tempName,
                     testCaseEntity,
                     "language not found",
-                    problemEntity.getTimeLimit(),
+//                    problemEntity.getTimeLimit(),
+                    getTimeLimitByLanguage(problemEntity, problemEntity.getSolutionCheckerSourceLanguage()),
                     problemEntity.getMemoryLimit());
 
             submissionResponses.put(submissionTestCase.getContestSubmissionTestcaseId(), response);
@@ -292,6 +294,24 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         }
 //        tempDir.pushToConcurrentLinkedQueue(tempName);
         return ans;
+    }
+
+    private int getTimeLimitByLanguage(ProblemEntity problem, String language) {
+        int timeLimit;
+        switch (language) {
+            case ContestSubmissionEntity.LANGUAGE_CPP:
+                timeLimit = problem.getTimeLimitCPP();
+                break;
+            case ContestSubmissionEntity.LANGUAGE_JAVA:
+                timeLimit = problem.getTimeLimitJAVA();
+                break;
+            case ContestSubmissionEntity.LANGUAGE_PYTHON:
+                timeLimit = problem.getTimeLimitPYTHON();
+                break;
+            default:
+                timeLimit = problem.getTimeLimitCPP();
+        }
+        return timeLimit;
     }
 
 }
