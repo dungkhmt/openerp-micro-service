@@ -36,3 +36,5 @@ package-lock.json
 *.bat
 
 .prettierrc
+
+/.VSCodeCounter
