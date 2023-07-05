@@ -1968,19 +1968,13 @@ public class ContestProblemController {
 
     @Secured("ROLE_TEACHER")
     @GetMapping("/get-all-my-problems")
-    public Page<ProblemEntity> getAllMyProblems(
-        Pageable pageable,
-        Principal owner
-    ) {
-        return this.problemTestCaseService.getOwnerProblemsPaging(pageable, owner.getName());
+    public List<ProblemEntity> getAllMyProblems(Principal owner) {
+        return this.problemTestCaseService.getOwnerProblems(owner.getName());
     }
 
     @Secured("ROLE_TEACHER")
     @GetMapping("/get-all-shared-problems")
-    public Page<ProblemEntity> getAllSharedProblems(
-        Pageable pageable,
-        Principal owner
-    ) {
-        return this.problemTestCaseService.getSharedProblemsPaging(pageable, owner.getName());
+    public List<ProblemEntity> getAllSharedProblems(Principal owner) {
+        return this.problemTestCaseService.getSharedProblems(owner.getName());
     }
 }
