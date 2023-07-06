@@ -117,20 +117,20 @@ public class SubmissionResponseHandler {
             long startTime = System.nanoTime();
             contestSubmissionTestCaseEntityRepo.saveAndFlush(cste);
             long endTime = System.nanoTime();
-            log.info(
+            log.debug(
                     "Save contestSubmissionTestCaseEntity to DB, execution time = {} ms",
                     (endTime - startTime) / 1000000);
 
         }
 
         long endTime1 = System.nanoTime();
-        log.info(
+        log.debug(
                 "Total handle response time = {} ms",
                 (endTime1 - startTime1) / 1000000);
 
         long used = memoryBean.getHeapMemoryUsage().getUsed() / mb;
         long committed = memoryBean.getHeapMemoryUsage().getCommitted() / mb;
-        System.out.println("Memory used / committed :  " + used + "mb / " + committed + "mb");
+        log.debug("Memory used / committed :  " + used + "mb / " + committed + "mb");
 
         if (compileError) {
             totalStatus = ContestSubmissionEntity.SUBMISSION_STATUS_COMPILE_ERROR;
