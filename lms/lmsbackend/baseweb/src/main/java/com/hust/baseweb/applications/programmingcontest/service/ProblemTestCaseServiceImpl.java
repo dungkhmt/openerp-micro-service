@@ -137,7 +137,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .problemName(modelCreateContestProblem.getProblemName())
                                                    .problemDescription(modelCreateContestProblem.getProblemDescription())
                                                    .memoryLimit(modelCreateContestProblem.getMemoryLimit())
-//                                                   .timeLimit(modelCreateContestProblem.getTimeLimit())
+                                                   .timeLimit(modelCreateContestProblem.getTimeLimitCPP()) //TODO: remove this after moving all to lms
                                                    .timeLimitCPP(modelCreateContestProblem.getTimeLimitCPP())
                                                    .timeLimitJAVA(modelCreateContestProblem.getTimeLimitJAVA())
                                                    .timeLimitPYTHON(modelCreateContestProblem.getTimeLimitPYTHON())

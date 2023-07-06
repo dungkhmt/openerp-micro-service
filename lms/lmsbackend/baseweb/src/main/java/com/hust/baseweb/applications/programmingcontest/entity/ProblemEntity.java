@@ -43,8 +43,8 @@ public class ProblemEntity implements Serializable {
     @Column(name = "created_by_user_login_id")
     private String userId;
 
-//    @Column(name = "time_limit")
-//    private int timeLimit;
+    @Column(name = "time_limit")
+    private int timeLimit;
 
     @Column(name = "time_limit_cpp")
     private int timeLimitCPP;
