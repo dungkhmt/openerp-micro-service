@@ -22,14 +22,14 @@ export default function UserContestProblemRole() {
   const [selectedUserId, setSelectedUserId] = useState(null);
 
   const columnUserRoles = [
-    {title: "UserId", field: "userLoginId"},
-    {title: "FullName", field: "fullname"},
-    {title: "RoleId", field: "roleId"},
+    {title: "User Id", field: "userLoginId"},
+    {title: "Full Name", field: "fullname"},
+    {title: "Role", field: "roleId"},
   ];
   const columns = [
     {title: "Index", field: "index"},
-    {title: "UserID", field: "userName"},
-    {title: "FullName", field: "fullName"},
+    {title: "User ID", field: "userName"},
+    {title: "Full Name", field: "fullName"},
     {
       title: "Action",
       render: (row) => (
@@ -75,7 +75,6 @@ export default function UserContestProblemRole() {
 
   function getUserRoles() {
     request("get", "/get-user-contest-problem-roles/" + problemId, (res) => {
-      console.log("getUserRoles, res.data = ", res.data);
       setUserRoles(res.data);
     }).then();
   }
@@ -105,17 +104,22 @@ export default function UserContestProblemRole() {
     getUserRoles();
   }, []);
 
+  useEffect(() => {
+    getUserRoles();
+  }, []);
+
+
   return (
     <div>
-      <Box sx={{flexGrow: 1, marginBottom: 2}}>
-        <AppBar position="static" color={"transparent"}>
+      <Box sx={{flexGrow: 1}}>
+        <AppBar position="static" color={"inherit"}>
           <Toolbar>
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />
               </SearchIconWrapper>
               <InputBase
-                style={{ paddingLeft: 50 }}
+                style={{ paddingLeft: 50, paddingRight: 800 }}
                 placeholder={"Search User to add role"}
                 onChange={(event) => {
                   searchUser(event.target.value, pageSearchSize, pageSearch);
@@ -127,19 +131,21 @@ export default function UserContestProblemRole() {
       </Box>
 
       <StandardTable
-        // title={"DS Users"}
+        title={"Search Result"}
         columns={columns}
         data={searchUsers}
         hideCommandBar
         options={{
           selection: false,
           pageSize: pageSearchSize,
-          search: true,
+          search: false,
           sorting: true,
         }}
       />
+
+      <Box sx={{margin: "1.5rem"}}/>
       <StandardTable
-        title={"User & Roles Management"}
+        title={"Users & Roles Management"}
         columns={columnUserRoles}
         data={userRoles}
         hideCommandBar
