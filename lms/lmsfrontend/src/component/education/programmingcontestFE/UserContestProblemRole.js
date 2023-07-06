@@ -102,7 +102,6 @@ export default function UserContestProblemRole() {
   }
 
   useEffect(() => {
-    getRoles();
     getUserRoles();
   }, []);
 
