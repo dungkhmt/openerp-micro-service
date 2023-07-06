@@ -118,7 +118,7 @@ public class ContainerServiceImpl implements ContainerService {
             params.put("facilityId", containerFilterRequestDTO.getFacilityId());
         }
         sql += " AND status != :statusNotEqual";
-        sqlCount += " AND status = :statusNotEqual";
+        sqlCount += " AND status != :statusNotEqual";
         params.put("statusNotEqual", Constants.ContainerStatus.DELETE.getStatus());
 
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);

@@ -19,7 +19,7 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
     const [typeContainers, setTypeContainers] = useState([]);
 
     useEffect(() => {
-        getFacility({ type: "Depot" }).then((res) => {
+        getFacility({ type: "Container" }).then((res) => {
             setFacilityList(res?.data.data.facilityModels);
             // if(truckId) {
             //     setFacility(res?.data.data.facilityModels.find((item) => item.id === truck?.facilityResponsiveDTO.facilityId))
@@ -51,7 +51,7 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
                 facilityId: facility,
                 typeContainerCode: size?.typeContainerCode,
                 containerCode: containerCode,
-                // isEmpty: isBreakRomooc
+                // isEmpty: false
             };
             console.log("data", data)
             updateContainer(data).then((res) => {
@@ -68,7 +68,9 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
         else {
             let data = {
                 facilityId: facility,
-                typeContainerCode: size?.typeContainerCode
+                typeContainerCode: size?.typeContainerCode,
+                containerCode: containerCode,
+                isEmpty: false
             };
             console.log("data", data)
             createContainer(data).then((res) => {

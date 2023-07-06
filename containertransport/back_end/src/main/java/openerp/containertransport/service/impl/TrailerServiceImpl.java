@@ -99,7 +99,7 @@ public class TrailerServiceImpl implements TrailerService {
             params.put("facilityId", trailerFilterRequestDTO.getFacilityId());
         }
         sql += " AND status != :statusNotEqual";
-        sqlCount += " AND status = :statusNotEqual";
+        sqlCount += " AND status != :statusNotEqual";
         params.put("statusNotEqual", Constants.TrailerStatus.DELETE.getStatus());
 
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);

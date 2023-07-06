@@ -61,36 +61,42 @@ const headCells = [
     numeric: false,
     disablePadding: false,
     label: 'Code',
+    width: '5%'
   },
   {
     id: 'name',
     numeric: false,
     disablePadding: false,
     label: 'Name',
+    width: '10%'
   },
   {
     id: 'address',
     numeric: false,
     disablePadding: false,
     label: 'Address',
+    width: '35%'
   },
   {
     id: 'owner',
     numeric: false,
     disablePadding: false,
     label: 'Owner',
+    width: '10%'
   },
   {
     id: 'acreage',
     numeric: false,
     disablePadding: false,
     label: 'Acreage',
+    width: '8%'
   },
   {
     id: 'type',
     numeric: false,
     disablePadding: false,
     label: 'Type',
+    width: '8%'
   },
   // {
   //     id: 'numberTruck',
@@ -118,12 +124,14 @@ const headCells = [
     numeric: false,
     disablePadding: false,
     label: 'Created At',
+    width: '10%'
   },
   {
     id: 'view',
     numeric: false,
     disablePadding: false,
     label: '',
+    width: '8%'
   },
 ];
 
