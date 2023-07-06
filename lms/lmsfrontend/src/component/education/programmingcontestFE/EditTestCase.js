@@ -1,10 +1,12 @@
-import {Button, CircularProgress, Grid, MenuItem, TextField,} from "@material-ui/core";
+import {Button, CircularProgress, Grid, MenuItem, TextField,} from "@mui/material";
+import PublishIcon from "@mui/icons-material/Publish";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import Typography from "@mui/material/Typography";
 import {useHistory, useParams} from "react-router-dom";
 import {request} from "../../../api";
 import {successNoti, warningNoti} from "../../../utils/notification";
+import HustContainerCard from "component/common/HustContainerCard";
 
 export default function EditTestCase(props) {
   const history = useHistory();
@@ -183,96 +185,106 @@ export default function EditTestCase(props) {
 
   return (
     <div>
-      <Grid container spacing={12}>
-        <Grid item xs={6}>
-          <Typography variant={"h5"}>Testcase</Typography>
-          <TextField
-            autoFocus
-            required
-            id="point"
-            label="Point"
-            placeholder="Point"
-            value={point}
-            onChange={(event) => {
-              setPoint(event.target.value);
-            }}
-          ></TextField>
-          <TextField
-            autoFocus
-            // required
-            select
-            id="Public TestCase"
-            label="Public TestCase"
-            placeholder="Public TestCase"
-            onChange={(event) => {
-              setIsPublic(event.target.value);
-            }}
-            value={isPublic}
-          >
-            <MenuItem key={"Y"} value={"Y"}>
-              {"Y"}
-            </MenuItem>
-            <MenuItem key={"N"} value={"N"}>
-              {"N"}
-            </MenuItem>
-          </TextField>
-          <br/>
-        </Grid>
-      </Grid>
-      <form onSubmit={handleFormSubmit}>
-        <Grid container spacing={1} alignItems="flex-end">
-          <Grid item xs={3}>
-            <input
-              type="file"
-              //accept=".c, .cpp, .java, .py"
-              id="selected-upload-file"
-              onChange={onFileChange}
+      <HustContainerCard title={'Testcase'}>
+        <Grid container spacing={2}>
+          <Grid item xs={2}>
+            <TextField
+              autoFocus
+              required
+              id="point"
+              label="Point"
+              placeholder="Point"
+              value={point}
+              onChange={(event) => {
+                setPoint(event.target.value);
+              }}
             />
           </Grid>
-          <br></br>
-          Description
-          <TextField
-            fullWidth
-            style={{
-              marginTop: "10px",
-              marginBottom: "24px",
-            }}
-            multiline
-            maxRows={10}
-            value={description}
-            onChange={(event) => {
-              setDescription(event.target.value);
-            }}
-          ></TextField>
-          Solution Output
-          <TextField
-            fullWidth
-            style={{
-              marginTop: "10px",
-              marginBottom: "24px",
-            }}
-            multiline
-            maxRows={10}
-            value={result}
-            onChange={(event) => {
-              setResult(event.target.value);
-            }}
-          ></TextField>
-          <Grid item xs={2}>
-            <Button
-              color="primary"
-              variant="contained"
-              type="submit"
-              onChange={onInputChange}
-              width="100%"
+          <Grid item xs={3}>
+            <TextField
+              autoFocus
+              // required
+              select
+              id="Public TestCase"
+              label="Public TestCase"
+              placeholder="Public TestCase"
+              style={{width: '150px'}}
+              onChange={(event) => {
+                setIsPublic(event.target.value);
+              }}
+              value={isPublic}
             >
-              SUBMIT
-            </Button>
-            <h2> Status: {uploadMessage}</h2>
+              <MenuItem key={"Y"} value={"Y"}>
+                {"Y"}
+              </MenuItem>
+              <MenuItem key={"N"} value={"N"}>
+                {"N"}
+              </MenuItem>
+            </TextField>
+            <br/>
           </Grid>
-          {isProcessing ? <CircularProgress/> : ""}
         </Grid>
-      </form>
+        <form onSubmit={handleFormSubmit}>
+          <Grid container spacing={1} alignItems="flex-end" mt={1}>
+            <Grid item xs={12}>
+              <Button color="primary" variant="outlined" component="label">
+                <PublishIcon/> Upload testcase file
+                <input hidden type="file" id="selected-upload-file" onChange={onFileChange}/>
+              </Button>
+            </Grid>
+            <br></br>
+            <Grid item xs={3}>
+              <Typography variant="h6">Description</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                style={{
+                  marginTop: "10px",
+                  marginBottom: "24px",
+                }}
+                multiline
+                maxRows={10}
+                value={description}
+                onChange={(event) => {
+                  setDescription(event.target.value);
+                }}
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <Typography variant="h6">Solution Output</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                style={{
+                  marginTop: "10px",
+                  marginBottom: "24px",
+                }}
+                multiline
+                maxRows={10}
+                value={result}
+                onChange={(event) => {
+                  setResult(event.target.value);
+                }}
+              />
+            </Grid>
+            <Grid item xs={2}>
+              <Button
+                color="primary"
+                variant="contained"
+                type="submit"
+                onChange={onInputChange}
+                width="100%"
+              >
+                SUBMIT
+              </Button>
+              <h2> Status: {uploadMessage}</h2>
+            </Grid>
+            {isProcessing ? <CircularProgress/> : ""}
+          </Grid>
+        </form>
+      </HustContainerCard>
     </div>
   );
 }
