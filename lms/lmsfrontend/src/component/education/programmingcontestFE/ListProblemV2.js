@@ -21,14 +21,8 @@ function ListProblemV2() {
   console.log(keycloak.profile);
   const [value, setValue] = useState(0);
   const [myProblems, setMyProblems] = useState([]);
-  const [pageMyProblems, setPageMyProblems] = useState(0);
-  const [sizeMyProblems, setSizeMyProblems] = useState(10);
-  const [totalMyProblems, setTotalMyProblems] = useState(0);
 
   const [sharedProblems, setSharedProblems] = useState([]);
-  const [pageSharedProblems, setPageSharedProblems] = useState(0);
-  const [sizeSharedProblems, setSizeSharedProblems] = useState(10);
-  const [totalSharedProblems, setTotalSharedProblems] = useState(0);
 
   const { t } = useTranslation("education/programmingcontest/listproblem");
 
@@ -135,7 +129,7 @@ function ListProblemV2() {
 
   const getProblems = useCallback((path, setData) => {
     request("get", path, (res) => {
-      const data = res.data.content.map((problem) => ({
+      const data = res.data.map((problem) => ({
         problemId: problem.problemId,
         problemName: problem.problemName,
         userId: problem.userId,
@@ -145,30 +139,27 @@ function ListProblemV2() {
         appearances: problem.appearances,
         statusId: problem.statusId,
       }));
-      const totalElements = res.data.totalElements;
-      setData(data, totalElements);
+      setData(data);
     }).then();
   }, []);
 
   useEffect(() => {
     getProblems(
-      `/get-all-my-problems?page=${pageMyProblems}&size=${sizeMyProblems}`,
-      (data, totalElements) => {
+      "/get-all-my-problems",
+      (data) => {
         setMyProblems(data);
-        setTotalMyProblems(totalElements);
       }
     );
-  }, [getProblems, pageMyProblems, sizeMyProblems]);
+  }, [getProblems]);
 
   useEffect(() => {
     getProblems(
-      `/get-all-shared-problems?page=${pageSharedProblems}&size=${sizeSharedProblems}`,
-      (data, totalElements) => {
+      "/get-all-shared-problems",
+      (data) => {
         setSharedProblems(data);
-        setTotalSharedProblems(totalElements);
       }
     );
-  }, [getProblems, pageSharedProblems, sizeSharedProblems]);
+  }, [getProblems]);
 
   return (
     <div>
@@ -204,7 +195,7 @@ function ListProblemV2() {
           key="my-problems"
           options={{
             selection: false,
-            pageSize: sizeMyProblems,
+            pageSize: 10,
             search: true,
             sorting: true,
           }}
@@ -220,23 +211,6 @@ function ListProblemV2() {
               },
             },
           ]}
-          components={{
-            Pagination: (props) => (
-              <TablePagination
-                {...props}
-                rowsPerPageOptions={PAGE_SIZES}
-                rowsPerPage={sizeMyProblems}
-                count={totalMyProblems}
-                page={pageMyProblems}
-                onPageChange={(e, value) => setPageMyProblems(value)}
-                onRowsPerPageChange={(e) => {
-                  setSizeMyProblems(e.target.value);
-                  setPageMyProblems(0);
-                }}
-                ActionsComponent={TablePaginationActions}
-              />
-            ),
-          }}
         />
       </TabPanelVertical>
       <TabPanelVertical value={value} index={1}>
@@ -248,26 +222,9 @@ function ListProblemV2() {
           key="sharedProblems"
           options={{
             selection: false,
-            pageSize: sizeSharedProblems,
+            pageSize: 10,
             search: true,
             sorting: true,
-          }}
-          components={{
-            Pagination: (props) => (
-              <TablePagination
-                {...props}
-                rowsPerPageOptions={PAGE_SIZES}
-                rowsPerPage={sizeSharedProblems}
-                count={totalSharedProblems}
-                page={pageSharedProblems}
-                onPageChange={(e, value) => setPageSharedProblems(value)}
-                onRowsPerPageChange={(e) => {
-                  setSizeSharedProblems(e.target.value);
-                  setPageSharedProblems(0);
-                }}
-                ActionsComponent={TablePaginationActions}
-              />
-            ),
           }}
         />
       </TabPanelVertical>

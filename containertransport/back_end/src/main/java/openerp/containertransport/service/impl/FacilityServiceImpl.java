@@ -51,7 +51,7 @@ public class FacilityServiceImpl implements FacilityService {
         facility.setFacilityName(facilityModel.getFacilityName());
         facility.setFacilityType(facilityModel.getFacilityType());
         facility.setMaxNumberContainer(facilityModel.getMaxNumberContainer());
-        facility.setMaxNumberTrailer(facilityModel.getNumberTrailer());
+        facility.setMaxNumberTrailer(facilityModel.getMaxNumberTrailer());
         facility.setMaxNumberTruck(facilityModel.getMaxNumberTruck());
         facility.setOwner(username);
         facility.setAcreage(facilityModel.getAcreage());
@@ -136,7 +136,7 @@ public class FacilityServiceImpl implements FacilityService {
             params.put("facilityName", facilityFilterRequestDTO.getFacilityName());
         }
         sql += " AND status != :statusNotEqual";
-        sqlCount += " AND status = :statusNotEqual";
+        sqlCount += " AND status != :statusNotEqual";
         params.put("statusNotEqual", Constants.FacilityStatus.DELETE.getStatus());
 
         if(!StringUtils.isEmpty(facilityFilterRequestDTO.getType())) {

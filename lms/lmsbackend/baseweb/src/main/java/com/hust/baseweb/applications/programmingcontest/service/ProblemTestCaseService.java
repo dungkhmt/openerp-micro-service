@@ -293,9 +293,9 @@ public interface ProblemTestCaseService {
 
     void exportProblem(String id, OutputStream outputStream);
 
-    Page<ProblemEntity> getOwnerProblemsPaging(Pageable pageable, String ownerId);
+    List<ProblemEntity> getOwnerProblems(String ownerId);
 
-    Page<ProblemEntity> getSharedProblemsPaging(Pageable pageable, String userId);
+    List<ProblemEntity> getSharedProblems(String userId);
 
     ModelCreateContestProblemResponse getContestProblemDetailByIdAndTeacher(String problemId, String teacherId) throws Exception;
 }

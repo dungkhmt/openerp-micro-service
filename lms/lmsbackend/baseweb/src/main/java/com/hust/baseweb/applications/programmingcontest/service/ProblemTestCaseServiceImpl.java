@@ -4141,8 +4141,13 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     public ModelCreateContestProblemResponse getContestProblemDetailByIdAndTeacher(String problemId, String teacherId)
             throws Exception {
-        boolean hasPermission = this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
-                teacherId, UserContestProblemRole.ROLE_VIEWER);
+        boolean hasPermission = 
+                this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
+                        teacherId, UserContestProblemRole.ROLE_OWNER)
+                        || this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
+                                teacherId, UserContestProblemRole.ROLE_EDITOR)
+                        || this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
+                                teacherId, UserContestProblemRole.ROLE_VIEWER);
         if (!hasPermission) {
             throw new MiniLeetCodeException("You don't have permission to view this problem", 403);
         }
@@ -4212,15 +4217,15 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return problemResponse;
     }
 
-    public Page<ProblemEntity> getOwnerProblemsPaging(Pageable pageable, String ownerId) {
+    public List<ProblemEntity> getOwnerProblems(String ownerId) {
         return this.problemRepo.findAll((root, query, criteriaBuilder) -> {
                 List<Predicate> predicates = new ArrayList<>();
                 predicates.add(criteriaBuilder.equal(root.get("userId"), ownerId));
                 return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
-            } , pageable);
+            });
     }
 
-    public Page<ProblemEntity> getSharedProblemsPaging(Pageable pageable, String userId) {
+    public List<ProblemEntity> getSharedProblems(String userId) {
         List<String> problemIds = this.userContestProblemRoleRepo.getProblemIdsShared(userId);
 
         return this.problemRepo.findAll((root, query, criteriaBuilder) -> {
@@ -4231,6 +4236,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     predicates.add(criteriaBuilder.equal(root.get("problemId"), ""));
                 }
                 return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
-            } , pageable);
+            });
     }
 }

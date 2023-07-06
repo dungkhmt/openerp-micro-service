@@ -170,7 +170,7 @@ export default function UserContestProblemRole() {
         onClose={handleModalClose}
         onUpdateInfo={onUpdateInfo}
         selectedUserId={selectedUserId}
-        rolesList={Object.values(PROBLEM_ROLE)}
+        rolesList={Object.values(PROBLEM_ROLE).filter((e) => e !== PROBLEM_ROLE.OWNER)}
       />
     </div>
   );
