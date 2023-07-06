@@ -98,7 +98,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         Gson gson = new Gson();
         ModelCreateContestProblem modelCreateContestProblem = gson.fromJson(json, ModelCreateContestProblem.class);
 
-        if (problemRepo.findByProblemId(modelCreateContestProblem.getProblemId()) != null) {
+        String problemId = modelCreateContestProblem.getProblemId().trim();
+
+        if (problemRepo.findByProblemId(problemId) != null) {
             throw new MiniLeetCodeException("problem id already exist");
         }
 
@@ -131,7 +133,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         });
 
         ProblemEntity problemEntity = ProblemEntity.builder()
-                                                   .problemId(modelCreateContestProblem.getProblemId())
+                                                   .problemId(problemId)
                                                    .problemName(modelCreateContestProblem.getProblemName())
                                                    .problemDescription(modelCreateContestProblem.getProblemDescription())
                                                    .memoryLimit(modelCreateContestProblem.getMemoryLimit())
@@ -564,7 +566,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     @Override
     public ContestEntity createContest(ModelCreateContest modelCreateContest, String userName) throws Exception {
         try {
-            ContestEntity contestEntityExist = contestRepo.findContestByContestId(modelCreateContest.getContestId());
+            String contestId = modelCreateContest.getContestId().trim();
+            ContestEntity contestEntityExist = contestRepo.findContestByContestId(contestId);
             if (contestEntityExist != null) {
                 throw new MiniLeetCodeException("Contest is already exist");
             }
@@ -573,7 +576,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
             if (modelCreateContest.getStartedAt() != null) {
                 contestEntity = ContestEntity.builder()
-                                             .contestId(modelCreateContest.getContestId())
+                                             .contestId(contestId)
                                              .contestName(modelCreateContest.getContestName())
                                              .contestSolvingTime(modelCreateContest.getContestTime())
 //                                             .problems(problemEntities)
@@ -601,7 +604,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .build();
             } else {
                 contestEntity = ContestEntity.builder()
-                                             .contestId(modelCreateContest.getContestId())
+                                             .contestId(contestId)
                                              .contestName(modelCreateContest.getContestName())
                                              .contestSolvingTime(modelCreateContest.getContestTime())
 //                                             .problems(problemEntities)
