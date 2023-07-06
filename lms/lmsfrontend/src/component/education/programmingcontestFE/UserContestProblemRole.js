@@ -15,10 +15,7 @@ import { errorNoti, successNoti } from "utils/notification";
 export default function UserContestProblemRole() {
   const {problemId} = useParams();
   const [searchUsers, setSearchUsers] = useState([]);
-  const [roles, setRoles] = useState([]);
-  const [keyword, setKeyword] = useState("");
-  const [pageSearchSize, setPageSearchSize] = useState(10);
-  const [totalPageSearch, setTotalPageSearch] = useState(0);
+  const [pageSearchSize, setPageSearchSize] = useState(5);
   const [pageSearch, setPageSearch] = useState(1);
   const [userRoles, setUserRoles] = useState([]);
   const [open, setOpen] = useState(false);
@@ -51,7 +48,6 @@ export default function UserContestProblemRole() {
   }
 
   function onUpdateInfo(selectRole, selectedUserId) {
-    //alert("onUpdateInfo " + selectRole + ":" + selectedUserId);
     let body = {
       problemId: problemId,
       userId: selectedUserId,
@@ -76,12 +72,6 @@ export default function UserContestProblemRole() {
     ).then();
   }
 
-  function getRoles() {
-    request("get", "/get-list-roles-contest", (res) => {
-      console.log("getRoles, res.data = ", res.data);
-      setRoles(res.data);
-    }).then();
-  }
 
   function getUserRoles() {
     request("get", "/get-user-contest-problem-roles/" + problemId, (res) => {
@@ -101,15 +91,12 @@ export default function UserContestProblemRole() {
       "&keyword=" +
       keyword,
       (res) => {
-        console.log("res search", res);
-        //setSearchUsers(res.data.contents.content);
         const data = res.data.contents.content.map((e, index) => ({
           index: index + 1,
           userName: e.userName,
           fullName: e.lastName + " " + e.middleName + " " + e.firstName,
         }));
         setSearchUsers(data);
-        setTotalPageSearch(res.data.contents.totalPages);
       }
     ).then();
   }
@@ -130,9 +117,8 @@ export default function UserContestProblemRole() {
               </SearchIconWrapper>
               <InputBase
                 style={{ paddingLeft: 50 }}
-                placeholder={"search..."}
+                placeholder={"Search User to add role"}
                 onChange={(event) => {
-                  setKeyword(event.target.value);
                   searchUser(event.target.value, pageSearchSize, pageSearch);
                 }}
               />
@@ -142,25 +128,25 @@ export default function UserContestProblemRole() {
       </Box>
 
       <StandardTable
-        title={"DS Users"}
+        // title={"DS Users"}
         columns={columns}
         data={searchUsers}
         hideCommandBar
         options={{
           selection: false,
-          pageSize: 20,
+          pageSize: pageSearchSize,
           search: true,
           sorting: true,
         }}
       />
       <StandardTable
-        title={"DS User & Roles"}
+        title={"User & Roles Management"}
         columns={columnUserRoles}
         data={userRoles}
         hideCommandBar
         options={{
           selection: false,
-          pageSize: 50,
+          pageSize: 10,
           search: true,
           sorting: true,
         }}
