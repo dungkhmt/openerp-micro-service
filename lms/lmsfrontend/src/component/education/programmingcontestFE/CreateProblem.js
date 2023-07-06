@@ -297,13 +297,16 @@ function CreateProblem() {
             fullWidth
             required
             id="timeLimitCPP"
-            label={t("timeLimit") + " - CPP"}
+            label={t("timeLimit")}
             type="number"
             value={timeLimitCPP}
             onChange={(event) => {
               setTimeLimitCPP(event.target.value);
             }}
-            InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>,}}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">CPP: </InputAdornment>,
+              endAdornment: <InputAdornment position="end">s</InputAdornment>
+            }}
           />
         </Grid>
 
@@ -312,13 +315,16 @@ function CreateProblem() {
             fullWidth
             required
             id="timeLimitJAVA"
-            label={t("timeLimit") + " - JAVA"}
+            label={t("timeLimit")}
             type="number"
             value={timeLimitJAVA}
             onChange={(event) => {
               setTimeLimitJAVA(event.target.value);
             }}
-            InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>,}}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">JAVA: </InputAdornment>,
+              endAdornment: <InputAdornment position="end">s</InputAdornment>
+            }}
           />
         </Grid>
 
@@ -333,7 +339,10 @@ function CreateProblem() {
             onChange={(event) => {
               setTimeLimitPYTHON(event.target.value);
             }}
-            InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>,}}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">PYTHON: </InputAdornment>,
+              endAdornment: <InputAdornment position="end">s</InputAdornment>
+            }}
           />
         </Grid>
 
