@@ -1,14 +1,16 @@
 import {LoadingButton} from "@mui/lab";
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import HustContainerCard from "../common/HustContainerCard";
 import XLSX from "xlsx";
 import {KC_REALM} from "../../config/keycloak";
 import {request} from "../../api";
 import {config} from "../../config/config";
-import {Button} from "@mui/material";
+import {Button, Divider, Grid, LinearProgress, Switch} from "@mui/material";
 import StandardTable from "../table/StandardTable";
 import {getColorSuccess} from "../education/programmingcontestFE/lib";
 import Box from "@mui/material/Box";
+import {defaultDatetimeFormat, toFormattedDateTime} from "../../utils/dateutils";
+import Typography from "@mui/material/Typography";
 
 function UploadUser() {
   const fileInputRef = useRef(null);
@@ -17,12 +19,20 @@ function UploadUser() {
   const [result, setResult] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [total, setTotal] = useState(0);
+
+  const [continueOnError, setContinueOnError] = useState(false);
+
   const downloadSampleFile = () => {
-    window.location.href = '/static/excels/sample-upload-user.xlsx';
+    window.location.href = '/static/excels/sample-upload-user_v2.xlsx';
   };
 
   function onFileChange(event) {
     setFile(event.target.files[0]);
+  }
+
+  function convertToUnixTimestamp(timeValue) {
+    return Math.floor(new Date(timeValue).getTime());
   }
 
   const handleUpload = () => {
@@ -32,7 +42,6 @@ function UploadUser() {
     if (fileInputRef.current) {
       fileInputRef.current.value = null;
     }
-    setLoading(false);
   }
 
   const handleUploadExcelUserList = () => {
@@ -44,44 +53,73 @@ function UploadUser() {
 
       // Assuming the first sheet in the workbook
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1, blankrows: false});
 
       const [headerRow, ...dataRows] = jsonData;
 
-      dataRows.forEach((row, index) => {
-        setTimeout(() => {addUser(row);}, index * 1000);
-      });
+      setTotal(dataRows.length);
+
+      // dataRows.forEach((row, index) => {
+      //   let timeoutId = setTimeout(
+      //     () => {
+      //       try {
+      //         addUser(row);
+      //       } catch (error) {
+      //         console.error(error);
+      //         clearTimeout(timeoutId); // Stop further execution of addUser if an error occurs
+      //       }
+      //     },
+      //     index * 600
+      //   );
+      // });
+
+      let idx = 0;
+      let intervalUploadUser = setInterval(() => {
+        if (idx < dataRows.length) {
+          addUser(dataRows[idx], intervalUploadUser);
+          idx++;
+        }
+      }, 1000);
+
     };
 
     reader.readAsArrayBuffer(file);
   }
 
-  const addUser = (row) => {
-    // Assuming the column order is: Email, Username, Firstname, Lastname, Password
+  const addUser = (row, intervalUploadUser) => {
+    // Assuming the column order is: Email, Username, Firstname, Lastname, Password, Enable, Created At
     let email = row[0];
     let username = !row[1] ? email.split('@')[0] : row[1];
     let firstName = row[2] || "";
     let lastName = row[3] || "";
     let password = row[4] || "password";
+    let enable = row[5];
+    let createdTimestamp = row[6] ? convertToUnixTimestamp(row[6]) : Math.floor(Date.now());
+    let group = row[7] ? row[7] : "STUDENT";
 
     let data = {
-      "username": username,
       "email": email,
+      "username": username,
       "firstName": firstName,
       "lastName": lastName,
-      "enabled": true,
-      "emailVerified": true,
-      "requiredActions": [],
+      "enabled": enable,
+      "emailVerified": false,
+      "requiredActions": ["VERIFY_EMAIL"],
       "groups": [
-        "/STUDENT"
+        group
       ],
       "credentials": [
         {
           "type": "password",
-          "value": password,
-          "temporary": true
+          "secretData": '{"value":"' + password + '","salt":""}',
+          "credentialData": '{"hashIterations":10,"algorithm":"bcrypt"}', // default
+          // "value": password,
+          // "temporary": true
         }
-      ]
+      ],
+      "attributes": {
+        "oldCreatedAt": createdTimestamp,
+      },
     };
 
     const headerConfig = {
@@ -96,13 +134,24 @@ function UploadUser() {
       (res) => {
         data.status = "SUCCESS";
         data.message = "";
+        data.password = password;
+        data.createdAt = createdTimestamp;
+        data.doneAt = defaultDatetimeFormat(new Date());
         setResult(result => [...result, data]);
       },
       {
         409: (err) => {
           data.status = "FAIL";
           data.message = err?.response.data.errorMessage || "";
+          data.password = password;
+          data.createdAt = createdTimestamp;
+          data.doneAt = defaultDatetimeFormat(new Date());
           setResult(result => [...result, data]);
+
+          if (!continueOnError) {
+            clearInterval(intervalUploadUser);
+            setLoading(false);
+          }
         }
       },
       data,
@@ -113,8 +162,8 @@ function UploadUser() {
   const columns = [
     {title: "Username", field: "username"},
     {title: "Email", field: "email"},
-    {title: "First name", field: "firstName"},
-    {title: "Last name", field: "lastName"},
+    // {title: "First name", field: "firstName"},
+    // {title: "Last name", field: "lastName"},
     {
       title: "Status",
       field: "status",
@@ -124,18 +173,106 @@ function UploadUser() {
         </span>
       )
     },
-    {title: "Message", field: "message"}
+    {title: "Message", field: "message"},
+    {title: "Done At", field: "doneAt"},
   ];
 
+  useEffect(() => {
+    if (result.length === total) setLoading(false);
+  }, [result])
+
+  const downloadHandler = (event) => {
+    if (result.length === 0) {
+      return;
+    }
+
+    var wbcols = [];
+
+    wbcols.push({wpx: 180});
+    wbcols.push({wpx: 120});
+    wbcols.push({wpx: 100});
+    wbcols.push({wpx: 100});
+    wbcols.push({wpx: 100});
+    wbcols.push({wpx: 60});
+    wbcols.push({wpx: 60});
+    wbcols.push({wpx: 120});
+    wbcols.push({wpx: 120});
+    wbcols.push({wpx: 120});
+
+    let datas = [];
+
+    for (let i = 0; i < result.length; i++) {
+      let data = {};
+      data["Email"] = result[i].email;
+      data["Username"] = result[i].username;
+      data["First Name"] = result[i].firstName;
+      data["Last Name"] = result[i].lastName;
+      data["Password"] = result[i].password;
+      data["Enabled"] = result[i].enabled;
+      data["Status"] = result[i].status;
+      data["Message"] = result[i].message;
+      data["Created At"] = toFormattedDateTime(result[i].createdAt);
+      data["Done At"] = result[i].doneAt;
+
+      datas[i] = data;
+    }
+
+    var sheet = XLSX.utils.json_to_sheet(datas);
+    var wb = XLSX.utils.book_new();
+    sheet["!cols"] = wbcols;
+
+    XLSX.utils.book_append_sheet(wb, sheet, "result");
+    XLSX.writeFile(
+      wb,
+      "upload_user_result.xlsx"
+    );
+  };
+
   return (
-    <HustContainerCard>
-      <Box sx={{margin: "24px 0 12px 24px"}}>
-        <input type="file" id="selected-upload-file" onChange={onFileChange} ref={fileInputRef}/>
-        <LoadingButton variant={"contained"} loading={loading} disabled={!fileInputRef.current} onClick={handleUpload}>
-          Upload
-        </LoadingButton>
-        <Button sx={{marginLeft: "18px"}} variant={"outlined"} onClick={downloadSampleFile}>Download Template</Button>
+    <HustContainerCard title="Upload Users">
+      <Grid container spacing={1} alignItems="center" sx={{margin: "0 24px 24px 4px"}}>
+        <Grid item xs={3}>
+          <input type="file" id="selected-upload-file" onChange={onFileChange} ref={fileInputRef}/>
+        </Grid>
+        <Grid item xs={3}>
+          <Button sx={{marginLeft: "18px"}} variant={"outlined"} onClick={downloadSampleFile}>Download Template</Button>
+        </Grid>
+        <Grid item xs={2}/>
+        <Grid item xs={4}>
+          Continue when error happen
+          <Switch checked={continueOnError} onChange={(event) => setContinueOnError(event.target.checked)}/>
+        </Grid>
+      </Grid>
+
+      <Box sx={{display: "flex", justifyContent: "center"}}>
+        <Divider light={true} sx={{width: "20%"}}/>
       </Box>
+
+      <Grid container spacing={1} alignItems="center" sx={{margin: "12px 0 16px 4px"}}>
+        <Grid item xs={2}>
+          {!loading &&
+            <LoadingButton color="success" variant={"contained"} loading={loading} disabled={!fileInputRef.current}
+                           onClick={handleUpload}>
+              Start
+            </LoadingButton>
+          }
+          {loading &&
+            <LoadingButton color="error" variant={"contained"} onClick={handleUpload}>
+              Stop
+            </LoadingButton>
+          }
+        </Grid>
+        <Grid item xs={1}>
+          <Typography variant="body2" color="text.secondary">Progress:</Typography>
+        </Grid>
+        <Grid item xs={8}>
+          <LinearProgress variant="determinate" value={total === 0 ? 0 : result.length * 100 / total}/>
+        </Grid>
+        <Grid item xs={1}>
+          <Typography variant="body2" color="text.secondary">{`${result.length}/${total}`}</Typography>
+        </Grid>
+      </Grid>
+
       <Box sx={{padding: "12px"}}>
         <StandardTable
           title={"Result"}
@@ -144,10 +281,21 @@ function UploadUser() {
           data={result}
           options={{
             selection: false,
-            pageSize: 20,
+            pageSize: 10,
             search: true,
             sorting: true,
           }}
+          actions={[
+            {
+              icon: () => {
+                return <Button variant="contained" onClick={downloadHandler} color="primary">
+                  Export
+                </Button>
+              },
+              tooltip: 'Export Result as Excel file',
+              isFreeAction: true
+            }
+          ]}
         />
       </Box>
 
