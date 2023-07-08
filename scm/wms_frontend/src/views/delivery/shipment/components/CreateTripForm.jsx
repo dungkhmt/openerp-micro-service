@@ -32,7 +32,7 @@ const CreateTripForm = ({ setIsAdd, currShipment }) => {
     let tripParams = {
       createdDate: moment(data?.startDate).format("DD-MM-YYYY"),
       shipmentCode: currShipment?.code,
-      userInCharge: data?.userInCharge?.name,
+      userInCharge: data?.userInCharge?.id,
       facilityCode: data?.facility?.code,
     };
     await createTripQuery.mutateAsync(tripParams);
@@ -57,7 +57,13 @@ const CreateTripForm = ({ setIsAdd, currShipment }) => {
                 userInCharge
                   ? userInCharge?.map((user) => {
                       return {
-                        name: user?.id,
+                        name:
+                          user?.firstName +
+                          " " +
+                          user?.middleName +
+                          " " +
+                          user?.lastName,
+                        id: user?.id,
                       };
                     })
                   : []

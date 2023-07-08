@@ -33,6 +33,7 @@ import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { ORDERS_STATUS } from "shared/AppConstants";
+import { convertUserToName } from "../../utils/GlobalUtils";
 import { receiptBillCols } from "./LocalConstant";
 import CreatePurchaseBill from "./components/CreatePurchaseBill";
 
@@ -270,7 +271,7 @@ function PurchaseOrderDetailScreen({}) {
               color: AppColors.secondary,
             }}
           >
-            {currOrder?.user?.id}
+            {convertUserToName(currOrder?.user)}
           </Typography>
         </Stack>
         <Stack sx={{ flexDirection: "row" }}>

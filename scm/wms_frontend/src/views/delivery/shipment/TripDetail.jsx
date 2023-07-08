@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import { useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
+import { convertUserToName } from "../../../utils/GlobalUtils";
 import { shipmentItemCols } from "../LocalConstant";
 
 // var intervalID;
@@ -125,22 +126,76 @@ function TripScreen({ screenAuthorization }) {
             THÔNG TIN CƠ BẢN
           </Typography>
         </Stack>
-        <Typography
-          sx={{
-            marginTop: 2,
-          }}
-        >
-          1. Mã chuyến: {currTrip?.code}
-        </Typography>
-        <Typography>
-          2. Ngày bắt đầu:
-          {unix(currTrip?.startedDate).format("DD-MM-YYYY")}
-        </Typography>
-        <Typography>
-          3. Người thực hiện:
-          {currTrip?.userInCharge?.id}
-        </Typography>
-        <Typography>4. Đơn hàng:</Typography>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            1. Mã chuyến:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {currTrip?.code}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            2. Ngày bắt đầu:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {unix(currTrip?.startedDate).format("DD-MM-YYYY")}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            3. Người thực hiện:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {convertUserToName(currTrip?.userInCharge)}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            4. Đơn hàng
+          </Typography>
+        </Stack>
       </Box>
       <CustomDataGrid
         params={params}

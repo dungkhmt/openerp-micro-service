@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
+import { convertUserToName } from "../../../utils/GlobalUtils";
 import { staticCustomerField } from "../../category/LocalConstant";
 function FacilityDetailScreen() {
   const [params, setParams] = useState({
@@ -111,7 +112,7 @@ function FacilityDetailScreen() {
               color: AppColors.secondary,
             }}
           >
-            {facility?.manager?.firstName || "" + facility?.creator?.lastName}
+            {convertUserToName(facility?.manager)}
           </Typography>
         </Stack>
         <Stack sx={{ flexDirection: "row" }}>
@@ -131,7 +132,7 @@ function FacilityDetailScreen() {
               color: AppColors.secondary,
             }}
           >
-            {facility?.creator?.firstName || "" + facility?.creator?.lastName}
+            {convertUserToName(facility?.creator)}
           </Typography>
         </Stack>
         <Stack sx={{ flexDirection: "row" }}>

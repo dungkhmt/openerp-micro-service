@@ -8,6 +8,7 @@ import SearchBoxMap from "../../../../components/map/SearchBoxMap";
 import { useCreateFacility } from "../../../../controllers/query/facility-query";
 import { useGetAllUsersExist } from "../../../../controllers/query/user-query";
 import { AppColors } from "../../../../shared/AppColors";
+import { convertUserToName } from "../../../../utils/GlobalUtils";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
@@ -37,7 +38,7 @@ const CreateFacilityForm = ({ setIsAdd }) => {
       address: data?.address,
       latitude: selectPosition?.lat.toString(),
       longitude: selectPosition?.lng.toString(),
-      managedBy: data?.managedBy?.name,
+      managedBy: data?.managedBy?.id,
       name: data?.name,
     };
     await createFacilityQuery.mutateAsync(facilityParams);
@@ -94,7 +95,8 @@ const CreateFacilityForm = ({ setIsAdd }) => {
                 users
                   ? users?.map((user) => {
                       return {
-                        name: user?.id,
+                        name: convertUserToName(user),
+                        id: user?.id,
                       };
                     })
                   : []

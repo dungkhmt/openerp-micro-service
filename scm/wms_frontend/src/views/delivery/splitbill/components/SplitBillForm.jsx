@@ -63,9 +63,7 @@ const SplitBillForm = ({
         isSelectable={true}
         params={params}
         setParams={setParams}
-        // sx={{ height: height - 64 - 71 - 24 - 20 - 35 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom - Page Title
-        // isLoading={}
-        totalItem={100}
+        hideFooterPagination={true}
         columns={[
           {
             field: "productName",

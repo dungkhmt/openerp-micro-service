@@ -1,6 +1,5 @@
 package wms.entity;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +9,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "entity_authorization")
+@Table(name = "scm_entity_authorization")
 public class EntityAuthorization {
     @Id
     private String id;

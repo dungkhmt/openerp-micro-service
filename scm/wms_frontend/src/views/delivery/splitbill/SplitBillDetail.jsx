@@ -142,7 +142,11 @@ function SplitBillDetailScreen({ screenAuthorization }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} containSearch={false} />
+        <CustomToolBar
+          actions={actions}
+          containSearch={false}
+          containFilter={false}
+        />
       </Box>
       <Box>
         <Stack direction={"row"} spacing={2} alignItems={"center"} marginY={2}>
@@ -168,10 +172,66 @@ function SplitBillDetailScreen({ screenAuthorization }) {
             THÔNG TIN CƠ BẢN
           </Typography>
         </Stack>
-        <Typography></Typography>
-        <Typography>1. Mã đơn : {currBills?.code}</Typography>
-        <Typography>2. Mã order: {currBills?.saleOrder?.code}</Typography>
-        <Typography>3. Tổng số item: {deliveryBillItems?.length}</Typography>
+        <Stack sx={{ flexDirection: "row", marginTop: 2 }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            1. Mã đơn:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {currBills?.code}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            2. Mã order:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {currBills?.saleOrder?.code}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row" }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            3. Tổng số item:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {deliveryBillItems?.length}
+          </Typography>
+        </Stack>
       </Box>
       <Stack
         direction={"row"}

@@ -34,6 +34,7 @@ import {
 } from "../../controllers/query/sale-order-query";
 import { AppColors } from "../../shared/AppColors";
 import { ORDERS_STATUS } from "../../shared/AppConstants";
+import { convertUserToName } from "../../utils/GlobalUtils";
 import { deliveryBillCols } from "./LocalConstant";
 import CreateDeliveryBill from "./components/CreateDeliveryBill";
 function SaleOrderDetailScreen() {
@@ -109,7 +110,6 @@ function SaleOrderDetailScreen() {
   const updateSaleOrderQuery = useUpdateSaleOrderStatus({
     orderCode: currOrder?.code,
   });
-  console.log("Curr: ", currOrder);
   const renderCustomTable = useCallback(() => {
     return (
       <CustomOrderTable
@@ -228,7 +228,7 @@ function SaleOrderDetailScreen() {
               color: AppColors.secondary,
             }}
           >
-            {currOrder?.user?.id}
+            {convertUserToName(currOrder?.user)}
           </Typography>
         </Stack>
         <Stack sx={{ flexDirection: "row" }}>
