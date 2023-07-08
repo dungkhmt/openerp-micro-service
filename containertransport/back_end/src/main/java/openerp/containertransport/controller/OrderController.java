@@ -26,7 +26,9 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createOrder(@RequestBody OrderModel orderModel) {
+    public ResponseEntity<?> createOrder(@RequestBody OrderModel orderModel, JwtAuthenticationToken token) {
+        String username = token.getName();
+        orderModel.setUsername(username);
         List<OrderModel> orders = orderService.createOrder(orderModel);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orders));
     }

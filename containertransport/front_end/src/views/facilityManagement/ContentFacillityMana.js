@@ -98,27 +98,6 @@ const headCells = [
     label: 'Type',
     width: '8%'
   },
-  // {
-  //     id: 'numberTruck',
-  //     numeric: false,
-  //     disablePadding: false,
-  //     label: 'Number Truck',
-  //     width: '8%'
-  // },
-  // {
-  //     id: 'numberTrailer',
-  //     numeric: false,
-  //     disablePadding: false,
-  //     label: 'Number Trailer',
-  //     width: '8%'
-  // },
-  // {
-  //     id: 'numberContainer',
-  //     numeric: false,
-  //     disablePadding: false,
-  //     label: 'Number Container',
-  //     width: '8%'
-  // },
   {
     id: 'createdAt',
     numeric: false,
@@ -323,7 +302,7 @@ export default function ContentsFacilityMana({ facilities, page, setPage, rowsPe
                       <TableCell align="left">{row.facilityName}</TableCell>
                       <TableCell align="left">{row.address}</TableCell>
                       <TableCell align="left">{row.owner}</TableCell>
-                      <TableCell align="left">{row.acreage}</TableCell>
+                      <TableCell align="left">{row.acreage} (m2)</TableCell>
                       <TableCell align="left">{row.facilityType}</TableCell>
                       <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell >

@@ -325,6 +325,7 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
             if (ordersSelect) {
                 ordersSelect.forEach((item) => {
                     let check = false;
+                    console.log("item", item)
                     // let facilitiesOrder = facilities.filter((item) => item.type = "order")
                     // neu da ton tai order trong router
                     facilitiesTmp?.forEach((faci) => {
@@ -344,8 +345,8 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                             action: "PICKUP-CONTAINER",
                             orderCode: item?.orderCode,
                             orderId: item.id,
-                            containerId: item?.container.id,
-                            containerCode: item?.container.containerCode,
+                            containerId: item?.containerModel?.id,
+                            containerCode: item?.containerModel?.containerCode,
                             longitude: item?.fromFacility.longitude,
                             latitude: item?.fromFacility.latitude,
                             arrivalTime: null,
@@ -362,8 +363,8 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                             action: "DELIVERY-CONTAINER",
                             orderCode: item?.orderCode,
                             orderId: item.id,
-                            containerId: item?.container.id,
-                            containerCode: item?.container.containerCode,
+                            containerId: item?.containerModel?.id,
+                            containerCode: item?.containerModel.containerCode,
                             longitude: item?.toFacility.longitude,
                             latitude: item?.toFacility.latitude,
                             arrivalTime: null,

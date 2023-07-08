@@ -144,6 +144,12 @@ public class FacilityServiceImpl implements FacilityService {
             sqlCount += " AND facility_type = :type";
             params.put("type", facilityFilterRequestDTO.getType());
         }
+
+        if(!StringUtils.isEmpty(facilityFilterRequestDTO.getTypeOwner())) {
+            sql += " AND type_owner = :typeOwner";
+            sqlCount += " AND type_owner = :typeOwner";
+            params.put("typeOwner", facilityFilterRequestDTO.getTypeOwner());
+        }
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
         for (String i : params.keySet()) {
             queryCount.setParameter(i, params.get(i));

@@ -136,7 +136,7 @@ roles.set("Customer", "TMS_CUSTOMER");
 roles.set("Driver", "TMS_DRIVER");
 
 export const facilityType = new Map();
-facilityType.set("Depot", "Depot");
+facilityType.set("Container", "Container");
 facilityType.set("Truck", "Truck");
 facilityType.set("Trailer", "Trailer");
 

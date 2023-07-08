@@ -21,6 +21,7 @@ const NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/search?";
 
 const FacilityModal = ({ open, handleClose, facility, setToast, setToastType, setToastMsg }) => {
     const [type, setType] = useState('');
+    const [typeOwner, setTypeOwner] = useState('');
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
     const [maxTruck, setMaxTruck] = useState('');
@@ -48,7 +49,8 @@ const FacilityModal = ({ open, handleClose, facility, setToast, setToastType, se
             setMaxTruck(facility?.maxNumberTruck);
         }
         if (role === roles.get("Customer")) {
-            setType(facilityType.get("Depot"));
+            setType(facilityType.get("Container"));
+            setTypeOwner("CUSTOMER");
         }
     }, [])
     const typeConst = [
@@ -69,6 +71,7 @@ const FacilityModal = ({ open, handleClose, facility, setToast, setToastType, se
             maxNumberTruck: type === "Truck" ? maxTruck : null,
             maxNumberTrailer: type === "Trailer" ? maxTrailer : null,
             maxNumberContainer: type === "Container" ? maxContainer : null,
+            typeOwner: typeOwner
         }
         console.log("data", data);
         if (facility) {

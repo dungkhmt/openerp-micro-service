@@ -35,6 +35,7 @@ public class TruckServiceImpl implements TruckService  {
         Truck truck = new Truck();
         truck.setFacility(facility);
         truck.setDriverName(truckModel.getDriverName());
+        truck.setDriverId(truckModel.getDriverId());
         truck.setLicensePlates(truckModel.getLicensePlates());
         truck.setBrandTruck(truckModel.getBrandTruck());
         truck.setStatus("AVAILABLE");

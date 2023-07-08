@@ -11,6 +11,7 @@ public class FacilityFilterRequestDTO {
     private String facilityCode;
     private String status;
     private String type;
+    private String typeOwner;
     private Integer page;
     private Integer pageSize;
     private String owner;

@@ -46,12 +46,12 @@ public class Order {
     private Container container;
 
     @ManyToOne()
-    @JoinColumn(name = "from_facility", referencedColumnName = "id")
+    @JoinColumn(name = "from_facility", referencedColumnName = "uid")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Facility fromFacility;
 
     @ManyToOne()
-    @JoinColumn(name = "to_facility", referencedColumnName = "id")
+    @JoinColumn(name = "to_facility", referencedColumnName = "uid")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Facility toFacility;
 

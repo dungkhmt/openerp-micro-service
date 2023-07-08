@@ -23,8 +23,8 @@ public class OrderModel implements Serializable {
     private String customerId;
     private List<Integer> containerIds;
     private FacilityResponsiveDTO fromFacility;
-    private Long fromFacilityId;
-    private Long toFacilityId;
+    private String fromFacilityId;
+    private String toFacilityId;
     private FacilityResponsiveDTO toFacility;
     private List<Container> containers;
     private long earlyDeliveryTime;
@@ -34,4 +34,5 @@ public class OrderModel implements Serializable {
     private String status;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private String username;
 }

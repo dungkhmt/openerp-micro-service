@@ -11,7 +11,7 @@ import React, { useEffect, useState } from "react";
 import { request } from "api";
 import './styles.scss';
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { getFacility } from "api/FacilityAPI";
+import { getFacility, getFacilityOwner } from "api/FacilityAPI";
 import { getContainerById, getContainers } from "api/ContainerAPI";
 import dayjs from "dayjs";
 import { updateOrder } from "api/OrderAPI";
@@ -57,6 +57,7 @@ const styles = {
 const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, order }) => {
     const [type, setType] = useState('');
     const [facilities, setFacilities] = useState([]);
+    const [fromFacilities, setFromFacilities] = useState([]);
     const [fromFacility, setFromFacility] = useState('');
     const [toFacility, setToFaciity] = useState('');
     const [containers, setContainers] = useState([]);
@@ -94,15 +95,24 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             }
             // setEarlyDeliveryTime(dayjs(new Date(order?.earlyDeliveryTime)));
         }
-        getFacility({}).then((res) => {
+        getFacility({typeOwner: "CUSTOMER"}).then((res) => {
             console.log("facility==========", res.data)
             setFacilities(res.data.data.facilityModels);
         });
-        getContainers({}).then((res) => {
+        getFacilityOwner({})
+        .then((res) => {
+            setFromFacilities(res?.data.data.facilityModels);
+        });
+        
+    }, []);
+
+    useEffect(() => {
+        getContainers({facilityId: fromFacility}).then((res) => {
             console.log("container==========", res.data)
             setContainers(res.data.data.containerModels);
         });
-    }, []);
+    }, [fromFacility]);
+    
     const typeConst = [
         { name: "Inbound Empty", id: "IE" },
         { name: "Inbound Full", id: "IF" },
@@ -188,8 +198,9 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             values.map((item) => containerIds.push(item.id))
         }
         setContainerSelect(containerIds);
+        setContainerOrder(values);
     }
-    console.log("type", type)
+    console.log("containerSelect", containerSelect)
     return (
         <Box >
             <CustomizedDialogs
@@ -246,10 +257,10 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                                         label="from facility"
                                                         disabled={type === "OE" ? true : false}
                                                     >
-                                                        {facilities ? (
-                                                            facilities.map((item) => {
+                                                        {fromFacilities ? (
+                                                            fromFacilities.map((item) => {
                                                                 return (
-                                                                    <MenuItem value={item.id}>{item.facilityName}</MenuItem>
+                                                                    <MenuItem value={item.uid}>{item.facilityName}</MenuItem>
                                                                 );
                                                             })
                                                         ) : null}

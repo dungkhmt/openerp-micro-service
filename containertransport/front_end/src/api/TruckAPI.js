@@ -39,3 +39,11 @@ export const deleteTruck = (uid) => {
     )
     return resData;
 }
+
+export const getAllDriver = () => {
+    const resData = request(
+        "get",
+        `https://openerp3.dailyopt.ai/iam/admin/realms/OpenERP-Dev/roles/TMS_DRIVER/users?first=0&max=101`, {}, {}, {}, {},
+    )
+    return resData;
+}
