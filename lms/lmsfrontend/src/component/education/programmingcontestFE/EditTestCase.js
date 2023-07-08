@@ -185,12 +185,13 @@ export default function EditTestCase(props) {
 
   return (
     <div>
-      <HustContainerCard title={'Testcase'}>
+      <HustContainerCard title={'Edit Testcase'}>
         <Grid container spacing={2}>
           <Grid item xs={2}>
             <TextField
               autoFocus
               required
+              type="number"
               id="point"
               label="Point"
               placeholder="Point"
@@ -202,7 +203,6 @@ export default function EditTestCase(props) {
           </Grid>
           <Grid item xs={3}>
             <TextField
-              autoFocus
               // required
               select
               id="Public TestCase"
@@ -233,11 +233,9 @@ export default function EditTestCase(props) {
               </Button>
             </Grid>
             <br></br>
-            <Grid item xs={3}>
-              <Typography variant="h6">Description</Typography>
-            </Grid>
             <Grid item xs={12}>
               <TextField
+                label="Description"
                 fullWidth
                 style={{
                   marginTop: "10px",
@@ -251,11 +249,9 @@ export default function EditTestCase(props) {
                 }}
               />
             </Grid>
-            <Grid item xs={3}>
-              <Typography variant="h6">Solution Output</Typography>
-            </Grid>
             <Grid item xs={12}>
               <TextField
+                label="Solution Output"
                 fullWidth
                 style={{
                   marginTop: "10px",
@@ -279,7 +275,7 @@ export default function EditTestCase(props) {
               >
                 SUBMIT
               </Button>
-              <h2> Status: {uploadMessage}</h2>
+              {!isProcessing && <h2> Status: {uploadMessage}</h2>}
             </Grid>
             {isProcessing ? <CircularProgress/> : ""}
           </Grid>
