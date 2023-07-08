@@ -8,10 +8,7 @@ import openerp.containertransport.dto.TripDeleteDTO;
 import openerp.containertransport.dto.TripFilterRequestDTO;
 import openerp.containertransport.dto.TripItemModel;
 import openerp.containertransport.dto.TripModel;
-import openerp.containertransport.entity.Order;
-import openerp.containertransport.entity.Shipment;
-import openerp.containertransport.entity.Trip;
-import openerp.containertransport.entity.Truck;
+import openerp.containertransport.entity.*;
 import openerp.containertransport.repo.*;
 import openerp.containertransport.service.TripItemService;
 import openerp.containertransport.service.TripService;
@@ -28,6 +25,7 @@ public class TripServiceImpl implements TripService {
     private final TripItemService tripItemService;
     private final TripItemRepo tripItemRepo;
     private final TruckRepo truckRepo;
+    private final TrailerRepo trailerRepo;
     private final ModelMapper modelMapper;
     private final OrderRepo orderRepo;
     private final ShipmentRepo shipmentRepo;
@@ -209,6 +207,20 @@ public class TripServiceImpl implements TripService {
                     order.setStatus(Constants.OrderStatus.ORDERED.getStatus());
                     orderRepo.save(order);
                 });
+
+                Truck truck = truckRepo.findByUid(trip.getTruck().getUid());
+                truck.setStatus(Constants.TruckStatus.AVAILABLE.getStatus());
+                truckRepo.save(truck);
+
+                List<TripItem> tripItems = tripItemRepo.findByTripId(tripUid);
+                tripItems.forEach((item) -> {
+                    if(item.getTrailer() != null) {
+                        Trailer trailer = item.getTrailer();
+                        trailer.setStatus(Constants.TrailerStatus.AVAILABLE.getStatus());
+                        trailerRepo.save(trailer);
+                    }
+                });
+
                 Trip tripDelete = tripRepo.deleteTripByUid(tripUid);
                 tripModels.add(convertToModel(tripDelete));
             }

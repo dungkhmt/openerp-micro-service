@@ -3,6 +3,7 @@ package openerp.containertransport.algorithms.solver;
 import lombok.*;
 import openerp.containertransport.algorithms.entity.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -17,5 +18,5 @@ public class TransportContainerInput {
     private List<ContainerInput> containerInputs;
     private List<DistanceElement> distances;
     private List<FacilityInput> facilityInputs;
-    private Long startTime;
+    private BigDecimal startTime;
 }

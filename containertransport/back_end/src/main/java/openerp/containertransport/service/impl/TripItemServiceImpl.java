@@ -35,7 +35,7 @@ public class TripItemServiceImpl implements TripItemService {
             containerRepo.save(container);
         }
         if(tripItemModel.getTrailerId() != null) {
-            Trailer trailer = trailerRepo.findById(tripItemModel.getTrailerId()).get();
+            Trailer trailer = trailerRepo.findByTrailerId(tripItemModel.getTrailerId());
             trailer.setStatus(Constants.TrailerStatus.SCHEDULED.getStatus());
 
             tripItem.setTrailer(trailer);
