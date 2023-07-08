@@ -39,7 +39,11 @@ function SplitBillScreen({ screenAuthorization }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} containSearch={false} />
+        <CustomToolBar
+          actions={actions}
+          containSearch={false}
+          containFilter={false}
+        />
       </Box>
       <Box>
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
@@ -65,15 +69,36 @@ function SplitBillScreen({ screenAuthorization }) {
             THÔNG TIN CƠ BẢN
           </Typography>
         </Stack>
-        <Typography
-          sx={{
-            fontSize: 16,
-            marginTop: 2,
-          }}
-        >
-          1. Tổng đơn cần chia: {data?.content?.length}
-        </Typography>
-        <Typography sx={{ marginBottom: 2 }}>2. Chi tiết</Typography>
+        <Stack sx={{ flexDirection: "row", marginTop: 2 }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            1. Tổng đơn cần chia:
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+              fontWeight: "bold",
+              color: AppColors.secondary,
+            }}
+          >
+            {data?.content?.length}
+          </Typography>
+        </Stack>
+        <Stack sx={{ flexDirection: "row", marginBottom: 2 }}>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: AppColors.green,
+            }}
+          >
+            2. Chi tiết
+          </Typography>
+        </Stack>
       </Box>
       <CustomDataGrid
         params={params}

@@ -30,6 +30,7 @@ const getColumnsShow = (columns, isSerial, params) => {
  * @typedef Prop
  * @property {boolean} isSerial
  * @property {boolean} isSelectable
+ * @property {boolean} hideFooterPagination
  * @property {import("@mui/x-data-grid").GridRowProps[]} rows
  * @property {import("@mui/x-data-grid").GridColDef[]} columns
  * @property {number} totalItem
@@ -63,6 +64,7 @@ const CustomDataGrid = (props) => {
     size,
     columnGroupingModel,
     handlePaginationModelChange,
+    hideFooterPagination = false,
     sx,
   } = props;
 
@@ -155,6 +157,7 @@ const CustomDataGrid = (props) => {
       // isRowSelectable={() => {
       //   return isSelectable;          Got bug if turn this thing on: Uncaught Error: No row with id #... found
       // }}
+      hideFooterPagination={hideFooterPagination}
       pageSizeOptions={[5, 10, 25]}
       rowCount={rowCountState}
       paginationModel={{

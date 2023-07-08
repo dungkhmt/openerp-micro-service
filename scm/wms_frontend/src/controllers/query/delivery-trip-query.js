@@ -212,13 +212,12 @@ export const useCreateDrone = (params) => {
         data
       );
       if (res.data && res.code === 1) {
+        toast.success("Tạo thành công!");
+        queryClient.invalidateQueries([queryKey.delivery_trip.drone_list]);
         return res.data;
       }
     },
-    onSuccess: (res, variables, context) => {
-      toast.success("Tạo thành công!");
-      queryClient.invalidateQueries([queryKey.delivery_trip.drone_list]);
-    },
+    onSuccess: (res, variables, context) => {},
     onError: () => {
       toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
     },

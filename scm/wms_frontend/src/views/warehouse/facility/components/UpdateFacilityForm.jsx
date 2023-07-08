@@ -5,6 +5,7 @@ import CustomMap from "../../../../components/map/CustomMap";
 import { useUpdateFacility } from "../../../../controllers/query/facility-query";
 import { useGetAllUsersExist } from "../../../../controllers/query/user-query";
 import { AppColors } from "../../../../shared/AppColors";
+import { convertUserToName } from "../../../../utils/GlobalUtils";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
@@ -47,7 +48,7 @@ const UpdateFacilityForm = ({ setOpenDrawer, currFacility }) => {
       name: data?.name,
       latitude: selectPosition?.lat.toString(),
       longitude: selectPosition?.lng.toString(),
-      managedBy: data?.managedBy?.name,
+      managedBy: data?.managedBy?.id,
     };
     await updateFacilityQuery.mutateAsync(customerParams);
     setOpenDrawer((pre) => !pre);
@@ -128,7 +129,8 @@ const UpdateFacilityForm = ({ setOpenDrawer, currFacility }) => {
               managedBy
                 ? managedBy.map((u) => {
                     return {
-                      name: u?.id,
+                      name: convertUserToName(u),
+                      id: u?.id,
                     };
                   })
                 : []

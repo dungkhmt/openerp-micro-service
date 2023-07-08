@@ -180,11 +180,12 @@ function CustomerScreen({ screenAuthorization }) {
         />
       </CustomDrawer>
       <DraggableDeleteDialog
-        // disable={isLoadingRemove}
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
-        callback={async () => {
-          await deleteCustomerQuery.mutateAsync({ id: itemSelected?.id });
+        callback={async (isDelete) => {
+          if (isDelete) {
+            await deleteCustomerQuery.mutateAsync({ id: itemSelected?.id });
+          }
         }}
       />
       <CustomizedDialogs

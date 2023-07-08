@@ -127,7 +127,6 @@ function CustomerTypeScreen({ screenAuthorization }) {
         />
       </CustomDrawer>
       <DraggableDeleteDialog
-        // disable={isLoadingRemove}
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
         callback={async (flag) => {

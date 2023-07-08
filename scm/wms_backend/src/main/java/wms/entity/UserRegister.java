@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "user_register")
+@Table(name = "scm_user_register")
 public class UserRegister implements Serializable {
     @Id
     @Size(max = 255)

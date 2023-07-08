@@ -2,7 +2,10 @@ import { Avatar, Button, Typography } from "@mui/material";
 import { unix } from "moment";
 import { AppColors } from "../../shared/AppColors";
 import { ITEM_STATUS_COLOR_MAPPING } from "../../shared/AppConstants";
-import { formatVietnameseCurrency } from "../../utils/GlobalUtils";
+import {
+  convertUserToName,
+  formatVietnameseCurrency,
+} from "../../utils/GlobalUtils";
 
 export const shipmentCols = [
   {
@@ -37,7 +40,8 @@ export const shipmentCols = [
     sortable: false,
     minWidth: 250,
     valueGetter: (item) => {
-      return item?.row?.user?.id;
+      let user = item?.row?.user;
+      return convertUserToName(user);
     },
   },
   {
@@ -99,7 +103,8 @@ export const tripCols = [
     sortable: false,
     minWidth: 150,
     valueGetter: (item) => {
-      return item?.row?.creator?.id;
+      let creator = item?.row?.creator;
+      return convertUserToName(creator);
     },
   },
   {
@@ -110,7 +115,7 @@ export const tripCols = [
     sortable: false,
     minWidth: 150,
     valueGetter: (item) => {
-      return item?.row?.userInCharge?.id;
+      return convertUserToName(item?.row?.userInCharge);
     },
   },
   {
@@ -515,8 +520,8 @@ export const deliveryStaff = [
     headerName: "Mã nhân viên",
     sortable: false,
     pinnable: true,
-    minWidth: 150,
-    maxWidth: 200,
+    minWidth: 200,
+    maxWidth: 300,
     renderCell: (params) => {
       return (
         <Typography sx={{ color: AppColors.secondary, fontWeight: "500" }}>
@@ -532,8 +537,8 @@ export const deliveryStaff = [
     align: "center",
     sortable: false,
     pinnable: true,
-    minWidth: 150,
-    maxWidth: 200,
+    minWidth: 100,
+    maxWidth: 150,
     renderCell: (params) => {
       return (
         <Avatar
@@ -549,9 +554,8 @@ export const deliveryStaff = [
     field: "name",
     headerName: "Tên nhân viên",
     sortable: false,
-    // pinnable: true,
-    minWidth: 150,
-    maxWidth: 200,
+    minWidth: 200,
+    maxWidth: 250,
     renderCell: (params) => {
       return (
         <Typography sx={{ color: AppColors.warning, fontWeight: "500" }}>

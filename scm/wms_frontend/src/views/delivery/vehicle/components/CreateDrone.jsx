@@ -2,6 +2,7 @@ import { Button, Stack } from "@mui/material";
 import CustomSelect from "../../../../components/select/CustomSelect";
 import { useCreateDrone } from "../../../../controllers/query/delivery-trip-query";
 import { useGetAllUsersExist } from "../../../../controllers/query/user-query";
+import { convertUserToName } from "../../../../utils/GlobalUtils";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
@@ -28,7 +29,7 @@ const CreateDrone = ({ setIsAdd }) => {
       capacity: data?.capacity,
       speed: data?.speed,
       transportCostPerUnit: data?.transportCostPerUnit,
-      userManaged: data?.userManaged?.name,
+      userManaged: data?.userManaged?.id,
       waitingCost: data?.waitingCost,
       name: data?.name,
     };
@@ -156,7 +157,8 @@ const CreateDrone = ({ setIsAdd }) => {
                 users
                   ? users.map((usr) => {
                       return {
-                        name: usr.id,
+                        name: convertUserToName(usr),
+                        id: usr?.id,
                       };
                     })
                   : []
