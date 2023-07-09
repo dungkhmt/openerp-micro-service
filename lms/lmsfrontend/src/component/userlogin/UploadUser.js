@@ -21,7 +21,9 @@ function UploadUser() {
 
   const [total, setTotal] = useState(0);
 
-  const [continueOnError, setContinueOnError] = useState(false);
+  const [continueOnError, setContinueOnError] = useState(true);
+
+  const intervalIdRef = useRef(null);
 
   const downloadSampleFile = () => {
     window.location.href = '/static/excels/sample-upload-user_v2.xlsx';
@@ -35,9 +37,9 @@ function UploadUser() {
     return Math.floor(new Date(timeValue).getTime());
   }
 
-  const handleUpload = () => {
-    setResult([]);
-    setLoading(true);
+  const handleUpload = async () => {
+    await setResult([]);
+    await setLoading(true);
     handleUploadExcelUserList();
     if (fileInputRef.current) {
       fileInputRef.current.value = null;
@@ -74,9 +76,9 @@ function UploadUser() {
       // });
 
       let idx = 0;
-      let intervalUploadUser = setInterval(() => {
+      intervalIdRef.current = setInterval(() => {
         if (idx < dataRows.length) {
-          addUser(dataRows[idx], intervalUploadUser);
+          addUser(dataRows[idx]);
           idx++;
         }
       }, 1000);
@@ -86,7 +88,12 @@ function UploadUser() {
     reader.readAsArrayBuffer(file);
   }
 
-  const addUser = (row, intervalUploadUser) => {
+  const stopUploading = () => {
+    setLoading(false);
+    clearInterval(intervalIdRef.current)
+  }
+
+  const addUser = (row) => {
     // Assuming the column order is: Email, Username, Firstname, Lastname, Password, Enable, Created At
     let email = row[0];
     let username = !row[1] ? email.split('@')[0] : row[1];
@@ -149,7 +156,7 @@ function UploadUser() {
           setResult(result => [...result, data]);
 
           if (!continueOnError) {
-            clearInterval(intervalUploadUser);
+            clearInterval(intervalIdRef.current);
             setLoading(false);
           }
         }
@@ -194,9 +201,10 @@ function UploadUser() {
     wbcols.push({wpx: 100});
     wbcols.push({wpx: 100});
     wbcols.push({wpx: 60});
+    wbcols.push({wpx: 80});
+    wbcols.push({wpx: 80});
     wbcols.push({wpx: 60});
-    wbcols.push({wpx: 120});
-    wbcols.push({wpx: 120});
+    wbcols.push({wpx: 180});
     wbcols.push({wpx: 120});
 
     let datas = [];
@@ -209,9 +217,10 @@ function UploadUser() {
       data["Last Name"] = result[i].lastName;
       data["Password"] = result[i].password;
       data["Enabled"] = result[i].enabled;
+      data["Created At"] = toFormattedDateTime(result[i].createdAt);
+      data["Group"] = result[i].groups.toString();
       data["Status"] = result[i].status;
       data["Message"] = result[i].message;
-      data["Created At"] = toFormattedDateTime(result[i].createdAt);
       data["Done At"] = result[i].doneAt;
 
       datas[i] = data;
@@ -257,7 +266,7 @@ function UploadUser() {
             </LoadingButton>
           }
           {loading &&
-            <LoadingButton color="error" variant={"contained"} onClick={handleUpload}>
+            <LoadingButton color="error" variant={"contained"} onClick={stopUploading}>
               Stop
             </LoadingButton>
           }
