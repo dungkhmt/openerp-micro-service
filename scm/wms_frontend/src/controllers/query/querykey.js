@@ -13,6 +13,7 @@ export const queryKey = {
     order_list: "purchase_order_list",
     order_item: "purchase_order_items",
     purchase_price: "purchase_price",
+    export_pdf: "export_purchase_order_pdf",
   },
   sale_order: {
     order_list: "sale_order_list",

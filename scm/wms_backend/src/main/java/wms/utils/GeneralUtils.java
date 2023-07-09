@@ -1,9 +1,11 @@
 package wms.utils;
 
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class GeneralUtils {
     public static String generateCodeFromSysTime() {
@@ -14,5 +16,10 @@ public class GeneralUtils {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         LocalDate date = LocalDate.parse(dayMonthYear, formatter);
         return date.atStartOfDay(ZoneId.systemDefault());
+    }
+    public static String convertVietnameseCurrency(Double amount) {
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        // Format the amount as Vietnamese currency
+        return currencyFormatter.format(amount);
     }
 }

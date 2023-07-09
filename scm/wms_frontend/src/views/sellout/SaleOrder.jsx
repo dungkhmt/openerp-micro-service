@@ -114,7 +114,12 @@ function SaleOrderScreen({ screenAuthorization }) {
                     key={index}
                     extraAction={extraAction}
                     onActionCall={extraAction.callback}
-                    disabled={params?.row?.status !== ORDERS_STATUS.created}
+                    disabled={
+                      !(
+                        params?.row?.status === ORDERS_STATUS.created ||
+                        index === 0
+                      )
+                    }
                   />
                 )),
               ];
