@@ -1,7 +1,8 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { Box } from "@mui/material";
+import InsertLinkIcon from "@mui/icons-material/InsertLink";
+import { Box, Button, Typography } from "@mui/material";
 import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
@@ -10,10 +11,15 @@ import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetProductList } from "controllers/query/category-query";
+import {
+  useGetProductList,
+  useImportCustomer,
+} from "controllers/query/category-query";
 import { useState } from "react";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
+import PrimaryButton from "../../../components/button/PrimaryButton";
+import CustomizedDialogs from "../../../components/dialog/CustomizedDialogs";
 import { productColumns } from "../LocalConstant";
 import CreateProductForm from "./components/CreateProductForm";
 import UpdateProductForm from "./components/UpdateProductForm";
@@ -27,8 +33,24 @@ function ProductScreen({ screenAuthorization }) {
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isApproved, setIsApproved] = useToggle(false);
+  const handleFileChange = (event) => {
+    setSelectedFile(event?.target?.files?.[0]);
+  };
+  // TODO: Change it to import product.
+  const importCustomerQuery = useImportCustomer();
   const { isLoading, data, isRefetching, isPreviousData } =
     useGetProductList(params);
+  const handleUpload = async () => {
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      importCustomerQuery.mutateAsync(formData);
+      setSelectedFile(null);
+    }
+    setIsApproved(false);
+  };
   let actions = [
     {
       title: "Thêm",
@@ -38,6 +60,16 @@ function ProductScreen({ screenAuthorization }) {
       icon: <AddIcon />,
       describe: "Thêm bản ghi mới",
       disabled: false,
+    },
+    {
+      title: "Import",
+      callback: (res) => {
+        handleFileChange(res);
+      },
+      icon: <InsertLinkIcon />,
+      describe: "Import từ file",
+      disabled: false,
+      type: "file",
     },
   ];
   const extraActions = [
@@ -125,6 +157,31 @@ function ProductScreen({ screenAuthorization }) {
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
         callback={(flag) => {}}
+      />
+      <CustomizedDialogs
+        open={isApproved}
+        handleClose={() => {
+          setIsApproved(false, () => {
+            setSelectedFile(null);
+          });
+        }}
+        contentTopDivider
+        title={selectedFile?.name}
+        contentBottomDivider
+        centerTitle="Phê duyệt import cusomter"
+        content={
+          <Typography color="textSecondary" gutterBottom style={{ padding: 8 }}>
+            Bạn có đồng ý phê duyệt tạo sản phẩm qua excel file?
+          </Typography>
+        }
+        actions={[
+          <Button onClick={setIsApproved}>Hủy bỏ</Button>,
+          <PrimaryButton onClick={handleUpload}>Phê duyệt</PrimaryButton>,
+        ]}
+        customStyles={{
+          contents: (theme) => ({ width: "100%" }),
+          actions: (theme) => ({ paddingRight: theme.spacing(2) }),
+        }}
       />
     </Box>
   );

@@ -1,6 +1,7 @@
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import {
   Box,
@@ -10,6 +11,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import axios from "axios";
 import { Action } from "components/action/Action";
 import PrimaryButton from "components/button/PrimaryButton";
 import withScreenSecurity from "components/common/withScreenSecurity";
@@ -33,11 +35,12 @@ import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { ORDERS_STATUS } from "shared/AppConstants";
+import { endPoint } from "../../controllers/endpoint";
 import { convertUserToName } from "../../utils/GlobalUtils";
 import { receiptBillCols } from "./LocalConstant";
 import CreatePurchaseBill from "./components/CreatePurchaseBill";
 
-function PurchaseOrderDetailScreen({}) {
+function PurchaseOrderDetailScreen() {
   const location = useLocation();
   const [isApproved, setIsApproved] = useToggle(false);
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
@@ -55,12 +58,27 @@ function PurchaseOrderDetailScreen({}) {
   const toggleTables = () => {
     setShowTable1((prev) => !prev);
   };
+  const { isLoading, data: orderItem } = useGetPurchaseOrderItems({
+    orderCode: currOrder?.code,
+  });
+  const { isLoading: isLoadingBillItem, data: billItem } =
+    useGetBillItemOfPurchaseOrder({
+      orderCode: currOrder?.code,
+    });
+
+  const { isLoading: isLoadingBill, data: bills } = useGetReceiptBillList({
+    orderCode: currOrder?.code,
+  });
+  const updatePurchaseOrderQuery = useUpdatePurchaseOrderStatus({
+    orderCode: currOrder?.code,
+  });
   const actions = useMemo(() => {
     return [
       {
         title:
           previous === "purchaseOrderScreen"
-            ? currOrder?.status === ORDERS_STATUS.accepted
+            ? currOrder?.status === ORDERS_STATUS.accepted ||
+              currOrder?.status === ORDERS_STATUS.delivering
               ? "Đã phê duyệt"
               : "Phê duyệt đơn hàng"
             : "Tạo phiếu nhập kho",
@@ -81,9 +99,45 @@ function PurchaseOrderDetailScreen({}) {
         describe: "Thêm bản ghi mới",
         disabled:
           previous === "purchaseOrderScreen" &&
-          currOrder?.status === ORDERS_STATUS.accepted,
+          (currOrder?.status === ORDERS_STATUS.accepted ||
+            currOrder?.status === ORDERS_STATUS.delivering),
 
         color: orderApproved ? "success" : null,
+      },
+      {
+        title: "Xuất pdf",
+        callback: async () => {
+          let params = {
+            orderCode: currOrder?.code,
+          };
+          const axiosConfig = {
+            responseType: "arraybuffer",
+            headers: {
+              Accept: "application/json",
+            },
+          };
+          const queryString = new URLSearchParams(params).toString();
+          axios
+            .get(
+              endPoint.exportPurchaseOrderPdf + "?" + queryString,
+              axiosConfig
+            )
+            .then((res) => {
+              const fileURL = window.URL.createObjectURL(new Blob([res.data]));
+              // Setting various property values
+              let alink = document.createElement("a");
+              alink.setAttribute(
+                "download",
+                `purchase_order_${currOrder?.code}.pdf`
+              );
+              document.body.appendChild(alink);
+              alink.href = fileURL;
+              alink.click();
+            });
+        },
+        icon: <PictureAsPdfIcon />,
+        describe: "Xuất báo cáo pdf",
+        disabled: false,
       },
     ];
   }, [previous, currOrder, orderApproved]);
@@ -103,20 +157,6 @@ function PurchaseOrderDetailScreen({}) {
       // permission: PERMISSIONS.MANAGE_CATEGORY_EDIT,
     },
   ];
-  const { isLoading, data: orderItem } = useGetPurchaseOrderItems({
-    orderCode: currOrder?.code,
-  });
-  const { isLoading: isLoadingBillItem, data: billItem } =
-    useGetBillItemOfPurchaseOrder({
-      orderCode: currOrder?.code,
-    });
-
-  const { isLoading: isLoadingBill, data: bills } = useGetReceiptBillList({
-    orderCode: currOrder?.code,
-  });
-  const updatePurchaseOrderQuery = useUpdatePurchaseOrderStatus({
-    orderCode: currOrder?.code,
-  });
   const renderCustomTable = useCallback(() => {
     return (
       <CustomOrderTable

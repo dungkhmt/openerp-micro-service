@@ -123,7 +123,11 @@ function PurchasePriceScreen({ screenAuthorization }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} containSearch={false} />
+        <CustomToolBar
+          actions={actions}
+          containSearch={false}
+          containFilter={false}
+        />
       </Box>
       <FormProvider {...methods}>
         <ErrorBoundary

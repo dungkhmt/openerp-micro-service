@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.internal.util.StringHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +22,10 @@ import wms.entity.*;
 import wms.exception.CustomException;
 import wms.repo.*;
 import wms.service.BaseService;
+import wms.service.files.ExportPDFService;
 import wms.utils.GeneralUtils;
+
+import java.io.IOException;
 
 @Service
 @Slf4j
@@ -29,7 +34,6 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
     private ProductSalePriceRepo productSalePriceRepo;
     @Autowired
     private SaleOrderItemRepo saleOrderItemRepo;
-
     @Autowired
     private SaleOrderRepo saleOrderRepo;
     @Autowired
@@ -38,7 +42,8 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
     private CustomerRepo customerRepo;
     @Autowired
     private ProductRepo productRepo;
-
+    @Autowired
+    private ExportPDFService exportPDFService;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public SaleOrder createOrder(SaleOrderDTO saleOrderDTO, JwtAuthenticationToken token) throws CustomException {
@@ -131,5 +136,12 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
     @Override
     public void deleteOrderById(long id) {
 
+    }
+
+    @Override
+    public ResponseEntity<InputStreamResource> exportOrderPdf(String orderCode) throws IOException {
+        SaleOrder order = saleOrderRepo.getOrderByCode(orderCode);
+        String dest = "don_mua_hang_" + orderCode + ".pdf";
+        return exportPDFService.createPdfOrder(order, dest);
     }
 }
