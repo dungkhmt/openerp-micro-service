@@ -1,2 +1,8 @@
-package openerp.containertransport.dto;public class DashboardOrderByMonthReq {
+package openerp.containertransport.dto;
+
+import lombok.Data;
+
+@Data
+public class DashboardOrderByMonthRes {
+    private Long year;
 }
