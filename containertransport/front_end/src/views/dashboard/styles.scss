@@ -1,0 +1,148 @@
+.fullScreen {
+    background-color: rgb(246, 246, 246);
+    min-height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    .MuiContainer-root {
+        padding: 0;
+    }
+
+    // margin-top: 20px;
+}
+
+.container {
+    .divider {
+        margin-top: 8px;
+        margin-bottom: 48px;
+    }
+}
+
+.headerTruckScreen {
+    padding: 25px 16px 20px 16px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgb(246, 246, 246);
+
+    .MuiButtonBase-root {
+        min-width: 70px;
+        line-height: 1.5;
+    }
+
+    .title {
+        .MuiTypography-root {
+            font-size: 24px;
+            font-weight: 700;
+        }
+    }
+
+    .btn-header {
+        display: flex;
+        align-items: center;
+
+        .material-icons {
+            height: auto;
+            display: flex;
+            margin-right: 4px;
+        }
+    }
+}
+.modal {
+    position: absolute;
+    margin-top: 10%;
+    margin-left: 35%;
+    min-width: 700px;
+    height: auto;
+    background-color: white;
+    padding: 32px;
+    .header-modal {
+        font-weight: 800;
+        
+        .header-modal-text {
+            font-weight: 650;
+        }
+    }
+    .body-modal{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .body-modal-item {
+            width: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            .body-modal-item-text {
+                font-weight: 600;
+            }
+        }
+        .body-modal-item-input {
+            .MuiOutlinedInput-root {
+                height: 40px;
+                width: 300px;
+            }
+            .MuiFormLabel-root {
+                font-size: 12px;
+            }
+        }
+    }
+    .footer-modal{
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 32px;
+        .btn-modal {
+            display: flex;
+            justify-content: space-between;
+            width: 25%;
+            margin-right: 32px;
+        }
+    }
+}
+
+.bodyContent {
+    background-color: white;
+}
+.icon-view-screen {
+    .MuiSvgIcon-root {
+        color: #747474;
+    }
+}
+.icon-view-screen:hover {
+    .MuiSvgIcon-root {
+        color: #c82a2a;
+    }
+}
+.line-chart {
+    .title {
+        margin-top: 20px;
+        margin-left: 16px;
+        margin-bottom: 32px;
+        .MuiTypography-root {
+            font-size: 20px;
+            font-weight: 650;
+        }
+    }
+    .chart {
+        padding: 8px 8px;
+        background-color: white;
+    }
+    .year {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 32px;
+        .text {
+            .MuiTypography-root {
+                font-weight: 550;
+                font-size: 18px;
+            }
+            margin-right: 16px;
+        }
+    }
+}
+.pie-chart {
+    margin-top: 32px;
+}
