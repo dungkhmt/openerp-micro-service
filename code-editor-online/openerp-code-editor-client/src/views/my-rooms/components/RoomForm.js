@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Button,
   Dialog,
@@ -6,7 +7,7 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsVisibleRoomForm, setReloadData, setSelectedRoom } from "../reducers/myRoomsReducers";
@@ -28,6 +29,7 @@ const RoomForm = () => {
     register,
     formState: { errors },
     reset,
+    setValue
   } = useForm();
   const handleSave = (data) => {
     if (selectedRoom?.id) {
@@ -64,6 +66,11 @@ const RoomForm = () => {
       );
     }
   };
+  useEffect(()=> {
+    if(selectedRoom){
+      setValue("roomName", selectedRoom?.roomName)
+    }
+  },[selectedRoom])
   return (
     <Dialog open={isVisibleRoomForm} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>{selectedRoom?.id ? "Chỉnh sửa thông tin phòng" : "Thêm mới phòng"}</DialogTitle>
@@ -73,7 +80,6 @@ const RoomForm = () => {
             {...register("roomName", { required: "Vui lòng nhập tên phòng" })}
             error={!!errors.roomName}
             helperText={errors.roomName?.message}
-            defaultValue={selectedRoom?.roomName}
             fullWidth
             label="Tên phòng"
           />
