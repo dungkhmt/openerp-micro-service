@@ -24,8 +24,6 @@ import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
 import { buildMapPathMenu } from "utils/MenuUtils";
 import { general } from "./menuconfig/general";
-import { student } from "./menuconfig/student";
-import { teacher } from "./menuconfig/teacher";
 import { user } from "./menuconfig/user";
 import { admin } from "./menuconfig/admin";
 import { salemanager } from "./menuconfig/salemanager";
@@ -33,19 +31,19 @@ import { customer } from "./menuconfig/customer";
 import { approver } from "./menuconfig/approver";
 import { deliverymanager } from "./menuconfig/deliverymanager";
 import { deliveryperson } from "./menuconfig/deliveryperson";
+import { purchasemanager } from "./menuconfig/purchasemanager";
 
 export const MENUS = [];
 
 MENUS.push(general);
 MENUS.push(user);
-// MENUS.push(teacher);
-// MENUS.push(student);
 MENUS.push(admin);
 MENUS.push(salemanager);
-MENUS.push(customer);
+MENUS.push(purchasemanager);
 MENUS.push(approver);
 MENUS.push(deliverymanager);
 MENUS.push(deliveryperson);
+MENUS.push(customer);
 
 export const menuIconMap = new Map();
 
