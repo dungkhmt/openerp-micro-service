@@ -2,7 +2,13 @@ import { grey } from "@mui/material/colors";
 import { styled } from "@mui/styles";
 import { AppColors } from "../../shared/AppColors";
 
-const { Box, Stack, Switch, FormControlLabel } = require("@mui/material");
+const {
+  Box,
+  Stack,
+  Switch,
+  FormControlLabel,
+  Checkbox,
+} = require("@mui/material");
 const { Controller } = require("react-hook-form");
 const { default: CustomInput } = require("../input/CustomInput");
 const { default: CustomSelect } = require("../select/CustomSelect");
@@ -98,11 +104,6 @@ const CustomFilter = (props) => {
                   <CustomSelect
                     readOnly={el?.readOnly}
                     options={el.options ? el.options : []}
-                    // onSearch={(value) =>
-                    //   handleSearch
-                    //     ? handleSearch({ [el.name]: value })
-                    //     : undefined
-                    // }
                     loading={el.loading}
                     value={value}
                     label={el.label}
@@ -142,7 +143,7 @@ const CustomFilter = (props) => {
                 control={control}
                 key={id}
                 render={({ field: { onChange, value } }) => (
-                  <CheckBox></CheckBox>
+                  <Checkbox {...el.label} defaultChecked color="default" />
                 )}
               />
             );
@@ -160,7 +161,6 @@ const CustomFilter = (props) => {
                         sx={{ m: 1, marginBottom: 2, marginTop: 0 }}
                         defaultChecked
                         check={el.check}
-                        // label={el.label}
                         required={el.required}
                         onChange={onChange}
                       />

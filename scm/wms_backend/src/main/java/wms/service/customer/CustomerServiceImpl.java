@@ -27,8 +27,6 @@ import wms.repo.*;
 import wms.service.BaseService;
 import wms.utils.GeneralUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -191,11 +189,11 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
     }
 
     @Override
-    public ReturnPaginationDTO<Customer> getAllCustomers(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
+    public ReturnPaginationDTO<Customer> getAllCustomers(int page, int pageSize, String sortField, boolean isSortAsc, String customerName, String status, String createdBy, String address, String textSearch) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
-        Page<Customer> customers = customerRepo.search(pageable);
+        Page<Customer> customers = customerRepo.search(pageable, customerName, status, createdBy, address, textSearch);
         return getPaginationResult(customers.getContent(), page, customers.getTotalPages(), customers.getTotalElements());
     }
     @Override

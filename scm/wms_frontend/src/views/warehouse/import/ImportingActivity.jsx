@@ -83,6 +83,7 @@ function ImportingActivityScreen({ screenAuthorization }) {
               });
             }
           }}
+          containSearch={false}
           onSubmit={onSubmit}
         />
       </Box>

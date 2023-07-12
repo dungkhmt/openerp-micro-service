@@ -98,7 +98,7 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
         for (Customer customer : customers) {
             double bestDistance = Double.POSITIVE_INFINITY;
             int bestIndex = -1;
-            for (int i = 0; i < facilities.size(); i++) {
+            for (int i = 0; i < facilities.size(); i++) { 
                 double cusLat = Double.parseDouble(customer.getLatitude());
                 double cusLon = Double.parseDouble(customer.getLongitude());
                 double facLat = Double.parseDouble(facilities.get(i).getLatitude());

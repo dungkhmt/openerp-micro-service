@@ -23,10 +23,11 @@ public class UserController extends BaseController {
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
             @RequestParam(value = "sort_asc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
-            @RequestParam(value = "role", required = false, defaultValue = DefaultConst.STRING) String role
-    ) {
+            @RequestParam(value = "role", required = false, defaultValue = DefaultConst.STRING) String role,
+            @RequestParam(value = "textSearch", required = false, defaultValue = DefaultConst.STRING) String textSearch
+            ) {
         try {
-            return response(new ResultEntity(1, "Get list users successfully", userService.getAllUsersPaging(page, pageSize, sortField, isSortAsc, role)));
+            return response(new ResultEntity(1, "Get list users successfully", userService.getAllUsersPaging(page, pageSize, sortField, isSortAsc, role, textSearch)));
         } catch (Exception ex) {
             return response(error(ex));
         }

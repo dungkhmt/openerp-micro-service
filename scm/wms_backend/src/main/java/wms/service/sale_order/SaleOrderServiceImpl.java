@@ -93,11 +93,11 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
     }
 
     @Override
-    public ReturnPaginationDTO<SaleOrder> getAllOrders(int page, int pageSize, String sortField, boolean isSortAsc, String orderStatus) throws JsonProcessingException {
+    public ReturnPaginationDTO<SaleOrder> getAllOrders(int page, int pageSize, String sortField, boolean isSortAsc, String orderStatus, String createdBy, String customerName, String textSearch) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
-        Page<SaleOrder> saleOrders = saleOrderRepo.search(pageable, orderStatus.toUpperCase());
+        Page<SaleOrder> saleOrders = saleOrderRepo.search(pageable, orderStatus.toUpperCase(), createdBy, customerName, textSearch);
         return getPaginationResult(saleOrders.getContent(), page, saleOrders.getTotalPages(), saleOrders.getTotalElements());
     }
 

@@ -79,7 +79,11 @@ function ShipmentScreen({ screenAuthorization }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} containFilter={false} />
+        <CustomToolBar
+          actions={actions}
+          containFilter={false}
+          containSearch={false}
+        />
       </Box>
       <CustomDataGrid
         params={params}

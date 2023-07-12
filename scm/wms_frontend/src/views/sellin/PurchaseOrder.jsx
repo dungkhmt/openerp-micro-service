@@ -17,6 +17,7 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { ORDERS_STATUS } from "shared/AppConstants";
+import { useGetAllUsersExist } from "../../controllers/query/user-query";
 import { purchaseOrderCols } from "./LocalConstant";
 import CreatePurOrderForm from "./components/CreatePurOrderForm";
 
@@ -38,7 +39,8 @@ function PurchaseOrderScreen({ screenAuthorization }) {
       previous: "purchaseOrderScreen",
     });
   };
-
+  const { isLoading: isUserLoading, data: users } = useGetAllUsersExist();
+  const STATUS = ["created", "accepted", "delivering", "delivered", "deleted"];
   const { isLoading, data: order } = useGetPurchaseOrderList(params);
   let actions = [
     {
@@ -78,11 +80,86 @@ function PurchaseOrderScreen({ screenAuthorization }) {
       color: AppColors.error,
     },
   ];
-
+  const filterFields = [
+    {
+      component: "select",
+      name: "createdBy",
+      type: "text",
+      label: "Người tạo",
+      readOnly: false,
+      require: true,
+      options: users
+        ? users?.map((user) => {
+            return {
+              name: user?.id,
+            };
+          })
+        : [],
+    },
+    {
+      component: "select",
+      name: "status",
+      type: "text",
+      label: "Trạng thái",
+      readOnly: false,
+      require: true,
+      options: STATUS
+        ? STATUS?.map((status) => {
+            return {
+              name: status,
+            };
+          })
+        : [],
+    },
+    {
+      component: "input",
+      name: "facilityName",
+      label: "Kho trực thuộc",
+      readOnly: false,
+      require: true,
+    },
+    {
+      component: "input",
+      name: "supplierCode",
+      label: "Mã nhà cung cấp",
+      readOnly: false,
+      require: true,
+    },
+  ];
+  const onSubmit = (data) => {
+    setParams({
+      ...params,
+      createdBy: data?.createdBy?.name,
+      facilityName: data?.facilityName,
+      supplierCode: data?.supplierCode,
+      orderStatus: data?.status?.name.toUpperCase(),
+    });
+  };
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} />
+        <CustomToolBar
+          actions={actions}
+          onSearch={(keyword) => {
+            if (keyword) {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: keyword,
+                };
+              });
+            } else {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: "",
+                };
+              });
+            }
+          }}
+          fields={filterFields}
+          onSubmit={onSubmit}
+        />
       </Box>
       <CustomDataGrid
         params={params}

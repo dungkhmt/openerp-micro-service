@@ -82,6 +82,7 @@ function ExportingActivityScreen({ screenAuthorization }) {
               });
             }
           }}
+          containSearch={false}
           onSubmit={onSubmit}
         />
       </Box>

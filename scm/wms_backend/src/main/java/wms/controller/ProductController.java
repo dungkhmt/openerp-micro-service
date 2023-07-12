@@ -52,10 +52,17 @@ public class ProductController extends BaseController {
             @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
-            @RequestParam(value = "sort_asc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc
+            @RequestParam(value = "sort_asc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
+            @RequestParam(value = "productName", required = false, defaultValue = DefaultConst.STRING) String productName,
+            @RequestParam(value = "status", required = false, defaultValue = DefaultConst.STRING) String status,
+            @RequestParam(value = "categoryCode", required = false, defaultValue = DefaultConst.STRING) String category,
+            @RequestParam(value = "unitCode", required = false, defaultValue = DefaultConst.STRING) String unit,
+            @RequestParam(value = "textSearch", required = false, defaultValue = DefaultConst.STRING) String textSearch
     ) {
         try {
-            return response(new ResultEntity(1, "Get list product successfully", productService.getAllProducts(page, pageSize, sortField, isSortAsc)));
+            return response(new ResultEntity(1, "Get list product successfully", productService.getAllProducts(page, pageSize, sortField, isSortAsc,
+                    productName, status, category, unit, textSearch
+                    )));
         } catch (Exception ex) {
             return response(error(ex));
         }

@@ -26,11 +26,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
         this.userRepo = userRepo;
     }
 
-    public ReturnPaginationDTO<UserRegister> getAllUsersPaging(int page, int pageSize, String sortField, boolean isSortAsc, String role) throws JsonProcessingException {
+    public ReturnPaginationDTO<UserRegister> getAllUsersPaging(int page, int pageSize, String sortField, boolean isSortAsc, String role, String textSearch) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? PageRequest.of(page - 1, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
-        Page<UserRegister> users = userRepo.search(pageable, role);
+        Page<UserRegister> users = userRepo.search(pageable, role, textSearch);
         return getPaginationResult(users.getContent(), page, users.getTotalPages(), users.getTotalElements());
     }
 

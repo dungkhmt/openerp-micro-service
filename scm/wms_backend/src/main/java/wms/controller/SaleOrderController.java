@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import wms.common.constant.DefaultConst;
-import wms.dto.purchase_order.UpdatePurchaseOrderStatusDTO;
 import wms.dto.sale_order.SaleOrderDTO;
 import wms.dto.sale_order.UpdateSaleOrderStatusDTO;
 import wms.entity.ResultEntity;
@@ -38,10 +37,14 @@ public class SaleOrderController extends BaseController {
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
             @RequestParam(value = "sortAsc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
-            @RequestParam(value = "orderStatus", required = false, defaultValue = DefaultConst.STRING) String orderStatus
+            @RequestParam(value = "orderStatus", required = false, defaultValue = DefaultConst.STRING) String orderStatus,
+            @RequestParam(value = "createdBy", required = false, defaultValue = DefaultConst.STRING) String createdBy,
+            @RequestParam(value = "customerName", required = false, defaultValue = DefaultConst.STRING) String customerName,
+            @RequestParam(value = "textSearch", required = false, defaultValue = DefaultConst.STRING) String textSearch
     ) {
         try {
-            return response(new ResultEntity(1, "Get list orders successfully", saleOrderService.getAllOrders(page, pageSize, sortField, isSortAsc, orderStatus)));
+            return response(new ResultEntity(1, "Get list orders successfully", saleOrderService.getAllOrders(page, pageSize, sortField, isSortAsc, orderStatus,
+                    createdBy, customerName, textSearch)));
         } catch (Exception ex) {
             return response(error(ex));
         }

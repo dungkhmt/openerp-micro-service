@@ -24,6 +24,7 @@ import { useEffect, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
+import { useGetAllUsersExist } from "../../../controllers/query/user-query";
 import { staticCustomerField } from "../LocalConstant";
 import CreateCustomerForm from "./components/CreateCustomerForm";
 import UpdateCustomerForm from "./components/UpdateCustomerForm";
@@ -50,7 +51,7 @@ function CustomerScreen({ screenAuthorization }) {
   const importCustomerQuery = useImportCustomer();
   const { isLoading: isLoadingCustomer, data: customerList } =
     useGetCustomerWithoutPaging();
-
+  const { isLoading: isUserLoading, data: users } = useGetAllUsersExist();
   const handleUpload = async () => {
     if (selectedFile) {
       const formData = new FormData();
@@ -111,11 +112,60 @@ function CustomerScreen({ screenAuthorization }) {
     },
   ];
 
+  const filterFields = [
+    {
+      component: "select",
+      name: "createdBy",
+      type: "text",
+      label: "Người tạo",
+      readOnly: false,
+      require: true,
+      options: users
+        ? users?.map((user) => {
+            return {
+              name: user?.id,
+            };
+          })
+        : [],
+    },
+    {
+      component: "switch",
+      name: "status",
+      label: "Trạng thái",
+      readOnly: false,
+      require: true,
+    },
+    {
+      component: "input",
+      name: "customerName",
+      label: "Tên khách hàng",
+      readOnly: false,
+      require: true,
+    },
+    {
+      component: "input",
+      name: "address",
+      label: "Địa chỉ",
+      readOnly: false,
+      require: true,
+    },
+  ];
   const handleButtonClick = () => {
     history.push(`${path}/map`, {
       customer: customerList,
     });
   };
+
+  const onSubmit = (data) => {
+    setParams({
+      ...params,
+      createdBy: data?.createdBy?.name,
+      customerName: data?.customerName,
+      address: data?.address,
+      status: data?.status ? "active" : "inactive",
+    });
+  };
+
   useEffect(() => {
     if (selectedFile) {
       setIsApproved(true);
@@ -124,7 +174,28 @@ function CustomerScreen({ screenAuthorization }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} />
+        <CustomToolBar
+          actions={actions}
+          onSearch={(keyword) => {
+            if (keyword) {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: keyword,
+                };
+              });
+            } else {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: "",
+                };
+              });
+            }
+          }}
+          fields={filterFields}
+          onSubmit={onSubmit}
+        />
       </Box>
       <CustomDataGrid
         params={params}
@@ -134,6 +205,7 @@ function CustomerScreen({ screenAuthorization }) {
         totalItem={customer?.totalElements}
         handlePaginationModelChange={(props) => {
           setParams({
+            ...params,
             page: props?.page + 1,
             pageSize: props?.pageSize,
           });

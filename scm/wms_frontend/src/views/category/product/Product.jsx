@@ -12,7 +12,9 @@ import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
 import {
+  useGetProductCateList,
   useGetProductList,
+  useGetProductUnitList,
   useImportCustomer,
 } from "controllers/query/category-query";
 import { useState } from "react";
@@ -42,6 +44,9 @@ function ProductScreen({ screenAuthorization }) {
   const importCustomerQuery = useImportCustomer();
   const { isLoading, data, isRefetching, isPreviousData } =
     useGetProductList(params);
+  const { isLoading: isLoadingCategory, data: category } =
+    useGetProductCateList();
+  const { isLoading: isLoadingUnit, data: unit } = useGetProductUnitList();
   const handleUpload = async () => {
     if (selectedFile) {
       const formData = new FormData();
@@ -92,10 +97,88 @@ function ProductScreen({ screenAuthorization }) {
       color: AppColors.error,
     },
   ];
+  const filterFields = [
+    {
+      component: "select",
+      name: "category",
+      type: "text",
+      label: "Loại sản phẩm",
+      readOnly: false,
+      require: true,
+      options: category
+        ? category?.content?.map((cate) => {
+            return {
+              name: cate?.name,
+              code: cate?.code,
+            };
+          })
+        : [],
+    },
+    {
+      component: "switch",
+      name: "status",
+      label: "Trạng thái",
+      readOnly: false,
+      require: true,
+    },
+    {
+      component: "input",
+      name: "productName",
+      label: "Tên sản phẩm",
+      readOnly: false,
+      require: true,
+    },
+    {
+      component: "select",
+      name: "unitCode",
+      type: "text",
+      label: "Đơn vị",
+      readOnly: false,
+      require: true,
+      options: unit
+        ? unit?.content?.map((unit) => {
+            return {
+              name: unit?.name,
+              code: unit?.code,
+            };
+          })
+        : [],
+    },
+  ];
+  const onSubmit = (data) => {
+    setParams({
+      ...params,
+      categoryCode: data?.category?.code,
+      unitCode: data?.unitCode?.code,
+      productName: data?.productName,
+      status: data?.status ? "active" : "inactive",
+    });
+  };
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} />
+        <CustomToolBar
+          actions={actions}
+          onSearch={(keyword) => {
+            if (keyword) {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: keyword,
+                };
+              });
+            } else {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: "",
+                };
+              });
+            }
+          }}
+          fields={filterFields}
+          onSubmit={onSubmit}
+        />
       </Box>
       <CustomDataGrid
         // isSerial
@@ -106,6 +189,7 @@ function ProductScreen({ screenAuthorization }) {
         totalItem={data?.totalElements}
         handlePaginationModelChange={(props) => {
           setParams({
+            ...params,
             page: props?.page + 1,
             pageSize: props?.pageSize,
           });
