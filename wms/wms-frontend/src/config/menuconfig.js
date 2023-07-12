@@ -33,6 +33,7 @@ import { customer } from "./menuconfig/customer";
 import { approver } from "./menuconfig/approver";
 import { deliverymanager } from "./menuconfig/deliverymanager";
 import { deliveryperson } from "./menuconfig/deliveryperson";
+import { purchasemanager } from "./menuconfig/purchasemanager";
 
 export const MENUS = [];
 
@@ -46,6 +47,7 @@ MENUS.push(customer);
 MENUS.push(approver);
 MENUS.push(deliverymanager);
 MENUS.push(deliveryperson);
+MENUS.push(purchasemanager);
 
 export const menuIconMap = new Map();
 
