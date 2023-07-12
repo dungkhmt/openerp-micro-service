@@ -55,7 +55,7 @@ public interface ProductV2Repository extends JpaRepository<Product, UUID> {
             "from wms_delivery_trip_item wdti  " +
             "join wms_assigned_order_item waoi on waoi.assigned_order_item_id = wdti.assigned_order_item_id " +
             "join wms_product wp on wp.product_id = waoi.product_id " +
-            "where wdti.status = 'CREATED' or wdti.status = 'DELIVERING' ) ", nativeQuery = true)
+            "where not wdti.is_deleted and wdti.status = 'CREATED' or wdti.status = 'DELIVERING' ) ", nativeQuery = true)
     List<ProductDiffHistoryInterface> getProductsDiffHistoryData();
 
     public static interface ProductDiffHistoryInterface {
