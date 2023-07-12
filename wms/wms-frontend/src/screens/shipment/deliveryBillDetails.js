@@ -47,7 +47,7 @@ const DeliveryBillDocument = ( { deliveryBillInfo } ) => {
       flexDirection: "row",
     }, 
     tableCol: { 
-      width: "20%", 
+      width: "18%", 
       borderStyle: "solid", 
       borderWidth: 1, 
       borderLeftWidth: 1, 

@@ -48,7 +48,7 @@ const ReceiptBillDocument = ( { receiptBillInfo } ) => {
       flexDirection: "row",
     }, 
     tableCol: { 
-      width: "16.66%", 
+      width: "15%", 
       borderStyle: "solid", 
       borderWidth: 1, 
       borderLeftWidth: 1, 
