@@ -61,27 +61,13 @@ function UploadUser() {
 
       setTotal(dataRows.length);
 
-      // dataRows.forEach((row, index) => {
-      //   let timeoutId = setTimeout(
-      //     () => {
-      //       try {
-      //         addUser(row);
-      //       } catch (error) {
-      //         console.error(error);
-      //         clearTimeout(timeoutId); // Stop further execution of addUser if an error occurs
-      //       }
-      //     },
-      //     index * 600
-      //   );
-      // });
-
       let idx = 0;
       intervalIdRef.current = setInterval(() => {
         if (idx < dataRows.length) {
           addUser(dataRows[idx]);
           idx++;
         }
-      }, 1000);
+      }, 500);
 
     };
 
@@ -99,10 +85,9 @@ function UploadUser() {
     let username = !row[1] ? email.split('@')[0] : row[1];
     let firstName = row[2] || "";
     let lastName = row[3] || "";
-    let password = row[4] || "password";
+    let password = row[4] || "soict1234";
     let enable = row[5];
-    let createdTimestamp = row[6] ? convertToUnixTimestamp(row[6]) : Math.floor(Date.now());
-    let group = row[7] ? row[7] : "STUDENT";
+    let group = row[6] ? row[6] : "STUDENT";
 
     let data = {
       "email": email,
@@ -118,15 +103,12 @@ function UploadUser() {
       "credentials": [
         {
           "type": "password",
-          "secretData": '{"value":"' + password + '","salt":""}',
-          "credentialData": '{"hashIterations":10,"algorithm":"bcrypt"}', // default
-          // "value": password,
-          // "temporary": true
+          // "secretData": '{"value":"' + password + '","salt":""}',
+          // "credentialData": '{"hashIterations":10,"algorithm":"bcrypt"}', // default
+          "value": password,
+          "temporary": true
         }
       ],
-      "attributes": {
-        "oldCreatedAt": createdTimestamp,
-      },
     };
 
     const headerConfig = {
@@ -142,7 +124,6 @@ function UploadUser() {
         data.status = "SUCCESS";
         data.message = "";
         data.password = password;
-        data.createdAt = createdTimestamp;
         data.doneAt = defaultDatetimeFormat(new Date());
         setResult(result => [...result, data]);
       },
@@ -151,7 +132,6 @@ function UploadUser() {
           data.status = "FAIL";
           data.message = err?.response.data.errorMessage || "";
           data.password = password;
-          data.createdAt = createdTimestamp;
           data.doneAt = defaultDatetimeFormat(new Date());
           setResult(result => [...result, data]);
 
@@ -202,7 +182,6 @@ function UploadUser() {
     wbcols.push({wpx: 100});
     wbcols.push({wpx: 60});
     wbcols.push({wpx: 80});
-    wbcols.push({wpx: 80});
     wbcols.push({wpx: 60});
     wbcols.push({wpx: 180});
     wbcols.push({wpx: 120});
@@ -217,7 +196,6 @@ function UploadUser() {
       data["Last Name"] = result[i].lastName;
       data["Password"] = result[i].password;
       data["Enabled"] = result[i].enabled;
-      data["Created At"] = toFormattedDateTime(result[i].createdAt);
       data["Group"] = result[i].groups.toString();
       data["Status"] = result[i].status;
       data["Message"] = result[i].message;
