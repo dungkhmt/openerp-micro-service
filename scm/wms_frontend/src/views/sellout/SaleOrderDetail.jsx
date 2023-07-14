@@ -81,8 +81,10 @@ function SaleOrderDetailScreen() {
           previous === "saleOrderScreen" ? <CheckCircleIcon /> : <AddIcon />,
         describe: "Thêm bản ghi mới",
         disabled:
-          previous === "saleOrderScreen" &&
-          (currOrder?.status === ORDERS_STATUS.accepted ||
+          (previous === "saleOrderScreen" &&
+            (currOrder?.status === ORDERS_STATUS.accepted ||
+              currOrder?.status === ORDERS_STATUS.delivering)) ||
+          (previous !== "saleOrderScreen" &&
             currOrder?.status === ORDERS_STATUS.delivering),
 
         color: orderApproved ? "success" : null,

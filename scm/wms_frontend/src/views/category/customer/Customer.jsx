@@ -270,7 +270,7 @@ function CustomerScreen({ screenAuthorization }) {
         contentTopDivider
         title={selectedFile?.name}
         contentBottomDivider
-        centerTitle="Phê duyệt import cusomter"
+        centerTitle="Phê duyệt import khách hàng mới"
         content={
           <Typography color="textSecondary" gutterBottom style={{ padding: 8 }}>
             Bạn có đồng ý phê duyệt tạo khách hàng qua excel file?

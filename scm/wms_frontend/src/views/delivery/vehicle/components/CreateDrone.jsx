@@ -155,12 +155,16 @@ const CreateDrone = ({ setIsAdd }) => {
               readOnly={false}
               options={
                 users
-                  ? users.map((usr) => {
-                      return {
-                        name: convertUserToName(usr),
-                        id: usr?.id,
-                      };
-                    })
+                  ? users
+                      ?.filter(
+                        (user) => user.registeredRoles === "SCM_DELIVERY_STAFF"
+                      )
+                      .map((usr) => {
+                        return {
+                          name: convertUserToName(usr),
+                          id: usr?.id,
+                        };
+                      })
                   : []
               }
               fullWidth={true}

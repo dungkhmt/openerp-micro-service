@@ -45,13 +45,11 @@ export const useCreateSaleOrder = (params) => {
         params,
         data
       );
-      if (res.data && res.code === 1) {
+      if (res.code === 1) {
+        toast.success("Tạo đơn bán thành công!");
+        queryClient.invalidateQueries([queryKey.sale_order.order_list]);
         return res.data;
       }
-    },
-    onSuccess: (res, variables, context) => {
-      toast.success("Tạo đơn bán thành công!");
-      queryClient.invalidateQueries([queryKey.sale_order.order_list]);
     },
     onError: () => {
       toast.error("Lỗi khi tạo đơn bán, vui lòng kiểm tra lại");

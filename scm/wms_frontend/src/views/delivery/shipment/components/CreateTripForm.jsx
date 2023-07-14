@@ -55,17 +55,21 @@ const CreateTripForm = ({ setIsAdd, currShipment }) => {
               readOnly={false}
               options={
                 userInCharge
-                  ? userInCharge?.map((user) => {
-                      return {
-                        name:
-                          user?.firstName +
-                          " " +
-                          user?.middleName +
-                          " " +
-                          user?.lastName,
-                        id: user?.id,
-                      };
-                    })
+                  ? userInCharge
+                      ?.filter(
+                        (user) => user.registeredRoles === "SCM_DELIVERY_STAFF"
+                      )
+                      .map((user) => {
+                        return {
+                          name:
+                            user?.firstName +
+                            " " +
+                            user?.middleName +
+                            " " +
+                            user?.lastName,
+                          id: user?.id,
+                        };
+                      })
                   : []
               }
               fullWidth={true}

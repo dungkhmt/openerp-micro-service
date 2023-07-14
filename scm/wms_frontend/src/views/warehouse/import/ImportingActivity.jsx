@@ -10,6 +10,7 @@ import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useWindowSize } from "react-use";
 import { AppColors } from "../../../shared/AppColors";
+import { ORDERS_STATUS } from "../../../shared/AppConstants";
 import { acceptedOrderCols } from "../LocalConstant";
 function ImportingActivityScreen({ screenAuthorization }) {
   let { path } = useRouteMatch();
@@ -21,7 +22,7 @@ function ImportingActivityScreen({ screenAuthorization }) {
   const { height } = useWindowSize();
 
   const { isLoading, data } = useGetPurchaseOrderList({
-    orderStatus: "accepted",
+    // orderStatus: "accepted",
     ...params,
   });
 
@@ -118,7 +119,7 @@ function ImportingActivityScreen({ screenAuthorization }) {
                   key={index}
                   extraAction={extraAction}
                   onActionCall={extraAction.callback}
-                  disabled={false}
+                  disabled={params?.row?.status === ORDERS_STATUS.created}
                 />
               )),
             ],

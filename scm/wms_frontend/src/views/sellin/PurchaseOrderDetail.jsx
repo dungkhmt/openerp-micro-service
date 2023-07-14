@@ -98,8 +98,10 @@ function PurchaseOrderDetailScreen() {
           ),
         describe: "Thêm bản ghi mới",
         disabled:
-          previous === "purchaseOrderScreen" &&
-          (currOrder?.status === ORDERS_STATUS.accepted ||
+          (previous === "purchaseOrderScreen" &&
+            (currOrder?.status === ORDERS_STATUS.accepted ||
+              currOrder?.status === ORDERS_STATUS.delivering)) ||
+          (previous !== "purchaseOrderScreen" &&
             currOrder?.status === ORDERS_STATUS.delivering),
 
         color: orderApproved ? "success" : null,

@@ -10,6 +10,7 @@ import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useWindowSize } from "react-use";
 import { AppColors } from "../../../shared/AppColors";
+import { ORDERS_STATUS } from "../../../shared/AppConstants";
 import { staticSaleOrderCols } from "../LocalConstant";
 function ExportingActivityScreen({ screenAuthorization }) {
   let { path } = useRouteMatch();
@@ -21,7 +22,7 @@ function ExportingActivityScreen({ screenAuthorization }) {
   const { height } = useWindowSize();
 
   const { isLoading, data } = useGetSaleOrderList({
-    orderStatus: "accepted",
+    // orderStatus: "accepted",
     ...params,
   });
 
@@ -117,7 +118,7 @@ function ExportingActivityScreen({ screenAuthorization }) {
                   key={index}
                   extraAction={extraAction}
                   onActionCall={extraAction.callback}
-                  disabled={false}
+                  disabled={params?.row?.status === ORDERS_STATUS.created}
                 />
               )),
             ],

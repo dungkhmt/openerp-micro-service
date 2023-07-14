@@ -115,7 +115,7 @@ export const useImportCustomer = (params) => {
         params,
         data
       );
-      if (res.data && res.code === 1) {
+      if (res.code === 1) {
         toast.success("Tạo khách hàng mới thành công!");
         queryClient.invalidateQueries([queryKey.category.customer_list]);
         return res.data;

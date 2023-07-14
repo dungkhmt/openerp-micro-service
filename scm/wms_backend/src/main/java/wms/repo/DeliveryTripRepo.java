@@ -9,8 +9,8 @@ import wms.entity.DeliveryTrip;
 import java.util.List;
 
 public interface DeliveryTripRepo extends JpaRepository<DeliveryTrip, Long> {
-    @Query(value = "select * from scm_delivery_trip", nativeQuery = true)
-    Page<DeliveryTrip> search(Pageable pageable);
+    @Query(value = "select * from scm_delivery_trip where is_deleted = 0 and ( shipment_code = :shipmentCode or :shipmentCode = '')", nativeQuery = true)
+    Page<DeliveryTrip> search(Pageable pageable, String shipmentCode);
     DeliveryTrip getDeliveryTripById(long id);
     DeliveryTrip getDeliveryTripByCode(String code);
 

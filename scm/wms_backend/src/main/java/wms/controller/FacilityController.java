@@ -4,9 +4,12 @@ package wms.controller;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import wms.common.constant.DefaultConst;
 import wms.dto.facility.ExportFromFacilityDTO;
 import wms.dto.facility.FacilityDTO;
@@ -14,8 +17,11 @@ import wms.dto.facility.FacilityUpdateDTO;
 import wms.dto.facility.ImportToFacilityDTO;
 import wms.entity.ResultEntity;
 import wms.service.facility.IFacilityService;
+import wms.service.files.IFileService;
 
 import javax.validation.Valid;
+import java.io.File;
+import java.io.FileInputStream;
 
 @RestController
 @RequestMapping("/facility")
@@ -23,6 +29,31 @@ import javax.validation.Valid;
 public class FacilityController extends BaseController{
     @Autowired
     private IFacilityService facilityService;
+    @Autowired
+    private IFileService fileService;
+    @ApiOperation(value = "Thêm mới kho hàng từ file excel", notes = "{}")
+    @PostMapping("/create-from-file")
+    public ResponseEntity<?> createFacilityFromFile(@RequestParam("file") MultipartFile multipartFile, JwtAuthenticationToken token) {
+        try {
+            facilityService.createFacilityFromFile(multipartFile, token);
+            return response(new ResultEntity(1, "Import facilities successfully", null));
+        } catch (Exception ex) {
+            log.error("Import facilities from excel file failed!");
+            return response(error(ex));
+        }
+    }
+    @GetMapping(path = "/download-customer-template")
+    public @ResponseBody
+    ResponseEntity<InputStreamResource> processFacilityTemplateDownload() throws Exception {
+        String templateSource = "/templates/Du_lieu_kho.xlsx";
+        String templateName = "employee_template";
+        File file = fileService.downloadTemplateExcelFile(templateSource, templateName);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
+                .contentType(org.springframework.http.MediaType.parseMediaType("application/vnd.ms-excel"))
+                .contentLength(file.length()) //
+                .body(new InputStreamResource(new FileInputStream(file)));
+    }
     @ApiOperation(value = "Thêm mới kho hàng nhà phân phối")
     @PostMapping("/create")
     public ResponseEntity<?> create(@Valid @RequestBody FacilityDTO facilityDTO, JwtAuthenticationToken token) {
