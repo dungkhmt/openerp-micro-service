@@ -146,10 +146,12 @@ export const useCreateDeliveryBill = (params) => {
       );
       if (res.code === 1) {
         toast.success(res.message);
-        queryClient.invalidateQueries([
-          queryKey.delivery_bill.bill_item_of_delivery_order,
-          queryKey.delivery_bill.delivery_bill_list,
-        ]);
+        queryClient.invalidateQueries({
+          queryKey: [queryKey.delivery_bill.bill_item_of_delivery_order],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [queryKey.facility.delivery_bill_list],
+        });
         return res.data;
       }
     },

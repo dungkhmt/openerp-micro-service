@@ -217,10 +217,17 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
                 distanceElement.setFromLocationId(points.get(i).getName());
                 distanceElement.setToLocationId(points.get(j).getName());
 //              double distance = Utils.calculateEuclideanDistance(points.get(i), points.get(j));
-                double distance = Utils.getDistanceGraphhopperApi(points.get(i).getX(), points.get(i).getY(),
-                        points.get(j).getX(), points.get(j).getY());
-                if (distance < 0) {
-                    throw new Exception("Got problem retrieving distance from internet");
+                double distance;
+                try {
+                    distance = Utils.getDistanceGraphhopperApi(points.get(i).getX(), points.get(i).getY(),
+                            points.get(j).getX(), points.get(j).getY());
+                }
+                catch (Exception ex) {
+                    log.error(ex.getMessage());
+                }
+                finally {
+                        distance = Utils.calculateEuclideanDistance(points.get(i), points.get(j));
+//                    throw new Exception("Got problem retrieving distance from internet");
                 }
                 distanceElement.setDistance(distance);
                 distanceElement.setTravelTime(distance / input.getTruck().getSpeed());

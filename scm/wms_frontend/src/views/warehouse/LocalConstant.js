@@ -134,6 +134,7 @@ export const staticWarehouseCols = [
     minWidth: 50,
     headerAlign: "center",
     align: "center",
+    flex: 1,
     renderCell: (params) => {
       return (
         <Button

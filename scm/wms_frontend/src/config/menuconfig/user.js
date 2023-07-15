@@ -9,7 +9,7 @@ export const user = {
     {
       id: "MENU_USER.ALL_USER",
       path: "/all-user",
-      isPublic: false,
+      isPublic: true,
       text: "All users",
       child: [],
     },
@@ -18,7 +18,7 @@ export const user = {
       onClick: () => {
         window.location.href = `${config.url.KEYCLOAK_BASE_URL}/admin/${KC_REALM}/console/#/${KC_REALM}/users`;
       },
-      isPublic: false,
+      isPublic: true,
       text: "Settings",
       child: [],
     },
