@@ -22,6 +22,7 @@ export const DEFAULT_CODE_SEGMENT_CPP = "//CPP \n" +
 
 export const DEFAULT_CODE_SEGMENT_JAVA = "//JAVA \n" +
   "import java.util.*; \n\n" +
+  "@SuppressWarnings({\"unchecked\", \"deprecation\"})\n" +
   "public class Main { \n" +
   "    public static void main(String[] args) { \n\n" +
   "    }\n" +

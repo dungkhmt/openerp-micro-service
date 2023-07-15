@@ -45,7 +45,7 @@ public class OrderServiceImpl implements OrderService {
             Order order = new Order();
             Container container = getContainerNearest(orderModel.getToFacilityId(), orderModel.getWeight());
             Facility fromFacility = facilityRepo.findById(container.getFacility().getId()).get();
-            Facility facilityTo = facilityRepo.findById(orderModel.getToFacilityId()).get();
+            Facility facilityTo = facilityRepo.findByUid(orderModel.getToFacilityId());
             order.setToFacility(facilityTo);
             order.setFromFacility(fromFacility);
             order.setContainer(container);
@@ -65,11 +65,11 @@ public class OrderServiceImpl implements OrderService {
                     order.setWeight(Long.valueOf(container.getTypeContainer().getSize()));
 
                     if(orderModel.getFromFacilityId() != null) {
-                        Facility facilityFrom = facilityRepo.findById(orderModel.getFromFacilityId()).get();
+                        Facility facilityFrom = facilityRepo.findByUid(orderModel.getFromFacilityId());
                         order.setFromFacility(facilityFrom);
                     }
                     if(orderModel.getToFacilityId() != null) {
-                        Facility facilityTo = facilityRepo.findById(orderModel.getToFacilityId()).get();
+                        Facility facilityTo = facilityRepo.findByUid(orderModel.getToFacilityId());
                         order.setToFacility(facilityTo);
                     }
 
@@ -90,7 +90,7 @@ public class OrderServiceImpl implements OrderService {
         return orderModels;
     }
     public Order createAttribute(OrderModel orderModel, Order order) {
-        order.setCustomerId(orderModel.getCustomerId());
+        order.setCustomerId(orderModel.getUsername());
         order.setEarlyDeliveryTime(orderModel.getEarlyDeliveryTime());
         order.setLateDeliveryTime(orderModel.getLateDeliveryTime());
         order.setEarlyPickupTime(orderModel.getEarlyPickupTime());
@@ -253,10 +253,12 @@ public class OrderServiceImpl implements OrderService {
         return facilityResponsive;
     }
 
-    public Long getFacilityNearest(Long facilityId) {
+    public Long getFacilityNearest(String facilityUid) {
         AtomicReference<Long> facilityRes = null;
 
         List<FacilityModel> facilityModels = getAllFacilityAdmin();
+
+        Long facilityId = facilityRepo.findByUid(facilityUid).getId();
 
         AtomicReference<BigDecimal> distant = new AtomicReference<>(new BigDecimal(Long.MAX_VALUE));
         List<Relationship> relationships = relationshipService.getAllRelationShip();
@@ -274,7 +276,8 @@ public class OrderServiceImpl implements OrderService {
         return facilityRes.get();
     }
 
-    public Container getContainerNearest(Long toFacility, long containerSize) {
+    public Container getContainerNearest(String toFacility, long containerSize) {
+        Long toFacilityId = facilityRepo.findByUid(toFacility).getId();
         List<FacilityModel> facilityModels = getAllFacilityAdmin();
 
         AtomicReference<BigDecimal> distant = new AtomicReference<>(new BigDecimal(Long.MAX_VALUE));
@@ -285,7 +288,7 @@ public class OrderServiceImpl implements OrderService {
         facilityModels.forEach((facilityModel) -> {
             relationships.forEach(relationship -> {
                 if(relationship.getFromFacility() == facilityModel.getId()
-                        && relationship.getToFacility() == toFacility
+                        && relationship.getToFacility() == toFacilityId
                         && checkContainerInDepot(facilityModel.getUid(), containerSize) != null
                 ) {
                     if(relationship.getDistant().compareTo(distant.get()) < 0) {

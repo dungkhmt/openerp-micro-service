@@ -3,6 +3,8 @@ package wms.controller;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +14,11 @@ import wms.dto.customer.CustomerDTO;
 import wms.dto.customer.CustomerUpdateDTO;
 import wms.entity.ResultEntity;
 import wms.service.customer.ICustomerService;
+import wms.service.files.IFileService;
 
 import javax.validation.Valid;
+import java.io.File;
+import java.io.FileInputStream;
 
 @RestController
 @RequestMapping("/customer")
@@ -21,6 +26,8 @@ import javax.validation.Valid;
 public class CustomerController extends BaseController{
     @Autowired
     private ICustomerService customerService;
+    @Autowired
+    private IFileService fileService;
     @ApiOperation(value = "Thêm mới khách hàng từ file excel", notes = "{}")
     @PostMapping("/create-from-file")
     public ResponseEntity<?> createProductFromExcelFile(@RequestParam("file") MultipartFile multipartFile, JwtAuthenticationToken token) {
@@ -28,21 +35,22 @@ public class CustomerController extends BaseController{
             customerService.createCustomerFromFile(multipartFile, token);
             return response(new ResultEntity(1, "Import customers successfully", null));
         } catch (Exception ex) {
-            log.error("Import products from excel file failed!");
+            log.error("Import customers from excel file failed!");
             return response(error(ex));
         }
     }
-    @ApiOperation(value = "Import khách hàng từ file excel")
-    @PostMapping("/import")
-    public ResponseEntity<?> importCustomer(@Valid @RequestBody CustomerDTO customerDTO, JwtAuthenticationToken token) {
-        try {
-            return response(new ResultEntity(1, "Import new customers successfully", customerService.createNewCustomer(customerDTO, token)));
-        }
-        catch (Exception ex) {
-            return response(error(ex));
-        }
+    @GetMapping(path = "/download-customer-template")
+    public @ResponseBody
+    ResponseEntity<InputStreamResource> processEmployeeTemplateDownload() throws Exception {
+        String templateSource = "/templates/Du_lieu_nhan_vien.xlsx";
+        String templateName = "employee_template";
+        File file = fileService.downloadTemplateExcelFile(templateSource, templateName);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
+                .contentType(org.springframework.http.MediaType.parseMediaType("application/vnd.ms-excel"))
+                .contentLength(file.length()) //
+                .body(new InputStreamResource(new FileInputStream(file)));
     }
-
     @ApiOperation(value = "Thêm mới khách hàng")
     @PostMapping("/create")
     public ResponseEntity<?> create(@Valid @RequestBody CustomerDTO customerDTO, JwtAuthenticationToken token) {
@@ -59,10 +67,16 @@ public class CustomerController extends BaseController{
             @RequestParam(value = DefaultConst.PAGE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE) Integer page,
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
-            @RequestParam(value = "sort_asc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc
+            @RequestParam(value = "sort_asc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
+            @RequestParam(value = "customerName", required = false, defaultValue = DefaultConst.STRING) String customerName,
+            @RequestParam(value = "status", required = false, defaultValue = DefaultConst.STRING) String status,
+            @RequestParam(value = "createdBy", required = false, defaultValue = DefaultConst.STRING) String createdBy,
+            @RequestParam(value = "address", required = false, defaultValue = DefaultConst.STRING) String address,
+            @RequestParam(value = "textSearch", required = false, defaultValue = DefaultConst.STRING) String textSearch
     ) {
         try {
-            return response(new ResultEntity(1, "Get list customer successfully", customerService.getAllCustomers(page, pageSize, sortField, isSortAsc)));
+            return response(new ResultEntity(1, "Get list customer successfully", customerService.getAllCustomers(page, pageSize, sortField, isSortAsc, customerName,
+                    status, createdBy, address, textSearch)));
         } catch (Exception ex) {
             return response(error(ex));
         }

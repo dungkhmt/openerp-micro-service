@@ -113,20 +113,6 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(contestProblemPage);
     }
 
-    @PostMapping("/ide/{computerLanguage}")
-    public ResponseEntity<?> runCode(
-        @PathVariable("computerLanguage") String computerLanguage,
-        @RequestBody ModelRunCodeFromIDE modelRunCodeFromIDE, Principal principal
-    ) throws Exception {
-        String response = problemTestCaseService.executableIDECode(
-            modelRunCodeFromIDE,
-            principal.getName(),
-            computerLanguage);
-        ModelRunCodeFromIDEOutput modelRunCodeFromIDEOutput = new ModelRunCodeFromIDEOutput();
-        modelRunCodeFromIDEOutput.setOutput(response);
-        return ResponseEntity.status(200).body(modelRunCodeFromIDEOutput);
-    }
-
     @Secured("ROLE_TEACHER")
     @PostMapping("/problem/generate-statement")
     public ResponseEntity<?> suggestProblemStatement(@RequestBody ProblemSuggestionRequest suggestion) throws Exception {
@@ -136,10 +122,14 @@ public class ContestProblemController {
 
     @Secured("ROLE_TEACHER")
     @GetMapping("/problem-details/{problemId}")
-    public ResponseEntity<?> getProblemDetails(@PathVariable("problemId") String problemId) throws Exception {
+    public ResponseEntity<?> getProblemDetails(@PathVariable("problemId") String problemId, Principal teacher) throws Exception {
         log.info("getProblemDetails problemId {}", problemId);
-        ModelCreateContestProblemResponse problemResponse = problemTestCaseService.getContestProblem(problemId);
-        return ResponseEntity.status(200).body(problemResponse);
+        try {
+            ModelCreateContestProblemResponse problemResponse = problemTestCaseService.getContestProblemDetailByIdAndTeacher(problemId, teacher.getName());
+            return ResponseEntity.status(200).body(problemResponse);
+        } catch (MiniLeetCodeException e) {
+            return ResponseEntity.status(e.getCode()).body(e.getMessage());
+        }
     }
 
     @GetMapping("/get-problem-detail-view-by-student/{problemId}")
@@ -225,15 +215,15 @@ public class ContestProblemController {
             principal.getName());
         boolean hasPermission = false;
         for (UserContestProblemRole e : L) {
-            if (e.getRoleId().equals(UserContestProblemRole.ROLE_MANAGER) ||
+            if (e.getRoleId().equals(UserContestProblemRole.ROLE_EDITOR) ||
                 e.getRoleId().equals(UserContestProblemRole.ROLE_OWNER)) {
                 hasPermission = true;
                 break;
             }
         }
         if (!hasPermission) {
-            //return ResponseEntity.status(401).body("No permission");
-            return ResponseEntity.status(HttpStatus.OK).body("No permission");
+            return ResponseEntity.status(403).body("No permission");
+            // return ResponseEntity.status(HttpStatus.OK).body("No permission");
         }
         ProblemEntity problemResponse = problemTestCaseService.updateContestProblem(
             problemId,
@@ -241,17 +231,6 @@ public class ContestProblemController {
             json,
             files);
         return ResponseEntity.status(HttpStatus.OK).body(problemResponse);
-    }
-
-    @PostMapping("/problem-detail-run-code/{problemId}")
-    public ResponseEntity<?> problemDetailsRunCode(
-        @PathVariable("problemId") String problemId,
-        @RequestBody ModelProblemDetailRunCode modelProblemDetailRunCode, Principal principal
-    ) throws Exception {
-        ModelProblemDetailRunCodeResponse resp = problemTestCaseService.problemDetailRunCode(problemId,
-                                                                                             modelProblemDetailRunCode,
-                                                                                             principal.getName());
-        return ResponseEntity.ok(resp);
     }
 
     @PostMapping("/check-compile")
@@ -268,18 +247,6 @@ public class ContestProblemController {
     ) {
         TestCaseEntity testCaseEntity = problemTestCaseService.saveTestCase(problemId, modelSaveTestcase);
         return ResponseEntity.status(200).body(testCaseEntity);
-    }
-
-    @PostMapping("/problem-details-submission/{problemId}")
-    public ResponseEntity<?> problemDetailsSubmission(
-        @PathVariable("problemId") String problemId,
-        @RequestBody ModelProblemDetailSubmission modelProblemDetailSubmission, Principal principal
-    )
-        throws Exception {
-        log.info("problemDetailsSubmission {}", problemId);
-        ModelContestSubmissionResponse response = problemTestCaseService
-            .problemDetailSubmission(modelProblemDetailSubmission, problemId, principal.getName());
-        return ResponseEntity.status(200).body(response);
     }
 
     @GetMapping("/get-all-problem-submission-by-user/{problemId}")
@@ -1750,14 +1717,28 @@ public class ContestProblemController {
 
     @PostMapping("/add-contest-problem-role-to-user/")
     public ResponseEntity<?> addContestProblemRole(Principal principal, @RequestBody ModelUserProblemRole input) {
-        boolean ok = problemTestCaseService.addUserProblemRole(principal.getName(), input);
-        return ResponseEntity.ok().body(ok);
+        try {
+            boolean ok = problemTestCaseService.addUserProblemRole(principal.getName(), input);
+            return ResponseEntity.ok().body(ok);
+        } catch (Exception e) {
+            if (e instanceof MiniLeetCodeException)
+                return ResponseEntity.status(((MiniLeetCodeException) e).getCode()).body(e.getMessage());
+            else
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping("/remove-contest-problem-role-to-user/")
-    public ResponseEntity<?> removeContestProblemRole(Principal principal, @RequestBody ModelUserProblemRole input) {
-        boolean ok = problemTestCaseService.removeUserProblemRole(principal.getName(), input);
-        return ResponseEntity.ok().body(ok);
+    public ResponseEntity<?> removeContestProblemRole(Principal principal, @RequestBody ModelUserProblemRole input) {   
+        try {
+            boolean ok = problemTestCaseService.removeUserProblemRole(principal.getName(), input);
+            return ResponseEntity.ok().body(ok);
+        } catch (Exception e) {
+            if (e instanceof MiniLeetCodeException)
+                return ResponseEntity.status(((MiniLeetCodeException) e).getCode()).body(e.getMessage());
+            else
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @GetMapping("/grant-manager-role-all-problems/{userId}/{roleId}")
@@ -1983,5 +1964,17 @@ public class ContestProblemController {
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + id + ".zip");
 
         return ResponseEntity.ok().headers(headers).body(stream);
+    }
+
+    @Secured("ROLE_TEACHER")
+    @GetMapping("/get-all-my-problems")
+    public List<ProblemEntity> getAllMyProblems(Principal owner) {
+        return this.problemTestCaseService.getOwnerProblems(owner.getName());
+    }
+
+    @Secured("ROLE_TEACHER")
+    @GetMapping("/get-all-shared-problems")
+    public List<ProblemEntity> getAllSharedProblems(Principal owner) {
+        return this.problemTestCaseService.getSharedProblems(owner.getName());
     }
 }

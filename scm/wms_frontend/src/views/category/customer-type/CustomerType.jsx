@@ -69,7 +69,11 @@ function CustomerTypeScreen({ screenAuthorization }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} />
+        <CustomToolBar
+          actions={actions}
+          containFilter={false}
+          containSearch={false}
+        />
       </Box>
       <CustomDataGrid
         params={params}
@@ -127,7 +131,6 @@ function CustomerTypeScreen({ screenAuthorization }) {
         />
       </CustomDrawer>
       <DraggableDeleteDialog
-        // disable={isLoadingRemove}
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
         callback={async (flag) => {

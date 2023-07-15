@@ -30,10 +30,11 @@ public class TruckServiceImpl implements TruckService  {
     @Override
     public Truck createTruck(TruckModel truckModel) {
         Facility facility = facilityRepo.findById(truckModel.getFacilityId()).get();
-        facility.setNumberTruck(facility.getNumberTruck() + 1);
+        facility.setNumberTruck(facility.getNumberTruck() == null ? 1 :  facility.getNumberTruck() + 1);
         facilityRepo.save(facility);
         Truck truck = new Truck();
         truck.setFacility(facility);
+        truck.setDriverName(truckModel.getDriverName());
         truck.setDriverId(truckModel.getDriverId());
         truck.setLicensePlates(truckModel.getLicensePlates());
         truck.setBrandTruck(truckModel.getBrandTruck());
@@ -72,7 +73,7 @@ public class TruckServiceImpl implements TruckService  {
             params.put("status", truckFilterRequestDTO.getStatus());
         }
         sql += " AND status != :statusNotEqual";
-        sqlCount += " AND status = :statusNotEqual";
+        sqlCount += " AND status != :statusNotEqual";
         params.put("statusNotEqual", Constants.TruckStatus.DELETE.getStatus());
 
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);

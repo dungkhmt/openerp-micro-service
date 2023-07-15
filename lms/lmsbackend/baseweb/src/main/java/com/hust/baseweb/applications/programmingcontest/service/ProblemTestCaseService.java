@@ -30,19 +30,7 @@ public interface ProblemTestCaseService {
 
     List<ModelProblemGeneralInfo> getAllProblemsGeneralInfo();
 
-    String executableIDECode(
-        ModelRunCodeFromIDE modelRunCodeFromIDE,
-        String userName,
-        String computerLanguage
-    ) throws Exception;
-
     ModelCreateContestProblemResponse getContestProblem(String problemId) throws Exception;
-
-    ModelProblemDetailRunCodeResponse problemDetailRunCode(
-        String problemId,
-        ModelProblemDetailRunCode modelProblemDetailRunCode,
-        String userName
-    ) throws Exception;
 
     ModelGetTestCaseResultResponse getTestCaseResult(
         String problemId,
@@ -53,12 +41,6 @@ public interface ProblemTestCaseService {
     ModelCheckCompileResponse checkCompile(ModelCheckCompile modelCheckCompile, String userName) throws Exception;
 
     TestCaseEntity saveTestCase(String problemId, ModelSaveTestcase modelSaveTestcase);
-
-    ModelContestSubmissionResponse problemDetailSubmission(
-        ModelProblemDetailSubmission modelProblemDetailSubmission,
-        String problemId,
-        String userName
-    ) throws Exception;
 
     ListProblemSubmissionResponse getListProblemSubmissionResponse(String problemId, String userId) throws Exception;
 
@@ -291,9 +273,9 @@ public interface ProblemTestCaseService {
 
     List<ModelResponseUserProblemRole> getUserProblemRoles(String problemId);
 
-    boolean addUserProblemRole(String userName, ModelUserProblemRole input);
+    boolean addUserProblemRole(String userName, ModelUserProblemRole input)  throws Exception;
 
-    boolean removeUserProblemRole(String userName, ModelUserProblemRole input);
+    boolean removeUserProblemRole(String userName, ModelUserProblemRole input)  throws Exception;
 
     boolean grantRole2AllProblems(String userLoginId, String userId, String roleId);
 
@@ -310,4 +292,10 @@ public interface ProblemTestCaseService {
     void switchAllContestJudgeMode(String judgeMode);
 
     void exportProblem(String id, OutputStream outputStream);
+
+    List<ProblemEntity> getOwnerProblems(String ownerId);
+
+    List<ProblemEntity> getSharedProblems(String userId);
+
+    ModelCreateContestProblemResponse getContestProblemDetailByIdAndTeacher(String problemId, String teacherId) throws Exception;
 }

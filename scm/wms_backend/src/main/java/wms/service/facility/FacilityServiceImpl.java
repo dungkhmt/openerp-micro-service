@@ -2,6 +2,9 @@ package wms.service.facility;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 import org.hibernate.internal.util.StringHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import wms.algorithms.utils.Utils;
 import wms.common.enums.CommonStatus;
 import wms.common.enums.ErrorCode;
@@ -21,15 +25,14 @@ import wms.entity.*;
 import wms.exception.CustomException;
 import wms.repo.*;
 import wms.service.BaseService;
+import wms.service.files.IFileService;
 import wms.service.purchase_order.IPurchaseOrderService;
 import wms.service.sale_order.ISaleOrderService;
 import wms.utils.GeneralUtils;
 
+import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -68,6 +71,56 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
     private IPurchaseOrderService purchaseOrderService;
     @Autowired
     private ISaleOrderService saleOrderService;
+    @Autowired
+    private IFileService fileService;
+    @Override
+    public void createFacilityFromFile(MultipartFile file, JwtAuthenticationToken token) throws IOException, CustomException {
+        UserRegister createdBy = userRepo.getUserByUserLoginId(token.getName());
+        if (createdBy == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown staff create this facility, can't create");
+        }
+        Iterator<Row> rowIterator = fileService.initWorkbookRow(file);
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            if (row.getRowNum() == 0 || isRowEmpty(row)) continue;
+            saveFacilities(row, createdBy);
+        }
+    }
+    public static boolean isRowEmpty(Row row) {
+        for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
+            Cell cell = row.getCell(c);
+            if (cell != null && cell.getCellTypeEnum() != CellType.BLANK)
+                return false;
+        }
+        return true;
+    }
+    private List<Facility> saveFacilities(Row row, UserRegister createdBy) throws CustomException {
+        List<Facility> listFacilities = new ArrayList<>();
+        List<Facility> facilities = facilityRepo.getAllFacility();
+        UserRegister manager = userRepo.getUserByUserLoginId(row.getCell(5).toString());
+        if (createdBy == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown staff create this facility, can't create");
+        }
+        if (manager == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown manager manage this facility, can't create");
+        }
+        Facility facility = Facility.builder()
+                .name(row.getCell(1).toString())
+                .code("FAC" + GeneralUtils.generateCodeFromSysTime() + row.getCell(0).getNumericCellValue())
+                .address(row.getCell(2).getStringCellValue())
+                .status(CommonStatus.ACTIVE.getStatus().toUpperCase())
+                .latitude(row.getCell(3).getStringCellValue())
+                .longitude(row.getCell(4).getStringCellValue())
+                .creator(createdBy)
+                .manager(manager)
+                .build();
+
+        listFacilities.add(facility);
+        List<Facility> lstFacilities = facilityRepo.saveAll(listFacilities);
+        log.info("Num of facilities added {}", listFacilities.size());
+        clusterCustomerIntoFacility();
+        return lstFacilities;
+    }
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Facility createFacility(FacilityDTO facilityDTO, JwtAuthenticationToken token) throws CustomException {
@@ -80,7 +133,7 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
                 .name(facilityDTO.getName())
                 .code("FAC" + GeneralUtils.generateCodeFromSysTime())
                 .address(facilityDTO.getAddress())
-                .status(CommonStatus.ACTIVE.getStatus().toLowerCase())
+                .status(CommonStatus.ACTIVE.getStatus().toUpperCase())
                 .latitude(facilityDTO.getLatitude())
                 .longitude(facilityDTO.getLongitude())
                 .creator(createdBy)
@@ -98,7 +151,7 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
         for (Customer customer : customers) {
             double bestDistance = Double.POSITIVE_INFINITY;
             int bestIndex = -1;
-            for (int i = 0; i < facilities.size(); i++) {
+            for (int i = 0; i < facilities.size(); i++) { 
                 double cusLat = Double.parseDouble(customer.getLatitude());
                 double cusLon = Double.parseDouble(customer.getLongitude());
                 double facLat = Double.parseDouble(facilities.get(i).getLatitude());

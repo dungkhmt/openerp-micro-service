@@ -15,11 +15,10 @@ import lombok.Setter;
 @Table(name = "container_transport_trailers")
 public class Trailer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    protected String uid;
 
-    @Column(name = "uid")
-    private String uid;
+    @GeneratedValue
+    private Long id;
 
     @Column(name = "trailer_code")
     private String trailerCode;

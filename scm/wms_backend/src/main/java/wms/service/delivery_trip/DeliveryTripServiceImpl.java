@@ -100,11 +100,11 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
     }
 
     @Override
-    public ReturnPaginationDTO<DeliveryTrip> getAllDeliveryTrips(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
+    public ReturnPaginationDTO<DeliveryTrip> getAllDeliveryTrips(int page, int pageSize, String sortField, boolean isSortAsc, String shipmentCode) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
-        Page<DeliveryTrip> deliveryTrips = deliveryTripRepo.search(pageable);
+        Page<DeliveryTrip> deliveryTrips = deliveryTripRepo.search(pageable, shipmentCode);
         return getPaginationResult(deliveryTrips.getContent(), page, deliveryTrips.getTotalPages(), deliveryTrips.getTotalElements());
     }
 
@@ -217,10 +217,17 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
                 distanceElement.setFromLocationId(points.get(i).getName());
                 distanceElement.setToLocationId(points.get(j).getName());
 //              double distance = Utils.calculateEuclideanDistance(points.get(i), points.get(j));
-                double distance = Utils.getDistanceGraphhopperApi(points.get(i).getX(), points.get(i).getY(),
-                        points.get(j).getX(), points.get(j).getY());
-                if (distance < 0) {
-                    throw new Exception("Got problem retrieving distance from internet");
+                double distance;
+                try {
+                    distance = Utils.getDistanceGraphhopperApi(points.get(i).getX(), points.get(i).getY(),
+                            points.get(j).getX(), points.get(j).getY());
+                }
+                catch (Exception ex) {
+                    log.error(ex.getMessage());
+                }
+                finally {
+                        distance = Utils.calculateEuclideanDistance(points.get(i), points.get(j));
+//                    throw new Exception("Got problem retrieving distance from internet");
                 }
                 distanceElement.setDistance(distance);
                 distanceElement.setTravelTime(distance / input.getTruck().getSpeed());

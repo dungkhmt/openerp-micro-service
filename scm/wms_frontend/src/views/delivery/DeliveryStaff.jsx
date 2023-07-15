@@ -67,7 +67,27 @@ function DeliveryStaffScreen({ screenAuthorization }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} containFilter={false} />
+        <CustomToolBar
+          actions={actions}
+          containFilter={false}
+          onSearch={(keyword) => {
+            if (keyword) {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: keyword,
+                };
+              });
+            } else {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: "",
+                };
+              });
+            }
+          }}
+        />
       </Box>
       <CustomDataGrid
         params={params}
@@ -77,6 +97,7 @@ function DeliveryStaffScreen({ screenAuthorization }) {
         totalItem={users?.totalElements}
         handlePaginationModelChange={(props) => {
           setParams({
+            ...params,
             page: props?.page + 1,
             pageSize: props?.pageSize,
             role: "SCM_DELIVERY_STAFF",
@@ -110,23 +131,6 @@ function DeliveryStaffScreen({ screenAuthorization }) {
         ]}
         rows={users ? users?.content : []}
       />
-      {/* <CustomModal
-        open={isAdd}
-        toggle={setIsAdd}
-        size="sm"
-        title="Tạo mới đơn mua hàng"
-      >
-        <CreatePurOrderForm setIsAdd={setIsAdd} />
-      </CustomModal>
-
-      <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
-        <HeaderModal onClose={setOpenDrawer} title="Sửa thông tin đơn hàng" />
-      </CustomDrawer>
-      <DraggableDeleteDialog
-        open={isRemove && itemSelected}
-        handleOpen={setIsRemove}
-        callback={(flag) => {}}
-      /> */}
     </Box>
   );
 }

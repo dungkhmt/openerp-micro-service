@@ -17,7 +17,6 @@ public class DeliveryRouteServiceImpl implements DeliveryRouteService {
     DistanceCalculator distanceCalculator;
     private Map<AddressPair, ResponsePath> pathMap = new HashMap<>();
     private final Double INFINITY_VALUE = Double.MAX_VALUE;
-    private List<List<Integer>> OPTIMAL_PATHS = new ArrayList<>();
 
     @Override
     public RouteResponse getRoute(RouteRequest r) {
@@ -109,13 +108,8 @@ public class DeliveryRouteServiceImpl implements DeliveryRouteService {
         log.info(String.format("Norm address => %s", normAddress));
     }
 
-    public void getSimpleRoute(List<Double[]> costMatrix) {
-        List<Integer> path = new ArrayList<>();
-        List<List<Integer>> totalPaths = new ArrayList<>();
-        tsp(0, costMatrix.size(), path, costMatrix, ReducedMatrix.builder().matrix(costMatrix).build(), totalPaths);
-    }
-
-    private void tsp(int level, int totalNode, List<Integer> path, List<Double[]> costMatrix, ReducedMatrix reducedMatrix, List<List<Integer>> totalPaths) {
+    @Override
+    public void tsp(int level, int totalNode, List<Integer> path, List<Double[]> costMatrix, ReducedMatrix reducedMatrix, List<List<Integer>> totalPaths) {
         if (level == 0) {
             path.add(0); // warehouse
             ReducedMatrix matrix = getReducedMatrix(reducedMatrix);

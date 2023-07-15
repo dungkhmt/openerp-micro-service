@@ -23,7 +23,7 @@ const TrailerScreen = () => {
         setOpenModal(!openModal);
     }
     useEffect(() => {
-        getTraler({}).then((res) => {
+        getTraler({ page: page, pageSize: rowsPerPage }).then((res) => {
             console.log("trailer", res?.data.data.trailerModels);
             setTrailer(res?.data.data.trailerModels);
             setCount(res?.data.data.count);

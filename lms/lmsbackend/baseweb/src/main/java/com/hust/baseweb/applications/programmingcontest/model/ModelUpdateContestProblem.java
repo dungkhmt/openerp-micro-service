@@ -15,6 +15,9 @@ public class ModelUpdateContestProblem {
     private String problemName;
     private String problemDescription;
     private int timeLimit;
+    private int timeLimitCPP;
+    private int timeLimitJAVA;
+    private int timeLimitPYTHON;
     private int memoryLimit;
     private String levelId;
     private String categoryId;
@@ -28,4 +31,5 @@ public class ModelUpdateContestProblem {
     private String[] fileId;
     private Integer[] tagIds;
     private List<String> removedFilesId;
+    private String status;
 }

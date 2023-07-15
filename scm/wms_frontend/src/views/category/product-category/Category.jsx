@@ -69,7 +69,11 @@ function ProductCategoryScreen({ screenAuthorization }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} />
+        <CustomToolBar
+          actions={actions}
+          containFilter={false}
+          containSearch={false}
+        />
       </Box>
       <CustomDataGrid
         params={params}

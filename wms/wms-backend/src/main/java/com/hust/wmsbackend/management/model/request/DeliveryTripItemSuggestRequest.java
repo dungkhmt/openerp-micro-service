@@ -10,6 +10,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class DeliveryTripItemSuggestRequest {
-    private List<String> customerAddressIds;
+    private List<String> assignedOrderItemIds;
     private String warehouseId;
 }

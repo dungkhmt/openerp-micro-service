@@ -29,7 +29,7 @@ function ShipmentDetailScreen() {
   const [isAdd, setIsAdd] = useToggle(false);
 
   const { isLoading, data } = useGetDeliveryTripList({
-    shipment_code: currShipment?.code,
+    shipmentCode: currShipment?.code,
     ...params,
   });
 

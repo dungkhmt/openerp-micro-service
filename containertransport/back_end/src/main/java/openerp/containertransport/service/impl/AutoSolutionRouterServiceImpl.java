@@ -11,6 +11,7 @@ import openerp.containertransport.entity.Relationship;
 import openerp.containertransport.service.*;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         ShipmentModel shipmentModel = shipmentService.getShipmentByUid(shipmentUid);
 
         TransportContainerInput transportContainerInput = new TransportContainerInput();
-        transportContainerInput.setStartTime(shipmentModel.getExecutedTime());
+        transportContainerInput.setStartTime(BigDecimal.valueOf(shipmentModel.getExecutedTime()));
 
         // get Trucks
         TruckFilterRequestDTO truckFilterRequestDTO = new TruckFilterRequestDTO();

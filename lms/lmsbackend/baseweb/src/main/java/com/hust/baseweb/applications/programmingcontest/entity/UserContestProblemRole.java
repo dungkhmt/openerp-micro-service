@@ -19,14 +19,14 @@ import java.util.UUID;
 
 public class UserContestProblemRole {
 
-    public static final String ROLE_MANAGER = "MANAGER";
-    public static final String ROLE_VIEW = "VIEW";
+    public static final String ROLE_EDITOR = "EDITOR";
+    public static final String ROLE_VIEWER = "VIEWER";
     public static final String ROLE_OWNER = "OWNER";
 
     public static List<String> getListRoles() {
         List<String> L = new ArrayList();
-        L.add(ROLE_MANAGER);
-        L.add(ROLE_VIEW);
+        L.add(ROLE_EDITOR);
+        L.add(ROLE_VIEWER);
         L.add(ROLE_OWNER);
         return L;
     }

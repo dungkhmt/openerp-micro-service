@@ -139,24 +139,24 @@ function GroupMenuItem(props) {
     }
   }
 
-  if (group.child.length === 1) {
-    const childMenuItem = group.child[0];
+  // if (group.child.length === 1) {
+  //   const childMenuItem = group.child[0];
 
-    if (!childMenuItem.icon) {
-      childMenuItem.icon = group.icon;
-    }
+  //   if (!childMenuItem.icon) {
+  //     childMenuItem.icon = group.icon;
+  //   }
 
-    return (
-      <MenuItem
-        key={childMenuItem.text}
-        menuItem={childMenuItem}
-        color={color}
-        selected={selected[0]}
-        menu={permittedFunctions}
-        icon
-      />
-    );
-  } else
+  //   return (
+  //     <MenuItem
+  //       key={childMenuItem.text}
+  //       menuItem={childMenuItem}
+  //       color={color}
+  //       selected={selected[0]}
+  //       menu={permittedFunctions}
+  //       icon
+  //     />
+  //   );
+  // } else
     return (
       <li>
         <ListItem

@@ -1,13 +1,7 @@
 import { Typography } from "@mui/material";
 import { icon } from "leaflet";
 import { useRef } from "react";
-import {
-  MapContainer,
-  Marker,
-  Polyline,
-  Popup,
-  TileLayer,
-} from "react-leaflet";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { useLocation } from "react-router-dom";
 import withScreenSecurity from "../../../components/common/withScreenSecurity";
 
@@ -101,7 +95,7 @@ function CustomerMapScreen({ screenAuthorization }) {
           </Popup>
         </Marker>
       ))}
-      {polyPoints.map((points, index) => {
+      {/* {polyPoints.map((points, index) => {
         return (
           <Polyline
             key={index}
@@ -109,7 +103,7 @@ function CustomerMapScreen({ screenAuthorization }) {
             pathOptions={{ color: "red" }}
           />
         );
-      })}
+      })} */}
     </MapContainer>
   );
 }

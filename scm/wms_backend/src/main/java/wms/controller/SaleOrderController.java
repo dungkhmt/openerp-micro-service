@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import wms.common.constant.DefaultConst;
-import wms.dto.purchase_order.UpdatePurchaseOrderStatusDTO;
 import wms.dto.sale_order.SaleOrderDTO;
 import wms.dto.sale_order.UpdateSaleOrderStatusDTO;
 import wms.entity.ResultEntity;
@@ -38,10 +37,14 @@ public class SaleOrderController extends BaseController {
             @RequestParam(value = DefaultConst.PAGE_SIZE, required = false, defaultValue = DefaultConst.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = DefaultConst.SORT_TYPE, required = false, defaultValue = DefaultConst.STRING) String sortField,
             @RequestParam(value = "sortAsc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc,
-            @RequestParam(value = "orderStatus", required = false, defaultValue = DefaultConst.STRING) String orderStatus
+            @RequestParam(value = "orderStatus", required = false, defaultValue = DefaultConst.STRING) String orderStatus,
+            @RequestParam(value = "createdBy", required = false, defaultValue = DefaultConst.STRING) String createdBy,
+            @RequestParam(value = "customerName", required = false, defaultValue = DefaultConst.STRING) String customerName,
+            @RequestParam(value = "textSearch", required = false, defaultValue = DefaultConst.STRING) String textSearch
     ) {
         try {
-            return response(new ResultEntity(1, "Get list orders successfully", saleOrderService.getAllOrders(page, pageSize, sortField, isSortAsc, orderStatus)));
+            return response(new ResultEntity(1, "Get list orders successfully", saleOrderService.getAllOrders(page, pageSize, sortField, isSortAsc, orderStatus,
+                    createdBy, customerName, textSearch)));
         } catch (Exception ex) {
             return response(error(ex));
         }
@@ -60,34 +63,6 @@ public class SaleOrderController extends BaseController {
             return response(error(ex));
         }
     }
-//    @GetMapping("/get-by-id/{id}")
-//    public ResponseEntity<?> getOrderByID(@PathVariable("id") long id) {
-//        try {
-//            return response(new ResultEntity(1, "Get order by id successfully", purchaseOrderService.getOrderById(id)));
-//        } catch (Exception ex) {
-//            return response(error(ex));
-//        }
-//    }
-//    @GetMapping("/get-by-code")
-//    public ResponseEntity<?> getOrderByCode(
-//            @RequestParam(value = "code", required = true, defaultValue = DefaultConst.STRING) String code) {
-//        try {
-//            return response(new ResultEntity(1, "Get order by code successfully", purchaseOrderService.getOrderByCode(code)));
-//        } catch (Exception ex) {
-//            return response(error(ex));
-//        }
-//    }
-//    @ApiOperation(value = "Should only update products and vat")
-//    // TODO: Reconsider this apis
-//    @PutMapping("/update/{id}")
-//    public ResponseEntity<?> updateOrder(@Valid @RequestBody UpdatePurchaseOrderDTO updatePurchaseOrderDTO, @PathVariable("id") long id) {
-//        try {
-//            return response(new ResultEntity(1, "Update order successfully", purchaseOrderService.updateOrder(updatePurchaseOrderDTO, id)));
-//        } catch (Exception ex) {
-//            return response(error(ex));
-//        }
-//    }
-//
     @ApiOperation(value = "Approve created order. Only created order can be approved")
     @PutMapping("/update-status")
     public ResponseEntity<?> updateOrderStatus(@RequestBody UpdateSaleOrderStatusDTO status,
@@ -98,13 +73,14 @@ public class SaleOrderController extends BaseController {
             return response(error(ex));
         }
     }
-//    @DeleteMapping("/delete/{id}")
-//    public ResponseEntity<?> deleteOrderById(@PathVariable("id") long id) {
-//        try {
-//            purchaseOrderService.deleteOrderById(id);
-//            return response(new ResultEntity(1, "Delete order successfully", id));
-//        } catch (Exception ex) {
-//            return response(error(ex));
-//        }
-//    }
+    @GetMapping("/export-order-pdf")
+    public ResponseEntity<?> exportOrderPdf(
+            @RequestParam(value = "orderCode", required = true) String orderCode
+    ) {
+        try {
+            return saleOrderService.exportOrderPdf(orderCode);
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
 }

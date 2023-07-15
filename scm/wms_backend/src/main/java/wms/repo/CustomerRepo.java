@@ -10,8 +10,16 @@ import wms.entity.Facility;
 import java.util.List;
 
 public interface CustomerRepo extends JpaRepository<Customer, Long> {
-    @Query(value = "select * from scm_customer where is_deleted = 0", nativeQuery = true)
-    Page<Customer> search(Pageable pageable);
+    @Query(value = "select * from scm_customer sc where sc.is_deleted = 0\n" +
+            "            and (sc.name ilike concat('%', :customerName, '%'))\n" +
+            "            and (sc.status = :status or :status = '')\n" +
+            "            and (sc.created_by = :createdBy or :createdBy = '')\n" +
+            "            and (sc.address ilike concat('%', :address, '%'))\n" +
+            "            and (sc.name ilike concat('%', :textSearch, '%')\n" +
+            "                    or sc.code ilike concat('%', :textSearch, '%')\n" +
+            "                    or sc.status ilike concat('%', :textSearch, '%')\n" +
+            "                    or sc.address ilike concat('%', :textSearch, '%'))", nativeQuery = true)
+    Page<Customer> search(Pageable pageable, String customerName,String status,String createdBy,String address,String textSearch);
     Customer getCustomerById(long id);
     Customer getCustomerByCode(String code);
     @Query(value = "select * from scm_customer where is_deleted = 0", nativeQuery = true)

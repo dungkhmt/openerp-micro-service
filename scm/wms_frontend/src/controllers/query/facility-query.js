@@ -116,3 +116,25 @@ export const useUpdateFacility = (params) => {
     onMutate: (variables) => {},
   });
 };
+export const useImportFacility = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.importFacility,
+        params,
+        data
+      );
+      if (res.code === 1) {
+        toast.success("Tạo kho hàng mới thành công!");
+        queryClient.invalidateQueries([queryKey.category.customer_list]);
+        return res.data;
+      }
+    },
+    onError: () => {
+      toast.error("Lỗi khi tạo kho hàng, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};

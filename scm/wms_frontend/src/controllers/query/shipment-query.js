@@ -16,6 +16,7 @@ export const useCreateShipment = (params) => {
       );
       if (res.data && res.code === 1) {
         toast.success("Tạo đợt giao hàng thành công!");
+        queryClient.invalidateQueries([queryKey.shipment.shipment_list]);
         return res.data;
       }
     },
@@ -23,9 +24,9 @@ export const useCreateShipment = (params) => {
     //   toast.success("Tạo đợt giao hàng thành công!");
     //   queryClient.invalidateQueries([queryKey.shipment.shipment_list]);
     // },
-    // onError: () => {
-    //   toast.error("Lỗi khi tạo kế hoạch, vui lòng kiểm tra lại");
-    // },
+    onError: () => {
+      toast.error("Lỗi khi tạo đợt giao hàng, vui lòng kiểm tra lại");
+    },
     // // befor mutation function actually triggers.
     // onMutate: (variables) => {},
   });

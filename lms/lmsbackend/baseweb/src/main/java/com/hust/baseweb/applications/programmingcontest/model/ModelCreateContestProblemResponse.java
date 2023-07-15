@@ -25,6 +25,12 @@ public class ModelCreateContestProblemResponse {
 
     private int timeLimit;
 
+    private int timeLimitCPP;
+
+    private int timeLimitJAVA;
+
+    private int timeLimitPYTHON;
+
     private int memoryLimit;
 
     private String levelId;
@@ -54,4 +60,8 @@ public class ModelCreateContestProblemResponse {
     private List<String> attachmentNames;
 
     private List<TagEntity> tags;
+
+    private String status;
+
+    private List<String> roles;
 }

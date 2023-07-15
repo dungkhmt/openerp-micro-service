@@ -2,12 +2,10 @@ package com.hust.baseweb.applications.programmingcontest.entity;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,6 +16,8 @@ import java.util.Date;
 @Table(name = "contest_problem_new")
 public class ProblemEntity implements Serializable {
     private static final long serialVersionUID = 3487495895819800L;
+    public static final String PROBLEM_STATUS_OPEN = "OPEN";
+    public static final String PROBLEM_STATUS_HIDDEN = "HIDDEN";
 
     @Id
     @Column(name = "problem_id")
@@ -32,8 +32,17 @@ public class ProblemEntity implements Serializable {
     @Column(name = "created_by_user_login_id")
     private String userId;
 
-    @Column(name = "time_limit")
-    private int timeLimit;
+//    @Column(name = "time_limit")
+//    private int timeLimit;
+
+    @Column(name = "time_limit_cpp")
+    private int timeLimitCPP;
+
+    @Column(name = "time_limit_java")
+    private int timeLimitJAVA;
+
+    @Column(name = "time_limit_python")
+    private int timeLimitPYTHON;
 
     @Column(name = "memory_limit")
     private int memoryLimit;
@@ -74,10 +83,25 @@ public class ProblemEntity implements Serializable {
     @Column(name = "score_evaluation_type")
     private String scoreEvaluationType;
 
+    @Column(name = "appearances")
+    private int appearances;
+
+//    @OneToMany(mappedBy = "contestProblem")
+//    private Set<TestCase> testCases;
+//    @JoinTable(name = "contest_problem_test_case",
+//            joinColumns = @JoinColumn(name = "problem_id", referencedColumnName = "problem_id"),
+//            inverseJoinColumns = @JoinColumn(name = "test_case_id", referencedColumnName = "test_case_id")
+//    )
+//    @OneToMany(fetch = FetchType.LAZY)
+//    private List<TestCase> testCases;
+
 //    @JoinTable(name = "problem_tag",
-//               joinColumns = @JoinColumn(name = "problem_id", referencedColumnName = "problem_id"),
-//               inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "tag_id")
+//            joinColumns = @JoinColumn(name = "problem_id", referencedColumnName = "problem_id"),
+//            inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "tag_id")
 //    )
 //    @OneToMany(fetch = FetchType.LAZY)
 //    private List<TagEntity> tags;
+
+    @Column(name = "status_id")
+    private String statusId;
 }

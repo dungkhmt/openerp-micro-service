@@ -68,11 +68,11 @@ function MainAppRoute(props) {
           />
           <PrivateRoute component={ThesisRoutes} path="/thesis" />
 
-          <Route
+          <PrivateRoute
             component={UploadUser}
             exact
             path={`/user/upload`}
-          ></Route>
+          />
 
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />

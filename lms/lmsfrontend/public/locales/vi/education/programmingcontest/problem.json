@@ -24,6 +24,7 @@
   "validateSubmit": {
     "warningCheckSolutionCompile": "Bạn chưa hoàn thành bước \"BIÊN DỊCH\"",
     "missingField": "Trường {{fieldName}} không được bỏ trống"
-  }
+  },
+  "status": "Trạng thái"
 
 }

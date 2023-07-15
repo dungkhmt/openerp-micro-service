@@ -16,8 +16,10 @@ public interface UserRepo extends JpaRepository<UserRegister, Long> {
             , nativeQuery = true)
     UserRegister getUserByUserLoginId(String id);
 
-    @Query(value = "            select *\n" +
-            "            from user_register ur\n" +
-            "            where ur.registered_roles like concat('%', :role, '%')", nativeQuery = true)
-    Page<UserRegister> search(Pageable pageable, String role);
+    @Query(value = " select * from user_register ur where ur.registered_roles like concat('%', :role, '%')\n" +
+            " and (ur.user_login_id ilike concat('%', :textSearch, '%')\n" +
+            "                    or ur.email ilike concat('%', :textSearch, '%')\n" +
+            "                    or concat(ur.first_name, ' ', ur.middle_name, ' ', ur.last_name) ilike concat('%', :textSearch, '%')\n" +
+            "                    or ur.status_id ilike concat('%', :textSearch, '%'))", nativeQuery = true)
+    Page<UserRegister> search(Pageable pageable, String role, String textSearch);
 }

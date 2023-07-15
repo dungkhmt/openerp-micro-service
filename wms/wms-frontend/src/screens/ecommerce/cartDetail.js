@@ -99,7 +99,7 @@ const CartDetail = () => {
   const [isOpenMapModal, setOpenMapModal] = useState(false);
   const [selectPosition, setSelectPosition] = useState(null);
   const [cartItems, setCartItems] = useState(null);
-  const [paymentType, setPaymentType] = useState(null);
+  const [paymentType, setPaymentType] = useState("0");
   const [isLoading, setLoading] = useState(true);
 
   const { register, errors, handleSubmit, watch, getValues } = useForm();

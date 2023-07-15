@@ -148,6 +148,7 @@ const DeliveryTripDetail = ( props ) => {
     setSelectedWarehouseName(selectedAssignedItem.warehouseName);
     setSelectedQuantity(1);
 
+    console.log("Items => ", [...deliveryItemsTableData, newDeliveryItem]);
     await request(
       'post',
       API_PATH.SUGGEST_ITEM,
@@ -159,7 +160,7 @@ const DeliveryTripDetail = ( props ) => {
       },
       {
         warehouseId: newDeliveryItem.warehouseId,
-        customerAddressIds: [...deliveryItemsTableData, newDeliveryItem].map(item => item.customerAddressId)
+        assignedOrderItemIds: [...deliveryItemsTableData, newDeliveryItem].map(item => item.assignOrderItemId)
       }
     )
 
@@ -185,7 +186,7 @@ const DeliveryTripDetail = ( props ) => {
         if (res.status == 200) {
           setTripInfo(res.data);
           successNoti("Lưu thông tin chuyến giao hàng thành công");
-          // window.location.reload();
+          window.location.reload();
         }
       },
       {

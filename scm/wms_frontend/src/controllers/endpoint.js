@@ -50,10 +50,12 @@ export const endPoint = {
   createSellinPrice: baseUrl + "/product/set-purchase-price",
   getSellinPrice: baseUrl + "/product/get-all-sellin-price",
   updateSellinPrice: baseUrl + "/product/sellin-price/update",
+  exportPurchaseOrderPdf: baseUrl + "/purchase-order/export-order-pdf",
   // Facility
   getFacility: baseUrl + "/facility/get-all",
   getFacilityInventory: baseUrl + "/facility/get-inventory",
   createFacility: baseUrl + "/facility/create",
+  importFacility: baseUrl + "/facility/create-from-file",
   updateFacility: baseUrl + "/facility/update",
   getFacilityNoPaging: baseUrl + "/facility/get-all-without-paging",
   getFacilityCustomers: baseUrl + "/facility/get-customer-of-facility-paging",
@@ -77,6 +79,7 @@ export const endPoint = {
   createSelloutPrice: baseUrl + "/product/set-sale-price",
   getSelloutPrice: baseUrl + "/product/get-all-sellout-price",
   updateSelloutPrice: baseUrl + "/product/sellout-price/update",
+  exportSaleOrderPdf: baseUrl + "/sale-order/export-order-pdf",
   // Shipment
   createShipment: baseUrl + "/shipment/create",
   getShipments: baseUrl + "/shipment/get-all",

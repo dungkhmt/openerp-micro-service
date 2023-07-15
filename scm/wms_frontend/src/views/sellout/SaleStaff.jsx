@@ -67,7 +67,27 @@ function SaleStaffScreen({ screenAuthorization }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} containFilter={false} />
+        <CustomToolBar
+          actions={actions}
+          containFilter={false}
+          onSearch={(keyword) => {
+            if (keyword) {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: keyword,
+                };
+              });
+            } else {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: "",
+                };
+              });
+            }
+          }}
+        />
       </Box>
       <CustomDataGrid
         params={params}
@@ -77,6 +97,7 @@ function SaleStaffScreen({ screenAuthorization }) {
         totalItem={users?.totalElements}
         handlePaginationModelChange={(props) => {
           setParams({
+            ...params,
             page: props?.page + 1,
             pageSize: props?.pageSize,
             role: "SCM",

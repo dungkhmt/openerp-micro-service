@@ -17,6 +17,7 @@ public class FacilityModel {
     private String facilityCode;
     private String facilityName;
     private String facilityType;
+    private String typeOwner;
     private String address;
     private String owner;
     private BigDecimal acreage;

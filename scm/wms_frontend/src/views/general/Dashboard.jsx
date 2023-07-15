@@ -1,5 +1,6 @@
 import { Box, Stack, Typography } from "@mui/material";
 import { blue, deepOrange } from "@mui/material/colors";
+import moment from "moment";
 import { ErrorBoundary } from "react-error-boundary";
 import AreaChart from "../../components/chart/AreaChart";
 import BarChart from "../../components/chart/BarChart";
@@ -85,35 +86,39 @@ const mappingData = [
   ["vn-333", "Cần Thơ"],
 ];
 const DashBoard = () => {
+  let currMonth = moment().month() + 1;
+  let currYear = moment().year();
+  let currQuarter = moment().quarter();
+  // console.log("Month, year, quarter", currMonth, currYear, currQuarter);
   const { isLoading: loadNewFacility, data: facility } =
     useGetNewFacilityMonthly({
-      year: 2023,
+      year: currYear,
     });
   const { isLoading: loadNewCustomer, data: customer } =
     useGetNewCustomerMonthly({
-      year: 2023,
+      year: currYear,
     });
   const { isLoading: loadImportedProduct, data: importedProducts } =
     useGetImportedProduct({
-      month: 5,
-      year: 2023,
+      month: currMonth,
+      year: currYear,
     });
   const { isLoading: loadPurchaseOrderQuarter, data: quaterPurchaseOrder } =
     useGetPurchaseOrderQuarterly({
-      quarter: 2,
-      year: 2023,
+      quarter: currQuarter,
+      year: currYear,
     });
   const { isLoading: loadTopFiveCustomer, data: topFiveCustomer } =
     useGetTopCustomerBuying({
-      month: 5,
-      year: 2023,
+      month: currMonth,
+      year: currYear,
     });
   const { isLoading: loadProductCategory, data: productCategory } =
     useGetProductCategoryRate();
   const { isLoading: loadTripCustomers, data: tripCustomers } =
     useGetTripCustomerPerProvince({
-      month: 5,
-      year: 2023,
+      month: currMonth,
+      year: currYear,
     });
   const { isLoading: loadSaleAnnually, data: salesAnnually } =
     useGetSaleAnnually();
@@ -347,7 +352,7 @@ const DashBoard = () => {
                         : -1;
                     });
                     let index = mapping?.findIndex((a) => a !== -1);
-                    return [mappingData[index][0], res[1]];
+                    return [mappingData?.[index]?.[0], res[1]];
                   })
                 : []
             }

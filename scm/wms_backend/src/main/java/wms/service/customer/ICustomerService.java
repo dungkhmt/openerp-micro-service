@@ -6,10 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.customer.CustomerDTO;
 import wms.dto.customer.CustomerUpdateDTO;
-import wms.dto.product.ProductDTO;
 import wms.entity.Customer;
-import wms.entity.Facility;
-import wms.entity.ProductEntity;
 import wms.exception.CustomException;
 
 import java.io.IOException;
@@ -19,7 +16,8 @@ public interface ICustomerService {
     void createCustomerFromFile(MultipartFile file, JwtAuthenticationToken token) throws IOException, CustomException;
 //    List<Customer> importCustomer();
     Customer createNewCustomer(CustomerDTO customer,  JwtAuthenticationToken token) throws CustomException;
-    ReturnPaginationDTO<Customer> getAllCustomers(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
+    ReturnPaginationDTO<Customer> getAllCustomers(int page, int pageSize,
+                                                  String sortField, boolean isSortAsc, String customerName, String status, String createdBy, String address, String textSearch) throws JsonProcessingException;
     List<Customer> getAllWithoutPaging();
     Customer getCustomerById(long id);
     Customer getCustomerByCode(String code);

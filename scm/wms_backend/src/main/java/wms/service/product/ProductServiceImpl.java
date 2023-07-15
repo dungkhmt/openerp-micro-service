@@ -129,11 +129,11 @@ public class ProductServiceImpl extends BaseService implements IProductService {
     }
 
     @Override
-    public ReturnPaginationDTO<ProductEntity> getAllProducts(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
+    public ReturnPaginationDTO<ProductEntity> getAllProducts(int page, int pageSize, String sortField, boolean isSortAsc, String productName, String status, String category, String unit, String textSearch) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
-        Page<ProductEntity> productList = productRepository.search(pageable);
+        Page<ProductEntity> productList = productRepository.search(pageable, productName, status, category, unit, textSearch);
         return getPaginationResult(productList.getContent(), page, productList.getTotalPages(), productList.getTotalElements());
     }
 

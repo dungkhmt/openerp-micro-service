@@ -22,7 +22,6 @@ export default function ContestManagerListRegisteredParticipant(props) {
     },
   ];
   function handleApprove(id) {
-    //alert("approve " + id);
     setIsProcessing(true);
     let body = {
       id: id,
@@ -31,13 +30,13 @@ export default function ContestManagerListRegisteredParticipant(props) {
       "post",
       "/approve-registered-user-2-contest",
       (res) => {
-        successNoti("Đã hoàn thành phân công tự động.");
+        successNoti("Successful", 3000);
         setIsProcessing(false);
       },
       {
         onError: () => {
           setIsProcessing(false);
-          errorNoti("Đã có lỗi xảy ra.");
+          errorNoti("An error happened", 5000);
         },
         401: () => {},
       },
@@ -69,7 +68,6 @@ export default function ContestManagerListRegisteredParticipant(props) {
   }, []);
   return (
     <div>
-      {" "}
       <StandardTable
         title={"Registered Members"}
         columns={columns}

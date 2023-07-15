@@ -43,7 +43,6 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
     private UserRepo userRepo;
     @Autowired
     private ProductRepo productRepo;
-
     @Autowired
     private ExportPDFService exportPDFService;
 
@@ -176,6 +175,7 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
     @Override
     public ResponseEntity<InputStreamResource> exportOrderPdf(String orderCode) throws IOException {
         PurchaseOrder order = purchaseOrderRepo.getOrderByCode(orderCode);
-        return exportPDFService.createPdfOrder(order);
+        String dest = "don_mua_hang_" + orderCode + ".pdf";
+        return exportPDFService.createPdfOrder(order, dest);
     }
 }

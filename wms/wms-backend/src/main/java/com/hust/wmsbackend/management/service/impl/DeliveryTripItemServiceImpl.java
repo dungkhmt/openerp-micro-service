@@ -106,7 +106,8 @@ public class DeliveryTripItemServiceImpl implements DeliveryTripItemService {
     @Override
     public List<AssignedOrderItemDTO> getDeliveryTripItemSuggest(DeliveryTripItemSuggestRequest request) {
         if (request.getWarehouseId() == null || request.getWarehouseId().isEmpty()
-            || request.getCustomerAddressIds() == null || request.getCustomerAddressIds().isEmpty()) {
+            || request.getAssignedOrderItemIds() == null || request.getAssignedOrderItemIds().isEmpty()
+        ) {
             return assignedOrderItemService.getAllCreatedItems();
         }
         // lấy tất cả assigned_order_item có cùng warehouseId và status = CREATED
@@ -135,15 +136,27 @@ public class DeliveryTripItemServiceImpl implements DeliveryTripItemService {
 
         // lấy cluster từ danh sách selected assigned_order_item được truyền lên từ request
         List<CustomerAddress> cluster = new ArrayList<>();
-        for (String customerAddressIdStr : request.getCustomerAddressIds()) {
-            Optional<CustomerAddress> opt = customerAddressRepository.findById(UUID.fromString(customerAddressIdStr));
-            if (!opt.isPresent()) {
-                throw new RuntimeException(String.format("Customer address id %s not found", customerAddressIdStr));
+
+        for (String assignedOrderItemIdStr : request.getAssignedOrderItemIds()) {
+            Optional<AssignedOrderItem> itemOpt = assignedOrderItemRepository.findById(UUID.fromString(assignedOrderItemIdStr));
+            if (!itemOpt.isPresent()) {
+                throw new RuntimeException(String.format("Assigned order item id %s not found", assignedOrderItemIdStr));
             }
-            cluster.add(opt.get());
+            AssignedOrderItem item = itemOpt.get();
+            Optional<SaleOrderHeader> orderOpt = saleOrderHeaderRepository.findById(item.getOrderId());
+            if (!orderOpt.isPresent()) {
+                throw new RuntimeException(String.format("Order id %s not found", item.getOrderId()));
+            }
+            SaleOrderHeader order = orderOpt.get();
+            Optional<CustomerAddress> customerAddressOpt = customerAddressRepository.findById(order.getCustomerAddressId());
+            if (!customerAddressOpt.isPresent()) {
+                throw new RuntimeException(String.format("Customer address id %s not found", order.getCustomerAddressId()));
+            }
+            cluster.add(customerAddressOpt.get());
         }
 
         // tính toán và lưu khoảng cách từ các assigned_order_item tới cluster
+        // key = customer address id; value = distance from this address to cluster
         Map<UUID, BigDecimal> distanceMap = new HashMap<>();
         for (CustomerAddress from : selectedAddresses) {
             BigDecimal distance = customerAddressService.getDistanceToCluster(from, cluster);
@@ -163,16 +176,17 @@ public class DeliveryTripItemServiceImpl implements DeliveryTripItemService {
         for (Map.Entry<UUID, BigDecimal> entry : sortedDistanceMap.entrySet()) {
             UUID key = entry.getKey();
             List<Integer> indexes = new ArrayList<>();
-            List<UUID> selectedCustomerAddressIds = request.getCustomerAddressIds().stream().map(UUID::fromString).collect(Collectors.toList());
             for (int i = 0 ; i < orders.size() ; i++) {
-                if (key.compareTo(orders.get(i).getCustomerAddressId()) == 0 &&
-                        !selectedCustomerAddressIds.contains(key)) { // loại những item có customer address nằm trong selected customer address id ở request
+                if (key.compareTo(orders.get(i).getCustomerAddressId()) == 0) {
+                    // loại những item có customer address nằm trong selected customer address id ở request
                     indexes.add(i);
                 }
             }
             for (Integer index : indexes) {
-                sortedByCluster.add(assignedOrderItems.get(index));
-
+                AssignedOrderItem item = assignedOrderItems.get(index);
+                if (!request.getAssignedOrderItemIds().contains(item.getAssignedOrderItemId().toString())) {
+                    sortedByCluster.add(assignedOrderItems.get(index));
+                }
             }
             log.info(String.format("Distance from customerAddressId = %s to cluster is %.10f", key, entry.getValue()));
         }

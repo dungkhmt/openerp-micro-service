@@ -67,7 +67,7 @@ public class Utils {
 
             return distanceMatrix.getPaths().size() > 0 ? distanceMatrix.getPaths().get(0).getDistance() : -1.0;
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
         return -1; // Return a negative value to indicate failure

@@ -17,6 +17,7 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { ORDERS_STATUS } from "shared/AppConstants";
+import { useGetAllUsersExist } from "../../controllers/query/user-query";
 import { saleOrderCols } from "./LocalConstant";
 import CreateSaleOrderForm from "./components/CreateSaleOrderForm";
 
@@ -39,6 +40,8 @@ function SaleOrderScreen({ screenAuthorization }) {
     });
   };
 
+  const STATUS = ["created", "accepted", "delivering", "delivered", "deleted"];
+  const { isLoading: isUserLoading, data: users } = useGetAllUsersExist();
   const { isLoading, data } = useGetSaleOrderList(params);
   let actions = [
     {
@@ -78,10 +81,80 @@ function SaleOrderScreen({ screenAuthorization }) {
       color: AppColors.error,
     },
   ];
+
+  const filterFields = [
+    {
+      component: "select",
+      name: "createdBy",
+      type: "text",
+      label: "Người tạo",
+      readOnly: false,
+      require: true,
+      options: users
+        ? users?.map((user) => {
+            return {
+              name: user?.id,
+            };
+          })
+        : [],
+    },
+    {
+      component: "select",
+      name: "status",
+      type: "text",
+      label: "Trạng thái",
+      readOnly: false,
+      require: true,
+      options: STATUS
+        ? STATUS?.map((status) => {
+            return {
+              name: status,
+            };
+          })
+        : [],
+    },
+    {
+      component: "input",
+      name: "customerName",
+      label: "Khách hàng",
+      readOnly: false,
+      require: true,
+    },
+  ];
+
+  const onSubmit = (data) => {
+    setParams({
+      ...params,
+      createdBy: data?.createdBy?.name,
+      customerName: data?.customerName,
+      orderStatus: data?.status?.name.toUpperCase(),
+    });
+  };
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
-        <CustomToolBar actions={actions} />
+        <CustomToolBar
+          actions={actions}
+          onSearch={(keyword) => {
+            if (keyword) {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: keyword,
+                };
+              });
+            } else {
+              setParams((pre) => {
+                return {
+                  ...pre,
+                  textSearch: "",
+                };
+              });
+            }
+          }}
+          fields={filterFields}
+          onSubmit={onSubmit}
+        />
       </Box>
       <CustomDataGrid
         params={params}
@@ -91,6 +164,7 @@ function SaleOrderScreen({ screenAuthorization }) {
         totalItem={data?.totalElements}
         handlePaginationModelChange={(props) => {
           setParams({
+            ...params,
             page: props?.page + 1,
             pageSize: props?.pageSize,
           });
@@ -114,7 +188,12 @@ function SaleOrderScreen({ screenAuthorization }) {
                     key={index}
                     extraAction={extraAction}
                     onActionCall={extraAction.callback}
-                    disabled={params?.row?.status !== ORDERS_STATUS.created}
+                    disabled={
+                      !(
+                        params?.row?.status === ORDERS_STATUS.created ||
+                        index === 0
+                      )
+                    }
                   />
                 )),
               ];

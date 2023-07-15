@@ -1,6 +1,7 @@
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import {
   Box,
@@ -10,6 +11,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import axios from "axios";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomModal from "components/modal/CustomModal";
 import CustomOrderTable from "components/table/CustomOrderTable";
@@ -27,6 +29,7 @@ import PrimaryButton from "../../components/button/PrimaryButton";
 import CustomDataGrid from "../../components/datagrid/CustomDataGrid";
 import CustomizedDialogs from "../../components/dialog/CustomizedDialogs";
 import CustomDeliveryBillTable from "../../components/table/CustomDeliveryBillTable";
+import { endPoint } from "../../controllers/endpoint";
 import { useGetFacilityInventory } from "../../controllers/query/facility-query";
 import {
   useGetSaleOrderItems,
@@ -34,6 +37,7 @@ import {
 } from "../../controllers/query/sale-order-query";
 import { AppColors } from "../../shared/AppColors";
 import { ORDERS_STATUS } from "../../shared/AppConstants";
+import { convertUserToName } from "../../utils/GlobalUtils";
 import { deliveryBillCols } from "./LocalConstant";
 import CreateDeliveryBill from "./components/CreateDeliveryBill";
 function SaleOrderDetailScreen() {
@@ -60,7 +64,8 @@ function SaleOrderDetailScreen() {
       {
         title:
           previous === "saleOrderScreen"
-            ? currOrder?.status === ORDERS_STATUS.accepted
+            ? currOrder?.status === ORDERS_STATUS.accepted ||
+              currOrder?.status === ORDERS_STATUS.delivering
               ? "Đã phê duyệt"
               : "Phê duyệt đơn hàng"
             : "Tạo phiếu xuất kho",
@@ -76,10 +81,45 @@ function SaleOrderDetailScreen() {
           previous === "saleOrderScreen" ? <CheckCircleIcon /> : <AddIcon />,
         describe: "Thêm bản ghi mới",
         disabled:
-          previous === "saleOrderScreen" &&
-          currOrder?.status === ORDERS_STATUS.accepted,
+          (previous === "saleOrderScreen" &&
+            (currOrder?.status === ORDERS_STATUS.accepted ||
+              currOrder?.status === ORDERS_STATUS.delivering)) ||
+          (previous !== "saleOrderScreen" &&
+            currOrder?.status === ORDERS_STATUS.delivering),
 
         color: orderApproved ? "success" : null,
+      },
+      {
+        title: "Xuất pdf",
+        callback: async () => {
+          let params = {
+            orderCode: currOrder?.code,
+          };
+          const axiosConfig = {
+            responseType: "arraybuffer",
+            headers: {
+              Accept: "application/json",
+            },
+          };
+          const queryString = new URLSearchParams(params).toString();
+          axios
+            .get(endPoint.exportSaleOrderPdf + "?" + queryString, axiosConfig)
+            .then((res) => {
+              const fileURL = window.URL.createObjectURL(new Blob([res.data]));
+              // Setting various property values
+              let alink = document.createElement("a");
+              alink.setAttribute(
+                "download",
+                `sale_order_${currOrder?.code}.pdf`
+              );
+              document.body.appendChild(alink);
+              alink.href = fileURL;
+              alink.click();
+            });
+        },
+        icon: <PictureAsPdfIcon />,
+        describe: "Xuất báo cáo pdf",
+        disabled: false,
       },
     ];
   }, [previous, currOrder, orderApproved]);
@@ -109,7 +149,6 @@ function SaleOrderDetailScreen() {
   const updateSaleOrderQuery = useUpdateSaleOrderStatus({
     orderCode: currOrder?.code,
   });
-  console.log("Curr: ", currOrder);
   const renderCustomTable = useCallback(() => {
     return (
       <CustomOrderTable
@@ -228,7 +267,7 @@ function SaleOrderDetailScreen() {
               color: AppColors.secondary,
             }}
           >
-            {currOrder?.user?.id}
+            {convertUserToName(currOrder?.user)}
           </Typography>
         </Stack>
         <Stack sx={{ flexDirection: "row" }}>

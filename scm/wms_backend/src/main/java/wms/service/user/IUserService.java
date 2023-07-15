@@ -9,7 +9,7 @@ import wms.exception.CustomException;
 import java.util.List;
 
 public interface IUserService {
-    ReturnPaginationDTO<UserRegister> getAllUsersPaging(int page, int pageSize, String sortField, boolean isSortAsc, String role) throws JsonProcessingException;
+    ReturnPaginationDTO<UserRegister> getAllUsersPaging(int page, int pageSize, String sortField, boolean isSortAsc, String role, String textSearch) throws JsonProcessingException;
     List<UserRegister> getAllUsers();
     UserRegister getUserById(long id);
     UserRegister getUserByCode(String code);

@@ -29,6 +29,9 @@ public class Facility {
     @Column(name = "facility_type")
     private String facilityType;
 
+    @Column(name = "type_owner")
+    private String typeOwner;
+
     private String address;
 
     private String owner;

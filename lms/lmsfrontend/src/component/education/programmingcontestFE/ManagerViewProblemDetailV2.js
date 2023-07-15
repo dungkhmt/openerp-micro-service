@@ -28,6 +28,7 @@ import ContestsUsingAProblem from "./ContestsUsingAProblem";
 import EditIcon from "@mui/icons-material/Edit";
 import {useHistory} from "react-router-dom";
 import {styled} from "@mui/material/styles";
+import { PROBLEM_ROLE, PROBLEM_STATUS } from "utils/constants";
 
 const CssTextField = styled(TextField)({
   ".MuiInputBase-input.Mui-disabled": {
@@ -54,7 +55,10 @@ function ManagerViewProblemDetailV2() {
 
   const [problemName, setProblemName] = useState("");
   const [description, setDescription] = useState("");
-  const [timeLimit, setTimeLimit] = useState(1);
+  // const [timeLimit, setTimeLimit] = useState(1);
+  const [timeLimitCPP, setTimeLimitCPP] = useState(1);
+  const [timeLimitJAVA, setTimeLimitJAVA] = useState(1);
+  const [timeLimitPYTHON, setTimeLimitPYTHON] = useState(1);
   const [memoryLimit, setMemoryLimit] = useState(1);
   const [levelId, setLevelId] = useState("");
   const [languageSolution, setLanguageSolution] = useState("CPP");
@@ -65,6 +69,8 @@ function ManagerViewProblemDetailV2() {
   const [isPublic, setIsPublic] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [fetchedImageArray, setFetchedImageArray] = useState([]);
+  const [status, setStatus] = useState("");
+  const [roles, setRoles] = useState([]);
 
 
   useEffect(() => {
@@ -83,7 +89,10 @@ function ManagerViewProblemDetailV2() {
 
       setProblemName(res.problemName);
       setLevelId(res.levelId);
-      setTimeLimit(res.timeLimit);
+      // setTimeLimit(res.timeLimit);
+      setTimeLimitCPP(res.timeLimitCPP);
+      setTimeLimitJAVA(res.timeLimitJAVA);
+      setTimeLimitPYTHON(res.timeLimitPYTHON);
       setMemoryLimit(res.memoryLimit);
       setIsPublic(res.publicProblem);
       setLanguageSolution(res.correctSolutionLanguage);
@@ -93,6 +102,8 @@ function ManagerViewProblemDetailV2() {
       setIsCustomEvaluated(res.scoreEvaluationType === CUSTOM_EVALUATION);
       setDescription(res.problemDescription);
       setSelectedTags(res.tags);
+      setRoles(res.roles);
+      setStatus(res.status);
     });
   }, [problemId]);
 
@@ -100,26 +111,56 @@ function ManagerViewProblemDetailV2() {
     <HustContainerCard
       title={"Problem Detail"}
       action={
-        <Button
-          variant="contained"
-          color="info"
-          onClick={() => {
-            history.push("/programming-contest/edit-problem/" + problemId);
-          }}
-          startIcon={<EditIcon sx={{marginRight: "4px"}}/>}
-        >
-          Edit
-        </Button>
+        <>
+          <Button
+            variant="contained"
+            color="info"
+            onClick={() => {
+              history.push("/programming-contest/edit-problem/" + problemId);
+            }}
+            startIcon={<EditIcon sx={{ marginRight: "4px" }} />}
+            sx={{ marginRight: "8px" }}
+            disabled={!roles.includes(PROBLEM_ROLE.OWNER) && (
+              !roles.includes(PROBLEM_ROLE.EDITOR) || status !== PROBLEM_STATUS.OPEN
+            )}
+          >
+            Edit
+          </Button>
+          {
+          roles.includes(PROBLEM_ROLE.OWNER) && <Button
+            variant="contained"
+            color="info"
+            onClick={() => {
+              history.push(
+                "/programming-contest/user-contest-problem-role-management/" +
+                  problemId
+              );
+            }}
+          >
+            Manage Role
+          </Button>
+          }
+        </>
       }
     >
       <Grid container spacing={2}>
-        <Grid item xs={4}>
+        <Grid item xs={10}>
           <CssTextField
             disabled
             fullWidth
             id="problemName"
             label={t("problemName")}
             value={problemName}
+          />
+        </Grid>
+
+        <Grid item xs={2}>
+          <CssTextField
+            disabled
+            fullWidth
+            id="status"
+            label={t("status")}
+            value={status}
           />
         </Grid>
 
@@ -137,12 +178,54 @@ function ManagerViewProblemDetailV2() {
           <CssTextField
             disabled
             fullWidth
-            id="timeLimit"
+            id="isPublicProblem"
+            label={t("public", {ns: "common"})}
+            value={isPublic ? t("yes", {ns: "common"}) : t("no", {ns: "common"})}
+          />
+        </Grid>
+
+        <Grid item xs={2}>
+          <CssTextField
+            disabled
+            fullWidth
+            id="timeLimitCPP"
             label={t("timeLimit")}
-            placeholder="Time Limit"
             type="number"
-            value={timeLimit}
-            InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>}}
+            value={timeLimitCPP}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">CPP: </InputAdornment>,
+              endAdornment: <InputAdornment position="end">s</InputAdornment>
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={2}>
+          <CssTextField
+            disabled
+            fullWidth
+            id="timeLimitJAVA"
+            label={t("timeLimit")}
+            type="number"
+            value={timeLimitJAVA}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">JAVA: </InputAdornment>,
+              endAdornment: <InputAdornment position="end">s</InputAdornment>
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={2}>
+          <CssTextField
+            disabled
+            fullWidth
+            id="timeLimitPYTHON"
+            label={t("timeLimit")}
+            type="number"
+            value={timeLimitPYTHON}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">PYTHON: </InputAdornment>,
+              endAdornment: <InputAdornment position="end">s</InputAdornment>
+            }}
           />
         </Grid>
 
@@ -155,15 +238,6 @@ function ManagerViewProblemDetailV2() {
             type="number"
             value={memoryLimit}
             InputProps={{endAdornment: <InputAdornment position="end">MB</InputAdornment>}}
-          />
-        </Grid>
-        <Grid item xs={2}>
-          <CssTextField
-            disabled
-            fullWidth
-            id="isPublicProblem"
-            label={t("public", {ns: "common"})}
-            value={isPublic ? t("yes", {ns: "common"}) : t("no", {ns: "common"})}
           />
         </Grid>
 

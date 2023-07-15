@@ -10,9 +10,19 @@ import wms.entity.SaleOrder;
 import java.util.List;
 
 public interface SaleOrderRepo extends JpaRepository<SaleOrder, Long> {
-    @Query(value = "select so.* from scm_sale_order so" +
-            "         where so.status != 'DELETED' and (so.status = :orderStatus or :orderStatus = '')\n", nativeQuery = true)
-    Page<SaleOrder> search(Pageable pageable, String orderStatus);
+    @Query(value = "select so.*, sf.name\n" +
+            "            from scm_sale_order so\n" +
+            "                     left join scm_customer sf on so.customer_code = sf.code\n" +
+            "            where so.is_deleted = 0\n" +
+            "              and so.status != 'DELETED'\n" +
+            "              and (sf.name ilike concat('%', :customerName, '%'))\n" +
+            "              and (so.status = :orderStatus or :orderStatus = '')\n" +
+            "              and (so.created_by = :createdBy or :createdBy = '')\n" +
+            "              and (sf.name ilike concat('%', :text, '%')\n" +
+            "                or so.status ilike concat('%', :text, '%')\n" +
+            "                or so.created_by ilike concat('%', :text, '%')\n" +
+            "                )", nativeQuery = true)
+    Page<SaleOrder> search(Pageable pageable, String orderStatus, String createdBy, String customerName, String text);
     SaleOrder getOrderById(long id);
     SaleOrder getOrderByCode(String code);
     @Query(value = "SELECT *\n" +

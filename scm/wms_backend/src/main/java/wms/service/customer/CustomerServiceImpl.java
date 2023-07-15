@@ -25,10 +25,9 @@ import wms.entity.*;
 import wms.exception.CustomException;
 import wms.repo.*;
 import wms.service.BaseService;
+import wms.service.files.IFileService;
 import wms.utils.GeneralUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -49,6 +48,8 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
     @Autowired
     private CustomerRepo customerRepo;
 
+    @Autowired
+    private IFileService fileService;
     @Override
     @Transactional
     public void createCustomerFromFile(MultipartFile file, JwtAuthenticationToken token) throws IOException, CustomException {
@@ -56,37 +57,12 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
         if (createdBy == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown staff create this customer, can't create");
         }
-        Iterator<Row> rowIterator = initWorkbookRow(file);
+        Iterator<Row> rowIterator = fileService.initWorkbookRow(file);
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
             if (row.getRowNum() == 0 || isRowEmpty(row)) continue;
             saveCustomers(row, createdBy);
         }
-    }
-    private Iterator<Row> initWorkbookRow(MultipartFile file) throws CustomException, IOException {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        if (fileName.equals("")) {
-            throw caughtException(ErrorCode.USER_ACTION_FAILED.getCode(), "Hãy tải file lên hệ thống!");
-        }
-        String fileExt = "";
-        if (fileName.contains(".")) {
-            fileExt = fileName.substring(fileName.lastIndexOf("."));
-        }
-        if (!fileExt.contains("xls")) {
-            throw caughtException(ErrorCode.FORMAT.getCode(), "Wrong file type. Only support .xls and .xlsx file extensions");
-        }
-        InputStream fis = file.getInputStream();
-        Workbook workbook = null;
-        Sheet sheet = null;
-        if (fileExt.equals(".xls")) {
-            workbook = new HSSFWorkbook(fis);
-            sheet = workbook.getSheetAt(0);
-        }
-        else {
-            workbook = new XSSFWorkbook(fis);
-            sheet = workbook.getSheetAt(0);
-        }
-        return sheet.iterator();
     }
     public static boolean isRowEmpty(Row row) {
         for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
@@ -117,7 +93,7 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
             }
         }
         Customer customer = Customer.builder()
-                .code("CUS" + row.getCell(0).getNumericCellValue())
+                .code("CUS" + GeneralUtils.generateCodeFromSysTime() + row.getCell(0).getNumericCellValue())
                 .phone(row.getCell(12).getCellTypeEnum().equals(CellType.NUMERIC) ?
                         String.valueOf(row.getCell(12).getNumericCellValue())
                         : row.getCell(12).getStringCellValue())
@@ -191,11 +167,11 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
     }
 
     @Override
-    public ReturnPaginationDTO<Customer> getAllCustomers(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
+    public ReturnPaginationDTO<Customer> getAllCustomers(int page, int pageSize, String sortField, boolean isSortAsc, String customerName, String status, String createdBy, String address, String textSearch) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
-        Page<Customer> customers = customerRepo.search(pageable);
+        Page<Customer> customers = customerRepo.search(pageable, customerName, status, createdBy, address, textSearch);
         return getPaginationResult(customers.getContent(), page, customers.getTotalPages(), customers.getTotalElements());
     }
     @Override

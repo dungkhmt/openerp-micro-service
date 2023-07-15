@@ -1,10 +1,11 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import InsertLinkIcon from "@mui/icons-material/InsertLink";
 import MapIcon from "@mui/icons-material/Map";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import WarehouseIcon from "@mui/icons-material/Warehouse";
-import { Box } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
@@ -17,16 +18,18 @@ import {
   useGetFacilityInventory,
   useGetFacilityList,
   useGetFacilityListNoPaging,
+  useImportFacility,
 } from "controllers/query/facility-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
+import PrimaryButton from "../../../components/button/PrimaryButton";
+import CustomizedDialogs from "../../../components/dialog/CustomizedDialogs";
 import { useGetAllUsersExist } from "../../../controllers/query/user-query";
 import { staticProductFields, staticWarehouseCols } from "../LocalConstant";
 import CreateFacilityForm from "./components/CreateFacilityForm";
 import UpdateFacilityForm from "./components/UpdateFacilityForm";
-
 function FacilityScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
@@ -40,6 +43,11 @@ function FacilityScreen({ screenAuthorization }) {
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
   const history = useHistory();
+  const [selectedFile, setSelectedFile] = useState(null);
+  const handleFileChange = (event) => {
+    setSelectedFile(event?.target?.files?.[0]);
+  };
+  const [isApproved, setIsApproved] = useToggle(false);
   let { path } = useRouteMatch();
 
   const { isLoading, data: facility } = useGetFacilityList(params);
@@ -49,7 +57,17 @@ function FacilityScreen({ screenAuthorization }) {
     useGetFacilityInventory({
       code: facilityCode,
     });
+  const importFacilityQuery = useImportFacility();
   const { isLoading: isUserLoading, data: users } = useGetAllUsersExist();
+  const handleUpload = async () => {
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      importFacilityQuery.mutateAsync(formData);
+      setSelectedFile(null);
+    }
+    setIsApproved(false);
+  };
   let actions = [
     {
       title: "Thêm",
@@ -59,6 +77,16 @@ function FacilityScreen({ screenAuthorization }) {
       icon: <AddIcon />,
       describe: "Thêm bản ghi mới",
       disabled: false,
+    },
+    {
+      title: "Import",
+      callback: (res) => {
+        handleFileChange(res);
+      },
+      icon: <InsertLinkIcon />,
+      describe: "Import từ file",
+      disabled: false,
+      type: "file",
     },
     {
       title: "Bản đồ",
@@ -174,6 +202,11 @@ function FacilityScreen({ screenAuthorization }) {
       facility: item,
     });
   };
+  useEffect(() => {
+    if (selectedFile) {
+      setIsApproved(true);
+    }
+  }, [selectedFile, setIsApproved]);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
@@ -273,6 +306,31 @@ function FacilityScreen({ screenAuthorization }) {
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
         callback={(flag) => {}}
+      />
+      <CustomizedDialogs
+        open={isApproved}
+        handleClose={() => {
+          setIsApproved(false, () => {
+            setSelectedFile(null);
+          });
+        }}
+        contentTopDivider
+        title={selectedFile?.name}
+        contentBottomDivider
+        centerTitle="Phê duyệt import kho"
+        content={
+          <Typography color="textSecondary" gutterBottom style={{ padding: 8 }}>
+            Bạn có đồng ý phê duyệt tạo kho hàng qua excel file?
+          </Typography>
+        }
+        actions={[
+          <Button onClick={setIsApproved}>Hủy bỏ</Button>,
+          <PrimaryButton onClick={handleUpload}>Phê duyệt</PrimaryButton>,
+        ]}
+        customStyles={{
+          contents: (theme) => ({ width: "100%" }),
+          actions: (theme) => ({ paddingRight: theme.spacing(2) }),
+        }}
       />
     </Box>
   );

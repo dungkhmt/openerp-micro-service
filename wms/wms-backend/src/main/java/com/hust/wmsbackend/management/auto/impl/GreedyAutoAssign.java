@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor(onConstructor = @__(@Autowired))
-public class SimpleAutoAssign implements AutoAssignOrderItem {
+public class GreedyAutoAssign implements AutoAssignOrderItem {
 
     private DistanceCalculator distanceCalculator;
 

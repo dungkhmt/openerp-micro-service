@@ -51,7 +51,7 @@ public class FacilityServiceImpl implements FacilityService {
         facility.setFacilityName(facilityModel.getFacilityName());
         facility.setFacilityType(facilityModel.getFacilityType());
         facility.setMaxNumberContainer(facilityModel.getMaxNumberContainer());
-        facility.setMaxNumberTrailer(facilityModel.getNumberTrailer());
+        facility.setMaxNumberTrailer(facilityModel.getMaxNumberTrailer());
         facility.setMaxNumberTruck(facilityModel.getMaxNumberTruck());
         facility.setOwner(username);
         facility.setAcreage(facilityModel.getAcreage());
@@ -136,13 +136,19 @@ public class FacilityServiceImpl implements FacilityService {
             params.put("facilityName", facilityFilterRequestDTO.getFacilityName());
         }
         sql += " AND status != :statusNotEqual";
-        sqlCount += " AND status = :statusNotEqual";
+        sqlCount += " AND status != :statusNotEqual";
         params.put("statusNotEqual", Constants.FacilityStatus.DELETE.getStatus());
 
         if(!StringUtils.isEmpty(facilityFilterRequestDTO.getType())) {
             sql += " AND facility_type = :type";
             sqlCount += " AND facility_type = :type";
             params.put("type", facilityFilterRequestDTO.getType());
+        }
+
+        if(!StringUtils.isEmpty(facilityFilterRequestDTO.getTypeOwner())) {
+            sql += " AND type_owner = :typeOwner";
+            sqlCount += " AND type_owner = :typeOwner";
+            params.put("typeOwner", facilityFilterRequestDTO.getTypeOwner());
         }
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
         for (String i : params.keySet()) {

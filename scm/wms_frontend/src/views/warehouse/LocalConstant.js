@@ -5,7 +5,10 @@ import {
   ITEM_STATUS_COLOR_MAPPING,
   ORDER_STATUS_COLOR_MAPPING,
 } from "../../shared/AppConstants";
-import { formatVietnameseCurrency } from "../../utils/GlobalUtils";
+import {
+  convertUserToName,
+  formatVietnameseCurrency,
+} from "../../utils/GlobalUtils";
 
 export const staticProductFields = [
   {
@@ -87,11 +90,12 @@ export const staticWarehouseCols = [
     renderCell: (params) => {
       return (
         <Typography sx={{ color: AppColors.warning, fontWeight: "500" }}>
-          {params?.row?.creator?.firstName +
+          {convertUserToName(params?.row?.creator)}
+          {/* {params?.row?.creator?.firstName +
             " " +
             params?.row?.creator?.middleName +
             " " +
-            params?.row?.creator?.lastName}
+            params?.row?.creator?.lastName} */}
         </Typography>
       );
     },
@@ -130,6 +134,7 @@ export const staticWarehouseCols = [
     minWidth: 50,
     headerAlign: "center",
     align: "center",
+    flex: 1,
     renderCell: (params) => {
       return (
         <Button
@@ -206,7 +211,7 @@ export const staticSaleOrderCols = [
     sortable: false,
     minWidth: 150,
     valueGetter: (params) => {
-      return params.row.user.id;
+      return convertUserToName(params.row.user);
     },
   },
   {
@@ -393,7 +398,7 @@ export const acceptedOrderCols = [
     sortable: false,
     minWidth: 150,
     valueGetter: (params) => {
-      return params.row.user.id;
+      return convertUserToName(params.row.user);
     },
   },
   {

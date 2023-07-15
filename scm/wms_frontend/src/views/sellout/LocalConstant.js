@@ -5,7 +5,10 @@ import {
   ITEM_STATUS_COLOR_MAPPING,
   ORDER_STATUS_COLOR_MAPPING,
 } from "../../shared/AppConstants";
-import { formatVietnameseCurrency } from "../../utils/GlobalUtils";
+import {
+  convertUserToName,
+  formatVietnameseCurrency,
+} from "../../utils/GlobalUtils";
 
 export const saleOrderCols = [
   {
@@ -77,7 +80,7 @@ export const saleOrderCols = [
     sortable: false,
     minWidth: 150,
     valueGetter: (params) => {
-      return params.row?.user?.id;
+      return convertUserToName(params?.row?.user);
     },
   },
   {
