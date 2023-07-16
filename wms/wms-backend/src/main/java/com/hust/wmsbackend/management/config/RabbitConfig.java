@@ -30,8 +30,8 @@ public class RabbitConfig {
 
     public static final String NOTIFICATION_HEADERS_EXCHANGE = "notification_headers";
 
-//  TODO: @Value("${spring.rabbitmq.listener.simple.auto-startup}")
-    private boolean autoStartup = true;
+    @Value("${spring.rabbitmq.listener.simple.auto-startup}")
+    private boolean autoStartup;
 
     @Autowired
     private ConnectionFactory connectionFactory;
