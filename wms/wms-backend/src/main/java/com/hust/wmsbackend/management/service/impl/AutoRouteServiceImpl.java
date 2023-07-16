@@ -10,6 +10,7 @@ import com.hust.wmsbackend.management.model.request.NewNotificationRequest;
 import com.hust.wmsbackend.management.model.response.AutoRouteResponse;
 import com.hust.wmsbackend.management.repository.*;
 import com.hust.wmsbackend.management.service.AutoRouteService;
+import com.hust.wmsbackend.management.service.NotificationsService;
 import com.hust.wmsbackend.management.utils.ExternalApiCaller;
 import com.hust.wmsbackend.vrp.delivery.DeliveryAddressDTO;
 import com.hust.wmsbackend.vrp.delivery.DeliveryRouteService;
@@ -48,10 +49,8 @@ public class AutoRouteServiceImpl implements AutoRouteService {
     private DeliveryTripItemRepository deliveryTripItemRepository;
     @Autowired
     private DeliveryTripRepository deliveryTripRepository;
-    @Value("${external-api.notification.uri}")
-    private String NOTIFICATION_URI;
     @Autowired
-    private ExternalApiCaller apiCaller;
+    private NotificationsService notificationsService;
 
     @Override
     @Transactional
@@ -126,25 +125,30 @@ public class AutoRouteServiceImpl implements AutoRouteService {
         deliveryTrip.setDistance(BigDecimal.valueOf(routeResponse.getTotalCost()));
         deliveryTripRepository.save(deliveryTrip);
 
-        ObjectMapper mapper = new ObjectMapper();
-        boolean done = false;
-        try {
-            done = apiCaller.simpleBooleanCall(NOTIFICATION_URI, token, mapper.writeValueAsString(NewNotificationRequest.builder()
-                    .toUser(principal.getName())
-                    .url(String.format("/delivery-manager/delivery-trips/%s", deliveryTripId))
-                    .content(String.format("Tìm hành trình tối ưu cho chuyến giao hàng %s thành công", deliveryTripId))
-                    .build()));
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-            log.error("Exception when build Notification request");
-        }
+//        ObjectMapper mapper = new ObjectMapper();
+//        boolean done = false;
+//        try {
+//            done = apiCaller.simpleBooleanCall(NOTIFICATION_URI, token, mapper.writeValueAsString(NewNotificationRequest.builder()
+//                    .toUser(principal.getName())
+//                    .url(String.format("/delivery-manager/delivery-trips/%s", deliveryTripId))
+//                    .content(String.format("Tìm hành trình tối ưu cho chuyến giao hàng %s thành công", deliveryTripId))
+//                    .build()));
 
-        if (done) {
-            log.info("Push notification done");
-        } else {
-            log.info("Push notification fail");
-        }
+//            done = true;
+//        } catch (JsonProcessingException e) {
+//            log.error(e.getMessage());
+//            log.error("Exception when build Notification request");
+//        }
+//
+//        if (done) {
+//            log.info("Push notification done");
+//        } else {
+//            log.info("Push notification fail");
+//        }
 
+        notificationsService.create("AUTO_ROUTE", principal.getName(),
+            String.format("Tìm hành trình tối ưu cho chuyến giao hàng %s thành công", deliveryTripId),
+            String.format("/delivery-manager/delivery-trips/%s", deliveryTripId));
         log.info("Done auto route");
     }
 
