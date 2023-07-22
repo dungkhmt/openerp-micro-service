@@ -89,18 +89,17 @@ export default function ContestManagerUserSubmission(props) {
   };
 
   function handleExportParticipantSubmission() {
+    setIsProcessing(true);
     request(
       "get",
       "/get-user-judged-problem-submission/" + contestId,
       (res) => {
-        console.log("handleJudgeContest", res.data);
-        setIsProcessing(false);
         generatePdfDocument(
           res.data,
           `USER_JUDGED_SUBMISSION-${contestId}.pdf`
         );
       }
-    ).then();
+    ).then(() => setIsProcessing(false));
   }
 
   const generateColumns = () => {
