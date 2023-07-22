@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Box, IconButton} from "@mui/material";
+import {Box, IconButton, Tooltip} from "@mui/material";
 import ContestManagerViewSubmissionOfAUserDialog from "./ContestManagerViewSubmissionOfAUserDialog";
 import ManagerSubmitCodeOfParticipant from "./ManagerSubmitCodeOfParticipant";
 import {request} from "../../../api";
@@ -7,13 +7,15 @@ import StandardTable from "component/table/StandardTable";
 import HustModal from "component/common/HustModal";
 import {Link} from "react-router-dom";
 import {getStatusColor} from "./lib";
-import {successNoti} from "../../../utils/notification";
+import {errorNoti, successNoti} from "../../../utils/notification";
 import {LoadingButton} from "@mui/lab";
 import CodeIcon from '@mui/icons-material/Code';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {pdf} from "@react-pdf/renderer";
 import SubmissionOfParticipantPDFDocument from "./template/SubmissionOfParticipantPDFDocument";
 import FileSaver from "file-saver";
+import {MTableToolbar} from "material-table";
+import {MuiThemeProvider} from "@material-ui/core/styles";
 
 export default function ContestManagerUserSubmission(props) {
   const contestId = props.contestId;
@@ -26,33 +28,33 @@ export default function ContestManagerUserSubmission(props) {
     setIsOpenManagerSubmitCodeOfParticipant,
   ] = useState(false);
 
-  const [filterParams, setFilterParams] = useState({page: 0, size: 10});
+  const [filterParams, setFilterParams] = useState({page: 0, size: 10, search: ''});
   const [totalSizeSubmission, setTotalSizeSubmission] = useState(0);
 
   const [isProcessing, setIsProcessing] = useState(false);
 
   function handleCloseManagerSubmitParticipantCode() {
     setIsOpenManagerSubmitCodeOfParticipant(false);
-    getSubmission(filterParams.size, 0);
+    setFilterParams({page: 0, size: filterParams.size, search: filterParams.search})
+    getSubmission();
   }
 
   function handleCloseDialog() {
     setIsOpen(false);
   }
 
-  function getSubmission(s, p) {
+  function getSubmission() {
     request(
       "get",
       "/get-contest-submission-paging/" +
-      contestId +
-      "?size=" +
-      filterParams.size +
-      "&page=" +
-      filterParams.page,
+      contestId,
       (res) => {
         setContestSubmissions(res.data.content);
         setTotalSizeSubmission(res.data.totalElements)
-      }
+      },
+      {onError: (error) => errorNoti("An error happened", 3000)},
+      null,
+      {params: filterParams}
     ).then();
   }
 
@@ -134,7 +136,7 @@ export default function ContestManagerUserSubmission(props) {
           </span>
         )
       },
-      {title: "Message", field: "message"},
+      // {title: "Message", field: "message"},
       {title: "Point", field: "point"},
       {title: "Submitted At", field: "createAt"},
       {
@@ -184,79 +186,76 @@ export default function ContestManagerUserSubmission(props) {
   }
 
   useEffect(() => {
-    getSubmission(filterParams.size, 0);
+    getSubmission();
   }, []);
 
   useEffect(() => {
-    getSubmission(filterParams.size, filterParams.page);
+    getSubmission();
   }, [filterParams]);
 
   return (
     <Box sx={{marginTop: "12px"}}>
       <StandardTable
-        title={"User Submissions"}
+        title={"Contest Submissions"}
         columns={generateColumns()}
         data={contestSubmissions}
         hideCommandBar
         options={{
           selection: false,
           pageSize: 10,
-          search: false,
+          search: true,
           sorting: false,
+          searchText: filterParams.search,
+          debounceInterval: 800
+        }}
+        localization={{
+          toolbar: {
+            searchPlaceholder: "Search by UserID or ProblemID",
+          },
         }}
         page={filterParams.page}
         totalCount={totalSizeSubmission}
         onChangePage={(page, size) => setFilterParams({...filterParams, page, size})}
-        actions={[
-          {
-            icon: () => {
-              return (
-                <LoadingButton loading={isProcessing} loadingPosition="center" variant="contained"
-                               onClick={handleSubmitCodeParticipant} color="primary">
-                  Submit Participant Code
-                </LoadingButton>
-              )
-            },
-            tooltip: 'Submit code as a participant',
-            isFreeAction: true
-          },
-          {
-            icon: () => {
-              return (
-                <LoadingButton loading={isProcessing} loadingPosition="center" variant="contained"
-                               onClick={handleJudgeAll} color="primary">
-                  Judge All
-                </LoadingButton>
-              )
-            },
-            tooltip: 'Judge all submissions that are NOT EVALUATED',
-            isFreeAction: true
-          },
-          {
-            icon: () => {
-              return (
-                <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
-                               onClick={handleRejudgeAll} color="primary">
-                  Rejudge All
-                </LoadingButton>
-              )
-            },
-            tooltip: 'Rejudge all submissions in this contest',
-            isFreeAction: true
-          },
-          {
-            icon: () => {
-              return (
-                <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
-                               onClick={handleExportParticipantSubmission} color="primary">
-                  Export
-                </LoadingButton>
-              )
-            },
-            tooltip: 'Export all submissions in this contest',
-            isFreeAction: true
-          }
-        ]}
+        onSearchChange={search => setFilterParams({page: 0, size: filterParams.size, search})}
+        components={{
+          Toolbar: (props) => (
+            <div>
+              <MTableToolbar {...props} searchFieldStyle={{width: 320}}/>
+              <MuiThemeProvider>
+                <Box display="flex" justifyContent="flex-end" width="100%" sx={{padding: "8px 0 16px 16px"}}>
+                  <Tooltip title="Submit code as a participant">
+                    <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
+                                   sx={{marginRight: "16px"}} color="primary"
+                                   onClick={handleSubmitCodeParticipant}>
+                      Submit Participant Code
+                    </LoadingButton>
+                  </Tooltip>
+                  <Tooltip title="Judge all submissions that are NOT EVALUATED">
+                    <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
+                                   sx={{marginRight: "16px"}} color="primary"
+                                   onClick={handleJudgeAll}>
+                      Judge All
+                    </LoadingButton>
+                  </Tooltip>
+                  <Tooltip title="Rejudge all submissions in this contest">
+                    <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
+                                   sx={{marginRight: "16px"}} color="primary"
+                                   onClick={handleRejudgeAll}>
+                      Rejudge All
+                    </LoadingButton>
+                  </Tooltip>
+                  <Tooltip title="Export all submissions in this contest">
+                    <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
+                                   sx={{marginRight: "16px"}} color="primary"
+                                   onClick={handleExportParticipantSubmission}>
+                      Export
+                    </LoadingButton>
+                  </Tooltip>
+                </Box>
+              </MuiThemeProvider>
+            </div>
+          ),
+        }}
       />
 
       <ContestManagerViewSubmissionOfAUserDialog

@@ -1595,15 +1595,16 @@ public class ContestProblemController {
     @GetMapping("/get-contest-submission-paging/{contestId}")
     public ResponseEntity<?> getContestSubmissionPaging(
         @PathVariable("contestId") String contestId,
-        Pageable pageable
+        @RequestParam String search,
+        @RequestParam int page,
+        @RequestParam int size
     ) {
-        log.info("getContestSubmissionPaging, contestId = " + contestId);
-        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdAt").descending());
-        Page<ContestSubmission> page = problemTestCaseService.findContestSubmissionByContestIdPaging(
-            pageable,
-            contestId);
-        log.info("page {}", page);
-        return ResponseEntity.status(200).body(page);
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<ContestSubmission> res = problemTestCaseService.findContestSubmissionByContestIdPaging(
+            pageRequest,
+            contestId,
+            search);
+        return ResponseEntity.status(200).body(res);
     }
 
     @GetMapping("/get-contest-not-evaluated-submission-paging/{contestId}")

@@ -186,7 +186,7 @@ public interface ProblemTestCaseService {
 
     void deleteUserContest(ModelAddUserToContest modelAddUserToContest) throws MiniLeetCodeException;
 
-    Page<ContestSubmission> findContestSubmissionByContestIdPaging(Pageable pageable, String contestId);
+    Page<ContestSubmission> findContestSubmissionByContestIdPaging(Pageable pageable, String contestId, String searchTerm);
 
     Page<ContestSubmission> findContestNotEvaluatedSubmissionByContestIdPaging(Pageable pageable, String contestId);
 
