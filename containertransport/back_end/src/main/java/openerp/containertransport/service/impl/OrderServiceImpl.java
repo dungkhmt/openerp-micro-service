@@ -3,7 +3,9 @@ package openerp.containertransport.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
+import openerp.containertransport.constants.Constants;
 import openerp.containertransport.dto.*;
+import openerp.containertransport.dto.dashboard.DashboardTimeOrderDTO;
 import openerp.containertransport.entity.Container;
 import openerp.containertransport.entity.Facility;
 import openerp.containertransport.entity.Order;
@@ -227,6 +229,38 @@ public class OrderServiceImpl implements OrderService {
             orderModels.add(convertToModel(order));
         });
         return orderModels;
+    }
+
+    @Override
+    public Integer countOrderByMonth(DashboardTimeOrderDTO dashboardTimeOrderDTO, String status) {
+        String sqlCount = "SELECT COUNT(id) FROM container_transport_order WHERE 1=1";
+        HashMap<String, Object> params = new HashMap<>();
+
+        if(status.equals(Constants.OrderStatus.ORDERED.getStatus())) {
+            sqlCount += " AND created_at >= :startTime";
+            params.put("startTime", dashboardTimeOrderDTO.getStartTime());
+
+            sqlCount += " AND created_at <= :endTime";
+            params.put("endTime", dashboardTimeOrderDTO.getEndTime());
+        }
+
+        if(status.equals(Constants.OrderStatus.DONE.getStatus())) {
+            sqlCount += " AND updated_at >= :startTime";
+            params.put("startTime", dashboardTimeOrderDTO.getStartTime());
+
+            sqlCount += " AND updated_at <= :endTime";
+            params.put("endTime", dashboardTimeOrderDTO.getEndTime());
+
+            sqlCount += " AND status = :status";
+            params.put("status", status);
+        }
+
+        Query queryCount = this.entityManager.createNativeQuery(sqlCount);
+        for (String i : params.keySet()) {
+            queryCount.setParameter(i, params.get(i));
+        }
+
+        return (Integer) queryCount.getSingleResult();
     }
 
     public OrderModel convertToModel(Order order){

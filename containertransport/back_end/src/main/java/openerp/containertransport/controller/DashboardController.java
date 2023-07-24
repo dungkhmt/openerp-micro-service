@@ -14,7 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class DashboardController {
 
     @PostMapping("/order-by-month")
-    public ResponseEntity<?> getOrderByMonth(@PathVariable Long year) {
+    public ResponseEntity<?> getOrderByMonth(@PathVariable int year) {
+        return null;
+    }
+
+    @PostMapping("/truck-rate")
+    public ResponseEntity<?> getRateUsingTruck() {
         return null;
     }
 }
