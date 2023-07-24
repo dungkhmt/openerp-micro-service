@@ -6,6 +6,7 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 public class FacilityUpdateDTO {
+    private Long id;
     private String name;
     private String address;
     private String status;

@@ -14,6 +14,8 @@ import wms.algorithms.entity.DistanceMatrix;
 import wms.algorithms.entity.Node;
 import wms.common.CommonResource;
 
+import java.io.IOException;
+
 @Component
 public class Utils {
     public static String graphhopperUrl;
@@ -48,28 +50,18 @@ public class Utils {
 
         return distance*1000;
     }
-    public static double getDistanceGraphhopperApi(double sourceLat, double sourceLon, double targetLat, double targetLon) {
-//        String apiKey = "f1ca6ef8-2158-46e7-82ca-749cea4be153";
-//        String apiUrl = String.format("https://graphhopper.com/api/1/route?point=%.6f,%.6f&point=%.6f,%.6f&type=json&key=%s",
-//                sourceLat, sourceLon, targetLat, targetLon, apiKey);
+    public static double getDistanceGraphhopperApi(double sourceLat, double sourceLon, double targetLat, double targetLon) throws IOException {
         String apiUrl = String.format(graphhopperUrl,
                 sourceLat, sourceLon, targetLat, targetLon, apiKey);
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet httpGet = new HttpGet(apiUrl);
-        try {
-            HttpResponse response = httpClient.execute(httpGet);
-            HttpEntity entity = response.getEntity();
-            entity.getContent();
-            String jsonResult = EntityUtils.toString(entity);
-            Gson gson = new Gson();
-            DistanceMatrix distanceMatrix = gson.fromJson(jsonResult, DistanceMatrix.class);
-
-
-            return distanceMatrix.getPaths().size() > 0 ? distanceMatrix.getPaths().get(0).getDistance() : -1.0;
-        } catch (Exception e) {
-//            e.printStackTrace();
-        }
-
-        return -1; // Return a negative value to indicate failure
+        HttpResponse response = httpClient.execute(httpGet);
+        HttpEntity entity = response.getEntity();
+        entity.getContent();
+        String jsonResult = EntityUtils.toString(entity);
+        Gson gson = new Gson();
+        DistanceMatrix distanceMatrix = gson.fromJson(jsonResult, DistanceMatrix.class);
+        return distanceMatrix.getPaths().size() > 0 ? distanceMatrix.getPaths().get(0).getDistance() : -1.0;
+//        return -1; // Return a negative value to indicate failure
     }
 }

@@ -201,13 +201,13 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
     }
 
     @Override
-    public Facility updateFacility(FacilityUpdateDTO facilityDTO, long id) throws CustomException {
-        Facility facility = facilityRepo.getFacilityById(id);
+    public Facility updateFacility(FacilityUpdateDTO facilityDTO) throws CustomException {
+        Facility facility = facilityRepo.getFacilityById(facilityDTO.getId());
         if (facility == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Facility does not exist, can't update");
         }
         UserRegister manager = userRepo.getUserByUserLoginId(facilityDTO.getManagedBy());
-        Facility facilityToUpdate = facilityRepo.getFacilityById(id);
+        Facility facilityToUpdate = facilityRepo.getFacilityById(facilityDTO.getId());
         facilityToUpdate.setName(facilityDTO.getName());
         facilityToUpdate.setAddress(facilityDTO.getAddress());
         facilityToUpdate.setStatus(facilityDTO.getStatus());

@@ -47,6 +47,7 @@
     "react-toastify": "^6.2.0",
     "react-use": "^17.4.0",
     "simplebar-react": "^2.3.6",
+    "sonarqube-scanner": "^3.0.1",
     "web-vitals": "^2.1.4",
     "yup": "^1.1.1"
   },
