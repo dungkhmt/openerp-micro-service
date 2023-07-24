@@ -14,6 +14,7 @@ import { getOrders } from "api/OrderAPI";
 import { getTrucks } from "api/TruckAPI";
 import TruckAndOrdersInTrip from "../tripComponent/TruckAndOrdersInTrip";
 import OrderArrangementInTrip from "../tripComponent/OrderArrangementInTrip";
+import { getShipmentById } from "api/ShipmentAPI";
 
 const CreateTripDetail = () => {
     const { truckScheduler, setTruckScheduler, tripsCreate, setTripCreate } = useContext(MyContext);
@@ -29,7 +30,7 @@ const CreateTripDetail = () => {
     const [tripItems, setTripItem] = useState([]);
     const history = useHistory();
     const location = useLocation();
-    const tripsTmpId = useState(location?.search);
+    const [startTime, setStartTime] = useState(0);
 
     const [toastOpen, setToast] = useState(false);
     const [toastType, setToastType] = useState();
@@ -45,16 +46,10 @@ const CreateTripDetail = () => {
             // let orderTmp = res.data.data.filter(item => checkScheduler(item.id, "order"))
             setOrders(res.data.data.orderModels);
         });
-        // if (tripsTmpId[0] !== null) {
-        //     console.log("tripTmp",tripsCreate[tripsTmpId[0].slice(1)]);
-        //     trucks.forEach((item) => {
-        //         if(item.id == tripsCreate[tripsTmpId[0].slice(1)].truckId) {
-        //             setTruckSelect(item);
-        //         }
-        //     })
-        //     // (tripsTmpId[0].slice(1));
 
-        // }
+        getShipmentById(shipmentId).then((res) => {
+            setStartTime(res?.data.data?.executed_time)
+        })
     }, [])
     const handleCancelCreateTrip = () => {
         history.push(`/shipment/detail/${shipmentId}`);
@@ -122,13 +117,17 @@ const CreateTripDetail = () => {
             return false;
         }
         let nbTrailer = 0;
+        let totalWeight = 0;
+        let totalTime = startTime;
         // check nbTrailer
         for (let i = 1; i < tripItems.length - 1; i++) {
             if (tripItems[i].action === "PICKUP-TRAILER") {
                 nbTrailer = Number(nbTrailer) + 1;
+                totalWeight = totalWeight + tripItems[i].container.size;
             }
             if (tripItems[i].action === "DELIVERY-TRAILER") {
                 nbTrailer = Number(nbTrailer) - 1;
+                totalWeight = totalWeight - tripItems[i].container.size;
             }
             if (tripItems[i].action === "DELIVERY-CONTAINER" && nbTrailer === 0) {
                 setToastMsg(`Please view again at before ${tripItems[i].action} ${tripItems[i].orderCode}`)
@@ -150,9 +149,16 @@ const CreateTripDetail = () => {
                 appearToast();
                 return false;
             }
+
+            // check weight
+            if(totalWeight > 40) {
+                setToastMsg(`Over the capacity of the trailer when ${tripItems[i].action} at ${tripItems[i].facilityResponsiveDTO.facilityCode}`)
+                appearToast();
+                return false;
+            }
         }
 
-        // check weight
+        
 
         // check time
         return true;

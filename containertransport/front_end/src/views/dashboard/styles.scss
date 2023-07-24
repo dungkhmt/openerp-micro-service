@@ -144,5 +144,17 @@
     }
 }
 .pie-chart {
+    display: flex;
     margin-top: 32px;
+    .container-type {
+        width: 30%;
+        margin-right: 5%;
+    }
+    .truck {
+        width: 30%;
+        margin-right: 5%;
+    }
+    .trailer {
+        width: 30%;
+    }
 }

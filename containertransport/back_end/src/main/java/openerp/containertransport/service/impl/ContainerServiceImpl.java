@@ -34,6 +34,7 @@ public class ContainerServiceImpl implements ContainerService {
     @Override
     public ContainerModel createContainer(ContainerModel containerModelDTO, String username) {
         TypeContainer typeContainer = typeContainerRepo.findByTypeContainerCode(containerModelDTO.getTypeContainerCode());
+        typeContainer.setTotal(typeContainer.getTotal() + 1);
 
         Facility facility = facilityRepo.findById(containerModelDTO.getFacilityId()).get();
         Container container = new Container();
@@ -83,6 +84,8 @@ public class ContainerServiceImpl implements ContainerService {
     @Override
     public ContainerModel deleteContainer(String uid) {
         Container container = containerRepo.findByUid(uid);
+        TypeContainer typeContainer = container.getTypeContainer();
+        typeContainer.setTotal(typeContainer.getTotal() - 1);
         container.setStatus(Constants.ContainerStatus.DELETE.getStatus());
         container = containerRepo.save(container);
         return convertToModel(container);

@@ -71,49 +71,18 @@ const PieChart = ({ series: data }) => {
         borderRadius: 5,
       },
     },
-    series: [
-      {
-        name: 'Browsers',
-        colorByPoint: true,
-        data: [
-          {
-            name: '20fit',
-            y: 61.04,
-            drilldown: 'Chrome'
-          },
-          {
-            name: '40fit',
-            y: 38.96,
-            drilldown: 'a'
-          },
-        ]
-      }
-    ],
+    series: data.map((el, id) => ({
+      ...el,
+      color: colors[id],
+    })),
   });
   useEffect(() => {
     setOptions({
       ...options,
-      series: [
-        {
-          name: 'Type Container',
-          colorByPoint: true,
-          data:
-            [
-              {
-                name: '20fit',
-                y: 61.04,
-                drilldown: 'Chrome'
-              },
-              {
-                name: '40fit',
-                y: 38.96,
-                drilldown: 'a'
-              },
-            ]
-
-
-        }
-      ],
+      series: data.map((el, id) => ({
+        ...el,
+        color: colors[id],
+      })),
     });
   }, [data]);
   return (

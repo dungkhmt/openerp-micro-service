@@ -320,7 +320,7 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
                             onRequestSort={handleRequestSort}
-                            rowCount={orders.length}
+                            rowCount={orders?.length}
                         />
                         <TableBody>
                             {orders

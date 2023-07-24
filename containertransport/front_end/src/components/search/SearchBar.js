@@ -17,7 +17,7 @@ const styles = {
             minWidth: '20%',
             '& .filter-by': {
                 border: '1px solid #c5c3c3',
-                borderRadius: '3px',
+                borderRadius: '3px 0px 0px 3px',
                 width: '100%',
                 height: '40px',
                 display: 'flex',
@@ -56,7 +56,8 @@ const styles = {
             width: '100%',
             '& .MuiInputBase-root': {
                 height: '40px !important',
-                width: '100%'
+                width: '100%',
+                borderRadius: '0px 3px 3px 0px'
             }
         }
     })

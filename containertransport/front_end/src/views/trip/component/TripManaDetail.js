@@ -6,6 +6,7 @@ import { getTripByTripId } from "api/TripAPI";
 import { menuIconMap } from "config/menuconfig";
 import { getTripItemByTripId } from "api/TripItemAPI";
 import TableOrder from "./TableOrder";
+import MapComponent from "views/shipment/routing/Map";
 
 const TripManaDetail = () => {
     const [toastOpen, setToast] = useState(false);
@@ -35,7 +36,7 @@ const TripManaDetail = () => {
     console.log("tripItem", tripItems);
     return (
         <Box className="fullScreen">
-            <Container maxWidth="md" className="container">
+            <Container maxWidth="lg" className="container">
                 <Box className="toast">
                     {toastOpen ? (
                         <Alert variant="filled" severity={toastType} >
@@ -67,6 +68,9 @@ const TripManaDetail = () => {
 
                 <Box className="trip-items">
                     <TableOrder tripItems={tripItems} setExecutes={setExecutes} executed={executed} />
+                </Box>
+                <Box mt={4}>
+                    <MapComponent tripItems={tripItems} />
                 </Box>
             </Container>
         </Box>
