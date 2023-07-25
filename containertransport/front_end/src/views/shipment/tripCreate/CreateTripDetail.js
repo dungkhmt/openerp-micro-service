@@ -83,21 +83,31 @@ const CreateTripDetail = () => {
                 truckId: truckSelect?.id,
                 orderIds: orderSubmit,
                 tripItemModelList: tripItemTmp
-            }
+            },
+            type: "Normal"
         }
         console.log("data", dataSubmit);
         if (checkValidate) {
-            createTrip(dataSubmit).then((res) => {
-                setToastType("success");
-                setToast(true);
-                setToastMsg("Create Trip Success !!!")
-                setTimeout(() => {
-                    setToast(false);
-                    history.push({
-                        pathname: `/shipment/detail/${shipmentId}`,
-                    })
-                }, "1000");
-            })
+            createTrip(dataSubmit)
+                .then((res) => {
+                    console.log("res", res)
+                    if (res.data.meta.code === 400) {
+                        setToastType("error");
+                        setToast(true);
+                        setToastMsg(res.data.data)
+                    }
+                    if (res.data.meta.code === 200) {
+                        setToastType("success");
+                        setToast(true);
+                        setToastMsg("Create Trip Success !!!")
+                        setTimeout(() => {
+                            setToast(false);
+                            history.push({
+                                pathname: `/shipment/detail/${shipmentId}`,
+                            })
+                        }, "1000");
+                    }
+                })
         }
     }
 
@@ -151,14 +161,14 @@ const CreateTripDetail = () => {
             }
 
             // check weight
-            if(totalWeight > 40) {
+            if (totalWeight > 40) {
                 setToastMsg(`Over the capacity of the trailer when ${tripItems[i].action} at ${tripItems[i].facilityResponsiveDTO.facilityCode}`)
                 appearToast();
                 return false;
             }
         }
 
-        
+
 
         // check time
         return true;

@@ -2,13 +2,14 @@ package openerp.containertransport.controller;
 
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.MetaData;
-import openerp.containertransport.dto.TripCreateDTO;
-import openerp.containertransport.dto.TripDeleteDTO;
-import openerp.containertransport.dto.TripFilterRequestDTO;
-import openerp.containertransport.dto.TripModel;
+import openerp.containertransport.dto.*;
 import openerp.containertransport.dto.metaData.MetaDTO;
 import openerp.containertransport.dto.metaData.ResponseMetaData;
+import openerp.containertransport.dto.validDTO.ValidTripItemDTO;
+import openerp.containertransport.entity.Shipment;
+import openerp.containertransport.repo.ShipmentRepo;
 import openerp.containertransport.service.TripService;
+import openerp.containertransport.service.impl.TripServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -22,6 +23,8 @@ import java.util.List;
 @RequestMapping("/trip")
 public class TripController {
     private final TripService tripService;
+    private final TripServiceImpl tripServiceImpl;
+    private final ShipmentRepo shipmentRepo;
 
     @PostMapping("/")
     public ResponseEntity<?> filterTrip(@RequestBody TripFilterRequestDTO requestDTO) {
@@ -37,6 +40,15 @@ public class TripController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createTrip(@RequestBody TripCreateDTO tripCreateDTO) {
+        if(tripCreateDTO.getType().equals("Normal")) {
+            TripModel tripModel = tripCreateDTO.getTripContents();
+            List<TripItemModel> tripItemModels = tripModel.getTripItemModelList();
+            Shipment shipment = shipmentRepo.findByUid(tripCreateDTO.getShipmentId());
+            ValidTripItemDTO validTripItemDTO = tripServiceImpl.checkValidTrip(tripItemModels, shipment.getExecuted_time());
+            if(!validTripItemDTO.getCheck()) {
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.BAD_REQUEST), validTripItemDTO.getMessageErr()));
+            }
+        }
         TripModel tripModelCreate = tripService.createTrip(tripCreateDTO.getTripContents(), tripCreateDTO.getShipmentId(), tripCreateDTO.getCreateBy());
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModelCreate));
     }

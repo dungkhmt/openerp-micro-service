@@ -53,6 +53,11 @@ public class TripItem {
     private Container container;
 
     @ManyToOne()
+    @JoinColumn(name = "order_id", referencedColumnName = "uid")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Order order;
+
+    @ManyToOne()
     @JoinColumn(name = "trailer_id", referencedColumnName = "id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Trailer trailer;

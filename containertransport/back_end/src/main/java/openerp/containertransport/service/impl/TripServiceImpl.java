@@ -3,19 +3,22 @@ package openerp.containertransport.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
+import openerp.containertransport.algorithms.entity.DistanceElement;
+import openerp.containertransport.algorithms.entity.DistantKey;
 import openerp.containertransport.constants.Constants;
-import openerp.containertransport.dto.TripDeleteDTO;
-import openerp.containertransport.dto.TripFilterRequestDTO;
-import openerp.containertransport.dto.TripItemModel;
-import openerp.containertransport.dto.TripModel;
+import openerp.containertransport.dto.*;
+import openerp.containertransport.dto.validDTO.ValidTripItemDTO;
 import openerp.containertransport.entity.*;
 import openerp.containertransport.repo.*;
+import openerp.containertransport.service.FacilityService;
+import openerp.containertransport.service.RelationshipService;
 import openerp.containertransport.service.TripItemService;
 import openerp.containertransport.service.TripService;
 import openerp.containertransport.utils.RandomUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -29,6 +32,8 @@ public class TripServiceImpl implements TripService {
     private final ModelMapper modelMapper;
     private final OrderRepo orderRepo;
     private final ShipmentRepo shipmentRepo;
+    private final RelationshipService relationshipService;
+    private final FacilityService facilityService;
     private final EntityManager entityManager;
     @Override
     public TripModel createTrip(TripModel tripModel, String shipmentId, String createBy) {
@@ -252,5 +257,85 @@ public class TripServiceImpl implements TripService {
             }
         }
         return true;
+    }
+
+    public ValidTripItemDTO checkValidTrip(List<TripItemModel> tripItemModels, long startTime) {
+        ValidTripItemDTO validTripItemDTO = new ValidTripItemDTO();
+
+        List<Relationship> relationships = relationshipService.getAllRelationShip();
+        Map<DistantKey, DistanceElement> distanceElementMap = convertToDistantInput(relationships);
+
+        FacilityFilterRequestDTO facilityFilter = new FacilityFilterRequestDTO();
+        List<FacilityModel> facilityModels = facilityService.filterFacility(facilityFilter).getFacilityModels();
+        Map<Long, FacilityModel> facilityModelMap = convertToMapFacility(facilityModels);
+
+        Long totalTime = startTime;
+        BigDecimal totalDistant = new BigDecimal(0);
+        Integer prevPick = tripItemModels.get(0).getFacilityId().intValue();
+        for (int i = 1; i < tripItemModels.size(); i++) {
+            DistantKey distantKey = DistantKey.builder()
+                    .fromFacility(prevPick)
+                    .toFacility(tripItemModels.get(i).getFacilityId().intValue())
+                    .build();
+            Long time = distanceElementMap.get(distantKey).getTravelTime();
+            BigDecimal distant = distanceElementMap.get(distantKey).getDistance();
+
+            totalTime += time;
+            totalDistant = totalDistant.add(distant);
+
+            if(tripItemModels.get(i).getAction().equals("PICKUP_CONTAINER") && !tripItemModels.get(i).getTypeOrder().equals("OE")
+                    && totalTime > tripItemModels.get(i).getLateArrivalTime()) {
+                validTripItemDTO.setCheck(false);
+                validTripItemDTO.setMessageErr("Trip is incorrect time when PICKUP_CONTAINER of "+ tripItemModels.get(i).getOrderCode());
+                return validTripItemDTO;
+            }
+
+            if(tripItemModels.get(i).getAction().equals("DELIVERY_CONTAINER") && !tripItemModels.get(i).getTypeOrder().equals("IE")
+                    && totalTime > tripItemModels.get(i).getLateDepartureTime()) {
+                validTripItemDTO.setCheck(false);
+                validTripItemDTO.setMessageErr("Trip is incorrect time when DELIVERY_CONTAINER of "+ tripItemModels.get(i).getOrderCode());
+                return validTripItemDTO;
+            }
+
+            if(tripItemModels.get(i-1).getAction().equals("PICKUP_CONTAINER")){
+                totalTime += facilityModelMap.get(tripItemModels.get(i).getFacilityId()).getProcessingTimePickUp();
+            }
+
+            if(tripItemModels.get(i-1).getAction().equals("DELIVERY_CONTAINER")){
+                totalTime += facilityModelMap.get(tripItemModels.get(i).getFacilityId()).getProcessingTimeDrop();
+            }
+
+        }
+        validTripItemDTO.setTotalDistant(totalDistant);
+        validTripItemDTO.setTotalTime(totalTime);
+        validTripItemDTO.setCheck(true);
+
+        return validTripItemDTO;
+    }
+
+    public Map<DistantKey, DistanceElement> convertToDistantInput(List<Relationship> relationships) {
+        Map<DistantKey, DistanceElement> distanceMap = new HashMap<>();
+        relationships.forEach(relationship -> {
+            DistanceElement distanceElement = new DistanceElement();
+            distanceElement.setFromFacility((int) relationship.getFromFacility().longValue());
+            distanceElement.setToFacility((int) relationship.getToFacility().longValue());
+            distanceElement.setDistance(relationship.getDistant());
+            distanceElement.setTravelTime(relationship.getTime());
+
+            DistantKey distantKey = DistantKey.builder()
+                    .fromFacility((int) relationship.getFromFacility().longValue())
+                    .toFacility((int) relationship.getToFacility().longValue())
+                    .build();
+            distanceMap.put(distantKey, distanceElement);
+        });
+        return distanceMap;
+    }
+
+    public Map<Long, FacilityModel> convertToMapFacility(List<FacilityModel> facilityModels) {
+        Map<Long, FacilityModel> facilityModelMap = new HashMap<>();
+        for (FacilityModel facilityModel : facilityModels) {
+            facilityModelMap.put(facilityModel.getId(), facilityModel);
+        }
+        return facilityModelMap;
     }
 }

@@ -11,4 +11,5 @@ public class TripCreateDTO {
     private String shipmentId;
     private String createBy;
     private TripModel tripContents;
+    private String type;
 }
