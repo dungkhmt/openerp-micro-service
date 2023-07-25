@@ -83,4 +83,13 @@ public class SaleOrderController extends BaseController {
             return response(error(ex));
         }
     }
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteOrderById(@RequestParam(value = "id", required = true) Long id) {
+        try {
+            saleOrderService.deleteOrderById(id);
+            return response(new ResultEntity(1, "Delete order successfully", id));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
 }

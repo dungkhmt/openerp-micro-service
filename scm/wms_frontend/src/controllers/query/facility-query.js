@@ -102,15 +102,12 @@ export const useUpdateFacility = (params) => {
         data
       );
       if (res.data && res.code === 1) {
+        queryClient.invalidateQueries([queryKey.facility.facility_list]);
         return res.data;
       } else throw Error;
     },
-    onSuccess: (res, variables, context) => {
-      toast.success("Thay đổi thành công!");
-      queryClient.invalidateQueries([queryKey.facility.facility_list]);
-    },
     onError: () => {
-      toast.error("Lỗi khi thay đổi, vui lòng kiểm tra lại");
+      // toast.error("Lỗi khi thay đổi, vui lòng kiểm tra lại");
     },
     // befor mutation function actually triggers.
     onMutate: (variables) => {},

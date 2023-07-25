@@ -149,7 +149,7 @@ public class DashboardServiceImpl extends BaseService implements IDashBoardServi
                 if (topFiveBuying.get(4) < totalBuying) {
                     topFiveBuying.remove(4);
                     topFiveCustomer.remove(4);
-                    for (int i = 3; i >=0; i++) {
+                    for (int i = 3; i >=0; i--) {
                         if (topFiveBuying.get(i) > totalBuying) {
                             topFiveBuying.add(i+1, totalBuying);
                             topFiveCustomer.add(i+1, customer);

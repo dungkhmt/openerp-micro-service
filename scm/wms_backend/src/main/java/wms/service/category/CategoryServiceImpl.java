@@ -177,7 +177,7 @@ public class CategoryServiceImpl extends BaseService implements ICategoryService
     public void deleteCustomerTypeByCode(String code) throws CustomException {
         CustomerType customerType = getCustomerTypeByCode(code);
         if (customerType == null) {
-            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Customer type not exists, can't delete");
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Customer type does not exists, can't delete");
         }
         customerType.setDeleted(1);
         customerTypeRepo.save(customerType);

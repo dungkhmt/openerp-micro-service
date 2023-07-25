@@ -13,7 +13,7 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Long>  {
             "from scm_purchase_order spo\n" +
             "         left join scm_facility sf on spo.bought_by = sf.code\n" +
             "where spo.is_deleted = 0\n" +
-            "  and spo.status != 'DELETED'\n" +
+//            "  and spo.status != 'DELETED'\n" +
             "  and (sf.name ilike concat('%', :facilityName, '%'))\n" +
             "  and (spo.status = :orderStatus or :orderStatus = '')\n" +
             "  and (spo.supplier_code ilike concat('%', :supplierCode, '%'))\n" +

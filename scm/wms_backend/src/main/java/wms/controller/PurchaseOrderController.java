@@ -105,8 +105,8 @@ public class PurchaseOrderController extends BaseController {
             return response(error(ex));
         }
     }
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteOrderById(@PathVariable("id") long id) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteOrderById(@RequestParam(value = "id", required = true) Long id) {
         try {
             purchaseOrderService.deleteOrderById(id);
             return response(new ResultEntity(1, "Delete order successfully", id));

@@ -112,7 +112,7 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
 
     @Override
     public SaleOrder getOrderById(long id) {
-        return null;
+        return saleOrderRepo.getOrderById(id);
     }
 
     @Override
@@ -135,7 +135,9 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
 
     @Override
     public void deleteOrderById(long id) {
-
+        SaleOrder order = getOrderById(id);
+        order.setStatus(OrderStatus.DELETED.getStatus());
+        saleOrderRepo.save(order);
     }
 
     @Override

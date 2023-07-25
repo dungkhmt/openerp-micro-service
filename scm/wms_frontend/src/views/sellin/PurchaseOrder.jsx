@@ -11,13 +11,17 @@ import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetPurchaseOrderList } from "controllers/query/purchase-order-query";
+import {
+  useDeletePurchaseOrder,
+  useGetPurchaseOrderList,
+} from "controllers/query/purchase-order-query";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { ORDERS_STATUS } from "shared/AppConstants";
 import { useGetAllUsersExist } from "../../controllers/query/user-query";
+import { convertUserToName } from "../../utils/GlobalUtils";
 import { purchaseOrderCols } from "./LocalConstant";
 import CreatePurOrderForm from "./components/CreatePurOrderForm";
 
@@ -40,6 +44,7 @@ function PurchaseOrderScreen({ screenAuthorization }) {
     });
   };
   const { isLoading: isUserLoading, data: users } = useGetAllUsersExist();
+  const deleteOrderQuery = useDeletePurchaseOrder();
   const STATUS = ["created", "accepted", "delivering", "delivered", "deleted"];
   const { isLoading, data: order } = useGetPurchaseOrderList(params);
   let actions = [
@@ -91,7 +96,8 @@ function PurchaseOrderScreen({ screenAuthorization }) {
       options: users
         ? users?.map((user) => {
             return {
-              name: user?.id,
+              name: convertUserToName(user),
+              id: user?.id,
             };
           })
         : [],
@@ -129,7 +135,7 @@ function PurchaseOrderScreen({ screenAuthorization }) {
   const onSubmit = (data) => {
     setParams({
       ...params,
-      createdBy: data?.createdBy?.name,
+      createdBy: data?.createdBy?.id,
       facilityName: data?.facilityName,
       supplierCode: data?.supplierCode,
       orderStatus: data?.status?.name.toUpperCase(),
@@ -196,7 +202,7 @@ function PurchaseOrderScreen({ screenAuthorization }) {
                       !(
                         params?.row?.status === ORDERS_STATUS.created ||
                         index === 0
-                      )
+                      ) || params?.row?.status === ORDERS_STATUS.deleted
                     }
                   />
                 )),
@@ -222,7 +228,14 @@ function PurchaseOrderScreen({ screenAuthorization }) {
       <DraggableDeleteDialog
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
-        callback={(flag) => {}}
+        callback={async (flag) => {
+          if (flag) {
+            await deleteOrderQuery.mutateAsync({
+              id: itemSelected?.id,
+            });
+          }
+          setIsRemove(false);
+        }}
       />
     </Box>
   );

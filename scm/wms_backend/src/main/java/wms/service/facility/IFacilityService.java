@@ -24,7 +24,7 @@ public interface IFacilityService {
     Facility getFacilityById(long id);
     Facility getFacilityByCode(String code);
     ReturnPaginationDTO<ProductFacility> getInventoryItems(int page, int pageSize, String sortField, boolean isSortAsc, String facilityCode) throws JsonProcessingException;
-    Facility updateFacility(FacilityUpdateDTO facilityDTO) throws CustomException;
+    Facility updateFacility(FacilityUpdateDTO facilityDTO, Long id) throws CustomException;
     void importToFacilityWithOrder(ImportToFacilityDTO importToFacilityDTO) throws CustomException;
     ReceiptBill getReceiptBillForOrderByCode(String orderCode, String code);
     void exportFromFacility(ExportFromFacilityDTO exportFromFacilityDTO) throws CustomException;

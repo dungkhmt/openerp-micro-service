@@ -123,21 +123,13 @@ public class FacilityController extends BaseController{
         }
     }
     @PutMapping("/update")
-    public ResponseEntity<?> updateFacility(@Valid @RequestBody FacilityUpdateDTO facilityDTO) {
+    public ResponseEntity<?> updateFacility(@Valid @RequestBody FacilityUpdateDTO facilityDTO, @RequestParam("id") Long id) {
         try {
-            return response(new ResultEntity(1, "Update facility successfully", facilityService.updateFacility(facilityDTO)));
+            return response(new ResultEntity(1, "Update facility successfully", facilityService.updateFacility(facilityDTO, id)));
         } catch (Exception ex) {
             return response(error(ex));
         }
     }
-//    @PutMapping("/update-inventory/{id}")
-//    public ResponseEntity<?> updateFacilityInventory(@Valid @RequestBody FacilityUpdateDTO facilityDTO, @PathVariable("id") long id) {
-//        try {
-//            return response(new ResultEntity(1, "Update facility successfully", facilityService.updateFacility(facilityDTO, id)));
-//        } catch (Exception ex) {
-//            return response(error(ex));
-//        }
-//    }
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteFacilityById(@PathVariable("id") long id) {
         try {

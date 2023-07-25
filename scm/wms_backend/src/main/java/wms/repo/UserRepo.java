@@ -8,6 +8,8 @@ import wms.entity.DeliveryTrip;
 import wms.entity.UserLogin;
 import wms.entity.UserRegister;
 
+import java.util.List;
+
 public interface UserRepo extends JpaRepository<UserRegister, Long> {
     @Query(value = "                            select *\n" +
             "                            from user_register ur\n" +
@@ -22,4 +24,8 @@ public interface UserRepo extends JpaRepository<UserRegister, Long> {
             "                    or concat(ur.first_name, ' ', ur.middle_name, ' ', ur.last_name) ilike concat('%', :textSearch, '%')\n" +
             "                    or ur.status_id ilike concat('%', :textSearch, '%'))", nativeQuery = true)
     Page<UserRegister> search(Pageable pageable, String role, String textSearch);
+
+    @Query(value = "select * from scm_user_register where registered_roles like concat('%', :roleName, '%')"
+            , nativeQuery = true)
+    List<UserRegister> getUsersByRole(String roleName);
 }

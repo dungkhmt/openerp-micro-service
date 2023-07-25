@@ -53,6 +53,7 @@ export const queryKey = {
     user_list: "user_list",
     user_list_all: "user_list_all",
     user_list_pagination: "user_list_pagination",
+    user_list_all_by_role: "user_list_all_by_role",
   },
   dashboard: {
     new_facility_month: "new_facility_month",

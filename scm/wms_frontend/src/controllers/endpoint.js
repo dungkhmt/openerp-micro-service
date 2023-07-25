@@ -25,7 +25,7 @@ export const endPoint = {
   updateCustomerType: baseUrl + "/category/customer-type/update",
 
   getContractType: baseUrl + "/category/contract-type/get-all",
-  deleteContractType: baseUrl + "/category/customer-type/remove",
+  deleteContractType: baseUrl + "/category/contract-type/remove",
   createContractType: baseUrl + "/category/contract-type/create",
   updateContractType: baseUrl + "/category/contract-type/update",
 
@@ -46,6 +46,7 @@ export const endPoint = {
   getPurchaseOrder: baseUrl + "/purchase-order/get-all",
   getPurchaseOrderItems: baseUrl + "/purchase-order/get-order-items",
   updatePurchaseOrderStatus: baseUrl + "/purchase-order/update-status",
+  deletePurchaseOrder: baseUrl + "/purchase-order/delete",
   createPurchaseOrder: baseUrl + "/purchase-order/create",
   createSellinPrice: baseUrl + "/product/set-purchase-price",
   getSellinPrice: baseUrl + "/product/get-all-sellin-price",
@@ -76,6 +77,7 @@ export const endPoint = {
   getSaleOrderItems: baseUrl + "/sale-order/get-order-items",
   createSaleOrder: baseUrl + "/sale-order/create",
   updateSaleOrderStatus: baseUrl + "/sale-order/update-status",
+  deleteSaleOrder: baseUrl + "/sale-order/delete",
   createSelloutPrice: baseUrl + "/product/set-sale-price",
   getSelloutPrice: baseUrl + "/product/get-all-sellout-price",
   updateSelloutPrice: baseUrl + "/product/sellout-price/update",
@@ -103,6 +105,7 @@ export const endPoint = {
   // createNewUser: base
   getAllUsers: baseUrl + "/user/get-all",
   getAllUsersWithoutPagination: baseUrl + "/user/get-all-exists",
+  getAllUsersByRole: baseUrl + "/user/get-all-by-roles",
   // Dashboard
   getNewFacilityMonthly: baseUrl + "/dashboard/facility/new-facility",
   getNewcustomerMonthly: baseUrl + "/dashboard/customer/new-customer",

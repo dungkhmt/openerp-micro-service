@@ -94,7 +94,7 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
         }
         return true;
     }
-    private List<Facility> saveFacilities(Row row, UserRegister createdBy) throws CustomException {
+    private void saveFacilities(Row row, UserRegister createdBy) throws CustomException {
         List<Facility> listFacilities = new ArrayList<>();
         List<Facility> facilities = facilityRepo.getAllFacility();
         UserRegister manager = userRepo.getUserByUserLoginId(row.getCell(5).toString());
@@ -119,7 +119,6 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
         List<Facility> lstFacilities = facilityRepo.saveAll(listFacilities);
         log.info("Num of facilities added {}", listFacilities.size());
         clusterCustomerIntoFacility();
-        return lstFacilities;
     }
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -201,21 +200,24 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
     }
 
     @Override
-    public Facility updateFacility(FacilityUpdateDTO facilityDTO) throws CustomException {
-        Facility facility = facilityRepo.getFacilityById(facilityDTO.getId());
-        if (facility == null) {
+    public Facility updateFacility(FacilityUpdateDTO facilityDTO, Long id) throws CustomException {
+        Facility facilityToUpdate = facilityRepo.getFacilityById(id);
+        if (facilityToUpdate == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Facility does not exist, can't update");
         }
         UserRegister manager = userRepo.getUserByUserLoginId(facilityDTO.getManagedBy());
-        Facility facilityToUpdate = facilityRepo.getFacilityById(facilityDTO.getId());
+        if (manager == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Manager unknown");
+        }
         facilityToUpdate.setName(facilityDTO.getName());
         facilityToUpdate.setAddress(facilityDTO.getAddress());
         facilityToUpdate.setStatus(facilityDTO.getStatus());
         facilityToUpdate.setLatitude(facilityToUpdate.getLatitude());
         facilityToUpdate.setLongitude(facilityToUpdate.getLongitude());
         facilityToUpdate.setManager(manager);
-        // Don't update user_created
-        return facilityRepo.save(facilityToUpdate);
+        Facility facility = facilityRepo.save(facilityToUpdate);
+        clusterCustomerIntoFacility();
+        return facility;
     }
 
     @Override

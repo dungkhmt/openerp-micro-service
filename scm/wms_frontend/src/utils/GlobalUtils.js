@@ -6,5 +6,12 @@ export const formatVietnameseCurrency = (amount) => {
   return formattedAmount;
 };
 export const convertUserToName = (user) => {
-  return user?.firstName + " " + user?.middleName + " " + user?.lastName;
+  if (user === null || user === undefined) return "";
+  return (
+    (user?.firstName || "") +
+    " " +
+    (user?.middleName || "") +
+    " " +
+    (user?.lastName || "")
+  );
 };

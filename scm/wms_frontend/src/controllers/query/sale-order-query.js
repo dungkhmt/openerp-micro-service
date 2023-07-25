@@ -137,3 +137,25 @@ export const useUpdateSelloutPrice = (params) => {
     onMutate: (variables) => {},
   });
 };
+
+export const useDeleteSaleOrder = () => {
+  return useMutation({
+    mutationFn: async (params) => {
+      const res = await axiosSendRequest(
+        "delete",
+        endPoint.deleteSaleOrder,
+        params
+      );
+      if (res.code === 1) {
+        toast.success("Xóa đơn bán thành công!");
+        queryClient.invalidateQueries([queryKey.sale_order.order_list]);
+        return res.data;
+      }
+    },
+    onError: () => {
+      toast.error("Lỗi khi xóa dữ liệu, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};

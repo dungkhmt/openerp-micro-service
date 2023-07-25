@@ -11,13 +11,17 @@ import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetSaleOrderList } from "controllers/query/sale-order-query";
+import {
+  useDeleteSaleOrder,
+  useGetSaleOrderList,
+} from "controllers/query/sale-order-query";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { ORDERS_STATUS } from "shared/AppConstants";
 import { useGetAllUsersExist } from "../../controllers/query/user-query";
+import { convertUserToName } from "../../utils/GlobalUtils";
 import { saleOrderCols } from "./LocalConstant";
 import CreateSaleOrderForm from "./components/CreateSaleOrderForm";
 
@@ -41,6 +45,7 @@ function SaleOrderScreen({ screenAuthorization }) {
   };
 
   const STATUS = ["created", "accepted", "delivering", "delivered", "deleted"];
+  const deleteOrderQuery = useDeleteSaleOrder();
   const { isLoading: isUserLoading, data: users } = useGetAllUsersExist();
   const { isLoading, data } = useGetSaleOrderList(params);
   let actions = [
@@ -93,7 +98,8 @@ function SaleOrderScreen({ screenAuthorization }) {
       options: users
         ? users?.map((user) => {
             return {
-              name: user?.id,
+              name: convertUserToName(user),
+              id: user?.id,
             };
           })
         : [],
@@ -125,7 +131,7 @@ function SaleOrderScreen({ screenAuthorization }) {
   const onSubmit = (data) => {
     setParams({
       ...params,
-      createdBy: data?.createdBy?.name,
+      createdBy: data?.createdBy?.id,
       customerName: data?.customerName,
       orderStatus: data?.status?.name.toUpperCase(),
     });
@@ -192,7 +198,7 @@ function SaleOrderScreen({ screenAuthorization }) {
                       !(
                         params?.row?.status === ORDERS_STATUS.created ||
                         index === 0
-                      )
+                      ) || params?.row?.status === ORDERS_STATUS.deleted
                     }
                   />
                 )),
@@ -218,7 +224,14 @@ function SaleOrderScreen({ screenAuthorization }) {
         // disable={isLoadingRemove}
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
-        callback={(flag) => {}}
+        callback={async (flag) => {
+          if (flag) {
+            await deleteOrderQuery.mutateAsync({
+              id: itemSelected?.id,
+            });
+          }
+          setIsRemove(false);
+        }}
       />
     </Box>
   );

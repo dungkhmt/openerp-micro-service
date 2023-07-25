@@ -14,7 +14,7 @@ public interface SaleOrderRepo extends JpaRepository<SaleOrder, Long> {
             "            from scm_sale_order so\n" +
             "                     left join scm_customer sf on so.customer_code = sf.code\n" +
             "            where so.is_deleted = 0\n" +
-            "              and so.status != 'DELETED'\n" +
+//            "              and so.status != 'DELETED'\n" +
             "              and (sf.name ilike concat('%', :customerName, '%'))\n" +
             "              and (so.status = :orderStatus or :orderStatus = '')\n" +
             "              and (so.created_by = :createdBy or :createdBy = '')\n" +

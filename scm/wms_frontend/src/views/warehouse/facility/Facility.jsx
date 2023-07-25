@@ -26,7 +26,8 @@ import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import PrimaryButton from "../../../components/button/PrimaryButton";
 import CustomizedDialogs from "../../../components/dialog/CustomizedDialogs";
-import { useGetAllUsersExist } from "../../../controllers/query/user-query";
+import { useGetAllUsersByRoles } from "../../../controllers/query/user-query";
+import { convertUserToName } from "../../../utils/GlobalUtils";
 import { staticProductFields, staticWarehouseCols } from "../LocalConstant";
 import CreateFacilityForm from "./components/CreateFacilityForm";
 import UpdateFacilityForm from "./components/UpdateFacilityForm";
@@ -58,7 +59,8 @@ function FacilityScreen({ screenAuthorization }) {
       code: facilityCode,
     });
   const importFacilityQuery = useImportFacility();
-  const { isLoading: isUserLoading, data: users } = useGetAllUsersExist();
+  const { isLoading: isUserLoading, data: users } =
+    useGetAllUsersByRoles("SCM_WAREHOUSE");
   const handleUpload = async () => {
     if (selectedFile) {
       const formData = new FormData();
@@ -148,7 +150,8 @@ function FacilityScreen({ screenAuthorization }) {
       options: users
         ? users?.map((user) => {
             return {
-              name: user?.id,
+              name: convertUserToName(user),
+              id: user?.id,
             };
           })
         : [],
@@ -163,7 +166,8 @@ function FacilityScreen({ screenAuthorization }) {
       options: users
         ? users?.map((user) => {
             return {
-              name: user?.id,
+              name: convertUserToName(user),
+              id: user?.id,
             };
           })
         : [],
@@ -186,8 +190,8 @@ function FacilityScreen({ screenAuthorization }) {
   const onSubmit = (data) => {
     setParams({
       ...params,
-      createdBy: data?.createdBy?.name,
-      managedBy: data?.managedBy?.name,
+      createdBy: data?.createdBy?.id,
+      managedBy: data?.managedBy?.id,
       facilityName: data?.facilityName,
       status: data?.status ? "ACTIVE" : "INACTIVE",
     });
