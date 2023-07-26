@@ -46,18 +46,24 @@ const CodeEditor = (props) => {
     }
   }, []);
   useEffect(() => {
-    if (cursorMgr.current) {
+    if (cursorMgr.current && socket.current) {
       participants?.map((participant) => {
         try {
-          cursorMgr.current.addCursor(participant?.socketId, participant?.fullName, randomColor(), {
-            row: 0,
-            column: 0,
-          });
-        } catch (error) {
-        }
+          if (socket.current.id !== participant?.socketId) {
+            cursorMgr.current.addCursor(
+              participant?.socketId,
+              participant?.fullName,
+              randomColor(),
+              {
+                row: 0,
+                column: 0,
+              }
+            );
+          }
+        } catch (error) {}
       });
     }
-  }, [participants]);
+  }, [participants, socket]);
   const onChange = (value) => {
     if (editorRef.current) {
       const editor = editorRef.current.editor;

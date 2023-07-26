@@ -8,8 +8,13 @@
   position: absolute;
   pointer-events: auto;
 }
-.remote-cursor:hover > .ace-multi-cursor-tooltip {
-  opacity: 1;
+.remote-cursor:hover .ace-multi-cursor-tooltip {
+  opacity:1;
+  /* visibility: visible; */
+}
+.ace-multi-cursor:hover ~ .ace-multi-cursor-tooltip {
+  opacity:1 !important;
+  /* visibility: visible; */
 }
 .ace-multi-cursor-tooltip {
   opacity: 0;
