@@ -66,8 +66,8 @@ public class DeliveryTripDTO {
         this.distance = trip.getDistance();
         this.totalWeight = trip.getTotalWeight();
         this.totalLocations = trip.getTotalLocations();
-        this.lastUpdatedStamp = DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, trip.getLastUpdatedStamp());
-        this.createdStamp = DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, trip.getCreatedStamp());
+        this.lastUpdatedStamp = DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, trip.getLastUpdatedStamp());
+        this.createdStamp = DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, trip.getCreatedStamp());
         this.createdBy = trip.getCreatedBy();
         this.warehouseId = trip.getWarehouseId();
         this.isDeleted = trip.isDeleted();
