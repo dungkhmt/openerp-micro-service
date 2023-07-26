@@ -202,8 +202,9 @@ function ProductScreen({ screenAuthorization }) {
             align: "center",
             sortable: false,
             width: 125,
-            minWidth: 150,
-            maxWidth: 200,
+            // minWidth: 150,
+            // maxWidth: 200,
+            flex: 1,
             type: "actions",
             getActions: (params) => [
               ...extraActions.map((extraAction, index) => (
