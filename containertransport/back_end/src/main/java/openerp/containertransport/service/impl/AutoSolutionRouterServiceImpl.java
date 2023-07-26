@@ -35,7 +35,7 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         ShipmentModel shipmentModel = shipmentService.getShipmentByUid(shipmentUid);
 
         TransportContainerInput transportContainerInput = new TransportContainerInput();
-        transportContainerInput.setStartTime(BigDecimal.valueOf(shipmentModel.getExecutedTime()));
+        transportContainerInput.setStartTime(shipmentModel.getExecutedTime());
 
         // get Trucks
         TruckFilterRequestDTO truckFilterRequestDTO = new TruckFilterRequestDTO();
@@ -101,6 +101,7 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
                     tripItemModel.setAction(point.getAction());
                     tripItemModel.setFacilityId(Long.valueOf(point.getFacilityId()));
                     tripItemModel.setOrderCode(point.getOrderCode());
+                    tripItemModel.setOrderUid(point.getOrderId());
                     tripItemModel.setContainerId(point.getContainerId());
                     tripItemModel.setTrailerId(point.getTrailerId() != null ? Long.valueOf(point.getTrailerId()) : null);
                     tripItemModel.setType(point.getType());
@@ -155,7 +156,7 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         List<Request> requests = new ArrayList<>();
         orderModels.forEach(orderModel -> {
             Request request = new Request();
-            request.setRequestId(orderModel.getId());
+            request.setRequestId(orderModel.getUid());
             request.setOrderCode(orderModel.getOrderCode());
             request.setContainerID(orderModel.getContainerModel().getId());
             request.setWeightContainer(orderModel.getContainerModel().getSize());

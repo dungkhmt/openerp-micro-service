@@ -18,5 +18,5 @@ public class TransportContainerInput {
     private List<ContainerInput> containerInputs;
     private List<DistanceElement> distances;
     private List<FacilityInput> facilityInputs;
-    private BigDecimal startTime;
+    private Long startTime;
 }

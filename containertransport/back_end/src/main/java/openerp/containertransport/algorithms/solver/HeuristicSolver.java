@@ -32,7 +32,7 @@ public class HeuristicSolver {
     private List<DepotTruck> depotTrucks;
     private List<DepotTrailer> depotTrailers;
     private Map<Integer, FacilityInput> facilityInputMap = new HashMap<>();
-    private BigDecimal startTime;
+    private Long startTime;
     private TransportContainerSolutionOutput transportContainerSolutionOutput;
 
     public TransportContainerSolutionOutput solve (TransportContainerInput input){
@@ -274,7 +274,7 @@ public class HeuristicSolver {
 
     public Point createdPointFromRequest(String action, Request request, boolean checkToPoint) {
         Point point = new Point();
-        point.setId(request.getRequestId());
+        point.setOrderId(request.getRequestId());
         point.setAction(action);
         point.setFacilityId( action.equals(Constants.ACTION.PICKUP_CONTAINER.getAction()) ? request.getFromLocationID() : request.getToLocationID());
         point.setOrderCode(request.getOrderCode());
@@ -815,7 +815,7 @@ public class HeuristicSolver {
                     .build();
             Long time = this.distanceElementMap.get(distantKey).getTravelTime();
             if(i == 0) {
-                pointInTrips.get(i).setTotalTime(0L);
+                pointInTrips.get(i).setTotalTime(this.startTime);
             } else {
                 pointInTrips.get(i).setTotalTime(time + pointInTrips.get(i-1).getTotalTime());
                 if(pointInTrips.get(i-1).getAction().equals(Constants.ACTION.PICKUP_CONTAINER.getAction())){
@@ -934,7 +934,7 @@ public class HeuristicSolver {
             }
             prevPoint = pointList.get(i).getFacilityId();
         }
-        tripOutput.setTotalTime(totalTime.add(this.startTime));
+        tripOutput.setTotalTime(totalTime.add(new BigDecimal(this.startTime)));
         return tripOutput;
     }
 

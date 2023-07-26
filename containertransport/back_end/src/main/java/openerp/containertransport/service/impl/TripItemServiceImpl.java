@@ -7,6 +7,7 @@ import openerp.containertransport.entity.*;
 import openerp.containertransport.repo.*;
 import openerp.containertransport.service.TripItemService;
 import openerp.containertransport.utils.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class TripItemServiceImpl implements TripItemService {
     private final ContainerRepo containerRepo;
     private final TrailerRepo trailerRepo;
     private final TripRepo tripRepo;
+    private final OrderRepo orderRepo;
     @Override
     public TripItemModel createTripItem(TripItemModel tripItemModel, String tripUid) {
         TripItem tripItem = new TripItem();
@@ -43,6 +45,10 @@ public class TripItemServiceImpl implements TripItemService {
         }
         if(tripItemModel.getOrderCode() != null) {
             tripItem.setOrderCode(tripItemModel.getOrderCode());
+        }
+        if(StringUtils.isEmpty(tripItemModel.getOrderUid())) {
+            Order order = orderRepo.findByUid(tripItemModel.getOrderUid());
+            tripItem.setOrder(order);
         }
         Trip trip = tripRepo.findByUid(tripUid);
         tripItem.setTrip(trip);

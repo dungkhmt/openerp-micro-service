@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.Constants;
 import openerp.containertransport.dto.DashboardOrderByMonthRes;
 import openerp.containertransport.dto.dashboard.DashboardTimeOrderDTO;
+import openerp.containertransport.dto.dashboard.DashboardTypeContainer;
 import openerp.containertransport.service.DashboardService;
 import openerp.containertransport.service.OrderService;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,11 @@ public class DashboardServiceImpl implements DashboardService {
         orderByMonth.put("New", listNewOrder);
         orderByMonth.put("Done", listDoneOrder);
 
+        return null;
+    }
+
+    @Override
+    public DashboardTypeContainer getRateTypeContainer() {
         return null;
     }
 }
