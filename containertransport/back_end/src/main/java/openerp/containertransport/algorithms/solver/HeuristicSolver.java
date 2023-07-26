@@ -274,7 +274,8 @@ public class HeuristicSolver {
 
     public Point createdPointFromRequest(String action, Request request, boolean checkToPoint) {
         Point point = new Point();
-        point.setOrderId(request.getRequestId());
+        point.setId(request.getRequestId());
+        point.setOrderId(request.getRequestUid());
         point.setAction(action);
         point.setFacilityId( action.equals(Constants.ACTION.PICKUP_CONTAINER.getAction()) ? request.getFromLocationID() : request.getToLocationID());
         point.setOrderCode(request.getOrderCode());

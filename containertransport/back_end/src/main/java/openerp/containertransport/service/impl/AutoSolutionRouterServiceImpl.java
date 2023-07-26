@@ -156,7 +156,8 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         List<Request> requests = new ArrayList<>();
         orderModels.forEach(orderModel -> {
             Request request = new Request();
-            request.setRequestId(orderModel.getUid());
+            request.setRequestId(orderModel.getId());
+            request.setRequestUid(orderModel.getUid());
             request.setOrderCode(orderModel.getOrderCode());
             request.setContainerID(orderModel.getContainerModel().getId());
             request.setWeightContainer(orderModel.getContainerModel().getSize());

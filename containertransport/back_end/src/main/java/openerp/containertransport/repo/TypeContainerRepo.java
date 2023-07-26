@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface TypeContainerRepo extends JpaRepository<TypeContainer, Long> {
     TypeContainer findByTypeContainerCode (String typeContainerCode);
 
-    @Query("SELECT SUM(container_transport_type_container.total) FROM container_transport_type_container;")
+    @Query(value = "SELECT SUM(container_transport_type_container.total) FROM container_transport_type_container", nativeQuery = true)
     Long countContainer();
 }
