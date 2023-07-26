@@ -2,9 +2,10 @@ package openerp.containertransport.dto.dashboard;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Data
 public class DashboardTypeContainer {
-    private Map<String, Float> rateTypeContainer;
+    private Map<Integer, BigDecimal> rateTypeContainer;
 }

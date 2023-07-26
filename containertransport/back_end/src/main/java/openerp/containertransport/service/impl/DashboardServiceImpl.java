@@ -3,18 +3,23 @@ package openerp.containertransport.service.impl;
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.Constants;
 import openerp.containertransport.dto.DashboardOrderByMonthRes;
+import openerp.containertransport.dto.TypeContainerFilterReqDTO;
+import openerp.containertransport.dto.TypeContainerModel;
 import openerp.containertransport.dto.dashboard.DashboardTimeOrderDTO;
 import openerp.containertransport.dto.dashboard.DashboardTypeContainer;
 import openerp.containertransport.service.DashboardService;
 import openerp.containertransport.service.OrderService;
+import openerp.containertransport.service.TypeContainerService;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService {
     private final OrderService orderService;
+    private final TypeContainerService typeContainerService;
     @Override
     public DashboardOrderByMonthRes getOrderByMonth(int year) {
         Map<Integer, DashboardTimeOrderDTO> timeMonth = new HashMap<>();
@@ -57,6 +62,21 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public DashboardTypeContainer getRateTypeContainer() {
-        return null;
+        DashboardTypeContainer dashboardTypeContainer = new DashboardTypeContainer();
+        Map<Integer, BigDecimal> rateTypeContainer = new HashMap<>();
+
+        TypeContainerFilterReqDTO typeContainerFilterReqDTO = new TypeContainerFilterReqDTO();
+        List<TypeContainerModel> typeContainerModels = typeContainerService.filterTypeContainer(typeContainerFilterReqDTO).getTypeContainers();
+
+        Long countContainer = typeContainerService.countContainer();
+
+        typeContainerModels.forEach((item) -> {
+
+            BigDecimal rate = BigDecimal.valueOf((item.getTotal()/countContainer)).setScale(2);
+            rateTypeContainer.put(item.getSize(), rate);
+        });
+        dashboardTypeContainer.setRateTypeContainer(rateTypeContainer);
+
+        return dashboardTypeContainer;
     }
 }

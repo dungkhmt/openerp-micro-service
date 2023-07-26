@@ -8,4 +8,5 @@ import openerp.containertransport.entity.TypeContainer;
 public interface TypeContainerService {
     TypeContainerModel createTypeContainer(TypeContainerModel typeContainerModel);
     TypeContainerFilterRes filterTypeContainer(TypeContainerFilterReqDTO typeContainerModel);
+    Long countContainer();
 }
