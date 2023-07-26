@@ -48,6 +48,7 @@ export const endPoint = {
   updatePurchaseOrderStatus: baseUrl + "/purchase-order/update-status",
   deletePurchaseOrder: baseUrl + "/purchase-order/delete",
   createPurchaseOrder: baseUrl + "/purchase-order/create",
+  updatePurchaseOrder: baseUrl + "/purchase-order/update",
   createSellinPrice: baseUrl + "/product/set-purchase-price",
   getSellinPrice: baseUrl + "/product/get-all-sellin-price",
   updateSellinPrice: baseUrl + "/product/sellin-price/update",

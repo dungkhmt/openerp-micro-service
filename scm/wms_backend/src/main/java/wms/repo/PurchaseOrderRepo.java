@@ -24,6 +24,9 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Long>  {
             "    )", nativeQuery = true)
     Page<PurchaseOrder> search(Pageable pageable, String orderStatus, String facilityName, String createdBy, String supplierCode, String text);
     PurchaseOrder getOrderById(long id);
+    @Query(value = "select spo.* from scm_purchase_order spo\n" +
+            "         left join scm_purchase_order_item spoi on spo.code = spoi.order_code\n" +
+            "         where code = :code and spoi.is_deleted = 0", nativeQuery = true)
     PurchaseOrder getOrderByCode(String code);
 
     @Query(value = "SELECT *\n" +

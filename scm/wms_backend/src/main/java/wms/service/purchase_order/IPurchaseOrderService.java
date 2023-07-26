@@ -20,7 +20,7 @@ public interface IPurchaseOrderService {
     PurchaseOrder getOrderById(long id);
     PurchaseOrder getOrderByCode(String code);
     PurchaseOrderItem getOrderItemByProduct(String orderCode, String productCode);
-    PurchaseOrder updateOrder(UpdatePurchaseOrderDTO updatePurchaseOrderDTO, long id) throws CustomException;
+    PurchaseOrder updateOrder(UpdatePurchaseOrderDTO updatePurchaseOrderDTO) throws CustomException;
     PurchaseOrder updateOrderStatus(String status, String orderCode) throws CustomException;
     void deleteOrderById(long id);
     ResponseEntity<InputStreamResource> exportOrderPdf(String orderCode) throws IOException;

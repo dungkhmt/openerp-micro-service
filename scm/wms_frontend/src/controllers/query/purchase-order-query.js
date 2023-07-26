@@ -162,3 +162,25 @@ export const useDeletePurchaseOrder = () => {
     onMutate: (variables) => {},
   });
 };
+export const useUpdatePurchaseOrder = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.updatePurchaseOrder,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        toast.success("Tạo đơn mua thành công!");
+        queryClient.invalidateQueries([queryKey.purchase_order.order_list]);
+        return res.data;
+      }
+    },
+    onError: () => {
+      toast.error("Lỗi khi tạo đơn mua, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};

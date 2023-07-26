@@ -24,6 +24,7 @@ import { useGetAllUsersExist } from "../../controllers/query/user-query";
 import { convertUserToName } from "../../utils/GlobalUtils";
 import { purchaseOrderCols } from "./LocalConstant";
 import CreatePurOrderForm from "./components/CreatePurOrderForm";
+import UpdatePurOrderForm from "./components/UpdatePurOrderForm";
 
 function PurchaseOrderScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
@@ -70,6 +71,7 @@ function PurchaseOrderScreen({ screenAuthorization }) {
     {
       title: "Sửa",
       callback: async (item) => {
+        setItemSelected(item);
         setOpenDrawer();
       },
       icon: <EditIcon />,
@@ -223,7 +225,12 @@ function PurchaseOrderScreen({ screenAuthorization }) {
 
       <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
         <HeaderModal onClose={setOpenDrawer} title="Sửa thông tin đơn hàng" />
-        {/* <UpdateProductForm /> */}
+        <Box sx={{ marginY: 2 }}>
+          <UpdatePurOrderForm
+            setOpenDrawer={setOpenDrawer}
+            createOrder={itemSelected}
+          />
+        </Box>
       </CustomDrawer>
       <DraggableDeleteDialog
         open={isRemove && itemSelected}
