@@ -12,9 +12,11 @@ import com.hust.wmsbackend.management.repository.*;
 import com.hust.wmsbackend.management.service.ProductService;
 import com.hust.wmsbackend.management.service.ProductWarehouseService;
 import com.hust.wmsbackend.management.service.WarehouseService;
+import com.hust.wmsbackend.management.utils.DateTimeFormat;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTimeComparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -323,8 +325,8 @@ public class ProductServiceImpl implements ProductService {
             List<ProductPriceResponse.ProductHistoryPrices> historyPrices = prices.stream()
                 .map(price -> ProductPriceResponse.ProductHistoryPrices.builder()
                     .price(price.getPrice())
-                    .startDate(price.getStartDate())
-                    .endDate(price.getEndDate())
+                    .startDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, price.getStartDate()))
+                    .endDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, price.getEndDate()))
                     .description(price.getDescription())
                     .productPriceId(price.getProductPriceId())
                     .build())
@@ -359,8 +361,15 @@ public class ProductServiceImpl implements ProductService {
         List<ProductPrice> prices = productPriceRepository.findAllByProductId(productId);
         Date now = new Date();
         BigDecimal currPrice = null;
+        DateTimeComparator comparator = DateTimeComparator.getDateOnlyInstance();
         for (ProductPrice price : prices) {
-            if (price.getStartDate().before(now) && (price.getEndDate() == null || price.getEndDate().after(now))) {
+//            if (price.getStartDate().before(now) && (price.getEndDate() == null || price.getEndDate().after(now))) {
+//                currPrice = price.getPrice();
+//                break;
+//            }
+            boolean isStartDateBefore = comparator.compare(price.getStartDate(), now) <= 0;
+            boolean isEndDateAfter = price.getEndDate() == null || comparator.compare(price.getEndDate(), now) >= 0;
+            if (isStartDateBefore && isEndDateAfter) {
                 currPrice = price.getPrice();
                 break;
             }
