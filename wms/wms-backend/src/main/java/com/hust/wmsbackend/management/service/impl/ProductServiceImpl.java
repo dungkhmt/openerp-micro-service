@@ -13,10 +13,12 @@ import com.hust.wmsbackend.management.service.ProductService;
 import com.hust.wmsbackend.management.service.ProductWarehouseService;
 import com.hust.wmsbackend.management.service.WarehouseService;
 import com.hust.wmsbackend.management.utils.DateTimeFormat;
+import com.hust.wmsbackend.management.utils.DateUtils;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTimeComparator;
+import org.joda.time.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -284,6 +286,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public boolean createProductPrice(ProductPriceRequest request) {
         log.info(String.format("Create product price with request %s", request));
         if (!productRepository.findById(UUID.fromString(request.getProductId())).isPresent()) {
@@ -301,6 +304,43 @@ public class ProductServiceImpl implements ProductService {
             return false;
         }
 
+        UUID productId = UUID.fromString(request.getProductId());
+        // get previous price config
+        List<ProductPrice> prices = productPriceRepository.findAllByProductId(productId);
+
+        Date maxStartDate = new Date(Long.MIN_VALUE);
+        UUID maxStartDateProductPriceId = null;
+
+        // get current product price entity
+        ProductPrice updatePrice = null;
+        if (!prices.isEmpty()){
+            for (ProductPrice price : prices) {
+                if (DateUtils.isBeforeOrEqual(price.getStartDate(), maxStartDate)) {
+                    maxStartDate = price.getStartDate();
+                    maxStartDateProductPriceId = price.getProductPriceId();
+                    updatePrice = price;
+                }
+            }
+        }
+
+        // set previous price config end date to request.getStartDate() - 1
+
+        if (maxStartDateProductPriceId != null) {
+            // tồn tại giá trị maxStartDate => cần set productPrice của record này về request.getStartDate() - 1
+            updatePrice.setEndDate(org.apache.commons.lang.time.DateUtils.addDays(request.getStartDate(), -1));
+        }
+
+        if (!prices.isEmpty()) {
+            for (ProductPrice price : prices) {
+                if (updatePrice != null && price.getProductPriceId().equals(updatePrice.getProductPriceId())) {
+                    price.setEndDate(updatePrice.getEndDate());
+                }
+                if (DateUtils.isOverlap(request.getStartDate(), request.getEndDate(), price.getStartDate(), price.getEndDate())) {
+                    return false;
+                }
+            }
+        }
+
         ProductPrice productPrice = ProductPrice
             .builder()
             .productPriceId(UUID.randomUUID())
@@ -311,6 +351,9 @@ public class ProductServiceImpl implements ProductService {
             .productId(UUID.fromString(request.getProductId()))
             .build();
         productPriceRepository.save(productPrice);
+        if (updatePrice != null) {
+            productPriceRepository.save(updatePrice);
+        }
         log.info("Saved new product price");
         return true;
     }
