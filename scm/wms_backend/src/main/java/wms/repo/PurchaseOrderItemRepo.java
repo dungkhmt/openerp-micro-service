@@ -16,7 +16,7 @@ public interface PurchaseOrderItemRepo extends JpaRepository<PurchaseOrderItem, 
     PurchaseOrderItem getItemByProductCode(String orderCode, String productCode);
     @Query(value = "select * from scm_purchase_order_item poi left join scm_product p on p.code = poi.product_code\n" +
             " where (order_code = :orderCode or :orderCode = '') and poi.is_deleted = 0", nativeQuery = true)
-    Page<PurchaseOrderItem> search(Pageable pageable, String orderCode);
+        Page<PurchaseOrderItem> search(Pageable pageable, String orderCode);
 
     @Modifying
     @Query(value = "update scm_purchase_order_item set is_deleted = 1 where id in :ids", nativeQuery = true)

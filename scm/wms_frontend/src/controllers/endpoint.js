@@ -78,6 +78,7 @@ export const endPoint = {
   getSaleOrderItems: baseUrl + "/sale-order/get-order-items",
   createSaleOrder: baseUrl + "/sale-order/create",
   updateSaleOrderStatus: baseUrl + "/sale-order/update-status",
+  updateSaleOrder: baseUrl + "/sale-order/update",
   deleteSaleOrder: baseUrl + "/sale-order/delete",
   createSelloutPrice: baseUrl + "/product/set-sale-price",
   getSelloutPrice: baseUrl + "/product/get-all-sellout-price",

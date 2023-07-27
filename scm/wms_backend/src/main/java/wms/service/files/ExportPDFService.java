@@ -203,6 +203,7 @@ public class ExportPDFService {
         List<SaleOrderItem> saleOrderItems = order.getSaleOrderItems();
         for (int i = 0; i < saleOrderItems.size(); i++) {
             SaleOrderItem item = saleOrderItems.get(i);
+            if (item.getDeleted() == 1) continue;
             double itemPrice = item.getPriceUnit();
             int itemQuantity = item.getQuantity();
             double total = itemPrice * itemQuantity;

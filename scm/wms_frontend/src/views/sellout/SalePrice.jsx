@@ -140,6 +140,8 @@ function SalePriceScreen({ screenAuthorization }) {
       );
       let contractDiscount = selloutPrices?.[selloutIndex]?.contractDiscount;
       let massDiscount = selloutPrices?.[selloutIndex]?.massDiscount;
+      let distributionDiscount =
+        selloutPrices?.[selloutIndex]?.contractType?.channel?.promotion;
       const mergedProductIndex = mergedProductContractData?.findIndex(
         (el) =>
           el?.productEntity?.code === params?.row?.productEntity?.code &&
@@ -150,7 +152,7 @@ function SalePriceScreen({ screenAuthorization }) {
       let vat = mergedProductContractData[mergedProductIndex]?.vat;
       let priceAfterAll =
         (((priceBeforeVat * (100 + vat)) / 100) *
-          (100 - contractDiscount - massDiscount)) /
+          (100 - contractDiscount - massDiscount - distributionDiscount)) /
         100;
       return priceAfterAll ? (
         <Typography>
@@ -276,7 +278,7 @@ function SalePriceScreen({ screenAuthorization }) {
                 return (
                   <Typography sx={{ fontSize: 14 }}>
                     {selloutPrice
-                      ? selloutPrice?.contractDiscount
+                      ? `${selloutPrice?.contractDiscount} %`
                       : price
                       ? price?.contractDiscount
                       : "Nhập %"}
@@ -315,6 +317,23 @@ function SalePriceScreen({ screenAuthorization }) {
                       />
                     )}
                   />
+                );
+              },
+            },
+            {
+              field: "distributionDiscount",
+              headerName: "Chiết khấu kênh phân phối (%)",
+              sortable: false,
+              minWidth: 150,
+              type: "number",
+              editable: true,
+              headerAlign: "center",
+              align: "center",
+              renderCell: (params) => {
+                return (
+                  <Typography sx={{ fontSize: 14 }}>
+                    {`${params?.row?.contract?.channel?.promotion} %`}
+                  </Typography>
                 );
               },
             },

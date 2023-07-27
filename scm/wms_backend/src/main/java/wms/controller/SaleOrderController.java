@@ -7,7 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import wms.common.constant.DefaultConst;
+import wms.dto.purchase_order.UpdatePurchaseOrderDTO;
 import wms.dto.sale_order.SaleOrderDTO;
+import wms.dto.sale_order.UpdateSaleOrderDTO;
 import wms.dto.sale_order.UpdateSaleOrderStatusDTO;
 import wms.entity.ResultEntity;
 import wms.service.sale_order.ISaleOrderService;
@@ -79,6 +81,16 @@ public class SaleOrderController extends BaseController {
     ) {
         try {
             return saleOrderService.exportOrderPdf(orderCode);
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @ApiOperation(value = "Update sale order")
+    @PostMapping("/update")
+    public ResponseEntity<?> updateOrder(@Valid @RequestBody UpdateSaleOrderDTO updateSaleOrderDTO
+    ) {
+        try {
+            return response(new ResultEntity(1, "Update order successfully", saleOrderService.updateOrder(updateSaleOrderDTO)));
         } catch (Exception ex) {
             return response(error(ex));
         }

@@ -159,3 +159,25 @@ export const useDeleteSaleOrder = () => {
     onMutate: (variables) => {},
   });
 };
+export const useUpdateSaleOrder = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "post",
+        endPoint.updateSaleOrder,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        toast.success("Cập nhật thành công!");
+        queryClient.invalidateQueries([queryKey.sale_order.order_list]);
+        return res.data;
+      }
+    },
+    onError: () => {
+      toast.error("Lỗi, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};

@@ -21,6 +21,7 @@ public interface CustomerRepo extends JpaRepository<Customer, Long> {
             "                    or sc.address ilike concat('%', :textSearch, '%'))", nativeQuery = true)
     Page<Customer> search(Pageable pageable, String customerName,String status,String createdBy,String address,String textSearch);
     Customer getCustomerById(long id);
+
     Customer getCustomerByCode(String code);
     @Query(value = "select * from scm_customer where is_deleted = 0", nativeQuery = true)
     List<Customer> getAllCustomers();

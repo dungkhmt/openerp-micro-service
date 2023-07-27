@@ -6,7 +6,7 @@ import {
   useGetProductListNoPaging,
 } from "controllers/query/category-query";
 import { useGetSellinPrice } from "controllers/query/purchase-order-query";
-import { useCreateSaleOrder } from "controllers/query/sale-order-query";
+import { useUpdateSaleOrder } from "controllers/query/sale-order-query";
 import { useMemo, useState } from "react";
 import { AppColors } from "../../../shared/AppColors";
 import { formatVietnameseCurrency } from "../../../utils/GlobalUtils";
@@ -20,7 +20,8 @@ const {
 } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
 
-const CreateSaleOrderForm = ({ setIsAdd }) => {
+const UpdateSaleOrderForm = ({ setOpenDrawer, createOrder }) => {
+  console.log("create order: ", createOrder);
   const [params, setParams] = useState({
     page: 1,
     pageSize: 10,
@@ -28,7 +29,12 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
   const methods = useForm({
     mode: "onChange",
     defaultValues: {
-      products: [],
+      customerCode: createOrder?.customerCode,
+      discount: createOrder?.discount,
+      boughtBy: {
+        name: createOrder?.customer?.name,
+        code: createOrder?.customer?.code,
+      },
     },
     // resolver: yupResolver(saleOrderSchema),
   });
@@ -49,11 +55,12 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
     useGetProductListNoPaging();
   const { isLoading: isLoadingSellinPrice, data: sellinPrice } =
     useGetSellinPrice();
-  const createSaleOrderQuery = useCreateSaleOrder();
+  const updateSaleOrderQuery = useUpdateSaleOrder();
 
   const onSubmit = async (data) => {
     let orderParams = {
       boughtBy: data?.boughtBy?.code,
+      createdOrderCode: createOrder?.code,
       orderItems: data?.products?.map((pro) => {
         return {
           priceUnit:
@@ -65,8 +72,8 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
       }),
       discount: data?.discount,
     };
-    await createSaleOrderQuery.mutateAsync(orderParams);
-    setIsAdd((pre) => !pre);
+    await updateSaleOrderQuery.mutateAsync(orderParams);
+    setOpenDrawer((pre) => !pre);
     reset();
   };
   const mergeProductWithPrice = useMemo(() => {
@@ -80,6 +87,7 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
     });
     return result?.every((ele) => ele !== null) ? result : null;
   }, [sellinPrice, product]);
+
   const calculateTotalMoney = useMemo(() => {
     let totalMoney = products?.reduce(
       (accum, curr) =>
@@ -159,7 +167,7 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
             align: "center",
             flex: 1,
             renderCell: (params) => {
-              const product = products.find((el) => el.id === params.id);
+              const product = products?.find((el) => el.id === params.id);
               return product ? product.quantity : "Nhập số lượng";
             },
             renderEditCell: (params) => {
@@ -246,4 +254,4 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
     </FormProvider>
   );
 };
-export default CreateSaleOrderForm;
+export default UpdateSaleOrderForm;
