@@ -21,6 +21,8 @@ import NotAccess from "./components/NotAccess";
 import Participants from "./components/Participants";
 import {
   handleAddRemoteUser,
+  handleOnOffCameraParticipant,
+  handleOnOffCameraRemoteUser,
   handleOnOffMicParticipant,
   handleOnOffMicRemoteUser,
   handleRemoveRemoteUser,
@@ -186,6 +188,17 @@ const CodeEditorPage = () => {
           dispatch(
             setState({
               isMute: !audio,
+            })
+          );
+        }
+      });
+      socketRef.current.on(SOCKET_EVENTS.ACCEPT_ON_OFF_CAMERA, ({ socketId, video }) => {
+        dispatch(handleOnOffCameraParticipant({ socketId, video }));
+        dispatch(handleOnOffCameraRemoteUser({ socketId, video }));
+        if (socketId === socketRef.current.id) {
+          dispatch(
+            setState({
+              isShowCamera: video
             })
           );
         }
