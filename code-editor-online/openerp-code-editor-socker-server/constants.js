@@ -15,6 +15,8 @@ const SOCKET_IO_EVENTS = {
   ACCEPT_ON_OFF_MIC: "accept-on-off-mic", // broadcast event to all users and update status of mic for user
   REQUEST_REMOVE_PARTICIPANT: "request-remove-participant",
   ACCEPT_REMOVE_PARTICIPANT: "accept-remove-participant",
+  REQUEST_ON_OFF_CAMERA: "request-on-off-camera",
+  ACCEPT_ON_OFF_CAMERA: "accept-on-off-camera",
 };
 
 module.exports = {

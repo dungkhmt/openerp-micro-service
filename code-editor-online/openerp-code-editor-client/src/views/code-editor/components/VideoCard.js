@@ -1,11 +1,11 @@
 import { Mic, MicOff, RemoveCircleOutline } from "@mui/icons-material";
-import { IconButton, Tooltip } from "@mui/material";
+import { Avatar, IconButton, Tooltip } from "@mui/material";
 import { useKeycloak } from "@react-keycloak/web";
 import React from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { SOCKET_EVENTS } from "utils/constants";
+import { CHARACTER_COLOR, SOCKET_EVENTS } from "utils/constants";
 import {
   handleOnOffMicParticipant,
   handleOnOffMicRemoteUser,
@@ -45,7 +45,14 @@ const VideoCard = (props) => {
     }
   };
   return (
-    <div style={{ position: "relative", width: "100%" }}>
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        backgroundColor: !video && "#000000",
+        marginBottom: "3px",
+      }}
+    >
       <video ref={remoteVideoRef} muted={muted} autoPlay style={{ width: "100%" }}></video>
       <div
         style={{
@@ -58,10 +65,34 @@ const VideoCard = (props) => {
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "wrap",
+          zIndex: 2,
         }}
       >
         {fullName ? fullName : "Bạn"}
       </div>
+      {!video && (
+        <div
+          style={{
+            position: "absolute",
+            backgroundColor: "#000000",
+            top: 0,
+            left: 0,
+            height: "100%",
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Avatar
+            sx={{
+              bgcolor: CHARACTER_COLOR[fullName?.split(" ").at(-1)?.toUpperCase()[0]],
+            }}
+          >
+            {fullName?.split(" ").at(-1)?.toUpperCase()[0]}
+          </Avatar>
+        </div>
+      )}
       {!isLocal && (
         <>
           <Tooltip
@@ -76,7 +107,8 @@ const VideoCard = (props) => {
               style={{
                 position: "absolute",
                 bottom: "5%",
-                right: "1%",
+                right: "5px",
+                zIndex: 2,
               }}
             >
               <IconButton
@@ -84,6 +116,7 @@ const VideoCard = (props) => {
                   color: roomMaster?.id !== token?.preferred_username ? "#bdbbbb" : "#ffffff",
                 }}
                 color="primary"
+                size="small"
                 disabled={roomMaster?.id !== token?.preferred_username}
                 onClick={() => {
                   handleMuteRemoteMic(socketId, !audio);
@@ -104,14 +137,16 @@ const VideoCard = (props) => {
             <div
               style={{
                 position: "absolute",
-                bottom: "22%",
-                right: "1%",
+                bottom: "25%",
+                right: "5px",
+                zIndex: 2,
               }}
             >
               <IconButton
                 style={{
                   color: roomMaster?.id !== token?.preferred_username ? "#bdbbbb" : "#ffffff",
                 }}
+                size="small"
                 disabled={roomMaster?.id !== token?.preferred_username}
                 onClick={() => {
                   // handleMuteRemoteMic(socketId, !audio);
