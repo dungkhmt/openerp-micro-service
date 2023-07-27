@@ -65,10 +65,10 @@ const RoomItemCard = (props) => {
     <Card sx={{ marginTop: "20px" }}>
       <CardContent>
         <Grid container spacing={4}>
-          <Grid item sx={{ alignItems: "center", display: "flex" }}>
+          <Grid item xs={1} sx={{ alignItems: "center", display: "flex" }}>
             <Source fontSize="large" />
           </Grid>
-          <Grid item xs={8}>
+          <Grid item xs={11} md={8}>
             <Typography variant="h5" gutterBottom>
               {item?.roomName}
             </Typography>
@@ -93,9 +93,9 @@ const RoomItemCard = (props) => {
             sx={{
               alignItems: "center",
               display: "flex",
-              justifyContent: "end",
+              justifyContent: "center",
             }}
-            xs={2}
+            xs={6} md={2}
           >
             <Button
               variant="contained"
@@ -106,7 +106,7 @@ const RoomItemCard = (props) => {
               Tham gia phòng
             </Button>
           </Grid>
-          <Grid item sx={{ alignItems: "center", display: "flex" }} xs={1}>
+          <Grid item sx={{ alignItems: "center", display: "flex", justifyContent:'center' }} xs={6} md={1}>
             <IconButton onClick={handleClick}>
               <Settings
                 fontSize="large"
