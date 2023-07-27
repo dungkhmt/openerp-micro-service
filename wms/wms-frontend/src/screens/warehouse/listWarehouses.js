@@ -93,7 +93,7 @@ const ListWarehouse = () => {
         data={warehousesTableData}
         hideCommandBar={isHideCommandBar}
         options={{
-          selection: true,
+          selection: false,
           pageSize: 20,
           search: true,
           sorting: true,
@@ -101,7 +101,7 @@ const ListWarehouse = () => {
         onRowClick={ (event, rowData) => {
           window.location.href = `${path}/update/${rowData.warehouseId}`;
         } } 
-        onSelectionChange={onSelectionChangeHandle}
+        // onSelectionChange={onSelectionChangeHandle}
         actions={[
           {
             icon: <IconButton onClick={() => setMapModalOpen(true)}>
@@ -118,27 +118,27 @@ const ListWarehouse = () => {
           }
         ]}
         rowKey='warehouseId'
-        editable={{
-          onRowDelete: (selectedIds) => new Promise((resolve, reject) => {
-            setTimeout(() => {
-              request(
-                "delete",
-                API_PATH.WAREHOUSE,
-                (res) => {
-                  const deleteData = warehousesTableData.filter(
-                    warehouse => !selectedIds.includes(warehouse["warehouseId"])
-                  );
-                  setWarehousesTableData(deleteData);
-                  successNoti(`Đã xóa ${selectedIds.length} bản ghi`);
-                },
-                {
-                  500: () => errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau")
-                },
-                selectedIds
-              )
-            })
-          })
-        }}
+        // editable={{
+          // onRowDelete: (selectedIds) => new Promise((resolve, reject) => {
+          //   setTimeout(() => {
+          //     request(
+          //       "delete",
+          //       API_PATH.WAREHOUSE,
+          //       (res) => {
+          //         const deleteData = warehousesTableData.filter(
+          //           warehouse => !selectedIds.includes(warehouse["warehouseId"])
+          //         );
+          //         setWarehousesTableData(deleteData);
+          //         successNoti(`Đã xóa ${selectedIds.length} bản ghi`);
+          //       },
+          //       {
+          //         500: () => errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau")
+          //       },
+          //       selectedIds
+          //     )
+          //   })
+          // })
+        // }}
       />
     </div>
   </div>

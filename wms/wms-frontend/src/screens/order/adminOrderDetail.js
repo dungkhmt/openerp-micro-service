@@ -162,8 +162,10 @@ const AdminOrderDetail = ( props ) => {
         setProcessingItems(data.processingItems);
         setRemainingItems(data.remainingItems);
         setLoading(false);
+        setOrderInfo({...orderInfo, remainingItems: data.remainingItems});
       }
-    )
+    );
+    console.log("new order info => ", orderInfo);
   }
   
   return (
