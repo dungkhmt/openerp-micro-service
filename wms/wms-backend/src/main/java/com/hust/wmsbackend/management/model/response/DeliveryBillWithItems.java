@@ -31,7 +31,7 @@ public class DeliveryBillWithItems {
         this.description = deliveryBill.getDescription();
         this.deliveryTripId = deliveryBill.getDeliveryTripId();
         this.createdBy = deliveryBill.getCreatedBy();
-        this.createdStampStr = DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, deliveryBill.getCreatedStamp());
-        this.lastUpdateStampStr = DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, deliveryBill.getLastUpdateStamp());
+        this.createdStampStr = DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, deliveryBill.getCreatedStamp());
+        this.lastUpdateStampStr = DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, deliveryBill.getLastUpdateStamp());
     }
 }

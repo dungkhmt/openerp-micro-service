@@ -321,6 +321,19 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
         return true;
     }
 
+    @Override
+    public DeliveryTripDTO deleteFromShipmentById(String tripId) {
+        Optional<DeliveryTrip> deliveryTripOpt = deliveryTripRepository.findById(tripId);
+        if (!deliveryTripOpt.isPresent()) {
+            log.warn(String.format("Delivery trip with id %s is not exist", tripId));
+            return null;
+        }
+        DeliveryTrip trip = deliveryTripOpt.get();
+        trip.setShipmentId(null);
+        deliveryTripRepository.save(trip);
+        return new DeliveryTripDTO(trip);
+    }
+
     private DeliveryTrip findOrThrow(String deliveryTripId) {
         Optional<DeliveryTrip> deliveryTripOpt = deliveryTripRepository.findById(deliveryTripId);
         if (!deliveryTripOpt.isPresent()) {

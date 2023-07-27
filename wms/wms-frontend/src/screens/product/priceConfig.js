@@ -78,7 +78,9 @@ const PriceHistory = ( { data } ) => {
                       reject();
                     }
                   },
-                  {},
+                  {
+                    500: () => errorNoti("Giá trị cấu hình giá mới không hợp lệ")
+                  },
                   requestBody
                 )
                 resolve();

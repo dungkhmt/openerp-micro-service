@@ -372,7 +372,7 @@ const DeliveryTripDetail = ( props ) => {
         }
 
         {
-          !isDeleted && tripInfo?.deliveryTripStatusCode == 'CREATED' &&
+          !isDeleted && tripInfo?.deliveryTripStatusCode == 'CREATED' && deliveryItemsTableData.length > 0 && 
           <Grid className={classes.buttonWrap}>
             <Button variant="contained" className={classes.addButton} 
               type="submit" onClick={autoRouteButtonHandle}>Auto route</Button>
