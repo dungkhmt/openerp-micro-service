@@ -57,7 +57,9 @@ const styles = {
 const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, order }) => {
     const [type, setType] = useState('');
     const [facilities, setFacilities] = useState([]);
+    const [ownerFacilities, setOwnerFacilities] = useState([])
     const [fromFacilities, setFromFacilities] = useState([]);
+    const [toFacilities, setToFacilities] = useState([]);
     const [fromFacility, setFromFacility] = useState('');
     const [toFacility, setToFaciity] = useState('');
     const [containers, setContainers] = useState([]);
@@ -95,16 +97,33 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             }
             // setEarlyDeliveryTime(dayjs(new Date(order?.earlyDeliveryTime)));
         }
-        getFacility({typeOwner: "CUSTOMER"}).then((res) => {
+        getFacility({typeOwner: ["CUSTOMER", "CUSTOMS"]}).then((res) => {
             console.log("facility==========", res.data)
             setFacilities(res.data.data.facilityModels);
         });
         getFacilityOwner({})
         .then((res) => {
-            setFromFacilities(res?.data.data.facilityModels);
+            setOwnerFacilities(res?.data.data.facilityModels);
         });
         
     }, []);
+
+    useEffect(() => {
+        if(type === "OE") {
+            setToFacilities(ownerFacilities);
+        }
+        if(type === "IE") {
+            setFromFacilities(ownerFacilities)
+        }
+        if(type === "IF") {
+            setFromFacilities(ownerFacilities);
+            setToFacilities(facilities);
+        }
+        if(type === "OF") {
+            setFromFacilities(facilities);
+            setToFacilities(ownerFacilities);
+        }
+    }, [type])
 
     useEffect(() => {
         getContainers({facilityId: fromFacility}).then((res) => {
@@ -284,8 +303,8 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                                         label="to facility"
                                                         disabled={type === "IE" ? true : false}
                                                     >
-                                                        {facilities ? (
-                                                            facilities.map((item) => {
+                                                        {toFacilities ? (
+                                                            toFacilities.map((item) => {
                                                                 return (
                                                                     <MenuItem value={item.id}>{item.facilityName}</MenuItem>
                                                                 );
