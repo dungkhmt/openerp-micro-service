@@ -36,6 +36,7 @@ export const queryKey = {
     bill_item_of_delivery_order: "bill_item_of_delivery_order",
     bill_item_of_bill: "bill_item_of_bill",
     splitted_bill_item: "splitted_bill_item",
+    bill_item_by_seq: "bill_item_by_seq",
   },
   shipment: {
     shipment_list: "shipment_list",

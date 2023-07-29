@@ -18,7 +18,7 @@ public interface SaleOrderItemRepo extends JpaRepository<SaleOrderItem, Long> {
             " where (order_code = :orderCode or :orderCode = '') and soi.is_deleted = 0", nativeQuery = true)
     Page<SaleOrderItem> search(Pageable pageable, String orderCode);
 
-    @Query(value = "select * from scm_sale_order_item where order_code = :orderCode and product_code = :productCode", nativeQuery = true)
+    @Query(value = "select * from scm_sale_order_item where order_code = :orderCode and product_code = :productCode and is_deleted = 0", nativeQuery = true)
     SaleOrderItem getItemByProductCode(String orderCode, String productCode);
 
     @Modifying

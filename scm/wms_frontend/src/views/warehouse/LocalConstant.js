@@ -398,7 +398,7 @@ export const acceptedOrderCols = [
     align: "center",
     headerName: "Thời điểm tạo",
     sortable: false,
-    minWidth: 150,
+    minWidth: 120,
     valueGetter: (params) => {
       return unix(params?.row?.createdDate).format("DD-MM-YYYY");
     },

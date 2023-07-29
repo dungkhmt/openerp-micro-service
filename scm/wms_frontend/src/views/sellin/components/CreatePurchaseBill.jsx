@@ -1,6 +1,6 @@
 import { Button, InputBase, Stack } from "@mui/material";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
-import { useGetProductList } from "controllers/query/category-query";
+import { useGetProductListNoPaging } from "controllers/query/category-query";
 import { useGetPurchaseOrderItems } from "controllers/query/purchase-order-query";
 import moment from "moment";
 import { useState } from "react";
@@ -38,10 +38,12 @@ const CreatePurchaseBill = ({ setIsAdd, currOrder }) => {
     control,
     name: "products",
   });
-  const { isLoading: isLoadingProduct, data: product } = useGetProductList();
+  const { isLoading: isLoadingProduct, data: product } =
+    useGetProductListNoPaging();
   const { isLoading, data: orderItem } = useGetPurchaseOrderItems({
     orderCode: currOrder?.code,
   });
+
   const createBillQuery = useCreateReceiptBill();
 
   const onSubmit = async (data) => {
@@ -59,7 +61,20 @@ const CreatePurchaseBill = ({ setIsAdd, currOrder }) => {
     setIsAdd((pre) => !pre);
     reset();
   };
-
+  console.log(
+    "item: ",
+    product,
+    orderItem,
+    product?.filter((pro) => {
+      console.log(
+        "order item: ",
+        orderItem?.content?.map((item) => item?.product?.code)
+      );
+      return orderItem?.content
+        ?.map((item) => item?.product?.code)
+        .includes(pro?.code);
+    })
+  );
   return (
     <FormProvider {...methods}>
       <CustomDataGrid
@@ -147,8 +162,8 @@ const CreatePurchaseBill = ({ setIsAdd, currOrder }) => {
           // staticProductFields[2],
         ]}
         rows={
-          product?.content
-            ? product?.content?.filter((pro) =>
+          product
+            ? product?.filter((pro) =>
                 orderItem?.content
                   ?.map((item) => item?.product?.code)
                   .includes(pro?.code)
@@ -156,7 +171,7 @@ const CreatePurchaseBill = ({ setIsAdd, currOrder }) => {
             : []
         }
         onSelectionChange={(ids) => {
-          let results = product?.content.filter((pro) => ids.includes(pro?.id));
+          let results = product?.filter((pro) => ids.includes(pro?.id));
           setValue("products", results);
         }}
       />

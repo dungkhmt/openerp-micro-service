@@ -103,10 +103,21 @@ public class ShipmentController extends BaseController {
 
     @ApiOperation(value = "Assign splitted đơn (shipment item) cho các trip")
     @PutMapping("/assign-shipment-item")
-    public ResponseEntity<?> create(@Valid @RequestBody AssignedItemDTO assignedItemDTO) {
+    public ResponseEntity<?> assign(@Valid @RequestBody AssignedItemDTO assignedItemDTO) {
         try {
             shipmentService.assignShipmentItem(assignedItemDTO);
             return response(new ResultEntity(1, "Assign item to trip successfully", null));
+        }
+        catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @ApiOperation(value = "Unassign splitted đơn (shipment item) cho các trip")
+    @PutMapping("/unassign-shipment-item")
+    public ResponseEntity<?> unassign(@Valid @RequestBody AssignedItemDTO assignedItemDTO) {
+        try {
+            shipmentService.unassignShipmentItem(assignedItemDTO);
+            return response(new ResultEntity(1, "Unassign item to trip successfully", null));
         }
         catch (Exception ex) {
             return response(error(ex));

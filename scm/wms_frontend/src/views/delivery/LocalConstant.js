@@ -135,7 +135,7 @@ export const tripCols = [
     align: "center",
     headerName: "Kho lấy hàng",
     sortable: false,
-    minWidth: 200,
+    minWidth: 250,
     valueGetter: (item) => {
       return item?.row?.facility?.name;
     },
@@ -166,7 +166,7 @@ export const shipmentItemCols = [
     align: "center",
     headerName: "Mua bởi",
     sortable: false,
-    minWidth: 150,
+    minWidth: 250,
     valueGetter: (params) => {
       return params?.row?.deliveryBill?.saleOrder?.customer?.name;
     },
@@ -178,9 +178,9 @@ export const shipmentItemCols = [
     headerName: "Tên sản phẩm",
     sortable: false,
     minWidth: 200,
-    // valueGetter: (params) => {
-    //   return params?.row?.deliveryBill?.saleOrder?.customer?.name;
-    // },
+    valueGetter: (params) => {
+      return params?.row?.productName;
+    },
   },
   {
     field: "quantity",
@@ -194,7 +194,6 @@ export const shipmentItemCols = [
     field: "status",
     headerName: "Trạng thái",
     sortable: false,
-    width: 125,
     minWidth: 150,
     maxWidth: 200,
     renderCell: (params) => {
@@ -208,7 +207,6 @@ export const shipmentItemCols = [
             paddingX: 2,
             height: "24px",
             background: AppColors.primary,
-            // ORDER_STATUS_COLOR_MAPPING[params?.row?.status.toLowerCase()],
           }}
         >
           <Typography
@@ -218,7 +216,7 @@ export const shipmentItemCols = [
               color: "white",
             }}
           >
-            {params?.row?.status}
+            {params?.row?.isDeleted === 0 ? "ACTIVE" : "INACTIVE"}
           </Typography>
         </Button>
       );
@@ -416,7 +414,7 @@ export const deliveryBillCols = [
     align: "center",
     headerName: "Thời điểm tạo",
     sortable: false,
-    minWidth: 200,
+    minWidth: 150,
     valueGetter: (params) => {
       return unix(params?.row?.createdDate).format("DD-MM-YYYY");
     },
@@ -427,7 +425,7 @@ export const deliveryBillCols = [
     align: "center",
     headerName: "Ngày giao hàng",
     sortable: false,
-    minWidth: 200,
+    minWidth: 150,
     valueGetter: (params) => {
       return unix(params?.row?.createdDate).format("DD-MM-YYYY");
     },
@@ -438,7 +436,7 @@ export const deliveryBillCols = [
     align: "center",
     headerName: "Mua bởi",
     sortable: false,
-    minWidth: 200,
+    minWidth: 250,
     valueGetter: (params) => {
       return params?.row?.saleOrder?.customer?.name;
     },
@@ -449,7 +447,7 @@ export const deliveryBillCols = [
     align: "center",
     headerName: "Kho trực thuộc",
     sortable: false,
-    minWidth: 200,
+    minWidth: 250,
     valueGetter: (params) => {
       return params?.row?.saleOrder?.customer?.facility?.name;
     },

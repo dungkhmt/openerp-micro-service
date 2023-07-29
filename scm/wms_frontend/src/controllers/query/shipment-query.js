@@ -64,7 +64,7 @@ export const useGetShipmentItems = (params) => {
 };
 export const useGetItemsOfTrip = (params) => {
   return useQuery({
-    queryKey: [queryKey.shipment.trip_items],
+    queryKey: [queryKey.shipment.trip_items, params],
     queryFn: async (data) => {
       const res = await axiosSendRequest(
         "get",
@@ -94,6 +94,31 @@ export const useAssignShipmentToTrip = (params) => {
         return res.data;
       } else {
         toast.error("Lỗi khi phân, vui lòng kiểm tra lại");
+      }
+    },
+    onSuccess: (res, variables, context) => {
+      queryClient.invalidateQueries({
+        queryKey: [queryKey.delivery_bill.splitted_bill_item],
+      });
+    },
+    onMutate: (variables) => {},
+  });
+};
+
+export const useUnAssignShipmentToTrip = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "put",
+        endPoint.unassignShipmentToTrip,
+        params,
+        data
+      );
+      if (res.code === 1) {
+        toast.success("Bỏ đơn trong chuyến thành công!");
+        return res.data;
+      } else {
+        toast.error("Lỗi khi bỏ, vui lòng kiểm tra lại");
       }
     },
     onSuccess: (res, variables, context) => {

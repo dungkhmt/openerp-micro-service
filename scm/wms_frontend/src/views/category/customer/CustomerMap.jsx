@@ -1,9 +1,16 @@
 import { Typography } from "@mui/material";
 import { icon } from "leaflet";
 import { useRef } from "react";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Polyline,
+  Popup,
+  TileLayer,
+} from "react-leaflet";
 import { useLocation } from "react-router-dom";
 import withScreenSecurity from "../../../components/common/withScreenSecurity";
+import { generateRandomColor } from "../../../utils/GlobalUtils";
 
 const googleTileLayerUrl = "https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}";
 const googleAttribution = "Map data © Google";
@@ -43,14 +50,25 @@ function CustomerMapScreen({ screenAuthorization }) {
 
   const polyPoints = customer?.map((cus, index) => {
     return [
-      [parseFloat(cus?.latitude), parseFloat(cus?.longitude)],
       [
         parseFloat(cus?.facility?.latitude),
         parseFloat(cus?.facility?.longitude),
       ],
+      [parseFloat(cus?.latitude), parseFloat(cus?.longitude)],
     ];
   });
+  function mapColorToFacility(polyPoints) {
+    const groupedMap = new Map();
+
+    for (const [facility, customers] of polyPoints) {
+      const key = JSON.stringify(facility);
+      let clusterColor = generateRandomColor();
+      groupedMap.set(key, clusterColor);
+    }
+    return groupedMap;
+  }
   var facilities = getAllFacilities(customer);
+  const colorByFacility = mapColorToFacility(polyPoints);
   return (
     <MapContainer
       center={{ lat: 21.008330038713357, lng: 105.84273632066207 }}
@@ -95,15 +113,17 @@ function CustomerMapScreen({ screenAuthorization }) {
           </Popup>
         </Marker>
       ))}
-      {/* {polyPoints.map((points, index) => {
+      {polyPoints.map((points, index) => {
         return (
           <Polyline
             key={index}
             positions={[points ? points : []]}
-            pathOptions={{ color: "red" }}
+            pathOptions={{
+              color: colorByFacility.get(JSON.stringify(points[0])),
+            }}
           />
         );
-      })} */}
+      })}
     </MapContainer>
   );
 }

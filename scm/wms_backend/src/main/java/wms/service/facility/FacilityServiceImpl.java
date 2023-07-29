@@ -33,6 +33,7 @@ import wms.utils.GeneralUtils;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -449,6 +450,7 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
         Map<String, Integer> qtyMappingFromBill = new HashMap<>();
         for (DeliveryBill bill : deliveryBills) {
             for (DeliveryBillItem item : bill.getDeliveryBillItems()) {
+                if (item.getDeleted() == 1) continue;
                 if (qtyMappingFromBill.containsKey(item.getProduct().getCode())) {
                     qtyMappingFromBill.merge(item.getProduct().getCode(), item.getEffectiveQty(), Integer::sum);
                 }
@@ -457,7 +459,7 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
                 }
             }
         }
-        for (SaleOrderItem orderItem : currExportingOrder.getSaleOrderItems()) {
+        for (SaleOrderItem orderItem : currExportingOrder.getSaleOrderItems().stream().filter(item -> item.getDeleted() != 1).collect(Collectors.toList())) {
             String currentProductCode = orderItem.getProduct().getCode().toUpperCase();
             for (ExportItemDTO exportItem : exportFromFacilityDTO.getExportItems()) {
                 if (exportItem.getProductCode().equals(currentProductCode)) {

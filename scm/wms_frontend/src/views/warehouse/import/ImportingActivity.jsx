@@ -108,7 +108,7 @@ function ImportingActivityScreen({ screenAuthorization }) {
             headerAlign: "center",
             align: "center",
             sortable: false,
-            width: 125,
+            minWidth: 125,
             flex: 1,
             type: "actions",
             getActions: (params) => [
@@ -118,7 +118,10 @@ function ImportingActivityScreen({ screenAuthorization }) {
                   key={index}
                   extraAction={extraAction}
                   onActionCall={extraAction.callback}
-                  disabled={params?.row?.status === ORDERS_STATUS.created}
+                  disabled={
+                    params?.row?.status === ORDERS_STATUS.created ||
+                    params?.row?.status === ORDERS_STATUS.deleted
+                  }
                 />
               )),
             ],

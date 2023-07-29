@@ -73,6 +73,7 @@ export const endPoint = {
   createDeliveryBill: baseUrl + "/facility/export-item",
   getSplittedBillItems: baseUrl + "/delivery-bill/get-split-bill",
   createSplitBillItems: baseUrl + "/delivery-bill/split-bill",
+  getBillItemBySeq: baseUrl + "/delivery-bill/get-bill-items-of-bill-with-seq",
   // Sale Order
   getSaleOrder: baseUrl + "/sale-order/get-all",
   getSaleOrderItems: baseUrl + "/sale-order/get-order-items",
@@ -90,6 +91,7 @@ export const endPoint = {
   getShipmentItems: baseUrl + "/shipment/get-all-item",
   getItemOfTrip: baseUrl + "/shipment/get-item-of-trip",
   assignShipmentToTrip: baseUrl + "/shipment/assign-shipment-item",
+  unassignShipmentToTrip: baseUrl + "/shipment/unassign-shipment-item",
   // Delivery
   createDeliveryTrip: baseUrl + "/delivery-trip/create",
   getDeliveryTrips: baseUrl + "/delivery-trip/get-all",

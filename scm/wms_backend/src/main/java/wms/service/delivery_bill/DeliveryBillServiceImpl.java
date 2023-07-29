@@ -60,8 +60,13 @@ public class DeliveryBillServiceImpl extends BaseService implements IDeliveryBil
     }
 
     @Override
-    public List<DeliveryBillItem> getBillItemsOfBill(String billCode) throws JsonProcessingException {
+    public List<DeliveryBillItem> getBillItemsOfBill(String billCode) {
         return deliveryBillItemRepo.getAllItemOfABill(billCode);
+    }
+
+    @Override
+    public List<DeliveryBillItem> getBillItemsOfBillBySeq(String billCode, String seqId) {
+        return deliveryBillItemRepo.getItemOfABillBySeq(billCode, seqId);
     }
 
     @Override

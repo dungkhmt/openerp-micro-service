@@ -237,6 +237,7 @@ function ShipmentDetailScreen() {
             headerAlign: "center",
             align: "center",
             sortable: false,
+            minWidth: 150,
             flex: 1,
             type: "actions",
             getActions: (params) => [

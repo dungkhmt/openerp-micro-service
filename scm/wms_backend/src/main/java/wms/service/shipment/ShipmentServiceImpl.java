@@ -4,19 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.internal.util.StringHelper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.product.ProductDTO;
-import wms.dto.shipment.AssignedItemDTO;
-import wms.dto.shipment.ShipmentDTO;
-import wms.dto.shipment.ShipmentItemDTO;
+import wms.dto.shipment.*;
 import wms.entity.*;
 import wms.exception.CustomException;
 import wms.repo.ShipmentItemRepo;
@@ -26,6 +21,10 @@ import wms.service.BaseService;
 import wms.service.delivery_bill.IDeliveryBillService;
 import wms.service.delivery_trip.IDeliveryTripService;
 import wms.utils.GeneralUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -111,7 +110,22 @@ public class ShipmentServiceImpl extends BaseService implements IShipmentService
         shipmentItem.setTripSeqId(GeneralUtils.generateCodeFromSysTime());
         shipmentItemRepo.save(shipmentItem);
     }
-
+    @Override
+    @Transactional
+    public void unassignShipmentItem(AssignedItemDTO assignedItemDTO) throws CustomException {
+        ShipmentItem shipmentItem = getShipmentItemByCode(assignedItemDTO.getShipmentItemCode());
+        DeliveryTrip assignedTrip = deliveryTripService.getDeliveryTripByCode(assignedItemDTO.getTripCode());
+        if (shipmentItem == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Shipment item not exists");
+        }
+        if (assignedTrip == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Can't find assigned trip item not exists");
+        }
+        shipmentItem.setShipment(null);
+        shipmentItem.setDeliveryTrip(null);
+        shipmentItem.setTripSeqId(null);
+        shipmentItemRepo.save(shipmentItem);
+    }
     @Override
     public ReturnPaginationDTO<Shipment> getAllShipments(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
@@ -131,14 +145,46 @@ public class ShipmentServiceImpl extends BaseService implements IShipmentService
     }
 
     @Override
-    public ReturnPaginationDTO<ShipmentItem> getAllItemOfTrip(int page, int pageSize, String sortField, boolean isSortAsc, String tripCode) throws JsonProcessingException {
+    public ReturnPaginationDTO<ReturnShipmentItemDTO> getAllItemOfTrip(int page, int pageSize, String sortField, boolean isSortAsc, String tripCode) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
         Page<ShipmentItem> shipmentItems = shipmentItemRepo.getShipmentItemOfATrip(pageable, tripCode);
-        return getPaginationResult(shipmentItems.getContent(), page, shipmentItems.getTotalPages(), shipmentItems.getTotalElements());
+        Page<ReturnShipmentItemDTO> shipmentItemDTOS = mapPageToDTO(shipmentItems);
+        return getPaginationResult(shipmentItemDTOS.getContent(), page, shipmentItemDTOS.getTotalPages(), shipmentItemDTOS.getTotalElements());
     }
+    public Page<ReturnShipmentItemDTO> mapPageToDTO(Page<ShipmentItem> entityPage) {
+        List<ShipmentItem> entityList = entityPage.getContent();
+        List<ReturnShipmentItemDTO> dtoList = new ArrayList<>();
 
+        for (ShipmentItem entity : entityList) {
+            ReturnShipmentItemDTO dto = mapEntityToDTO(entity);
+            dtoList.add(dto);
+        }
+
+        Pageable pageable = entityPage.getPageable();
+        long totalElements = entityPage.getTotalElements();
+        int pageNumber = entityPage.getNumber();
+        int pageSize = entityPage.getSize();
+
+        return new PageImpl<>(dtoList, pageable, totalElements);
+    }
+    public ReturnShipmentItemDTO mapEntityToDTO(ShipmentItem entity) {
+         ReturnShipmentItemDTO dto = new ReturnShipmentItemDTO();
+         dto.setShipment(entity.getShipment());
+         dto.setCode(entity.getCode());
+         dto.setDeliveryBill(entity.getDeliveryBill());
+         dto.setDeliveryTrip(entity.getDeliveryTrip());
+         dto.setQuantity(entity.getQuantity());
+         dto.setTripSeqId(entity.getTripSeqId());
+         List<DeliveryBillItem> dbillItem = entity.getDeliveryBill().getDeliveryBillItems().stream().filter(item ->
+                 item.getSeqId().equals(entity.getDeliveryBillItemSeqId())).collect(Collectors.toList());
+         dto.setProductName(dbillItem.isEmpty() ? "" : dbillItem.get(0).getProduct().getName());
+         dto.setCreatedDate(entity.getCreatedDate());
+         dto.setId(entity.getId());
+         dto.setIsDeleted(entity.getDeleted());
+         return dto;
+    }
     @Override
     public Shipment getShipmentById(long id) {
         return shipmentRepo.getShipmentById(id);

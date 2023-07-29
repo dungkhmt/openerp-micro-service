@@ -420,19 +420,6 @@ function PurchaseOrderDetailScreen() {
         </IconButton>
         <CreatePurchaseBill currOrder={currOrder} setIsAdd={setIsAdd} />
       </CustomModal>
-      {/* <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
-        <HeaderModal onClose={setOpenDrawer} title="Thông tin phiếu nhập" />
-        <Box>
-          {itemSelected?.map((item) => {
-            return (
-              <Box>
-                <Typography>Name: {item?.product?.name}</Typography>
-                <Typography>Quantity: {item?.effectiveQty}</Typography>
-              </Box>
-            );
-          })}
-        </Box>
-      </CustomDrawer> */}
       <CustomizedDialogs
         open={isApproved}
         handleClose={setIsApproved}

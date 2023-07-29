@@ -1,4 +1,4 @@
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   Backdrop,
   Box,
@@ -15,7 +15,10 @@ import {
   useDeleteTripRoute,
   useGetTripRouteList,
 } from "controllers/query/delivery-trip-query";
-import { useGetItemsOfTrip } from "controllers/query/shipment-query";
+import {
+  useGetItemsOfTrip,
+  useUnAssignShipmentToTrip,
+} from "controllers/query/shipment-query";
 import { unix } from "moment";
 import { useEffect, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
@@ -27,21 +30,20 @@ import { shipmentItemCols } from "../LocalConstant";
 // var intervalID;
 
 function TripScreen({ screenAuthorization }) {
+  const location = useLocation();
+  const currTrip = location.state.trip;
   const [params, setParams] = useState({
     page: 1,
     pageSize: 10,
+    tripCode: currTrip?.code,
   });
-  const location = useLocation();
   const { height } = useWindowSize();
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState(0);
   const history = useHistory();
   let { path } = useRouteMatch();
 
-  const currTrip = location.state.trip;
-  const { isLoading, data: itemOfTrip } = useGetItemsOfTrip({
-    tripCode: currTrip?.code,
-  });
+  const { isLoading, data: itemOfTrip } = useGetItemsOfTrip(params);
   const { isLoading: isLoadingTripRoute, data: tripRoute } =
     useGetTripRouteList({
       tripCode: currTrip?.code,
@@ -50,12 +52,20 @@ function TripScreen({ screenAuthorization }) {
   const deleteTripRouteQuery = useDeleteTripRoute({
     tripCode: currTrip?.code,
   });
+  const usassignBillToTripQuery = useUnAssignShipmentToTrip();
   const extraActions = [
     {
-      title: "Xem",
-      callback: (item) => {},
-      icon: <VisibilityIcon />,
-      color: AppColors.green,
+      title: "Xóa khỏi chuyến",
+      callback: async (item) => {
+        let tripCode = item?.deliveryTrip?.code;
+        let assignParams = {
+          shipmentItemCode: item?.code,
+          tripCode: tripCode,
+        };
+        await usassignBillToTripQuery.mutateAsync(assignParams);
+      },
+      icon: <DeleteIcon />,
+      color: AppColors.error,
     },
   ];
 
@@ -92,7 +102,6 @@ function TripScreen({ screenAuthorization }) {
       handleClose();
     }
   }, [count]);
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
@@ -202,12 +211,15 @@ function TripScreen({ screenAuthorization }) {
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20, marginTop: 2 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading || isLoadingTripRoute}
-        totalItem={tripRoute?.totalElements}
+        totalItem={itemOfTrip?.totalElements}
         handlePaginationModelChange={(props) => {
-          setParams({
+          let newParams = {
             page: props?.page + 1,
             pageSize: props?.pageSize,
-          });
+            tripCode: currTrip?.code,
+          };
+          setParams(newParams);
+          console.log("params: ", newParams);
         }}
         columns={[
           ...shipmentItemCols,
@@ -217,6 +229,7 @@ function TripScreen({ screenAuthorization }) {
             headerAlign: "center",
             align: "center",
             sortable: false,
+            minWidth: 150,
             flex: 1,
             type: "actions",
             getActions: (params) => [
@@ -226,7 +239,7 @@ function TripScreen({ screenAuthorization }) {
                   key={index}
                   extraAction={extraAction}
                   onActionCall={extraAction.callback}
-                  disabled={false}
+                  disabled={tripRoute !== null}
                 />
               )),
             ],

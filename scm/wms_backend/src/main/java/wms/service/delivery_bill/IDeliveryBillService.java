@@ -14,6 +14,7 @@ public interface IDeliveryBillService {
     ReturnPaginationDTO<DeliveryBill> getAllBills(int page, int pageSize, String sortField, boolean isSortAsc, String orderCode) throws JsonProcessingException;
     List<DeliveryBillItem> getBillItemsOfOrder(String orderCode) throws JsonProcessingException;
     List<DeliveryBillItem> getBillItemsOfBill(String billCode) throws JsonProcessingException;
+    List<DeliveryBillItem> getBillItemsOfBillBySeq(String billCode, String seqId) throws JsonProcessingException;
     ReturnPaginationDTO<DeliveryBill> getBillsCanDeliver(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException;
     DeliveryBill getBillById(long id);
     DeliveryBill getBillByCode(String code);
