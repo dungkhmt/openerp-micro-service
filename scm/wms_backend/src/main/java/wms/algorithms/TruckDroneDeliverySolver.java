@@ -96,7 +96,7 @@ public class TruckDroneDeliverySolver {
                     this.tspBootstrappingSolution.get(i+1)) * constructedInput.getTruck().getTransportCostPerUnit();
             ;
         }
-
+        solution.setTotalTSPCost(globalTSPCost);
         System.out.println("TSP cost: " + globalTSPCost);
         System.out.println("TSP-D cost: " + solution.calculateTotalCost());
         return solution;

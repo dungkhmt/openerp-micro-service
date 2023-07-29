@@ -34,4 +34,6 @@ public class RouteSchedulingOutput {
     private double totalTruckWait;
     @Field(value = "totalDroneWait")
     private double totalDroneWait;
+    @Field(value = "totalTSPCost")
+    private double totalTSPCost;
 }

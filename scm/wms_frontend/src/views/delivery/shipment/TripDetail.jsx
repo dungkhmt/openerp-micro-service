@@ -24,7 +24,10 @@ import { useEffect, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import { useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
-import { convertUserToName } from "../../../utils/GlobalUtils";
+import {
+  convertUserToName,
+  formatVietnameseCurrency,
+} from "../../../utils/GlobalUtils";
 import { shipmentItemCols } from "../LocalConstant";
 
 // var intervalID;
@@ -364,6 +367,126 @@ function TripScreen({ screenAuthorization }) {
           </Box>
         </Box>
       </Backdrop>
+      <Stack sx={{ flexDirection: "row" }}>
+        <Typography
+          sx={{
+            fontSize: 16,
+            color: AppColors.green,
+          }}
+        >
+          1. Tổng chi phí lộ trình xe tải ban đầu (không có drone):
+        </Typography>
+        <Typography
+          sx={{
+            marginLeft: 2,
+            fontSize: 16,
+            fontWeight: "bold",
+            color: AppColors.secondary,
+          }}
+        >
+          {formatVietnameseCurrency(tripRoute?.totalTSPCost)}
+        </Typography>
+      </Stack>
+      <Stack sx={{ flexDirection: "row" }}>
+        <Typography
+          sx={{
+            fontSize: 16,
+            color: AppColors.green,
+          }}
+        >
+          2. Tổng chi phí khi có drone:
+        </Typography>
+        <Typography
+          sx={{
+            marginLeft: 2,
+            fontSize: 16,
+            fontWeight: "bold",
+            color: AppColors.secondary,
+          }}
+        >
+          {formatVietnameseCurrency(tripRoute?.totalCost)}
+        </Typography>
+      </Stack>
+      <Stack sx={{ flexDirection: "row" }}>
+        <Typography
+          sx={{
+            fontSize: 16,
+            color: AppColors.green,
+          }}
+        >
+          3. Chi phí giao hàng của xe tải:
+        </Typography>
+        <Typography
+          sx={{
+            marginLeft: 2,
+            fontSize: 16,
+            fontWeight: "bold",
+            color: AppColors.secondary,
+          }}
+        >
+          {formatVietnameseCurrency(tripRoute?.totalTruckCost)}
+        </Typography>
+      </Stack>
+      <Stack sx={{ flexDirection: "row" }}>
+        <Typography
+          sx={{
+            fontSize: 16,
+            color: AppColors.green,
+          }}
+        >
+          4. Chi phí giao hàng của drone:
+        </Typography>
+        <Typography
+          sx={{
+            marginLeft: 2,
+            fontSize: 16,
+            fontWeight: "bold",
+            color: AppColors.secondary,
+          }}
+        >
+          {formatVietnameseCurrency(tripRoute?.totalDroneCost)}
+        </Typography>
+      </Stack>
+      <Stack sx={{ flexDirection: "row" }}>
+        <Typography
+          sx={{
+            fontSize: 16,
+            color: AppColors.green,
+          }}
+        >
+          5. Chi phí chờ đợi của xe tải:
+        </Typography>
+        <Typography
+          sx={{
+            marginLeft: 2,
+            fontSize: 16,
+            fontWeight: "bold",
+            color: AppColors.secondary,
+          }}
+        >
+          {formatVietnameseCurrency(tripRoute?.totalTruckWait)}
+        </Typography>
+      </Stack>
+      <Stack sx={{ flexDirection: "row" }}>
+        <Typography
+          sx={{
+            fontSize: 16,
+            color: AppColors.green,
+          }}
+        >
+          6. Chi phí chờ đợi của drone:
+        </Typography>
+        <Typography
+          sx={{
+            marginLeft: 2,
+            fontSize: 16,
+            fontWeight: "bold",
+            color: AppColors.secondary,
+          }}
+        >
+          {formatVietnameseCurrency(tripRoute?.totalDroneWait)}
+        </Typography>
+      </Stack>
     </Box>
   );
 }

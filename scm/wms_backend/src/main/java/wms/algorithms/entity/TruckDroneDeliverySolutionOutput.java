@@ -21,6 +21,7 @@ public class TruckDroneDeliverySolutionOutput {
     private double totalDroneCost;
     private double totalTruckWait;
     private double totalDroneWait;
+    private double totalTSPCost;
     public TruckDroneDeliverySolutionOutput(TruckDroneDeliveryInput input, TruckRoute truckRoute, List<DroneRoute> droneRoutes) {
         this.truckRoute = truckRoute;
         this.droneRoutes = droneRoutes;
@@ -30,6 +31,7 @@ public class TruckDroneDeliverySolutionOutput {
         this.totalDroneCost = 0;
         this.totalTruckWait = 0;
         this.totalDroneWait = 0;
+        this.totalTSPCost = 0;
     }
     public double calculateDroneCost() {
         double droneCost = 0.0;

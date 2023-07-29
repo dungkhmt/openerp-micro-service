@@ -2,6 +2,7 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import CustomSelect from "components/select/CustomSelect";
 import { useRef, useState } from "react";
 import CustomMap from "../../../../components/map/CustomMap";
+import SearchBoxMap from "../../../../components/map/SearchBoxMap";
 import { useUpdateFacility } from "../../../../controllers/query/facility-query";
 import { useGetAllUsersByRoles } from "../../../../controllers/query/user-query";
 import { AppColors } from "../../../../shared/AppColors";
@@ -151,7 +152,12 @@ const UpdateFacilityForm = ({ setOpenDrawer, currFacility }) => {
         <Typography style={{ color: AppColors.error, fontSize: 14 }}>
           Lấy vị trí
         </Typography>
+        <SearchBoxMap
+          selectPosition={selectPosition}
+          setSelectPosition={setSelectPosition}
+        />
       </Box>
+
       <Stack direction={"row"}>
         <Controller
           key={"map"}

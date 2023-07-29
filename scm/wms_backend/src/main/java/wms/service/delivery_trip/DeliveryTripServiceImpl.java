@@ -185,10 +185,11 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         input.setDrone(drone);
         // Set depot info
         Depot depot = new Depot();
-        depot.setLocationID("depot");
+        String depotName = trip.getFacility().getName();
+        depot.setLocationID(depotName);
         input.setDepot(depot);
         Node depotNode = new Node(Double.parseDouble(trip.getFacility().getLatitude()),
-                Double.parseDouble(trip.getFacility().getLongitude()), "depot");
+                Double.parseDouble(trip.getFacility().getLongitude()), depotName);
         points.add(depotNode);
         // Set customer location
         Set<Customer> customers = new HashSet<>();
@@ -196,19 +197,18 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
             Customer customer = shipmentItem.getDeliveryBill().getSaleOrder().getCustomer();
             customers.add(customer);
         }
-        int count = 0;
         for (Customer customer: customers) {
-            count++;
             Node node = new Node();
             node.setX(Double.parseDouble(customer.getLatitude()));
             node.setY(Double.parseDouble(customer.getLongitude()));
-            node.setName("C" + count);
+            node.setName(customer.getName());
             points.add(node);
         }
 
         input.setLocations(points);
         List<List<DistanceElement>> listDistances = new ArrayList<>();
         List<Request> listCustomerRequests = new ArrayList<>();
+        int countFailRequest = 0;
         for (int i = 0; i < points.size(); i++) {
             List<DistanceElement> distances = new ArrayList<>();
             for (int j = 0; j < points.size(); j++) {
@@ -218,12 +218,17 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
                 distanceElement.setToLocationId(points.get(j).getName());
                 double distance = 0;
                 try {
-                    distance = Utils.getDistanceGraphhopperApi(points.get(i).getX(), points.get(i).getY(),
-                            points.get(j).getX(), points.get(j).getY());
+                    if (countFailRequest > 5) {
+                        distance = Utils.calculateEuclideanDistance(points.get(i), points.get(j));
+                    } else {
+                        distance = Utils.getDistanceGraphhopperApi(points.get(i).getX(), points.get(i).getY(),
+                                points.get(j).getX(), points.get(j).getY());
+                    }
                 }
                 catch (Exception ex) {
                     log.error("Got problem retrieving distance from internet: {}", ex.getMessage());
                     distance = Utils.calculateEuclideanDistance(points.get(i), points.get(j));
+                    countFailRequest++;
                 }
                 distanceElement.setDistance(distance);
                 distanceElement.setTravelTime(distance / input.getTruck().getSpeed());
@@ -277,6 +282,7 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         output.setTotalTruckWait(finalSolution.getTotalTruckWait());
         output.setTotalDroneWait(finalSolution.getTotalDroneWait());
         output.setTripCode(trip.getCode());
+        output.setTotalTSPCost(finalSolution.getTotalTSPCost());
         mongoTemplate.save(output);
     }
 

@@ -212,9 +212,9 @@ public class FacilityServiceImpl extends BaseService implements IFacilityService
         }
         facilityToUpdate.setName(facilityDTO.getName());
         facilityToUpdate.setAddress(facilityDTO.getAddress());
-        facilityToUpdate.setStatus(facilityDTO.getStatus());
-        facilityToUpdate.setLatitude(facilityToUpdate.getLatitude());
-        facilityToUpdate.setLongitude(facilityToUpdate.getLongitude());
+        facilityToUpdate.setStatus(facilityDTO.getStatus().toUpperCase());
+        facilityToUpdate.setLatitude(facilityDTO.getLatitude());
+        facilityToUpdate.setLongitude(facilityDTO.getLongitude());
         facilityToUpdate.setManager(manager);
         Facility facility = facilityRepo.save(facilityToUpdate);
         clusterCustomerIntoFacility();
