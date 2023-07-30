@@ -214,9 +214,11 @@ public class TruckDroneDeliverySolver {
             return false;
         }
         double enduranceTime = constructedInput.getDrone().getDurationCapacity();
-        double visitTime = constructedInput.getDistanceBtwTwoNodesByNode(first, middle);
-        double rendezvousTime = constructedInput.getDistanceBtwTwoNodesByNode(middle, last);
-
+        double visitTime = constructedInput.getFlyingTimeBtwTwoNodes(first, middle);
+        double rendezvousTime = constructedInput.getFlyingTimeBtwTwoNodes(middle, last);
+        if (visitTime + rendezvousTime > enduranceTime) {
+            System.out.println("Drone for node " + first.getName() + "||" + middle.getName() + "||" + last.getName() + " is not in endurance limit");
+        }
         return visitTime + rendezvousTime <= enduranceTime;
     }
     /**

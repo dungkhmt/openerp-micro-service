@@ -61,20 +61,6 @@ const CreatePurchaseBill = ({ setIsAdd, currOrder }) => {
     setIsAdd((pre) => !pre);
     reset();
   };
-  console.log(
-    "item: ",
-    product,
-    orderItem,
-    product?.filter((pro) => {
-      console.log(
-        "order item: ",
-        orderItem?.content?.map((item) => item?.product?.code)
-      );
-      return orderItem?.content
-        ?.map((item) => item?.product?.code)
-        .includes(pro?.code);
-    })
-  );
   return (
     <FormProvider {...methods}>
       <CustomDataGrid

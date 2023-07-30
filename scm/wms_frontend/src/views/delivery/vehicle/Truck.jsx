@@ -19,6 +19,7 @@ import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { truckCols } from "../LocalConstant";
 import CreateTruck from "./components/CreateTruck";
+import UpdateTruck from "./components/UpdateTruck";
 
 function TruckScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
@@ -52,6 +53,7 @@ function TruckScreen({ screenAuthorization }) {
     {
       title: "Sửa",
       callback: (item) => {
+        setItemSelected(item);
         setOpenDrawer((pre) => !pre);
       },
       icon: <EditIcon />,
@@ -125,6 +127,9 @@ function TruckScreen({ screenAuthorization }) {
       </CustomModal>
       <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
         <HeaderModal onClose={setOpenDrawer} title="Sửa thông tin xe tải" />
+        <Box sx={{ marginTop: 2 }}>
+          <UpdateTruck setIsAdd={setOpenDrawer} currTruck={itemSelected} />
+        </Box>
       </CustomDrawer>
       <DraggableDeleteDialog
         // disable={isLoadingRemove}

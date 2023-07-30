@@ -19,6 +19,7 @@ import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { droneCols } from "../LocalConstant";
 import CreateDrone from "./components/CreateDrone";
+import UpdateDrone from "./components/UpdateDrone";
 
 function DroneScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
@@ -52,6 +53,7 @@ function DroneScreen({ screenAuthorization }) {
     {
       title: "Sửa",
       callback: (item) => {
+        setItemSelected(item);
         setOpenDrawer((pre) => !pre);
       },
       icon: <EditIcon />,
@@ -126,6 +128,9 @@ function DroneScreen({ screenAuthorization }) {
       </CustomModal>
       <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
         <HeaderModal onClose={setOpenDrawer} title="Sửa thông tin drone" />
+        <Box sx={{ marginTop: 2 }}>
+          <UpdateDrone setIsAdd={setOpenDrawer} currDrone={itemSelected} />
+        </Box>
       </CustomDrawer>
       <DraggableDeleteDialog
         // disable={isLoadingRemove}

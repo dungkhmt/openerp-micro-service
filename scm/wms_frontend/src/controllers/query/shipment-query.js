@@ -116,16 +116,62 @@ export const useUnAssignShipmentToTrip = (params) => {
       );
       if (res.code === 1) {
         toast.success("Bỏ đơn trong chuyến thành công!");
+        queryClient.invalidateQueries({
+          queryKey: [queryKey.shipment.trip_items],
+        });
         return res.data;
       } else {
         toast.error("Lỗi khi bỏ, vui lòng kiểm tra lại");
       }
     },
-    onSuccess: (res, variables, context) => {
-      queryClient.invalidateQueries({
-        queryKey: [queryKey.delivery_bill.splitted_bill_item],
-      });
+    onMutate: (variables) => {},
+  });
+};
+
+export const useUpdateShipment = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "put",
+        endPoint.updateShipment,
+        params,
+        data
+      );
+      if (res.code === 1) {
+        toast.success("Cập nhật thành công!");
+        queryClient.invalidateQueries([queryKey.shipment.shipment_list]);
+        return res.data;
+      }
     },
+    onSuccess: (res, variables, context) => {},
+    onError: () => {
+      toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
+export const useDeleteShipment = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "delete",
+        endPoint.deleteShipment,
+        params,
+        data
+      );
+      if (res.code === 1) {
+        toast.success("Xóa thành công!");
+        queryClient.invalidateQueries([queryKey.shipment.shipment_list]);
+        return res.data;
+      } else throw Error;
+    },
+    onSuccess: (res, variables, context) => {},
+    onError: () => {
+      toast.error("Lỗi khi xóa, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
     onMutate: (variables) => {},
   });
 };

@@ -165,6 +165,30 @@ export const useCreateTruck = (params) => {
     onMutate: (variables) => {},
   });
 };
+
+export const useUpdateTruck = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "put",
+        endPoint.updateTruck,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        toast.success("Cập nhật thành công!");
+        queryClient.invalidateQueries([queryKey.delivery_trip.truck_list]);
+        return res.data;
+      }
+    },
+    onSuccess: (res, variables, context) => {},
+    onError: () => {
+      toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
 export const useDeleteTruck = (params) => {
   return useMutation({
     mutationFn: async (data) => {
@@ -237,6 +261,77 @@ export const useDeleteDrone = (params) => {
       if (res.data && res.code === 1) {
         toast.success("Xóa thành công!");
         queryClient.invalidateQueries([queryKey.delivery_trip.drone_list]);
+        return res.data;
+      } else throw Error;
+    },
+    onSuccess: (res, variables, context) => {},
+    onError: () => {
+      toast.error("Lỗi khi xóa, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+export const useUpdateDrone = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "put",
+        endPoint.updateDrone,
+        params,
+        data
+      );
+      if (res.data && res.code === 1) {
+        toast.success("Cập nhật thành công!");
+        queryClient.invalidateQueries([queryKey.delivery_trip.drone_list]);
+        return res.data;
+      }
+    },
+    onSuccess: (res, variables, context) => {},
+    onError: () => {
+      toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
+export const useUpdateTrip = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "put",
+        endPoint.updateTrip,
+        params,
+        data
+      );
+      if (res.code === 1) {
+        toast.success("Cập nhật thành công!");
+        queryClient.invalidateQueries([queryKey.delivery_trip.trip_list]);
+        return res.data;
+      }
+    },
+    onSuccess: (res, variables, context) => {},
+    onError: () => {
+      toast.error("Lỗi khi tạo, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
+export const useDeleteTrip = (params) => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSendRequest(
+        "delete",
+        endPoint.deleteTrip,
+        params,
+        data
+      );
+      if (res.code === 1) {
+        toast.success("Xóa thành công!");
+        queryClient.invalidateQueries([queryKey.delivery_trip.trip_list]);
         return res.data;
       } else throw Error;
     },

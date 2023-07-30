@@ -76,9 +76,20 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
 
     @Override
     public TruckEntity updateTruck(TruckDTO truckDTO, long id) throws CustomException {
-        return null;
+        UserRegister manager = userRepo.getUserByUserLoginId(truckDTO.getUserManaged());
+        TruckEntity truck = truckRepo.getTruckById(id);
+        if (truck == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown truck");
+        }
+        truck.setCapacity(truckDTO.getCapacity());
+        truck.setSize(truckDTO.getSize());
+        truck.setName(truckDTO.getName());
+        truck.setSpeed(truckDTO.getSpeed());
+        truck.setTransportCostPerUnit(truckDTO.getTransportCostPerUnit());
+        truck.setWaitingCost(truckDTO.getWaitingCost());
+        truck.setUserLogin(manager != null ? manager : truck.getUserLogin());
+        return truckRepo.save(truck);
     }
-
     @Override
     public void deleteTruckById(long id) {
         truckRepo.deleteById(id);
@@ -136,7 +147,19 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
 
     @Override
     public DroneEntity updateDrone(DroneDTO droneDTO, long id) throws CustomException {
-        return null;
+        UserRegister manager = userRepo.getUserByUserLoginId(droneDTO.getUserManaged());
+        DroneEntity drone = droneRepo.getDroneById(id);
+        if (drone == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown drone");
+        }
+        drone.setCapacity(droneDTO.getCapacity());
+        drone.setName(droneDTO.getName());
+        drone.setSpeed(droneDTO.getSpeed());
+        drone.setTransportCostPerUnit(droneDTO.getTransportCostPerUnit());
+        drone.setWaitingCost(droneDTO.getWaitingCost());
+        drone.setUserLogin(manager != null ? manager : drone.getUserLogin());
+        drone.setDurationTime(droneDTO.getDuration());
+        return droneRepo.save(drone);
     }
 
     @Override

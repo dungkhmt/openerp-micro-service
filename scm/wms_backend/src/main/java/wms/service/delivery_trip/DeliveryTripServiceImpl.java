@@ -109,6 +109,36 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
     }
 
     @Override
+    public DeliveryTrip updateDeliveryTrip(DeliveryTripDTO deliveryTripDTO, long id) throws CustomException {
+        DeliveryTrip currTrip = deliveryTripRepo.getDeliveryTripById(id);
+        UserRegister userInCharge = userRepo.getUserByUserLoginId(deliveryTripDTO.getUserInCharge());
+        Shipment shipment = shipmentRepo.getShipmentByCode(deliveryTripDTO.getShipmentCode());
+        Facility facility = facilityRepo.getFacilityByCode(deliveryTripDTO.getFacilityCode());
+        if (shipment == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Not found shipment for this trip, can't update");
+        }
+        if (userInCharge == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Not found user in charge for this trip, can't update");
+        }
+        if (facility == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Not found facility for this trip, can't update");
+        }
+        currTrip.setUserInCharge(userInCharge);
+        currTrip.setShipment(shipment);
+        currTrip.setFacility(facility);
+        currTrip.setCreatedDate(GeneralUtils.convertFromStringToDate(deliveryTripDTO.getCreatedDate()));
+        return deliveryTripRepo.save(currTrip);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteDeliveryTrip(long id) {
+        DeliveryTrip trip = deliveryTripRepo.getDeliveryTripById(id);
+        trip.setDeleted(1);
+        deliveryTripRepo.save(trip);
+    }
+
+    @Override
     public List<DeliveryTrip> getTripToAssignBill(String billCode) throws JsonProcessingException {
         /**
          * Logic: A bill has a customer bought and that customer belongs to a facility
@@ -134,11 +164,6 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
     @Override
     public DeliveryTrip getDeliveryTripByCode(String code) {
         return deliveryTripRepo.getDeliveryTripByCode(code);
-    }
-
-    @Override
-    public DeliveryTrip updateDeliveryTrip(ProductDTO productDTO, long id) throws CustomException {
-        return null;
     }
 
     @Override
@@ -219,7 +244,7 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
                 double distance = 0;
                 try {
                     if (countFailRequest > 5) {
-                        distance = Utils.calculateEuclideanDistance(points.get(i), points.get(j));
+                        distance = Utils.calculateCoordinationDistance(points.get(i).getX(), points.get(i).getY(), points.get(j).getX(), points.get(j).getY());
                     } else {
                         distance = Utils.getDistanceGraphhopperApi(points.get(i).getX(), points.get(i).getY(),
                                 points.get(j).getX(), points.get(j).getY());
@@ -227,7 +252,7 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
                 }
                 catch (Exception ex) {
                     log.error("Got problem retrieving distance from internet: {}", ex.getMessage());
-                    distance = Utils.calculateEuclideanDistance(points.get(i), points.get(j));
+                    distance = Utils.calculateCoordinationDistance(points.get(i).getX(), points.get(i).getY(), points.get(j).getX(), points.get(j).getY());
                     countFailRequest++;
                 }
                 distanceElement.setDistance(distance);

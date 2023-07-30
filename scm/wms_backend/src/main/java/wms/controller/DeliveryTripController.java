@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import wms.common.constant.DefaultConst;
 import wms.dto.delivery_trip.DeliveryTripDTO;
 import wms.dto.delivery_trip.TripRouteDTO;
+import wms.dto.vehicle.DroneDTO;
 import wms.entity.ResultEntity;
 import wms.service.delivery_trip.IDeliveryTripService;
 
@@ -42,6 +43,27 @@ public class DeliveryTripController extends BaseController {
         try {
             return response(new ResultEntity(1, "Get list delivery trips successfully", deliveryTripService.getAllDeliveryTrips(page, pageSize, sortField, isSortAsc, shipmentCode)));
         } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @PutMapping("/update")
+    public ResponseEntity<?> updateDeliveryTrip(@Valid @RequestBody DeliveryTripDTO deliveryTripDTO,
+                                         @RequestParam(value = "id", required = true, defaultValue = DefaultConst.NUMBER) Long id
+    ) {
+        try {
+            return response(new ResultEntity(1, "Update drone successfully", deliveryTripService.updateDeliveryTrip(deliveryTripDTO, id)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @ApiOperation(value = "Delete trip")
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteTrip(@RequestParam(value = "id") Long id) {
+        try {
+            deliveryTripService.deleteDeliveryTrip(id);
+            return response(new ResultEntity(1, "Delete trip successfully", null));
+        }
+        catch (Exception ex) {
             return response(error(ex));
         }
     }
