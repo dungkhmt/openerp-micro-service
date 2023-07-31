@@ -91,7 +91,7 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         DeliveryTrip newDeliveryTrip = DeliveryTrip.builder()
                 .code("TRIP" + GeneralUtils.generateCodeFromSysTime())
                 .facility(facility)
-                .startedDate(GeneralUtils.convertFromStringToDate(deliveryTripDTO.getCreatedDate()))
+                .startedDate(GeneralUtils.convertFromStringToDate(deliveryTripDTO.getStartedDate()))
                 .creator(createdBy)
                 .userInCharge(userInCharge)
                 .shipment(shipment)
@@ -126,7 +126,7 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         currTrip.setUserInCharge(userInCharge);
         currTrip.setShipment(shipment);
         currTrip.setFacility(facility);
-        currTrip.setCreatedDate(GeneralUtils.convertFromStringToDate(deliveryTripDTO.getCreatedDate()));
+        currTrip.setStartedDate(GeneralUtils.convertFromStringToDate(deliveryTripDTO.getStartedDate()));
         return deliveryTripRepo.save(currTrip);
     }
 

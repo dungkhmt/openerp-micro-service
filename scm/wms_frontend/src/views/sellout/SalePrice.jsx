@@ -355,6 +355,7 @@ function SalePriceScreen({ screenAuthorization }) {
               align: "center",
               sortable: false,
               flex: 1,
+              minWidth: 150,
               type: "actions",
               getActions: (params) => {
                 let price = selloutPrices?.find(
