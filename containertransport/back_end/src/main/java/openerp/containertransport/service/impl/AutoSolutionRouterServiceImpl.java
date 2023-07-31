@@ -1,6 +1,7 @@
 package openerp.containertransport.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import openerp.containertransport.algorithms.entity.*;
 import openerp.containertransport.algorithms.entity.output.TransportContainerSolutionOutput;
 import openerp.containertransport.algorithms.entity.output.TripOutput;
@@ -18,6 +19,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService {
     private final TruckService truckService;
     private final TrailerService trailerService;
@@ -86,8 +88,11 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         List<DistanceElement> distanceElements = convertToDistantInput(relationships);
         transportContainerInput.setDistances(distanceElements);
 
+        long startTime = System.currentTimeMillis();
         TransportContainerSolutionOutput transportContainerSolutionOutput = heuristicSolver.solve(transportContainerInput);
-
+        long endTime = System.currentTimeMillis();
+        log.info("Time process {}", endTime - startTime);
+        shipmentModel.setTimeTest(endTime - startTime);
         for (Map.Entry<Integer, TripOutput> tripOutput : transportContainerSolutionOutput.getTripOutputs().entrySet()) {
             if(tripOutput.getValue().getPoints() != null && tripOutput.getValue().getPoints().size() != 0) {
 

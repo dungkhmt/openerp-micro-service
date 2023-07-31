@@ -14,4 +14,6 @@ public interface ContainerService {
     ContainerModel updateContainer(ContainerModel containerModel);
     ContainerModel deleteContainer(String uid);
     ContainerFilterRes filterContainer(ContainerFilterRequestDTO containerFilterRequestDTO);
+
+    ResponseEntity<?> createContainerV2(ContainerModel containerModel, String username);
 }

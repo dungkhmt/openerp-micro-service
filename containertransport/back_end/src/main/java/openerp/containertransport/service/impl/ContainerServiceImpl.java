@@ -177,6 +177,36 @@ public class ContainerServiceImpl implements ContainerService {
         return containerFilterRes;
     }
 
+    @Override
+    public ResponseEntity<?> createContainerV2(ContainerModel containerModel, String username) {
+        List<String> listContainerCode = containerModel.getListContainerCode();
+        for (String containerCode : listContainerCode) {
+            Container containerCheck = containerRepo.findByContainerCode(containerCode);
+            Facility facility = facilityRepo.findById(containerModel.getFacilityId()).get();
+            if (containerCheck != null) {
+                if(!containerCheck.getStatus().equals(Constants.ContainerStatus.DELETE.getStatus())) {
+                    return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.BAD_REQUEST), "This container already exists"));
+                }
+            }
+            TypeContainer typeContainer = typeContainerRepo.findByTypeContainerCode(containerModel.getTypeContainerCode());
+            typeContainer.setTotal(typeContainer.getTotal() + 1);
+
+            Container container = new Container();
+            container.setFacility(facility);
+            container.setContainerCode(containerModel.getContainerCode());
+            container.setSize(typeContainer.getSize());
+            container.setTypeContainer(typeContainer);
+            container.setEmpty(false);
+            container.setStatus(Constants.ContainerStatus.AVAILABLE.getStatus());
+            container.setOwner(username);
+            container.setUid(RandomUtils.getRandomId());
+            container.setCreatedAt(System.currentTimeMillis());
+            container.setUpdatedAt(System.currentTimeMillis());
+            containerRepo.save(container);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body("Done");
+    }
+
     public ContainerModel convertToModel(Container container) {
         ContainerModel containerModel = modelMapper.map(container, ContainerModel.class);
         FacilityResponsiveDTO facilityResponsiveDTO = new FacilityResponsiveDTO();

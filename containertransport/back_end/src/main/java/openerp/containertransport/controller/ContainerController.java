@@ -30,6 +30,12 @@ public class ContainerController {
         return containerService.createContainer(containerModelDTO, username);
     }
 
+    @PostMapping("v2/create")
+    public ResponseEntity<?> createv2(@RequestBody ContainerModel containerModel, JwtAuthenticationToken token) {
+        String username = token.getName();
+        return containerService.createContainerV2(containerModel, username);
+    }
+
     @PostMapping("/")
     public ResponseEntity<?> filterContainer(@RequestBody ContainerFilterRequestDTO containerFilterRequestDTO, JwtAuthenticationToken token){
         String username = token.getName();

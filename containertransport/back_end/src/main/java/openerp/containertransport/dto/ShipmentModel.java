@@ -28,4 +28,5 @@ public class ShipmentModel implements Serializable {
     private List<TripModel> tripList;
     private long createdAt;
     private long updatedAt;
+    private long timeTest;
 }
