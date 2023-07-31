@@ -163,9 +163,34 @@ const AdminOrderDetail = ( props ) => {
         setRemainingItems(data.remainingItems);
         setLoading(false);
         setOrderInfo({...orderInfo, remainingItems: data.remainingItems});
+
+        // cập nhật quantity của các items trong warehouse (tạm thời ở phía front end chứ ko đẩy về back end)
+        console.log("Processing items => ", data.processingItems);
+        var newAllWarehouses = allWarehouses;
+        for (var i = 0; i < newAllWarehouses.length; i++) {
+          var warehouse = newAllWarehouses[i];
+          for (var j = 0; j < data.processingItems.length; j++) {
+            var item = data.processingItems[j];
+            if (item.warehouseId == warehouse.info.id) {
+              for (var k = 0; k < warehouse.items.length; k++) {
+                var warehouseItem = warehouse.items[k];
+                if (warehouseItem.bayId == item.bayId && warehouseItem.productId == item.productId) {
+                  const newQuantity = warehouseItem.quantity - item.quantity;
+                  warehouseItem.quantity = newQuantity;
+                  warehouse.items[k] = warehouseItem;
+                }
+              }
+            }
+          }
+          newAllWarehouses[i] = warehouse;
+        }
+        setAllWarehouses(newAllWarehouses);
+        console.log("New all warehouses => ", newAllWarehouses);
+
       }
     );
     console.log("new order info => ", orderInfo);
+    console.log("all warehouse => ", allWarehouses);
   }
   
   return (
@@ -386,6 +411,10 @@ const AdminOrderDetail = ( props ) => {
             editable={!isDoneOrder && {
               onRowAdd: newData => new Promise((resolve, reject) => {
                 setTimeout(() => {
+                  if (selectedWarehouseId == null || selectedBayId == null || selectedQuantity < 1) {
+                    errorNoti("Giá trị thêm mới không hợp lệ");
+                    return ;
+                  }
                   const adder = {
                     productId: selectedProductId,
                     productName: selectedProductName,
@@ -409,9 +438,39 @@ const AdminOrderDetail = ( props ) => {
                     }
                   }
                   console.log("New order info => ", newOrderInfo);
+
+                  // update lại số lượng hàng tại kho, do đã được gọi bằng API nên được lưu tại front end, biến allWarehouses 
+                  console.log("All warehouse => ", allWarehouses);
+                  var newAllWarehouses = allWarehouses;
+                  for (var i = 0; i < newAllWarehouses.length; i++) {
+                    var warehouse = newAllWarehouses[i];
+                    if (warehouse?.info?.id == selectedWarehouseId) {
+                      for (var j = 0; j < warehouse.items.length; j++) {
+                        var item = warehouse.items[j];
+                        if (item.bayId == selectedBayId && item.productId == selectedProductId) {
+                          var newQuantity = item.quantity - selectedQuantity;
+                          item.quantity = newQuantity;
+                          warehouse.items[j] = item;
+                          newAllWarehouses[i] = warehouse;
+                        }
+                      }
+                    }
+                  }
+                  console.log("New all warehouses => ", newAllWarehouses);
+                  setAllWarehouses(newAllWarehouses);
+
                   setOrderInfo(newOrderInfo);
                   setRemainingItems(newOrderInfo.remainingItems);
-                  setSelectedQuantity(0);
+                  setSelectedQuantity(1);
+
+                  // update lại giá trị đã chọn cho adder
+                  setSelectedProductId(null);
+                  setSelectedProductName(null);
+                  setSelectedBayId(null);
+                  setSelectedBayCode(null);
+                  setSelectedWarehouseId(null);
+                  setSelectedWarehouseName(null);
+
                   resolve();
                 })
               }),

@@ -271,8 +271,9 @@ public class ProductServiceImpl implements ProductService {
             productRepository.getProductDetailQuantityResponseByProductId(productId);
         List<ProductWarehouse> productWarehouses = productWarehouseRepository.findAllByProductId(productId);
         Map<UUID, String> warehouseNameMap = warehouseService.getWarehouseNameMap();
-        List<ProductDetailResponse.ProductWarehouseQuantity> warehouseQuantities = productWarehouses.stream().map(
-                productWarehouse -> ProductDetailResponse.ProductWarehouseQuantity.
+        List<ProductDetailResponse.ProductWarehouseQuantity> warehouseQuantities = productWarehouses.stream()
+                .filter(productWarehouse -> productWarehouse.getQuantityOnHand().compareTo(BigDecimal.ZERO) > 0)
+                .map(productWarehouse -> ProductDetailResponse.ProductWarehouseQuantity.
                         builder().quantity(productWarehouse.getQuantityOnHand())
                         .warehouseName(warehouseNameMap.get(productWarehouse.getWarehouseId()))
                         .warehouseId(productWarehouse.getWarehouseId().toString())
