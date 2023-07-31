@@ -3,15 +3,20 @@ import { Button, Stack } from "@mui/material";
 import moment from "moment";
 import { shipmentSchema } from "utils/validate";
 import { CustomDatePicker } from "../../../../components/datepicker/CustomDatePicker";
-import { useCreateShipment } from "../../../../controllers/query/shipment-query";
+import { useUpdateShipment } from "../../../../controllers/query/shipment-query";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
 const { default: CustomInput } = require("components/input/CustomInput");
 
-const CreateShipmentForm = ({ setIsAdd }) => {
+const UpdateShipment = ({ setOpenDrawer, currShipment }) => {
   const methods = useForm({
     mode: "onChange",
-    defaultValues: {},
+    defaultValues: {
+      endedDate: moment(currShipment?.endedDate).format("DD-MM-YYYY"),
+      maxSize: currShipment?.maxSize,
+      startedDate: moment(currShipment?.startedDate).format("DD-MM-YYYY"),
+      title: currShipment?.title,
+    },
     resolver: yupResolver(shipmentSchema),
   });
   const {
@@ -21,17 +26,25 @@ const CreateShipmentForm = ({ setIsAdd }) => {
     control,
   } = methods;
 
-  const createShipmentQuery = useCreateShipment();
+  const updateShipmentQuery = useUpdateShipment({
+    id: currShipment?.id,
+  });
 
   const onSubmit = async (data) => {
     let shipmentParams = {
-      endedDate: moment(data?.endedDate).format("DD-MM-YYYY"),
+      endedDate: moment(
+        data?.endedDate.substring(3),
+        "MMM DD YYYY HH:mm:ss Z"
+      ).format("DD-MM-YYYY"),
       maxSize: data?.maxSize,
-      startedDate: moment(data?.startedDate).format("DD-MM-YYYY"),
+      startedDate: moment(
+        data?.startedDate.substring(3),
+        "MMM DD YYYY HH:mm:ss Z"
+      ).format("DD-MM-YYYY"),
       title: data?.title,
     };
-    await createShipmentQuery.mutateAsync(shipmentParams);
-    setIsAdd((pre) => !pre);
+    await updateShipmentQuery.mutateAsync(shipmentParams);
+    setOpenDrawer((pre) => !pre);
     reset();
   };
   return (
@@ -127,4 +140,4 @@ const CreateShipmentForm = ({ setIsAdd }) => {
     </FormProvider>
   );
 };
-export default CreateShipmentForm;
+export default UpdateShipment;

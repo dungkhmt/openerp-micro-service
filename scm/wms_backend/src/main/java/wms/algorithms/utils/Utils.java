@@ -48,7 +48,7 @@ public class Utils {
 
         double distance = r * c;
 
-        return distance*1000;
+        return distance * 1000;
     }
     public static double getDistanceGraphhopperApi(double sourceLat, double sourceLon, double targetLat, double targetLon) throws IOException {
         String apiUrl = String.format(graphhopperUrl,
