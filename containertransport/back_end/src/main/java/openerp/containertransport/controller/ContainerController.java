@@ -25,8 +25,9 @@ public class ContainerController {
     @PostMapping("/create")
     public ResponseEntity<?> createContainer(@RequestBody ContainerModel containerModelDTO, JwtAuthenticationToken token) {
         String username = token.getName();
-        ContainerModel containerModel = containerService.createContainer(containerModelDTO, username);
-        return ResponseEntity.status(HttpStatus.OK).body(containerModel);
+//        ContainerModel containerModel = containerService.createContainer(containerModelDTO, username);
+//        return ResponseEntity.status(HttpStatus.OK).body(containerModel);
+        return containerService.createContainer(containerModelDTO, username);
     }
 
     @PostMapping("/")

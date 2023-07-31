@@ -4,7 +4,7 @@
     display: flex;
     flex-direction: column;
     position: relative;
-
+    padding: 16px 24px 0px 24px;
     .MuiContainer-root {
         padding: 0;
     }
@@ -13,7 +13,7 @@
 }
 
 .container {
-    min-width: fit-content;
+    width: 100%;
     .btn-add {
         .btn-header {
             display: flex;
@@ -362,6 +362,9 @@
     }
     .map-order-v2 {
         
+        .leaflet-container {
+            height: 100vh !important;
+        }
     }
 }
 

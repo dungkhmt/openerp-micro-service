@@ -26,7 +26,7 @@ const ShipmentScreen = () => {
     }, [toastOpen, page, rowsPerPage]);
     return (
         <Box className="fullScreen">
-            <Container maxWidth="lg" className="container">
+            <Container maxWidth="100vw" className="container">
                 <Box className="toast">
                     {toastOpen ? (
                         <Alert variant="filled" severity={toastType} >

@@ -304,7 +304,7 @@ public class TripServiceImpl implements TripService {
             if(tripItemModels.get(i-1).getAction().equals("DELIVERY_CONTAINER")){
                 totalTime += facilityModelMap.get(tripItemModels.get(i).getFacilityId()).getProcessingTimeDrop();
             }
-
+            prevPick = tripItemModels.get(i).getFacilityId().intValue();
         }
         validTripItemDTO.setTotalDistant(totalDistant);
         validTripItemDTO.setTotalTime(totalTime);

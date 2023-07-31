@@ -62,6 +62,7 @@ public class OrderServiceImpl implements OrderService {
             if(!orderModel.getContainerIds().isEmpty()){
                 orderModel.getContainerIds().forEach((item) -> {
                     Container container = containerRepo.findById(item);
+                    container.setStatus(Constants.ContainerStatus.ORDERED.getStatus());
                     Order order = new Order();
                     order.setContainer(container);
                     order.setWeight(Long.valueOf(container.getTypeContainer().getSize()));

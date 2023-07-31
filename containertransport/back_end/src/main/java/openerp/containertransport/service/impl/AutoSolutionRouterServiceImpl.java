@@ -197,8 +197,8 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         facilityModels.forEach(facilityModel -> {
             FacilityInput facilityInput = new FacilityInput();
             facilityInput.setFacilityId((int) facilityModel.getId());
-            facilityInput.setTimeProcessPickup(facilityModel.getProcessingTimePickUp());
-            facilityInput.setTimeProcessDrop(facilityModel.getProcessingTimeDrop());
+            facilityInput.setTimeProcessPickup(facilityModel.getProcessingTimePickUp() != null ? facilityModel.getProcessingTimePickUp() : 0);
+            facilityInput.setTimeProcessDrop(facilityModel.getProcessingTimeDrop() != null ? facilityModel.getProcessingTimeDrop() : 0);
             facilityInputs.add(facilityInput);
         });
         return facilityInputs;

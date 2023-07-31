@@ -62,7 +62,7 @@ const ShipmentDetail = () => {
                 <ReactLoading type="spin" color="#0000FF" className="loading"
                     height='6%' width='6%' />
             ) : (
-                <Container maxWidth="lg" className="container">
+                <Container maxWidth="100vw" className="container">
                     <Box className="toast">
                         {toastOpen ? (
                             <Alert variant="filled" severity={toastType} >

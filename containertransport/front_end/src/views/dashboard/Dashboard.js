@@ -88,7 +88,7 @@ const Dashboard = () => {
     console.log("years", years)
     return (
         <Box className="fullScreen">
-            <Container maxWidth="lg" className="container">
+            <Container maxWidth='100vw' className="container">
                 <Box className="line-chart">
                     <Box className="title">
                         <Typography>Number of orders by month</Typography>

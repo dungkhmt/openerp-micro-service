@@ -228,7 +228,7 @@ const CreateTripDetail = () => {
                             <Box>
                                 <MapComponent tripItems={tripItems} />
                             </Box>
-                            <Box>Thong tin trip</Box>
+                            {/* <Box>Thong tin trip</Box> */}
                         </Box>
                     </Box>
                 </Box>

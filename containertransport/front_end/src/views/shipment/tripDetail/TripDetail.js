@@ -161,7 +161,7 @@ const TripDetail = () => {
                 <Box className="order-arrangement-v2">
                     <OrderArrangementInTrip ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} tripItems={tripItems} flag={flag} />
                 </Box>
-                <Box className="map-order">
+                <Box className="map-order-v2">
                     <Box>
                         <MapComponent tripItems={tripItems} />
                     </Box>

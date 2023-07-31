@@ -126,7 +126,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
     }, [type])
 
     useEffect(() => {
-        getContainers({facilityId: fromFacility}).then((res) => {
+        getContainers({facilityId: fromFacility, status: "AVAILABLE"}).then((res) => {
             console.log("container==========", res.data)
             setContainers(res.data.data.containerModels);
         });
@@ -306,7 +306,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                                         {toFacilities ? (
                                                             toFacilities.map((item) => {
                                                                 return (
-                                                                    <MenuItem value={item.id}>{item.facilityName}</MenuItem>
+                                                                    <MenuItem value={item.uid}>{item.facilityName}</MenuItem>
                                                                 );
                                                             })
                                                         ) : null}

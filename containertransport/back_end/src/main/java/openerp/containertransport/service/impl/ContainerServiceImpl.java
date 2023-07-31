@@ -4,7 +4,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.Constants;
+import openerp.containertransport.constants.MetaData;
 import openerp.containertransport.dto.*;
+import openerp.containertransport.dto.metaData.MetaDTO;
+import openerp.containertransport.dto.metaData.ResponseMetaData;
 import openerp.containertransport.entity.Container;
 import openerp.containertransport.entity.Facility;
 import openerp.containertransport.entity.Truck;
@@ -16,6 +19,8 @@ import openerp.containertransport.service.ContainerService;
 import openerp.containertransport.utils.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,11 +37,25 @@ public class ContainerServiceImpl implements ContainerService {
     private final EntityManager entityManager;
     private final TypeContainerRepo typeContainerRepo;
     @Override
-    public ContainerModel createContainer(ContainerModel containerModelDTO, String username) {
+    public ResponseEntity<?> createContainer(ContainerModel containerModelDTO, String username) {
+        Container containerCheck = containerRepo.findByContainerCode(containerModelDTO.getContainerCode());
+        Facility facility = facilityRepo.findById(containerModelDTO.getFacilityId()).get();
+        if (containerCheck != null) {
+            if(!containerCheck.getStatus().equals(Constants.ContainerStatus.DELETE.getStatus())) {
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.BAD_REQUEST), "This container already exists"));
+            } else {
+                containerCheck.setFacility(facility);
+                containerCheck.setEmpty(containerModelDTO.getIsEmpty());
+                containerCheck.setStatus(Constants.ContainerStatus.AVAILABLE.getStatus());
+                containerCheck.setOwner(username);
+                containerCheck.setUpdatedAt(System.currentTimeMillis());
+                containerRepo.save(containerCheck);
+                return ResponseEntity.status(HttpStatus.OK).body(convertToModel(containerCheck));
+            }
+        }
         TypeContainer typeContainer = typeContainerRepo.findByTypeContainerCode(containerModelDTO.getTypeContainerCode());
         typeContainer.setTotal(typeContainer.getTotal() + 1);
 
-        Facility facility = facilityRepo.findById(containerModelDTO.getFacilityId()).get();
         Container container = new Container();
         container.setFacility(facility);
         container.setContainerCode(containerModelDTO.getContainerCode());
@@ -49,7 +68,7 @@ public class ContainerServiceImpl implements ContainerService {
         container.setCreatedAt(System.currentTimeMillis());
         container.setUpdatedAt(System.currentTimeMillis());
         containerRepo.save(container);
-        return convertToModel(container);
+        return ResponseEntity.status(HttpStatus.OK).body(convertToModel(container));
     }
 
     @Override
@@ -113,6 +132,11 @@ public class ContainerServiceImpl implements ContainerService {
             sql += " AND size = :size";
             sqlCount += " AND size = :size";
             params.put("size", containerFilterRequestDTO.getContainerSize());
+        }
+        if (!StringUtils.isEmpty(containerFilterRequestDTO.getStatus())) {
+            sql += " AND status = :status";
+            sqlCount += " AND status = :status";
+            params.put("status", containerFilterRequestDTO.getStatus());
         }
 
         if (containerFilterRequestDTO.getFacilityId() != null) {

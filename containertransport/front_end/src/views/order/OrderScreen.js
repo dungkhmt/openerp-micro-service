@@ -20,13 +20,13 @@ const OrderScreen = () => {
 
     useEffect(() => {
         getOrders({ page: page, pageSize: rowsPerPage, status: "APPROVED" }).then((res) => {
-            setOrders(res.data.data.orderModels);
-            setCount(res.data.data.count);
+            setOrders(res?.data?.data.orderModels);
+            setCount(res?.data?.data.count);
         });
     }, [toastOpen, page, rowsPerPage])
     return (
         <Box className="fullScreen">
-            <Container maxWidth="lg" className="container">
+            <Container maxWidth="100vw" className="container">
                 <Box className="toast">
                     {toastOpen ? (
                         <Alert variant="filled" severity={toastType} >
