@@ -2,9 +2,7 @@ package wms.service.customer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.internal.util.StringHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,7 +12,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import wms.algorithms.utils.Utils;
 import wms.common.enums.ErrorCode;
@@ -29,7 +26,6 @@ import wms.service.files.IFileService;
 import wms.utils.GeneralUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -72,7 +68,7 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
         }
         return true;
     }
-    private List<Customer> saveCustomers(Row row, UserRegister createdBy) {
+    private void saveCustomers(Row row, UserRegister createdBy) {
         List<Customer> listCustomers = new ArrayList<>();
         String customerName = row.getCell(6).getStringCellValue().equals("HUB") ? "Bưu cục " + row.getCell(4).getStringCellValue().replace("HUB", "") :
                 "Bưu cục " + row.getCell(4).getStringCellValue();
@@ -112,7 +108,7 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
 
         listCustomers.add(customer);
         log.info("Num of customers added {}", listCustomers.size());
-        return customerRepo.saveAll(listCustomers);
+        customerRepo.saveAll(listCustomers);
     }
 
     @Override
@@ -205,8 +201,8 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
         customerToUpdate.setPhone(customerDTO.getPhone());
         customerToUpdate.setAddress(customerDTO.getAddress());
         customerToUpdate.setStatus(customerDTO.getStatus());
-        customerToUpdate.setLatitude(customerToUpdate.getLatitude());
-        customerToUpdate.setLongitude(customerToUpdate.getLongitude());
+        customerToUpdate.setLatitude(customerDTO.getLatitude());
+        customerToUpdate.setLongitude(customerDTO.getLongitude());
         customerToUpdate.setContractType(contractType);
         customerToUpdate.setCustomerType(customerType);
         // Don't update user_created
@@ -214,7 +210,10 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteCustomerById(long id) {
-        customerRepo.deleteById(id);
+        Customer currCustomer = customerRepo.getCustomerById(id);
+        currCustomer.setDeleted(1);
+        customerRepo.save(currCustomer);
     }
 }

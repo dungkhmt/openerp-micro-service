@@ -1,4 +1,3 @@
-import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box } from "@mui/material";
 import { Action } from "components/action/Action";
@@ -49,16 +48,16 @@ function ExportingActivityScreen({ screenAuthorization }) {
       color: AppColors.green,
       // permission: PERMISSIONS.MANAGE_CATEGORY_EDIT,
     },
-    {
-      title: "Xóa",
-      callback: (item) => {
-        // setIsRemove();
-        // setItemSelected(item);
-      },
-      icon: <DeleteIcon />,
-      color: AppColors.error,
-      // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
-    },
+    // {
+    //   title: "Xóa",
+    //   callback: (item) => {
+    //     // setIsRemove();
+    //     // setItemSelected(item);
+    //   },
+    //   icon: <DeleteIcon />,
+    //   color: AppColors.error,
+    //   // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
+    // },
   ];
   return (
     <Box sx={{ flexGrow: 1 }}>

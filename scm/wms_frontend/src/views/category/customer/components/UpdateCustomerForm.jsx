@@ -7,6 +7,7 @@ import {
 } from "controllers/query/category-query";
 import { useRef, useState } from "react";
 import CustomMap from "../../../../components/map/CustomMap";
+import SearchBoxMap from "../../../../components/map/SearchBoxMap";
 import { AppColors } from "../../../../shared/AppColors";
 
 const { FormProvider, useForm, Controller } = require("react-hook-form");
@@ -58,7 +59,6 @@ const UpdateCustomerForm = ({ setOpenDrawer, currCustomer }) => {
       latitude: selectPosition?.lat.toString(),
       longitude: selectPosition?.lng.toString(),
     };
-    console.log("Params: ", customerParams);
     await updateCustomerQuery.mutateAsync(customerParams);
     setOpenDrawer((pre) => !pre);
     reset();
@@ -184,6 +184,10 @@ const UpdateCustomerForm = ({ setOpenDrawer, currCustomer }) => {
         <Typography style={{ color: AppColors.error, fontSize: 14 }}>
           Lấy vị trí
         </Typography>
+        <SearchBoxMap
+          selectPosition={selectPosition}
+          setSelectPosition={setSelectPosition}
+        />
       </Box>
       <Stack direction={"row"}>
         <Controller
@@ -192,7 +196,7 @@ const UpdateCustomerForm = ({ setOpenDrawer, currCustomer }) => {
           name={"map"}
           render={({ field: { onChange, value } }) => (
             <CustomMap
-            style={{ width: "100%", height: "50vh" }}
+              style={{ width: "100%", height: "50vh" }}
               location={selectPosition}
               mapRef={mapRef}
               setSelectPosition={setSelectPosition}

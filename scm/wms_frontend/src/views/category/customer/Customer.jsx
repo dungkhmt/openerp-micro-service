@@ -260,6 +260,7 @@ function CustomerScreen({ screenAuthorization }) {
           if (isDelete) {
             await deleteCustomerQuery.mutateAsync({ id: itemSelected?.id });
           }
+          setIsRemove(false);
         }}
       />
       <CustomizedDialogs

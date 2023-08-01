@@ -38,12 +38,14 @@ import { ORDERS_STATUS } from "shared/AppConstants";
 import { endPoint } from "../../controllers/endpoint";
 import { convertUserToName } from "../../utils/GlobalUtils";
 import { receiptBillCols } from "./LocalConstant";
+import BillDetailModal from "./components/BillDetailModal";
 import CreatePurchaseBill from "./components/CreatePurchaseBill";
 
 function PurchaseOrderDetailScreen() {
   const location = useLocation();
   const [isApproved, setIsApproved] = useToggle(false);
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
+  const [isSeeBillDetail, setSeeBillDetail] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
   const [orderApproved, setOrderApprove] = useState(false);
   const currOrder = location.state.order;
@@ -148,11 +150,13 @@ function PurchaseOrderDetailScreen() {
     {
       title: "Xem chi tiết",
       callback: (item) => {
+        console.log("Item: ", item);
         let billItemsOfBill = billItem?.filter(
           (bill) => bill?.receiptBill?.code === item?.code
         );
+        console.log("bill item: ", billItemsOfBill);
+        setSeeBillDetail((pre) => !pre);
         setItemSelected(billItemsOfBill);
-        setOpenDrawer();
       },
       icon: <VisibilityIcon />,
       color: AppColors.green,
@@ -212,6 +216,15 @@ function PurchaseOrderDetailScreen() {
       />
     );
   }, [bills]);
+  const renderBillDetail = useCallback(() => {
+    return (
+      <BillDetailModal
+        billItemsOfBill={itemSelected}
+        setSeeBillDetail={setSeeBillDetail}
+        isLoadingBillItem={isLoadingBillItem}
+      />
+    );
+  }, [isLoadingBillItem, itemSelected, setSeeBillDetail]);
   const handleUpdateStatusOrder = async () => {
     let updateData = {
       status: "accepted",
@@ -442,6 +455,15 @@ function PurchaseOrderDetailScreen() {
           actions: (theme) => ({ paddingRight: theme.spacing(2) }),
         }}
       />
+
+      <CustomModal
+        open={isSeeBillDetail}
+        toggle={setSeeBillDetail}
+        size="sm"
+        title="Chi tiết phiếu nhập"
+      >
+        {renderBillDetail()}
+      </CustomModal>
     </Box>
   );
 }

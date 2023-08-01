@@ -9,7 +9,7 @@ public class DeliveryTripDTO {
     @NotBlank(message = "Shipment code khong duoc de trong")
     private String shipmentCode;
     private String userInCharge;
-    private String createdDate;
+    private String startedDate;
     @NotBlank(message = "Facility code khong duoc de trong")
     private String facilityCode;
 }
