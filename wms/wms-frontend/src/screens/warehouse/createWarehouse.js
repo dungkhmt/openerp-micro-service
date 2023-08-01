@@ -504,11 +504,11 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
                             </Grid>
 
                           </Box>
-                          <Box 
+                          {data.canBeDelete && <Box 
                             className={classes.removeIconBox} 
                             onClick={() => removeFormFields(index)}  >
                             <HighlightOffIcon className={classes.removeIcon} />
-                          </Box>
+                          </Box>}
                         </Box>
                       </Box>
                     ))

@@ -46,5 +46,6 @@ public class WarehouseWithBays {
         private Integer width;
         @Min(value = 0)
         private Integer length;
+        private boolean canBeDelete;
     }
 }

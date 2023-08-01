@@ -29,5 +29,7 @@ public interface ReceiptItemRepository extends JpaRepository<ReceiptItem, UUID> 
     @Query(GET_PROCESSED_ITEMS + "where ri.receiptBillId = :receiptBillId")
     List<ProcessedItemModel> getProcessedItemsByReceiptBillId(String receiptBillId);
 
-    Optional<ReceiptItem> findReceiptItemByReceiptItemRequestId(UUID requestId);
+    List<ReceiptItem> findAllByProductId(UUID productId);
+
+    List<ReceiptItem> findAllByBayId(UUID bayId);
 }

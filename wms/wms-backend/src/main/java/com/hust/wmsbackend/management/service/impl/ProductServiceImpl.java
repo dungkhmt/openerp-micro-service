@@ -41,6 +41,10 @@ public class ProductServiceImpl implements ProductService {
     private ProductWarehouseRepository productWarehouseRepository;
     private BayRepository bayRepository;
     private InventoryItemRepository inventoryItemRepository;
+    private ReceiptItemRequestRepository receiptItemRequestRepository;
+    private ReceiptItemRepository receiptItemRepository;
+    private SaleOrderItemRepository saleOrderItemRepository;
+    private AssignedOrderItemRepository assignedOrderItemRepository;
     private RedisCacheService redisCacheService;
 
     private WarehouseService warehouseService;
@@ -227,9 +231,38 @@ public class ProductServiceImpl implements ProductService {
                     .code(product.getCode())
                     .retailPrice(getCurrPriceByProductId(product.getProductId()))
                     .onHandQuantity(onhandQuantity == null ? BigDecimal.ZERO : onhandQuantity)
+                    .canBeDelete(checkProductCanBeDelete(product.getProductId()))
                     .build());
         }
         return response;
+    }
+
+    private boolean checkProductCanBeDelete(UUID productId) {
+        List<InventoryItem> inventoryItemList = inventoryItemRepository.findAllByProductId(productId);
+        if (!inventoryItemList.isEmpty()) {
+            return false;
+        }
+        List<ProductWarehouse> productWarehouseList = productWarehouseRepository.findAllByProductId(productId);
+        if (!productWarehouseList.isEmpty()) {
+            return false;
+        }
+        List<ReceiptItemRequest> receiptItemRequestList = receiptItemRequestRepository.findAllByProductId(productId);
+        if (!receiptItemRequestList.isEmpty()) {
+            return false;
+        }
+        List<ReceiptItem> receiptItemList = receiptItemRepository.findAllByProductId(productId);
+        if (!receiptItemList.isEmpty()) {
+            return false;
+        }
+        List<SaleOrderItem> saleOrderItemList = saleOrderItemRepository.findAllByProductId(productId);
+        if (!saleOrderItemList.isEmpty()) {
+            return false;
+        }
+        List<AssignedOrderItem> assignedOrderItemList = assignedOrderItemRepository.findAllByProductId(productId);
+        if (!assignedOrderItemList.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 
     @Override

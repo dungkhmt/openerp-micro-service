@@ -4,7 +4,7 @@ import { request } from "api";
 import StandardTable from "components/StandardTable";
 import { API_PATH } from "../apiPaths";
 import { Link } from 'react-router-dom';
-import { successNoti } from "utils/notification";
+import { errorNoti, successNoti } from "utils/notification";
 import { Fragment, useState, useEffect } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import LoadingScreen from "components/common/loading/loading";
@@ -65,6 +65,17 @@ const ProductListing =  () => {
         editable={{
           onRowDelete: (selectedIds) => new Promise((resolve, reject) => {
             setTimeout(() => {
+              for (var i = 0; i < selectedIds.length; i++) {
+                const id = selectedIds[i];
+                for (var j = 0; j < productTableData.length; j++) {
+                  const product = productTableData[j];
+                  if (product.productId == id && ( !product.canBeDelete )) {
+                    errorNoti("Không thể xóa sản phẩm này");
+                    return;
+                  }
+                }
+              }
+
               request(
                 "delete",
                 API_PATH.PRODUCT,
