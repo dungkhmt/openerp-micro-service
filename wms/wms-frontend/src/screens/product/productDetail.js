@@ -271,6 +271,10 @@ const ProductDetail = ( props ) => {
   const { path } = useRouteMatch();
 
   const submitForm = (data) => {
+    if (categoryId == null || uom == null) {
+      errorNoti("Vui lòng nhập đầy đủ thông tin");
+      return ;
+    }
     // remove empty key-value in form data
     const entries = Object.entries(data);
     const nonEmptyOrNull = entries.filter(
@@ -460,7 +464,7 @@ const ProductDetail = ( props ) => {
 
                 <Grid container spacing={3} className={classes.inforWrap}>
                   <Grid item xs={6}>
-                    <Box className={classes.labelInput}>Phân loại</Box>
+                    <Box className={classes.labelInput}>Phân loại <RequireStar /></Box>
                     <Select
                       label="categoryId"
                       // {...register("categoryId", { required: false })}
@@ -484,7 +488,7 @@ const ProductDetail = ( props ) => {
                     </Select>
                   </Grid>
                   <Grid item xs={6}>
-                    <Box className={classes.labelInput}>Đơn vị tính</Box>
+                    <Box className={classes.labelInput}>Đơn vị tính <RequireStar /></Box>
                     <Select
                       label="uom"
                       value={uom}

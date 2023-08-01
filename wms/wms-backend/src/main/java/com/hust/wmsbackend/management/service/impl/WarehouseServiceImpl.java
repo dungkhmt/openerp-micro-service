@@ -25,6 +25,8 @@ public class WarehouseServiceImpl implements WarehouseService {
     private BayRepository bayRepository;
     private WarehouseRepository warehouseRepository;
     private InventoryItemRepository inventoryItemRepository;
+    private ReceiptItemRepository receiptItemRepository;
+    private AssignedOrderItemRepository assignedOrderItemRepository;
     private ProductV2Repository productRepository;
     private SaleOrderItemRepository saleOrderItemRepository;
 
@@ -149,16 +151,15 @@ public class WarehouseServiceImpl implements WarehouseService {
             List<Bay> bays = bayRepository.findAllByWarehouseId(uuid);
             List<WarehouseWithBays.Shelf> shelves = bays.stream()
                                                         .map(bay -> WarehouseWithBays.Shelf.builder()
-                                                                                           .code(bay.getCode())
-                                                                                           .width(bay.getXLong())
-                                                                                           .length(bay.getYLong())
-                                                                                           .x(bay.getX())
-                                                                                           .y(bay.getY())
-                                                                                           .id(bay
-                                                                                                   .getBayId()
-                                                                                                   .toString())
-                                                                                           .build())
-                                                        .collect(Collectors.toList());
+                                                        .code(bay.getCode())
+                                                        .width(bay.getXLong())
+                                                        .length(bay.getYLong())
+                                                        .x(bay.getX())
+                                                        .y(bay.getY())
+                                                        .id(bay.getBayId().toString())
+                                                        .canBeDelete(checkBayCanBeDelete(bay.getBayId()))
+                                                        .build())
+                                                    .collect(Collectors.toList());
             return WarehouseWithBays.builder()
                                     .id(warehouse.getWarehouseId().toString())
                                     .warehouseLength(warehouse.getLength())
@@ -174,6 +175,22 @@ public class WarehouseServiceImpl implements WarehouseService {
             log.warn(String.format("Not found warehouse with id %s", id));
             return null;
         }
+    }
+
+    private boolean checkBayCanBeDelete(UUID bayId) {
+        List<InventoryItem> inventoryItemList = inventoryItemRepository.findAllByBayId(bayId);
+        if (!inventoryItemList.isEmpty()) {
+            return false;
+        }
+        List<ReceiptItem> receiptItemList = receiptItemRepository.findAllByBayId(bayId);
+        if (!receiptItemList.isEmpty()) {
+            return false;
+        }
+        List<AssignedOrderItem> assignedOrderItemList = assignedOrderItemRepository.findAllByBayId(bayId);
+        if (!assignedOrderItemList.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 
     @Override
