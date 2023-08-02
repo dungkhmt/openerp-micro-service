@@ -13,4 +13,5 @@ public interface ReceiptItemRequestRepository extends JpaRepository<ReceiptItemR
 
     List<ReceiptItemRequest> findAllByProductId(UUID productId);
 
+    List<ReceiptItemRequest> findAllByWarehouseId(UUID warehouseId);
 }

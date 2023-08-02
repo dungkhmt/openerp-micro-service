@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, String> {
@@ -24,4 +25,6 @@ public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, Stri
         "and dt.delivery_person_id = ?1 " +
         "and dt.status in ?2 ", nativeQuery = true)
     List<DeliveryTrip> findTodayDeliveryTripsByPerson(String deliveryPersonId, List<String> deliveryStatus);
+
+    List<DeliveryTrip> findAllByWarehouseId(UUID warehouseId);
 }

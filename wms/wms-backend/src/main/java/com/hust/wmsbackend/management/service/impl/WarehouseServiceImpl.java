@@ -2,14 +2,17 @@ package com.hust.wmsbackend.management.service.impl;
 
 import com.hust.wmsbackend.management.cache.RedisCacheService;
 import com.hust.wmsbackend.management.entity.*;
+import com.hust.wmsbackend.management.model.ReceiptRequest;
 import com.hust.wmsbackend.management.model.WarehouseWithBays;
 import com.hust.wmsbackend.management.model.response.ProductWarehouseResponse;
 import com.hust.wmsbackend.management.model.response.WarehouseDetailsResponse;
+import com.hust.wmsbackend.management.model.response.WarehouseGeneral;
 import com.hust.wmsbackend.management.repository.*;
 import com.hust.wmsbackend.management.service.WarehouseService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,10 @@ import java.util.stream.Collectors;
 public class WarehouseServiceImpl implements WarehouseService {
 
     private BayRepository bayRepository;
+    private ProductWarehouseRepository productWarehouseRepository;
+    private ReceiptRepository receiptRepository;
+    private ReceiptItemRequestRepository receiptItemRequestRepository;
+    private DeliveryTripRepository deliveryTripRepository;
     private WarehouseRepository warehouseRepository;
     private InventoryItemRepository inventoryItemRepository;
     private ReceiptItemRepository receiptItemRepository;
@@ -106,12 +113,43 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public List<Warehouse> getAllWarehouseGeneral() {
+    public List<WarehouseGeneral> getAllWarehouseGeneral() {
         log.info("Start get all warehouse in service");
         List<Warehouse> response = getWarehouseInCacheElseDatabase();
-        // TODO: Filter by company or something else... user can not view all facility in database
-        log.info(String.format("Get %d facilities", response.size()));
-        return response;
+        return response.stream().map(warehouse -> new WarehouseGeneral(warehouse, checkBeDelete(warehouse.getWarehouseId())))
+                .collect(Collectors.toList());
+    }
+
+    private boolean checkBeDelete(UUID warehouseId) {
+        List<InventoryItem> inventoryItemList = inventoryItemRepository.findAllByWarehouseId(warehouseId);
+        if (!inventoryItemList.isEmpty()) {
+            return false;
+        }
+        List<ProductWarehouse> productWarehouseList = productWarehouseRepository.findAllByWarehouseId(warehouseId);
+        if (!productWarehouseList.isEmpty()) {
+            return false;
+        }
+        List<ReceiptItemRequest> receiptItemRequestList = receiptItemRequestRepository.findAllByWarehouseId(warehouseId);
+        if (!receiptItemRequestList.isEmpty()) {
+            return false;
+        }
+        List<Bay> bayList = bayRepository.findAllByWarehouseId(warehouseId);
+        if (!bayList.isEmpty()) {
+            return false;
+        }
+        List<Receipt> receiptList = receiptRepository.findAllByWarehouseId(warehouseId);
+        if (!receiptList.isEmpty()) {
+            return false;
+        }
+        List<AssignedOrderItem> assignedOrderItemList = assignedOrderItemRepository.findAllByWarehouseId(warehouseId);
+        if (!assignedOrderItemList.isEmpty()) {
+            return false;
+        }
+        List<DeliveryTrip> deliveryTripList = deliveryTripRepository.findAllByWarehouseId(warehouseId);
+        if (!deliveryTripList.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 
     @Override
