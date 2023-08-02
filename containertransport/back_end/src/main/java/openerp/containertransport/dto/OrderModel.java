@@ -18,7 +18,7 @@ public class OrderModel implements Serializable {
     private String orderCode;
     private String type;
     private long weight;
-    private boolean isBreakRomooc;
+    private Boolean isBreakRomooc;
     private ContainerModel containerModel;
     private String customerId;
     private List<Integer> containerIds;

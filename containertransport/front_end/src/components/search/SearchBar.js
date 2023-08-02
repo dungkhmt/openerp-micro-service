@@ -162,12 +162,14 @@ const SearchBar = ({ filters, setFilters, status }) => {
                     />
                 </Box>
             </Box>
-            <Box className="item-filter">
+            <Box className="item-filter" mb={2}>
                 {filters.length > 0 ? (
                     filters.map((item) => {
                         return (
-                            <Box sx={{ display: 'flex', marginRight: '8px',  width: 'fit-content',
-                            border: '1px solid gray', borderRadius: '10px', padding: '2px 4px' }}>
+                            <Box sx={{
+                                display: 'flex', marginRight: '8px', width: 'fit-content',
+                                border: '1px solid gray', borderRadius: '10px', padding: '2px 4px'
+                            }}>
                                 <Box sx={{}}>
                                     <Typography>{item.value}</Typography>
                                 </Box>

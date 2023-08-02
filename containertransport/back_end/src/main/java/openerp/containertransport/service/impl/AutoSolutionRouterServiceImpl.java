@@ -57,7 +57,9 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
 
         // request
         OrderFilterRequestDTO orderFilterRequestDTO = new OrderFilterRequestDTO();
-        orderFilterRequestDTO.setStatus("ORDERED");
+        List<String> status = new ArrayList<>();
+        status.add("ORDERED");
+        orderFilterRequestDTO.setStatus(status);
         List<OrderModel> orderModels = orderService.filterOrders(orderFilterRequestDTO).getOrderModels();
         List<Request> requests = convertToRequest(orderModels);
         transportContainerInput.setRequests(requests);
@@ -170,7 +172,7 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
             request.setToLocationID((int) orderModel.getToFacility().getFacilityId());
             request.setLatestTimePickup(orderModel.getLatePickupTime());
             request.setLatestTimeDelivery(orderModel.getLateDeliveryTime());
-            request.setIsBreakRomooc(orderModel.isBreakRomooc());
+            request.setIsBreakRomooc(orderModel.getIsBreakRomooc());
             request.setType(orderModel.getType());
             requests.add(request);
         });

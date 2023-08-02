@@ -99,7 +99,7 @@ public class OrderServiceImpl implements OrderService {
         order.setEarlyPickupTime(orderModel.getEarlyPickupTime());
         order.setLatePickupTime(orderModel.getLatePickupTime());
         order.setType(orderModel.getType());
-        order.setIsBreakRomooc(orderModel.isBreakRomooc());
+        order.setIsBreakRomooc(orderModel.getIsBreakRomooc());
         order.setStatus("WAIT_APPROVE");
         order.setUid(RandomUtils.getRandomId());
         order.setCreatedAt(System.currentTimeMillis());
@@ -126,18 +126,24 @@ public class OrderServiceImpl implements OrderService {
             sqlCount += " AND order_code = :orderCode";
             params.put("orderCode", orderFilterRequestDTO.getOrderCode());
         }
-        if(orderFilterRequestDTO.getStatus() != null && !orderFilterRequestDTO.getStatus().equals("APPROVED")){
-            sql += " AND status = :status";
-            sqlCount += " AND status = :status";
+        if(orderFilterRequestDTO.getStatus() != null){
+            sql += " AND status IN :status";
+            sqlCount += " AND status IN :status";
             params.put("status", orderFilterRequestDTO.getStatus());
         }
-        if(orderFilterRequestDTO.getStatus() != null && orderFilterRequestDTO.getStatus().equals("APPROVED")){
+        if(orderFilterRequestDTO.getType() != null && orderFilterRequestDTO.getType().equals("APPROVED")){
             List<String> status = new ArrayList<>();
             status.add("WAIT_APPROVE");
             status.add("DELETED");
             sql += " AND status NOT IN :status";
             sqlCount += " AND status NOT IN :status";
             params.put("status", status);
+        }
+
+        if(orderFilterRequestDTO.getType() != null && orderFilterRequestDTO.getType().equals("WAIT_APPROVE")){
+            sql += " AND status = :statusType";
+            sqlCount += " AND status = :statusType";
+            params.put("statusType", "WAIT_APPROVE");
         }
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
         for (String i : params.keySet()) {
@@ -206,6 +212,11 @@ public class OrderServiceImpl implements OrderService {
         if(orderModel.getLateDeliveryTime() > 0) {
             order.setLateDeliveryTime(orderModel.getLateDeliveryTime());
         }
+        if(orderModel.getToFacilityId() != order.getToFacility().getUid()) {
+            Facility facility = facilityRepo.findByUid(orderModel.getToFacilityId());
+            order.setToFacility(facility);
+        }
+        order.setIsBreakRomooc(orderModel.getIsBreakRomooc());
         order.setUpdatedAt(System.currentTimeMillis());
         order = orderRepo.save(order);
         return convertToModel(order);
@@ -264,6 +275,17 @@ public class OrderServiceImpl implements OrderService {
         return (Integer) queryCount.getSingleResult();
     }
 
+    @Override
+    public OrderModel deleteOrder(String uid) {
+        Order order = orderRepo.findByUid(uid);
+        Container container = order.getContainer();
+        container.setStatus(Constants.ContainerStatus.AVAILABLE.getStatus());
+        containerRepo.save(container);
+        order.setStatus(Constants.OrderStatus.CANCEL.getStatus());
+        orderRepo.save(order);
+        return convertToModel(order);
+    }
+
     public OrderModel convertToModel(Order order){
         OrderModel orderModel = modelMapper.map(order, OrderModel.class);
         FacilityResponsiveDTO fromFacility = buildFacilityResponse(order.getFromFacility());
@@ -279,6 +301,7 @@ public class OrderServiceImpl implements OrderService {
                 .facilityName(facility.getFacilityName())
                 .facilityCode(facility.getFacilityCode())
                 .facilityId(facility.getId())
+                .facilityUid(facility.getUid())
                 .longitude(facility.getLongitude())
                 .latitude(facility.getLatitude())
                 .processingTimePickUp(facility.getProcessingTimePickUp())

@@ -24,7 +24,7 @@ const OrderWaitApprove = () => {
         let data = {
             page: page, 
             pageSize: rowsPerPage,
-            status: "WAIT_APPROVE"
+            status: ["WAIT_APPROVE"]
         }
         getOrders(data).then((res) => {
             setOrders(res?.data.data.orderModels);

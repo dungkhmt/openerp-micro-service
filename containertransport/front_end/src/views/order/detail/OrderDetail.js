@@ -4,7 +4,7 @@ import { Alert, Box, Button, Container, Divider, Icon, Typography } from "@mui/m
 import { useHistory, useParams } from "react-router-dom";
 import { MyContext } from "contextAPI/MyContext";
 import { menuIconMap, typeOrderMap } from "config/menuconfig";
-import { getOrderByUid } from "api/OrderAPI";
+import { deleteOrder, getOrderByUid } from "api/OrderAPI";
 import NewOrderModal from "../NewOrderModal";
 
 const OrderDetail = () => {
@@ -30,12 +30,29 @@ const OrderDetail = () => {
     }, [open])
 
     const handleBackScreen = () => {
-        if (type === "wait") {
+        if (type === "WaitApprove") {
             history.push('/wait-approve/order')
         }
         else {
             history.push('/order')
         }
+    }
+    const handleCancel = () => {
+        deleteOrder(uid).then((res) => {
+            console.log(res);
+            setToastMsg("Delete Order Success");
+            setToastType("success");
+            setToast(true);
+            setTimeout(() => {
+                setToast(false);
+            }, "3000");
+            if (type === "WaitApprove") {
+                history.push('/wait-approve/order')
+            }
+            else {
+                history.push('/order')
+            }
+        })
     }
     return (
         <Box className="fullScreen">
@@ -55,10 +72,10 @@ const OrderDetail = () => {
                         <Icon>
                             {menuIconMap.get("ArrowBackIosIcon")}
                         </Icon>
-                        {type === "wait" ? (
+                        {type === "WaitApprove" ? (
                             <Typography>Go back orders wait approve screen</Typography>
                         ) : (
-                            <Typography>Go back approved orders screen</Typography>
+                            <Typography>Go back orders screen</Typography>
                         )}
 
                     </Box>
@@ -68,12 +85,17 @@ const OrderDetail = () => {
                         </Box>
                         {type === "wait" ? null : (
                             <Box className="btn-header">
-                                <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                                // onClick={handleCancelCreateShipment}
-                                >Delete</Button>
-                                <Button variant="contained" className="header-submit-shipment-btn-save"
-                                    onClick={handleClose}
-                                >Modify</Button>
+
+                                {order?.status === "WAIT_APPROVE" ? (
+                                    <>
+                                        <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
+                                        onClick={handleCancel}
+                                        >Delete</Button>
+                                        <Button variant="contained" className="header-submit-shipment-btn-save"
+                                            onClick={handleClose}
+                                        >Modify</Button>
+                                    </>
+                                ) : null}
                             </Box>
                         )}
                     </Box>
@@ -109,7 +131,7 @@ const OrderDetail = () => {
                         <Box className="text-head">
                             <Typography>Break Romooc:</Typography>
                         </Box>
-                        <Typography>{order?.breakRomooc ? "True" : "False"}</Typography>
+                        <Typography>{order?.isBreakRomooc ? "True" : "False"}</Typography>
                     </Box>
                     {/* <Box className="order-info-item">
                         <Box className="text-head">

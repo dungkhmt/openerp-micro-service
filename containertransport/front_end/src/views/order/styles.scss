@@ -130,6 +130,14 @@
                 font-weight: 600;
             }
         }
+        .multi-select {
+            .MuiOutlinedInput-root {
+                height: fit-content !important;
+            }
+            .MuiChip-root {
+                margin: 4px 4px !important;
+            }
+        }
         .contentModal-item-input {
             width: 60%;
             display: flex;
@@ -218,5 +226,10 @@
             font-weight: 600;
             font-weight: 18px;
         }
+    }
+}
+.MuiPopover-paper {
+    .MuiList-root {
+        max-height: 350px;
     }
 }
