@@ -18,4 +18,5 @@ public class ProductGeneralResponse {
     private byte[] imageData;
     private String imageContentType;
     private String productCategoryId;
+    private boolean canBeDelete;
 }

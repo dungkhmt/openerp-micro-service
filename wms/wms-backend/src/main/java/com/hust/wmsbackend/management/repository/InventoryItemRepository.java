@@ -22,4 +22,9 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, UU
             "join Product p on p.productId = ?2 and p.productId = ii.productId " +
             "where ii.quantityOnHandTotal > 0 ")
     List<InventoryItem> findAllByWarehouseIdAndHavingProductId(UUID warehouseId, UUID productId);
+
+    List<InventoryItem> findAllByProductId(UUID productId);
+
+    List<InventoryItem> findAllByBayId(UUID bayId);
+
 }
