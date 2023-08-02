@@ -52,31 +52,54 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public Warehouse createWarehouse(WarehouseWithBays request) {
         log.info(String.format("Start create warehouse with request %s", request));
-        Warehouse newWarehouse = Warehouse.builder()
-                                          .name(request.getName())
-                                          .address(request.getAddress())
-                                          .width(request.getWarehouseWidth())
-                                          .length(request.getWarehouseLength())
-                                          .code(request.getCode())
-                                          .latitude(request.getLatitude())
-                                          .longitude(request.getLongitude())
-                                          .build();
 
+        // update hoặc tạo mới thông tin chung của kho
+        Warehouse newWarehouse;
         List<Bay> prevBays;
+        UUID warehouseId;
         if (request.getId() != null) {
-            UUID warehouseIdUUID = UUID.fromString(request.getId());
-            newWarehouse.setWarehouseId(warehouseIdUUID);
-            prevBays = bayRepository.findAllByWarehouseId(warehouseIdUUID);
+            warehouseId = UUID.fromString(request.getId());
+            Optional<Warehouse> warehouseOpt = warehouseRepository.findById(warehouseId);
+            if (!warehouseOpt.isPresent()) {
+                log.error(String.format("Warehouse with id %s is not found", request.getId()));
+                return null;
+            }
+            Warehouse warehouse = warehouseOpt.get();
+            warehouse.setName(request.getName());
+            warehouse.setAddress(request.getAddress());
+            warehouse.setWidth(request.getWarehouseWidth());
+            warehouse.setLength(request.getWarehouseLength());
+            warehouse.setCode(request.getCode());
+            warehouse.setLatitude(request.getLatitude());
+            warehouse.setLongitude(request.getLongitude());
+            warehouseRepository.save(warehouse);
+            prevBays = bayRepository.findAllByWarehouseId(warehouseId);
+            newWarehouse = warehouse;
         } else {
+            newWarehouse = Warehouse.builder()
+                    .name(request.getName())
+                    .address(request.getAddress())
+                    .width(request.getWarehouseWidth())
+                    .length(request.getWarehouseLength())
+                    .code(request.getCode())
+                    .latitude(request.getLatitude())
+                    .longitude(request.getLongitude())
+                    .build();
+            Warehouse savedWarehouse = warehouseRepository.save(newWarehouse);
+            newWarehouse = savedWarehouse;
+            warehouseId = savedWarehouse.getWarehouseId();
             prevBays = new ArrayList<>();
         }
 
-        Warehouse warehouse = warehouseRepository.save(newWarehouse);
         log.info("Start save list shelf");
         List<WarehouseWithBays.Shelf> listShelf = request.getListShelf();
         if (listShelf != null && !listShelf.isEmpty()) {
-            UUID warehouseId = warehouse.getWarehouseId();
             List<Bay> bays = listShelf.stream()
+                    .filter(shelf -> shelf.getCode() != null
+                            && shelf.getX() != null
+                            && shelf.getY() != null
+                            && shelf.getLength() != null
+                            && shelf.getWidth() != null)
                                       .map(shelf -> {
                                           Bay bay = Bay.builder()
                                                        .warehouseId(warehouseId)
@@ -102,14 +125,24 @@ public class WarehouseServiceImpl implements WarehouseService {
 
             log.info(String.format("Saved bay list for warehouse id %s", warehouseId));
         }
-        log.info(String.format("Saved warehouse entity with id %s", warehouse.getWarehouseId()));
+        log.info(String.format("Saved warehouse entity with id %s", newWarehouse.getWarehouseId()));
         // update redis
         List<Warehouse> warehouses = redisCacheService.getCachedListObject(RedisCacheService.ALL_WAREHOUSES_KEY, Warehouse.class);
         if (warehouses != null && !warehouses.isEmpty()) {
-            warehouses.add(warehouse);
+            int index = -1;
+            for (int i = 0; i < warehouses.size(); i++) {
+                Warehouse warehouse = warehouses.get(i);
+                if (warehouse.getWarehouseId().toString().equals(request.getId())) {
+                    index = i;
+                }
+            }
+            if (index != - 1) {
+                warehouses.remove(index);
+            }
+            warehouses.add(newWarehouse);
         }
         redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_WAREHOUSES_KEY, warehouses);
-        return warehouse;
+        return newWarehouse;
     }
 
     @Override
