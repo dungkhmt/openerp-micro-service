@@ -19,4 +19,6 @@ public interface TripService {
     TripModel updateTrip(String uid, TripModel tripModel);
 
     List<TripModel> deleteTrips(TripDeleteDTO tripDeleteDTO);
+
+    List<Trip> getTripByShipmentId(String shipmentId);
 }

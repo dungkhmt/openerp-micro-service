@@ -27,10 +27,10 @@ public class OrderModel implements Serializable {
     private String toFacilityId;
     private FacilityResponsiveDTO toFacility;
     private List<Container> containers;
-    private long earlyDeliveryTime;
-    private long lateDeliveryTime;
-    private long earlyPickupTime;
-    private long latePickupTime;
+    private Long earlyDeliveryTime;
+    private Long lateDeliveryTime;
+    private Long earlyPickupTime;
+    private Long latePickupTime;
     private String status;
     private Timestamp createdAt;
     private Timestamp updatedAt;

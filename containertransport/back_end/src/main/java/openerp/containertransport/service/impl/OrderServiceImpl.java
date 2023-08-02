@@ -94,10 +94,18 @@ public class OrderServiceImpl implements OrderService {
     }
     public Order createAttribute(OrderModel orderModel, Order order) {
         order.setCustomerId(orderModel.getUsername());
-        order.setEarlyDeliveryTime(orderModel.getEarlyDeliveryTime());
-        order.setLateDeliveryTime(orderModel.getLateDeliveryTime());
-        order.setEarlyPickupTime(orderModel.getEarlyPickupTime());
-        order.setLatePickupTime(orderModel.getLatePickupTime());
+        order.setEarlyDeliveryTime(System.currentTimeMillis() + 1000*60*60*24*365);
+        if(orderModel.getLateDeliveryTime() != null) {
+            order.setLateDeliveryTime(orderModel.getLateDeliveryTime());
+        } else {
+            order.setLateDeliveryTime(System.currentTimeMillis() + 1000*60*60*24*365);
+        }
+        if(orderModel.getLatePickupTime() != null) {
+            order.setLatePickupTime(orderModel.getLatePickupTime());
+        } else {
+            order.setLatePickupTime(System.currentTimeMillis() + 1000*60*60*24*365);
+        }
+        order.setEarlyPickupTime(System.currentTimeMillis() + 1000*60*60*24*365);
         order.setType(orderModel.getType());
         order.setIsBreakRomooc(orderModel.getIsBreakRomooc());
         order.setStatus("WAIT_APPROVE");

@@ -233,6 +233,12 @@ public class TripServiceImpl implements TripService {
         return tripModels;
     }
 
+    @Override
+    public List<Trip> getTripByShipmentId(String shipmentId) {
+        List<Trip> tripList = tripRepo.getTripByShipmentId(shipmentId);
+        return tripList;
+    }
+
     public TripModel convertToModel(Trip trip) {
         TripModel tripModel = modelMapper.map(trip, TripModel.class);
         List<Long> orderIds = new ArrayList<>();
