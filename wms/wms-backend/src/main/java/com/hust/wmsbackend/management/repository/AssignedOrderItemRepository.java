@@ -22,4 +22,6 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
     List<AssignedOrderItem> findAllByProductId(UUID productId);
 
     List<AssignedOrderItem> findAllByBayId(UUID bayId);
+
+    List<AssignedOrderItem> findAllByWarehouseId(UUID warehouseId);
 }

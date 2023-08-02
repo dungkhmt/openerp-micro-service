@@ -54,9 +54,10 @@ public class ProductServiceImpl implements ProductService {
     public Product createProduct(ProductRequest request) {
         log.info("Start create product " + request);
         Product product;
+        String productId;
         boolean isCreateRequest = request.getProductId() == null;
         if (!isCreateRequest) {
-            String productId = request.getProductId();
+            productId = request.getProductId();
             log.info("Start update product with id " + productId);
             Optional<Product> productOpt = productRepository.findById(UUID.fromString(productId));
             if (productOpt.isPresent()) {
@@ -91,7 +92,8 @@ public class ProductServiceImpl implements ProductService {
                 return null;
             }
         }
-        productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        productId = savedProduct.getProductId().toString();
         log.info("Saved new product");
 
         // update init product quantity of created product is not allowed
@@ -102,79 +104,18 @@ public class ProductServiceImpl implements ProductService {
         // update redis
         List<Product> products = redisCacheService.getCachedListObject(RedisCacheService.ALL_PRODUCTS_KEY, Product.class);
         if (products != null && !products.isEmpty()) {
+            int index = -1;
+            for (int i = 0; i < products.size(); i++) {
+                Product lProduct = products.get(i);
+                if (lProduct.getProductId().toString().equals(productId)) {
+                    index = i;
+                }
+            }
+            if (index != -1) {
+                products.remove(index);
+            }
             products.add(product);
             redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_PRODUCTS_KEY, products);
-        }
-
-        List<ProductRequest.InitProductQuantity> quantityList = request.getInitProductQuantityList();
-        Map<String, BigDecimal> normQuantityMap = new HashMap<>();
-        if (quantityList != null && !quantityList.isEmpty()) {
-            log.info("Init product quantity list is NOT empty");
-            Map<String, String> bayIdWarehouseIdMap = new HashMap<>();
-
-            // normalize list by bay id
-            for (ProductRequest.InitProductQuantity quantity : quantityList) {
-                String bayId = quantity.getBayId();
-                bayIdWarehouseIdMap.put(quantity.getBayId(), quantity.getWarehouseId());
-                if (!normQuantityMap.containsKey(quantity.getBayId())) {
-                    normQuantityMap.put(bayId, quantity.getQuantity());
-                } else {
-                    BigDecimal newValue = normQuantityMap.get(bayId).add(quantity.getQuantity());
-                    normQuantityMap.put(bayId, newValue);
-                }
-            }
-
-            for (ProductRequest.InitProductQuantity quantity : quantityList) {
-                InventoryItem item = InventoryItem.builder()
-                    .inventoryItemId(UUID.randomUUID())
-                    .bayId(UUID.fromString(quantity.getBayId()))
-                    .quantityOnHandTotal(quantity.getQuantity())
-                    .importPrice(quantity.getImportPrice())
-                    .productId(product.getProductId())
-                    .lotId(quantity.getLotId())
-                    .currencyUomId("VND")
-                    .datetimeReceived(new Date())
-                    .warehouseId(UUID.fromString(bayIdWarehouseIdMap.get(quantity.getBayId().toString())))
-                    .createdStamp(new Date())
-                    .lastUpdatedStamp(new Date())
-                    .isInitQuantity(true)
-                    .build();
-                inventoryItemRepository.save(item);
-            }
-            log.info("Saved product bay entity");
-
-            // update product warehouse quantity
-            List<Bay> bays = bayRepository.findAll();
-            Map<String, String> bayWarehouseMap = new HashMap<>(); // key = bayId, value = warehouseId -> For fast lookup
-            for (Bay bay : bays) {
-                bayWarehouseMap.put(bay.getBayId().toString(), bay.getWarehouseId().toString());
-            }
-            for (Map.Entry<String, BigDecimal> entry : normQuantityMap.entrySet()) {
-                if (bayWarehouseMap.containsKey(entry.getKey())) {
-                    UUID warehouseId = UUID.fromString(bayWarehouseMap.get(entry.getKey()));
-                    BigDecimal addQuantity = entry.getValue();
-                    BigDecimal currQuantity = productWarehouseService.
-                        getProductQuantityByWarehouseIdAndProductId(warehouseId, product.getProductId());
-                    BigDecimal newQuantity = currQuantity.add(addQuantity);
-
-                    Optional<ProductWarehouse> productWarehouseOpt = productWarehouseRepository.
-                        findProductWarehouseByWarehouseIdAndProductId(warehouseId, product.getProductId());
-                    ProductWarehouse productWarehouse;
-                    if (productWarehouseOpt.isPresent()) {
-                        productWarehouse = productWarehouseOpt.get();
-                        productWarehouse.setQuantityOnHand(newQuantity);
-                    } else {
-                        productWarehouse = ProductWarehouse.builder()
-                                                           .productId(product.getProductId())
-                                                           .warehouseId(warehouseId)
-                                                           .productWarehouseId(UUID.randomUUID())
-                                                           .quantityOnHand(newQuantity)
-                                                           .build();
-                    }
-                    productWarehouseRepository.save(productWarehouse);
-                }
-            }
-            log.info("Saved product warehouse entity");
         }
         return product;
     }

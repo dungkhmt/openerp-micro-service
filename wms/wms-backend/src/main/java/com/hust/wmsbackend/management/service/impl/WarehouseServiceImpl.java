@@ -2,14 +2,17 @@ package com.hust.wmsbackend.management.service.impl;
 
 import com.hust.wmsbackend.management.cache.RedisCacheService;
 import com.hust.wmsbackend.management.entity.*;
+import com.hust.wmsbackend.management.model.ReceiptRequest;
 import com.hust.wmsbackend.management.model.WarehouseWithBays;
 import com.hust.wmsbackend.management.model.response.ProductWarehouseResponse;
 import com.hust.wmsbackend.management.model.response.WarehouseDetailsResponse;
+import com.hust.wmsbackend.management.model.response.WarehouseGeneral;
 import com.hust.wmsbackend.management.repository.*;
 import com.hust.wmsbackend.management.service.WarehouseService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,10 @@ import java.util.stream.Collectors;
 public class WarehouseServiceImpl implements WarehouseService {
 
     private BayRepository bayRepository;
+    private ProductWarehouseRepository productWarehouseRepository;
+    private ReceiptRepository receiptRepository;
+    private ReceiptItemRequestRepository receiptItemRequestRepository;
+    private DeliveryTripRepository deliveryTripRepository;
     private WarehouseRepository warehouseRepository;
     private InventoryItemRepository inventoryItemRepository;
     private ReceiptItemRepository receiptItemRepository;
@@ -45,31 +52,54 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public Warehouse createWarehouse(WarehouseWithBays request) {
         log.info(String.format("Start create warehouse with request %s", request));
-        Warehouse newWarehouse = Warehouse.builder()
-                                          .name(request.getName())
-                                          .address(request.getAddress())
-                                          .width(request.getWarehouseWidth())
-                                          .length(request.getWarehouseLength())
-                                          .code(request.getCode())
-                                          .latitude(request.getLatitude())
-                                          .longitude(request.getLongitude())
-                                          .build();
 
+        // update hoặc tạo mới thông tin chung của kho
+        Warehouse newWarehouse;
         List<Bay> prevBays;
+        UUID warehouseId;
         if (request.getId() != null) {
-            UUID warehouseIdUUID = UUID.fromString(request.getId());
-            newWarehouse.setWarehouseId(warehouseIdUUID);
-            prevBays = bayRepository.findAllByWarehouseId(warehouseIdUUID);
+            warehouseId = UUID.fromString(request.getId());
+            Optional<Warehouse> warehouseOpt = warehouseRepository.findById(warehouseId);
+            if (!warehouseOpt.isPresent()) {
+                log.error(String.format("Warehouse with id %s is not found", request.getId()));
+                return null;
+            }
+            Warehouse warehouse = warehouseOpt.get();
+            warehouse.setName(request.getName());
+            warehouse.setAddress(request.getAddress());
+            warehouse.setWidth(request.getWarehouseWidth());
+            warehouse.setLength(request.getWarehouseLength());
+            warehouse.setCode(request.getCode());
+            warehouse.setLatitude(request.getLatitude());
+            warehouse.setLongitude(request.getLongitude());
+            warehouseRepository.save(warehouse);
+            prevBays = bayRepository.findAllByWarehouseId(warehouseId);
+            newWarehouse = warehouse;
         } else {
+            newWarehouse = Warehouse.builder()
+                    .name(request.getName())
+                    .address(request.getAddress())
+                    .width(request.getWarehouseWidth())
+                    .length(request.getWarehouseLength())
+                    .code(request.getCode())
+                    .latitude(request.getLatitude())
+                    .longitude(request.getLongitude())
+                    .build();
+            Warehouse savedWarehouse = warehouseRepository.save(newWarehouse);
+            newWarehouse = savedWarehouse;
+            warehouseId = savedWarehouse.getWarehouseId();
             prevBays = new ArrayList<>();
         }
 
-        Warehouse warehouse = warehouseRepository.save(newWarehouse);
         log.info("Start save list shelf");
         List<WarehouseWithBays.Shelf> listShelf = request.getListShelf();
         if (listShelf != null && !listShelf.isEmpty()) {
-            UUID warehouseId = warehouse.getWarehouseId();
             List<Bay> bays = listShelf.stream()
+                    .filter(shelf -> shelf.getCode() != null
+                            && shelf.getX() != null
+                            && shelf.getY() != null
+                            && shelf.getLength() != null
+                            && shelf.getWidth() != null)
                                       .map(shelf -> {
                                           Bay bay = Bay.builder()
                                                        .warehouseId(warehouseId)
@@ -95,23 +125,64 @@ public class WarehouseServiceImpl implements WarehouseService {
 
             log.info(String.format("Saved bay list for warehouse id %s", warehouseId));
         }
-        log.info(String.format("Saved warehouse entity with id %s", warehouse.getWarehouseId()));
+        log.info(String.format("Saved warehouse entity with id %s", newWarehouse.getWarehouseId()));
         // update redis
         List<Warehouse> warehouses = redisCacheService.getCachedListObject(RedisCacheService.ALL_WAREHOUSES_KEY, Warehouse.class);
         if (warehouses != null && !warehouses.isEmpty()) {
-            warehouses.add(warehouse);
+            int index = -1;
+            for (int i = 0; i < warehouses.size(); i++) {
+                Warehouse warehouse = warehouses.get(i);
+                if (warehouse.getWarehouseId().toString().equals(request.getId())) {
+                    index = i;
+                }
+            }
+            if (index != - 1) {
+                warehouses.remove(index);
+            }
+            warehouses.add(newWarehouse);
         }
         redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_WAREHOUSES_KEY, warehouses);
-        return warehouse;
+        return newWarehouse;
     }
 
     @Override
-    public List<Warehouse> getAllWarehouseGeneral() {
+    public List<WarehouseGeneral> getAllWarehouseGeneral() {
         log.info("Start get all warehouse in service");
         List<Warehouse> response = getWarehouseInCacheElseDatabase();
-        // TODO: Filter by company or something else... user can not view all facility in database
-        log.info(String.format("Get %d facilities", response.size()));
-        return response;
+        return response.stream().map(warehouse -> new WarehouseGeneral(warehouse, checkBeDelete(warehouse.getWarehouseId())))
+                .collect(Collectors.toList());
+    }
+
+    private boolean checkBeDelete(UUID warehouseId) {
+        List<InventoryItem> inventoryItemList = inventoryItemRepository.findAllByWarehouseId(warehouseId);
+        if (!inventoryItemList.isEmpty()) {
+            return false;
+        }
+        List<ProductWarehouse> productWarehouseList = productWarehouseRepository.findAllByWarehouseId(warehouseId);
+        if (!productWarehouseList.isEmpty()) {
+            return false;
+        }
+        List<ReceiptItemRequest> receiptItemRequestList = receiptItemRequestRepository.findAllByWarehouseId(warehouseId);
+        if (!receiptItemRequestList.isEmpty()) {
+            return false;
+        }
+        List<Bay> bayList = bayRepository.findAllByWarehouseId(warehouseId);
+        if (!bayList.isEmpty()) {
+            return false;
+        }
+        List<Receipt> receiptList = receiptRepository.findAllByWarehouseId(warehouseId);
+        if (!receiptList.isEmpty()) {
+            return false;
+        }
+        List<AssignedOrderItem> assignedOrderItemList = assignedOrderItemRepository.findAllByWarehouseId(warehouseId);
+        if (!assignedOrderItemList.isEmpty()) {
+            return false;
+        }
+        List<DeliveryTrip> deliveryTripList = deliveryTripRepository.findAllByWarehouseId(warehouseId);
+        if (!deliveryTripList.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 
     @Override

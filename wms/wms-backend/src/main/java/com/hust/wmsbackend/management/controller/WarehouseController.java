@@ -4,6 +4,7 @@ import com.hust.wmsbackend.management.entity.Warehouse;
 import com.hust.wmsbackend.management.model.WarehouseWithBays;
 import com.hust.wmsbackend.management.model.response.ProductWarehouseResponse;
 import com.hust.wmsbackend.management.model.response.WarehouseDetailsResponse;
+import com.hust.wmsbackend.management.model.response.WarehouseGeneral;
 import com.hust.wmsbackend.management.service.WarehouseService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class WarehouseController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Warehouse>> getAllWarehouseGeneral() {
+    public ResponseEntity<List<WarehouseGeneral>> getAllWarehouseGeneral() {
         return ResponseEntity.ok(warehouseService.getAllWarehouseGeneral());
     }
 

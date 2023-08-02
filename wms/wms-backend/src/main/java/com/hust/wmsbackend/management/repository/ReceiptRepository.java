@@ -17,4 +17,5 @@ public interface ReceiptRepository extends JpaRepository<Receipt, UUID> {
 
     List<Receipt> findAllByOrderByCreatedStampDesc();
 
+    List<Receipt> findAllByWarehouseId(UUID warehouseId);
 }

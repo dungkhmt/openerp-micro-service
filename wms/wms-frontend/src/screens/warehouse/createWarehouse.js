@@ -132,8 +132,8 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
         }
       },
       {
-        401: () => { },
-        400: (e) => { errorNoti(e.response.data.errors[0].message); }
+        401: () => { errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau") },
+        400: (e) => { errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau") }
       },
       data
     );
