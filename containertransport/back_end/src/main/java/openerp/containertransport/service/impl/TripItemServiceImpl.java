@@ -27,7 +27,6 @@ public class TripItemServiceImpl implements TripItemService {
     private final TrailerRepo trailerRepo;
     private final TripRepo tripRepo;
     private final OrderRepo orderRepo;
-    private final TripService tripService;
     private final ShipmentRepo shipmentRepo;
     private final TruckRepo truckRepo;
 
@@ -131,7 +130,7 @@ public class TripItemServiceImpl implements TripItemService {
                 truck.setStatus(Constants.TruckStatus.AVAILABLE.getStatus());
                 truckRepo.save(truck);
 
-                List<Trip> tripList = tripService.getTripByShipmentId(trip.getShipment().getUid());
+                List<Trip> tripList = tripRepo.getTripByShipmentId(trip.getShipment().getUid());
                 List<Trip> tripListDone = tripList.stream().filter((item) -> item.getStatus().equals(Constants.ShipmentStatus.DONE.getStatus())).collect(Collectors.toList());
                 if(tripList.size() == tripListDone.size()) {
                     Shipment shipment = shipmentRepo.findByUid(trip.getShipment().getUid());

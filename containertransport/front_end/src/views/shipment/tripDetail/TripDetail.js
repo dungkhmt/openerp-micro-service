@@ -153,7 +153,7 @@ const TripDetail = () => {
                 </Box> */}
                 <Box className="content-truck-and-orders-v2">
                     <TruckAndOrdersInTrip trucks={trucks} setTruckSelect={setTruckSelect} truckSelect={truckSelect}
-                        orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} tripId={tripId} setFlag={setFlag} />
+                        orders={orders} ordersSelect={ordersSelect} setOrdersSelect={setOrdersSelect} tripId={tripId} setFlag={setFlag} trip={trip} />
                 </Box>
                 {/* <Box className="order-arrangement">
                     <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} tripItems={tripItems} flag={flag}/>

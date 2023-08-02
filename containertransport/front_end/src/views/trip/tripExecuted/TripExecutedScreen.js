@@ -4,37 +4,24 @@ import '../styles.scss';
 import { getTripByDriver } from "api/TripAPI";
 import TableTrip from "../component/TableTrip";
 
-const TripPendingScreen = () => {
-    const [toastOpen, setToast] = useState(false);
-    const [toastType, setToastType] = useState();
-    const [toastMsg, setToastMsg] = useState('');
+const TripExecutedScreen = () => {
 
     const [trips, setTrips] = useState([]);
-    const [executed, setExecutes] = useState(false)
-
     useEffect(() => {
         let data = {
-            status: "Pending"
+            status: "DONE"
         };
         getTripByDriver(data).then((res) => {
             console.log("=========", res.data.data);
             setTrips(res?.data?.data);
         })
-    }, [executed])
-
+    }, [])
     return (
         <Box className="fullScreen">
             <Container maxWidth="100vw" className="container">
-                <Box className="toast">
-                    {toastOpen ? (
-                        <Alert variant="filled" severity={toastType} >
-                            <strong>{toastMsg}</strong >
-                        </Alert >) : null}
-                </Box>
-
                 <Box className="trip-header">
                     <Box className="title">
-                        <Typography>Trips Pending Management</Typography>
+                        <Typography>Trips Executed Management</Typography>
                     </Box>
                 </Box>
 
@@ -43,10 +30,10 @@ const TripPendingScreen = () => {
                 </Box>
 
                 <Box className="list-trip">
-                    <TableTrip trips={trips} setExecutes={setExecutes} executed={executed} type="Pending" />
+                    <TableTrip trips={trips} type="Done" />
                 </Box>
             </Container>
         </Box>
     )
 }
-export default TripPendingScreen;
+export default TripExecutedScreen;

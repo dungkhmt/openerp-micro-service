@@ -66,12 +66,16 @@ const DetailTrailer = () => {
                             <Typography >Trailer {trailer?.trailerCode}</Typography>
                         </Box>
                         <Box className="btn-header">
-                            <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                            onClick={handleDeleteTrailer}
-                            >Delete</Button>
-                            <Button variant="contained" className="header-submit-shipment-btn-save"
-                                onClick={handleClose}
-                            >Modify</Button>
+                            {trailer?.status === "AVAILABLE" ? (
+                                <>
+                                    <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
+                                        onClick={handleDeleteTrailer}
+                                    >Delete</Button>
+                                    <Button variant="contained" className="header-submit-shipment-btn-save"
+                                        onClick={handleClose}
+                                    >Modify</Button>
+                                </>
+                            ) : null}
                         </Box>
                     </Box>
                 </Box>
@@ -120,7 +124,7 @@ const DetailTrailer = () => {
                 </Box>
 
                 {open ? (<ModalTrailer open={open} handleClose={handleClose} trailer={trailer}
-                setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
+                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
             </Container>
         </Box>
     )

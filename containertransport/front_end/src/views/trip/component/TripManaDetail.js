@@ -17,7 +17,7 @@ const TripManaDetail = () => {
  
     const history = useHistory();
 
-    const { tripId } = useParams();
+    const { tripId, type } = useParams();
 
     const [tripItems, setTripItems] = useState([]);
     const [trip, setTrip] = useState('');
@@ -32,6 +32,14 @@ const TripManaDetail = () => {
             })
         }
     }, [executed])
+    const goBack = () => {
+        if(type === "Done") {
+            history.push('/trip/executed')
+        }
+        else {
+            history.push('/trip/pending')
+        }
+    }
 
     console.log("tripItem", tripItems);
     return (
@@ -46,7 +54,7 @@ const TripManaDetail = () => {
 
                 <Box className="header-detail">
                     <Box className="headerScreen-go-back"
-                        onClick={() => history.push('/trip/pending')}
+                        onClick={goBack}
                         sx={{ cursor: "pointer" }}
                     >
                         <Icon>
@@ -67,7 +75,7 @@ const TripManaDetail = () => {
                 </Box>
 
                 <Box className="trip-items">
-                    <TableOrder tripItems={tripItems} setExecutes={setExecutes} executed={executed} />
+                    <TableOrder tripItems={tripItems} setExecutes={setExecutes} executed={executed} type={type} />
                 </Box>
                 <Box mt={4}>
                     <MapComponent tripItems={tripItems} />
