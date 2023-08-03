@@ -35,6 +35,7 @@ public class TripServiceImpl implements TripService {
     private final RelationshipService relationshipService;
     private final FacilityService facilityService;
     private final EntityManager entityManager;
+
     @Override
     public TripModel createTrip(TripModel tripModel, String shipmentId, String createBy) {
         Trip trip = new Trip();
@@ -118,14 +119,13 @@ public class TripServiceImpl implements TripService {
         params.put("driverId", requestDTO.getUsername());
 
         if (requestDTO.getStatus() != null) {
-            if(requestDTO.getStatus().equals("Pending")) {
+            if (requestDTO.getStatus().equals("Pending")) {
                 List<String> status = new ArrayList<>();
                 status.add("SCHEDULED");
                 status.add("EXECUTING");
                 sql += " AND status in :status";
                 params.put("status", status);
-            }
-            else {
+            } else {
                 sql += " AND status = :status";
                 params.put("status", requestDTO.getStatus());
             }
@@ -147,53 +147,56 @@ public class TripServiceImpl implements TripService {
         Trip trip = tripRepo.findByUid(uid);
         List<TripItemModel> tripItemModelsOld = tripItemService.getTripItemByTripId(trip.getUid());
 
-        if(tripModel.getStatus() != null) {
+        if (tripModel.getStatus() != null) {
             trip.setStatus(tripModel.getStatus());
         }
-        if(tripModel.getTruckId() != null && tripModel.getTruckId() != trip.getTruck().getId()) {
-            Truck truckOld = truckRepo.findByUid(trip.getTruck().getUid());
-            truckOld.setStatus(Constants.TruckStatus.AVAILABLE.getStatus());
-            truckRepo.save(truckOld);
+        if (tripModel.getActor().equals("ADMIN")) {
 
-            Truck truckUpdate = truckRepo.findByUid(tripModel.getTruckUid());
-            truckUpdate.setStatus(Constants.TruckStatus.SCHEDULED.getStatus());
-            truckRepo.save(truckUpdate);
-            trip.setTruck(truckUpdate);
-            trip.setDriverId(truckUpdate.getDriverId());
+            if (tripModel.getTruckId() != null && tripModel.getTruckId() != trip.getTruck().getId()) {
+                Truck truckOld = truckRepo.findByUid(trip.getTruck().getUid());
+                truckOld.setStatus(Constants.TruckStatus.AVAILABLE.getStatus());
+                truckRepo.save(truckOld);
+
+                Truck truckUpdate = truckRepo.findByUid(tripModel.getTruckUid());
+                truckUpdate.setStatus(Constants.TruckStatus.SCHEDULED.getStatus());
+                truckRepo.save(truckUpdate);
+                trip.setTruck(truckUpdate);
+                trip.setDriverId(truckUpdate.getDriverId());
+            }
+            if (tripModel.getOrderIds().size() != trip.getOrders().size()
+                    || !Arrays.deepEquals(tripModel.getOrderIds().toArray(new Long[0]), trip.getOrders().stream().map(Order::getId).toArray())
+                    || !checkSameTripItem(tripItemModelsOld, tripModel.getTripItemModelList())) {
+
+                // update status oldOrder
+                List<Order> ordersOld = trip.getOrders();
+                ordersOld.forEach((order) -> {
+                    Order orderOld = orderRepo.findByUid(order.getUid());
+                    orderOld.setStatus(Constants.OrderStatus.ORDERED.getStatus());
+                    orderRepo.save(orderOld);
+                });
+
+                // update status OrderUpdate
+                List<Order> ordersUpdate = new ArrayList<>();
+                tripModel.getOrderIds().forEach((orderId) -> {
+                    Order order = orderRepo.findById(orderId).get();
+                    order.setStatus("SCHEDULED");
+                    order = orderRepo.save(order);
+                    ordersUpdate.add(order);
+                });
+                trip.setOrders(ordersUpdate);
+
+                // delete old tripItem
+                tripItemRepo.deleteByTripUid(trip.getUid());
+
+                // create new tripItem
+                Trip finalTrip = trip;
+                tripModel.getTripItemModelList().forEach((item) -> {
+                    TripItemModel tripItemModel = tripItemService.createTripItem(item, finalTrip.getUid());
+                });
+
+            }
+            trip = tripRepo.save(trip);
         }
-        if(tripModel.getOrderIds().size() != trip.getOrders().size()
-                || !Arrays.deepEquals(tripModel.getOrderIds().toArray(new Long[0]), trip.getOrders().stream().map(Order::getId).toArray())
-                || !checkSameTripItem(tripItemModelsOld, tripModel.getTripItemModelList())) {
-
-            // update status oldOrder
-            List<Order> ordersOld = trip.getOrders();
-            ordersOld.forEach((order) -> {
-                Order orderOld = orderRepo.findByUid(order.getUid());
-                orderOld.setStatus(Constants.OrderStatus.ORDERED.getStatus());
-                orderRepo.save(orderOld);
-            });
-
-            // update status OrderUpdate
-            List<Order> ordersUpdate = new ArrayList<>();
-            tripModel.getOrderIds().forEach((orderId) -> {
-                Order order = orderRepo.findById(orderId).get();
-                order.setStatus("SCHEDULED");
-                order = orderRepo.save(order);
-                ordersUpdate.add(order);
-            });
-            trip.setOrders(ordersUpdate);
-
-            // delete old tripItem
-            tripItemRepo.deleteByTripUid(trip.getUid());
-
-            // create new tripItem
-            Trip finalTrip = trip;
-            tripModel.getTripItemModelList().forEach((item) -> {
-                TripItemModel tripItemModel = tripItemService.createTripItem(item, finalTrip.getUid());
-            });
-
-        }
-        trip = tripRepo.save(trip);
         return convertToModel(trip);
     }
 
@@ -203,7 +206,7 @@ public class TripServiceImpl implements TripService {
         List<String> uidList = tripDeleteDTO.getListUidTrip();
         uidList.forEach((tripUid) -> {
             Trip trip = tripRepo.findByUid(tripUid);
-            if(trip.getStatus().equals(Constants.TripStatus.SCHEDULED.getStatus())
+            if (trip.getStatus().equals(Constants.TripStatus.SCHEDULED.getStatus())
 //                    && trip.getShipment().getStatus().equals(Constants.ShipmentStatus.SCHEDULED.getStatus())
             ) {
                 tripItemRepo.deleteByTripUid(tripUid);
@@ -219,7 +222,7 @@ public class TripServiceImpl implements TripService {
 
                 List<TripItem> tripItems = tripItemRepo.findByTripId(tripUid);
                 tripItems.forEach((item) -> {
-                    if(item.getTrailer() != null) {
+                    if (item.getTrailer() != null) {
                         Trailer trailer = item.getTrailer();
                         trailer.setStatus(Constants.TrailerStatus.AVAILABLE.getStatus());
                         trailerRepo.save(trailer);
@@ -253,12 +256,12 @@ public class TripServiceImpl implements TripService {
     }
 
     public boolean checkSameTripItem(List<TripItemModel> tripItemModelsOld, List<TripItemModel> tripItemModelsNew) {
-        if(tripItemModelsOld.size() != tripItemModelsNew.size()) {
+        if (tripItemModelsOld.size() != tripItemModelsNew.size()) {
             return false;
         }
-        for (int i = 0; i < tripItemModelsOld.size(); i++){
-            if(!Objects.equals(tripItemModelsOld.get(i).getAction(), tripItemModelsNew.get(i).getAction())
-            || tripItemModelsOld.get(i).getOrderCode() != tripItemModelsNew.get(i).getOrderCode()) {
+        for (int i = 0; i < tripItemModelsOld.size(); i++) {
+            if (!Objects.equals(tripItemModelsOld.get(i).getAction(), tripItemModelsNew.get(i).getAction())
+                    || tripItemModelsOld.get(i).getOrderCode() != tripItemModelsNew.get(i).getOrderCode()) {
                 return false;
             }
         }
@@ -289,25 +292,25 @@ public class TripServiceImpl implements TripService {
             totalTime += time;
             totalDistant = totalDistant.add(distant);
 
-            if(tripItemModels.get(i).getAction().equals("PICKUP_CONTAINER") && !tripItemModels.get(i).getTypeOrder().equals("OE")
+            if (tripItemModels.get(i).getAction().equals("PICKUP_CONTAINER") && !tripItemModels.get(i).getTypeOrder().equals("OE")
                     && totalTime > tripItemModels.get(i).getLateArrivalTime()) {
                 validTripItemDTO.setCheck(false);
-                validTripItemDTO.setMessageErr("Trip is incorrect time when PICKUP_CONTAINER of "+ tripItemModels.get(i).getOrderCode());
+                validTripItemDTO.setMessageErr("Trip is incorrect time when PICKUP_CONTAINER of " + tripItemModels.get(i).getOrderCode());
                 return validTripItemDTO;
             }
 
-            if(tripItemModels.get(i).getAction().equals("DELIVERY_CONTAINER") && !tripItemModels.get(i).getTypeOrder().equals("IE")
+            if (tripItemModels.get(i).getAction().equals("DELIVERY_CONTAINER") && !tripItemModels.get(i).getTypeOrder().equals("IE")
                     && totalTime > tripItemModels.get(i).getLateDepartureTime()) {
                 validTripItemDTO.setCheck(false);
-                validTripItemDTO.setMessageErr("Trip is incorrect time when DELIVERY_CONTAINER of "+ tripItemModels.get(i).getOrderCode());
+                validTripItemDTO.setMessageErr("Trip is incorrect time when DELIVERY_CONTAINER of " + tripItemModels.get(i).getOrderCode());
                 return validTripItemDTO;
             }
 
-            if(tripItemModels.get(i-1).getAction().equals("PICKUP_CONTAINER")){
+            if (tripItemModels.get(i - 1).getAction().equals("PICKUP_CONTAINER")) {
                 totalTime += facilityModelMap.get(tripItemModels.get(i).getFacilityId()).getProcessingTimePickUp();
             }
 
-            if(tripItemModels.get(i-1).getAction().equals("DELIVERY_CONTAINER")){
+            if (tripItemModels.get(i - 1).getAction().equals("DELIVERY_CONTAINER")) {
                 totalTime += facilityModelMap.get(tripItemModels.get(i).getFacilityId()).getProcessingTimeDrop();
             }
             prevPick = tripItemModels.get(i).getFacilityId().intValue();
