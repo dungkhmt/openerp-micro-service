@@ -10,7 +10,7 @@ public enum OrderStatus {
     CREATED("Khởi tạo", "CREATED"),
     APPROVED("Đã phê duyệt", "APPROVED"),
     DISTRIBUTED("Đã phân phối", "DISTRIBUTED"),
-    DELIVERING_A_PART("Đang giao hàng một phần", "DELIVERING_A_PART"),
+    DELIVERING_A_PART("Đang giao hàng", "DELIVERING_A_PART"),
     CANCELLED("Đã hủy", "CANCELLED"),
     COMPLETED("Đã hoàn thành giao hàng", "COMPLETED");
 

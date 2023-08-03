@@ -187,6 +187,12 @@ const AdminOrderDetail = ( props ) => {
         setAllWarehouses(newAllWarehouses);
         console.log("New all warehouses => ", newAllWarehouses);
 
+      },
+      {
+        500: () => {
+          errorNoti("Không tìm được phân phối phù hợp");
+          setLoading(false);
+        }
       }
     );
     console.log("new order info => ", orderInfo);
