@@ -31,7 +31,7 @@ public class GraphHopperCalculator implements DistanceCalculator {
     }
 
     @Override
-    public Map<UUID, Double> getWarehouseCusAddMap(double cusAddLon, double cusAddLat, List<Warehouse> warehouses) {
+    public Map<UUID, Double> getWarehouseCusAddMap(double cusAddLon, double cusAddLat, List<Warehouse> warehouses) throws RuntimeException {
         Map<UUID, Double> map = new HashMap<>();
         for (Warehouse warehouse : warehouses) {
             GHRequest request = new GHRequest(roundBigDecimal(warehouse.getLatitude()), roundBigDecimal(warehouse.getLongitude()),
