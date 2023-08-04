@@ -2,11 +2,14 @@ package openerp.containertransport.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.Constants;
-import openerp.containertransport.dto.DashboardOrderByMonthRes;
+import openerp.containertransport.dto.dashboard.DashboardOrderByMonthRes;
 import openerp.containertransport.dto.TypeContainerFilterReqDTO;
 import openerp.containertransport.dto.TypeContainerModel;
 import openerp.containertransport.dto.dashboard.DashboardTimeOrderDTO;
-import openerp.containertransport.dto.dashboard.DashboardTypeContainer;
+import openerp.containertransport.dto.dashboard.DashboardUseTruck;
+import openerp.containertransport.dto.dashboard.RateUseEntityDTO;
+import openerp.containertransport.repo.TrailerRepo;
+import openerp.containertransport.repo.TruckRepo;
 import openerp.containertransport.service.DashboardService;
 import openerp.containertransport.service.OrderService;
 import openerp.containertransport.service.TypeContainerService;
@@ -20,6 +23,8 @@ import java.util.*;
 public class DashboardServiceImpl implements DashboardService {
     private final OrderService orderService;
     private final TypeContainerService typeContainerService;
+    private final TruckRepo truckRepo;
+    private final TrailerRepo trailerRepo;
     @Override
     public DashboardOrderByMonthRes getOrderByMonth(int year) {
         Map<Integer, DashboardTimeOrderDTO> timeMonth = new HashMap<>();
@@ -57,26 +62,59 @@ public class DashboardServiceImpl implements DashboardService {
         orderByMonth.put("New", listNewOrder);
         orderByMonth.put("Done", listDoneOrder);
 
-        return null;
+        DashboardOrderByMonthRes dashboardOrderByMonthRes = new DashboardOrderByMonthRes();
+        dashboardOrderByMonthRes.setOrderByMonth(orderByMonth);
+
+        return dashboardOrderByMonthRes;
     }
 
     @Override
-    public DashboardTypeContainer getRateTypeContainer() {
-        DashboardTypeContainer dashboardTypeContainer = new DashboardTypeContainer();
-        Map<Integer, BigDecimal> rateTypeContainer = new HashMap<>();
+    public DashboardUseTruck getRateUseTruck() {
+        DashboardUseTruck dashboardUseTruck = new DashboardUseTruck();
 
-        TypeContainerFilterReqDTO typeContainerFilterReqDTO = new TypeContainerFilterReqDTO();
-        List<TypeContainerModel> typeContainerModels = typeContainerService.filterTypeContainer(typeContainerFilterReqDTO).getTypeContainers();
+        long countAvailable = truckRepo.countTruckByStatus(Constants.TruckStatus.AVAILABLE.getStatus());
+        long countScheduler = truckRepo.countTruckByStatus(Constants.TruckStatus.SCHEDULED.getStatus());
+        long countExecuting = truckRepo.countTruckByStatus(Constants.TruckStatus.EXECUTING.getStatus());
+        long total = countAvailable + countScheduler + countExecuting;
 
-        Long countContainer = typeContainerService.countContainer();
+        RateUseEntityDTO rateAvailable = new RateUseEntityDTO();
+        rateAvailable.setName(Constants.TruckStatus.AVAILABLE.getStatus());
+        rateAvailable.setRate(new BigDecimal(countAvailable/total).setScale(2));
 
-        typeContainerModels.forEach((item) -> {
+        RateUseEntityDTO rateScheduler = new RateUseEntityDTO();
+        rateScheduler.setName(Constants.TruckStatus.SCHEDULED.getStatus());
+        rateScheduler.setRate(new BigDecimal(countScheduler/total).setScale(2));
 
-            BigDecimal rate = BigDecimal.valueOf((item.getTotal()/countContainer)).setScale(2);
-            rateTypeContainer.put(item.getSize(), rate);
-        });
-        dashboardTypeContainer.setRateTypeContainer(rateTypeContainer);
+        RateUseEntityDTO rateExecuting = new RateUseEntityDTO();
+        rateExecuting.setName(Constants.TruckStatus.EXECUTING.getStatus());
+        rateExecuting.setRate(new BigDecimal(countExecuting/total).setScale(2));
 
-        return dashboardTypeContainer;
+        List<RateUseEntityDTO> rateUseEntityDTOList = new ArrayList<>();
+        rateUseEntityDTOList.add(rateAvailable);
+        rateUseEntityDTOList.add(rateExecuting);
+        rateUseEntityDTOList.add(rateScheduler);
+
+        dashboardUseTruck.setRateUseTruck(rateUseEntityDTOList);
+        return dashboardUseTruck;
     }
+
+//    @Override
+//    public DashboardUseTruck getRateTypeContainer() {
+//        DashboardUseTruck dashboardUseTruck = new DashboardUseTruck();
+//        Map<String, BigDecimal> rateUseTruck = new HashMap<>();
+//
+//        TypeContainerFilterReqDTO typeContainerFilterReqDTO = new TypeContainerFilterReqDTO();
+//        List<TypeContainerModel> typeContainerModels = typeContainerService.filterTypeContainer(typeContainerFilterReqDTO).getTypeContainers();
+//
+//        Long countContainer = typeContainerService.countContainer();
+//
+//        typeContainerModels.forEach((item) -> {
+//
+//            BigDecimal rate = BigDecimal.valueOf((item.getTotal()/countContainer)).setScale(2);
+//            rateTypeContainer.put(item.getSize(), rate);
+//        });
+//        dashboardUseTruck.setRateTypeContainer(rateTypeContainer);
+//
+//        return dashboardUseTruck;
+//    }
 }

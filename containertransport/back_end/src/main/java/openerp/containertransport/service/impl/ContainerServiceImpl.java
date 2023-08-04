@@ -56,6 +56,8 @@ public class ContainerServiceImpl implements ContainerService {
         TypeContainer typeContainer = typeContainerRepo.findByTypeContainerCode(containerModelDTO.getTypeContainerCode());
         typeContainer.setTotal(typeContainer.getTotal() + 1);
 
+        facility.setNumberContainer(facility.getNumberContainer() == null ? 1 :  facility.getNumberContainer() + 1);
+
         Container container = new Container();
         container.setFacility(facility);
         container.setContainerCode(containerModelDTO.getContainerCode());
@@ -81,7 +83,7 @@ public class ContainerServiceImpl implements ContainerService {
     @Override
     public ContainerModel updateContainer(ContainerModel containerModel) {
         Container container = containerRepo.findByUid(containerModel.getUid());
-        if (containerModel.getFacilityId() != null) {
+        if (containerModel.getFacilityId() != null && container.getFacility().getId() != containerModel.getFacilityId()) {
             Facility facility = facilityRepo.findById(containerModel.getFacilityId()).get();
             container.setFacility(facility);
         }

@@ -37,6 +37,7 @@ public class TrailerServiceImpl implements TrailerService {
         Facility facility = new Facility();
         if(trailerModel.getFacilityId() != null) {
             facility = facilityRepo.findById(trailerModel.getFacilityId());
+            facility.setNumberTrailer(facility.getNumberTrailer() == null ? 1 :  facility.getNumberTrailer() + 1);
         }
         trailer.setFacility(facility);
         trailer.setStatus("AVAILABLE");
@@ -133,6 +134,8 @@ public class TrailerServiceImpl implements TrailerService {
         Trailer trailer = trailerRepo.findByUid(uid);
         trailer.setStatus(Constants.TrailerStatus.DELETE.getStatus());
         trailer = trailerRepo.save(trailer);
+        Facility facility = facilityRepo.findByUid(trailer.getFacility().getUid());
+        facility.setNumberTrailer(facility.getNumberTrailer() - 1);
         return convertToModel(trailer);
     }
 
