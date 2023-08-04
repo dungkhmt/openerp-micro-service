@@ -54,6 +54,10 @@ spring:
       cluster-nodes: localhost:9200
       cluster-name: my-cluster
 
+    mongodb:
+      uri: mongodb://localhost:27017, localhost:27018, localhost:27019
+      replicaSet: rs0
+      database: scm
 
 app:
   cors:
@@ -89,12 +93,3 @@ file:
     path: templates/vuArial.ttf
   image:
     path: images/logo.jpg
-mongo:
-  uri: mongodb+srv://hoangbui:rbking123@cluster0.sddmlff.mongodb.net/?retryWrites=true&w=majority
-  dbname: scm
-
-#tls:
-#  caFile:
-#    name:
-#  certificateKeyFile:
-#    name:

@@ -5,21 +5,39 @@ import com.mongodb.client.MongoClients;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.MongoTransactionManager;
+import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @Configuration
-@EnableMongoRepositories(basePackages = "wms.repo")
-public class MongoConfig {
-    @Value("${mongo.uri}")
-    private String mongoUri;
-    @Bean
+@EnableMongoRepositories(
+//        basePackages = {"wms.config"
+//}
+)
+public class MongoConfig extends AbstractMongoClientConfiguration {
+
+//    @Bean
+////    @Autowired
+////    @ConditionalOnExpression("'${mongo.transactions}'=='enabled'")
+//    MongoTransactionManager transactionManager(MongoDbFactory dbFactory) {
+//        return new MongoTransactionManager(dbFactory);
+//    }
+
+    @Value("${spring.data.mongodb.database}")
+    private String databaseName;
+
+    @Value("${spring.data.mongodb.uri}")
+    private String uri;
+
+
+    @Override
     public MongoClient mongoClient() {
-        return MongoClients.create(mongoUri);
+        return MongoClients.create(uri);
     }
 
-    @Bean
-    public MongoTemplate mongoTemplate() {
-        return new MongoTemplate(mongoClient(), "scm");
+    @Override
+    protected String getDatabaseName() {
+        return databaseName;
     }
 }
