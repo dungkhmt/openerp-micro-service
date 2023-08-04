@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @Configuration
 @EnableMongoRepositories(basePackages = "wms.repo")
 public class MongoConfig {
-    @Value("${mongouri}")
+    @Value("${mongo.uri}")
     private String mongoUri;
     @Bean
     public MongoClient mongoClient() {
