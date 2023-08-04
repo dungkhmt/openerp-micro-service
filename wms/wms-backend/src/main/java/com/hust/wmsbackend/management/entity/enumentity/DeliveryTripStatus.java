@@ -8,8 +8,7 @@ import lombok.Getter;
 public enum DeliveryTripStatus {
     CREATED("Khởi tạo", "CREATED"),
     DELIVERING("Đang giao", "DELIVERING"),
-    FAIL("Giao thất bại", "FAIL"),
-    DONE("Giao thành công", "DONE");
+    DONE("Hoàn thành giao hàng", "DONE");
 
     private final String name;
     private final String code;

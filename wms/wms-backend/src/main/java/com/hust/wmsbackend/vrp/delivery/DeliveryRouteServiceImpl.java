@@ -4,6 +4,7 @@ import com.graphhopper.ResponsePath;
 import com.hust.wmsbackend.management.auto.DistanceCalculator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.omg.SendingContext.RunTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +20,9 @@ public class DeliveryRouteServiceImpl implements DeliveryRouteService {
     private final Double INFINITY_VALUE = Double.MAX_VALUE;
 
     @Override
-    public RouteResponse getRoute(RouteRequest r) {
+    public RouteResponse getRoute(RouteRequest r) throws RuntimeException {
         // remove duplicate customer address
         buildNormAddressList(r);
-
         List<Double[]> matrix = calCostMatrix(r);
         log.info("Cost matrix => ");
         for (Double[] m : matrix) {
@@ -230,7 +230,7 @@ public class DeliveryRouteServiceImpl implements DeliveryRouteService {
         return ReducedMatrix.builder().reducedCost(totalReduceCost).matrix(matrix.getMatrix()).build();
     }
 
-    private List<Double[]> calCostMatrix(RouteRequest r) {
+    private List<Double[]> calCostMatrix(RouteRequest r) throws RuntimeException {
         List<Double[]> matrix = new ArrayList<>();
         int customerCount = r.getAddressDTOs().size();
         log.info(String.format("Start calculate cost matrix for request %s", r));

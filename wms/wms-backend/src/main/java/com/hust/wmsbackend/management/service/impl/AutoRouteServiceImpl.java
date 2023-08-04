@@ -82,7 +82,17 @@ public class AutoRouteServiceImpl implements AutoRouteService {
                                                 .warehouseLon(warehouse.getLongitude()).addressDTOs(addressDTOs).build();
 
         // get route response
-        RouteResponse routeResponse = deliveryRouteService.getRoute(routeRequest);
+        RouteResponse routeResponse;
+        try {
+            routeResponse = deliveryRouteService.getRoute(routeRequest);
+        } catch (RuntimeException e) {
+            String deliveryTripId = request.getDeliveryTripId();
+            notificationsService.create("AUTO_ROUTE", principal.getName(),
+                    String.format("Không tìm được lộ trình cho chuyến giao hàng %s", deliveryTripId),
+                    String.format("/delivery-manager/delivery-trips/%s", deliveryTripId));
+            log.info("Fail auto route");
+            return;
+        }
 
         // delete old paths of this delivery_trip (if exist)
         String deliveryTripId = request.getDeliveryTripId();
