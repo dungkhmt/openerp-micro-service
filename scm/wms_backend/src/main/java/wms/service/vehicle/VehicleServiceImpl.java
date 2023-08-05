@@ -20,6 +20,9 @@ import wms.repo.UserRepo;
 import wms.service.BaseService;
 import wms.utils.GeneralUtils;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class VehicleServiceImpl extends BaseService implements IVehicleService {
     private final UserRepo userRepo;
@@ -78,6 +81,12 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
     public TruckEntity updateTruck(TruckDTO truckDTO, long id) throws CustomException {
         UserRegister manager = userRepo.getUserByUserLoginId(truckDTO.getUserManaged());
         TruckEntity truck = truckRepo.getTruckById(id);
+        List<TruckEntity> truckLst = truckRepo.findAll();
+        List<TruckEntity> listManager = truckLst.stream().filter(tr -> !truck.getUserLogin().getId().equals(tr.getUserLogin().getId())
+                && tr.getUserLogin().getId().equals(truckDTO.getUserManaged())).collect(Collectors.toList());
+        if (listManager.size() > 0) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Manager has been in charged of another truck");
+        }
         if (truck == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown truck");
         }
@@ -148,7 +157,14 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
     @Override
     public DroneEntity updateDrone(DroneDTO droneDTO, long id) throws CustomException {
         UserRegister manager = userRepo.getUserByUserLoginId(droneDTO.getUserManaged());
+
         DroneEntity drone = droneRepo.getDroneById(id);
+        List<DroneEntity> truckLst = droneRepo.findAll();
+        List<DroneEntity> listManager = truckLst.stream().filter(tr -> !drone.getUserLogin().getId().equals(tr.getUserLogin().getId())
+                && tr.getUserLogin().getId().equals(droneDTO.getUserManaged())).collect(Collectors.toList());
+        if (listManager.size() > 0) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Manager has been in charged of another drone");
+        }
         if (drone == null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown drone");
         }

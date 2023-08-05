@@ -26,6 +26,7 @@ import wms.repo.*;
 import wms.service.BaseService;
 import wms.utils.GeneralUtils;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -234,6 +235,12 @@ public class ProductServiceImpl extends BaseService implements IProductService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteSellinPrice(Long id) {
+        productPriceRepo.deleteById(id);
+    }
+
+    @Override
     public void setSalePrice(List<ProductDiscountDTO> productDiscountDTO) throws CustomException {
         for (ProductDiscountDTO discountDTO : productDiscountDTO) {
             ContractType contractType = contractTypeRepo.getContractTypeByCode(discountDTO.getContractTypeCode());
@@ -273,5 +280,11 @@ public class ProductServiceImpl extends BaseService implements IProductService {
 //        double priceAfterAll = productDiscountDTO.getPriceAfterVat() * (100 - productDiscountDTO.getMassDiscount() - productDiscountDTO.getContractDiscount()) / 100;
 //        productSalePrice.setPriceAfterAll(priceAfterAll);
         return productSalePriceRepo.save(productSalePrice);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteSelloutPrice(Long id) {
+        productSalePriceRepo.deleteById(id);
     }
 }

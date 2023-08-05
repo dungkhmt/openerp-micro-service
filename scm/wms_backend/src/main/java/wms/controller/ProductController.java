@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import wms.common.constant.DefaultConst;
@@ -138,6 +139,15 @@ public class ProductController extends BaseController {
             return response(error(ex));
         }
     }
+    @DeleteMapping("/sellin-price/delete")
+    public ResponseEntity<?> deleteProductSellinPrice(@RequestParam(value = "id", required = false, defaultValue = DefaultConst.NUMBER) Long id) {
+        try {
+            productService.deleteSellinPrice(id);
+            return response(new ResultEntity(1, "Delete price successfully", null));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
     @ApiOperation(value = "Setup giá bán")
     @PostMapping("/set-sale-price")
     public ResponseEntity<?> setSalePrice(@Valid @RequestBody List<ProductDiscountDTO> productDiscountDTO) {
@@ -161,6 +171,15 @@ public class ProductController extends BaseController {
     public ResponseEntity<?> updateProductSellinPrice(@RequestBody ProductDiscountDTO discountDTO) {
         try {
             return response(new ResultEntity(1, "Update price successfully", productService.updateSelloutPrice(discountDTO)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @DeleteMapping("/sellout-price/delete")
+    public ResponseEntity<?> deleteProductSelloutPrice(@RequestParam(value = "id", required = false, defaultValue = DefaultConst.NUMBER) Long id) {
+        try {
+            productService.deleteSelloutPrice(id);
+            return response(new ResultEntity(1, "Delete price successfully", null));
         } catch (Exception ex) {
             return response(error(ex));
         }
