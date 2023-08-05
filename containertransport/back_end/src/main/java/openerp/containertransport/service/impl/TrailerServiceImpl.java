@@ -88,6 +88,11 @@ public class TrailerServiceImpl implements TrailerService {
             sqlCount += " AND status = :status";
             params.put("status", trailerFilterRequestDTO.getStatus());
         }
+        if(trailerFilterRequestDTO.getTrailerCode() != null){
+            sql += " AND trailer_code = :trailerCode";
+            sqlCount += " AND trailer_code = :trailerCode";
+            params.put("trailerCode", trailerFilterRequestDTO.getTrailerCode());
+        }
         if(trailerFilterRequestDTO.getTruckId() != null) {
             sql += " AND truck_id = :truckId";
             sqlCount += " AND truck_id = :truckId";

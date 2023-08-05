@@ -59,7 +59,7 @@ const FacilityDetail = () => {
                 setToast(false);
             }, "3000");
             history.push('/facility');
-          })
+        })
     }
 
     console.log("facility", facility);
@@ -87,11 +87,13 @@ const FacilityDetail = () => {
                             <Typography >Facility {facility?.facilityCode}</Typography>
                         </Box>
                         <Box className="btn-header">
-                            <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                            onClick={handleDelete}
-                            >Delete</Button>
+                            {(trucks?.length > 0 || trailers.length > 0 || containers.length > 0) ? null : (
+                                <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
+                                    onClick={handleDelete}
+                                >Delete</Button>
+                            )}
                             <Button variant="contained" className="header-submit-shipment-btn-save"
-                            onClick={handleClose}
+                                onClick={handleClose}
                             >Modify</Button>
                         </Box>
                     </Box>
@@ -134,18 +136,20 @@ const FacilityDetail = () => {
                         </Box>
                         <Typography>{facility?.facilityType}</Typography>
                     </Box>
-                    <Box className="facility-info-item">
-                        <Box className="facility-info-item-text">
-                            <Typography>Processing Time Pick Up:</Typography>
-                        </Box>
-                        <Typography>{facility?.processingTimePickUp} s</Typography>
-                    </Box>
-                    <Box className="facility-info-item">
-                        <Box className="facility-info-item-text">
-                            <Typography>Processing Time Drop:</Typography>
-                        </Box>
-                        <Typography>{facility?.processingTimeDrop} s</Typography>
-                    </Box>
+                    {facility?.facilityType === "Container" ? (
+                        <Box className="facility-info-item">
+                            <Box className="facility-info-item-text">
+                                <Typography>Processing Time Pick Up:</Typography>
+                            </Box>
+                            <Typography>{facility?.processingTimePickUp} s</Typography>
+                        </Box>) : null}
+                    {facility?.facilityType === "Container" ? (
+                        <Box className="facility-info-item">
+                            <Box className="facility-info-item-text">
+                                <Typography>Processing Time Drop:</Typography>
+                            </Box>
+                            <Typography>{facility?.processingTimeDrop} s</Typography>
+                        </Box>) : null}
 
                     {facility?.facilityType === "Trailer" ? (<Box className="facility-info-item">
                         <Box className="facility-info-item-text">

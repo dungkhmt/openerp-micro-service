@@ -6,7 +6,7 @@ import HeaderFacilityScreen from "./HeaderFacilityScreen";
 import {getFacilityOwner } from "api/FacilityAPI";
 import { MyContext } from "contextAPI/MyContext";
 import SearchBar from "components/search/SearchBar";
-import { facilityStatus } from "config/menuconfig";
+import { facilityStatus, facilityType } from "config/menuconfig";
 
 const FacilityScreen = () => {
     const [facilities, setFacilities] = useState([]);
@@ -37,9 +37,9 @@ const FacilityScreen = () => {
         if(code) {
             data.facilityCode = code.value;
         }
-        let status = filters.find((item) => item.type === "status");
-        if(status) {
-            data.status = status.value;
+        let type = filters.find((item) => item.type === "type");
+        if(type) {
+            data.type = type.value;
         }
         getFacilityOwner(data)
             .then((res) => {
@@ -49,7 +49,7 @@ const FacilityScreen = () => {
             });
         console.log("role", role);
         let statusTmp = [];
-        for(let [key, value] of facilityStatus.entries()) {
+        for(let [key, value] of facilityType.entries()) {
             statusTmp.push({name: value});
         }
         setStatus(statusTmp);
@@ -74,7 +74,7 @@ const FacilityScreen = () => {
                     <Divider />
                 </Box>
                 <Box>
-                    <SearchBar filters={filters} setFilters={setFilters} status={status} />
+                    <SearchBar filters={filters} setFilters={setFilters} status={status} type="type" />
                 </Box>
                 <ContentsFacilityMana facilities={facilities} page={page} setPage={setPage}
                     rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} 

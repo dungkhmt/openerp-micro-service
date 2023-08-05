@@ -22,7 +22,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { useHistory } from 'react-router-dom';
 import { Chip, Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -285,8 +285,7 @@ export default function ShipmentScreenContents({ shipments, page, setPage, rowsP
                       </TableCell>
                       <TableCell align="left">{row.created_by_user_id} {'  '}</TableCell>
                       <TableCell align="left">
-                        <Chip label={row.status} 
-                        color={`${row?.status === "WAITING_SCHEDULER" ? "primary" : (row?.status === "DONE" ? "success" : "secondary" )}`} />
+                        <Chip label={row?.status} color={colorStatus.get(row?.status)} />
                       </TableCell>
                       <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>

@@ -99,6 +99,18 @@ const DetailContainerScreen = () => {
                     </Box>
                     <Box className="facility-info-item">
                         <Box className="facility-info-item-text">
+                            <Typography>Facility Name:</Typography>
+                        </Box>
+                        <Typography>{container?.facilityResponsiveDTO?.facilityName}</Typography>
+                    </Box>
+                    <Box className="facility-info-item">
+                        <Box className="facility-info-item-text">
+                            <Typography>Facility Address:</Typography>
+                        </Box>
+                        <Typography>{container?.facilityResponsiveDTO?.address}</Typography>
+                    </Box>
+                    <Box className="facility-info-item">
+                        <Box className="facility-info-item-text">
                             <Typography>Size:</Typography>
                         </Box>
                         <Typography>{container?.size}</Typography>
@@ -109,12 +121,12 @@ const DetailContainerScreen = () => {
                         </Box>
                         <Typography>{container?.status}</Typography>
                     </Box>
-                    <Box className="facility-info-item">
+                    {/* <Box className="facility-info-item">
                         <Box className="facility-info-item-text">
                             <Typography>Empty:</Typography>
                         </Box>
                         <Typography>{container?.isEmpty ? "True" : "False"}</Typography>
-                    </Box>
+                    </Box> */}
                     <Box className="facility-info-item">
                         <Box className="facility-info-item-text">
                             <Typography>Create At:</Typography>

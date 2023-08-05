@@ -24,6 +24,7 @@ const TruckScreen = () => {
 
     const status = [
         { name: "AVAILABLE" },
+        { name: "SCHEDULED" },
         { name: "EXECUTING" }
     ]
 
@@ -39,10 +40,14 @@ const TruckScreen = () => {
         let code = filters.find((item) => item.type === "code");
         if(code) {
             data.truckCode = code.value;
+            data.page = 0;
+            setPage(0);
         }
         let status = filters.find((item) => item.type === "status");
         if(status) {
             data.status = status.value;
+            data.page = 0;
+            setPage(0);
         }
         getTrucks(data).then((res) => {
             console.log("truck==========", res.data.truckModels)
@@ -65,7 +70,7 @@ const TruckScreen = () => {
                     <Divider />
                 </Box>
                 <Box>
-                    <SearchBar filters={filters} setFilters={setFilters} status={status} />
+                    <SearchBar filters={filters} setFilters={setFilters} status={status} type="status" />
                 </Box>
                 <ContentsTruckManagement trucks={trucks} page={page} setPage={setPage}
                     rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count}

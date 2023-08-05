@@ -148,3 +148,13 @@ export const tripItemType = new Map();
 tripItemType.set("Order", "Order");
 tripItemType.set("Truck", "Truck");
 tripItemType.set("Trailer", "Trailer");
+
+export const colorStatus = new Map();
+colorStatus.set("Container", "success");
+colorStatus.set("Truck", "secondary");
+colorStatus.set("Trailer", "primary");
+colorStatus.set("WAITING_SCHEDULER", "primary");
+colorStatus.set("AVAILABLE", "success");
+colorStatus.set("SCHEDULED", "secondary");
+colorStatus.set("EXECUTING", "secondary");
+colorStatus.set("DONE", "success");

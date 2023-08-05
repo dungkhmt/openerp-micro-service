@@ -23,7 +23,6 @@ const OrderScreen = () => {
 
     const [filters, setFilters] = useState([]);
     const status = [
-        { name: "WAIT_APPROVE" },
         { name: "ORDERED" },
         { name: "DONE" },
         { name: "CANCEL" },
@@ -36,6 +35,8 @@ const OrderScreen = () => {
         let code = filters.find((item) => item.type === "code");
         if(code) {
             data.orderCode = code.value;
+            data.page = 0;
+            setPage(0);
         }
         
         if(role?.includes("ADMIN")) {
@@ -47,6 +48,8 @@ const OrderScreen = () => {
             listStatus.push(status.value);
             listStatus.push("APPROVED");
             data.status = listStatus;
+            data.page = 0;
+            setPage(0);
         }
         getOrders(data).then((res) => {
             setOrders(res?.data?.data.orderModels);
@@ -70,7 +73,7 @@ const OrderScreen = () => {
                     <Divider />
                 </Box>
                 <Box>
-                    <SearchBar filters={filters} setFilters={setFilters} status={status} />
+                    <SearchBar filters={filters} setFilters={setFilters} status={status} type="status" />
                 </Box>
                 <ContentsOrderManagerment orders={orders} page={page} setPage={setPage}
                     rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count}

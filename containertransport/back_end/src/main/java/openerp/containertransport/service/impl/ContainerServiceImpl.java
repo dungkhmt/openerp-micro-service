@@ -82,7 +82,7 @@ public class ContainerServiceImpl implements ContainerService {
 
     @Override
     public ContainerModel updateContainer(ContainerModel containerModel) {
-        Container container = containerRepo.findByUid(containerModel.getUid());
+        Container container = containerRepo.findById(containerModel.getId());
         if (containerModel.getFacilityId() != null && container.getFacility().getId() != containerModel.getFacilityId()) {
             Facility facility = facilityRepo.findById(containerModel.getFacilityId()).get();
             container.setFacility(facility);

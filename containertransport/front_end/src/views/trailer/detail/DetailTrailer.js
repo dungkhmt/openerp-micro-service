@@ -99,6 +99,12 @@ const DetailTrailer = () => {
                     </Box>
                     <Box className="facility-info-item">
                         <Box className="facility-info-item-text">
+                            <Typography>Facility name:</Typography>
+                        </Box>
+                        <Typography>{trailer?.facilityResponsiveDTO?.facilityName}</Typography>
+                    </Box>
+                    <Box className="facility-info-item">
+                        <Box className="facility-info-item-text">
                             <Typography>Address:</Typography>
                         </Box>
                         <Typography>{trailer?.facilityResponsiveDTO?.address}</Typography>

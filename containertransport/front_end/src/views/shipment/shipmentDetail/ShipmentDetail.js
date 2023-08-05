@@ -92,7 +92,7 @@ const ShipmentDetail = () => {
                         </Box>
                         <Box className="headerScreen-trip-detail-info">
                             <Box className="title-header">
-                                <Typography >Shipment {shipment?.code}</Typography>
+                                <Typography >Shipment {shipment?.code} Quyên Bò</Typography>
                             </Box>
                             {/* <Box className="btn-add"
                             onClick={() => history.push('/shipment/trip/create')}

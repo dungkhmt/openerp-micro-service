@@ -71,6 +71,11 @@ public class ShipmentServiceImpl implements ShipmentService {
             sqlCount += " AND status = :status";
             params.put("status", requestDTO.getStatus());
         }
+        if (requestDTO.getShipmentCode() != null) {
+            sql += " AND code = :shipmentCode";
+            sqlCount += " AND code = :shipmentCode";
+            params.put("shipmentCode", requestDTO.getShipmentCode());
+        }
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
         for (String i : params.keySet()) {
             queryCount.setParameter(i, params.get(i));
