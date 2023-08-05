@@ -5,6 +5,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class DashboardUseTrailer {
-    List<RateUseEntityDTO> rateUseTrailer;
+public class DashboardUseTypeContainer {
+    List<RateUseEntityDTO> rateUseTypeContainer;
 }

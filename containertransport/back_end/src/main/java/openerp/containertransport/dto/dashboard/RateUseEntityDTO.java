@@ -7,5 +7,5 @@ import java.math.BigDecimal;
 @Data
 public class RateUseEntityDTO {
     private String name;
-    private BigDecimal rate;
+    private BigDecimal y;
 }

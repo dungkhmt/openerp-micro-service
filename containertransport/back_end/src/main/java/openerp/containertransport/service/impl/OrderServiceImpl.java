@@ -252,7 +252,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Integer countOrderByMonth(DashboardTimeOrderDTO dashboardTimeOrderDTO, String status) {
+    public Long countOrderByMonth(DashboardTimeOrderDTO dashboardTimeOrderDTO, String status) {
         String sqlCount = "SELECT COUNT(id) FROM container_transport_order WHERE 1=1";
         HashMap<String, Object> params = new HashMap<>();
 
@@ -280,7 +280,7 @@ public class OrderServiceImpl implements OrderService {
             queryCount.setParameter(i, params.get(i));
         }
 
-        return (Integer) queryCount.getSingleResult();
+        return (Long) queryCount.getSingleResult();
     }
 
     @Override

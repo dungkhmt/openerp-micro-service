@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface TruckRepo extends JpaRepository<Truck, Long> {
     Truck findByUid(String uid);
 
-    @Query(value = "SELECT SUM(container_transport_trucks.uid) FROM container_transport_trucks WHERE status = :status", nativeQuery = true)
-    long countTruckByStatus(String status);
+    @Query(value = "SELECT COUNT(container_transport_trucks.uid) FROM container_transport_trucks WHERE status = :status", nativeQuery = true)
+    float countTruckByStatus(String status);
 }
