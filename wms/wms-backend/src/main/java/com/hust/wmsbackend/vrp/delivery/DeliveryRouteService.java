@@ -8,4 +8,5 @@ public interface DeliveryRouteService {
 
     void tsp(int level, int totalNode, List<Integer> path, List<Double[]> costMatrix, ReducedMatrix reducedMatrix, List<List<Integer>> totalPaths);
 
+    void buildNormAddressList(RouteRequest r);
 }

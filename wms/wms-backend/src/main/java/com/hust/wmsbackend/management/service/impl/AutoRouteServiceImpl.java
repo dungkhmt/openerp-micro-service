@@ -247,5 +247,4 @@ public class AutoRouteServiceImpl implements AutoRouteService {
             .customers(customers).warehouse(warehouseMarker).build();
     }
 
-
 }

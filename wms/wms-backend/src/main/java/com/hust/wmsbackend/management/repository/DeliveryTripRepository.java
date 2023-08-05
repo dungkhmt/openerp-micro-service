@@ -23,7 +23,8 @@ public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, Stri
         "join wms_shipment s on dt.shipment_id = s.shipment_id " +
         "where date(now()) = date(s.expected_delivery_stamp) " +
         "and dt.delivery_person_id = ?1 " +
-        "and dt.status in ?2 ", nativeQuery = true)
+        "and dt.status in ?2 " +
+        "and dt.is_deleted = false ", nativeQuery = true)
     List<DeliveryTrip> findTodayDeliveryTripsByPerson(String deliveryPersonId, List<String> deliveryStatus);
 
     List<DeliveryTrip> findAllByWarehouseId(UUID warehouseId);
