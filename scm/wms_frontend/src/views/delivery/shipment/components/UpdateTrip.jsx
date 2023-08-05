@@ -12,7 +12,7 @@ const UpdateTrip = ({ setOpenDrawer, currTrip }) => {
   const methods = useForm({
     mode: "onChange",
     defaultValues: {
-      startedDate: moment(currTrip?.startDate).format("DD-MM-YYYY"),
+      startedDate: moment.unix(currTrip?.startedDate).format("DD-MM-YYYY"),
       shipmentCode: currTrip?.shipment?.code,
       userInCharge: currTrip?.userInCharge?.name,
       facility: currTrip?.facility,
@@ -34,6 +34,7 @@ const UpdateTrip = ({ setOpenDrawer, currTrip }) => {
   const updateTripQuery = useUpdateTrip({ id: currTrip?.id });
 
   const onSubmit = async (data) => {
+    console.log("Data: ", data);
     let tripParams = {
       startedDate: moment(data?.startedDate).format("DD-MM-YYYY"),
       shipmentCode: currTrip?.shipment?.code,

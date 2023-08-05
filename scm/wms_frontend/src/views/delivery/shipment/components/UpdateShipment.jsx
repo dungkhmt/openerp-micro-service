@@ -12,9 +12,11 @@ const UpdateShipment = ({ setOpenDrawer, currShipment }) => {
   const methods = useForm({
     mode: "onChange",
     defaultValues: {
-      endedDate: moment(currShipment?.endedDate).format("DD-MM-YYYY"),
+      endedDate: new Date(currShipment?.endedDate).toLocaleDateString("en-US"),
       maxSize: currShipment?.maxSize,
-      startedDate: moment(currShipment?.startedDate).format("DD-MM-YYYY"),
+      startedDate: new Date(currShipment?.startedDate).toLocaleDateString(
+        "en-US"
+      ),
       title: currShipment?.title,
     },
     resolver: yupResolver(shipmentSchema),
@@ -32,13 +34,13 @@ const UpdateShipment = ({ setOpenDrawer, currShipment }) => {
 
   const onSubmit = async (data) => {
     let shipmentParams = {
-      endedDate: moment(
-        data?.endedDate.substring(3),
-        "MMM DD YYYY HH:mm:ss Z"
-      ).format("DD-MM-YYYY"),
       maxSize: data?.maxSize,
       startedDate: moment(
         data?.startedDate.substring(3),
+        "MMM DD YYYY HH:mm:ss Z"
+      ).format("DD-MM-YYYY"),
+      endedDate: moment(
+        data?.endedDate.substring(3),
         "MMM DD YYYY HH:mm:ss Z"
       ).format("DD-MM-YYYY"),
       title: data?.title,
