@@ -19,8 +19,8 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { Chip, Icon } from '@mui/material';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import { getTrucks } from 'api/TruckAPI';
 
@@ -180,9 +180,9 @@ export default function TruckInFacility(props) {
     const isSelected = (name) => selected.indexOf(name) !== -1;
     const handleDetail = (id) => {
         history.push({
-          pathname: `/truck/detail/${id}`,
+            pathname: `/truck/detail/${id}`,
         })
-      }
+    }
     return (
         <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
             <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -236,7 +236,9 @@ export default function TruckInFacility(props) {
                                             </TableCell>
                                             <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
                                             <TableCell align="left">{row.driverName}</TableCell>
-                                            <TableCell align="left">{row.status}</TableCell>
+                                            <TableCell align="left">
+                                                <Chip label={row.status} color={colorStatus.get(row.status)} />
+                                            </TableCell>
                                             <TableCell align="left">{row.licensePlates}</TableCell>
                                             <TableCell align="left">{row.brandTruck}</TableCell>
                                             <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
@@ -244,16 +246,17 @@ export default function TruckInFacility(props) {
                                                 <Box sx={{ display: 'flex' }}>
                                                     <Tooltip title="View">
                                                         <Box
-                                                          onClick={() => { handleDetail(row?.uid) }} 
+                                                            onClick={() => { handleDetail(row?.uid) }}
                                                         >
                                                             <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                                                         </Box>
                                                     </Tooltip>
-                                                    <Tooltip title="Delete">
-                                                        <Box>
-                                                            <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                                                        </Box>
-                                                    </Tooltip>
+                                                    {row.status === "AVAILABLE" ? (
+                                                        <Tooltip title="Delete">
+                                                            <Box>
+                                                                <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                                                            </Box>
+                                                        </Tooltip>) : null}
                                                 </Box>
                                             </TableCell>
                                         </TableRow>

@@ -75,6 +75,24 @@ const DeliveryTripDetail = ( props ) => {
           if (res.data.deleted) {
             setDeleted(true);
           }
+          // cập nhật danh sách các sản phẩm cần phân phối (thuật toán gợi ý phân phối hàng hóa)
+          if (res.data.items.length > 0) {
+            const selectedItemIds = res.data.items.map(item => item.assignOrderItemId);
+            request(
+              'post',
+              API_PATH.SUGGEST_ITEM,
+              (res) => {
+                setCreatedItemsTableData(res.data);
+              },
+              {
+
+              },
+              {
+                warehouseId: res.data.warehouseId,
+                assignedOrderItemIds: selectedItemIds
+              }
+            )
+          }
         }
       );
 

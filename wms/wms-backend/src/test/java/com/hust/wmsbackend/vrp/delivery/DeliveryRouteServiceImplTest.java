@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,4 +43,30 @@ class DeliveryRouteServiceImplTest {
         System.out.printf("All paths: %s%n", totalPaths);
     }
 
+    @Test
+    public void buildNormAddTest() {
+        List<DeliveryAddressDTO> addressDTOs = new ArrayList<>();
+        addressDTOs.add(DeliveryAddressDTO.builder().deliveryTripItemId("TRP_ITEM_00075")
+                .longitude(new BigDecimal("105.85915783364125"))
+                .latitude(new BigDecimal("20.99565866383600"))
+                .build());
+        addressDTOs.add(DeliveryAddressDTO.builder().deliveryTripItemId("TRP_ITEM_00076")
+                .longitude(new BigDecimal("105.85915783364125"))
+                .latitude(new BigDecimal("20.99565866383600"))
+                .build());
+        addressDTOs.add(DeliveryAddressDTO.builder().deliveryTripItemId("TRP_ITEM_00062")
+                .longitude(new BigDecimal("105.81587820000000"))
+                .latitude(new BigDecimal("21.15872680000000"))
+                .build());
+        addressDTOs.add(DeliveryAddressDTO.builder().deliveryTripItemId("TRP_ITEM_00073")
+                .longitude(new BigDecimal("105.85915783364125"))
+                .latitude(new BigDecimal("20.99565866383600"))
+                .build());
+        addressDTOs.add(DeliveryAddressDTO.builder().deliveryTripItemId("TRP_ITEM_00074")
+                .longitude(new BigDecimal("105.85915783364125"))
+                .latitude(new BigDecimal("20.99565866383600"))
+                .build());
+        RouteRequest request = RouteRequest.builder().addressDTOs(addressDTOs).build();
+        service.buildNormAddressList(request);
+    }
 }

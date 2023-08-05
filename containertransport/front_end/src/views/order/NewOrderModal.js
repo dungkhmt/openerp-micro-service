@@ -14,7 +14,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { getFacility, getFacilityOwner } from "api/FacilityAPI";
 import { getContainerById, getContainers } from "api/ContainerAPI";
 import dayjs from "dayjs";
-import { updateOrder } from "api/OrderAPI";
+import { updateOrder, updateOrderV2 } from "api/OrderAPI";
 
 
 const styles = {
@@ -72,7 +72,14 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
     const [isBreakRomooc, setIsBreakRomooc] = useState(false);
 
     useEffect(() => {
-
+        
+            getFacility({typeOwner: ["CUSTOMER", "CUSTOMS"]}).then((res) => {
+                console.log("facility==========", res.data)
+                setFacilities(res.data.data.facilityModels);
+            });
+            getFacilityOwner({}).then((res) => {
+                setOwnerFacilities(res?.data.data.facilityModels);
+            });
         if (order) {
 
             let typeTmp = typeConst.find((item) => item.id === order.type);
@@ -85,8 +92,8 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             });
 
 
-            setFromFacility(order?.fromFacility.facilityId);
-            setToFaciity(order?.toFacility.facilityId)
+            setFromFacility(order?.fromFacility.facilityUid);
+            setToFaciity(order?.toFacility.facilityUid)
             setIsBreakRomooc(order.breakRomooc);
             // setEarlyPickUpTime(dayjs(new Date(order?.earlyPickupTime)));
             if(order.latePickupTime) {
@@ -97,18 +104,12 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             }
             // setEarlyDeliveryTime(dayjs(new Date(order?.earlyDeliveryTime)));
         }
-        getFacility({typeOwner: ["CUSTOMER", "CUSTOMS"]}).then((res) => {
-            console.log("facility==========", res.data)
-            setFacilities(res.data.data.facilityModels);
-        });
-        getFacilityOwner({})
-        .then((res) => {
-            setOwnerFacilities(res?.data.data.facilityModels);
-        });
+
         
     }, []);
 
     useEffect(() => {
+
         if(type === "OE") {
             setToFacilities(ownerFacilities);
         }
@@ -123,7 +124,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             setFromFacilities(facilities);
             setToFacilities(ownerFacilities);
         }
-    }, [type])
+    }, [type, ownerFacilities, facilities])
 
     useEffect(() => {
         getContainers({facilityId: fromFacility, status: "AVAILABLE"}).then((res) => {
@@ -144,6 +145,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
         setOpen(false);
     }
     const handleChangeBreakRomooc = (e) => {
+        console.log("check", e.target.checked)
         setIsBreakRomooc(e.target.checked);
     }
     const handleSubmit = () => {
@@ -189,7 +191,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             })
         }
         else {
-            updateOrder(order.id, data).then((res) => {
+            updateOrderV2(order.uid, data).then((res) => {
                 console.log("res", res);
                 if (!res) {
                     setToastType("error");
@@ -219,7 +221,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
         setContainerSelect(containerIds);
         setContainerOrder(values);
     }
-    console.log("containerSelect", containerSelect)
+    console.log("order", order)
     return (
         <Box >
             <CustomizedDialogs
@@ -250,6 +252,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                                     onChange={(e) => setType(e.target.value)}
                                                     label="type"
                                                     inputProps={{ 'aria-label': 'Without label' }}
+                                                    disabled={order ? true : false}
                                                 >
                                                     {typeConst ? (
                                                         typeConst.map((item, key) => {
@@ -274,7 +277,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                                         value={fromFacility}
                                                         onChange={(e) => setFromFacility(e.target.value)}
                                                         label="from facility"
-                                                        disabled={type === "OE" ? true : false}
+                                                        disabled={type === "OE" ? true : (order ? true : false)}
                                                     >
                                                         {fromFacilities ? (
                                                             fromFacilities.map((item) => {
@@ -320,11 +323,12 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                             <Box className="contentModal-item-text">
                                                 <Typography>Containers:</Typography>
                                             </Box>
-                                            <Box className="contentModal-item-input">
+                                            <Box className="contentModal-item-input multi-select">
                                                 <Autocomplete
                                                     multiple
                                                     disabled={order ? true : false}
                                                     id="tags-outlined"
+                                                    size="small"
                                                     options={containers}
                                                     value={containerOrder}
                                                     getOptionLabel={(option) => option.containerCode}

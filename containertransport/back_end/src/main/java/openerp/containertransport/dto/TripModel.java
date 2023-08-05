@@ -35,4 +35,5 @@ public class TripModel implements Serializable {
     private String createdByUserId;
     private long createdAt;
     private long updatedAt;
+    private String actor;
 }

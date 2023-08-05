@@ -6,7 +6,7 @@ import PrimaryButton from "components/button/PrimaryButton";
 import { menuIconMap } from "config/menuconfig";
 import { MyContext } from "contextAPI/MyContext";
 import TripsContents from "./TripsContents";
-import { autoCreateRouter, getShipmentById } from "api/ShipmentAPI";
+import { autoCreateRouter, deleteShipment, getShipmentById } from "api/ShipmentAPI";
 import ShipmentContents from "./ShipmentContents";
 import { getTrips } from "api/TripAPI";
 import ReactLoading from "react-loading";
@@ -55,6 +55,17 @@ const ShipmentDetail = () => {
     const handleModifyShipment = () => {
         setOpen(!open);
     }
+    const handleCancelShipment = () => {
+        deleteShipment(shipment.uid).then((res) => {
+            setToastMsg("Delete Shipment Success");
+            setToastType("success");
+            setToast(true);
+            setTimeout(() => {
+                setToast(false);
+            }, "3000");
+            history.push("/shipment")
+        })
+    }
     console.log("=========", shipment)
     return (
         <Box className="fullScreen">
@@ -81,19 +92,26 @@ const ShipmentDetail = () => {
                         </Box>
                         <Box className="headerScreen-trip-detail-info">
                             <Box className="title-header">
-                                <Typography >Shipment {shipment?.code}</Typography>
+                                <Typography >Shipment {shipment?.code} Quyên Bò</Typography>
                             </Box>
                             {/* <Box className="btn-add"
                             onClick={() => history.push('/shipment/trip/create')}
                         >
                         </Box> */}
                             <Box className="btn-header">
-                                <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                                // onClick={handleCancelCreateShipment}
-                                >Delete</Button>
-                                <Button variant="contained" className="header-submit-shipment-btn-save"
-                                onClick={handleModifyShipment}
-                                >Modify</Button>
+                                {
+                                    shipment?.status === "WAITING_SCHEDULER" ? (
+                                        <>
+                                            <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
+                                                onClick={handleCancelShipment}
+                                            >Delete</Button>
+                                            <Button variant="contained" className="header-submit-shipment-btn-save"
+                                                onClick={handleModifyShipment}
+                                            >Modify</Button>
+                                        </>
+                                    ) : null
+                                }
+
                             </Box>
                         </Box>
                     </Box>
@@ -139,14 +157,14 @@ const ShipmentDetail = () => {
                         </Box>
 
                     </Box>
-                    {trips.length > 0 ? 
-                    <TripsContents trips={trips} shipmentId={shipmentId}
-                        setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} flag={flag} setFlag={setFlag}
-                    /> : null}
+                    {trips.length > 0 ?
+                        <TripsContents trips={trips} shipmentId={shipmentId}
+                            setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} flag={flag} setFlag={setFlag}
+                        /> : null}
 
                     {open ? (
                         <ModalShipment open={open} setOpen={setOpen} shipment={shipment}
-                        setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
+                            setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
                     ) : null}
                 </Container>
             )}

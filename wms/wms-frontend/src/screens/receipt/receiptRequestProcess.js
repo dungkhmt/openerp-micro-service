@@ -131,10 +131,10 @@ const ProcessItem = ({ rowData, warehousesDetail, setProcessingItems,
               adder.lotId == null ||
               adder.importPrice == null) {
               errorNoti("Vui lòng nhập đầy đủ thông tin");
-            } else if (adder.importPrice < 0) {
+            } else if (adder.importPrice <= 0) {
               errorNoti("Giá nhập hàng không được nhỏ hơn 0");
-            } else if (adder.quantity < 0) {
-              errorNoti("Số lượng không được nhỏ hơn 0");
+            } else if (adder.quantity <= 0) {
+              errorNoti("Số lượng phải lớn hơn 0");
             } else {
               const total = parseInt(addedItemCount) + parseInt(adder.quantity);
               console.log("Total => ", total, "; Row data quantity => ", rowData.quantity);

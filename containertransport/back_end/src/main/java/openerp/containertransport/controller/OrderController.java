@@ -82,7 +82,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModelUpdate));
     }
 
-    @PutMapping("/update/{orderUid}")
+    @PutMapping("/updateV2/{orderUid}")
     public ResponseEntity<?> updateOrderByCode(@PathVariable String orderUid, @RequestBody OrderModel orderModel) {
         OrderModel orderModelUpdate = orderService.updateOrderByUid(orderUid, orderModel);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModelUpdate));
@@ -92,5 +92,11 @@ public class OrderController {
     public ResponseEntity<?> updateOrderByCode(@RequestBody OrderUpdateDTO orderUpdateDTO) {
         List<OrderModel> orderModelsUpdate = orderService.updateListOrder(orderUpdateDTO);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModelsUpdate));
+    }
+
+    @DeleteMapping("/delete/{uid}")
+    public ResponseEntity<?> deleteTruck(@PathVariable String uid) {
+        OrderModel orderModel = orderService.deleteOrder(uid);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orderModel));
     }
 }

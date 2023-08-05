@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Alert, Box, Button, Container, Divider, FormControl, Icon, IconButton, InputAdornment, InputBase, InputLabel, MenuItem, OutlinedInput, Select, TextField, Typography } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
+import { Alert, Box, Button, ClickAwayListener, Container, Divider, FormControl, Icon, IconButton, InputAdornment, InputBase, InputLabel, MenuItem, OutlinedInput, Select, TextField, Typography } from "@mui/material";
 import { menuIconMap } from "config/menuconfig";
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
@@ -35,6 +35,7 @@ const styles = {
                 // width: '200px',
                 padding: '16px 4px 8px 4px',
                 border: '1px solid #c5c3c3',
+                paddingLeft: '10px',
                 '& .filter-by-item-title': {
                     marginBottom: '16px',
                     '& .MuiTypography-root': {
@@ -62,7 +63,7 @@ const styles = {
         }
     })
 }
-const SearchBar = ({ filters, setFilters, status }) => {
+const SearchBar = ({ filters, setFilters, status, type }) => {
     const [open, setOpen] = useState(false);
 
     const [code, setCode] = useState('');
@@ -72,20 +73,21 @@ const SearchBar = ({ filters, setFilters, status }) => {
         setOpen(!open)
     }
     const handleFilterStatus = () => {
-        let data = { type: "status", value: statusChose }
-        setFilters(prevState => [...prevState, data]);
+        let filterTmp = filters.filter((item) => item.type !== type);
+        let data = { type: type, value: statusChose }
+        setFilters(prevState => [...filterTmp, data]);
         handleSwitch();
     }
     const searchCode = () => {
         let data = { type: "code", value: code }
         setFilters(prevState => [...prevState, data])
     }
-    const handleRemoveFilter = (type) => {
-        let data = filters.filter((item) => item.type !== type);
-        if (type === "code") {
+    const handleRemoveFilter = (typeFilter) => {
+        let data = filters.filter((item) => item.type !== typeFilter);
+        if (typeFilter === "code") {
             setCode('');
         }
-        if (type === "status") {
+        if (typeFilter === "status") {
             setStatusChose('');
         }
         setFilters(data);
@@ -110,10 +112,10 @@ const SearchBar = ({ filters, setFilters, status }) => {
                     {open ? (
                         <Box className="filter-by-item">
                             <Box className="filter-by-item-title">
-                                <Typography>Status:</Typography>
+                                <Typography>{type === "status" ? "Status:" : "Type:"}</Typography>
                             </Box>
                             <FormControl fullWidth>
-                                <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                                <InputLabel id="demo-simple-select-label">{type === "status" ? "Status" : "Type"}</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-label"
                                     id="demo-simple-select"
@@ -162,12 +164,14 @@ const SearchBar = ({ filters, setFilters, status }) => {
                     />
                 </Box>
             </Box>
-            <Box className="item-filter">
+            <Box className="item-filter" mb={2} sx={{display: 'flex'}}>
                 {filters.length > 0 ? (
                     filters.map((item) => {
                         return (
-                            <Box sx={{ display: 'flex', marginRight: '8px',  width: 'fit-content',
-                            border: '1px solid gray', borderRadius: '10px', padding: '2px 4px' }}>
+                            <Box sx={{
+                                display: 'flex', marginRight: '8px', width: 'fit-content',
+                                border: '1px solid gray', borderRadius: '10px', padding: '2px 4px'
+                            }}>
                                 <Box sx={{}}>
                                     <Typography>{item.value}</Typography>
                                 </Box>
@@ -182,7 +186,7 @@ const SearchBar = ({ filters, setFilters, status }) => {
 
                 ) : null}
             </Box>
-        </Box>
+        </Box >
     )
 }
 export default SearchBar;

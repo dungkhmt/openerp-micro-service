@@ -22,8 +22,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import './styles.scss';
-import { Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { Chip, Icon } from '@mui/material';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import { deleteFacility } from 'api/FacilityAPI';
 
@@ -96,7 +96,7 @@ const headCells = [
     numeric: false,
     disablePadding: false,
     label: 'Type',
-    width: '8%'
+    width: '10%'
   },
   {
     id: 'createdAt',
@@ -110,7 +110,7 @@ const headCells = [
     numeric: false,
     disablePadding: false,
     label: '',
-    width: '8%'
+    width: '6%'
   },
 ];
 
@@ -140,7 +140,7 @@ function EnhancedTableHead(props) {
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
+            align={headCell.numeric ? 'right' : (headCell.id === "type" ? 'center' : 'left')}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
             width={headCell.width}
@@ -303,7 +303,8 @@ export default function ContentsFacilityMana({ facilities, page, setPage, rowsPe
                       <TableCell align="left">{row.address}</TableCell>
                       <TableCell align="left">{row.owner}</TableCell>
                       <TableCell align="left">{row.acreage} (m2)</TableCell>
-                      <TableCell align="left">{row.facilityType}</TableCell>
+                      <TableCell align="center">
+                        <Chip label={row.facilityType} color={colorStatus.get(row.facilityType)} /></TableCell>
                       <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell >
                         <Box sx={{ display: 'flex' }}>
@@ -314,11 +315,11 @@ export default function ContentsFacilityMana({ facilities, page, setPage, rowsPe
                               <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                             </Box>
                           </Tooltip>
-                          <Tooltip title="Delete">
+                          {/* <Tooltip title="Delete">
                             <Box onClick={() => { handleDelete(row?.uid) }}>
                               <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
                             </Box>
-                          </Tooltip>
+                          </Tooltip> */}
                         </Box>
                       </TableCell>
                     </TableRow>

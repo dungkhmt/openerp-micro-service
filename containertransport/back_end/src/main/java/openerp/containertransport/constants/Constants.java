@@ -62,6 +62,7 @@ public class Constants implements Serializable {
         ORDERED("ORDERED"),
         SCHEDULED("SCHEDULED"),
         DONE("DONE"),
+        CANCEL("CANCEL"),
         EXECUTING("EXECUTING");
         private final String status;
         OrderStatus(String status) {

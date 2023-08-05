@@ -32,6 +32,14 @@ export const updateShipment = (id, data) => {
     return resData;
 }
 
+export const deleteShipment = (uid) => {
+    const resData = request(
+        "delete",
+        `/shipment/delete/${uid}`, {},{}, {}, {},
+    )
+    return resData;
+}
+
 export const autoCreateRouter = (data) => {
     const resData = request(
         "get",

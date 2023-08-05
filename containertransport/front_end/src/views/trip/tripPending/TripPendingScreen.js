@@ -43,7 +43,7 @@ const TripPendingScreen = () => {
                 </Box>
 
                 <Box className="list-trip">
-                    <TableTrip trips={trips} setExecutes={setExecutes} executed={executed} />
+                    <TableTrip trips={trips} setExecutes={setExecutes} executed={executed} type="Pending" />
                 </Box>
             </Container>
         </Box>

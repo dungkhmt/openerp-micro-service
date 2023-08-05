@@ -124,7 +124,8 @@ public class TruckServiceImpl implements TruckService  {
             facilityNew.setNumberTruck(facilityNew.getNumberTruck() + 1);
             truck.setFacility(facilityNew);
         }
-        if(truckModel.getDriverName() != null){
+        if(truckModel.getDriverId() != null) {
+            truck.setDriverId(truckModel.getDriverId());
             truck.setDriverName(truckModel.getDriverName());
         }
         if(truckModel.getBrandTruck() != null){
@@ -132,6 +133,9 @@ public class TruckServiceImpl implements TruckService  {
         }
         if(truckModel.getLicensePlates() != null){
             truck.setLicensePlates(truckModel.getLicensePlates());
+        }
+        if(truckModel.getYearOfManufacture() != null) {
+            truck.setYearOfManufacture(truckModel.getYearOfManufacture());
         }
         truck.setUpdatedAt(System.currentTimeMillis());
         truckRepo.save(truck);
@@ -144,6 +148,9 @@ public class TruckServiceImpl implements TruckService  {
         Truck truck = truckRepo.findByUid(uid);
         truck.setStatus(Constants.TruckStatus.DELETE.getStatus());
         truck = truckRepo.save(truck);
+        Facility facility = facilityRepo.findByUid(truck.getFacility().getUid());
+        facility.setNumberTruck(facility.getNumberTruck() - 1);
+        facilityRepo.save(facility);
         return convertToModel(truck);
     }
 

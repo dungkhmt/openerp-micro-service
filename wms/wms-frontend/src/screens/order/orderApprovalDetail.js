@@ -228,7 +228,7 @@ const OrderApprovalDetail = ( props ) => {
                       fullWidth
                       variant="outlined"
                       size="small"
-                      value={convertToVNDFormat(orderInfo?.totalProductCost)}
+                      value={convertToVNDFormat(orderInfo?.totalOrderCost)}
                       InputProps={{
                         readOnly: true,
                       }}

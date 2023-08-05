@@ -93,7 +93,7 @@ function EnhancedTableHead(props) {
     );
 }
 
-const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ordersSelect, setOrdersSelect, setFlag }) => {
+const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ordersSelect, setOrdersSelect, setFlag, trip }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [value, setValue] = useState([]);
     const [pendingValue, setPendingValue] = useState([]);
@@ -127,7 +127,14 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
         setOrdersSelect(valueTmp);
         setFlag(true);
     }
-    console.log("value", value)
+    const convertMillisecondsToHours = (milliseconds) => {
+        const seconds = milliseconds / 1000;
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        
+        return `${hours} giờ ${minutes} phút`;
+      }
+    console.log("trip", trip)
     return (
         <Box className="truck-order">
             <Box className="chose-truck-v2">
@@ -183,6 +190,26 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                     </Box>
                 ) : null}
 
+                <Box className="header-info" mt={4}>
+                    <Typography>Trip info:</Typography>
+                </Box>
+                {trip ? (
+                    <Box className="truck-select-info">
+                        <Box className="truck-info-item">
+                            <Box className="truck-info-item-title">
+                                <Typography>Total distant:</Typography>
+                            </Box>
+                            <Box>{Number(trip?.total_distant / 1000).toFixed(2)} (km)</Box>
+                        </Box>
+                        <Box className="truck-info-item">
+                            <Box className="truck-info-item-title">
+                                <Typography>Total time:</Typography>
+                            </Box>
+                            <Box>{convertMillisecondsToHours(trip?.total_time)}</Box>
+                        </Box>
+                    </Box>
+                ) : null}
+
             </Box>
             <Box className="chose-orders-v2">
                 <Box className="chose-orders-header">
@@ -200,7 +227,7 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                     </Box>
                 </Box>
                 {open ?
-                    <Box id={id} anchorEl={anchorEl} placement="bottom-start" sx={{width: '50%', float: 'right', zIndex: 10000 }}>
+                    <Box id={id} anchorEl={anchorEl} placement="bottom-start" sx={{ width: '50%', float: 'right', zIndex: 10000 }}>
                         <ClickAwayListener onClickAway={handleClose}>
                             <div>
                                 <Autocomplete

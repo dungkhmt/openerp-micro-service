@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -62,7 +63,27 @@ public class TripController {
     }
 
     @PutMapping("/update/{uid}")
-    public ResponseEntity<?> updateTrip(@PathVariable String uid ,@RequestBody TripModel tripModel) {
+    public ResponseEntity<?> updateTrip(@PathVariable String uid ,@RequestBody TripModel tripModel, JwtAuthenticationToken token) {
+        List<String> roleIds = token
+                .getAuthorities()
+                .stream()
+                .filter(grantedAuthority -> !grantedAuthority
+                        .getAuthority()
+                        .startsWith("ROLE_GR")) // remove all composite roles
+                .map(grantedAuthority -> { // convert role to permission
+                    String roleId = grantedAuthority.getAuthority().substring(5); // remove prefix "ROLE_"
+                    return roleId;
+                })
+                .collect(Collectors.toList());
+        if(roleIds.contains("ADMIN")) {
+            List<TripItemModel> tripItemModels = tripModel.getTripItemModelList();
+            Shipment shipment = shipmentRepo.findById(tripModel.getShipmentId()).get();
+            ValidTripItemDTO validTripItemDTO = tripServiceImpl.checkValidTrip(tripItemModels, shipment.getExecuted_time());
+            if(!validTripItemDTO.getCheck()) {
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.BAD_REQUEST), validTripItemDTO.getMessageErr()));
+            }
+            tripModel.setActor("ADMIN");
+        }
         TripModel tripModelUpdate = tripService.updateTrip(uid, tripModel);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModelUpdate));
     }

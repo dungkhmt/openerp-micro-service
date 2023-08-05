@@ -11,4 +11,7 @@ public interface TrailerRepo extends JpaRepository<Trailer, Long> {
             nativeQuery = true)
     Trailer findByTrailerId(long id);
     Trailer findByUid(String uid);
+
+    @Query(value = "SELECT COUNT(container_transport_trailers.uid) FROM container_transport_trailers WHERE status = :status", nativeQuery = true)
+    float countTrailerByStatus(String status);
 }

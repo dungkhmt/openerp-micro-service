@@ -131,7 +131,7 @@ function EnhancedTableHead(props) {
     );
 }
 
-export default function TableTrip({ trips, setExecutes, executed }) {
+export default function TableTrip({ trips, setExecutes, executed, type }) {
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
     const [selected, setSelected] = React.useState([]);
@@ -200,7 +200,7 @@ export default function TableTrip({ trips, setExecutes, executed }) {
     const isSelected = (name) => selected.indexOf(name) !== -1;
     const handleDetail = (id) => {
         history.push({
-          pathname: `/trip/detail/${id}`,
+            pathname: `/trip/detail/${type}/${id}`,
         })
     }
     const handleExecuted = (id) => {
@@ -268,13 +268,15 @@ export default function TableTrip({ trips, setExecutes, executed }) {
                                             <TableCell align="left">{row.status}</TableCell>
                                             <TableCell>
                                                 <Box sx={{ display: 'flex' }}>
-                                                    <Button
-                                                        disabled={row.status !== "SCHEDULED" ? true : false}
-                                                        variant="contained"
-                                                        onClick={() => {handleExecuted(row.id)}}
-                                                    >
-                                                        Executing
-                                                    </Button>
+                                                    {type === "Done" ? null : (
+                                                        <Button
+                                                            disabled={row.status !== "SCHEDULED" ? true : false}
+                                                            variant="contained"
+                                                            onClick={() => { handleExecuted(row.id) }}
+                                                        >
+                                                            Executing
+                                                        </Button>
+                                                    )}
                                                     <Box sx={{ marginLeft: '16px' }}
                                                         onClick={() => { handleDetail(row?.uid) }} >
                                                         <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>

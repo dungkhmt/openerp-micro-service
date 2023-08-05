@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class FacilityResponsiveDTO {
     private long facilityId;
+    private String facilityUid;
     private String facilityCode;
     private String facilityName;
     private BigDecimal longitude;

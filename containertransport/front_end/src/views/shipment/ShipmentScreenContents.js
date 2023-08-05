@@ -21,8 +21,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { useHistory } from 'react-router-dom';
-import { Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { Chip, Icon } from '@mui/material';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -284,7 +284,9 @@ export default function ShipmentScreenContents({ shipments, page, setPage, rowsP
                         {row.code}
                       </TableCell>
                       <TableCell align="left">{row.created_by_user_id} {'  '}</TableCell>
-                      <TableCell align="left">{row.status}</TableCell>
+                      <TableCell align="left">
+                        <Chip label={row?.status} color={colorStatus.get(row?.status)} />
+                      </TableCell>
                       <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
                       <TableCell>
@@ -292,9 +294,9 @@ export default function ShipmentScreenContents({ shipments, page, setPage, rowsP
                           <Box onClick={() => { handleDetail(row?.uid) }} >
                             <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                           </Box>
-                          <Box>
+                          {/* <Box>
                             <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                          </Box>
+                          </Box> */}
                         </Box>
                       </TableCell>
                     </TableRow>

@@ -60,7 +60,9 @@
     padding: 32px;
     .header-modal {
         font-weight: 800;
-        
+        .MuiTypography-root {
+            font-size: 20px;
+        }
         .header-modal-text {
             font-weight: 650;
         }

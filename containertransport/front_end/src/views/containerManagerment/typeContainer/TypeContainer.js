@@ -44,7 +44,7 @@ const TypeContainer = () => {
                     <Box className="title">
                         <Typography >Type Container Management</Typography>
                     </Box>
-                    <Box className="btn-add"
+                    {/* <Box className="btn-add"
                         onClick={() => handleClose()}
                     >
                         <PrimaryButton className="btn-header">
@@ -55,7 +55,7 @@ const TypeContainer = () => {
                                 New Type
                             </Typography>
                         </PrimaryButton>
-                    </Box>
+                    </Box> */}
                     {openModal ? (<ModalTypeContainer open={openModal} handleClose={handleClose}
                         setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
                 </Box>
