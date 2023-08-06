@@ -15,6 +15,7 @@ const BillDetailModal = ({
   isLoadingBillItem,
 }) => {
   // Finding the Total Cost
+  console.log("Bill ", billItemsOfBill);
   return (
     <TableContainer
       component={Paper}
@@ -38,7 +39,9 @@ const BillDetailModal = ({
               <TableCell align="right">{row?.seqId}</TableCell>
               <TableCell align="right">{row?.effectiveQty}</TableCell>
               <TableCell align="right">
-                {unix(row?.receivingDate)?.format("DD-MM-YYYY")}
+                {unix(
+                  row?.receivingDate ? row?.receivingDate : row?.updatedDate
+                )?.format("DD-MM-YYYY")}
               </TableCell>
             </TableRow>
           ))}

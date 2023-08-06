@@ -191,6 +191,9 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         UserRegister user = trip.getUserInCharge();
         // Set truck properties
         TruckEntity truckEntity = truckRepo.getTruckFromUser(user.getId());
+        if (truckEntity == null) {
+            throw new Exception("No truck managed by this delivery staff");
+        }
         Truck truck = new Truck();
         truck.setID(truckEntity.getCode());
         truck.setCapacity(truckEntity.getCapacity());
@@ -201,6 +204,9 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         // Set drone properties
         DroneEntity droneEntity = droneRepo.getDroneFromUser(user.getId());
         Drone drone = new Drone();
+        if (droneEntity == null) {
+            throw new Exception("No drone managed by this delivery staff");
+        }
         drone.setID(droneEntity.getCode());
         drone.setCapacity(droneEntity.getCapacity());
         drone.setWaitingCost(droneEntity.getWaitingCost());

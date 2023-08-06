@@ -21,7 +21,7 @@ import {
   useGetDeliveryBillList,
 } from "controllers/query/bill-query";
 import { unix } from "moment";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { Action } from "../../components/action/Action";
@@ -38,6 +38,7 @@ import {
 import { AppColors } from "../../shared/AppColors";
 import { ORDERS_STATUS } from "../../shared/AppConstants";
 import { convertUserToName } from "../../utils/GlobalUtils";
+import BillDetailModal from "../sellin/components/BillDetailModal";
 import { deliveryBillCols } from "./LocalConstant";
 import CreateDeliveryBill from "./components/CreateDeliveryBill";
 function SaleOrderDetailScreen() {
@@ -45,6 +46,8 @@ function SaleOrderDetailScreen() {
   const [isApproved, setIsApproved] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
   const [orderApproved, setOrderApprove] = useState(false);
+  const [isSeeBillDetail, setSeeBillDetail] = useToggle(false);
+  const [billSelected, setBillSelected] = useState();
   const currOrder = location.state.order;
   const previous = location?.state?.previous;
   const [params, setParams] = useState({
@@ -126,7 +129,15 @@ function SaleOrderDetailScreen() {
   const extraActions = [
     {
       title: "Xem chi tiết",
-      callback: (item) => {},
+      callback: (item) => {
+        if (isLoadingBillItem) {
+          return;
+        }
+        let billItemsOfBill = billItem?.filter(
+          (bill) => bill?.deliveryBill?.code === item?.code
+        );
+        setBillSelected(billItemsOfBill);
+      },
       icon: <VisibilityIcon />,
       color: AppColors.green,
       // permission: PERMISSIONS.MANAGE_CATEGORY_EDIT,
@@ -157,6 +168,42 @@ function SaleOrderDetailScreen() {
       />
     );
   }, [orderItem, currOrder]);
+  const renderDeliveryBills = useCallback(() => {
+    return (
+      <CustomDataGrid
+        params={params}
+        setParams={setParams}
+        sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
+        isLoading={isLoadingBill}
+        totalItem={100}
+        columns={[
+          ...deliveryBillCols,
+          {
+            field: "action",
+            headerName: "Hành động",
+            headerAlign: "center",
+            align: "center",
+            sortable: false,
+            flex: 1,
+            type: "actions",
+            getActions: (params) => {
+              return [
+                ...extraActions.map((extraAction, index) => (
+                  <Action
+                    item={params.row}
+                    key={index}
+                    extraAction={extraAction}
+                    onActionCall={extraAction.callback}
+                  />
+                )),
+              ];
+            },
+          },
+        ]}
+        rows={bills ? bills?.content : []}
+      />
+    );
+  }, [bills]);
   const renderCustomBill = useCallback(() => {
     return (
       <CustomDeliveryBillTable
@@ -177,6 +224,20 @@ function SaleOrderDetailScreen() {
     }
     setIsApproved((pre) => !pre);
   };
+  const renderBillDetail = useCallback(() => {
+    return (
+      <BillDetailModal
+        billItemsOfBill={billSelected}
+        setSeeBillDetail={setSeeBillDetail}
+        isLoadingBillItem={isLoadingBillItem}
+      />
+    );
+  }, [isLoadingBillItem, billSelected, setSeeBillDetail]);
+  useLayoutEffect(() => {
+    if (billSelected) {
+      setSeeBillDetail((pre) => !pre);
+    }
+  }, [billSelected, setSeeBillDetail]);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
@@ -359,38 +420,7 @@ function SaleOrderDetailScreen() {
               THÔNG TIN PHIẾU XUẤT ĐƠN HÀNG
             </Typography>
           </Stack>
-          <CustomDataGrid
-            params={params}
-            setParams={setParams}
-            sx={{ height: height - 64 - 71 - 24 - 20 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
-            isLoading={isLoadingBill}
-            totalItem={100}
-            columns={[
-              ...deliveryBillCols,
-              {
-                field: "action",
-                headerName: "Hành động",
-                headerAlign: "center",
-                align: "center",
-                sortable: false,
-                flex: 1,
-                type: "actions",
-                getActions: (params) => {
-                  return [
-                    ...extraActions.map((extraAction, index) => (
-                      <Action
-                        item={params.row}
-                        key={index}
-                        extraAction={extraAction}
-                        onActionCall={extraAction.callback}
-                      />
-                    )),
-                  ];
-                },
-              },
-            ]}
-            rows={bills ? bills?.content : []}
-          />
+          {renderDeliveryBills()}
         </Box>
       )}
       <CustomModal
@@ -425,6 +455,14 @@ function SaleOrderDetailScreen() {
           actions: (theme) => ({ paddingRight: theme.spacing(2) }),
         }}
       />
+      <CustomModal
+        open={isSeeBillDetail}
+        toggle={setSeeBillDetail}
+        size="sm"
+        title="Chi tiết phiếu nhập"
+      >
+        {renderBillDetail()}
+      </CustomModal>
     </Box>
   );
 }

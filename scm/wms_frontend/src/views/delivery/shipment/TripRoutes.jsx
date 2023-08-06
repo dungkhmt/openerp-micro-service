@@ -61,7 +61,7 @@ function TripRoutesScreen({ screenAuthorization }) {
         <Marker
           key={index}
           position={[cus?.node?.x, cus?.node?.y]}
-          icon={cus?.node?.name === "depot" ? facilityIcon : shopIcon}
+          icon={cus?.node?.name.includes("Vincom") ? facilityIcon : shopIcon}
           ref={markerRef}
         >
           <Popup>
@@ -75,7 +75,7 @@ function TripRoutesScreen({ screenAuthorization }) {
           <Marker
             key={index}
             position={[cus?.node?.x, cus?.node?.y]}
-            icon={cus?.node?.name === "depot" ? facilityIcon : shopIcon}
+            icon={cus?.node?.name.includes("Vincom") ? facilityIcon : shopIcon}
             ref={markerRef}
           >
             <Popup>
