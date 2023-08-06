@@ -30,7 +30,7 @@ const CreateTripForm = ({ setIsAdd, currShipment }) => {
 
   const onSubmit = async (data) => {
     let tripParams = {
-      createdDate: moment(data?.startDate).format("DD-MM-YYYY"),
+      startedDate: moment(data?.startedDate).format("DD-MM-YYYY"),
       shipmentCode: currShipment?.code,
       userInCharge: data?.userInCharge?.id,
       facilityCode: data?.facility?.code,

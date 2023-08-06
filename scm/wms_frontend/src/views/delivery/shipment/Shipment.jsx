@@ -33,6 +33,7 @@ function ShipmentScreen({ screenAuthorization }) {
   const [isAdd, setIsAdd] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
+  console.log("Item selected: ", itemSelected);
   let { path } = useRouteMatch();
 
   const { isLoading, data } = useGetShipmentList(params);

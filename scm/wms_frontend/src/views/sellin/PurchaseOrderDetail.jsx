@@ -30,7 +30,7 @@ import {
   useUpdatePurchaseOrderStatus,
 } from "controllers/query/purchase-order-query";
 import { unix } from "moment";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
@@ -46,7 +46,8 @@ function PurchaseOrderDetailScreen() {
   const [isApproved, setIsApproved] = useToggle(false);
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
   const [isSeeBillDetail, setSeeBillDetail] = useToggle(false);
-  const [itemSelected, setItemSelected] = useState(null);
+  const [itemSelected, setItemSelected] = useState();
+  const [billSelected, setBillSelected] = useState();
   const [orderApproved, setOrderApprove] = useState(false);
   const currOrder = location.state.order;
   const previous = location?.state?.previous;
@@ -150,13 +151,13 @@ function PurchaseOrderDetailScreen() {
     {
       title: "Xem chi tiết",
       callback: (item) => {
-        console.log("Item: ", item);
+        if (isLoadingBillItem) {
+          return;
+        }
         let billItemsOfBill = billItem?.filter(
           (bill) => bill?.receiptBill?.code === item?.code
         );
-        console.log("bill item: ", billItemsOfBill);
-        setSeeBillDetail((pre) => !pre);
-        setItemSelected(billItemsOfBill);
+        setBillSelected(billItemsOfBill);
       },
       icon: <VisibilityIcon />,
       color: AppColors.green,
@@ -219,12 +220,12 @@ function PurchaseOrderDetailScreen() {
   const renderBillDetail = useCallback(() => {
     return (
       <BillDetailModal
-        billItemsOfBill={itemSelected}
+        billItemsOfBill={billSelected}
         setSeeBillDetail={setSeeBillDetail}
         isLoadingBillItem={isLoadingBillItem}
       />
     );
-  }, [isLoadingBillItem, itemSelected, setSeeBillDetail]);
+  }, [isLoadingBillItem, billSelected, setSeeBillDetail]);
   const handleUpdateStatusOrder = async () => {
     let updateData = {
       status: "accepted",
@@ -236,6 +237,12 @@ function PurchaseOrderDetailScreen() {
 
     setIsApproved((pre) => !pre);
   };
+
+  useLayoutEffect(() => {
+    if (billSelected) {
+      setSeeBillDetail((pre) => !pre);
+    }
+  }, [billSelected, setSeeBillDetail]);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>

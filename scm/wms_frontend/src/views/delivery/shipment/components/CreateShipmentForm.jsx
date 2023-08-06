@@ -24,11 +24,18 @@ const CreateShipmentForm = ({ setIsAdd }) => {
   const createShipmentQuery = useCreateShipment();
 
   const onSubmit = async (data) => {
+    console.log("Data: ", data);
     let shipmentParams = {
-      endedDate: moment(data?.endedDate).format("DD-MM-YYYY"),
-      maxSize: data?.maxSize,
-      startedDate: moment(data?.startedDate).format("DD-MM-YYYY"),
+      startedDate: moment(
+        data?.startedDate.substring(3),
+        "MMM DD YYYY HH:mm:ss Z"
+      ).format("DD-MM-YYYY"),
+      endedDate: moment(
+        data?.endedDate.substring(3),
+        "MMM DD YYYY HH:mm:ss Z"
+      ).format("DD-MM-YYYY"),
       title: data?.title,
+      maxSize: data?.maxSize,
     };
     await createShipmentQuery.mutateAsync(shipmentParams);
     setIsAdd((pre) => !pre);

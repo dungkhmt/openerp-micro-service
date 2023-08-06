@@ -16,6 +16,7 @@ import {
 } from "controllers/query/category-query";
 import {
   useCreateSellinPrice,
+  useDeleteSellinPrice,
   useGetSellinPrice,
 } from "controllers/query/purchase-order-query";
 import moment, { unix } from "moment";
@@ -63,7 +64,9 @@ function PurchasePriceScreen({ screenAuthorization }) {
   const { isLoading: isLoadingSellinPrice, data: sellinPrices } =
     useGetSellinPrice();
   const createPurchasePrices = useCreateSellinPrice();
-
+  const deletePurchasePrices = useDeleteSellinPrice({
+    id: itemSelected?.id,
+  });
   const onSubmit = async (data) => {
     let productPriceParams = data?.productPrices.map((pro) => {
       return {
@@ -105,7 +108,9 @@ function PurchasePriceScreen({ screenAuthorization }) {
       title: "Xóa",
       callback: (item) => {
         setIsRemove();
-        setItemSelected(item);
+        setItemSelected(
+          sellinPrices?.find((el) => el?.productEntity?.code === item?.code)
+        );
       },
       icon: <DeleteIcon />,
       color: AppColors.error,
@@ -387,10 +392,14 @@ function PurchasePriceScreen({ screenAuthorization }) {
         <UpdateProductPrice currPrice={itemSelected} setIsAdd={setOpenDrawer} />
       </CustomDrawer>
       <DraggableDeleteDialog
-        // disable={isLoadingRemove}
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
-        callback={(flag) => {}}
+        callback={async (flag) => {
+          if (flag) {
+            await deletePurchasePrices.mutateAsync();
+          }
+          setIsRemove(false);
+        }}
       />
     </Box>
   );

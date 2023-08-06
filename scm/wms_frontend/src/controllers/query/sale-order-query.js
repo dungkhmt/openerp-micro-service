@@ -138,6 +138,28 @@ export const useUpdateSelloutPrice = (params) => {
   });
 };
 
+export const useDeleteSelloutPrice = (params) => {
+  return useMutation({
+    mutationFn: async () => {
+      const res = await axiosSendRequest(
+        "delete",
+        endPoint.deleteSelloutPrice,
+        params
+      );
+      if (res.code === 1) {
+        toast.success("Xóa thành công!");
+        queryClient.invalidateQueries([queryKey.sale_order.sale_price]);
+        return res.data;
+      }
+    },
+    onError: () => {
+      toast.error("Lỗi khi xóa dữ liệu, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
+
 export const useDeleteSaleOrder = () => {
   return useMutation({
     mutationFn: async (params) => {
