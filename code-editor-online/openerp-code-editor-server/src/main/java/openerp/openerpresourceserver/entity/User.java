@@ -34,7 +34,7 @@ public class User {
 
     private String lastName;
 
-    private boolean enabled;
+    private Boolean enabled;
 
     @CreatedDate
     @Column(name = "created_stamp")
