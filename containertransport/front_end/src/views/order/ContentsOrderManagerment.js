@@ -19,7 +19,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import './styles.scss';
 import { Button, Chip, Divider, Icon, Menu, MenuItem } from '@mui/material';
-import { menuIconMap, roles, typeOrderMap } from 'config/menuconfig';
+import { colorStatus, menuIconMap, roles, typeOrderMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EditIcon from '@mui/icons-material/Edit';
@@ -375,7 +375,9 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                                             <TableCell align="left">{row?.fromFacility.facilityName}</TableCell>
                                             <TableCell align="left">{row?.toFacility.facilityName}</TableCell>
                                             <TableCell align="left">{typeOrderMap.get(row.type)}</TableCell>
-                                            <TableCell align="left"><Chip label={row.status} color={`${row?.status === "WAIT_APPROVE" ? "primary" : (row?.status === "CANCEL" ? "error" : "success")}`} /></TableCell>
+                                            <TableCell align="left">
+                                                <Chip label={row?.status} color={colorStatus.get(row?.status)} />
+                                            </TableCell>
                                             <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                                             <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
                                             <TableCell >

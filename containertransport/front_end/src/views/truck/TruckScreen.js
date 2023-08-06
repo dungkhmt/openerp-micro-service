@@ -40,6 +40,26 @@ const TruckScreen = () => {
         let code = filters.find((item) => item.type === "code");
         if(code) {
             data.truckCode = code.value;
+        }
+        let status = filters.find((item) => item.type === "status");
+        if(status) {
+            data.status = status.value;
+        }
+        getTrucks(data).then((res) => {
+            console.log("truck==========", res?.data.truckModels)
+            setTrucks(res?.data.truckModels);
+            setCount(res?.data.count);
+        });
+    }, [openModal, page, rowsPerPage, flag]);
+
+    useEffect(() => {
+        let data = { 
+            page: page,
+            pageSize: rowsPerPage,
+        }
+        let code = filters.find((item) => item.type === "code");
+        if(code) {
+            data.truckCode = code.value;
             data.page = 0;
             setPage(0);
         }
@@ -54,7 +74,7 @@ const TruckScreen = () => {
             setTrucks(res?.data.truckModels);
             setCount(res?.data.count);
         });
-    }, [openModal, page, rowsPerPage, filters, flag]);
+    }, [filters]);
     return (
         <Box className="fullScreen">
             <Container maxWidth="100vw" className="container">

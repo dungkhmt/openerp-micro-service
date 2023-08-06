@@ -208,7 +208,7 @@ const CreateTripDetail = () => {
     
     return (
         <Box className="fullScreen">
-            <Container maxWidth="xl" className="container">
+            <Container maxWidth="100vw" className="container">
                 <Box className="trip-create">
                     <Box className="toast">
                         {toastOpen ? (

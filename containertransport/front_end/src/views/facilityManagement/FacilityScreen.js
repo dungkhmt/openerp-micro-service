@@ -53,7 +53,38 @@ const FacilityScreen = () => {
             statusTmp.push({name: value});
         }
         setStatus(statusTmp);
-    }, [page, rowsPerPage, openModal, flag, filters]);
+    }, [page, rowsPerPage, openModal, flag]);
+
+    useEffect(() => {
+        let data = { 
+            page: page,
+            pageSize: rowsPerPage,
+        }
+        let code = filters.find((item) => item.type === "code");
+        if(code) {
+            data.facilityCode = code.value;
+            data.page = 0;
+            setPage(0);
+        }
+        let type = filters.find((item) => item.type === "type");
+        if(type) {
+            data.type = type.value;
+            data.page = 0;
+            setPage(0);
+        }
+        getFacilityOwner(data)
+            .then((res) => {
+                console.log("facility==========", res?.data.data.facilityModels)
+                setFacilities(res?.data.data.facilityModels);
+                setCount(res?.data.data.count);
+            });
+        console.log("role", role);
+        let statusTmp = [];
+        for(let [key, value] of facilityType.entries()) {
+            statusTmp.push({name: value});
+        }
+        setStatus(statusTmp);
+    }, [filters]);
 
     const handleClose = () => {
         setOpenModal(!openModal);

@@ -22,7 +22,7 @@ import { visuallyHidden } from '@mui/utils';
 import { Chip, Icon } from '@mui/material';
 import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
-import { getTrucks } from 'api/TruckAPI';
+import { deleteTruck, getTrucks } from 'api/TruckAPI';
 
 const DEFAULT_ORDER = 'asc';
 const DEFAULT_ORDER_BY = 'calories';
@@ -118,7 +118,7 @@ function EnhancedTableHead(props) {
 }
 
 export default function TruckInFacility(props) {
-    const { facilityId } = props;
+    const { facilityId, setToast, setToastType, setToastMsg } = props;
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
     const [selected, setSelected] = React.useState([]);
@@ -130,13 +130,15 @@ export default function TruckInFacility(props) {
 
     const [trucks, setTrucks] = React.useState([]);
 
+    const [load, setLoad] = React.useState(false);
+
     React.useEffect(() => {
         getTrucks({ page: page, pageSize: rowsPerPage, facilityId: facilityId }).then((res) => {
             console.log("truck==========", res?.data.truckModels)
             setTrucks(res?.data.truckModels);
             setCount(res?.data.count);
         });
-    }, [page, rowsPerPage, count])
+    }, [page, rowsPerPage, count, load])
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
             const newSelected = trucks.map((n) => n.name);
@@ -183,6 +185,18 @@ export default function TruckInFacility(props) {
             pathname: `/truck/detail/${id}`,
         })
     }
+    const handleDelete = (uid) => {
+        deleteTruck(uid).then((res) => {
+          console.log(res);
+          setToastMsg("Delete Truck Success");
+          setToastType("success");
+          setToast(true);
+          setLoad(!load);
+          setTimeout(() => {
+            setToast(false);
+          }, "3000");
+        })
+      }
     return (
         <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
             <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -253,7 +267,7 @@ export default function TruckInFacility(props) {
                                                     </Tooltip>
                                                     {row.status === "AVAILABLE" ? (
                                                         <Tooltip title="Delete">
-                                                            <Box>
+                                                            <Box onClick={() => handleDelete(row?.uid)}>
                                                                 <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
                                                             </Box>
                                                         </Tooltip>) : null}

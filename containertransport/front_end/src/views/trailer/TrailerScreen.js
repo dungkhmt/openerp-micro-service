@@ -39,6 +39,26 @@ const TrailerScreen = () => {
         let code = filters.find((item) => item.type === "code");
         if(code) {
             data.trailerCode = code.value;
+        }
+        let status = filters.find((item) => item.type === "status");
+        if(status) {
+            data.status = status.value;
+        }
+        getTraler(data).then((res) => {
+            console.log("trailer", res?.data.data.trailerModels);
+            setTrailer(res?.data.data.trailerModels.sort((a, b) => a.updateAt - b.updateAt));
+            setCount(res?.data.data.count);
+        })
+    }, [openModal, page, rowsPerPage, flag])
+
+    useEffect(() => {
+        let data = { 
+            page: page,
+            pageSize: rowsPerPage,
+        }
+        let code = filters.find((item) => item.type === "code");
+        if(code) {
+            data.trailerCode = code.value;
             data.page = 0;
             setPage(0);
         }
@@ -53,7 +73,7 @@ const TrailerScreen = () => {
             setTrailer(res?.data.data.trailerModels.sort((a, b) => a.updateAt - b.updateAt));
             setCount(res?.data.data.count);
         })
-    }, [openModal, page, rowsPerPage, flag, filters])
+    }, [filters])
 
 
     return (

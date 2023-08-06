@@ -36,6 +36,27 @@ const ContainerScreen = () => {
         let code = filters.find((item) => item.type === "code");
         if(code) {
             data.containerCode = code.value;
+        }
+        let status = filters.find((item) => item.type === "status");
+        if(status) {
+            data.status = status.value;
+        }
+        getContainers(data)
+            .then((res) => {
+                console.log("container==========", res?.data.data.containerModels);
+                setContainers(res?.data.data.containerModels);
+                setCount(res?.data.data.count);
+            });
+    }, [openModal, page, rowsPerPage, flag])
+
+    useEffect(() => {
+        let data = { 
+            page: page,
+            pageSize: rowsPerPage,
+        }
+        let code = filters.find((item) => item.type === "code");
+        if(code) {
+            data.containerCode = code.value;
             data.page = 0;
             setPage(0);
         }
@@ -51,7 +72,7 @@ const ContainerScreen = () => {
                 setContainers(res?.data.data.containerModels);
                 setCount(res?.data.data.count);
             });
-    }, [openModal, page, rowsPerPage, flag, filters])
+    }, [filters])
 
     const handleClose = () => {
         setOpenModal(!openModal);

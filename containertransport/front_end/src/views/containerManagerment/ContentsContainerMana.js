@@ -23,7 +23,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import './styles.scss';
 import { Chip, Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import { deleteContainer } from 'api/ContainerAPI';
 
@@ -287,7 +287,9 @@ export default function ContentsContainerMana({ containers, page, setPage, rowsP
                       </TableCell>
                       <TableCell align="left">{row.size}</TableCell>
                       <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
-                      <TableCell align="left"><Chip label={row.status} color={`${row?.status === "AVAILABLE" ? "success" : "primary"}`} /></TableCell>
+                      <TableCell align="left">
+                        <Chip label={row?.status} color={colorStatus.get(row?.status)} />
+                      </TableCell>
                       <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
                       <TableCell>

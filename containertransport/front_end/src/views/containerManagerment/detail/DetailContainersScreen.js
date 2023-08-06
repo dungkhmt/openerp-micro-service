@@ -28,7 +28,7 @@ const DetailContainerScreen = () => {
     const handleClose = () => {
         setOpen(!open);
     }
-    const handleDetail = () => {
+    const handleDelete = () => {
         deleteContainer(containerId).then((res) => {
             console.log(res);
             setToastMsg("Delete Container Success !!!");
@@ -53,7 +53,10 @@ const DetailContainerScreen = () => {
 
                 <Box className="header-detail">
                     <Box className="headerScreen-go-back"
-                        onClick={() => history.push('/container')}
+                        onClick={() => {
+                            // history.push('/container')
+                            history.goBack()
+                        }}
                         sx={{ cursor: "pointer" }}
                     >
                         <Icon>
@@ -69,7 +72,7 @@ const DetailContainerScreen = () => {
                             {container?.status === "AVAILABLE" ? (
                                 <>
                                     <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                                        onClick={handleDetail}
+                                        onClick={handleDelete}
                                     >Delete</Button>
                                     <Button variant="contained" className="header-submit-shipment-btn-save"
                                         onClick={handleClose}

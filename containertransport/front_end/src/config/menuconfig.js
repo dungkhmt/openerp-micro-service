@@ -158,3 +158,7 @@ colorStatus.set("AVAILABLE", "success");
 colorStatus.set("SCHEDULED", "secondary");
 colorStatus.set("EXECUTING", "secondary");
 colorStatus.set("DONE", "success");
+colorStatus.set("CANCEL", "error");
+colorStatus.set("DELETE", "error");
+colorStatus.set("WAIT_APPROVE", "warning");
+colorStatus.set("ORDERED", "primary");

@@ -87,7 +87,7 @@ const FacilityDetail = () => {
                             <Typography >Facility {facility?.facilityCode}</Typography>
                         </Box>
                         <Box className="btn-header">
-                            {(trucks?.length > 0 || trailers.length > 0 || containers.length > 0) ? null : (
+                            {(trucks?.length > 0 && trailers.length > 0 && containers.length > 0) ? null : (
                                 <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
                                     onClick={handleDelete}
                                 >Delete</Button>
@@ -195,7 +195,7 @@ const FacilityDetail = () => {
                         <Box className="title">
                             <Typography>Trucks In Facility</Typography>
                         </Box>
-                        <TruckInFacility facilityId={facilityId} />
+                        <TruckInFacility facilityId={facilityId} setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
                     </Box>
                 ) : null}
 
@@ -204,7 +204,7 @@ const FacilityDetail = () => {
                         <Box className="title">
                             <Typography>Containers In Facility</Typography>
                         </Box>
-                        <ContainerInFacility facilityId={facilityId} />
+                        <ContainerInFacility facilityId={facilityId} setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
                     </Box>
                 ) : null}
 
@@ -213,7 +213,7 @@ const FacilityDetail = () => {
                         <Box className="title">
                             <Typography>Trailers In Facility</Typography>
                         </Box>
-                        <TrailerInFacility facilityId={facilityId} />
+                        <TrailerInFacility facilityId={facilityId} setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
                     </Box>
                 ) : null}
                 {openModify ? <FacilityModal open={openModify} handleClose={handleClose} facility={facility}

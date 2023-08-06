@@ -23,7 +23,7 @@ import { Chip, Icon } from '@mui/material';
 import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import { getTrucks } from 'api/TruckAPI';
-import { getContainers } from 'api/ContainerAPI';
+import { deleteContainer, getContainers } from 'api/ContainerAPI';
 
 const DEFAULT_ORDER = 'asc';
 const DEFAULT_ORDER_BY = 'calories';
@@ -105,7 +105,7 @@ function EnhancedTableHead(props) {
 }
 
 export default function ContainerInFacility(props) {
-    const { facilityId } = props;
+    const { facilityId, setToast, setToastType, setToastMsg} = props;
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
     const [selected, setSelected] = React.useState([]);
@@ -117,12 +117,14 @@ export default function ContainerInFacility(props) {
 
     const [containers, setContainers] = React.useState([]);
 
+    const [load, setLoad] = React.useState(false);
+
     React.useEffect(() => {
         getContainers({ page: page, pageSize: rowsPerPage, facilityId: facilityId }).then((res) => {
             setContainers(res?.data.data.containerModels);
             setCount(res?.data.data.count);
         });
-    }, [page, rowsPerPage, count])
+    }, [page, rowsPerPage, count, load])
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
             const newSelected = containers.map((n) => n.name);
@@ -167,6 +169,18 @@ export default function ContainerInFacility(props) {
     const handleDetail = (id) => {
         history.push({
             pathname: `/container/detail/${id}`,
+        })
+    }
+    const handleDelete = (containerId) => {
+        deleteContainer(containerId).then((res) => {
+            console.log(res);
+            setToastMsg("Delete Container Success !!!");
+            setToastType("success");
+            setToast(true);
+            setLoad(!load);
+            setTimeout(() => {
+                setToast(false);
+            }, "3000");
         })
     }
     return (
@@ -236,7 +250,7 @@ export default function ContainerInFacility(props) {
                                                     </Tooltip>
                                                     {row.status === "AVAILABLE" ? (
                                                         <Tooltip title="Delete">
-                                                            <Box>
+                                                            <Box onClick={() => handleDelete(row?.uid)}>
                                                                 <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
                                                             </Box>
                                                         </Tooltip>

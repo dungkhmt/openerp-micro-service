@@ -22,7 +22,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Chip, Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import { deleteTrailer } from 'api/TrailerAPI';
 
@@ -279,7 +279,9 @@ export default function ContentsTrailerScreen({ trailer, page, setPage, rowsPerP
                         {row.trailerCode}
                       </TableCell>
                       <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
-                      <TableCell align="left"><Chip label={row.status} color={`${row?.status === "AVAILABLE" ? "success" : "primary"}`} /></TableCell>
+                      <TableCell align="left">
+                        <Chip label={row?.status} color={colorStatus.get(row?.status)} />
+                      </TableCell>
                       <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
                       <TableCell>

@@ -33,6 +33,27 @@ const ShipmentScreen = () => {
         let code = filters.find((item) => item.type === "code");
         if(code) {
             data.shipmentCode = code.value;
+        }
+        let status = filters.find((item) => item.type === "status");
+        if(status) {
+            data.status = status.value;
+        }
+        getShipment(data)
+            .then((res) => {
+                console.log("shipment==========", res?.data.data)
+                setShipments(res?.data.data.shipmentModels);
+                setCount(res?.data.data.count);
+            });
+    }, [toastOpen, page, rowsPerPage]);
+
+    useEffect(() => {
+        let data = { 
+            page: page,
+            pageSize: rowsPerPage,
+        }
+        let code = filters.find((item) => item.type === "code");
+        if(code) {
+            data.shipmentCode = code.value;
             data.page = 0;
             setPage(0);
         }
@@ -48,7 +69,7 @@ const ShipmentScreen = () => {
                 setShipments(res?.data.data.shipmentModels);
                 setCount(res?.data.data.count);
             });
-    }, [toastOpen, page, rowsPerPage, filters]);
+    }, [filters]);
     return (
         <Box className="fullScreen">
             <Container maxWidth="100vw" className="container">

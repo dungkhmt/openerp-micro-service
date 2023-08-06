@@ -27,6 +27,8 @@ const ShipmentDetail = () => {
 
     const [flag, setFlag] = useState(false);
 
+    const statusModify = ["WAITING_SCHEDULER", "SCHEDULED"]
+
     useEffect(() => {
         let data = {
             shipmentId: shipmentId
@@ -101,17 +103,16 @@ const ShipmentDetail = () => {
                             <Box className="btn-header">
                                 {
                                     shipment?.status === "WAITING_SCHEDULER" ? (
-                                        <>
-                                            <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                                                onClick={handleCancelShipment}
-                                            >Delete</Button>
-                                            <Button variant="contained" className="header-submit-shipment-btn-save"
-                                                onClick={handleModifyShipment}
-                                            >Modify</Button>
-                                        </>
+                                        <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
+                                            onClick={handleCancelShipment}
+                                        >Delete</Button>
                                     ) : null
                                 }
-
+                                {statusModify.includes(shipment?.status) ? (
+                                    <Button variant="contained" className="header-submit-shipment-btn-save"
+                                        onClick={handleModifyShipment}
+                                    >Modify</Button>
+                                ) : null}
                             </Box>
                         </Box>
                     </Box>
@@ -126,7 +127,8 @@ const ShipmentDetail = () => {
                         <Box className="title">
                             <Typography>Trips Management</Typography>
                         </Box>
-                        <Box className="trips-btn">
+                        {statusModify.includes(shipment?.status) ? (
+                            <Box className="trips-btn">
                             {/* {trips.length > 0 ? */}
                             <Box className="auto-create-trips"
                                 onClick={autoCreateTrip}
@@ -155,6 +157,8 @@ const ShipmentDetail = () => {
                                 </PrimaryButton>
                             </Box>
                         </Box>
+                        ) : null}
+                        
 
                     </Box>
                     {trips.length > 0 ?
