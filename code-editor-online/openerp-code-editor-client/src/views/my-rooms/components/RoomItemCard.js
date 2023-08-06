@@ -59,7 +59,7 @@ const RoomItemCard = (props) => {
   };
   const handleCopyRoomId = () => {
     copy(item.id);
-    successNoti("Copied room id to clipboard", true);
+    successNoti("Đã sao chép mã phòng", true);
   };
   return (
     <Card sx={{ marginTop: "20px" }}>
@@ -73,7 +73,7 @@ const RoomItemCard = (props) => {
               {item?.roomName}
             </Typography>
             <div>
-              Id phòng: <strong>{item?.id}</strong>{" "}
+              Mã phòng: <strong>{item?.id}</strong>{" "}
               <Tooltip title="Copy to clipboard">
                 <IconButton>
                   <ContentCopy
@@ -99,6 +99,7 @@ const RoomItemCard = (props) => {
           >
             <Button
               variant="contained"
+              sx={{ textTransform: "none" }}
               onClick={() => {
                 handleJoinRoom();
               }}
