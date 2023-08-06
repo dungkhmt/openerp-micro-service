@@ -40,6 +40,7 @@ public class TripServiceImpl implements TripService {
         Trip trip = new Trip();
         Truck truck = truckRepo.findById(tripModel.getTruckId()).get();
         truck.setStatus(Constants.TruckStatus.SCHEDULED.getStatus());
+        truck.setUpdatedAt(System.currentTimeMillis());
         truckRepo.save(truck);
         List<Order> orders = new ArrayList<>();
         tripModel.getOrderIds().forEach((item) -> {
@@ -50,6 +51,7 @@ public class TripServiceImpl implements TripService {
         });
         Shipment shipment = shipmentRepo.findByUid(shipmentId);
         shipment.setStatus(Constants.ShipmentStatus.SCHEDULED.getStatus());
+        shipment.setUpdatedAt(System.currentTimeMillis());
         shipmentRepo.save(shipment);
         trip.setShipment(shipment);
         trip.setTruck(truck);
@@ -150,9 +152,11 @@ public class TripServiceImpl implements TripService {
 
         if (tripModel.getStatus() != null) {
             trip.setStatus(tripModel.getStatus());
+            trip.setUpdatedAt(System.currentTimeMillis());
             if(tripModel.getStatus().equals("EXECUTING")) {
                 Shipment shipment = shipmentRepo.findByUid(trip.getShipment().getUid());
                 shipment.setStatus(Constants.ShipmentStatus.EXECUTING.getStatus());
+                shipment.setUpdatedAt(System.currentTimeMillis());
                 shipmentRepo.save(shipment);
             }
         }
@@ -162,10 +166,12 @@ public class TripServiceImpl implements TripService {
             if (tripModel.getTruckId() != null && tripModel.getTruckId() != trip.getTruck().getId()) {
                 Truck truckOld = truckRepo.findByUid(trip.getTruck().getUid());
                 truckOld.setStatus(Constants.TruckStatus.AVAILABLE.getStatus());
+                truckOld.setUpdatedAt(System.currentTimeMillis());
                 truckRepo.save(truckOld);
 
                 Truck truckUpdate = truckRepo.findByUid(tripModel.getTruckUid());
                 truckUpdate.setStatus(Constants.TruckStatus.SCHEDULED.getStatus());
+                truckUpdate.setUpdatedAt(System.currentTimeMillis());
                 truckRepo.save(truckUpdate);
                 trip.setTruck(truckUpdate);
                 trip.setDriverId(truckUpdate.getDriverId());
@@ -228,6 +234,7 @@ public class TripServiceImpl implements TripService {
 
                 Truck truck = truckRepo.findByUid(trip.getTruck().getUid());
                 truck.setStatus(Constants.TruckStatus.AVAILABLE.getStatus());
+                truck.setUpdatedAt(System.currentTimeMillis());
                 truckRepo.save(truck);
 
                 List<TripItem> tripItems = tripItemRepo.findByTripId(tripUid);
@@ -235,6 +242,7 @@ public class TripServiceImpl implements TripService {
                     if (item.getTrailer() != null) {
                         Trailer trailer = item.getTrailer();
                         trailer.setStatus(Constants.TrailerStatus.AVAILABLE.getStatus());
+                        trailer.setUpdatedAt(System.currentTimeMillis());
                         trailerRepo.save(trailer);
                     }
                 });

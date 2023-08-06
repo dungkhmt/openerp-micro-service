@@ -138,6 +138,7 @@ public class TrailerServiceImpl implements TrailerService {
     public TrailerModel deleteTrailer(String uid) {
         Trailer trailer = trailerRepo.findByUid(uid);
         trailer.setStatus(Constants.TrailerStatus.DELETE.getStatus());
+        trailer.setUpdatedAt(System.currentTimeMillis());
         trailer = trailerRepo.save(trailer);
         Facility facility = facilityRepo.findByUid(trailer.getFacility().getUid());
         facility.setNumberTrailer(facility.getNumberTrailer() - 1);

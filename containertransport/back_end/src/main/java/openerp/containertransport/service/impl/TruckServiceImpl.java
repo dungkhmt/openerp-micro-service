@@ -147,6 +147,7 @@ public class TruckServiceImpl implements TruckService  {
     public TruckModel deleteTruck(String uid) {
         Truck truck = truckRepo.findByUid(uid);
         truck.setStatus(Constants.TruckStatus.DELETE.getStatus());
+        truck.setUpdatedAt(System.currentTimeMillis());
         truck = truckRepo.save(truck);
         Facility facility = facilityRepo.findByUid(truck.getFacility().getUid());
         facility.setNumberTruck(facility.getNumberTruck() - 1);

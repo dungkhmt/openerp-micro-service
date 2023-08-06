@@ -142,10 +142,10 @@ public class OrderServiceImpl implements OrderService {
         if(orderFilterRequestDTO.getType() != null && orderFilterRequestDTO.getType().equals("APPROVED")){
             List<String> status = new ArrayList<>();
             status.add("WAIT_APPROVE");
-            status.add("DELETED");
-            sql += " AND status NOT IN :status";
-            sqlCount += " AND status NOT IN :status";
-            params.put("status", status);
+            status.add("CANCEL");
+            sql += " AND status NOT IN :statusNotIn";
+            sqlCount += " AND status NOT IN :statusNotIn";
+            params.put("statusNotIn", status);
         }
 
         if(orderFilterRequestDTO.getType() != null && orderFilterRequestDTO.getType().equals("WAIT_APPROVE")){
@@ -288,6 +288,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepo.findByUid(uid);
         Container container = order.getContainer();
         container.setStatus(Constants.ContainerStatus.AVAILABLE.getStatus());
+        container.setUpdatedAt(System.currentTimeMillis());
         containerRepo.save(container);
         order.setStatus(Constants.OrderStatus.CANCEL.getStatus());
         orderRepo.save(order);

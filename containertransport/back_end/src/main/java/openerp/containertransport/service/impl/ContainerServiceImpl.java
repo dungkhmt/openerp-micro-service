@@ -108,7 +108,12 @@ public class ContainerServiceImpl implements ContainerService {
         TypeContainer typeContainer = container.getTypeContainer();
         typeContainer.setTotal(typeContainer.getTotal() - 1);
         container.setStatus(Constants.ContainerStatus.DELETE.getStatus());
+        container.setUpdatedAt(System.currentTimeMillis());
         container = containerRepo.save(container);
+
+        Facility facility = facilityRepo.findByUid(container.getFacility().getUid());
+        facility.setNumberContainer(facility.getNumberContainer() - 1);
+        facilityRepo.save(facility);
         return convertToModel(container);
     }
 

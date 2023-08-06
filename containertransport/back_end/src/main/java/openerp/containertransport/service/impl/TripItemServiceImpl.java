@@ -38,6 +38,7 @@ public class TripItemServiceImpl implements TripItemService {
         if(tripItemModel.getContainerId() != null) {
             Container container = containerRepo.findById(tripItemModel.getContainerId()).get();
             container.setStatus(Constants.ContainerStatus.SCHEDULED.getStatus());
+            container.setUpdatedAt(System.currentTimeMillis());
 
             tripItem.setContainer(container);
             containerRepo.save(container);
@@ -45,6 +46,7 @@ public class TripItemServiceImpl implements TripItemService {
         if(tripItemModel.getTrailerId() != null) {
             Trailer trailer = trailerRepo.findByTrailerId(tripItemModel.getTrailerId());
             trailer.setStatus(Constants.TrailerStatus.SCHEDULED.getStatus());
+            trailer.setUpdatedAt(System.currentTimeMillis());
 
             tripItem.setTrailer(trailer);
             trailerRepo.save(trailer);
@@ -98,6 +100,7 @@ public class TripItemServiceImpl implements TripItemService {
 
                 Container container = containerRepo.findByUid(order.getContainer().getUid());
                 container.setStatus(Constants.ContainerStatus.EXECUTING.getStatus());
+                container.setUpdatedAt(System.currentTimeMillis());
                 containerRepo.save(container);
             }
             if(tripItemModel.getStatus().equals(Constants.OrderStatus.DONE.getStatus())
@@ -112,6 +115,7 @@ public class TripItemServiceImpl implements TripItemService {
                 container.setStatus(Constants.ContainerStatus.AVAILABLE.getStatus());
                 container.setOwner(order.getCustomerId());
                 container.setFacility(toFacility);
+                container.setUpdatedAt(System.currentTimeMillis());
                 containerRepo.save(container);
             }
 
@@ -120,6 +124,7 @@ public class TripItemServiceImpl implements TripItemService {
                 Trip trip = tripRepo.findByUid(tripItemModel.getTripId());
                 Truck truck = truckRepo.findByUid(trip.getTruck().getUid());
                 truck.setStatus(Constants.TruckStatus.EXECUTING.getStatus());
+                truck.setUpdatedAt(System.currentTimeMillis());
                 truckRepo.save(truck);
             }
 
@@ -127,6 +132,7 @@ public class TripItemServiceImpl implements TripItemService {
                     && tripItemModel.getAction().equals("PICKUP-TRAILER")) {
                 Trailer trailer = trailerRepo.findById(tripItemModel.getTrailerId()).get();
                 trailer.setStatus(Constants.TrailerStatus.EXECUTING.getStatus());
+                trailer.setUpdatedAt(System.currentTimeMillis());
                 trailerRepo.save(trailer);
             }
 
@@ -137,6 +143,7 @@ public class TripItemServiceImpl implements TripItemService {
 
                 Facility toFacility = facilityRepo.findById(tripItemModel.getFacilityId()).get();
                 trailer.setFacility(toFacility);
+                trailer.setUpdatedAt(System.currentTimeMillis());
                 trailerRepo.save(trailer);
             }
 
@@ -144,6 +151,7 @@ public class TripItemServiceImpl implements TripItemService {
                     && tripItemModel.getAction().equals("STOP")) {
                 Trip trip = tripRepo.findByUid(tripItemModel.getTripId());
                 trip.setStatus(Constants.TripStatus.DONE.getStatus());
+                trip.setUpdatedAt(System.currentTimeMillis());
                 tripRepo.save(trip);
 
                 Facility toFacility = facilityRepo.findById(tripItemModel.getFacilityId()).get();
@@ -151,6 +159,7 @@ public class TripItemServiceImpl implements TripItemService {
                 Truck truck = truckRepo.findByUid(trip.getTruck().getUid());
                 truck.setStatus(Constants.TruckStatus.AVAILABLE.getStatus());
                 truck.setFacility(toFacility);
+                truck.setUpdatedAt(System.currentTimeMillis());
                 truckRepo.save(truck);
 
                 List<Trip> tripList = tripRepo.getTripByShipmentId(trip.getShipment().getUid());
@@ -158,6 +167,7 @@ public class TripItemServiceImpl implements TripItemService {
                 if(tripList.size() == tripListDone.size()) {
                     Shipment shipment = shipmentRepo.findByUid(trip.getShipment().getUid());
                     shipment.setStatus(Constants.ShipmentStatus.DONE.getStatus());
+                    shipment.setUpdatedAt(System.currentTimeMillis());
                     shipmentRepo.save(shipment);
                 }
             }

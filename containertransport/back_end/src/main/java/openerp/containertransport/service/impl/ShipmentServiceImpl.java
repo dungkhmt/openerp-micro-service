@@ -117,6 +117,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         if(shipment.getExecuted_time() != null) {
             shipment.setExecuted_time(shipmentModel.getExecutedTime());
         }
+        shipment.setUpdatedAt(System.currentTimeMillis());
         shipment = shipmentRepo.save(shipment);
         return convertToModel(shipment);
     }
@@ -126,6 +127,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         Shipment shipment = shipmentRepo.findByUid(uid);
         if(shipment.getStatus().equals(Constants.ShipmentStatus.WAITING_SCHEDULED.getStatus())) {
             shipment.setStatus(Constants.ShipmentStatus.DELETE.getStatus());
+            shipment.setUpdatedAt(System.currentTimeMillis());
             shipment = shipmentRepo.save(shipment);
 
             List<Trip> trips = tripRepo.getTripByShipmentId(shipment.getUid());

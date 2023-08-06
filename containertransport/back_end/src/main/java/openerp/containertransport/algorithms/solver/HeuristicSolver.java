@@ -964,7 +964,8 @@ public class HeuristicSolver {
             }
             prevPoint = pointList.get(i).getFacilityId();
         }
-        tripOutput.setTotalTime(totalTime.add(new BigDecimal(this.startTime)));
+//        tripOutput.setTotalTime(totalTime.add(new BigDecimal(this.startTime)));
+        tripOutput.setTotalTime(totalTime);
         return tripOutput;
     }
 
