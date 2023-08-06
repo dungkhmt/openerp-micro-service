@@ -27,7 +27,7 @@ const MyRoomsPage = () => {
   const handleSearchRoom = (keyword, page) => {
     request(
       "get",
-      `/code-editor/rooms/search?page=${page}&size=10&sort=createDate&keyword=${
+      `/code-editor/rooms/search?page=${page}&size=20&sort=createDate,desc&keyword=${
         keyword ? keyword : ""
       }`,
       (response) => {
@@ -44,6 +44,12 @@ const MyRoomsPage = () => {
   const handleChangeKeyWord = debounce((value) => {
     setKeyword(value);
   }, 300);
+  const syncUser = () => {
+    request("get", `/code-editor/users/sync-user`);
+  };
+  useEffect(() => {
+    syncUser();
+  },[]);
   return (
     <div>
       <Card>
