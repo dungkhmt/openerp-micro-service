@@ -148,7 +148,7 @@ public class CustomerServiceImpl extends BaseService implements ICustomerService
                 .code("CUS" + GeneralUtils.generateCodeFromSysTime())
                 .phone(customer.getPhone())
                 .address(customer.getAddress())
-                .province(customer.getProvince())
+                .province(customer.getProvince().length() > 0 ? customer.getProvince().toUpperCase() : null)
                 .name(customer.getName())
                 .longitude(customer.getLongitude())
                 .latitude(customer.getLatitude())

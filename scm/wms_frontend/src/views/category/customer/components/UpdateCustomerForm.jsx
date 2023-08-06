@@ -58,6 +58,7 @@ const UpdateCustomerForm = ({ setOpenDrawer, currCustomer }) => {
       phone: data?.phone,
       latitude: selectPosition?.lat.toString(),
       longitude: selectPosition?.lng.toString(),
+      province: data?.province,
     };
     await updateCustomerQuery.mutateAsync(customerParams);
     setOpenDrawer((pre) => !pre);

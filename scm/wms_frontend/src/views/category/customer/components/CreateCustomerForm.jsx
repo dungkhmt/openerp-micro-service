@@ -47,6 +47,7 @@ const CreateCustomerForm = ({ setIsAdd }) => {
       phone: data?.phone,
       latitude: selectPosition?.lat.toString(),
       longitude: selectPosition?.lng.toString(),
+      province: data?.province,
     };
     await createCustomerQuery.mutateAsync(customerParams);
     setIsAdd((pre) => !pre);
@@ -86,6 +87,25 @@ const CreateCustomerForm = ({ setIsAdd }) => {
               isFullWidth={true}
               error={!!errors["name"]}
               message={errors["name"]?.message}
+            />
+          )}
+        />
+      </Stack>
+      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+        <Controller
+          key={"province"}
+          control={control}
+          name={"province"}
+          render={({ field: { onChange, value } }) => (
+            <CustomInput
+              required={true}
+              value={value}
+              type={"text"}
+              onChange={onChange}
+              label={"Tỉnh thành"}
+              isFullWidth={true}
+              error={!!errors["province"]}
+              message={errors["province"]?.message}
             />
           )}
         />

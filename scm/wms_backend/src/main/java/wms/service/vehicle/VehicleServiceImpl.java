@@ -2,16 +2,16 @@ package wms.service.vehicle;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.hibernate.internal.util.StringHelper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import wms.common.enums.ErrorCode;
 import wms.dto.ReturnPaginationDTO;
+import wms.dto.shipment.ReturnShipmentItemDTO;
 import wms.dto.vehicle.DroneDTO;
+import wms.dto.vehicle.DroneResponseDTO;
 import wms.dto.vehicle.TruckDTO;
+import wms.dto.vehicle.TruckResponseDTO;
 import wms.entity.*;
 import wms.exception.CustomException;
 import wms.repo.DroneRepo;
@@ -20,6 +20,7 @@ import wms.repo.UserRepo;
 import wms.service.BaseService;
 import wms.utils.GeneralUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,14 +60,45 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
     }
 
     @Override
-    public ReturnPaginationDTO<TruckEntity> getAllTrucks(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
+    public ReturnPaginationDTO<TruckResponseDTO> getAllTrucks(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
         Page<TruckEntity> truckList = truckRepo.search(pageable);
-        return getPaginationResult(truckList.getContent(), page, truckList.getTotalPages(), truckList.getTotalElements());
+        Page<TruckResponseDTO> truckResponseDTOS = mapTruckPageToDTO(truckList);
+        return getPaginationResult(truckResponseDTOS.getContent(), page, truckResponseDTOS.getTotalPages(), truckResponseDTOS.getTotalElements());
     }
+    public Page<TruckResponseDTO> mapTruckPageToDTO(Page<TruckEntity> entityPage) {
+        List<TruckEntity> entityList = entityPage.getContent();
+        List<TruckResponseDTO> dtoList = new ArrayList<>();
 
+        for (TruckEntity entity : entityList) {
+            TruckResponseDTO dto = mapEntityToDTO(entity);
+            dtoList.add(dto);
+        }
+
+        Pageable pageable = entityPage.getPageable();
+        long totalElements = entityPage.getTotalElements();
+        int pageNumber = entityPage.getNumber();
+        int pageSize = entityPage.getSize();
+
+        return new PageImpl<>(dtoList, pageable, totalElements);
+    }
+    public TruckResponseDTO mapEntityToDTO(TruckEntity entity) {
+        TruckResponseDTO dto = new TruckResponseDTO();
+        dto.setId(entity.getId());
+        dto.setCode(entity.getCode());
+        dto.setName(entity.getName());
+        dto.setSize(entity.getSize());
+        dto.setCapacity(entity.getCapacity());
+        dto.setSpeed(entity.getSpeed());
+        dto.setTransportCostPerUnit(entity.getTransportCostPerUnit());
+        dto.setWaitingCost(entity.getWaitingCost());
+        dto.setUserName(entity.getUserLogin().getFirstName()
+        + " " + entity.getUserLogin().getMiddleName() + " " +
+                entity.getUserLogin().getLastName());
+        return dto;
+    }
     @Override
     public TruckEntity getTruckById(long id) {
         return truckRepo.getTruckById(id);
@@ -136,14 +168,45 @@ public class VehicleServiceImpl extends BaseService implements IVehicleService {
     }
 
     @Override
-    public ReturnPaginationDTO<DroneEntity> getAllDrones(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
+    public ReturnPaginationDTO<DroneResponseDTO> getAllDrones(int page, int pageSize, String sortField, boolean isSortAsc) throws JsonProcessingException {
         Pageable pageable = StringHelper.isEmpty(sortField) ? getDefaultPage(page, pageSize)
                 : isSortAsc ? PageRequest.of(page - 1, pageSize, Sort.by(sortField).ascending())
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
         Page<DroneEntity> droneList = droneRepo.search(pageable);
-        return getPaginationResult(droneList.getContent(), page, droneList.getTotalPages(), droneList.getTotalElements());
+        Page<DroneResponseDTO> droneResponseDTOS = mapDronePageToDTO(droneList);
+        return getPaginationResult(droneResponseDTOS.getContent(), page, droneResponseDTOS.getTotalPages(), droneResponseDTOS.getTotalElements());
     }
+    public Page<DroneResponseDTO> mapDronePageToDTO(Page<DroneEntity> entityPage) {
+        List<DroneEntity> entityList = entityPage.getContent();
+        List<DroneResponseDTO> dtoList = new ArrayList<>();
 
+        for (DroneEntity entity : entityList) {
+            DroneResponseDTO dto = mapEntityToDTO(entity);
+            dtoList.add(dto);
+        }
+
+        Pageable pageable = entityPage.getPageable();
+        long totalElements = entityPage.getTotalElements();
+        int pageNumber = entityPage.getNumber();
+        int pageSize = entityPage.getSize();
+
+        return new PageImpl<>(dtoList, pageable, totalElements);
+    }
+    public DroneResponseDTO mapEntityToDTO(DroneEntity entity) {
+        DroneResponseDTO dto = new DroneResponseDTO();
+        dto.setId(entity.getId());
+        dto.setCode(entity.getCode());
+        dto.setName(entity.getName());
+        dto.setDurationTime(entity.getDurationTime());
+        dto.setCapacity(entity.getCapacity());
+        dto.setSpeed(entity.getSpeed());
+        dto.setTransportCostPerUnit(entity.getTransportCostPerUnit());
+        dto.setWaitingCost(entity.getWaitingCost());
+        dto.setUserName(entity.getUserLogin().getFirstName()
+                + " " + entity.getUserLogin().getMiddleName() + " " +
+                entity.getUserLogin().getLastName());
+        return dto;
+    }
     @Override
     public DroneEntity getDroneById(long id) {
         return droneRepo.getDroneById(id);
