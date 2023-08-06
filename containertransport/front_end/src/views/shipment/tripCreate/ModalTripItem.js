@@ -6,13 +6,17 @@ import { getFacility } from "api/FacilityAPI";
 import { tripItemType } from "config/menuconfig";
 
 const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, setTrailerSelect, truckSelected }) => {
-    const [facilityList, setFacilityList] = useState([]);
-    const [facility, setFacility] = useState();
+    
+    const [facilities, setFacilities] = useState([]);
     const [trailers, setTrailerList] = useState([]);
+    const [facility, setFacility] = useState();
     const [trailer, setTrailer] = useState();
     const [action, setAction] = useState('');
     const [type, setType] = useState('');
     const [msg, setMsg] = useState('');
+
+    const [facilitiesTrailer, setFacilitiesTrailer] = useState([]);
+    const [facilitiesTruck, setFacilitiesTruck] = useState([]);
 
     const actionConst = [
         { name: "PICKUP-TRAILER", id: "1" },
@@ -33,10 +37,23 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
             setTrailerList(res?.data.data.trailerModels);
         })
         // xem xet lay dung facility
-        getFacility({}).then((res) => {
-            setFacilityList(res?.data.data.facilityModels);
+        getFacility({type: "Trailer"}).then((res) => {
+            setFacilitiesTrailer(res?.data.data.facilityModels);
+        })
+
+        getFacility({type: "Truck"}).then((res) => {
+            setFacilitiesTruck(res?.data.data.facilityModels);
         })
     }, []);
+
+    useEffect(() => {
+        if(action === "DROP-TRAILER") {
+            setFacilities(facilitiesTrailer)
+        }
+        if(action === "STOP") {
+            setFacilities(facilitiesTruck)
+        }
+    }, [action])
 
     const handleChange = (event) => {
         setFacility(event.target.value);
@@ -210,7 +227,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                                     {trailers ? (
                                         trailers.map((item, index) => {
                                             return (
-                                                <MenuItem value={item}>{item?.trailerCode} - {item?.facilityResponsiveDTO.facilityCode}</MenuItem>
+                                                <MenuItem value={item}>{item?.trailerCode} - {item?.facilityResponsiveDTO.facilityCode} - {item?.facilityResponsiveDTO.facilityName}</MenuItem>
                                             );
                                         })
                                     ) : null}
@@ -232,10 +249,10 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                                         label="facility"
                                         inputProps={{ 'aria-label': 'Without label' }}
                                     >
-                                        {facilityList ? (
-                                            facilityList.map((item, key) => {
+                                        {facilities ? (
+                                            facilities.map((item, key) => {
                                                 return (
-                                                    <MenuItem value={item}>{item.facilityName}</MenuItem>
+                                                    <MenuItem value={item}>{item?.facilityCode} - {item?.facilityName}</MenuItem>
                                                 );
                                             })
                                         ) : null}
@@ -258,10 +275,10 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                                         label="facility"
                                         inputProps={{ 'aria-label': 'Without label' }}
                                     >
-                                        {facilityList ? (
-                                            facilityList.map((item, key) => {
+                                        {facilities ? (
+                                            facilities.map((item, key) => {
                                                 return (
-                                                    <MenuItem value={item}>{item?.facilityName}</MenuItem>
+                                                    <MenuItem value={item}>{item?.facilityCode} - {item?.facilityName}</MenuItem>
                                                 );
                                             })
                                         ) : null}

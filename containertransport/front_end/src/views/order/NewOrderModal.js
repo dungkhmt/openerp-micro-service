@@ -74,8 +74,8 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
     useEffect(() => {
         
             getFacility({typeOwner: ["CUSTOMER", "CUSTOMS"]}).then((res) => {
-                console.log("facility==========", res.data)
-                setFacilities(res.data.data.facilityModels);
+                console.log("facility==========", res?.data)
+                setFacilities(res?.data.data.facilityModels);
             });
             getFacilityOwner({}).then((res) => {
                 setOwnerFacilities(res?.data.data.facilityModels);
@@ -85,9 +85,9 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             let typeTmp = typeConst.find((item) => item.id === order.type);
             setType(typeTmp.id);
             getContainerById(order.containerModel.uid).then((res) => {
-                console.log("order====", res.data);
+                console.log("order====", res?.data);
                 let containerSelectTmp = [];
-                containerSelectTmp.push(res.data);
+                containerSelectTmp.push(res?.data);
                 setContainerOrder(containerSelectTmp);
             });
 
@@ -128,8 +128,8 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
 
     useEffect(() => {
         getContainers({facilityId: fromFacility, status: "AVAILABLE"}).then((res) => {
-            console.log("container==========", res.data)
-            setContainers(res.data.data.containerModels);
+            console.log("container==========", res?.data)
+            setContainers(res?.data.data.containerModels);
         });
     }, [fromFacility]);
     

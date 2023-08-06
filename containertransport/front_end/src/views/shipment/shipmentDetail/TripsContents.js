@@ -387,11 +387,13 @@ export default function TripsContents({ trips, shipmentId, setToast, setToastTyp
                               <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                             </Box>
                           </Tooltip>
-                          <Tooltip title="Delete">
-                            <Box onClick={() => { handleDelete(row?.uid) }}>
-                              <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                            </Box>
-                          </Tooltip>
+                          {row?.status === "SCHEDULED" ? (
+                            <Tooltip title="Delete">
+                              <Box onClick={() => { handleDelete(row?.uid) }}>
+                                <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                              </Box>
+                            </Tooltip>
+                          ) : null}
                         </Box>
                       </TableCell>
                     </TableRow>

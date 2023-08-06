@@ -18,7 +18,7 @@ public class TripModel implements Serializable {
     private long id;
     private String uid;
     private String code;
-    private Long shipmentId;
+    private String shipmentId;
     private Long truckId;
     private String truckUid;
     private String driverName;
@@ -26,6 +26,7 @@ public class TripModel implements Serializable {
     private List<TripItemModel> tripItemModelList;
     private List<Long> orderIds;
     private List<Order> orders;
+    private List<OrderModel> ordersModel;
     private String status;
     @JsonProperty("total_distant")
     private BigDecimal totalDistant;

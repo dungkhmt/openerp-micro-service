@@ -40,11 +40,11 @@ const CreateTripDetail = () => {
         getTrucks({}).then((res) => {
             // let truckTmp = res.data.filter(item => checkScheduler(item.id, "truck"))
             // console.log("truck", res.data)
-            setTrucks(res.data.truckModels);
+            setTrucks(res?.data.truckModels);
         });
-        getOrders({ status: 'ORDERED' }).then((res) => {
+        getOrders({ status: ['ORDERED'] }).then((res) => {
             // let orderTmp = res.data.data.filter(item => checkScheduler(item.id, "order"))
-            setOrders(res.data.data.orderModels);
+            setOrders(res?.data.data.orderModels);
         });
 
         getShipmentById(shipmentId).then((res) => {
@@ -68,6 +68,7 @@ const CreateTripDetail = () => {
                 action: item.action,
                 facilityId: item.facilityId,
                 orderCode: item.orderCode,
+                orderId: item.orderId,
                 arrivalTime: item.arrivalTime,
                 departureTime: item.departureTime,
                 containerId: item?.containerId,
@@ -91,12 +92,12 @@ const CreateTripDetail = () => {
             createTrip(dataSubmit)
                 .then((res) => {
                     console.log("res", res)
-                    if (res.data.meta.code === 400) {
+                    if (res?.data.meta.code === 400) {
                         setToastType("error");
                         setToast(true);
-                        setToastMsg(res.data.data)
+                        setToastMsg(res?.data.data)
                     }
-                    if (res.data.meta.code === 200) {
+                    if (res?.data.meta.code === 200) {
                         setToastType("success");
                         setToast(true);
                         setToastMsg("Create Trip Success !!!")
@@ -133,12 +134,30 @@ const CreateTripDetail = () => {
         for (let i = 1; i < tripItems.length - 1; i++) {
             if (tripItems[i].action === "PICKUP-TRAILER") {
                 nbTrailer = Number(nbTrailer) + 1;
+            }
+            if (tripItems[i].action === "DROP-TRAILER") {
+                nbTrailer = Number(nbTrailer) - 1;
+            }
+
+            if (tripItems[i].action === "PICKUP-CONTAINER") {
                 totalWeight = totalWeight + tripItems[i].container.size;
             }
-            if (tripItems[i].action === "DELIVERY-TRAILER") {
-                nbTrailer = Number(nbTrailer) - 1;
+            if (tripItems[i].action === "DELIVERY-CONTAINER") {
+                let checkPickup = false;
+                for (let j = 1; j < i; j++) {
+                    if (tripItems[j].action === "PICKUP-CONTAINER" && tripItems[j].orderCode === tripItems[i].orderCode) {
+                        checkPickup = true;
+                        break;
+                    }
+                }
+                if (!checkPickup) {
+                    setToastMsg(`Please Pickup Container before Delivery Container of  ${tripItems[i].orderCode}`)
+                    appearToast();
+                    return false;
+                }
                 totalWeight = totalWeight - tripItems[i].container.size;
             }
+
             if (tripItems[i].action === "DELIVERY-CONTAINER" && nbTrailer === 0) {
                 setToastMsg(`Please view again at before ${tripItems[i].action} ${tripItems[i].orderCode}`)
                 appearToast();
@@ -156,6 +175,12 @@ const CreateTripDetail = () => {
 
             if (tripItems[i].action === "PICKUP-CONTAINER" && nbTrailer === 0) {
                 setToastMsg(`Please chose Trailer before Pickup Container in Order ${tripItems[i].orderCode}`)
+                appearToast();
+                return false;
+            }
+
+            if (tripItems[i].action === "STOP" && i !== tripItems.length - 1) {
+                setToastMsg(`Please chose position action STOP`)
                 appearToast();
                 return false;
             }
@@ -180,6 +205,7 @@ const CreateTripDetail = () => {
             setToast(false);
         }, 3000)
     }
+    
     return (
         <Box className="fullScreen">
             <Container maxWidth="xl" className="container">

@@ -35,6 +35,29 @@ const OrderScreen = () => {
         let code = filters.find((item) => item.type === "code");
         if(code) {
             data.orderCode = code.value;
+        }
+        
+        if(role?.includes("ADMIN")) {
+            data.type = ["APPROVED"]
+        }
+        let status = filters.find((item) => item.type === "status");
+        if(status) {
+            let listStatus = [];
+            listStatus.push(status.value);
+            listStatus.push("APPROVED");
+            data.status = listStatus;
+        }
+        getOrders(data).then((res) => {
+            setOrders(res?.data?.data.orderModels);
+            setCount(res?.data?.data.count);
+        });
+    }, [toastOpen, page, rowsPerPage, flag])
+
+    useEffect(() => {
+        let data = { page: page, pageSize: rowsPerPage};
+        let code = filters.find((item) => item.type === "code");
+        if(code) {
+            data.orderCode = code.value;
             data.page = 0;
             setPage(0);
         }
@@ -55,7 +78,7 @@ const OrderScreen = () => {
             setOrders(res?.data?.data.orderModels);
             setCount(res?.data?.data.count);
         });
-    }, [toastOpen, page, rowsPerPage, filters, flag])
+    }, [filters])
     console.log("role", role);
     return (
         <Box className="fullScreen">

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Box, Container, Divider, Icon, Typography } from "@mui/material";
+import { Alert, Box, Button, Container, Divider, Icon, Typography } from "@mui/material";
 import '../styles.scss';
 import { useHistory, useParams } from "react-router-dom";
 import { getTripByTripId } from "api/TripAPI";
@@ -28,7 +28,7 @@ const TripManaDetail = () => {
                 setTrip(res?.data?.data)
             });
             getTripItemByTripId(tripId).then((res) => {
-                setTripItems(res.data.data);
+                setTripItems(res?.data.data);
             })
         }
     }, [executed])
@@ -66,6 +66,14 @@ const TripManaDetail = () => {
                         <Box className="title">
                             <Typography>Trip {trip?.code}</Typography>
                         </Box>
+                        <Box className="btn-header">
+                            {trip?.status === "SCHEDULED" ? (
+                                <Button variant="contained" className="header-create-shipment-btn-cancel"
+                                    // onClick={handleDeleteTruck}
+                                >EXECUTING</Button>
+                            ) : null}
+
+                        </Box>
                     </Box>
 
                 </Box>
@@ -75,7 +83,7 @@ const TripManaDetail = () => {
                 </Box>
 
                 <Box className="trip-items">
-                    <TableOrder tripItems={tripItems} setExecutes={setExecutes} executed={executed} type={type} />
+                    <TableOrder tripItems={tripItems} setExecutes={setExecutes} executed={executed} type={type} trip={trip} />
                 </Box>
                 <Box mt={4}>
                     <MapComponent tripItems={tripItems} />

@@ -29,6 +29,7 @@ public class TripItemServiceImpl implements TripItemService {
     private final OrderRepo orderRepo;
     private final ShipmentRepo shipmentRepo;
     private final TruckRepo truckRepo;
+    private final ContainerServiceImpl containerService;
 
     @Override
     public TripItemModel createTripItem(TripItemModel tripItemModel, String tripUid) {
@@ -160,6 +161,7 @@ public class TripItemServiceImpl implements TripItemService {
         if(tripItem.getContainer() != null) {
             tripItemModel.setContainerCode(tripItem.getContainer().getContainerCode());
             tripItemModel.setContainerId(tripItem.getContainer().getId());
+            tripItemModel.setContainer(containerService.convertToModel(tripItem.getContainer()));
         }
         if (tripItem.getTrailer() != null) {
             tripItemModel.setTrailerCode(tripItem.getTrailer().getTrailerCode());

@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,6 +50,8 @@ public class TripController {
             if(!validTripItemDTO.getCheck()) {
                 return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.BAD_REQUEST), validTripItemDTO.getMessageErr()));
             }
+            tripModel.setTotalDistant(validTripItemDTO.getTotalDistant());
+            tripModel.setTotalTime(BigDecimal.valueOf(validTripItemDTO.getTotalTime()));
         }
         TripModel tripModelCreate = tripService.createTrip(tripCreateDTO.getTripContents(), tripCreateDTO.getShipmentId(), tripCreateDTO.getCreateBy());
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModelCreate));
@@ -77,12 +80,14 @@ public class TripController {
                 .collect(Collectors.toList());
         if(roleIds.contains("ADMIN")) {
             List<TripItemModel> tripItemModels = tripModel.getTripItemModelList();
-            Shipment shipment = shipmentRepo.findById(tripModel.getShipmentId()).get();
+            Shipment shipment = shipmentRepo.findByUid(tripModel.getShipmentId());
             ValidTripItemDTO validTripItemDTO = tripServiceImpl.checkValidTrip(tripItemModels, shipment.getExecuted_time());
             if(!validTripItemDTO.getCheck()) {
                 return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.BAD_REQUEST), validTripItemDTO.getMessageErr()));
             }
             tripModel.setActor("ADMIN");
+            tripModel.setTotalDistant(validTripItemDTO.getTotalDistant());
+            tripModel.setTotalTime(BigDecimal.valueOf(validTripItemDTO.getTotalTime()));
         }
         TripModel tripModelUpdate = tripService.updateTrip(uid, tripModel);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModelUpdate));

@@ -10,37 +10,37 @@ const headCells = [
     {
         id: 'code',
         numeric: false,
-        disablePadding: true,
+        disablePadding: false,
         label: 'Order Code',
-        with: '12%'
+        with: '10%'
     },
     {
         id: 'customer',
         numeric: false,
-        disablePadding: true,
+        disablePadding: false,
         label: 'Customer',
         with: '10%'
     },
     {
         id: 'fromFacility',
         numeric: false,
-        disablePadding: true,
+        disablePadding: false,
         label: 'From Facility',
-        with: '12%'
+        with: '11%'
     },
     {
         id: 'toFacility',
         numeric: false,
-        disablePadding: true,
+        disablePadding: false,
         label: 'To Facility',
-        with: '12%'
+        with: '11%'
     },
     {
         id: 'type',
         numeric: false,
         disablePadding: false,
         label: 'Type',
-        with: '13%'
+        with: '11%'
     },
     {
         id: 'size',
@@ -50,19 +50,33 @@ const headCells = [
         with: '10%'
     },
     {
+        id: 'latePickup',
+        numeric: false,
+        disablePadding: false,
+        label: 'Late Pickup',
+        with: '12%'
+    },
+    {
+        id: 'lateDelivery',
+        numeric: false,
+        disablePadding: false,
+        label: 'Late Delivery',
+        with: '12%'
+    },
+    {
         id: 'status',
         numeric: false,
         disablePadding: false,
         label: 'Status',
         with: '18%'
     },
-    {
-        id: 'createdAt',
-        numeric: false,
-        disablePadding: false,
-        label: 'Created At',
-        with: '13%'
-    },
+    // {
+    //     id: 'createdAt',
+    //     numeric: false,
+    //     disablePadding: false,
+    //     label: 'Created At',
+    //     with: '13%'
+    // },
     {
         id: 'view',
         numeric: false,
@@ -80,7 +94,7 @@ function EnhancedTableHead(props) {
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
-                        align={headCell.numeric ? 'right' : 'left'}
+                        align={headCell.numeric ? 'right' : (headCell.id === "size" ? 'center' : 'left')}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
                         width={headCell.with}
@@ -254,7 +268,7 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                                     renderTags={() => null}
                                     noOptionsText="No labels"
                                     renderOption={(props, option, { selected }) => (
-                                        <li {...props} style={{ justifyContent: "center" }}>
+                                        <li {...props} style={{ justifyContent: "left" }}>
                                             <Box
                                                 component={DoneIcon}
                                                 sx={{ width: 17, height: 17, mr: '16px', ml: '-2px' }}
@@ -326,13 +340,15 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                                                 >
                                                     {row.orderCode}
                                                 </TableCell>
-                                                <TableCell align="left" sx={{ paddingLeft: '0px !important' }}>{row?.customerId}</TableCell>
+                                                <TableCell align="left">{row?.customerId}</TableCell>
                                                 <TableCell align="left">{row?.fromFacility.facilityName}</TableCell>
                                                 <TableCell align="left">{row?.toFacility.facilityName}</TableCell>
                                                 <TableCell align="left">{typeOrderMap.get(row.type)}</TableCell>
-                                                <TableCell align="left">{row?.container?.size}</TableCell>
+                                                <TableCell align="center">{row?.containerModel?.size}</TableCell>
+                                                <TableCell align="left">{new Date(row?.latePickupTime).toLocaleDateString()}</TableCell>
+                                                <TableCell align="left">{new Date(row?.lateDeliveryTime).toLocaleDateString()}</TableCell>
                                                 <TableCell align="left">{row?.status}</TableCell>
-                                                <TableCell align="left">{new Date(row?.createdAt).toLocaleDateString()}</TableCell>
+                                                {/* <TableCell align="left">{new Date(row?.createdAt).toLocaleDateString()}</TableCell> */}
                                                 <TableCell >
                                                     <Box sx={{ display: 'flex' }}>
                                                         {/* <Tooltip title="View">

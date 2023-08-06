@@ -33,7 +33,7 @@ public class Trip {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Truck truck;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinTable(	name = "container_transport_trip_order",
             joinColumns = @JoinColumn(name = "trip_id"),
             inverseJoinColumns = @JoinColumn(name = "order_id"))

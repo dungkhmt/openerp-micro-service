@@ -20,7 +20,7 @@ const TruckDetail = () => {
 
     useEffect(() => {
         getTruckById(truckId).then((res) => {
-            setTruck(res.data);
+            setTruck(res?.data);
         })
     }, [open]);
     const handleClose = () => {

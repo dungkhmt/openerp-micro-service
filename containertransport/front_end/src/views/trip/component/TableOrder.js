@@ -142,7 +142,7 @@ function EnhancedTableHead(props) {
     );
 }
 
-export default function TableOrder({ tripItems, setExecutes, executed, type }) {
+export default function TableOrder({ tripItems, setExecutes, executed, type, trip }) {
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
     const [selected, setSelected] = React.useState([]);
@@ -346,12 +346,12 @@ export default function TableOrder({ tripItems, setExecutes, executed, type }) {
                                                 <TableCell>
                                                     <Box sx={{ display: 'flex' }}>
                                                         <Button
-                                                            disabled={row.status === "DONE" ? true : false}
+                                                            disabled={row.status === "DONE" || trip?.status === "SCHEDULED" ? true : false}
                                                             variant="contained"
                                                             onClick={() => { handleExecuted(row) }}
                                                             sx={{ width: '100%' }}
                                                         >
-                                                            {row.status === "SCHEDULED" ? "Executing" : "Done"}
+                                                            {row.status === "SCHEDULED" ? "EXECUTING" : "DONE"}
                                                         </Button>
                                                     </Box>
 

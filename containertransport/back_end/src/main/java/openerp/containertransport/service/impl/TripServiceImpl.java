@@ -10,16 +10,14 @@ import openerp.containertransport.dto.*;
 import openerp.containertransport.dto.validDTO.ValidTripItemDTO;
 import openerp.containertransport.entity.*;
 import openerp.containertransport.repo.*;
-import openerp.containertransport.service.FacilityService;
-import openerp.containertransport.service.RelationshipService;
-import openerp.containertransport.service.TripItemService;
-import openerp.containertransport.service.TripService;
+import openerp.containertransport.service.*;
 import openerp.containertransport.utils.RandomUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +33,7 @@ public class TripServiceImpl implements TripService {
     private final RelationshipService relationshipService;
     private final FacilityService facilityService;
     private final EntityManager entityManager;
+    private final OrderServiceImpl orderService;
 
     @Override
     public TripModel createTrip(TripModel tripModel, String shipmentId, String createBy) {
@@ -50,6 +49,8 @@ public class TripServiceImpl implements TripService {
             orders.add(order);
         });
         Shipment shipment = shipmentRepo.findByUid(shipmentId);
+        shipment.setStatus(Constants.ShipmentStatus.SCHEDULED.getStatus());
+        shipmentRepo.save(shipment);
         trip.setShipment(shipment);
         trip.setTruck(truck);
         trip.setDriverId(truck.getDriverId());
@@ -149,9 +150,15 @@ public class TripServiceImpl implements TripService {
 
         if (tripModel.getStatus() != null) {
             trip.setStatus(tripModel.getStatus());
+            if(tripModel.getStatus().equals("EXECUTING")) {
+                Shipment shipment = shipmentRepo.findByUid(trip.getShipment().getUid());
+                shipment.setStatus(Constants.ShipmentStatus.EXECUTING.getStatus());
+                shipmentRepo.save(shipment);
+            }
         }
-        if (tripModel.getActor().equals("ADMIN")) {
+        if (tripModel.getActor() != null && tripModel.getActor().equals("ADMIN")) {
 
+            // update truck in trip
             if (tripModel.getTruckId() != null && tripModel.getTruckId() != trip.getTruck().getId()) {
                 Truck truckOld = truckRepo.findByUid(trip.getTruck().getUid());
                 truckOld.setStatus(Constants.TruckStatus.AVAILABLE.getStatus());
@@ -193,6 +200,9 @@ public class TripServiceImpl implements TripService {
                 tripModel.getTripItemModelList().forEach((item) -> {
                     TripItemModel tripItemModel = tripItemService.createTripItem(item, finalTrip.getUid());
                 });
+
+                trip.setTotalDistant(tripModel.getTotalDistant());
+                trip.setTotalTime(tripModel.getTotalTime());
 
             }
             trip = tripRepo.save(trip);
@@ -245,13 +255,15 @@ public class TripServiceImpl implements TripService {
     public TripModel convertToModel(Trip trip) {
         TripModel tripModel = modelMapper.map(trip, TripModel.class);
         List<Long> orderIds = new ArrayList<>();
+        List<OrderModel> orderModels = new ArrayList<>();
         tripModel.setTruckId(trip.getTruck().getId());
         tripModel.setTruckUid(trip.getTruck().getUid());
         tripModel.setDriverName(trip.getTruck().getDriverName());
         tripModel.setTruckCode(trip.getTruck().getTruckCode());
         trip.getOrders().forEach((item) -> orderIds.add(item.getId()));
+        orderModels = trip.getOrders().stream().map(orderService::convertToModel).collect(Collectors.toList());
         tripModel.setOrderIds(orderIds);
-        tripModel.setOrders(trip.getOrders());
+        tripModel.setOrdersModel(orderModels);
         return tripModel;
     }
 

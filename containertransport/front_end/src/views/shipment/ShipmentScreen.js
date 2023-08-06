@@ -44,7 +44,7 @@ const ShipmentScreen = () => {
         }
         getShipment(data)
             .then((res) => {
-                console.log("shipment==========", res.data.data)
+                console.log("shipment==========", res?.data.data)
                 setShipments(res?.data.data.shipmentModels);
                 setCount(res?.data.data.count);
             });

@@ -50,8 +50,8 @@ const TruckScreen = () => {
             setPage(0);
         }
         getTrucks(data).then((res) => {
-            console.log("truck==========", res.data.truckModels)
-            setTrucks(res.data.truckModels);
+            console.log("truck==========", res?.data.truckModels)
+            setTrucks(res?.data.truckModels);
             setCount(res?.data.count);
         });
     }, [openModal, page, rowsPerPage, filters, flag]);

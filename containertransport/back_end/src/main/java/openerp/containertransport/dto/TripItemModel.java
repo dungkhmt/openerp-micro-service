@@ -42,4 +42,5 @@ public class TripItemModel implements Serializable {
     private String typeOrder;
     private long lateArrivalTime;
     private long lateDepartureTime;
+    private ContainerModel container;
 }

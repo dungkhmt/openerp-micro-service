@@ -132,8 +132,8 @@ export default function TruckInFacility(props) {
 
     React.useEffect(() => {
         getTrucks({ page: page, pageSize: rowsPerPage, facilityId: facilityId }).then((res) => {
-            console.log("truck==========", res.data.truckModels)
-            setTrucks(res.data.truckModels);
+            console.log("truck==========", res?.data.truckModels)
+            setTrucks(res?.data.truckModels);
             setCount(res?.data.count);
         });
     }, [page, rowsPerPage, count])

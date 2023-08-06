@@ -294,9 +294,12 @@ export default function ShipmentScreenContents({ shipments, page, setPage, rowsP
                           <Box onClick={() => { handleDetail(row?.uid) }} >
                             <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                           </Box>
-                          {/* <Box>
-                            <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                          </Box> */}
+                          {row?.status === "WAITING_SCHEDULER" ? (
+                            <Box>
+                              <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                            </Box>
+                          ) : null}
+
                         </Box>
                       </TableCell>
                     </TableRow>

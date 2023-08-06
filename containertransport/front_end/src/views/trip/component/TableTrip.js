@@ -272,7 +272,7 @@ export default function TableTrip({ trips, setExecutes, executed, type }) {
                                                         <Button
                                                             disabled={row.status !== "SCHEDULED" ? true : false}
                                                             variant="contained"
-                                                            onClick={() => { handleExecuted(row.id) }}
+                                                            onClick={() => { handleExecuted(row.uid) }}
                                                         >
                                                             Executing
                                                         </Button>
