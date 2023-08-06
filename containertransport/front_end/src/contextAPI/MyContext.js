@@ -12,6 +12,7 @@ export const AppProvider = ({children}) => {
     const [tripsCreate, setTripCreate] = useState([]);
     const [truckScheduler, setTruckScheduler] = useState([]);
     const [ordersScheduler, setOrderScheduler] = useState([]);
+    console.log("keycloak", keycloak)
     return (
         <MyContext.Provider value={{tripsCreate, setTripCreate, truckScheduler,
          setTruckScheduler, ordersScheduler, setOrderScheduler, preferred_username, role}}>

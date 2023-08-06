@@ -234,7 +234,7 @@ export default function TableTrip({ trips, setExecutes, executed, type }) {
     }
     const convertMillisecondsToHours = (milliseconds) => {
         const seconds = milliseconds / 1000;
-        const hours = Math.floor(seconds / 3600);
+        const hours = Math.floor((seconds / 3600) % 24);
         const minutes = Math.floor((seconds % 3600) / 60);
         const date = Math.floor(hours / 24);
         if(date > 0) {

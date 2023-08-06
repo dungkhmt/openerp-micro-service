@@ -57,7 +57,8 @@ const styles = {
 const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, order }) => {
     const [type, setType] = useState('');
     const [facilities, setFacilities] = useState([]);
-    const [ownerFacilities, setOwnerFacilities] = useState([])
+    const [ownerFacilities, setOwnerFacilities] = useState([]);
+    const [portFacilities, setPortFacilities] = useState([]);
     const [fromFacilities, setFromFacilities] = useState([]);
     const [toFacilities, setToFacilities] = useState([]);
     const [fromFacility, setFromFacility] = useState('');
@@ -76,6 +77,10 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             getFacility({typeOwner: ["CUSTOMER", "CUSTOMS"]}).then((res) => {
                 console.log("facility==========", res?.data)
                 setFacilities(res?.data.data.facilityModels);
+            });
+            getFacility({typeOwner: ["CUSTOMS"]}).then((res) => {
+                console.log("facility==========", res?.data)
+                setPortFacilities(res?.data.data.facilityModels);
             });
             getFacilityOwner({}).then((res) => {
                 setOwnerFacilities(res?.data.data.facilityModels);
@@ -117,14 +122,14 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             setFromFacilities(ownerFacilities)
         }
         if(type === "IF") {
+            setFromFacilities(portFacilities);
+            setToFacilities(ownerFacilities);
+        }
+        if(type === "OF") {
             setFromFacilities(ownerFacilities);
             setToFacilities(facilities);
         }
-        if(type === "OF") {
-            setFromFacilities(facilities);
-            setToFacilities(ownerFacilities);
-        }
-    }, [type, ownerFacilities, facilities])
+    }, [type, ownerFacilities, facilities, portFacilities])
 
     useEffect(() => {
         getContainers({facilityId: fromFacility, status: "AVAILABLE"}).then((res) => {
@@ -221,7 +226,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
         setContainerSelect(containerIds);
         setContainerOrder(values);
     }
-    console.log("order", order)
+    console.log("portFacility", portFacilities)
     return (
         <Box >
             <CustomizedDialogs

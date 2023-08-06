@@ -22,10 +22,17 @@ const OrderScreen = () => {
     const [flag, setFlag] = useState(false);
 
     const [filters, setFilters] = useState([]);
-    const status = [
+    const statusCustomer = [
+        { name: "WAIT_APPROVE"},
         { name: "ORDERED" },
         { name: "DONE" },
         { name: "CANCEL" },
+        { name: "SCHEDULED"},
+        { name: "EXECUTING" }
+    ]
+    const statusDVVC = [
+        { name: "ORDERED" },
+        { name: "DONE" },
         { name: "SCHEDULED"},
         { name: "EXECUTING" }
     ]
@@ -37,14 +44,13 @@ const OrderScreen = () => {
             data.orderCode = code.value;
         }
         
-        if(role?.includes("ADMIN")) {
-            data.type = ["APPROVED"]
+        if(role?.includes("TMS_ADMIN")) {
+            data.type = "APPROVED"
         }
         let status = filters.find((item) => item.type === "status");
         if(status) {
             let listStatus = [];
             listStatus.push(status.value);
-            listStatus.push("APPROVED");
             data.status = listStatus;
         }
         getOrders(data).then((res) => {
@@ -62,14 +68,13 @@ const OrderScreen = () => {
             setPage(0);
         }
         
-        if(role?.includes("ADMIN")) {
-            data.type = ["APPROVED"]
+        if(role?.includes("TMS_ADMIN")) {
+            data.type = "APPROVED";
         }
         let status = filters.find((item) => item.type === "status");
         if(status) {
             let listStatus = [];
             listStatus.push(status.value);
-            listStatus.push("APPROVED");
             data.status = listStatus;
             data.page = 0;
             setPage(0);
@@ -96,7 +101,7 @@ const OrderScreen = () => {
                     <Divider />
                 </Box>
                 <Box>
-                    <SearchBar filters={filters} setFilters={setFilters} status={status} type="status" />
+                    <SearchBar filters={filters} setFilters={setFilters} status={role?.includes("TMS_ADMIN") ? statusDVVC : statusCustomer} type="status" />
                 </Box>
                 <ContentsOrderManagerment orders={orders} page={page} setPage={setPage}
                     rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count}

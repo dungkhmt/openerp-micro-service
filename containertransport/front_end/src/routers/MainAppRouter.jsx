@@ -28,6 +28,7 @@ import OrderWaitApprove from "views/order/waitApprove/OrderWaitApprove";
 import TypeContainer from "views/containerManagerment/typeContainer/TypeContainer";
 import Dashboard from "views/dashboard/Dashboard";
 import TripExecutedScreen from "views/trip/tripExecuted/TripExecutedScreen";
+import TypeContainerDetail from "views/containerManagerment/typeContainer/detail/TypeContainerDetail";
 
 const styles = {
   loadingProgress: {
@@ -73,6 +74,7 @@ function MainAppRouter(props) {
             <PrivateRoute component={ContainerScreen} exact path="/container" />
             <PrivateRoute component={DetailContainerScreen} exact path="/container/detail/:containerId" />
             <PrivateRoute component={TypeContainer} exact path="/type/container" />
+            <PrivateRoute component={TypeContainerDetail} exact path="/type/container/detail/:typeId" />
 
             <PrivateRoute component={TrailerScreen} exact path="/trailer" />
             <PrivateRoute component={DetailTrailer} exact path="/trailer/detail/:trailerId" />

@@ -79,8 +79,9 @@ const SearchBar = ({ filters, setFilters, status, type }) => {
         handleSwitch();
     }
     const searchCode = () => {
+        let filterTmp = filters.filter((item) => item.type !== "code");
         let data = { type: "code", value: code }
-        setFilters(prevState => [...prevState, data])
+        setFilters(prevState => [...filterTmp, data])
     }
     const handleRemoveFilter = (typeFilter) => {
         let data = filters.filter((item) => item.type !== typeFilter);

@@ -143,15 +143,15 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
     }
     const convertMillisecondsToHours = (milliseconds) => {
         const seconds = milliseconds / 1000;
-        const hours = Math.floor(seconds / 3600);
+        const hours = Math.floor((seconds / 3600) % 24);
         const minutes = Math.floor((seconds % 3600) / 60);
         const date = Math.floor(hours / 24);
-        if(date > 0) {
+        if (date > 0) {
             return `${date} ngày ${hours} giờ ${minutes} phút`;
         }
-        
+
         return `${hours} giờ ${minutes} phút`;
-      }
+    }
     console.log("trip", trip)
     return (
         <Box className="truck-order">
@@ -208,24 +208,27 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                     </Box>
                 ) : null}
 
-                <Box className="header-info" mt={4}>
-                    <Typography>Trip info:</Typography>
-                </Box>
+
                 {trip ? (
-                    <Box className="truck-select-info">
-                        <Box className="truck-info-item">
-                            <Box className="truck-info-item-title">
-                                <Typography>Total distant:</Typography>
-                            </Box>
-                            <Box>{Number(trip?.total_distant / 1000).toFixed(2)} (km)</Box>
+                    <>
+                        <Box className="header-info" mt={4}>
+                            <Typography>Trip info:</Typography>
                         </Box>
-                        <Box className="truck-info-item">
-                            <Box className="truck-info-item-title">
-                                <Typography>Total time:</Typography>
+                        <Box className="truck-select-info">
+                            <Box className="truck-info-item">
+                                <Box className="truck-info-item-title">
+                                    <Typography>Total distant:</Typography>
+                                </Box>
+                                <Box>{Number(trip?.total_distant / 1000).toFixed(2)} (km)</Box>
                             </Box>
-                            <Box>{convertMillisecondsToHours(trip?.total_time)}</Box>
+                            <Box className="truck-info-item">
+                                <Box className="truck-info-item-title">
+                                    <Typography>Total time:</Typography>
+                                </Box>
+                                <Box>{convertMillisecondsToHours(trip?.total_time)}</Box>
+                            </Box>
                         </Box>
-                    </Box>
+                    </>
                 ) : null}
 
             </Box>

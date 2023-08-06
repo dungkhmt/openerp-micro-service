@@ -388,7 +388,7 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                             }
                         });
                         if (!check) {
-                            facilitiesTmp2 = facilitiesTmp2.filter((req) => req.orderId !== faci.orderId);
+                            facilitiesTmp2 = facilitiesTmp2.filter((req) => req.orderCode !== faci.orderCode);
                         }
                     }
                 })

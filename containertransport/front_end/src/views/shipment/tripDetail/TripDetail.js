@@ -38,7 +38,7 @@ const TripDetail = () => {
         getTrucks({}).then((res) => {
             setTrucks(res?.data.truckModels);
         });
-        getOrders({}).then((res) => {
+        getOrders({status: ["ORDERED"]}).then((res) => {
             setOrders(res?.data.data.orderModels);
         });
         getTripItemByTripId(tripId).then((res) => {
@@ -51,8 +51,9 @@ const TripDetail = () => {
     }, [loading])
     useEffect(() => {
         getTripByTripId(tripId).then((res) => {
-            console.log("res", res)
             setOrdersSelect(res?.data.data.ordersModel);
+            let ordersTmp = orders.concat(res?.data.data.ordersModel);
+            setOrders(ordersTmp)
             trucks.forEach((item) => {
                 if (item.id === res?.data.data.truckId) {
                     setTruckSelect(item)
@@ -210,7 +211,7 @@ const TripDetail = () => {
             setToast(false);
         }, 3000)
     }
-    console.log("tripItems113", tripItems)
+    console.log("orderselec", ordersSelect)
     return (
         <Box className="trip-detail">
             <Box className="toast">
