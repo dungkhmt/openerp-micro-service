@@ -35,11 +35,11 @@ const Participants = (props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // if (localVideo && localVideo?.getAudioTracks().length > 0) {
-    //   localVideo.getAudioTracks()[0].enabled = !isMute;
-    // }
+    if (localVideo && localVideo?.getAudioTracks().length > 0) {
+      localVideo.getAudioTracks()[0].enabled = !isMute;
+    }
     dispatch(handleOnOffMic({ isMute: !isMute }));
-  }, [isMute]);
+  }, [isMute, localVideo]);
   useEffect(() => {
     // if (isShowCamera && localVideo) {
     //   localVideo.getVideoTracks().forEach((track) => {
