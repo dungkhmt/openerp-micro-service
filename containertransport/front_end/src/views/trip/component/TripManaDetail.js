@@ -7,6 +7,7 @@ import { menuIconMap } from "config/menuconfig";
 import { getTripItemByTripId } from "api/TripItemAPI";
 import TableOrder from "./TableOrder";
 import MapComponent from "views/shipment/routing/Map";
+import { convertMillisecondsToHours } from "utils/Utils";
 
 const TripManaDetail = () => {
     const [toastOpen, setToast] = useState(false);
@@ -80,6 +81,34 @@ const TripManaDetail = () => {
 
                 <Box className="divider">
                     <Divider />
+                </Box>
+
+                <Box className="facility-info">
+                    <Box className="facility-info-item">
+                        <Box className="facility-info-item-text">
+                            <Typography>Total Orders:</Typography>
+                        </Box>
+                        <Typography>{trip?.orderIds?.length}</Typography>
+                    </Box>
+                    <Box className="facility-info-item">
+                        <Box className="facility-info-item-text">
+                            <Typography>Total Distant:</Typography>
+                        </Box>
+                        <Typography>{Number(trip?.total_distant / 1000).toFixed(2)} (km)</Typography>
+                    </Box>
+                    <Box className="facility-info-item">
+                        <Box className="facility-info-item-text">
+                            <Typography>Total Time:</Typography>
+                        </Box>
+                        <Typography>{convertMillisecondsToHours(trip?.total_time)}</Typography>
+                    </Box>
+                    
+                    <Box className="facility-info-item">
+                        <Box className="facility-info-item-text">
+                            <Typography>Start executed time:</Typography>
+                        </Box>
+                        <Typography>{new Date(trip?.startTime).toLocaleString()}</Typography>
+                    </Box>
                 </Box>
 
                 <Box className="trip-items">

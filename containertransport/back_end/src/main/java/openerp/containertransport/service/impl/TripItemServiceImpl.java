@@ -91,44 +91,66 @@ public class TripItemServiceImpl implements TripItemService {
         if(tripItemModel.getStatus() != null) {
             tripItem.setStatus(tripItemModel.getStatus());
             if(tripItemModel.getStatus().equals(Constants.OrderStatus.EXECUTING.getStatus())
-            && tripItemModel.getAction().equals("PICKUP_CONTAINER")) {
+            && tripItemModel.getAction().equals("PICKUP-CONTAINER")) {
                 Order order = orderRepo.findByUid(tripItemModel.getOrderUid());
                 order.setStatus(Constants.OrderStatus.EXECUTING.getStatus());
                 orderRepo.save(order);
+
+                Container container = containerRepo.findByUid(order.getContainer().getUid());
+                container.setStatus(Constants.ContainerStatus.EXECUTING.getStatus());
+                containerRepo.save(container);
             }
             if(tripItemModel.getStatus().equals(Constants.OrderStatus.DONE.getStatus())
-                    && tripItemModel.getAction().equals("DELIVERY_CONTAINER")) {
+                    && tripItemModel.getAction().equals("DELIVERY-CONTAINER")) {
                 Order order = orderRepo.findByUid(tripItemModel.getOrderUid());
                 order.setStatus(Constants.OrderStatus.DONE.getStatus());
                 orderRepo.save(order);
+
+                Facility toFacility = facilityRepo.findById(tripItemModel.getFacilityId()).get();
+
+                Container container = containerRepo.findByUid(order.getContainer().getUid());
+                container.setStatus(Constants.ContainerStatus.AVAILABLE.getStatus());
+                container.setOwner(order.getCustomerId());
+                container.setFacility(toFacility);
+                containerRepo.save(container);
             }
 
-            if(tripItemModel.getAction().equals("DEPART")) {
+            if(tripItemModel.getStatus().equals(Constants.OrderStatus.DONE.getStatus())
+                    && tripItemModel.getAction().equals("DEPART")) {
                 Trip trip = tripRepo.findByUid(tripItemModel.getTripId());
                 Truck truck = truckRepo.findByUid(trip.getTruck().getUid());
                 truck.setStatus(Constants.TruckStatus.EXECUTING.getStatus());
                 truckRepo.save(truck);
             }
 
-            if(tripItemModel.getAction().equals("PICKUP_TRAILER")) {
+            if(tripItemModel.getStatus().equals(Constants.OrderStatus.DONE.getStatus())
+                    && tripItemModel.getAction().equals("PICKUP-TRAILER")) {
                 Trailer trailer = trailerRepo.findById(tripItemModel.getTrailerId()).get();
                 trailer.setStatus(Constants.TrailerStatus.EXECUTING.getStatus());
                 trailerRepo.save(trailer);
             }
 
-            if(tripItemModel.getAction().equals("DELIVERY_TRAILER")) {
+            if(tripItemModel.getStatus().equals(Constants.OrderStatus.DONE.getStatus())
+                    && tripItemModel.getAction().equals("DROP-TRAILER")) {
                 Trailer trailer = trailerRepo.findById(tripItemModel.getTrailerId()).get();
                 trailer.setStatus(Constants.TrailerStatus.AVAILABLE.getStatus());
+
+                Facility toFacility = facilityRepo.findById(tripItemModel.getFacilityId()).get();
+                trailer.setFacility(toFacility);
                 trailerRepo.save(trailer);
             }
 
-            if(tripItemModel.getAction().equals("STOP")) {
+            if(tripItemModel.getStatus().equals(Constants.OrderStatus.DONE.getStatus())
+                    && tripItemModel.getAction().equals("STOP")) {
                 Trip trip = tripRepo.findByUid(tripItemModel.getTripId());
                 trip.setStatus(Constants.TripStatus.DONE.getStatus());
                 tripRepo.save(trip);
 
+                Facility toFacility = facilityRepo.findById(tripItemModel.getFacilityId()).get();
+
                 Truck truck = truckRepo.findByUid(trip.getTruck().getUid());
                 truck.setStatus(Constants.TruckStatus.AVAILABLE.getStatus());
+                truck.setFacility(toFacility);
                 truckRepo.save(truck);
 
                 List<Trip> tripList = tripRepo.getTripByShipmentId(trip.getShipment().getUid());
@@ -158,6 +180,10 @@ public class TripItemServiceImpl implements TripItemService {
         tripItemModel.setLongitude(tripItem.getFacility().getLongitude());
         tripItemModel.setLatitude(tripItem.getFacility().getLatitude());
         tripItemModel.setTruckId(tripItem.getTrip().getTruck().getId());
+        tripItemModel.setTripId(tripItem.getTrip().getUid());
+        if(tripItem.getOrder() != null) {
+            tripItemModel.setOrderUid(tripItem.getOrder().getUid());
+        }
         if(tripItem.getContainer() != null) {
             tripItemModel.setContainerCode(tripItem.getContainer().getContainerCode());
             tripItemModel.setContainerId(tripItem.getContainer().getId());

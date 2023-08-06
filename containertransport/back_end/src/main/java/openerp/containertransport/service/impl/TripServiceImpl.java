@@ -260,6 +260,7 @@ public class TripServiceImpl implements TripService {
         tripModel.setTruckUid(trip.getTruck().getUid());
         tripModel.setDriverName(trip.getTruck().getDriverName());
         tripModel.setTruckCode(trip.getTruck().getTruckCode());
+        tripModel.setStartTime(trip.getShipment().getExecuted_time());
         trip.getOrders().forEach((item) -> orderIds.add(item.getId()));
         orderModels = trip.getOrders().stream().map(orderService::convertToModel).collect(Collectors.toList());
         tripModel.setOrderIds(orderIds);
@@ -328,7 +329,7 @@ public class TripServiceImpl implements TripService {
             prevPick = tripItemModels.get(i).getFacilityId().intValue();
         }
         validTripItemDTO.setTotalDistant(totalDistant);
-        validTripItemDTO.setTotalTime(totalTime);
+        validTripItemDTO.setTotalTime(totalTime-startTime);
         validTripItemDTO.setCheck(true);
 
         return validTripItemDTO;

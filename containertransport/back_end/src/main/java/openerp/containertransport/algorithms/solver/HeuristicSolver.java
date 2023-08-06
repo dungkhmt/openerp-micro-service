@@ -923,7 +923,7 @@ public class HeuristicSolver {
                 }
             }
             Point pointDepotTrailer = new Point();
-            pointDepotTrailer.setAction(Constants.ACTION.DELIVERY_TRAILER.getAction());
+            pointDepotTrailer.setAction(Constants.ACTION.DROP_TRAILER.getAction());
             pointDepotTrailer.setTrailerId(trailerId.get());
             pointDepotTrailer.setOrderCode(this.trailerScheduler.get(trailerId.get()).getTrailerCode());
             pointDepotTrailer.setType("Trailer");

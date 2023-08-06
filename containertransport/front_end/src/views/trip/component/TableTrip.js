@@ -19,8 +19,8 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Button, Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { Button, Chip, Icon } from '@mui/material';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import { updateTrip } from 'api/TripAPI';
 
@@ -58,28 +58,49 @@ const headCells = [
         numeric: false,
         disablePadding: false,
         label: 'Trip Code',
-        width: '20%'
+        width: '15%'
     },
     {
         id: 'totalOrder',
         numeric: false,
         disablePadding: false,
         label: 'Total order',
-        width: '20%'
+        width: '15%'
+    },
+    {
+        id: 'totalDistant',
+        numeric: false,
+        disablePadding: false,
+        label: 'Total Distant',
+        width: '15%'
+    },
+    {
+        id: 'totalTime',
+        numeric: false,
+        disablePadding: false,
+        label: 'Total Time',
+        width: '15%'
     },
     {
         id: 'status',
         numeric: false,
         disablePadding: false,
         label: 'Status',
-        width: '20%'
+        width: '15%'
+    },
+    {
+        id: 'executedTime',
+        numeric: false,
+        disablePadding: false,
+        label: 'Executed Time',
+        width: '15%'
     },
     {
         id: 'action',
         numeric: false,
         disablePadding: false,
         label: '',
-        width: '20%'
+        width: '10%'
     },
 ];
 
@@ -211,6 +232,16 @@ export default function TableTrip({ trips, setExecutes, executed, type }) {
             setExecutes(!executed);
         })
     }
+    const convertMillisecondsToHours = (milliseconds) => {
+        const seconds = milliseconds / 1000;
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const date = Math.floor(hours / 24);
+        if(date > 0) {
+            return `${date} ngày ${hours} giờ ${minutes} phút`;
+        }
+        return `${hours} giờ ${minutes} phút`;
+      }
     return (
         <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
             <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -265,7 +296,12 @@ export default function TableTrip({ trips, setExecutes, executed, type }) {
                                                 {row.code}
                                             </TableCell>
                                             <TableCell align="left">{row?.orderIds.length}</TableCell>
-                                            <TableCell align="left">{row.status}</TableCell>
+                                            <TableCell align="left">{Number(row?.total_distant / 1000).toFixed(2)} (km)</TableCell>
+                                            <TableCell align="left">{convertMillisecondsToHours(row?.total_time)}</TableCell>
+                                            <TableCell align="left">
+                                                <Chip label={row?.status} color={colorStatus.get(row?.status)} />
+                                            </TableCell>
+                                            <TableCell align="left">{new Date(row?.startTime).toLocaleDateString()}</TableCell>
                                             <TableCell>
                                                 <Box sx={{ display: 'flex' }}>
                                                     {type === "Done" ? null : (

@@ -22,7 +22,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Chip, Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import { deleteTruck } from 'api/TruckAPI';
 
@@ -301,7 +301,9 @@ export default function ContentsTruckManagement({ trucks, page, setPage, rowsPer
                       </TableCell>
                       <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
                       <TableCell align="left">{row.driverName}</TableCell>
-                      <TableCell align="left"><Chip label={row.status} color={`${row?.status === "AVAILABLE" ? "success" : "primary"}`} /></TableCell>
+                      <TableCell align="left">
+                        <Chip label={row?.status} color={colorStatus.get(row?.status)} />
+                      </TableCell>
                       <TableCell align="left">{row.licensePlates}</TableCell>
                       <TableCell align="left">{row.brandTruck}</TableCell>
                       <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>

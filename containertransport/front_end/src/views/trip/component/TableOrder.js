@@ -211,76 +211,85 @@ export default function TableOrder({ tripItems, setExecutes, executed, type, tri
     const isSelected = (name) => selected.indexOf(name) !== -1;
 
     const handleExecuted = (row) => {
-        if (row?.type === "Truck") {
-            if (row.action === "DEPART" && row.status === "SCHEDULED") {
-                let dataTruck = {
-                    status: "EXECUTING"
-                }
-                updateTruck(row.truckId, dataTruck).then((res) => {
-                });
-            }
-            if (row.action === "STOP" && row.status === "EXECUTING") {
-                let dataTruck = {
-                    status: "AVAILABLE"
-                }
-                updateTruck(row.truckId, dataTruck).then((res) => {
-                });
-            }
+        // if (row?.type === "Truck") {
+        //     if (row.action === "DEPART" && row.status === "SCHEDULED") {
+        //         let dataTruck = {
+        //             status: "EXECUTING"
+        //         }
+        //         updateTruck(row.truckId, dataTruck).then((res) => {
+        //         });
+        //     }
+        //     if (row.action === "STOP" && row.status === "EXECUTING") {
+        //         let dataTruck = {
+        //             status: "AVAILABLE"
+        //         }
+        //         updateTruck(row.truckId, dataTruck).then((res) => {
+        //         });
+        //     }
 
-            let dataItem = {
-                status: row.status === "SCHEDULED" ? "EXECUTING" : "DONE"
-            }
-            updateTripItem(row.id, dataItem).then((res) => { });
-            setExecutes(!executed);
+        //     let dataItem = {
+        //         status: row.status === "SCHEDULED" ? "EXECUTING" : "DONE"
+        //     }
+        //     updateTripItem(row.id, dataItem).then((res) => { });
+        //     setExecutes(!executed);
+        // }
+        // if (row?.type === "Trailer") {
+        //     if (row.action === "PICKUP_TRAILER" && row.status === "SCHEDULED") {
+        //         let dataTrailer = {
+        //             id: row.trailerId,
+        //             status: "EXECUTING"
+        //         }
+        //         updateTrailer(dataTrailer).then((res) => {
+        //         })
+        //     }
+
+        //     if (row.action === "DROP_TRAILER" && row.status === "EXECUTING") {
+        //         let dataTrailer = {
+        //             id: row.trailerId,
+        //             status: "AVAILABLE"
+        //         }
+        //         updateTrailer(dataTrailer).then((res) => {
+        //         })
+        //     }
+
+        //     let dataItem = {
+        //         status: row.status === "SCHEDULED" ? "EXECUTING" : "DONE"
+        //     }
+        //     updateTripItem(row.id, dataItem).then((res) => { });
+        //     setExecutes(!executed);
+        // }
+        // if (row?.type === "Order") {
+        //     if (row.action === "PICKUP-CONTAINER" && row.status === "SCHEDULED") {
+        //         let dataOrder = {
+        //             status: "EXECUTING"
+        //         }
+        //         updateOrderByOrderCode(row.orderCode, dataOrder).then((res) => {
+        //         })
+        //     }
+
+        //     if (row.action === "DELIVERY-CONTAINER" && row.status === "EXECUTING") {
+        //         let dataOrder = {
+        //             status: "DONE"
+        //         }
+        //         updateOrderByOrderCode(row.orderCode, dataOrder).then((res) => {
+        //         })
+        //     }
+
+        //     let dataItem = {
+        //         status: row.status === "SCHEDULED" ? "EXECUTING" : "DONE"
+        //     }
+        //     updateTripItem(row.id, dataItem).then((res) => { });
+        //     setExecutes(!executed);
+        // }
+        if(row.status === "SCHEDULED") {
+            row.status = "EXECUTING";
         }
-        if (row?.type === "Trailer") {
-            if (row.action === "PICKUP_TRAILER" && row.status === "SCHEDULED") {
-                let dataTrailer = {
-                    id: row.trailerId,
-                    status: "EXECUTING"
-                }
-                updateTrailer(dataTrailer).then((res) => {
-                })
-            }
-
-            if (row.action === "DELIVERY_TRAILER" && row.status === "EXECUTING") {
-                let dataTrailer = {
-                    id: row.trailerId,
-                    status: "AVAILABLE"
-                }
-                updateTrailer(dataTrailer).then((res) => {
-                })
-            }
-
-            let dataItem = {
-                status: row.status === "SCHEDULED" ? "EXECUTING" : "DONE"
-            }
-            updateTripItem(row.id, dataItem).then((res) => { });
-            setExecutes(!executed);
+        else if(row.status === "EXECUTING") {
+            row.status = "DONE";
         }
-        if (row?.type === "Order") {
-            if (row.action === "PICKUP-CONTAINER" && row.status === "SCHEDULED") {
-                let dataOrder = {
-                    status: "EXECUTING"
-                }
-                updateOrderByOrderCode(row.orderCode, dataOrder).then((res) => {
-                })
-            }
-
-            if (row.action === "DELIVERY-CONTAINER" && row.status === "EXECUTING") {
-                let dataOrder = {
-                    status: "DONE"
-                }
-                updateOrderByOrderCode(row.orderCode, dataOrder).then((res) => {
-                })
-            }
-
-            let dataItem = {
-                status: row.status === "SCHEDULED" ? "EXECUTING" : "DONE"
-            }
-            updateTripItem(row.id, dataItem).then((res) => { });
+        updateTripItem(row.uid, row).then((res) => {
             setExecutes(!executed);
-        }
+        });
     }
     return (
         <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
