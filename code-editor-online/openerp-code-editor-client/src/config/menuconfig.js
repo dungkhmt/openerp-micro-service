@@ -33,8 +33,8 @@ export const MENUS = [];
 
 MENUS.push(general);
 MENUS.push(user);
-MENUS.push(teacher);
-MENUS.push(student);
+// MENUS.push(teacher);
+// MENUS.push(student);
 MENUS.push(codeEditorOnline);
 
 export const menuIconMap = new Map();
