@@ -43,7 +43,12 @@ const CreateShipmentForm = ({ setIsAdd }) => {
   };
   return (
     <FormProvider {...methods}>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         <Controller
           key={"title"}
           control={control}

@@ -49,7 +49,12 @@ const UpdateTruck = ({ setIsAdd, currTruck }) => {
   };
   return (
     <FormProvider {...methods}>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         <Controller
           key={"name"}
           control={control}
@@ -85,7 +90,12 @@ const UpdateTruck = ({ setIsAdd, currTruck }) => {
           )}
         />
       </Stack>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         <Controller
           key={"capacity"}
           control={control}
@@ -121,7 +131,12 @@ const UpdateTruck = ({ setIsAdd, currTruck }) => {
           )}
         />
       </Stack>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         <Controller
           key={"waitingCost"}
           control={control}

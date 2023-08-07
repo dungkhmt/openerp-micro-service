@@ -47,7 +47,12 @@ const UpdateTrip = ({ setOpenDrawer, currTrip }) => {
   };
   return (
     <FormProvider {...methods}>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         {/* <Typography>
           Nên có thêm phần gợi ý xem lấy kho nào thì trùng với cụm customers
           đang được phân trip

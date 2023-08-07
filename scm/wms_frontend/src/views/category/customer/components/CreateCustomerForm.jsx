@@ -55,7 +55,12 @@ const CreateCustomerForm = ({ setIsAdd }) => {
   };
   return (
     <FormProvider {...methods}>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         <Controller
           key={"address"}
           control={control}
@@ -91,7 +96,12 @@ const CreateCustomerForm = ({ setIsAdd }) => {
           )}
         />
       </Stack>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         <Controller
           key={"province"}
           control={control}
