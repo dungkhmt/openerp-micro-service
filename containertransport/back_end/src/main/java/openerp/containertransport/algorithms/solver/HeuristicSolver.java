@@ -113,7 +113,7 @@ public class HeuristicSolver {
             BigDecimal bestTotalDistant = new BigDecimal(String.valueOf(this.transportContainerSolutionOutput.getTotalDistant()));
 
             // Find request when remove it, return total distant min (tong quang duong giam nhat)
-            InfoRemoveRequest infoRemoveRequest = removeRequestInTrip(); // cap nhat distant and router trong tmp
+            InfoRemoveRequest infoRemoveRequest = (loop % 2 == 0) ? removeRequestInTrip() : removeRequestInTripV2(); // cap nhat distant and router trong tmp
             log.info("Remove request: {} in router truck: {}", infoRemoveRequest.getRequestId(), infoRemoveRequest.getTruckId());
 
             // Add request vao cho thich hop sao cho tong quang duong la nho nhat
@@ -784,7 +784,7 @@ public class HeuristicSolver {
         int truckSelect = 0;
         int indexRequest = random.nextInt(size);
         Request request = SerializationUtils.clone(this.requestList.get(indexRequest));
-        requestSelect = this.requestList.get(indexRequest).getRequestId();
+        requestSelect = request.getRequestId();
 
         BigDecimal totalDistantLoop = new BigDecimal(String.valueOf(this.transportContainerSolutionOutput.getTotalDistant()));
 
@@ -802,7 +802,6 @@ public class HeuristicSolver {
             if (points.size() < this.transportContainerSolutionOutput.getTripOutputs().get(truckInput.getTruckID()).getPoints().size()) {
                 // remove trailer and not update trailer
                 List<Point> pointNoTrailer = tripOutput.getPoints().stream().filter((item) -> !item.getType().equals("Trailer")).collect(Collectors.toList());
-//                    tripOutput = removePickTrailer(tripOutput);
 
                 BigDecimal distantTmp;
                 BigDecimal totalDistantTripAfter;
