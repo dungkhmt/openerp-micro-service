@@ -783,8 +783,73 @@ public class HeuristicSolver {
         long requestSelect = 0;
         int truckSelect = 0;
         int indexRequest = random.nextInt(size);
+        Request request = SerializationUtils.clone(this.requestList.get(indexRequest));
         requestSelect = this.requestList.get(indexRequest).getRequestId();
-        // can check lai truck router
+
+        BigDecimal totalDistantLoop = new BigDecimal(String.valueOf(this.transportContainerSolutionOutput.getTotalDistant()));
+
+
+        // tìm router chứa request
+        for (TruckInput truckInput : this.trucks.values().toArray(new TruckInput[0])) {
+            TripOutput tripOutput = SerializationUtils.clone(this.transportContainerSolutionOutput.getTripOutputs().get(truckInput.getTruckID()));
+            BigDecimal totalDistantTripBefore = new BigDecimal(String.valueOf(this.transportContainerSolutionOutput.getTripOutputs().get(truckInput.getTruckID()).getTotalDistant()));
+            if(tripOutput.getPoints() == null) {
+                continue;
+            }
+            List<Point> points = tripOutput.getPoints().stream()
+                    .filter((item) -> !item.getOrderCode().equals(request.getOrderCode())).collect(Collectors.toList());
+
+            if (points.size() < this.transportContainerSolutionOutput.getTripOutputs().get(truckInput.getTruckID()).getPoints().size()) {
+                // remove trailer and not update trailer
+                List<Point> pointNoTrailer = tripOutput.getPoints().stream().filter((item) -> !item.getType().equals("Trailer")).collect(Collectors.toList());
+//                    tripOutput = removePickTrailer(tripOutput);
+
+                BigDecimal distantTmp;
+                BigDecimal totalDistantTripAfter;
+
+                // after remove, have 0 point
+                if (pointNoTrailer.size() == 0) {
+                    distantTmp = new BigDecimal(Double.MAX_VALUE);
+                    totalDistantTripAfter = totalDistantLoop.subtract(totalDistantTripBefore);
+                }
+                else {
+                    // add trailer
+                    List<Point> pointsInTrip = insertPickTrailerWithScheduler(tripOutput.getPoints(), truckInput.getTruckID());
+                    tripOutput.setPoints(pointsInTrip);
+                    distantTmp = calcDistantRouter(truckInput.getLocationId(), points);
+                    totalDistantTripAfter = totalDistantLoop.subtract(totalDistantTripBefore).add(distantTmp);
+                }
+                truckSelect = truckInput.getTruckID();
+                tripOutput.setTotalDistant(distantTmp);
+
+                // update old trailer
+                TripOutput tripOutputBeforeRemove = SerializationUtils.clone(this.transportContainerSolutionOutput.getTripOutputs().get(truckSelect));
+                List<Point> pointsTrailerBefore = tripOutputBeforeRemove.getPoints().stream().filter((item) -> item.getType().equals("Trailer")).collect(Collectors.toList());
+                for (Point point : pointsTrailerBefore) {
+                    removeToTrailerScheduler(point.getTrailerId());
+                }
+
+                // update new trailer scheduler and update weight
+                if (tripOutput.getPoints().size() > 0) {
+                    List<Point> pointsTrailer = tripOutput.getPoints().stream().filter((item) -> item.getType().equals("Trailer")).collect(Collectors.toList());
+                    for (Point point : pointsTrailer) {
+                        insertToTrailerScheduler(point.getTrailerId());
+                    }
+
+                    List<Point> pointListAfter = updateWeightContainer(tripOutput.getPoints(), 0, tripOutput.getPoints().size()-1);
+                    tripOutput.setPoints(pointListAfter);
+                }
+
+                // update tmp
+                this.transportContainerSolutionOutput.getTripOutputsTmp().get(truckSelect).setPoints(tripOutput.getPoints());
+                this.transportContainerSolutionOutput.getTripOutputsTmp().get(truckSelect).setTotalDistant(tripOutput.getTotalDistant());
+                this.transportContainerSolutionOutput.setTotalDistantTmp(totalDistantTripAfter);
+
+                break;
+            }
+        }
+
+
         infoRemoveRequest.setRequestId(requestSelect);
         infoRemoveRequest.setTruckId(truckSelect);
         return infoRemoveRequest;
