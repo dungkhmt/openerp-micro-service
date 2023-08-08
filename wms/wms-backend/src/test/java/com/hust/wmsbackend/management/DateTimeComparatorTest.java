@@ -39,6 +39,12 @@ public class DateTimeComparatorTest {
 
     @Test
     public void overlapTest() throws ParseException {
+        Date s1t0 = new SimpleDateFormat("dd/MM/yyyy").parse("01/05/2023");
+        Date e1t0 = new SimpleDateFormat("dd/MM/yyyy").parse("30/05/2023");
+        Date s2t0 = new SimpleDateFormat("dd/MM/yyyy").parse("05/05/2023");
+        Date e2t0 = new SimpleDateFormat("dd/MM/yyyy").parse("20/05/2023");
+        Assert.assertEquals(DateUtils.isOverlap(s1t0, e1t0, s2t0, e2t0), true);
+
         Date s1t1 = new SimpleDateFormat("dd/MM/yyyy").parse("27/07/2023");
         Date e1t1 = new SimpleDateFormat("dd/MM/yyyy").parse("27/08/2023");
         Date s2t1 = new SimpleDateFormat("dd/MM/yyyy").parse("28/07/2023");

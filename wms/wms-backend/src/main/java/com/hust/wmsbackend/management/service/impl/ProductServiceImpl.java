@@ -97,9 +97,9 @@ public class ProductServiceImpl implements ProductService {
         log.info("Saved new product");
 
         // update init product quantity of created product is not allowed
-        if (!isCreateRequest) {
-            return product;
-        }
+//        if (!isCreateRequest) {
+//            return product;
+//        }
 
         // update redis
         List<Product> products = redisCacheService.getCachedListObject(RedisCacheService.ALL_PRODUCTS_KEY, Product.class);
@@ -283,25 +283,20 @@ public class ProductServiceImpl implements ProductService {
         // get previous price config
         List<ProductPrice> prices = productPriceRepository.findAllByProductId(productId);
 
-        Date maxStartDate = new Date(Long.MIN_VALUE);
-        UUID maxStartDateProductPriceId = null;
-
         // get current product price entity
         ProductPrice updatePrice = null;
+        Date now = new Date();
         if (!prices.isEmpty()){
             for (ProductPrice price : prices) {
-                if (DateUtils.isBeforeOrEqual(price.getStartDate(), maxStartDate)) {
-                    maxStartDate = price.getStartDate();
-                    maxStartDateProductPriceId = price.getProductPriceId();
+                if (DateUtils.isNowBetween(now, price.getStartDate(), price.getEndDate())) {
                     updatePrice = price;
+                    break;
                 }
             }
         }
 
         // set previous price config end date to request.getStartDate() - 1
-
-        if (maxStartDateProductPriceId != null) {
-            // tồn tại giá trị maxStartDate => cần set productPrice của record này về request.getStartDate() - 1
+        if (updatePrice != null) {
             updatePrice.setEndDate(org.apache.commons.lang.time.DateUtils.addDays(request.getStartDate(), -1));
         }
 
