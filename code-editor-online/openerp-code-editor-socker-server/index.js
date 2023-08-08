@@ -72,12 +72,14 @@ io.on("connection", (socket) => {
     });
 
     socket.on(SOCKET_IO_EVENTS.REQUEST_ON_OFF_MIC, ({ socketId, audio }) => {
+      userSocketMap[socket.id].audio = audio;
       io.to(roomId).emit(SOCKET_IO_EVENTS.ACCEPT_ON_OFF_MIC, {
         socketId,
         audio,
       });
     });
     socket.on(SOCKET_IO_EVENTS.REQUEST_ON_OFF_CAMERA, ({ socketId, video }) => {
+      userSocketMap[socket.id].video = video;
       io.to(roomId).emit(SOCKET_IO_EVENTS.ACCEPT_ON_OFF_CAMERA, {
         socketId,
         video,
