@@ -34,6 +34,8 @@ public class HeuristicSolver {
     private Map<Integer, FacilityInput> facilityInputMap = new HashMap<>();
     private Long startTime;
     private TransportContainerSolutionOutput transportContainerSolutionOutput;
+    private final static int NUMBER_LOOP = 50;
+    private final static int STOP_LOOP = 20;
 
     public TransportContainerSolutionOutput solve (TransportContainerInput input){
 
@@ -107,7 +109,8 @@ public class HeuristicSolver {
     public void greedyAlgorithmTms() {
         initRouters();
         createRouter();
-        int loop = 50;
+        int loop = NUMBER_LOOP;
+        int count = 0;
 
         while (loop > 0) {
             BigDecimal bestTotalDistant = new BigDecimal(String.valueOf(this.transportContainerSolutionOutput.getTotalDistant()));
@@ -179,6 +182,7 @@ public class HeuristicSolver {
                 removeTrailerSchedulerInTrip(tripOutputOldTmp);
                 tripOutputOld = insertTrailerSchedulerInTrip(tripOutputOld);
                 this.transportContainerSolutionOutput.getTripOutputsTmp().put(infoRemoveRequest.getTruckId(), tripOutputOld);
+                count += 1;
             }
             else {
                 this.transportContainerSolutionOutput.setTotalDistant(totalDistantSolutionLoop);
@@ -187,12 +191,17 @@ public class HeuristicSolver {
                     this.transportContainerSolutionOutput.getTripOutputs().put(infoRemoveRequest.getTruckId(), tripOutputInRouterRemoved);
                 }
                 this.transportContainerSolutionOutput.getTripOutputs().put(truckRouterSelected, tripOutputLoop);
+                count = 0;
             }
 
             // update solutionTmp
             updateSolutionTmp();
+            if(count == STOP_LOOP) {
+                loop = 0;
+            } else {
+                loop -= 1;
+            }
 
-            loop -= 1;
         }
     }
     public void createRouter() {

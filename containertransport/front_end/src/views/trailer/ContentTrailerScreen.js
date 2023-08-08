@@ -241,7 +241,7 @@ export default function ContentsTrailerScreen({ trailer, page, setPage, rowsPerP
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={trailer.length}
+              rowCount={trailer?.length}
             />
             <TableBody>
               {trailer

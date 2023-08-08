@@ -198,6 +198,17 @@ public class TripServiceImpl implements TripService {
                 });
                 trip.setOrders(ordersUpdate);
 
+                // update status trailer
+                List<TripItem> tripItems = tripItemRepo.findByTripId(trip.getUid());
+                for (TripItem tripItem: tripItems) {
+                    if(tripItem.getTrailer() != null) {
+                        Trailer trailer = tripItem.getTrailer();
+                        trailer.setStatus(Constants.TrailerStatus.AVAILABLE.getStatus());
+                        trailer.setUpdatedAt(System.currentTimeMillis());
+                        trailerRepo.save(trailer);
+                    }
+                }
+
                 // delete old tripItem
                 tripItemRepo.deleteByTripUid(trip.getUid());
 
@@ -238,15 +249,14 @@ public class TripServiceImpl implements TripService {
                 truckRepo.save(truck);
 
                 List<TripItem> tripItems = tripItemRepo.findByTripId(tripUid);
-                tripItems.forEach((item) -> {
-                    if (item.getTrailer() != null) {
-                        Trailer trailer = item.getTrailer();
-                        trailer.setStatus(Constants.TrailerStatus.AVAILABLE.getStatus());
-                        trailer.setUpdatedAt(System.currentTimeMillis());
-                        trailerRepo.save(trailer);
-                    }
-                });
-
+//                tripItems.forEach((item) -> {
+//                    if (item.getTrailer() != null) {
+//                        Trailer trailer = trailerRepo.findByUid(item.getTrailer().getUid());
+//                        trailer.setStatus(Constants.TrailerStatus.AVAILABLE.getStatus());
+//                        trailer.setUpdatedAt(System.currentTimeMillis());
+////                        trailerRepo.save(trailer);
+//                    }
+//                });
                 Trip tripDelete = tripRepo.deleteTripByUid(tripUid);
                 tripModels.add(convertToModel(tripDelete));
             }
