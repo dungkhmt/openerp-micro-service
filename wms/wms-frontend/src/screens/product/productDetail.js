@@ -497,7 +497,7 @@ const ProductDetail = ( props ) => {
                       fullWidth
                     >
                       <MenuItem value={"Cái"} >Cái</MenuItem>
-                      <MenuItem value={"Kg"}>Kg</MenuItem>
+                      {/* <MenuItem value={"Kg"}>Kg</MenuItem> */}
                       <MenuItem value={"Gói"}>Gói</MenuItem>
                     </Select>
                   </Grid>

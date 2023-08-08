@@ -21,7 +21,11 @@ const PriceHistory = ( { data } ) => {
 
   const columns = [
     { title: "Giá bán *", field: "price",
-      editComponent: <TextField type="number" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} /> },
+      editComponent: <TextField type="number" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} InputProps={{
+        inputProps: { 
+            min: 0 
+          }
+      }} /> },
     { title: "Ngày bắt đầu *", field: "startDate",
       editComponent: <TextField type="date" value={newStartDate} onChange={(e) => setNewStartDate(e.target.value)} />  },
     { title: "Ngày kết thúc", field: "endDate",
