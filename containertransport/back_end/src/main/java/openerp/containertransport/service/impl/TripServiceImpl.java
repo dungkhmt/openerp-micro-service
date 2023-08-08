@@ -12,8 +12,10 @@ import openerp.containertransport.entity.*;
 import openerp.containertransport.repo.*;
 import openerp.containertransport.service.*;
 import openerp.containertransport.utils.RandomUtils;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -34,6 +36,7 @@ public class TripServiceImpl implements TripService {
     private final FacilityService facilityService;
     private final EntityManager entityManager;
     private final OrderServiceImpl orderService;
+    private final FacilityRepo facilityRepo;
 
     @Override
     public TripModel createTrip(TripModel tripModel, String shipmentId, String createBy) {
@@ -199,15 +202,19 @@ public class TripServiceImpl implements TripService {
                 trip.setOrders(ordersUpdate);
 
                 // update status trailer
-                List<TripItem> tripItems = tripItemRepo.findByTripId(trip.getUid());
-                for (TripItem tripItem: tripItems) {
-                    if(tripItem.getTrailer() != null) {
-                        Trailer trailer = tripItem.getTrailer();
+                List<TripItem> tripItems = tripItemRepo.findByTripId(uid);
+                tripItems.forEach((item) -> {
+                    if (item.getTrailer() != null) {
+                        Facility facility = facilityRepo.findByUid(item.getTrailer().getFacility().getUid());
+                        facility = Hibernate.unproxy(facility, Facility.class);
+                        Trailer trailer = item.getTrailer();
+                        trailer = Hibernate.unproxy(trailer, Trailer.class);
+                        trailer.setFacility(facility);
                         trailer.setStatus(Constants.TrailerStatus.AVAILABLE.getStatus());
                         trailer.setUpdatedAt(System.currentTimeMillis());
                         trailerRepo.save(trailer);
                     }
-                }
+                });
 
                 // delete old tripItem
                 tripItemRepo.deleteByTripUid(trip.getUid());
@@ -227,6 +234,7 @@ public class TripServiceImpl implements TripService {
         return convertToModel(trip);
     }
 
+    @Transactional
     @Override
     public List<TripModel> deleteTrips(TripDeleteDTO tripDeleteDTO) {
         List<TripModel> tripModels = new ArrayList<>();
@@ -236,7 +244,7 @@ public class TripServiceImpl implements TripService {
             if (trip.getStatus().equals(Constants.TripStatus.SCHEDULED.getStatus())
 //                    && trip.getShipment().getStatus().equals(Constants.ShipmentStatus.SCHEDULED.getStatus())
             ) {
-                tripItemRepo.deleteByTripUid(tripUid);
+
                 List<Order> orders = trip.getOrders();
                 orders.forEach((order) -> {
                     order.setStatus(Constants.OrderStatus.ORDERED.getStatus());
@@ -249,14 +257,19 @@ public class TripServiceImpl implements TripService {
                 truckRepo.save(truck);
 
                 List<TripItem> tripItems = tripItemRepo.findByTripId(tripUid);
-//                tripItems.forEach((item) -> {
-//                    if (item.getTrailer() != null) {
-//                        Trailer trailer = trailerRepo.findByUid(item.getTrailer().getUid());
-//                        trailer.setStatus(Constants.TrailerStatus.AVAILABLE.getStatus());
-//                        trailer.setUpdatedAt(System.currentTimeMillis());
-////                        trailerRepo.save(trailer);
-//                    }
-//                });
+                tripItems.forEach((item) -> {
+                    if (item.getTrailer() != null) {
+                        Facility facility = facilityRepo.findByUid(item.getTrailer().getFacility().getUid());
+                        facility = Hibernate.unproxy(facility, Facility.class);
+                        Trailer trailer = item.getTrailer();
+                        trailer = Hibernate.unproxy(trailer, Trailer.class);
+                        trailer.setFacility(facility);
+                        trailer.setStatus(Constants.TrailerStatus.AVAILABLE.getStatus());
+                        trailer.setUpdatedAt(System.currentTimeMillis());
+                        trailerRepo.save(trailer);
+                    }
+                });
+                tripItemRepo.deleteByTripUid(tripUid);
                 Trip tripDelete = tripRepo.deleteTripByUid(tripUid);
                 tripModels.add(convertToModel(tripDelete));
             }
