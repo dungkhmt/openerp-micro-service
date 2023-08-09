@@ -46,6 +46,9 @@ public class OrderServiceImpl implements OrderService {
         if(orderModel.getType().equals("OE")) {
             Order order = new Order();
             Container container = getContainerNearest(orderModel.getToFacilityId(), orderModel.getWeight());
+            if(container == null) {
+                return null;
+            }
             Facility fromFacility = facilityRepo.findById(container.getFacility().getId()).get();
             Facility facilityTo = facilityRepo.findByUid(orderModel.getToFacilityId());
             order.setToFacility(facilityTo);

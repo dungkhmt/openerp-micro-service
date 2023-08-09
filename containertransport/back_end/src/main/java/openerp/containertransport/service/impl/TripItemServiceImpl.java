@@ -54,7 +54,7 @@ public class TripItemServiceImpl implements TripItemService {
         if(tripItemModel.getOrderCode() != null) {
             tripItem.setOrderCode(tripItemModel.getOrderCode());
         }
-        if(StringUtils.isEmpty(tripItemModel.getOrderUid())) {
+        if(tripItemModel.getOrderUid() != null) {
             Order order = orderRepo.findByUid(tripItemModel.getOrderUid());
             tripItem.setOrder(order);
         }

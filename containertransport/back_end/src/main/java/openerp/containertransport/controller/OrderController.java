@@ -30,6 +30,9 @@ public class OrderController {
         String username = token.getName();
         orderModel.setUsername(username);
         List<OrderModel> orders = orderService.createOrder(orderModel);
+        if(orders == null) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.BAD_REQUEST), "Đơn vị vận chuyển đang quá tải!"));
+        }
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), orders));
     }
 

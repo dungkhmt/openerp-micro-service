@@ -159,7 +159,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             fromFacilityId: fromFacility,
             toFacilityId: toFacility,
             // earlyDeliveryTime: (new Date(earlyDeliveryTime)).getTime(),
-            // lateDeliveryTime: (new Date(lateDeliveryTime)).getTime(),
+            lateDeliveryTime: (new Date(lateDeliveryTime)).getTime(),
             // earlyPickupTime: (new Date(earlyPickUpTime)).getTime(),
             latePickupTime: (new Date(latePickUpTime)).getTime(),
             isBreakRomooc: isBreakRomooc,
@@ -178,10 +178,15 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                 `/order/create`, {}, {}, data
             ).then((res) => {
                 console.log("res", res);
+                if (res?.data.meta.code === 400) {
+                    setToastType("error");
+                    setToastMsg(res?.data.data);
+                }
                 if (!res) {
                     setToastType("error");
                     setToastMsg("Created order fail !!!");
-                } else {
+                } 
+                if (res?.data.meta.code === 200) {
                     setToastType("success");
                     setToastMsg("Created order success !!!");
                 }
