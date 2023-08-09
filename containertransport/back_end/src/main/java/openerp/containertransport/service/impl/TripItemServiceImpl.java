@@ -93,7 +93,7 @@ public class TripItemServiceImpl implements TripItemService {
         if(tripItemModel.getStatus() != null) {
             tripItem.setStatus(tripItemModel.getStatus());
             if(tripItemModel.getStatus().equals(Constants.OrderStatus.EXECUTING.getStatus())
-            && tripItemModel.getAction().equals("PICKUP-CONTAINER")) {
+            && tripItemModel.getAction().equals("PICKUP_CONTAINER")) {
                 Order order = orderRepo.findByUid(tripItemModel.getOrderUid());
                 order.setStatus(Constants.OrderStatus.EXECUTING.getStatus());
                 orderRepo.save(order);
@@ -104,7 +104,7 @@ public class TripItemServiceImpl implements TripItemService {
                 containerRepo.save(container);
             }
             if(tripItemModel.getStatus().equals(Constants.OrderStatus.DONE.getStatus())
-                    && tripItemModel.getAction().equals("DELIVERY-CONTAINER")) {
+                    && tripItemModel.getAction().equals("DELIVERY_CONTAINER")) {
                 Order order = orderRepo.findByUid(tripItemModel.getOrderUid());
                 order.setStatus(Constants.OrderStatus.DONE.getStatus());
                 orderRepo.save(order);
@@ -129,7 +129,7 @@ public class TripItemServiceImpl implements TripItemService {
             }
 
             if(tripItemModel.getStatus().equals(Constants.OrderStatus.DONE.getStatus())
-                    && tripItemModel.getAction().equals("PICKUP-TRAILER")) {
+                    && tripItemModel.getAction().equals("PICKUP_TRAILER")) {
                 Trailer trailer = trailerRepo.findById(tripItemModel.getTrailerId()).get();
                 trailer.setStatus(Constants.TrailerStatus.EXECUTING.getStatus());
                 trailer.setUpdatedAt(System.currentTimeMillis());
@@ -137,7 +137,7 @@ public class TripItemServiceImpl implements TripItemService {
             }
 
             if(tripItemModel.getStatus().equals(Constants.OrderStatus.DONE.getStatus())
-                    && tripItemModel.getAction().equals("DROP-TRAILER")) {
+                    && tripItemModel.getAction().equals("DROP_TRAILER")) {
                 Trailer trailer = trailerRepo.findById(tripItemModel.getTrailerId()).get();
                 trailer.setStatus(Constants.TrailerStatus.AVAILABLE.getStatus());
 

@@ -132,20 +132,20 @@ const CreateTripDetail = () => {
         let totalTime = startTime;
         // check nbTrailer
         for (let i = 1; i < tripItems.length - 1; i++) {
-            if (tripItems[i].action === "PICKUP-TRAILER") {
+            if (tripItems[i].action === "PICKUP_TRAILER") {
                 nbTrailer = Number(nbTrailer) + 1;
             }
-            if (tripItems[i].action === "DROP-TRAILER") {
+            if (tripItems[i].action === "DROP_TRAILER") {
                 nbTrailer = Number(nbTrailer) - 1;
             }
 
-            if (tripItems[i].action === "PICKUP-CONTAINER") {
+            if (tripItems[i].action === "PICKUP_CONTAINER") {
                 totalWeight = totalWeight + tripItems[i].container.size;
             }
-            if (tripItems[i].action === "DELIVERY-CONTAINER") {
+            if (tripItems[i].action === "DELIVERY_CONTAINER") {
                 let checkPickup = false;
                 for (let j = 1; j < i; j++) {
-                    if (tripItems[j].action === "PICKUP-CONTAINER" && tripItems[j].orderCode === tripItems[i].orderCode) {
+                    if (tripItems[j].action === "PICKUP_CONTAINER" && tripItems[j].orderCode === tripItems[i].orderCode) {
                         checkPickup = true;
                         break;
                     }
@@ -158,12 +158,12 @@ const CreateTripDetail = () => {
                 totalWeight = totalWeight - tripItems[i].container.size;
             }
 
-            if (tripItems[i].action === "DELIVERY-CONTAINER" && nbTrailer === 0) {
+            if (tripItems[i].action === "DELIVERY_CONTAINER" && nbTrailer === 0) {
                 setToastMsg(`Please view again at before ${tripItems[i].action} ${tripItems[i].orderCode}`)
                 appearToast();
                 return false;
             }
-            if (tripItems[i].action === "DELIVERY-CONTAINER" && tripItems[i].isBreakRomooc) {
+            if (tripItems[i].action === "DELIVERY_CONTAINER" && tripItems[i].isBreakRomooc) {
                 nbTrailer = Number(nbTrailer) - 1;
             }
             console.log("nbTrailer", nbTrailer)
@@ -173,7 +173,7 @@ const CreateTripDetail = () => {
                 return false;
             }
 
-            if (tripItems[i].action === "PICKUP-CONTAINER" && nbTrailer === 0) {
+            if (tripItems[i].action === "PICKUP_CONTAINER" && nbTrailer === 0) {
                 setToastMsg(`Please chose Trailer before Pickup Container in Order ${tripItems[i].orderCode}`)
                 appearToast();
                 return false;

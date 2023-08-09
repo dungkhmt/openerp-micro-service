@@ -267,7 +267,7 @@ export default function TableOrder({ tripItems, setExecutes, executed, type, tri
         //         })
         //     }
 
-        //     if (row.action === "DELIVERY-CONTAINER" && row.status === "EXECUTING") {
+        //     if (row.action === "DELIVERY_CONTAINER" && row.status === "EXECUTING") {
         //         let dataOrder = {
         //             status: "DONE"
         //         }

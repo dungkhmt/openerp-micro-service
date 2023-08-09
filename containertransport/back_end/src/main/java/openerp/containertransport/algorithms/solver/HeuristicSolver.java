@@ -34,7 +34,7 @@ public class HeuristicSolver {
     private Map<Integer, FacilityInput> facilityInputMap = new HashMap<>();
     private Long startTime;
     private TransportContainerSolutionOutput transportContainerSolutionOutput;
-    private final static int NUMBER_LOOP = 50;
+    private final static int NUMBER_LOOP = 100;
     private final static int STOP_LOOP = 20;
 
     public TransportContainerSolutionOutput solve (TransportContainerInput input){
