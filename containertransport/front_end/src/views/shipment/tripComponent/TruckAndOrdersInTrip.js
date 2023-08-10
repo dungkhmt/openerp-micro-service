@@ -227,6 +227,12 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                                 </Box>
                                 <Box>{convertMillisecondsToHours(trip?.total_time)}</Box>
                             </Box>
+                            <Box className="truck-info-item">
+                                <Box className="truck-info-item-title">
+                                    <Typography>Total order:</Typography>
+                                </Box>
+                                <Box>{trip?.orderIds?.length} (đơn hàng)</Box>
+                            </Box>
                         </Box>
                     </>
                 ) : null}
