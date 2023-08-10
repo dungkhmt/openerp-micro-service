@@ -93,6 +93,12 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         log.info("Start save list shelf");
         List<WarehouseWithBays.Shelf> listShelf = request.getListShelf();
+
+        // delete all bay
+        if (request.getId() != null && listShelf.isEmpty()) {
+            bayRepository.deleteAll(prevBays);
+        }
+
         if (listShelf != null && !listShelf.isEmpty()) {
             List<Bay> bays = listShelf.stream()
                     .filter(shelf -> shelf.getCode() != null

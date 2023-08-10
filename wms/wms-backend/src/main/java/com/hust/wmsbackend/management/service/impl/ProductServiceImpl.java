@@ -286,7 +286,7 @@ public class ProductServiceImpl implements ProductService {
         // get current product price entity
         ProductPrice updatePrice = null;
         Date now = new Date();
-        if (!prices.isEmpty()){
+        if (!prices.isEmpty()) {
             for (ProductPrice price : prices) {
                 if (DateUtils.isNowBetween(now, price.getStartDate(), price.getEndDate())) {
                     updatePrice = price;
@@ -296,12 +296,18 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // set previous price config end date to request.getStartDate() - 1
-        if (updatePrice != null) {
-            updatePrice.setEndDate(org.apache.commons.lang.time.DateUtils.addDays(request.getStartDate(), -1));
+        if (updatePrice != null && updatePrice.getEndDate() == null) {
+            Date newEndDate = org.apache.commons.lang.time.DateUtils.addDays(request.getStartDate(), -1);
+            if (DateUtils.isBeforeOrEqual(updatePrice.getStartDate(), newEndDate)) {
+                updatePrice.setEndDate(newEndDate);
+            }
         }
 
         if (!prices.isEmpty()) {
             for (ProductPrice price : prices) {
+                if (DateUtils.isOverlap(request.getStartDate(), request.getEndDate(), price.getStartDate(), price.getEndDate())) {
+                    return false;
+                }
                 if (updatePrice != null && price.getProductPriceId().equals(updatePrice.getProductPriceId())) {
                     price.setEndDate(updatePrice.getEndDate());
                 }

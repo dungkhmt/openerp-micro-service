@@ -154,7 +154,6 @@ public class DeliveryRouteServiceImpl implements DeliveryRouteService {
             setInfinityValueForColAndRow(i, path.get(path.size() - 1), cloneReducedMatrix);
 
             ReducedMatrix matrix = getReducedMatrix(cloneReducedMatrix);
-//            double comp = matrix.getReducedCost() + reducedMatrix.getMatrix().get(path.get(path.size() - 1))[i];
             double comp = matrix.getReducedCost() + costMatrix.get(path.get(path.size() - 1))[i];
             if (comp < minCost) {
                 minReducedMatrix.setReducedCost(matrix.getReducedCost());
