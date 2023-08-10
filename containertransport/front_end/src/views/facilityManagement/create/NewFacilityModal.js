@@ -48,9 +48,16 @@ const FacilityModal = ({ open, handleClose, facility, setToast, setToastType, se
             setMaxTrailer(facility?.maxNumberTrailer);
             setMaxTruck(facility?.maxNumberTruck);
         }
-        if (role === roles.get("Customer")) {
+        if (role.includes(roles.get("Customer"))) {
             setType(facilityType.get("Container"));
             setTypeOwner("CUSTOMER");
+        }
+        if (role.includes(roles.get("Customs"))) {
+            setType(facilityType.get("Container"));
+            setTypeOwner("CUSTOMS");
+        }
+        if (role.includes(roles.get("Admin"))) {
+            setTypeOwner("ADMIN");
         }
     }, [])
     const typeConst = [

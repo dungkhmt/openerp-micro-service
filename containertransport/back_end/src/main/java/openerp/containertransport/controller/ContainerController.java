@@ -50,7 +50,7 @@ public class ContainerController {
                     return roleId;
                 })
                 .collect(Collectors.toList());
-        if(roleIds.contains("TMS_CUSTOMER")) {
+        if(roleIds.contains("TMS_CUSTOMER") || roleIds.contains("TMS_CUSTOMS")) {
             containerFilterRequestDTO.setOwner(username);
         }
         ContainerFilterRes containerModels = containerService.filterContainer(containerFilterRequestDTO);

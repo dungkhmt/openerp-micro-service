@@ -134,6 +134,8 @@ typeOrderMap.set("OE", "Outbound Empty");
 export const roles = new Map();
 roles.set("Customer", "TMS_CUSTOMER");
 roles.set("Driver", "TMS_DRIVER");
+roles.set("Customs", "TMS_CUSTOMS");
+roles.set("Admin", "TMS_ADMIN");
 
 export const facilityType = new Map();
 facilityType.set("Container", "Container");
