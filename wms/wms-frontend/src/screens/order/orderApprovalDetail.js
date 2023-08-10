@@ -386,7 +386,7 @@ const OrderApprovalDetail = ( props ) => {
           { title: "Tên sản phẩm", field: "productName" },
           { title: "Số lượng", field: "quantity" },
           { title: "Đơn giá", field: "priceUnit" },
-          { title: "Trạng thái", field: "deliveryStatus" }
+          // { title: "Trạng thái", field: "deliveryStatus" }
         ] : [
           { title: "Tên sản phẩm", field: "productName" },
           { title: "Số lượng", field: "quantity" },

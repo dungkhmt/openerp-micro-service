@@ -1,24 +1,19 @@
 package com.hust.wmsbackend.management.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.util.PointList;
 import com.hust.wmsbackend.management.entity.*;
 import com.hust.wmsbackend.management.model.DeliveryTripDTO;
-import com.hust.wmsbackend.management.model.request.NewNotificationRequest;
 import com.hust.wmsbackend.management.model.response.AutoRouteResponse;
 import com.hust.wmsbackend.management.repository.*;
 import com.hust.wmsbackend.management.service.AutoRouteService;
 import com.hust.wmsbackend.management.service.NotificationsService;
-import com.hust.wmsbackend.management.utils.ExternalApiCaller;
 import com.hust.wmsbackend.vrp.delivery.DeliveryAddressDTO;
 import com.hust.wmsbackend.vrp.delivery.DeliveryRouteService;
 import com.hust.wmsbackend.vrp.delivery.RouteRequest;
 import com.hust.wmsbackend.vrp.delivery.RouteResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -134,27 +129,6 @@ public class AutoRouteServiceImpl implements AutoRouteService {
         DeliveryTrip deliveryTrip = deliveryTripOpt.get();
         deliveryTrip.setDistance(BigDecimal.valueOf(routeResponse.getTotalCost()));
         deliveryTripRepository.save(deliveryTrip);
-
-//        ObjectMapper mapper = new ObjectMapper();
-//        boolean done = false;
-//        try {
-//            done = apiCaller.simpleBooleanCall(NOTIFICATION_URI, token, mapper.writeValueAsString(NewNotificationRequest.builder()
-//                    .toUser(principal.getName())
-//                    .url(String.format("/delivery-manager/delivery-trips/%s", deliveryTripId))
-//                    .content(String.format("Tìm hành trình tối ưu cho chuyến giao hàng %s thành công", deliveryTripId))
-//                    .build()));
-
-//            done = true;
-//        } catch (JsonProcessingException e) {
-//            log.error(e.getMessage());
-//            log.error("Exception when build Notification request");
-//        }
-//
-//        if (done) {
-//            log.info("Push notification done");
-//        } else {
-//            log.info("Push notification fail");
-//        }
 
         notificationsService.create("AUTO_ROUTE", principal.getName(),
             String.format("Tìm hành trình tối ưu cho chuyến giao hàng %s thành công", deliveryTripId),

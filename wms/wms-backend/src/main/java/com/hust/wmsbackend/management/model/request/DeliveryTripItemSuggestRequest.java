@@ -9,6 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class DeliveryTripItemSuggestRequest {
     private List<String> assignedOrderItemIds;
     private String warehouseId;
