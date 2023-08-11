@@ -193,6 +193,12 @@ public class TripItemServiceImpl implements TripItemService {
         tripItemModel.setTripId(tripItem.getTrip().getUid());
         if(tripItem.getOrder() != null) {
             tripItemModel.setOrderUid(tripItem.getOrder().getUid());
+            if(tripItemModel.getAction().equals("PICKUP_CONTAINER") && tripItem.getOrder().getLatePickupTime() > 0) {
+                tripItemModel.setLateTime(tripItem.getOrder().getLatePickupTime());
+            }
+            if (tripItemModel.getAction().equals("DELIVERY_CONTAINER") && tripItem.getOrder().getLateDeliveryTime() > 0){
+                tripItemModel.setLateTime(tripItem.getOrder().getLateDeliveryTime());
+            }
         }
         if(tripItem.getContainer() != null) {
             tripItemModel.setContainerCode(tripItem.getContainer().getContainerCode());

@@ -19,8 +19,8 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Button, Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { Button, Chip, Icon } from '@mui/material';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import { updateTrip } from 'api/TripAPI';
 import { updateTruck } from 'api/TruckAPI';
@@ -91,6 +91,13 @@ const headCells = [
         disablePadding: false,
         label: 'Status',
         width: '15%'
+    },
+    {
+        id: 'lateTime',
+        numeric: false,
+        disablePadding: false,
+        label: 'Late Time',
+        width: '12%'
     },
     {
         id: 'impl',
@@ -350,7 +357,14 @@ export default function TableOrder({ tripItems, setExecutes, executed, type, tri
                                             {row?.type === "Truck" ? (<TableCell align="left">{row?.orderCode}</TableCell>) : null}
                                             {row?.type === "Trailer" ? (<TableCell align="left">{row?.trailerCode}</TableCell>) : null}
                                             {row?.type === "Order" ? (<TableCell align="left">{row?.containerCode}</TableCell>) : null}
-                                            <TableCell align="left">{row.status}</TableCell>
+                                            <TableCell align="left">
+                                                <Chip label={row.status} color={colorStatus.get(row.status)} /> 
+                                            </TableCell>
+                                            {
+                                                row.lateTime > 0 ? (
+                                                    <TableCell>{new Date(row.lateTime).toLocaleDateString()}</TableCell>
+                                                ) : <TableCell></TableCell>
+                                            }
                                             {type === "Done" ? null : (
                                                 <TableCell>
                                                     <Box sx={{ display: 'flex' }}>

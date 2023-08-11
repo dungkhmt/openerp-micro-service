@@ -91,7 +91,8 @@ const TripDetail = () => {
                 departureTime: item.departureTime,
                 containerId: item?.containerId,
                 trailerId: item?.trailerId,
-                type: item?.type
+                type: item?.type,
+                typeOrder: item?.typeOrder
             }
             tripItemTmp.push(tripItem);
         })

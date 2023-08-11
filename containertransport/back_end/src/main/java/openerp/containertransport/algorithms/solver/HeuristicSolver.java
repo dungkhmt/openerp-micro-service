@@ -709,6 +709,7 @@ public class HeuristicSolver {
                     if (pointNoTrailer.size() == 0) {
                         distantTmp = new BigDecimal(Double.MAX_VALUE);
                         totalDistantTripAfter = totalDistantLoop.subtract(totalDistantTripBefore);
+                        tripOutput.setPoints(new ArrayList<>());
                     }
                     else {
                         // add trailer
@@ -819,6 +820,7 @@ public class HeuristicSolver {
                 if (pointNoTrailer.size() == 0) {
                     distantTmp = new BigDecimal(Double.MAX_VALUE);
                     totalDistantTripAfter = totalDistantLoop.subtract(totalDistantTripBefore);
+                    tripOutput.setPoints(new ArrayList<>());
                 }
                 else {
                     // add trailer

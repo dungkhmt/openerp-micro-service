@@ -217,6 +217,12 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                         <Box className="truck-select-info">
                             <Box className="truck-info-item">
                                 <Box className="truck-info-item-title">
+                                    <Typography>Start time:</Typography>
+                                </Box>
+                                <Box>{new Date(trip?.startTime).toLocaleDateString()}</Box>
+                            </Box>
+                            <Box className="truck-info-item">
+                                <Box className="truck-info-item-title">
                                     <Typography>Total distant:</Typography>
                                 </Box>
                                 <Box>{Number(trip?.total_distant / 1000).toFixed(2)} (km)</Box>

@@ -336,15 +336,15 @@ public class TripServiceImpl implements TripService {
             totalTime += time;
             totalDistant = totalDistant.add(distant);
 
-            if (tripItemModels.get(i).getAction().equals("PICKUP_CONTAINER") && !tripItemModels.get(i).getTypeOrder().equals("OE")
-                    && totalTime > tripItemModels.get(i).getLateArrivalTime()) {
+            if (tripItemModels.get(i).getAction().equals("PICKUP_CONTAINER") && !Objects.equals(tripItemModels.get(i).getTypeOrder(), "OE")
+                    && totalTime > tripItemModels.get(i).getLateTime()) {
                 validTripItemDTO.setCheck(false);
                 validTripItemDTO.setMessageErr("Trip is incorrect time when PICKUP_CONTAINER of " + tripItemModels.get(i).getOrderCode());
                 return validTripItemDTO;
             }
 
-            if (tripItemModels.get(i).getAction().equals("DELIVERY_CONTAINER") && !tripItemModels.get(i).getTypeOrder().equals("IE")
-                    && totalTime > tripItemModels.get(i).getLateDepartureTime()) {
+            if (tripItemModels.get(i).getAction().equals("DELIVERY_CONTAINER") && !Objects.equals(tripItemModels.get(i).getTypeOrder(), "IE")
+                    && totalTime > tripItemModels.get(i).getLateTime()) {
                 validTripItemDTO.setCheck(false);
                 validTripItemDTO.setMessageErr("Trip is incorrect time when DELIVERY_CONTAINER of " + tripItemModels.get(i).getOrderCode());
                 return validTripItemDTO;

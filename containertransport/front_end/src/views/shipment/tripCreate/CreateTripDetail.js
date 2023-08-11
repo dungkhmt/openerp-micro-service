@@ -73,7 +73,8 @@ const CreateTripDetail = () => {
                 departureTime: item.departureTime,
                 containerId: item?.containerId,
                 trailerId: item?.trailerId,
-                type: item?.type
+                type: item?.type,
+                typeOrder: item?.typeOrder
             }
             tripItemTmp.push(tripItem);
         })
@@ -95,7 +96,10 @@ const CreateTripDetail = () => {
                     if (res?.data.meta.code === 400) {
                         setToastType("error");
                         setToast(true);
-                        setToastMsg(res?.data.data)
+                        setToastMsg(res?.data.data);
+                        setTimeout(() => {
+                            setToast(false);
+                        }, "2000");
                     }
                     if (res?.data.meta.code === 200) {
                         setToastType("success");
@@ -106,7 +110,7 @@ const CreateTripDetail = () => {
                             history.push({
                                 pathname: `/shipment/detail/${shipmentId}`,
                             })
-                        }, "1000");
+                        }, "2000");
                     }
                 })
         }
