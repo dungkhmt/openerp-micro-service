@@ -233,10 +233,12 @@ public class TruckDroneDeliverySolver {
             double distanceJK = constructedInput.getDistanceBtwTwoNodesByNode(customer, subRoute.get(i+1));
             double distanceIK = constructedInput.getDistanceBtwTwoNodesByNode(subRoute.get(i), subRoute.get(i+1));
             double delta = (distanceIJ + distanceJK - distanceIK) * constructedInput.getTruck().getTransportCostPerUnit();
+            double timeTravel = distanceIJ / constructedInput.getTruck().getSpeed() +
+                    distanceJK / constructedInput.getTruck().getSpeed();
             if (delta < currSavings) {
                 // Why delta < savings? Cos if not, there is no point in relocating a truck node to another position
                 // that increases the total cost and also that will make currSavings - delta negative.
-                if (constructedInput.getDrone().isAbleToFly(0.0)) { // TODO: Calculate this addedUpCost.
+                if (constructedInput.getDrone().isAbleToFly(timeTravel)) { // TODO: Calculate this addedUpCost.
                     // Why check this ableToFly conditions?
                     // Cos we are adding new node -> cost would likely to increase the time travel of the added subroute.
                     if (currSavings - delta > maxSavings) {
@@ -394,7 +396,7 @@ public class TruckDroneDeliverySolver {
     }
 
     public int getIndexOfNodeInTSPSol(Node node) {
-        if (node.getName().equals("depot")) return 0;
+        if (node.getName().contains("Vincom")) return 0;
         for (int i = 0; i < tspBootstrappingSolution.size(); i++) {
             if (node.getName().equals(tspBootstrappingSolution.get(i).getName()))
                 return i;
