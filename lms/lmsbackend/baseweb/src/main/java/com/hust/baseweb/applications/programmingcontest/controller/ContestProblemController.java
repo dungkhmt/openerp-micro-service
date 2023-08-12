@@ -1591,7 +1591,7 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(page);
     }
 
-    //@Secured("ROLE_TEACHER")
+    @Secured("ROLE_TEACHER")
     @GetMapping("/get-contest-submission-paging/{contestId}")
     public ResponseEntity<?> getContestSubmissionPaging(
         @PathVariable("contestId") String contestId,
