@@ -23,6 +23,8 @@ import CodeIcon from '@mui/icons-material/Code';
 import React from "react";
 import {GiTeacher} from "react-icons/gi";
 import {RiCodeSSlashLine} from "react-icons/ri";
+import {FaUsers} from "react-icons/fa";
+import {SiManageiq} from "react-icons/si";
 import TeachingIcon from "../assets/icons/mathematics.svg";
 import {buildMapPathMenu} from "../utils/MenuUtils";
 import {eduLearningManagement} from "./menuconfig/classmanagement/student";
@@ -77,8 +79,10 @@ menuIconMap.set("LocalGroceryStoreIcon", <LocalGroceryStoreIcon/>);
 menuIconMap.set("BlurOnIcon", <BlurOnIcon/>);
 menuIconMap.set("GiTeacher", <GiTeacher size={24}/>);
 menuIconMap.set("LocalLibraryIcon", <LocalLibraryIcon/>);
+menuIconMap.set("DataManagementIcon", <SiManageiq/>);
 menuIconMap.set("ProgrammingIcon", <TerminalIcon/>)
 menuIconMap.set("CodeIcon", <RiCodeSSlashLine/>)
+menuIconMap.set("UsersIcon", <FaUsers/>)
 menuIconMap.set("AssignmentOutlinedIcon", <AssignmentOutlinedIcon/>);
 
 export const mapPathMenu = buildMapPathMenu(MENU_LIST);

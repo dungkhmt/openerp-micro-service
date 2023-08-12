@@ -2,8 +2,8 @@ export const DataAdministration = {
   id: "MENU_DATA_ADMIN",
   path: "",
   isPublic: false,
-  icon: "LocalLibraryIcon",
-  text: "Data management",
+  icon: "DataManagementIcon",
+  text: "Data Management",
   child: [
     {
       id: "MENU_DATA_ADMIN.MENU_DATA_ADMIN_DASHBOARD",
