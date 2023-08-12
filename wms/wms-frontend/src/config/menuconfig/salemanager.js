@@ -14,7 +14,7 @@ export const salemanager = {
       id: "MENU_WMSv2_SALE_MANAGER.RECEIPT_REQUEST",
       path: "/sale-manager/receipt-request",
       isPublic: false,
-      text: "Tạo đơn xin nhập hàng",
+      text: "Tạo yêu cầu nhập hàng",
       child: [],
     },
     {

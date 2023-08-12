@@ -21,6 +21,7 @@ public class ReceiptRequest {
     private List<ReceiptItemRequest> receiptItemList;
     private String createdReason;
     private Date expectedReceiveDate;
+    private int isPurchaseManagerRequest;
 
     @Data
     @AllArgsConstructor
