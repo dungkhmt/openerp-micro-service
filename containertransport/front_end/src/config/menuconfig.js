@@ -134,6 +134,8 @@ typeOrderMap.set("OE", "Outbound Empty");
 export const roles = new Map();
 roles.set("Customer", "TMS_CUSTOMER");
 roles.set("Driver", "TMS_DRIVER");
+roles.set("Customs", "TMS_CUSTOMS");
+roles.set("Admin", "TMS_ADMIN");
 
 export const facilityType = new Map();
 facilityType.set("Container", "Container");
@@ -148,3 +150,17 @@ export const tripItemType = new Map();
 tripItemType.set("Order", "Order");
 tripItemType.set("Truck", "Truck");
 tripItemType.set("Trailer", "Trailer");
+
+export const colorStatus = new Map();
+colorStatus.set("Container", "success");
+colorStatus.set("Truck", "secondary");
+colorStatus.set("Trailer", "primary");
+colorStatus.set("WAITING_SCHEDULER", "primary");
+colorStatus.set("AVAILABLE", "success");
+colorStatus.set("SCHEDULED", "secondary");
+colorStatus.set("EXECUTING", "secondary");
+colorStatus.set("DONE", "success");
+colorStatus.set("CANCEL", "error");
+colorStatus.set("DELETE", "error");
+colorStatus.set("WAIT_APPROVE", "warning");
+colorStatus.set("ORDERED", "primary");

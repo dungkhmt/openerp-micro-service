@@ -43,7 +43,7 @@ const DetailTrailer = () => {
     console.log("trailer", trailer)
     return (
         <Box className="fullScreen">
-            <Container maxWidth="lg" className="container">
+            <Container maxWidth="xl" className="container">
                 <Box className="toast">
                     {toastOpen ? (
                         <Alert variant="filled" severity={toastType} >
@@ -66,12 +66,16 @@ const DetailTrailer = () => {
                             <Typography >Trailer {trailer?.trailerCode}</Typography>
                         </Box>
                         <Box className="btn-header">
-                            <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                            onClick={handleDeleteTrailer}
-                            >Delete</Button>
-                            <Button variant="contained" className="header-submit-shipment-btn-save"
-                                onClick={handleClose}
-                            >Modify</Button>
+                            {trailer?.status === "AVAILABLE" ? (
+                                <>
+                                    <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
+                                        onClick={handleDeleteTrailer}
+                                    >Delete</Button>
+                                    <Button variant="contained" className="header-submit-shipment-btn-save"
+                                        onClick={handleClose}
+                                    >Modify</Button>
+                                </>
+                            ) : null}
                         </Box>
                     </Box>
                 </Box>
@@ -92,6 +96,12 @@ const DetailTrailer = () => {
                             <Typography>Facility:</Typography>
                         </Box>
                         <Typography>{trailer?.facilityResponsiveDTO?.facilityCode}</Typography>
+                    </Box>
+                    <Box className="facility-info-item">
+                        <Box className="facility-info-item-text">
+                            <Typography>Facility name:</Typography>
+                        </Box>
+                        <Typography>{trailer?.facilityResponsiveDTO?.facilityName}</Typography>
                     </Box>
                     <Box className="facility-info-item">
                         <Box className="facility-info-item-text">
@@ -120,7 +130,7 @@ const DetailTrailer = () => {
                 </Box>
 
                 {open ? (<ModalTrailer open={open} handleClose={handleClose} trailer={trailer}
-                setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
+                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
             </Container>
         </Box>
     )

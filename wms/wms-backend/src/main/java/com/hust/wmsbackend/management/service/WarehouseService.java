@@ -4,6 +4,7 @@ import com.hust.wmsbackend.management.entity.Warehouse;
 import com.hust.wmsbackend.management.model.WarehouseWithBays;
 import com.hust.wmsbackend.management.model.response.ProductWarehouseResponse;
 import com.hust.wmsbackend.management.model.response.WarehouseDetailsResponse;
+import com.hust.wmsbackend.management.model.response.WarehouseGeneral;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ public interface WarehouseService {
 
     Warehouse createWarehouse(WarehouseWithBays request);
 
-    List<Warehouse> getAllWarehouseGeneral();
+    List<WarehouseGeneral> getAllWarehouseGeneral();
 
     boolean delete(List<String> facilityIds);
 

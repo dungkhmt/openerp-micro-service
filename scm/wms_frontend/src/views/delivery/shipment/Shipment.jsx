@@ -11,13 +11,17 @@ import CustomDrawer from "components/drawer/CustomDrawer";
 import CustomModal from "components/modal/CustomModal";
 import HeaderModal from "components/modal/HeaderModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetShipmentList } from "controllers/query/shipment-query";
+import {
+  useDeleteShipment,
+  useGetShipmentList,
+} from "controllers/query/shipment-query";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { shipmentCols } from "../LocalConstant";
 import CreateShipmentForm from "./components/CreateShipmentForm";
+import UpdateShipment from "./components/UpdateShipment";
 function ShipmentScreen({ screenAuthorization }) {
   const [params, setParams] = useState({
     page: 1,
@@ -29,9 +33,13 @@ function ShipmentScreen({ screenAuthorization }) {
   const [isAdd, setIsAdd] = useToggle(false);
   const [isRemove, setIsRemove] = useToggle(false);
   const [itemSelected, setItemSelected] = useState(null);
+  console.log("Item selected: ", itemSelected);
   let { path } = useRouteMatch();
 
   const { isLoading, data } = useGetShipmentList(params);
+  const deleteShipmentQuery = useDeleteShipment({
+    id: itemSelected?.id,
+  });
   const history = useHistory();
   const handleButtonClick = (params) => {
     history.push(`${path}/shipment-detail`, {
@@ -53,7 +61,8 @@ function ShipmentScreen({ screenAuthorization }) {
     {
       title: "Sửa",
       callback: async (item) => {
-        setOpenDrawer();
+        setOpenDrawer((pre) => !pre);
+        setItemSelected(item);
       },
       icon: <EditIcon />,
       color: AppColors.secondary,
@@ -137,12 +146,23 @@ function ShipmentScreen({ screenAuthorization }) {
           onClose={setOpenDrawer}
           title="Sửa thông tin đợt giao hàng"
         />
+        <Box sx={{ marginTop: 2 }}>
+          <UpdateShipment
+            setOpenDrawer={setOpenDrawer}
+            currShipment={itemSelected}
+          />
+        </Box>
       </CustomDrawer>
       <DraggableDeleteDialog
         // disable={isLoadingRemove}
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
-        callback={(flag) => {}}
+        callback={async (flag) => {
+          if (flag) {
+            await deleteShipmentQuery.mutateAsync();
+          }
+          setIsRemove(false);
+        }}
       />
     </Box>
   );

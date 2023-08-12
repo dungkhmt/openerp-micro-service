@@ -34,7 +34,12 @@ const UpdateCustomerType = ({ currCustomerType, openDrawer }) => {
   return (
     <FormProvider {...methods}>
       <Box sx={{ marginTop: 5 }}></Box>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         <Controller
           key={"name"}
           control={control}

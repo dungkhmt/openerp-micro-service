@@ -39,7 +39,12 @@ const CreateTruck = ({ setIsAdd }) => {
   };
   return (
     <FormProvider {...methods}>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         <Controller
           key={"name"}
           control={control}
@@ -75,7 +80,12 @@ const CreateTruck = ({ setIsAdd }) => {
           )}
         />
       </Stack>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         <Controller
           key={"capacity"}
           control={control}
@@ -111,7 +121,12 @@ const CreateTruck = ({ setIsAdd }) => {
           )}
         />
       </Stack>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         <Controller
           key={"waitingCost"}
           control={control}

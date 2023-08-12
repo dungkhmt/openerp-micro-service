@@ -14,7 +14,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { getFacility, getFacilityOwner } from "api/FacilityAPI";
 import { getContainerById, getContainers } from "api/ContainerAPI";
 import dayjs from "dayjs";
-import { updateOrder } from "api/OrderAPI";
+import { updateOrder, updateOrderV2 } from "api/OrderAPI";
 
 
 const styles = {
@@ -57,7 +57,8 @@ const styles = {
 const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, order }) => {
     const [type, setType] = useState('');
     const [facilities, setFacilities] = useState([]);
-    const [ownerFacilities, setOwnerFacilities] = useState([])
+    const [ownerFacilities, setOwnerFacilities] = useState([]);
+    const [portFacilities, setPortFacilities] = useState([]);
     const [fromFacilities, setFromFacilities] = useState([]);
     const [toFacilities, setToFacilities] = useState([]);
     const [fromFacility, setFromFacility] = useState('');
@@ -72,21 +73,32 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
     const [isBreakRomooc, setIsBreakRomooc] = useState(false);
 
     useEffect(() => {
-
+        
+            getFacility({typeOwner: ["CUSTOMER", "CUSTOMS"]}).then((res) => {
+                console.log("facility==========", res?.data)
+                setFacilities(res?.data.data.facilityModels);
+            });
+            getFacility({typeOwner: ["CUSTOMS"]}).then((res) => {
+                console.log("facility==========", res?.data)
+                setPortFacilities(res?.data.data.facilityModels);
+            });
+            getFacilityOwner({}).then((res) => {
+                setOwnerFacilities(res?.data.data.facilityModels);
+            });
         if (order) {
 
             let typeTmp = typeConst.find((item) => item.id === order.type);
             setType(typeTmp.id);
             getContainerById(order.containerModel.uid).then((res) => {
-                console.log("order====", res.data);
+                console.log("order====", res?.data);
                 let containerSelectTmp = [];
-                containerSelectTmp.push(res.data);
+                containerSelectTmp.push(res?.data);
                 setContainerOrder(containerSelectTmp);
             });
 
 
-            setFromFacility(order?.fromFacility.facilityId);
-            setToFaciity(order?.toFacility.facilityId)
+            setFromFacility(order?.fromFacility.facilityUid);
+            setToFaciity(order?.toFacility.facilityUid)
             setIsBreakRomooc(order.breakRomooc);
             // setEarlyPickUpTime(dayjs(new Date(order?.earlyPickupTime)));
             if(order.latePickupTime) {
@@ -97,18 +109,12 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             }
             // setEarlyDeliveryTime(dayjs(new Date(order?.earlyDeliveryTime)));
         }
-        getFacility({typeOwner: ["CUSTOMER", "CUSTOMS"]}).then((res) => {
-            console.log("facility==========", res.data)
-            setFacilities(res.data.data.facilityModels);
-        });
-        getFacilityOwner({})
-        .then((res) => {
-            setOwnerFacilities(res?.data.data.facilityModels);
-        });
+
         
     }, []);
 
     useEffect(() => {
+
         if(type === "OE") {
             setToFacilities(ownerFacilities);
         }
@@ -116,19 +122,19 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             setFromFacilities(ownerFacilities)
         }
         if(type === "IF") {
+            setFromFacilities(portFacilities);
+            setToFacilities(ownerFacilities);
+        }
+        if(type === "OF") {
             setFromFacilities(ownerFacilities);
             setToFacilities(facilities);
         }
-        if(type === "OF") {
-            setFromFacilities(facilities);
-            setToFacilities(ownerFacilities);
-        }
-    }, [type])
+    }, [type, ownerFacilities, facilities, portFacilities])
 
     useEffect(() => {
-        getContainers({facilityId: fromFacility}).then((res) => {
-            console.log("container==========", res.data)
-            setContainers(res.data.data.containerModels);
+        getContainers({facilityId: fromFacility, status: "AVAILABLE"}).then((res) => {
+            console.log("container==========", res?.data)
+            setContainers(res?.data.data.containerModels);
         });
     }, [fromFacility]);
     
@@ -144,6 +150,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
         setOpen(false);
     }
     const handleChangeBreakRomooc = (e) => {
+        console.log("check", e.target.checked)
         setIsBreakRomooc(e.target.checked);
     }
     const handleSubmit = () => {
@@ -152,7 +159,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             fromFacilityId: fromFacility,
             toFacilityId: toFacility,
             // earlyDeliveryTime: (new Date(earlyDeliveryTime)).getTime(),
-            // lateDeliveryTime: (new Date(lateDeliveryTime)).getTime(),
+            lateDeliveryTime: (new Date(lateDeliveryTime)).getTime(),
             // earlyPickupTime: (new Date(earlyPickUpTime)).getTime(),
             latePickupTime: (new Date(latePickUpTime)).getTime(),
             isBreakRomooc: isBreakRomooc,
@@ -171,10 +178,15 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                 `/order/create`, {}, {}, data
             ).then((res) => {
                 console.log("res", res);
+                if (res?.data.meta.code === 400) {
+                    setToastType("error");
+                    setToastMsg(res?.data.data);
+                }
                 if (!res) {
                     setToastType("error");
                     setToastMsg("Created order fail !!!");
-                } else {
+                } 
+                if (res?.data.meta.code === 200) {
                     setToastType("success");
                     setToastMsg("Created order success !!!");
                 }
@@ -189,7 +201,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             })
         }
         else {
-            updateOrder(order.id, data).then((res) => {
+            updateOrderV2(order.uid, data).then((res) => {
                 console.log("res", res);
                 if (!res) {
                     setToastType("error");
@@ -219,7 +231,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
         setContainerSelect(containerIds);
         setContainerOrder(values);
     }
-    console.log("containerSelect", containerSelect)
+    console.log("portFacility", portFacilities)
     return (
         <Box >
             <CustomizedDialogs
@@ -250,6 +262,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                                     onChange={(e) => setType(e.target.value)}
                                                     label="type"
                                                     inputProps={{ 'aria-label': 'Without label' }}
+                                                    disabled={order ? true : false}
                                                 >
                                                     {typeConst ? (
                                                         typeConst.map((item, key) => {
@@ -274,7 +287,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                                         value={fromFacility}
                                                         onChange={(e) => setFromFacility(e.target.value)}
                                                         label="from facility"
-                                                        disabled={type === "OE" ? true : false}
+                                                        disabled={type === "OE" ? true : (order ? true : false)}
                                                     >
                                                         {fromFacilities ? (
                                                             fromFacilities.map((item) => {
@@ -306,7 +319,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                                         {toFacilities ? (
                                                             toFacilities.map((item) => {
                                                                 return (
-                                                                    <MenuItem value={item.id}>{item.facilityName}</MenuItem>
+                                                                    <MenuItem value={item.uid}>{item.facilityName}</MenuItem>
                                                                 );
                                                             })
                                                         ) : null}
@@ -320,11 +333,12 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                             <Box className="contentModal-item-text">
                                                 <Typography>Containers:</Typography>
                                             </Box>
-                                            <Box className="contentModal-item-input">
+                                            <Box className="contentModal-item-input multi-select">
                                                 <Autocomplete
                                                     multiple
                                                     disabled={order ? true : false}
                                                     id="tags-outlined"
+                                                    size="small"
                                                     options={containers}
                                                     value={containerOrder}
                                                     getOptionLabel={(option) => option.containerCode}

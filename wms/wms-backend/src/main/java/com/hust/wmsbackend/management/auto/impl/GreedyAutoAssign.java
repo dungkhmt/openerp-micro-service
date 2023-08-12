@@ -53,7 +53,12 @@ public class GreedyAutoAssign implements AutoAssignOrderItem {
         }
         List<UUID> productIds = items.stream().map(OrderItem::getProductId).collect(Collectors.toList());
         List<Warehouse> warehouses = warehouseService.getAllWarehousesHaveProductIds(productIds);
-        Map<UUID, Double> distMap = distanceCalculator.getWarehouseCusAddMap(cusAddLon, cusAddLat, warehouses);
+        Map<UUID, Double> distMap;
+        try {
+            distMap = distanceCalculator.getWarehouseCusAddMap(cusAddLon, cusAddLat, warehouses);
+        } catch (RuntimeException e) {
+            return null;
+        }
         Map<UUID, Double> sortedDistMap = distMap.entrySet()
             .stream().sorted(Map.Entry.comparingByValue())
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));

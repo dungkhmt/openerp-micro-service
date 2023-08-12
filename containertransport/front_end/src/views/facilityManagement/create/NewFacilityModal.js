@@ -48,9 +48,16 @@ const FacilityModal = ({ open, handleClose, facility, setToast, setToastType, se
             setMaxTrailer(facility?.maxNumberTrailer);
             setMaxTruck(facility?.maxNumberTruck);
         }
-        if (role === roles.get("Customer")) {
+        if (role.includes(roles.get("Customer"))) {
             setType(facilityType.get("Container"));
             setTypeOwner("CUSTOMER");
+        }
+        if (role.includes(roles.get("Customs"))) {
+            setType(facilityType.get("Container"));
+            setTypeOwner("CUSTOMS");
+        }
+        if (role.includes(roles.get("Admin"))) {
+            setTypeOwner("ADMIN");
         }
     }, [])
     const typeConst = [
@@ -179,6 +186,8 @@ const FacilityModal = ({ open, handleClose, facility, setToast, setToastType, se
                                                         onChange={(e) => setType(e.target.value)}
                                                         label="type"
                                                         size="small"
+                                                        disabled={facility ? true : false}
+                                                        // placeholder="type"
                                                     >
                                                         {typeConst ? (
                                                             typeConst.map((item) => {
@@ -211,6 +220,8 @@ const FacilityModal = ({ open, handleClose, facility, setToast, setToastType, se
                                             <Typography>Acreage: </Typography>
                                         </Box>
                                         <Box className="contentModal-item-input">
+                                            <FormControl variant="outlined">
+                                                <InputLabel htmlFor="outlined-textarea">Acreage</InputLabel>
                                             <OutlinedInput
                                                 id="outlined-textarea"
                                                 label="Acreage"
@@ -220,6 +231,7 @@ const FacilityModal = ({ open, handleClose, facility, setToast, setToastType, se
                                                 size="small"
                                                 onChange={(e) => setAcreage(e.target.value)}
                                             />
+                                            </FormControl>
                                         </Box>
                                     </Box>
                                     <Box className="contentModal-item">
@@ -234,6 +246,7 @@ const FacilityModal = ({ open, handleClose, facility, setToast, setToastType, se
                                                     label="Address"
                                                     placeholder="address"
                                                     size="small"
+                                                    disabled={facility ? true : false}
                                                     // multiline
                                                     value={address}
                                                     onChange={(e) => setAddress(e.target.value)}

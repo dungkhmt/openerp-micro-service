@@ -228,7 +228,7 @@ const OrderApprovalDetail = ( props ) => {
                       fullWidth
                       variant="outlined"
                       size="small"
-                      value={convertToVNDFormat(orderInfo?.totalProductCost)}
+                      value={convertToVNDFormat(orderInfo?.totalOrderCost)}
                       InputProps={{
                         readOnly: true,
                       }}
@@ -386,7 +386,7 @@ const OrderApprovalDetail = ( props ) => {
           { title: "Tên sản phẩm", field: "productName" },
           { title: "Số lượng", field: "quantity" },
           { title: "Đơn giá", field: "priceUnit" },
-          { title: "Trạng thái", field: "deliveryStatus" }
+          // { title: "Trạng thái", field: "deliveryStatus" }
         ] : [
           { title: "Tên sản phẩm", field: "productName" },
           { title: "Số lượng", field: "quantity" },

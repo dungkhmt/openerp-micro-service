@@ -22,7 +22,7 @@ const initialState = {
 
   isEditCode: false,
 
-  isVisibleInput: false,
+  isVisibleInput: true,
 
   // participants
   isVisibleParticipants: false,

@@ -24,11 +24,18 @@ const CreateShipmentForm = ({ setIsAdd }) => {
   const createShipmentQuery = useCreateShipment();
 
   const onSubmit = async (data) => {
+    console.log("Data: ", data);
     let shipmentParams = {
-      endedDate: moment(data?.endDate).format("DD-MM-YYYY"),
-      maxSize: data?.maxSize,
-      startedDate: moment(data?.startDate).format("DD-MM-YYYY"),
+      startedDate: moment(
+        data?.startedDate.substring(3),
+        "MMM DD YYYY HH:mm:ss Z"
+      ).format("DD-MM-YYYY"),
+      endedDate: moment(
+        data?.endedDate.substring(3),
+        "MMM DD YYYY HH:mm:ss Z"
+      ).format("DD-MM-YYYY"),
       title: data?.title,
+      maxSize: data?.maxSize,
     };
     await createShipmentQuery.mutateAsync(shipmentParams);
     setIsAdd((pre) => !pre);
@@ -36,7 +43,12 @@ const CreateShipmentForm = ({ setIsAdd }) => {
   };
   return (
     <FormProvider {...methods}>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         <Controller
           key={"title"}
           control={control}

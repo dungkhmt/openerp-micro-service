@@ -27,7 +27,7 @@ const MyRoomsPage = () => {
   const handleSearchRoom = (keyword, page) => {
     request(
       "get",
-      `/code-editor/rooms/search?page=${page}&size=10&sort=createDate&keyword=${
+      `/code-editor/rooms/search?page=${page}&size=20&sort=createDate,desc&keyword=${
         keyword ? keyword : ""
       }`,
       (response) => {
@@ -44,13 +44,19 @@ const MyRoomsPage = () => {
   const handleChangeKeyWord = debounce((value) => {
     setKeyword(value);
   }, 300);
+  const syncUser = () => {
+    request("get", `/code-editor/users/sync-user`);
+  };
+  useEffect(() => {
+    syncUser();
+  },[]);
   return (
     <div>
       <Card>
         <CardHeader title="Danh sách phòng" />
         <CardContent>
-          <Grid container justifyContent="space-between" sx={{ marginBottom: "30px" }}>
-            <Grid item xs={4}>
+          <Grid container justifyContent="space-between" sx={{ marginBottom: "30px" }} spacing={2}>
+            <Grid item xs={12} sm={8} md={6} lg={4}>
               <OutlinedInput
                 name="searchText"
                 onChange={(e) => {

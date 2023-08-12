@@ -6,7 +6,7 @@ import PrimaryButton from "components/button/PrimaryButton";
 import { menuIconMap } from "config/menuconfig";
 import { MyContext } from "contextAPI/MyContext";
 import TripsContents from "./TripsContents";
-import { autoCreateRouter, getShipmentById } from "api/ShipmentAPI";
+import { autoCreateRouter, deleteShipment, getShipmentById } from "api/ShipmentAPI";
 import ShipmentContents from "./ShipmentContents";
 import { getTrips } from "api/TripAPI";
 import ReactLoading from "react-loading";
@@ -26,6 +26,8 @@ const ShipmentDetail = () => {
     const [open, setOpen] = useState(false);
 
     const [flag, setFlag] = useState(false);
+
+    const statusModify = ["WAITING_SCHEDULER", "SCHEDULED"]
 
     useEffect(() => {
         let data = {
@@ -55,6 +57,17 @@ const ShipmentDetail = () => {
     const handleModifyShipment = () => {
         setOpen(!open);
     }
+    const handleCancelShipment = () => {
+        deleteShipment(shipment.uid).then((res) => {
+            setToastMsg("Delete Shipment Success");
+            setToastType("success");
+            setToast(true);
+            setTimeout(() => {
+                setToast(false);
+            }, "3000");
+            history.push("/shipment")
+        })
+    }
     console.log("=========", shipment)
     return (
         <Box className="fullScreen">
@@ -62,7 +75,7 @@ const ShipmentDetail = () => {
                 <ReactLoading type="spin" color="#0000FF" className="loading"
                     height='6%' width='6%' />
             ) : (
-                <Container maxWidth="lg" className="container">
+                <Container maxWidth="100vw" className="container">
                     <Box className="toast">
                         {toastOpen ? (
                             <Alert variant="filled" severity={toastType} >
@@ -88,12 +101,18 @@ const ShipmentDetail = () => {
                         >
                         </Box> */}
                             <Box className="btn-header">
-                                <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                                // onClick={handleCancelCreateShipment}
-                                >Delete</Button>
-                                <Button variant="contained" className="header-submit-shipment-btn-save"
-                                onClick={handleModifyShipment}
-                                >Modify</Button>
+                                {
+                                    shipment?.status === "WAITING_SCHEDULER" ? (
+                                        <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
+                                            onClick={handleCancelShipment}
+                                        >Delete</Button>
+                                    ) : null
+                                }
+                                {statusModify.includes(shipment?.status) ? (
+                                    <Button variant="contained" className="header-submit-shipment-btn-save"
+                                        onClick={handleModifyShipment}
+                                    >Modify</Button>
+                                ) : null}
                             </Box>
                         </Box>
                     </Box>
@@ -108,7 +127,8 @@ const ShipmentDetail = () => {
                         <Box className="title">
                             <Typography>Trips Management</Typography>
                         </Box>
-                        <Box className="trips-btn">
+                        {statusModify.includes(shipment?.status) ? (
+                            <Box className="trips-btn">
                             {/* {trips.length > 0 ? */}
                             <Box className="auto-create-trips"
                                 onClick={autoCreateTrip}
@@ -137,16 +157,18 @@ const ShipmentDetail = () => {
                                 </PrimaryButton>
                             </Box>
                         </Box>
+                        ) : null}
+                        
 
                     </Box>
-                    {trips.length > 0 ? 
-                    <TripsContents trips={trips} shipmentId={shipmentId}
-                        setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} flag={flag} setFlag={setFlag}
-                    /> : null}
+                    {trips.length > 0 ?
+                        <TripsContents trips={trips} shipmentId={shipmentId}
+                            setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} flag={flag} setFlag={setFlag}
+                        /> : null}
 
                     {open ? (
                         <ModalShipment open={open} setOpen={setOpen} shipment={shipment}
-                        setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
+                            setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
                     ) : null}
                 </Container>
             )}

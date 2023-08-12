@@ -28,7 +28,7 @@ const DetailContainerScreen = () => {
     const handleClose = () => {
         setOpen(!open);
     }
-    const handleDetail = () => {
+    const handleDelete = () => {
         deleteContainer(containerId).then((res) => {
             console.log(res);
             setToastMsg("Delete Container Success !!!");
@@ -38,12 +38,12 @@ const DetailContainerScreen = () => {
                 setToast(false);
             }, "3000");
             history.push('/container');
-          })
+        })
     }
     console.log("container", container)
     return (
         <Box className="fullScreen">
-            <Container maxWidth="lg" className="container">
+            <Container maxWidth="xl" className="container">
                 <Box className="toast">
                     {toastOpen ? (
                         <Alert variant="filled" severity={toastType} >
@@ -53,7 +53,10 @@ const DetailContainerScreen = () => {
 
                 <Box className="header-detail">
                     <Box className="headerScreen-go-back"
-                        onClick={() => history.push('/container')}
+                        onClick={() => {
+                            // history.push('/container')
+                            history.goBack()
+                        }}
                         sx={{ cursor: "pointer" }}
                     >
                         <Icon>
@@ -66,12 +69,16 @@ const DetailContainerScreen = () => {
                             <Typography >Container {container?.containerCode}</Typography>
                         </Box>
                         <Box className="btn-header">
-                            <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                                onClick={handleDetail}
-                            >Delete</Button>
-                            <Button variant="contained" className="header-submit-shipment-btn-save"
-                                onClick={handleClose}
-                            >Modify</Button>
+                            {container?.status === "AVAILABLE" ? (
+                                <>
+                                    <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
+                                        onClick={handleDelete}
+                                    >Delete</Button>
+                                    <Button variant="contained" className="header-submit-shipment-btn-save"
+                                        onClick={handleClose}
+                                    >Modify</Button>
+                                </>
+                            ) : null}
                         </Box>
                     </Box>
                 </Box>
@@ -95,6 +102,18 @@ const DetailContainerScreen = () => {
                     </Box>
                     <Box className="facility-info-item">
                         <Box className="facility-info-item-text">
+                            <Typography>Facility Name:</Typography>
+                        </Box>
+                        <Typography>{container?.facilityResponsiveDTO?.facilityName}</Typography>
+                    </Box>
+                    <Box className="facility-info-item">
+                        <Box className="facility-info-item-text">
+                            <Typography>Facility Address:</Typography>
+                        </Box>
+                        <Typography>{container?.facilityResponsiveDTO?.address}</Typography>
+                    </Box>
+                    <Box className="facility-info-item">
+                        <Box className="facility-info-item-text">
                             <Typography>Size:</Typography>
                         </Box>
                         <Typography>{container?.size}</Typography>
@@ -105,12 +124,12 @@ const DetailContainerScreen = () => {
                         </Box>
                         <Typography>{container?.status}</Typography>
                     </Box>
-                    <Box className="facility-info-item">
+                    {/* <Box className="facility-info-item">
                         <Box className="facility-info-item-text">
                             <Typography>Empty:</Typography>
                         </Box>
                         <Typography>{container?.isEmpty ? "True" : "False"}</Typography>
-                    </Box>
+                    </Box> */}
                     <Box className="facility-info-item">
                         <Box className="facility-info-item-text">
                             <Typography>Create At:</Typography>
@@ -126,7 +145,7 @@ const DetailContainerScreen = () => {
                 </Box>
 
                 {open ? (<ModalContainer open={open} handleClose={handleClose} container={container}
-                setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
+                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
             </Container>
         </Box>
     )

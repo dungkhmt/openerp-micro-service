@@ -115,8 +115,8 @@ public class CustomerController extends BaseController{
             return response(error(ex));
         }
     }
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteCustomerById(@PathVariable("id") long id) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteCustomerById(@RequestParam(value = "id") Long id) {
         try {
             customerService.deleteCustomerById(id);
             return response(new ResultEntity(1, "Delete customer successfully", id));

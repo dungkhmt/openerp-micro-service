@@ -18,12 +18,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import './styles.scss';
-import { Button, Divider, Icon, Menu, MenuItem } from '@mui/material';
-import { menuIconMap, typeOrderMap } from 'config/menuconfig';
+import { Button, Chip, Divider, Icon, Menu, MenuItem } from '@mui/material';
+import { colorStatus, menuIconMap, roles, typeOrderMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EditIcon from '@mui/icons-material/Edit';
-import { updateOrderList } from 'api/OrderAPI';
+import { deleteOrder, updateOrderList } from 'api/OrderAPI';
+import { MyContext } from 'contextAPI/MyContext';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -168,7 +169,7 @@ function EnhancedTableHead(props) {
     );
 }
 
-export default function ContentsOrderManagerment({ orders, page, setPage, rowsPerPage, setRowsPerPage, count, flag, setFlag, type }) {
+export default function ContentsOrderManagerment({ orders, page, setPage, rowsPerPage, setRowsPerPage, count, flag, setFlag, type, setToast, setToastType, setToastMsg}) {
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
     const [selected, setSelected] = React.useState([]);
@@ -180,6 +181,8 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
     const open = Boolean(anchorEl);
     const [openButton, setOpenButton] = React.useState(false);
     const [status, setStatus] = React.useState('');
+
+    const { role, preferred_username } = React.useContext(MyContext);
 
     const handleRequestSort = React.useCallback(
         (event, newOrderBy) => {
@@ -244,7 +247,7 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
     const isSelected = (name) => selected.indexOf(name) !== -1;
     const handleDetail = (uid) => {
         if (type === "WaitApprove") {
-            history.push(`/wait-approve/order/wait/${uid}`)
+            history.push(`/wait-approve/order/${type}/${uid}`)
         }
         else {
             history.push(`/order/${uid}`)
@@ -268,7 +271,18 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
             setFlag(!flag);
         })
     };
-    console.log("status", status);
+    const handleCancel = (uid) => {
+        deleteOrder(uid).then((res) => {
+            console.log(res);
+            setToastMsg("Delete Order Success");
+            setToastType("success");
+            setToast(true);
+            setFlag(!flag);
+            setTimeout(() => {
+                setToast(false);
+            }, "3000");
+        })
+    }
     return (
         <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
             <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -361,7 +375,9 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                                             <TableCell align="left">{row?.fromFacility.facilityName}</TableCell>
                                             <TableCell align="left">{row?.toFacility.facilityName}</TableCell>
                                             <TableCell align="left">{typeOrderMap.get(row.type)}</TableCell>
-                                            <TableCell align="left">{row.status}</TableCell>
+                                            <TableCell align="left">
+                                                <Chip label={row?.status} color={colorStatus.get(row?.status)} />
+                                            </TableCell>
                                             <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                                             <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
                                             <TableCell >
@@ -373,13 +389,13 @@ export default function ContentsOrderManagerment({ orders, page, setPage, rowsPe
                                                             <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                                                         </Box>
                                                     </Tooltip>
-                                                    {type === "WaitApprove" ? null : (
+                                                    {(row?.status === "WAIT_APPROVE" && role.includes(roles.get("Customer"))) ? (
                                                         <Tooltip title="Delete">
-                                                            <Box>
+                                                            <Box onClick={handleCancel}>
                                                                 <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
                                                             </Box>
                                                         </Tooltip>
-                                                    )}
+                                                    ) : null}
                                                 </Box>
                                             </TableCell>
                                         </TableRow>

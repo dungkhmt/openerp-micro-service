@@ -211,7 +211,10 @@ public class ShipmentServiceImpl extends BaseService implements IShipmentService
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteShipmentById(long id) {
-        shipmentRepo.deleteById(id);
+        Shipment currShipment = shipmentRepo.getShipmentById(id);
+        currShipment.setDeleted(1);
+        shipmentRepo.save(currShipment);
     }
 }

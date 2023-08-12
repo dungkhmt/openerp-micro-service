@@ -11,6 +11,7 @@ public class TrailerFilterRequestDTO {
     private String facilityId;
     private String status;
     private Integer truckId;
+    private String trailerCode;
     private Integer page;
     private Integer pageSize;
 }

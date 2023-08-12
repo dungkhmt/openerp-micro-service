@@ -80,7 +80,7 @@ public class SaleOrderServiceImpl extends BaseService implements ISaleOrderServi
             }
             // TODO: Add distribution channel as one of the discount factors here
             ProductSalePrice salePrice = productSalePriceRepo.getByProductAndContract(orderItem.getProductCode(), boughtBy.getContractType().getCode());
-            double massDiscount = salePrice != null ? salePrice.getMassDiscount() : 0;
+            double massDiscount = salePrice != null && orderItem.getQuantity() >= product.getMassQuantity() ? salePrice.getMassDiscount() : 0;
             double contractDiscount = salePrice != null ? salePrice.getContractDiscount() : 0;
             double promotionDiscount = salePrice != null ? salePrice.getContractType().getChannel().getPromotion() : 0;
             SaleOrderItem item = SaleOrderItem.builder()

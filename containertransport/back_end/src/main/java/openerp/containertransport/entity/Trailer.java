@@ -14,11 +14,13 @@ import lombok.Setter;
 @Entity
 @Table(name = "container_transport_trailers")
 public class Trailer {
-    @Id
-    protected String uid;
 
-    @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "uid")
+    protected String uid;
 
     @Column(name = "trailer_code")
     private String trailerCode;

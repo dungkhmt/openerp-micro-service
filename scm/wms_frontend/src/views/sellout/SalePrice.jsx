@@ -20,6 +20,7 @@ import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import {
   useCreateSelloutPrice,
+  useDeleteSelloutPrice,
   useGetSelloutPrice,
 } from "../../controllers/query/sale-order-query";
 import { formatVietnameseCurrency } from "../../utils/GlobalUtils";
@@ -62,7 +63,9 @@ function SalePriceScreen({ screenAuthorization }) {
   const { isLoading: isLoadingSelloutPrice, data: selloutPrices } =
     useGetSelloutPrice();
   const createSalePrices = useCreateSelloutPrice();
-
+  const deleteSalePrices = useDeleteSelloutPrice({
+    id: itemSelected?.id,
+  });
   const onSubmit = async (data) => {
     let productSalePriceParams = data?.productSalePrices.map((pro) => {
       return {
@@ -106,7 +109,13 @@ function SalePriceScreen({ screenAuthorization }) {
       title: "Xóa",
       callback: (item) => {
         setIsRemove();
-        setItemSelected(item);
+        setItemSelected(
+          selloutPrices?.find(
+            (el) =>
+              el?.productEntity?.code === item?.productEntity?.code &&
+              el?.contractType?.code === item?.contract?.code
+          )
+        );
       },
       icon: <DeleteIcon />,
       color: AppColors.error,
@@ -355,6 +364,7 @@ function SalePriceScreen({ screenAuthorization }) {
               align: "center",
               sortable: false,
               flex: 1,
+              minWidth: 150,
               type: "actions",
               getActions: (params) => {
                 let price = selloutPrices?.find(
@@ -397,7 +407,12 @@ function SalePriceScreen({ screenAuthorization }) {
         // disable={isLoadingRemove}
         open={isRemove && itemSelected}
         handleOpen={setIsRemove}
-        callback={(flag) => {}}
+        callback={async (flag) => {
+          if (flag) {
+            await deleteSalePrices.mutateAsync();
+          }
+          setIsRemove(false);
+        }}
       />
     </Box>
   );

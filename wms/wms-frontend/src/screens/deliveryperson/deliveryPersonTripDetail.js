@@ -265,7 +265,7 @@ const DeliveryPersonTripDetail = ( props ) => {
             </Box>
           </Grid>
 
-          <Grid item xs={6}>
+          {/* <Grid item xs={6}>
             <Box className={classes.inputWrap}>
               <Box className={classes.labelInput}>
                 Tổng quãng đường 
@@ -280,7 +280,7 @@ const DeliveryPersonTripDetail = ( props ) => {
                 }}
               />
             </Box>
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={6}>
             <Box className={classes.inputWrap}>

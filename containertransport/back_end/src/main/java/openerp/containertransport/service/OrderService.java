@@ -17,5 +17,6 @@ public interface OrderService {
     OrderModel updateOrder(long id, OrderModel orderModel);
     OrderModel updateOrderByUid(String orderCode, OrderModel orderModel);
     List<OrderModel> updateListOrder(OrderUpdateDTO orderUpdateDTO);
-    Integer countOrderByMonth(DashboardTimeOrderDTO dashboardTimeOrderDTO, String status);
+    Long countOrderByMonth(DashboardTimeOrderDTO dashboardTimeOrderDTO, String status);
+    OrderModel deleteOrder(String uid);
 }

@@ -141,6 +141,28 @@ export const useUpdateSellinPrice = (params) => {
     onMutate: (variables) => {},
   });
 };
+
+export const useDeleteSellinPrice = (params) => {
+  return useMutation({
+    mutationFn: async () => {
+      const res = await axiosSendRequest(
+        "delete",
+        endPoint.deleteSellinPrice,
+        params
+      );
+      if (res.code === 1) {
+        toast.success("Xóa thành công!");
+        queryClient.invalidateQueries([queryKey.purchase_order.purchase_price]);
+        return res.data;
+      }
+    },
+    onError: () => {
+      toast.error("Lỗi khi xóa dữ liệu, vui lòng kiểm tra lại");
+    },
+    // befor mutation function actually triggers.
+    onMutate: (variables) => {},
+  });
+};
 export const useDeletePurchaseOrder = () => {
   return useMutation({
     mutationFn: async (params) => {

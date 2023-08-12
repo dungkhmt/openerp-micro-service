@@ -22,4 +22,5 @@ public interface ProductWarehouseRepository extends JpaRepository<ProductWarehou
     @Query("select sum(pw.quantityOnHand) from ProductWarehouse pw where pw.productId = :productId")
     BigDecimal getTotalOnHandQuantityByProductId(UUID productId);
 
+    List<ProductWarehouse> findAllByWarehouseId(UUID warehouseId);
 }

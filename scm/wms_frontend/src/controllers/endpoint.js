@@ -52,6 +52,7 @@ export const endPoint = {
   createSellinPrice: baseUrl + "/product/set-purchase-price",
   getSellinPrice: baseUrl + "/product/get-all-sellin-price",
   updateSellinPrice: baseUrl + "/product/sellin-price/update",
+  deleteSellinPrice: baseUrl + "/product/sellin-price/delete",
   exportPurchaseOrderPdf: baseUrl + "/purchase-order/export-order-pdf",
   // Facility
   getFacility: baseUrl + "/facility/get-all",
@@ -84,6 +85,7 @@ export const endPoint = {
   createSelloutPrice: baseUrl + "/product/set-sale-price",
   getSelloutPrice: baseUrl + "/product/get-all-sellout-price",
   updateSelloutPrice: baseUrl + "/product/sellout-price/update",
+  deleteSelloutPrice: baseUrl + "/product/sellout-price/delete",
   exportSaleOrderPdf: baseUrl + "/sale-order/export-order-pdf",
   // Shipment
   createShipment: baseUrl + "/shipment/create",
@@ -92,18 +94,24 @@ export const endPoint = {
   getItemOfTrip: baseUrl + "/shipment/get-item-of-trip",
   assignShipmentToTrip: baseUrl + "/shipment/assign-shipment-item",
   unassignShipmentToTrip: baseUrl + "/shipment/unassign-shipment-item",
+  updateShipment: baseUrl + "/shipment/update",
+  deleteShipment: baseUrl + "/shipment/delete",
   // Delivery
   createDeliveryTrip: baseUrl + "/delivery-trip/create",
   getDeliveryTrips: baseUrl + "/delivery-trip/get-all",
   getTripToAssignBill: baseUrl + "/delivery-trip/get-trip-to-assign",
   createTripRoute: baseUrl + "/delivery-trip/create-trip-route",
   deleteTripRoute: baseUrl + "/delivery-trip/delete-trip-route",
+  deleteTrip: baseUrl + "/delivery-trip/delete",
+  updateTrip: baseUrl + "/delivery-trip/update",
   getTruck: baseUrl + "/vehicle/truck/get-all",
   deleteTruck: baseUrl + "/vehicle/truck/remove",
   getDrone: baseUrl + "/vehicle/drone/get-all",
   deleteDrone: baseUrl + "/vehicle/drone/remove",
   createTruck: baseUrl + "/vehicle/truck/create",
+  updateTruck: baseUrl + "/vehicle/truck/update",
   createDrone: baseUrl + "/vehicle/drone/create",
+  updateDrone: baseUrl + "/vehicle/drone/update",
   getTripRoutes: baseUrl + "/delivery-trip/get-trip-route",
   // User
   // createNewUser: base

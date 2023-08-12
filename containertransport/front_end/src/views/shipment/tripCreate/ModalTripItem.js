@@ -6,17 +6,21 @@ import { getFacility } from "api/FacilityAPI";
 import { tripItemType } from "config/menuconfig";
 
 const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, setTrailerSelect, truckSelected }) => {
-    const [facilityList, setFacilityList] = useState([]);
-    const [facility, setFacility] = useState();
+    
+    const [facilities, setFacilities] = useState([]);
     const [trailers, setTrailerList] = useState([]);
+    const [facility, setFacility] = useState();
     const [trailer, setTrailer] = useState();
     const [action, setAction] = useState('');
     const [type, setType] = useState('');
     const [msg, setMsg] = useState('');
 
+    const [facilitiesTrailer, setFacilitiesTrailer] = useState([]);
+    const [facilitiesTruck, setFacilitiesTruck] = useState([]);
+
     const actionConst = [
-        { name: "PICKUP-TRAILER", id: "1" },
-        { name: "DROP-TRAILER", id: "2" },
+        { name: "PICKUP_TRAILER", id: "1" },
+        { name: "DROP_TRAILER", id: "2" },
         { name: "STOP", id: "3" },
     ];
     const typeConst = [
@@ -33,10 +37,23 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
             setTrailerList(res?.data.data.trailerModels);
         })
         // xem xet lay dung facility
-        getFacility({}).then((res) => {
-            setFacilityList(res?.data.data.facilityModels);
+        getFacility({type: "Trailer"}).then((res) => {
+            setFacilitiesTrailer(res?.data.data.facilityModels);
+        })
+
+        getFacility({type: "Truck"}).then((res) => {
+            setFacilitiesTruck(res?.data.data.facilityModels);
         })
     }, []);
+
+    useEffect(() => {
+        if(action === "DROP_TRAILER") {
+            setFacilities(facilitiesTrailer)
+        }
+        if(action === "STOP") {
+            setFacilities(facilitiesTruck)
+        }
+    }, [action])
 
     const handleChange = (event) => {
         setFacility(event.target.value);
@@ -48,7 +65,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
         setTrailer(event.target.value);
     };
     const handleChangeAction = (event) => {
-        if(event.target.value === "PICKUP-TRAILER" || event.target.value === "DROP-TRAILER") {
+        if(event.target.value === "PICKUP_TRAILER" || event.target.value === "DROP_TRAILER") {
             setType("Trailer");
         }
         if(event.target.value === "STOP") {
@@ -69,7 +86,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
         }
         if (type === "Trailer") {
             let tripItem;
-            if (action === "PICKUP-TRAILER") {
+            if (action === "PICKUP_TRAILER") {
                 tripItem =
                 [{
                     // xem xet lai id co the trung
@@ -89,7 +106,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                 }];
                 setTrailerSelect(trailer);
             }
-            if (action === "DROP-TRAILER") {
+            if (action === "DROP_TRAILER") {
                 console.log("trailerSelect", trailerSelect);
                 if (!trailerSelect) {
                     setMsg("Can't select add DROP TRAILER action while Trailer is not selected before!")
@@ -194,7 +211,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                             </FormControl>
                         </Box>
                     </Box>
-                    {type && type === "Trailer" && action && action === "PICKUP-TRAILER" ? (<Box className="body-modal-item">
+                    {type && type === "Trailer" && action && action === "PICKUP_TRAILER" ? (<Box className="body-modal-item">
                         <Box className="body-modal-item-text">
                             <Typography>Trailer:</Typography>
                         </Box>
@@ -210,7 +227,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                                     {trailers ? (
                                         trailers.map((item, index) => {
                                             return (
-                                                <MenuItem value={item}>{item?.trailerCode} - {item?.facilityResponsiveDTO.facilityCode}</MenuItem>
+                                                <MenuItem value={item}>{item?.trailerCode} - {item?.facilityResponsiveDTO.facilityCode} - {item?.facilityResponsiveDTO.facilityName}</MenuItem>
                                             );
                                         })
                                     ) : null}
@@ -218,7 +235,7 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                             </FormControl>
                         </Box>
                     </Box>) : null}
-                    {type && type === "Trailer" && action && action === "DROP-TRAILER" ? (
+                    {type && type === "Trailer" && action && action === "DROP_TRAILER" ? (
                         <Box className="body-modal-item">
                             <Box className="body-modal-item-text">
                                 <Typography>Facility:</Typography>
@@ -232,10 +249,10 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                                         label="facility"
                                         inputProps={{ 'aria-label': 'Without label' }}
                                     >
-                                        {facilityList ? (
-                                            facilityList.map((item, key) => {
+                                        {facilities ? (
+                                            facilities.map((item, key) => {
                                                 return (
-                                                    <MenuItem value={item}>{item.facilityName}</MenuItem>
+                                                    <MenuItem value={item}>{item?.facilityCode} - {item?.facilityName}</MenuItem>
                                                 );
                                             })
                                         ) : null}
@@ -258,10 +275,10 @@ const ModalTripItem = ({ openModal, handleModal, setAddTripItem, trailerSelect, 
                                         label="facility"
                                         inputProps={{ 'aria-label': 'Without label' }}
                                     >
-                                        {facilityList ? (
-                                            facilityList.map((item, key) => {
+                                        {facilities ? (
+                                            facilities.map((item, key) => {
                                                 return (
-                                                    <MenuItem value={item}>{item?.facilityName}</MenuItem>
+                                                    <MenuItem value={item}>{item?.facilityCode} - {item?.facilityName}</MenuItem>
                                                 );
                                             })
                                         ) : null}

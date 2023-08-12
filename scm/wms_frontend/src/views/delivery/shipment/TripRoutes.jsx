@@ -1,10 +1,12 @@
-import { Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import L, { icon } from "leaflet";
 import "leaflet-routing-machine";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import "leaflet-routing-machine/dist/leaflet.routing.icons.png";
 import { useRef, useState } from "react";
 import {
+  LayerGroup,
+  LayersControl,
   MapContainer,
   Marker,
   Polyline,
@@ -13,6 +15,7 @@ import {
 } from "react-leaflet";
 import { useLocation } from "react-router-dom";
 import withScreenSecurity from "../../../components/common/withScreenSecurity";
+import { AppColors } from "../../../shared/AppColors";
 import RoutingMachine from "./RoutingMachine";
 const googleTileLayerUrl = "https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}";
 const googleAttribution = "Map data © Google";
@@ -35,13 +38,6 @@ function TripRoutesScreen({ screenAuthorization }) {
       return L.latLng(cus?.node?.x, cus?.node?.y);
     })
   );
-  const polyPoints = tripRoute?.droneRoutes
-    ?.map((droneRoute) => {
-      return droneRoute.droneRouteElements?.map((cus, index) => {
-        return [cus?.node?.x, cus?.node?.y];
-      });
-    })
-    .flat();
   return (
     <MapContainer
       center={{ lat: 21.008330038713357, lng: 105.84273632066207 }}
@@ -65,7 +61,7 @@ function TripRoutesScreen({ screenAuthorization }) {
         <Marker
           key={index}
           position={[cus?.node?.x, cus?.node?.y]}
-          icon={cus?.node?.name === "depot" ? facilityIcon : shopIcon}
+          icon={cus?.node?.name.includes("Vincom") ? facilityIcon : shopIcon}
           ref={markerRef}
         >
           <Popup>
@@ -79,7 +75,7 @@ function TripRoutesScreen({ screenAuthorization }) {
           <Marker
             key={index}
             position={[cus?.node?.x, cus?.node?.y]}
-            icon={cus?.node?.name === "depot" ? facilityIcon : shopIcon}
+            icon={cus?.node?.name.includes("Vincom") ? facilityIcon : shopIcon}
             ref={markerRef}
           >
             <Popup>
@@ -89,11 +85,47 @@ function TripRoutesScreen({ screenAuthorization }) {
           </Marker>
         ));
       })}
-      <Polyline
-        positions={[polyPoints ? polyPoints : []]}
-        pathOptions={{ color: "red" }}
-      />
+      {tripRoute?.droneRoutes?.map((droneRoute) => {
+        let polyPoints = droneRoute.droneRouteElements?.map((cus, index) => {
+          return [cus?.node?.x, cus?.node?.y];
+        });
+        return (
+          <Polyline
+            positions={[polyPoints ? polyPoints : []]}
+            pathOptions={{ color: "red" }}
+          />
+        );
+      })}
       <RoutingMachine waypoints={waypoints} />
+      <LayersControl position="topright">
+        <LayersControl.Overlay name="Drone route">
+          <LayerGroup>
+            <Stack sx={{ flexDirection: "row" }}>
+              <Typography
+                sx={{
+                  fontSize: 16,
+                  color: AppColors.green,
+                }}
+              >
+                4. Chi phí giao hàng của drone:
+              </Typography>
+              <Typography
+                sx={{
+                  marginLeft: 2,
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  color: AppColors.secondary,
+                }}
+              >
+                {"afdf"}
+              </Typography>
+            </Stack>
+          </LayerGroup>
+        </LayersControl.Overlay>
+        <LayersControl.Overlay checked name="Truck route">
+          <LayerGroup></LayerGroup>
+        </LayersControl.Overlay>
+      </LayersControl>
     </MapContainer>
   );
 }

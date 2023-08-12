@@ -6,20 +6,15 @@ import NewOrderModal from "./NewOrderModal";
 import { useContext, useState } from "react";
 import { MyContext } from "contextAPI/MyContext";
 
-const HeaderOrderScreen = ({ setToast, setToastType, setToastMsg, type }) => {
+const HeaderOrderScreen = ({ setToast, setToastType, setToastMsg }) => {
     const [open, setOpen] = useState(false);
     const { role, preferred_username } = useContext(MyContext);
     return (
         <Box className="headerScreen">
             <Box className="title">
-                {type === "WaitApprove" ? (
-                    <Typography >Order Wait Approve Management</Typography>
-                ) : (
-                    <Typography >Order Management</Typography>
-                )}
-
+                <Typography >Order Management</Typography>
             </Box>
-            {role === roles.get("Customer") ? (
+            {role.includes(roles.get("Customer")) ? (
                 <Box className="btn-add"
                     onClick={() => setOpen(true)}
                 >

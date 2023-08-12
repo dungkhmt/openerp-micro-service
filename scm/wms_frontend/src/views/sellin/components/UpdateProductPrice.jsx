@@ -12,6 +12,7 @@ const {
 } = require("react-hook-form");
 
 const UpdateProductPrice = ({ setIsAdd, currPrice }) => {
+  console.log("Curr price: ", currPrice);
   const methods = useForm({
     mode: "onChange",
     defaultValues: {

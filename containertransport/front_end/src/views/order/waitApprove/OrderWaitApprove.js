@@ -24,7 +24,7 @@ const OrderWaitApprove = () => {
         let data = {
             page: page, 
             pageSize: rowsPerPage,
-            status: "WAIT_APPROVE"
+            status: ["WAIT_APPROVE"]
         }
         getOrders(data).then((res) => {
             setOrders(res?.data.data.orderModels);
@@ -33,7 +33,7 @@ const OrderWaitApprove = () => {
     }, [toastOpen, page, rowsPerPage, flag])
     return (
         <Box className="fullScreen">
-            <Container maxWidth="lg" className="container">
+            <Container maxWidth="100vw" className="container">
                 <Box className="toast">
                     {toastOpen ? (
                         <Alert variant="filled" severity={toastType} >

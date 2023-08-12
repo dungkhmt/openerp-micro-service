@@ -21,8 +21,8 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { Chip, Icon } from '@mui/material';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import { deleteTruck } from 'api/TruckAPI';
 
@@ -242,7 +242,7 @@ export default function ContentsTruckManagement({ trucks, page, setPage, rowsPer
       setToastType("success");
       setToast(true);
       setTimeout(() => {
-          setToast(false);
+        setToast(false);
       }, "3000");
       setFlag(!flag);
     })
@@ -301,22 +301,27 @@ export default function ContentsTruckManagement({ trucks, page, setPage, rowsPer
                       </TableCell>
                       <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
                       <TableCell align="left">{row.driverName}</TableCell>
-                      <TableCell align="left">{row.status}</TableCell>
+                      <TableCell align="left">
+                        <Chip label={row?.status} color={colorStatus.get(row?.status)} />
+                      </TableCell>
                       <TableCell align="left">{row.licensePlates}</TableCell>
                       <TableCell align="left">{row.brandTruck}</TableCell>
                       <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell>
-                        <Box  sx={{ display: 'flex' }}>
+                        <Box sx={{ display: 'flex' }}>
                           <Tooltip title="View">
                             <Box onClick={() => { handleDetail(row?.uid) }} >
                               <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                             </Box>
                           </Tooltip>
-                          <Tooltip title="Delete">
-                            <Box onClick={() => { handleDelete(row?.uid) }}>
-                              <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                            </Box>
-                          </Tooltip>
+                          {row?.status === "AVAILABLE" ? (
+                            <Tooltip title="Delete">
+                              <Box onClick={() => { handleDelete(row?.uid) }}>
+                                <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                              </Box>
+                            </Tooltip>
+                          ) : null}
+
                         </Box>
                       </TableCell>
                     </TableRow>

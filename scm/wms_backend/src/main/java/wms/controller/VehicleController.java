@@ -6,18 +6,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import wms.algorithms.entity.Truck;
 import wms.common.constant.DefaultConst;
 import wms.dto.ReturnPaginationDTO;
 import wms.dto.customer.CustomerDTO;
 import wms.dto.customer.CustomerUpdateDTO;
 import wms.dto.vehicle.DroneDTO;
 import wms.dto.vehicle.TruckDTO;
+import wms.dto.vehicle.TruckResponseDTO;
 import wms.entity.ResultEntity;
 import wms.entity.TruckEntity;
 import wms.repo.TruckRepo;
 import wms.service.vehicle.IVehicleService;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/vehicle")
@@ -49,7 +52,8 @@ public class VehicleController extends BaseController {
             @RequestParam(value = "sort_asc", required = false, defaultValue = DefaultConst.BOOL) Boolean isSortAsc
     ) {
         try {
-            return response(new ResultEntity(1, "Get list truck successfully", vehicleService.getAllTrucks(page, pageSize, sortField, isSortAsc)));
+            ReturnPaginationDTO<TruckResponseDTO> truckEntityList = vehicleService.getAllTrucks(page, pageSize, sortField, isSortAsc);
+            return response(new ResultEntity(1, "Get list truck successfully", truckEntityList));
         } catch (Exception ex) {
             return response(error(ex));
         }
@@ -71,8 +75,10 @@ public class VehicleController extends BaseController {
             return response(error(ex));
         }
     }
-    @PutMapping("/truck/update/{id}")
-    public ResponseEntity<?> updateTruck(@Valid @RequestBody TruckDTO truckDTO, @PathVariable("id") long id) {
+    @PutMapping("/truck/update")
+    public ResponseEntity<?> updateTruck(@Valid @RequestBody TruckDTO truckDTO,
+                                         @RequestParam(value = "id", required = true, defaultValue = DefaultConst.NUMBER) Long id
+                                         ) {
         try {
             return response(new ResultEntity(1, "Update truck successfully", vehicleService.updateTruck(truckDTO, id)));
         } catch (Exception ex) {
@@ -143,8 +149,10 @@ public class VehicleController extends BaseController {
             return response(error(ex));
         }
     }
-    @PutMapping("/drone/update/{id}")
-    public ResponseEntity<?> updateDrone(@Valid @RequestBody DroneDTO droneDTO, @PathVariable("id") long id) {
+    @PutMapping("/drone/update")
+    public ResponseEntity<?> updateDrone(@Valid @RequestBody DroneDTO droneDTO,
+                                         @RequestParam(value = "id", required = true, defaultValue = DefaultConst.NUMBER) Long id
+                                         ) {
         try {
             return response(new ResultEntity(1, "Update drone successfully", vehicleService.updateDrone(droneDTO, id)));
         } catch (Exception ex) {

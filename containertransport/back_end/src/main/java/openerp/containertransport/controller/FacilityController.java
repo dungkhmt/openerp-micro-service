@@ -51,7 +51,7 @@ public class FacilityController {
                     return roleId;
                 })
                 .collect(Collectors.toList());
-        if(roleIds.contains("TMS_CUSTOMER")) {
+        if(roleIds.contains("TMS_CUSTOMER") || roleIds.contains("TMS_CUSTOMS")) {
             facilityFilterRequestDTO.setOwner(username);
         }
         FacilityFilterRes facilityModels = facilityService.filterFacility(facilityFilterRequestDTO);

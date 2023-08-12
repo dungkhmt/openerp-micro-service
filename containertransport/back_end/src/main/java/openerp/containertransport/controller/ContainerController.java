@@ -25,8 +25,15 @@ public class ContainerController {
     @PostMapping("/create")
     public ResponseEntity<?> createContainer(@RequestBody ContainerModel containerModelDTO, JwtAuthenticationToken token) {
         String username = token.getName();
-        ContainerModel containerModel = containerService.createContainer(containerModelDTO, username);
-        return ResponseEntity.status(HttpStatus.OK).body(containerModel);
+//        ContainerModel containerModel = containerService.createContainer(containerModelDTO, username);
+//        return ResponseEntity.status(HttpStatus.OK).body(containerModel);
+        return containerService.createContainer(containerModelDTO, username);
+    }
+
+    @PostMapping("v2/create")
+    public ResponseEntity<?> createv2(@RequestBody ContainerModel containerModel, JwtAuthenticationToken token) {
+        String username = token.getName();
+        return containerService.createContainerV2(containerModel, username);
     }
 
     @PostMapping("/")
@@ -43,7 +50,7 @@ public class ContainerController {
                     return roleId;
                 })
                 .collect(Collectors.toList());
-        if(roleIds.contains("TMS_CUSTOMER")) {
+        if(roleIds.contains("TMS_CUSTOMER") || roleIds.contains("TMS_CUSTOMS")) {
             containerFilterRequestDTO.setOwner(username);
         }
         ContainerFilterRes containerModels = containerService.filterContainer(containerFilterRequestDTO);

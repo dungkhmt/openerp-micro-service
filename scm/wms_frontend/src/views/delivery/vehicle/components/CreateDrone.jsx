@@ -39,7 +39,12 @@ const CreateDrone = ({ setIsAdd }) => {
   };
   return (
     <FormProvider {...methods}>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         <Controller
           key={"name"}
           control={control}
@@ -92,7 +97,12 @@ const CreateDrone = ({ setIsAdd }) => {
           )}
         />
       </Stack>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         <Controller
           key={"speed"}
           control={control}

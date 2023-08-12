@@ -5,6 +5,7 @@ import ContentsOrderManagerment from "./ContentsOrderManagerment";
 import HeaderOrderScreen from "./HeaderOrderScreen";
 import { getOrders } from "api/OrderAPI";
 import { MyContext } from "contextAPI/MyContext";
+import SearchBar from "components/search/SearchBar";
 
 const OrderScreen = () => {
     const [orders, setOrders] = useState([]);
@@ -18,15 +19,75 @@ const OrderScreen = () => {
     const [count, setCount] = useState(0);
     const { role, preferred_username } = useContext(MyContext);
 
+    const [flag, setFlag] = useState(false);
+
+    const [filters, setFilters] = useState([]);
+    const statusCustomer = [
+        { name: "WAIT_APPROVE"},
+        { name: "ORDERED" },
+        { name: "DONE" },
+        { name: "CANCEL" },
+        { name: "SCHEDULED"},
+        { name: "EXECUTING" }
+    ]
+    const statusDVVC = [
+        { name: "ORDERED" },
+        { name: "DONE" },
+        { name: "SCHEDULED"},
+        { name: "EXECUTING" }
+    ]
+
     useEffect(() => {
-        getOrders({ page: page, pageSize: rowsPerPage, status: "APPROVED" }).then((res) => {
-            setOrders(res.data.data.orderModels);
-            setCount(res.data.data.count);
+        let data = { page: page, pageSize: rowsPerPage};
+        let code = filters.find((item) => item.type === "code");
+        if(code) {
+            data.orderCode = code.value;
+        }
+        
+        if(role?.includes("TMS_ADMIN")) {
+            data.type = "APPROVED"
+        }
+        let status = filters.find((item) => item.type === "status");
+        if(status) {
+            let listStatus = [];
+            listStatus.push(status.value);
+            data.status = listStatus;
+        }
+        getOrders(data).then((res) => {
+            setOrders(res?.data?.data.orderModels);
+            setCount(res?.data?.data.count);
         });
-    }, [toastOpen, page, rowsPerPage])
+    }, [toastOpen, page, rowsPerPage, flag])
+
+    useEffect(() => {
+        let data = { page: page, pageSize: rowsPerPage};
+        let code = filters.find((item) => item.type === "code");
+        if(code) {
+            data.orderCode = code.value;
+            data.page = 0;
+            setPage(0);
+        }
+        
+        if(role?.includes("TMS_ADMIN")) {
+            data.type = "APPROVED";
+        }
+        let status = filters.find((item) => item.type === "status");
+        if(status) {
+            let listStatus = [];
+            listStatus.push(status.value);
+            data.status = listStatus;
+            data.page = 0;
+            setPage(0);
+        }
+        getOrders(data).then((res) => {
+            setOrders(res?.data?.data.orderModels);
+            setCount(res?.data?.data.count);
+        });
+    }, [filters])
+    console.log("role", role);
     return (
         <Box className="fullScreen">
-            <Container maxWidth="lg" className="container">
+            <Container maxWidth="100vw" className="container">
                 <Box className="toast">
                     {toastOpen ? (
                         <Alert variant="filled" severity={toastType} >
@@ -39,8 +100,13 @@ const OrderScreen = () => {
                 <Box className="divider">
                     <Divider />
                 </Box>
+                <Box>
+                    <SearchBar filters={filters} setFilters={setFilters} status={role?.includes("TMS_ADMIN") ? statusDVVC : statusCustomer} type="status" />
+                </Box>
                 <ContentsOrderManagerment orders={orders} page={page} setPage={setPage}
-                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count} />
+                    rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} count={count}
+                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg}
+                    flag={flag} setFlag={setFlag} />
             </Container>
         </Box>
     );

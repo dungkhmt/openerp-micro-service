@@ -1,7 +1,7 @@
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Button, Container, Typography } from "@mui/material";
+import { useHistory } from "react-router";
 
 const styles = {
-
   wrapper: {
     background: "#f4f6f8",
     height: window.innerHeight - 112,
@@ -9,11 +9,12 @@ const styles = {
 };
 
 const NotAccess = () => {
+  const history = useHistory();
   return (
     <Box
       display="flex"
       flexDirection="column"
-      // height="100%"
+      height="100%"
       justifyContent="center"
       sx={styles.wrapper}
     >
@@ -35,6 +36,17 @@ const NotAccess = () => {
             }}
             src="/static/images/undraw_page_not_found_su7k.svg"
           />
+          <Box mt={2}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                history.push("/code-editor/create-join-room");
+              }}
+            >
+              Quay lại
+            </Button>
+          </Box>
         </Box>
       </Container>
     </Box>

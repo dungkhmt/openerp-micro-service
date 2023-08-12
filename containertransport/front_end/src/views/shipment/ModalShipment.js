@@ -35,7 +35,7 @@ const ModalShipment = ({ open, setOpen, shipment, setToast, setToastType, setToa
                 description: description,
                 executed_time: new Date(executedTime).getTime()
             }
-            updateShipment(shipment?.id ,dataSubmit).then((res) => {
+            updateShipment(shipment?.uid ,dataSubmit).then((res) => {
                 if(!res) {
                     setToastType("error");
                     setToastMsg("Update Shipment Fail !!!")
@@ -108,7 +108,7 @@ const ModalShipment = ({ open, setOpen, shipment, setToast, setToastType, setToa
                                                 <DemoContainer components={['DateTimePicker']}>
                                                     <DateTimePicker label="Executed Time"
                                                         value={executedTime}
-                                                        
+                                                        disabled={!shipment || shipment?.status === "WAITING_SCHEDULER" ? false : true}
                                                         onChange={(e) => setExecutedTime((new Date(e)).getTime())} />
                                                 </DemoContainer>
                                             </LocalizationProvider>

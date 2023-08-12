@@ -132,8 +132,8 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
         }
       },
       {
-        401: () => { },
-        400: (e) => { errorNoti(e.response.data.errors[0].message); }
+        401: () => { errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau") },
+        400: (e) => { errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau") }
       },
       data
     );
@@ -504,11 +504,11 @@ const CreateWarehouse = ( props, { screenAuthorization } ) => {
                             </Grid>
 
                           </Box>
-                          <Box 
+                          {data.canBeDelete && <Box 
                             className={classes.removeIconBox} 
                             onClick={() => removeFormFields(index)}  >
                             <HighlightOffIcon className={classes.removeIcon} />
-                          </Box>
+                          </Box>}
                         </Box>
                       </Box>
                     ))

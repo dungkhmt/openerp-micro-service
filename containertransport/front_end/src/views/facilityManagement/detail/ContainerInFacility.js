@@ -19,11 +19,11 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { Chip, Icon } from '@mui/material';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import { getTrucks } from 'api/TruckAPI';
-import { getContainers } from 'api/ContainerAPI';
+import { deleteContainer, getContainers } from 'api/ContainerAPI';
 
 const DEFAULT_ORDER = 'asc';
 const DEFAULT_ORDER_BY = 'calories';
@@ -105,7 +105,7 @@ function EnhancedTableHead(props) {
 }
 
 export default function ContainerInFacility(props) {
-    const { facilityId } = props;
+    const { facilityId, setToast, setToastType, setToastMsg} = props;
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
     const [selected, setSelected] = React.useState([]);
@@ -117,12 +117,14 @@ export default function ContainerInFacility(props) {
 
     const [containers, setContainers] = React.useState([]);
 
+    const [load, setLoad] = React.useState(false);
+
     React.useEffect(() => {
         getContainers({ page: page, pageSize: rowsPerPage, facilityId: facilityId }).then((res) => {
             setContainers(res?.data.data.containerModels);
             setCount(res?.data.data.count);
         });
-    }, [page, rowsPerPage, count])
+    }, [page, rowsPerPage, count, load])
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
             const newSelected = containers.map((n) => n.name);
@@ -167,6 +169,18 @@ export default function ContainerInFacility(props) {
     const handleDetail = (id) => {
         history.push({
             pathname: `/container/detail/${id}`,
+        })
+    }
+    const handleDelete = (containerId) => {
+        deleteContainer(containerId).then((res) => {
+            console.log(res);
+            setToastMsg("Delete Container Success !!!");
+            setToastType("success");
+            setToast(true);
+            setLoad(!load);
+            setTimeout(() => {
+                setToast(false);
+            }, "3000");
         })
     }
     return (
@@ -222,7 +236,9 @@ export default function ContainerInFacility(props) {
                                             </TableCell>
                                             <TableCell align="left">{row.size}</TableCell>
                                             <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
-                                            <TableCell align="left">{row.status}</TableCell>
+                                            <TableCell align="left">
+                                                <Chip label={row.status} color={colorStatus.get(row.status)} />
+                                            </TableCell>
                                             <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                                             <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
                                             <TableCell>
@@ -232,11 +248,14 @@ export default function ContainerInFacility(props) {
                                                             <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                                                         </Box>
                                                     </Tooltip>
-                                                    <Tooltip title="Delete">
-                                                        <Box>
-                                                            <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                                                        </Box>
-                                                    </Tooltip>
+                                                    {row.status === "AVAILABLE" ? (
+                                                        <Tooltip title="Delete">
+                                                            <Box onClick={() => handleDelete(row?.uid)}>
+                                                                <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                                                            </Box>
+                                                        </Tooltip>
+                                                    ) : null}
+
                                                 </Box>
 
                                             </TableCell>

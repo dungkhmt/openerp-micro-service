@@ -269,7 +269,7 @@ export const truckCols = [
     field: "transportCostPerUnit",
     headerAlign: "center",
     align: "center",
-    headerName: "Phí vận chuyển",
+    headerName: "Phí vận chuyển (đ/m)",
     sortable: false,
     minWidth: 200,
     valueFormatter: (params) => {
@@ -280,7 +280,7 @@ export const truckCols = [
     field: "waitingCost",
     headerAlign: "center",
     align: "center",
-    headerName: "Phí chờ đợi",
+    headerName: "Phí chờ đợi (đ/s)",
     sortable: false,
     minWidth: 200,
     valueFormatter: (params) => {
@@ -306,7 +306,7 @@ export const truckCols = [
     sortable: false,
     minWidth: 200,
     valueGetter: (params) => {
-      return params?.row?.userLogin?.id;
+      return params?.row?.userName;
     },
     // valueFormatter: (params) => {
     //   return `${params.value} kg`;
@@ -362,7 +362,7 @@ export const droneCols = [
     field: "transportCostPerUnit",
     headerAlign: "center",
     align: "center",
-    headerName: "Phí vận chuyển",
+    headerName: "Phí vận chuyển (đ/m)",
     sortable: false,
     minWidth: 200,
     valueFormatter: (params) => {
@@ -373,7 +373,7 @@ export const droneCols = [
     field: "waitingCost",
     headerAlign: "center",
     align: "center",
-    headerName: "Phí chờ đợi",
+    headerName: "Phí chờ đợi (đ/s)",
     sortable: false,
     minWidth: 200,
     valueFormatter: (params) => {
@@ -390,6 +390,20 @@ export const droneCols = [
     valueFormatter: (params) => {
       return `${params.value} m/s`;
     },
+  },
+  {
+    field: "managedBy",
+    headerAlign: "center",
+    align: "center",
+    headerName: "Người phụ trách",
+    sortable: false,
+    minWidth: 200,
+    valueGetter: (params) => {
+      return params?.row?.userName;
+    },
+    // valueFormatter: (params) => {
+    //   return `${params.value} kg`;
+    // },
   },
 ];
 export const deliveryBillCols = [

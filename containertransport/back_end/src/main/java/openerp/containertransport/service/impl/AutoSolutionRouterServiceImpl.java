@@ -1,6 +1,7 @@
 package openerp.containertransport.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import openerp.containertransport.algorithms.entity.*;
 import openerp.containertransport.algorithms.entity.output.TransportContainerSolutionOutput;
 import openerp.containertransport.algorithms.entity.output.TripOutput;
@@ -18,6 +19,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService {
     private final TruckService truckService;
     private final TrailerService trailerService;
@@ -55,7 +57,9 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
 
         // request
         OrderFilterRequestDTO orderFilterRequestDTO = new OrderFilterRequestDTO();
-        orderFilterRequestDTO.setStatus("ORDERED");
+        List<String> status = new ArrayList<>();
+        status.add("ORDERED");
+        orderFilterRequestDTO.setStatus(status);
         List<OrderModel> orderModels = orderService.filterOrders(orderFilterRequestDTO).getOrderModels();
         List<Request> requests = convertToRequest(orderModels);
         transportContainerInput.setRequests(requests);
@@ -86,8 +90,11 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         List<DistanceElement> distanceElements = convertToDistantInput(relationships);
         transportContainerInput.setDistances(distanceElements);
 
+        long startTime = System.currentTimeMillis();
         TransportContainerSolutionOutput transportContainerSolutionOutput = heuristicSolver.solve(transportContainerInput);
-
+        long endTime = System.currentTimeMillis();
+        log.info("Time process {}", endTime - startTime);
+        shipmentModel.setTimeTest(endTime - startTime);
         for (Map.Entry<Integer, TripOutput> tripOutput : transportContainerSolutionOutput.getTripOutputs().entrySet()) {
             if(tripOutput.getValue().getPoints() != null && tripOutput.getValue().getPoints().size() != 0) {
 
@@ -165,7 +172,7 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
             request.setToLocationID((int) orderModel.getToFacility().getFacilityId());
             request.setLatestTimePickup(orderModel.getLatePickupTime());
             request.setLatestTimeDelivery(orderModel.getLateDeliveryTime());
-            request.setIsBreakRomooc(orderModel.isBreakRomooc());
+            request.setIsBreakRomooc(orderModel.getIsBreakRomooc());
             request.setType(orderModel.getType());
             requests.add(request);
         });
@@ -197,8 +204,8 @@ public class AutoSolutionRouterServiceImpl implements AutoSolutionRouterService 
         facilityModels.forEach(facilityModel -> {
             FacilityInput facilityInput = new FacilityInput();
             facilityInput.setFacilityId((int) facilityModel.getId());
-            facilityInput.setTimeProcessPickup(facilityModel.getProcessingTimePickUp());
-            facilityInput.setTimeProcessDrop(facilityModel.getProcessingTimeDrop());
+            facilityInput.setTimeProcessPickup(facilityModel.getProcessingTimePickUp() != null ? facilityModel.getProcessingTimePickUp() : 0);
+            facilityInput.setTimeProcessDrop(facilityModel.getProcessingTimeDrop() != null ? facilityModel.getProcessingTimeDrop() : 0);
             facilityInputs.add(facilityInput);
         });
         return facilityInputs;

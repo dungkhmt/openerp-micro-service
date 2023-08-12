@@ -74,8 +74,8 @@ public class TypeContainerServiceImpl implements TypeContainerService {
     }
 
     @Override
-    public Long countContainer() {
-        return typeContainerRepo.countContainer();
+    public Float countContainer(Integer size) {
+        return typeContainerRepo.countContainer(size);
     }
 
     public TypeContainerModel convertToModel (TypeContainer typeContainer) {

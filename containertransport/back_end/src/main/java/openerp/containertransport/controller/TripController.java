@@ -16,7 +16,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -48,6 +50,8 @@ public class TripController {
             if(!validTripItemDTO.getCheck()) {
                 return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.BAD_REQUEST), validTripItemDTO.getMessageErr()));
             }
+            tripModel.setTotalDistant(validTripItemDTO.getTotalDistant());
+            tripModel.setTotalTime(BigDecimal.valueOf(validTripItemDTO.getTotalTime()));
         }
         TripModel tripModelCreate = tripService.createTrip(tripCreateDTO.getTripContents(), tripCreateDTO.getShipmentId(), tripCreateDTO.getCreateBy());
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModelCreate));
@@ -62,7 +66,29 @@ public class TripController {
     }
 
     @PutMapping("/update/{uid}")
-    public ResponseEntity<?> updateTrip(@PathVariable String uid ,@RequestBody TripModel tripModel) {
+    public ResponseEntity<?> updateTrip(@PathVariable String uid ,@RequestBody TripModel tripModel, JwtAuthenticationToken token) {
+        List<String> roleIds = token
+                .getAuthorities()
+                .stream()
+                .filter(grantedAuthority -> !grantedAuthority
+                        .getAuthority()
+                        .startsWith("ROLE_GR")) // remove all composite roles
+                .map(grantedAuthority -> { // convert role to permission
+                    String roleId = grantedAuthority.getAuthority().substring(5); // remove prefix "ROLE_"
+                    return roleId;
+                })
+                .collect(Collectors.toList());
+        if(roleIds.contains("ADMIN")) {
+            List<TripItemModel> tripItemModels = tripModel.getTripItemModelList();
+            Shipment shipment = shipmentRepo.findByUid(tripModel.getShipmentId());
+            ValidTripItemDTO validTripItemDTO = tripServiceImpl.checkValidTrip(tripItemModels, shipment.getExecuted_time());
+            if(!validTripItemDTO.getCheck()) {
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.BAD_REQUEST), validTripItemDTO.getMessageErr()));
+            }
+            tripModel.setActor("ADMIN");
+            tripModel.setTotalDistant(validTripItemDTO.getTotalDistant());
+            tripModel.setTotalTime(BigDecimal.valueOf(validTripItemDTO.getTotalTime()));
+        }
         TripModel tripModelUpdate = tripService.updateTrip(uid, tripModel);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMetaData(new MetaDTO(MetaData.SUCCESS), tripModelUpdate));
     }

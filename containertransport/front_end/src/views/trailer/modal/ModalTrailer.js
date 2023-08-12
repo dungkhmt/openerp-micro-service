@@ -29,7 +29,7 @@ const ModalTrailer = ({ open, handleClose, trailer, setToast, setToastType, setT
     const handleSubmit = () => {
         if(trailer) {
             let data = {
-                id: trailer.id,
+                uid: trailer.uid,
                 facilityId: facility,
             };
             console.log("data", data)

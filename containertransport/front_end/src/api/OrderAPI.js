@@ -32,6 +32,22 @@ export const updateOrder = async (id, data) => {
     return resData;
 }
 
+export const updateOrderV2 = async (uid, data) => {
+    const resData = request(
+        "put",
+        `/order/updateV2/${uid}`, {}, {}, data, {}
+    );
+    return resData;
+}
+
+export const deleteOrder = async (uid, data) => {
+    const resData = request(
+        "delete",
+        `/order/delete/${uid}`, {}, {}, data, {}
+    );
+    return resData;
+}
+
 export const updateOrderByOrderCode = async (orderCode, data) => {
     const resData = request(
         "put",

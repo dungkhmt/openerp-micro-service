@@ -19,10 +19,10 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { Chip, Icon } from '@mui/material';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
-import { getTrucks } from 'api/TruckAPI';
+import { deleteTruck, getTrucks } from 'api/TruckAPI';
 
 const DEFAULT_ORDER = 'asc';
 const DEFAULT_ORDER_BY = 'calories';
@@ -118,7 +118,7 @@ function EnhancedTableHead(props) {
 }
 
 export default function TruckInFacility(props) {
-    const { facilityId } = props;
+    const { facilityId, setToast, setToastType, setToastMsg } = props;
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
     const [selected, setSelected] = React.useState([]);
@@ -130,13 +130,15 @@ export default function TruckInFacility(props) {
 
     const [trucks, setTrucks] = React.useState([]);
 
+    const [load, setLoad] = React.useState(false);
+
     React.useEffect(() => {
         getTrucks({ page: page, pageSize: rowsPerPage, facilityId: facilityId }).then((res) => {
-            console.log("truck==========", res.data.truckModels)
-            setTrucks(res.data.truckModels);
+            console.log("truck==========", res?.data.truckModels)
+            setTrucks(res?.data.truckModels);
             setCount(res?.data.count);
         });
-    }, [page, rowsPerPage, count])
+    }, [page, rowsPerPage, count, load])
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
             const newSelected = trucks.map((n) => n.name);
@@ -180,7 +182,19 @@ export default function TruckInFacility(props) {
     const isSelected = (name) => selected.indexOf(name) !== -1;
     const handleDetail = (id) => {
         history.push({
-          pathname: `/truck/detail/${id}`,
+            pathname: `/truck/detail/${id}`,
+        })
+    }
+    const handleDelete = (uid) => {
+        deleteTruck(uid).then((res) => {
+          console.log(res);
+          setToastMsg("Delete Truck Success");
+          setToastType("success");
+          setToast(true);
+          setLoad(!load);
+          setTimeout(() => {
+            setToast(false);
+          }, "3000");
         })
       }
     return (
@@ -236,7 +250,9 @@ export default function TruckInFacility(props) {
                                             </TableCell>
                                             <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
                                             <TableCell align="left">{row.driverName}</TableCell>
-                                            <TableCell align="left">{row.status}</TableCell>
+                                            <TableCell align="left">
+                                                <Chip label={row.status} color={colorStatus.get(row.status)} />
+                                            </TableCell>
                                             <TableCell align="left">{row.licensePlates}</TableCell>
                                             <TableCell align="left">{row.brandTruck}</TableCell>
                                             <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
@@ -244,16 +260,17 @@ export default function TruckInFacility(props) {
                                                 <Box sx={{ display: 'flex' }}>
                                                     <Tooltip title="View">
                                                         <Box
-                                                          onClick={() => { handleDetail(row?.uid) }} 
+                                                            onClick={() => { handleDetail(row?.uid) }}
                                                         >
                                                             <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                                                         </Box>
                                                     </Tooltip>
-                                                    <Tooltip title="Delete">
-                                                        <Box>
-                                                            <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                                                        </Box>
-                                                    </Tooltip>
+                                                    {row.status === "AVAILABLE" ? (
+                                                        <Tooltip title="Delete">
+                                                            <Box onClick={() => handleDelete(row?.uid)}>
+                                                                <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                                                            </Box>
+                                                        </Tooltip>) : null}
                                                 </Box>
                                             </TableCell>
                                         </TableRow>

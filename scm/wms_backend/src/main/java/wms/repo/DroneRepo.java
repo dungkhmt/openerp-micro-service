@@ -10,6 +10,7 @@ import wms.entity.TruckEntity;
 public interface DroneRepo extends JpaRepository<DroneEntity, Long> {
     @Query(value = "select * from scm_drone where is_deleted = 0", nativeQuery = true)
     Page<DroneEntity> search(Pageable pageable);
+    @Query(value = "select * from scm_drone where scm_drone.id = :id and scm_drone.is_deleted = 0 limit 1 ", nativeQuery = true)
     DroneEntity getDroneById(long id);
     DroneEntity getDroneByCode(String code);
 
