@@ -32,7 +32,7 @@ export default function ContestProblemSubmissionDetail() {
       (res) => {
         setMemoryUsage(res.data.memoryUsage);
         setProblemId(res.data.problemId);
-        setRunTime(res.data.runTime);
+        setRunTime(res.data.runtime);
         setScore(res.data.point);
         setSubmissionLanguage(res.data.sourceCodeLanguage);
         setSubmissionSource(res.data.sourceCode);
