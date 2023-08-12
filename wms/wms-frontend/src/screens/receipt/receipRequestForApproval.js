@@ -32,7 +32,7 @@ const ReceiptRequestForApproval = ( props ) => {
       API_PATH.APPROVE_RECEIPT_REQUEST + "/" + receiptId,
       (res) => {
         if (res.status == 200) {
-          successNoti("Phê duyệt đơn xin nhập hàng thành công");
+          successNoti("Phê duyệt yêu cầu nhập hàng thành công");
           history.push(`${path.slice(0, path.lastIndexOf("/"))}`);
         } else {
           errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau.");
@@ -48,7 +48,7 @@ const ReceiptRequestForApproval = ( props ) => {
       API_PATH.CANCEL_RECEIPT_REQUEST + "/" + receiptId,
       (res) => {
         if (res.status == 200) {
-          successNoti("Hủy đơn xin nhập hàng thành công");
+          successNoti("Hủy yêu cầu nhập hàng thành công");
         } else {
           errorNoti("Có lỗi xảy ra. Vui lòng thử lại sau.");
         }
@@ -78,7 +78,7 @@ const ReceiptRequestForApproval = ( props ) => {
     <Box>
       <Grid container justifyContent="space-between" className={classes.headerBox}>
         <Grid>
-          <Typography variant="h5">Phê duyệt đơn xin nhập hàng</Typography>
+          <Typography variant="h5">Phê duyệt yêu cầu nhập hàng</Typography>
         </Grid>
         <Grid className={classes.buttonWrap}>
         <Button variant="contained" className={classes.addButton} 
