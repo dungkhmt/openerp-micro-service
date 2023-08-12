@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {useHistory} from "react-router-dom";
-import {Button, Grid, InputAdornment} from "@mui/material";
+import {Button, Grid, InputAdornment, LinearProgress} from "@mui/material";
 import HustContainerCard from "../../common/HustContainerCard";
 import {request} from "../../../api";
 import EditIcon from "@mui/icons-material/Edit";
@@ -23,7 +23,7 @@ const CssTextField = styled(TextField)({
   },
 });
 
-export function ContestManagerListProblem(props) {
+export function ContestManagerDetail(props) {
   const contestId = props.contestId;
   const [contestName, setContestName] = useState("");
   const [isPublic, setIsPublic] = useState(false);
@@ -34,8 +34,10 @@ export function ContestManagerListProblem(props) {
   const [problemDescriptionViewType, setProblemDescriptionViewType] = useState("");
   const [evaluateBothPublicPrivateTestcase, setEvaluateBothPublicPrivateTestcase,] = useState("");
   const [maxSourceCodeLength, setMaxSourceCodeLength] = useState(50000);
-
   const [minTimeBetweenTwoSubmissions, setMinTimeBetweenTwoSubmissions] = useState(0);
+
+  const [loading, setLoading] = useState(true);
+
   const history = useHistory();
 
   function getContestDetail() {
@@ -50,7 +52,7 @@ export function ContestManagerListProblem(props) {
       setMinTimeBetweenTwoSubmissions(res.data.minTimeBetweenTwoSubmissions);
       setEvaluateBothPublicPrivateTestcase(res.data.evaluateBothPublicPrivateTestcase);
       setMaxSourceCodeLength(res.data.maxSourceCodeLength);
-    }).then();
+    }).then(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -75,7 +77,8 @@ export function ContestManagerListProblem(props) {
         </Button>
       }
     >
-      <Grid container rowSpacing={3} spacing={2} mb="16px">
+      {loading && <LinearProgress/>}
+      <Grid container rowSpacing={3} spacing={2} mb="16px" display={loading ? "none" : ""}>
         <Grid item xs={9}>
           <CssTextField
             disabled
@@ -159,7 +162,7 @@ export function ContestManagerListProblem(props) {
             disabled
             fullWidth
             id="participantViewResultMode"
-            label="Allow viewing testcase detail"
+            label="Allow viewing Testcase Detail"
             value={participantViewResultMode}
           >
           </CssTextField>
@@ -187,9 +190,6 @@ export function ContestManagerListProblem(props) {
           </CssTextField>
         </Grid>
       </Grid>
-      {/*<Box sx={{margin: "14px 0"}}>*/}
-      {/*  <ContestManagerManageProblem contestId={contestId}/>*/}
-      {/*</Box>*/}
     </HustContainerCard>
   );
 }

@@ -5,9 +5,12 @@ import StandardTable from "../../table/StandardTable";
 import Typography from "@mui/material/Typography";
 import {toFormattedDateTime} from "../../../utils/dateutils";
 import AddIcon from "@material-ui/icons/Add";
+import HustContainerCard from "../../common/HustContainerCard";
+import {LinearProgress} from "@mui/material";
 
 export function ListContestManagerByRegistration() {
   const [contests, setContests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const columns = [
     {
@@ -42,7 +45,7 @@ export function ListContestManagerByRegistration() {
   function getContestListByUserRole() {
     request("get", "/get-contest-by-user-role", (res) => {
       setContests(res.data);
-    }).then();
+    }).then(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -50,7 +53,8 @@ export function ListContestManagerByRegistration() {
   }, []);
 
   return (
-    <div>
+    <HustContainerCard>
+      {loading && <LinearProgress/>}
       <StandardTable
         title="Contests"
         columns={columns}
@@ -75,6 +79,6 @@ export function ListContestManagerByRegistration() {
           }
         ]}
       />
-    </div>
+    </HustContainerCard>
   );
 }

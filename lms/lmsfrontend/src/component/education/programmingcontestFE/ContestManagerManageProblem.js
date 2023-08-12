@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {request} from "../../../api";
 import Typography from "@mui/material/Typography";
-import {Autocomplete, Button, Grid, IconButton, TextField} from "@mui/material";
+import {Autocomplete, Button, Grid, IconButton, LinearProgress, TextField} from "@mui/material";
 import StandardTable from "component/table/StandardTable";
 import Box from "@mui/material/Box";
 import {errorNoti, successNoti} from "../../../utils/notification";
@@ -18,7 +18,7 @@ export function ContestManagerManageProblem(props) {
   const contestId = props.contestId;
   const [allProblems, setAllProblems] = useState([]);
   const [contestProblems, setContestProblems] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [searchProblemValue, setSearchProblemValue] = useState("");
   const [chosenProblem, setChosenProblem] = useState(null);
@@ -114,7 +114,7 @@ export function ContestManagerManageProblem(props) {
   const getAllProblemsInContest = () => {
     request("get", "/get-contest-detail/" + contestId, (res) => {
       setContestProblems(res.data.list || []);
-    }).then();
+    }).then(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -144,6 +144,7 @@ export function ContestManagerManageProblem(props) {
 
   return (
     <Box sx={{margin: "14px 0"}}>
+      {loading && <LinearProgress/>}
       <Box display="flex" justifyContent="space-between" sx={{marginBottom: "16px"}}>
         <Autocomplete
           id="problem-select"

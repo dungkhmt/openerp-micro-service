@@ -5,7 +5,7 @@ import {useParams} from "react-router-dom";
 import {Tab, Tabs} from "@mui/material";
 import {a11yProps, TabPanelVertical} from "./TabPanel";
 import CodeSimilarityCheck from "./CodeSimilarityCheck";
-import {ContestManagerListProblem} from "./ContestManagerListProblem";
+import {ContestManagerDetail} from "./ContestManagerDetail";
 import ContestManagerListMember from "./ContestManagerListMember";
 import ContestManagerListRegisteredParticipant from "./ContestManagerListRegisteredParticipant";
 import ContestManagerAddMember2Contest from "./ContestManagerAddMember2Contest";
@@ -72,7 +72,7 @@ export function ContestManager() {
       </Tabs>
 
       <TabPanelVertical value={value} index={0}>
-        <ContestManagerListProblem contestId={contestId}/>
+        <ContestManagerDetail contestId={contestId}/>
       </TabPanelVertical>
 
       <TabPanelVertical value={value} index={1}>
