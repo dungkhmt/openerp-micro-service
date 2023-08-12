@@ -62,7 +62,6 @@ export default function ContestManagerAddMember2Contest(props) {
       "get",
       "/get-roles-user-approved-notapproved-in-contest/" + u + "/" + contestId,
       (res) => {
-        console.log("role in - notin contest ", res.data);
         setRolesApproved(res.data.rolesApprovedInContest);
         setRolesNotApproved(res.data.rolesNotInContest);
         setSelectedUserId(u);
@@ -72,7 +71,6 @@ export default function ContestManagerAddMember2Contest(props) {
   }
   function getRoles() {
     request("get", "/get-list-roles-contest", (res) => {
-      console.log("getRoles, res.data = ", res.data);
       setRoles(res.data);
     }).then();
   }
@@ -93,7 +91,7 @@ export default function ContestManagerAddMember2Contest(props) {
         const data = res.data.contents.content.map((e, index) => ({
           index: index + 1,
           userName: e.userName,
-          fullName: e.lastName + " " + e.middleName + " " + e.firstName,
+          fullName: e.firstName + " " + e.middleName + " " + e.lastName,
         }));
         setSearchUsers(data);
         setTotalPageSearch(res.data.contents.totalPages);
@@ -127,13 +125,13 @@ export default function ContestManagerAddMember2Contest(props) {
       </Box>
 
       <StandardTable
-        title={"DS Users"}
+        title={"Users"}
         columns={columns}
         data={searchUsers}
         hideCommandBar
         options={{
           selection: false,
-          pageSize: 20,
+          pageSize: 10,
           search: true,
           sorting: true,
         }}

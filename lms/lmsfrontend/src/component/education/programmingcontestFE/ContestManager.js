@@ -51,7 +51,7 @@ export function ContestManager() {
           style={{width: "11%"}}
         />
         <Tab label="List User" {...a11yProps(2)} style={{width: "11%"}}/>
-        <Tab label="Register User" {...a11yProps(3)} style={{width: "11%"}}/>
+        <Tab label="Registered User" {...a11yProps(3)} style={{width: "11%"}}/>
         <Tab label="Add User" {...a11yProps(4)} style={{width: "11%"}}/>
         <Tab label="Ranking" {...a11yProps(5)} style={{width: "11%"}}/>
         <Tab
