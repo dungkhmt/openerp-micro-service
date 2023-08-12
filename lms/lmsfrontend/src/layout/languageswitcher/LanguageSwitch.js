@@ -26,7 +26,7 @@ const LanguageSwitch = () => {
         <MenuItem value={"en"}>
           <img src={UKflag} alt="" style={{width: "18px", height: "14px", marginRight: "8px"}}/> ENG
         </MenuItem>
-        <MenuItem value={"vi"}>
+        <MenuItem value={"vi-VN"}>
           <img src={VIflag} alt="" style={{width: "18px", height: "14px", marginRight: "8px"}}/> VIE
         </MenuItem>
       </Select>
