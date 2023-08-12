@@ -1,12 +1,12 @@
 import InfoIcon from "@mui/icons-material/Info";
-import {CircularProgress, IconButton} from "@mui/material";
+import {CircularProgress, IconButton, LinearProgress} from "@mui/material";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import HustModal from "component/common/HustModal";
-import MaterialTable from "material-table";
 import {React, useEffect, useState} from "react";
 import {request} from "../../../api";
 import {toFormattedDateTime} from "../../../utils/dateutils";
 import Box from "@mui/material/Box";
+import StandardTable from "../../table/StandardTable";
 
 export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
   props
@@ -17,7 +17,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
   const [testcaseDetailList, setTestcaseDetailList] = useState([]);
   const [selectedTestcase, setSelectedTestcase] = useState();
 
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(true);
 
   const [score, setScore] = useState(0);
 
@@ -79,12 +79,6 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
     let selectedFile = null;
     for (let i = 0; i < testcaseDetailList.length; i++) {
       if (testcaseDetailList[i].testCaseId === testCaseId) {
-        //alert(
-        //  "upload solution output for test case " +
-        //    testCaseId +
-        //    " file " +
-        //    testcaseDetailList[i].file.name
-        // );
         selectedFile = testcaseDetailList[i].file;
         break;
       }
@@ -109,9 +103,6 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
       "/submit-solution-output-of-testcase",
       (res) => {
         res = res.data;
-        setIsProcessing(false);
-        console.log("result submit = ", res);
-        //alert("submit solution output OK");
         setScore(res.score);
         let arr_res = [];
         for (let i = 0; i < submissionTestCase.length; i++) {
@@ -129,8 +120,6 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
       },
       {
         onError: (e) => {
-          setIsProcessing(false);
-          console.error(e);
         },
       },
       formData,
@@ -181,7 +170,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
         401: () => {
         },
       }
-    );
+    ).then(() => setIsProcessing(false));
   }
 
   function getTestcaseDetail(testcaseId) {
@@ -254,13 +243,21 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
   };
 
   return (
-    <div>
-      <MaterialTable
+    <Box>
+      {isProcessing && <LinearProgress/>}
+      <StandardTable
         title={"Problem's Test cases"}
         columns={columns}
         data={submissionTestCase}
+        hideCommandBar
+        options={{
+          selection: false,
+          pageSize: 10,
+          search: true,
+          sorting: true,
+        }}
       />
       <ModalPreview chosenTestcase={selectedTestcase}/>
-    </div>
+    </Box>
   );
 }
