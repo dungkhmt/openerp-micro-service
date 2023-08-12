@@ -17,10 +17,21 @@
   "checkerSourceCodePlaceholder": "Code chấm điểm cho output của sinh viên",
   "checkSolutionCompile": "Biên dịch",
   "problemList": {
-    "title": "Danh sách bài tập"
+    "title": "Danh sách bài tập",
+    "status": "Trạng thái",
+    "title": "Tiêu đề",
+    "solution": "Lời giải",
+    "level": "Độ khó",
+    "createdBy": "Người tạo",
+    "createdAt": "Thời gian tạo",
+    "appearances": "Số Contest sử dụng",
+    "addTestCase": "Thêm Test Case",
+    "edit": "Chỉnh sửa",
+    "myProblems": "Bài tập của tôi",
+    "sharedProblems": "Bài tập được chia sẻ"
   },
-  "createProblem": "Tạo bài tập mới",
-  "editProblem": "Chỉnh sửa bài tập",
+  "createProblem": "Tạo mới Bài tập",
+  "editProblem": "Chỉnh sửa Bài tập",
   "validateSubmit": {
     "warningCheckSolutionCompile": "Bạn chưa hoàn thành bước \"BIÊN DỊCH\"",
     "missingField": "Trường {{fieldName}} không được bỏ trống"
