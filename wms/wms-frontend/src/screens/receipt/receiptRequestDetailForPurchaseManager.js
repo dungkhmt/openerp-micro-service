@@ -16,7 +16,7 @@ import { Fragment, useState, useEffect } from "react";
 import LoadingScreen from "components/common/loading/loading";
 import withScreenSecurity from "components/common/withScreenSecurity";
 
-const ReceiptRequestDetail = ( props ) => {
+const ReceiptRequestDetailForPurchaseManager = ( props ) => {
   const history = useHistory();
   const { path } = useRouteMatch();
   const classes = useStyles();
@@ -64,14 +64,15 @@ const ReceiptRequestDetail = ( props ) => {
     const requestBody = {
       "createdReason": data.createdReason,
       "expectedReceiveDate": data.expectedReceiveDate,
-      "receiptItemList": productTableData
+      "receiptItemList": productTableData,
+      "isPurchaseManagerRequest": 1
     }
     request(
       "put",
       API_PATH.RECEIPT,
       (res) => {
         if (res.status == 200) {
-          successNoti("Tạo yêu cầu nhập hàng hóa thành công");
+          successNoti("Tạo đơn nhập hàng hóa thành công");
           setProductTableData([]);
           history.push(`${path}`);
         } else {
@@ -129,7 +130,7 @@ const ReceiptRequestDetail = ( props ) => {
           className={classes.headerBox} >
           <Grid>
             <Typography variant="h5">
-              Tạo mới yêu cầu nhập hàng
+              Tạo mới đơn nhập hàng
             </Typography>
           </Grid>
           {
@@ -264,5 +265,5 @@ const ReceiptRequestDetail = ( props ) => {
   )
 }
 
-const SCR_ID = "SCR_WMSv2_CREATE_RECEIPT_REQUEST";
-export default withScreenSecurity(ReceiptRequestDetail, SCR_ID, true);
+const SCR_ID = "SCR_WMSv2_CREATE_RECEIPT_REQUEST_FOR_PURCHASE_MANAGER";
+export default withScreenSecurity(ReceiptRequestDetailForPurchaseManager, SCR_ID, true);

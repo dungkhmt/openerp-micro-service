@@ -33,7 +33,7 @@ const ReceiptRequestForApprovalListing = () => {
   isLoading ? <LoadingScreen /> :
   <Fragment>
     <StandardTable 
-      title="Phê duyệt đơn xin nhập hàng"
+      title="Phê duyệt yêu cầu nhập hàng"
       columns={[
         { title: "Ngày tạo đơn", field: "createdDate" },
         { title: "Ngày muốn nhận hàng", field: "expectedReceiveDate" },

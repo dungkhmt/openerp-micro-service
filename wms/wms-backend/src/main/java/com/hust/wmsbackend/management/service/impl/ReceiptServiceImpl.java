@@ -54,7 +54,7 @@ public class ReceiptServiceImpl implements ReceiptService {
                                  .warehouseId(request.getWarehouseId() == null ? null : UUID.fromString(request.getWarehouseId()))
                                  .receiptDate(request.getReceivedDate())
                                  .receiptName(request.getReceiptName())
-                                 .status(ReceiptStatus.CREATED)
+                                 .status(request.getIsPurchaseManagerRequest() == 1 ? ReceiptStatus.APPROVED : ReceiptStatus.CREATED)
                                  .createdReason(request.getCreatedReason())
                                  .expectedReceiptDate(request.getExpectedReceiveDate())
                                  .createdBy(principal.getName())
