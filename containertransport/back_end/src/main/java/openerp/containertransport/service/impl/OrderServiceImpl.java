@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -66,6 +67,7 @@ public class OrderServiceImpl implements OrderService {
                 orderModel.getContainerIds().forEach((item) -> {
                     Container container = containerRepo.findById(item);
                     container.setStatus(Constants.ContainerStatus.ORDERED.getStatus());
+                    container.setUpdatedAt(System.currentTimeMillis());
                     Order order = new Order();
                     order.setContainer(container);
                     order.setWeight(Long.valueOf(container.getTypeContainer().getSize()));
@@ -98,12 +100,12 @@ public class OrderServiceImpl implements OrderService {
     public Order createAttribute(OrderModel orderModel, Order order) {
         order.setCustomerId(orderModel.getUsername());
         order.setEarlyDeliveryTime(System.currentTimeMillis() + 1000*60*60*24*365);
-        if(orderModel.getLateDeliveryTime() != null) {
+        if(orderModel.getLateDeliveryTime() != null && orderModel.getLateDeliveryTime() != 0) {
             order.setLateDeliveryTime(orderModel.getLateDeliveryTime());
         } else {
             order.setLateDeliveryTime(System.currentTimeMillis() + 1000*60*60*24*365);
         }
-        if(orderModel.getLatePickupTime() != null) {
+        if(orderModel.getLatePickupTime() != null && orderModel.getLatePickupTime() != 0) {
             order.setLatePickupTime(orderModel.getLatePickupTime());
         } else {
             order.setLatePickupTime(System.currentTimeMillis() + 1000*60*60*24*365);
@@ -324,7 +326,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Long getFacilityNearest(String facilityUid) {
-        AtomicReference<Long> facilityRes = null;
+        AtomicReference<Long> facilityRes = new AtomicReference<>();
 
         List<FacilityModel> facilityModels = getAllFacilityAdmin();
 
@@ -353,7 +355,7 @@ public class OrderServiceImpl implements OrderService {
         AtomicReference<BigDecimal> distant = new AtomicReference<>(new BigDecimal(Long.MAX_VALUE));
         List<Relationship> relationships = relationshipService.getAllRelationShip();
 
-        AtomicReference<Long> containerId = null;
+        AtomicReference<Long> containerId = new AtomicReference<>();
 
         facilityModels.forEach((facilityModel) -> {
             relationships.forEach(relationship -> {
@@ -387,7 +389,7 @@ public class OrderServiceImpl implements OrderService {
 
     public List<FacilityModel> getAllFacilityAdmin() {
         FacilityFilterRequestDTO requestDTO = new FacilityFilterRequestDTO();
-        requestDTO.setOwner("dungpq");
+        requestDTO.setTypeOwner(Arrays.asList("ADMIN"));
         requestDTO.setType("Container");
         List<FacilityModel> facilityModels = facilityService.filterFacility(requestDTO).getFacilityModels();
         return facilityModels;

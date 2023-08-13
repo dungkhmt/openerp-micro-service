@@ -15,4 +15,5 @@ public class ContainerFilterRequestDTO {
     private String facilityId;
     private String owner;
     private String status;
+    private String type;
 }

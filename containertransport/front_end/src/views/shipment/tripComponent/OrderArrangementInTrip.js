@@ -258,7 +258,7 @@ const Row = SortableElement(({ data, facilitiesTmp, setFacilitiesTmp,...other })
     )
 })
 
-const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, tripItems, flag }) => {
+const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, tripItems, flag, trip }) => {
     // const [facilities, setFacilities] = useState([]);
     const [facilitiesFinal, setFacilitiesFinal] = useState([]);
     const [open, setOpen] = useState(false);
@@ -469,10 +469,11 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                 <Box className="facility-arrangment-head-title">
                     <Typography>Facilities Arrangement:</Typography>
                 </Box>
+                {["DONE", "EXECUTING"].includes(trip?.status) ? null : (
                 <Button variant="contained" className="header-trip-detail-btn-save"
                     onClick={handleAddTripItem}
                 >Add TripItem
-                </Button>
+                </Button>)}
             </Box>
             <Table className="table-trip-items">
                 <EnhancedTableHead

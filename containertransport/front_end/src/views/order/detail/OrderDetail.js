@@ -3,8 +3,8 @@ import '../styles.scss';
 import { Alert, Box, Button, Container, Divider, Icon, Typography } from "@mui/material";
 import { useHistory, useParams } from "react-router-dom";
 import { MyContext } from "contextAPI/MyContext";
-import { menuIconMap, typeOrderMap } from "config/menuconfig";
-import { deleteOrder, getOrderByUid } from "api/OrderAPI";
+import { menuIconMap, roles, typeOrderMap } from "config/menuconfig";
+import { deleteOrder, getOrderByUid, updateOrderList } from "api/OrderAPI";
 import NewOrderModal from "../NewOrderModal";
 
 const OrderDetail = () => {
@@ -54,6 +54,25 @@ const OrderDetail = () => {
             }
         })
     }
+    const handleReject = () => {
+        let data = {
+            status: "REJECT",
+            uidList: [].concat(uid)
+        }
+        updateOrderList(data).then((res) => {
+            history.push('/wait-approve/order')
+        })
+    }
+    const handleApprove = () => {
+        let data = {
+            status: "ORDERED",
+            uidList: [].concat(uid)
+        }
+        updateOrderList(data).then((res) => {
+            history.push('/wait-approve/order')
+        })
+    }
+    console.log("uid", uid)
     return (
         <Box className="fullScreen">
             <Container maxWidth="100vw" className="container">
@@ -83,9 +102,21 @@ const OrderDetail = () => {
                         <Box className="title-header">
                             <Typography >Order {order?.orderCode}</Typography>
                         </Box>
-                        {type === "wait" ? null : (
+                        {type === "WaitApprove" ? (
                             <Box className="btn-header">
-
+                                {role.includes(roles.get("Admin")) ? (
+                                    <>
+                                        <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
+                                            onClick={handleReject}
+                                        >Reject</Button>
+                                        <Button variant="contained" className="header-submit-shipment-btn-save"
+                                            onClick={handleApprove}
+                                        >Approve</Button>
+                                </>
+                                ) : null}
+                            </Box>
+                        ) : (
+                            <Box className="btn-header">
                                 {order?.status === "WAIT_APPROVE" ? (
                                     <>
                                         <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"

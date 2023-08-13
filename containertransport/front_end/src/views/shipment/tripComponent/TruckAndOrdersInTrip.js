@@ -152,7 +152,7 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
 
         return `${hours} giờ ${minutes} phút`;
     }
-    console.log("trip", trip)
+    console.log("ordersSelect", ordersSelect)
     return (
         <Box className="truck-order">
             <Box className="chose-truck-v2">
@@ -249,6 +249,7 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                     <Box className="header-info">
                         <Typography>Orders:</Typography>
                     </Box>
+                    {["DONE", "EXECUTING"].includes(trip?.status) ? null : (
                     <Box sx={{ backgroundColor: "#1976d2", borderRadius: '4px' }}>
                         <Button disableRipple
                             aria-describedby={id}
@@ -257,7 +258,7 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                         >
                             <span>Add Orders</span>
                         </Button>
-                    </Box>
+                    </Box>)}
                 </Box>
                 {open ?
                     <Box id={id} anchorEl={anchorEl} placement="bottom-start" sx={{ width: '50%', float: 'right', zIndex: 10000 }}>

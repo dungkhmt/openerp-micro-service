@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Controller
@@ -50,7 +51,7 @@ public class ContainerController {
                     return roleId;
                 })
                 .collect(Collectors.toList());
-        if(roleIds.contains("TMS_CUSTOMER") || roleIds.contains("TMS_CUSTOMS")) {
+        if((roleIds.contains("TMS_CUSTOMER") || roleIds.contains("TMS_CUSTOMS")) && !Objects.equals(containerFilterRequestDTO.getType(), "Order")) {
             containerFilterRequestDTO.setOwner(username);
         }
         ContainerFilterRes containerModels = containerService.filterContainer(containerFilterRequestDTO);

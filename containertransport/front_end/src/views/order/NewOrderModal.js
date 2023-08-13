@@ -71,20 +71,26 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
     const [earlyPickUpTime, setEarlyPickUpTime] = useState();
     const [latePickUpTime, setLatePickUpTime] = useState(null);
     const [isBreakRomooc, setIsBreakRomooc] = useState(false);
+    const [weight, setWeight] = useState();
+    const [facilitiesAdmin, setFacilitiesAdmin] = useState([]);
 
     useEffect(() => {
-        
-            getFacility({typeOwner: ["CUSTOMER", "CUSTOMS"]}).then((res) => {
-                console.log("facility==========", res?.data)
-                setFacilities(res?.data.data.facilityModels);
-            });
-            getFacility({typeOwner: ["CUSTOMS"]}).then((res) => {
-                console.log("facility==========", res?.data)
-                setPortFacilities(res?.data.data.facilityModels);
-            });
-            getFacilityOwner({}).then((res) => {
-                setOwnerFacilities(res?.data.data.facilityModels);
-            });
+
+        getFacility({ typeOwner: ["CUSTOMER", "CUSTOMS"] }).then((res) => {
+            console.log("facility==========", res?.data)
+            setFacilities(res?.data.data.facilityModels);
+        });
+        getFacility({ typeOwner: ["CUSTOMS"] }).then((res) => {
+            console.log("facility==========", res?.data)
+            setPortFacilities(res?.data.data.facilityModels);
+        });
+        getFacilityOwner({}).then((res) => {
+            setOwnerFacilities(res?.data.data.facilityModels);
+        });
+        getFacility({ typeOwner: ["ADMIN"], type: "Container" }).then((res) => {
+            console.log("facility==========", res?.data)
+            setFacilitiesAdmin(res?.data.data.facilityModels);
+        });
         if (order) {
 
             let typeTmp = typeConst.find((item) => item.id === order.type);
@@ -101,48 +107,61 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             setToFaciity(order?.toFacility.facilityUid)
             setIsBreakRomooc(order.breakRomooc);
             // setEarlyPickUpTime(dayjs(new Date(order?.earlyPickupTime)));
-            if(order.latePickupTime) {
+            if (order.latePickupTime) {
                 setLatePickUpTime(dayjs(new Date(order?.latePickupTime)));
             }
-            if(order.lateDeliveryTime) {
+            if (order.lateDeliveryTime) {
                 setLateDeliveryTime(dayjs(new Date(order?.lateDeliveryTime)));
             }
             // setEarlyDeliveryTime(dayjs(new Date(order?.earlyDeliveryTime)));
         }
 
-        
+
     }, []);
 
     useEffect(() => {
 
-        if(type === "OE") {
+        if (type === "OE") {
             setToFacilities(ownerFacilities);
+            setFromFacilities(facilitiesAdmin);
         }
-        if(type === "IE") {
-            setFromFacilities(ownerFacilities)
+        if (type === "IE") {
+            setFromFacilities(ownerFacilities);
+            setToFacilities(facilitiesAdmin);
         }
-        if(type === "IF") {
+        if (type === "IF") {
             setFromFacilities(portFacilities);
             setToFacilities(ownerFacilities);
         }
-        if(type === "OF") {
+        if (type === "OF") {
             setFromFacilities(ownerFacilities);
             setToFacilities(facilities);
         }
     }, [type, ownerFacilities, facilities, portFacilities])
 
     useEffect(() => {
-        getContainers({facilityId: fromFacility, status: "AVAILABLE"}).then((res) => {
+        let data = {
+            facilityId: fromFacility,
+             status: "AVAILABLE"
+        }
+        if(type === "IF") {
+            data["type"] = "Order";
+        }
+        getContainers(data).then((res) => {
             console.log("container==========", res?.data)
             setContainers(res?.data.data.containerModels);
         });
     }, [fromFacility]);
-    
+
     const typeConst = [
         { name: "Inbound Empty", id: "IE" },
         { name: "Inbound Full", id: "IF" },
         { name: "Outbound Empty", id: "OE" },
         { name: "Outbound Full", id: "OF" }
+    ];
+    const sizeContainer = [
+        { name: "20", id: 20 },
+        { name: "40", id: 40 }
     ];
     const typeFull = ["IF", "IE", "OF"];
 
@@ -165,11 +184,14 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
             isBreakRomooc: isBreakRomooc,
             containerIds: containerSelect
         }
-        if(type !== "IE") {
+        if (type !== "IE") {
             data["lateDeliveryTime"] = (new Date(lateDeliveryTime)).getTime();
         }
-        if(type !== "OE") {
+        if (type !== "OE") {
             data["latePickupTime"] = (new Date(latePickUpTime)).getTime();
+        }
+        if (type === "OE") {
+            data["weight"] = weight;
         }
         console.log("data", data);
         if (!order) {
@@ -185,7 +207,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                 if (!res) {
                     setToastType("error");
                     setToastMsg("Created order fail !!!");
-                } 
+                }
                 if (res?.data.meta.code === 200) {
                     setToastType("success");
                     setToastMsg("Created order success !!!");
@@ -231,7 +253,8 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
         setContainerSelect(containerIds);
         setContainerOrder(values);
     }
-    console.log("portFacility", portFacilities)
+    console.log("facilitiesAdmin", facilitiesAdmin);
+    console.log("order", order)
     return (
         <Box >
             <CustomizedDialogs
@@ -314,7 +337,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                                         value={toFacility}
                                                         onChange={(e) => setToFaciity(e.target.value)}
                                                         label="to facility"
-                                                        disabled={type === "IE" ? true : false}
+                                                        disabled={["IE", "OE"].includes(type) ? true : false}
                                                     >
                                                         {toFacilities ? (
                                                             toFacilities.map((item) => {
@@ -328,6 +351,36 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                             </Box>
                                         </Box>
                                     ) : null}
+
+                                    {
+                                        (type === "OE") ? (
+                                            <Box className="contentModal-item">
+                                                <Box className="contentModal-item-text">
+                                                    <Typography>Size:</Typography>
+                                                </Box>
+                                                <Box className="contentModal-item-input">
+                                                    <FormControl>
+                                                        <InputLabel id="demo-simple-select-label">Size</InputLabel>
+                                                        <Select
+                                                            value={weight}
+                                                            onChange={(e) => setWeight(e.target.value)}
+                                                            label="size"
+                                                            disabled={order && type === "OE" ? true : false}
+                                                        >
+                                                            {sizeContainer ? (
+                                                                sizeContainer.map((item) => {
+                                                                    return (
+                                                                        <MenuItem value={item.id}>{item.name}</MenuItem>
+                                                                    );
+                                                                })
+                                                            ) : null}
+                                                        </Select>
+                                                    </FormControl>
+                                                </Box>
+                                            </Box>
+                                        ) : null
+                                    }
+
                                     {
                                         typeFull.includes(type) ? (<Box className="contentModal-item">
                                             <Box className="contentModal-item-text">
@@ -356,6 +409,7 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                             </Box>
                                         </Box>) : null
                                     }
+                                    {type !== "IE" ? (
                                     <Box className="contentModal-item">
                                         <Box className="contentModal-item-text">
                                             <Typography>Break Romooc:</Typography>
@@ -368,7 +422,8 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                                 inputProps={{ 'aria-label': 'controlled' }}
                                             />
                                         </Box>
-                                    </Box>
+                                    </Box>) : null}
+                                    
                                     {/* <Box className="contentModal-item">
                                         <Box className="contentModal-item-text">
                                             <Typography>Early Delivery Time:</Typography>
@@ -383,21 +438,21 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                             </LocalizationProvider>
                                         </Box>
                                     </Box> */}
-                                    {((order && order?.type !== "IE")  || (!order && type !== "IE")) ? (
-                                    <Box className="contentModal-item">
-                                        <Box className="contentModal-item-text">
-                                            <Typography>Late Delivery Time:</Typography>
-                                        </Box>
-                                        <Box className="contentModal-item-input">
-                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                <DemoContainer components={['DateTimePicker']}>
-                                                    <DateTimePicker label="Late Delivery Time"
-                                                        value={lateDeliveryTime}
-                                                        onChange={(e) => setLateDeliveryTime((new Date(e)).getTime())} />
-                                                </DemoContainer>
-                                            </LocalizationProvider>
-                                        </Box>
-                                    </Box>) : null}
+                                    {((order && order?.type !== "IE") || (!order && type !== "IE")) ? (
+                                        <Box className="contentModal-item">
+                                            <Box className="contentModal-item-text">
+                                                <Typography>Late Delivery Time:</Typography>
+                                            </Box>
+                                            <Box className="contentModal-item-input">
+                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                    <DemoContainer components={['DateTimePicker']}>
+                                                        <DateTimePicker label="Late Delivery Time"
+                                                            value={lateDeliveryTime}
+                                                            onChange={(e) => setLateDeliveryTime((new Date(e)).getTime())} />
+                                                    </DemoContainer>
+                                                </LocalizationProvider>
+                                            </Box>
+                                        </Box>) : null}
                                     {/* <Box className="contentModal-item">
                                         <Box className="contentModal-item-text">
                                             <Typography>Early PickUp Time:</Typography>
@@ -412,21 +467,21 @@ const NewOrderModal = ({ open, setOpen, setToast, setToastType, setToastMsg, ord
                                             </LocalizationProvider>
                                         </Box>
                                     </Box> */}
-                                    {((order && order?.type !== "OE")  || (!order && type !== "OE")) ? (
-                                    <Box className="contentModal-item">
-                                        <Box className="contentModal-item-text">
-                                            <Typography>Late PickUp Time:</Typography>
-                                        </Box>
-                                        <Box className="contentModal-item-input">
-                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                <DemoContainer components={['DateTimePicker']}>
-                                                    <DateTimePicker label="Late PickUp Time"
-                                                        value={latePickUpTime}
-                                                        onChange={(e) => setLatePickUpTime((new Date(e)).getTime())} />
-                                                </DemoContainer>
-                                            </LocalizationProvider>
-                                        </Box>
-                                    </Box>) : null}
+                                    {((order && order?.type !== "OE") || (!order && type !== "OE")) ? (
+                                        <Box className="contentModal-item">
+                                            <Box className="contentModal-item-text">
+                                                <Typography>Late PickUp Time:</Typography>
+                                            </Box>
+                                            <Box className="contentModal-item-input">
+                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                    <DemoContainer components={['DateTimePicker']}>
+                                                        <DateTimePicker label="Late PickUp Time"
+                                                            value={latePickUpTime}
+                                                            onChange={(e) => setLatePickUpTime((new Date(e)).getTime())} />
+                                                    </DemoContainer>
+                                                </LocalizationProvider>
+                                            </Box>
+                                        </Box>) : null}
                                     <Divider />
                                     <Box
                                         display="flex"

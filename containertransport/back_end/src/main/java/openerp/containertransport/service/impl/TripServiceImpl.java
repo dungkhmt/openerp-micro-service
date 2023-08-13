@@ -37,6 +37,7 @@ public class TripServiceImpl implements TripService {
     private final EntityManager entityManager;
     private final OrderServiceImpl orderService;
     private final FacilityRepo facilityRepo;
+    private final ContainerRepo containerRepo;
 
     @Override
     public TripModel createTrip(TripModel tripModel, String shipmentId, String createBy) {
@@ -267,6 +268,16 @@ public class TripServiceImpl implements TripService {
                         trailer.setStatus(Constants.TrailerStatus.AVAILABLE.getStatus());
                         trailer.setUpdatedAt(System.currentTimeMillis());
                         trailerRepo.save(trailer);
+                    }
+                    if (item.getContainer() != null) {
+                        Facility facility = facilityRepo.findByUid(item.getContainer().getFacility().getUid());
+                        facility = Hibernate.unproxy(facility, Facility.class);
+                        Container container = item.getContainer();
+                        container = Hibernate.unproxy(container, Container.class);
+                        container.setFacility(facility);
+                        container.setStatus(Constants.ContainerStatus.ORDERED.getStatus());
+                        container.setUpdatedAt(System.currentTimeMillis());
+                        containerRepo.save(container);
                     }
                 });
                 tripItemRepo.deleteByTripUid(tripUid);

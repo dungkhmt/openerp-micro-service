@@ -35,11 +35,12 @@ const TripDetail = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        let ordersTmp = [];
         getTrucks({}).then((res) => {
             setTrucks(res?.data.truckModels);
         });
         getOrders({status: ["ORDERED"]}).then((res) => {
-            setOrders(res?.data.data.orderModels);
+            ordersTmp = ordersTmp.concat(res?.data.data.orderModels);
         });
         getTripItemByTripId(tripId).then((res) => {
             console.log("tripItem1111111", res?.data.data.sort((a, b) => a.id - b.id))
@@ -48,12 +49,14 @@ const TripDetail = () => {
         getTripByTripId(tripId).then((res) => {
             setTrip(res?.data.data);
         });
+        getTripByTripId(tripId).then((res) => {
+            setOrdersSelect(res?.data.data.ordersModel);
+            ordersTmp = ordersTmp.concat(res?.data.data.ordersModel);
+            setOrders(ordersTmp);
+        });
     }, [loading])
     useEffect(() => {
         getTripByTripId(tripId).then((res) => {
-            setOrdersSelect(res?.data.data.ordersModel);
-            let ordersTmp = orders.concat(res?.data.data.ordersModel);
-            setOrders(ordersTmp)
             trucks.forEach((item) => {
                 if (item.id === res?.data.data.truckId) {
                     setTruckSelect(item)
@@ -212,7 +215,7 @@ const TripDetail = () => {
             setToast(false);
         }, 3000)
     }
-    console.log("orderselec", ordersSelect)
+    console.log("orders", orders)
     return (
         <Box className="trip-detail">
             <Box className="toast">
@@ -241,9 +244,11 @@ const TripDetail = () => {
                                 sx={{ marginRight: '32px' }}
                                 onClick={handleCancelTrip}
                             >Delete</Button>) : null}
+                        {["DONE", "EXECUTING"].includes(trip?.status) ? null : (
                         <Button variant="contained" className="header-trip-detail-btn-save"
                             onClick={handleSubmit}
                         >Save</Button>
+                        )}
                     </Box>
                 </Box>
             </Box>
@@ -261,7 +266,7 @@ const TripDetail = () => {
                     <OrderArrangement ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} tripItems={tripItems} flag={flag}/>
                 </Box> */}
                 <Box className="order-arrangement-v2">
-                    <OrderArrangementInTrip ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} tripItems={tripItems} flag={flag} />
+                    <OrderArrangementInTrip ordersSelect={ordersSelect} setTripItem={setTripItem} truckSelected={truckSelect} tripItems={tripItems} flag={flag} trip={trip} />
                 </Box>
                 <Box className="map-order-v2">
                     <Box>
