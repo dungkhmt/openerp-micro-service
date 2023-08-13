@@ -24,6 +24,7 @@ const ContainerScreen = () => {
 
     const status = [
         { name: "AVAILABLE" },
+        { name: "ORDERED" },
         { name: "SCHEDULED" },
         { name: "EXECUTING" }
     ]
