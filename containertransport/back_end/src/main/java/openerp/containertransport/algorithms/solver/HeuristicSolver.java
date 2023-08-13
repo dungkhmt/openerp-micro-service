@@ -650,7 +650,7 @@ public class HeuristicSolver {
                 pointsNoTrailer.add(0, pickTrailer);
                 offset += 1;
             }
-            else if (pointsInTrip.get(p).getNbTrailer() == 0) {
+            else if (pointsInTrip.get(p).getNbTrailer() == 0 && p < pointsInTrip.size() - 1 && pointsInTrip.get(p+1).getType().equals("Order")) {
                 Point pickTrailer = getBestTrailerWithTrailer(pointsInTrip.get(p).getFacilityId(), pointsInTrip.get(p+1).getFacilityId(), trailerInputs);
                 pickTrailer.setWeightContainer(0);
 //                insertToTrailerScheduler(pickTrailer.getTrailerId());
@@ -1005,6 +1005,18 @@ public class HeuristicSolver {
             pointDepotTrailer.setFacilityId(depotTrailerID.get());
 
             pointList.add(pointDepotTrailer);
+        }
+        if(endPoint.getNbTrailer() == 0) {
+            AtomicReference<BigDecimal> distantEndRouter = new AtomicReference<>(BigDecimal.valueOf(Long.MAX_VALUE));
+            this.depotTrucks.forEach((depotTruck) -> {
+                DistantKey distantKey2Truck = new DistantKey(endPoint.getFacilityId(), depotTruck.getDepotTruckId());
+                BigDecimal distant2Truck = distanceElementMap.get(distantKey2Truck).getDistance();
+
+                if (distant2Truck.compareTo(distantEndRouter.get()) < 0) {
+                    distantEndRouter.set(distant2Truck);
+                    depotTruckID.set(depotTruck.getDepotTruckId());
+                }
+            });
         }
 
         Point pointStop = new Point();
