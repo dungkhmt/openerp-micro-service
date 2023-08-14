@@ -104,7 +104,7 @@ public class TripItemServiceImpl implements TripItemService {
                 containerRepo.save(container);
             }
             if(tripItemModel.getStatus().equals(Constants.OrderStatus.DONE.getStatus())
-                    && tripItemModel.getAction().equals("DELIVERY_CONTAINER")) {
+                    && tripItemModel.getAction().contains("DELIVERY_CONTAINER")) {
                 Order order = orderRepo.findByUid(tripItemModel.getOrderUid());
                 order.setStatus(Constants.OrderStatus.DONE.getStatus());
                 orderRepo.save(order);
@@ -196,7 +196,7 @@ public class TripItemServiceImpl implements TripItemService {
             if(tripItemModel.getAction().equals("PICKUP_CONTAINER") && tripItem.getOrder().getLatePickupTime() > 0) {
                 tripItemModel.setLateTime(tripItem.getOrder().getLatePickupTime());
             }
-            if (tripItemModel.getAction().equals("DELIVERY_CONTAINER") && tripItem.getOrder().getLateDeliveryTime() > 0){
+            if (tripItemModel.getAction().contains("DELIVERY_CONTAINER") && tripItem.getOrder().getLateDeliveryTime() > 0){
                 tripItemModel.setLateTime(tripItem.getOrder().getLateDeliveryTime());
             }
         }

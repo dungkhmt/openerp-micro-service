@@ -370,7 +370,7 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                             facilityCode: item?.toFacility.facilityCode,
                             earlyTime: item?.earlyDeliveryTime,
                             lateTime: item?.lateDeliveryTime,
-                            action: "DELIVERY_CONTAINER",
+                            action: item?.isBreakRomooc ? "DELIVERY_CONTAINER, DROP_TRAILER" : "DELIVERY_CONTAINER",
                             orderCode: item?.orderCode,
                             orderUid: item.uid,
                             containerId: item?.containerModel?.id,

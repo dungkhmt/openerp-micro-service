@@ -156,7 +156,7 @@ const TripDetail = () => {
             if (tripItems[i].action === "PICKUP_CONTAINER") {
                 totalWeight = totalWeight + tripItems[i].container.size;
             }
-            if (tripItems[i].action === "DELIVERY_CONTAINER") {
+            if (tripItems[i].action.indexOf("DELIVERY_CONTAINER") !== 1) {
                 let checkPickup = false;
                 for (let j = 1; j < i; j++) {
                     if (tripItems[j].action === "PICKUP_CONTAINER" && tripItems[j].orderCode === tripItems[i].orderCode) {
@@ -172,12 +172,12 @@ const TripDetail = () => {
                 totalWeight = totalWeight - tripItems[i].container.size;
             }
 
-            if (tripItems[i].action === "DELIVERY_CONTAINER" && nbTrailer === 0) {
+            if (tripItems[i].action.indexOf("DELIVERY_CONTAINER") !== 1 && nbTrailer === 0) {
                 setToastMsg(`Please view again at before ${tripItems[i].action} ${tripItems[i].orderCode}`)
                 appearToast();
                 return false;
             }
-            if (tripItems[i].action === "DELIVERY_CONTAINER" && tripItems[i].isBreakRomooc) {
+            if (tripItems[i].action.indexOf("DELIVERY_CONTAINER") !== 1 && tripItems[i].isBreakRomooc) {
                 nbTrailer = Number(nbTrailer) - 1;
             }
             console.log("nbTrailer", nbTrailer)

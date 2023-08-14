@@ -125,7 +125,9 @@ const ModalShipment = ({ open, setOpen, shipment, setToast, setToastType, setToa
                                                 label="Description"
                                                 placeholder="description"
                                                 multiline
-                                                size="small"
+                                                rows={2}
+                                                className="textarea"
+                                                // size="small"
                                                 onChange={(e) => setDescription(e.target.value)}
                                             />
                                         </Box>

@@ -212,7 +212,9 @@
         .contentModal-item-input {
             width: 60%;
             display: flex;
-
+            .textarea {
+                height: fit-content !important;
+            }
             .MuiOutlinedInput-root {
                 min-height: 40px;
                 width: 100%;

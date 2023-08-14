@@ -354,7 +354,7 @@ public class TripServiceImpl implements TripService {
                 return validTripItemDTO;
             }
 
-            if (tripItemModels.get(i).getAction().equals("DELIVERY_CONTAINER") && !Objects.equals(tripItemModels.get(i).getTypeOrder(), "IE")
+            if (tripItemModels.get(i).getAction().contains("DELIVERY_CONTAINER") && !Objects.equals(tripItemModels.get(i).getTypeOrder(), "IE")
                     && totalTime > tripItemModels.get(i).getLateTime()) {
                 validTripItemDTO.setCheck(false);
                 validTripItemDTO.setMessageErr("Trip is incorrect time when DELIVERY_CONTAINER of " + tripItemModels.get(i).getOrderCode());
@@ -365,7 +365,7 @@ public class TripServiceImpl implements TripService {
                 totalTime += facilityModelMap.get(tripItemModels.get(i).getFacilityId()).getProcessingTimePickUp();
             }
 
-            if (tripItemModels.get(i - 1).getAction().equals("DELIVERY_CONTAINER")) {
+            if (tripItemModels.get(i - 1).getAction().contains("DELIVERY_CONTAINER")) {
                 totalTime += facilityModelMap.get(tripItemModels.get(i).getFacilityId()).getProcessingTimeDrop();
             }
             prevPick = tripItemModels.get(i).getFacilityId().intValue();

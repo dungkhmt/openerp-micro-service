@@ -295,6 +295,7 @@ public class HeuristicSolver {
         point.setIsBreakRomooc(request.getIsBreakRomooc());
         if(checkToPoint && request.getIsBreakRomooc()) {
             point.setNbTrailer(0);
+            point.setAction("DELIVERY_CONTAINER, DROP_TRAILER");
         } else {
             point.setNbTrailer(1);
         }
@@ -302,7 +303,7 @@ public class HeuristicSolver {
         if(action.equals(Constants.ACTION.PICKUP_CONTAINER.getAction())) {
             point.setLatePickupContainer(request.getLatestTimePickup());
         }
-        if(action.equals(Constants.ACTION.DELIVERY_CONTAINER.getAction())){
+        if(action.contains(Constants.ACTION.DELIVERY_CONTAINER.getAction())){
             point.setLateDeliveryContainer(request.getLatestTimeDelivery());
         }
         point.setType("Order");
@@ -930,7 +931,7 @@ public class HeuristicSolver {
                 return false;
             }
 
-            if(pointInTrips.get(i).getAction().equals(Constants.ACTION.DELIVERY_CONTAINER.getAction()) && !pointInTrips.get(i).getTypeRequest().equals("IE")
+            if(pointInTrips.get(i).getAction().contains(Constants.ACTION.DELIVERY_CONTAINER.getAction()) && !pointInTrips.get(i).getTypeRequest().equals("IE")
                     && totalTime > pointInTrips.get(i).getLateDeliveryContainer()){
                 return false;
             }
@@ -939,7 +940,7 @@ public class HeuristicSolver {
                 totalTime += this.facilityInputMap.get(pointInTrips.get(i-1).getFacilityId()).getTimeProcessPickup();
             }
 
-            if(pointInTrips.get(i-1).getAction().equals(Constants.ACTION.DELIVERY_CONTAINER.getAction())){
+            if(pointInTrips.get(i-1).getAction().contains(Constants.ACTION.DELIVERY_CONTAINER.getAction())){
                 totalTime += this.facilityInputMap.get(pointInTrips.get(i-1).getFacilityId()).getTimeProcessDrop();
             }
 
@@ -1046,7 +1047,7 @@ public class HeuristicSolver {
                 totalTime = totalTime.add(new BigDecimal(this.facilityInputMap.get(pointList.get(i-1).getFacilityId()).getTimeProcessPickup()));
             }
 
-            if(pointList.get(i-1).getAction().equals(Constants.ACTION.DELIVERY_CONTAINER.getAction()) && !pointList.get(i-1).getTypeRequest().equals("IE")){
+            if(pointList.get(i-1).getAction().contains(Constants.ACTION.DELIVERY_CONTAINER.getAction()) && !pointList.get(i-1).getTypeRequest().equals("IE")){
                 totalTime = totalTime.add(new BigDecimal(this.facilityInputMap.get(pointList.get(i-1).getFacilityId()).getTimeProcessDrop()));
             }
             prevPoint = pointList.get(i).getFacilityId();
