@@ -18,7 +18,7 @@ export default function CreateTestCase(props) {
   const [description, setDescription] = useState("");
   const [load, setLoad] = useState(false);
   const [checkTestcaseResult, setCheckTestcaseResult] = useState(false);
-  const [point, setPoint] = useState(0);
+  const [point, setPoint] = useState(1);
   const [isPublic, setIsPublic] = useState("N");
   const [isProcessing, setIsProcessing] = useState(false);
   const [filename, setFilename] = useState("");
