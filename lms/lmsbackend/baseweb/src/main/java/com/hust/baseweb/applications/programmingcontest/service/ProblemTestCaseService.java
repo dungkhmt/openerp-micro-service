@@ -80,11 +80,6 @@ public interface ProblemTestCaseService {
         UUID submissionId
     );
 
-    ModelContestSubmissionResponse submitContestProblem(
-        ModelContestSubmission modelContestSubmission,
-        String userName
-    ) throws Exception;
-
     ModelContestSubmissionResponse submitContestProblemTestCaseByTestCase(
         ModelContestSubmission modelContestSubmission,
         String userName
@@ -215,8 +210,6 @@ public interface ProblemTestCaseService {
     void deleteTestcase(UUID testcaseId, String userId) throws MiniLeetCodeException;
 
     ModelCodeSimilarityOutput checkSimilarity(String contestId, ModelCheckSimilarityInput I);
-
-    ModelEvaluateBatchSubmissionResponse evaluateBatchSubmissionContest(String contestId);
 
     ModelEvaluateBatchSubmissionResponse reJudgeAllSubmissionsOfContest(String contestId);
 

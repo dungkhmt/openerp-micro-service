@@ -947,7 +947,7 @@ public class ContestProblemController {
                                                                                 .problemName("")
                                                                                 .contestSubmissionID(null)
                                                                                 .submittedAt(null)
-                                                                                .score(0)
+                                                                                .score(0L)
                                                                                 .numberTestCasePassed(0)
                                                                                 .totalNumberTestCase(0)
                                                                                 .build();
@@ -971,7 +971,7 @@ public class ContestProblemController {
                                                                                 .problemName("")
                                                                                 .contestSubmissionID(null)
                                                                                 .submittedAt(null)
-                                                                                .score(0)
+                                                                                .score(0L)
                                                                                 .numberTestCasePassed(0)
                                                                                 .totalNumberTestCase(0)
                                                                                 .build();
@@ -994,7 +994,7 @@ public class ContestProblemController {
                                                                                     .problemName("")
                                                                                     .contestSubmissionID(null)
                                                                                     .submittedAt(null)
-                                                                                    .score(0)
+                                                                                    .score(0L)
                                                                                     .numberTestCasePassed(0)
                                                                                     .totalNumberTestCase(0)
                                                                                     .build();
@@ -1021,7 +1021,7 @@ public class ContestProblemController {
                                                                                 .problemName("")
                                                                                 .contestSubmissionID(null)
                                                                                 .submittedAt(null)
-                                                                                .score(0)
+                                                                                .score(0L)
                                                                                 .numberTestCasePassed(0)
                                                                                 .totalNumberTestCase(0)
                                                                                 .build();
@@ -1058,7 +1058,7 @@ public class ContestProblemController {
                                                                                     .problemName("")
                                                                                     .contestSubmissionID(null)
                                                                                     .submittedAt(null)
-                                                                                    .score(0)
+                                                                                    .score(0L)
                                                                                     .numberTestCasePassed(0)
                                                                                     .totalNumberTestCase(0)
                                                                                     .build();
@@ -1211,7 +1211,7 @@ public class ContestProblemController {
                                              .problemName("")
                                              .contestSubmissionID(null)
                                              .submittedAt(null)
-                                             .score(0)
+                                             .score(0L)
                                              .numberTestCasePassed(0)
                                              .totalNumberTestCase(0)
                                              .build();
@@ -1226,7 +1226,7 @@ public class ContestProblemController {
                                              .problemName("")
                                              .contestSubmissionID(null)
                                              .submittedAt(null)
-                                             .score(0)
+                                             .score(0L)
                                              .numberTestCasePassed(0)
                                              .totalNumberTestCase(0)
                                              .build();
@@ -1241,7 +1241,7 @@ public class ContestProblemController {
                                              .problemName("")
                                              .contestSubmissionID(null)
                                              .submittedAt(null)
-                                             .score(0)
+                                             .score(0L)
                                              .numberTestCasePassed(0)
                                              .totalNumberTestCase(0)
                                              .build();
@@ -1257,7 +1257,7 @@ public class ContestProblemController {
                                              .problemName("")
                                              .contestSubmissionID(null)
                                              .submittedAt(null)
-                                             .score(0)
+                                             .score(0L)
                                              .numberTestCasePassed(0)
                                              .totalNumberTestCase(0)
                                              .build();
@@ -1273,7 +1273,7 @@ public class ContestProblemController {
                                              .problemName("")
                                              .contestSubmissionID(null)
                                              .submittedAt(null)
-                                             .score(0)
+                                             .score(0L)
                                              .numberTestCasePassed(0)
                                              .totalNumberTestCase(0)
                                              .build();
@@ -1290,7 +1290,7 @@ public class ContestProblemController {
                                              .problemName("")
                                              .contestSubmissionID(null)
                                              .submittedAt(null)
-                                             .score(0)
+                                             .score(0L)
                                              .numberTestCasePassed(0)
                                              .totalNumberTestCase(0)
                                              .build();
@@ -1310,7 +1310,7 @@ public class ContestProblemController {
                                              .problemName("")
                                              .contestSubmissionID(null)
                                              .submittedAt(null)
-                                             .score(0)
+                                             .score(0L)
                                              .numberTestCasePassed(0)
                                              .totalNumberTestCase(0)
                                              .build();
@@ -1326,7 +1326,7 @@ public class ContestProblemController {
                                              .problemName("")
                                              .contestSubmissionID(null)
                                              .submittedAt(null)
-                                             .score(0)
+                                             .score(0L)
                                              .numberTestCasePassed(0)
                                              .totalNumberTestCase(0)
                                              .build();
@@ -1431,18 +1431,6 @@ public class ContestProblemController {
         return ResponseEntity.ok().body("OK");
     }
 
-    @PostMapping("/contest-submit-all")
-    public ResponseEntity<?> contestSubmitAll(@RequestBody ModelContestSubmissionAll request, Principal principal) {
-        log.info("contestSubmitAll request {}", request);
-        request.getContents().parallelStream().forEach(modelContestSubmission -> {
-            try {
-                problemTestCaseService.submitContestProblem(modelContestSubmission, principal.getName());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        return ResponseEntity.status(200).body(null);
-    }
 
     @GetMapping("/get-ranking-contest-new/{contestId}")
     public ResponseEntity<?> getRankingContestNewVersion(

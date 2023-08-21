@@ -19,7 +19,7 @@ public class ModelContestSubmissionResponse {
     UUID selectedTestCaseId; // optional for re-run, check submit an output of a test-case
     String problemName;
     Date submittedAt;
-    Integer score;
+    Long score;
     String testCasePass;
     int numberTestCasePassed;
     int totalNumberTestCase;
