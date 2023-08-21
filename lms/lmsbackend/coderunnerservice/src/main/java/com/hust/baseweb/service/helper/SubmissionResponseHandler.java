@@ -42,7 +42,7 @@ public class SubmissionResponseHandler {
             String problemEvaluationType
     ) throws Exception {
         int runtime = 0;
-        int score = 0;
+        long score = 0;
         int nbTestCasePass = 0;
 
         String totalStatus;
@@ -170,7 +170,7 @@ public class SubmissionResponseHandler {
             Map<UUID, String> submissionResponses
     ) {
 
-        int totalPoint = 0;
+        long totalPoint = 0;
 
         for (Map.Entry<UUID, String> testCaseResponse : submissionResponses.entrySet()) {
             UUID submissionTestCaseId = testCaseResponse.getKey();

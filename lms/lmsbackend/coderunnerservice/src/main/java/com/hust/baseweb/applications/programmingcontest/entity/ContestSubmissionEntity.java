@@ -64,7 +64,7 @@ public class ContestSubmissionEntity {
     private float memoryUsage;
 
     @Column(name = "point")
-    private Integer point;
+    private Long point;
 
     @Column(name = "status")
     private String status;
