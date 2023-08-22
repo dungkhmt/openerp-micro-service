@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class ContestSubmissionsByUserCustom {
 
     private String problemId;
-    private Integer point;
+    private Long point;
 }

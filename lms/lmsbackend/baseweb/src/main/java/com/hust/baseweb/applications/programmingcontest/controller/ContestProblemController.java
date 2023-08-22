@@ -1295,7 +1295,7 @@ public class ContestProblemController {
 
     @GetMapping("/public-ranking/{contestId}")
     public ResponseEntity<?> getRankingContestPublic(
-        @PathVariable("contestId") String contestId, Pageable pageable,
+        @PathVariable("contestId") String contestId,
         @RequestParam Constants.GetPointForRankingType getPointForRankingType
     ) {
         ContestEntity contest = contestService.findContestWithCache(contestId);
@@ -1308,23 +1308,18 @@ public class ContestProblemController {
                 .body("This contest size is too big. Contact the contest manager for ranking table");
         }
 
-        pageable = Pageable.unpaged();
-        List<ContestSubmissionsByUser> res = problemTestCaseService.getRankingByContestIdNew(pageable, contestId,
-                                                                                             getPointForRankingType);
+        List<ContestSubmissionsByUser> res = problemTestCaseService.getRankingByContestIdNew(contestId, getPointForRankingType);
 
         return ResponseEntity.status(200).body(res);
     }
 
     @GetMapping("/get-ranking-contest-new/{contestId}")
     public ResponseEntity<?> getRankingContestNewVersion(
-        @PathVariable("contestId") String contestId, Pageable pageable,
+        @PathVariable("contestId") String contestId,
         @RequestParam Constants.GetPointForRankingType getPointForRankingType
     ) {
-        pageable = Pageable.unpaged();
-        List<ContestSubmissionsByUser> page = problemTestCaseService.getRankingByContestIdNew(pageable, contestId,
-                                                                                              getPointForRankingType);
-        // log.info("ranking page {}", page);
-        return ResponseEntity.status(200).body(page);
+        List<ContestSubmissionsByUser> res = problemTestCaseService.getRankingByContestIdNew(contestId, getPointForRankingType);
+        return ResponseEntity.status(200).body(res);
     }
 
     @PostMapping("/recalculate-ranking/{contestId}")
