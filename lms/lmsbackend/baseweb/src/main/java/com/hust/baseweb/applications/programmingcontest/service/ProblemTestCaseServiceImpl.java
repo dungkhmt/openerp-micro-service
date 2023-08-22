@@ -319,12 +319,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return problemEntity;
     }
 
-
-    @Override
-    public Page<ProblemEntity> getContestProblemPaging(Pageable pageable) {
-        return problemPagingAndSortingRepo.findAll(pageable);
-    }
-
     @Override
     public List<ProblemEntity> getAllProblems() {
         List<ProblemEntity> problems = problemRepo.findAll();
@@ -519,47 +513,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                       .isPublic(modelSaveTestcase.getIsPublic())
                                                       .build();
         return testCaseService.saveTestCaseWithCache(testCaseEntity);
-    }
-
-
-    @Override
-    public ListProblemSubmissionResponse getListProblemSubmissionResponse(
-        String problemId,
-        String userId
-    ) throws Exception {
-        UserLogin userLogin = userLoginRepo.findByUserLoginId(userId);
-        ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
-        if (userLogin == null || problemEntity == null) {
-            throw new Exception("not found");
-        }
-        List<Object[]> list = problemSubmissionRepo.getListProblemSubmissionByUserAndProblemId(
-            userLogin,
-            problemEntity);
-        List<ProblemSubmissionResponse> problemSubmissionResponseList = new ArrayList<>();
-        try {
-            list.forEach(objects -> {
-                //  log.info("objects {}", objects);
-                ProblemSubmissionResponse problemSubmissionResponse = ProblemSubmissionResponse.builder()
-                                                                                               .problemSubmissionId((UUID) objects[0])
-                                                                                               .timeSubmitted((String) objects[1])
-                                                                                               .status((String) objects[2])
-                                                                                               .score((int) objects[3])
-                                                                                               .runtime((String) objects[4])
-                                                                                               .memoryUsage((float) objects[5])
-                                                                                               .language((String) objects[6])
-                                                                                               .build();
-                problemSubmissionResponseList.add(problemSubmissionResponse);
-            });
-        } catch (Exception e) {
-            // log.info("error");
-            e.printStackTrace();
-            throw e;
-        }
-
-        return ListProblemSubmissionResponse.builder()
-                                            .contents(problemSubmissionResponseList)
-                                            .isSubmitted(list.size() != 0)
-                                            .build();
     }
 
     @Transactional
@@ -1802,27 +1755,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public ModelGetContestPageResponse getContestPagingByUserCreatedContest(String userName, Pageable pageable) {
-//        UserLogin userCreateContest = userLoginRepo.findByUserLoginId(userName);
-        Page<ContestEntity> contestPage = contestPagingAndSortingRepo.findAllByUserId(pageable, userName);
-        return getModelGetContestPageResponse(contestPage);
-    }
-
-    @Override
-    public ModelGetContestPageResponse getContestPagingByUserManagerContest(String userName, Pageable pageable) {
-        List<UserRegistrationContestEntity> L = userRegistrationContestRepo.findAllByUserIdAndRoleId(
-            userName,
-            UserRegistrationContestEntity.ROLE_MANAGER);
-        //Page<ContestEntity> contestPage =  contestPagingAndSortingRepo.findAllByUserIdAndRoleId(pageable, userName, UserRegistrationContestEntity.ROLE_MANAGER);
-        HashSet<String> contestIds = new HashSet();
-        for (UserRegistrationContestEntity e : L) {
-            contestIds.add(e.getContestId());
-        }
-        List<ContestEntity> contestEntities = contestPagingAndSortingRepo.findAllByContestIdIn(contestIds);
-        return getModelGetContestPageResponse(contestEntities);
-    }
-
-    @Override
     public ModelGetContestPageResponse getAllContestsPagingByAdmin(String userName, Pageable pageable) {
         //List<ContestEntity> contestEntities = contestPagingAndSortingRepo.findAll();
         Page<ContestEntity> contestEntities = contestPagingAndSortingRepo.findAll(pageable);
@@ -1999,11 +1931,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             userName);
         long count = userRegistrationContestPagingAndSortingRepo.getNumberOfNotRegisteredContestByUserLogin(userName);
         return getModelGetContestPageResponse(list, count);
-    }
-
-    @Override
-    public Page<UserSubmissionContestResultNativeEntity> getRankingByContestId(Pageable pageable, String contestId) {
-        return userSubmissionContestResultNativePagingRepo.findAllByContestId(pageable, contestId);
     }
 
     @Override
@@ -2202,17 +2129,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public int addAllUsersToContest(ModelAddUserToContest model) {
-        List<UserLogin> users = userService.getAllUserLogins();
-        int cnt = 0;
-        for (UserLogin u : users) {
-            model.setUserId(u.getUserLoginId());
-            cnt += addUserToContest(model);
-        }
-        return cnt;
-    }
-
-    @Override
     public void deleteUserContest(ModelAddUserToContest modelAddUserToContest) throws MiniLeetCodeException {
         UserRegistrationContestEntity userRegistrationContest = userRegistrationContestRepo.findUserRegistrationContestEntityByContestIdAndUserId(
             modelAddUserToContest.getContestId(),
@@ -2361,32 +2277,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     contestSubmissionEntity.getCreatedAt(),
                     DateTimeUtils.DateTimeFormat.DATE_TIME_ISO_FORMAT)
                               : null)
-                .sourceCodeLanguage(contestSubmissionEntity.getSourceCodeLanguage())
-                .point(contestSubmissionEntity.getPoint())
-                .problemId(contestSubmissionEntity.getProblemId())
-                .testCasePass(contestSubmissionEntity.getTestCasePass())
-                .status(contestSubmissionEntity.getStatus())
-                .message(contestSubmissionEntity.getMessage())
-                .userId(contestSubmissionEntity.getUserId())
-                .fullname(userService.findPersonByUserLoginId(contestSubmissionEntity.getUserId()).getFullName())
-                .build());
-    }
-
-    @Override
-    public Page<ContestSubmission> findContestNotEvaluatedSubmissionByContestIdPaging(
-        Pageable pageable,
-        String contestId
-    ) {
-        //return contestSubmissionPagingAndSortingRepo.findAllByContestId(pageable, contestId)
-        return contestSubmissionPagingAndSortingRepo
-            .findAllByContestIdAndStatus(pageable, contestId, ContestSubmissionEntity.SUBMISSION_STATUS_NOT_AVAILABLE)
-            .map(contestSubmissionEntity -> ContestSubmission
-                .builder()
-                .contestSubmissionId(contestSubmissionEntity.getContestSubmissionId())
-                .contestId(contestSubmissionEntity.getContestId())
-                .createAt(contestSubmissionEntity.getCreatedAt() != null ? DateTimeUtils.dateToString(
-                    contestSubmissionEntity.getCreatedAt(),
-                    DateTimeUtils.DateTimeFormat.DATE_TIME_ISO_FORMAT) : null)
                 .sourceCodeLanguage(contestSubmissionEntity.getSourceCodeLanguage())
                 .point(contestSubmissionEntity.getPoint())
                 .problemId(contestSubmissionEntity.getProblemId())
@@ -2851,19 +2741,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     public ModelEvaluateBatchSubmissionResponse judgeAllSubmissionsOfContest(String contestId) {
         //return judgeAllSubmissionsOfContestBasedOnUserAndProblems(contestId);
         return judgeAllSubmissionsOfContestBasedSubmissionDate(contestId);
-    }
-
-    @Override
-    public List<ModelContestByRoleResponse> getContestsByRoleOfUser(String userLoginId) {
-        List<ContestRole> contestRoles = contestRoleRepo.findAllByUserLoginIdAndThruDate(userLoginId, null);
-        List<ModelContestByRoleResponse> modelContestByRoleResponses = new ArrayList();
-        for (ContestRole cr : contestRoles) {
-            ModelContestByRoleResponse m = new ModelContestByRoleResponse();
-            m.setContestId(cr.getContestId());
-            m.setRoleId(cr.getRoleId());
-            modelContestByRoleResponses.add(m);
-        }
-        return modelContestByRoleResponses;
     }
 
     private ModelGetTestCase convertToModelGetTestCase(TestCaseEntity testCaseEntity) {
@@ -3367,49 +3244,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public int addAdminToManagerAndParticipantAllContest() {
-        int cnt = 0;
-        String admin = "admin";
-        List<ContestEntity> contests = contestRepo.findAll();
-        for (ContestEntity c : contests) {
-            String contestId = c.getContestId();
-            List<UserRegistrationContestEntity> L = userRegistrationContestRepo
-                .findUserRegistrationContestEntityByContestIdAndUserIdAndStatusAndRoleId(
-                    contestId,
-                    admin,
-                    UserRegistrationContestEntity.STATUS_SUCCESSFUL,
-                    UserRegistrationContestEntity.ROLE_MANAGER);
-            if (L == null || L.size() == 0) {
-                UserRegistrationContestEntity ur = new UserRegistrationContestEntity();
-                ur.setContestId(contestId);
-                ur.setUserId(admin);
-                ur.setStatus(UserRegistrationContestEntity.STATUS_SUCCESSFUL);
-                ur.setRoleId(UserRegistrationContestEntity.ROLE_MANAGER);
-                ur = userRegistrationContestRepo.save(ur);
-                cnt++;
-            }
-
-            L = userRegistrationContestRepo
-                .findUserRegistrationContestEntityByContestIdAndUserIdAndStatusAndRoleId(
-                    contestId,
-                    admin,
-                    UserRegistrationContestEntity.STATUS_SUCCESSFUL,
-                    UserRegistrationContestEntity.ROLE_PARTICIPANT);
-            if (L == null || L.size() == 0) {
-                UserRegistrationContestEntity ur = new UserRegistrationContestEntity();
-                ur.setContestId(contestId);
-                ur.setUserId(admin);
-                ur.setStatus(UserRegistrationContestEntity.STATUS_SUCCESSFUL);
-                ur.setRoleId(UserRegistrationContestEntity.ROLE_PARTICIPANT);
-                ur = userRegistrationContestRepo.save(ur);
-                cnt++;
-            }
-
-        }
-        return cnt;
-    }
-
-    @Override
     public ModelUploadTestCaseOutput addTestCase(
         String testCase,
         ModelProgrammingContestUploadTestCase modelUploadTestCase,
@@ -3696,17 +3530,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public boolean forbidMemberFromSubmitToContest(UUID id) {
-        UserRegistrationContestEntity u = userRegistrationContestRepo.findById(id).orElse(null);
-        if (u != null) {
-            u.setPermissionId(UserRegistrationContestEntity.PERMISSION_FORBIDDEN_SUBMIT);
-            userRegistrationContestRepo.save(u);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     public boolean updatePermissionMemberToContest(String userId, ModelUpdatePermissionMemberToContestInput input) {
         UserRegistrationContestEntity u = userRegistrationContestRepo.findById(input.getUserRegisId()).orElse(null);
         if (u != null) {
@@ -3717,17 +3540,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public boolean updateProblemContest(String userId, ModelUpdateProblemContestInput I) {
-        ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(I.getContestId(), I.getProblemId());
-        if (cp == null) {
-            return false;
-        }
-        cp.setSubmissionMode(I.getSubmissionMode());
-        cp = contestProblemRepo.save(cp);
-        return true;
     }
 
     @Override
@@ -3789,21 +3601,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         for (UserContestProblemRole e : L) {
             userContestProblemRoleRepo.delete(e);
             //userContestProblemRoleRepo.remove(e);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean grantRole2AllProblems(String userLoginId, String userId, String roleId) {
-        List<ProblemEntity> problems = problemRepo.findAll();
-        for (ProblemEntity p : problems) {
-            UserContestProblemRole upr = new UserContestProblemRole();
-            upr.setUpdateByUserId(userLoginId);
-            upr.setUserId(userId);
-            upr.setRoleId(roleId);
-            upr.setProblemId(p.getProblemId());
-            upr.setCreatedStamp(new Date());
-            upr = userContestProblemRoleRepo.save(upr);
         }
         return true;
     }

@@ -62,44 +62,6 @@ public class ContestService {
         return contestRepo.save(contest);
     }
 
-
-    public ModelGetContestDetailResponse getContestSolvingDetailByContestId(
-        String contestId,
-        String userName
-    ) throws MiniLeetCodeException {
-        ContestEntity contestEntity = findContestWithCache(contestId);
-
-        if (!contestEntity.getStatusId().equals(ContestEntity.CONTEST_STATUS_RUNNING)) {
-            return ModelGetContestDetailResponse.builder()
-                                                .contestId(contestId)
-                                                .contestName(contestEntity.getContestName())
-                                                .contestTime(contestEntity.getContestSolvingTime())
-                                                .startAt(contestEntity.getStartedAt())
-                                                .list(new ArrayList())
-                                                .unauthorized(false)
-                                                .isPublic(contestEntity.getIsPublic())
-                                                .statusId(contestEntity.getStatusId())
-                                                .listStatusIds(ContestEntity.getStatusIds())
-                                                .build();
-        }
-
-        UserRegistrationContestEntity userRegistrationContest = null;
-        List<UserRegistrationContestEntity> userRegistrationContests = userRegistrationContestRepo.findUserRegistrationContestEntityByContestIdAndUserIdAndStatus(
-            contestId,
-            userName,
-            Constants.RegistrationType.SUCCESSFUL.getValue());
-        if (userRegistrationContests != null && userRegistrationContests.size() > 0) {
-            userRegistrationContest = userRegistrationContests.get(0);
-        }
-
-        if (userRegistrationContest == null) {
-            return ModelGetContestDetailResponse.builder()
-                                                .unauthorized(true)
-                                                .build();
-        }
-        return getModelGetContestDetailResponseWithCache(contestEntity);
-    }
-
     @Cacheable(value = HASH_CONTEST_SOLVING_DETAIL, key = "#contest.contestId")
     public ModelGetContestDetailResponse getModelGetContestDetailResponseWithCache(ContestEntity contest) {
         return getModelGetContestDetailResponse(contest);

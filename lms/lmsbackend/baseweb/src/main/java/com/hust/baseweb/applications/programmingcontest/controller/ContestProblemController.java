@@ -93,25 +93,6 @@ public class ContestProblemController {
         return ResponseEntity.ok().body(problems);
     }
 
-    @GetMapping("/get-contest-problem-paging")
-    public ResponseEntity<?> getContestProblemPaging(
-        Pageable pageable, @Param("sortBy") String sortBy,
-        @Param("desc") String desc
-    ) {
-        log.info("getContestProblemPaging pageable {}", pageable);
-        log.info("sortBy {}", sortBy);
-        if (sortBy != null) {
-            if (desc != null) {
-                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                                          Sort.by(sortBy).descending());
-            } else {
-                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                                          Sort.by(sortBy).ascending());
-            }
-        }
-        Page<ProblemEntity> contestProblemPage = problemTestCaseService.getContestProblemPaging(pageable);
-        return ResponseEntity.status(200).body(contestProblemPage);
-    }
 
     @Secured("ROLE_TEACHER")
     @PostMapping("/problem/generate-statement")
@@ -249,16 +230,6 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(testCaseEntity);
     }
 
-    @GetMapping("/get-all-problem-submission-by-user/{problemId}")
-    public ResponseEntity<?> getAllProblemSubmissionByUser(
-        @PathVariable("problemId") String problemId,
-        Principal principal
-    ) throws Exception {
-        ListProblemSubmissionResponse listProblemSubmissionResponse = problemTestCaseService
-            .getListProblemSubmissionResponse(problemId, principal.getName());
-        return ResponseEntity.status(200).body(listProblemSubmissionResponse);
-    }
-
     @GetMapping("/get-problem-submission/{id}")
     public ResponseEntity<?> getProblemSubmissionById(@PathVariable("id") UUID id, Principal principal)
         throws MiniLeetCodeException {
@@ -266,13 +237,6 @@ public class ContestProblemController {
         ModelProblemSubmissionDetailResponse modelProblemSubmissionDetailResponse = problemTestCaseService
             .findProblemSubmissionById(id, principal.getName());
         return ResponseEntity.status(200).body(modelProblemSubmissionDetailResponse);
-    }
-
-    @GetMapping("/add-admin-to-manager-all-contest")
-    public ResponseEntity<?> addAdminToManagerAndParticipantAllContest(Principal principal) {
-        int cnt = problemTestCaseService.addAdminToManagerAndParticipantAllContest();
-        log.info("addAdminToManagerAndParticipantAllContest, cnt = " + cnt);
-        return ResponseEntity.ok().body(cnt);
     }
 
     @PostMapping("/create-contest")
@@ -322,15 +286,6 @@ public class ContestProblemController {
     public ResponseEntity<?> getListRolesContest() {
         List<String> L = UserRegistrationContestEntity.getListRoles();
         return ResponseEntity.ok().body(L);
-    }
-
-    @GetMapping("/get-my-contest-by-role")
-    public ResponseEntity<?> getMyContestByRole(Principal principal) {
-        String userLoginId = principal.getName();
-        log.info("getMyContestByRole, userLoginId = " + userLoginId);
-        List<ModelContestByRoleResponse> modelContestByRoleResponses = problemTestCaseService
-            .getContestsByRoleOfUser(userLoginId);
-        return ResponseEntity.ok().body(modelContestByRoleResponses);
     }
 
     @GetMapping("/get-contest-paging")
@@ -473,33 +428,6 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(tag);
     }
 
-    @GetMapping("/get-contest-detail-solving/{contestId}")
-    public ResponseEntity<?> getContestDetailSolving(@PathVariable("contestId") String contestId, Principal principal)
-        throws MiniLeetCodeException {
-//        log.info("getContestDetail constestid {}", contestId);
-        ModelGetContestDetailResponse response = null;
-
-        ContestEntity contestEntity = contestRepo.findContestByContestId(contestId);
-        if (!contestEntity.getStatusId().equals(ContestEntity.CONTEST_STATUS_RUNNING)) {
-            response = ModelGetContestDetailResponse.builder()
-                                                    .contestId(contestId)
-                                                    .contestName(contestEntity.getContestName())
-                                                    .contestTime(contestEntity.getContestSolvingTime())
-                                                    .startAt(contestEntity.getStartedAt())
-                                                    .list(new ArrayList())
-                                                    .unauthorized(false)
-                                                    .isPublic(contestEntity.getIsPublic())
-                                                    .statusId(contestEntity.getStatusId())
-                                                    .listStatusIds(ContestEntity.getStatusIds())
-                                                    .build();
-            return ResponseEntity.status(200).body(response);
-        }
-
-        response = contestService.getContestSolvingDetailByContestId(contestId, principal.getName());
-        return ResponseEntity.status(200).body(response);
-    }
-
-
     //@Secured("ROLE_STUDENT")
     @PostMapping("/student-register-contest/{contestId}")
     public ResponseEntity<?> studentRegisterContest(@PathVariable("contestId") String contestId, Principal principal)
@@ -530,48 +458,12 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(resp);
     }
 
-    @Secured("ROLE_TEACHER")
-    @GetMapping("/get-contest-paging-by-user-manager")
-    public ResponseEntity<?> getContestPagingByUserManager(
-        Principal principal, Pageable pageable,
-        @Param("sortBy") String sortBy
-    ) {
-        log.info("getContestPagingByUserCreate");
-        if (sortBy != null) {
-            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(sortBy));
-        } else {
-            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                                      Sort.by("createdAt").ascending());
-        }
-        ModelGetContestPageResponse resp = problemTestCaseService
-            .getContestPagingByUserManagerContest(principal.getName(), pageable);
-        return ResponseEntity.status(200).body(resp);
-    }
-
     //@Secured("ROLE_TEACHER")
     @GetMapping("/get-contest-by-user-role")
     public ResponseEntity<?> getContestPagingByUserRole(Principal principal) {
         String userId = principal.getName();
         List<ModelGetContestResponse> resp = problemTestCaseService
             .getContestByUserRole(principal.getName());
-        return ResponseEntity.status(200).body(resp);
-    }
-
-    //@Secured("ROLE_TEACHER")
-    @GetMapping("/get-contest-paging-by-user-create")
-    public ResponseEntity<?> getContestPagingByUserCreate(
-        Principal principal, Pageable pageable,
-        @Param("sortBy") String sortBy
-    ) {
-        log.info("getContestPagingByUserCreate");
-        if (sortBy != null) {
-            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(sortBy));
-        } else {
-            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                                      Sort.by("createdAt").ascending());
-        }
-        ModelGetContestPageResponse resp = problemTestCaseService
-            .getContestPagingByUserCreatedContest(principal.getName(), pageable);
         return ResponseEntity.status(200).body(resp);
     }
 
@@ -601,16 +493,6 @@ public class ContestProblemController {
         @RequestBody ModelRemoveMemberFromContestInput input
     ) {
         boolean res = problemTestCaseService.removeMemberFromContest(input.getId());
-        return ResponseEntity.ok().body(res);
-    }
-
-    //@Secured("ROLE_TEACHER")
-    @PostMapping("/forbid-member-from-submit-to-contest")
-    public ResponseEntity<?> forbidMemberFromSubmitToContest(
-        Principal principal,
-        @RequestBody ModelRemoveMemberFromContestInput input
-    ) {
-        boolean res = problemTestCaseService.forbidMemberFromSubmitToContest(input.getId());
         return ResponseEntity.ok().body(res);
     }
 
@@ -695,26 +577,6 @@ public class ContestProblemController {
             return ResponseEntity.ok().body("");
         }
         return ResponseEntity.ok().body(true);
-    }
-
-    //@Secured("ROLE_TEACHER")
-    @PostMapping("/teacher-manager-all-student-register-contest")
-    public ResponseEntity<?> teacherManagerAllStudentRegisterContest(
-        Principal principal,
-        @RequestBody ModelTeacherManageStudentRegisterContest request
-    ) throws MiniLeetCodeException {
-        log.info("teacherManagerAllStudentRegisterContest");
-        List<UserLogin> users = userService.getAllUserLogins();
-        int cnt = 0;
-        int i = 0;
-        for (UserLogin u : users) {
-            i++;
-            request.setUserId(u.getUserLoginId());
-            cnt += problemTestCaseService.teacherManageStudentRegisterContest(principal.getName(), request);
-            log.info(
-                "teacherManagerAllStudentRegisterContest finished " + i + "/" + users.size() + " processed " + cnt);
-        }
-        return ResponseEntity.status(200).body(cnt);
     }
 
     @GetMapping("/get-contest-registered-student")
@@ -1444,17 +1306,6 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(page);
     }
 
-    @GetMapping("/get-ranking-contest/{contestId}")
-    public ResponseEntity<?> getRankingContest(@PathVariable("contestId") String contestId, Pageable pageable) {
-        log.info("getRankingContest page {}", pageable);
-        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("point").descending());
-        Page<UserSubmissionContestResultNativeEntity> page = problemTestCaseService.getRankingByContestId(
-            pageable,
-            contestId);
-        // log.info("ranking page {}", page);
-        return ResponseEntity.status(200).body(page);
-    }
-
     @PostMapping("/recalculate-ranking/{contestId}")
     public ResponseEntity<?> recalculateRanking(@PathVariable("contestId") String contestId) {
         log.info("/recalculate-ranking/ contestid {}", contestId);
@@ -1495,15 +1346,6 @@ public class ContestProblemController {
     ) throws MiniLeetCodeException {
         problemTestCaseService.editTestCase(testCaseId, modelSaveTestcase);
         return ResponseEntity.status(200).body(null);
-    }
-
-    @PostMapping("/add-all-users-to-contest")
-    public ResponseEntity<?> addAllUsersToContest(
-        Principal principal,
-        @RequestBody ModelAddUserToContest modelAddUserToContest
-    ) {
-        int cnt = problemTestCaseService.addAllUsersToContest(modelAddUserToContest);
-        return ResponseEntity.ok().body(cnt);
     }
 
     @PostMapping("/add-user-to-contest")
@@ -1595,19 +1437,6 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(res);
     }
 
-    @GetMapping("/get-contest-not-evaluated-submission-paging/{contestId}")
-    public ResponseEntity<?> getContestNotEvaluatedSubmissionPaging(
-        @PathVariable("contestId") String contestId,
-        Pageable pageable
-    ) {
-        log.info("getContestNotEvaluatedSubmissionPaging, contestId = " + contestId);
-        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdAt").descending());
-        Page<ContestSubmission> page = problemTestCaseService
-            .findContestNotEvaluatedSubmissionByContestIdPaging(pageable, contestId);
-        log.info("page {}", page);
-        return ResponseEntity.status(200).body(page);
-    }
-
     @GetMapping("/get-contest-submission-of-a-user-paging/{contestId}/{userId}")
     public ResponseEntity<?> getContestSubmissionOfAUserPaging(
         @PathVariable("contestId") String contestId,
@@ -1692,12 +1521,6 @@ public class ContestProblemController {
         return ResponseEntity.ok().body(res);
     }
 
-    @PostMapping("/update-problem-contest")
-    public ResponseEntity<?> updateProblemContest(Principal principal, @RequestBody ModelUpdateProblemContestInput I) {
-        boolean res = problemTestCaseService.updateProblemContest(principal.getName(), I);
-        return ResponseEntity.ok().body(res);
-    }
-
     @GetMapping("/get-user-contest-problem-roles/{problemId}")
     public ResponseEntity<?> getUserContestProblemRoles(Principal principal, @PathVariable String problemId) {
         List<ModelResponseUserProblemRole> res = problemTestCaseService.getUserProblemRoles(problemId);
@@ -1728,17 +1551,6 @@ public class ContestProblemController {
             else
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-    }
-
-    @GetMapping("/grant-manager-role-all-problems/{userId}/{roleId}")
-    public ResponseEntity<?> grantRole2AllProblems(
-        Principal principal,
-        @PathVariable String userId,
-        @PathVariable String roleId
-    ) {
-        //log.info("grantRole2AllProblems, userId = " + userId + " roleId = " + roleId);
-        boolean ok = problemTestCaseService.grantRole2AllProblems(principal.getName(), userId, roleId);
-        return ResponseEntity.ok().body(ok);
     }
 
     @GetMapping("/public/ranking-programming-contest/{contestId}")
