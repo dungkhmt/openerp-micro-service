@@ -1,74 +1,33 @@
 import {Box, LinearProgress} from "@mui/material";
-import Button from "@mui/material/Button";
 import {useEffect, useState} from "react";
-import XLSX from "xlsx";
 import HustContainerCard from "../../common/HustContainerCard";
 import StandardTable from "../../table/StandardTable";
 import {request} from "../../../api";
-import {successNoti} from "../../../utils/notification";
+import {useParams} from "react-router";
+import {errorNoti} from "../../../utils/notification";
 
-export default function ContestManagerRankingNew(props) {
-  const contestId = props.contestId;
+export default function ContestManagerRankingPublicV2(props) {
+  const { contestId } = useParams();
   const [ranking, setRanking] = useState([]);
   const [rankingDetail, setRankingDetail] = useState([]);
   const [problemIds, setProblemIds] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const copyLinkHandler = () => {
-    navigator.clipboard.writeText(window.location.host + "/programming-contest/public/" + contestId + "/ranking").then(() => successNoti("URL copied to clipboard", 1000));
-  }
-  const downloadHandler = (event) => {
-    if (ranking.length === 0) {
-      return;
-    }
-
-    var wbcols = [];
-
-    wbcols.push({wpx: 80});
-    wbcols.push({wpx: 120});
-    let numOfProblem = ranking[0].mapProblemsToPoints.length;
-    for (let i = 0; i < numOfProblem; i++) {
-      wbcols.push({wpx: 50});
-    }
-    wbcols.push({wpx: 50});
-
-    let datas = [];
-
-    for (let i = 0; i < ranking.length; i++) {
-      let data = {};
-      data["Username"] = ranking[i].userId;
-      data["Fullname"] = ranking[i].fullname;
-      for (let j = 0; j < numOfProblem; j++) {
-        const problem = ranking[i].mapProblemsToPoints[j].problemId;
-        const problemPoint = ranking[i].mapProblemsToPoints[j].point;
-        data[problem] = problemPoint;
-      }
-      data["TOTAL"] = ranking[i].totalPoint;
-
-      datas[i] = data;
-    }
-
-    var sheet = XLSX.utils.json_to_sheet(datas);
-    var wb = XLSX.utils.book_new();
-    sheet["!cols"] = wbcols;
-
-    XLSX.utils.book_append_sheet(wb, sheet, "ranking");
-    XLSX.writeFile(
-      wb,
-      contestId + "-RANKING.xlsx"
-    );
-  };
-
   function getRanking() {
     setLoading(true);
     request(
       "get",
-      "/get-ranking-contest-new/" +
+      "/public-ranking/" +
       contestId +
       "?getPointForRankingType=HIGHEST",
       (res) => {
         let sortedResult = res.data.sort((a, b) => b.totalPoint - a.totalPoint);
         setRanking(sortedResult);
+      },
+      {
+        onError: (err) => {
+          errorNoti(err?.response?.data, 5000)
+        }
       }
     ).then(() => setLoading(false));
   }
@@ -150,28 +109,6 @@ export default function ContestManagerRankingNew(props) {
             search: true,
             sorting: true,
           }}
-          actions={[
-            {
-              icon: () => {
-                return <Button variant="contained" onClick={downloadHandler} color="success"
-                               className={"no-background-btn"}>
-                  Export
-                </Button>
-              },
-              tooltip: 'Export Ranking as Excel file',
-              isFreeAction: true
-            },
-            {
-              icon: () => {
-                return <Button variant="outlined" onClick={copyLinkHandler}
-                               className={"no-background-btn"}>
-                  Get link
-                </Button>
-              },
-              tooltip: 'Get public URL to this ranking',
-              isFreeAction: true
-            }
-          ]}
         />
       </Box>
     </HustContainerCard>

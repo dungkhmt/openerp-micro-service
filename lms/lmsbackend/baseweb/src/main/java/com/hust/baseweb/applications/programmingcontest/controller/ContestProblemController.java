@@ -1293,6 +1293,27 @@ public class ContestProblemController {
         return ResponseEntity.ok().body("OK");
     }
 
+    @GetMapping("/public-ranking/{contestId}")
+    public ResponseEntity<?> getRankingContestPublic(
+        @PathVariable("contestId") String contestId, Pageable pageable,
+        @RequestParam Constants.GetPointForRankingType getPointForRankingType
+    ) {
+        ContestEntity contest = contestService.findContestWithCache(contestId);
+        if (!contest.getIsPublic()) {
+            return ResponseEntity.status(400).body("This contest is not public");
+        }
+        if (contestSubmissionRepo.countAllByContestId(contestId) > 500) {
+            return ResponseEntity
+                .status(400)
+                .body("This contest size is too big. Contact the contest manager for ranking table");
+        }
+
+        pageable = Pageable.unpaged();
+        List<ContestSubmissionsByUser> res = problemTestCaseService.getRankingByContestIdNew(pageable, contestId,
+                                                                                             getPointForRankingType);
+
+        return ResponseEntity.status(200).body(res);
+    }
 
     @GetMapping("/get-ranking-contest-new/{contestId}")
     public ResponseEntity<?> getRankingContestNewVersion(
@@ -1553,14 +1574,14 @@ public class ContestProblemController {
         }
     }
 
-    @GetMapping("/public/ranking-programming-contest/{contestId}")
-    public ResponseEntity<?> getRankingContestPublic(@PathVariable("contestId") String contestId, Pageable pageable) {
-        pageable = Pageable.unpaged();
-        List<ContestSubmissionsByUser> page = problemTestCaseService.getRankingByContestIdNew(pageable, contestId,
-                                                                                              Constants.GetPointForRankingType.HIGHEST);
-        // log.info("ranking page {}", page);
-        return ResponseEntity.status(200).body(page);
-    }
+//    @GetMapping("/public/ranking-programming-contest/{contestId}")
+//    public ResponseEntity<?> getRankingContestPublic(@PathVariable("contestId") String contestId, Pageable pageable) {
+//        pageable = Pageable.unpaged();
+//        List<ContestSubmissionsByUser> page = problemTestCaseService.getRankingByContestIdNew(pageable, contestId,
+//                                                                                              Constants.GetPointForRankingType.HIGHEST);
+//        // log.info("ranking page {}", page);
+//        return ResponseEntity.status(200).body(page);
+//    }
 
     @PostMapping("/switch-judge-mode")
     public ResponseEntity<?> switchAllContestJudgeMode(@RequestParam("mode") String judgeMode) {
