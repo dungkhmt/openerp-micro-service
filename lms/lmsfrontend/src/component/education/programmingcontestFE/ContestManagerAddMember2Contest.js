@@ -70,7 +70,7 @@ export default function ContestManagerAddMember2Contest(props) {
     );
   }
   function getRoles() {
-    request("get", "/get-list-roles-contest", (res) => {
+    request("get", "/contests/roles", (res) => {
       setRoles(res.data);
     }).then();
   }

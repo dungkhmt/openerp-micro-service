@@ -74,7 +74,7 @@ function ManagerViewProblemDetailV2() {
 
 
   useEffect(() => {
-    request("get", "/problem-details/" + problemId, (res) => {
+    request("get", "teacher/problems/" + problemId, (res) => {
       res = res.data;
       if (res.attachment && res.attachment.length !== 0) {
         const newFileURLArray = res.attachment.map((url) => ({

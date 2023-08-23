@@ -66,7 +66,7 @@ export default function CreateTestCase(props) {
 
     request(
       "POST",
-      "/save-test-case/" + problemId,
+      "/testcases/" + problemId,
       (res) => {
         console.log("res", res);
         // setShowSubmitSuccess(true);

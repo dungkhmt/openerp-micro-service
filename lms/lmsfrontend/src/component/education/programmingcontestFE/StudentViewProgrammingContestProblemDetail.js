@@ -149,7 +149,7 @@
 //     authGet(
 //       dispatch,
 //       token,
-//       "/get-problem-detail-view-by-student-in-contest/" + problemId + "/" + contestId
+//       "/student/problems/" + problemId + "/" + contestId
 //     ).then((res) => {
 //       setProblem(res);
 //       console.log(res);

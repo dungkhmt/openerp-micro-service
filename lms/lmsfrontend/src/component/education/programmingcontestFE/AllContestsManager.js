@@ -36,7 +36,7 @@ export default function AllContestsManager() {
   async function getContestList() {
     request(
       "get",
-      "/get-all-contests-paging-by-admin?size=" +
+      "/admin/contests?size=" +
       pageSize +
       "&page=" +
       page,

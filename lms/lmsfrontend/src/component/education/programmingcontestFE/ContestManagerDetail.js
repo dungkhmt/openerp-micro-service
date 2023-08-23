@@ -41,7 +41,7 @@ export function ContestManagerDetail(props) {
   const history = useHistory();
 
   function getContestDetail() {
-    request("get", "/get-contest-detail/" + contestId, (res) => {
+    request("get", "/contests/" + contestId, (res) => {
       setContestName(res.data.contestName);
       setIsPublic(res.data.isPublic);
       setStatusId(res.data.statusId);

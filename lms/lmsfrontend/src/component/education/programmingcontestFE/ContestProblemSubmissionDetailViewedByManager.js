@@ -34,8 +34,8 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
     };
 
     request(
-      "post",
-      "/update-contest-submission-source-code",
+      "put",
+      "/contests/submissions/source-code",
       (res) => {
         console.log("update submission source code", res.data);
       },

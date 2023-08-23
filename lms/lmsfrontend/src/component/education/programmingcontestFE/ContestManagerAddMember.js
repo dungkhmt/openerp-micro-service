@@ -53,8 +53,7 @@ export default function ContestManagerAddMember(props) {
   }
 
   function getRoles() {
-    request("get", "/get-list-roles-contest", (res) => {
-      console.log("getRoles, res.data = ", res.data);
+    request("get", "/contests/roles", (res) => {
       setRoles(res.data);
     }).then();
   }

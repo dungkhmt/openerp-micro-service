@@ -59,8 +59,9 @@ public class ContestProblemController {
     ProblemTestCaseServiceCache cacheService;
     ChatGPTService chatGPTService;
 
-    @PostMapping("/create-problem")
-    public ResponseEntity<?> createContestProblem(
+    @Secured("ROLE_TEACHER")
+    @PostMapping("/problems")
+    public ResponseEntity<?> createProblem(
         Principal principal,
         @RequestParam("ModelCreateContestProblem") String json,
         @RequestParam("files") MultipartFile[] files
@@ -74,37 +75,28 @@ public class ContestProblemController {
         @PathVariable("problemId") String problemId,
         @RequestBody ModelGetTestCaseResult testCaseResult, Principal principal
     ) throws Exception {
-        log.info("get test case result {}", problemId);
         ModelGetTestCaseResultResponse resp = problemTestCaseService.getTestCaseResult(problemId, principal.getName(),
                                                                                        testCaseResult);
         return ResponseEntity.status(200).body(resp);
     }
 
     @Secured("ROLE_TEACHER")
-    @GetMapping("/get-all-contest-problems")
-    public ResponseEntity<?> getAllContestProblems(Principal principal) {
-        List<ProblemEntity> problems = problemTestCaseService.getAllProblems();
-        return ResponseEntity.ok().body(problems);
-    }
-
-    @GetMapping("/get-all-contest-problems-general-info")
-    public ResponseEntity<?> getAllContestProblemsGeneralInfo(Principal principal) {
+    @GetMapping("/problems/general-info")
+    public ResponseEntity<?> getAllContestProblemsGeneralInfo() {
         List<ModelProblemGeneralInfo> problems = problemTestCaseService.getAllProblemsGeneralInfo();
         return ResponseEntity.ok().body(problems);
     }
 
-
     @Secured("ROLE_TEACHER")
-    @PostMapping("/problem/generate-statement")
+    @PostMapping("/problems/generate-statement")
     public ResponseEntity<?> suggestProblemStatement(@RequestBody ProblemSuggestionRequest suggestion) throws Exception {
         String problemStatement = chatGPTService.getChatGPTAnswer(suggestion.generateRequest());
         return ResponseEntity.status(200).body(problemStatement);
     }
 
     @Secured("ROLE_TEACHER")
-    @GetMapping("/problem-details/{problemId}")
-    public ResponseEntity<?> getProblemDetails(@PathVariable("problemId") String problemId, Principal teacher) throws Exception {
-        log.info("getProblemDetails problemId {}", problemId);
+    @GetMapping("/teacher/problems/{problemId}")
+    public ResponseEntity<?> getProblemDetailViewByTeacher(@PathVariable("problemId") String problemId, Principal teacher) throws Exception {
         try {
             ModelCreateContestProblemResponse problemResponse = problemTestCaseService.getContestProblemDetailByIdAndTeacher(problemId, teacher.getName());
             return ResponseEntity.status(200).body(problemResponse);
@@ -113,11 +105,8 @@ public class ContestProblemController {
         }
     }
 
-    @GetMapping("/get-problem-detail-view-by-student/{problemId}")
-    public ResponseEntity<?> getProblemDetailViewByStudent(
-        Principal principal,
-        @PathVariable("problemId") String problemId
-    ) {
+    @GetMapping("/student/problems/{problemId}")
+    public ResponseEntity<?> getProblemDetailViewByStudent(@PathVariable("problemId") String problemId) {
         try {
             ModelCreateContestProblemResponse problemEntity = problemTestCaseService.getContestProblem(problemId);
             ModelStudentViewProblemDetail model = new ModelStudentViewProblemDetail();
@@ -131,66 +120,12 @@ public class ContestProblemController {
     }
 
     @Secured("ROLE_TEACHER")
-    @GetMapping("/get-problem-detail-view-by-manager/{problemId}")
-    public ResponseEntity<?> getProblemDetailViewByManager(Principal principal, @PathVariable String problemId) {
-        try {
-            ModelCreateContestProblemResponse problemEntity = problemTestCaseService.getContestProblem(problemId);
-            ModelStudentViewProblemDetail model = new ModelStudentViewProblemDetail();
-            model.setProblemStatement(problemEntity.getProblemDescription());
-            model.setProblemName(problemEntity.getProblemName());
-            model.setCreatedStamp(problemEntity.getCreatedAt());
-            model.setAttachment(problemEntity.getAttachment());
-            model.setAttachmentNames(problemEntity.getAttachmentNames());
-            PersonModel person = userService.findPersonByUserLoginId(problemEntity.getUserId());
-            model.setCreatedByUserFullName(person.getFullName());
-            return ResponseEntity.ok().body(model);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.ok().body("NOTFOUND");
-
-    }
-
-    @GetMapping("/get-problem-detail-view-by-student-in-contest/{problemId}/{contestId}")
-    public ResponseEntity<?> getProblemDetailViewByStudent(
-        Principal principal,
-        @PathVariable("problemId") String problemId, @PathVariable("contestId") String contestId
-    ) {
-        try {
-            ContestEntity contestEntity = contestRepo.findContestByContestId(contestId);
-            ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
-            if (cp == null) {
-                return ResponseEntity.ok().body("NOTFOUND");
-            }
-            ModelCreateContestProblemResponse problemEntity = problemTestCaseService.getContestProblem(problemId);
-            ModelStudentViewProblemDetail model = new ModelStudentViewProblemDetail();
-            if (contestEntity.getProblemDescriptionViewType() != null &&
-                contestEntity.getProblemDescriptionViewType()
-                             .equals(ContestEntity.CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_HIDDEN)) {
-                model.setProblemStatement(" ");
-            } else {
-                model.setProblemStatement(problemEntity.getProblemDescription());
-            }
-
-            model.setSubmissionMode(cp.getSubmissionMode());
-            model.setProblemName(cp.getProblemRename());
-            model.setProblemCode(cp.getProblemRecode());
-            model.setAttachment(problemEntity.getAttachment());
-            model.setAttachmentNames(problemEntity.getAttachmentNames());
-            return ResponseEntity.ok().body(model);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.ok().body("NOTFOUND");
-    }
-
-    @PostMapping("/update-problem-detail/{problemId}")
-    public ResponseEntity<?> updateProblemDetails(
+    @PutMapping("/problems/{problemId}")
+    public ResponseEntity<?> updateProblem(
         @PathVariable("problemId") String problemId, Principal principal,
         @RequestParam("ModelUpdateContestProblem") String json, @RequestParam("files") MultipartFile[] files
     )
         throws Exception {
-        //log.info("updateProblemDetails problemId {}", problemId);
         List<UserContestProblemRole> L = userContestProblemRoleRepo.findAllByProblemIdAndUserId(
             problemId,
             principal.getName());
@@ -204,7 +139,6 @@ public class ContestProblemController {
         }
         if (!hasPermission) {
             return ResponseEntity.status(403).body("No permission");
-            // return ResponseEntity.status(HttpStatus.OK).body("No permission");
         }
         ProblemEntity problemResponse = problemTestCaseService.updateContestProblem(
             problemId,
@@ -221,7 +155,8 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(resp);
     }
 
-    @PostMapping("/save-test-case/{problemId}")
+    @Secured("ROLE_TEACHER")
+    @PostMapping("/testcases/{problemId}")
     public ResponseEntity<?> saveTestCase(
         @PathVariable("problemId") String problemId,
         @RequestBody ModelSaveTestcase modelSaveTestcase
@@ -230,16 +165,8 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(testCaseEntity);
     }
 
-    @GetMapping("/get-problem-submission/{id}")
-    public ResponseEntity<?> getProblemSubmissionById(@PathVariable("id") UUID id, Principal principal)
-        throws MiniLeetCodeException {
-        log.info("getProblemSubmissionById id {}", id);
-        ModelProblemSubmissionDetailResponse modelProblemSubmissionDetailResponse = problemTestCaseService
-            .findProblemSubmissionById(id, principal.getName());
-        return ResponseEntity.status(200).body(modelProblemSubmissionDetailResponse);
-    }
-
-    @PostMapping("/create-contest")
+    @Secured("ROLE_TEACHER")
+    @PostMapping("/contests")
     public ResponseEntity<?> createContest(@RequestBody @Valid ModelCreateContest modelCreateContest, Principal principal)
         throws Exception {
         log.info("createContest {}", modelCreateContest);
@@ -247,7 +174,8 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(contest);
     }
 
-    @PostMapping("/edit-contest/{contestId}")
+    @Secured("ROLE_TEACHER")
+    @PutMapping("/contests/{contestId}")
     public ResponseEntity<?> editContest(
         @RequestBody ModelUpdateContest modelUpdateContest, Principal principal,
         @PathVariable("contestId") String contestId
@@ -259,7 +187,8 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(null);
     }
 
-    @PostMapping("/save-problem-to-contest")
+    @Secured("ROLE_TEACHER")
+    @PostMapping("/contest-problem")
     public ResponseEntity<?> saveProblemToContest(
         @RequestBody ModelProblemInfoInContest modelProblemInfoInContest,
         Principal principal
@@ -270,7 +199,8 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body("ok");
     }
 
-    @DeleteMapping("/remove-problem-from-contest")
+    @Secured("ROLE_TEACHER")
+    @DeleteMapping("/contest-problem")
     public ResponseEntity<?> removeProblemFromContest(
         @RequestParam String contestId,
         @RequestParam String problemId,
@@ -282,26 +212,13 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body("ok");
     }
 
-    @GetMapping("/get-list-roles-contest")
+    @GetMapping("/contests/roles")
     public ResponseEntity<?> getListRolesContest() {
         List<String> L = UserRegistrationContestEntity.getListRoles();
         return ResponseEntity.ok().body(L);
     }
 
-    @GetMapping("/get-contest-paging")
-    public ResponseEntity<?> getContestPaging(Pageable pageable, @Param("sortBy") String sortBy) {
-        log.info("getContestPaging sortBy {} pageable {}", sortBy, pageable);
-        if (sortBy != null) {
-            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(sortBy));
-        } else {
-            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                                      Sort.by("createdAt").ascending());
-        }
-        ModelGetContestPageResponse modelGetContestPageResponse = problemTestCaseService.getContestPaging(pageable);
-        return ResponseEntity.status(200).body(modelGetContestPageResponse);
-    }
-
-    @GetMapping("/get-contest-detail/{contestId}")
+    @GetMapping("/contests/{contestId}")
     public ResponseEntity<?> getContestDetail(@PathVariable("contestId") String contestId, Principal principal) {
         log.info("getContestDetail constestid {}", contestId);
         ModelGetContestDetailResponse response = problemTestCaseService.getContestDetailByContestIdAndTeacher(
@@ -310,19 +227,17 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(response);
     }
 
-    @PostMapping("/update-contest-submission-source-code")
-    public ResponseEntity<?> updateContestSubmisionSourceCode(
-        Principal principal,
+    @Secured("ROLE_TEACHER")
+    @PutMapping("/contests/submissions/source-code")
+    public ResponseEntity<?> updateContestSubmissionSourceCode(
         @RequestBody ModelUpdateContestSubmission input
     ) {
-        log.info("updateContestSubmisionSourceCode, new source code = " + input.getModifiedSourceCodeSubmitted());
         ContestSubmissionEntity sub = problemTestCaseService.updateContestSubmissionSourceCode(input);
         return ResponseEntity.ok().body(sub);
     }
 
-    @GetMapping("/get-code-similarity-summary-of-participants/{contestId}")
+    @GetMapping("/contests/{contestId}/similarity-check")
     public ResponseEntity<?> getCodeSimilaritySummaryOfParticipants(
-        Principal principal,
         @PathVariable String contestId
     ) {
         List<ModelReponseCodeSimilaritySummaryParticipant> res = problemTestCaseService.getListModelReponseCodeSimilaritySummaryParticipant(
@@ -330,24 +245,23 @@ public class ContestProblemController {
         return ResponseEntity.ok().body(res);
     }
 
-    @PostMapping("/get-code-similarity")
-    public ResponseEntity<?> getCodeSimilarity(Principal principal, @RequestBody ModelGetCodeSimilarityParams input) {
+    @PostMapping("/code-similarity")
+    public ResponseEntity<?> getCodeSimilarity(@RequestBody ModelGetCodeSimilarityParams input) {
         List<CodePlagiarism> codePlagiarism = problemTestCaseService.findAllBy(input);
         return ResponseEntity.ok().body(codePlagiarism);
     }
 
-    @PostMapping("/get-code-similarity-cluster")
+    @PostMapping("/code-similarity-cluster")
     public ResponseEntity<?> getCodeSimilarityCluster(
-        Principal principal,
         @RequestBody ModelGetCodeSimilarityParams input
     ) {
         List<ModelSimilarityClusterOutput> res = problemTestCaseService.computeSimilarityClusters(input);
         return ResponseEntity.ok().body(res);
     }
 
-    @PostMapping("/check-code-similarity/{contestId}")
+    @PostMapping("/contests/check-code-similarity/{contestId}")
     public ResponseEntity<?> checkCodeSimilarity(
-        Principal principal, @RequestBody ModelCheckSimilarityInput I,
+        @RequestBody ModelCheckSimilarityInput I,
         @PathVariable String contestId
     ) {
         log.info("checkCodeSimilarity, contestId = " + contestId);
@@ -355,14 +269,14 @@ public class ContestProblemController {
         return ResponseEntity.ok().body(res);
     }
 
-    @GetMapping("/get-list-contest-problem-student/{contestId}")
+    @GetMapping("/contests/{contestId}/problems")
     public ResponseEntity<?> getListContestProblemViewedByStudent(@PathVariable("contestId") String contestId) {
         ContestEntity contestEntity = contestRepo.findContestByContestId(contestId);
         List<ProblemEntity> listProblem = contestEntity.getProblems();
         return ResponseEntity.status(200).body(listProblem);
     }
 
-    @GetMapping("/get-list-contest-problem-student-V2/{contestId}")
+    @GetMapping("/contests/{contestId}/problems/v2")
     public ResponseEntity<?> getListContestProblemViewedByStudentV2(
         @PathVariable("contestId") String contestId,
         Principal principal
@@ -413,14 +327,14 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(responses);
     }
 
-    @GetMapping("/get-all-tags")
+    @GetMapping("/tags")
     public ResponseEntity<?> getAllTags() {
 
         List<TagEntity> listTag = problemTestCaseService.getAllTags();
         return ResponseEntity.status(200).body(listTag);
     }
 
-    @PostMapping("/add-tag")
+    @PostMapping("/tags")
     public ResponseEntity<?> addNewTag(@RequestBody ModelTag tagInput) {
 
         TagEntity tag = problemTestCaseService.addNewTag(tagInput);
@@ -428,8 +342,7 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(tag);
     }
 
-    //@Secured("ROLE_STUDENT")
-    @PostMapping("/student-register-contest/{contestId}")
+    @PostMapping("contests/{contestId}/register-student")
     public ResponseEntity<?> studentRegisterContest(@PathVariable("contestId") String contestId, Principal principal)
         throws MiniLeetCodeException {
         log.info("studentRegisterContest {}", contestId);
@@ -439,13 +352,12 @@ public class ContestProblemController {
         return ResponseEntity.status(200).body(resp);
     }
 
-    //@Secured("ROLE_TEACHER")
-    @GetMapping("/get-all-contests-paging-by-admin")
+    @Secured("ROLE_TEACHER")
+    @GetMapping("/admin/contests")
     public ResponseEntity<?> getAllContestPagingByAdmin(
         Principal principal, Pageable pageable,
         @Param("sortBy") String sortBy
     ) {
-        log.info("getContestPagingByUserCreate");
         if (sortBy != null) {
             pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(sortBy));
         } else {

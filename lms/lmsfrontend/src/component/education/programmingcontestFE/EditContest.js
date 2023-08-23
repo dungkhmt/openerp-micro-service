@@ -70,7 +70,7 @@ export default function EditContest() {
       judgeMode: judgeMode,
     };
 
-    request("post", "/edit-contest/" + contestId, () => {
+    request("put", "/contests/" + contestId, () => {
         successNoti("Save contest successfully", 3000);
       },
       {
@@ -81,7 +81,7 @@ export default function EditContest() {
   }
 
   function getContestInfo() {
-    request("get", "/get-contest-detail/" + contestId, (res) => {
+    request("get", "/contests/" + contestId, (res) => {
       setContestTime(res.data.contestTime);
       setContestName(res.data.contestName);
       setIsPublic(res.data.isPublic);

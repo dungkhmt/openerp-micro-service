@@ -3,7 +3,7 @@ import {request} from "../../../../api";
 export const getAllTags = (successHandler) => {
   request(
     "get",
-    "/get-all-tags/",
+    "/tags/",
     successHandler,
     {}
   ).then();
@@ -12,7 +12,7 @@ export const getAllTags = (successHandler) => {
 export const addNewTag = (body, successHandler, callback) => {
   request(
     "post",
-    "/add-tag/",
+    "/tags/",
     successHandler,
     {},
     body

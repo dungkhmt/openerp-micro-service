@@ -90,7 +90,7 @@ export function ContestManagerManageProblem(props) {
           onClick={() => {
             request(
               "delete",
-              "/remove-problem-from-contest?contestId=" + contestId + "&problemId=" + problem.problemId,
+              "/contest-problem?contestId=" + contestId + "&problemId=" + problem.problemId,
               () => {
                 successNoti("Problem removed from contest", 5000);
                 getAllProblemsInContest();
@@ -106,13 +106,13 @@ export function ContestManagerManageProblem(props) {
   ];
 
   const getAllProblems = () => {
-    request("get", "/get-all-contest-problems-general-info", (res) => {
+    request("get", "/problems/general-info", (res) => {
       setAllProblems(res.data || []);
     }).then();
   }
 
   const getAllProblemsInContest = () => {
-    request("get", "/get-contest-detail/" + contestId, (res) => {
+    request("get", "/contests/" + contestId, (res) => {
       setContestProblems(res.data.list || []);
     }).then(() => setLoading(false));
   }

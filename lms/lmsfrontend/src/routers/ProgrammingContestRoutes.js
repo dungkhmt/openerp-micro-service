@@ -20,7 +20,6 @@ import {StudentContestRegistered} from "../component/education/programmingcontes
 import StudentViewContestDetail from "../component/education/programmingcontestFE/StudentViewContestDetail";
 import StudentViewProgrammingContestProblemDetailV2
   from "../component/education/programmingcontestFE/StudentViewProgrammingContestProblemDetailV2";
-import ManagerViewProblemDetail from "../component/education/programmingcontestFE/ManagerViewProblemDetail";
 import SubmitSolutionOutput from "../component/education/programmingcontestFE/SubmitSolutionOutput";
 import SuggestProblem from "../component/education/programmingcontestFE/SuggestProblem";
 import ManagerViewProblemDetailV2 from "../component/education/programmingcontestFE/ManagerViewProblemDetailV2";

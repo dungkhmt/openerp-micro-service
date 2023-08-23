@@ -135,7 +135,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
   function getProblemDetail() {
     request(
       "get",
-      "/get-problem-detail-view-by-student-in-contest/" +
+      "/student/problems/" +
       problemId +
       "/" +
       contestId,

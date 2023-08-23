@@ -39,7 +39,7 @@ function CreateProblem() {
 
     request(
       "post",
-      "/problem/generate-statement",
+      "/problems/generate-statement",
       (res) => {
         setLoading(false);
         setResult(res.data);

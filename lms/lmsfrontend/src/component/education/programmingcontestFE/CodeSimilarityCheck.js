@@ -46,7 +46,7 @@ export default function CodeSimilarityCheck(props) {
     request(
       "post",
       //"/get-code-similarity/" + contestId,
-      "/get-code-similarity",
+      "/code-similarity",
       (res) => {
         console.log("getCodeChecking Plagiarism, res = ", res.data);
         let data = res.data.map((c) => ({
@@ -65,7 +65,7 @@ export default function CodeSimilarityCheck(props) {
     request(
       "post",
       //"/get-code-similarity/" + contestId,
-      "/get-code-similarity-cluster",
+      "/code-similarity-cluster",
       (res) => {
         console.log("getCodeChecking Plagiarism, res = ", res.data);
         /*
@@ -86,7 +86,7 @@ export default function CodeSimilarityCheck(props) {
     request(
       "get",
       //"/get-code-similarity/" + contestId,
-      "get-code-similarity-summary-of-participants/" + contestId,
+      "contests/" + contestId + "/similarity-check",
       (res) => {
         console.log("getCodeSimilaritySummaryOfParticipants, res = ", res.data);
         /*
@@ -111,7 +111,7 @@ export default function CodeSimilarityCheck(props) {
     };
     request(
       "post",
-      "/check-code-similarity/" + contestId,
+      "/contests/check-code-similarity/" + contestId,
       {},
       {},
       body
@@ -126,7 +126,7 @@ export default function CodeSimilarityCheck(props) {
     };
     request(
       "post",
-      "/check-code-similarity/" + contestId,
+      "/contests/check-code-similarity/" + contestId,
 
       (res) => {
         console.log("getCodeChecking, res = ", res.data);
