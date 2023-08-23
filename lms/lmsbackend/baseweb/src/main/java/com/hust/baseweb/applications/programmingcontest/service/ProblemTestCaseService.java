@@ -150,7 +150,6 @@ public interface ProblemTestCaseService {
     ModelGetContestPageResponse getNotRegisteredContestByUser(Pageable pageable, String userName);
 
     List<ContestSubmissionsByUser> getRankingByContestIdNew(
-        Pageable pageable,
         String contestId,
         Constants.GetPointForRankingType getPointForRankingType
     );
