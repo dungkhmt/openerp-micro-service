@@ -63,7 +63,7 @@ export default function ContestManagerRankingNew(props) {
     setLoading(true);
     request(
       "get",
-      "/get-ranking-contest-new/" +
+      "/contests/ranking/" +
       contestId +
       "?getPointForRankingType=HIGHEST",
       (res) => {

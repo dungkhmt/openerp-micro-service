@@ -31,7 +31,7 @@ function ListProblemV2() {
     form.setAttribute("target", "_blank");
     form.setAttribute(
       "action",
-      `${BASE_URL}/export-problem/${problem.problemId}`
+      `${BASE_URL}/problems/${problem.problemId}/export`
     );
 
     document.body.appendChild(form);
@@ -142,7 +142,7 @@ function ListProblemV2() {
 
   useEffect(() => {
     getProblems(
-      "/get-all-my-problems",
+      "/teacher/owned-problems",
       (data) => {
         setMyProblems(data);
       }
@@ -151,7 +151,7 @@ function ListProblemV2() {
 
   useEffect(() => {
     getProblems(
-      "/get-all-shared-problems",
+      "/teacher/shared-problems",
       (data) => {
         setSharedProblems(data);
       }

@@ -27,8 +27,7 @@ export default function ContestProblemSubmissionDetail() {
   useEffect(() => {
     request(
       "get",
-      "/get-contest-problem-submission-detail-viewed-by-participant/" +
-        problemSubmissionId,
+      "/student/contests/submissions/" + problemSubmissionId + "/general-info",
       (res) => {
         setMemoryUsage(res.data.memoryUsage);
         setProblemId(res.data.problemId);

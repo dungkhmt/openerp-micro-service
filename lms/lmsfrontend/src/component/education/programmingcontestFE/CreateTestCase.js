@@ -102,7 +102,7 @@ export default function CreateTestCase(props) {
 
     request(
       "post",
-      "/upload-test-case",
+      "/testcases",
       (res) => {
         res = res.data;
         setIsProcessing(false);

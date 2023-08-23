@@ -43,7 +43,7 @@ export function ListContestManagerByRegistration() {
   ];
 
   function getContestListByUserRole() {
-    request("get", "/get-contest-by-user-role", (res) => {
+    request("get", "/contests", (res) => {
       setContests(res.data);
     }).then(() => setLoading(false));
   }

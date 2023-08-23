@@ -17,7 +17,7 @@ export default function ContestManagerRankingPublicV2(props) {
     setLoading(true);
     request(
       "get",
-      "/public-ranking/" +
+      "contests/public-ranking/" +
       contestId +
       "?getPointForRankingType=HIGHEST",
       (res) => {

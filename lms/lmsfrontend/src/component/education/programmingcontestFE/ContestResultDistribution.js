@@ -33,7 +33,7 @@ export default function ContestResultDistribution(props) {
     setLoading(true);
     request(
       "get",
-      "/get-ranking-contest-new/" +
+      "/contests/ranking/" +
       contestId +
       "?getPointForRankingType=" +
       "HIGHEST",

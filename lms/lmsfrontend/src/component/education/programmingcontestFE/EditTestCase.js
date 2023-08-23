@@ -32,7 +32,6 @@ export default function EditTestCase(props) {
     setValue(newValue);
   };
 
-  console.log("EditTestCasem testCaseId = ", testCaseId);
 
   const getTestCaseResult = () => {
     console.log("get test case result");
@@ -42,7 +41,7 @@ export default function EditTestCase(props) {
     };
     request(
       "POST",
-      "/get-test-case-result/" + problemId,
+      "/testcases/" + problemId + "/result",
       (res) => {
         console.log("res", res);
         setLoad(false);
@@ -54,39 +53,10 @@ export default function EditTestCase(props) {
     ).then();
   };
 
-  const saveTestCase = () => {
-    if (!checkTestcaseResult) {
-      // setShowSubmitWarming(true);
-      warningNoti("You must test your test case result before save", true);
-      return;
-    }
-
-    let body = {
-      input: input,
-      result: result,
-      point: point,
-      isPublic: isPublic,
-    };
-
-    request(
-      "POST",
-      "/update-test-case/" + testCaseId,
-
-      (res) => {
-        successNoti("Your test case is saved", true);
-
-        history.goBack();
-      },
-      {},
-      body
-    ).then(() => history.back);
-  };
-
   useEffect(() => {
     console.log("EditTestCase useEffect start....");
 
-    request("GET", "/get-test-case-detail/" + testCaseId, (res) => {
-      console.log("useEffect getTestCaseDetail return res = ", res);
+    request("GET", "/testcases/" + testCaseId, (res) => {
       setDescription(
         //res.data.problemDescription != null ? res.data.problemDescription : " "
         res.data.description
@@ -124,8 +94,8 @@ export default function EditTestCase(props) {
       formData.append("file", filename);
 
       request(
-        "post",
-        "/upload-update-test-case/" + testCaseId,
+        "put",
+        "/testcases/" + testCaseId + "/file-upload",
         (res) => {
           res = res.data;
           setIsProcessing(false);
@@ -150,7 +120,7 @@ export default function EditTestCase(props) {
       // without file attached
       request(
         "post",
-        "/update-test-case-without-file/" + testCaseId,
+        "/testcases/" + testCaseId,
         (res) => {
           res = res.data;
           setIsProcessing(false);

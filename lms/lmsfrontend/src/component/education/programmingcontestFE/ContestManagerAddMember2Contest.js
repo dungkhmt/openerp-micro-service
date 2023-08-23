@@ -47,7 +47,7 @@ export default function ContestManagerAddMember2Contest(props) {
 
     request(
       "post",
-      "/add-user-to-contest",
+      "/contests/users",
       (res) => {
         alert("Add successully");
         setOpen(false);
@@ -57,10 +57,9 @@ export default function ContestManagerAddMember2Contest(props) {
     ).then();
   }
   function handleClick(u) {
-    //alert("click " + u);
     request(
       "get",
-      "/get-roles-user-approved-notapproved-in-contest/" + u + "/" + contestId,
+      "/contests/" + contestId + "/users/" + u + "/roles",
       (res) => {
         setRolesApproved(res.data.rolesApprovedInContest);
         setRolesNotApproved(res.data.rolesNotInContest);
@@ -77,8 +76,7 @@ export default function ContestManagerAddMember2Contest(props) {
   function searchUser(keyword, s, p) {
     request(
       "get",
-      "/search-user/" +
-        contestId +
+      "/contests/" + contestId + "/users" +
         "?size=" +
         s +
         "&page=" +

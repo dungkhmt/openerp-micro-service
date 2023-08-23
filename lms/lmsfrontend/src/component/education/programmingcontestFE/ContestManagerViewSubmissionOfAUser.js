@@ -28,26 +28,20 @@ export default function ContestManagerViewSubmissionOfAUser(props) {
   function getSubmission(s, p) {
     request(
       "get",
-      "/get-contest-submission-of-a-user-paging/" +
-        contestId +
-        "/" +
-        userId +
+      "/teacher/contests/" + contestId + "/users/" + userId + "/submissions" +
         "?size=" +
         s +
         "&page=" +
         (p - 1),
       (res) => {
-        console.log("res submission", res.data);
         setContestSubmissions(res.data.content);
-        console.log("contest submission", contestSubmissions);
         setTotalPageSubmission(res.data.totalPages);
       }
     ).then();
   }
 
   function handleRejudge(submissionId) {
-    //alert("rejudge submission " + submissionId);
-    request("post", "/evaluate-submission/" + submissionId, (res) => {
+    request("post", "/submissions/" + submissionId + "/evaluation", (res) => {
       console.log("evaluate submission", res.data);
     }).then();
   }

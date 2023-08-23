@@ -25,7 +25,7 @@ export default function ContestManagerListParticipant(props) {
   function getUserSuccessful(s, p) {
     request(
       "get",
-      "/get-user-register-successful-contest/" +
+      "/contests/" + contestId + "/registered-users" +
         contestId +
         "?size=" +
         s +

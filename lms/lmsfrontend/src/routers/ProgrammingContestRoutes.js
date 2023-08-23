@@ -13,7 +13,6 @@ import EditContest from "../component/education/programmingcontestFE/EditContest
 import EditProblem from "../component/education/programmingcontestFE/EditProblem";
 import EditTestCase from "../component/education/programmingcontestFE/EditTestCase";
 import {ListContestManager} from "../component/education/programmingcontestFE/ListContestManager";
-import ListPracticalProblem from "../component/education/programmingcontestFE/ListPracticalProblem";
 import ListProblemV2 from "../component/education/programmingcontestFE/ListProblemV2";
 import {StudentContestNotRegistered} from "../component/education/programmingcontestFE/StudentContestNotRegistered";
 import {StudentContestRegistered} from "../component/education/programmingcontestFE/StudentContestRegistered";
@@ -92,11 +91,6 @@ export default function ProgrammingContestRoutes() {
           component={EditContest}
           path={`${path}/contest-edit/:contestId`}
         />
-        <Route
-          component={ListPracticalProblem}
-          path={`${path}/student-public-problem`}
-        />
-
         <Route
           component={EditTestCase}
           path={`${path}/edit-testcase/:problemId/:testCaseId`}

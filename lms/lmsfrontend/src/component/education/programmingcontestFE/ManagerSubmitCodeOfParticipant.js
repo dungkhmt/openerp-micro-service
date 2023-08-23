@@ -32,7 +32,7 @@ export default function ManagerSubmitCodeOfParticipant(props) {
     };
     request(
       "POST",
-      "/manager-submit-code-of-participant",
+      "/teacher/submissions/participant-code",
       successHandler,
       errorHandlers,
       formData

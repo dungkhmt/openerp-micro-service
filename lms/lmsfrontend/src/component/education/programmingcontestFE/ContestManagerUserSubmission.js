@@ -46,8 +46,7 @@ export default function ContestManagerUserSubmission(props) {
   function getSubmission() {
     request(
       "get",
-      "/get-contest-submission-paging/" +
-      contestId,
+      "/teacher/contests/" + contestId + "/submissions",
       (res) => {
         setContestSubmissions(res.data.content);
         setTotalSizeSubmission(res.data.totalElements)
@@ -62,7 +61,7 @@ export default function ContestManagerUserSubmission(props) {
     setIsProcessing(true);
     request(
       "post",
-      "/evaluate-batch-submission-of-contest/" + contestId,
+      "/submissions/" + contestId + "/batch-evaluation",
       (res) => {
         setIsProcessing(false);
         successNoti("Submissions will be rejudged", 5000)
@@ -74,7 +73,7 @@ export default function ContestManagerUserSubmission(props) {
     setIsProcessing(true);
     request(
       "post",
-      "/evaluate-batch-not-evaluated-submission-of-contest/" + contestId,
+      "/submissions/" + contestId + "/batch-non-evaluated-evaluation",
       (res) => {
         setIsProcessing(false);
         successNoti("Submissions will be judged", 5000)
@@ -94,7 +93,7 @@ export default function ContestManagerUserSubmission(props) {
     setIsProcessing(true);
     request(
       "get",
-      "/get-user-judged-problem-submission/" + contestId,
+      "/contests/" + contestId + "/judged-submissions",
       (res) => {
         generatePdfDocument(
           res.data,
@@ -175,8 +174,7 @@ export default function ContestManagerUserSubmission(props) {
   }
 
   function handleRejudge(submissionId) {
-    //alert("rejudge submission " + submissionId);
-    request("post", "/evaluate-submission/" + submissionId, (res) => {
+    request("post", "/submissions/" + submissionId + "/evaluation", (res) => {
       console.log("evaluate submission", res.data);
     }).then();
   }

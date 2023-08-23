@@ -47,8 +47,7 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
   function getSubmissionDetailTestCaseByTestCase() {
     request(
       "get",
-      "/get-contest-problem-submission-detail-by-testcase-of-a-submission/" +
-        submissionId,
+      "/teacher/contests/submissions/" + submissionId,
       (res) => {
         let L = res.data.map((c) => ({
           ...c,
@@ -63,7 +62,7 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
   function getTestcaseDetail(testcaseId) {
     request(
       "get",
-      "/get-test-case-detail/" + testcaseId,
+      "/testcases/" + testcaseId,
       (res) => {
         setTestcaseDetailList((prev) => [...prev, res.data]);
       },

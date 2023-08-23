@@ -33,7 +33,7 @@ export default function ContestStudentList() {
   ];
 
   function getContestList() {
-    request("get", "/get-contest-registered-student", (res) => {
+    request("get", "/students/contests", (res) => {
       const data = res.data.contests.map((e, index) => ({
         index: index + 1,
         contestId: e.contestId,

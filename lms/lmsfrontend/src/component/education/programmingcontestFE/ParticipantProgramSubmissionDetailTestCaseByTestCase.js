@@ -100,7 +100,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
 
     request(
       "post",
-      "/submit-solution-output-of-testcase",
+      "/contests/submissions/testcases/solution-output",
       (res) => {
         res = res.data;
         setScore(res.score);
@@ -144,8 +144,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
   function getSubmissionDetailTestCaseByTestCase() {
     request(
       "get",
-      "/get-contest-problem-submission-detail-by-testcase-of-a-submission-viewed-by-participant/" +
-      submissionId,
+      "/student/contests/submissions/" + submissionId,
       (res) => {
         let L = res.data.map((c) => ({
           ...c,
@@ -172,36 +171,9 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
       }
     ).then(() => setIsProcessing(false));
   }
-
-  function getTestcaseDetail(testcaseId) {
-    request(
-      "get",
-      //"/get-test-case-detail/" + testcaseId,
-      "/get-test-case-detail-short/" + testcaseId,
-      (res) => {
-        setTestcaseDetailList((prev) => [...prev, res.data]);
-      },
-      {
-        401: () => {
-        },
-      }
-    );
-  }
-
   useEffect(() => {
     getSubmissionDetailTestCaseByTestCase();
   }, []);
-
-  /*
-  useEffect(() => {
-    var testcaseIdsList = submissionTestCase.map(
-      (testcase) => testcase.testCaseId
-    );
-    testcaseIdsList.forEach((id) => {
-      getTestcaseDetail(id);
-    });
-  }, [submissionTestCase]);
-  */
 
   const ModalPreview = (chosenTestcase) => {
     return (

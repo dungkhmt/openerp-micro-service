@@ -62,10 +62,10 @@ export default function ContestManagerListMember(props) {
       id: id,
     };
     request(
-      "post",
-      "/remove-member-from-contest",
+      "delete",
+      "/contests/members",
       (res) => {
-        successNoti("Đã hoàn thành phân công tự động.");
+        successNoti("Participant removed successfully");
         setIsProcessing(false);
       },
       {
@@ -81,7 +81,7 @@ export default function ContestManagerListMember(props) {
   }
 
   function getMembersOfContest() {
-    request("get", "/get-members-of-contest/" + contestId, (res) => {
+    request("get", "/contests/" + contestId + "/members", (res) => {
       const data = res.data.map((e, i) => ({
         index: i + 1,
         id: e.id,
@@ -103,11 +103,11 @@ export default function ContestManagerListMember(props) {
       permissionId: selectedPermission,
     };
     request(
-      "post",
+      "put",
       //"/forbid-member-from-submit-to-contest",
-      "/update-permission-of-member-to-contest",
+      "/contests/permissions",
       (res) => {
-        successNoti("Đã hoàn thành phân công tự động.");
+        successNoti("Updated Successfully");
         setIsProcessing(false);
         setOpenUpdateMemberDialog(false);
         getMembersOfContest();
@@ -115,7 +115,7 @@ export default function ContestManagerListMember(props) {
       {
         onError: () => {
           setIsProcessing(false);
-          errorNoti("Đã có lỗi xảy ra.");
+          errorNoti("An error happened");
         },
         401: () => {},
       },
@@ -128,7 +128,7 @@ export default function ContestManagerListMember(props) {
   }
 
   function getPermissions() {
-    request("get", "/get-permissions-of-members-of-contest", (res) => {
+    request("get", "/contests/permissions", (res) => {
       setPermissionIds(res.data);
     });
   }
@@ -153,7 +153,7 @@ export default function ContestManagerListMember(props) {
 
     request(
       "post",
-      "/upload-excel-student-list-to-contest",
+      "/contests/students/upload-list",
       (res) => {
         setIsProcessing(false);
         console.log("handleFormSubmit, res = ", res);
