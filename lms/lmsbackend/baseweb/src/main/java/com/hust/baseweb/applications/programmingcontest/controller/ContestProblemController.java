@@ -376,7 +376,7 @@ public class ContestProblemController {
             userId,
             contestId);
 
-        Map<String, Integer> mapProblemToMaxSubmissionPoint = new HashMap<>();
+        Map<String, Long> mapProblemToMaxSubmissionPoint = new HashMap<>();
         for (ModelProblemMaxSubmissionPoint problem : listTriedProblem) {
             mapProblemToMaxSubmissionPoint.put(problem.getProblemId(), problem.getMaxPoint());
         }

@@ -4,5 +4,5 @@ public interface ModelProblemMaxSubmissionPoint {
 
     public String getProblemId();
 
-    public Integer getMaxPoint();
+    public Long getMaxPoint();
 }
