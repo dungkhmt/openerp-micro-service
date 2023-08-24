@@ -90,10 +90,10 @@ export default function UserContestProblemRole() {
       "&keyword=" +
       keyword,
       (res) => {
-        const data = res.data.contents.content.map((e, index) => ({
+        const data = res.data.content.map((e, index) => ({
           index: index + 1,
-          userName: e.userName,
-          fullName: e.lastName + " " + e.middleName + " " + e.firstName,
+          userName: e.userLoginId,
+          fullName: (e.lastName ? e.lastName : "") + " " + (e.firstName ? e.firstName : ""),
         }));
         setSearchUsers(data);
       }

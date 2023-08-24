@@ -468,7 +468,8 @@ public class ContestProblemController {
             keyword = "";
         }
         log.info("searchUserBaseKeywordm keyword = " + keyword);
-        ListPersonModel resp = problemTestCaseService.searchUserBaseKeyword(pageable, keyword);
+//        ListPersonModel resp = problemTestCaseService.searchUserBaseKeyword(pageable, keyword);
+        Page<ModelSearchUserResult> resp = userService.findUserByKeyword(pageable, keyword);
         return ResponseEntity.status(200).body(resp);
     }
 

@@ -1,5 +1,6 @@
 package com.hust.baseweb.repo;
 
+import com.hust.baseweb.applications.programmingcontest.model.ModelSearchUserResult;
 import com.hust.baseweb.entity.Party;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.model.PersonModel;
@@ -22,6 +23,16 @@ public interface UserLoginRepo extends JpaRepository<UserLogin, String> {
         "select new com.hust.baseweb.model.PersonModel( ul.userLoginId, p.lastName, p.middleName, p.firstName) from UserLogin ul " +
         "inner join Party pa on ul.party = pa inner join Person p on p.partyId = ul.party and  (ul.userLoginId like %:keyword% )")
     Page<PersonModel> searchUser(Pageable pageable, @Param("keyword") String keyword);
+
+    @Query(value = "select new com.hust.baseweb.applications.programmingcontest.model.ModelSearchUserResult(ul.userLoginId, ul.firstName, ul.lastName, ul.email) " +
+                   "from UserLogin ul \n" +
+                   "where ul.userLoginId like CONCAT('%', :keyword, '%') " +
+                   "or ul.firstName like CONCAT('%', :keyword, '%') " +
+                   "or ul.lastName like CONCAT('%', :keyword, '%') ")
+    Page<ModelSearchUserResult> findUserLoginByUserLoginIdLikeOrFirstNameLikeOrLastNameLike(
+        @Param("keyword") String keyword,
+        Pageable pageable
+    );
 
     UserLogin findByUserLoginId(String userLoginId);
 
@@ -53,9 +64,6 @@ public interface UserLoginRepo extends JpaRepository<UserLogin, String> {
                    " on u.user_login_id = ug.user_login_id \n" +
                    "where ug.group_id = ?1", nativeQuery = true)
     List<String> findAllUserLoginOfGroup(String groupId);
-
-    @Query(value = "SELECT ul.* FROM user_login ul WHERE ul.party_id = :partyId", nativeQuery = true)
-    UserLogin finByPartyId(@Param("partyId") UUID partyId);
 
     @Query(
         nativeQuery = true,

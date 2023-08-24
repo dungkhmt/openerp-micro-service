@@ -34,7 +34,7 @@ public class UserLogin {
 //
 //    private boolean isSystem;
 //
-    private boolean enabled;
+    private Boolean enabled;
 //
 //    private boolean hasLoggedOut;
 //

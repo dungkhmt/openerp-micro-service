@@ -1812,13 +1812,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             UserRegistrationContestEntity.STATUS_SUCCESSFUL);
         List<ModelMemberOfContestResponse> res = new ArrayList();
         for (UserRegistrationContestEntity u : lst) {
-            PersonModel person = userService.findPersonByUserLoginId(u.getUserId());
             ModelMemberOfContestResponse m = new ModelMemberOfContestResponse();
             m.setId(u.getId());
             m.setContestId(contestId);
             m.setUserId(u.getUserId());
             m.setRoleId(u.getRoleId());
-            m.setFullName(person.getFullName());
+            m.setFullName(userService.getUserFullName(u.getUserId()));
             m.setLastUpdatedDate(u.getLastUpdated());
             m.setUpdatedByUserId(u.getUpdatedByUserLogin_id());
             m.setPermissionId(u.getPermissionId());
@@ -1849,13 +1848,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             UserRegistrationContestEntity.STATUS_PENDING);
         List<ModelMemberOfContestResponse> res = new ArrayList();
         for (UserRegistrationContestEntity u : lst) {
-            PersonModel person = userService.findPersonByUserLoginId(u.getUserId());
             ModelMemberOfContestResponse m = new ModelMemberOfContestResponse();
             m.setId(u.getId());
             m.setContestId(contestId);
             m.setUserId(u.getUserId());
             m.setRoleId(u.getRoleId());
-            m.setFullName(person.getFullName());
+            m.setFullName(userService.getUserFullName(u.getUserId()));
             res.add(m);
         }
         return res;
@@ -1863,7 +1861,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     @Override
     public ListModelUserRegisteredContestInfo searchUser(Pageable pageable, String contestId, String keyword) {
-//        ContestEntity contest = contestRepo.findContestByContestId(contestId);
         Page<ModelUserRegisteredClassInfo> list = userRegistrationContestPagingAndSortingRepo.searchUser(
             pageable,
             contestId,
@@ -1875,9 +1872,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     @Override
     public ListPersonModel searchUserBaseKeyword(Pageable pageable, String keyword) {
-//        ContestEntity contest = contestRepo.findContestByContestId(contestId);
         Page<PersonModel> list = userLoginRepo.searchUser(pageable, keyword);
-        // log.info("searchUserBaseKeyword, list.sz = ");
         return ListPersonModel.builder()
                               .contents(list)
                               .build();
@@ -2013,13 +2008,14 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 totalPoint += tmp.getPoint();
             }
 //            PersonModel person = userService.findPersonByUserLoginId(user.getUserId());
-            UUID partyId = userLoginRepo.findByUserLoginId(user.getUserId()).getParty().getPartyId();
-            Person userInfo = personRepo.findByPartyId(partyId);
+//            UUID partyId = userLoginRepo.findByUserLoginId(user.getUserId()).getParty().getPartyId();
+//            Person userInfo = personRepo.findByPartyId(partyId);
 //            String fullname = user.getLastName() + " " + user.getMiddleName() + " " + user.getFirstName();
-            String firstName = userInfo.getFirstName() != null ? userInfo.getFirstName() : "";
-            String middleName = userInfo.getMiddleName() != null ? userInfo.getMiddleName() : "";
-            String lastName = userInfo.getLastName() != null ? userInfo.getLastName() : "";
-            contestSubmission.setFullname(firstName + " " + middleName + " " + lastName);
+//            String firstName = userInfo.getFirstName() != null ? userInfo.getFirstName() : "";
+//            String middleName = userInfo.getMiddleName() != null ? userInfo.getMiddleName() : "";
+//            String lastName = userInfo.getLastName() != null ? userInfo.getLastName() : "";
+//            contestSubmission.setFullname(firstName + " " + middleName + " " + lastName);
+            contestSubmission.setFullname(userService.getUserFullName(user.getUserId()));
             contestSubmission.setMapProblemsToPoints(mapProblemsToPoints);
             contestSubmission.setTotalPoint(totalPoint);
             listContestSubmissionsByUser.add(contestSubmission);
@@ -2273,7 +2269,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 .status(contestSubmissionEntity.getStatus())
                 .message(contestSubmissionEntity.getMessage())
                 .userId(contestSubmissionEntity.getUserId())
-                .fullname(userService.findPersonByUserLoginId(contestSubmissionEntity.getUserId()).getFullName())
+                .fullname(userService.getUserFullName(contestSubmissionEntity.getUserId()))
                 .build());
     }
 
@@ -3395,9 +3391,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         if (mUserId2Submission.get(s.getUserId()) == null) {
             mUserId2Submission.put(s.getUserId(), new ArrayList<ModelUserJudgedProblemSubmissionResponse>());
             ModelUserJudgedProblemSubmissionResponse e = new ModelUserJudgedProblemSubmissionResponse();
-            PersonModel person = userService.findPersonByUserLoginId(s.getUserId());
+//            PersonModel person = userService.findPersonByUserLoginId(s.getUserId());
             e.setUserId(s.getUserId());
-            e.setFullName(person.getFullName());
+            e.setFullName(userService.getUserFullName(s.getUserId()));
             e.setProblemId(s.getProblemId());
             e.setSubmissionSourceCode(s.getSourceCode());
             e.setPoint(s.getPoint());
@@ -3423,9 +3419,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             }
             if (maxP == null) {
                 ModelUserJudgedProblemSubmissionResponse e = new ModelUserJudgedProblemSubmissionResponse();
-                PersonModel person = userService.findPersonByUserLoginId(s.getUserId());
+//                PersonModel person = userService.findPersonByUserLoginId(s.getUserId());
                 e.setUserId(s.getUserId());
-                e.setFullName(person.getFullName());
+                e.setFullName(userService.getUserFullName(s.getUserId()));
                 e.setProblemId(s.getProblemId());
                 e.setSubmissionSourceCode(s.getSourceCode());
                 e.setPoint(s.getPoint());

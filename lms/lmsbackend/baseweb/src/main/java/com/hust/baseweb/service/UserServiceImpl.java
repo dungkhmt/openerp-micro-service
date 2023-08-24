@@ -2,6 +2,7 @@ package com.hust.baseweb.service;
 
 import com.hust.baseweb.applications.mail.service.MailService;
 import com.hust.baseweb.applications.notifications.service.NotificationsService;
+import com.hust.baseweb.applications.programmingcontest.model.ModelSearchUserResult;
 import com.hust.baseweb.entity.PartyType.PartyTypeEnum;
 import com.hust.baseweb.entity.Person;
 import com.hust.baseweb.entity.Status.StatusEnum;
@@ -82,6 +83,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserLogin findById(String userLoginId) {
         return userLoginRepo.findByUserLoginId(userLoginId);
+    }
+
+    @Override
+    public String getUserFullName(UserLogin user) {
+        String firstName = user.getFirstName() != null ? user.getFirstName() : "";
+        String lastName = user.getLastName() != null ? user.getLastName() : "";
+        return firstName + " " + lastName;
+    }
+
+    @Override
+    public String getUserFullName(String userId) {
+        UserLogin user = userLoginRepo.findByUserLoginId(userId);
+        return getUserFullName(user);
     }
 
     public List<UserLogin> getAllUserLogins() {
@@ -204,6 +218,11 @@ public class UserServiceImpl implements UserService {
     public Page<UserRestBriefProjection> findPersonByFullName(Pageable page, String sString) {
         return userRestRepository.findByTypeAndStatusAndFullNameLike(page, PartyTypeEnum.PERSON.name(),
                                                                      StatusEnum.PARTY_ENABLED.name(), sString);
+    }
+
+    @Override
+    public Page<ModelSearchUserResult> findUserByKeyword(Pageable page, String keyword) {
+        return userLoginRepo.findUserLoginByUserLoginIdLikeOrFirstNameLikeOrLastNameLike(keyword, page);
     }
 
     @Override
