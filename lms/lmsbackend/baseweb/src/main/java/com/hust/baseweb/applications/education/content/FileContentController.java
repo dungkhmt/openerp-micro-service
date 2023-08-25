@@ -100,10 +100,12 @@ public class FileContentController {
                     ImageIO.write(bImage, fileExtension, outPutFile);
 
                     // change type File to type FileInputStream
-                    FileInputStream input = new FileInputStream(outPutFile);
-
-                    //change image to byte and add to array
-                    files.add(IOUtils.toByteArray(input));
+                    try(FileInputStream input = new FileInputStream(outPutFile)) {
+                        //change image to byte and add to array
+                        files.add(IOUtils.toByteArray(input));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
                     //delete image
                     try {
@@ -112,9 +114,14 @@ public class FileContentController {
                         e.printStackTrace();
                     }
                 }
+
+                try {
+                    document.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 //        if (fileIds.length != 0) {
