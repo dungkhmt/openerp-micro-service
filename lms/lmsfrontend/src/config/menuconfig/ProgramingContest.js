@@ -3,14 +3,6 @@ export const ProgrammingContestMenuTeacher = {
   icon: "ProgrammingIcon",
   text: "Programming Teacher",
   child: [
-    // {
-    //   id: "MENU_PROGRAMMING_CONTEST_MANAGER.MENU_PROGRAMMING_CONTEST_MANAGER_CREATE_PROBLEM",
-    //   path: "/programming-contest/create-problem",
-    //   isPublic: false,
-    //   icon: null,
-    //   text: "Create Problem",
-    //   child: [],
-    // },
     {
       id: "MENU_PROGRAMMING_CONTEST_MANAGER.MENU_PROGRAMMING_CONTEST_MANAGER_LIST_PROBLEM",
       path: "/programming-contest/list-problems",
@@ -19,14 +11,6 @@ export const ProgrammingContestMenuTeacher = {
       text: "Manage Problem",
       child: [],
     },
-    // {
-    //   id: "MENU_PROGRAMMING_CONTEST_MANAGER.MENU_PROGRAMMING_CONTEST_MANAGER_CREATE_CONTEST",
-    //   path: "/programming-contest/create-contest",
-    //   isPublic: false,
-    //   icon: null,
-    //   text: "Create Contest",
-    //   child: [],
-    // },
     {
       id: "MENU_PROGRAMMING_CONTEST_MANAGER.MENU_PROGRAMMING_CONTEST_MANAGER_LIST_CONTEST",
       path: "/programming-contest/teacher-list-contest-manager",
@@ -67,15 +51,5 @@ export const ProgrammingContestMenuStudent = {
       text: "My Contests",
       child: [],
     },
-    /*
-    {
-      id: "MENU_PROGRAMMING_CONTEST_PARTICIPANT.MENU_PROGRAMMING_CONTEST_PARTICIPANT_LIST_PUBLIC_PROBLEM",
-      path: "/programming-contest/student-public-problem",
-      isPublic: false,
-      icon: null,
-      text: "Practical Problem",
-      child: [],
-    },
-    */
   ],
 };
