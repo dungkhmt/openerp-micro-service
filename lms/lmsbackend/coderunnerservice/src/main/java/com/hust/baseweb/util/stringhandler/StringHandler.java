@@ -216,6 +216,11 @@ public class StringHandler {
             return buildCompileErrorForSubmission(1, response);
         }
 
+        int lastNewlineIndex = response.trim().lastIndexOf('\n');
+        int secondLastNewlineIndex = response.lastIndexOf('\n', lastNewlineIndex - 1);
+
+        String runtime = response.substring(secondLastNewlineIndex + 1, lastNewlineIndex).trim();
+
         // get testcase answer of participant
         String participantAns = response.substring(
                 0,
@@ -256,7 +261,7 @@ public class StringHandler {
         }
 
         return ProblemSubmission.builder()
-//                                .runtime(runtime)
+                .runtime(Long.parseLong(runtime))
                 .score(score)
                 .status(status)
                 .message(response)

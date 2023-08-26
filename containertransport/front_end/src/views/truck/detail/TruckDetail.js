@@ -20,7 +20,7 @@ const TruckDetail = () => {
 
     useEffect(() => {
         getTruckById(truckId).then((res) => {
-            setTruck(res.data);
+            setTruck(res?.data);
         })
     }, [open]);
     const handleClose = () => {
@@ -41,12 +41,12 @@ const TruckDetail = () => {
     console.log("Truck", truck)
     return (
         <Box className="fullScreen">
-            <Container maxWidth="lg" className="container">
+            <Container maxWidth="xl" className="container">
                 <Box className="toast">
                     {toastOpen ? (
-                    <Alert variant="filled" severity={toastType} >
-                        <strong>{toastMsg}</strong >
-                    </Alert > ) : null}
+                        <Alert variant="filled" severity={toastType} >
+                            <strong>{toastMsg}</strong >
+                        </Alert >) : null}
                 </Box>
                 <Box className="header-detail">
                     <Box className="headerScreen-go-back"
@@ -63,12 +63,17 @@ const TruckDetail = () => {
                             <Typography >Truck {truck?.truckCode}</Typography>
                         </Box>
                         <Box className="btn-header">
-                            <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                            onClick={handleDeleteTruck}
-                            >Delete</Button>
-                            <Button variant="contained" className="header-submit-shipment-btn-save"
-                                onClick={handleClose}
-                            >Modify</Button>
+                            {truck?.status === "AVAILABLE" ? (
+                                <>
+                                    <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
+                                        onClick={handleDeleteTruck}
+                                    >Delete</Button>
+                                    <Button variant="contained" className="header-submit-shipment-btn-save"
+                                        onClick={handleClose}
+                                    >Modify</Button>
+                                </>
+                            ) : null}
+
                         </Box>
                     </Box>
                 </Box>
@@ -136,8 +141,8 @@ const TruckDetail = () => {
                         <Typography>{new Date(truck?.updatedAt).toLocaleString()}</Typography>
                     </Box>
                 </Box>
-                {open ? (<ModalTruck openModal={open} handleClose={handleClose} truckId={truckId} truck={truck} 
-                setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
+                {open ? (<ModalTruck openModal={open} handleClose={handleClose} truckId={truckId} truck={truck}
+                    setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />) : null}
             </Container>
         </Box>
     )

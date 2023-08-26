@@ -30,7 +30,7 @@ import {
   useUpdatePurchaseOrderStatus,
 } from "controllers/query/purchase-order-query";
 import { unix } from "moment";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
@@ -38,13 +38,16 @@ import { ORDERS_STATUS } from "shared/AppConstants";
 import { endPoint } from "../../controllers/endpoint";
 import { convertUserToName } from "../../utils/GlobalUtils";
 import { receiptBillCols } from "./LocalConstant";
+import BillDetailModal from "./components/BillDetailModal";
 import CreatePurchaseBill from "./components/CreatePurchaseBill";
 
 function PurchaseOrderDetailScreen() {
   const location = useLocation();
   const [isApproved, setIsApproved] = useToggle(false);
   const [isOpenDrawer, setOpenDrawer] = useToggle(false);
-  const [itemSelected, setItemSelected] = useState(null);
+  const [isSeeBillDetail, setSeeBillDetail] = useToggle(false);
+  const [itemSelected, setItemSelected] = useState();
+  const [billSelected, setBillSelected] = useState();
   const [orderApproved, setOrderApprove] = useState(false);
   const currOrder = location.state.order;
   const previous = location?.state?.previous;
@@ -148,11 +151,13 @@ function PurchaseOrderDetailScreen() {
     {
       title: "Xem chi tiết",
       callback: (item) => {
+        if (isLoadingBillItem) {
+          return;
+        }
         let billItemsOfBill = billItem?.filter(
           (bill) => bill?.receiptBill?.code === item?.code
         );
-        setItemSelected(billItemsOfBill);
-        setOpenDrawer();
+        setBillSelected(billItemsOfBill);
       },
       icon: <VisibilityIcon />,
       color: AppColors.green,
@@ -212,6 +217,15 @@ function PurchaseOrderDetailScreen() {
       />
     );
   }, [bills]);
+  const renderBillDetail = useCallback(() => {
+    return (
+      <BillDetailModal
+        billItemsOfBill={billSelected}
+        setSeeBillDetail={setSeeBillDetail}
+        isLoadingBillItem={isLoadingBillItem}
+      />
+    );
+  }, [isLoadingBillItem, billSelected, setSeeBillDetail]);
   const handleUpdateStatusOrder = async () => {
     let updateData = {
       status: "accepted",
@@ -223,6 +237,12 @@ function PurchaseOrderDetailScreen() {
 
     setIsApproved((pre) => !pre);
   };
+
+  useLayoutEffect(() => {
+    if (billSelected) {
+      setSeeBillDetail((pre) => !pre);
+    }
+  }, [billSelected, setSeeBillDetail]);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
@@ -420,19 +440,6 @@ function PurchaseOrderDetailScreen() {
         </IconButton>
         <CreatePurchaseBill currOrder={currOrder} setIsAdd={setIsAdd} />
       </CustomModal>
-      {/* <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
-        <HeaderModal onClose={setOpenDrawer} title="Thông tin phiếu nhập" />
-        <Box>
-          {itemSelected?.map((item) => {
-            return (
-              <Box>
-                <Typography>Name: {item?.product?.name}</Typography>
-                <Typography>Quantity: {item?.effectiveQty}</Typography>
-              </Box>
-            );
-          })}
-        </Box>
-      </CustomDrawer> */}
       <CustomizedDialogs
         open={isApproved}
         handleClose={setIsApproved}
@@ -455,6 +462,15 @@ function PurchaseOrderDetailScreen() {
           actions: (theme) => ({ paddingRight: theme.spacing(2) }),
         }}
       />
+
+      <CustomModal
+        open={isSeeBillDetail}
+        toggle={setSeeBillDetail}
+        size="sm"
+        title="Chi tiết phiếu nhập"
+      >
+        {renderBillDetail()}
+      </CustomModal>
     </Box>
   );
 }

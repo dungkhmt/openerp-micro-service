@@ -60,8 +60,13 @@ public class DeliveryBillServiceImpl extends BaseService implements IDeliveryBil
     }
 
     @Override
-    public List<DeliveryBillItem> getBillItemsOfBill(String billCode) throws JsonProcessingException {
+    public List<DeliveryBillItem> getBillItemsOfBill(String billCode) {
         return deliveryBillItemRepo.getAllItemOfABill(billCode);
+    }
+
+    @Override
+    public List<DeliveryBillItem> getBillItemsOfBillBySeq(String billCode, String seqId) {
+        return deliveryBillItemRepo.getItemOfABillBySeq(billCode, seqId);
     }
 
     @Override
@@ -103,9 +108,7 @@ public class DeliveryBillServiceImpl extends BaseService implements IDeliveryBil
         int index = 0;
         for (SplitBillItemDTO splitBillItemDTO : splitBillDTO.getBillItemDTOS()) {
             index++;
-            List<DeliveryBillItem> currBillItems = deliveryBill.getDeliveryBillItems().stream().filter(item -> {
-                return item.getSeqId().equals(splitBillItemDTO.getDeliveryBillItemSeqId());
-            }).collect(Collectors.toList());
+            List<DeliveryBillItem> currBillItems = deliveryBill.getDeliveryBillItems().stream().filter(item -> item.getSeqId().equals(splitBillItemDTO.getDeliveryBillItemSeqId())).collect(Collectors.toList());
             // There is only one bill item can have same seqId and delivery_bill_code with this DTO.
             if (currBillItems.size() != 1) {
                 throw caughtException(ErrorCode.UNMATCH.getCode(), "Can't find matched delivery bill item, can't split");

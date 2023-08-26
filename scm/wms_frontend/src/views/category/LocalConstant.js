@@ -121,6 +121,7 @@ export const staticCustomerField = [
     align: "center",
     sortable: false,
     minWidth: 150,
+    flex: 1,
     renderCell: (params) => {
       return (
         <Typography sx={{ color: AppColors.warning, fontWeight: "500" }}>

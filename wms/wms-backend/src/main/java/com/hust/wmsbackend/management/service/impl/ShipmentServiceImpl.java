@@ -50,8 +50,8 @@ public class ShipmentServiceImpl implements ShipmentService {
         List<Shipment> shipments =  shipmentRepository.findAllByIsDeletedIsFalseOrderByCreatedStampDesc();
         return shipments.stream().map(shipment -> ShipmentDTO.builder()
             .shipmentId(shipment.getShipmentId())
-            .lastUpdatedStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, shipment.getLastUpdatedStamp()))
-            .createdStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, shipment.getCreatedStamp()))
+            .lastUpdatedStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, shipment.getLastUpdatedStamp()))
+            .createdStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, shipment.getCreatedStamp()))
             .createdBy(shipment.getCreatedBy())
             .expectedDeliveryStr(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, shipment.getExpectedDeliveryStamp()))
             .build()).collect(Collectors.toList());
@@ -83,9 +83,9 @@ public class ShipmentServiceImpl implements ShipmentService {
         return ShipmentDTO.builder().shipmentId(shipment.getShipmentId())
             .expectedDeliveryStamp(shipment.getExpectedDeliveryStamp())
             .expectedDeliveryStr(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, shipment.getExpectedDeliveryStamp()))
-            .createdStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, shipment.getCreatedStamp()))
+            .createdStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, shipment.getCreatedStamp()))
             .createdBy(shipment.getCreatedBy())
-            .lastUpdatedStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, shipment.getLastUpdatedStamp()))
+            .lastUpdatedStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, shipment.getLastUpdatedStamp()))
             .trips(tripDTOS)
             .build();
     }

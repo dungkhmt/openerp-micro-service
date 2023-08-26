@@ -10,37 +10,37 @@ const headCells = [
     {
         id: 'code',
         numeric: false,
-        disablePadding: true,
+        disablePadding: false,
         label: 'Order Code',
-        with: '12%'
+        with: '10%'
     },
     {
         id: 'customer',
         numeric: false,
-        disablePadding: true,
+        disablePadding: false,
         label: 'Customer',
         with: '10%'
     },
     {
         id: 'fromFacility',
         numeric: false,
-        disablePadding: true,
+        disablePadding: false,
         label: 'From Facility',
-        with: '12%'
+        with: '11%'
     },
     {
         id: 'toFacility',
         numeric: false,
-        disablePadding: true,
+        disablePadding: false,
         label: 'To Facility',
-        with: '12%'
+        with: '11%'
     },
     {
         id: 'type',
         numeric: false,
         disablePadding: false,
         label: 'Type',
-        with: '13%'
+        with: '11%'
     },
     {
         id: 'size',
@@ -50,19 +50,33 @@ const headCells = [
         with: '10%'
     },
     {
+        id: 'latePickup',
+        numeric: false,
+        disablePadding: false,
+        label: 'Late Pickup',
+        with: '12%'
+    },
+    {
+        id: 'lateDelivery',
+        numeric: false,
+        disablePadding: false,
+        label: 'Late Delivery',
+        with: '12%'
+    },
+    {
         id: 'status',
         numeric: false,
         disablePadding: false,
         label: 'Status',
         with: '18%'
     },
-    {
-        id: 'createdAt',
-        numeric: false,
-        disablePadding: false,
-        label: 'Created At',
-        with: '13%'
-    },
+    // {
+    //     id: 'createdAt',
+    //     numeric: false,
+    //     disablePadding: false,
+    //     label: 'Created At',
+    //     with: '13%'
+    // },
     {
         id: 'view',
         numeric: false,
@@ -80,7 +94,7 @@ function EnhancedTableHead(props) {
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
-                        align={headCell.numeric ? 'right' : 'left'}
+                        align={headCell.numeric ? 'right' : (headCell.id === "size" ? 'center' : 'left')}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
                         width={headCell.with}
@@ -93,7 +107,7 @@ function EnhancedTableHead(props) {
     );
 }
 
-const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ordersSelect, setOrdersSelect, setFlag }) => {
+const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ordersSelect, setOrdersSelect, setFlag, trip }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [value, setValue] = useState([]);
     const [pendingValue, setPendingValue] = useState([]);
@@ -127,7 +141,18 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
         setOrdersSelect(valueTmp);
         setFlag(true);
     }
-    console.log("value", value)
+    const convertMillisecondsToHours = (milliseconds) => {
+        const seconds = milliseconds / 1000;
+        const hours = Math.floor((seconds / 3600) % 24);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const date = Math.floor(hours / 24);
+        if (date > 0) {
+            return `${date} ngày ${hours} giờ ${minutes} phút`;
+        }
+
+        return `${hours} giờ ${minutes} phút`;
+    }
+    console.log("ordersSelect", ordersSelect)
     return (
         <Box className="truck-order">
             <Box className="chose-truck-v2">
@@ -183,12 +208,48 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                     </Box>
                 ) : null}
 
+
+                {trip ? (
+                    <>
+                        <Box className="header-info" mt={4}>
+                            <Typography>Trip info:</Typography>
+                        </Box>
+                        <Box className="truck-select-info">
+                            <Box className="truck-info-item">
+                                <Box className="truck-info-item-title">
+                                    <Typography>Start time:</Typography>
+                                </Box>
+                                <Box>{new Date(trip?.startTime).toLocaleDateString()}</Box>
+                            </Box>
+                            <Box className="truck-info-item">
+                                <Box className="truck-info-item-title">
+                                    <Typography>Total distant:</Typography>
+                                </Box>
+                                <Box>{Number(trip?.total_distant / 1000).toFixed(2)} (km)</Box>
+                            </Box>
+                            <Box className="truck-info-item">
+                                <Box className="truck-info-item-title">
+                                    <Typography>Total time:</Typography>
+                                </Box>
+                                <Box>{convertMillisecondsToHours(trip?.total_time)}</Box>
+                            </Box>
+                            <Box className="truck-info-item">
+                                <Box className="truck-info-item-title">
+                                    <Typography>Total order:</Typography>
+                                </Box>
+                                <Box>{trip?.orderIds?.length} (đơn hàng)</Box>
+                            </Box>
+                        </Box>
+                    </>
+                ) : null}
+
             </Box>
             <Box className="chose-orders-v2">
                 <Box className="chose-orders-header">
                     <Box className="header-info">
                         <Typography>Orders:</Typography>
                     </Box>
+                    {["DONE", "EXECUTING"].includes(trip?.status) ? null : (
                     <Box sx={{ backgroundColor: "#1976d2", borderRadius: '4px' }}>
                         <Button disableRipple
                             aria-describedby={id}
@@ -197,10 +258,10 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                         >
                             <span>Add Orders</span>
                         </Button>
-                    </Box>
+                    </Box>)}
                 </Box>
                 {open ?
-                    <Box id={id} anchorEl={anchorEl} placement="bottom-start" sx={{width: '50%', float: 'right', zIndex: 10000 }}>
+                    <Box id={id} anchorEl={anchorEl} placement="bottom-start" sx={{ width: '50%', float: 'right', zIndex: 10000 }}>
                         <ClickAwayListener onClickAway={handleClose}>
                             <div>
                                 <Autocomplete
@@ -227,7 +288,7 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                                     renderTags={() => null}
                                     noOptionsText="No labels"
                                     renderOption={(props, option, { selected }) => (
-                                        <li {...props} style={{ justifyContent: "center" }}>
+                                        <li {...props} style={{ justifyContent: "left" }}>
                                             <Box
                                                 component={DoneIcon}
                                                 sx={{ width: 17, height: 17, mr: '16px', ml: '-2px' }}
@@ -299,13 +360,15 @@ const TruckAndOrdersInTrip = ({ trucks, setTruckSelect, truckSelect, orders, ord
                                                 >
                                                     {row.orderCode}
                                                 </TableCell>
-                                                <TableCell align="left" sx={{ paddingLeft: '0px !important' }}>{row?.customerId}</TableCell>
+                                                <TableCell align="left">{row?.customerId}</TableCell>
                                                 <TableCell align="left">{row?.fromFacility.facilityName}</TableCell>
                                                 <TableCell align="left">{row?.toFacility.facilityName}</TableCell>
                                                 <TableCell align="left">{typeOrderMap.get(row.type)}</TableCell>
-                                                <TableCell align="left">{row?.containerModel?.size}</TableCell>
+                                                <TableCell align="center">{row?.containerModel?.size}</TableCell>
+                                                <TableCell align="left">{new Date(row?.latePickupTime).toLocaleDateString()}</TableCell>
+                                                <TableCell align="left">{new Date(row?.lateDeliveryTime).toLocaleDateString()}</TableCell>
                                                 <TableCell align="left">{row?.status}</TableCell>
-                                                <TableCell align="left">{new Date(row?.createdAt).toLocaleDateString()}</TableCell>
+                                                {/* <TableCell align="left">{new Date(row?.createdAt).toLocaleDateString()}</TableCell> */}
                                                 <TableCell >
                                                     <Box sx={{ display: 'flex' }}>
                                                         {/* <Tooltip title="View">

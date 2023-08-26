@@ -22,7 +22,7 @@ const initialState = {
 
   isEditCode: false,
 
-  isVisibleInput: false,
+  isVisibleInput: true,
 
   // participants
   isVisibleParticipants: false,
@@ -105,11 +105,25 @@ export const codeEditorSlice = createSlice({
         remoteUser.audio = audio;
       }
     },
+    handleOnOffCameraRemoteUser: (state, action) => {
+      const { socketId, video } = action.payload;
+      const remoteUser = state.remoteUsers.find((item) => item.socketId === socketId);
+      if (remoteUser) {
+        remoteUser.video = video;
+      }
+    },
     handleOnOffMicParticipant: (state, action) => {
       const { socketId, audio } = action.payload;
       const participant = state.participants.find((item) => item.socketId === socketId);
       if (participant) {
         participant.audio = audio;
+      }
+    },
+    handleOnOffCameraParticipant: (state, action) => {
+      const { socketId, video } = action.payload;
+      const participant = state.participants.find((item) => item.socketId === socketId);
+      if (participant) {
+        participant.video = video;
       }
     },
 
@@ -161,7 +175,9 @@ export const {
   handleAddRemoteUser,
   handleRemoveRemoteUser,
   handleOnOffMicRemoteUser,
+  handleOnOffCameraRemoteUser,
   handleOnOffMicParticipant,
+  handleOnOffCameraParticipant,
   setIsVisibleParticipants,
   setParticipants,
   setSource,

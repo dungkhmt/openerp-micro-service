@@ -21,8 +21,8 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { Chip, Icon } from '@mui/material';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import { deleteTrailer } from 'api/TrailerAPI';
 
@@ -241,7 +241,7 @@ export default function ContentsTrailerScreen({ trailer, page, setPage, rowsPerP
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={trailer.length}
+              rowCount={trailer?.length}
             />
             <TableBody>
               {trailer
@@ -279,7 +279,9 @@ export default function ContentsTrailerScreen({ trailer, page, setPage, rowsPerP
                         {row.trailerCode}
                       </TableCell>
                       <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
-                      <TableCell align="left">{row.status}</TableCell>
+                      <TableCell align="left">
+                        <Chip label={row?.status} color={colorStatus.get(row?.status)} />
+                      </TableCell>
                       <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
                       <TableCell>
@@ -291,11 +293,13 @@ export default function ContentsTrailerScreen({ trailer, page, setPage, rowsPerP
                               <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                             </Box>
                           </Tooltip>
+                          {row?.status === "AVAILABLE" ? (
                           <Tooltip title="Delete">
                             <Box onClick={() => { handleDelete(row?.uid) }}>
                               <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
                             </Box>
                           </Tooltip>
+                          ) : null}
                         </Box>
                       </TableCell>
                     </TableRow>

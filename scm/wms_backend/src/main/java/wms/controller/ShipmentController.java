@@ -60,6 +60,17 @@ public class ShipmentController extends BaseController {
             return response(error(ex));
         }
     }
+    @ApiOperation(value = "Delete shipment")
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteShipment(@RequestParam(value = "id") Long id) {
+        try {
+            shipmentService.deleteShipmentById(id);
+            return response(new ResultEntity(1, "Delete shipment successfully", null));
+        }
+        catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
     @ApiOperation(value = "Phân đơn thành các shipment từ các spliting order")
     @PostMapping("/create-shipment-item")
     public ResponseEntity<?> createItem(@Valid @RequestBody ShipmentItemDTO shipmentItemDTO) {
@@ -103,10 +114,21 @@ public class ShipmentController extends BaseController {
 
     @ApiOperation(value = "Assign splitted đơn (shipment item) cho các trip")
     @PutMapping("/assign-shipment-item")
-    public ResponseEntity<?> create(@Valid @RequestBody AssignedItemDTO assignedItemDTO) {
+    public ResponseEntity<?> assign(@Valid @RequestBody AssignedItemDTO assignedItemDTO) {
         try {
             shipmentService.assignShipmentItem(assignedItemDTO);
             return response(new ResultEntity(1, "Assign item to trip successfully", null));
+        }
+        catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
+    @ApiOperation(value = "Unassign splitted đơn (shipment item) cho các trip")
+    @PutMapping("/unassign-shipment-item")
+    public ResponseEntity<?> unassign(@Valid @RequestBody AssignedItemDTO assignedItemDTO) {
+        try {
+            shipmentService.unassignShipmentItem(assignedItemDTO);
+            return response(new ResultEntity(1, "Unassign item to trip successfully", null));
         }
         catch (Exception ex) {
             return response(error(ex));

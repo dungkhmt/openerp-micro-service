@@ -39,6 +39,11 @@ public class UserServiceImpl extends BaseService implements IUserService {
         return userRepo.findAll();
     }
 
+    @Override
+    public List<UserRegister> getAllUsersByRole(String roleName) {
+        return userRepo.getUsersByRole(roleName);
+    }
+
     public UserRegister getUserById(long id) {
         return null;
     }

@@ -19,8 +19,8 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Button, Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { Button, Chip, Icon } from '@mui/material';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import { updateTrip } from 'api/TripAPI';
 
@@ -58,28 +58,49 @@ const headCells = [
         numeric: false,
         disablePadding: false,
         label: 'Trip Code',
-        width: '20%'
+        width: '15%'
     },
     {
         id: 'totalOrder',
         numeric: false,
         disablePadding: false,
         label: 'Total order',
-        width: '20%'
+        width: '15%'
+    },
+    {
+        id: 'totalDistant',
+        numeric: false,
+        disablePadding: false,
+        label: 'Total Distant',
+        width: '15%'
+    },
+    {
+        id: 'totalTime',
+        numeric: false,
+        disablePadding: false,
+        label: 'Total Time',
+        width: '15%'
     },
     {
         id: 'status',
         numeric: false,
         disablePadding: false,
         label: 'Status',
-        width: '20%'
+        width: '15%'
+    },
+    {
+        id: 'executedTime',
+        numeric: false,
+        disablePadding: false,
+        label: 'Executed Time',
+        width: '15%'
     },
     {
         id: 'action',
         numeric: false,
         disablePadding: false,
         label: '',
-        width: '20%'
+        width: '10%'
     },
 ];
 
@@ -131,7 +152,7 @@ function EnhancedTableHead(props) {
     );
 }
 
-export default function TableTrip({ trips, setExecutes, executed }) {
+export default function TableTrip({ trips, setExecutes, executed, type }) {
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
     const [selected, setSelected] = React.useState([]);
@@ -200,7 +221,7 @@ export default function TableTrip({ trips, setExecutes, executed }) {
     const isSelected = (name) => selected.indexOf(name) !== -1;
     const handleDetail = (id) => {
         history.push({
-          pathname: `/trip/detail/${id}`,
+            pathname: `/trip/detail/${type}/${id}`,
         })
     }
     const handleExecuted = (id) => {
@@ -211,6 +232,16 @@ export default function TableTrip({ trips, setExecutes, executed }) {
             setExecutes(!executed);
         })
     }
+    const convertMillisecondsToHours = (milliseconds) => {
+        const seconds = milliseconds / 1000;
+        const hours = Math.floor((seconds / 3600) % 24);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const date = Math.floor(hours / 24);
+        if(date > 0) {
+            return `${date} ngày ${hours} giờ ${minutes} phút`;
+        }
+        return `${hours} giờ ${minutes} phút`;
+      }
     return (
         <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
             <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -265,16 +296,23 @@ export default function TableTrip({ trips, setExecutes, executed }) {
                                                 {row.code}
                                             </TableCell>
                                             <TableCell align="left">{row?.orderIds.length}</TableCell>
-                                            <TableCell align="left">{row.status}</TableCell>
+                                            <TableCell align="left">{Number(row?.total_distant / 1000).toFixed(2)} (km)</TableCell>
+                                            <TableCell align="left">{convertMillisecondsToHours(row?.total_time)}</TableCell>
+                                            <TableCell align="left">
+                                                <Chip label={row?.status} color={colorStatus.get(row?.status)} />
+                                            </TableCell>
+                                            <TableCell align="left">{new Date(row?.startTime).toLocaleDateString()}</TableCell>
                                             <TableCell>
                                                 <Box sx={{ display: 'flex' }}>
-                                                    <Button
-                                                        disabled={row.status !== "SCHEDULED" ? true : false}
-                                                        variant="contained"
-                                                        onClick={() => {handleExecuted(row.id)}}
-                                                    >
-                                                        Executing
-                                                    </Button>
+                                                    {type === "Done" ? null : (
+                                                        <Button
+                                                            disabled={row.status !== "SCHEDULED" ? true : false}
+                                                            variant="contained"
+                                                            onClick={() => { handleExecuted(row.uid) }}
+                                                        >
+                                                            Executing
+                                                        </Button>
+                                                    )}
                                                     <Box sx={{ marginLeft: '16px' }}
                                                         onClick={() => { handleDetail(row?.uid) }} >
                                                         <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>

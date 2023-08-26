@@ -3,7 +3,7 @@ import {request} from "../../../../api";
 export const saveProblemToContest = (body, successHandler, callback) => {
   request(
     "post",
-    "/save-problem-to-contest/",
+    "/contest-problem/",
     successHandler,
     {},
     body

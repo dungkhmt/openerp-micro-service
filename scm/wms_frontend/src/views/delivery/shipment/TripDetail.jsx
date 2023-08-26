@@ -1,4 +1,4 @@
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   Backdrop,
   Box,
@@ -15,33 +15,38 @@ import {
   useDeleteTripRoute,
   useGetTripRouteList,
 } from "controllers/query/delivery-trip-query";
-import { useGetItemsOfTrip } from "controllers/query/shipment-query";
+import {
+  useGetItemsOfTrip,
+  useUnAssignShipmentToTrip,
+} from "controllers/query/shipment-query";
 import { unix } from "moment";
 import { useEffect, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import { useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
-import { convertUserToName } from "../../../utils/GlobalUtils";
+import {
+  convertUserToName,
+  formatVietnameseCurrency,
+} from "../../../utils/GlobalUtils";
 import { shipmentItemCols } from "../LocalConstant";
 
 // var intervalID;
 
 function TripScreen({ screenAuthorization }) {
+  const location = useLocation();
+  const currTrip = location.state.trip;
   const [params, setParams] = useState({
     page: 1,
     pageSize: 10,
+    tripCode: currTrip?.code,
   });
-  const location = useLocation();
   const { height } = useWindowSize();
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState(0);
   const history = useHistory();
   let { path } = useRouteMatch();
 
-  const currTrip = location.state.trip;
-  const { isLoading, data: itemOfTrip } = useGetItemsOfTrip({
-    tripCode: currTrip?.code,
-  });
+  const { isLoading, data: itemOfTrip } = useGetItemsOfTrip(params);
   const { isLoading: isLoadingTripRoute, data: tripRoute } =
     useGetTripRouteList({
       tripCode: currTrip?.code,
@@ -50,12 +55,20 @@ function TripScreen({ screenAuthorization }) {
   const deleteTripRouteQuery = useDeleteTripRoute({
     tripCode: currTrip?.code,
   });
+  const usassignBillToTripQuery = useUnAssignShipmentToTrip();
   const extraActions = [
     {
-      title: "Xem",
-      callback: (item) => {},
-      icon: <VisibilityIcon />,
-      color: AppColors.green,
+      title: "Xóa khỏi chuyến",
+      callback: async (item) => {
+        let tripCode = item?.deliveryTrip?.code;
+        let assignParams = {
+          shipmentItemCode: item?.code,
+          tripCode: tripCode,
+        };
+        await usassignBillToTripQuery.mutateAsync(assignParams);
+      },
+      icon: <DeleteIcon />,
+      color: AppColors.error,
     },
   ];
 
@@ -92,7 +105,6 @@ function TripScreen({ screenAuthorization }) {
       handleClose();
     }
   }, [count]);
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
@@ -202,12 +214,14 @@ function TripScreen({ screenAuthorization }) {
         setParams={setParams}
         sx={{ height: height - 64 - 71 - 24 - 20, marginTop: 2 }} // Toolbar - Searchbar - TopPaddingToolBar - Padding bottom
         isLoading={isLoading || isLoadingTripRoute}
-        totalItem={tripRoute?.totalElements}
+        totalItem={itemOfTrip?.totalElements}
         handlePaginationModelChange={(props) => {
-          setParams({
+          let newParams = {
             page: props?.page + 1,
             pageSize: props?.pageSize,
-          });
+            tripCode: currTrip?.code,
+          };
+          setParams(newParams);
         }}
         columns={[
           ...shipmentItemCols,
@@ -217,6 +231,7 @@ function TripScreen({ screenAuthorization }) {
             headerAlign: "center",
             align: "center",
             sortable: false,
+            minWidth: 150,
             flex: 1,
             type: "actions",
             getActions: (params) => [
@@ -226,7 +241,7 @@ function TripScreen({ screenAuthorization }) {
                   key={index}
                   extraAction={extraAction}
                   onActionCall={extraAction.callback}
-                  disabled={false}
+                  disabled={tripRoute !== null}
                 />
               )),
             ],
@@ -351,6 +366,183 @@ function TripScreen({ screenAuthorization }) {
           </Box>
         </Box>
       </Backdrop>
+      {tripRoute && (
+        <Box>
+          <Stack sx={{ flexDirection: "row" }}>
+            <Typography
+              sx={{
+                fontSize: 16,
+                color: AppColors.green,
+              }}
+            >
+              1. Tổng chi phí lộ trình xe tải ban đầu (không có drone):
+            </Typography>
+            <Typography
+              sx={{
+                marginLeft: 2,
+                fontSize: 16,
+                fontWeight: "bold",
+                color: AppColors.secondary,
+              }}
+            >
+              {formatVietnameseCurrency(tripRoute?.totalTSPCost)}
+            </Typography>
+          </Stack>
+          <Stack sx={{ flexDirection: "row" }}>
+            <Typography
+              sx={{
+                fontSize: 16,
+                color: AppColors.green,
+              }}
+            >
+              2. Tổng chi phí khi có drone:
+            </Typography>
+            <Typography
+              sx={{
+                marginLeft: 2,
+                fontSize: 16,
+                fontWeight: "bold",
+                color: AppColors.secondary,
+              }}
+            >
+              {formatVietnameseCurrency(tripRoute?.totalCost)}
+            </Typography>
+          </Stack>
+          <Stack sx={{ flexDirection: "row" }}>
+            <Typography
+              sx={{
+                fontSize: 16,
+                color: AppColors.green,
+              }}
+            >
+              3. Chi phí giao hàng của xe tải:
+            </Typography>
+            <Typography
+              sx={{
+                marginLeft: 2,
+                fontSize: 16,
+                fontWeight: "bold",
+                color: AppColors.secondary,
+              }}
+            >
+              {formatVietnameseCurrency(tripRoute?.totalTruckCost)}
+            </Typography>
+          </Stack>
+          <Stack sx={{ flexDirection: "row" }}>
+            <Typography
+              sx={{
+                fontSize: 16,
+                color: AppColors.green,
+              }}
+            >
+              4. Chi phí giao hàng của drone:
+            </Typography>
+            <Typography
+              sx={{
+                marginLeft: 2,
+                fontSize: 16,
+                fontWeight: "bold",
+                color: AppColors.secondary,
+              }}
+            >
+              {formatVietnameseCurrency(tripRoute?.totalDroneCost)}
+            </Typography>
+          </Stack>
+          <Stack sx={{ flexDirection: "row" }}>
+            <Typography
+              sx={{
+                fontSize: 16,
+                color: AppColors.green,
+              }}
+            >
+              5. Chi phí chờ đợi của xe tải:
+            </Typography>
+            <Typography
+              sx={{
+                marginLeft: 2,
+                fontSize: 16,
+                fontWeight: "bold",
+                color: AppColors.secondary,
+              }}
+            >
+              {formatVietnameseCurrency(tripRoute?.totalTruckWait)}
+            </Typography>
+          </Stack>
+          <Stack sx={{ flexDirection: "row" }}>
+            <Typography
+              sx={{
+                fontSize: 16,
+                color: AppColors.green,
+              }}
+            >
+              6. Chi phí chờ đợi của drone:
+            </Typography>
+            <Typography
+              sx={{
+                marginLeft: 2,
+                fontSize: 16,
+                fontWeight: "bold",
+                color: AppColors.secondary,
+              }}
+            >
+              {formatVietnameseCurrency(tripRoute?.totalDroneWait)}
+            </Typography>
+          </Stack>
+          <Stack sx={{ flexDirection: "row" }}>
+            <Typography
+              sx={{
+                fontSize: 16,
+                color: AppColors.green,
+              }}
+            >
+              7. Lộ trình giao hàng của drone:
+            </Typography>
+            <Stack sx={{ flexDirection: "column" }}>
+              {tripRoute?.droneRoutes?.map((ele) => {
+                let droneEle = ele?.droneRouteElements;
+                return (
+                  <Typography
+                    sx={{
+                      marginLeft: 2,
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: AppColors.secondary,
+                    }}
+                  >
+                    {`${droneEle?.[0]?.locationID} ===> ${droneEle?.[1]?.locationID} ===> ${droneEle?.[2]?.locationID}`}
+                  </Typography>
+                );
+              })}
+            </Stack>
+          </Stack>
+          <Stack sx={{ flexDirection: "row" }}>
+            <Typography
+              sx={{
+                fontSize: 16,
+                color: AppColors.green,
+              }}
+            >
+              8. Lộ trình giao hàng của xe tải:
+            </Typography>
+            <Stack sx={{ flexDirection: "column" }}>
+              {tripRoute?.truckRoute?.routeElements.map((ele) => {
+                return (
+                  <Typography
+                    sx={{
+                      marginLeft: 2,
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: AppColors.secondary,
+                    }}
+                  >
+                    {ele?.locationID}
+                  </Typography>
+                );
+              })}
+            </Stack>
+          </Stack>
+        </Box>
+      )}
     </Box>
   );
 }

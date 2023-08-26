@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Box, Button, Icon, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Button, Chip, Icon, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import '../styles.scss';
 import { DragDropContext } from "react-beautiful-dnd";
 import { Droppable } from "react-beautiful-dnd";
@@ -10,7 +10,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import ModalTripItem from "../tripCreate/ModalTripItem";
 import { getTripItemByTripId } from "api/TripItemAPI";
-import { menuIconMap, tripItemType } from "config/menuconfig";
+import { colorStatus, menuIconMap, tripItemType } from "config/menuconfig";
 import { SortableContainer, SortableHandle, SortableElement, arrayMove } from 'react-sortable-hoc'
 
 
@@ -140,21 +140,21 @@ const headCells = [
         numeric: false,
         disablePadding: false,
         label: 'Code',
-        width: '15%'
+        width: '13%'
     },
     {
         id: 'facility',
         numeric: false,
         disablePadding: false,
         label: 'Facility',
-        width: '15%'
+        width: '13%'
     },
     {
         id: 'action',
         numeric: false,
         disablePadding: false,
         label: 'Action',
-        width: '20%'
+        width: '17%'
     },
     {
         id: 'entity',
@@ -168,7 +168,14 @@ const headCells = [
         numeric: false,
         disablePadding: false,
         label: 'Status',
-        width: '20%'
+        width: '15%'
+    },
+    {
+        id: 'lateTime',
+        numeric: false,
+        disablePadding: false,
+        label: 'Late Time',
+        width: '13%'
     },
     {
         id: 'impl',
@@ -235,8 +242,9 @@ const Row = SortableElement(({ data, facilitiesTmp, setFacilitiesTmp,...other })
             {data?.type === tripItemType.get("Trailer") ? (<TableCell>{data?.trailerCode}</TableCell>) : null}
             {data?.type === tripItemType.get("Order") ? (<TableCell>{data?.containerCode}</TableCell>) : null}
             <TableCell>
-                {data.status ? data.status : "SCHEDULED"}
+                <Chip label={data.status ? data.status : "SCHEDULED"} color={colorStatus.get(data.status ? data.status : "SCHEDULED")} /> 
             </TableCell>
+            {data?.lateTime > 0 ? (<TableCell>{new Date(data?.lateTime).toLocaleDateString()}</TableCell>) : <TableCell></TableCell>}
             {(data?.type === "Trailer" || (data?.type === "Truck" && data?.action === "STOP")) ? (
                 <TableCell>
                     <Box className="icon-view-screen"
@@ -250,7 +258,7 @@ const Row = SortableElement(({ data, facilitiesTmp, setFacilitiesTmp,...other })
     )
 })
 
-const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, tripItems, flag }) => {
+const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, tripItems, flag, trip }) => {
     // const [facilities, setFacilities] = useState([]);
     const [facilitiesFinal, setFacilitiesFinal] = useState([]);
     const [open, setOpen] = useState(false);
@@ -342,15 +350,17 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                             facilityCode: item?.fromFacility.facilityCode,
                             earlyTime: item?.earlyPickupTime,
                             lateTime: item?.latePickupTime,
-                            action: "PICKUP-CONTAINER",
+                            action: "PICKUP_CONTAINER",
                             orderCode: item?.orderCode,
-                            orderId: item.id,
+                            orderUid: item.uid,
                             containerId: item?.containerModel?.id,
                             containerCode: item?.containerModel?.containerCode,
+                            container: item?.containerModel,
                             longitude: item?.fromFacility.longitude,
                             latitude: item?.fromFacility.latitude,
                             arrivalTime: null,
                             departureTime: null,
+                            typeOrder: item?.type,
                             type: tripItemType.get("Order")
                         }
                         let toFacility = {
@@ -360,15 +370,17 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                             facilityCode: item?.toFacility.facilityCode,
                             earlyTime: item?.earlyDeliveryTime,
                             lateTime: item?.lateDeliveryTime,
-                            action: "DELIVERY-CONTAINER",
+                            action: item?.isBreakRomooc ? "DELIVERY_CONTAINER, DROP_TRAILER" : "DELIVERY_CONTAINER",
                             orderCode: item?.orderCode,
-                            orderId: item.id,
+                            orderUid: item.uid,
                             containerId: item?.containerModel?.id,
                             containerCode: item?.containerModel.containerCode,
+                            container: item?.containerModel,
                             longitude: item?.toFacility.longitude,
                             latitude: item?.toFacility.latitude,
                             arrivalTime: null,
                             departureTime: null,
+                            typeOrder: item?.type,
                             type: tripItemType.get("Order")
                         }
                         facilitiesTmp.push(fromFacility);
@@ -386,7 +398,7 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                             }
                         });
                         if (!check) {
-                            facilitiesTmp2 = facilitiesTmp2.filter((req) => req.orderId !== faci.orderId);
+                            facilitiesTmp2 = facilitiesTmp2.filter((req) => req.orderCode !== faci.orderCode);
                         }
                     }
                 })
@@ -457,10 +469,11 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                 <Box className="facility-arrangment-head-title">
                     <Typography>Facilities Arrangement:</Typography>
                 </Box>
+                {["DONE", "EXECUTING"].includes(trip?.status) ? null : (
                 <Button variant="contained" className="header-trip-detail-btn-save"
                     onClick={handleAddTripItem}
                 >Add TripItem
-                </Button>
+                </Button>)}
             </Box>
             <Table className="table-trip-items">
                 <EnhancedTableHead
@@ -487,8 +500,9 @@ const OrderArrangementInTrip = ({ ordersSelect, setTripItem, truckSelected, trip
                                     {row?.type === tripItemType.get("Trailer") ? (<TableCell>{row?.trailerCode ? row?.trailerCode : row?.orderCode}</TableCell>) : null}
                                     {row?.type === tripItemType.get("Order") ? (<TableCell>{row?.orderCode}</TableCell>) : null}
                                     <TableCell>
-                                        {row.status ? row.status : "SCHEDULED"}
+                                        <Chip label={row.status ? row.status : "SCHEDULED"} color={colorStatus.get(row.status ? row.status : "SCHEDULED")} /> 
                                     </TableCell>
+                                    <TableCell></TableCell>
                                     <TableCell><Box></Box></TableCell>
                                 </TableRow >
                             )

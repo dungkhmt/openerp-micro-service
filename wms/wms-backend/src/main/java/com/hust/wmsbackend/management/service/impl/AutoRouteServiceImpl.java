@@ -1,23 +1,19 @@
 package com.hust.wmsbackend.management.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.util.PointList;
 import com.hust.wmsbackend.management.entity.*;
 import com.hust.wmsbackend.management.model.DeliveryTripDTO;
-import com.hust.wmsbackend.management.model.request.NewNotificationRequest;
 import com.hust.wmsbackend.management.model.response.AutoRouteResponse;
 import com.hust.wmsbackend.management.repository.*;
 import com.hust.wmsbackend.management.service.AutoRouteService;
-import com.hust.wmsbackend.management.utils.ExternalApiCaller;
+import com.hust.wmsbackend.management.service.NotificationsService;
 import com.hust.wmsbackend.vrp.delivery.DeliveryAddressDTO;
 import com.hust.wmsbackend.vrp.delivery.DeliveryRouteService;
 import com.hust.wmsbackend.vrp.delivery.RouteRequest;
 import com.hust.wmsbackend.vrp.delivery.RouteResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,10 +44,8 @@ public class AutoRouteServiceImpl implements AutoRouteService {
     private DeliveryTripItemRepository deliveryTripItemRepository;
     @Autowired
     private DeliveryTripRepository deliveryTripRepository;
-    @Value("${external-api.notification.uri}")
-    private String NOTIFICATION_URI;
     @Autowired
-    private ExternalApiCaller apiCaller;
+    private NotificationsService notificationsService;
 
     @Override
     @Transactional
@@ -83,7 +77,17 @@ public class AutoRouteServiceImpl implements AutoRouteService {
                                                 .warehouseLon(warehouse.getLongitude()).addressDTOs(addressDTOs).build();
 
         // get route response
-        RouteResponse routeResponse = deliveryRouteService.getRoute(routeRequest);
+        RouteResponse routeResponse;
+        try {
+            routeResponse = deliveryRouteService.getRoute(routeRequest);
+        } catch (RuntimeException e) {
+            String deliveryTripId = request.getDeliveryTripId();
+            notificationsService.create("AUTO_ROUTE", principal.getName(),
+                    String.format("Không tìm được lộ trình cho chuyến giao hàng %s", deliveryTripId),
+                    String.format("/delivery-manager/delivery-trips/%s", deliveryTripId));
+            log.info("Fail auto route");
+            return;
+        }
 
         // delete old paths of this delivery_trip (if exist)
         String deliveryTripId = request.getDeliveryTripId();
@@ -126,25 +130,9 @@ public class AutoRouteServiceImpl implements AutoRouteService {
         deliveryTrip.setDistance(BigDecimal.valueOf(routeResponse.getTotalCost()));
         deliveryTripRepository.save(deliveryTrip);
 
-        ObjectMapper mapper = new ObjectMapper();
-        boolean done = false;
-        try {
-            done = apiCaller.simpleBooleanCall(NOTIFICATION_URI, token, mapper.writeValueAsString(NewNotificationRequest.builder()
-                    .toUser(principal.getName())
-                    .url(String.format("/delivery-manager/delivery-trips/%s", deliveryTripId))
-                    .content(String.format("Tìm hành trình tối ưu cho chuyến giao hàng %s thành công", deliveryTripId))
-                    .build()));
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-            log.error("Exception when build Notification request");
-        }
-
-        if (done) {
-            log.info("Push notification done");
-        } else {
-            log.info("Push notification fail");
-        }
-
+        notificationsService.create("AUTO_ROUTE", principal.getName(),
+            String.format("Tìm hành trình tối ưu cho chuyến giao hàng %s thành công", deliveryTripId),
+            String.format("/delivery-manager/delivery-trips/%s", deliveryTripId));
         log.info("Done auto route");
     }
 
@@ -232,6 +220,5 @@ public class AutoRouteServiceImpl implements AutoRouteService {
         return AutoRouteResponse.builder().deliveryTripId(deliveryTripId).points(points)
             .customers(customers).warehouse(warehouseMarker).build();
     }
-
 
 }

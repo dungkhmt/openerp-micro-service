@@ -29,8 +29,9 @@ export default function StudentLearningProgressDetailProgrammingSubmission(
         data={(query) =>
           new Promise((resolve, reject) => {
             let url =
-              "/get-contest-submission-paging-of-a-user/" +
+              "/users/" +
               studentId +
+              "/submissions"
               "?page=" +
               `${query.page}` +
               "&size=" +

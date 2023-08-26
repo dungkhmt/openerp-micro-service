@@ -30,7 +30,7 @@ public class ReceiptBillWithItems {
         this.description = bill.getDescription();
         this.receiptId = bill.getReceiptId().toString();
         this.createdBy = bill.getCreatedBy();
-        this.createdStampStr = DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, bill.getCreatedStamp());
-        this.lastUpdateStampStr = DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, bill.getLastUpdateStamp());
+        this.createdStampStr = DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, bill.getCreatedStamp());
+        this.lastUpdateStampStr = DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, bill.getLastUpdateStamp());
     }
 }

@@ -36,6 +36,7 @@ export const queryKey = {
     bill_item_of_delivery_order: "bill_item_of_delivery_order",
     bill_item_of_bill: "bill_item_of_bill",
     splitted_bill_item: "splitted_bill_item",
+    bill_item_by_seq: "bill_item_by_seq",
   },
   shipment: {
     shipment_list: "shipment_list",
@@ -53,6 +54,7 @@ export const queryKey = {
     user_list: "user_list",
     user_list_all: "user_list_all",
     user_list_pagination: "user_list_pagination",
+    user_list_all_by_role: "user_list_all_by_role",
   },
   dashboard: {
     new_facility_month: "new_facility_month",

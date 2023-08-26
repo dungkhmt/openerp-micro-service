@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import wms.dto.shipment.ReturnShipmentItemDTO;
+import wms.dto.shipment.ShipmentProjection;
 import wms.entity.Facility;
 import wms.entity.ShipmentItem;
 

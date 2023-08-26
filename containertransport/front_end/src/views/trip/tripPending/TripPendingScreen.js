@@ -17,14 +17,14 @@ const TripPendingScreen = () => {
             status: "Pending"
         };
         getTripByDriver(data).then((res) => {
-            console.log("=========", res.data.data);
+            console.log("=========", res?.data.data);
             setTrips(res?.data?.data);
         })
     }, [executed])
 
     return (
         <Box className="fullScreen">
-            <Container maxWidth="md" className="container">
+            <Container maxWidth="100vw" className="container">
                 <Box className="toast">
                     {toastOpen ? (
                         <Alert variant="filled" severity={toastType} >
@@ -43,7 +43,7 @@ const TripPendingScreen = () => {
                 </Box>
 
                 <Box className="list-trip">
-                    <TableTrip trips={trips} setExecutes={setExecutes} executed={executed} />
+                    <TableTrip trips={trips} setExecutes={setExecutes} executed={executed} type="Pending" />
                 </Box>
             </Container>
         </Box>

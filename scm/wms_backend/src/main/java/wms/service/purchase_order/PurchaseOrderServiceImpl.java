@@ -27,6 +27,9 @@ import wms.service.files.ExportPDFService;
 import wms.utils.GeneralUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -51,7 +54,6 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
     public PurchaseOrder createOrder(PurchaseOrderDTO purchaseOrderDTO, JwtAuthenticationToken token) throws CustomException {
         Facility boughtBy = facilityRepo.getFacilityByCode(purchaseOrderDTO.getBoughtBy());
         UserRegister createdBy = userRepo.getUserByUserLoginId(token.getName());
-
         if (boughtBy== null) {
             throw caughtException(ErrorCode.NON_EXIST.getCode(), "Order belongs to no facility, can't create");
         }
@@ -130,10 +132,17 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PurchaseOrder updateOrder(UpdatePurchaseOrderDTO updatePurchaseOrderDTO, long id) throws CustomException {
+    public PurchaseOrder updateOrder(UpdatePurchaseOrderDTO updatePurchaseOrderDTO) throws CustomException {
         double totalMoney = 0.0;
         PurchaseOrder currOrder = getOrderByCode(updatePurchaseOrderDTO.getCreatedOrderCode());
+        if (currOrder == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Unknown order, can't update");
+        }
+        List<Long> lstPreviousOrderItemId = currOrder.getPurchaseOrderItems().stream().map(PurchaseOrderItem::getId).collect(Collectors.toList());
+        purchaseOrderItemRepo.deleteAllByIds(lstPreviousOrderItemId);
+        Facility boughtBy = facilityRepo.getFacilityByCode(updatePurchaseOrderDTO.getBoughtBy());
         int seq = 0;
+        List<PurchaseOrderItem> purchaseOrderItems = new ArrayList<>();
         for (PurchaseOrderItemDTO orderItem : updatePurchaseOrderDTO.getOrderItems()) {
             seq++;
             ProductEntity product = productRepo.getProductByCode(orderItem.getProductCode().toUpperCase());
@@ -150,7 +159,12 @@ public class PurchaseOrderServiceImpl extends BaseService implements IPurchaseOr
                     .build();
             totalMoney += orderItem.getPriceUnit() * orderItem.getQuantity();
             purchaseOrderItemRepo.save(item);
+            purchaseOrderItems.add(item);
         }
+        currOrder.setPurchaseOrderItems(purchaseOrderItems);
+        currOrder.setSupplierCode(updatePurchaseOrderDTO.getSupplierCode());
+        currOrder.setFacility(boughtBy);
+        currOrder.setVat(updatePurchaseOrderDTO.getVat());
         currOrder.setTotalMoney(totalMoney);
         currOrder.setTotalPayment(totalMoney + totalMoney * updatePurchaseOrderDTO.getVat() / 100);
         return purchaseOrderRepo.save(currOrder);

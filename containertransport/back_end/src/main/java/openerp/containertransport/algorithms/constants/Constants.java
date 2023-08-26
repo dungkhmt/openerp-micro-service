@@ -20,7 +20,7 @@ public class Constants implements Serializable {
     @Getter
     public enum ACTION {
         PICKUP_TRAILER("PICKUP_TRAILER"),
-        DELIVERY_TRAILER("DELIVERY_TRAILER"),
+        DROP_TRAILER("DROP_TRAILER"),
         PICKUP_CONTAINER("PICKUP_CONTAINER"),
         DELIVERY_CONTAINER("DELIVERY_CONTAINER"),
         STOP("STOP"),

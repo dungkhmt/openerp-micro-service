@@ -91,7 +91,7 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         DeliveryTrip newDeliveryTrip = DeliveryTrip.builder()
                 .code("TRIP" + GeneralUtils.generateCodeFromSysTime())
                 .facility(facility)
-                .startedDate(GeneralUtils.convertFromStringToDate(deliveryTripDTO.getCreatedDate()))
+                .startedDate(GeneralUtils.convertFromStringToDate(deliveryTripDTO.getStartedDate()))
                 .creator(createdBy)
                 .userInCharge(userInCharge)
                 .shipment(shipment)
@@ -106,6 +106,36 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
                 : PageRequest.of(page - 1, pageSize, Sort.by(sortField).descending());
         Page<DeliveryTrip> deliveryTrips = deliveryTripRepo.search(pageable, shipmentCode);
         return getPaginationResult(deliveryTrips.getContent(), page, deliveryTrips.getTotalPages(), deliveryTrips.getTotalElements());
+    }
+
+    @Override
+    public DeliveryTrip updateDeliveryTrip(DeliveryTripDTO deliveryTripDTO, long id) throws CustomException {
+        DeliveryTrip currTrip = deliveryTripRepo.getDeliveryTripById(id);
+        UserRegister userInCharge = userRepo.getUserByUserLoginId(deliveryTripDTO.getUserInCharge());
+        Shipment shipment = shipmentRepo.getShipmentByCode(deliveryTripDTO.getShipmentCode());
+        Facility facility = facilityRepo.getFacilityByCode(deliveryTripDTO.getFacilityCode());
+        if (shipment == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Not found shipment for this trip, can't update");
+        }
+        if (userInCharge == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Not found user in charge for this trip, can't update");
+        }
+        if (facility == null) {
+            throw caughtException(ErrorCode.NON_EXIST.getCode(), "Not found facility for this trip, can't update");
+        }
+        currTrip.setUserInCharge(userInCharge);
+        currTrip.setShipment(shipment);
+        currTrip.setFacility(facility);
+        currTrip.setStartedDate(GeneralUtils.convertFromStringToDate(deliveryTripDTO.getStartedDate()));
+        return deliveryTripRepo.save(currTrip);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteDeliveryTrip(long id) {
+        DeliveryTrip trip = deliveryTripRepo.getDeliveryTripById(id);
+        trip.setDeleted(1);
+        deliveryTripRepo.save(trip);
     }
 
     @Override
@@ -137,11 +167,6 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
     }
 
     @Override
-    public DeliveryTrip updateDeliveryTrip(ProductDTO productDTO, long id) throws CustomException {
-        return null;
-    }
-
-    @Override
     public void deleteDeliveryTripById(long id) {
 
     }
@@ -166,6 +191,9 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         UserRegister user = trip.getUserInCharge();
         // Set truck properties
         TruckEntity truckEntity = truckRepo.getTruckFromUser(user.getId());
+        if (truckEntity == null) {
+            throw new Exception("No truck managed by this delivery staff");
+        }
         Truck truck = new Truck();
         truck.setID(truckEntity.getCode());
         truck.setCapacity(truckEntity.getCapacity());
@@ -176,6 +204,9 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         // Set drone properties
         DroneEntity droneEntity = droneRepo.getDroneFromUser(user.getId());
         Drone drone = new Drone();
+        if (droneEntity == null) {
+            throw new Exception("No drone managed by this delivery staff");
+        }
         drone.setID(droneEntity.getCode());
         drone.setCapacity(droneEntity.getCapacity());
         drone.setWaitingCost(droneEntity.getWaitingCost());
@@ -185,10 +216,11 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         input.setDrone(drone);
         // Set depot info
         Depot depot = new Depot();
-        depot.setLocationID("depot");
+        String depotName = trip.getFacility().getName();
+        depot.setLocationID(depotName);
         input.setDepot(depot);
         Node depotNode = new Node(Double.parseDouble(trip.getFacility().getLatitude()),
-                Double.parseDouble(trip.getFacility().getLongitude()), "depot");
+                Double.parseDouble(trip.getFacility().getLongitude()), depotName);
         points.add(depotNode);
         // Set customer location
         Set<Customer> customers = new HashSet<>();
@@ -196,19 +228,18 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
             Customer customer = shipmentItem.getDeliveryBill().getSaleOrder().getCustomer();
             customers.add(customer);
         }
-        int count = 0;
         for (Customer customer: customers) {
-            count++;
             Node node = new Node();
             node.setX(Double.parseDouble(customer.getLatitude()));
             node.setY(Double.parseDouble(customer.getLongitude()));
-            node.setName("C" + count);
+            node.setName(customer.getName());
             points.add(node);
         }
 
         input.setLocations(points);
         List<List<DistanceElement>> listDistances = new ArrayList<>();
         List<Request> listCustomerRequests = new ArrayList<>();
+        int countFailRequest = 0;
         for (int i = 0; i < points.size(); i++) {
             List<DistanceElement> distances = new ArrayList<>();
             for (int j = 0; j < points.size(); j++) {
@@ -216,18 +247,19 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
                 distanceElement.setId(i + "_" + j);
                 distanceElement.setFromLocationId(points.get(i).getName());
                 distanceElement.setToLocationId(points.get(j).getName());
-//              double distance = Utils.calculateEuclideanDistance(points.get(i), points.get(j));
-                double distance;
+                double distance = 0;
                 try {
-                    distance = Utils.getDistanceGraphhopperApi(points.get(i).getX(), points.get(i).getY(),
-                            points.get(j).getX(), points.get(j).getY());
+                    if (countFailRequest > 5) {
+                        distance = Utils.calculateCoordinationDistance(points.get(i).getX(), points.get(i).getY(), points.get(j).getX(), points.get(j).getY());
+                    } else {
+                        distance = Utils.getDistanceGraphhopperApi(points.get(i).getX(), points.get(i).getY(),
+                                points.get(j).getX(), points.get(j).getY());
+                    }
                 }
                 catch (Exception ex) {
-                    log.error(ex.getMessage());
-                }
-                finally {
-                        distance = Utils.calculateEuclideanDistance(points.get(i), points.get(j));
-//                    throw new Exception("Got problem retrieving distance from internet");
+                    log.error("Got problem retrieving distance from internet: {}", ex.getMessage());
+                    distance = Utils.calculateCoordinationDistance(points.get(i).getX(), points.get(i).getY(), points.get(j).getX(), points.get(j).getY());
+                    countFailRequest++;
                 }
                 distanceElement.setDistance(distance);
                 distanceElement.setTravelTime(distance / input.getTruck().getSpeed());
@@ -281,6 +313,7 @@ public class DeliveryTripServiceImpl extends BaseService implements IDeliveryTri
         output.setTotalTruckWait(finalSolution.getTotalTruckWait());
         output.setTotalDroneWait(finalSolution.getTotalDroneWait());
         output.setTripCode(trip.getCode());
+        output.setTotalTSPCost(finalSolution.getTotalTSPCost());
         mongoTemplate.save(output);
     }
 

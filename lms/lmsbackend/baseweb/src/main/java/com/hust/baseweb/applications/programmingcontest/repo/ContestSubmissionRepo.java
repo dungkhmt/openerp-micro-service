@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ContestSubmissionRepo extends JpaRepository<ContestSubmissionEntity, UUID> {
+
+    long countAllByContestId(String contestId);
 //    List<Integer> getListProblemSubmissionDistinctWithHighestScore(@Param("userLogin") UserLogin userLogin);
 
     @Query(value =

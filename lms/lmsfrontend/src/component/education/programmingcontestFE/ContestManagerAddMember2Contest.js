@@ -47,7 +47,7 @@ export default function ContestManagerAddMember2Contest(props) {
 
     request(
       "post",
-      "/add-user-to-contest",
+      "/contests/users",
       (res) => {
         alert("Add successully");
         setOpen(false);
@@ -57,12 +57,10 @@ export default function ContestManagerAddMember2Contest(props) {
     ).then();
   }
   function handleClick(u) {
-    //alert("click " + u);
     request(
       "get",
-      "/get-roles-user-approved-notapproved-in-contest/" + u + "/" + contestId,
+      "/contests/" + contestId + "/users/" + u + "/roles",
       (res) => {
-        console.log("role in - notin contest ", res.data);
         setRolesApproved(res.data.rolesApprovedInContest);
         setRolesNotApproved(res.data.rolesNotInContest);
         setSelectedUserId(u);
@@ -71,16 +69,14 @@ export default function ContestManagerAddMember2Contest(props) {
     );
   }
   function getRoles() {
-    request("get", "/get-list-roles-contest", (res) => {
-      console.log("getRoles, res.data = ", res.data);
+    request("get", "/contests/roles", (res) => {
       setRoles(res.data);
     }).then();
   }
   function searchUser(keyword, s, p) {
     request(
       "get",
-      "/search-user/" +
-        contestId +
+      "/contests/" + contestId + "/users" +
         "?size=" +
         s +
         "&page=" +
@@ -93,7 +89,7 @@ export default function ContestManagerAddMember2Contest(props) {
         const data = res.data.contents.content.map((e, index) => ({
           index: index + 1,
           userName: e.userName,
-          fullName: e.lastName + " " + e.middleName + " " + e.firstName,
+          fullName: e.firstName + " " + e.middleName + " " + e.lastName,
         }));
         setSearchUsers(data);
         setTotalPageSearch(res.data.contents.totalPages);
@@ -127,13 +123,13 @@ export default function ContestManagerAddMember2Contest(props) {
       </Box>
 
       <StandardTable
-        title={"DS Users"}
+        title={"Users"}
         columns={columns}
         data={searchUsers}
         hideCommandBar
         options={{
           selection: false,
-          pageSize: 20,
+          pageSize: 10,
           search: true,
           sorting: true,
         }}

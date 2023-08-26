@@ -8,14 +8,21 @@ import withScreenSecurity from "components/common/withScreenSecurity";
 import CustomDataGrid from "components/datagrid/CustomDataGrid";
 import CustomModal from "components/modal/CustomModal";
 import CustomToolBar from "components/toolbar/CustomToolBar";
-import { useGetDeliveryTripList } from "controllers/query/delivery-trip-query";
+import {
+  useDeleteTrip,
+  useGetDeliveryTripList,
+} from "controllers/query/delivery-trip-query";
 import { unix } from "moment";
 import { useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
+import DraggableDeleteDialog from "../../../components/dialog/DraggableDialogs";
+import CustomDrawer from "../../../components/drawer/CustomDrawer";
+import HeaderModal from "../../../components/modal/HeaderModal";
 import { tripCols } from "../LocalConstant";
 import CreateTripForm from "./components/CreateTripForm";
+import UpdateTrip from "./components/UpdateTrip";
 function ShipmentDetailScreen() {
   const location = useLocation();
   const history = useHistory();
@@ -25,6 +32,9 @@ function ShipmentDetailScreen() {
     page: 1,
     pageSize: 10,
   });
+  const [isOpenDrawer, setOpenDrawer] = useToggle(false);
+  const [isRemove, setIsRemove] = useToggle(false);
+  const [itemSelected, setItemSelected] = useState(null);
   const { height } = useWindowSize();
   const [isAdd, setIsAdd] = useToggle(false);
 
@@ -32,7 +42,9 @@ function ShipmentDetailScreen() {
     shipmentCode: currShipment?.code,
     ...params,
   });
-
+  const deleteTripQuery = useDeleteTrip({
+    id: itemSelected?.id,
+  });
   const handleButtonClick = (params) => {
     history.push(`${path}/trip-detail`, {
       trip: params,
@@ -62,8 +74,8 @@ function ShipmentDetailScreen() {
     {
       title: "Sửa",
       callback: async (item) => {
-        // setIsApproved((pre) => !pre);
-        // setUpdateOrder(item);
+        setOpenDrawer((pre) => !pre);
+        setItemSelected(item);
       },
       icon: <EditIcon />,
       color: AppColors.secondary,
@@ -71,8 +83,8 @@ function ShipmentDetailScreen() {
     {
       title: "Xóa",
       callback: (item) => {
-        // setIsRemove();
-        // setItemSelected(item);
+        setIsRemove();
+        setItemSelected(item);
       },
       icon: <DeleteIcon />,
       color: AppColors.error,
@@ -237,6 +249,7 @@ function ShipmentDetailScreen() {
             headerAlign: "center",
             align: "center",
             sortable: false,
+            minWidth: 150,
             flex: 1,
             type: "actions",
             getActions: (params) => [
@@ -262,6 +275,26 @@ function ShipmentDetailScreen() {
       >
         <CreateTripForm setIsAdd={setIsAdd} currShipment={currShipment} />
       </CustomModal>
+      <CustomDrawer open={isOpenDrawer} onClose={setOpenDrawer}>
+        <HeaderModal
+          onClose={setOpenDrawer}
+          title="Sửa thông tin chuyến giao hàng"
+        />
+        <Box sx={{ marginTop: 2 }}>
+          <UpdateTrip setOpenDrawer={setOpenDrawer} currTrip={itemSelected} />
+        </Box>
+      </CustomDrawer>
+      <DraggableDeleteDialog
+        // disable={isLoadingRemove}
+        open={isRemove && itemSelected}
+        handleOpen={setIsRemove}
+        callback={async (flag) => {
+          if (flag) {
+            await deleteTripQuery.mutateAsync();
+          }
+          setIsRemove(false);
+        }}
+      />
     </Box>
   );
 }

@@ -16,5 +16,5 @@ public class ContestSubmissionsByUser {
     private List<ContestSubmissionsByUserCustom> mapProblemsToPoints;
     private String userId;
     private String fullname;
-    private int totalPoint;
+    private long totalPoint;
 }

@@ -43,4 +43,15 @@ public class UserController extends BaseController {
             return response(error(ex));
         }
     }
+    @ApiOperation(value = "Get all users by roles")
+    @GetMapping("/get-all-by-roles")
+    public ResponseEntity<?> getAllUsersExists(
+            @RequestParam(value = "role", required = false, defaultValue = DefaultConst.STRING) String role
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get list users successfully", userService.getAllUsersByRole(role)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
 }

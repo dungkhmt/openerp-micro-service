@@ -25,6 +25,7 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
 import { useGetAllUsersExist } from "../../../controllers/query/user-query";
+import { convertUserToName } from "../../../utils/GlobalUtils";
 import { staticCustomerField } from "../LocalConstant";
 import CreateCustomerForm from "./components/CreateCustomerForm";
 import UpdateCustomerForm from "./components/UpdateCustomerForm";
@@ -123,7 +124,8 @@ function CustomerScreen({ screenAuthorization }) {
       options: users
         ? users?.map((user) => {
             return {
-              name: user?.id,
+              name: convertUserToName(user),
+              id: user?.id,
             };
           })
         : [],
@@ -159,7 +161,7 @@ function CustomerScreen({ screenAuthorization }) {
   const onSubmit = (data) => {
     setParams({
       ...params,
-      createdBy: data?.createdBy?.name,
+      createdBy: data?.createdBy?.id,
       customerName: data?.customerName,
       address: data?.address,
       status: data?.status ? "active" : "inactive",
@@ -258,6 +260,7 @@ function CustomerScreen({ screenAuthorization }) {
           if (isDelete) {
             await deleteCustomerQuery.mutateAsync({ id: itemSelected?.id });
           }
+          setIsRemove(false);
         }}
       />
       <CustomizedDialogs

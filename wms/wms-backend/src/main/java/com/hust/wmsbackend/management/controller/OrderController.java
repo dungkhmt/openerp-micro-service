@@ -63,6 +63,10 @@ public class OrderController {
 
     @PutMapping(path = "/auto-assign/{orderId}")
     public ResponseEntity<AutoAssignOrderItemResponse> autoAssignOrderItems(@PathVariable String orderId) {
-        return ResponseEntity.ok(autoAssignOrderItem.assign(orderId));
+        AutoAssignOrderItemResponse response = autoAssignOrderItem.assign(orderId);
+        if (response == null) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return ResponseEntity.ok(response);
     }
 }

@@ -1,9 +1,12 @@
 package com.hust.baseweb.rest.user;
 
+import com.hust.baseweb.applications.programmingcontest.model.ModelSearchUserResult;
+import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -81,18 +84,15 @@ public class UserController {
      *
      * @param page         This is a Pageable object that is used to paginate the results.
      * @param searchString The search string that the user entered in the search box.
-     * @param filterString This is a string that contains the filter criteria.
      * @return A list of users
      */
-    @GetMapping(path = "/users")
+    @GetMapping(path = "/statistics/users")
     public ResponseEntity<?> getUsers(
         Pageable page,
-        @RequestParam(name = "search", required = false) String searchString,
-        @RequestParam(name = "filter", required = false) String filterString
+        @RequestParam(name = "search", required = false) String searchString
     ) {
-        log.debug("::getUsers, searchString = " + searchString);
-        return ResponseEntity.ok().body(
-            userService.findPersonByFullName(page, searchString));
+        Page<ModelSearchUserResult> res = userService.findUserByKeyword(page, searchString);
+        return ResponseEntity.ok().body(res);
     }
 
 //    @GetMapping(path = "/users/search")

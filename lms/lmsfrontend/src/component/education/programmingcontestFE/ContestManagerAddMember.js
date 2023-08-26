@@ -36,7 +36,7 @@ export default function ContestManagerAddMember(props) {
   function searchUser(keyword, s, p) {
     request(
       "get",
-      "/search-user/" +
+      "/contests/" + contestId + "/users" +
         contestId +
         "?size=" +
         s +
@@ -53,8 +53,7 @@ export default function ContestManagerAddMember(props) {
   }
 
   function getRoles() {
-    request("get", "/get-list-roles-contest", (res) => {
-      console.log("getRoles, res.data = ", res.data);
+    request("get", "/contests/roles", (res) => {
       setRoles(res.data);
     }).then();
   }
@@ -66,7 +65,7 @@ export default function ContestManagerAddMember(props) {
   function getUserPending(s, p) {
     request(
       "get",
-      "/get-user-register-pending-contest/" +
+      "/contests/" + contestId + "/pending-users" +
         contestId +
         "?size=" +
         s +
@@ -83,8 +82,7 @@ export default function ContestManagerAddMember(props) {
   function getUserSuccessful(s, p) {
     request(
       "get",
-      "/get-user-register-successful-contest/" +
-        contestId +
+      "/contests/" + contestId + "/registered-users" +
         "?size=" +
         s +
         "&page=" +
@@ -235,7 +233,7 @@ export default function ContestManagerAddMember(props) {
                           };
                           request(
                             "post",
-                            "/techer-manager-student-register-contest",
+                            "/contests/registers/approval-management",
                             () => {
                               successful.push(s);
                               // setSuccessful(successful)
@@ -265,11 +263,10 @@ export default function ContestManagerAddMember(props) {
                             userId: s.userName,
                             role: s.role,
                           };
-                          console.log("body of add user to contest ", body);
                           successful.push(s);
                           request(
                             "POST",
-                            "/add-user-to-contest",
+                            "/contests/users",
                             {},
                             {},
                             body
@@ -300,8 +297,8 @@ export default function ContestManagerAddMember(props) {
                           };
 
                           request(
-                            "POST",
-                            "/delete-user-contest",
+                            "delete",
+                            "/contests/users",
                             {},
                             {},
                             body

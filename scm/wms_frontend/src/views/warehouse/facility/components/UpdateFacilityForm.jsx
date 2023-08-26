@@ -2,8 +2,9 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import CustomSelect from "components/select/CustomSelect";
 import { useRef, useState } from "react";
 import CustomMap from "../../../../components/map/CustomMap";
+import SearchBoxMap from "../../../../components/map/SearchBoxMap";
 import { useUpdateFacility } from "../../../../controllers/query/facility-query";
-import { useGetAllUsersExist } from "../../../../controllers/query/user-query";
+import { useGetAllUsersByRoles } from "../../../../controllers/query/user-query";
 import { AppColors } from "../../../../shared/AppColors";
 import { convertUserToName } from "../../../../utils/GlobalUtils";
 
@@ -36,13 +37,15 @@ const UpdateFacilityForm = ({ setOpenDrawer, currFacility }) => {
   } = methods;
 
   const { isLoading: isLoadingManagedBy, data: managedBy } =
-    useGetAllUsersExist();
+    useGetAllUsersByRoles({
+      role: "SCM_WAREHOUSE",
+    });
   const updateFacilityQuery = useUpdateFacility({
     id: currFacility?.id,
   });
 
   const onSubmit = async (data) => {
-    let customerParams = {
+    let facilityParams = {
       address: data?.address,
       status: data?.status?.name,
       name: data?.name,
@@ -50,7 +53,7 @@ const UpdateFacilityForm = ({ setOpenDrawer, currFacility }) => {
       longitude: selectPosition?.lng.toString(),
       managedBy: data?.managedBy?.id,
     };
-    await updateFacilityQuery.mutateAsync(customerParams);
+    await updateFacilityQuery.mutateAsync(facilityParams);
     setOpenDrawer((pre) => !pre);
     reset();
   };
@@ -149,7 +152,12 @@ const UpdateFacilityForm = ({ setOpenDrawer, currFacility }) => {
         <Typography style={{ color: AppColors.error, fontSize: 14 }}>
           Lấy vị trí
         </Typography>
+        <SearchBoxMap
+          selectPosition={selectPosition}
+          setSelectPosition={setSelectPosition}
+        />
       </Box>
+
       <Stack direction={"row"}>
         <Controller
           key={"map"}

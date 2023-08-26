@@ -37,10 +37,10 @@ public class TrailerServiceImpl implements TrailerService {
         Facility facility = new Facility();
         if(trailerModel.getFacilityId() != null) {
             facility = facilityRepo.findById(trailerModel.getFacilityId());
+            facility.setNumberTrailer(facility.getNumberTrailer() == null ? 1 :  facility.getNumberTrailer() + 1);
         }
         trailer.setFacility(facility);
         trailer.setStatus("AVAILABLE");
-        trailer.setUid(RandomUtils.getRandomId());
         trailer.setUid(RandomUtils.getRandomId());
         trailer.setCreatedAt(System.currentTimeMillis());
         trailer.setUpdatedAt(System.currentTimeMillis());
@@ -88,6 +88,11 @@ public class TrailerServiceImpl implements TrailerService {
             sqlCount += " AND status = :status";
             params.put("status", trailerFilterRequestDTO.getStatus());
         }
+        if(trailerFilterRequestDTO.getTrailerCode() != null){
+            sql += " AND trailer_code = :trailerCode";
+            sqlCount += " AND trailer_code = :trailerCode";
+            params.put("trailerCode", trailerFilterRequestDTO.getTrailerCode());
+        }
         if(trailerFilterRequestDTO.getTruckId() != null) {
             sql += " AND truck_id = :truckId";
             sqlCount += " AND truck_id = :truckId";
@@ -133,7 +138,10 @@ public class TrailerServiceImpl implements TrailerService {
     public TrailerModel deleteTrailer(String uid) {
         Trailer trailer = trailerRepo.findByUid(uid);
         trailer.setStatus(Constants.TrailerStatus.DELETE.getStatus());
+        trailer.setUpdatedAt(System.currentTimeMillis());
         trailer = trailerRepo.save(trailer);
+        Facility facility = facilityRepo.findByUid(trailer.getFacility().getUid());
+        facility.setNumberTrailer(facility.getNumberTrailer() - 1);
         return convertToModel(trailer);
     }
 

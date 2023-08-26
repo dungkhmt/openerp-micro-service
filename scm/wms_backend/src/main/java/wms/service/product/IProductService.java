@@ -30,7 +30,9 @@ public interface IProductService {
     void setPurchasePrice(List<ProductPriceDTO> productPriceDTO) throws CustomException;
     List<ProductPrice> getAllSellinPrice();
     ProductPrice updateSellinPrice(ProductPriceDTO productPriceDTO) throws CustomException;
+    void deleteSellinPrice(Long id);
     void setSalePrice(List<ProductDiscountDTO> productDiscountDTO) throws CustomException;
     List<ProductSalePrice> getAllSelloutPrice();
     ProductSalePrice updateSelloutPrice(ProductDiscountDTO productDiscountDTO) throws CustomException;
+    void deleteSelloutPrice(Long id);
 }

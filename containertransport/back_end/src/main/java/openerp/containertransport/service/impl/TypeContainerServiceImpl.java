@@ -73,6 +73,11 @@ public class TypeContainerServiceImpl implements TypeContainerService {
         return typeContainerFilterRes;
     }
 
+    @Override
+    public Float countContainer(Integer size) {
+        return typeContainerRepo.countContainer(size);
+    }
+
     public TypeContainerModel convertToModel (TypeContainer typeContainer) {
         TypeContainerModel typeContainerModel = modelMapper.map(typeContainer, TypeContainerModel.class);
         return typeContainerModel;

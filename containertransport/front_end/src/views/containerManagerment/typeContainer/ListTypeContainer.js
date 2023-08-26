@@ -212,7 +212,7 @@ export default function ListTypeContainer({ typeContainers, page, setPage, rowsP
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   const handleDetail = (id) => {
-    history.push(`/container/detail/${id}`)
+    history.push(`/type/container/detail/${id}`)
   }
   return (
     <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
@@ -274,7 +274,7 @@ export default function ListTypeContainer({ typeContainers, page, setPage, rowsP
                         <Box sx={{ display: 'flex' }}>
                           <Tooltip title="View">
                             <Box 
-                            // onClick={() => { handleDetail(row?.uid) }} 
+                              onClick={() => { handleDetail(row?.size) }} 
                             >
                               <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                             </Box>

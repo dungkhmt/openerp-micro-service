@@ -51,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
             .map(order -> OrderGeneralResponse
                 .builder()
                 .orderId(order.getOrderId())
-                .createdOrderDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, order.getOrderDate()))
+                .createdOrderDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, order.getOrderDate()))
                 .orderType(order.getOrderType().getName())
                 .status(order.getStatus().getName())
                 .totalOrderCost(order.getTotalOrderCost())
@@ -87,7 +87,7 @@ public class OrderServiceImpl implements OrderService {
                     .quantity(item.getQuantity())
                     .priceUnit(orderItem.getPriceUnit())
                     .address(customerAddressRepository.findById(order.getCustomerAddressId()).get().getAddressName())
-                    .createdDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, order.getCreatedStamp()))
+                    .createdDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, order.getCreatedStamp()))
                     .build();
             if (item.getStatus() == DeliveryTripItemStatus.DONE) {
                 successProductHistory.add(adder);
@@ -142,7 +142,7 @@ public class OrderServiceImpl implements OrderService {
                          .warehouseName(warehouseNameMap.get(item.getWarehouseId()))
                          .lotId(item.getLotId())
                          .status(item.getStatus().getName())
-                         .createdDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, item.getCreatedStamp()))
+                         .createdDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, item.getCreatedStamp()))
                          .build())
             .collect(Collectors.toList());
 
@@ -184,7 +184,7 @@ public class OrderServiceImpl implements OrderService {
             .totalFailProductCount(BigDecimal.valueOf(failProductHistory.size()))
             .failProductHistory(failProductHistory)
             .successProductHistory(successProductHistory)
-            .createdDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, saleOrderHeader.getCreatedStamp()))
+            .createdDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, saleOrderHeader.getCreatedStamp()))
             .paymentMethod(saleOrderHeader.getPaymentType().getName())
             .receiptAddress(customerAddressOpt.get().getAddressName())
             .totalOrderCost(saleOrderHeader.getTotalOrderCost())

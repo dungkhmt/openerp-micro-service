@@ -1,4 +1,3 @@
-import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box } from "@mui/material";
 import { Action } from "components/action/Action";
@@ -49,16 +48,16 @@ function ExportingActivityScreen({ screenAuthorization }) {
       color: AppColors.green,
       // permission: PERMISSIONS.MANAGE_CATEGORY_EDIT,
     },
-    {
-      title: "Xóa",
-      callback: (item) => {
-        // setIsRemove();
-        // setItemSelected(item);
-      },
-      icon: <DeleteIcon />,
-      color: AppColors.error,
-      // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
-    },
+    // {
+    //   title: "Xóa",
+    //   callback: (item) => {
+    //     // setIsRemove();
+    //     // setItemSelected(item);
+    //   },
+    //   icon: <DeleteIcon />,
+    //   color: AppColors.error,
+    //   // permission: PERMISSIONS.MANAGE_CATEGORY_DELETE,
+    // },
   ];
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -107,9 +106,8 @@ function ExportingActivityScreen({ screenAuthorization }) {
             headerAlign: "center",
             align: "center",
             sortable: false,
-            width: 125,
-            minWidth: 150,
-            maxWidth: 200,
+            minWidth: 125,
+            flex: 1,
             type: "actions",
             getActions: (params) => [
               ...extraActions.map((extraAction, index) => (
@@ -118,7 +116,10 @@ function ExportingActivityScreen({ screenAuthorization }) {
                   key={index}
                   extraAction={extraAction}
                   onActionCall={extraAction.callback}
-                  disabled={params?.row?.status === ORDERS_STATUS.created}
+                  disabled={
+                    params?.row?.status === ORDERS_STATUS.created ||
+                    params?.row?.status === ORDERS_STATUS.deleted
+                  }
                 />
               )),
             ],

@@ -53,7 +53,17 @@ public class DeliveryBillController extends BaseController {
             return response(error(ex));
         }
     }
-
+    @GetMapping("/get-bill-items-of-bill-with-seq")
+    public ResponseEntity<?> getBillItemsOfBill(
+            @RequestParam(value = "bill_code", required = false, defaultValue = DefaultConst.STRING) String billCode,
+            @RequestParam(value = "seq_id", required = false, defaultValue = DefaultConst.STRING) String seqId
+    ) {
+        try {
+            return response(new ResultEntity(1, "Get bill items successfully", deliveryBillService.getBillItemsOfBillBySeq( billCode, seqId)));
+        } catch (Exception ex) {
+            return response(error(ex));
+        }
+    }
     @ApiOperation(value = "Phân đơn giao hàng thành các lô nhỏ hơn để chia cho các trip")
     @PostMapping("/split-bill")
     public ResponseEntity<?> splitBills(

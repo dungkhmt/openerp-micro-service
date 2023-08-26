@@ -21,8 +21,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { useHistory } from 'react-router-dom';
-import { Button, Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { Button, Chip, Icon } from '@mui/material';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { deleteTrip } from 'api/TripAPI';
 
 function descendingComparator(a, b, orderBy) {
@@ -57,6 +57,7 @@ const headCells = [
   {
     id: 'code',
     numeric: false,
+    align: 'center',
     disablePadding: false,
     label: 'Trip Code',
     width: '11%'
@@ -64,6 +65,7 @@ const headCells = [
   {
     id: 'truckCode',
     numeric: false,
+    align: 'center',
     disablePadding: false,
     label: 'Truck Code',
     width: '12%'
@@ -71,6 +73,7 @@ const headCells = [
   {
     id: 'driverName',
     numeric: false,
+    align: 'center',
     disablePadding: false,
     label: 'Driver Name',
     width: '10%'
@@ -78,6 +81,7 @@ const headCells = [
   {
     id: 'numberOrder',
     numeric: false,
+    align: 'center',
     disablePadding: false,
     label: 'Number Orders',
     width: '10%'
@@ -85,6 +89,7 @@ const headCells = [
   {
     id: 'created_by_user_id',
     numeric: false,
+    align: 'center',
     disablePadding: false,
     label: 'Created By User',
     width: '10%'
@@ -92,6 +97,7 @@ const headCells = [
   {
     id: 'status',
     numeric: false,
+    align: 'center',
     disablePadding: false,
     label: 'Status',
     width: '12%'
@@ -99,6 +105,7 @@ const headCells = [
   {
     id: 'createdAt',
     numeric: false,
+    align: 'center',
     disablePadding: false,
     label: 'Created At',
     width: '13%'
@@ -106,6 +113,7 @@ const headCells = [
   {
     id: 'updatedAt',
     numeric: false,
+    align: 'center',
     disablePadding: false,
     label: 'Updated At',
     width: '13%'
@@ -113,6 +121,7 @@ const headCells = [
   {
     id: 'view',
     numeric: false,
+    align: 'center',
     disablePadding: false,
     label: '',
     width: '10%'
@@ -147,23 +156,23 @@ function EnhancedTableHead(props) {
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
+            align={headCell.align}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
             width={headCell?.width}
           >
-            <TableSortLabel
+            {/* <TableSortLabel
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
+            > */}
+            {headCell.label}
+            {/* {orderBy === headCell.id ? (
                 <Box component="span" sx={visuallyHidden}>
                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
                 </Box>
               ) : null}
-            </TableSortLabel>
+            </TableSortLabel> */}
           </TableCell>
         ))}
       </TableRow>
@@ -365,10 +374,12 @@ export default function TripsContents({ trips, shipmentId, setToast, setToastTyp
                       <TableCell align="center">{row?.truckCode}</TableCell>
                       <TableCell align="center">{row?.driverName}</TableCell>
                       <TableCell align="center">{row?.orderIds?.length}</TableCell>
-                      <TableCell align="left">{row?.created_by_user_id}</TableCell>
-                      <TableCell align="left">{row?.status}</TableCell>
-                      <TableCell align="left">{new Date(row?.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell align="left">{new Date(row?.updatedAt).toLocaleDateString()}</TableCell>
+                      <TableCell align="center">{row?.created_by_user_id}</TableCell>
+                      <TableCell align="center">
+                        <Chip label={row?.status} color={colorStatus.get(row?.status)} />
+                      </TableCell>
+                      <TableCell align="center">{new Date(row?.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell align="center">{new Date(row?.updatedAt).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex' }}>
                           <Tooltip title="View">
@@ -376,11 +387,13 @@ export default function TripsContents({ trips, shipmentId, setToast, setToastTyp
                               <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                             </Box>
                           </Tooltip>
-                          <Tooltip title="Delete">
-                            <Box onClick={() => { handleDelete(row?.uid) }}>
-                              <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                            </Box>
-                          </Tooltip>
+                          {row?.status === "SCHEDULED" ? (
+                            <Tooltip title="Delete">
+                              <Box onClick={() => { handleDelete(row?.uid) }}>
+                                <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                              </Box>
+                            </Tooltip>
+                          ) : null}
                         </Box>
                       </TableCell>
                     </TableRow>

@@ -1,4 +1,4 @@
-// Màn hình tạo mới đơn xin nhập hàng dành cho quản lý bán hàng
+// Màn hình tạo mới yêu cầu nhập hàng dành cho quản lý bán hàng
 
 import { Button, Grid, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
@@ -71,7 +71,7 @@ const ReceiptRequestDetail = ( props ) => {
       API_PATH.RECEIPT,
       (res) => {
         if (res.status == 200) {
-          successNoti("Tạo đơn xin nhập hàng hóa thành công");
+          successNoti("Tạo yêu cầu nhập hàng hóa thành công");
           setProductTableData([]);
           history.push(`${path}`);
         } else {
@@ -129,7 +129,7 @@ const ReceiptRequestDetail = ( props ) => {
           className={classes.headerBox} >
           <Grid>
             <Typography variant="h5">
-              Tạo mới đơn xin nhập hàng
+              Tạo mới yêu cầu nhập hàng
             </Typography>
           </Grid>
           {

@@ -202,3 +202,21 @@ export const useCreateSplitBillItem = (params) => {
     },
   });
 };
+
+export const useGetDeliveryBillItemBySeq = () => {
+  return useQuery({
+    queryKey: [queryKey.delivery_bill.bill_item_by_seq],
+    queryFn: async (params) => {
+      const res = await axiosSendRequest(
+        "get",
+        endPoint.getBillItemBySeq,
+        params
+      );
+      if (res.data && res.code === 1) {
+        return res.data;
+      }
+    },
+    keepPreviousData: true,
+    onSuccess: (data) => {},
+  });
+};

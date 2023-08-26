@@ -34,8 +34,8 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
     };
 
     request(
-      "post",
-      "/update-contest-submission-source-code",
+      "put",
+      "/contests/submissions/source-code",
       (res) => {
         console.log("update submission source code", res.data);
       },
@@ -44,15 +44,13 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
     ).then();
   }
   useEffect(() => {
-    console.log("problemSubmissionId ", problemSubmissionId);
     request(
       "get",
-      "/get-contest-problem-submission-detail-viewed-by-manager/" +
-        problemSubmissionId,
+      "/teacher/contests/submissions/" + problemSubmissionId + "/general-info",
       (res) => {
         setMemoryUsage(res.data.memoryUsage);
         setProblemId(res.data.problemId);
-        setRunTime(res.data.runTime);
+        setRunTime(res.data.runtime);
         setScore(res.data.point);
         setSubmissionLanguage(res.data.sourceCodeLanguage);
         setSubmissionSource(res.data.sourceCode);
@@ -66,7 +64,7 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
 
     request(
       "get",
-      "/get-contest-infos-of-a-subsmission/" + problemSubmissionId,
+      "/subsmissions/" + problemSubmissionId + "/contest",
       (res) => {
         setListProblemIds(res.data.problemIds);
         setListProblems(res.data.problems);

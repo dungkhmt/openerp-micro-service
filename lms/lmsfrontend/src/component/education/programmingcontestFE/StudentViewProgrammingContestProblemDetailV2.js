@@ -101,7 +101,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
     //TODO: consider remove duplicate code
     request(
       "post",
-      "/contest-submit-problem-via-upload-file-v3",
+      "/contests/submissions/file-upload",
       (res) => {
         res = res.data;
         listSubmissionRef.current.refreshSubmission();
@@ -135,7 +135,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
   function getProblemDetail() {
     request(
       "get",
-      "/get-problem-detail-view-by-student-in-contest/" +
+      "/student/problems/" +
       problemId +
       "/" +
       contestId,

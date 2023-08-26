@@ -30,8 +30,8 @@ const StudentViewSubmission = forwardRef((props, ref) => {
   const getSubmissions = async () => {
     let requestUrl = "";
     if (problemId !== "")
-      requestUrl = "/get-contest-submission-in-problem-paging-of-a-user-and-contest?contestid=" + contestId + "&problemid=" + problemId;
-    else requestUrl = "/get-contest-submission-paging-of-a-user-and-contest/" + contestId;
+      requestUrl = "/contests/users/submissions?contestid=" + contestId + "&problemid=" + problemId;
+    else requestUrl = "/contests/" + contestId + "/users/submissions";
 
     await request(
       "get",

@@ -36,6 +36,7 @@ const ModalTruck = ({ openModal, handleClose, truckId, truck, setToast, setToast
             setLicensePlates(truck?.licensePlates);
             setDriverName(truck?.driverName);
             setYearOfManufacture(truck?.yearOfManufacture);
+            setDriverId(truck?.driverId);
         }
     }, []);
 

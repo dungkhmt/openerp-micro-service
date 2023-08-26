@@ -24,8 +24,8 @@ public class ProductPriceResponse {
     @Builder
     public static class ProductHistoryPrices {
         private UUID productPriceId;
-        private Date startDate;
-        private Date endDate;
+        private String startDate;
+        private String endDate;
         private BigDecimal price;
         private String description;
     }

@@ -3,7 +3,7 @@
 import { LoadingButton } from "@mui/lab";
 import { Button, Card, CardActionArea, Grid, TextField, Typography } from "@mui/material";
 import { request } from "api";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
@@ -59,6 +59,12 @@ const CreateJoinRoomPage = () => {
       }
     );
   };
+  const syncUser = () => {
+    request("get", `/code-editor/users/sync-user`);
+  };
+  useEffect(() => {
+    syncUser();
+  },[]);
   return (
     <div>
       <Grid

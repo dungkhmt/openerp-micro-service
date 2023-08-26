@@ -193,7 +193,7 @@ function CreateProblem() {
 
     request(
       "post",
-      "/create-problem",
+      "/problems",
       (res) => {
         setLoading(false);
         successNoti("Problem saved successfully", 1000);

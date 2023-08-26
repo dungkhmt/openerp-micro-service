@@ -18,10 +18,10 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { Chip, Icon } from '@mui/material';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
-import { getTraler } from 'api/TrailerAPI';
+import { deleteTrailer, getTraler } from 'api/TrailerAPI';
 
 const DEFAULT_ORDER = 'asc';
 const DEFAULT_ORDER_BY = 'calories';
@@ -91,7 +91,7 @@ function EnhancedTableHead(props) {
 }
 
 export default function TrailerInFacility(props) {
-    const { facilityId } = props;
+    const { facilityId, setToast, setToastType, setToastMsg } = props;
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
     const [selected, setSelected] = React.useState([]);
@@ -103,12 +103,14 @@ export default function TrailerInFacility(props) {
 
     const [trailers, setTrailers] = React.useState([]);
 
+    const [load, setLoad] = React.useState(false);
+
     React.useEffect(() => {
         getTraler({ page: page, pageSize: rowsPerPage, facilityId: facilityId }).then((res) => {
             setTrailers(res?.data.data.trailerModels);
             setCount(res?.data.data.count);
         });
-    }, [page, rowsPerPage, count])
+    }, [page, rowsPerPage, count, load])
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
             const newSelected = trailers.map((n) => n.name);
@@ -155,6 +157,18 @@ export default function TrailerInFacility(props) {
             pathname: `/container/detail/${id}`,
         })
     }
+    const handleDelete = (uid) => {
+        deleteTrailer(uid).then((res) => {
+          console.log(res);
+          setToastMsg("Delete Trailer Success");
+          setToastType("success");
+          setToast(true);
+          setLoad(!load);
+          setTimeout(() => {
+            setToast(false);
+          }, "3000");
+        })
+      }
     return (
         <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
             <Paper sx={{ width: '95%', mb: 2, boxShadow: "none" }}>
@@ -207,7 +221,9 @@ export default function TrailerInFacility(props) {
                                                 {row.trailerCode}
                                             </TableCell>
                                             <TableCell align="left">{row.facilityResponsiveDTO.facilityName}</TableCell>
-                                            <TableCell align="left">{row.status}</TableCell>
+                                            <TableCell align="left">
+                                                <Chip label={row.status} color={colorStatus.get(row.status)} />
+                                            </TableCell>
                                             <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                                             <TableCell align="left">{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
                                             <TableCell>
@@ -217,11 +233,12 @@ export default function TrailerInFacility(props) {
                                                             <Icon className='icon-view-screen'>{menuIconMap.get("RemoveRedEyeIcon")}</Icon>
                                                         </Box>
                                                     </Tooltip>
-                                                    <Tooltip title="Delete">
-                                                        <Box>
-                                                            <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
-                                                        </Box>
-                                                    </Tooltip>
+                                                    {row.status === "AVAILABLE" ? (
+                                                        <Tooltip title="Delete">
+                                                            <Box onClick={() => handleDelete(row?.uid)}>
+                                                                <Icon className='icon-view-screen' sx={{ marginLeft: '8px' }}>{menuIconMap.get("DeleteForeverIcon")}</Icon>
+                                                            </Box>
+                                                        </Tooltip>) : null}
                                                 </Box>
 
                                             </TableCell>

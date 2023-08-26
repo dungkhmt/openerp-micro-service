@@ -4,6 +4,7 @@ import openerp.containertransport.dto.OrderFilterRequestDTO;
 import openerp.containertransport.dto.OrderModel;
 import openerp.containertransport.dto.OrderUpdateDTO;
 import openerp.containertransport.dto.OrdersRes;
+import openerp.containertransport.dto.dashboard.DashboardTimeOrderDTO;
 import openerp.containertransport.entity.Order;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface OrderService {
     OrderModel updateOrder(long id, OrderModel orderModel);
     OrderModel updateOrderByUid(String orderCode, OrderModel orderModel);
     List<OrderModel> updateListOrder(OrderUpdateDTO orderUpdateDTO);
+    Long countOrderByMonth(DashboardTimeOrderDTO dashboardTimeOrderDTO, String status);
+    OrderModel deleteOrder(String uid);
 }

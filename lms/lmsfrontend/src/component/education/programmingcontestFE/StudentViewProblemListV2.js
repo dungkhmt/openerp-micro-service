@@ -1,4 +1,4 @@
-import {Box, Checkbox, Chip} from "@mui/material";
+import {Box, Checkbox, Chip, LinearProgress} from "@mui/material";
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {Link, useParams} from "react-router-dom";
@@ -13,10 +13,12 @@ export default function StudentViewProblemList() {
   const {contestId} = useParams();
   const [problems, setProblems] = useState([]);
 
+  const [loading, setLoading] = useState(true);
+
   function getContestDetail() {
     request(
       "get",
-      "/get-list-contest-problem-student-V2/" + contestId,
+      "/contests/" + contestId + "/problems/v2",
       (res) => {
         setProblems(res.data);
         for (let i = 0; i < res.data.length; i++) {
@@ -35,7 +37,7 @@ export default function StudentViewProblemList() {
         }
       },
       {}
-    );
+    ).then(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -116,6 +118,7 @@ export default function StudentViewProblemList() {
   ];
   return (
     <Box>
+      {loading && <LinearProgress/>}
       <StandardTable
         title={t("problemList.title")}
         columns={columns}

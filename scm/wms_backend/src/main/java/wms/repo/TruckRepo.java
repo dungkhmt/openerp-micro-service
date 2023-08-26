@@ -12,6 +12,7 @@ public interface TruckRepo extends JpaRepository<TruckEntity, Long> {
 //    @Query(value = "select st.*, ul.user_login_id from scm_truck st left join user_login ul on st.user_id = ul.user_login_id", nativeQuery = true)
     @Query(value = "select * from scm_truck where is_deleted = 0", nativeQuery = true)
     Page<TruckEntity> search(Pageable pageable);
+    @Query(value = "select * from scm_truck where scm_truck.id = :id and is_deleted = 0 limit 1", nativeQuery = true)
     TruckEntity getTruckById(long id);
     TruckEntity getTruckByCode(String code);
     @Query(value = "select scm_truck.user_id from scm_truck where scm_truck.code = :truckCode", nativeQuery = true)

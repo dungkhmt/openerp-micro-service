@@ -2,6 +2,8 @@ package openerp.containertransport.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -11,7 +13,7 @@ public class FacilityFilterRequestDTO {
     private String facilityCode;
     private String status;
     private String type;
-    private String typeOwner;
+    private List<String> typeOwner;
     private Integer page;
     private Integer pageSize;
     private String owner;

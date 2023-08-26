@@ -149,7 +149,7 @@ public class DashboardServiceImpl extends BaseService implements IDashBoardServi
                 if (topFiveBuying.get(4) < totalBuying) {
                     topFiveBuying.remove(4);
                     topFiveCustomer.remove(4);
-                    for (int i = 3; i >=0; i++) {
+                    for (int i = 3; i >=0; i--) {
                         if (topFiveBuying.get(i) > totalBuying) {
                             topFiveBuying.add(i+1, totalBuying);
                             topFiveCustomer.add(i+1, customer);
@@ -172,7 +172,11 @@ public class DashboardServiceImpl extends BaseService implements IDashBoardServi
     public List<List<Object>> getTripCustomerOfEveryProvince(int month, int year) {
         List<ShipmentItem> shipmentItems = shipmentItemRepo.getShipmentItemsOfMonth(month, year);
         List<Customer> customers = shipmentItems.stream().map(item -> item.getDeliveryBill().getSaleOrder().getCustomer()).collect(Collectors.toList());
-        Map<String, List<Customer>> customerMapping = customers.stream().collect(Collectors.groupingBy(Customer::getProvince));
+        Map<String, List<Customer>> customerMapping = customers.stream().filter(cus -> {
+            if (cus.getProvince() != null) {
+                return true;
+            } else return false;
+        }).collect(Collectors.groupingBy(customer -> customer.getProvince().toUpperCase()));
         List<List<Object>> results = new ArrayList<>();
         for (Map.Entry<String, List<Customer>> entry : customerMapping.entrySet()) {
             String province = entry.getKey();

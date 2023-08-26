@@ -23,4 +23,6 @@ public interface DeliveryTripService {
 
     boolean startDelivery(String deliveryTripId, Principal principal);
 
+    DeliveryTripDTO deleteFromShipmentById(String tripId);
+
 }

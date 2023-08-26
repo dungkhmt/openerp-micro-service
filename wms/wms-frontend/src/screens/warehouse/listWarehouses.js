@@ -121,6 +121,19 @@ const ListWarehouse = () => {
         editable={{
           onRowDelete: (selectedIds) => new Promise((resolve, reject) => {
             setTimeout(() => {
+              for (var i = 0; i < selectedIds.length; i++) {
+                const id = selectedIds[i]
+                console.log("ID => ", id);
+                for (var j = 0; j < warehousesTableData.length; j++) {
+                  const warehouse = warehousesTableData[j];
+                  console.log("Warehouse => ", warehouse);
+                  if (id == warehouse.warehouseId && (!warehouse.canBeDelete)) {
+                    errorNoti("Không thể xóa kho này");
+                    return;
+                  }
+                }
+              }
+
               request(
                 "delete",
                 API_PATH.WAREHOUSE,

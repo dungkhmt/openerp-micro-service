@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Getter
 @Setter
@@ -24,4 +25,5 @@ public class ContainerModel {
     private Boolean isEmpty;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private List<String> listContainerCode;
 }

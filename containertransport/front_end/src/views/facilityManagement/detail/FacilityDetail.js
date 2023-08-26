@@ -59,13 +59,13 @@ const FacilityDetail = () => {
                 setToast(false);
             }, "3000");
             history.push('/facility');
-          })
+        })
     }
 
     console.log("facility", facility);
     return (
         <Box className="fullScreen">
-            <Container maxWidth="lg" className="container">
+            <Container maxWidth="100vw" className="container">
                 <Box className="toast">
                     {toastOpen ? (
                         <Alert variant="filled" severity={toastType} >
@@ -87,11 +87,13 @@ const FacilityDetail = () => {
                             <Typography >Facility {facility?.facilityCode}</Typography>
                         </Box>
                         <Box className="btn-header">
-                            <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
-                            onClick={handleDelete}
-                            >Delete</Button>
+                            {(trucks?.length > 0 && trailers.length > 0 && containers.length > 0) ? null : (
+                                <Button variant="outlined" color="error" className="header-create-shipment-btn-cancel"
+                                    onClick={handleDelete}
+                                >Delete</Button>
+                            )}
                             <Button variant="contained" className="header-submit-shipment-btn-save"
-                            onClick={handleClose}
+                                onClick={handleClose}
                             >Modify</Button>
                         </Box>
                     </Box>
@@ -134,18 +136,20 @@ const FacilityDetail = () => {
                         </Box>
                         <Typography>{facility?.facilityType}</Typography>
                     </Box>
-                    <Box className="facility-info-item">
-                        <Box className="facility-info-item-text">
-                            <Typography>Processing Time Pick Up:</Typography>
-                        </Box>
-                        <Typography>{facility?.processingTimePickUp} s</Typography>
-                    </Box>
-                    <Box className="facility-info-item">
-                        <Box className="facility-info-item-text">
-                            <Typography>Processing Time Drop:</Typography>
-                        </Box>
-                        <Typography>{facility?.processingTimeDrop} s</Typography>
-                    </Box>
+                    {facility?.facilityType === "Container" ? (
+                        <Box className="facility-info-item">
+                            <Box className="facility-info-item-text">
+                                <Typography>Processing Time Pick Up:</Typography>
+                            </Box>
+                            <Typography>{facility?.processingTimePickUp} s</Typography>
+                        </Box>) : null}
+                    {facility?.facilityType === "Container" ? (
+                        <Box className="facility-info-item">
+                            <Box className="facility-info-item-text">
+                                <Typography>Processing Time Drop:</Typography>
+                            </Box>
+                            <Typography>{facility?.processingTimeDrop} s</Typography>
+                        </Box>) : null}
 
                     {facility?.facilityType === "Trailer" ? (<Box className="facility-info-item">
                         <Box className="facility-info-item-text">
@@ -191,7 +195,7 @@ const FacilityDetail = () => {
                         <Box className="title">
                             <Typography>Trucks In Facility</Typography>
                         </Box>
-                        <TruckInFacility facilityId={facilityId} />
+                        <TruckInFacility facilityId={facilityId} setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
                     </Box>
                 ) : null}
 
@@ -200,7 +204,7 @@ const FacilityDetail = () => {
                         <Box className="title">
                             <Typography>Containers In Facility</Typography>
                         </Box>
-                        <ContainerInFacility facilityId={facilityId} />
+                        <ContainerInFacility facilityId={facilityId} setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
                     </Box>
                 ) : null}
 
@@ -209,7 +213,7 @@ const FacilityDetail = () => {
                         <Box className="title">
                             <Typography>Trailers In Facility</Typography>
                         </Box>
-                        <TrailerInFacility facilityId={facilityId} />
+                        <TrailerInFacility facilityId={facilityId} setToast={setToast} setToastType={setToastType} setToastMsg={setToastMsg} />
                     </Box>
                 ) : null}
                 {openModify ? <FacilityModal open={openModify} handleClose={handleClose} facility={facility}

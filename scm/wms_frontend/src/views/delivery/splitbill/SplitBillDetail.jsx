@@ -19,6 +19,7 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { useToggle, useWindowSize } from "react-use";
 import { AppColors } from "shared/AppColors";
+import { convertUserToName } from "../../../utils/GlobalUtils";
 import { splittedBillCols } from "../LocalConstant";
 import SplitBillForm from "./components/SplitBillForm";
 function SplitBillDetailScreen({ screenAuthorization }) {
@@ -332,8 +333,12 @@ function SplitBillDetailScreen({ screenAuthorization }) {
                 options={
                   trips
                     ? trips.map((trip) => {
+                        console.log("Trip: ", trip);
                         return {
-                          name: trip?.code + "-" + trip?.userInCharge?.id,
+                          name:
+                            trip?.code +
+                            "-" +
+                            convertUserToName(trip?.userInCharge),
                         };
                       })
                     : []

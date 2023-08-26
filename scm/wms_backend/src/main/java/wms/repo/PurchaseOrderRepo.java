@@ -13,7 +13,7 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Long>  {
             "from scm_purchase_order spo\n" +
             "         left join scm_facility sf on spo.bought_by = sf.code\n" +
             "where spo.is_deleted = 0\n" +
-            "  and spo.status != 'DELETED'\n" +
+//            "  and spo.status != 'DELETED'\n" +
             "  and (sf.name ilike concat('%', :facilityName, '%'))\n" +
             "  and (spo.status = :orderStatus or :orderStatus = '')\n" +
             "  and (spo.supplier_code ilike concat('%', :supplierCode, '%'))\n" +
@@ -24,6 +24,9 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Long>  {
             "    )", nativeQuery = true)
     Page<PurchaseOrder> search(Pageable pageable, String orderStatus, String facilityName, String createdBy, String supplierCode, String text);
     PurchaseOrder getOrderById(long id);
+    @Query(value = "select spo.* from scm_purchase_order spo\n" +
+            "         left join scm_purchase_order_item spoi on spo.code = spoi.order_code\n" +
+            "         where code = :code and spoi.is_deleted = 0", nativeQuery = true)
     PurchaseOrder getOrderByCode(String code);
 
     @Query(value = "SELECT *\n" +

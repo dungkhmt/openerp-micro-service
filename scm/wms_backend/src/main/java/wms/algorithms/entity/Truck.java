@@ -13,6 +13,6 @@ public class Truck {
     private String ID;
     private double capacity;
     private double speed;
-    private double transportCostPerUnit = 25;
-    private double waitingCost = 10;
+    private double transportCostPerUnit;
+    private double waitingCost;
 }

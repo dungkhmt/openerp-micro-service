@@ -26,8 +26,7 @@ export default function ContestManagerListRequestingParticipant(props) {
   function getUserPending(s, p) {
     request(
       "get",
-      "/get-user-register-pending-contest/" +
-        contestId +
+      "/contests/" + contestId + "/pending-users" +
         "?size=" +
         s +
         "&page=" +
@@ -42,8 +41,7 @@ export default function ContestManagerListRequestingParticipant(props) {
   function getUserSuccessful(s, p) {
     request(
       "get",
-      "/get-user-register-successful-contest/" +
-        contestId +
+      "/contests/" + contestId + "/registered-users" +
         "?size=" +
         s +
         "&page=" +
@@ -127,7 +125,7 @@ export default function ContestManagerListRequestingParticipant(props) {
                         };
                         request(
                           "post",
-                          "/techer-manager-student-register-contest",
+                          "/contests/registers/approval-management",
                           () => {
                             successful.push(s);
                             // setSuccessful(successful)
@@ -160,7 +158,7 @@ export default function ContestManagerListRequestingParticipant(props) {
                         };
                         request(
                           "post",
-                          "/techer-manager-student-register-contest",
+                          "/contests/registers/approval-management",
                           () => {
                             pendings.splice(index, 1);
                             setLoad(false);

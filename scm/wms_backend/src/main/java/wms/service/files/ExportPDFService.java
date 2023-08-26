@@ -32,6 +32,7 @@ import wms.entity.SaleOrderItem;
 
 import java.io.*;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -52,7 +53,9 @@ public class ExportPDFService {
     );
     public ResponseEntity<InputStreamResource> createPdfOrder(PurchaseOrder order, String dest) throws IOException {
         Document document = initPDF(dest);
-        PdfFont font = PdfFontFactory.createFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+        URL resourceURL = ExportPDFService.class.getClassLoader().getResource(fontPath);
+        String fontFilePath = new File(resourceURL.getFile()).getAbsolutePath();
+        PdfFont font = PdfFontFactory.createFont(fontFilePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         document.setFont(font);
         Table headerTable = initHeader(font, order.getCode(), "purchase");
         Table title = initTitle();
@@ -75,7 +78,9 @@ public class ExportPDFService {
     }
     public ResponseEntity<InputStreamResource> createPdfOrder(SaleOrder order, String dest) throws IOException {
         Document document = initPDF(dest);
-        PdfFont font = PdfFontFactory.createFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+        URL resourceURL = ExportPDFService.class.getClassLoader().getResource(fontPath);
+        String fontFilePath = new File(resourceURL.getFile()).getAbsolutePath();
+        PdfFont font = PdfFontFactory.createFont(fontFilePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         document.setFont(font);
         Table headerTable = initHeader(font, order.getCode(), "sale");
         Table title = initTitle();
@@ -108,7 +113,8 @@ public class ExportPDFService {
         DeviceRgb color = new DeviceRgb(60, 290, 30);
         float[] colWidth = {70f, 380, 145f};
         Table headerTable = new Table(colWidth);
-        String imFile = pdfLogoImage;
+        URL resourceURL = ExportPDFService.class.getClassLoader().getResource(pdfLogoImage);
+        String imFile = new File(resourceURL.getFile()).getAbsolutePath();
         ImageData imageData = ImageDataFactory.create(imFile);
         Image image = new Image(imageData)
                 .setFixedPosition(50f, 750f)
@@ -165,6 +171,7 @@ public class ExportPDFService {
         List<PurchaseOrderItem> purchaseOrderItems = order.getPurchaseOrderItems();
         for (int i = 0; i < purchaseOrderItems.size(); i++) {
             PurchaseOrderItem item = purchaseOrderItems.get(i);
+            if (item.getDeleted() == 1) continue;
             double itemPrice = item.getPriceUnit();
             int itemQuantity = item.getQuantity();
             double total = itemPrice * itemQuantity;
@@ -196,6 +203,7 @@ public class ExportPDFService {
         List<SaleOrderItem> saleOrderItems = order.getSaleOrderItems();
         for (int i = 0; i < saleOrderItems.size(); i++) {
             SaleOrderItem item = saleOrderItems.get(i);
+            if (item.getDeleted() == 1) continue;
             double itemPrice = item.getPriceUnit();
             int itemQuantity = item.getQuantity();
             double total = itemPrice * itemQuantity;

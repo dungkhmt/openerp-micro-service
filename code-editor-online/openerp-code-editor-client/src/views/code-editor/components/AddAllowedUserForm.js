@@ -2,7 +2,6 @@ import {
   Autocomplete,
   Avatar,
   Button,
-  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -41,9 +40,8 @@ const AddAllowedUserForm = (props) => {
       setLoading(true);
       request(
         "get",
-        `/code-editor/users/search?keyword=${keyword}&page=0&size=10`,
+        `/code-editor/users/search?keyword=${keyword}&page=0&size=20`,
         (response) => {
-          console.log(response);
           if (response && response.status === 200) {
             setUserList(response.data.content);
             setLoading(false);
@@ -121,7 +119,7 @@ const AddAllowedUserForm = (props) => {
                       <ListItemAvatar>
                         <Avatar
                           sx={{ bgcolor: CHARACTER_COLOR[option?.lastName?.toUpperCase()[0]] }}
-                        >{`${option?.lastName?.toUpperCase()[0]}`}</Avatar>
+                        >{option?.lastName && `${option?.lastName?.toUpperCase()[0]}`}</Avatar>
                       </ListItemAvatar>
                       <div
                         style={{

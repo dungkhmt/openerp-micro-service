@@ -1,0 +1,95 @@
+SQL_DB_HOST: openerp3.dailyopt.ai
+SQL_DB_PORT: 6543
+SQL_DB_USER: postgres
+SQL_DB_PASS: openerp
+POSTGRES_DB: openerp_dev
+#SQL_DB_HOST: 127.0.0.1
+#SQL_DB_PORT: 5432
+#SQL_DB_USER: postgres
+#SQL_DB_PASS: rbking123
+#POSTGRES_DB: postgres
+server:
+  servlet:
+    context-path: '/api'
+  compression:
+    enabled: true # Enable response compression
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json # The comma-separated list of mime types that should be compressed
+    min-response-size: 2048 # Compress the response only if the response size is at least 1 KB
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://openerp3.dailyopt.ai/iam/realms/OpenERP-Dev/protocol/openid-connect/certs
+  jmx:
+    enabled: false
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${SQL_DB_HOST}:${SQL_DB_PORT}/${POSTGRES_DB}
+    username: ${SQL_DB_USER}
+    password: ${SQL_DB_PASS}
+    hikari: # reference: https://github:com/brettwooldridge/HikariCP#configuration-knobs-baby:
+      maxLifetime: 30000
+      leakDetectionThreshold: 60000
+      maximum-pool-size: 5 # https://stackoverflow.com/questions/32211481/could-not-open-jpa-entitymanager-for-transaction-nested-exception-is-javax-pers
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true # not recommended for production
+        order_inserts: true
+        jdbc:
+          batch_size: 50
+
+  data:
+    # https://stackoverflow.com/questions/72932610/spring-data-jdbc-could-not-safely-identify-store-assignment-for-repository-can
+    jdbc:
+      repositories:
+        enabled: false
+
+    elasticsearch:
+      cluster-nodes: localhost:9200
+      cluster-name: my-cluster
+
+    mongodb:
+      uri: mongodb://localhost:27017, localhost:27018, localhost:27019
+      replicaSet: rs0
+      database: scm
+
+app:
+  cors:
+    allowed-origins: http://localhost:3000
+
+logging:
+  level:
+    root: INFO
+    org:
+      springframework: INFO
+
+#      springframework.security: TRACE
+#      hibernate:
+#        SQL: DEBUG
+#        type:
+#          descriptor:
+#            sql:
+#              BasicBinder: TRACE
+
+redis:
+  host: localhost
+  port: 6379
+  password: ${REDIS_PASSWORD:123456}
+  expired: ${REDIS_EXPIRED:3600000}
+
+
+graphhopper:
+  apiKey: f1ca6ef8-2158-46e7-82ca-749cea4be153
+  url: https://graphhopper.com/api/1/route?point=%.6f,%.6f&point=%.6f,%.6f&type=json&key=%s
+
+file:
+  font:
+    path: templates/vuArial.ttf
+  image:
+    path: images/logo.jpg

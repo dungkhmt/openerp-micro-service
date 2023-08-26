@@ -39,7 +39,7 @@ export default function ContestsUsingAProblem(props) {
   ];
 
   function getContests() {
-    request("get", "get-contests-using-a-problem/" + problemId, (res) => {
+    request("get", "problems/" + problemId + "/contests", (res) => {
       setContests(res.data);
     });
   }

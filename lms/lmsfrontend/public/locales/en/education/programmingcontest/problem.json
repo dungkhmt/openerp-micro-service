@@ -1,7 +1,7 @@
 {
   "problem": "Problem",
   "problemId": "Problem ID",
-  "problemName": "Problem name",
+  "problemName": "Problem Name",
   "level": "Level",
   "timeLimit": "Time limit",
   "memoryLimit": "Memory limit",
@@ -17,7 +17,18 @@
   "checkerSourceCodePlaceholder": "Source code to evaluate contestant's output",
   "checkSolutionCompile": "Check compile",
   "problemList": {
-    "title": "Problems"
+    "title": "Problems",
+    "status": "Status",
+    "title": "Title",
+    "solution": "Solution",
+    "level": "Level",
+    "createdBy": "Created By",
+    "createdAt": "Created At",
+    "appearances": "Contests Used",
+    "addTestCase": "Add Test Case",
+    "edit": "Edit",
+    "myProblems": "My Problems",
+    "sharedProblems": "Shared Problems"
   },
   "createProblem": "Create new Problem",
   "editProblem": "Edit problem",

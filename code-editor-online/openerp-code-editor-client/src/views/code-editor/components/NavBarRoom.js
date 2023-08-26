@@ -55,7 +55,7 @@ const MyButton = styled(Button)(`
   text-transform: none;
 `);
 const NavBarRoom = (props) => {
-  const { socket, myPeer, localVideo } = props;
+  const { socket, myPeer } = props;
   const dispatch = useDispatch();
   const history = useHistory();
   const [loadingRunCode, setLoadingRunCode] = useState(false);
@@ -70,9 +70,11 @@ const NavBarRoom = (props) => {
     roomMaster,
     isEditCode,
     isVisibleInput,
+    localVideo,
   } = useSelector((state) => state.codeEditor);
   const { keycloak } = useKeycloak();
   const token = keycloak.tokenParsed;
+
   const [anchorConfigEditor, setAnchorConfigEditor] = useState(null);
   const handleDisplayParticipants = () => {
     dispatch(setIsVisibleParticipants(!isVisibleParticipants));
@@ -187,11 +189,48 @@ const NavBarRoom = (props) => {
     );
   };
   const handleShowCamera = async () => {
+    if (isShowCamera) {
+        if (localVideo) {
+        localVideo.getTracks().forEach((track) => track.stop());
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true })
+      dispatch(
+        setState({
+          localVideo: stream,
+        })
+      );
+      for (const participant of participants) {
+        if (myPeer.current.id !== participant.peerId) {
+          let call = myPeer.current.call(participant.peerId, stream);
+          call.peerConnection.getSenders()[0].replaceTrack(stream);
+        }
+      }
+    
+    } else {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      dispatch(
+        setState({
+          localVideo: stream,
+        })
+      );
+      for (const participant of participants) {
+        if (myPeer.current.id !== participant.peerId) {
+          let call = myPeer.current.call(participant.peerId, stream);
+          call.peerConnection.getSenders()[0].replaceTrack(stream);
+        }
+      }
+    }
     dispatch(
       setState({
         isShowCamera: !isShowCamera,
       })
     );
+    if (socket.current) {
+      socket.current.emit(SOCKET_EVENTS.REQUEST_ON_OFF_CAMERA, {
+        socketId: socket.current.id,
+        video: !isShowCamera,
+      });
+    }
   };
   return (
     <div>

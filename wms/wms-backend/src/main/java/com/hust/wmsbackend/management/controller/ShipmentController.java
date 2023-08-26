@@ -95,6 +95,12 @@ public class ShipmentController {
         return response != null ? ResponseEntity.ok(response) : new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @DeleteMapping("/shipment/delivery-trip/{tripId}")
+    public ResponseEntity<DeliveryTripDTO> deleteDeliveryTripFromShipmentById(@PathVariable String tripId) {
+        DeliveryTripDTO response = deliveryTripService.deleteFromShipmentById(tripId);
+        return response != null ? ResponseEntity.ok(response) : new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @GetMapping("/assigned-order-items")
     public ResponseEntity<List<AssignedOrderItemDTO>> getAssignedOrderItems() {
         return ResponseEntity.ok(assignedOrderItemService.getAllCreatedItems());

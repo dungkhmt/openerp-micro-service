@@ -1,6 +1,6 @@
-// Trang liệt kê danh sách đơn xin nhập hàng
+// Trang liệt kê danh sách yêu cầu nhập hàng
 // được tạo bởi actor là quản lý bán hàng
-// chỉ liệt kê các đơn xin nhập hàng do user này tạo
+// chỉ liệt kê các yêu cầu nhập hàng do user này tạo
 
 import { request } from "api";
 import StandardTable from "components/StandardTable";
@@ -51,7 +51,7 @@ const ReceiptRequestListing = () => {
   isLoading ? <LoadingScreen /> :
   <Fragment>
     <StandardTable
-      title="Danh sách đơn xin nhập hàng"
+      title="Danh sách yêu cầu nhập hàng"
       columns={columns}
       data={receiptTableData}
       options={{
@@ -68,7 +68,7 @@ const ReceiptRequestListing = () => {
           icon: <Link to={`${path}/create`}>
             <AddIcon />
           </Link>,
-          tooltip: "Tạo đơn xin nhập hàng mới",
+          tooltip: "Tạo yêu cầu nhập hàng mới",
           isFreeAction: true
         }
       ]}

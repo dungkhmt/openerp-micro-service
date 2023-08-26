@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import { facilitySchema } from "utils/validate";
 import SearchBoxMap from "../../../../components/map/SearchBoxMap";
 import { useCreateFacility } from "../../../../controllers/query/facility-query";
-import { useGetAllUsersExist } from "../../../../controllers/query/user-query";
+import { useGetAllUsersByRoles } from "../../../../controllers/query/user-query";
 import { AppColors } from "../../../../shared/AppColors";
 import { convertUserToName } from "../../../../utils/GlobalUtils";
 
@@ -31,7 +31,9 @@ const CreateFacilityForm = ({ setIsAdd }) => {
     control,
   } = methods;
 
-  const { isLoading: isUserLoading, data: users } = useGetAllUsersExist();
+  const { isLoading: isUserLoading, data: users } = useGetAllUsersByRoles({
+    role: "SCM_WAREHOUSE",
+  });
   const createFacilityQuery = useCreateFacility();
   const onSubmit = async (data) => {
     let facilityParams = {
@@ -47,7 +49,12 @@ const CreateFacilityForm = ({ setIsAdd }) => {
   };
   return (
     <FormProvider {...methods}>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         <Controller
           key={"name"}
           control={control}

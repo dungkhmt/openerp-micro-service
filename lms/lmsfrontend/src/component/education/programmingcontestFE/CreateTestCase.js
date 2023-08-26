@@ -18,7 +18,7 @@ export default function CreateTestCase(props) {
   const [description, setDescription] = useState("");
   const [load, setLoad] = useState(false);
   const [checkTestcaseResult, setCheckTestcaseResult] = useState(false);
-  const [point, setPoint] = useState(0);
+  const [point, setPoint] = useState(1);
   const [isPublic, setIsPublic] = useState("N");
   const [isProcessing, setIsProcessing] = useState(false);
   const [filename, setFilename] = useState("");
@@ -66,7 +66,7 @@ export default function CreateTestCase(props) {
 
     request(
       "POST",
-      "/save-test-case/" + problemId,
+      "/testcases/" + problemId,
       (res) => {
         console.log("res", res);
         // setShowSubmitSuccess(true);
@@ -102,7 +102,7 @@ export default function CreateTestCase(props) {
 
     request(
       "post",
-      "/upload-test-case",
+      "/testcases",
       (res) => {
         res = res.data;
         setIsProcessing(false);

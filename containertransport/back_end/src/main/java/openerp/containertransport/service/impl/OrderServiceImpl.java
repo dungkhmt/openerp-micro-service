@@ -3,7 +3,9 @@ package openerp.containertransport.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
+import openerp.containertransport.constants.Constants;
 import openerp.containertransport.dto.*;
+import openerp.containertransport.dto.dashboard.DashboardTimeOrderDTO;
 import openerp.containertransport.entity.Container;
 import openerp.containertransport.entity.Facility;
 import openerp.containertransport.entity.Order;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -44,6 +47,9 @@ public class OrderServiceImpl implements OrderService {
         if(orderModel.getType().equals("OE")) {
             Order order = new Order();
             Container container = getContainerNearest(orderModel.getToFacilityId(), orderModel.getWeight());
+            if(container == null) {
+                return null;
+            }
             Facility fromFacility = facilityRepo.findById(container.getFacility().getId()).get();
             Facility facilityTo = facilityRepo.findByUid(orderModel.getToFacilityId());
             order.setToFacility(facilityTo);
@@ -60,6 +66,8 @@ public class OrderServiceImpl implements OrderService {
             if(!orderModel.getContainerIds().isEmpty()){
                 orderModel.getContainerIds().forEach((item) -> {
                     Container container = containerRepo.findById(item);
+                    container.setStatus(Constants.ContainerStatus.ORDERED.getStatus());
+                    container.setUpdatedAt(System.currentTimeMillis());
                     Order order = new Order();
                     order.setContainer(container);
                     order.setWeight(Long.valueOf(container.getTypeContainer().getSize()));
@@ -91,12 +99,20 @@ public class OrderServiceImpl implements OrderService {
     }
     public Order createAttribute(OrderModel orderModel, Order order) {
         order.setCustomerId(orderModel.getUsername());
-        order.setEarlyDeliveryTime(orderModel.getEarlyDeliveryTime());
-        order.setLateDeliveryTime(orderModel.getLateDeliveryTime());
-        order.setEarlyPickupTime(orderModel.getEarlyPickupTime());
-        order.setLatePickupTime(orderModel.getLatePickupTime());
+        order.setEarlyDeliveryTime(System.currentTimeMillis() + 1000*60*60*24*365);
+        if(orderModel.getLateDeliveryTime() != null && orderModel.getLateDeliveryTime() != 0) {
+            order.setLateDeliveryTime(orderModel.getLateDeliveryTime());
+        } else {
+            order.setLateDeliveryTime(System.currentTimeMillis() + 1000*60*60*24*365);
+        }
+        if(orderModel.getLatePickupTime() != null && orderModel.getLatePickupTime() != 0) {
+            order.setLatePickupTime(orderModel.getLatePickupTime());
+        } else {
+            order.setLatePickupTime(System.currentTimeMillis() + 1000*60*60*24*365);
+        }
+        order.setEarlyPickupTime(System.currentTimeMillis() + 1000*60*60*24*365);
         order.setType(orderModel.getType());
-        order.setIsBreakRomooc(orderModel.isBreakRomooc());
+        order.setIsBreakRomooc(orderModel.getIsBreakRomooc());
         order.setStatus("WAIT_APPROVE");
         order.setUid(RandomUtils.getRandomId());
         order.setCreatedAt(System.currentTimeMillis());
@@ -123,18 +139,24 @@ public class OrderServiceImpl implements OrderService {
             sqlCount += " AND order_code = :orderCode";
             params.put("orderCode", orderFilterRequestDTO.getOrderCode());
         }
-        if(orderFilterRequestDTO.getStatus() != null && !orderFilterRequestDTO.getStatus().equals("APPROVED")){
-            sql += " AND status = :status";
-            sqlCount += " AND status = :status";
+        if(orderFilterRequestDTO.getStatus() != null){
+            sql += " AND status IN :status";
+            sqlCount += " AND status IN :status";
             params.put("status", orderFilterRequestDTO.getStatus());
         }
-        if(orderFilterRequestDTO.getStatus() != null && orderFilterRequestDTO.getStatus().equals("APPROVED")){
+        if(orderFilterRequestDTO.getType() != null && orderFilterRequestDTO.getType().equals("APPROVED")){
             List<String> status = new ArrayList<>();
             status.add("WAIT_APPROVE");
-            status.add("DELETED");
-            sql += " AND status NOT IN :status";
-            sqlCount += " AND status NOT IN :status";
-            params.put("status", status);
+            status.add("CANCEL");
+            sql += " AND status NOT IN :statusNotIn";
+            sqlCount += " AND status NOT IN :statusNotIn";
+            params.put("statusNotIn", status);
+        }
+
+        if(orderFilterRequestDTO.getType() != null && orderFilterRequestDTO.getType().equals("WAIT_APPROVE")){
+            sql += " AND status = :statusType";
+            sqlCount += " AND status = :statusType";
+            params.put("statusType", "WAIT_APPROVE");
         }
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
         for (String i : params.keySet()) {
@@ -203,6 +225,11 @@ public class OrderServiceImpl implements OrderService {
         if(orderModel.getLateDeliveryTime() > 0) {
             order.setLateDeliveryTime(orderModel.getLateDeliveryTime());
         }
+        if(orderModel.getToFacilityId() != order.getToFacility().getUid()) {
+            Facility facility = facilityRepo.findByUid(orderModel.getToFacilityId());
+            order.setToFacility(facility);
+        }
+        order.setIsBreakRomooc(orderModel.getIsBreakRomooc());
         order.setUpdatedAt(System.currentTimeMillis());
         order = orderRepo.save(order);
         return convertToModel(order);
@@ -229,6 +256,50 @@ public class OrderServiceImpl implements OrderService {
         return orderModels;
     }
 
+    @Override
+    public Long countOrderByMonth(DashboardTimeOrderDTO dashboardTimeOrderDTO, String status) {
+        String sqlCount = "SELECT COUNT(id) FROM container_transport_order WHERE 1=1";
+        HashMap<String, Object> params = new HashMap<>();
+
+        if(status.equals(Constants.OrderStatus.ORDERED.getStatus())) {
+            sqlCount += " AND created_at >= :startTime";
+            params.put("startTime", dashboardTimeOrderDTO.getStartTime());
+
+            sqlCount += " AND created_at <= :endTime";
+            params.put("endTime", dashboardTimeOrderDTO.getEndTime());
+        }
+
+        if(status.equals(Constants.OrderStatus.DONE.getStatus())) {
+            sqlCount += " AND updated_at >= :startTime";
+            params.put("startTime", dashboardTimeOrderDTO.getStartTime());
+
+            sqlCount += " AND updated_at <= :endTime";
+            params.put("endTime", dashboardTimeOrderDTO.getEndTime());
+
+            sqlCount += " AND status = :status";
+            params.put("status", status);
+        }
+
+        Query queryCount = this.entityManager.createNativeQuery(sqlCount);
+        for (String i : params.keySet()) {
+            queryCount.setParameter(i, params.get(i));
+        }
+
+        return (Long) queryCount.getSingleResult();
+    }
+
+    @Override
+    public OrderModel deleteOrder(String uid) {
+        Order order = orderRepo.findByUid(uid);
+        Container container = order.getContainer();
+        container.setStatus(Constants.ContainerStatus.AVAILABLE.getStatus());
+        container.setUpdatedAt(System.currentTimeMillis());
+        containerRepo.save(container);
+        order.setStatus(Constants.OrderStatus.CANCEL.getStatus());
+        orderRepo.save(order);
+        return convertToModel(order);
+    }
+
     public OrderModel convertToModel(Order order){
         OrderModel orderModel = modelMapper.map(order, OrderModel.class);
         FacilityResponsiveDTO fromFacility = buildFacilityResponse(order.getFromFacility());
@@ -244,6 +315,7 @@ public class OrderServiceImpl implements OrderService {
                 .facilityName(facility.getFacilityName())
                 .facilityCode(facility.getFacilityCode())
                 .facilityId(facility.getId())
+                .facilityUid(facility.getUid())
                 .longitude(facility.getLongitude())
                 .latitude(facility.getLatitude())
                 .processingTimePickUp(facility.getProcessingTimePickUp())
@@ -254,7 +326,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Long getFacilityNearest(String facilityUid) {
-        AtomicReference<Long> facilityRes = null;
+        AtomicReference<Long> facilityRes = new AtomicReference<>();
 
         List<FacilityModel> facilityModels = getAllFacilityAdmin();
 
@@ -283,7 +355,7 @@ public class OrderServiceImpl implements OrderService {
         AtomicReference<BigDecimal> distant = new AtomicReference<>(new BigDecimal(Long.MAX_VALUE));
         List<Relationship> relationships = relationshipService.getAllRelationShip();
 
-        AtomicReference<Long> containerId = null;
+        AtomicReference<Long> containerId = new AtomicReference<>();
 
         facilityModels.forEach((facilityModel) -> {
             relationships.forEach(relationship -> {
@@ -317,7 +389,7 @@ public class OrderServiceImpl implements OrderService {
 
     public List<FacilityModel> getAllFacilityAdmin() {
         FacilityFilterRequestDTO requestDTO = new FacilityFilterRequestDTO();
-        requestDTO.setOwner("dungpq");
+        requestDTO.setTypeOwner(Arrays.asList("ADMIN"));
         requestDTO.setType("Container");
         List<FacilityModel> facilityModels = facilityService.filterFacility(requestDTO).getFacilityModels();
         return facilityModels;

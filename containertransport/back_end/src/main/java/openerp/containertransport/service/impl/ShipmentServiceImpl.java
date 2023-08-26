@@ -4,12 +4,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import openerp.containertransport.constants.Constants;
-import openerp.containertransport.dto.ShipmentFilterRequestDTO;
-import openerp.containertransport.dto.ShipmentModel;
-import openerp.containertransport.dto.ShipmentRes;
-import openerp.containertransport.dto.TripModel;
+import openerp.containertransport.dto.*;
 import openerp.containertransport.entity.Shipment;
+import openerp.containertransport.entity.Trip;
 import openerp.containertransport.repo.ShipmentRepo;
+import openerp.containertransport.repo.TripRepo;
 import openerp.containertransport.service.ShipmentService;
 import openerp.containertransport.service.TripService;
 import openerp.containertransport.utils.RandomUtils;
@@ -20,12 +19,14 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ShipmentServiceImpl implements ShipmentService {
     private final ShipmentRepo shipmentRepo;
     private final TripService tripService;
+    private final TripRepo tripRepo;
     private final ModelMapper modelMapper;
     private final EntityManager entityManager;
     @Override
@@ -70,6 +71,11 @@ public class ShipmentServiceImpl implements ShipmentService {
             sqlCount += " AND status = :status";
             params.put("status", requestDTO.getStatus());
         }
+        if (requestDTO.getShipmentCode() != null) {
+            sql += " AND code = :shipmentCode";
+            sqlCount += " AND code = :shipmentCode";
+            params.put("shipmentCode", requestDTO.getShipmentCode());
+        }
         Query queryCount = this.entityManager.createNativeQuery(sqlCount);
         for (String i : params.keySet()) {
             queryCount.setParameter(i, params.get(i));
@@ -111,6 +117,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         if(shipment.getExecuted_time() != null) {
             shipment.setExecuted_time(shipmentModel.getExecutedTime());
         }
+        shipment.setUpdatedAt(System.currentTimeMillis());
         shipment = shipmentRepo.save(shipment);
         return convertToModel(shipment);
     }
@@ -120,7 +127,14 @@ public class ShipmentServiceImpl implements ShipmentService {
         Shipment shipment = shipmentRepo.findByUid(uid);
         if(shipment.getStatus().equals(Constants.ShipmentStatus.WAITING_SCHEDULED.getStatus())) {
             shipment.setStatus(Constants.ShipmentStatus.DELETE.getStatus());
+            shipment.setUpdatedAt(System.currentTimeMillis());
             shipment = shipmentRepo.save(shipment);
+
+            List<Trip> trips = tripRepo.getTripByShipmentId(shipment.getUid());
+            TripDeleteDTO tripDeleteDTO = new TripDeleteDTO();
+            List<String> listUidTrip = trips.stream().map(Trip::getUid).collect(Collectors.toList());
+            tripDeleteDTO.setListUidTrip(listUidTrip);
+            tripService.deleteTrips(tripDeleteDTO);
         }
         return convertToModel(shipment);
     }

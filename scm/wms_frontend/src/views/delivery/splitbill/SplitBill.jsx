@@ -76,7 +76,7 @@ function SplitBillScreen({ screenAuthorization }) {
               color: AppColors.green,
             }}
           >
-            1. Tổng đơn cần chia:
+            1. Tổng đơn giao hàng:
           </Typography>
           <Typography
             sx={{
@@ -86,7 +86,7 @@ function SplitBillScreen({ screenAuthorization }) {
               color: AppColors.secondary,
             }}
           >
-            {data?.content?.length}
+            {data?.totalElements}
           </Typography>
         </Stack>
         <Stack sx={{ flexDirection: "row", marginBottom: 2 }}>

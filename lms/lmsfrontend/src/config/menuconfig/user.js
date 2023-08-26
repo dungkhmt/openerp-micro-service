@@ -5,8 +5,8 @@ export const user = {
   id: "MENU_USER",
   path: "",
   isPublic: false,
-  icon: "ManageAccountsIcon",
-  text: "Người dùng",
+  icon: "UsersIcon",
+  text: "Users",
   child: [
     // {
     //   id: "MENU_USER_CREATE",
@@ -38,7 +38,7 @@ export const user = {
         window.location.href = `${config.url.KEYCLOAK_BASE_URL}/admin/${KC_REALM}/console/#/${KC_REALM}/users`;
       },
       isPublic: false,
-      text: "Manage users (Keycloak)",
+      text: "Manage Users (Keycloak)",
       child: [],
     },
     {

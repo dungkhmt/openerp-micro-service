@@ -44,7 +44,8 @@ export default function CreateContest(props) {
     };
 
     request(
-      "post", "/create-contest",
+      "post",
+      "/contests",
       (res) => {
         successNoti("Contest created successfully")
         sleep(1000).then(() => {

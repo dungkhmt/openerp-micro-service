@@ -17,8 +17,8 @@ public class Drone {
     private double capacity; // maximum product weight
     private double durationCapacity; // max duration time
     private double speed;
-    private double transportCostPerUnit = 1;
-    private double waitingCost = 1;
+    private double transportCostPerUnit;
+    private double waitingCost;
 
     public List<Request> getEligibleServedByDroneCustomer(List<Request> customers) {
         List<Request> eligibleCustomers = new ArrayList<>();

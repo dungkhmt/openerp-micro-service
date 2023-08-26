@@ -41,8 +41,8 @@ public class SubmissionResponseHandler {
         ContestSubmissionEntity submission,
         String problemEvaluationType
     ) throws Exception {
-//        int runtime = 0;
-        int score = 0;
+        int runtime = 0;
+        long score = 0;
         int nbTestCasePass = 0;
 
         String totalStatus;
@@ -91,7 +91,7 @@ public class SubmissionResponseHandler {
                 throw new Exception("error from StringHandler");
             }
 
-//            runtime = runtime + problemSubmission.getRuntime().intValue();
+            runtime = runtime + problemSubmission.getRuntime().intValue();
             score = score + problemSubmission.getScore();
             nbTestCasePass += problemSubmission.getNbTestCasePass();
 
@@ -151,7 +151,7 @@ public class SubmissionResponseHandler {
         submission.setTestCasePass(nbTestCasePass + " / " + testCaseEntityList.size());
         submission.setSourceCode(submission.getSourceCode());
         submission.setSourceCodeLanguage(submission.getSourceCodeLanguage());
-//        submission.setRuntime((long) runtime);
+        submission.setRuntime((long) runtime);
         submission.setMessage(message);
         submission.setUpdateAt(new Date());
         contestSubmissionRepo.saveAndFlush(submission);
@@ -170,7 +170,7 @@ public class SubmissionResponseHandler {
         Map<UUID, String> submissionResponses
     ) {
 
-        int totalPoint = 0;
+        long totalPoint = 0;
 
         for (Map.Entry<UUID, String> testCaseResponse : submissionResponses.entrySet()) {
             UUID submissionTestCaseId = testCaseResponse.getKey();

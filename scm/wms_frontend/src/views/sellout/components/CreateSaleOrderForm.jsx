@@ -6,10 +6,7 @@ import {
   useGetProductListNoPaging,
 } from "controllers/query/category-query";
 import { useGetSellinPrice } from "controllers/query/purchase-order-query";
-import {
-  useCreateSaleOrder,
-  useGetSelloutPrice,
-} from "controllers/query/sale-order-query";
+import { useCreateSaleOrder } from "controllers/query/sale-order-query";
 import { useMemo, useState } from "react";
 import { AppColors } from "../../../shared/AppColors";
 import { formatVietnameseCurrency } from "../../../utils/GlobalUtils";
@@ -52,8 +49,6 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
     useGetProductListNoPaging();
   const { isLoading: isLoadingSellinPrice, data: sellinPrice } =
     useGetSellinPrice();
-  const { isLoading: isLoadingSelloutPrice, data: selloutPrice } =
-    useGetSelloutPrice();
   const createSaleOrderQuery = useCreateSaleOrder();
 
   const onSubmit = async (data) => {
@@ -74,30 +69,6 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
     setIsAdd((pre) => !pre);
     reset();
   };
-  // const mergeProductWithPrice = useMemo(() => {
-  //   let result = selloutPrice?.map((price) => {
-  //     let productList = product?.content?.filter((pro) => {
-  //       return pro?.code === price?.productEntity?.code;
-  //     });
-  //     let finalMergedProduct =
-  //       productList?.length > 0
-  //         ? { ...productList?.[0], selloutPrice: price }
-  //         : null;
-  //     if (finalMergedProduct !== null) {
-  //       let currSellinPrice = sellinPrice.find(
-  //         (price) => finalMergedProduct?.code === price?.productEntity?.code
-  //       );
-  //       if (currSellinPrice)
-  //         finalMergedProduct = {
-  //           ...finalMergedProduct,
-  //           sellinPrice: currSellinPrice,
-  //         };
-  //       else return null;
-  //     }
-  //     return finalMergedProduct;
-  //   });
-  //   return result?.every((ele) => ele !== null) ? result : null;
-  // }, [selloutPrice, sellinPrice, product]);
   const mergeProductWithPrice = useMemo(() => {
     let result = sellinPrice?.map((price) => {
       let productList = product?.filter((pro) => {
@@ -109,22 +80,6 @@ const CreateSaleOrderForm = ({ setIsAdd }) => {
     });
     return result?.every((ele) => ele !== null) ? result : null;
   }, [sellinPrice, product]);
-  // const calculateTotalMoney = useMemo(() => {
-  //   let totalMoney = products?.reduce(
-  //     (accum, curr) =>
-  //       accum +
-  //       ((((curr?.sellinPrice?.priceBeforeVat *
-  //         (100 + curr?.sellinPrice?.vat)) /
-  //         100) *
-  //         (100 -
-  //           curr?.selloutPrice?.massDiscount -
-  //           curr?.selloutPrice?.contractDiscount)) /
-  //         100) *
-  //         curr?.quantity,
-  //     0
-  //   );
-  //   return totalMoney ? totalMoney : 0;
-  // }, [products]);
   const calculateTotalMoney = useMemo(() => {
     let totalMoney = products?.reduce(
       (accum, curr) =>

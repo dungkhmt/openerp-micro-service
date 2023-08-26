@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface ContainerRepo extends JpaRepository<Container, Long> {
     Container findById(long id);
     Container findByUid(String uid);
+    Container findByContainerCode(String containerCode);
 }

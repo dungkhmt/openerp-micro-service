@@ -22,7 +22,7 @@ public class ContestSubmission {
     private String affiliation;
     private String testCasePass;
     private String sourceCodeLanguage;
-    private Integer point;
+    private Long point;
     private String status;
     private String message;
     private String createAt;

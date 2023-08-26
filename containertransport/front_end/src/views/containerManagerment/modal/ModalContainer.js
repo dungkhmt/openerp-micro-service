@@ -7,6 +7,8 @@ import { getFacility } from "api/FacilityAPI";
 import TertiaryButton from "components/button/TertiaryButton";
 import PrimaryButton from "components/button/PrimaryButton";
 import { createContainer, getTypeContainer, updateContainer } from "api/ContainerAPI";
+import { MyContext } from "contextAPI/MyContext";
+import { roles } from "config/menuconfig";
 
 
 const ModalContainer = ({ open, handleClose, container, setToast, setToastType, setToastMsg }) => {
@@ -18,8 +20,19 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
 
     const [typeContainers, setTypeContainers] = useState([]);
 
+    const { role } = useContext(MyContext);
+
     useEffect(() => {
-        getFacility({ type: "Container" }).then((res) => {
+        let data = {
+            type: "Container"
+        }
+        if(role.includes(roles.get("Customs"))) {
+            data.typeOwner = ["CUSTOMS"]
+        }
+        if(role.includes(roles.get("Admin"))) {
+            data.typeOwner = ["ADMIN"]
+        }
+        getFacility(data).then((res) => {
             setFacilityList(res?.data.data.facilityModels);
             // if(truckId) {
             //     setFacility(res?.data.data.facilityModels.find((item) => item.id === truck?.facilityResponsiveDTO.facilityId))
@@ -173,6 +186,7 @@ const ModalContainer = ({ open, handleClose, container, setToast, setToastType, 
                                                 label="Container Code"
                                                 placeholder="container code"
                                                 value={containerCode}
+                                                disabled={container ? true : false}
                                                 size="small"
                                                 onChange={(e) => setContainerCode(e.target.value)}
                                             />

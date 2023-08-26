@@ -44,7 +44,7 @@ export default function StudentViewProblemList() {
   function getContestDetail() {
     request(
       "get",
-      "/get-list-contest-problem-student/" + contestId,
+      "/contests/" + contestId + "/problems",
       (res) => {
         setProblems(res.data);
         for (let i = 0; i < res.data.length; i++) {

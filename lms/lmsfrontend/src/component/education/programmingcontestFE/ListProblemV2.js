@@ -1,30 +1,28 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { BASE_URL, request } from "../../../api";
-import { useTranslation } from "react-i18next";
-import { toFormattedDateTime } from "../../../utils/dateutils";
-import { Box, Chip, IconButton, TablePagination } from "@mui/material";
-import { GetApp } from "@material-ui/icons";
-import { getColorLevel } from "./lib";
-import { StandardTable } from "erp-hust/lib/StandardTable";
+import React, {useCallback, useEffect, useState} from "react";
+import {Link} from "react-router-dom";
+import {BASE_URL, request} from "../../../api";
+import {useTranslation} from "react-i18next";
+import {toFormattedDateTime} from "../../../utils/dateutils";
+import {Box, Chip, IconButton, Tab, Tabs} from "@mui/material";
+import {GetApp} from "@material-ui/icons";
+import {getColorLevel} from "./lib";
+import {StandardTable} from "erp-hust/lib/StandardTable";
 import AddIcon from "@material-ui/icons/Add";
-import { TablePaginationActions } from "component/table/StandardTable";
-import { a11yProps } from "component/tab";
-import { TabPanelVertical } from "./TabPanel";
-import { Tab, Tabs } from "@mui/material";
-import { useKeycloak } from "@react-keycloak/web";
-import { PROBLEM_STATUS } from "utils/constants";
-import { errorNoti } from "utils/notification";
+import {a11yProps} from "component/tab";
+import {TabPanelVertical} from "./TabPanel";
+import {useKeycloak} from "@react-keycloak/web";
+import {PROBLEM_STATUS} from "utils/constants";
+import {errorNoti} from "utils/notification";
+import HustContainerCard from "../../common/HustContainerCard";
 
 function ListProblemV2() {
-  const { keycloak } = useKeycloak();
-  console.log(keycloak.profile);
+  const {keycloak} = useKeycloak();
   const [value, setValue] = useState(0);
   const [myProblems, setMyProblems] = useState([]);
 
   const [sharedProblems, setSharedProblems] = useState([]);
 
-  const { t } = useTranslation("education/programmingcontest/listproblem");
+  const {t} = useTranslation("education/programmingcontest/problem");
 
   const onSingleDownload = (problem) => {
     const form = document.createElement("form");
@@ -33,7 +31,7 @@ function ListProblemV2() {
     form.setAttribute("target", "_blank");
     form.setAttribute(
       "action",
-      `${BASE_URL}/export-problem/${problem.problemId}`
+      `${BASE_URL}/problems/${problem.problemId}/export`
     );
 
     document.body.appendChild(form);
@@ -68,19 +66,19 @@ function ListProblemV2() {
         </Link>
       ),
     },
-    { title: "Name", field: "problemName" },
-    { title: "Created By", field: "userId" },
-    { title: "Created At", field: "createdAt" },
+    {title: t("problemName"), field: "problemName"},
+    {title: t("problemList.createdBy"), field: "userId"},
+    {title: t("problemList.createdAt"), field: "createdAt"},
     {
-      title: "Level",
+      title: t("problemList.level"),
       field: "levelId",
       render: (rowData) => (
-        <span
-          style={{ color: getColorLevel(`${rowData.levelId}`) }}
-        >{`${rowData.levelId}`}</span>
+        <span style={{color: getColorLevel(`${rowData.levelId}`)}}>
+          {`${rowData.levelId}`}
+        </span>
       ),
     },
-    { title: "Status", field: "statusId" },
+    {title: t("problemList.status"), field: "statusId"},
     {
       title: "Tags",
       render: (rowData) => (
@@ -102,11 +100,11 @@ function ListProblemV2() {
       ),
     },
     {
-      title: "Contests Used",
+      title: t("problemList.appearances"),
       field: "appearances",
       render: (rowData) => {
         return (
-          <span style={{ marginLeft: "24px" }}>{rowData.appearances}</span>
+          <span style={{marginLeft: "24px"}}>{rowData.appearances}</span>
         );
       },
     },
@@ -119,13 +117,12 @@ function ListProblemV2() {
             color="primary"
             onClick={() => onSingleDownload(rowData)}
           >
-            <GetApp />
+            <GetApp/>
           </IconButton>
         );
       },
     },
   ];
-  const PAGE_SIZES = [10, 20, 50];
 
   const getProblems = useCallback((path, setData) => {
     request("get", path, (res) => {
@@ -145,7 +142,7 @@ function ListProblemV2() {
 
   useEffect(() => {
     getProblems(
-      "/get-all-my-problems",
+      "/teacher/owned-problems",
       (data) => {
         setMyProblems(data);
       }
@@ -154,7 +151,7 @@ function ListProblemV2() {
 
   useEffect(() => {
     getProblems(
-      "/get-all-shared-problems",
+      "/teacher/shared-problems",
       (data) => {
         setSharedProblems(data);
       }
@@ -162,33 +159,21 @@ function ListProblemV2() {
   }, [getProblems]);
 
   return (
-    <div>
-      <Tabs
-        value={value}
-        onChange={(e, value) => setValue(value)}
-        indicatorColor={"primary"}
-        autoFocus
-        sx={{
-          width: "100%",
-          display: "inline-table",
-          border: "1px solid transparent ",
-          position: "relative",
-          borderBottom: "none",
-          marginBottom: "6px",
-        }}
-        aria-label="basic tabs example"
-      >
-        <Tab label="My problems" {...a11yProps(0)} style={{ width: "11%" }} />
-        <Tab
-          label="Shared problems"
-          {...a11yProps(1)}
-          style={{ width: "11%" }}
-        />
-      </Tabs>
+    <HustContainerCard>
+      <Box sx={{borderBottom: 2, borderColor: "divider"}}>
+        <Tabs
+          value={value}
+          onChange={(e, value) => setValue(value)}
+          variant="fullWidth"
+        >
+          <Tab label={t("problemList.myProblems")} {...a11yProps(0)} />
+          <Tab label={t("problemList.sharedProblems")} {...a11yProps(1)} />
+        </Tabs>
+      </Box>
 
       <TabPanelVertical value={value} index={0}>
         <StandardTable
-          title="My Problems"
+          title="Problems"
           columns={COLUMNS}
           data={myProblems}
           hideCommandBar
@@ -202,20 +187,21 @@ function ListProblemV2() {
           actions={[
             {
               icon: () => {
-                return <AddIcon fontSize="large" />;
+                return <AddIcon fontSize="large"/>;
               },
-              tooltip: t("addNewProblem"),
+              tooltip: t("createProblem"),
               isFreeAction: true,
               onClick: () => {
                 window.open("/programming-contest/create-problem");
               },
             },
           ]}
+          sx={{marginTop: "8px"}}
         />
       </TabPanelVertical>
       <TabPanelVertical value={value} index={1}>
         <StandardTable
-          title="Shared Problems"
+          title="Problems"
           columns={COLUMNS}
           data={sharedProblems}
           hideCommandBar
@@ -226,9 +212,10 @@ function ListProblemV2() {
             search: true,
             sorting: true,
           }}
+          sx={{marginTop: "8px"}}
         />
       </TabPanelVertical>
-    </div>
+    </HustContainerCard>
   );
 }
 

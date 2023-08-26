@@ -5,6 +5,7 @@ import XLSX from "xlsx";
 import HustContainerCard from "../../common/HustContainerCard";
 import StandardTable from "../../table/StandardTable";
 import {request} from "../../../api";
+import {successNoti} from "../../../utils/notification";
 
 export default function ContestManagerRankingNew(props) {
   const contestId = props.contestId;
@@ -13,6 +14,9 @@ export default function ContestManagerRankingNew(props) {
   const [problemIds, setProblemIds] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const copyLinkHandler = () => {
+    navigator.clipboard.writeText(window.location.host + "/programming-contest/public/" + contestId + "/ranking").then(() => successNoti("URL copied to clipboard", 1000));
+  }
   const downloadHandler = (event) => {
     if (ranking.length === 0) {
       return;
@@ -59,7 +63,7 @@ export default function ContestManagerRankingNew(props) {
     setLoading(true);
     request(
       "get",
-      "/get-ranking-contest-new/" +
+      "/contests/ranking/" +
       contestId +
       "?getPointForRankingType=HIGHEST",
       (res) => {
@@ -155,6 +159,16 @@ export default function ContestManagerRankingNew(props) {
                 </Button>
               },
               tooltip: 'Export Ranking as Excel file',
+              isFreeAction: true
+            },
+            {
+              icon: () => {
+                return <Button variant="outlined" onClick={copyLinkHandler}
+                               className={"no-background-btn"}>
+                  Get link
+                </Button>
+              },
+              tooltip: 'Get public URL to this ranking',
               isFreeAction: true
             }
           ]}

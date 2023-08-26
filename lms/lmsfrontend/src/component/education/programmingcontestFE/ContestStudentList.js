@@ -3,12 +3,15 @@ import StandardTable from "component/table/StandardTable";
 import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {toFormattedDateTime} from "utils/dateutils";
+import HustContainerCard from "../../common/HustContainerCard";
+import {LinearProgress} from "@mui/material";
 
 export default function ContestStudentList() {
   const [contests, setContests] = useState([]);
+  const [loading, setLoading] = useState(true);
+
 
   const columns = [
-    // {title: "No.", field: "index"},
     {
       title: "Contest",
       field: "contestName",
@@ -26,28 +29,30 @@ export default function ContestStudentList() {
     },
     {title: "Status", field: "status"},
     {title: "Created By", field: "createdBy"},
-    {title: "Created At", field: "date"},
+    {title: "Created At", field: "createdAt"},
   ];
 
   function getContestList() {
-    request("get", "/get-contest-registered-student", (res) => {
+    request("get", "/students/contests", (res) => {
       const data = res.data.contests.map((e, index) => ({
         index: index + 1,
         contestId: e.contestId,
         contestName: e.contestName,
         status: e.statusId,
         createdBy: e.userId,
-        date: toFormattedDateTime(e.createdAt),
+        createdAt: toFormattedDateTime(e.createdAt),
       }));
       setContests(data);
-    }).then();
+    }).then(() => setLoading(false));
   }
 
   useEffect(() => {
     getContestList();
   }, []);
+
   return (
-    <div>
+    <HustContainerCard>
+      {loading && <LinearProgress/>}
       <StandardTable
         title={"Registered Contest"}
         columns={columns}
@@ -60,6 +65,6 @@ export default function ContestStudentList() {
           sorting: true,
         }}
       />
-    </div>
+    </HustContainerCard>
   );
 }

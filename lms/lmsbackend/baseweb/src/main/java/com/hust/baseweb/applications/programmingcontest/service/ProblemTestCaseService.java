@@ -24,8 +24,6 @@ public interface ProblemTestCaseService {
         MultipartFile[] files
     ) throws Exception;
 
-    Page<ProblemEntity> getContestProblemPaging(Pageable pageable);
-
     List<ProblemEntity> getAllProblems();
 
     List<ModelProblemGeneralInfo> getAllProblemsGeneralInfo();
@@ -41,8 +39,6 @@ public interface ProblemTestCaseService {
     ModelCheckCompileResponse checkCompile(ModelCheckCompile modelCheckCompile, String userName) throws Exception;
 
     TestCaseEntity saveTestCase(String problemId, ModelSaveTestcase modelSaveTestcase);
-
-    ListProblemSubmissionResponse getListProblemSubmissionResponse(String problemId, String userId) throws Exception;
 
     ContestEntity createContest(ModelCreateContest modelCreateContest, String userName) throws Exception;
 
@@ -79,11 +75,6 @@ public interface ProblemTestCaseService {
     List<ModelProblemSubmissionDetailByTestCaseResponse> getContestProblemSubmissionDetailByTestCaseOfASubmissionViewedByParticipant(
         UUID submissionId
     );
-
-    ModelContestSubmissionResponse submitContestProblem(
-        ModelContestSubmission modelContestSubmission,
-        String userName
-    ) throws Exception;
 
     ModelContestSubmissionResponse submitContestProblemTestCaseByTestCase(
         ModelContestSubmission modelContestSubmission,
@@ -136,10 +127,6 @@ public interface ProblemTestCaseService {
 
     void calculateContestResult(String contestId);
 
-    ModelGetContestPageResponse getContestPagingByUserCreatedContest(String userName, Pageable pageable);
-
-    ModelGetContestPageResponse getContestPagingByUserManagerContest(String userName, Pageable pageable);
-
     ModelGetContestPageResponse getAllContestsPagingByAdmin(String userName, Pageable pageable);
 
     List<ModelGetContestResponse> getContestByUserRole(String userName);
@@ -163,12 +150,9 @@ public interface ProblemTestCaseService {
     ModelGetContestPageResponse getNotRegisteredContestByUser(Pageable pageable, String userName);
 
     List<ContestSubmissionsByUser> getRankingByContestIdNew(
-        Pageable pageable,
         String contestId,
         Constants.GetPointForRankingType getPointForRankingType
     );
-
-    Page<UserSubmissionContestResultNativeEntity> getRankingByContestId(Pageable pageable, String contestId);
 
     Page<ProblemEntity> getPublicProblemPaging(Pageable pageable);
 
@@ -182,13 +166,9 @@ public interface ProblemTestCaseService {
 
     int addUserToContest(ModelAddUserToContest modelAddUserToContest);
 
-    int addAllUsersToContest(ModelAddUserToContest modelAddUserToContest);
-
     void deleteUserContest(ModelAddUserToContest modelAddUserToContest) throws MiniLeetCodeException;
 
-    Page<ContestSubmission> findContestSubmissionByContestIdPaging(Pageable pageable, String contestId);
-
-    Page<ContestSubmission> findContestNotEvaluatedSubmissionByContestIdPaging(Pageable pageable, String contestId);
+    Page<ContestSubmission> findContestSubmissionByContestIdPaging(Pageable pageable, String contestId, String searchTerm);
 
     Page<ContestSubmission> findContestSubmissionByUserLoginIdPaging(Pageable pageable, String userLoginId);
 
@@ -216,8 +196,6 @@ public interface ProblemTestCaseService {
 
     ModelCodeSimilarityOutput checkSimilarity(String contestId, ModelCheckSimilarityInput I);
 
-    ModelEvaluateBatchSubmissionResponse evaluateBatchSubmissionContest(String contestId);
-
     ModelEvaluateBatchSubmissionResponse reJudgeAllSubmissionsOfContest(String contestId);
 
     ModelEvaluateBatchSubmissionResponse judgeAllSubmissionsOfContest(String contestId);
@@ -227,8 +205,6 @@ public interface ProblemTestCaseService {
     void evaluateSubmission(ContestSubmissionEntity sub, ContestEntity contest);
 
     void evaluateSubmissionUsingQueue(ContestSubmissionEntity submission, ContestEntity contest);
-
-    List<ModelContestByRoleResponse> getContestsByRoleOfUser(String userLoginId);
 
     List<CodePlagiarism> findAllByContestId(String contestId);
 
@@ -241,8 +217,6 @@ public interface ProblemTestCaseService {
     ContestSubmissionEntity updateContestSubmissionSourceCode(ModelUpdateContestSubmission input);
 
     List<ModelGetContestResponse> getContestsUsingAProblem(String problemId);
-
-    int addAdminToManagerAndParticipantAllContest();
 
     ModelUploadTestCaseOutput addTestCase(
         String testCase,
@@ -265,19 +239,13 @@ public interface ProblemTestCaseService {
 
     boolean removeMemberFromContest(UUID id);
 
-    boolean forbidMemberFromSubmitToContest(UUID id);
-
     boolean updatePermissionMemberToContest(String userId, ModelUpdatePermissionMemberToContestInput input);
-
-    boolean updateProblemContest(String userId, ModelUpdateProblemContestInput I);
 
     List<ModelResponseUserProblemRole> getUserProblemRoles(String problemId);
 
     boolean addUserProblemRole(String userName, ModelUserProblemRole input)  throws Exception;
 
     boolean removeUserProblemRole(String userName, ModelUserProblemRole input)  throws Exception;
-
-    boolean grantRole2AllProblems(String userLoginId, String userId, String roleId);
 
     void evaluateCustomProblemSubmission(UUID contestSubmissionId) throws Exception;
 

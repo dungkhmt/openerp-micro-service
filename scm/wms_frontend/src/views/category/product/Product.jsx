@@ -1,7 +1,6 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import InsertLinkIcon from "@mui/icons-material/InsertLink";
 import { Box, Button, Typography } from "@mui/material";
 import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
@@ -66,16 +65,16 @@ function ProductScreen({ screenAuthorization }) {
       describe: "Thêm bản ghi mới",
       disabled: false,
     },
-    {
-      title: "Import",
-      callback: (res) => {
-        handleFileChange(res);
-      },
-      icon: <InsertLinkIcon />,
-      describe: "Import từ file",
-      disabled: false,
-      type: "file",
-    },
+    // {
+    //   title: "Import",
+    //   callback: (res) => {
+    //     handleFileChange(res);
+    //   },
+    //   icon: <InsertLinkIcon />,
+    //   describe: "Import từ file",
+    //   disabled: false,
+    //   type: "file",
+    // },
   ];
   const extraActions = [
     {
@@ -202,9 +201,8 @@ function ProductScreen({ screenAuthorization }) {
             headerAlign: "center",
             align: "center",
             sortable: false,
-            width: 125,
             minWidth: 150,
-            maxWidth: 200,
+            flex: 1,
             type: "actions",
             getActions: (params) => [
               ...extraActions.map((extraAction, index) => (

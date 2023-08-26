@@ -322,3 +322,20 @@ values ('SCR_WMSv2_RECEIPT_BILL_DETAIL.VIEW', 'ADMIN', null, now(), null) ;
 -- xem màn hình phiếu xuất hàng chi tiết
 insert into entity_authorization (id, role_id, last_updated, created, description)
 values ('SCR_WMSv2_DELIVERY_BILL_DETAIL.VIEW', 'ADMIN', null, now(), null) ;
+
+-- bổ sung thêm use case cho phép giám đốc mua hàng tạo đơn mua hàng trực tiếp mà không cần thông qua đơn yêu cầu nhập hàng của giám đốc kinh doanh
+INSERT INTO public.entity_authorization
+(id, role_id, last_updated, created, description)
+VALUES('MENU_WMSv2_PURCHASE_MANAGER.CREATE_RECEIPTS', 'ADMIN', now(), now(), null);
+
+INSERT INTO public.entity_authorization
+(id, role_id, last_updated, created, description)
+VALUES('MENU_WMSv2_PURCHASE_MANAGER.CREATE_RECEIPTS', 'WMS_PURCHASE_MANAGER', now(), now(), null);
+
+INSERT INTO public.entity_authorization
+(id, role_id, last_updated, created, description)
+VALUES('SCR_WMSv2_CREATE_RECEIPT_REQUEST_FOR_PURCHASE_MANAGER.VIEW', 'ADMIN', now(), now(), null);
+
+INSERT INTO public.entity_authorization
+(id, role_id, last_updated, created, description)
+VALUES('SCR_WMSv2_CREATE_RECEIPT_REQUEST_FOR_PURCHASE_MANAGER.VIEW', 'WMS_PURCHASE_MANAGER', now(), now(), null);

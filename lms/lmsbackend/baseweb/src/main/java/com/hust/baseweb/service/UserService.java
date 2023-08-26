@@ -1,5 +1,6 @@
 package com.hust.baseweb.service;
 
+import com.hust.baseweb.applications.programmingcontest.model.ModelSearchUserResult;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.model.ModelPageUserSearchResponse;
 import com.hust.baseweb.model.PersonModel;
@@ -16,11 +17,17 @@ public interface UserService {
 
     UserLogin findById(String userLoginId);
 
+    String getUserFullName(UserLogin userId);
+
+    String getUserFullName(String userId);
+
     DPerson findByPartyId(String partyId);
 
 //    Page<DPerson> findAllPerson(Pageable page, SortAndFiltersInput query);
 
     Page<UserRestBriefProjection> findPersonByFullName(Pageable page, String sString);
+
+    Page<ModelSearchUserResult> findUserByKeyword(Pageable page, String keyword);
 
     Page<UserRestBriefProjection> findUsersByUserLoginId(Pageable page, String sString);
 

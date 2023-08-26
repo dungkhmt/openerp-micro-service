@@ -56,7 +56,7 @@ export default function UserContestProblemRole() {
 
     request(
       "post",
-      "/add-contest-problem-role-to-user/",
+      "/problems/users/role",
       (res) => {
         if (res.data) successNoti("Add user to problem successfully", 3000);
         else errorNoti("You have already added this user to this problem before", 3000);
@@ -74,7 +74,7 @@ export default function UserContestProblemRole() {
 
 
   function getUserRoles() {
-    request("get", "/get-user-contest-problem-roles/" + problemId, (res) => {
+    request("get", "/problems/" + problemId + "/users/role", (res) => {
       setUserRoles(res.data);
     }).then();
   }
@@ -82,7 +82,7 @@ export default function UserContestProblemRole() {
   function searchUser(keyword, s, p) {
     request(
       "get",
-      "/search-user-based-keyword" +
+      "/users" +
       "?size=" +
       s +
       "&page=" +
@@ -90,10 +90,10 @@ export default function UserContestProblemRole() {
       "&keyword=" +
       keyword,
       (res) => {
-        const data = res.data.contents.content.map((e, index) => ({
+        const data = res.data.content.map((e, index) => ({
           index: index + 1,
-          userName: e.userName,
-          fullName: e.lastName + " " + e.middleName + " " + e.firstName,
+          userName: e.userLoginId,
+          fullName: (e.lastName ? e.lastName : "") + " " + (e.firstName ? e.firstName : ""),
         }));
         setSearchUsers(data);
       }

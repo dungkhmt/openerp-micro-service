@@ -16,7 +16,7 @@ public class ModelUserJudgedProblemSubmissionResponse {
     private String problemId;
     private String problemName;
     private String submissionSourceCode;
-    private int point;
+    private long point;
     private String testCasePassed;
     private String status;
 }

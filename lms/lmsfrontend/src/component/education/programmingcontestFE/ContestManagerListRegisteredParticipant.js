@@ -28,7 +28,7 @@ export default function ContestManagerListRegisteredParticipant(props) {
     };
     request(
       "post",
-      "/approve-registered-user-2-contest",
+      "/contests/registers/approval",
       (res) => {
         successNoti("Successful", 3000);
         setIsProcessing(false);
@@ -48,7 +48,7 @@ export default function ContestManagerListRegisteredParticipant(props) {
     setIsProcessing(true);
     request(
       "get",
-      "/get-pending-registered-users-of-contest/" + contestId,
+      "/contests/" + contestId + "/pending-users-v2",
       (res) => {
         const data = res.data.map((e, i) => ({
           index: i + 1,

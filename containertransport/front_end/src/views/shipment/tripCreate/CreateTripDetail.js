@@ -14,6 +14,7 @@ import { getOrders } from "api/OrderAPI";
 import { getTrucks } from "api/TruckAPI";
 import TruckAndOrdersInTrip from "../tripComponent/TruckAndOrdersInTrip";
 import OrderArrangementInTrip from "../tripComponent/OrderArrangementInTrip";
+import { getShipmentById } from "api/ShipmentAPI";
 
 const CreateTripDetail = () => {
     const { truckScheduler, setTruckScheduler, tripsCreate, setTripCreate } = useContext(MyContext);
@@ -29,7 +30,7 @@ const CreateTripDetail = () => {
     const [tripItems, setTripItem] = useState([]);
     const history = useHistory();
     const location = useLocation();
-    const tripsTmpId = useState(location?.search);
+    const [startTime, setStartTime] = useState(0);
 
     const [toastOpen, setToast] = useState(false);
     const [toastType, setToastType] = useState();
@@ -39,22 +40,16 @@ const CreateTripDetail = () => {
         getTrucks({}).then((res) => {
             // let truckTmp = res.data.filter(item => checkScheduler(item.id, "truck"))
             // console.log("truck", res.data)
-            setTrucks(res.data.truckModels);
+            setTrucks(res?.data.truckModels);
         });
-        getOrders({ status: 'ORDERED' }).then((res) => {
+        getOrders({ status: ['ORDERED'] }).then((res) => {
             // let orderTmp = res.data.data.filter(item => checkScheduler(item.id, "order"))
-            setOrders(res.data.data.orderModels);
+            setOrders(res?.data.data.orderModels);
         });
-        // if (tripsTmpId[0] !== null) {
-        //     console.log("tripTmp",tripsCreate[tripsTmpId[0].slice(1)]);
-        //     trucks.forEach((item) => {
-        //         if(item.id == tripsCreate[tripsTmpId[0].slice(1)].truckId) {
-        //             setTruckSelect(item);
-        //         }
-        //     })
-        //     // (tripsTmpId[0].slice(1));
 
-        // }
+        getShipmentById(shipmentId).then((res) => {
+            setStartTime(res?.data.data?.executed_time)
+        })
     }, [])
     const handleCancelCreateTrip = () => {
         history.push(`/shipment/detail/${shipmentId}`);
@@ -73,11 +68,13 @@ const CreateTripDetail = () => {
                 action: item.action,
                 facilityId: item.facilityId,
                 orderCode: item.orderCode,
+                orderId: item.orderId,
                 arrivalTime: item.arrivalTime,
                 departureTime: item.departureTime,
                 containerId: item?.containerId,
                 trailerId: item?.trailerId,
-                type: item?.type
+                type: item?.type,
+                typeOrder: item?.typeOrder
             }
             tripItemTmp.push(tripItem);
         })
@@ -88,21 +85,34 @@ const CreateTripDetail = () => {
                 truckId: truckSelect?.id,
                 orderIds: orderSubmit,
                 tripItemModelList: tripItemTmp
-            }
+            },
+            type: "Normal"
         }
         console.log("data", dataSubmit);
         if (checkValidate) {
-            createTrip(dataSubmit).then((res) => {
-                setToastType("success");
-                setToast(true);
-                setToastMsg("Create Trip Success !!!")
-                setTimeout(() => {
-                    setToast(false);
-                    history.push({
-                        pathname: `/shipment/detail/${shipmentId}`,
-                    })
-                }, "1000");
-            })
+            createTrip(dataSubmit)
+                .then((res) => {
+                    console.log("res", res)
+                    if (res?.data.meta.code === 400) {
+                        setToastType("error");
+                        setToast(true);
+                        setToastMsg(res?.data.data);
+                        setTimeout(() => {
+                            setToast(false);
+                        }, "2000");
+                    }
+                    if (res?.data.meta.code === 200) {
+                        setToastType("success");
+                        setToast(true);
+                        setToastMsg("Create Trip Success !!!")
+                        setTimeout(() => {
+                            setToast(false);
+                            history.push({
+                                pathname: `/shipment/detail/${shipmentId}`,
+                            })
+                        }, "2000");
+                    }
+                })
         }
     }
 
@@ -122,20 +132,42 @@ const CreateTripDetail = () => {
             return false;
         }
         let nbTrailer = 0;
+        let totalWeight = 0;
+        let totalTime = startTime;
         // check nbTrailer
         for (let i = 1; i < tripItems.length - 1; i++) {
-            if (tripItems[i].action === "PICKUP-TRAILER") {
+            if (tripItems[i].action === "PICKUP_TRAILER") {
                 nbTrailer = Number(nbTrailer) + 1;
             }
-            if (tripItems[i].action === "DELIVERY-TRAILER") {
+            if (tripItems[i].action.indexOf("DROP_TRAILER") !== -1) {
                 nbTrailer = Number(nbTrailer) - 1;
             }
-            if (tripItems[i].action === "DELIVERY-CONTAINER" && nbTrailer === 0) {
+
+            if (tripItems[i].action === "PICKUP_CONTAINER") {
+                totalWeight = totalWeight + tripItems[i].container.size;
+            }
+            if (tripItems[i].action.indexOf("DELIVERY_CONTAINER") !== 1) {
+                let checkPickup = false;
+                for (let j = 1; j < i; j++) {
+                    if (tripItems[j].action === "PICKUP_CONTAINER" && tripItems[j].orderCode === tripItems[i].orderCode) {
+                        checkPickup = true;
+                        break;
+                    }
+                }
+                if (!checkPickup) {
+                    setToastMsg(`Please Pickup Container before Delivery Container of  ${tripItems[i].orderCode}`)
+                    appearToast();
+                    return false;
+                }
+                totalWeight = totalWeight - tripItems[i].container.size;
+            }
+
+            if (tripItems[i].action.indexOf("DELIVERY_CONTAINER") !== -1 && nbTrailer === 0) {
                 setToastMsg(`Please view again at before ${tripItems[i].action} ${tripItems[i].orderCode}`)
                 appearToast();
                 return false;
             }
-            if (tripItems[i].action === "DELIVERY-CONTAINER" && tripItems[i].isBreakRomooc) {
+            if (tripItems[i].action.indexOf("DELIVERY_CONTAINER") !== -1 && tripItems[i].isBreakRomooc) {
                 nbTrailer = Number(nbTrailer) - 1;
             }
             console.log("nbTrailer", nbTrailer)
@@ -145,14 +177,27 @@ const CreateTripDetail = () => {
                 return false;
             }
 
-            if (tripItems[i].action === "PICKUP-CONTAINER" && nbTrailer === 0) {
+            if (tripItems[i].action === "PICKUP_CONTAINER" && nbTrailer === 0) {
                 setToastMsg(`Please chose Trailer before Pickup Container in Order ${tripItems[i].orderCode}`)
+                appearToast();
+                return false;
+            }
+
+            if (tripItems[i].action === "STOP" && i !== tripItems.length - 1) {
+                setToastMsg(`Please chose position action STOP`)
+                appearToast();
+                return false;
+            }
+
+            // check weight
+            if (totalWeight > 40) {
+                setToastMsg(`Over the capacity of the trailer when ${tripItems[i].action} at ${tripItems[i].facilityResponsiveDTO.facilityCode}`)
                 appearToast();
                 return false;
             }
         }
 
-        // check weight
+
 
         // check time
         return true;
@@ -164,9 +209,10 @@ const CreateTripDetail = () => {
             setToast(false);
         }, 3000)
     }
+    
     return (
         <Box className="fullScreen">
-            <Container maxWidth="xl" className="container">
+            <Container maxWidth="100vw" className="container">
                 <Box className="trip-create">
                     <Box className="toast">
                         {toastOpen ? (
@@ -212,7 +258,7 @@ const CreateTripDetail = () => {
                             <Box>
                                 <MapComponent tripItems={tripItems} />
                             </Box>
-                            <Box>Thong tin trip</Box>
+                            {/* <Box>Thong tin trip</Box> */}
                         </Box>
                     </Box>
                 </Box>

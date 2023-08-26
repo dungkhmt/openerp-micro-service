@@ -27,7 +27,7 @@ export function StudentContestNotRegistered() {
   async function getContestList() {
     request(
       "get",
-      "/get-contest-paging-not-registered?size=" +
+      "/students/not-registered-contests?size=" +
       pageSize +
       "&page=" +
       page,
@@ -46,7 +46,7 @@ export function StudentContestNotRegistered() {
     setLoading(true);
     request(
       "post",
-      "/student-register-contest/" + contestId,
+      "/contests/" + contestId + "register-student",
       (res) => {
         successNoti(res.data.message, true);
         getContestList();

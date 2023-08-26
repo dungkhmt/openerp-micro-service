@@ -12,8 +12,8 @@ import AdminRoute from "./AdminRoute";
 import ProgrammingContestRoutes from "./ProgrammingContestRoutes";
 import ThesisRoutes from "./ThesisRoutes";
 import WhiteBoardRoute from "./WhiteBoardRoute";
-import ContestManagerRankingPublic from "../component/education/programmingcontestFE/ContestManagerRankingPublic";
 import UploadUser from "../component/userlogin/UploadUser";
+import ContestManagerRankingPublicV2 from "../component/education/programmingcontestFE/ContestManagerRankingPublicV2";
 
 const EduRoute = lazy(() => import("./EduRoute"));
 // const UserLoginRoute = lazy(() => import("./UserLoginRoute"));
@@ -50,8 +50,8 @@ function MainAppRoute(props) {
         <Switch>
           <Route component={Home} exact path="/" />
           <Route
-            component={ContestManagerRankingPublic}
-            path={"/programming-contest/public/contest-raking/:contestId"}
+            component={ContestManagerRankingPublicV2}
+            path={"/programming-contest/public/:contestId/ranking"}
           />
 
           {/* consider remove */}

@@ -1,6 +1,4 @@
 import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box } from "@mui/material";
 import { Action } from "components/action/Action";
 import withScreenSecurity from "components/common/withScreenSecurity";
@@ -36,22 +34,22 @@ function AllUsersScreen({ screenAuthorization }) {
   const { isLoading, data: users } = useGetUserPagination(params);
   let actions = [];
   const extraActions = [
-    {
-      title: "Xem",
-      callback: (item) => {
-        handleButtonClick(item);
-      },
-      icon: <VisibilityIcon />,
-      color: AppColors.green,
-    },
-    {
-      title: "Sửa",
-      callback: async (item) => {
-        setOpenDrawer();
-      },
-      icon: <EditIcon />,
-      color: AppColors.secondary,
-    },
+    // {
+    //   title: "Xem",
+    //   callback: (item) => {
+    //     handleButtonClick(item);
+    //   },
+    //   icon: <VisibilityIcon />,
+    //   color: AppColors.green,
+    // },
+    // {
+    //   title: "Sửa",
+    //   callback: async (item) => {
+    //     setOpenDrawer();
+    //   },
+    //   icon: <EditIcon />,
+    //   color: AppColors.secondary,
+    // },
     {
       title: "Xóa",
       callback: (item) => {

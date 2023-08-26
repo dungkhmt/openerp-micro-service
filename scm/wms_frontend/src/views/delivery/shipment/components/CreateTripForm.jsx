@@ -30,7 +30,7 @@ const CreateTripForm = ({ setIsAdd, currShipment }) => {
 
   const onSubmit = async (data) => {
     let tripParams = {
-      createdDate: moment(data?.startDate).format("DD-MM-YYYY"),
+      startedDate: moment(data?.startedDate).format("DD-MM-YYYY"),
       shipmentCode: currShipment?.code,
       userInCharge: data?.userInCharge?.id,
       facilityCode: data?.facility?.code,
@@ -41,7 +41,12 @@ const CreateTripForm = ({ setIsAdd, currShipment }) => {
   };
   return (
     <FormProvider {...methods}>
-      <Stack direction="row" justifyContent={"space-around"} spacing={5}>
+      <Stack
+        direction="row"
+        justifyContent={"space-around"}
+        spacing={5}
+        sx={{ marginY: 2 }}
+      >
         {/* <Typography>
           Nên có thêm phần gợi ý xem lấy kho nào thì trùng với cụm customers
           đang được phân trip

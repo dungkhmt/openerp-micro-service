@@ -14,7 +14,6 @@ export default function StudentList(props) {
 
   function getStudentsOfCurrentPage() {
     const params = {
-      securityGroups: "ROLE_STUDENT,ROLE_EDUCATION_LEARNING_MANAGEMENT_STUDENT",
       ...filterParams
     }
     let successHandler = res => setStudentsOfCurrentPage({
@@ -24,7 +23,7 @@ export default function StudentList(props) {
     let errorHandlers = {
       onError: (error) => errorNoti("Đã xảy ra lỗi trong khi tải dữ liệu!", 3000)
     }
-    request("GET", "/users", successHandler, errorHandlers,  null, { params })
+    request("GET", "/statistics/users", successHandler, errorHandlers,  null, { params })
   }
 
   function navigateToLeaningProfilesPageOfStudent(studentLoginId) {
@@ -32,9 +31,9 @@ export default function StudentList(props) {
   }
 
   const columns = [
-    { title: "User Login ID", field: "userLoginId" },
-    { title: "Họ tên", field: "fullName" },
-    { title: "Đơn vị", field: "affiliations" },
+    { title: "User ID", field: "userLoginId" },
+    { title: "First Name", field: "firstName" },
+    { title: "Last Name", field: "lastName" },
     { title: "Email", field: "email" }
   ]
 
@@ -52,7 +51,7 @@ export default function StudentList(props) {
             sorting: true,
             pageSize: filterParams.size,
             searchText: filterParams.search,
-            debounceInterval: 300
+            debounceInterval: 800
           }}
           page={filterParams.page}
           totalCount={studentsOfCurrentPage.totalElements}

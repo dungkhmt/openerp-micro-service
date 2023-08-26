@@ -54,7 +54,7 @@ public class ReceiptServiceImpl implements ReceiptService {
                                  .warehouseId(request.getWarehouseId() == null ? null : UUID.fromString(request.getWarehouseId()))
                                  .receiptDate(request.getReceivedDate())
                                  .receiptName(request.getReceiptName())
-                                 .status(ReceiptStatus.CREATED)
+                                 .status(request.getIsPurchaseManagerRequest() == 1 ? ReceiptStatus.APPROVED : ReceiptStatus.CREATED)
                                  .createdReason(request.getCreatedReason())
                                  .expectedReceiptDate(request.getExpectedReceiveDate())
                                  .createdBy(principal.getName())
@@ -147,12 +147,12 @@ public class ReceiptServiceImpl implements ReceiptService {
         return receipts.stream().map(receipt -> ReceiptRequestResponse.builder()
             .receiptRequestId(receipt.getReceiptId())
             .approvedBy(receipt.getApprovedBy())
-            .createdDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, receipt.getCreatedStamp()))
+            .createdDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, receipt.getCreatedStamp()))
             .createdBy(receipt.getCreatedBy())
             .cancelledBy(receipt.getCancelledBy())
             .status(receipt.getStatus().getName())
-            .lastUpdateStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, receipt.getLastUpdatedStamp()))
-            .expectedReceiveDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, receipt.getExpectedReceiptDate()))
+            .lastUpdateStamp(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, receipt.getLastUpdatedStamp()))
+            .expectedReceiveDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, receipt.getExpectedReceiptDate()))
             .build())
             .collect(Collectors.toList());
     }
@@ -169,10 +169,10 @@ public class ReceiptServiceImpl implements ReceiptService {
         return receipts.stream().map(receipt -> ReceiptRequestResponse.builder()
             .receiptRequestId(receipt.getReceiptId())
             .approvedBy(receipt.getApprovedBy())
-            .createdDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, receipt.getCreatedStamp()))
+            .createdDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, receipt.getCreatedStamp()))
             .createdBy(receipt.getCreatedBy())
             .status(receipt.getStatus().getName())
-            .expectedReceiveDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, receipt.getExpectedReceiptDate()))
+            .expectedReceiveDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, receipt.getExpectedReceiptDate()))
             .build())
             .collect(Collectors.toList());
     }
@@ -209,12 +209,12 @@ public class ReceiptServiceImpl implements ReceiptService {
         }
         return ReceiptRequestResponse.builder()
                 .receiptRequestId(receipt.getReceiptId())
-                .createdDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, receipt.getCreatedStamp()))
+                .createdDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, receipt.getCreatedStamp()))
                 .approvedBy(receipt.getApprovedBy())
                 .status(receipt.getStatus().getName())
                 .createdBy(receipt.getCreatedBy())
                 .createdReason(receipt.getCreatedReason())
-                .expectedReceiveDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY_HH_MM_SS, receipt.getExpectedReceiptDate()))
+                .expectedReceiveDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, receipt.getExpectedReceiptDate()))
                 .items(itemResponse).build();
     }
 

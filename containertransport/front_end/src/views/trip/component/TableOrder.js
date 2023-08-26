@@ -19,8 +19,8 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Button, Icon } from '@mui/material';
-import { menuIconMap } from 'config/menuconfig';
+import { Button, Chip, Icon } from '@mui/material';
+import { colorStatus, menuIconMap } from 'config/menuconfig';
 import { useHistory } from 'react-router-dom';
 import { updateTrip } from 'api/TripAPI';
 import { updateTruck } from 'api/TruckAPI';
@@ -62,7 +62,7 @@ const headCells = [
         numeric: false,
         disablePadding: false,
         label: 'Code',
-        width: '10%'
+        width: '15%'
     },
     {
         id: 'facility',
@@ -93,11 +93,18 @@ const headCells = [
         width: '15%'
     },
     {
+        id: 'lateTime',
+        numeric: false,
+        disablePadding: false,
+        label: 'Late Time',
+        width: '12%'
+    },
+    {
         id: 'impl',
         numeric: false,
         disablePadding: false,
         label: '',
-        width: '15%'
+        width: '10%'
     },
 ];
 
@@ -105,7 +112,7 @@ const DEFAULT_ORDER = 'asc';
 const DEFAULT_ORDER_BY = 'calories';
 
 function EnhancedTableHead(props) {
-    const { onSelectAllClick, order, orderBy, numSelected, rowCount } = props;
+    const { onSelectAllClick, order, orderBy, numSelected, rowCount, type } = props;
 
     return (
         <TableHead>
@@ -121,35 +128,28 @@ function EnhancedTableHead(props) {
                         }}
                     />
                 </TableCell>
-                {headCells.map((headCell) => (
-                    <TableCell
-                        key={headCell.id}
-                        align={headCell.numeric ? 'right' : 'left'}
-                        padding={headCell.disablePadding ? 'none' : 'normal'}
-                        // sortDirection={orderBy === headCell.id ? order : false}
-                        width={headCell?.width}
-                    >
-                        {headCell.label}
-                        {/* <TableSortLabel
-              active={orderBy === headCell.id}
-            //   direction={orderBy === headCell.id ? order : 'asc'}
-            //   onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-               {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null} 
-            </TableSortLabel> */}
-                    </TableCell>
-                ))}
+                {headCells.map((headCell) => {
+                    return (
+                        <>
+                            {type === "Done" && headCell.id === "impl" ? null : (
+                                <TableCell
+                                    key={headCell.id}
+                                    align={headCell.numeric ? 'right' : 'left'}
+                                    padding={headCell.disablePadding ? 'none' : 'normal'}
+                                    // sortDirection={orderBy === headCell.id ? order : false}
+                                    width={headCell?.width}
+                                >
+                                    {headCell.label}
+                                </TableCell>
+                            )}
+                        </>
+                    )})}
             </TableRow>
         </TableHead>
     );
 }
 
-export default function TableOrder({ tripItems, setExecutes, executed }) {
+export default function TableOrder({ tripItems, setExecutes, executed, type, trip }) {
     const [order, setOrder] = React.useState(DEFAULT_ORDER);
     const [orderBy, setOrderBy] = React.useState(DEFAULT_ORDER_BY);
     const [selected, setSelected] = React.useState([]);
@@ -218,76 +218,85 @@ export default function TableOrder({ tripItems, setExecutes, executed }) {
     const isSelected = (name) => selected.indexOf(name) !== -1;
 
     const handleExecuted = (row) => {
-        if(row?.type === "Truck") {
-            if(row.action === "DEPART" && row.status === "SCHEDULED") {
-                let dataTruck = {
-                    status: "EXECUTING"
-                }
-                updateTruck(row.truckId, dataTruck).then((res) => {
-                });
-            }
-            if(row.action === "STOP" && row.status === "EXECUTING") {
-                let dataTruck = {
-                    status: "AVAILABLE"
-                }
-                updateTruck(row.truckId, dataTruck).then((res) => {
-                });
-            }
-            
-            let dataItem = {
-                status: row.status === "SCHEDULED" ? "EXECUTING" : "DONE"
-            }
-            updateTripItem(row.id, dataItem).then((res) => {});
-            setExecutes(!executed);
+        // if (row?.type === "Truck") {
+        //     if (row.action === "DEPART" && row.status === "SCHEDULED") {
+        //         let dataTruck = {
+        //             status: "EXECUTING"
+        //         }
+        //         updateTruck(row.truckId, dataTruck).then((res) => {
+        //         });
+        //     }
+        //     if (row.action === "STOP" && row.status === "EXECUTING") {
+        //         let dataTruck = {
+        //             status: "AVAILABLE"
+        //         }
+        //         updateTruck(row.truckId, dataTruck).then((res) => {
+        //         });
+        //     }
+
+        //     let dataItem = {
+        //         status: row.status === "SCHEDULED" ? "EXECUTING" : "DONE"
+        //     }
+        //     updateTripItem(row.id, dataItem).then((res) => { });
+        //     setExecutes(!executed);
+        // }
+        // if (row?.type === "Trailer") {
+        //     if (row.action === "PICKUP_TRAILER" && row.status === "SCHEDULED") {
+        //         let dataTrailer = {
+        //             id: row.trailerId,
+        //             status: "EXECUTING"
+        //         }
+        //         updateTrailer(dataTrailer).then((res) => {
+        //         })
+        //     }
+
+        //     if (row.action === "DROP_TRAILER" && row.status === "EXECUTING") {
+        //         let dataTrailer = {
+        //             id: row.trailerId,
+        //             status: "AVAILABLE"
+        //         }
+        //         updateTrailer(dataTrailer).then((res) => {
+        //         })
+        //     }
+
+        //     let dataItem = {
+        //         status: row.status === "SCHEDULED" ? "EXECUTING" : "DONE"
+        //     }
+        //     updateTripItem(row.id, dataItem).then((res) => { });
+        //     setExecutes(!executed);
+        // }
+        // if (row?.type === "Order") {
+        //     if (row.action === "PICKUP-CONTAINER" && row.status === "SCHEDULED") {
+        //         let dataOrder = {
+        //             status: "EXECUTING"
+        //         }
+        //         updateOrderByOrderCode(row.orderCode, dataOrder).then((res) => {
+        //         })
+        //     }
+
+        //     if (row.action === "DELIVERY_CONTAINER" && row.status === "EXECUTING") {
+        //         let dataOrder = {
+        //             status: "DONE"
+        //         }
+        //         updateOrderByOrderCode(row.orderCode, dataOrder).then((res) => {
+        //         })
+        //     }
+
+        //     let dataItem = {
+        //         status: row.status === "SCHEDULED" ? "EXECUTING" : "DONE"
+        //     }
+        //     updateTripItem(row.id, dataItem).then((res) => { });
+        //     setExecutes(!executed);
+        // }
+        if(row.status === "SCHEDULED") {
+            row.status = "EXECUTING";
         }
-        if(row?.type === "Trailer") {
-            if(row.action === "PICKUP_TRAILER" && row.status === "SCHEDULED") {
-                let dataTrailer = {
-                    id: row.trailerId,
-                    status: "EXECUTING"
-                }
-                updateTrailer(dataTrailer).then((res) => {
-                })
-            }
-
-            if(row.action === "DELIVERY_TRAILER" && row.status === "EXECUTING") {
-                let dataTrailer = {
-                    id: row.trailerId,
-                    status: "AVAILABLE"
-                }
-                updateTrailer(dataTrailer).then((res) => {
-                })
-            }
-
-            let dataItem = {
-                status: row.status === "SCHEDULED" ? "EXECUTING" : "DONE"
-            }
-            updateTripItem(row.id, dataItem).then((res) => {});
-            setExecutes(!executed);
+        else if(row.status === "EXECUTING") {
+            row.status = "DONE";
         }
-        if(row?.type === "Order") {
-            if(row.action === "PICKUP-CONTAINER" && row.status === "SCHEDULED") {
-                let dataOrder = {
-                    status: "EXECUTING"
-                }
-                updateOrderByOrderCode(row.orderCode, dataOrder).then((res) => {
-                })
-            }
-
-            if(row.action === "DELIVERY-CONTAINER" && row.status === "EXECUTING") {
-                let dataOrder = {
-                    status: "DONE"
-                }
-                updateOrderByOrderCode(row.orderCode, dataOrder).then((res) => {
-                })
-            }
-
-            let dataItem = {
-                status: row.status === "SCHEDULED" ? "EXECUTING" : "DONE"
-            }
-            updateTripItem(row.id, dataItem).then((res) => {});
+        updateTripItem(row.uid, row).then((res) => {
             setExecutes(!executed);
-        }
+        });
     }
     return (
         <Box sx={{ width: '100%', display: "flex", justifyContent: "center", backgroundColor: "white" }}>
@@ -305,6 +314,7 @@ export default function TableOrder({ tripItems, setExecutes, executed }) {
                             onSelectAllClick={handleSelectAllClick}
                             //   onRequestSort={handleRequestSort}
                             rowCount={tripItems.length}
+                            type={type}
                         />
                         <TableBody>
                             {tripItems
@@ -338,7 +348,7 @@ export default function TableOrder({ tripItems, setExecutes, executed }) {
                                                 component="th"
                                                 id={labelId}
                                                 scope="row"
-                                                align="left" 
+                                                align="left"
                                             >
                                                 {row?.code}
                                             </TableCell>
@@ -347,20 +357,28 @@ export default function TableOrder({ tripItems, setExecutes, executed }) {
                                             {row?.type === "Truck" ? (<TableCell align="left">{row?.orderCode}</TableCell>) : null}
                                             {row?.type === "Trailer" ? (<TableCell align="left">{row?.trailerCode}</TableCell>) : null}
                                             {row?.type === "Order" ? (<TableCell align="left">{row?.containerCode}</TableCell>) : null}
-                                            <TableCell align="left">{row.status}</TableCell>
-                                            <TableCell>
-                                                <Box sx={{ display: 'flex' }}>
-                                                    <Button
-                                                        disabled={row.status === "DONE" ? true : false}
-                                                        variant="contained"
-                                                        onClick={() => {handleExecuted(row)}}
-                                                        sx={{width: '100%'}}
-                                                    >
-                                                        {row.status === "SCHEDULED" ? "Executing" : "Done" }
-                                                    </Button>
-                                                </Box>
-
+                                            <TableCell align="left">
+                                                <Chip label={row.status} color={colorStatus.get(row.status)} /> 
                                             </TableCell>
+                                            {
+                                                row.lateTime > 0 ? (
+                                                    <TableCell>{new Date(row.lateTime).toLocaleDateString()}</TableCell>
+                                                ) : <TableCell></TableCell>
+                                            }
+                                            {type === "Done" ? null : (
+                                                <TableCell>
+                                                    <Box sx={{ display: 'flex' }}>
+                                                        <Button
+                                                            disabled={row.status === "DONE" || trip?.status === "SCHEDULED" ? true : false}
+                                                            variant="contained"
+                                                            onClick={() => { handleExecuted(row) }}
+                                                            sx={{ width: '100%' }}
+                                                        >
+                                                            {row.status === "SCHEDULED" ? "EXECUTING" : "DONE"}
+                                                        </Button>
+                                                    </Box>
+
+                                                </TableCell>)}
                                         </TableRow>
                                     );
                                 })

@@ -4,6 +4,7 @@ import com.graphhopper.ResponsePath;
 import com.hust.wmsbackend.management.auto.DistanceCalculator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.omg.SendingContext.RunTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +20,11 @@ public class DeliveryRouteServiceImpl implements DeliveryRouteService {
     private final Double INFINITY_VALUE = Double.MAX_VALUE;
 
     @Override
-    public RouteResponse getRoute(RouteRequest r) {
+    public RouteResponse getRoute(RouteRequest request) throws RuntimeException {
         // remove duplicate customer address
-        buildNormAddressList(r);
-
-        List<Double[]> matrix = calCostMatrix(r);
+        List<DeliveryAddressDTO> originalDeliveryAddresses = request.getAddressDTOs();
+        buildNormAddressList(request);
+        List<Double[]> matrix = calCostMatrix(request);
         log.info("Cost matrix => ");
         for (Double[] m : matrix) {
             log.info(Arrays.toString(m));
@@ -50,18 +51,18 @@ public class DeliveryRouteServiceImpl implements DeliveryRouteService {
                 // get path in node
                 AddressPair pair = new AddressPair();
                 if (sourceNode == 0) {
-                    pair.setSourLon(r.getWarehouseLon());
-                    pair.setSourLat(r.getWarehouseLat());
+                    pair.setSourLon(request.getWarehouseLon());
+                    pair.setSourLat(request.getWarehouseLat());
                 } else {
-                    pair.setSourLon(r.getAddressDTOs().get(sourceNode - 1).getLongitude());
-                    pair.setSourLat(r.getAddressDTOs().get(sourceNode - 1).getLatitude());
+                    pair.setSourLon(request.getAddressDTOs().get(sourceNode - 1).getLongitude());
+                    pair.setSourLat(request.getAddressDTOs().get(sourceNode - 1).getLatitude());
                 }
                 if (destNode == 0) {
-                    pair.setDestLon(r.getWarehouseLon());
-                    pair.setDestLat(r.getWarehouseLat());
+                    pair.setDestLon(request.getWarehouseLon());
+                    pair.setDestLat(request.getWarehouseLat());
                 } else {
-                    pair.setDestLon(r.getAddressDTOs().get(destNode - 1).getLongitude());
-                    pair.setDestLat(r.getAddressDTOs().get(destNode - 1).getLatitude());
+                    pair.setDestLon(request.getAddressDTOs().get(destNode - 1).getLongitude());
+                    pair.setDestLat(request.getAddressDTOs().get(destNode - 1).getLatitude());
                 }
                 ResponsePath adderPath = pathMap.get(pair);
                 responsePath.add(adderPath);
@@ -70,9 +71,17 @@ public class DeliveryRouteServiceImpl implements DeliveryRouteService {
                 if (sourceNode == 0) {
                     continue;
                 } else {
-                    DeliveryAddressDTO addressDTO = r.getAddressDTOs().get(sourceNode - 1);
-                    addressDTO.setSequence(sequence);
-                    order.add(addressDTO);
+//                    DeliveryAddressDTO addressDTO = request.getAddressDTOs().get(sourceNode - 1);
+                    DeliveryAddressDTO normAddressDTO = request.getAddressDTOs().get(sourceNode - 1);
+                    for (DeliveryAddressDTO origin : originalDeliveryAddresses) {
+                        if (origin.getLatitude().compareTo(normAddressDTO.getLatitude()) == 0 &&
+                            origin.getLongitude().compareTo(normAddressDTO.getLongitude()) == 0) {
+                            origin.setSequence(sequence);
+                            order.add(origin);
+                        }
+                    }
+//                    addressDTO.setSequence(sequence);
+//                    order.add(addressDTO);
                     sequence += 1;
                 }
             }
@@ -85,8 +94,8 @@ public class DeliveryRouteServiceImpl implements DeliveryRouteService {
         return null;
     }
 
-    private void buildNormAddressList(RouteRequest r) {
-        List<DeliveryAddressDTO> originAddress = r.getAddressDTOs();
+    public void buildNormAddressList(RouteRequest request) {
+        List<DeliveryAddressDTO> originAddress = request.getAddressDTOs();
         log.info(String.format("Origin address => %s", originAddress));
         List<DeliveryAddressDTO> normAddress = new ArrayList<>();
         normAddress.addAll(originAddress);
@@ -102,9 +111,10 @@ public class DeliveryRouteServiceImpl implements DeliveryRouteService {
         List<Integer> sortedIndex = new ArrayList<>(duplicateIndex);
         Collections.sort(sortedIndex);
         for (int i = sortedIndex.size() - 1; i >= 0; i--) {
-            normAddress.remove(i);
+            int removeIndex = sortedIndex.get(i);
+            normAddress.remove(removeIndex);
         }
-        r.setAddressDTOs(normAddress);
+        request.setAddressDTOs(normAddress);
         log.info(String.format("Norm address => %s", normAddress));
     }
 
@@ -144,7 +154,7 @@ public class DeliveryRouteServiceImpl implements DeliveryRouteService {
             setInfinityValueForColAndRow(i, path.get(path.size() - 1), cloneReducedMatrix);
 
             ReducedMatrix matrix = getReducedMatrix(cloneReducedMatrix);
-            double comp = matrix.getReducedCost() + reducedMatrix.getMatrix().get(path.get(path.size() - 1))[i];
+            double comp = matrix.getReducedCost() + costMatrix.get(path.get(path.size() - 1))[i];
             if (comp < minCost) {
                 minReducedMatrix.setReducedCost(matrix.getReducedCost());
                 minReducedMatrix.setMatrix(matrix.getMatrix());
@@ -230,7 +240,7 @@ public class DeliveryRouteServiceImpl implements DeliveryRouteService {
         return ReducedMatrix.builder().reducedCost(totalReduceCost).matrix(matrix.getMatrix()).build();
     }
 
-    private List<Double[]> calCostMatrix(RouteRequest r) {
+    private List<Double[]> calCostMatrix(RouteRequest r) throws RuntimeException {
         List<Double[]> matrix = new ArrayList<>();
         int customerCount = r.getAddressDTOs().size();
         log.info(String.format("Start calculate cost matrix for request %s", r));

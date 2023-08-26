@@ -35,7 +35,7 @@ export default function ListTestCase() {
   function getTestCases() {
     request(
       "GET",
-      "/get-test-case-list-by-problem/" + problemId,
+      "/problems/" + problemId + "/testcases",
 
       (res) => {
         // setTestCases(res.data.filter((item) => item.isPublic === "Y"));
@@ -51,9 +51,8 @@ export default function ListTestCase() {
 
   function rerunTestCase(problemId, testCaseId) {
     request(
-      "GET",
-      "/rerun-create-testcase-solution/" + problemId + "/" + testCaseId,
-
+      "post",
+      "/problems/" + problemId + "/testcases/" + testCaseId + "/solution",
       () => {
         getTestCases();
       },
@@ -147,13 +146,11 @@ export default function ListTestCase() {
             onClick={() => {
               request(
                 "delete",
-                "/delete-test-case/" + testCase.testCaseId,
-
+                "/testcases/" + testCase.testCaseId,
                 () => {
                   request(
                     "GET",
-                    "/get-test-case-list-by-problem/" + problemId,
-
+                    "/problems/" + problemId + "/testcases",
                     (res) => {
                       setTestCases(res.data);
                     },

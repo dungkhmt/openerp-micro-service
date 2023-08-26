@@ -14,4 +14,6 @@ public interface SaleOrderItemRepository extends JpaRepository<SaleOrderItem, UU
     List<SaleOrderItem> findAllByOrderId(UUID orderId);
 
     Optional<SaleOrderItem> findSaleOrderItemByOrderIdAndProductId(UUID orderId, UUID productId);
+
+    List<SaleOrderItem> findAllByProductId(UUID productId);
 }

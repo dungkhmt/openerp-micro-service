@@ -12,9 +12,13 @@ import com.hust.wmsbackend.management.repository.*;
 import com.hust.wmsbackend.management.service.ProductService;
 import com.hust.wmsbackend.management.service.ProductWarehouseService;
 import com.hust.wmsbackend.management.service.WarehouseService;
+import com.hust.wmsbackend.management.utils.DateTimeFormat;
+import com.hust.wmsbackend.management.utils.DateUtils;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTimeComparator;
+import org.joda.time.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +41,10 @@ public class ProductServiceImpl implements ProductService {
     private ProductWarehouseRepository productWarehouseRepository;
     private BayRepository bayRepository;
     private InventoryItemRepository inventoryItemRepository;
+    private ReceiptItemRequestRepository receiptItemRequestRepository;
+    private ReceiptItemRepository receiptItemRepository;
+    private SaleOrderItemRepository saleOrderItemRepository;
+    private AssignedOrderItemRepository assignedOrderItemRepository;
     private RedisCacheService redisCacheService;
 
     private WarehouseService warehouseService;
@@ -46,9 +54,10 @@ public class ProductServiceImpl implements ProductService {
     public Product createProduct(ProductRequest request) {
         log.info("Start create product " + request);
         Product product;
+        String productId;
         boolean isCreateRequest = request.getProductId() == null;
         if (!isCreateRequest) {
-            String productId = request.getProductId();
+            productId = request.getProductId();
             log.info("Start update product with id " + productId);
             Optional<Product> productOpt = productRepository.findById(UUID.fromString(productId));
             if (productOpt.isPresent()) {
@@ -83,90 +92,30 @@ public class ProductServiceImpl implements ProductService {
                 return null;
             }
         }
-        productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        productId = savedProduct.getProductId().toString();
         log.info("Saved new product");
 
         // update init product quantity of created product is not allowed
-        if (!isCreateRequest) {
-            return product;
-        }
+//        if (!isCreateRequest) {
+//            return product;
+//        }
 
         // update redis
         List<Product> products = redisCacheService.getCachedListObject(RedisCacheService.ALL_PRODUCTS_KEY, Product.class);
         if (products != null && !products.isEmpty()) {
+            int index = -1;
+            for (int i = 0; i < products.size(); i++) {
+                Product lProduct = products.get(i);
+                if (lProduct.getProductId().toString().equals(productId)) {
+                    index = i;
+                }
+            }
+            if (index != -1) {
+                products.remove(index);
+            }
             products.add(product);
             redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_PRODUCTS_KEY, products);
-        }
-
-        List<ProductRequest.InitProductQuantity> quantityList = request.getInitProductQuantityList();
-        Map<String, BigDecimal> normQuantityMap = new HashMap<>();
-        if (quantityList != null && !quantityList.isEmpty()) {
-            log.info("Init product quantity list is NOT empty");
-            Map<String, String> bayIdWarehouseIdMap = new HashMap<>();
-
-            // normalize list by bay id
-            for (ProductRequest.InitProductQuantity quantity : quantityList) {
-                String bayId = quantity.getBayId();
-                bayIdWarehouseIdMap.put(quantity.getBayId(), quantity.getWarehouseId());
-                if (!normQuantityMap.containsKey(quantity.getBayId())) {
-                    normQuantityMap.put(bayId, quantity.getQuantity());
-                } else {
-                    BigDecimal newValue = normQuantityMap.get(bayId).add(quantity.getQuantity());
-                    normQuantityMap.put(bayId, newValue);
-                }
-            }
-
-            for (ProductRequest.InitProductQuantity quantity : quantityList) {
-                InventoryItem item = InventoryItem.builder()
-                    .inventoryItemId(UUID.randomUUID())
-                    .bayId(UUID.fromString(quantity.getBayId()))
-                    .quantityOnHandTotal(quantity.getQuantity())
-                    .importPrice(quantity.getImportPrice())
-                    .productId(product.getProductId())
-                    .lotId(quantity.getLotId())
-                    .currencyUomId("VND")
-                    .datetimeReceived(new Date())
-                    .warehouseId(UUID.fromString(bayIdWarehouseIdMap.get(quantity.getBayId().toString())))
-                    .createdStamp(new Date())
-                    .lastUpdatedStamp(new Date())
-                    .isInitQuantity(true)
-                    .build();
-                inventoryItemRepository.save(item);
-            }
-            log.info("Saved product bay entity");
-
-            // update product warehouse quantity
-            List<Bay> bays = bayRepository.findAll();
-            Map<String, String> bayWarehouseMap = new HashMap<>(); // key = bayId, value = warehouseId -> For fast lookup
-            for (Bay bay : bays) {
-                bayWarehouseMap.put(bay.getBayId().toString(), bay.getWarehouseId().toString());
-            }
-            for (Map.Entry<String, BigDecimal> entry : normQuantityMap.entrySet()) {
-                if (bayWarehouseMap.containsKey(entry.getKey())) {
-                    UUID warehouseId = UUID.fromString(bayWarehouseMap.get(entry.getKey()));
-                    BigDecimal addQuantity = entry.getValue();
-                    BigDecimal currQuantity = productWarehouseService.
-                        getProductQuantityByWarehouseIdAndProductId(warehouseId, product.getProductId());
-                    BigDecimal newQuantity = currQuantity.add(addQuantity);
-
-                    Optional<ProductWarehouse> productWarehouseOpt = productWarehouseRepository.
-                        findProductWarehouseByWarehouseIdAndProductId(warehouseId, product.getProductId());
-                    ProductWarehouse productWarehouse;
-                    if (productWarehouseOpt.isPresent()) {
-                        productWarehouse = productWarehouseOpt.get();
-                        productWarehouse.setQuantityOnHand(newQuantity);
-                    } else {
-                        productWarehouse = ProductWarehouse.builder()
-                                                           .productId(product.getProductId())
-                                                           .warehouseId(warehouseId)
-                                                           .productWarehouseId(UUID.randomUUID())
-                                                           .quantityOnHand(newQuantity)
-                                                           .build();
-                    }
-                    productWarehouseRepository.save(productWarehouse);
-                }
-            }
-            log.info("Saved product warehouse entity");
         }
         return product;
     }
@@ -223,9 +172,38 @@ public class ProductServiceImpl implements ProductService {
                     .code(product.getCode())
                     .retailPrice(getCurrPriceByProductId(product.getProductId()))
                     .onHandQuantity(onhandQuantity == null ? BigDecimal.ZERO : onhandQuantity)
+                    .canBeDelete(checkProductCanBeDelete(product.getProductId()))
                     .build());
         }
         return response;
+    }
+
+    private boolean checkProductCanBeDelete(UUID productId) {
+        List<InventoryItem> inventoryItemList = inventoryItemRepository.findAllByProductId(productId);
+        if (!inventoryItemList.isEmpty()) {
+            return false;
+        }
+        List<ProductWarehouse> productWarehouseList = productWarehouseRepository.findAllByProductId(productId);
+        if (!productWarehouseList.isEmpty()) {
+            return false;
+        }
+        List<ReceiptItemRequest> receiptItemRequestList = receiptItemRequestRepository.findAllByProductId(productId);
+        if (!receiptItemRequestList.isEmpty()) {
+            return false;
+        }
+        List<ReceiptItem> receiptItemList = receiptItemRepository.findAllByProductId(productId);
+        if (!receiptItemList.isEmpty()) {
+            return false;
+        }
+        List<SaleOrderItem> saleOrderItemList = saleOrderItemRepository.findAllByProductId(productId);
+        if (!saleOrderItemList.isEmpty()) {
+            return false;
+        }
+        List<AssignedOrderItem> assignedOrderItemList = assignedOrderItemRepository.findAllByProductId(productId);
+        if (!assignedOrderItemList.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -267,8 +245,9 @@ public class ProductServiceImpl implements ProductService {
             productRepository.getProductDetailQuantityResponseByProductId(productId);
         List<ProductWarehouse> productWarehouses = productWarehouseRepository.findAllByProductId(productId);
         Map<UUID, String> warehouseNameMap = warehouseService.getWarehouseNameMap();
-        List<ProductDetailResponse.ProductWarehouseQuantity> warehouseQuantities = productWarehouses.stream().map(
-                productWarehouse -> ProductDetailResponse.ProductWarehouseQuantity.
+        List<ProductDetailResponse.ProductWarehouseQuantity> warehouseQuantities = productWarehouses.stream()
+                .filter(productWarehouse -> productWarehouse.getQuantityOnHand().compareTo(BigDecimal.ZERO) > 0)
+                .map(productWarehouse -> ProductDetailResponse.ProductWarehouseQuantity.
                         builder().quantity(productWarehouse.getQuantityOnHand())
                         .warehouseName(warehouseNameMap.get(productWarehouse.getWarehouseId()))
                         .warehouseId(productWarehouse.getWarehouseId().toString())
@@ -282,6 +261,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public boolean createProductPrice(ProductPriceRequest request) {
         log.info(String.format("Create product price with request %s", request));
         if (!productRepository.findById(UUID.fromString(request.getProductId())).isPresent()) {
@@ -299,6 +279,44 @@ public class ProductServiceImpl implements ProductService {
             return false;
         }
 
+        UUID productId = UUID.fromString(request.getProductId());
+        // get previous price config
+        List<ProductPrice> prices = productPriceRepository.findAllByProductId(productId);
+
+        // get current product price entity
+        ProductPrice updatePrice = null;
+        Date now = new Date();
+        if (!prices.isEmpty()) {
+            for (ProductPrice price : prices) {
+                if (DateUtils.isNowBetween(now, price.getStartDate(), price.getEndDate())) {
+                    updatePrice = price;
+                    break;
+                }
+            }
+        }
+
+        // set previous price config end date to request.getStartDate() - 1
+        if (updatePrice != null && updatePrice.getEndDate() == null) {
+            Date newEndDate = org.apache.commons.lang.time.DateUtils.addDays(request.getStartDate(), -1);
+            if (DateUtils.isBeforeOrEqual(updatePrice.getStartDate(), newEndDate)) {
+                updatePrice.setEndDate(newEndDate);
+            }
+        }
+
+        if (!prices.isEmpty()) {
+            for (ProductPrice price : prices) {
+                if (DateUtils.isOverlap(request.getStartDate(), request.getEndDate(), price.getStartDate(), price.getEndDate())) {
+                    return false;
+                }
+                if (updatePrice != null && price.getProductPriceId().equals(updatePrice.getProductPriceId())) {
+                    price.setEndDate(updatePrice.getEndDate());
+                }
+                if (DateUtils.isOverlap(request.getStartDate(), request.getEndDate(), price.getStartDate(), price.getEndDate())) {
+                    return false;
+                }
+            }
+        }
+
         ProductPrice productPrice = ProductPrice
             .builder()
             .productPriceId(UUID.randomUUID())
@@ -309,6 +327,9 @@ public class ProductServiceImpl implements ProductService {
             .productId(UUID.fromString(request.getProductId()))
             .build();
         productPriceRepository.save(productPrice);
+        if (updatePrice != null) {
+            productPriceRepository.save(updatePrice);
+        }
         log.info("Saved new product price");
         return true;
     }
@@ -323,8 +344,8 @@ public class ProductServiceImpl implements ProductService {
             List<ProductPriceResponse.ProductHistoryPrices> historyPrices = prices.stream()
                 .map(price -> ProductPriceResponse.ProductHistoryPrices.builder()
                     .price(price.getPrice())
-                    .startDate(price.getStartDate())
-                    .endDate(price.getEndDate())
+                    .startDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, price.getStartDate()))
+                    .endDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, price.getEndDate()))
                     .description(price.getDescription())
                     .productPriceId(price.getProductPriceId())
                     .build())
@@ -359,8 +380,15 @@ public class ProductServiceImpl implements ProductService {
         List<ProductPrice> prices = productPriceRepository.findAllByProductId(productId);
         Date now = new Date();
         BigDecimal currPrice = null;
+        DateTimeComparator comparator = DateTimeComparator.getDateOnlyInstance();
         for (ProductPrice price : prices) {
-            if (price.getStartDate().before(now) && (price.getEndDate() == null || price.getEndDate().after(now))) {
+//            if (price.getStartDate().before(now) && (price.getEndDate() == null || price.getEndDate().after(now))) {
+//                currPrice = price.getPrice();
+//                break;
+//            }
+            boolean isStartDateBefore = comparator.compare(price.getStartDate(), now) <= 0;
+            boolean isEndDateAfter = price.getEndDate() == null || comparator.compare(price.getEndDate(), now) >= 0;
+            if (isStartDateBefore && isEndDateAfter) {
                 currPrice = price.getPrice();
                 break;
             }

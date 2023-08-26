@@ -85,11 +85,11 @@ public class PurchaseOrderController extends BaseController {
         }
     }
     @ApiOperation(value = "Should only update products and vat")
-    // TODO: Reconsider this apis
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateOrder(@Valid @RequestBody UpdatePurchaseOrderDTO updatePurchaseOrderDTO, @PathVariable("id") long id) {
+    @PostMapping("/update")
+    public ResponseEntity<?> updateOrder(@Valid @RequestBody UpdatePurchaseOrderDTO updatePurchaseOrderDTO
+                                         ) {
         try {
-            return response(new ResultEntity(1, "Update order successfully", purchaseOrderService.updateOrder(updatePurchaseOrderDTO, id)));
+            return response(new ResultEntity(1, "Update order successfully", purchaseOrderService.updateOrder(updatePurchaseOrderDTO)));
         } catch (Exception ex) {
             return response(error(ex));
         }
@@ -105,8 +105,8 @@ public class PurchaseOrderController extends BaseController {
             return response(error(ex));
         }
     }
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteOrderById(@PathVariable("id") long id) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteOrderById(@RequestParam(value = "id", required = true) Long id) {
         try {
             purchaseOrderService.deleteOrderById(id);
             return response(new ResultEntity(1, "Delete order successfully", id));
