@@ -100,7 +100,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
 
     request(
       "post",
-      "/contests/submissions/testcases/solution-output",
+      "/submissions/testcases/solution-output",
       (res) => {
         res = res.data;
         setScore(res.score);
@@ -144,7 +144,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
   function getSubmissionDetailTestCaseByTestCase() {
     request(
       "get",
-      "/student/contests/submissions/" + submissionId,
+      "/student/submissions/" + submissionId,
       (res) => {
         let L = res.data.map((c) => ({
           ...c,

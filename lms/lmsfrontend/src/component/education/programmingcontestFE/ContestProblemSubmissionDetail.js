@@ -27,7 +27,7 @@ export default function ContestProblemSubmissionDetail() {
   useEffect(() => {
     request(
       "get",
-      "/student/contests/submissions/" + problemSubmissionId + "/general-info",
+      "/student/submissions/" + problemSubmissionId + "/general-info",
       (res) => {
         setMemoryUsage(res.data.memoryUsage);
         setProblemId(res.data.problemId);

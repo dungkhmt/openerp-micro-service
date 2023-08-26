@@ -47,7 +47,7 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
   function getSubmissionDetailTestCaseByTestCase() {
     request(
       "get",
-      "/teacher/contests/submissions/" + submissionId,
+      "/teacher/submissions/" + submissionId,
       (res) => {
         let L = res.data.map((c) => ({
           ...c,

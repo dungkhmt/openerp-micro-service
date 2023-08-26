@@ -22,7 +22,7 @@ export default function StudentLearningProgressDetailProgrammingSubmissionResult
     request(
       // token, history,
       "get",
-      "/users/" + studentId + "/contest-result",
+      "/contests/users/" + studentId + "/contest-result",
       (res) => {
         //let lst = [];
         //res.data.map((e) => {

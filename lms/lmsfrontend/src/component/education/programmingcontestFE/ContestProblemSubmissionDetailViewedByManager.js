@@ -35,7 +35,7 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
 
     request(
       "put",
-      "/contests/submissions/source-code",
+      "/submissions/source-code",
       (res) => {
         console.log("update submission source code", res.data);
       },
@@ -46,7 +46,7 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
   useEffect(() => {
     request(
       "get",
-      "/teacher/contests/submissions/" + problemSubmissionId + "/general-info",
+      "/teacher/submissions/" + problemSubmissionId + "/general-info",
       (res) => {
         setMemoryUsage(res.data.memoryUsage);
         setProblemId(res.data.problemId);

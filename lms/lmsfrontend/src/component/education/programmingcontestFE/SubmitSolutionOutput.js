@@ -41,7 +41,7 @@ export default function SubmitSolutionOutput() {
 
     request(
       "post",
-      "/contests/submissions/solution-output",
+      "/submissions/solution-output",
       (res) => {
         res = res.data;
         setIsProcessing(false);

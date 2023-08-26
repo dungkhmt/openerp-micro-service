@@ -86,7 +86,7 @@ export default function CodeSimilarityCheck(props) {
     request(
       "get",
       //"/get-code-similarity/" + contestId,
-      "contests/" + contestId + "/similarity-check",
+      "similarity-check/" + contestId,
       (res) => {
         console.log("getCodeSimilaritySummaryOfParticipants, res = ", res.data);
         /*
@@ -111,7 +111,7 @@ export default function CodeSimilarityCheck(props) {
     };
     request(
       "post",
-      "/contests/check-code-similarity/" + contestId,
+      "/check-code-similarity/" + contestId,
       {},
       {},
       body
@@ -126,7 +126,7 @@ export default function CodeSimilarityCheck(props) {
     };
     request(
       "post",
-      "/contests/check-code-similarity/" + contestId,
+      "/check-code-similarity/" + contestId,
 
       (res) => {
         console.log("getCodeChecking, res = ", res.data);

@@ -18,7 +18,7 @@ export default function AllContestsManager() {
   const switchJudgeMode = (mode) => {
     request(
       "post",
-      "/switch-judge-mode?mode=" + mode,
+      "/contests/switch-judge-mode?mode=" + mode,
       () => successNoti("Saved", 5000)
     ).then();
   }
