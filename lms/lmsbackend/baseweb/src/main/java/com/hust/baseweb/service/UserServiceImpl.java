@@ -85,8 +85,7 @@ public class UserServiceImpl implements UserService {
         return userLoginRepo.findByUserLoginId(userLoginId);
     }
 
-    @Override
-    public String getUserFullName(UserLogin user) {
+    private String getUserFullName(ModelSearchUserResult user) {
         String firstName = user.getFirstName() != null ? user.getFirstName() : "";
         String lastName = user.getLastName() != null ? user.getLastName() : "";
         return firstName + " " + lastName;
@@ -94,7 +93,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String getUserFullName(String userId) {
-        UserLogin user = userLoginRepo.findByUserLoginId(userId);
+        ModelSearchUserResult user = userLoginRepo.getUserGeneralInfo(userId);
         return getUserFullName(user);
     }
 

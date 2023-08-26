@@ -3,6 +3,7 @@ package com.hust.baseweb.applications.programmingcontest.repo;
 import com.hust.baseweb.applications.admin.dataadmin.education.model.ProgrammingContestSubmissionOM;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
 import com.hust.baseweb.applications.programmingcontest.model.ModelProblemMaxSubmissionPoint;
+import com.hust.baseweb.applications.programmingcontest.model.ModelSubmissionInfoRanking;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -123,4 +124,21 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmissionEn
     @Modifying
     @Query("update ContestSubmissionEntity s set s.status = ?2 where s.contestSubmissionId = ?1")
     void updateContestSubmissionStatus(UUID contestSubmissionId, String status);
+
+    @Query(value = "select new com.hust.baseweb.applications.programmingcontest.model.ModelSubmissionInfoRanking(c.problemId, MAX(c.point)) " +
+                   "from ContestSubmissionEntity c " +
+                   "where c.userId = ?1 " +
+                   "and c.contestId = ?2 " +
+                   "group by c.problemId")
+    List<ModelSubmissionInfoRanking> getHighestSubmissions(String userId, String contestId);
+
+
+    @Query(value = "select new com.hust.baseweb.applications.programmingcontest.model.ModelSubmissionInfoRanking(c.problemId, c.point) " +
+                   "from ContestSubmissionEntity c " +
+                   "where c.userId = ?1 " +
+                   "and c.contestId = ?2 " +
+                   "and c.createdAt = (select c2.createdAt " +
+                   "                    from ContestSubmissionEntity c2 " +
+                   "                    where c.createdAt = c2.createdAt)")
+    List<ModelSubmissionInfoRanking> getLatestSubmissions(String userId, String contestId);
 }

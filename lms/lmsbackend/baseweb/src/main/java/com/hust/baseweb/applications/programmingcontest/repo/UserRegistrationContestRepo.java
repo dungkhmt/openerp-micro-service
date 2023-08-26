@@ -2,6 +2,7 @@ package com.hust.baseweb.applications.programmingcontest.repo;
 
 import com.hust.baseweb.applications.programmingcontest.entity.UserRegistrationContestEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
@@ -49,6 +50,13 @@ public interface UserRegistrationContestRepo extends JpaRepository<UserRegistrat
     );
 
     List<UserRegistrationContestEntity> findAllByContestIdAndStatus(String contestId, String status);
+
+
+    @Query(value = "select user_id from user_registration_contest_new " +
+                   "where contest_id = ?1 " +
+                   "and status = ?2",
+           nativeQuery = true)
+    List<String> getAllUserIdsInContest(String contestId, String status);
 
     void deleteAllByContestId(String contestId);
 }

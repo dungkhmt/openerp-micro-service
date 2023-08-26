@@ -5,16 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContestSubmissionsByUser {
+public class ModelSubmissionInfoRanking {
 
-    private List<ModelSubmissionInfoRanking> mapProblemsToPoints;
-    private String userId;
-    private String fullname;
-    private long totalPoint;
+    private String problemId;
+    private Long point;
 }

@@ -1936,86 +1936,49 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         String contestId,
         Constants.GetPointForRankingType getPointForRankingType
     ) {
-        List<UserRegistrationContestEntity> users = userRegistrationContestRepo.findAllByContestIdAndStatus(contestId, Constants.RegistrationType.SUCCESSFUL.getValue());
-        ContestEntity contestEntity = contestRepo.findContestByContestId(contestId);
+        List<String> userIds = userRegistrationContestRepo.getAllUserIdsInContest(contestId, Constants.RegistrationType.SUCCESSFUL.getValue());
+        List<String> problemIds = contestRepo.findContestByContestId(contestId)
+                                             .getProblems().stream().map(ProblemEntity::getProblemId).collect(Collectors.toList());
 
         List<ContestSubmissionsByUser> listContestSubmissionsByUser = new ArrayList<>();
-        for (UserRegistrationContestEntity user : users) {
-
-            List<ContestSubmissionEntity> submissionsByUser = contestSubmissionPagingAndSortingRepo
-                .findAllByUserIdAndContestId(user.getUserId(), contestId);
-
+        for (String userId : userIds) {
             ContestSubmissionsByUser contestSubmission = new ContestSubmissionsByUser();
-            contestSubmission.setUserId(user.getUserId());
+            contestSubmission.setUserId(userId);
 
             HashMap<String, Long> mapProblemToPoint = new HashMap<>();
-
-            for (ProblemEntity problem : contestEntity.getProblems()) {
-                mapProblemToPoint.put(problem.getProblemId(), 0L);
+            for (String problemId : problemIds) {
+                mapProblemToPoint.put(problemId, 0L);
             }
 
+            List<ModelSubmissionInfoRanking> submissionsByUser = new ArrayList<>();
+
             switch (getPointForRankingType) {
-                // get highest submission score on each problem
                 case HIGHEST:
-                    for (ContestSubmissionEntity submission : submissionsByUser) {
-                        String problemId = submission.getProblemId();
-                        if (mapProblemToPoint.containsKey(problemId)) {
-                            if (submission.getPoint() > mapProblemToPoint.get(problemId)) {
-                                mapProblemToPoint.put(problemId, submission.getPoint());
-                            }
-                        }
-                    }
+                    submissionsByUser = contestSubmissionRepo.getHighestSubmissions(userId, contestId);
                     break;
 
-                // get latest submission score on each problem
                 case LATEST:
-                    HashMap<String, ContestSubmissionEntity> mapProblemToLatestSubmission = new HashMap<>();
-
-                    for (ContestSubmissionEntity submission : submissionsByUser) {
-                        String problemId = submission.getProblemId();
-                        if (mapProblemToPoint.containsKey(problemId)) {
-                            if (mapProblemToLatestSubmission.containsKey(problemId)) {
-                                Date tmpSubmissionTime = submission.getCreatedAt();
-                                Date currentSubmissionTime = mapProblemToLatestSubmission.get(problemId).getCreatedAt();
-                                if (tmpSubmissionTime.compareTo(currentSubmissionTime) >= 0) {
-                                    mapProblemToLatestSubmission.put(problemId, submission);
-                                }
-                            } else {
-                                mapProblemToLatestSubmission.put(problemId, submission);
-                            }
-                        }
-                    }
-
-                    for (Map.Entry<String, ContestSubmissionEntity> entry : mapProblemToLatestSubmission.entrySet()) {
-                        mapProblemToPoint.put(entry.getKey(), entry.getValue().getPoint());
-                    }
+                    submissionsByUser = contestSubmissionRepo.getLatestSubmissions(userId, contestId);
                     break;
+            }
+
+            for (ModelSubmissionInfoRanking submission : submissionsByUser) {
+                String problemId = submission.getProblemId();
+                if (mapProblemToPoint.containsKey(problemId))
+                    mapProblemToPoint.put(problemId, submission.getPoint());
             }
 
             long totalPoint = 0;
 
-            List<ContestSubmissionsByUserCustom> mapProblemsToPoints = new ArrayList<>();
+            List<ModelSubmissionInfoRanking> mapProblemsToPoints = new ArrayList<>();
             for (Map.Entry entry : mapProblemToPoint.entrySet()) {
-                ContestSubmissionsByUserCustom tmp = new ContestSubmissionsByUserCustom();
-                String problemId = entry.getKey().toString();
-//                String problemName = contestEntity.getProblems()
-//                                                  .stream().filter(p -> Objects.equals(p.getProblemId(), problemId))
-//                                                  .collect(Collectors.toList()).get(0)
-//                                                  .getProblemName();
-                tmp.setProblemId(problemId);
+                ModelSubmissionInfoRanking tmp = new ModelSubmissionInfoRanking();
+                tmp.setProblemId(entry.getKey().toString());
                 tmp.setPoint((Long) entry.getValue());
                 mapProblemsToPoints.add(tmp);
                 totalPoint += tmp.getPoint();
             }
-//            PersonModel person = userService.findPersonByUserLoginId(user.getUserId());
-//            UUID partyId = userLoginRepo.findByUserLoginId(user.getUserId()).getParty().getPartyId();
-//            Person userInfo = personRepo.findByPartyId(partyId);
-//            String fullname = user.getLastName() + " " + user.getMiddleName() + " " + user.getFirstName();
-//            String firstName = userInfo.getFirstName() != null ? userInfo.getFirstName() : "";
-//            String middleName = userInfo.getMiddleName() != null ? userInfo.getMiddleName() : "";
-//            String lastName = userInfo.getLastName() != null ? userInfo.getLastName() : "";
-//            contestSubmission.setFullname(firstName + " " + middleName + " " + lastName);
-            contestSubmission.setFullname(userService.getUserFullName(user.getUserId()));
+            contestSubmission.setFullname(userService.getUserFullName(userId));
             contestSubmission.setMapProblemsToPoints(mapProblemsToPoints);
             contestSubmission.setTotalPoint(totalPoint);
             listContestSubmissionsByUser.add(contestSubmission);

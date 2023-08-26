@@ -34,6 +34,11 @@ public interface UserLoginRepo extends JpaRepository<UserLogin, String> {
         Pageable pageable
     );
 
+    @Query(value = "select new com.hust.baseweb.applications.programmingcontest.model.ModelSearchUserResult(ul.userLoginId, ul.firstName, ul.lastName, ul.email) " +
+                   "from UserLogin ul \n" +
+                   "where ul.userLoginId = :userId")
+    ModelSearchUserResult getUserGeneralInfo(String userId);
+
     UserLogin findByUserLoginId(String userLoginId);
 
     List<UserLogin> findByParty(Party party);

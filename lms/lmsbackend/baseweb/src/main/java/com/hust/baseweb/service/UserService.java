@@ -17,8 +17,6 @@ public interface UserService {
 
     UserLogin findById(String userLoginId);
 
-    String getUserFullName(UserLogin userId);
-
     String getUserFullName(String userId);
 
     DPerson findByPartyId(String partyId);
