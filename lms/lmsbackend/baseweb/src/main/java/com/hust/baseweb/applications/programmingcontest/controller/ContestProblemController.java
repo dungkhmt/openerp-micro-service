@@ -9,12 +9,9 @@ import com.hust.baseweb.applications.programmingcontest.repo.ContestRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.UserContestProblemRoleRepo;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
 import com.hust.baseweb.service.UserService;
-import io.lettuce.core.dynamic.annotation.Param;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -166,21 +163,6 @@ public class ContestProblemController {
         TagEntity tag = problemTestCaseService.addNewTag(tagInput);
 
         return ResponseEntity.status(200).body(tag);
-    }
-
-    @Secured("ROLE_TEACHER")
-    @GetMapping("/users")
-    public ResponseEntity<?> searchUserBaseKeyword(
-        Pageable pageable,
-        @Param("keyword") String keyword
-    ) {
-        if (keyword == null) {
-            keyword = "";
-        }
-        log.info("searchUserBaseKeywordm keyword = " + keyword);
-//        ListPersonModel resp = problemTestCaseService.searchUserBaseKeyword(pageable, keyword);
-        Page<ModelSearchUserResult> resp = userService.findUserByKeyword(pageable, keyword);
-        return ResponseEntity.status(200).body(resp);
     }
 
     @GetMapping("/test-jmeter")
