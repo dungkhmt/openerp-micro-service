@@ -93,6 +93,12 @@ export default function EditTestCase(props) {
     if (filename !== "") {
       formData.append("file", filename);
 
+      const config = {
+        headers: {
+          "content-Type": "multipart/form-data",
+        },
+      };
+
       request(
         "put",
         "/testcases/" + testCaseId + "/file-upload",
@@ -119,7 +125,7 @@ export default function EditTestCase(props) {
     } else {
       // without file attached
       request(
-        "post",
+        "put",
         "/testcases/" + testCaseId,
         (res) => {
           res = res.data;
@@ -138,8 +144,7 @@ export default function EditTestCase(props) {
             //alert("Time Out!!!");
           },
         },
-        formData,
-        config
+        formData
       );
     }
   };
