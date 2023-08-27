@@ -116,6 +116,39 @@ public class ContestController {
         return ResponseEntity.status(200).body(response);
     }
 
+    @GetMapping("/contests/{contestId}/problems/{problemId}/")
+    public ResponseEntity<?> getProblemDetailInContestViewByStudent(
+        @PathVariable("problemId") String problemId, @PathVariable("contestId") String contestId
+    ) {
+        try {
+            ContestEntity contestEntity = contestRepo.findContestByContestId(contestId);
+            ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
+            if (cp == null) {
+                return ResponseEntity.ok().body("NOTFOUND");
+            }
+            ModelCreateContestProblemResponse problemEntity = problemTestCaseService.getContestProblem(problemId);
+            ModelStudentViewProblemDetail model = new ModelStudentViewProblemDetail();
+            if (contestEntity.getProblemDescriptionViewType() != null &&
+                contestEntity.getProblemDescriptionViewType()
+                             .equals(ContestEntity.CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_HIDDEN)) {
+                model.setProblemStatement(" ");
+            } else {
+                model.setProblemStatement(problemEntity.getProblemDescription());
+            }
+
+            model.setSubmissionMode(cp.getSubmissionMode());
+            model.setProblemName(cp.getProblemRename());
+            model.setProblemCode(cp.getProblemRecode());
+            model.setAttachment(problemEntity.getAttachment());
+            model.setAttachmentNames(problemEntity.getAttachmentNames());
+            return ResponseEntity.ok().body(model);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().body("NOTFOUND");
+    }
+
+
     @GetMapping("/contests/{contestId}/problems")
     public ResponseEntity<?> getListContestProblemViewedByStudent(@PathVariable("contestId") String contestId) {
         ContestEntity contestEntity = contestRepo.findContestByContestId(contestId);
