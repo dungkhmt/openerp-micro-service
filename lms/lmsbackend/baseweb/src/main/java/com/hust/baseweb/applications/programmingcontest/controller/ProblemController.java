@@ -1,20 +1,17 @@
 package com.hust.baseweb.applications.programmingcontest.controller;
 
 import com.hust.baseweb.applications.chatgpt.ChatGPTService;
-import com.hust.baseweb.applications.programmingcontest.entity.*;
+import com.hust.baseweb.applications.programmingcontest.entity.ProblemEntity;
+import com.hust.baseweb.applications.programmingcontest.entity.TagEntity;
+import com.hust.baseweb.applications.programmingcontest.entity.UserContestProblemRole;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
 import com.hust.baseweb.applications.programmingcontest.model.*;
-import com.hust.baseweb.applications.programmingcontest.repo.ContestProblemRepo;
-import com.hust.baseweb.applications.programmingcontest.repo.ContestRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.UserContestProblemRoleRepo;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
 import com.hust.baseweb.service.UserService;
-import io.lettuce.core.dynamic.annotation.Param;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,11 +30,9 @@ import java.util.UUID;
 @CrossOrigin
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
-public class ContestProblemController {
+public class ProblemController {
 
     ProblemTestCaseService problemTestCaseService;
-    ContestRepo contestRepo;
-    ContestProblemRepo contestProblemRepo;
     UserService userService;
     UserContestProblemRoleRepo userContestProblemRoleRepo;
     ChatGPTService chatGPTService;
@@ -83,38 +78,6 @@ public class ContestProblemController {
         } catch (MiniLeetCodeException e) {
             return ResponseEntity.status(e.getCode()).body(e.getMessage());
         }
-    }
-
-    @GetMapping("/student/problems/{problemId}/{contestId}")
-    public ResponseEntity<?> getProblemDetailViewByStudent(
-        @PathVariable("problemId") String problemId, @PathVariable("contestId") String contestId
-    ) {
-        try {
-            ContestEntity contestEntity = contestRepo.findContestByContestId(contestId);
-            ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
-            if (cp == null) {
-                return ResponseEntity.ok().body("NOTFOUND");
-            }
-            ModelCreateContestProblemResponse problemEntity = problemTestCaseService.getContestProblem(problemId);
-            ModelStudentViewProblemDetail model = new ModelStudentViewProblemDetail();
-            if (contestEntity.getProblemDescriptionViewType() != null &&
-                contestEntity.getProblemDescriptionViewType()
-                             .equals(ContestEntity.CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_HIDDEN)) {
-                model.setProblemStatement(" ");
-            } else {
-                model.setProblemStatement(problemEntity.getProblemDescription());
-            }
-
-            model.setSubmissionMode(cp.getSubmissionMode());
-            model.setProblemName(cp.getProblemRename());
-            model.setProblemCode(cp.getProblemRecode());
-            model.setAttachment(problemEntity.getAttachment());
-            model.setAttachmentNames(problemEntity.getAttachmentNames());
-            return ResponseEntity.ok().body(model);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.ok().body("NOTFOUND");
     }
 
     @Secured("ROLE_TEACHER")
@@ -166,21 +129,6 @@ public class ContestProblemController {
         TagEntity tag = problemTestCaseService.addNewTag(tagInput);
 
         return ResponseEntity.status(200).body(tag);
-    }
-
-    @Secured("ROLE_TEACHER")
-    @GetMapping("/users")
-    public ResponseEntity<?> searchUserBaseKeyword(
-        Pageable pageable,
-        @Param("keyword") String keyword
-    ) {
-        if (keyword == null) {
-            keyword = "";
-        }
-        log.info("searchUserBaseKeywordm keyword = " + keyword);
-//        ListPersonModel resp = problemTestCaseService.searchUserBaseKeyword(pageable, keyword);
-        Page<ModelSearchUserResult> resp = userService.findUserByKeyword(pageable, keyword);
-        return ResponseEntity.status(200).body(resp);
     }
 
     @GetMapping("/test-jmeter")

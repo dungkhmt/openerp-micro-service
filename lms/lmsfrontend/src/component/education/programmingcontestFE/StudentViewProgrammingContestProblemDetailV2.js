@@ -135,10 +135,10 @@ export default function StudentViewProgrammingContestProblemDetail() {
   function getProblemDetail() {
     request(
       "get",
-      "/student/problems/" +
-      problemId +
-      "/" +
-      contestId,
+      "/contests/" +
+      contestId +
+      "/problems/" +
+      problemId,
       (res) => {
         res = res.data;
         setProblem(res);
