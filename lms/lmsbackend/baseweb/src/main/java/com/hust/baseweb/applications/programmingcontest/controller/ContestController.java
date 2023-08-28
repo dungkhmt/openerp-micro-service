@@ -116,7 +116,7 @@ public class ContestController {
         return ResponseEntity.status(200).body(response);
     }
 
-    @GetMapping("/contests/{contestId}/problems/{problemId}/")
+    @GetMapping("/contests/{contestId}/problems/{problemId}")
     public ResponseEntity<?> getProblemDetailInContestViewByStudent(
         @PathVariable("problemId") String problemId, @PathVariable("contestId") String contestId
     ) {
