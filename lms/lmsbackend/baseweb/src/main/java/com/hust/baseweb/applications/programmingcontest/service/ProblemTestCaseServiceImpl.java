@@ -2237,8 +2237,17 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public ContestSubmissionEntity getContestSubmissionDetail(UUID submissionId) {
+    public ContestSubmissionEntity getContestSubmissionDetailForTeacher(UUID submissionId) {
         return contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(submissionId);
+    }
+
+    @Override
+    public ContestSubmissionEntity getContestSubmissionDetailForStudent(String userId, UUID submissionId) {
+        ContestSubmissionEntity submission = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(submissionId);
+        if (userId.equals(submission.getUserId())) {
+            return submission;
+        }
+        return null;
     }
 
     @Override

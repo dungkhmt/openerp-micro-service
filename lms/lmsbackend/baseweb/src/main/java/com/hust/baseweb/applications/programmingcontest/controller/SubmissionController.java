@@ -65,10 +65,11 @@ public class SubmissionController {
 
     @GetMapping("/student/submissions/{submissionId}/general-info")
     public ResponseEntity<?> getContestSubmissionDetailViewedByParticipant(
+        Principal principal,
         @PathVariable("submissionId") UUID submissionId
     ) {
-        log.info("get contest submission detail");
-        ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetail(submissionId);
+        ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetailForStudent(
+            principal.getName(), submissionId);
         return ResponseEntity.status(200).body(contestSubmission);
     }
 
@@ -77,8 +78,7 @@ public class SubmissionController {
     public ResponseEntity<?> getContestSubmissionDetailViewedByManager(
         @PathVariable("submissionId") UUID submissionId
     ) {
-        log.info("get contest submission detail");
-        ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetail(submissionId);
+        ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetailForTeacher(submissionId);
         return ResponseEntity.status(200).body(contestSubmission);
     }
 

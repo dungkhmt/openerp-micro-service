@@ -188,7 +188,9 @@ public interface ProblemTestCaseService {
     List<ContestSubmission> getNewestSubmissionResults(String userLoginId);
 
 
-    ContestSubmissionEntity getContestSubmissionDetail(UUID submissionId);
+    ContestSubmissionEntity getContestSubmissionDetailForTeacher(UUID submissionId);
+
+    ContestSubmissionEntity getContestSubmissionDetailForStudent(String userId, UUID submissionId);
 
     ModelGetContestInfosOfSubmissionOutput getContestInfosOfASubmission(UUID submissionId);
 
