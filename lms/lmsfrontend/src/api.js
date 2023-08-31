@@ -246,8 +246,8 @@ export async function request(
         errorHandlers["noResponse"](e);
       }
 
-      // , "Không thể kết nối tới máy chủ."
-      wifiOffNotify(wifiOffNotifyToastId);
+      // // , "Không thể kết nối tới máy chủ."
+      // wifiOffNotify(wifiOffNotifyToastId);
     } else {
       // Something happened in setting up the request that triggered an Error.
       console.log(
