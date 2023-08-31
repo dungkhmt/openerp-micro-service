@@ -176,8 +176,8 @@ function EditProblem() {
       errorNoti(t("missingField", {ns: "validation", fieldName: t("problemName")}), 3000);
       return false;
     }
-    if (timeLimitCPP <= 0 || timeLimitJAVA <= 0 || timeLimitPYTHON <=0 || timeLimitCPP > 60 || timeLimitJAVA > 60 || timeLimitPYTHON > 60) {
-      errorNoti(t("numberBetween", {ns: "validation", fieldName: t("timeLimit"), min: 1, max: 60}), 3000);
+    if (timeLimitCPP <= 0 || timeLimitJAVA <= 0 || timeLimitPYTHON <=0 || timeLimitCPP > 300 || timeLimitJAVA > 300 || timeLimitPYTHON > 300) {
+      errorNoti(t("numberBetween", {ns: "validation", fieldName: t("timeLimit"), min: 1, max: 300}), 3000);
       return false;
     }
     if (memoryLimit <= 0 || memoryLimit > 1024) {
