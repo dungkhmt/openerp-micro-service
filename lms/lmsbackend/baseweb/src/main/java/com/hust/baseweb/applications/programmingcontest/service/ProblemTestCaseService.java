@@ -73,7 +73,7 @@ public interface ProblemTestCaseService {
     List<ModelProblemSubmissionDetailByTestCaseResponse> getContestProblemSubmissionDetailByTestCaseOfASubmission(UUID submissionId);
 
     List<ModelProblemSubmissionDetailByTestCaseResponse> getContestProblemSubmissionDetailByTestCaseOfASubmissionViewedByParticipant(
-        UUID submissionId
+        String userId, UUID submissionId
     );
 
     ModelContestSubmissionResponse submitContestProblemTestCaseByTestCase(

@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -956,10 +957,15 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     @Override
     public List<ModelProblemSubmissionDetailByTestCaseResponse> getContestProblemSubmissionDetailByTestCaseOfASubmissionViewedByParticipant(
-        UUID submissionId
+        String userId, UUID submissionId
     ) {
         ContestSubmissionEntity sub = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(
             submissionId);
+
+        if (!userId.equals(sub.getUserId())) {
+            throw new AccessDeniedException("No permission");
+        }
+
         ContestEntity contest = null;
         String contestId = "";
         String problemId = "";
@@ -2247,7 +2253,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         if (userId.equals(submission.getUserId())) {
             return submission;
         }
-        return null;
+        throw new AccessDeniedException("No permission");
     }
 
     @Override
