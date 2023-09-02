@@ -42,7 +42,7 @@
     "react-splitter-layout": "^4.0.0",
     "react-toastify": "^6.2.0",
     "simplebar-react": "^2.3.6",
-    "socket.io-client": "^4.6.1",
+    "socket.io-client": "4.7.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
