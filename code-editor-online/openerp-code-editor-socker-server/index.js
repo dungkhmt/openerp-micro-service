@@ -13,8 +13,7 @@ const { default: axios } = require("axios");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const io = require("socket.io")(server, { cors: { origin: "*" }, allowEIO3: true // false by default 
-});
+const io = require("socket.io")(server, { cors: { origin: "*" }});
 
 userSocketMap = {};
 
