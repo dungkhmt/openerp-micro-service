@@ -19,7 +19,8 @@ WORKDIR /usr/src/app
 # where available (npm@5+)
 COPY --chown=node:node package.json ./
 
-RUN npm ci --only=production
+#RUN npm ci --only=production
+RUN npm i
 
 # Bundle app source
 COPY --chown=node:node . .
