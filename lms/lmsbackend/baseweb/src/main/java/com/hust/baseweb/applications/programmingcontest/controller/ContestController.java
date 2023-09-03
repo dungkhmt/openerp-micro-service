@@ -407,10 +407,6 @@ public class ContestController {
         @PathVariable("contestId") String contestId,
         @RequestParam Constants.GetPointForRankingType getPointForRankingType
     ) {
-        ContestEntity contest = contestService.findContestWithCache(contestId);
-        if (!contest.getIsPublic()) {
-            return ResponseEntity.status(400).body("This contest is not public");
-        }
         if (contestSubmissionRepo.countAllByContestId(contestId) > 500) {
             return ResponseEntity
                 .status(400)

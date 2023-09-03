@@ -20,11 +20,9 @@ import com.hust.baseweb.applications.programmingcontest.utils.TempDir;
 import com.hust.baseweb.applications.programmingcontest.utils.codesimilaritycheckingalgorithms.CodeSimilarityCheck;
 import com.hust.baseweb.applications.programmingcontest.utils.stringhandler.ProblemSubmission;
 import com.hust.baseweb.applications.programmingcontest.utils.stringhandler.StringHandler;
-import com.hust.baseweb.entity.Person;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.model.ListPersonModel;
 import com.hust.baseweb.model.PersonModel;
-import com.hust.baseweb.repo.PersonRepo;
 import com.hust.baseweb.repo.UserLoginRepo;
 import com.hust.baseweb.service.UserService;
 import lombok.AllArgsConstructor;
@@ -44,11 +42,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.criteria.Predicate;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.persistence.criteria.Predicate;
 import static com.hust.baseweb.config.rabbitmq.ProblemContestRoutingKey.JUDGE_PROBLEM;
 import static com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestConfig.EXCHANGE;
 
@@ -72,7 +70,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     private NotificationsService notificationsService;
     private UserSubmissionContestResultNativeRepo userSubmissionContestResultNativeRepo;
     private UserRegistrationContestPagingAndSortingRepo userRegistrationContestPagingAndSortingRepo;
-    private UserSubmissionContestResultNativePagingRepo userSubmissionContestResultNativePagingRepo;
     private ContestSubmissionPagingAndSortingRepo contestSubmissionPagingAndSortingRepo;
     private ContestSubmissionTestCaseEntityRepo contestSubmissionTestCaseEntityRepo;
     private UserService userService;
@@ -82,7 +79,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     private ContestProblemRepo contestProblemRepo;
     private UserContestProblemRoleRepo userContestProblemRoleRepo;
     private TagRepo tagRepo;
-    private PersonRepo personRepo;
     private MongoContentService mongoContentService;
     private ProblemService problemService;
     private ContestService contestService;
@@ -537,7 +533,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .contestName(modelCreateContest.getContestName())
                                              .contestSolvingTime(modelCreateContest.getContestTime())
 //                                             .problems(problemEntities)
-                                             .isPublic(modelCreateContest.isPublic())
                                              .countDown(modelCreateContest.getCountDownTime())
                                              .startedAt(modelCreateContest.getStartedAt())
                                              .startedCountDownTime(DateTimeUtils.minusMinutesDate(
@@ -565,7 +560,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .contestName(modelCreateContest.getContestName())
                                              .contestSolvingTime(modelCreateContest.getContestTime())
 //                                             .problems(problemEntities)
-                                             .isPublic(modelCreateContest.isPublic())
                                              .countDown(modelCreateContest.getCountDownTime())
                                              .userId(userName)
                                              .statusId(ContestEntity.CONTEST_STATUS_CREATED)
@@ -670,7 +664,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             throw new MiniLeetCodeException("Contest does not exist");
         }
         //  log.info("updateContest, isPublic = " + modelUpdateContest.getIsPublic());
-        boolean isPublic = !modelUpdateContest.getIsPublic().equals("false");
 
         //    log.info("updateContest, modelUpdateContest.isPublic = " + modelUpdateContest.getIsPublic() + " -> isPublic  = " + isPublic);
         UserLogin userLogin = userLoginRepo.findByUserLoginId(userName);
@@ -712,7 +705,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                        .endTime(DateTimeUtils.addMinutesDate(
                                                            modelUpdateContest.getStartedAt(),
                                                            modelUpdateContest.getContestSolvingTime()))
-                                                       .isPublic(isPublic)
                                                        .statusId(modelUpdateContest.getStatusId())
                                                        .submissionActionType(modelUpdateContest.getSubmissionActionType())
                                                        .maxNumberSubmissions(modelUpdateContest.getMaxNumberSubmission())
@@ -1784,7 +1776,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                                      .contestTime(contest.getContestSolvingTime())
                                                                                      .countDown(contest.getCountDown())
                                                                                      .startAt(contest.getStartedAt())
-                                                                                     .isPublic(contest.getIsPublic())
                                                                                      .statusId(contest.getStatusId())
                                                                                      .userId(contest.getUserId())
                                                                                      .createdAt(contest.getCreatedAt())
@@ -1912,7 +1903,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                                          .contestTime(contest.getContestSolvingTime())
                                                                                          .countDown(contest.getCountDown())
                                                                                          .startAt(contest.getStartedAt())
-                                                                                         .isPublic(contest.getIsPublic())
                                                                                          .statusId(contest.getStatusId())
                                                                                          .userId(contest.getUserId())
                                                                                          .createdAt(contest.getCreatedAt())
@@ -2723,30 +2713,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                .build();
     }
 
-    private ModelGetContestPageResponse getModelGetContestPageResponse(List<ContestEntity> contestPage) {
-        List<ModelGetContestResponse> lists = new ArrayList<>();
-        if (contestPage != null) {
-            contestPage.forEach(contest -> {
-                ModelGetContestResponse modelGetContestResponse = ModelGetContestResponse.builder()
-                                                                                         .contestId(contest.getContestId())
-                                                                                         .contestName(contest.getContestName())
-                                                                                         .contestTime(contest.getContestSolvingTime())
-                                                                                         .countDown(contest.getCountDown())
-                                                                                         .startAt(contest.getStartedAt())
-                                                                                         .isPublic(contest.getIsPublic())
-                                                                                         .statusId(contest.getStatusId())
-                                                                                         .userId(contest.getUserId())
-                                                                                         .createdAt(contest.getCreatedAt())
-                                                                                         .build();
-                lists.add(modelGetContestResponse);
-            });
-        }
-
-        return ModelGetContestPageResponse.builder()
-                                          .contests(lists)
-                                          .build();
-    }
-
     private ModelGetContestPageResponse getModelGetContestPageResponse(Page<ContestEntity> contestPage) {
         List<ModelGetContestResponse> lists = new ArrayList<>();
         if (contestPage != null) {
@@ -2757,7 +2723,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                                          .contestTime(contest.getContestSolvingTime())
                                                                                          .countDown(contest.getCountDown())
                                                                                          .startAt(contest.getStartedAt())
-                                                                                         .isPublic(contest.getIsPublic())
                                                                                          .statusId(contest.getStatusId())
                                                                                          .userId(contest.getUserId())
                                                                                          .createdAt(contest.getCreatedAt())
@@ -2781,7 +2746,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                                          .contestTime(contest.getContestSolvingTime())
                                                                                          .countDown(contest.getCountDown())
                                                                                          .startAt(contest.getStartedAt())
-                                                                                         .isPublic(contest.getIsPublic())
                                                                                          .statusId(contest.getStatusId())
                                                                                          .userId(contest.getUserId())
                                                                                          .createdAt(contest.getCreatedAt())
