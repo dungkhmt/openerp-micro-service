@@ -46,7 +46,7 @@ export function StudentContestNotRegistered() {
     setLoading(true);
     request(
       "post",
-      "/contests/" + contestId + "register-student",
+      "/contests/" + contestId + "/register-student",
       (res) => {
         successNoti(res.data.message, true);
         getContestList();
