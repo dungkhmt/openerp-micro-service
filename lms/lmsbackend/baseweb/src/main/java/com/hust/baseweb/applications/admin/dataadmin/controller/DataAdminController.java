@@ -187,11 +187,12 @@ public class DataAdminController {
                 }
             }
 
-            PersonModel person = userService.findPersonByUserLoginId(e.getUserLoginId());
-            if (person != null) {
-                m.setFullname(person.getLastName() + " " + person.getMiddleName() + " " + person.getFirstName());
-                m.setAffiliations(person.getAffiliations());
-            }
+//            PersonModel person = userService.findPersonByUserLoginId(e.getUserLoginId());
+//            if (person != null) {
+//                m.setFullname(person.getLastName() + " " + person.getMiddleName() + " " + person.getFirstName());
+//                m.setAffiliations(person.getAffiliations());
+//            }
+            m.setFullname(userService.getUserFullName(e.getUserLoginId()));
             m.setClassId(classId);
             m.setCourseId(courseId);
             m.setCourseName(courseName);
@@ -261,11 +262,12 @@ public class DataAdminController {
                 }
             }
 
-            PersonModel person = userService.findPersonByUserLoginId(e.getUserLoginId());
-            if (person != null) {
-                m.setFullname(person.getLastName() + " " + person.getMiddleName() + " " + person.getFirstName());
-                m.setAffiliations(person.getAffiliations());
-            }
+//            PersonModel person = userService.findPersonByUserLoginId(e.getUserLoginId());
+//            if (person != null) {
+//                m.setFullname(person.getLastName() + " " + person.getMiddleName() + " " + person.getFirstName());
+//                m.setAffiliations(person.getAffiliations());
+//            }
+            m.setFullname(userService.getUserFullName(e.getUserLoginId()));
             m.setClassId(classId);
             m.setCourseId(courseId);
             m.setCourseName(courseName);

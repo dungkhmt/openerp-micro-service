@@ -8,7 +8,6 @@ function ViewCourseVideo() {
   const columns = [
     { title: "UserName", field: "userLoginId" },
     { title: "FullName", field: "fullname" },
-    { title: "Affiliations", field: "affiliations" },
     { title: "ClassId", field: "classId" },
     { title: "CourseId", field: "courseId" },
     { title: "CourseName", field: "courseName" },

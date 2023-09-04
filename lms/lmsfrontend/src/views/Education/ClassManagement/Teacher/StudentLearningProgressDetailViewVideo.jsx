@@ -8,7 +8,6 @@ export default function StudentLearningProgressDetailViewVideo(props) {
   const columns = [
     { title: "UserName", field: "userLoginId" },
     { title: "FullName", field: "fullname" },
-    { title: "Affiliations", field: "affiliations" },
     { title: "ClassCode", field: "classId" },
     { title: "CourseId", field: "courseId" },
     { title: "CourseName", field: "courseName" },
