@@ -96,6 +96,12 @@ public class ProblemEntity implements Serializable {
 
     @Column(name = "appearances")
     private int appearances;
+
+    @Column(name = "is_preload_code")
+    private Boolean isPreloadCode;
+
+    @Column(name = "preload_code")
+    private String preloadCode;
     
 //    @OneToMany(mappedBy = "contestProblem")
 //    private Set<TestCase> testCases;

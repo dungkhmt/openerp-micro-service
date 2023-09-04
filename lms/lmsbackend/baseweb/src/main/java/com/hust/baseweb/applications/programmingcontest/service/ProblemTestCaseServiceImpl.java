@@ -145,6 +145,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .correctSolutionLanguage(modelCreateContestProblem.getCorrectSolutionLanguage())
                                                    .correctSolutionSourceCode(modelCreateContestProblem.getCorrectSolutionSourceCode())
                                                    .solution(modelCreateContestProblem.getSolution())
+                                                   .isPreloadCode(modelCreateContestProblem.getIsPreloadCode())
+                                                   .preloadCode(modelCreateContestProblem.getPreloadCode())
                                                    .solutionCheckerSourceCode(modelCreateContestProblem.getSolutionChecker())
                                                    .solutionCheckerSourceLanguage(modelCreateContestProblem.getSolutionCheckerLanguage())
                                                    .scoreEvaluationType(modelCreateContestProblem.getScoreEvaluationType() !=
@@ -299,6 +301,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         problemEntity.setProblemDescription(modelUpdateContestProblem.getProblemDescription());
         problemEntity.setLevelId(modelUpdateContestProblem.getLevelId());
         problemEntity.setSolution(modelUpdateContestProblem.getSolution());
+        problemEntity.setIsPreloadCode(modelUpdateContestProblem.getIsPreloadCode());
+        problemEntity.setPreloadCode(modelUpdateContestProblem.getPreloadCode());
 //        problemEntity.setTimeLimit(modelUpdateContestProblem.getTimeLimit());
         problemEntity.setTimeLimitCPP(modelUpdateContestProblem.getTimeLimitCPP());
         problemEntity.setTimeLimitJAVA(modelUpdateContestProblem.getTimeLimitJAVA());
@@ -356,6 +360,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             problemResponse.setSolutionCheckerSourceLanguage(problemEntity.getSolutionCheckerSourceLanguage());
             problemResponse.setScoreEvaluationType(problemEntity.getScoreEvaluationType());
             problemResponse.setSolution(problemEntity.getSolution());
+            problemResponse.setIsPreloadCode(problemEntity.getIsPreloadCode());
+            problemResponse.setPreloadCode(problemEntity.getPreloadCode());
             problemResponse.setLevelOrder(problemEntity.getLevelOrder());
             problemResponse.setCreatedAt(problemEntity.getCreatedAt());
             problemResponse.setPublicProblem(problemEntity.isPublicProblem());
@@ -666,7 +672,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         //  log.info("updateContest, isPublic = " + modelUpdateContest.getIsPublic());
 
         //    log.info("updateContest, modelUpdateContest.isPublic = " + modelUpdateContest.getIsPublic() + " -> isPublic  = " + isPublic);
-        UserLogin userLogin = userLoginRepo.findByUserLoginId(userName);
+//        UserLogin userLogin = userLoginRepo.findByUserLoginId(userName);
 
         List<UserRegistrationContestEntity> L = userRegistrationContestRepo
             .findUserRegistrationContestEntityByContestIdAndUserIdAndStatus(
@@ -3680,6 +3686,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         problemResponse.setSolutionCheckerSourceLanguage(problemEntity.getSolutionCheckerSourceLanguage());
         problemResponse.setScoreEvaluationType(problemEntity.getScoreEvaluationType());
         problemResponse.setSolution(problemEntity.getSolution());
+        problemResponse.setIsPreloadCode(problemEntity.getIsPreloadCode());
+        problemResponse.setPreloadCode(problemEntity.getPreloadCode());
         problemResponse.setLevelOrder(problemEntity.getLevelOrder());
         problemResponse.setCreatedAt(problemEntity.getCreatedAt());
         problemResponse.setPublicProblem(problemEntity.isPublicProblem());

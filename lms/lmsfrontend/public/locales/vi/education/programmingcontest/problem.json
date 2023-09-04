@@ -16,10 +16,11 @@
   "checkerSourceCode": "Checker Source code",
   "checkerSourceCodePlaceholder": "Code chấm điểm cho output của sinh viên",
   "checkSolutionCompile": "Biên dịch",
+  "isPreloadCode": "Cung cấp đoạn code ban đầu cho sinh viên",
+  "preloadCode": "Phần code cung cấp sẵn",
   "problemList": {
     "title": "Danh sách bài tập",
     "status": "Trạng thái",
-    "title": "Tiêu đề",
     "solution": "Lời giải",
     "level": "Độ khó",
     "createdBy": "Người tạo",

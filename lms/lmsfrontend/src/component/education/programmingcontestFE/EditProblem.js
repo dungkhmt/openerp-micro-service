@@ -8,7 +8,6 @@ import {
   Grid,
   InputAdornment,
   InputLabel,
-  Link as MuiLink,
   ListItemText,
   MenuItem,
   OutlinedInput,
@@ -36,7 +35,7 @@ import {getAllTags} from "./service/TagService";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ModelAddNewTag from "./ModelAddNewTag";
 import FileUploadZone from "../../../utils/FileUpload/FileUploadZone";
-import { PROBLEM_STATUS } from "utils/constants";
+import {PROBLEM_STATUS} from "utils/constants";
 
 const useStyles = makeStyles((theme) => ({
   description: {
@@ -64,6 +63,8 @@ function EditProblem() {
   const [memoryLimit, setMemoryLimit] = useState(1);
   const [levelId, setLevelId] = useState("");
   const [codeSolution, setCodeSolution] = useState("");
+  const [isPreloadCode, setIsPreloadCode] = useState(false);
+  const [preloadCode, setPreloadCode] = useState("");
   const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState("CPP");
   const [solutionChecker, setSolutionChecker] = useState("");
   const [isCustomEvaluated, setIsCustomEvaluated] = useState(false);
@@ -135,6 +136,8 @@ function EditProblem() {
       setIsPublic(res.publicProblem);
       setLanguageSolution(res.correctSolutionLanguage);
       setCodeSolution(res.correctSolutionSourceCode);
+      setIsPreloadCode(res.isPreloadCode);
+      setPreloadCode(res.preloadCode);
       setSolutionCheckerLanguage(res.solutionCheckerLanguage);
       setSolutionChecker(res.solutionCheckerSourceCode || "");
       setIsCustomEvaluated(res.scoreEvaluationType === CUSTOM_EVALUATION);
@@ -221,6 +224,8 @@ function EditProblem() {
       correctSolutionLanguage: languageSolution,
       solution: solution,
       correctSolutionSourceCode: codeSolution,
+      isPreloadCode: isPreloadCode,
+      preloadCode: preloadCode,
       solutionChecker: solutionChecker,
       isPublic: isPublic,
       fileId: fileId,
@@ -512,6 +517,28 @@ function EditProblem() {
 
       <Box sx={{marginTop: "12px"}}>
         <FormControlLabel
+          label={t("isPreloadCode")}
+          control={
+            <Checkbox
+              checked={isPreloadCode}
+              onChange={() => setIsPreloadCode(!isPreloadCode)}
+            />}
+        />
+        {isPreloadCode &&
+          <HustCodeEditor
+            title={t("preloadCode")}
+            sourceCode={preloadCode}
+            onChangeSourceCode={(code) => {
+              setPreloadCode(code);
+            }}
+            height="280px"
+            placeholder="Write the initial code segment that provided to the participants here"
+          />
+        }
+      </Box>
+
+      <Box sx={{marginTop: "12px"}}>
+        <FormControlLabel
           label={t("isCustomEvaluated")}
           control={
             <Checkbox
@@ -520,9 +547,6 @@ function EditProblem() {
             />}
         />
         <Typography variant="body2" color="gray">{t("customEvaluationNote1")}</Typography>
-        <MuiLink href="#" underline="hover">
-          <Typography variant="body2" color="gray">{t("customEvaluationNote2")}</Typography>
-        </MuiLink>
 
         {isCustomEvaluated &&
           <HustCodeEditor

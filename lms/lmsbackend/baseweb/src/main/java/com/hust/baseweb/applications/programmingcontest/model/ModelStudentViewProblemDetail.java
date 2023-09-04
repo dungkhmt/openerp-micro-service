@@ -23,4 +23,6 @@ public class ModelStudentViewProblemDetail {
     private Date createdStamp;
     private List<byte[]> attachment;
     private List<String> attachmentNames;
+    private Boolean isPreloadCode;
+    private String preloadCode;
 }

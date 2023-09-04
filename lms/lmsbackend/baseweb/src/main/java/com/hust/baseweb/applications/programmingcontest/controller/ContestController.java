@@ -1,15 +1,15 @@
 package com.hust.baseweb.applications.programmingcontest.controller;
 
 import com.google.gson.Gson;
-import com.hust.baseweb.applications.chatgpt.ChatGPTService;
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.*;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
 import com.hust.baseweb.applications.programmingcontest.model.*;
-import com.hust.baseweb.applications.programmingcontest.repo.*;
+import com.hust.baseweb.applications.programmingcontest.repo.ContestProblemRepo;
+import com.hust.baseweb.applications.programmingcontest.repo.ContestRepo;
+import com.hust.baseweb.applications.programmingcontest.repo.ContestSubmissionRepo;
 import com.hust.baseweb.applications.programmingcontest.service.ContestService;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
-import com.hust.baseweb.applications.programmingcontest.service.helper.cache.ProblemTestCaseServiceCache;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;
 import io.lettuce.core.dynamic.annotation.Param;
@@ -139,6 +139,8 @@ public class ContestController {
             model.setSubmissionMode(cp.getSubmissionMode());
             model.setProblemName(cp.getProblemRename());
             model.setProblemCode(cp.getProblemRecode());
+            model.setIsPreloadCode(problemEntity.getIsPreloadCode());
+            model.setPreloadCode(problemEntity.getPreloadCode());
             model.setAttachment(problemEntity.getAttachment());
             model.setAttachmentNames(problemEntity.getAttachmentNames());
             return ResponseEntity.ok().body(model);

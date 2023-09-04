@@ -61,6 +61,8 @@ function CreateProblem() {
   const [description, setDescription] = useState("");
   const [solution, setSolution] = useState("");
   const [codeSolution, setCodeSolution] = useState("");
+  const [isPreloadCode, setIsPreloadCode] = useState(false);
+  const [preloadCode, setPreloadCode] = useState("");
   const [languageSolution, setLanguageSolution] = useState("CPP");
   const [solutionChecker, setSolutionChecker] = useState("");
   const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState("CPP");
@@ -168,6 +170,8 @@ function CreateProblem() {
       correctSolutionLanguage: languageSolution,
       solution: solution,
       correctSolutionSourceCode: codeSolution,
+      isPreloadCode: isPreloadCode,
+      preloadCode: preloadCode,
       solutionChecker: solutionChecker,
       solutionCheckerLanguage: solutionCheckerLanguage,
       isPublic: isPublic,
@@ -466,6 +470,28 @@ function CreateProblem() {
 
       <Box sx={{marginTop: "12px"}}>
         <FormControlLabel
+          label={t("isPreloadCode")}
+          control={
+            <Checkbox
+              checked={isPreloadCode}
+              onChange={() => setIsPreloadCode(!isPreloadCode)}
+            />}
+        />
+        {isPreloadCode &&
+          <HustCodeEditor
+            title={t("preloadCode")}
+            sourceCode={preloadCode}
+            onChangeSourceCode={(code) => {
+              setPreloadCode(code);
+            }}
+            height="280px"
+            placeholder="Write the initial code segment that provided to the participants here"
+          />
+        }
+      </Box>
+
+      <Box sx={{marginTop: "12px"}}>
+        <FormControlLabel
           label={t("isCustomEvaluated")}
           control={
             <Checkbox
@@ -474,9 +500,6 @@ function CreateProblem() {
             />}
         />
         <Typography variant="body2" color="gray">{t("customEvaluationNote1")}</Typography>
-        <Link href="#" underline="hover">
-          <Typography variant="body2" color="gray">{t("customEvaluationNote2")}</Typography>
-        </Link>
 
         {isCustomEvaluated &&
           <HustCodeEditor
