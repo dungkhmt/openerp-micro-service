@@ -118,11 +118,12 @@ public class DataAdminController {
             cs.setContestId(e.getContestId());
             cs.setProblemId(e.getProblemId());
             cs.setUserId(e.getUserId());
-            PersonModel person = userService.findPersonByUserLoginId(e.getUserId());
-            if (person != null) {
-                cs.setFullname(person.getLastName() + " " + person.getMiddleName() + " " + person.getFirstName());
-                cs.setAffiliation(person.getAffiliations());
-            }
+//            PersonModel person = userService.findPersonByUserLoginId(e.getUserId());
+//            if (person != null) {
+//                cs.setFullname(person.getLastName() + " " + person.getMiddleName() + " " + person.getFirstName());
+//                cs.setAffiliation(person.getAffiliations());
+//            }
+            cs.setFullname(userService.getUserFullName(e.getUserId()));
 
             cs.setPoint(e.getPoint());
             cs.setStatus(e.getStatus());

@@ -7,7 +7,6 @@ export default function ViewProgrammingContestSubmission() {
   const columns = [
     { title: "UserName", field: "userId" },
     { title: "FullName", field: "fullname" },
-    { title: "Affiliations", field: "affiliation" },
     { title: "ContestId", field: "contestId" },
     { title: "ProblemId", field: "problemId" },
     { title: "Point", field: "point" },
