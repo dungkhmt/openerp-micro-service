@@ -3,6 +3,7 @@ package com.hust.baseweb.rest.user;
 import com.hust.baseweb.applications.programmingcontest.model.ModelSearchUserResult;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;
+import io.lettuce.core.dynamic.annotation.Param;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,18 @@ public class UserController {
 //    private SecurityGroupService securityGroupService;
 //
 //    private UserRegisterRepo userRegisterRepo;
+
+    @GetMapping("/users")
+    public ResponseEntity<?> searchUserBaseKeyword(
+        Pageable pageable,
+        @Param("keyword") String keyword
+    ) {
+        if (keyword == null) {
+            keyword = "";
+        }
+        Page<ModelSearchUserResult> resp = userService.findUserByKeyword(pageable, keyword);
+        return ResponseEntity.status(200).body(resp);
+    }
 
     /**
      * > This function returns a user's detail by login id

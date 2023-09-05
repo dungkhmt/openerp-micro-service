@@ -1,15 +1,15 @@
 package com.hust.baseweb.applications.programmingcontest.controller;
 
 import com.google.gson.Gson;
-import com.hust.baseweb.applications.chatgpt.ChatGPTService;
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.*;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
 import com.hust.baseweb.applications.programmingcontest.model.*;
-import com.hust.baseweb.applications.programmingcontest.repo.*;
+import com.hust.baseweb.applications.programmingcontest.repo.ContestProblemRepo;
+import com.hust.baseweb.applications.programmingcontest.repo.ContestRepo;
+import com.hust.baseweb.applications.programmingcontest.repo.ContestSubmissionRepo;
 import com.hust.baseweb.applications.programmingcontest.service.ContestService;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
-import com.hust.baseweb.applications.programmingcontest.service.helper.cache.ProblemTestCaseServiceCache;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;
 import io.lettuce.core.dynamic.annotation.Param;
@@ -115,6 +115,41 @@ public class ContestController {
             principal.getName());
         return ResponseEntity.status(200).body(response);
     }
+
+    @GetMapping("/contests/{contestId}/problems/{problemId}")
+    public ResponseEntity<?> getProblemDetailInContestViewByStudent(
+        @PathVariable("problemId") String problemId, @PathVariable("contestId") String contestId
+    ) {
+        try {
+            ContestEntity contestEntity = contestRepo.findContestByContestId(contestId);
+            ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
+            if (cp == null) {
+                return ResponseEntity.ok().body("NOTFOUND");
+            }
+            ModelCreateContestProblemResponse problemEntity = problemTestCaseService.getContestProblem(problemId);
+            ModelStudentViewProblemDetail model = new ModelStudentViewProblemDetail();
+            if (contestEntity.getProblemDescriptionViewType() != null &&
+                contestEntity.getProblemDescriptionViewType()
+                             .equals(ContestEntity.CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_HIDDEN)) {
+                model.setProblemStatement(" ");
+            } else {
+                model.setProblemStatement(problemEntity.getProblemDescription());
+            }
+
+            model.setSubmissionMode(cp.getSubmissionMode());
+            model.setProblemName(cp.getProblemRename());
+            model.setProblemCode(cp.getProblemRecode());
+            model.setIsPreloadCode(problemEntity.getIsPreloadCode());
+            model.setPreloadCode(problemEntity.getPreloadCode());
+            model.setAttachment(problemEntity.getAttachment());
+            model.setAttachmentNames(problemEntity.getAttachmentNames());
+            return ResponseEntity.ok().body(model);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().body("NOTFOUND");
+    }
+
 
     @GetMapping("/contests/{contestId}/problems")
     public ResponseEntity<?> getListContestProblemViewedByStudent(@PathVariable("contestId") String contestId) {
@@ -374,10 +409,6 @@ public class ContestController {
         @PathVariable("contestId") String contestId,
         @RequestParam Constants.GetPointForRankingType getPointForRankingType
     ) {
-        ContestEntity contest = contestService.findContestWithCache(contestId);
-        if (!contest.getIsPublic()) {
-            return ResponseEntity.status(400).body("This contest is not public");
-        }
         if (contestSubmissionRepo.countAllByContestId(contestId) > 500) {
             return ResponseEntity
                 .status(400)

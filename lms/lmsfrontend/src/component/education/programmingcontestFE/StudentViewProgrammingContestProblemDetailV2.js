@@ -135,13 +135,14 @@ export default function StudentViewProgrammingContestProblemDetail() {
   function getProblemDetail() {
     request(
       "get",
-      "/student/problems/" +
-      problemId +
-      "/" +
-      contestId,
+      "/contests/" +
+      contestId +
+      "/problems/" +
+      problemId,
       (res) => {
         res = res.data;
         setProblem(res);
+        if(res.isPreloadCode) setCodeSolution(res.preloadCode);
         if (res.attachment && res.attachment.length !== 0) {
           const newFileURLArray = res.attachment.map((url) => ({
             id: randomImageName(),
@@ -174,6 +175,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
   }, []);
 
   useEffect(() => {
+    if (problem && problem.isPreloadCode === true) return;
     switch (language) {
       case COMPUTER_LANGUAGES.CPP:
         setCodeSolution(DEFAULT_CODE_SEGMENT_CPP);

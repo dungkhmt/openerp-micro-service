@@ -16,7 +16,6 @@ export default function CreateContest(props) {
 
   const [contestName, setContestName] = useState("");
   const [contestId, setContestId] = useState("");
-  const [isPublic, setIsPublic] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [maxNumberSubmissions, setMaxNumberSubmissions] = useState(10);
   const [maxSourceCodeLength, setMaxSourceCodeLength] = useState(50000);
@@ -35,7 +34,6 @@ export default function CreateContest(props) {
       contestName: contestName,
       contestTime: 0,
       problemIds: [],
-      isPublic: isPublic,
       maxNumberSubmissions: maxNumberSubmissions,
       startedAt: startDate,
       countDownTime: 0,
@@ -98,27 +96,6 @@ export default function CreateContest(props) {
                   setContestName(event.target.value);
                 }}
               />
-            </Grid>
-
-
-            <Grid item xs={3}>
-              <TextField
-                fullWidth
-                select
-                id="Public"
-                label="Public"
-                onChange={(event) => {
-                  setIsPublic(event.target.value);
-                }}
-                value={isPublic}
-              >
-                <MenuItem key={"true"} value={true}>
-                  Yes
-                </MenuItem>
-                <MenuItem key={"false"} value={false}>
-                  No
-                </MenuItem>
-              </TextField>
             </Grid>
 
             <Grid item xs={3}>

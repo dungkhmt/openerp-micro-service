@@ -24,6 +24,8 @@ public class ModelCreateContestProblem {
     private String solutionChecker;
     private String solutionCheckerLanguage;
     private String solution;
+    private Boolean isPreloadCode;
+    private String preloadCode;
     private Boolean isPublic;
     private String scoreEvaluationType;
     private String[] fileId;

@@ -49,6 +49,10 @@ public class ModelCreateContestProblemResponse {
 
     private String solution;
 
+    private Boolean isPreloadCode;
+
+    private String preloadCode;
+
     private int levelOrder;
 
     private Date createdAt;

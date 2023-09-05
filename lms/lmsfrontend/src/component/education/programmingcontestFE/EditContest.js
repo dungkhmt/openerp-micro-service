@@ -27,7 +27,6 @@ export default function EditContest() {
   const [contestName, setContestName] = useState("");
   const [contestTime, setContestTime] = useState(Number(0));
 
-  const [isPublic, setIsPublic] = useState(false);
   const [startDate, setStartDate] = React.useState(new Date());
   const [countDown, setCountDown] = useState(Number(0));
   const [statusId, setStatusId] = useState("");
@@ -56,7 +55,6 @@ export default function EditContest() {
     let body = {
       contestName: contestName,
       contestSolvingTime: contestTime,
-      isPublic: isPublic,
       startedAt: startDate,
       countDownTime: countDown,
       statusId: statusId,
@@ -84,7 +82,6 @@ export default function EditContest() {
     request("get", "/contests/" + contestId, (res) => {
       setContestTime(res.data.contestTime);
       setContestName(res.data.contestName);
-      setIsPublic(res.data.isPublic);
       setStartDate(res.data.startAt);
       setStatusId(res.data.statusId);
       setListStatusIds(res.data.listStatusIds);
@@ -142,26 +139,6 @@ export default function EditContest() {
                 {listStatusIds.map((item) => (<MenuItem key={item} value={item}>
                   {item}
                 </MenuItem>))}
-              </TextField>
-            </Grid>
-
-            <Grid item xs={3}>
-              <TextField
-                fullWidth
-                select
-                id="Public"
-                label="Public"
-                onChange={(event) => {
-                  setIsPublic(event.target.value);
-                }}
-                value={isPublic}
-              >
-                <MenuItem key={"true"} value={true}>
-                  Yes
-                </MenuItem>
-                <MenuItem key={"false"} value={false}>
-                  No
-                </MenuItem>
               </TextField>
             </Grid>
 

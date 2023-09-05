@@ -72,8 +72,8 @@ export default function ContestManagerRankingPublicV2(props) {
         title: "TOTAL",
         field: "totalPoint",
         render: (rankingRecord) => (
-          <span style={{fontWeight: 600, color: "#2e7d32"}}>
-            {`${rankingRecord.totalPoint}`}
+          <span style={{fontWeight: 600, color: "#2e7d32", width: "100%", display: "inline-block", textAlign: "right"}}>
+            {`${rankingRecord.totalPoint.toLocaleString('en-US')}`}
           </span>
         )
       }

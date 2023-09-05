@@ -17,7 +17,6 @@ public class ModelGetContestDetailResponse implements Serializable {
     private Date startAt;
     private List<ModelGetProblemDetailResponse> list;
     private boolean unauthorized;
-    private Boolean isPublic;
     private String statusId;
     private String submissionActionType;
     private int maxNumberSubmission;

@@ -20,16 +20,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.security.Principal;
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @CrossOrigin
@@ -56,19 +54,33 @@ public class SubmissionController {
 
     @GetMapping("/student/submissions/{submissionId}")
     public ResponseEntity<?> getContestProblemSubmissionDetailByTestCaseOfASubmissionViewedByParticipant(
-        @PathVariable UUID submissionId
+        Principal principal, @PathVariable UUID submissionId
     ) {
-        List<ModelProblemSubmissionDetailByTestCaseResponse> retLst = problemTestCaseService
-            .getContestProblemSubmissionDetailByTestCaseOfASubmissionViewedByParticipant(submissionId);
+        List<ModelProblemSubmissionDetailByTestCaseResponse> retLst;
+        try {
+            retLst = problemTestCaseService
+                .getContestProblemSubmissionDetailByTestCaseOfASubmissionViewedByParticipant(
+                    principal.getName(),
+                    submissionId);
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(403).body(e.getMessage());
+        }
         return ResponseEntity.ok().body(retLst);
     }
 
     @GetMapping("/student/submissions/{submissionId}/general-info")
     public ResponseEntity<?> getContestSubmissionDetailViewedByParticipant(
+        Principal principal,
         @PathVariable("submissionId") UUID submissionId
     ) {
-        log.info("get contest submission detail");
-        ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetail(submissionId);
+        ContestSubmissionEntity contestSubmission;
+        try {
+             contestSubmission = problemTestCaseService.getContestSubmissionDetailForStudent(
+                principal.getName(), submissionId);
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(403).body(e.getMessage());
+        }
+
         return ResponseEntity.status(200).body(contestSubmission);
     }
 
@@ -77,8 +89,7 @@ public class SubmissionController {
     public ResponseEntity<?> getContestSubmissionDetailViewedByManager(
         @PathVariable("submissionId") UUID submissionId
     ) {
-        log.info("get contest submission detail");
-        ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetail(submissionId);
+        ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetailForTeacher(submissionId);
         return ResponseEntity.status(200).body(contestSubmission);
     }
 

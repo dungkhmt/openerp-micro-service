@@ -105,7 +105,6 @@ public class ContestService {
             .startAt(contestEntity.getStartedAt())
             .list(problems)
             .unauthorized(false)
-            .isPublic(contestEntity.getIsPublic())
             .statusId(contestEntity.getStatusId())
             .listStatusIds(ContestEntity.getStatusIds())
             .listSubmissionActionTypes(ContestEntity.getSubmissionActionTypes())

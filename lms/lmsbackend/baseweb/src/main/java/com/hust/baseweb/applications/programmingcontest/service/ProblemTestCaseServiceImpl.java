@@ -20,11 +20,9 @@ import com.hust.baseweb.applications.programmingcontest.utils.TempDir;
 import com.hust.baseweb.applications.programmingcontest.utils.codesimilaritycheckingalgorithms.CodeSimilarityCheck;
 import com.hust.baseweb.applications.programmingcontest.utils.stringhandler.ProblemSubmission;
 import com.hust.baseweb.applications.programmingcontest.utils.stringhandler.StringHandler;
-import com.hust.baseweb.entity.Person;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.model.ListPersonModel;
 import com.hust.baseweb.model.PersonModel;
-import com.hust.baseweb.repo.PersonRepo;
 import com.hust.baseweb.repo.UserLoginRepo;
 import com.hust.baseweb.service.UserService;
 import lombok.AllArgsConstructor;
@@ -39,15 +37,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.criteria.Predicate;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.persistence.criteria.Predicate;
 import static com.hust.baseweb.config.rabbitmq.ProblemContestRoutingKey.JUDGE_PROBLEM;
 import static com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestConfig.EXCHANGE;
 
@@ -71,7 +70,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     private NotificationsService notificationsService;
     private UserSubmissionContestResultNativeRepo userSubmissionContestResultNativeRepo;
     private UserRegistrationContestPagingAndSortingRepo userRegistrationContestPagingAndSortingRepo;
-    private UserSubmissionContestResultNativePagingRepo userSubmissionContestResultNativePagingRepo;
     private ContestSubmissionPagingAndSortingRepo contestSubmissionPagingAndSortingRepo;
     private ContestSubmissionTestCaseEntityRepo contestSubmissionTestCaseEntityRepo;
     private UserService userService;
@@ -81,7 +79,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     private ContestProblemRepo contestProblemRepo;
     private UserContestProblemRoleRepo userContestProblemRoleRepo;
     private TagRepo tagRepo;
-    private PersonRepo personRepo;
     private MongoContentService mongoContentService;
     private ProblemService problemService;
     private ContestService contestService;
@@ -148,6 +145,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .correctSolutionLanguage(modelCreateContestProblem.getCorrectSolutionLanguage())
                                                    .correctSolutionSourceCode(modelCreateContestProblem.getCorrectSolutionSourceCode())
                                                    .solution(modelCreateContestProblem.getSolution())
+                                                   .isPreloadCode(modelCreateContestProblem.getIsPreloadCode())
+                                                   .preloadCode(modelCreateContestProblem.getPreloadCode())
                                                    .solutionCheckerSourceCode(modelCreateContestProblem.getSolutionChecker())
                                                    .solutionCheckerSourceLanguage(modelCreateContestProblem.getSolutionCheckerLanguage())
                                                    .scoreEvaluationType(modelCreateContestProblem.getScoreEvaluationType() !=
@@ -302,6 +301,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         problemEntity.setProblemDescription(modelUpdateContestProblem.getProblemDescription());
         problemEntity.setLevelId(modelUpdateContestProblem.getLevelId());
         problemEntity.setSolution(modelUpdateContestProblem.getSolution());
+        problemEntity.setIsPreloadCode(modelUpdateContestProblem.getIsPreloadCode());
+        problemEntity.setPreloadCode(modelUpdateContestProblem.getPreloadCode());
 //        problemEntity.setTimeLimit(modelUpdateContestProblem.getTimeLimit());
         problemEntity.setTimeLimitCPP(modelUpdateContestProblem.getTimeLimitCPP());
         problemEntity.setTimeLimitJAVA(modelUpdateContestProblem.getTimeLimitJAVA());
@@ -359,6 +360,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             problemResponse.setSolutionCheckerSourceLanguage(problemEntity.getSolutionCheckerSourceLanguage());
             problemResponse.setScoreEvaluationType(problemEntity.getScoreEvaluationType());
             problemResponse.setSolution(problemEntity.getSolution());
+            problemResponse.setIsPreloadCode(problemEntity.getIsPreloadCode());
+            problemResponse.setPreloadCode(problemEntity.getPreloadCode());
             problemResponse.setLevelOrder(problemEntity.getLevelOrder());
             problemResponse.setCreatedAt(problemEntity.getCreatedAt());
             problemResponse.setPublicProblem(problemEntity.isPublicProblem());
@@ -536,7 +539,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .contestName(modelCreateContest.getContestName())
                                              .contestSolvingTime(modelCreateContest.getContestTime())
 //                                             .problems(problemEntities)
-                                             .isPublic(modelCreateContest.isPublic())
                                              .countDown(modelCreateContest.getCountDownTime())
                                              .startedAt(modelCreateContest.getStartedAt())
                                              .startedCountDownTime(DateTimeUtils.minusMinutesDate(
@@ -564,7 +566,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .contestName(modelCreateContest.getContestName())
                                              .contestSolvingTime(modelCreateContest.getContestTime())
 //                                             .problems(problemEntities)
-                                             .isPublic(modelCreateContest.isPublic())
                                              .countDown(modelCreateContest.getCountDownTime())
                                              .userId(userName)
                                              .statusId(ContestEntity.CONTEST_STATUS_CREATED)
@@ -669,10 +670,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             throw new MiniLeetCodeException("Contest does not exist");
         }
         //  log.info("updateContest, isPublic = " + modelUpdateContest.getIsPublic());
-        boolean isPublic = !modelUpdateContest.getIsPublic().equals("false");
 
         //    log.info("updateContest, modelUpdateContest.isPublic = " + modelUpdateContest.getIsPublic() + " -> isPublic  = " + isPublic);
-        UserLogin userLogin = userLoginRepo.findByUserLoginId(userName);
+//        UserLogin userLogin = userLoginRepo.findByUserLoginId(userName);
 
         List<UserRegistrationContestEntity> L = userRegistrationContestRepo
             .findUserRegistrationContestEntityByContestIdAndUserIdAndStatus(
@@ -711,7 +711,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                        .endTime(DateTimeUtils.addMinutesDate(
                                                            modelUpdateContest.getStartedAt(),
                                                            modelUpdateContest.getContestSolvingTime()))
-                                                       .isPublic(isPublic)
                                                        .statusId(modelUpdateContest.getStatusId())
                                                        .submissionActionType(modelUpdateContest.getSubmissionActionType())
                                                        .maxNumberSubmissions(modelUpdateContest.getMaxNumberSubmission())
@@ -956,10 +955,15 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     @Override
     public List<ModelProblemSubmissionDetailByTestCaseResponse> getContestProblemSubmissionDetailByTestCaseOfASubmissionViewedByParticipant(
-        UUID submissionId
+        String userId, UUID submissionId
     ) {
         ContestSubmissionEntity sub = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(
             submissionId);
+
+        if (!userId.equals(sub.getUserId())) {
+            throw new AccessDeniedException("No permission");
+        }
+
         ContestEntity contest = null;
         String contestId = "";
         String problemId = "";
@@ -1778,7 +1782,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                                      .contestTime(contest.getContestSolvingTime())
                                                                                      .countDown(contest.getCountDown())
                                                                                      .startAt(contest.getStartedAt())
-                                                                                     .isPublic(contest.getIsPublic())
                                                                                      .statusId(contest.getStatusId())
                                                                                      .userId(contest.getUserId())
                                                                                      .createdAt(contest.getCreatedAt())
@@ -1906,7 +1909,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                                          .contestTime(contest.getContestSolvingTime())
                                                                                          .countDown(contest.getCountDown())
                                                                                          .startAt(contest.getStartedAt())
-                                                                                         .isPublic(contest.getIsPublic())
                                                                                          .statusId(contest.getStatusId())
                                                                                          .userId(contest.getUserId())
                                                                                          .createdAt(contest.getCreatedAt())
@@ -2237,8 +2239,17 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public ContestSubmissionEntity getContestSubmissionDetail(UUID submissionId) {
+    public ContestSubmissionEntity getContestSubmissionDetailForTeacher(UUID submissionId) {
         return contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(submissionId);
+    }
+
+    @Override
+    public ContestSubmissionEntity getContestSubmissionDetailForStudent(String userId, UUID submissionId) {
+        ContestSubmissionEntity submission = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(submissionId);
+        if (userId.equals(submission.getUserId())) {
+            return submission;
+        }
+        throw new AccessDeniedException("No permission");
     }
 
     @Override
@@ -2708,30 +2719,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                .build();
     }
 
-    private ModelGetContestPageResponse getModelGetContestPageResponse(List<ContestEntity> contestPage) {
-        List<ModelGetContestResponse> lists = new ArrayList<>();
-        if (contestPage != null) {
-            contestPage.forEach(contest -> {
-                ModelGetContestResponse modelGetContestResponse = ModelGetContestResponse.builder()
-                                                                                         .contestId(contest.getContestId())
-                                                                                         .contestName(contest.getContestName())
-                                                                                         .contestTime(contest.getContestSolvingTime())
-                                                                                         .countDown(contest.getCountDown())
-                                                                                         .startAt(contest.getStartedAt())
-                                                                                         .isPublic(contest.getIsPublic())
-                                                                                         .statusId(contest.getStatusId())
-                                                                                         .userId(contest.getUserId())
-                                                                                         .createdAt(contest.getCreatedAt())
-                                                                                         .build();
-                lists.add(modelGetContestResponse);
-            });
-        }
-
-        return ModelGetContestPageResponse.builder()
-                                          .contests(lists)
-                                          .build();
-    }
-
     private ModelGetContestPageResponse getModelGetContestPageResponse(Page<ContestEntity> contestPage) {
         List<ModelGetContestResponse> lists = new ArrayList<>();
         if (contestPage != null) {
@@ -2742,7 +2729,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                                          .contestTime(contest.getContestSolvingTime())
                                                                                          .countDown(contest.getCountDown())
                                                                                          .startAt(contest.getStartedAt())
-                                                                                         .isPublic(contest.getIsPublic())
                                                                                          .statusId(contest.getStatusId())
                                                                                          .userId(contest.getUserId())
                                                                                          .createdAt(contest.getCreatedAt())
@@ -2766,7 +2752,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                                          .contestTime(contest.getContestSolvingTime())
                                                                                          .countDown(contest.getCountDown())
                                                                                          .startAt(contest.getStartedAt())
-                                                                                         .isPublic(contest.getIsPublic())
                                                                                          .statusId(contest.getStatusId())
                                                                                          .userId(contest.getUserId())
                                                                                          .createdAt(contest.getCreatedAt())
@@ -3701,6 +3686,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         problemResponse.setSolutionCheckerSourceLanguage(problemEntity.getSolutionCheckerSourceLanguage());
         problemResponse.setScoreEvaluationType(problemEntity.getScoreEvaluationType());
         problemResponse.setSolution(problemEntity.getSolution());
+        problemResponse.setIsPreloadCode(problemEntity.getIsPreloadCode());
+        problemResponse.setPreloadCode(problemEntity.getPreloadCode());
         problemResponse.setLevelOrder(problemEntity.getLevelOrder());
         problemResponse.setCreatedAt(problemEntity.getCreatedAt());
         problemResponse.setPublicProblem(problemEntity.isPublicProblem());

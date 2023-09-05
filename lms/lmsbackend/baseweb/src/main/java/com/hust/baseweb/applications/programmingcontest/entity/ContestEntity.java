@@ -135,9 +135,6 @@ public class ContestEntity implements Serializable {
     @Column(name = "try_again")
     private boolean tryAgain;
 
-    @Column(name = "public")
-    private Boolean isPublic;
-
     @Column(name = "created_stamp")
     private Date createdAt;
 

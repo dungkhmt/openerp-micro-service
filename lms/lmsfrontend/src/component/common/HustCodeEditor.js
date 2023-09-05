@@ -33,10 +33,10 @@ const HustCodeEditor = (props) => {
     }
   }
   return (
-    <Box {...remainProps} className={`${classRoot}`} sx={{marginTop: "24px"}}>
+    <Box {...remainProps} className={`${classRoot}`} sx={{marginTop: "18px"}}>
       <Box sx={{display: "flex", flexDirection: "row", justifyContent: "space-between", marginBottom: "8px"}}>
         <Typography variant="h5">{title}</Typography>
-        <HustCodeLanguagePicker language={language} onChangeLanguage={onChangeLanguage}/>
+        {language && <HustCodeLanguagePicker language={language} onChangeLanguage={onChangeLanguage}/>}
       </Box>
 
       <AceEditor

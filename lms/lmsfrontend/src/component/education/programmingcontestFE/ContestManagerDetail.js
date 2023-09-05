@@ -26,7 +26,6 @@ const CssTextField = styled(TextField)({
 export function ContestManagerDetail(props) {
   const contestId = props.contestId;
   const [contestName, setContestName] = useState("");
-  const [isPublic, setIsPublic] = useState(false);
   const [statusId, setStatusId] = useState("");
   const [submissionActionType, setSubmissionActionType] = useState("");
   const [maxNumberSubmission, setMaxNumberSubmission] = useState(10);
@@ -43,7 +42,6 @@ export function ContestManagerDetail(props) {
   function getContestDetail() {
     request("get", "/contests/" + contestId, (res) => {
       setContestName(res.data.contestName);
-      setIsPublic(res.data.isPublic);
       setStatusId(res.data.statusId);
       setSubmissionActionType(res.data.submissionActionType);
       setParticipantViewResultMode(res.data.participantViewResultMode);
@@ -96,17 +94,6 @@ export function ContestManagerDetail(props) {
             id="statusId"
             label="Status"
             value={statusId}
-          >
-          </CssTextField>
-        </Grid>
-
-        <Grid item xs={3}>
-          <CssTextField
-            disabled
-            fullWidth
-            id="Public"
-            label="Public"
-            value={isPublic ? "Yes" : "No"}
           >
           </CssTextField>
         </Grid>
