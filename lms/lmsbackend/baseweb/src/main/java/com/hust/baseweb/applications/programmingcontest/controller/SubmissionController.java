@@ -307,7 +307,6 @@ public class SubmissionController {
                                                                                     .numberTestCasePassed(0)
                                                                                     .totalNumberTestCase(0)
                                                                                     .build();
-                //log.info("contestSubmitProblemViaUploadFile: Participant has not permission to submit");
                 return ResponseEntity.ok().body(resp);
 
             }
@@ -316,6 +315,18 @@ public class SubmissionController {
         List<ContestSubmissionEntity> submissions = contestSubmissionRepo
             .findAllByContestIdAndUserIdAndProblemId(model.getContestId(), principal.getName(),
                                                      model.getProblemId());
+
+        if (cp != null &&
+            cp.getSubmissionMode() != null &&
+            cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_NOT_ALLOWED)) {
+            ModelContestSubmissionResponse resp = ModelContestSubmissionResponse.builder()
+                                                                                .status("SUBMISSION_NOT_ALLOWED")
+                                                                                .message(
+                                                                                    "This problem is not opened for submitting solution")
+                                                                                .build();
+            return ResponseEntity.ok().body(resp);
+        }
+
         if (submissions.size() >= contestEntity.getMaxNumberSubmissions()) {
             ModelContestSubmissionResponse resp = ModelContestSubmissionResponse.builder()
                                                                                 .status("MAX_NUMBER_SUBMISSIONS_REACHED")
@@ -445,6 +456,13 @@ public class SubmissionController {
                 ModelContestSubmissionResponse resp = buildSubmissionResponseNoPermission();
                 return ResponseEntity.ok().body(resp);
             }
+        }
+
+        if (cp != null &&
+            cp.getSubmissionMode() != null &&
+            cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_NOT_ALLOWED)) {
+            ModelContestSubmissionResponse resp = buildSubmissionResponseSubmissionNotAllowed();
+            return ResponseEntity.ok().body(resp);
         }
 
         int numOfSubmissions = contestSubmissionRepo
@@ -585,6 +603,14 @@ public class SubmissionController {
                                              .score(0L)
                                              .numberTestCasePassed(0)
                                              .totalNumberTestCase(0)
+                                             .build();
+    }
+
+    private ModelContestSubmissionResponse buildSubmissionResponseSubmissionNotAllowed() {
+        return ModelContestSubmissionResponse.builder()
+                                             .status("SUBMISSION_NOT_ALLOWED")
+                                             .message(
+                                                 "This problem is not opened for submitting solution")
                                              .build();
     }
 

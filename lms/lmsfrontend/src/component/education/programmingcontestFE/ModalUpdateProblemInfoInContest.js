@@ -3,7 +3,12 @@ import React, {useEffect, useState} from "react";
 import {MenuItem, TextField} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import {saveProblemToContest} from "./service/ContestProblemService";
-import {getSubmissionModeFromConstant, SUBMISSION_MODE_SOLUTION_OUTPUT, SUBMISSION_MODE_SOURCE_CODE} from "./Constant";
+import {
+  getSubmissionModeFromConstant,
+  SUBMISSION_MODE_NOT_ALLOWED,
+  SUBMISSION_MODE_SOLUTION_OUTPUT,
+  SUBMISSION_MODE_SOURCE_CODE
+} from "./Constant";
 
 const ModalUpdateProblemInfoInContest = (props) => {
   const {contestId, editingProblem, isOpen, handleSuccess, handleClose} = props;
@@ -105,6 +110,9 @@ const ModalUpdateProblemInfoInContest = (props) => {
         </MenuItem>
         <MenuItem value={SUBMISSION_MODE_SOLUTION_OUTPUT}>
           {getSubmissionModeFromConstant(SUBMISSION_MODE_SOLUTION_OUTPUT)}
+        </MenuItem>
+        <MenuItem value={SUBMISSION_MODE_NOT_ALLOWED}>
+          {getSubmissionModeFromConstant(SUBMISSION_MODE_NOT_ALLOWED)}
         </MenuItem>
       </TextField>
     </HustModal>

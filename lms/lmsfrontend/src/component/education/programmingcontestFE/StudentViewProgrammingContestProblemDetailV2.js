@@ -60,6 +60,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
     "MAX_NUMBER_SUBMISSIONS_REACHED",
     "MAX_SOURCE_CODE_LENGTH_VIOLATIONS",
     "SUBMISSION_INTERVAL_VIOLATIONS",
+    "SUBMISSION_NOT_ALLOWED",
   ];
 
   const inputRef = useRef();
