@@ -1938,7 +1938,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         String contestId,
         Constants.GetPointForRankingType getPointForRankingType
     ) {
-        List<String> userIds = userRegistrationContestRepo.getAllUserIdsInContest(contestId, Constants.RegistrationType.SUCCESSFUL.getValue());
+        List<String> userIds = userRegistrationContestRepo.getAllUserIdsInContest(contestId, Constants.RegistrationType.SUCCESSFUL.getValue())
+                                                          .stream().distinct().collect(Collectors.toList());
         List<String> problemIds = contestRepo.findContestByContestId(contestId)
                                              .getProblems().stream().map(ProblemEntity::getProblemId).collect(Collectors.toList());
 
