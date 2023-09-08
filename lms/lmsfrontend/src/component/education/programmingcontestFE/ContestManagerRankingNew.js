@@ -94,10 +94,6 @@ export default function ContestManagerRankingNew(props) {
   }, [ranking])
 
   const generateColumns = () => {
-    let problems = [];
-    if (ranking.length > 0) {
-      problems = ranking[0].mapProblemsToPoints;
-    }
     const columns = [
       {title: "Username", field: "userId"},
       {
@@ -140,7 +136,7 @@ export default function ContestManagerRankingNew(props) {
       <Box>
         {loading && <LinearProgress/>}
         <StandardTable
-          title={"Contest: " + contestId}
+          title={contestId}
           columns={generateColumns()}
           data={rankingDetail}
           hideCommandBar
