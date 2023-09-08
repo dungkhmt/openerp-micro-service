@@ -15,7 +15,9 @@ import {
   COMPUTER_LANGUAGES,
   DEFAULT_CODE_SEGMENT_CPP,
   DEFAULT_CODE_SEGMENT_JAVA,
-  DEFAULT_CODE_SEGMENT_PYTHON
+  DEFAULT_CODE_SEGMENT_PYTHON,
+  SUBMISSION_MODE_NOT_ALLOWED,
+  SUBMISSION_MODE_SOURCE_CODE
 } from "./Constant";
 import ReactHtmlParser from 'react-html-parser';
 import {ContentState, EditorState} from "draft-js";
@@ -40,6 +42,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
   const [status, setStatus] = useState("");
   const [message, setMessage] = useState("");
   const [codeSolution, setCodeSolution] = useState("");
+  const [submissionMode, setSubmissionMode] = useState(SUBMISSION_MODE_SOURCE_CODE);
   const [isSubmitCode, setIsSubmitCode] = useState(0);
 
   const [openModalPreview, setOpenModalPreview] = useState(false);
@@ -144,6 +147,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
         res = res.data;
         setProblem(res);
         if(res.isPreloadCode) setCodeSolution(res.preloadCode);
+        if(res.submissionMode) setSubmissionMode(res.submissionMode);
         if (res.attachment && res.attachment.length !== 0) {
           const newFileURLArray = res.attachment.map((url) => ({
             id: randomImageName(),
@@ -266,9 +270,9 @@ export default function StudentViewProgrammingContestProblemDetail() {
             }}
             height={"480px"}
           />
-          <Box sx={{width: "100%", display: "flex", justifyContent: "center"}}>
+          <Box sx={{width: "100%", display: "flex", justifyContent: "center", alignItems: "center"}}>
             <Button
-              disabled={isProcessing}
+              disabled={isProcessing || submissionMode === SUBMISSION_MODE_NOT_ALLOWED}
               color="primary"
               variant="contained"
               type="submit"
@@ -277,6 +281,11 @@ export default function StudentViewProgrammingContestProblemDetail() {
             >
               SUBMIT CODE
             </Button>
+            {submissionMode === SUBMISSION_MODE_NOT_ALLOWED &&
+              <Typography color="gray" ml={1}>
+                Currently, this contest problem is not open for submissions
+              </Typography>
+            }
           </Box>
 
         </Box>
@@ -301,7 +310,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
 
             <Grid item xs={2}>
               <Button
-                disabled={isProcessing}
+                disabled={isProcessing || submissionMode === SUBMISSION_MODE_NOT_ALLOWED}
                 color="primary"
                 variant="contained"
                 type="submit"
