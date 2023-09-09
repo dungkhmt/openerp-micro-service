@@ -41,7 +41,7 @@
     "i18next-browser-languagedetector": "^6.1.4",
     "i18next-http-backend": "^1.4.0",
     "interweave": "^12.9.0",
-    "keycloak-js": "^21.0.2",
+    "keycloak-js": "22.0.1",
     "konva": "^8.3.8",
     "material-table": "^1.68.1",
     "material-ui-dropzone": "^3.3.1",
