@@ -409,11 +409,11 @@ public class ContestController {
         @PathVariable("contestId") String contestId,
         @RequestParam Constants.GetPointForRankingType getPointForRankingType
     ) {
-        if (contestSubmissionRepo.countAllByContestId(contestId) > 500) {
-            return ResponseEntity
-                .status(400)
-                .body("This contest size is too big. Contact the contest manager for ranking table");
-        }
+        // if (contestSubmissionRepo.countAllByContestId(contestId) > 500) {
+        //     return ResponseEntity
+        //         .status(400)
+        //         .body("This contest size is too big. Contact the contest manager for ranking table");
+        // }
 
         List<ContestSubmissionsByUser> res = problemTestCaseService.getRankingByContestIdNew(
             contestId,
