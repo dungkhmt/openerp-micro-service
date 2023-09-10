@@ -530,9 +530,32 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             if (contestEntityExist != null) {
                 throw new MiniLeetCodeException("Contest is already exist");
             }
-            ContestEntity contestEntity = null;
-//            List<ProblemEntity> problemEntities = getContestProblemsFromListContestId(modelCreateContest.getProblemIds());
+            ContestEntity contestEntity = ContestEntity.builder()
+                                                       .contestId(contestId)
+                                                       .contestName(modelCreateContest.getContestName())
+                                                       .contestSolvingTime(modelCreateContest.getContestTime())
+                                                       .countDown(modelCreateContest.getCountDownTime())
+                                                       .startedAt(modelCreateContest.getStartedAt())
+                                                       .startedCountDownTime(DateTimeUtils.minusMinutesDate(
+                                                           modelCreateContest.getStartedAt(),
+                                                           modelCreateContest.getCountDownTime()))
+                                                       .endTime(DateTimeUtils.addMinutesDate(
+                                                           modelCreateContest.getStartedAt(),
+                                                           modelCreateContest.getContestTime()))
+                                                       .userId(userName)
+                                                       .statusId(ContestEntity.CONTEST_STATUS_CREATED)
+                                                       .maxNumberSubmissions(modelCreateContest.getMaxNumberSubmissions())
+                                                       .maxSourceCodeLength(modelCreateContest.getMaxSourceCodeLength())
+                                                       .minTimeBetweenTwoSubmissions(modelCreateContest.getMinTimeBetweenTwoSubmissions())
+                                                       .judgeMode(ContestEntity.ASYNCHRONOUS_JUDGE_MODE_QUEUE)
+                                                       .submissionActionType(ContestEntity.CONTEST_SUBMISSION_ACTION_TYPE_STORE_AND_EXECUTE)
+                                                       .problemDescriptionViewType(ContestEntity.CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_VISIBLE)
+                                                       .participantViewResultMode(ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_ENABLED)
+                                                       .evaluateBothPublicPrivateTestcase(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES)
+                                                       .createdAt(new Date())
+                                                       .build();
 
+/*
             if (modelCreateContest.getStartedAt() != null) {
                 contestEntity = ContestEntity.builder()
                                              .contestId(contestId)
@@ -557,7 +580,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .problemDescriptionViewType(ContestEntity.CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_VISIBLE)
                                              //.participantViewResultMode(ContestEntity.CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER)
                                              .participantViewResultMode(ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_ENABLED)
-                                             .evaluateBothPublicPrivateTestcase(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_NO)
+                                             //.evaluateBothPublicPrivateTestcase(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_NO)
+                                             .evaluateBothPublicPrivateTestcase(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES)
+
                                              .createdAt(new Date())
                                              .build();
             } else {
@@ -574,6 +599,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .createdAt(new Date())
                                              .build();
             }
+*/
             contestEntity = contestService.saveContestWithCache(contestEntity);
 
             // create corresponding entities in ContestRole
@@ -583,21 +609,21 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             Date fromDate = new Date();
             contestRole.setRoleId(ContestRole.CONTEST_ROLE_OWNER);
             contestRole.setFromDate(fromDate);
-            contestRole = contestRoleRepo.save(contestRole);
+            contestRoleRepo.save(contestRole);
 
             contestRole = new ContestRole();
             contestRole.setContestId(modelCreateContest.getContestId());
             contestRole.setUserLoginId(userName);
             contestRole.setRoleId(ContestRole.CONTEST_ROLE_MANAGER);
             contestRole.setFromDate(fromDate);
-            contestRole = contestRoleRepo.save(contestRole);
+            contestRoleRepo.save(contestRole);
 
             contestRole = new ContestRole();
             contestRole.setContestId(modelCreateContest.getContestId());
             contestRole.setUserLoginId(userName);
             contestRole.setRoleId(ContestRole.CONTEST_ROLE_PARTICIPANT);
             contestRole.setFromDate(fromDate);
-            contestRole = contestRoleRepo.save(contestRole);
+            contestRoleRepo.save(contestRole);
 
             // create correspoding entities in UserRegistrationContestEntity
             UserRegistrationContestEntity urc = new UserRegistrationContestEntity();
@@ -605,21 +631,21 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             urc.setRoleId(UserRegistrationContestEntity.ROLE_OWNER);
             urc.setUserId(userName);
             urc.setStatus(UserRegistrationContestEntity.STATUS_SUCCESSFUL);
-            urc = userRegistrationContestRepo.save(urc);
+            userRegistrationContestRepo.save(urc);
 
             urc = new UserRegistrationContestEntity();
             urc.setContestId(modelCreateContest.getContestId());
             urc.setRoleId(UserRegistrationContestEntity.ROLE_MANAGER);
             urc.setUserId(userName);
             urc.setStatus(UserRegistrationContestEntity.STATUS_SUCCESSFUL);
-            urc = userRegistrationContestRepo.save(urc);
+            userRegistrationContestRepo.save(urc);
 
             urc = new UserRegistrationContestEntity();
             urc.setContestId(modelCreateContest.getContestId());
             urc.setRoleId(UserRegistrationContestEntity.ROLE_PARTICIPANT);
             urc.setUserId(userName);
             urc.setStatus(UserRegistrationContestEntity.STATUS_SUCCESSFUL);
-            urc = userRegistrationContestRepo.save(urc);
+            userRegistrationContestRepo.save(urc);
 
             // add account admin to the contest
             String admin = "admin";
@@ -630,21 +656,21 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 urc.setRoleId(UserRegistrationContestEntity.ROLE_OWNER);
                 urc.setUserId(admin);
                 urc.setStatus(UserRegistrationContestEntity.STATUS_SUCCESSFUL);
-                urc = userRegistrationContestRepo.save(urc);
+                userRegistrationContestRepo.save(urc);
 
                 urc = new UserRegistrationContestEntity();
                 urc.setContestId(modelCreateContest.getContestId());
                 urc.setRoleId(UserRegistrationContestEntity.ROLE_MANAGER);
                 urc.setUserId(admin);
                 urc.setStatus(UserRegistrationContestEntity.STATUS_SUCCESSFUL);
-                urc = userRegistrationContestRepo.save(urc);
+                userRegistrationContestRepo.save(urc);
 
                 urc = new UserRegistrationContestEntity();
                 urc.setContestId(modelCreateContest.getContestId());
                 urc.setRoleId(UserRegistrationContestEntity.ROLE_PARTICIPANT);
                 urc.setUserId(admin);
                 urc.setStatus(UserRegistrationContestEntity.STATUS_SUCCESSFUL);
-                urc = userRegistrationContestRepo.save(urc);
+                userRegistrationContestRepo.save(urc);
 
                 //push notification to admin
                 notificationsService.create(userName, u.getUserLoginId(),
@@ -669,10 +695,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         if (contestEntityExist == null) {
             throw new MiniLeetCodeException("Contest does not exist");
         }
-        //  log.info("updateContest, isPublic = " + modelUpdateContest.getIsPublic());
-
-        //    log.info("updateContest, modelUpdateContest.isPublic = " + modelUpdateContest.getIsPublic() + " -> isPublic  = " + isPublic);
-//        UserLogin userLogin = userLoginRepo.findByUserLoginId(userName);
 
         List<UserRegistrationContestEntity> L = userRegistrationContestRepo
             .findUserRegistrationContestEntityByContestIdAndUserIdAndStatus(
@@ -690,52 +712,32 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         if (!canUpdate) {
             throw new MiniLeetCodeException("You don't have privileged");
         }
-        //if(!userName.equals(contestEntityExist.getUserId())){
-        //    throw new MiniLeetCodeException("You don't have privileged");
-        //}
 
-
-//        List<ProblemEntity> problemEntities = getContestProblemsFromListContestId(modelUpdateContest.getProblemIds());
-        if (modelUpdateContest.getStartedAt() != null) {
-            ContestEntity contestEntity = ContestEntity.builder()
-                                                       .contestId(contestId)
-                                                       .contestName(modelUpdateContest.getContestName())
-                                                       .contestSolvingTime(modelUpdateContest.getContestSolvingTime())
-                                                       .problems(contestEntityExist.getProblems())
-                                                       .userId(contestEntityExist.getUserId())
-                                                       .countDown(modelUpdateContest.getCountDownTime())
-                                                       .startedAt(modelUpdateContest.getStartedAt())
-                                                       .startedCountDownTime(DateTimeUtils.minusMinutesDate(
-                                                           modelUpdateContest.getStartedAt(),
-                                                           modelUpdateContest.getCountDownTime()))
-                                                       .endTime(DateTimeUtils.addMinutesDate(
-                                                           modelUpdateContest.getStartedAt(),
-                                                           modelUpdateContest.getContestSolvingTime()))
-                                                       .statusId(modelUpdateContest.getStatusId())
-                                                       .submissionActionType(modelUpdateContest.getSubmissionActionType())
-                                                       .maxNumberSubmissions(modelUpdateContest.getMaxNumberSubmission())
-                                                       .participantViewResultMode(modelUpdateContest.getParticipantViewResultMode())
-                                                       .problemDescriptionViewType(modelUpdateContest.getProblemDescriptionViewType())
-                                                       .useCacheContestProblem(modelUpdateContest.getUseCacheContestProblem())
-                                                       .maxSourceCodeLength(modelUpdateContest.getMaxSourceCodeLength())
-                                                       .evaluateBothPublicPrivateTestcase(modelUpdateContest.getEvaluateBothPublicPrivateTestcase())
-                                                       .minTimeBetweenTwoSubmissions(modelUpdateContest.getMinTimeBetweenTwoSubmissions())
-                                                       .judgeMode(modelUpdateContest.getJudgeMode())
-                                                       .build();
-            return contestService.updateContestWithCache(contestEntity);
-
-        } else {
-            ContestEntity contestEntity = ContestEntity.builder()
-                                                       .contestId(contestId)
-                                                       .contestName(modelUpdateContest.getContestName())
-                                                       .contestSolvingTime(modelUpdateContest.getContestSolvingTime())
-                                                       .problems(contestEntityExist.getProblems())
-                                                       .userId(contestEntityExist.getUserId())
-                                                       .countDown(modelUpdateContest.getCountDownTime())
-                                                       .statusId(modelUpdateContest.getStatusId())
-                                                       .build();
-            return contestService.updateContestWithCache(contestEntity);
-        }
+        ContestEntity contestEntity = ContestEntity.builder()
+                                                   .contestId(contestId)
+                                                   .contestName(modelUpdateContest.getContestName())
+                                                   .contestSolvingTime(modelUpdateContest.getContestSolvingTime())
+                                                   .problems(contestEntityExist.getProblems())
+                                                   .userId(contestEntityExist.getUserId())
+                                                   .countDown(modelUpdateContest.getCountDownTime())
+                                                   .startedAt(modelUpdateContest.getStartedAt())
+                                                   .startedCountDownTime(DateTimeUtils.minusMinutesDate(
+                                                       modelUpdateContest.getStartedAt(),
+                                                       modelUpdateContest.getCountDownTime()))
+                                                   .endTime(DateTimeUtils.addMinutesDate(
+                                                       modelUpdateContest.getStartedAt(),
+                                                       modelUpdateContest.getContestSolvingTime()))
+                                                   .statusId(modelUpdateContest.getStatusId())
+                                                   .submissionActionType(modelUpdateContest.getSubmissionActionType())
+                                                   .maxNumberSubmissions(modelUpdateContest.getMaxNumberSubmission())
+                                                   .participantViewResultMode(modelUpdateContest.getParticipantViewResultMode())
+                                                   .problemDescriptionViewType(modelUpdateContest.getProblemDescriptionViewType())
+                                                   .maxSourceCodeLength(modelUpdateContest.getMaxSourceCodeLength())
+                                                   .evaluateBothPublicPrivateTestcase(modelUpdateContest.getEvaluateBothPublicPrivateTestcase())
+                                                   .minTimeBetweenTwoSubmissions(modelUpdateContest.getMinTimeBetweenTwoSubmissions())
+                                                   .judgeMode(modelUpdateContest.getJudgeMode())
+                                                   .build();
+        return contestService.updateContestWithCache(contestEntity);
 
     }
 
@@ -1790,6 +1792,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                                      .build();
             res.add(modelGetContestResponse);
         }
+
+        Collections.reverse(res);
         return res;
     }
 
@@ -1882,16 +1886,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public ModelGetContestPageResponse getRegisteredContestByUser(Pageable pageable, String userName) {
-//        Page<ContestEntity> list = userRegistrationContestPagingAndSortingRepo.getContestByUserAndStatusSuccessful(pageable, userName);
-        Date currentDate = new Date();
-        //log.info("getRegisteredContestByUser, currentDateTime = " + currentDate);
-        //Page<ContestEntity> list = userRegistrationContestPagingAndSortingRepo.getContestByUserAndStatusSuccessfulInSolvingTime(pageable, userName, currentDate);
-        Page<ContestEntity> list = userRegistrationContestPagingAndSortingRepo.getContestByUser(pageable, userName);
-        return getModelGetContestPageResponse(list);
-    }
-
-    @Override
     public ModelGetContestPageResponse getRegisteredContestsByUser(String userName) {
         List<UserRegistrationContestEntity> lst = userRegistrationContestRepo
             .findAllByUserIdAndRoleIdAndStatus(
@@ -1916,6 +1910,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 lists.add(modelGetContestResponse);
             });
         }
+
+        Collections.reverse(lists);
 
         return ModelGetContestPageResponse.builder()
                                           .contests(lists)

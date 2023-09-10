@@ -143,8 +143,6 @@ public interface ProblemTestCaseService {
 
     ListPersonModel searchUserBaseKeyword(Pageable pageable, String keyword);
 
-    ModelGetContestPageResponse getRegisteredContestByUser(Pageable pageable, String userName);
-
     ModelGetContestPageResponse getRegisteredContestsByUser(String userName);
 
     ModelGetContestPageResponse getNotRegisteredContestByUser(Pageable pageable, String userName);
