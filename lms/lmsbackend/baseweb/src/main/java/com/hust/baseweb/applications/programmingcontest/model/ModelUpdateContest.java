@@ -12,7 +12,6 @@ public class ModelUpdateContest {
     private long contestSolvingTime;
     private List<String> problemIds;
     private Date startedAt;
-    private String isPublic;
     private long countDownTime;
     private String statusId;
     private String submissionActionType;
