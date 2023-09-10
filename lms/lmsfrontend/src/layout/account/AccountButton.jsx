@@ -12,6 +12,21 @@ const bgColor = randomColor({
 
 const menuId = "primary-search-account-menu";
 
+export const getTextAvatar = (name) => {
+  if (typeof name === "string" && name.trim().length > 0) {
+    const words = name.trim().split(" ");
+    if (words.length > 1) {
+      const firstChar = words[0].charAt(0);
+      const lastChar = words[words.length - 1].charAt(0);
+      return firstChar + lastChar;
+    } else {
+      return words[0].charAt(0);
+    }
+  } else {
+    return undefined;
+  }
+};
+
 function AccountButton() {
   //
   const { keycloak } = useKeycloak();
@@ -51,11 +66,7 @@ function AccountButton() {
           alt="account button"
           sx={{ width: 36, height: 36, background: bgColor }}
         >
-          {keycloak.tokenParsed.name
-            ?.split(" ")
-            .pop()
-            .substring(0, 1)
-            .toLocaleUpperCase()}
+          {getTextAvatar(keycloak.tokenParsed.name)?.toLocaleUpperCase()}
         </Avatar>
       </IconButton>
       <AccountMenu

@@ -1,21 +1,21 @@
-import {CssBaseline} from "@material-ui/core";
-import {createTheme, MuiThemeProvider} from "@material-ui/core/styles";
+import { CssBaseline } from "@material-ui/core";
+import { createTheme, MuiThemeProvider } from "@material-ui/core/styles";
 // import {SvgIcon, Typography} from "@mui/material";
 // import {Box} from "@mui/system";
-import {Box, SvgIcon, Typography} from "@material-ui/core";
-import {ReactKeycloakProvider} from "@react-keycloak/web";
-import {request} from "api";
-import {FacebookCircularProgress} from "component/common/progressBar/CustomizedCircularProgress.jsx";
-import keycloak, {initOptions} from "config/keycloak.js";
-import {useEffect} from "react";
-import {I18nextProvider} from "react-i18next";
-import {QueryClient, QueryClientProvider} from "react-query";
-import {Router} from "react-router-dom";
-import {Slide, ToastContainer} from "react-toastify";
+import { Box, SvgIcon, Typography } from "@material-ui/core";
+import { ReactKeycloakProvider } from "@react-keycloak/web";
+import { request } from "api";
+import { FacebookCircularProgress } from "component/common/progressBar/CustomizedCircularProgress.jsx";
+import keycloak, { initOptions } from "config/keycloak.js";
+import { useEffect } from "react";
+import { I18nextProvider } from "react-i18next";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { Router } from "react-router-dom";
+import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {menuState} from "state/MenuState";
-import {notificationState} from "state/NotificationState";
-import {ReactComponent as Logo} from "./assets/icons/logo.svg";
+import { menuState } from "state/MenuState";
+import { notificationState } from "state/NotificationState";
+import { ReactComponent as Logo } from "./assets/icons/logo.svg";
 import history from "./history.js";
 import Routes from "./Routes";
 import i18n from "./translation/i18n";
@@ -61,21 +61,23 @@ const AppLoading = (
         flexGrow: 1,
       }}
     >
-      <SvgIcon style={{fontSize: "150px", marginBottom: "20px"}} viewBox="0 0 150 150">
-        <Logo width={132} height={132} x={9} y={9}/>
+      <SvgIcon
+        style={{ fontSize: "150px", marginBottom: "20px" }}
+        viewBox="0 0 150 150"
+      >
+        <Logo width={132} height={132} x={9} y={9} />
       </SvgIcon>
       <Box>
-        <FacebookCircularProgress/>
+        <FacebookCircularProgress />
       </Box>
     </Box>
     <Box>
-      <Typography sx={{mb: 4}}>OpenERP Team</Typography>
+      <Typography sx={{ mb: 4 }}>OpenERP Team</Typography>
     </Box>
   </Box>
 );
 
 function App() {
-
   // TODO: Consider remove this logic!
   const logout = () => {
     menuState.permittedFunctions.set(new Set());
@@ -89,7 +91,7 @@ function App() {
   const onKeycloakEvent = async (event, error) => {
     if (event === "onAuthSuccess") {
       request("get", `/`);
-      console.log(keycloak.tokenParsed.preferred_username);
+      // console.log(keycloak.tokenParsed.preferred_username);
       // // Currently maybe not necessary
       // // Check token validity every 10 seconds (10 000 ms) and, if necessary, update the token.
       // // Refresh token if it's valid for less then 60 seconds
@@ -136,9 +138,9 @@ function App() {
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={queryClient}>
           <MuiThemeProvider theme={theme}>
-            <CssBaseline/>
+            <CssBaseline />
             <Router history={history}>
-              <Routes/>
+              <Routes />
               <ToastContainer
                 position="bottom-center"
                 transition={Slide}

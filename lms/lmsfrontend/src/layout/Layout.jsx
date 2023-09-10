@@ -1,25 +1,25 @@
 import AppBar from "@material-ui/core/AppBar";
 import IconButton from "@material-ui/core/IconButton";
-import {makeStyles, styled} from "@material-ui/core/styles";
 import SvgIcon from "@material-ui/core/SvgIcon";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import {default as MenuIcon} from "@material-ui/icons/Menu";
+import { makeStyles, styled } from "@material-ui/core/styles";
+import { default as MenuIcon } from "@material-ui/icons/Menu";
+import { useKeycloak } from "@react-keycloak/web";
 import clsx from "clsx";
-import React, {useEffect, useState} from "react";
-import {useLocation} from "react-router-dom";
-import {ReactComponent as Logo} from "../assets/icons/logo.svg";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { ReactComponent as Logo } from "../assets/icons/logo.svg";
 import bgImage from "../assets/img/sidebar-2.webp";
 import AccountButton from "./account/AccountButton";
 import LanguageSwitch from "./languageswitcher/LanguageSwitch";
 import NotificationButton from "./notification/NotificationButton";
-import SideBar, {drawerWidth} from "./sidebar/v1/SideBar";
-import {useKeycloak} from "@react-keycloak/web";
+import SideBar, { drawerWidth } from "./sidebar/v1/SideBar";
 
 /**
  * https://mui.com/material-ui/react-app-bar/#fixed-placement
  */
-const Offset = styled("div")(({theme}) => ({
+const Offset = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   padding: theme.spacing(0, 1),
@@ -79,12 +79,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Layout({children}) {
+function Layout({ children }) {
   const classes = useStyles();
-  const {pathname} = useLocation();
+  const { pathname } = useLocation();
   const isMeeting = pathname.startsWith("/chat/voice/main");
 
-  const {keycloak} = useKeycloak();
+  const { keycloak } = useKeycloak();
 
   const [open, setOpen] = React.useState(true);
   const [image] = useState(bgImage);
@@ -105,10 +105,10 @@ function Layout({children}) {
             edge="start"
             className={classes.menuButton}
           >
-            <MenuIcon/>
+            <MenuIcon />
           </IconButton>
           <SvgIcon fontSize="large">
-            <Logo width={20} height={20} x={2} y={2}/>
+            <Logo width={20} height={20} x={2} y={2} />
           </SvgIcon>
 
           <Typography className={classes.appName} variant="h6" noWrap>
@@ -116,25 +116,25 @@ function Layout({children}) {
           </Typography>
 
           {/* Use this div tag to push the icons to the right */}
-          <div style={{flexGrow: 1}}/>
+          <div style={{ flexGrow: 1 }} />
           <div className={classes.sectionDesktop}>
-            <LanguageSwitch/>
+            <LanguageSwitch />
             {keycloak.authenticated && (
               <>
-                <NotificationButton/>
-                <AccountButton/>
+                <NotificationButton />
+                <AccountButton />
               </>
             )}
           </div>
         </Toolbar>
       </AppBar>
-      <SideBar open={open} image={image} color={color}/>
+      <SideBar open={open} image={image} color={color} />
       <main
         className={clsx(classes.content, {
           [classes.contentShift]: open,
         })}
       >
-        <Offset/>
+        <Offset />
         {children}
       </main>
     </div>
