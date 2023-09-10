@@ -98,14 +98,6 @@ public class ContestEntity implements Serializable {
         return L;
     }
 
-    public static List<Integer> getListMaxNumberSubmissions() {
-        List<Integer> L = new ArrayList();
-        for (int i = 0; i <= 200; i++) {
-            L.add(i);
-        }
-        return L;
-    }
-
     @Id
     @Column(name = "contest_id")
     private String contestId;
@@ -131,9 +123,6 @@ public class ContestEntity implements Serializable {
     @OneToMany(fetch = FetchType.LAZY)
     @JsonIgnore
     private List<ProblemEntity> problems;
-
-    @Column(name = "try_again")
-    private boolean tryAgain;
 
     @Column(name = "created_stamp")
     private Date createdAt;
@@ -164,9 +153,6 @@ public class ContestEntity implements Serializable {
 
     @Column(name = "problem_description_view_type")
     private String problemDescriptionViewType;
-
-    @Column(name = "use_cache_contest_problem")
-    private String useCacheContestProblem;
 
     @Column(name = "max_source_code_length")
     private int maxSourceCodeLength;

@@ -15,13 +15,13 @@ import EditTestCase from "../component/education/programmingcontestFE/EditTestCa
 import {ListContestManager} from "../component/education/programmingcontestFE/ListContestManager";
 import ListProblemV2 from "../component/education/programmingcontestFE/ListProblemV2";
 import {StudentContestNotRegistered} from "../component/education/programmingcontestFE/StudentContestNotRegistered";
-import {StudentContestRegistered} from "../component/education/programmingcontestFE/StudentContestRegistered";
 import StudentViewContestDetail from "../component/education/programmingcontestFE/StudentViewContestDetail";
 import StudentViewProgrammingContestProblemDetailV2
   from "../component/education/programmingcontestFE/StudentViewProgrammingContestProblemDetailV2";
 import SubmitSolutionOutput from "../component/education/programmingcontestFE/SubmitSolutionOutput";
 import SuggestProblem from "../component/education/programmingcontestFE/SuggestProblem";
 import ManagerViewProblemDetailV2 from "../component/education/programmingcontestFE/ManagerViewProblemDetailV2";
+import ContestStudentList from "../component/education/programmingcontestFE/ContestStudentList";
 
 export default function ProgrammingContestRoutes() {
   let { path } = useRouteMatch();
@@ -71,7 +71,7 @@ export default function ProgrammingContestRoutes() {
           path={`${path}/student-list-contest-not-registered`}
         />
         <Route
-          component={StudentContestRegistered}
+          component={ContestStudentList}
           path={`${path}/student-list-contest-registered`}
         />
         <Route

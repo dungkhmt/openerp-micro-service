@@ -716,7 +716,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                        .maxNumberSubmissions(modelUpdateContest.getMaxNumberSubmission())
                                                        .participantViewResultMode(modelUpdateContest.getParticipantViewResultMode())
                                                        .problemDescriptionViewType(modelUpdateContest.getProblemDescriptionViewType())
-                                                       .useCacheContestProblem(modelUpdateContest.getUseCacheContestProblem())
                                                        .maxSourceCodeLength(modelUpdateContest.getMaxSourceCodeLength())
                                                        .evaluateBothPublicPrivateTestcase(modelUpdateContest.getEvaluateBothPublicPrivateTestcase())
                                                        .minTimeBetweenTwoSubmissions(modelUpdateContest.getMinTimeBetweenTwoSubmissions())
@@ -1790,6 +1789,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                                      .build();
             res.add(modelGetContestResponse);
         }
+
+        Collections.reverse(res);
         return res;
     }
 
@@ -1882,16 +1883,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public ModelGetContestPageResponse getRegisteredContestByUser(Pageable pageable, String userName) {
-//        Page<ContestEntity> list = userRegistrationContestPagingAndSortingRepo.getContestByUserAndStatusSuccessful(pageable, userName);
-        Date currentDate = new Date();
-        //log.info("getRegisteredContestByUser, currentDateTime = " + currentDate);
-        //Page<ContestEntity> list = userRegistrationContestPagingAndSortingRepo.getContestByUserAndStatusSuccessfulInSolvingTime(pageable, userName, currentDate);
-        Page<ContestEntity> list = userRegistrationContestPagingAndSortingRepo.getContestByUser(pageable, userName);
-        return getModelGetContestPageResponse(list);
-    }
-
-    @Override
     public ModelGetContestPageResponse getRegisteredContestsByUser(String userName) {
         List<UserRegistrationContestEntity> lst = userRegistrationContestRepo
             .findAllByUserIdAndRoleIdAndStatus(
@@ -1916,6 +1907,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 lists.add(modelGetContestResponse);
             });
         }
+
+        Collections.reverse(lists);
 
         return ModelGetContestPageResponse.builder()
                                           .contests(lists)

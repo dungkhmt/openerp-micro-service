@@ -348,23 +348,6 @@ public class ContestController {
         return ResponseEntity.ok().body(res);
     }
 
-    @GetMapping("/students/registered-contests")
-    public ResponseEntity<?> getContestRegisteredByStudentPaging(
-        Pageable pageable, @Param("sortBy") String sortBy,
-        Principal principal
-    ) {
-        //log.info("getContestRegisteredByStudentPaging sortBy {} pageable {}", sortBy, pageable);
-        if (sortBy != null) {
-            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(sortBy));
-        } else {
-            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                                      Sort.by("createdAt").ascending());
-        }
-        ModelGetContestPageResponse modelGetContestPageResponse = problemTestCaseService
-            .getRegisteredContestByUser(pageable, principal.getName());
-        return ResponseEntity.status(200).body(modelGetContestPageResponse);
-    }
-
     @GetMapping("/students/not-registered-contests")
     public ResponseEntity<?> getContestNotRegisteredByStudentPaging(
         Pageable pageable, @Param("sortBy") String sortBy,
@@ -375,7 +358,7 @@ public class ContestController {
             pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(sortBy));
         } else {
             pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                                      Sort.by("createdAt").ascending());
+                                      Sort.by("startedAt").descending());
         }
         ModelGetContestPageResponse modelGetContestPageResponse = problemTestCaseService
             .getNotRegisteredContestByUser(pageable, principal.getName());

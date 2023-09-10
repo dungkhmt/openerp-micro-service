@@ -40,7 +40,7 @@ export default function ContestStudentList() {
         contestName: e.contestName,
         status: e.statusId,
         createdBy: e.userId,
-        createdAt: toFormattedDateTime(e.createdAt),
+        createdAt: toFormattedDateTime(e.startAt),
       }));
       setContests(data);
     }).then(() => setLoading(false));
