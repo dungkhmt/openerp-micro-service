@@ -3,9 +3,19 @@ export const CUSTOM_EVALUATION = "CUSTOM_EVALUATION";
 
 export const SUBMISSION_MODE_SOURCE_CODE = "SUBMISSION_MODE_SOURCE_CODE";
 export const SUBMISSION_MODE_SOLUTION_OUTPUT = "SUBMISSION_MODE_SOLUTION_OUTPUT";
+export const SUBMISSION_MODE_NOT_ALLOWED = "SUBMISSION_MODE_NOT_ALLOWED";
 
 export const getSubmissionModeFromConstant = (mode) => {
-  return mode === SUBMISSION_MODE_SOLUTION_OUTPUT ? "OUTPUT ONLY" : "NORMAL";
+  switch (mode) {
+    case SUBMISSION_MODE_SOURCE_CODE:
+      return "Normal";
+    case SUBMISSION_MODE_SOLUTION_OUTPUT:
+      return "Submit only output";
+    case SUBMISSION_MODE_NOT_ALLOWED:
+      return "NOT allow submitting";
+    default:
+      return "NORMAL";
+  }
 }
 
 export const COMPUTER_LANGUAGES = Object.freeze({

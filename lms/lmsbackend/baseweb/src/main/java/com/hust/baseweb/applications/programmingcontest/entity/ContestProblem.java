@@ -19,11 +19,13 @@ public class ContestProblem {
 
     public static final String SUBMISSION_MODE_SOURCE_CODE = "SUBMISSION_MODE_SOURCE_CODE";
     public static final String SUBMISSION_MODE_SOLUTION_OUTPUT = "SUBMISSION_MODE_SOLUTION_OUTPUT";
+    public static final String SUBMISSION_MODE_NOT_ALLOWED = "SUBMISSION_MODE_NOT_ALLOWED";
 
     public static List<String> getSubmissionModes() {
         List<String> L = new ArrayList();
         L.add(SUBMISSION_MODE_SOURCE_CODE);
         L.add(SUBMISSION_MODE_SOLUTION_OUTPUT);
+        L.add(SUBMISSION_MODE_NOT_ALLOWED);
         return L;
     }
 

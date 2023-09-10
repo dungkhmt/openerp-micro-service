@@ -274,17 +274,7 @@ public class SubmissionController {
                                                                                     "PARTICIPANT_NOT_APPROVED_OR_REGISTERED")
                                                                                 .message(
                                                                                     "Participant is not approved or not registered")
-                                                                                .testCasePass("0")
-                                                                                .runtime(new Long(0))
-                                                                                .memoryUsage(new Float(0))
-                                                                                .problemName("")
-                                                                                .contestSubmissionID(null)
-                                                                                .submittedAt(null)
-                                                                                .score(0L)
-                                                                                .numberTestCasePassed(0)
-                                                                                .totalNumberTestCase(0)
                                                                                 .build();
-            //log.info("contestSubmitProblemViaUploadFile: Participant not approved or registered");
             return ResponseEntity.ok().body(resp);
 
         }
@@ -297,17 +287,7 @@ public class SubmissionController {
                                                                                         "PARTICIPANT_HAS_NOT_PERMISSION_TO_SUBMIT")
                                                                                     .message(
                                                                                         "Participant has not permission to submit")
-                                                                                    .testCasePass("0")
-                                                                                    .runtime(new Long(0))
-                                                                                    .memoryUsage(new Float(0))
-                                                                                    .problemName("")
-                                                                                    .contestSubmissionID(null)
-                                                                                    .submittedAt(null)
-                                                                                    .score(0L)
-                                                                                    .numberTestCasePassed(0)
-                                                                                    .totalNumberTestCase(0)
                                                                                     .build();
-                //log.info("contestSubmitProblemViaUploadFile: Participant has not permission to submit");
                 return ResponseEntity.ok().body(resp);
 
             }
@@ -316,26 +296,26 @@ public class SubmissionController {
         List<ContestSubmissionEntity> submissions = contestSubmissionRepo
             .findAllByContestIdAndUserIdAndProblemId(model.getContestId(), principal.getName(),
                                                      model.getProblemId());
+
+        if (cp != null &&
+            cp.getSubmissionMode() != null &&
+            cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_NOT_ALLOWED)) {
+            ModelContestSubmissionResponse resp = ModelContestSubmissionResponse.builder()
+                                                                                .status("SUBMISSION_NOT_ALLOWED")
+                                                                                .message(
+                                                                                    "This problem is not opened for submitting solution")
+                                                                                .build();
+            return ResponseEntity.ok().body(resp);
+        }
+
         if (submissions.size() >= contestEntity.getMaxNumberSubmissions()) {
             ModelContestSubmissionResponse resp = ModelContestSubmissionResponse.builder()
                                                                                 .status("MAX_NUMBER_SUBMISSIONS_REACHED")
                                                                                 .message(
                                                                                     "Maximum Number of Submissions " +
                                                                                     contestEntity.getMaxNumberSubmissions()
-                                                                                    +
-                                                                                    " Reached! Cannot submit more")
-                                                                                .testCasePass("0")
-                                                                                .runtime(new Long(0))
-                                                                                .memoryUsage(new Float(0))
-                                                                                .problemName("")
-                                                                                .contestSubmissionID(null)
-                                                                                .submittedAt(null)
-                                                                                .score(0L)
-                                                                                .numberTestCasePassed(0)
-                                                                                .totalNumberTestCase(0)
+                                                                                    + " Reached! Cannot submit more")
                                                                                 .build();
-            //log.info("contestSubmitProblemViaUploadFile: Maximum Number of Submissions "
-            //        + contestEntity.getMaxNumberSubmissions() + " Reached! Cannot submit more");
             return ResponseEntity.ok().body(resp);
         }
 
@@ -346,7 +326,6 @@ public class SubmissionController {
             while (in.hasNext()) {
                 String line = in.nextLine();
                 source.append(line).append("\n");
-                // System.out.println("contestSubmitProblemViaUploadFile: read line: " + line);
             }
             in.close();
 
@@ -355,24 +334,10 @@ public class SubmissionController {
                                                                                     .status(
                                                                                         "MAX_SOURCE_CODE_LENGTH_VIOLATIONS")
                                                                                     .message(
-                                                                                        "Max source code length violations " +
+                                                                                        "Max source code length violations: " +
                                                                                         source.length() +
-                                                                                        " > "
-                                                                                        +
-                                                                                        contestEntity.getMaxSourceCodeLength() +
-                                                                                        " ")
-                                                                                    .testCasePass("0")
-                                                                                    .runtime(new Long(0))
-                                                                                    .memoryUsage(new Float(0))
-                                                                                    .problemName("")
-                                                                                    .contestSubmissionID(null)
-                                                                                    .submittedAt(null)
-                                                                                    .score(0L)
-                                                                                    .numberTestCasePassed(0)
-                                                                                    .totalNumberTestCase(0)
+                                                                                        " exceeded")
                                                                                     .build();
-                //log.info("contestSubmitProblemViaUploadFile: Max Source code Length violations " + source.length()
-                //        + " > " + contestEntity.getMaxSourceCodeLength() + " --> Cannot submit more");
                 return ResponseEntity.ok().body(resp);
             }
             ModelContestSubmission request = new ModelContestSubmission(model.getContestId(), model.getProblemId(),
@@ -445,6 +410,13 @@ public class SubmissionController {
                 ModelContestSubmissionResponse resp = buildSubmissionResponseNoPermission();
                 return ResponseEntity.ok().body(resp);
             }
+        }
+
+        if (cp != null &&
+            cp.getSubmissionMode() != null &&
+            cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_NOT_ALLOWED)) {
+            ModelContestSubmissionResponse resp = buildSubmissionResponseSubmissionNotAllowed();
+            return ResponseEntity.ok().body(resp);
         }
 
         int numOfSubmissions = contestSubmissionRepo
@@ -560,15 +532,6 @@ public class SubmissionController {
         return ModelContestSubmissionResponse.builder()
                                              .status("PARTICIPANT_NOT_APPROVED_OR_REGISTERED")
                                              .message("Participant is not approved or not registered")
-                                             .testCasePass("0")
-                                             .runtime(0L)
-                                             .memoryUsage((float) 0)
-                                             .problemName("")
-                                             .contestSubmissionID(null)
-                                             .submittedAt(null)
-                                             .score(0L)
-                                             .numberTestCasePassed(0)
-                                             .totalNumberTestCase(0)
                                              .build();
     }
 
@@ -576,15 +539,14 @@ public class SubmissionController {
         return ModelContestSubmissionResponse.builder()
                                              .status("PARTICIPANT_HAS_NOT_PERMISSION_TO_SUBMIT")
                                              .message("Participant has no permission to submit")
-                                             .testCasePass("0")
-                                             .runtime(0L)
-                                             .memoryUsage((float) 0)
-                                             .problemName("")
-                                             .contestSubmissionID(null)
-                                             .submittedAt(null)
-                                             .score(0L)
-                                             .numberTestCasePassed(0)
-                                             .totalNumberTestCase(0)
+                                             .build();
+    }
+
+    private ModelContestSubmissionResponse buildSubmissionResponseSubmissionNotAllowed() {
+        return ModelContestSubmissionResponse.builder()
+                                             .status("SUBMISSION_NOT_ALLOWED")
+                                             .message(
+                                                 "This problem is not opened for submitting solution")
                                              .build();
     }
 
@@ -593,15 +555,6 @@ public class SubmissionController {
                                              .status("MAX_NUMBER_SUBMISSIONS_REACHED")
                                              .message("Maximum Number of Submissions " + maxNumberSubmission
                                                       + " Reached! Cannot submit more")
-                                             .testCasePass("0")
-                                             .runtime(0L)
-                                             .memoryUsage((float) 0)
-                                             .problemName("")
-                                             .contestSubmissionID(null)
-                                             .submittedAt(null)
-                                             .score(0L)
-                                             .numberTestCasePassed(0)
-                                             .totalNumberTestCase(0)
                                              .build();
     }
 
@@ -613,15 +566,6 @@ public class SubmissionController {
                                              .status("MAX_SOURCE_CODE_LENGTH_VIOLATIONS")
                                              .message("Max source code length violations " + sourceLength + " exceeded "
                                                       + maxLength + " ")
-                                             .testCasePass("0")
-                                             .runtime(0L)
-                                             .memoryUsage((float) 0)
-                                             .problemName("")
-                                             .contestSubmissionID(null)
-                                             .submittedAt(null)
-                                             .score(0L)
-                                             .numberTestCasePassed(0)
-                                             .totalNumberTestCase(0)
                                              .build();
     }
 
@@ -629,15 +573,6 @@ public class SubmissionController {
         return ModelContestSubmissionResponse.builder()
                                              .status("SUBMISSION_INTERVAL_VIOLATIONS")
                                              .message("Not enough time between 2 submissions (" + interval + "s) ")
-                                             .testCasePass("0")
-                                             .runtime(0L)
-                                             .memoryUsage((float) 0)
-                                             .problemName("")
-                                             .contestSubmissionID(null)
-                                             .submittedAt(null)
-                                             .score(0L)
-                                             .numberTestCasePassed(0)
-                                             .totalNumberTestCase(0)
                                              .build();
     }
 
