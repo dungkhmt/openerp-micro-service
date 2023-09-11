@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {request} from "../../../api";
 import Typography from "@mui/material/Typography";
-import {Autocomplete, Button, Grid, IconButton, LinearProgress, TextField} from "@mui/material";
+import {Autocomplete, Button, Grid, IconButton, LinearProgress, TextField,FormControlLabel,Checkbox} from "@mui/material";
 import StandardTable from "component/table/StandardTable";
 import Box from "@mui/material/Box";
 import {errorNoti, successNoti} from "../../../utils/notification";
@@ -27,6 +27,7 @@ export function ContestManagerManageProblem(props) {
   const [openModalAddProblem, setOpenModalAddProblem] = useState(false);
   const [openModalUpdateProblem, setOpenModalUpdateProblem] = useState(false);
 
+  const [isImportFromExistingContest, setIsImportFromExistingContest] = useState(false);
   const [importFromContestId, setImportFromContestId] = useState(null);
 
   const columns = [
@@ -232,7 +233,17 @@ export function ContestManagerManageProblem(props) {
           }}
         />
       </Box>
-      <Box>
+      <Box sx={{marginTop: "12px"}}>
+      <FormControlLabel
+          label="Import From Existing Contest"
+          control={
+            <Checkbox
+              checked={isImportFromExistingContest}
+              onChange={() => setIsImportFromExistingContest(!isImportFromExistingContest)}
+            />}
+        />
+     
+      <Box display="flex" justifyContent="space-between" sx={{marginBottom: "16px"}}>
       <TextField
                 fullWidth
                 autoFocus
@@ -253,13 +264,15 @@ export function ContestManagerManageProblem(props) {
         <LoadingButton
           loading={loading}
           variant="contained"
-          style={{marginTop: "36px"}}
+          //style={{marginTop: "36px"}}
           onClick={handleImportProblems}
           disabled={isValidContestId() || loading}
         >
           Import
         </LoadingButton>
       </Box>      
+      
+      </Box>
       <StandardTable
         title={"Problems in Contest"}
         columns={columns}
