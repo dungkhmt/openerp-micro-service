@@ -3724,6 +3724,30 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return problemResponse;
     }
 
+    @Override
+    public int importProblemFromAContest(ModelImportProblemsFromAContestInput I) {
+        ContestEntity contest = contestRepo.findContestByContestId(I.getFromContestId());
+        //log.info("importProblemFromAContest, contestId = " + I.getContestId() + " fromContestId " + I.getFromContestId());
+        if(contest == null) return 0;
+        int cnt = 0;
+        for(ProblemEntity p: contest.getProblems()){
+            ContestProblem ocp = contestProblemRepo.findByContestIdAndProblemId(I.getFromContestId(), p.getProblemId());
+            ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(I.getContestId(), p.getProblemId());
+            if(cp != null) continue;
+            cp = new ContestProblem();
+            cp.setContestId(I.getContestId());
+            cp.setProblemId(p.getProblemId());
+            cp.setSubmissionMode(ocp.getSubmissionMode());
+            cp.setProblemRename(ocp.getProblemRename());
+            cp.setProblemRecode(ocp.getProblemRecode());
+            cp = contestProblemRepo.save(cp);
+            //log.info("importProblemFromAContest, save " + I.getContestId() + " problem " + p.getProblemId() + " cnt = " + cnt);
+            cnt ++;
+        }
+
+        return cnt;
+    }
+
     public List<ProblemEntity> getOwnerProblems(String ownerId) {
         return this.problemRepo.findAll((root, query, criteriaBuilder) -> {
                 List<Predicate> predicates = new ArrayList<>();

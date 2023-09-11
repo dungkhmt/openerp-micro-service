@@ -13,7 +13,7 @@ import ModalUpdateProblemInfoInContest from "./ModalUpdateProblemInfoInContest";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {getColorLevel} from "./lib";
 import {getSubmissionModeFromConstant} from "./Constant";
-
+import {LoadingButton} from "@mui/lab";
 export function ContestManagerManageProblem(props) {
   const contestId = props.contestId;
   const [allProblems, setAllProblems] = useState([]);
@@ -26,6 +26,8 @@ export function ContestManagerManageProblem(props) {
 
   const [openModalAddProblem, setOpenModalAddProblem] = useState(false);
   const [openModalUpdateProblem, setOpenModalUpdateProblem] = useState(false);
+
+  const [importFromContestId, setImportFromContestId] = useState(null);
 
   const columns = [
     {
@@ -105,6 +107,33 @@ export function ContestManagerManageProblem(props) {
     }
   ];
 
+  const handleImportProblems = () => {
+    setLoading(true);
+    let body = {
+      contestId: contestId,
+      fromContestId: importFromContestId
+    };
+
+    request(
+      "post",
+      "/import-problems-from-a-contest",
+      (res) => {
+        successNoti("Import problems successfully")
+        sleep(1000).then(() => {
+          //history.push("/programming-contest/contest-manager/" + res.data.contestId);
+          getAllProblemsInContest()
+        });
+      },
+      {
+        //onError: (err) => {
+        //  errorNoti(err?.response?.data?.message, 5000)
+        //}
+      },
+      body
+    )
+      .then()
+      .finally(() => setLoading(false));
+  }
   const getAllProblems = () => {
     request("get", "/problems/general-info", (res) => {
       setAllProblems(res.data || []);
@@ -132,7 +161,9 @@ export function ContestManagerManageProblem(props) {
     setChosenProblem(newProblem);
     setOpenModalAddProblem(true);
   }
-
+  const isValidContestId = () => {
+    return new RegExp(/[%^/\\|.?;[\]]/g).test(contestId);
+  };
   const handleAddProblemToContestSuccess = () => {
     successNoti("Problem saved to contest successfully", 5000);
     getAllProblemsInContest();
@@ -201,7 +232,34 @@ export function ContestManagerManageProblem(props) {
           }}
         />
       </Box>
-
+      <Box>
+      <TextField
+                fullWidth
+                autoFocus
+                required
+                value={importFromContestId}
+                id="importFromContestId"
+                label="Contest Id"
+                onChange={(event) => {
+                  setImportFromContestId(event.target.value);
+                }}
+                error={isValidContestId()}
+                helperText={
+                  isValidContestId()
+                    ? "Contest ID must not contain special characters including %^/\\|.?;[]"
+                    : ""
+                }
+              />
+        <LoadingButton
+          loading={loading}
+          variant="contained"
+          style={{marginTop: "36px"}}
+          onClick={handleImportProblems}
+          disabled={isValidContestId() || loading}
+        >
+          Import
+        </LoadingButton>
+      </Box>      
       <StandardTable
         title={"Problems in Contest"}
         columns={columns}

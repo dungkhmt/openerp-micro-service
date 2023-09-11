@@ -60,8 +60,19 @@ public class ContestController {
         throws Exception {
         log.info("createContest {}", modelCreateContest);
         ContestEntity contest = problemTestCaseService.createContest(modelCreateContest, principal.getName());
+        //ContestEntity contest = problemTestCaseService.createContest(modelCreateContest, principal.getName());
         return ResponseEntity.status(200).body(contest);
     }
+    @Secured("ROLE_TEACHER")
+    @PostMapping("/import-problems-from-a-contest")
+    public ResponseEntity<?> importProblemsFromAContest(Principal principal,
+                                                       @RequestBody ModelImportProblemsFromAContestInput I){
+
+        int cnt = problemTestCaseService.importProblemFromAContest(I);
+        return ResponseEntity.ok().body(cnt);
+
+    }
+
 
     @Secured("ROLE_TEACHER")
     @PutMapping("/contests/{contestId}")

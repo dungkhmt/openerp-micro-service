@@ -266,4 +266,6 @@ public interface ProblemTestCaseService {
     List<ProblemEntity> getSharedProblems(String userId);
 
     ModelCreateContestProblemResponse getContestProblemDetailByIdAndTeacher(String problemId, String teacherId) throws Exception;
+
+    public int importProblemFromAContest(ModelImportProblemsFromAContestInput I);
 }
