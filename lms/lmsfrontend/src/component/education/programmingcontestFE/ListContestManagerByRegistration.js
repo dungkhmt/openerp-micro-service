@@ -39,7 +39,7 @@ export function ListContestManagerByRegistration() {
     },
     {title: "Status", field: "statusId"},
     {title: "Role", field: "roleId"},
-    {title: "Registration Status", field: "registrationStatusId"},
+    // {title: "Registration Status", field: "registrationStatusId"},
   ];
 
   function getContestListByUserRole() {
