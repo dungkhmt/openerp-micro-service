@@ -1772,12 +1772,30 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public List<ModelGetContestResponse> getContestByUserRole(String userName) {
-        List<UserRegistrationContestEntity> L = userRegistrationContestRepo.findAllByUserId(userName);
+    public List<ModelGetContestResponse> getManagedContestOfTeacher(String userName) {
+        List<String> roles = new ArrayList<>();
+        roles.add(UserRegistrationContestEntity.ROLE_OWNER);
+        roles.add(UserRegistrationContestEntity.ROLE_MANAGER);
+        List<UserRegistrationContestEntity> userRegistrationContestList = userRegistrationContestRepo.findAllByUserIdAndRoleIdIn(userName, roles);
 
-        List<ModelGetContestResponse> res = new ArrayList();
-        for (UserRegistrationContestEntity e : L) {
-            ContestEntity contest = contestRepo.findContestByContestId(e.getContestId());
+        Map<String, List<String>> mapContestIdToRoleList = new HashMap<>();
+        for (UserRegistrationContestEntity userRegistrationContest : userRegistrationContestList) {
+            String contestId = userRegistrationContest.getContestId();
+            String role = userRegistrationContest.getRoleId();
+            mapContestIdToRoleList.computeIfAbsent(contestId, k -> new ArrayList<>())
+                                  .add(role);
+        }
+
+        Map<String, String> mapContestIdToRoleListString = new HashMap<>();
+        mapContestIdToRoleList.forEach((contestId, roleList) -> {
+            String rolesString = String.join(", ", roles);
+            mapContestIdToRoleListString.put(contestId, rolesString);
+        });
+
+        List<ModelGetContestResponse> res = new ArrayList<>();
+
+        for (Map.Entry<String, String> e : mapContestIdToRoleListString.entrySet()) {
+            ContestEntity contest = contestRepo.findContestByContestId(e.getKey());
             ModelGetContestResponse modelGetContestResponse = ModelGetContestResponse.builder()
                                                                                      .contestId(contest.getContestId())
                                                                                      .contestName(contest.getContestName())
@@ -1787,13 +1805,22 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                                      .statusId(contest.getStatusId())
                                                                                      .userId(contest.getUserId())
                                                                                      .createdAt(contest.getCreatedAt())
-                                                                                     .roleId(e.getRoleId())
-                                                                                     .registrationStatusId(e.getStatus())
+                                                                                     .roleId(e.getValue())
                                                                                      .build();
             res.add(modelGetContestResponse);
         }
 
-        Collections.reverse(res);
+        res.sort((a, b) -> {
+            if (a.getStartAt() == null && b.getStartAt() == null) {
+                return 0;
+            } else if (a.getStartAt() == null) {
+                return 1;
+            } else if (b.getStartAt() == null) {
+                return -1;
+            } else {
+                return b.getStartAt().compareTo(a.getStartAt());
+            }
+        });
         return res;
     }
 

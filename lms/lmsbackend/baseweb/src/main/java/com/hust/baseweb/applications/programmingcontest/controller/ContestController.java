@@ -240,9 +240,9 @@ public class ContestController {
 
     @Secured("ROLE_TEACHER")
     @GetMapping("/contests")
-    public ResponseEntity<?> getContestPagingByUserRole(Principal principal) {
+    public ResponseEntity<?> getManagedContestOfTeacher(Principal principal) {
         List<ModelGetContestResponse> resp = problemTestCaseService
-            .getContestByUserRole(principal.getName());
+            .getManagedContestOfTeacher(principal.getName());
         return ResponseEntity.status(200).body(resp);
     }
 
