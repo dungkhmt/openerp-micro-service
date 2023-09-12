@@ -1799,12 +1799,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             ModelGetContestResponse modelGetContestResponse = ModelGetContestResponse.builder()
                                                                                      .contestId(contest.getContestId())
                                                                                      .contestName(contest.getContestName())
-                                                                                     .contestTime(contest.getContestSolvingTime())
-                                                                                     .countDown(contest.getCountDown())
                                                                                      .startAt(contest.getStartedAt())
                                                                                      .statusId(contest.getStatusId())
                                                                                      .userId(contest.getUserId())
-                                                                                     .createdAt(contest.getCreatedAt())
                                                                                      .roleId(e.getValue())
                                                                                      .build();
             res.add(modelGetContestResponse);
