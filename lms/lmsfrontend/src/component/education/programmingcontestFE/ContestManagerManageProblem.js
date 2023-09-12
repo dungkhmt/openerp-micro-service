@@ -250,7 +250,7 @@ export function ContestManagerManageProblem(props) {
                 required
                 value={importFromContestId}
                 id="importFromContestId"
-                label="Contest Id"
+                label="Import From ContestId"
                 onChange={(event) => {
                   setImportFromContestId(event.target.value);
                 }}

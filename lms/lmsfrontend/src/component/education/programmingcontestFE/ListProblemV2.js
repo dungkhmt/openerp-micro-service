@@ -21,6 +21,7 @@ function ListProblemV2() {
   const [myProblems, setMyProblems] = useState([]);
 
   const [sharedProblems, setSharedProblems] = useState([]);
+  const [allProblems, setAllProblems] = useState([]);
 
   const {t} = useTranslation("education/programmingcontest/problem");
 
@@ -123,7 +124,23 @@ function ListProblemV2() {
       },
     },
   ];
-
+  /*
+  const getAllProblems = () => {
+    request("get", "/teacher/all-problems", (res) => {
+      const data = res.data.map((problem) => ({
+        problemId: problem.problemId,
+        problemName: problem.problemName,
+        userId: problem.userId,
+        createdAt: toFormattedDateTime(problem.createdAt),
+        levelId: problem.levelId,
+        tags: problem.tags,
+        appearances: problem.appearances,
+        statusId: problem.statusId,
+      }));
+      setData(data);
+    }).then();
+  }
+  */
   const getProblems = useCallback((path, setData) => {
     request("get", path, (res) => {
       const data = res.data.map((problem) => ({
@@ -158,6 +175,14 @@ function ListProblemV2() {
     );
   }, [getProblems]);
 
+  useEffect(() => {
+    getProblems(
+      "/teacher/all-problems",
+      (data) => {
+        setAllProblems(data);
+      }
+    );
+  }, [getProblems]);
   return (
     <HustContainerCard>
       <Box sx={{borderBottom: 2, borderColor: "divider"}}>
@@ -168,6 +193,7 @@ function ListProblemV2() {
         >
           <Tab label={t("problemList.myProblems")} {...a11yProps(0)} />
           <Tab label={t("problemList.sharedProblems")} {...a11yProps(1)} />
+          <Tab label={t("problemList.allProblems")} {...a11yProps(2)} />
         </Tabs>
       </Box>
 
@@ -199,6 +225,7 @@ function ListProblemV2() {
           sx={{marginTop: "8px"}}
         />
       </TabPanelVertical>
+
       <TabPanelVertical value={value} index={1}>
         <StandardTable
           title="Problems"
@@ -206,6 +233,22 @@ function ListProblemV2() {
           data={sharedProblems}
           hideCommandBar
           key="sharedProblems"
+          options={{
+            selection: false,
+            pageSize: 10,
+            search: true,
+            sorting: true,
+          }}
+          sx={{marginTop: "8px"}}
+        />
+      </TabPanelVertical>
+      <TabPanelVertical value={value} index={2}>
+        <StandardTable
+          title="All Problems"
+          columns={COLUMNS}
+          data={allProblems}
+          hideCommandBar
+          key="allProblems"
           options={{
             selection: false,
             pageSize: 10,

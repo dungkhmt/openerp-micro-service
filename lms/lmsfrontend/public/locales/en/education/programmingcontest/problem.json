@@ -29,7 +29,8 @@
     "addTestCase": "Add Test Case",
     "edit": "Edit",
     "myProblems": "My Problems",
-    "sharedProblems": "Shared Problems"
+    "sharedProblems": "Shared Problems",
+    "allProblems": "All Problems"
   },
   "createProblem": "Create new Problem",
   "editProblem": "Edit problem",

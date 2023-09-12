@@ -3796,4 +3796,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
             });
     }
+
+    @Override
+    public List<ProblemEntity> getAllProblems(String userId) {
+        List<ProblemEntity> problems = problemRepo.findAll();
+        return problems;
+    }
 }

@@ -29,7 +29,8 @@
     "addTestCase": "Thêm Test Case",
     "edit": "Chỉnh sửa",
     "myProblems": "Bài tập của tôi",
-    "sharedProblems": "Bài tập được chia sẻ"
+    "sharedProblems": "Bài tập được chia sẻ",
+    "allProblems": "Tất cả Bài tập"
   },
   "createProblem": "Tạo mới Bài tập",
   "editProblem": "Chỉnh sửa Bài tập",
