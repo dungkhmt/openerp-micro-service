@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {request} from "../../../api";
 import StandardTable from "component/table/StandardTable";
-import {Box, Button, Chip, CircularProgress, IconButton, Tooltip} from "@mui/material";
+import {Box, Button, Chip, CircularProgress, IconButton, LinearProgress, Tooltip} from "@mui/material";
 import PublishIcon from "@mui/icons-material/Publish";
 import {errorNoti, successNoti} from "utils/notification";
 import {toFormattedDateTime} from "utils/dateutils";
@@ -15,7 +15,7 @@ import {LoadingButton} from "@mui/lab";
 export default function ContestManagerListMember(props) {
   const contestId = props.contestId;
   const [members, setMembers] = useState([]);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(true);
   const [openUpdateMemberDialog, setOpenUpdateMemberDialog] = useState(false);
   const [permissionIds, setPermissionIds] = useState([]);
   const [selectedUserRegisId, setSelectedUserRegisId] = useState(null);
@@ -50,13 +50,11 @@ export default function ContestManagerListMember(props) {
   ];
 
   function handleForbidSubmit(id) {
-    // alert("remove " + id);
     setSelectedUserRegisId(id);
     setOpenUpdateMemberDialog(true);
   }
 
   function handleRemove(id) {
-    // alert("remove " + id);
     setIsProcessing(true);
     let body = {
       id: id,
@@ -93,6 +91,8 @@ export default function ContestManagerListMember(props) {
         updatedByUserId: e.updatedByUserId,
       }));
       setMembers(data);
+
+      setIsProcessing(false);
     });
   }
 
@@ -185,6 +185,7 @@ export default function ContestManagerListMember(props) {
   }, []);
   return (
     <HustContainerCard>
+      {isProcessing && <LinearProgress/>}
       <StandardTable
         title={"Users"}
         columns={columns}
@@ -215,7 +216,7 @@ export default function ContestManagerListMember(props) {
                     />
                   )}
                   <Button color="primary" variant="contained" onClick={handleUploadExcelStudentList}>Submit</Button>
-                  {isProcessing ? <CircularProgress/> : ""}
+                  
                 </Box>
               </MuiThemeProvider>
             </div>

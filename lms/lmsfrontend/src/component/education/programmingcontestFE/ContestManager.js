@@ -91,7 +91,6 @@ export function ContestManager() {
 
       <TabPanelVertical value={value} index={4}>
         <ContestManagerAddMember2Contest contestId={contestId}/>
-        {/* <ContestManagerAddMember contestId={contestId}/> */}
       </TabPanelVertical>
 
       <TabPanelVertical value={value} index={5}>
