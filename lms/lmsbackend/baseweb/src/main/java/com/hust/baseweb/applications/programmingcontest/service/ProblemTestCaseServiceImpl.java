@@ -2050,6 +2050,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                           .userId(modelAddUserToContest.getUserId())
                                                                           .status(Constants.RegistrationType.SUCCESSFUL.getValue())
                                                                           .roleId(modelAddUserToContest.getRole())
+                                                                          .permissionId(UserRegistrationContestEntity.PERMISSION_SUBMIT)
                                                                           .build());
             return 1;
         } else {

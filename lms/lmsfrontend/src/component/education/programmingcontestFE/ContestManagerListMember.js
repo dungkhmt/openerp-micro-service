@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {request} from "../../../api";
 import StandardTable from "component/table/StandardTable";
-import {Box, Button, Chip, CircularProgress, IconButton, LinearProgress, Tooltip} from "@mui/material";
+import {Box, Button, Chip, IconButton, LinearProgress} from "@mui/material";
 import PublishIcon from "@mui/icons-material/Publish";
 import {errorNoti, successNoti} from "utils/notification";
 import {toFormattedDateTime} from "utils/dateutils";
@@ -10,7 +10,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import HustContainerCard from "../../common/HustContainerCard";
 import {MTableToolbar} from "material-table";
 import {MuiThemeProvider} from "@material-ui/core/styles";
-import {LoadingButton} from "@mui/lab";
+import EditIcon from "@mui/icons-material/Edit";
+import ManagerSubmitCodeOfParticipant from "./ManagerSubmitCodeOfParticipant";
+import HustModal from "../../common/HustModal";
+import UploadUserToContestDialog from "./UploadUserToContestDialog";
 
 export default function ContestManagerListMember(props) {
   const contestId = props.contestId;
@@ -21,16 +24,24 @@ export default function ContestManagerListMember(props) {
   const [selectedUserRegisId, setSelectedUserRegisId] = useState(null);
 
   const [filename, setFilename] = useState(null);
-  const [uploadMessage, setUploadMessage] = useState("");
+
+  const [openUploadDialog, setOpenUploadDialog] = useState(false);
 
   const columns = [
     {title: "No.", field: "index"},
     {title: "User ID", field: "userId"},
     {title: "Name", field: "fullName"},
     {title: "Role", field: "roleId"},
+    // {title: "Updated At", field: "lastUpdatedDate"},
     {title: "Permission", field: "permissionId"},
-    {title: "Updated At", field: "lastUpdatedDate"},
-    {title: "Updated By ", field: "updatedByUserId"},
+    {
+      title: "Update Permission",
+      render: (row) => (
+        <IconButton variant="contained" color="info" onClick={() => handleForbidSubmit(row.id)}>
+          <EditIcon/>
+        </IconButton>
+      ),
+    },
     {
       title: "Remove",
       render: (row) => (
@@ -38,14 +49,6 @@ export default function ContestManagerListMember(props) {
           <DeleteIcon/>
         </IconButton>
       )
-    },
-    {
-      title: "Permission Submit",
-      render: (row) => (
-        <Button variant="contained" color="info" onClick={() => handleForbidSubmit(row.id)}>
-          Update Permission
-        </Button>
-      ),
     },
   ];
 
@@ -65,11 +68,12 @@ export default function ContestManagerListMember(props) {
       (res) => {
         successNoti("Participant removed successfully");
         setIsProcessing(false);
+        getMembersOfContest();
       },
       {
         onError: () => {
           setIsProcessing(false);
-          errorNoti("Đã có lỗi xảy ra.");
+          errorNoti("An error happened");
         },
         401: () => {
         },
@@ -104,7 +108,6 @@ export default function ContestManagerListMember(props) {
     };
     request(
       "put",
-      //"/forbid-member-from-submit-to-contest",
       "/contests/permissions",
       (res) => {
         successNoti("Updated Successfully");
@@ -117,7 +120,8 @@ export default function ContestManagerListMember(props) {
           setIsProcessing(false);
           errorNoti("An error happened");
         },
-        401: () => {},
+        401: () => {
+        },
       },
       body
     );
@@ -136,8 +140,6 @@ export default function ContestManagerListMember(props) {
   const handleUploadExcelStudentList = (event) => {
     event.preventDefault();
     setIsProcessing(true);
-    setUploadMessage("");
-    //alert("handleUploadExcelStudentList " + testId);
     let body = {
       contestId: contestId,
     };
@@ -156,18 +158,11 @@ export default function ContestManagerListMember(props) {
       "/contests/students/upload-list",
       (res) => {
         setIsProcessing(false);
-        console.log("handleFormSubmit, res = ", res);
-        setUploadMessage(res.message);
-        //if (res.status == "TIME_OUT") {
-        //  alert("Time Out!!!");
-        //} else {
-        //}
       },
       {
         onError: (e) => {
           setIsProcessing(false);
           console.error(e);
-          //alert("Time Out!!!");
         },
       },
       formData,
@@ -183,6 +178,7 @@ export default function ContestManagerListMember(props) {
     getMembersOfContest();
     getPermissions();
   }, []);
+
   return (
     <HustContainerCard>
       {isProcessing && <LinearProgress/>}
@@ -216,12 +212,23 @@ export default function ContestManagerListMember(props) {
                     />
                   )}
                   <Button color="primary" variant="contained" onClick={handleUploadExcelStudentList}>Submit</Button>
-                  
+
                 </Box>
               </MuiThemeProvider>
             </div>
           ),
         }}
+        actions={[
+          {
+            icon: () => {
+              return <Button variant="contained" sx={{ml: 2, mr: 2}} onClick={() => {setOpenUploadDialog(true)}}>
+                Upload
+              </Button>
+            },
+            tooltip: 'Upload Users with Excel file',
+            isFreeAction: true
+          }
+        ]}
       />
       <UpdatePermissionMemberOfContestDialog
         open={openUpdateMemberDialog}
@@ -229,6 +236,10 @@ export default function ContestManagerListMember(props) {
         onUpdateInfo={onUpdateInfo}
         selectedUserRegisId={selectedUserRegisId}
         permissionIds={permissionIds}
+      />
+      <UploadUserToContestDialog
+        isOpen={openUploadDialog}
+        contestId={contestId}
       />
     </HustContainerCard>
   );
