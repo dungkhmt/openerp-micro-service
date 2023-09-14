@@ -1891,17 +1891,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public ListModelUserRegisteredContestInfo searchUser(Pageable pageable, String contestId, String keyword) {
-        Page<ModelUserRegisteredClassInfo> list = userRegistrationContestPagingAndSortingRepo.searchUser(
-            pageable,
-            contestId,
-            keyword);
-        return ListModelUserRegisteredContestInfo.builder()
-                                                 .contents(list)
-                                                 .build();
-    }
-
-    @Override
     public ListPersonModel searchUserBaseKeyword(Pageable pageable, String keyword) {
         Page<PersonModel> list = userLoginRepo.searchUser(pageable, keyword);
         return ListPersonModel.builder()

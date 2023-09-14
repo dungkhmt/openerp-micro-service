@@ -315,19 +315,6 @@ public class ContestController {
     }
 
     @Secured("ROLE_TEACHER")
-    @GetMapping("/contests/{contestId}/users")
-    public ResponseEntity<?> searchUser(
-        @PathVariable("contestId") String contestId, Pageable pageable,
-        @Param("keyword") String keyword
-    ) {
-        if (keyword == null) {
-            keyword = "";
-        }
-        ListModelUserRegisteredContestInfo resp = problemTestCaseService.searchUser(pageable, contestId, keyword);
-        return ResponseEntity.status(200).body(resp);
-    }
-
-    @Secured("ROLE_TEACHER")
     @PostMapping("/contests/registers/approval-management")
     public ResponseEntity<?> teacherManagerStudentRegisterContest(
         Principal principal,
