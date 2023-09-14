@@ -2,7 +2,7 @@ import React, {useRef, useState} from "react";
 import {request} from "../../../api";
 import {errorNoti} from "../../../utils/notification";
 
-import {Box, Button, Chip} from "@mui/material";
+import {Box, Button} from "@mui/material";
 import HustModal from "../../common/HustModal";
 import StandardTable from "../../table/StandardTable";
 
@@ -18,7 +18,7 @@ export default function UploadUserToContestDialog(props) {
   }
 
   const downloadSampleFile = () => {
-    window.location.href = '/static/excels/sample-upload-user_v2.xlsx';
+    window.location.href = '/static/excels/sample-upload-user-contest.xlsx';
   };
 
   const handleUpload = () => {
@@ -54,10 +54,21 @@ export default function UploadUserToContestDialog(props) {
     );
   }
 
+  const getUploadStatusColor = (status) => {
+    if (status === 'SUCCESSFUL') return 'green';
+    return 'red';
+  }
+
   const columns = [
     {title: "User ID", field: "userId"},
-    {title: "Role", field: "roleId"},
-    {title: "Status", field: "status"},
+    {title: "Role", field: "roleId",},
+    {title: "Status",
+      field: "status",
+      render: (rowData) => (
+        <span style={{color: getUploadStatusColor(`${rowData.status}`)}}>
+          {`${rowData.status}`}
+        </span>
+      ),},
   ];
 
   return (
@@ -69,31 +80,22 @@ export default function UploadUserToContestDialog(props) {
       textOk="Upload"
       textClose="Cancel"
       isLoading={isProcessing}
-      maxWidthPaper={uploadedUsers.length > 0 ? 720 : 600}
+      maxWidthPaper={uploadedUsers.length > 0 ? 800 : 600}
     >
       <Box sx={{mb: 1}}>
         <Box display="flex" justifyContent="flex-start" alignItems="center" width="100%" sx={{mb: 2}}>
           <input type="file" id="selected-upload-file" onChange={onFileChange} ref={fileInputRef}/>
-          {filename && (
-            <Chip
-              color="success"
-              variant="outlined"
-              label={filename.name}
-              onDelete={() => setFilename(undefined)}
-            />
-          )}
-
           <Button sx={{marginLeft: "24px"}} variant={"outlined"} onClick={downloadSampleFile}>Download Template</Button>
         </Box>
 
         {uploadedUsers.length > 0 &&
           <StandardTable
-            title="Upload Result"
+            title={uploadedUsers.filter(user => user.status === 'SUCCESSFUL').length + "/" + uploadedUsers.length + " Successful"}
             columns={columns}
             data={uploadedUsers}
             options={{
               selection: false,
-              pageSize: 10,
+              pageSize: 5,
               search: true,
               sorting: true,
             }}

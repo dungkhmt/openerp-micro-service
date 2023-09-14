@@ -2048,7 +2048,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         response.setRoleId(role);
 
         if (userLoginRepo.findByUserLoginId(userId) == null) {
-            response.setStatus("User " + userId + " not found");
+            response.setStatus("User not found");
             return response;
         }
 

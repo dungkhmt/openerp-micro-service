@@ -521,12 +521,8 @@ public class ContestController {
                 Row row = sheet.getRow(i);
                 Cell c = row.getCell(0);
 
+                if (c == null || c.getStringCellValue().equals("")) continue;
                 String userId = c.getStringCellValue();
-                UserLogin u = userService.findById(userId);
-                if (u == null) {
-                    log.info("uploadExcelStudentListOfContest, user " + userId + " NOT EXISTS");
-                    continue;
-                }
                 ModelAddUserToContest m = new ModelAddUserToContest();
                 m.setContestId(contestId);
                 m.setUserId(userId);
