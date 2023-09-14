@@ -1,18 +1,13 @@
 import React, {useEffect, useState} from "react";
 import {request} from "../../../api";
 import StandardTable from "component/table/StandardTable";
-import {Box, Button, Chip, IconButton, LinearProgress} from "@mui/material";
-import PublishIcon from "@mui/icons-material/Publish";
+import {Button, IconButton, LinearProgress} from "@mui/material";
 import {errorNoti, successNoti} from "utils/notification";
 import {toFormattedDateTime} from "utils/dateutils";
 import UpdatePermissionMemberOfContestDialog from "./UpdatePermissionMemberOfContestDialog";
 import DeleteIcon from "@mui/icons-material/Delete";
 import HustContainerCard from "../../common/HustContainerCard";
-import {MTableToolbar} from "material-table";
-import {MuiThemeProvider} from "@material-ui/core/styles";
 import EditIcon from "@mui/icons-material/Edit";
-import ManagerSubmitCodeOfParticipant from "./ManagerSubmitCodeOfParticipant";
-import HustModal from "../../common/HustModal";
 import UploadUserToContestDialog from "./UploadUserToContestDialog";
 
 export default function ContestManagerListMember(props) {
@@ -174,6 +169,11 @@ export default function ContestManagerListMember(props) {
     setFilename(event.target.files[0]);
   }
 
+  const handleCloseUploadUserDialog = () => {
+    getMembersOfContest();
+    setOpenUploadDialog(false);
+  }
+
   useEffect(() => {
     getMembersOfContest();
     getPermissions();
@@ -193,35 +193,12 @@ export default function ContestManagerListMember(props) {
           search: true,
           sorting: true,
         }}
-        components={{
-          Toolbar: (props) => (
-            <div>
-              <MTableToolbar {...props} searchFieldStyle={{width: 280}}/>
-              <MuiThemeProvider>
-                <Box display="flex" justifyContent="flex-start" width="100%" sx={{padding: "0 0 12px 12px"}}>
-                  <Button color="primary" variant="outlined" component="label" sx={{marginRight: "8px"}}>
-                    <PublishIcon/> Upload Excel file
-                    <input hidden type="file" id="selected-upload-file" onChange={onFileChange}/>
-                  </Button>
-                  {filename && (
-                    <Chip
-                      color="success"
-                      variant="outlined"
-                      label={filename.name}
-                      onDelete={() => setFilename(undefined)}
-                    />
-                  )}
-                  <Button color="primary" variant="contained" onClick={handleUploadExcelStudentList}>Submit</Button>
-
-                </Box>
-              </MuiThemeProvider>
-            </div>
-          ),
-        }}
         actions={[
           {
             icon: () => {
-              return <Button variant="contained" sx={{ml: 2, mr: 2}} onClick={() => {setOpenUploadDialog(true)}}>
+              return <Button variant="contained" sx={{ml: 2, mr: 2}} onClick={() => {
+                setOpenUploadDialog(true)
+              }}>
                 Upload
               </Button>
             },
@@ -240,6 +217,7 @@ export default function ContestManagerListMember(props) {
       <UploadUserToContestDialog
         isOpen={openUploadDialog}
         contestId={contestId}
+        onClose={handleCloseUploadUserDialog}
       />
     </HustContainerCard>
   );

@@ -156,7 +156,7 @@ public interface ProblemTestCaseService {
 
     void editTestCase(UUID testCaseId, ModelSaveTestcase modelSaveTestcase) throws MiniLeetCodeException;
 
-    int addUserToContest(ModelAddUserToContest modelAddUserToContest);
+    ModelAddUserToContestResponse addUserToContest(ModelAddUserToContest modelAddUserToContest);
 
     void deleteUserContest(ModelAddUserToContest modelAddUserToContest) throws MiniLeetCodeException;
 

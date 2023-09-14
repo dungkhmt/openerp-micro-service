@@ -510,7 +510,7 @@ public class ContestController {
         Gson gson = new Gson();
         ModelUploadExcelParticipantToContestInput modelUpload = gson.fromJson(
             inputJson, ModelUploadExcelParticipantToContestInput.class);
-        List<String> uploadedUsers = new ArrayList<>();
+        List<ModelAddUserToContestResponse> uploadedUsers = new ArrayList<>();
         String contestId = modelUpload.getContestId();
         try (InputStream is = file.getInputStream()) {
             XSSFWorkbook wb = new XSSFWorkbook(is);
@@ -531,10 +531,8 @@ public class ContestController {
                 m.setContestId(contestId);
                 m.setUserId(userId);
                 m.setRole(UserRegistrationContestEntity.ROLE_PARTICIPANT);
-                int cnt = problemTestCaseService.addUserToContest(m);
-                //if(cnt == 1){
-                uploadedUsers.add(userId);
-                //}
+                ModelAddUserToContestResponse response = problemTestCaseService.addUserToContest(m);
+                uploadedUsers.add(response);
             }
         } catch (Exception e) {
             e.printStackTrace();

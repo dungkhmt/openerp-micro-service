@@ -1,18 +1,17 @@
 import React, {useRef, useState} from "react";
 import {request} from "../../../api";
-import {errorNoti, successNoti} from "../../../utils/notification";
+import {errorNoti} from "../../../utils/notification";
 
-import {Box, Button, Card, CardContent, Chip, Typography} from "@mui/material";
-import PublishIcon from "@mui/icons-material/Publish";
-import SendIcon from "@mui/icons-material/Send";
-import {LoadingButton} from "@mui/lab";
+import {Box, Button, Chip} from "@mui/material";
 import HustModal from "../../common/HustModal";
+import StandardTable from "../../table/StandardTable";
 
 export default function UploadUserToContestDialog(props) {
-  const { isOpen, contestId } = props;
+  const {isOpen, onClose, contestId} = props;
   const [isProcessing, setIsProcessing] = useState(false);
   const fileInputRef = useRef(null);
   const [filename, setFilename] = useState(null);
+  const [uploadedUsers, setUploadedUsers] = useState([]);
 
   function onFileChange(event) {
     setFilename(event.target.files[0]);
@@ -41,11 +40,13 @@ export default function UploadUserToContestDialog(props) {
       "post",
       "/contests/students/upload-list",
       (res) => {
+        setUploadedUsers(res.data);
         setIsProcessing(false);
       },
       {
         onError: (e) => {
           setIsProcessing(false);
+          errorNoti("An error happened", 5000)
         },
       },
       formData,
@@ -53,27 +54,52 @@ export default function UploadUserToContestDialog(props) {
     );
   }
 
+  const columns = [
+    {title: "User ID", field: "userId"},
+    {title: "Role", field: "roleId"},
+    {title: "Status", field: "status"},
+  ];
+
   return (
     <HustModal
       open={isOpen}
       title={'Upload Users to Contest'}
       onOk={handleUpload}
-      onClose={() => {}}
+      onClose={onClose}
       textOk="Upload"
       textClose="Cancel"
+      isLoading={isProcessing}
+      maxWidthPaper={uploadedUsers.length > 0 ? 720 : 600}
     >
-      <Box display="flex" justifyContent="flex-start" alignItems="center" width="100%" sx={{mb: 2}}>
-        <input type="file" id="selected-upload-file" onChange={onFileChange} ref={fileInputRef}/>
-        {filename && (
-          <Chip
-            color="success"
-            variant="outlined"
-            label={filename.name}
-            onDelete={() => setFilename(undefined)}
-          />
-        )}
+      <Box sx={{mb: 1}}>
+        <Box display="flex" justifyContent="flex-start" alignItems="center" width="100%" sx={{mb: 2}}>
+          <input type="file" id="selected-upload-file" onChange={onFileChange} ref={fileInputRef}/>
+          {filename && (
+            <Chip
+              color="success"
+              variant="outlined"
+              label={filename.name}
+              onDelete={() => setFilename(undefined)}
+            />
+          )}
 
-        <Button sx={{marginLeft: "24px"}} variant={"outlined"} onClick={downloadSampleFile}>Download Template</Button>
+          <Button sx={{marginLeft: "24px"}} variant={"outlined"} onClick={downloadSampleFile}>Download Template</Button>
+        </Box>
+
+        {uploadedUsers.length > 0 &&
+          <StandardTable
+            title="Upload Result"
+            columns={columns}
+            data={uploadedUsers}
+            options={{
+              selection: false,
+              pageSize: 10,
+              search: true,
+              sorting: true,
+            }}
+            hideCommandBar
+          />
+        }
       </Box>
     </HustModal>
   );

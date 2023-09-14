@@ -2038,12 +2038,30 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public int addUserToContest(ModelAddUserToContest modelAddUserToContest) {
+    public ModelAddUserToContestResponse addUserToContest(ModelAddUserToContest modelAddUserToContest) {
+        String contestId = modelAddUserToContest.getContestId();
+        String userId = modelAddUserToContest.getUserId();
+        String role = modelAddUserToContest.getRole();
+
+        ModelAddUserToContestResponse response = new ModelAddUserToContestResponse();
+        response.setUserId(userId);
+        response.setRoleId(role);
+
+        if (userLoginRepo.findByUserLoginId(userId) == null) {
+            response.setStatus("User " + userId + " not found");
+            return response;
+        }
+
         UserRegistrationContestEntity userRegistrationContest = userRegistrationContestRepo
-            .findUserRegistrationContestEntityByContestIdAndUserIdAndRoleId(
-                modelAddUserToContest.getContestId(),
-                modelAddUserToContest.getUserId(),
-                modelAddUserToContest.getRole());
+            .findUserRegistrationContestEntityByContestIdAndUserIdAndRoleId(contestId, userId, role);
+
+
+        if (userRegistrationContest != null && userRegistrationContest.getStatus().equals(Constants.RegistrationType.SUCCESSFUL.getValue())) {
+            response.setStatus("Already existed");
+            return response;
+        }
+
+
         if (userRegistrationContest == null) {
             userRegistrationContestRepo.save(UserRegistrationContestEntity.builder()
                                                                           .contestId(modelAddUserToContest.getContestId())
@@ -2052,13 +2070,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                           .roleId(modelAddUserToContest.getRole())
                                                                           .permissionId(UserRegistrationContestEntity.PERMISSION_SUBMIT)
                                                                           .build());
-            return 1;
         } else {
             userRegistrationContest.setStatus(Constants.RegistrationType.SUCCESSFUL.getValue());
             userRegistrationContestRepo.save(userRegistrationContest);
-            return 0;
         }
-
+        response.setStatus("SUCCESSFUL");
+        return response;
     }
 
     @Override
