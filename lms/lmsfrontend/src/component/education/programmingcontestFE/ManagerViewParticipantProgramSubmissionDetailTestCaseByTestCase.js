@@ -2,28 +2,27 @@ import InfoIcon from "@mui/icons-material/Info";
 import {IconButton} from "@mui/material";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import HustModal from "component/common/HustModal";
-import MaterialTable from "material-table";
 import {React, useEffect, useState} from "react";
 import {request} from "../../../api";
 import {toFormattedDateTime} from "../../../utils/dateutils";
+import StandardTable from "../../table/StandardTable";
+import Box from "@mui/material/Box";
 
 export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase(
   props
 ) {
-  const { submissionId } = props;
+  const {submissionId} = props;
   const [submissionTestCase, setSubmissionTestCase] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [testcaseDetailList, setTestcaseDetailList] = useState([]);
   const [selectedTestcase, setSelectedTestcase] = useState();
 
   const columns = [
-    { title: "Contest", field: "contestId" },
-    { title: "Problem", field: "problemId" },
-    { title: "Message", field: "message" },
-    { title: "Point", field: "point" },
-    { title: "Correct result", field: "testCaseAnswer" },
-    { title: "Participant's result", field: "participantAnswer" },
-    { title: "Submit at", field: "createdAt" },
+    {title: "Contest", field: "contestId"},
+    {title: "Problem", field: "problemId"},
+    {title: "Message", field: "message"},
+    {title: "Point", field: "point"},
+    {title: "Submit at", field: "createdAt"},
     {
       title: "",
       render: (rowData) => (
@@ -32,13 +31,14 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
           onClick={() => {
             for (let i = 0; i < testcaseDetailList.length; i++) {
               if (testcaseDetailList[i].testCaseId === rowData.testCaseId) {
+                testcaseDetailList[i].participantAnswer = rowData.participantAnswer;
                 setSelectedTestcase(testcaseDetailList[i]);
               }
             }
             setOpenModal(true);
           }}
         >
-          <InfoIcon />
+          <InfoIcon/>
         </IconButton>
       ),
     },
@@ -55,7 +55,10 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
         }));
         setSubmissionTestCase(L);
       },
-      { 401: () => {} }
+      {
+        401: () => {
+        }
+      }
     );
   }
 
@@ -66,7 +69,10 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
       (res) => {
         setTestcaseDetailList((prev) => [...prev, res.data]);
       },
-      { 401: () => {} }
+      {
+        401: () => {
+        }
+      }
     );
   }
 
@@ -90,28 +96,54 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
         onClose={() => setOpenModal(false)}
         isNotShowCloseButton
         showCloseBtnTitle={false}
+        maxWidthPaper={800}
       >
         <HustCopyCodeBlock
           title="Input"
           text={chosenTestcase?.chosenTestcase?.testCase}
+          mb={2}
         />
-        <HustCopyCodeBlock
-          title="Output"
-          text={chosenTestcase?.chosenTestcase?.correctAns}
-          mt={2}
-        />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            width: "100%",
+            justifyContent: "space-between",
+            marginTop: "14px",
+          }}
+        >
+          <Box width="48%">
+            <HustCopyCodeBlock
+              title="Correct output"
+              text={chosenTestcase?.chosenTestcase?.correctAns}
+            />
+          </Box>
+          <Box width="48%">
+            <HustCopyCodeBlock
+              title="User output"
+              text={chosenTestcase?.chosenTestcase?.participantAnswer}
+            />
+          </Box>
+        </Box>
       </HustModal>
     );
   };
 
   return (
     <div>
-      <MaterialTable
-        title={"Detail"}
+      <StandardTable
+        title={"Testcases"}
         columns={columns}
         data={submissionTestCase}
+        hideCommandBar
+        options={{
+          selection: false,
+          pageSize: 10,
+          search: false,
+          sorting: true,
+        }}
       />
-      <ModalPreview chosenTestcase={selectedTestcase} />
+      <ModalPreview chosenTestcase={selectedTestcase}/>
     </div>
   );
 }
