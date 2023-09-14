@@ -139,10 +139,6 @@ public interface ProblemTestCaseService {
 
     List<ModelMemberOfContestResponse> getPendingRegisteredUsersOfContest(String contestId);
 
-    ListModelUserRegisteredContestInfo searchUser(Pageable pageable, String contestId, String keyword);
-
-    ListPersonModel searchUserBaseKeyword(Pageable pageable, String keyword);
-
     ModelGetContestPageResponse getRegisteredContestsByUser(String userName);
 
     ModelGetContestPageResponse getNotRegisteredContestByUser(Pageable pageable, String userName);
@@ -157,8 +153,6 @@ public interface ProblemTestCaseService {
     List<ModelGetTestCase> getTestCaseByProblem(String problemId);
 
     ModelGetTestCaseDetail getTestCaseDetail(UUID testCaseId) throws MiniLeetCodeException;
-
-    ModelGetTestCaseDetail getTestCaseDetailShort(UUID testCaseId) throws MiniLeetCodeException;
 
     void editTestCase(UUID testCaseId, ModelSaveTestcase modelSaveTestcase) throws MiniLeetCodeException;
 

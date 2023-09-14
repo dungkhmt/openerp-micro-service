@@ -1891,14 +1891,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public ListPersonModel searchUserBaseKeyword(Pageable pageable, String keyword) {
-        Page<PersonModel> list = userLoginRepo.searchUser(pageable, keyword);
-        return ListPersonModel.builder()
-                              .contents(list)
-                              .build();
-    }
-
-    @Override
     public ModelGetContestPageResponse getRegisteredContestsByUser(String userName) {
         List<UserRegistrationContestEntity> lst = userRegistrationContestRepo
             .findAllByUserIdAndRoleIdAndStatus(
@@ -2024,26 +2016,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                      .testCaseId(testCaseId)
                                      .correctAns(testCase.getCorrectAnswer())
                                      .testCase(testCase.getTestCase())
-                                     .point(testCase.getTestCasePoint()).isPublic(testCase.getIsPublic())
-                                     .problemSolution(problem.getSolution())
-                                     .problemDescription(problem.getProblemDescription())
-                                     .description(testCase.getDescription())
-                                     .build();
-    }
-
-    @Override
-    public ModelGetTestCaseDetail getTestCaseDetailShort(UUID testCaseId) throws MiniLeetCodeException {
-        TestCaseEntity testCase = testCaseRepo.findTestCaseByTestCaseId(testCaseId);
-        if (testCase == null) {
-            throw new MiniLeetCodeException("testcase not found");
-        }
-
-        ProblemEntity problem = problemRepo.findByProblemId(testCase.getProblemId());
-
-        return ModelGetTestCaseDetail.builder()
-                                     .testCaseId(testCaseId)
-                                     .correctAns(testCase.getCorrectAnswerShort(20))
-                                     .testCase(testCase.getTestCaseShort(20))
                                      .point(testCase.getTestCasePoint()).isPublic(testCase.getIsPublic())
                                      .problemSolution(problem.getSolution())
                                      .problemDescription(problem.getProblemDescription())
