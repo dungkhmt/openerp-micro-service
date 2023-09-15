@@ -48,6 +48,9 @@ public class ContestEntity implements Serializable {
     public static final String SYNCHRONOUS_JUDGE_MODE = "SYNCHRONOUS_JUDGE_MODE";
     public static final String ASYNCHRONOUS_JUDGE_MODE_QUEUE = "ASYNCHRONOUS_JUDGE_MODE_QUEUE";
 
+    public static final String SEND_CONFIRM_EMAIL_UPON_SUBMISSION_YES = "Y";
+    public static final String SEND_CONFIRM_EMAIL_UPON_SUBMISSION_NO = "N";
+
     public static List<String> getJudgeModes() {
         List<String> L = new ArrayList();
         L.add(SYNCHRONOUS_JUDGE_MODE);
@@ -166,5 +169,6 @@ public class ContestEntity implements Serializable {
     @Column(name = "judge_mode")
     private String judgeMode; // synchronous or asynchronous using queue
 
-
+    @Column(name="send_confirm_email_upon_submission")
+    private String sendConfirmEmailUponSubmission;
 }

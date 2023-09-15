@@ -302,6 +302,7 @@ public interface ClassRepo extends JpaRepository<EduClass, UUID> {
            nativeQuery = true)
     List<GetAssigns4StudentOM> getAssignments4Student(UUID classId);
 
+    /*
     @Query(value = "select\n" +
                    "\tul.user_login_id id,\n" +
                    "\tconcat(p.first_name , ' ', p.middle_name , ' ', p.last_name ) \"name\",\n" +
@@ -320,6 +321,22 @@ public interface ClassRepo extends JpaRepository<EduClass, UUID> {
                    "order by\n" +
                    "\tp.last_name",
            nativeQuery = true)
+     */
+    @Query(value = "select\n" +
+                   "\tul.user_login_id id,\n" +
+                   "\tconcat(ul.first_name , ' ', ul.last_name ) \"name\",\n" +
+                   "\tul.email email\n" +
+                   "from\n" +
+                   "\tedu_class_registration ecr\n" +
+                   "inner join user_login ul on\n" +
+                   "\tecr.student_id = ul.user_login_id\n" +
+                   "where\n" +
+                   "\tecr.class_id = ?1\n" +
+                   "\tand ecr.status = ?2\n" +
+                   "order by\n" +
+                   "\tul.last_name",
+           nativeQuery = true)
+
     List<GetStudentsOfClassOM> getStudentsOfClass(UUID id, String status);
 
     @Query(value = "select\n" +

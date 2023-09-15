@@ -34,9 +34,10 @@ export default function ContestManagerListMember(props) {
     {
       title: "Remove",
       render: (row) => (
-        <IconButton variant="contained" color="error" onClick={() => handleRemove(row.id)}>
+        row.userId != 'admin' && <IconButton variant="contained" color="error" onClick={() => handleRemove(row.id)}>
           <DeleteIcon/>
         </IconButton>
+        
       )
     },
     {

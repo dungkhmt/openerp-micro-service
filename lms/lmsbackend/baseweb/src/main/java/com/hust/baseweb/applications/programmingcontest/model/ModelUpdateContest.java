@@ -23,5 +23,5 @@ public class ModelUpdateContest {
     private int maxSourceCodeLength;
     private int minTimeBetweenTwoSubmissions;
     private String judgeMode;
-
+    private String sendConfirmEmailUponSubmission;
 }
