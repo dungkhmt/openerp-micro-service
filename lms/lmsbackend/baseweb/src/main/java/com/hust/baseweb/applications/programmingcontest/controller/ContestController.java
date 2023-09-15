@@ -10,7 +10,6 @@ import com.hust.baseweb.applications.programmingcontest.repo.ContestRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestSubmissionRepo;
 import com.hust.baseweb.applications.programmingcontest.service.ContestService;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
-import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;
 import io.lettuce.core.dynamic.annotation.Param;
 import lombok.AllArgsConstructor;
@@ -64,13 +63,16 @@ public class ContestController {
         return ResponseEntity.status(200).body(contest);
     }
     @Secured("ROLE_TEACHER")
-    @PostMapping("/import-problems-from-a-contest")
-    public ResponseEntity<?> importProblemsFromAContest(Principal principal,
-                                                       @RequestBody ModelImportProblemsFromAContestInput I){
+    @PostMapping("/contests/import-problems")
+    public ResponseEntity<?> importProblemsFromAContest(@RequestBody ModelImportProblemsFromAContestInput input){
 
-        int cnt = problemTestCaseService.importProblemFromAContest(I);
-        return ResponseEntity.ok().body(cnt);
-
+        try {
+            List<ModelImportProblemFromContestResponse> res = problemTestCaseService.importProblemsFromAContest(input);
+            return ResponseEntity.ok().body(res);
+        }
+        catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 

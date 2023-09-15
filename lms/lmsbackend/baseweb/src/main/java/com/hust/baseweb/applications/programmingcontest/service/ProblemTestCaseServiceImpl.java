@@ -3728,27 +3728,36 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public int importProblemFromAContest(ModelImportProblemsFromAContestInput I) {
+    public List<ModelImportProblemFromContestResponse> importProblemsFromAContest(ModelImportProblemsFromAContestInput I) {
         ContestEntity contest = contestRepo.findContestByContestId(I.getFromContestId());
-        //log.info("importProblemFromAContest, contestId = " + I.getContestId() + " fromContestId " + I.getFromContestId());
-        if(contest == null) return 0;
-        int cnt = 0;
-        for(ProblemEntity p: contest.getProblems()){
+        if (contest == null) {
+            throw new IllegalArgumentException("Contest ID " + I.getFromContestId() + " not found");
+        }
+
+        List<ModelImportProblemFromContestResponse> responseList = new ArrayList<>();
+
+        for (ProblemEntity p : contest.getProblems()) {
+            ModelImportProblemFromContestResponse response = new ModelImportProblemFromContestResponse();
+            response.setProblemId(p.getProblemId());
             ContestProblem ocp = contestProblemRepo.findByContestIdAndProblemId(I.getFromContestId(), p.getProblemId());
             ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(I.getContestId(), p.getProblemId());
-            if(cp != null) continue;
+            if (cp != null) {
+                response.setStatus("Problem already existed");
+                responseList.add(response);
+                continue;
+            }
             cp = new ContestProblem();
             cp.setContestId(I.getContestId());
             cp.setProblemId(p.getProblemId());
             cp.setSubmissionMode(ocp.getSubmissionMode());
             cp.setProblemRename(ocp.getProblemRename());
             cp.setProblemRecode(ocp.getProblemRecode());
-            cp = contestProblemRepo.save(cp);
-            //log.info("importProblemFromAContest, save " + I.getContestId() + " problem " + p.getProblemId() + " cnt = " + cnt);
-            cnt ++;
+            contestProblemRepo.save(cp);
+            response.setStatus("SUCCESSFUL");
+            responseList.add(response);
         }
 
-        return cnt;
+        return responseList;
     }
 
     public List<ProblemEntity> getOwnerProblems(String ownerId) {
