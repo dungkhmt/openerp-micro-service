@@ -18,8 +18,6 @@ export default function ContestManagerListMember(props) {
   const [permissionIds, setPermissionIds] = useState([]);
   const [selectedUserRegisId, setSelectedUserRegisId] = useState(null);
 
-  const [filename, setFilename] = useState(null);
-
   const [openUploadDialog, setOpenUploadDialog] = useState(false);
 
   const columns = [
@@ -130,43 +128,6 @@ export default function ContestManagerListMember(props) {
     request("get", "/contests/permissions", (res) => {
       setPermissionIds(res.data);
     });
-  }
-
-  const handleUploadExcelStudentList = (event) => {
-    event.preventDefault();
-    setIsProcessing(true);
-    let body = {
-      contestId: contestId,
-    };
-    let formData = new FormData();
-    formData.append("inputJson", JSON.stringify(body));
-    formData.append("file", filename);
-
-    const config = {
-      headers: {
-        "content-Type": "multipart/form-data",
-      },
-    };
-
-    request(
-      "post",
-      "/contests/students/upload-list",
-      (res) => {
-        setIsProcessing(false);
-      },
-      {
-        onError: (e) => {
-          setIsProcessing(false);
-          console.error(e);
-        },
-      },
-      formData,
-      config
-    );
-  };
-
-  function onFileChange(event) {
-    setFilename(event.target.files[0]);
   }
 
   const handleCloseUploadUserDialog = () => {
