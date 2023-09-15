@@ -26,7 +26,7 @@ const ModalImportProblemsFromContest = (props) => {
 
     request(
       "post",
-      "/import-problems-from-a-contest",
+      "/contests/import-problems",
       (res) => {
         setImportedProblems(res.data);
       },
