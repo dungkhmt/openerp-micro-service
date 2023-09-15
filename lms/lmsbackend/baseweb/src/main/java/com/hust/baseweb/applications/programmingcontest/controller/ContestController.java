@@ -10,7 +10,6 @@ import com.hust.baseweb.applications.programmingcontest.repo.ContestRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestSubmissionRepo;
 import com.hust.baseweb.applications.programmingcontest.service.ContestService;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
-import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;
 import io.lettuce.core.dynamic.annotation.Param;
 import lombok.AllArgsConstructor;
@@ -64,13 +63,16 @@ public class ContestController {
         return ResponseEntity.status(200).body(contest);
     }
     @Secured("ROLE_TEACHER")
-    @PostMapping("/import-problems-from-a-contest")
-    public ResponseEntity<?> importProblemsFromAContest(Principal principal,
-                                                       @RequestBody ModelImportProblemsFromAContestInput I){
+    @PostMapping("/contests/import-problems")
+    public ResponseEntity<?> importProblemsFromAContest(@RequestBody ModelImportProblemsFromAContestInput input){
 
-        int cnt = problemTestCaseService.importProblemFromAContest(I);
-        return ResponseEntity.ok().body(cnt);
-
+        try {
+            List<ModelImportProblemFromContestResponse> res = problemTestCaseService.importProblemsFromAContest(input);
+            return ResponseEntity.ok().body(res);
+        }
+        catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 
@@ -240,9 +242,9 @@ public class ContestController {
 
     @Secured("ROLE_TEACHER")
     @GetMapping("/contests")
-    public ResponseEntity<?> getContestPagingByUserRole(Principal principal) {
+    public ResponseEntity<?> getManagedContestOfTeacher(Principal principal) {
         List<ModelGetContestResponse> resp = problemTestCaseService
-            .getContestByUserRole(principal.getName());
+            .getManagedContestOfTeacher(principal.getName());
         return ResponseEntity.status(200).body(resp);
     }
 
@@ -312,19 +314,6 @@ public class ContestController {
     public ResponseEntity<?> getPendingRegisteredUserOfContest(@PathVariable String contestId) {
         List<ModelMemberOfContestResponse> res = problemTestCaseService.getPendingRegisteredUsersOfContest(contestId);
         return ResponseEntity.ok().body(res);
-    }
-
-    @Secured("ROLE_TEACHER")
-    @GetMapping("/contests/{contestId}/users")
-    public ResponseEntity<?> searchUser(
-        @PathVariable("contestId") String contestId, Pageable pageable,
-        @Param("keyword") String keyword
-    ) {
-        if (keyword == null) {
-            keyword = "";
-        }
-        ListModelUserRegisteredContestInfo resp = problemTestCaseService.searchUser(pageable, contestId, keyword);
-        return ResponseEntity.status(200).body(resp);
     }
 
     @Secured("ROLE_TEACHER")
@@ -523,7 +512,7 @@ public class ContestController {
         Gson gson = new Gson();
         ModelUploadExcelParticipantToContestInput modelUpload = gson.fromJson(
             inputJson, ModelUploadExcelParticipantToContestInput.class);
-        List<String> uploadedUsers = new ArrayList<>();
+        List<ModelAddUserToContestResponse> uploadedUsers = new ArrayList<>();
         String contestId = modelUpload.getContestId();
         try (InputStream is = file.getInputStream()) {
             XSSFWorkbook wb = new XSSFWorkbook(is);
@@ -534,20 +523,14 @@ public class ContestController {
                 Row row = sheet.getRow(i);
                 Cell c = row.getCell(0);
 
+                if (c == null || c.getStringCellValue().equals("")) continue;
                 String userId = c.getStringCellValue();
-                UserLogin u = userService.findById(userId);
-                if (u == null) {
-                    log.info("uploadExcelStudentListOfContest, user " + userId + " NOT EXISTS");
-                    continue;
-                }
                 ModelAddUserToContest m = new ModelAddUserToContest();
                 m.setContestId(contestId);
                 m.setUserId(userId);
                 m.setRole(UserRegistrationContestEntity.ROLE_PARTICIPANT);
-                int cnt = problemTestCaseService.addUserToContest(m);
-                //if(cnt == 1){
-                uploadedUsers.add(userId);
-                //}
+                ModelAddUserToContestResponse response = problemTestCaseService.addUserToContest(m);
+                uploadedUsers.add(response);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -68,9 +68,6 @@ public class ContestEntity implements Serializable {
     @JsonIgnore
     private List<ProblemEntity> problems;
 
-    @Column(name = "try_again")
-    private boolean tryAgain;
-
     @Column(name = "public")
     private Boolean isPublic;
 

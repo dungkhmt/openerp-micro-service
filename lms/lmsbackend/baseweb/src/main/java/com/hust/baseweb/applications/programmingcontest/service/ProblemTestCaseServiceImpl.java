@@ -1774,28 +1774,52 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public List<ModelGetContestResponse> getContestByUserRole(String userName) {
-        List<UserRegistrationContestEntity> L = userRegistrationContestRepo.findAllByUserId(userName);
+    public List<ModelGetContestResponse> getManagedContestOfTeacher(String userName) {
+        List<String> roles = new ArrayList<>();
+        roles.add(UserRegistrationContestEntity.ROLE_OWNER);
+        roles.add(UserRegistrationContestEntity.ROLE_MANAGER);
+        List<UserRegistrationContestEntity> userRegistrationContestList = userRegistrationContestRepo.findAllByUserIdAndRoleIdIn(userName, roles);
 
-        List<ModelGetContestResponse> res = new ArrayList();
-        for (UserRegistrationContestEntity e : L) {
-            ContestEntity contest = contestRepo.findContestByContestId(e.getContestId());
+        Map<String, List<String>> mapContestIdToRoleList = new HashMap<>();
+        for (UserRegistrationContestEntity userRegistrationContest : userRegistrationContestList) {
+            String contestId = userRegistrationContest.getContestId();
+            String role = userRegistrationContest.getRoleId();
+            mapContestIdToRoleList.computeIfAbsent(contestId, k -> new ArrayList<>())
+                                  .add(role);
+        }
+
+        Map<String, String> mapContestIdToRoleListString = new HashMap<>();
+        mapContestIdToRoleList.forEach((contestId, roleList) -> {
+            String rolesString = String.join(", ", roles);
+            mapContestIdToRoleListString.put(contestId, rolesString);
+        });
+
+        List<ModelGetContestResponse> res = new ArrayList<>();
+
+        for (Map.Entry<String, String> e : mapContestIdToRoleListString.entrySet()) {
+            ContestEntity contest = contestRepo.findContestByContestId(e.getKey());
             ModelGetContestResponse modelGetContestResponse = ModelGetContestResponse.builder()
                                                                                      .contestId(contest.getContestId())
                                                                                      .contestName(contest.getContestName())
-                                                                                     .contestTime(contest.getContestSolvingTime())
-                                                                                     .countDown(contest.getCountDown())
                                                                                      .startAt(contest.getStartedAt())
                                                                                      .statusId(contest.getStatusId())
                                                                                      .userId(contest.getUserId())
-                                                                                     .createdAt(contest.getCreatedAt())
-                                                                                     .roleId(e.getRoleId())
-                                                                                     .registrationStatusId(e.getStatus())
+                                                                                     .roleId(e.getValue())
                                                                                      .build();
             res.add(modelGetContestResponse);
         }
 
-        Collections.reverse(res);
+        res.sort((a, b) -> {
+            if (a.getStartAt() == null && b.getStartAt() == null) {
+                return 0;
+            } else if (a.getStartAt() == null) {
+                return 1;
+            } else if (b.getStartAt() == null) {
+                return -1;
+            } else {
+                return b.getStartAt().compareTo(a.getStartAt());
+            }
+        });
         return res;
     }
 
@@ -1866,25 +1890,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             res.add(m);
         }
         return res;
-    }
-
-    @Override
-    public ListModelUserRegisteredContestInfo searchUser(Pageable pageable, String contestId, String keyword) {
-        Page<ModelUserRegisteredClassInfo> list = userRegistrationContestPagingAndSortingRepo.searchUser(
-            pageable,
-            contestId,
-            keyword);
-        return ListModelUserRegisteredContestInfo.builder()
-                                                 .contents(list)
-                                                 .build();
-    }
-
-    @Override
-    public ListPersonModel searchUserBaseKeyword(Pageable pageable, String keyword) {
-        Page<PersonModel> list = userLoginRepo.searchUser(pageable, keyword);
-        return ListPersonModel.builder()
-                              .contents(list)
-                              .build();
     }
 
     @Override
@@ -2021,26 +2026,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public ModelGetTestCaseDetail getTestCaseDetailShort(UUID testCaseId) throws MiniLeetCodeException {
-        TestCaseEntity testCase = testCaseRepo.findTestCaseByTestCaseId(testCaseId);
-        if (testCase == null) {
-            throw new MiniLeetCodeException("testcase not found");
-        }
-
-        ProblemEntity problem = problemRepo.findByProblemId(testCase.getProblemId());
-
-        return ModelGetTestCaseDetail.builder()
-                                     .testCaseId(testCaseId)
-                                     .correctAns(testCase.getCorrectAnswerShort(20))
-                                     .testCase(testCase.getTestCaseShort(20))
-                                     .point(testCase.getTestCasePoint()).isPublic(testCase.getIsPublic())
-                                     .problemSolution(problem.getSolution())
-                                     .problemDescription(problem.getProblemDescription())
-                                     .description(testCase.getDescription())
-                                     .build();
-    }
-
-    @Override
     public void editTestCase(UUID testCaseId, ModelSaveTestcase modelSaveTestcase) throws MiniLeetCodeException {
         TestCaseEntity testCase = testCaseRepo.findTestCaseByTestCaseId(testCaseId);
         if (testCase == null) {
@@ -2055,26 +2040,44 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public int addUserToContest(ModelAddUserToContest modelAddUserToContest) {
+    public ModelAddUserToContestResponse addUserToContest(ModelAddUserToContest modelAddUserToContest) {
+        String contestId = modelAddUserToContest.getContestId();
+        String userId = modelAddUserToContest.getUserId();
+        String role = modelAddUserToContest.getRole();
+
+        ModelAddUserToContestResponse response = new ModelAddUserToContestResponse();
+        response.setUserId(userId);
+        response.setRoleId(role);
+
+        if (userLoginRepo.findByUserLoginId(userId) == null) {
+            response.setStatus("User not found");
+            return response;
+        }
+
         UserRegistrationContestEntity userRegistrationContest = userRegistrationContestRepo
-            .findUserRegistrationContestEntityByContestIdAndUserIdAndRoleId(
-                modelAddUserToContest.getContestId(),
-                modelAddUserToContest.getUserId(),
-                modelAddUserToContest.getRole());
+            .findUserRegistrationContestEntityByContestIdAndUserIdAndRoleId(contestId, userId, role);
+
+
+        if (userRegistrationContest != null && userRegistrationContest.getStatus().equals(Constants.RegistrationType.SUCCESSFUL.getValue())) {
+            response.setStatus("Already existed");
+            return response;
+        }
+
+
         if (userRegistrationContest == null) {
             userRegistrationContestRepo.save(UserRegistrationContestEntity.builder()
                                                                           .contestId(modelAddUserToContest.getContestId())
                                                                           .userId(modelAddUserToContest.getUserId())
                                                                           .status(Constants.RegistrationType.SUCCESSFUL.getValue())
                                                                           .roleId(modelAddUserToContest.getRole())
+                                                                          .permissionId(UserRegistrationContestEntity.PERMISSION_SUBMIT)
                                                                           .build());
-            return 1;
         } else {
             userRegistrationContest.setStatus(Constants.RegistrationType.SUCCESSFUL.getValue());
             userRegistrationContestRepo.save(userRegistrationContest);
-            return 0;
         }
-
+        response.setStatus("SUCCESSFUL");
+        return response;
     }
 
     @Override
@@ -3732,27 +3735,36 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public int importProblemFromAContest(ModelImportProblemsFromAContestInput I) {
+    public List<ModelImportProblemFromContestResponse> importProblemsFromAContest(ModelImportProblemsFromAContestInput I) {
         ContestEntity contest = contestRepo.findContestByContestId(I.getFromContestId());
-        //log.info("importProblemFromAContest, contestId = " + I.getContestId() + " fromContestId " + I.getFromContestId());
-        if(contest == null) return 0;
-        int cnt = 0;
-        for(ProblemEntity p: contest.getProblems()){
+        if (contest == null) {
+            throw new IllegalArgumentException("Contest ID " + I.getFromContestId() + " not found");
+        }
+
+        List<ModelImportProblemFromContestResponse> responseList = new ArrayList<>();
+
+        for (ProblemEntity p : contest.getProblems()) {
+            ModelImportProblemFromContestResponse response = new ModelImportProblemFromContestResponse();
+            response.setProblemId(p.getProblemId());
             ContestProblem ocp = contestProblemRepo.findByContestIdAndProblemId(I.getFromContestId(), p.getProblemId());
             ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(I.getContestId(), p.getProblemId());
-            if(cp != null) continue;
+            if (cp != null) {
+                response.setStatus("Problem already existed");
+                responseList.add(response);
+                continue;
+            }
             cp = new ContestProblem();
             cp.setContestId(I.getContestId());
             cp.setProblemId(p.getProblemId());
             cp.setSubmissionMode(ocp.getSubmissionMode());
             cp.setProblemRename(ocp.getProblemRename());
             cp.setProblemRecode(ocp.getProblemRecode());
-            cp = contestProblemRepo.save(cp);
-            //log.info("importProblemFromAContest, save " + I.getContestId() + " problem " + p.getProblemId() + " cnt = " + cnt);
-            cnt ++;
+            contestProblemRepo.save(cp);
+            response.setStatus("SUCCESSFUL");
+            responseList.add(response);
         }
 
-        return cnt;
+        return responseList;
     }
 
     public List<ProblemEntity> getOwnerProblems(String ownerId) {

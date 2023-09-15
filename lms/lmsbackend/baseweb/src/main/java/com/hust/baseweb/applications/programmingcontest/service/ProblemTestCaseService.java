@@ -4,7 +4,6 @@ import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.*;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
 import com.hust.baseweb.applications.programmingcontest.model.*;
-import com.hust.baseweb.model.ListPersonModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -129,7 +128,7 @@ public interface ProblemTestCaseService {
 
     ModelGetContestPageResponse getAllContestsPagingByAdmin(String userName, Pageable pageable);
 
-    List<ModelGetContestResponse> getContestByUserRole(String userName);
+    List<ModelGetContestResponse> getManagedContestOfTeacher(String userName);
 
     ListModelUserRegisteredContestInfo getListUserRegisterContestSuccessfulPaging(Pageable pageable, String contestId);
 
@@ -138,10 +137,6 @@ public interface ProblemTestCaseService {
     ListModelUserRegisteredContestInfo getListUserRegisterContestPendingPaging(Pageable pageable, String contestId);
 
     List<ModelMemberOfContestResponse> getPendingRegisteredUsersOfContest(String contestId);
-
-    ListModelUserRegisteredContestInfo searchUser(Pageable pageable, String contestId, String keyword);
-
-    ListPersonModel searchUserBaseKeyword(Pageable pageable, String keyword);
 
     ModelGetContestPageResponse getRegisteredContestsByUser(String userName);
 
@@ -158,11 +153,9 @@ public interface ProblemTestCaseService {
 
     ModelGetTestCaseDetail getTestCaseDetail(UUID testCaseId) throws MiniLeetCodeException;
 
-    ModelGetTestCaseDetail getTestCaseDetailShort(UUID testCaseId) throws MiniLeetCodeException;
-
     void editTestCase(UUID testCaseId, ModelSaveTestcase modelSaveTestcase) throws MiniLeetCodeException;
 
-    int addUserToContest(ModelAddUserToContest modelAddUserToContest);
+    ModelAddUserToContestResponse addUserToContest(ModelAddUserToContest modelAddUserToContest);
 
     void deleteUserContest(ModelAddUserToContest modelAddUserToContest) throws MiniLeetCodeException;
 
@@ -269,5 +262,5 @@ public interface ProblemTestCaseService {
 
     ModelCreateContestProblemResponse getContestProblemDetailByIdAndTeacher(String problemId, String teacherId) throws Exception;
 
-    public int importProblemFromAContest(ModelImportProblemsFromAContestInput I);
+    List<ModelImportProblemFromContestResponse> importProblemsFromAContest(ModelImportProblemsFromAContestInput I);
 }

@@ -16,8 +16,6 @@ export default function ContestManagerAddMember2Contest(props) {
   const [roles, setRoles] = useState([]);
   const [keyword, setKeyword] = useState("");
   const [pageSearchSize, setPageSearchSize] = useState(10);
-  const [totalPageSearch, setTotalPageSearch] = useState(0);
-  const [pageSearch, setPageSearch] = useState(1);
   const [open, setOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [rolesApproved, setRolesApproved] = useState([]);
@@ -26,7 +24,7 @@ export default function ContestManagerAddMember2Contest(props) {
   const columns = [
     { title: "Index", field: "index" },
     { title: "UserID", field: "userName" },
-    { title: "FullName", field: "fullName" },
+    { title: "Full Name", field: "fullName" },
     {
       title: "Action",
       render: (row) => (
@@ -76,7 +74,8 @@ export default function ContestManagerAddMember2Contest(props) {
   function searchUser(keyword, s, p) {
     request(
       "get",
-      "/contests/" + contestId + "/users" +
+      // "/contests/" + contestId + "/users" +
+      "/users" +
         "?size=" +
         s +
         "&page=" +
@@ -84,15 +83,12 @@ export default function ContestManagerAddMember2Contest(props) {
         "&keyword=" +
         keyword,
       (res) => {
-        console.log("res search", res);
-        //setSearchUsers(res.data.contents.content);
-        const data = res.data.contents.content.map((e, index) => ({
+        const data = res.data.content.map((e, index) => ({
           index: index + 1,
-          userName: e.userName,
-          fullName: e.firstName + " " + e.middleName + " " + e.lastName,
+          userName: e.userLoginId,
+          fullName: (e.lastName ? e.lastName : "") + " " + (e.firstName ? e.firstName : ""),
         }));
         setSearchUsers(data);
-        setTotalPageSearch(res.data.contents.totalPages);
       }
     ).then();
   }
@@ -114,7 +110,7 @@ export default function ContestManagerAddMember2Contest(props) {
                 placeholder={"search..."}
                 onChange={(event) => {
                   setKeyword(event.target.value);
-                  searchUser(event.target.value, pageSearchSize, pageSearch);
+                  searchUser(event.target.value, pageSearchSize, 1);
                 }}
               />
             </Search>

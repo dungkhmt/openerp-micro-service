@@ -15,24 +15,14 @@ public interface UserRegistrationContestPagingAndSortingRepo
     extends PagingAndSortingRepository<UserRegistrationContestEntity, UUID> {
 
     @Query(
-        "select new com.hust.baseweb.applications.programmingcontest.model.ModelUserRegisteredClassInfo(ul.userLoginId, pe.middleName, pe.firstName, pe.lastName, urce.status) from UserRegistrationContestEntity urce " +
+        "select new com.hust.baseweb.applications.programmingcontest.model.ModelUserRegisteredClassInfo(ul.userLoginId, '', ul.firstName, ul.lastName, urce.status) from UserRegistrationContestEntity urce " +
         "inner join ContestEntity ce on urce.status =:status and urce.contestId = :contestId and urce.contestId = ce.contestId " +
-        "inner join UserLogin ul on urce.userId = ul.userLoginId " +
-        "inner join Party p on ul.party = p inner join Person pe on pe.partyId  = p.partyId")
+        "inner join UserLogin ul on urce.userId = ul.userLoginId ")
     Page<ModelUserRegisteredClassInfo> getAllUserRegisteredByContestIdAndStatusInfo(
         Pageable pageable,
         @Param("contestId")
         String contestId,
         @Param("status") String status
-    );
-
-    @Query(
-        "select new com.hust.baseweb.applications.programmingcontest.model.ModelUserRegisteredClassInfo( ul.userLoginId, p.middleName, p.firstName, p.lastName, urce.status) from UserLogin ul " +
-        "inner join Party pa on ul.party = pa inner join Person p on p.partyId = ul.party and  (ul.userLoginId like %:keyword% ) left outer join UserRegistrationContestEntity urce on ul.userLoginId = urce.userId and urce.contestId = :contestId")
-    Page<ModelUserRegisteredClassInfo> searchUser(
-        Pageable pageable,
-        @Param("contestId") String contestId,
-        @Param("keyword") String keyword
     );
 
     @Query(
