@@ -153,6 +153,7 @@ export default function EditContest() {
                   setMaxNumberSubmission(event.target.value);
                 }}
                 value={maxNumberSubmission}
+                InputProps={{endAdornment: <InputAdornment position="end">per problem</InputAdornment>}}
               />
             </Grid>
 

@@ -106,6 +106,7 @@ export function ContestManagerDetail(props) {
             id="maxNumberSubmission"
             label="Max number of Submissions"
             value={maxNumberSubmission}
+            InputProps={{endAdornment: <InputAdornment position="end">per problem</InputAdornment>}}
           />
         </Grid>
 
