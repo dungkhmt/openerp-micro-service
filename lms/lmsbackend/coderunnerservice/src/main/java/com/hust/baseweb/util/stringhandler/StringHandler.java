@@ -216,7 +216,8 @@ public class StringHandler {
             return buildCompileErrorForSubmission(1, response);
         }
 
-        int lastNewlineIndex = response.trim().lastIndexOf('\n');
+        response = response.trim();
+        int lastNewlineIndex = response.lastIndexOf('\n');
         int secondLastNewlineIndex = response.lastIndexOf('\n', lastNewlineIndex - 1);
 
         String runtime = response.substring(secondLastNewlineIndex + 1, lastNewlineIndex).trim();
