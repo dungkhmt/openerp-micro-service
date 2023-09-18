@@ -184,6 +184,12 @@ public class ProblemController {
     public ResponseEntity<?> removeContestProblemRole(Principal principal, @RequestBody ModelUserProblemRole input) {
         try {
             log.info("removeContestProblemRole, remove user " + input.getUserId() + " with role " + input.getRoleId() + " from the problem " + input.getProblemId());
+            if(principal.getName().equals(input.getUserId())){// current userlogin cannot remove himself from the problem
+                return ResponseEntity.ok().body(false);
+            }
+            if(input.getRoleId().equals(UserContestProblemRole.ROLE_OWNER)){// cannot remove user who is the owner of the problem
+                return ResponseEntity.ok().body(false);
+            }
 
             boolean ok = problemTestCaseService.removeUserProblemRole(principal.getName(), input);
             return ResponseEntity.ok().body(ok);
