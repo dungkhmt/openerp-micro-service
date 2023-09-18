@@ -552,6 +552,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                        .problemDescriptionViewType(ContestEntity.CONTEST_PROBLEM_DESCRIPTION_VIEW_TYPE_VISIBLE)
                                                        .participantViewResultMode(ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_ENABLED)
                                                        .evaluateBothPublicPrivateTestcase(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES)
+                                                       .sendConfirmEmailUponSubmission(ContestEntity.SEND_CONFIRM_EMAIL_UPON_SUBMISSION_NO)
                                                        .createdAt(new Date())
                                                        .build();
 
@@ -736,6 +737,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .evaluateBothPublicPrivateTestcase(modelUpdateContest.getEvaluateBothPublicPrivateTestcase())
                                                    .minTimeBetweenTwoSubmissions(modelUpdateContest.getMinTimeBetweenTwoSubmissions())
                                                    .judgeMode(modelUpdateContest.getJudgeMode())
+                                                   .sendConfirmEmailUponSubmission(modelUpdateContest.getSendConfirmEmailUponSubmission())
                                                    .build();
         return contestService.updateContestWithCache(contestEntity);
 
@@ -3456,6 +3458,11 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     public boolean removeMemberFromContest(UUID id) {
         UserRegistrationContestEntity u = userRegistrationContestRepo.findById(id).orElse(null);
         if (u != null) {
+            ContestEntity contest = contestRepo.findContestByContestId(u.getContestId());
+            String createdBy = "";
+            if(contest != null) createdBy = contest.getUserId();
+            if(u.getUserId().equals("admin")) return false;
+            if(u.getUserId().equals(createdBy)) return false;
             userRegistrationContestRepo.delete(u);
             return true;
         }

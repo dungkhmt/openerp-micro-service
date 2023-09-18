@@ -37,12 +37,13 @@ export const ProgrammingContestMenuStudent = {
   child: [
     {
       id: "MENU_PROGRAMMING_CONTEST_PARTICIPANT.MENU_PROGRAMMING_CONTEST_PARTICIPANT_LIST_NOT_REGISTERED_CONTEST",
-      path: "/programming-contest/student-list-contest-not-registered",
+      //path: "/programming-contest/student-list-contest-not-registered",
       isPublic: false,
       icon: null,
-      text: "Join contest",
+      text: "Join contest (N/A)",
       child: [],
     },
+    
     {
       id: "MENU_PROGRAMMING_CONTEST_PARTICIPANT.MENU_PROGRAMMING_CONTEST_PARTICIPANT_LIST_REGISTERED_CONTEST",
       path: "/programming-contest/student-list-contest-registered",
