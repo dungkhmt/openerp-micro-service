@@ -3535,9 +3535,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             input.getProblemId(),
             input.getUserId(),
             input.getRoleId());
-        if (L != null && L.size() > 0) {
+        //if (L != null && L.size() > 0) {
+        if(L == null || L.size() == 0){
             return false;
         }
+        log.info("removeUserProblemRole(" + input.getUserId() + "," +
+                 input.getProblemId() + "," + input.getRoleId() + ", got L.sz = " + L.size());
         for (UserContestProblemRole e : L) {
             userContestProblemRoleRepo.delete(e);
             //userContestProblemRoleRepo.remove(e);
