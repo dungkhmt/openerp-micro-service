@@ -2280,8 +2280,13 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             return;
         }
 
-        ProblemEntity problem = problemRepo.findByProblemId(testCase.getProblemId());
-        if (!problem.getUserId().equals(userId)) {
+        List<UserContestProblemRole> problemRoles = userContestProblemRoleRepo.findAllByProblemIdAndUserId(testCase.getProblemId(), userId);
+
+        boolean isAuthorized = problemRoles
+            .stream()
+            .anyMatch(problemRole -> problemRole.getRoleId().equals(UserContestProblemRole.ROLE_OWNER) ||
+                                     problemRole.getRoleId().equals(UserContestProblemRole.ROLE_EDITOR));
+        if (!isAuthorized) {
             throw new MiniLeetCodeException("permission denied");
         }
 
