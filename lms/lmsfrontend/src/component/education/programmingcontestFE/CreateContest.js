@@ -109,6 +109,7 @@ export default function CreateContest(props) {
                   setMaxNumberSubmissions(event.target.value);
                 }}
                 value={maxNumberSubmissions}
+                InputProps={{endAdornment: <InputAdornment position="end">per problem</InputAdornment>}}
               />
             </Grid>
 

@@ -25,6 +25,12 @@ export default function UserContestProblemRole() {
     {title: "User Id", field: "userLoginId"},
     {title: "Full Name", field: "fullname"},
     {title: "Role", field: "roleId"},
+    {
+      title: "Action",
+      render: (row) => (
+        <Button onClick={() => handleRemove(row["userLoginId"],row["roleId"])}>Remove</Button>
+      ),
+    },
   ];
   const columns = [
     {title: "Index", field: "index"},
@@ -37,7 +43,30 @@ export default function UserContestProblemRole() {
       ),
     },
   ];
-
+  function handleRemove(userId, roleId){
+    console.log('remove ' + userId + ',' + roleId);
+    let body = {
+      problemId: problemId,
+      userId: userId,
+      roleId: roleId,
+    };
+    request(
+      "delete",
+      "/problems/users/role",
+      (res) => {
+        if (res.data) successNoti("Remove role of user to problem successfully", 3000);
+        else errorNoti("Cannot remove user " + userId + " with role " + roleId + " from the problem", 3000);
+        //setOpen(false);
+      },
+      {
+        500: () => { 
+          errorNoti("Server error", 3000);
+          setOpen(false);
+        },
+      },
+      body
+    ).then();
+  }
   function handleClick(u) {
     setSelectedUserId(u);
     setOpen(true);

@@ -2280,8 +2280,13 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             return;
         }
 
-        ProblemEntity problem = problemRepo.findByProblemId(testCase.getProblemId());
-        if (!problem.getUserId().equals(userId)) {
+        List<UserContestProblemRole> problemRoles = userContestProblemRoleRepo.findAllByProblemIdAndUserId(testCase.getProblemId(), userId);
+
+        boolean isAuthorized = problemRoles
+            .stream()
+            .anyMatch(problemRole -> problemRole.getRoleId().equals(UserContestProblemRole.ROLE_OWNER) ||
+                                     problemRole.getRoleId().equals(UserContestProblemRole.ROLE_EDITOR));
+        if (!isAuthorized) {
             throw new MiniLeetCodeException("permission denied");
         }
 
@@ -3535,9 +3540,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             input.getProblemId(),
             input.getUserId(),
             input.getRoleId());
-        if (L != null && L.size() > 0) {
+        //if (L != null && L.size() > 0) {
+        if(L == null || L.size() == 0){
             return false;
         }
+        log.info("removeUserProblemRole(" + input.getUserId() + "," +
+                 input.getProblemId() + "," + input.getRoleId() + ", got L.sz = " + L.size());
         for (UserContestProblemRole e : L) {
             userContestProblemRoleRepo.delete(e);
             //userContestProblemRoleRepo.remove(e);

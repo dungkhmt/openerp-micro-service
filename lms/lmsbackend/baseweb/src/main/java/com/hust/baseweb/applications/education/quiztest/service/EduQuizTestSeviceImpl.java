@@ -1073,7 +1073,7 @@ public class EduQuizTestSeviceImpl implements QuizTestService {
 //            "STATUS_APPROVED");
 
         List<StudentInfo> list = repo.findAllStudentInTest(testId);
-
+        log.info("getQuizTestParticipationExecutionResult, got nbr students in the test " + testId + " = " + list.size());
         List<EduTestQuizGroup> eduTestQuizGroups = eduQuizTestGroupRepo.findByTestId(testId);
 
         for (StudentInfo studentInfo : list) {
