@@ -5,6 +5,7 @@ import {errorNoti} from "../../../utils/notification";
 import {Box, Button} from "@mui/material";
 import HustModal from "../../common/HustModal";
 import StandardTable from "../../table/StandardTable";
+import XLSX from "xlsx";
 
 export default function UploadUserToContestDialog(props) {
   const {isOpen, onClose, contestId} = props;
@@ -54,6 +55,39 @@ export default function UploadUserToContestDialog(props) {
     );
   }
 
+  const downloadHandler = (event) => {
+    if (uploadedUsers.length === 0) {
+      return;
+    }
+
+    var wbcols = [];
+
+    wbcols.push({wpx: 200});
+    wbcols.push({wpx: 120});
+    wbcols.push({wpx: 280});
+
+    let datas = [];
+
+    for (let i = 0; i < uploadedUsers.length; i++) {
+      let data = {};
+      data["User ID"] = uploadedUsers[i].userId;
+      data["Role"] = uploadedUsers[i].roleId;
+      data["Status"] = uploadedUsers[i].status;
+
+      datas[i] = data;
+    }
+
+    var sheet = XLSX.utils.json_to_sheet(datas);
+    var wb = XLSX.utils.book_new();
+    sheet["!cols"] = wbcols;
+
+    XLSX.utils.book_append_sheet(wb, sheet, "result");
+    XLSX.writeFile(
+      wb,
+      "upload_user_contest-" + contestId +".xlsx"
+    );
+  };
+
   const getUploadStatusColor = (status) => {
     if (status === 'SUCCESSFUL') return 'green';
     return 'red';
@@ -62,13 +96,15 @@ export default function UploadUserToContestDialog(props) {
   const columns = [
     {title: "User ID", field: "userId"},
     {title: "Role", field: "roleId",},
-    {title: "Status",
+    {
+      title: "Status",
       field: "status",
       render: (rowData) => (
         <span style={{color: getUploadStatusColor(`${rowData.status}`)}}>
           {`${rowData.status}`}
         </span>
-      ),},
+      ),
+    },
   ];
 
   return (
@@ -80,7 +116,7 @@ export default function UploadUserToContestDialog(props) {
       textOk="Upload"
       textClose="Cancel"
       isLoading={isProcessing}
-      maxWidthPaper={uploadedUsers.length > 0 ? 800 : 600}
+      maxWidthPaper={uploadedUsers.length > 0 ? 840 : 600}
     >
       <Box sx={{mb: 1}}>
         <Box display="flex" justifyContent="flex-start" alignItems="center" width="100%" sx={{mb: 2}}>
@@ -100,6 +136,17 @@ export default function UploadUserToContestDialog(props) {
               sorting: true,
             }}
             hideCommandBar
+            actions={[
+              {
+                icon: () => {
+                  return <Button variant="contained" onClick={downloadHandler} color="primary">
+                    Export
+                  </Button>
+                },
+                tooltip: 'Export Result as Excel file',
+                isFreeAction: true
+              }
+            ]}
           />
         }
       </Box>
