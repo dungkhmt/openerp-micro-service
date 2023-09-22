@@ -7,6 +7,7 @@ import com.hust.baseweb.applications.education.entity.LogUserLoginQuizQuestion;
 import com.hust.baseweb.applications.education.repo.ClassRepo;
 import com.hust.baseweb.applications.education.repo.LogUserLoginQuizQuestionRepo;
 import com.hust.baseweb.applications.education.report.model.quizparticipation.StudentQuizParticipationModel;
+import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.model.PersonModel;
 import com.hust.baseweb.service.UserService;
 import lombok.AllArgsConstructor;
@@ -60,7 +61,8 @@ public class LogUserLoginQuizQuestionServiceImpl implements LogUserLoginQuizQues
         Page<StudentQuizParticipationModel> studentQuizParticipationModels = logs.map(logi -> {
             //PersonModel personModel = userService.findPersonByUserLoginId(log.getUserLoginId());
             //PersonModel personModel = mUserLoginId2PersonModel.get(logi.getUserLoginId());
-            PersonModel personModel = userService.findPersonByUserLoginId(logi.getUserLoginId());
+            //PersonModel personModel = userService.findPersonByUserLoginId(logi.getUserLoginId());
+            UserLogin ul = userService.findById(logi.getUserLoginId());
 
             //QuizCourseTopic q = cacheQuizCourseTopic.get(log.getQuestionId());
             int grade = 0;
@@ -73,6 +75,11 @@ public class LogUserLoginQuizQuestionServiceImpl implements LogUserLoginQuizQues
 
             String fullName = "";
             String affiliations = "";
+            if(ul != null){
+                fullName = ul.getFirstName() + " " + ul.getLastName();
+            }
+
+            /*
             if (personModel != null) {
                 fullName = personModel.getLastName() +
                            " " +
@@ -85,7 +92,7 @@ public class LogUserLoginQuizQuestionServiceImpl implements LogUserLoginQuizQues
                 log.info("findByClassId, personModel NULL!");
 
             }
-
+            */
             return new StudentQuizParticipationModel(
                 logi.getUserLoginId(),
                 fullName, affiliations,
