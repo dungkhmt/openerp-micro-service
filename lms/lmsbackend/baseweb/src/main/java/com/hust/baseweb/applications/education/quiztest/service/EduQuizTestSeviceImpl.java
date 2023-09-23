@@ -1873,8 +1873,11 @@ public class EduQuizTestSeviceImpl implements QuizTestService {
         List<ModelResponseAnalyzeDoQuizInClass> res = new ArrayList();
         for(AnalyzeParticipantDoingQuizInClass e: lst){
             ModelResponseAnalyzeDoQuizInClass ent = new ModelResponseAnalyzeDoQuizInClass();
-            PersonModel person = userService.findPersonByUserLoginId(e.getParticipantUserloginId());
-            ent.setFullname(person.getFullName());
+            //PersonModel person = userService.findPersonByUserLoginId(e.getParticipantUserloginId());
+            String fullName = "";
+            UserLogin ul = userService.findById(e.getParticipantUserloginId());
+            if(ul != null) fullName = ul.getFirstName() + " " + ul.getLastName();
+            ent.setFullname(fullName);
             ent.setUserId(e.getParticipantUserloginId());
             ent.setNumberCorrect(e.getNumberCorrect());
             ent.setNumberSelect(e.getNumberParticipationSelect());
