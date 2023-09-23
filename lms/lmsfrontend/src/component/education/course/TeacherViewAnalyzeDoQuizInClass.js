@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import { request } from "../../../api";
 import { toFormattedDateTime } from "../../../utils/dateutils";
 import MaterialTable from "material-table";
-import { Button } from "@material-ui/core";
+//import { Button } from "@material-ui/core";
+import {Button, CircularProgress } from '@mui/material';
+
 export default function TeacherViewLogUserQuizList(props) {
   const { classId } = props;
   const [data, setData] = useState([]);
-
+  const [isProcessing, setIsProcessing] = useState(false);
   const columns = [
     { title: "UserID", field: "userId" },
     { title: "FullName", field: "fullname" },
@@ -15,6 +17,7 @@ export default function TeacherViewLogUserQuizList(props) {
     { title: "numberCorrectFastest", field: "numberCorrectFastest" },
   ];
   function getData() {
+    setIsProcessing(true);
     request("get", "/get-analyze-do-quiz-in-class/" + classId, (res) => {
       console.log("get data analyze do quiz in class, res = ", res);
       const tmp = res.data;
@@ -23,10 +26,12 @@ export default function TeacherViewLogUserQuizList(props) {
         date: toFormattedDateTime(c.date),
       }));
       setData(content);
+      setIsProcessing(false);
     });
   }
 
   function computeStatistic() {
+    setIsProcessing(true);
     let body = {
       classId: classId,
     };
@@ -35,6 +40,7 @@ export default function TeacherViewLogUserQuizList(props) {
       "/analyze-do-quiz-test-in-class",
       (res) => {
         console.log("Compute Do Quiz In Class Statistics, res = ", res.data);
+        setIsProcessing(false);
       },
       {},
       body
@@ -48,6 +54,7 @@ export default function TeacherViewLogUserQuizList(props) {
       <Button variant="contained" color="primary" onClick={computeStatistic}>
         Statistic
       </Button>
+      {isProcessing && <CircularProgress/>}
       <MaterialTable title={"Data"} columns={columns} data={data} />
     </>
   );
