@@ -24,6 +24,7 @@ import TeacherViewLogUserQuizList from "../../../../component/education/course/T
 //import TeacherViewQuizDetail from "../../../../component/education/course/TeacherViewQuizDetail";
 import TeacherClassViewLearningSessionList from "./TeacherClassViewLearningSessionList";
 import withScreenSecurity from "../../../../component/withScreenSecurity";
+import TeacherViewAnalyzeDoQuizInClass from "../../../../component/education/course/TeacherViewAnalyzeDoQuizInClass";
 
 /*
 const useStyles = makeStyles((theme) => ({
@@ -99,6 +100,7 @@ function TeacherViewDetailClass() {
       </TabPanel>
       <TabPanel value={selectedTab} index={5} dir={theme.direction}>
         <TeacherViewLogUserQuizList classId={classId} />
+        <TeacherViewAnalyzeDoQuizInClass classId={classId} />
       </TabPanel>
       <TabPanel value={selectedTab} index={6} dir={theme.direction}>
         <TeacherClassViewLearningSessionList classId={classId} />

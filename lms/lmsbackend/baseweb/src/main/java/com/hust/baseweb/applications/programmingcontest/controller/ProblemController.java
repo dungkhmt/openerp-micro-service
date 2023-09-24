@@ -90,6 +90,7 @@ public class ProblemController {
         List<UserContestProblemRole> L = userContestProblemRoleRepo.findAllByProblemIdAndUserId(
             problemId,
             principal.getName());
+
         boolean hasPermission = false;
         for (UserContestProblemRole e : L) {
             if (e.getRoleId().equals(UserContestProblemRole.ROLE_EDITOR) ||
@@ -183,7 +184,7 @@ public class ProblemController {
     @DeleteMapping("/problems/users/role")
     public ResponseEntity<?> removeContestProblemRole(Principal principal, @RequestBody ModelUserProblemRole input) {
         try {
-            log.info("removeContestProblemRole, remove user " + input.getUserId() + " with role " + input.getRoleId() + " from the problem " + input.getProblemId());
+            //log.info("removeContestProblemRole, remove user " + input.getUserId() + " with role " + input.getRoleId() + " from the problem " + input.getProblemId());
             if(principal.getName().equals(input.getUserId())){// current userlogin cannot remove himself from the problem
                 return ResponseEntity.ok().body(false);
             }
