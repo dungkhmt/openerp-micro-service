@@ -3198,7 +3198,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         if (modelUploadTestCase.getUploadMode().equals("EXECUTE")) {
             String tempName = tempDir.createRandomScriptFileName(userName +
                                                                  "-" +
-                                                                 problemEntity.getProblemName() +
+                                                                 problemEntity.getProblemId() +
                                                                  "-" +
                                                                  problemEntity.getCorrectSolutionLanguage());
 
