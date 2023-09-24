@@ -70,7 +70,7 @@ public class EduQuizTestSeviceImpl implements QuizTestService {
     private NotificationsService notificationsService;
 
     private EduTestQuizRoleRepo eduTestQuizRoleRepo;
-
+    private AnalyzeParticipantDoingQuizInClassRepo analyzeParticipantDoingQuizInClassRepo;
     @Transactional
     @Override
     public EduQuizTest save(QuizTestCreateInputModel input, UserLogin user) {
@@ -1691,4 +1691,200 @@ public class EduQuizTestSeviceImpl implements QuizTestService {
         }
         return cnt;
     }
+
+    class Info{
+        String userId;
+        String testId;
+        UUID questionId;
+        int point;
+        Date timePoint;
+        int numberSelect;// number of select
+
+        public Info(String userId, String testId, UUID questionId, int point, Date timePoint, int numberSelect) {
+            this.userId = userId;
+            this.testId = testId;
+            this.questionId = questionId;
+            this.point = point;
+            this.timePoint = timePoint;
+            this.numberSelect = numberSelect;
+        }
+    }
+    private boolean equalSet(Set<UUID> S1, Set<UUID> S2){
+        for(UUID e: S1)   if(!S2.contains(e)) return false;
+        for(UUID e: S2) if(!S1.contains(e)) return false;
+        return true;
+    }
+    @Override
+    public int summarizeQuizTestInClass(UUID classId) {
+        List<Info> infos = new ArrayList<Info>();
+        HashMap<UUID, QuizQuestion> mID2Question = new HashMap();
+        Set<String> userOfClass = new HashSet();
+        // get list of quiztest of the given class
+        List<EduQuizTest> quizTests = repo.findByClassId(classId);
+        HashMap<String, Integer> mUserID2NumSelect = new HashMap();
+        HashMap<String, Integer> mUserID2NumCorrect = new HashMap();
+        HashMap<String, Integer> mUserID2NumFastestCorrect = new HashMap();
+        log.info("summarizeQuizTestInClass, number quiz test = " + quizTests.size());
+        for(EduQuizTest t: quizTests) {
+            log.info("summarizeQuizTestInClass, consider QuizTest " + t.getTestId() + " Test Name " + t.getTestName());
+            // list of users participating in the test t
+            List<EduTestQuizParticipant> users = eduTestQuizParticipantRepo
+                .findByTestIdAndStatusId(t.getTestId(), EduTestQuizParticipant.STATUS_APPROVED);
+
+            List<EduTestQuizGroup> groups = eduQuizTestGroupRepo.findByTestId(t.getTestId());
+            Date fastestTimePoint = null;
+            String earliestUser = null;
+            for(EduTestQuizGroup g: groups) {
+                // get list of questions of the quiz-group q (de thi)
+                List<QuizGroupQuestionAssignment> GQA = quizGroupQuestionAssignmentRepo
+                    .findQuizGroupQuestionAssignmentsByQuizGroupId(g.getQuizGroupId());
+                List<UUID> questionIds = new ArrayList<>();
+                for(QuizGroupQuestionAssignment e: GQA){
+                    questionIds.add(e.getQuestionId());
+                }
+
+                List<UUID> quizGroupIds = new ArrayList();
+                quizGroupIds.add(g.getQuizGroupId());
+                List<EduTestQuizGroupParticipationAssignment> GPA = eduTestQuizGroupParticipationAssignmentRepo
+                    .findAllByQuizGroupIdIn(quizGroupIds);
+
+                List<QuizQuestion> questions = quizQuestionService.findAllQuizQuestionsByQuestionIdsIn(questionIds);
+
+                for(EduTestQuizGroupParticipationAssignment gpa: GPA) {
+                    String userID = gpa.getParticipationUserLoginId();
+                    for (QuizQuestion q : questions) {
+                        mID2Question.put(q.getQuestionId(), q);
+                        List<QuizChoiceAnswer> correctChoiceAns = quizChoiceAnswerRepo
+                            .findAllByQuizQuestion(q);
+                        Set<UUID> correctChoiceAnsId = new HashSet();
+                        for(QuizChoiceAnswer c: correctChoiceAns)
+                            if(c.getIsCorrectAnswer()=='Y')
+                                correctChoiceAnsId.add(c.getChoiceAnswerId());
+
+                        Date timePoint = null;
+                        List<QuizGroupQuestionParticipationExecutionChoice> choices = quizGroupQuestionParticipationExecutionChoiceRepo
+                            .findQuizGroupQuestionParticipationExecutionChoicesByParticipationUserLoginIdAndQuizGroupIdAndQuestionId(
+                                userID,
+                                g.getQuizGroupId(),
+                                q.getQuestionId());
+                        Set<UUID> choiceIds = new HashSet();
+                        for(QuizGroupQuestionParticipationExecutionChoice c: choices){
+                            choiceIds.add(c.getChoiceAnswerId());
+                            timePoint = c.getCreatedStamp();
+                        }
+                        // compare choices that user made and correctChoiceAns
+                        int point = 0;
+                        if(equalSet(correctChoiceAnsId,choiceIds)){
+                            point = 1;
+                            log.info("summarizeQuizTestInClass,user " + userID + " get point " + point);
+                        }
+                        int numSelect = 0;
+                        if(choices.size() > 0) numSelect = 1;
+                        //Info info = new Info(userID,t.getTestId(),q.getQuestionId(),point,timePoint,numSelect);
+                        //infos.add(info);
+                        userOfClass.add(userID);
+
+                        if(numSelect > 0){
+                            if(mUserID2NumSelect.get(userID)==null)
+                                mUserID2NumSelect.put(userID,1);
+                            else{
+                                mUserID2NumSelect.put(userID,mUserID2NumSelect.get(userID) + 1);
+                            }
+                        }
+
+                        if(point > 0) {
+                            if(mUserID2NumCorrect.get(userID)==null) {
+                                mUserID2NumCorrect.put(userID, 1);
+                                log.info("summarizeQuizTestInClass user " + userID + " get first point " + mUserID2NumCorrect.get(userID));
+
+                            }else{
+                                mUserID2NumCorrect.put(userID,mUserID2NumCorrect.get(userID)+1);
+                                log.info("summarizeQuizTestInClass user " + userID + " get points " + mUserID2NumCorrect.get(userID));
+                            }
+                            if (fastestTimePoint == null) {
+                                fastestTimePoint = timePoint;
+                                earliestUser = gpa.getParticipationUserLoginId();
+                                log.info("summarizeQuizTestInClass user " + earliestUser + " INIT FIRST");
+                            } else {
+                                if(timePoint != null && timePoint.before(fastestTimePoint)){
+                                    fastestTimePoint = timePoint;
+                                    earliestUser = gpa.getParticipationUserLoginId();
+                                    log.info("summarizeQuizTestInClass user " + earliestUser + " UPDATE new Earliest");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if(earliestUser != null){
+                if(mUserID2NumFastestCorrect.get(earliestUser)==null)
+                    mUserID2NumFastestCorrect.put(earliestUser,1);
+                else{
+                    int number_correct_fastest = mUserID2NumFastestCorrect.get(earliestUser);
+                    mUserID2NumFastestCorrect.put(earliestUser,number_correct_fastest + 1);
+                }
+            }
+        }
+        for(String userID: userOfClass){
+            int number_participation_select= 0;
+            int number_correct = 0;
+            int number_correct_fastest = 0;
+            if(mUserID2NumCorrect.get(userID)!=null){
+                number_correct = mUserID2NumCorrect.get(userID);
+            }
+            if(mUserID2NumSelect.get(userID)!=null){
+                number_participation_select = mUserID2NumSelect.get(userID);
+            }
+            if(mUserID2NumFastestCorrect.get(userID)!=null){
+                number_correct_fastest = mUserID2NumFastestCorrect.get(userID);
+            }
+            AnalyzeParticipantDoingQuizInClass o = null;
+            List<AnalyzeParticipantDoingQuizInClass> L = analyzeParticipantDoingQuizInClassRepo.findAllByClassIdAndParticipantUserloginId(classId,userID);
+            if(L != null && L.size() > 0){
+                o = L.get(0);
+            }
+            if(o == null) {// record not exists, add new one
+                o = new AnalyzeParticipantDoingQuizInClass();
+                o.setClassId(classId);
+                o.setParticipantUserloginId(userID);
+                o.setNumberQuizTest(quizTests.size());
+                o.setNumberCorrect(number_correct);
+                o.setNumberParticipationSelect(number_participation_select);
+                o.setNumberCorrectFastest(number_correct_fastest);
+                o.setCreatedStamp(new Date());
+                o = analyzeParticipantDoingQuizInClassRepo.save(o);
+            }else{// do not add more, just update
+                o.setNumberQuizTest(quizTests.size());
+                o.setNumberCorrect(number_correct);
+                o.setNumberParticipationSelect(number_participation_select);
+                o.setNumberCorrectFastest(number_correct_fastest);
+                o.setCreatedStamp(new Date());
+                o = analyzeParticipantDoingQuizInClassRepo.save(o);
+            }
+        }
+        return userOfClass.size();
+    }
+
+    @Override
+    public List<ModelResponseAnalyzeDoQuizInClass> getAnalyzeDoQuizInClass(UUID classId) {
+        List<AnalyzeParticipantDoingQuizInClass> lst = analyzeParticipantDoingQuizInClassRepo.findAllByClassId(classId);
+        log.info("getAnalyzeDoQuizInClass, lst.sz = " + lst.size());
+
+        List<ModelResponseAnalyzeDoQuizInClass> res = new ArrayList();
+        for(AnalyzeParticipantDoingQuizInClass e: lst){
+            ModelResponseAnalyzeDoQuizInClass ent = new ModelResponseAnalyzeDoQuizInClass();
+            //PersonModel person = userService.findPersonByUserLoginId(e.getParticipantUserloginId());
+            String fullName = "";
+            UserLogin ul = userService.findById(e.getParticipantUserloginId());
+            if(ul != null) fullName = ul.getFirstName() + " " + ul.getLastName();
+            ent.setFullname(fullName);
+            ent.setUserId(e.getParticipantUserloginId());
+            ent.setNumberCorrect(e.getNumberCorrect());
+            ent.setNumberSelect(e.getNumberParticipationSelect());
+            ent.setNumberCorrectFastest(e.getNumberCorrectFastest());
+            res.add(ent);
+        }
+        return res;
+    }
+
 }

@@ -84,4 +84,8 @@ public interface QuizTestService {
     public boolean updateFromQuizTestExecutionSubmission(UUID submissionId);
 
     public int summarizeQuizTestExecutionChoice(String testId);
+
+    public int summarizeQuizTestInClass(UUID classId);
+    public List<ModelResponseAnalyzeDoQuizInClass> getAnalyzeDoQuizInClass(UUID classId);
+
 }

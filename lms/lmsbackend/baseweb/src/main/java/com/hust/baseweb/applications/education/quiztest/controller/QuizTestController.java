@@ -630,4 +630,17 @@ public class QuizTestController {
         List<String> judgeModes = EduQuizTest.getListJudgeModes();
         return ResponseEntity.ok().body(judgeModes);
     }
+
+    @PostMapping("/analyze-do-quiz-test-in-class")
+    public ResponseEntity<?> analyzeDoQuizTestInClass(Principal principal, @RequestBody ModelAnalyzeDoQuizTestInClassInput I){
+        log.info("analyzeDoQuizTestInClass, classId = " + I.getClassId());
+        int res = quizTestService.summarizeQuizTestInClass(I.getClassId());
+
+        return ResponseEntity.ok().body(res);
+    }
+    @GetMapping("/get-analyze-do-quiz-in-class/{classId}")
+    public ResponseEntity<?> getAnalyzeDoQuizInClass(Principal principal, @PathVariable UUID classId){
+        List<ModelResponseAnalyzeDoQuizInClass> res = quizTestService.getAnalyzeDoQuizInClass(classId);
+        return ResponseEntity.ok().body(res);
+    }
 }
