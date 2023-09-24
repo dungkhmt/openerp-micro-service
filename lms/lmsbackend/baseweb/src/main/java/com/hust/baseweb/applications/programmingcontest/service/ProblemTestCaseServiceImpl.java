@@ -3652,16 +3652,18 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     public ModelCreateContestProblemResponse getContestProblemDetailByIdAndTeacher(String problemId, String teacherId)
             throws Exception {
-        boolean hasPermission = 
-                this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
-                        teacherId, UserContestProblemRole.ROLE_OWNER)
-                        || this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
-                                teacherId, UserContestProblemRole.ROLE_EDITOR)
-                        || this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
-                                teacherId, UserContestProblemRole.ROLE_VIEWER);
-        if (!hasPermission) {
-            throw new MiniLeetCodeException("You don't have permission to view this problem", 403);
-        }
+
+//        TODO: re-open this later
+//        boolean hasPermission =
+//                this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
+//                        teacherId, UserContestProblemRole.ROLE_OWNER)
+//                        || this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
+//                                teacherId, UserContestProblemRole.ROLE_EDITOR)
+//                        || this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
+//                                teacherId, UserContestProblemRole.ROLE_VIEWER);
+//        if (!hasPermission) {
+//            throw new MiniLeetCodeException("You don't have permission to view this problem", 403);
+//        }
 
         ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
         if (problemEntity == null) {

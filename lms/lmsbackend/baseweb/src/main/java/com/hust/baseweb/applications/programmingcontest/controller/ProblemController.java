@@ -91,18 +91,17 @@ public class ProblemController {
             problemId,
             principal.getName());
 
-//        TODO: re-open this later
-//        boolean hasPermission = false;
-//        for (UserContestProblemRole e : L) {
-//            if (e.getRoleId().equals(UserContestProblemRole.ROLE_EDITOR) ||
-//                e.getRoleId().equals(UserContestProblemRole.ROLE_OWNER)) {
-//                hasPermission = true;
-//                break;
-//            }
-//        }
-//        if (!hasPermission) {
-//            return ResponseEntity.status(403).body("No permission");
-//        }
+        boolean hasPermission = false;
+        for (UserContestProblemRole e : L) {
+            if (e.getRoleId().equals(UserContestProblemRole.ROLE_EDITOR) ||
+                e.getRoleId().equals(UserContestProblemRole.ROLE_OWNER)) {
+                hasPermission = true;
+                break;
+            }
+        }
+        if (!hasPermission) {
+            return ResponseEntity.status(403).body("No permission");
+        }
         ProblemEntity problemResponse = problemTestCaseService.updateContestProblem(
             problemId,
             principal.getName(),
