@@ -426,7 +426,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
         String tempName = tempDir.createRandomScriptFileName(userName +
                                                              "-" +
-                                                             problemEntity.getProblemName() +
+                                                             problemEntity.getProblemId() +
                                                              "-" +
                                                              problemEntity.getCorrectSolutionLanguage());
         String output = runCode(
@@ -3248,7 +3248,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         String testCase = tc.getTestCase();
         String tempName = tempDir.createRandomScriptFileName(userId +
                                                              "-" +
-                                                             problemEntity.getProblemName() +
+                                                             problemEntity.getProblemId() +
                                                              "-" +
                                                              problemEntity.getCorrectSolutionLanguage());
         String output = "";
@@ -3294,7 +3294,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
             String tempName = tempDir.createRandomScriptFileName(userName +
                                                                  "-" +
-                                                                 problemEntity.getProblemName() +
+                                                                 problemEntity.getProblemId() +
                                                                  "-" +
                                                                  problemEntity.getCorrectSolutionLanguage());
             String output = "";
