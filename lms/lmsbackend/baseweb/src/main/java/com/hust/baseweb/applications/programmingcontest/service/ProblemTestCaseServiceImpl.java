@@ -1946,12 +1946,27 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         List<String> problemIds = contestRepo.findContestByContestId(contestId)
                                              .getProblems().stream().map(ProblemEntity::getProblemId).collect(Collectors.toList());
 
+        int nbProblems = problemIds.size();
+
+        HashMap<String, Long> mProblem2MaxPoint = new HashMap();
+        for(String problemId: problemIds){
+            ProblemEntity P = problemRepo.findByProblemId(problemId);
+            long totalPoint = 0;
+            List<TestCaseEntity> TC = testCaseRepo.findAllByProblemId(problemId);
+            for(TestCaseEntity tc: TC){
+                totalPoint += tc.getTestCasePoint();
+            }
+            mProblem2MaxPoint.put(problemId,totalPoint);
+        }
+
         List<ContestSubmissionsByUser> listContestSubmissionsByUser = new ArrayList<>();
         for (String userId : userIds) {
             ContestSubmissionsByUser contestSubmission = new ContestSubmissionsByUser();
             contestSubmission.setUserId(userId);
 
             HashMap<String, Long> mapProblemToPoint = new HashMap<>();
+            HashMap<String, Double> mapProblem2PointPercentage = new HashMap<>();
+
             for (String problemId : problemIds) {
                 mapProblemToPoint.put(problemId, 0L);
             }
@@ -1972,9 +1987,19 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 String problemId = submission.getProblemId();
                 if (mapProblemToPoint.containsKey(problemId))
                     mapProblemToPoint.put(problemId, submission.getPoint());
+                long problemPoint = 0;
+                if(mProblem2MaxPoint.get(problemId)!=null){
+                    problemPoint = mProblem2MaxPoint.get(problemId);
+                }
+                double percentage = 0;
+                if(problemPoint > 0){
+                    percentage = submission.getPoint()*1.0/problemPoint;
+                }
+                mapProblem2PointPercentage.put(problemId,percentage);
             }
 
             long totalPoint = 0;
+            double totalPercentage = 0;
 
             List<ModelSubmissionInfoRanking> mapProblemsToPoints = new ArrayList<>();
             for (Map.Entry entry : mapProblemToPoint.entrySet()) {
@@ -1983,10 +2008,21 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 tmp.setPoint((Long) entry.getValue());
                 mapProblemsToPoints.add(tmp);
                 totalPoint += tmp.getPoint();
+
+                double percent = 0;
+                if(mapProblem2PointPercentage.get(tmp.getProblemId())!= null)
+                    percent = mapProblem2PointPercentage.get(tmp.getProblemId());
+                totalPercentage = totalPercentage + percent;
+                tmp.setPointPercentage((Double)percent);
             }
+            if(nbProblems > 0)
+                totalPercentage = totalPercentage*1.0/nbProblems;
+
             contestSubmission.setFullname(userService.getUserFullName(userId));
             contestSubmission.setMapProblemsToPoints(mapProblemsToPoints);
             contestSubmission.setTotalPoint(totalPoint);
+            contestSubmission.setTotalPercentagePoint(totalPercentage);
+            contestSubmission.setStringTotalPercentagePoint(String.format("%,.2f", totalPercentage));
             listContestSubmissionsByUser.add(contestSubmission);
         }
 

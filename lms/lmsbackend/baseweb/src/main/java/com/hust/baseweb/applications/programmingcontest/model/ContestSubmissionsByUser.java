@@ -1,9 +1,6 @@
 package com.hust.baseweb.applications.programmingcontest.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -11,10 +8,14 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class ContestSubmissionsByUser {
 
     private List<ModelSubmissionInfoRanking> mapProblemsToPoints;
     private String userId;
     private String fullname;
     private long totalPoint;
+    private double totalPercentagePoint;
+    private String stringTotalPercentagePoint;
 }

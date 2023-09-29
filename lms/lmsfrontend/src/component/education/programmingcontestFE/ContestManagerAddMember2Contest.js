@@ -125,8 +125,8 @@ export default function ContestManagerAddMember2Contest(props) {
         hideCommandBar
         options={{
           selection: false,
-          pageSize: 10,
-          search: true,
+          pageSize: 20,
+          search: false,
           sorting: true,
         }}
       />

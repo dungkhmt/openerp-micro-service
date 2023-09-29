@@ -22,9 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Log4j2
@@ -111,6 +109,65 @@ public class EduClassSessionServiceImpl implements EduClassSessionService {
         GenerateQuizTestGroupInputModel input = new GenerateQuizTestGroupInputModel(testId, 1);
         List<EduTestQuizGroup> eduTestQuizGroups = eduQuizTestGroupService.generateQuizTestGroups(input);
         return eduQuizTest;
+    }
+
+
+    @Override
+    public List<EduQuizTest> createQuizTestsOfClassSession(UUID sessionId, String sessionSequenceIndex,
+                                                           int numberOfTests, int duration) {
+        List<EduQuizTest> res = new ArrayList<>();
+        String testId = "";
+        String testName = "";
+
+        EduClassSession eduClassSession = eduClassSessionRepo.findById(sessionId).orElse(null);
+        List<EduQuizTest> tests = eduQuizTestRepo.findAllBySessionId(sessionId);
+        int startQuizIndex = 0;
+        if(tests != null) startQuizIndex = tests.size();
+        int sessionIndex = 1;
+        UUID classId = null;
+        String classCode = "";
+        String courseId = null;
+        String courseName = "";
+        if (eduClassSession != null) {
+            classId = eduClassSession.getClassId();
+            List<EduClassSession> sessions = eduClassSessionRepo.findAllByClassId(classId);
+            Collections.sort(sessions, new Comparator<EduClassSession>() {
+                @Override
+                public int compare(EduClassSession o1, EduClassSession o2) {
+                    int res = 1;
+                    if(o1.getStartDatetime().equals(o2.getStartDatetime())) res = 0;
+                    else if(o1.getStartDatetime().before(o2.getStartDatetime())) res = -1;
+                    return res;
+                }
+            });
+            for(int i = 0; i < sessions.size(); i++){
+                EduClassSession s = sessions.get(i);
+                log.info("createQuizTestsOfClassSession, sorted sessions " + s.getSessionId() + " date " + s.getStartDatetime());
+                if(s.getSessionId() == sessionId){
+                    sessionIndex = i+1;
+                }
+            }
+
+            EduClass eduClass = classRepo.findById(classId).orElse(null);
+            if (eduClass != null) {
+                EduCourse eduCourse = eduClass.getEduCourse();
+                if (eduCourse != null) {
+                    courseId = eduCourse.getId();
+                }
+            }
+
+        }
+
+        for(int t = 1; t <= numberOfTests; t++){
+            testId = classCode + "_session" + sessionIndex + "_quiz" + (startQuizIndex + t);
+            testName = classCode + " " + "Quiz " + (startQuizIndex + t) + " session " + sessionIndex + " "
+                       + courseName;
+
+            EduQuizTest test = createQuizTestOfClassSession(sessionId, testId, testName, duration);
+            log.info("createQuizTestsOfClassSession created quiz-test " + testId + " name " + testName);
+            res.add(test);
+        }
+        return res;
     }
 
     @Override

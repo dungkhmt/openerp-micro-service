@@ -44,6 +44,7 @@ export default function ContestManagerRankingNew(props) {
         data[problem] = problemPoint;
       }
       data["TOTAL"] = ranking[i].totalPoint;
+      data["PERCENTAGE"] = ranking[i].stringTotalPercentagePoint;
 
       datas[i] = data;
     }
@@ -84,7 +85,8 @@ export default function ContestManagerRankingNew(props) {
           ...Object.fromEntries(record.mapProblemsToPoints.map(item => [item.problemId, item.point])),
           userId: record.userId,
           fullname: record.fullname,
-          totalPoint: record.totalPoint
+          totalPoint: record.totalPoint,
+          totalPercentagePoint: record.stringTotalPercentagePoint
         };
         arr.push(convertedData);
       })
@@ -111,6 +113,15 @@ export default function ContestManagerRankingNew(props) {
         render: (rankingRecord) => (
           <span style={{fontWeight: 600, color: "#2e7d32", width: "100%", display: "inline-block", textAlign: "right"}}>
             {`${rankingRecord.totalPoint.toLocaleString('en-US')}`}
+          </span>
+        )
+      },
+      {
+        title: "PERCENT",
+        field: "totalPercentagePoint",
+        render: (rankingRecord) => (
+          <span style={{fontWeight: 600, color: "#2e7d32", width: "100%", display: "inline-block", textAlign: "right"}}>
+            {`${rankingRecord.totalPercentagePoint.toLocaleString('en-US')}`}
           </span>
         )
       }

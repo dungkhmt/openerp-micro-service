@@ -6,6 +6,7 @@ import com.hust.baseweb.applications.education.classmanagement.model.CreateQuizT
 import com.hust.baseweb.applications.education.classmanagement.model.EduClassSessionDetailOM;
 import com.hust.baseweb.applications.education.classmanagement.service.EduClassSessionService;
 import com.hust.baseweb.applications.education.quiztest.entity.EduQuizTest;
+import com.hust.baseweb.applications.education.quiztest.model.ModelCreateQuizTestsOfClassSessionInput;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;
 import lombok.AllArgsConstructor;
@@ -73,6 +74,20 @@ public class EduClassSessionController {
             input.getTestName(),
             input.getDuration());
         return ResponseEntity.ok().body(eduQuizTest);
+
+    }
+    @PostMapping("/add-some-quiz-tests-of-class-session")
+    public ResponseEntity<?> addSomeQuizTestsOfClassSession(
+        Principal principal,
+        @RequestBody ModelCreateQuizTestsOfClassSessionInput input
+    ) {
+        //log.info("addQuizTestOfClassSession....testName = " + input.getTestName());
+        List<EduQuizTest> eduQuizTests = eduClassSessionService.createQuizTestsOfClassSession(
+            input.getSessionId(),
+            input.getSessionSequenceIndex(),
+            input.getNumberTests(),
+            input.getDuration());
+        return ResponseEntity.ok().body(eduQuizTests);
 
     }
 }

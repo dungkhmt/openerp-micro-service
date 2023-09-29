@@ -125,7 +125,7 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmissionEn
     @Query("update ContestSubmissionEntity s set s.status = ?2 where s.contestSubmissionId = ?1")
     void updateContestSubmissionStatus(UUID contestSubmissionId, String status);
 
-    @Query(value = "select new com.hust.baseweb.applications.programmingcontest.model.ModelSubmissionInfoRanking(c.problemId, MAX(c.point)) " +
+    @Query(value = "select new com.hust.baseweb.applications.programmingcontest.model.ModelSubmissionInfoRanking(c.problemId, MAX(c.point), 0.0) " +
                    "from ContestSubmissionEntity c " +
                    "where c.userId = ?1 " +
                    "and c.contestId = ?2 " +
@@ -133,7 +133,7 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmissionEn
     List<ModelSubmissionInfoRanking> getHighestSubmissions(String userId, String contestId);
 
 
-    @Query(value = "select new com.hust.baseweb.applications.programmingcontest.model.ModelSubmissionInfoRanking(c.problemId, c.point) " +
+    @Query(value = "select new com.hust.baseweb.applications.programmingcontest.model.ModelSubmissionInfoRanking(c.problemId, c.point, 0.0) " +
                    "from ContestSubmissionEntity c " +
                    "where c.userId = ?1 " +
                    "and c.contestId = ?2 " +
