@@ -53,6 +53,12 @@ public interface UserRegistrationContestRepo extends JpaRepository<UserRegistrat
 
     List<UserRegistrationContestEntity> findAllByContestIdAndStatus(String contestId, String status);
 
+    @Query(value = "select * from user_registration_contest_new u " +
+                   "where u.contest_id = ?1 " +
+                   "and u.status = ?3 " +
+                   " and u.user_id in (select participant_id from contest_user_participant_group where contest_id = ?1 and user_id = ?2) " ,
+           nativeQuery = true)
+    List<UserRegistrationContestEntity> findAllInGroupByContestIdAndStatus(String contestId, String userId, String status);
 
     @Query(value = "select user_id from user_registration_contest_new " +
                    "where contest_id = ?1 " +

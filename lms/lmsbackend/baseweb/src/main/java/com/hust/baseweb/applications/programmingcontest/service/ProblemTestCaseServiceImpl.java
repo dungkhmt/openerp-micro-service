@@ -1858,6 +1858,27 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
+    public List<ModelMemberOfContestResponse> getListMemberOfContestGroup(String contestId, String userId) {
+        List<UserRegistrationContestEntity> lst = userRegistrationContestRepo.findAllInGroupByContestIdAndStatus(
+            contestId, userId,
+            UserRegistrationContestEntity.STATUS_SUCCESSFUL);
+        List<ModelMemberOfContestResponse> res = new ArrayList();
+        for (UserRegistrationContestEntity u : lst) {
+            ModelMemberOfContestResponse m = new ModelMemberOfContestResponse();
+            m.setId(u.getId());
+            m.setContestId(contestId);
+            m.setUserId(u.getUserId());
+            m.setRoleId(u.getRoleId());
+            m.setFullName(userService.getUserFullName(u.getUserId()));
+            m.setLastUpdatedDate(u.getLastUpdated());
+            m.setUpdatedByUserId(u.getUpdatedByUserLogin_id());
+            m.setPermissionId(u.getPermissionId());
+            res.add(m);
+        }
+        return res;
+    }
+
+    @Override
     public ListModelUserRegisteredContestInfo getListUserRegisterContestPendingPaging(
         Pageable pageable,
         String contestId

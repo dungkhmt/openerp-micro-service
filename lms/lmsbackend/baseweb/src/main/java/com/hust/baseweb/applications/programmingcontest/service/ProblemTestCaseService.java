@@ -133,6 +133,8 @@ public interface ProblemTestCaseService {
     ListModelUserRegisteredContestInfo getListUserRegisterContestSuccessfulPaging(Pageable pageable, String contestId);
 
     List<ModelMemberOfContestResponse> getListMemberOfContest(String contestId);
+    List<ModelMemberOfContestResponse> getListMemberOfContestGroup(String contestId, String userId);
+
 
     ListModelUserRegisteredContestInfo getListUserRegisterContestPendingPaging(Pageable pageable, String contestId);
 

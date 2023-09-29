@@ -276,6 +276,12 @@ public class ContestController {
         List<ModelMemberOfContestResponse> res = problemTestCaseService.getListMemberOfContest(contestId);
         return ResponseEntity.ok().body(res);
     }
+    @GetMapping("/contests/{contestId}/group/members")
+    public ResponseEntity<?> getMembersOfContestGroup(Principal principal, @PathVariable String contestId) {
+        String userId = principal.getName();
+        List<ModelMemberOfContestResponse> res = problemTestCaseService.getListMemberOfContestGroup(contestId, userId);
+        return ResponseEntity.ok().body(res);
+    }
 
     @Secured("ROLE_TEACHER")
     @DeleteMapping("/contests/members")

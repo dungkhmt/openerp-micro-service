@@ -77,7 +77,7 @@ export default function ContestManagerListMemberOfGroup(props) {
   }
 
   function getMembersOfContest() {
-    request("get", "/contests/" + contestId + "/members", (res) => {
+    request("get", "/contests/" + contestId + "/group/members", (res) => {
       const data = res.data.map((e, i) => ({
         index: i + 1,
         id: e.id,
