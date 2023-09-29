@@ -21,6 +21,7 @@ import { styled } from "@mui/material/styles";
 import { useKeycloak } from "@react-keycloak/web";
 import { lazy } from "react";
 import { getTextAvatar } from "./AccountButton";
+import {PLATFORM_NAME} from "../../config/config";
 
 const FeedbackDialog = lazy(() => import("./FeedbackDialog"));
 
@@ -113,7 +114,7 @@ export function AccountMenu(props) {
     { topDivider: true },
     {
       text: "Đóng góp ý kiến",
-      subheader: "Góp phần cải thiện phiên bản Open ERP mới.",
+      subheader: "Góp phần cải thiện phiên bản " + PLATFORM_NAME + " mới.",
       onClick: handleOpenFeedbackDialog,
       icon: (
         <FeedbackIcon

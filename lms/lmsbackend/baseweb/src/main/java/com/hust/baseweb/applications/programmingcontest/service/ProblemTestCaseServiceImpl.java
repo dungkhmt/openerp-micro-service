@@ -21,8 +21,6 @@ import com.hust.baseweb.applications.programmingcontest.utils.codesimilaritychec
 import com.hust.baseweb.applications.programmingcontest.utils.stringhandler.ProblemSubmission;
 import com.hust.baseweb.applications.programmingcontest.utils.stringhandler.StringHandler;
 import com.hust.baseweb.entity.UserLogin;
-import com.hust.baseweb.model.ListPersonModel;
-import com.hust.baseweb.model.PersonModel;
 import com.hust.baseweb.repo.UserLoginRepo;
 import com.hust.baseweb.service.UserService;
 import lombok.AllArgsConstructor;
@@ -428,7 +426,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
         String tempName = tempDir.createRandomScriptFileName(userName +
                                                              "-" +
-                                                             problemEntity.getProblemName() +
+                                                             problemEntity.getProblemId() +
                                                              "-" +
                                                              problemEntity.getCorrectSolutionLanguage());
         String output = runCode(
@@ -3234,7 +3232,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         if (modelUploadTestCase.getUploadMode().equals("EXECUTE")) {
             String tempName = tempDir.createRandomScriptFileName(userName +
                                                                  "-" +
-                                                                 problemEntity.getProblemName() +
+                                                                 problemEntity.getProblemId() +
                                                                  "-" +
                                                                  problemEntity.getCorrectSolutionLanguage());
 
@@ -3286,7 +3284,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         String testCase = tc.getTestCase();
         String tempName = tempDir.createRandomScriptFileName(userId +
                                                              "-" +
-                                                             problemEntity.getProblemName() +
+                                                             problemEntity.getProblemId() +
                                                              "-" +
                                                              problemEntity.getCorrectSolutionLanguage());
         String output = "";
@@ -3332,7 +3330,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
             String tempName = tempDir.createRandomScriptFileName(userName +
                                                                  "-" +
-                                                                 problemEntity.getProblemName() +
+                                                                 problemEntity.getProblemId() +
                                                                  "-" +
                                                                  problemEntity.getCorrectSolutionLanguage());
             String output = "";
@@ -3380,9 +3378,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         HashMap<String, ProblemEntity> mID2Problem
     ) {
         if (mUserId2Submission.get(s.getUserId()) == null) {
-            mUserId2Submission.put(s.getUserId(), new ArrayList<ModelUserJudgedProblemSubmissionResponse>());
+            mUserId2Submission.put(s.getUserId(), new ArrayList<>());
             ModelUserJudgedProblemSubmissionResponse e = new ModelUserJudgedProblemSubmissionResponse();
-//            PersonModel person = userService.findPersonByUserLoginId(s.getUserId());
             e.setUserId(s.getUserId());
             e.setFullName(userService.getUserFullName(s.getUserId()));
             e.setProblemId(s.getProblemId());
@@ -3410,7 +3407,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             }
             if (maxP == null) {
                 ModelUserJudgedProblemSubmissionResponse e = new ModelUserJudgedProblemSubmissionResponse();
-//                PersonModel person = userService.findPersonByUserLoginId(s.getUserId());
                 e.setUserId(s.getUserId());
                 e.setFullName(userService.getUserFullName(s.getUserId()));
                 e.setProblemId(s.getProblemId());
@@ -3447,14 +3443,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         }
         for (ContestSubmissionEntity s : submissions) {
             updateMaxPoint(s, mUserId2Submission, mID2Problem);
-            //ModelUserJudgedProblemSubmissionResponse e = new ModelUserJudgedProblemSubmissionResponse();
-            //PersonModel person = userService.findPersonByUserLoginId(s.getUserId());
-            //e.setUserId(s.getUserId());
-            //e.setFullName(person.getFullName());
-            //e.setProblemId(s.getProblemId());
-            //e.setSubmissionSourceCode(s.getSourceCode());
-            //e.setPoint(s.getPoint());
-            //res.add(e);
         }
         for (String userId : mUserId2Submission.keySet()) {
             if (mUserId2Submission.get(userId) != null) {
@@ -3700,16 +3688,18 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     public ModelCreateContestProblemResponse getContestProblemDetailByIdAndTeacher(String problemId, String teacherId)
             throws Exception {
-        boolean hasPermission = 
-                this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
-                        teacherId, UserContestProblemRole.ROLE_OWNER)
-                        || this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
-                                teacherId, UserContestProblemRole.ROLE_EDITOR)
-                        || this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
-                                teacherId, UserContestProblemRole.ROLE_VIEWER);
-        if (!hasPermission) {
-            throw new MiniLeetCodeException("You don't have permission to view this problem", 403);
-        }
+
+//        TODO: re-open this later
+//        boolean hasPermission =
+//                this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
+//                        teacherId, UserContestProblemRole.ROLE_OWNER)
+//                        || this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
+//                                teacherId, UserContestProblemRole.ROLE_EDITOR)
+//                        || this.userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(problemId,
+//                                teacherId, UserContestProblemRole.ROLE_VIEWER);
+//        if (!hasPermission) {
+//            throw new MiniLeetCodeException("You don't have permission to view this problem", 403);
+//        }
 
         ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
         if (problemEntity == null) {

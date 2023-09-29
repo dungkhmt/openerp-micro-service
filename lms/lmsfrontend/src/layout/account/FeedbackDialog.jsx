@@ -19,6 +19,7 @@ import RejectFeedbackDialog from "./RejectFeedbackDialog";
 import CustomizedDialogs from "../../component/dialog/CustomizedDialogs";
 import PrimaryButton from "../../component/button/PrimaryButton";
 import TertiaryButton from "../../component/button/TertiaryButton";
+import {PLATFORM_NAME} from "../../config/config";
 
 const heightVariants = {
   inactive: {
@@ -100,8 +101,8 @@ const styles = {
 
 const listItemIconStyles = {color: "black", fontSize: 26};
 const pageTitle = [
-  "Đóng góp ý kiến cho Open ERP",
-  "Góp phần cải thiện phiên bản Open ERP mới",
+  "Đóng góp ý kiến cho " + PLATFORM_NAME,
+  "Góp phần cải thiện phiên bản " + PLATFORM_NAME + " mới",
   "Đã xảy ra lỗi",
 ];
 
@@ -220,7 +221,7 @@ function FeedbackDialog({open}) {
                       <ListItemText
                         primary={
                           <Typography sx={styles.listItemTextPrimary}>
-                            Góp phần cải thiện phiên bản Open ERP mới
+                            {"Góp phần cải thiện phiên bản " + PLATFORM_NAME + " mới"}
                           </Typography>
                         }
                         secondary={
@@ -228,8 +229,7 @@ function FeedbackDialog({open}) {
                             color="textSecondary"
                             style={{fontSize: 15}}
                           >
-                            Đóng góp ý kiến về trải nghiệm với phiên bản Open
-                            ERP mới.
+                            {"Đóng góp ý kiến về trải nghiệm với phiên bản " + PLATFORM_NAME + " mới"}
                           </Typography>
                         }
                       />

@@ -1,24 +1,24 @@
-import { CssBaseline } from "@material-ui/core";
-import { createTheme, MuiThemeProvider } from "@material-ui/core/styles";
 // import {SvgIcon, Typography} from "@mui/material";
 // import {Box} from "@mui/system";
-import { Box, SvgIcon, Typography } from "@material-ui/core";
-import { ReactKeycloakProvider } from "@react-keycloak/web";
-import { request } from "api";
-import { FacebookCircularProgress } from "component/common/progressBar/CustomizedCircularProgress.jsx";
-import keycloak, { initOptions } from "config/keycloak.js";
-import { useEffect } from "react";
-import { I18nextProvider } from "react-i18next";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { Router } from "react-router-dom";
-import { Slide, ToastContainer } from "react-toastify";
+import {Box, CssBaseline, SvgIcon, Typography} from "@material-ui/core";
+import {createTheme, MuiThemeProvider} from "@material-ui/core/styles";
+import {ReactKeycloakProvider} from "@react-keycloak/web";
+import {request} from "api";
+import {FacebookCircularProgress} from "component/common/progressBar/CustomizedCircularProgress.jsx";
+import keycloak, {initOptions} from "config/keycloak.js";
+import React, {useEffect} from "react";
+import {I18nextProvider} from "react-i18next";
+import {QueryClient, QueryClientProvider} from "react-query";
+import {Router} from "react-router-dom";
+import {Slide, ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { menuState } from "state/MenuState";
-import { notificationState } from "state/NotificationState";
-import { ReactComponent as Logo } from "./assets/icons/logo.svg";
+import {menuState} from "state/MenuState";
+import {notificationState} from "state/NotificationState";
 import history from "./history.js";
 import Routes from "./Routes";
 import i18n from "./translation/i18n";
+import {PLATFORM_NAME} from "./config/config";
+import {ReactComponent as HustProgrammingLogo} from "./assets/icons/hust-programming-icon.svg";
 
 const theme = createTheme({
   typography: {
@@ -62,17 +62,17 @@ const AppLoading = (
       }}
     >
       <SvgIcon
-        style={{ fontSize: "150px", marginBottom: "20px" }}
+        style={{fontSize: "150px", marginBottom: "20px"}}
         viewBox="0 0 150 150"
       >
-        <Logo width={132} height={132} x={9} y={9} />
+        <HustProgrammingLogo width={140} height={128} x={9} y={9}/>
       </SvgIcon>
       <Box>
-        <FacebookCircularProgress />
+        <FacebookCircularProgress/>
       </Box>
     </Box>
     <Box>
-      <Typography sx={{ mb: 4 }}>OpenERP Team</Typography>
+      <Typography sx={{mb: 4}}>{PLATFORM_NAME} Team</Typography>
     </Box>
   </Box>
 );
@@ -138,9 +138,9 @@ function App() {
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={queryClient}>
           <MuiThemeProvider theme={theme}>
-            <CssBaseline />
+            <CssBaseline/>
             <Router history={history}>
-              <Routes />
+              <Routes/>
               <ToastContainer
                 position="bottom-center"
                 transition={Slide}
