@@ -7,10 +7,14 @@ import {a11yProps, TabPanelVertical} from "./TabPanel";
 import CodeSimilarityCheck from "./CodeSimilarityCheck";
 import {ContestManagerDetail} from "./ContestManagerDetail";
 import ContestManagerListMember from "./ContestManagerListMember";
+import ContestManagerListMemberOfGroup from "./ContestManagerListMemberOfGroup";
+
 import ContestManagerListRegisteredParticipant from "./ContestManagerListRegisteredParticipant";
 import ContestManagerAddMember2Contest from "./ContestManagerAddMember2Contest";
 
 import ContestManagerUserSubmission from "./ContestManagerUserSubmission";
+import ContestManagerUserSubmissionGroup from "./ContestManagerUserSubmissionGroup";
+
 import ContestManagerRankingNew from "./ContestManagerRankingNew";
 import ContestResultDistribution from "./ContestResultDistribution";
 import {ContestManagerManageProblem} from "./ContestManagerManageProblem";
@@ -81,6 +85,8 @@ export function ContestManager() {
 
       <TabPanelVertical value={value} index={2}>
         <ContestManagerListMember contestId={contestId}/>
+        <ContestManagerListMemberOfGroup contestId={contestId}/>
+        
         {/* <ContestManagerListParticipant contestId={contestId}/> */}
       </TabPanelVertical>
 
@@ -103,6 +109,8 @@ export function ContestManager() {
 
       <TabPanelVertical value={value} index={7}>
         <ContestManagerUserSubmission contestId={contestId}/>
+        <ContestManagerUserSubmissionGroup contestId={contestId}/>
+        
       </TabPanelVertical>
 
 

@@ -157,9 +157,13 @@ public interface ProblemTestCaseService {
 
     ModelAddUserToContestResponse addUserToContest(ModelAddUserToContest modelAddUserToContest);
 
+    ModelAddUserToContestGroupResponse addUserToContestGroup(ModelAddUserToContestGroup modelAddUserToContestGroup);
+
     void deleteUserContest(ModelAddUserToContest modelAddUserToContest) throws MiniLeetCodeException;
 
     Page<ContestSubmission> findContestSubmissionByContestIdPaging(Pageable pageable, String contestId, String searchTerm);
+
+    Page<ContestSubmission> findContestGroupSubmissionByContestIdPaging(Pageable pageable, String contestId, String userId, String searchTerm);
 
     Page<ContestSubmission> findContestSubmissionByUserLoginIdPaging(Pageable pageable, String userLoginId);
 

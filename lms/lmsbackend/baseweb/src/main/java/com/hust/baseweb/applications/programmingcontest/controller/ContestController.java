@@ -457,6 +457,25 @@ public class ContestController {
             search);
         return ResponseEntity.status(200).body(res);
     }
+    @Secured("ROLE_TEACHER")
+    @GetMapping("/teacher/contests/{contestId}/group/submissions")
+    public ResponseEntity<?> getContestGroupSubmissionPaging(
+        Principal principal,
+        @PathVariable("contestId") String contestId,
+        @RequestParam String search,
+        @RequestParam int page,
+        @RequestParam int size
+    ) {
+        String userId = principal.getName();
+        log.info("getContestGroupSubmissionPaging, userId = " + userId);
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<ContestSubmission> res = problemTestCaseService.findContestGroupSubmissionByContestIdPaging(
+            pageRequest,
+            contestId,
+            userId,
+            search);
+        return ResponseEntity.status(200).body(res);
+    }
 
     @Secured("ROLE_TEACHER")
     @GetMapping("/teacher/contests/{contestId}/users/{userId}/submissions")
@@ -530,6 +549,44 @@ public class ContestController {
                 m.setUserId(userId);
                 m.setRole(UserRegistrationContestEntity.ROLE_PARTICIPANT);
                 ModelAddUserToContestResponse response = problemTestCaseService.addUserToContest(m);
+                uploadedUsers.add(response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.ok().body(uploadedUsers);
+    }
+
+    @PostMapping("/contests/students/upload-group-list")
+    public ResponseEntity<?> uploadExcelStudentGroupListOfContest(
+        Principal principal,
+        @RequestParam("inputJson") String inputJson,
+        @RequestParam("file") MultipartFile file
+    ) {
+        String userLoginId = principal.getName();
+        Gson gson = new Gson();
+        ModelUploadExcelParticipantToContestInput modelUpload = gson.fromJson(
+            inputJson, ModelUploadExcelParticipantToContestInput.class);
+        List<ModelAddUserToContestGroupResponse> uploadedUsers = new ArrayList<>();
+        String contestId = modelUpload.getContestId();
+        try (InputStream is = file.getInputStream()) {
+            XSSFWorkbook wb = new XSSFWorkbook(is);
+            XSSFSheet sheet = wb.getSheetAt(0);
+            int lastRowNum = sheet.getLastRowNum();
+            //System.out.println("uploadExcelStudentListOfQuizTest, lastRowNum = " + lastRowNum);
+            for (int i = 1; i <= lastRowNum; i++) {
+                Row row = sheet.getRow(i);
+                Cell c = row.getCell(0);
+
+                if (c == null || c.getStringCellValue().equals("")) continue;
+                String participantId = c.getStringCellValue();
+                ModelAddUserToContestGroup m = new ModelAddUserToContestGroup();
+                m.setContestId(contestId);
+                m.setUserId(userLoginId);
+                m.setParticipantId(participantId);
+
+                ModelAddUserToContestGroupResponse response = problemTestCaseService.addUserToContestGroup(m);
                 uploadedUsers.add(response);
             }
         } catch (Exception e) {

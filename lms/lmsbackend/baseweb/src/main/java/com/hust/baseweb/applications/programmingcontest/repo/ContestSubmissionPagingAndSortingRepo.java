@@ -1,6 +1,7 @@
 package com.hust.baseweb.applications.programmingcontest.repo;
 
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
+import com.hust.baseweb.applications.programmingcontest.entity.ContestUserParticipantGroup;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -45,6 +46,22 @@ public interface ContestSubmissionPagingAndSortingRepo
     Page<ContestSubmissionEntity> searchSubmissionInContestPaging(
         @Param("contestId") String contestId,
         @Param("userId") String userId,
+        @Param("problemId") String problemId,
+        Pageable pageable
+    );
+
+
+    @Query("SELECT s FROM ContestSubmissionEntity s " +
+           "WHERE s.contestId = :contestId " +
+           "AND s.userId in (select C.participantId from ContestUserParticipantGroup C where C.contestId = :contestId and C.userId = :userId) " +
+           "AND (LOWER(s.userId) LIKE LOWER(concat('%', :participantId, '%')) " +
+           "    OR LOWER(s.problemId) LIKE LOWER(concat('%', :problemId, '%'))" +
+           ")")
+
+    Page<ContestSubmissionEntity> searchSubmissionInContestGroupPaging(
+        @Param("contestId") String contestId,
+        @Param("userId") String userId,
+        @Param("participantId") String participantId,
         @Param("problemId") String problemId,
         Pageable pageable
     );

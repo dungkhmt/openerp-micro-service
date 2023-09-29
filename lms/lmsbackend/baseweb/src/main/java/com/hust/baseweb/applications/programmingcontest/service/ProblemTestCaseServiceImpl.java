@@ -85,7 +85,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     private SubmissionResponseHandler submissionResponseHandler;
     private ProblemTestCaseServiceCache cacheService;
     private ContestProblemExportService exporter;
-
+    private ContestUserParticipantGroupRepo contestUserParticipantGroupRepo;
     @Override
     @Transactional
     public ProblemEntity createContestProblem(
@@ -2113,6 +2113,45 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         response.setStatus("SUCCESSFUL");
         return response;
     }
+    @Override
+    public ModelAddUserToContestGroupResponse addUserToContestGroup(ModelAddUserToContestGroup modelAddUserToContestGroup) {
+        String contestId = modelAddUserToContestGroup.getContestId();
+        String userId = modelAddUserToContestGroup.getUserId();
+        String participantId = modelAddUserToContestGroup.getParticipantId();
+
+        ModelAddUserToContestGroupResponse response = new ModelAddUserToContestGroupResponse();
+        response.setUserId(userId);
+        response.setParticipantId(participantId);
+
+        if (userLoginRepo.findByUserLoginId(userId) == null) {
+            response.setStatus("User not found");
+            return response;
+        }
+        if (userLoginRepo.findByUserLoginId(participantId) == null) {
+            response.setStatus("User not found");
+            return response;
+        }
+
+        ContestUserParticipantGroup cupg = contestUserParticipantGroupRepo
+            .findByContestIdAndUserIdAndParticipantId(contestId, userId, participantId);
+
+
+        if (cupg != null) {
+            response.setStatus("Already existed");
+            return response;
+        }
+
+
+        if (cupg == null) {
+            contestUserParticipantGroupRepo.save(ContestUserParticipantGroup.builder()
+                                                                          .contestId(contestId)
+                                                                          .userId(userId)
+                                                                          .participantId(participantId)
+                                                                          .build());
+        }
+        response.setStatus("SUCCESSFUL");
+        return response;
+    }
 
     @Override
     public void deleteUserContest(ModelAddUserToContest modelAddUserToContest) throws MiniLeetCodeException {
@@ -2272,6 +2311,33 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 .userId(contestSubmissionEntity.getUserId())
                 .fullname(userService.getUserFullName(contestSubmissionEntity.getUserId()))
                 .build());
+    }
+    @Override
+    public Page<ContestSubmission> findContestGroupSubmissionByContestIdPaging(Pageable pageable, String contestId, String userId,
+                                                                               String searchTerm) {
+        searchTerm = searchTerm.toLowerCase();
+        log.info("findContestGroupSubmissionByContestIdPaging, contestId = " + contestId + " userId = " + userId);
+        return contestSubmissionPagingAndSortingRepo
+//            .findAllByContestId(pageable, contestId)
+.searchSubmissionInContestGroupPaging(contestId, userId, searchTerm, searchTerm, pageable)
+.map(contestSubmissionEntity -> ContestSubmission
+    .builder()
+    .contestSubmissionId(contestSubmissionEntity.getContestSubmissionId())
+    .contestId(contestSubmissionEntity.getContestId())
+    .createAt(contestSubmissionEntity.getCreatedAt() != null
+                  ? DateTimeUtils.dateToString(
+        contestSubmissionEntity.getCreatedAt(),
+        DateTimeUtils.DateTimeFormat.DATE_TIME_ISO_FORMAT)
+                  : null)
+    .sourceCodeLanguage(contestSubmissionEntity.getSourceCodeLanguage())
+    .point(contestSubmissionEntity.getPoint())
+    .problemId(contestSubmissionEntity.getProblemId())
+    .testCasePass(contestSubmissionEntity.getTestCasePass())
+    .status(contestSubmissionEntity.getStatus())
+    .message(contestSubmissionEntity.getMessage())
+    .userId(contestSubmissionEntity.getUserId())
+    .fullname(userService.getUserFullName(contestSubmissionEntity.getUserId()))
+    .build());
     }
 
     @Override
