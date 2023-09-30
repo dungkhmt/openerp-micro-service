@@ -38,7 +38,7 @@ export default function ContestManagerListMemberOfGroup(props) {
     {
       title: "Remove",
       render: (row) => (
-        row.userId != 'admin' && <IconButton variant="contained" color="error" onClick={() => handleRemove(row.id)}>
+        row.userId != 'admin' && <IconButton variant="contained" color="error" onClick={() => handleRemove(row.userId)}>
           <DeleteIcon/>
         </IconButton>
         
@@ -51,14 +51,15 @@ export default function ContestManagerListMemberOfGroup(props) {
     setOpenUpdateMemberDialog(true);
   }
 
-  function handleRemove(id) {
+  function handleRemove(userId) {
     setIsProcessing(true);
     let body = {
-      id: id,
+      contestId: contestId,
+      participantId: userId
     };
     request(
       "delete",
-      "/contests/members",
+      "/contests/group/members",
       (res) => {
         successNoti("Participant removed successfully");
         setIsProcessing(false);

@@ -3586,6 +3586,22 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
+    public boolean removeMemberFromContestGroup(String contestId, String userId, String participantId) {
+        ContestUserParticipantGroup item = contestUserParticipantGroupRepo
+            .findByContestIdAndUserIdAndParticipantId(contestId, userId, participantId);
+        if(item == null) {
+
+            log.info("removeMemberFromContestGroup, cannot find record for contest " + contestId + " user " + userId + " participant " + participantId);
+            return false;
+        }else {
+            contestUserParticipantGroupRepo.delete(item);
+            log.info("removeMemberFromContestGroup, DELETED record for contest " + contestId + " user " + userId + " participant " + participantId);
+
+            return true;
+        }
+    }
+
+    @Override
     public boolean updatePermissionMemberToContest(String userId, ModelUpdatePermissionMemberToContestInput input) {
         UserRegistrationContestEntity u = userRegistrationContestRepo.findById(input.getUserRegisId()).orElse(null);
         if (u != null) {

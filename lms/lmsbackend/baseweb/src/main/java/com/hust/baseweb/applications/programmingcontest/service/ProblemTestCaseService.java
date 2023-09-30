@@ -238,6 +238,10 @@ public interface ProblemTestCaseService {
 
     boolean removeMemberFromContest(UUID id);
 
+    boolean removeMemberFromContestGroup(String contestId, String userId, String participantId);
+
+
+
     boolean updatePermissionMemberToContest(String userId, ModelUpdatePermissionMemberToContestInput input);
 
     List<ModelResponseUserProblemRole> getUserProblemRoles(String problemId);

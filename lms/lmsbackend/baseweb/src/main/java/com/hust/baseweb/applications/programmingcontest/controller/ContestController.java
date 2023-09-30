@@ -293,6 +293,16 @@ public class ContestController {
     }
 
     @Secured("ROLE_TEACHER")
+    @DeleteMapping("/contests/group/members")
+    public ResponseEntity<?> removeMemberFromContestGroup(
+        Principal principal,
+        @RequestBody ModelRemoveMemberFromContestGroupInput input
+    ) {
+        String userId = principal.getName();
+        boolean res = problemTestCaseService.removeMemberFromContestGroup(input.getContestId(), userId, input.getParticipantId());
+        return ResponseEntity.ok().body(res);
+    }
+    @Secured("ROLE_TEACHER")
     @PutMapping("/contests/permissions")
     public ResponseEntity<?> updatePermissionOfMemberToContest(
         Principal principal,
