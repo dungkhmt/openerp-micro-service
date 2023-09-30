@@ -70,7 +70,7 @@ export default function UploadUserToContestGroupDialog(props) {
 
     for (let i = 0; i < uploadedUsers.length; i++) {
       let data = {};
-      data["User ID"] = uploadedUsers[i].userId;
+      data["User ID"] = uploadedUsers[i].participantId;
       data["Role"] = uploadedUsers[i].roleId;
       data["Status"] = uploadedUsers[i].status;
 
@@ -94,7 +94,7 @@ export default function UploadUserToContestGroupDialog(props) {
   }
 
   const columns = [
-    {title: "User ID", field: "userId"},
+    {title: "User ID", field: "participantId"},
     {title: "Role", field: "roleId",},
     {
       title: "Status",

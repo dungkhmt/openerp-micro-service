@@ -2188,10 +2188,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         response.setUserId(userId);
         response.setParticipantId(participantId);
 
-        if (userLoginRepo.findByUserLoginId(userId) == null) {
-            response.setStatus("User not found");
-            return response;
-        }
         if (userLoginRepo.findByUserLoginId(participantId) == null) {
             response.setStatus("User not found");
             return response;
@@ -2200,21 +2196,19 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         ContestUserParticipantGroup cupg = contestUserParticipantGroupRepo
             .findByContestIdAndUserIdAndParticipantId(contestId, userId, participantId);
 
-
         if (cupg != null) {
             response.setStatus("Already existed");
             return response;
         }
 
 
-        if (cupg == null) {
-            contestUserParticipantGroupRepo.save(ContestUserParticipantGroup.builder()
-                                                                          .contestId(contestId)
-                                                                          .userId(userId)
-                                                                          .participantId(participantId)
-                                                                          .build());
-        }
+        contestUserParticipantGroupRepo.save(ContestUserParticipantGroup.builder()
+                                                                      .contestId(contestId)
+                                                                      .userId(userId)
+                                                                      .participantId(participantId)
+                                                                      .build());
         response.setStatus("SUCCESSFUL");
+
         return response;
     }
 
