@@ -160,7 +160,7 @@ export default function StandardTable(props) {
             Cell: (props) => (
               <MTableCell
                 {...props}
-                style={{padding: "16px 16px"}}
+                style={{padding: "12px"}}
               />
             ),
             ...props.components,

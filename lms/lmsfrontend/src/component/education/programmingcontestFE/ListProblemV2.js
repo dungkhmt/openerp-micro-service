@@ -6,7 +6,6 @@ import {toFormattedDateTime} from "../../../utils/dateutils";
 import {Box, Chip, IconButton, Tab, Tabs} from "@mui/material";
 import {GetApp} from "@material-ui/icons";
 import {getColorLevel} from "./lib";
-import {StandardTable} from "erp-hust/lib/StandardTable";
 import AddIcon from "@material-ui/icons/Add";
 import {a11yProps} from "component/tab";
 import {TabPanelVertical} from "./TabPanel";
@@ -14,6 +13,7 @@ import {useKeycloak} from "@react-keycloak/web";
 import {PROBLEM_STATUS} from "utils/constants";
 import {errorNoti} from "utils/notification";
 import HustContainerCard from "../../common/HustContainerCard";
+import StandardTable from "../../table/StandardTable";
 
 function ListProblemV2() {
   const {keycloak} = useKeycloak();
