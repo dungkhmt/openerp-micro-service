@@ -21,7 +21,7 @@ import {useTranslation} from "react-i18next";
 import HustContainerCard from "../../common/HustContainerCard";
 import RichTextEditor from "../../common/editor/RichTextEditor";
 import HustCodeEditor from "../../common/HustCodeEditor";
-import {CUSTOM_EVALUATION} from "./Constant";
+import {COMPUTER_LANGUAGES, CUSTOM_EVALUATION} from "./Constant";
 import ListTestCase from "./ListTestCase";
 import FileUploadZone from "../../../utils/FileUpload/FileUploadZone";
 import ContestsUsingAProblem from "./ContestsUsingAProblem";
@@ -61,11 +61,11 @@ function ManagerViewProblemDetailV2() {
   const [timeLimitPYTHON, setTimeLimitPYTHON] = useState(1);
   const [memoryLimit, setMemoryLimit] = useState(1);
   const [levelId, setLevelId] = useState("");
-  const [languageSolution, setLanguageSolution] = useState("CPP");
+  const [languageSolution, setLanguageSolution] = useState(COMPUTER_LANGUAGES.CPP17);
   const [codeSolution, setCodeSolution] = useState("");
   const [isPreloadCode, setIsPreloadCode] = useState(false);
   const [preloadCode, setPreloadCode] = useState("");
-  const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState("CPP");
+  const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState(COMPUTER_LANGUAGES.CPP17);
   const [solutionChecker, setSolutionChecker] = useState("");
   const [isCustomEvaluated, setIsCustomEvaluated] = useState(false);
   const [isPublic, setIsPublic] = useState(false);
@@ -197,7 +197,7 @@ function ManagerViewProblemDetailV2() {
             type="number"
             value={timeLimitCPP}
             InputProps={{
-              startAdornment: <InputAdornment position="start">CPP: </InputAdornment>,
+              startAdornment: <InputAdornment position="start">C/CPP: </InputAdornment>,
               endAdornment: <InputAdornment position="end">s</InputAdornment>
             }}
           />

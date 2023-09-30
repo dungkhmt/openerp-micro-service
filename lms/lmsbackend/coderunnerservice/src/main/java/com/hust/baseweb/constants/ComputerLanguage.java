@@ -1,4 +1,4 @@
-package com.hust.baseweb.applications.programmingcontest.utils;
+package com.hust.baseweb.constants;
 
 public class ComputerLanguage {
 

@@ -3,12 +3,30 @@ package com.hust.baseweb.applications.programmingcontest.utils.executor;
 
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
+import com.hust.baseweb.applications.programmingcontest.utils.ComputerLanguage;
 
 import java.util.List;
 
 public class GccExecutor {
 
-    private static final String buildCmd = "g++ -w -o main main.cpp";
+    private static final String BUILD_COMMAND_C = "gcc -w -o main main.cpp";
+    private static final String BUILD_COMMAND_CPP_11 = "g++ -std=c++11 -w -o main main.cpp";
+    private static final String BUILD_COMMAND_CPP_14 = "g++ -std=c++14 -w -o main main.cpp";
+    private static final String BUILD_COMMAND_CPP_17 = "g++ -std=c++17 -w -o main main.cpp";
+
+    private String getBuildCmd(ComputerLanguage.Languages language) {
+        switch (language) {
+            case C:
+                return BUILD_COMMAND_C;
+            case CPP11:
+                return BUILD_COMMAND_CPP_11;
+            case CPP14:
+                return BUILD_COMMAND_CPP_14;
+            default:
+                return BUILD_COMMAND_CPP_17;
+        }
+    }
+
     private static final String suffixes = ".cpp";
     private static final String SHFileStart = "#!/bin/bash\n";
 
@@ -26,7 +44,8 @@ public class GccExecutor {
         String source,
         String testCase,
         String tmpName,
-        int timeLimit
+        int timeLimit,
+        ComputerLanguage.Languages cppVersion
     ) {
 
         String sourceSH = SHFileStart
@@ -57,7 +76,7 @@ public class GccExecutor {
                           "EOF" +
                           "\n"
                           +
-                          buildCmd +
+                          getBuildCmd(cppVersion) +
                           "\n"
                           +
                           "FILE=main" +
@@ -95,7 +114,7 @@ public class GccExecutor {
         return sourceSH;
     }
 
-    public String checkCompile(String source, String tmpName) {
+    public String checkCompile(String source, String tmpName, ComputerLanguage.Languages language) {
 
         String sourceSH = SHFileStart
                           + "mkdir -p " + tmpName + "\n"
@@ -103,7 +122,7 @@ public class GccExecutor {
                           + "cat <<EOF >> main" + suffixes + "\n"
                           + source + "\n"
                           + "EOF" + "\n"
-                          + buildCmd + "\n"
+                          + getBuildCmd(language) + "\n"
                           + "FILE=main" + "\n"
                           + "if test -f \"$FILE\"; then" + "\n"
                           + "  echo Successful\n"
@@ -122,7 +141,8 @@ public class GccExecutor {
         TestCaseEntity testCase,
         String solutionOutput,
         String tmpName,
-        int timeLimit
+        int timeLimit,
+        ComputerLanguage.Languages language
     ) {
         String genTestCase = "";
         //for(int i = 0; i < testCaseEntities.size(); i++){
@@ -140,7 +160,7 @@ public class GccExecutor {
                           + "cat <<EOF >> main" + suffixes + "\n"
                           + sourceChecker + "\n"
                           + "EOF" + "\n"
-                          + buildCmd + "\n"
+                          + getBuildCmd(language) + "\n"
                           + "FILE=main" + "\n"
                           + "if test -f \"$FILE\"; then" + "\n"
                           + genTestCase + "\n"
@@ -172,7 +192,8 @@ public class GccExecutor {
         String source,
         String tmpName,
         int timeLimit,
-        int memoryLimit
+        int memoryLimit,
+        ComputerLanguage.Languages language
     ) {
         StringBuilder genTestCase = new StringBuilder();
         for (int i = 0; i < testCaseEntities.size(); i++) {
@@ -190,7 +211,7 @@ public class GccExecutor {
                           + "cat <<EOF >> main" + suffixes + "\n"
                           + source + "\n"
                           + "EOF" + "\n"
-                          + buildCmd + "\n"
+                          + getBuildCmd(language) + "\n"
                           + "FILE=main" + "\n"
                           + "if test -f \"$FILE\"; then" + "\n"
                           + genTestCase + "\n"

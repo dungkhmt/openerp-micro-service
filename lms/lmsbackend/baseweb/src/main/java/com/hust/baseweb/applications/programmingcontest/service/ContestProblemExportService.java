@@ -8,6 +8,7 @@ import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
 import com.hust.baseweb.applications.programmingcontest.model.ModelCreateContestProblemResponse;
 import com.hust.baseweb.applications.programmingcontest.repo.ProblemRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.TestCaseRepo;
+import com.hust.baseweb.applications.programmingcontest.utils.ComputerLanguage;
 import lombok.AllArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +92,7 @@ public class ContestProblemExportService {
     }
 
     public File exportProblemCorrectSolutionToFile(ModelCreateContestProblemResponse problem) throws IOException {
-        String ext = Constants.Languages.mapLanguageToExtension(problem.getCorrectSolutionLanguage());
+        String ext = Constants.Languages.mapLanguageToExtension(ComputerLanguage.Languages.valueOf(problem.getCorrectSolutionLanguage()));
         File file = new File("Solution" + ext);
 
         FileWriter fileWriter = new FileWriter(file);
@@ -106,7 +107,7 @@ public class ContestProblemExportService {
     }
 
     public File exportProblemCustomCheckerToFile(ModelCreateContestProblemResponse problem) throws IOException {
-        String ext = Constants.Languages.mapLanguageToExtension(problem.getSolutionCheckerSourceLanguage());
+        String ext = Constants.Languages.mapLanguageToExtension(ComputerLanguage.Languages.valueOf(problem.getSolutionCheckerSourceLanguage()));
         File file = new File("CustomSolutionChecker" + ext);
 
         FileWriter fileWriter = new FileWriter(file);

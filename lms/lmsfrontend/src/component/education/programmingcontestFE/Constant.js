@@ -19,12 +19,30 @@ export const getSubmissionModeFromConstant = (mode) => {
 }
 
 export const COMPUTER_LANGUAGES = Object.freeze({
-  CPP: 'CPP',
+  C: 'C',
+  CPP11: 'CPP11',
+  CPP14: 'CPP14',
+  CPP17: 'CPP17',
   JAVA: 'JAVA',
   PYTHON: 'PYTHON3'
 })
 
-export const DEFAULT_CODE_SEGMENT_CPP = "//CPP \n" +
+export const mapLanguageToDisplayName = (language) => {
+  switch (language) {
+    case COMPUTER_LANGUAGES.C:
+      return "C";
+    case COMPUTER_LANGUAGES.CPP11:
+      return "C++ 11";
+    case COMPUTER_LANGUAGES.CPP14:
+      return "C++ 14";
+    case COMPUTER_LANGUAGES.CPP17:
+      return "C++ 17";
+    default:
+      return language;
+  }
+}
+
+export const DEFAULT_CODE_SEGMENT_CPP = "//C/C++ \n" +
   "#include <bits/stdc++.h> \n\n" +
   "int main() \n" +
   "{ \n\n" +

@@ -193,7 +193,11 @@ public class DockerClientBase {
         String[] runCommand = {"bash", dirName + ".sh"};
         String containerId;
         switch (languages) {
+            case C:
             case CPP:
+            case CPP11:
+            case CPP14:
+            case CPP17:
                 containerId = m.get("/gcc");
                 break;
             case JAVA:

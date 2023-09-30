@@ -1,5 +1,6 @@
 package com.hust.baseweb.applications.programmingcontest.constants;
 
+import com.hust.baseweb.applications.programmingcontest.utils.ComputerLanguage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,16 +103,17 @@ public class Constants {
             return this.value;
         }
 
-        public static String mapLanguageToExtension(String languages) {
-            switch (languages) {
-                case "CPP":
-                    return ".cpp";
-                case "PYTHON3":
+        public static String mapLanguageToExtension(ComputerLanguage.Languages language) {
+            switch (language) {
+                case C:
+                    return ".c";
+                case PYTHON3:
                     return ".py";
-                case "JAVA":
+                case JAVA:
                     return ".java";
+                default:
+                    return ".cpp";
             }
-            return null;
         }
 
     }

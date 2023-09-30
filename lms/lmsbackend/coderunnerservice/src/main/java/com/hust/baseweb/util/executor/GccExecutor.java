@@ -1,5 +1,6 @@
 package com.hust.baseweb.util.executor;
 
+import com.hust.baseweb.constants.ComputerLanguage;
 import com.hust.baseweb.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
 
@@ -7,7 +8,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GccExecutor {
-    private static final String buildCmd = "g++ -w -o main main.cpp";
+    private static final String BUILD_COMMAND_C = "gcc -w -o main main.cpp";
+    private static final String BUILD_COMMAND_CPP_11 = "g++ -std=c++11 -w -o main main.cpp";
+    private static final String BUILD_COMMAND_CPP_14 = "g++ -std=c++14 -w -o main main.cpp";
+    private static final String BUILD_COMMAND_CPP_17 = "g++ -std=c++17 -w -o main main.cpp";
+
+    private String getBuildCmd(ComputerLanguage.Languages language) {
+        switch (language) {
+            case C:
+                return BUILD_COMMAND_C;
+            case CPP11:
+                return BUILD_COMMAND_CPP_11;
+            case CPP14:
+                return BUILD_COMMAND_CPP_14;
+            default:
+                return BUILD_COMMAND_CPP_17;
+        }
+    }
+
     private static final String suffixes = ".cpp";
     private static final String SHFileStart = "#!/bin/bash\n";
 
@@ -21,60 +39,30 @@ public class GccExecutor {
 
     }
 
-    public String generateScriptFileWithTestCaseAndCorrectSolution(String source, String testCase, String tmpName, int timeLimit) {
-
-//        String sourceSH = SHFileStart
-//                + "mkdir -p " + tmpName + "\n"
-//                + "cd " + tmpName + "\n"
-//                + "cat <<EOF >> main" + suffixes + "\n"
-//                + source + "\n"
-//                + "EOF" + "\n"
-//                + "cat <<EOF >> testcase.txt \n"
-//                + testCase + "\n"
-//                + "EOF" + "\n"
-//                + buildCmd + "\n"
-//                + "FILE=main" + "\n"
-//                + "if test -f \"$FILE\"; then" + "\n"
-//                + "    cat testcase.txt | timeout " + timeLimit + "s " + "./main && echo -e \"\\nSuccessful\" || echo Time Limit Exceeded" + "\n"
-//                + "else\n"
-//                + "  echo Compile Error\n"
-//                + "fi" + "\n"
-//                + "cd .. \n"
-//                + "rm -rf " + tmpName + " & " + "\n"
-//                + "rm -rf " + tmpName + ".sh" + " & " + "\n";
-
+    public String generateScriptFileWithTestCaseAndCorrectSolution(
+            String source,
+            String testCase,
+            String tmpName,
+            int timeLimit,
+            ComputerLanguage.Languages cppVersion
+    ) {
 
         List<TestCaseEntity> testCaseEntities = new ArrayList<>();
         TestCaseEntity testCaseEntity = new TestCaseEntity();
         testCaseEntity.setTestCase(testCase);
         testCaseEntities.add(testCaseEntity);
 
-        return genSubmitScriptFile(testCaseEntities, source, tmpName, timeLimit, 10);
+        return genSubmitScriptFile(testCaseEntities, source, tmpName, timeLimit, 100, cppVersion);
     }
 
-    public String checkCompile(String source, String tmpName) {
-
-        String sourceSH = SHFileStart
-                + "mkdir -p " + tmpName + "\n"
-                + "cd " + tmpName + "\n"
-                + "cat <<EOF >> main" + suffixes + "\n"
-                + source + "\n"
-                + "EOF" + "\n"
-                + buildCmd + "\n"
-                + "FILE=main" + "\n"
-                + "if test -f \"$FILE\"; then" + "\n"
-                + "  echo Successful\n"
-                + "else\n"
-                + "  echo Compile Error\n"
-                + "fi" + "\n"
-                + "cd .. \n"
-                + "rm -rf " + tmpName + " & " + "\n"
-                + "rm -rf " + tmpName + ".sh" + " & " + "\n";
-
-        return sourceSH;
-    }
-
-    public String genSubmitScriptFileChecker(String sourceChecker, TestCaseEntity testCase, String solutionOutput, String tmpName, int timeLimit) {
+    public String genSubmitScriptFileChecker(
+            String sourceChecker,
+            TestCaseEntity testCase,
+            String solutionOutput,
+            String tmpName,
+            int timeLimit,
+            ComputerLanguage.Languages language
+    ) {
         String genTestCase = "";
         //for(int i = 0; i < testCaseEntities.size(); i++){
         String testcase = "cat <<EOF >> testcase" + 0 + ".txt \n"
@@ -91,7 +79,7 @@ public class GccExecutor {
                 + "cat <<EOF >> main" + suffixes + "\n"
                 + sourceChecker + "\n"
                 + "EOF" + "\n"
-                + buildCmd + "\n"
+                + getBuildCmd(language) + "\n"
                 + "FILE=main" + "\n"
                 + "if test -f \"$FILE\"; then" + "\n"
                 + genTestCase + "\n"
@@ -118,7 +106,14 @@ public class GccExecutor {
 
     }
 
-    public String genSubmitScriptFile(List<TestCaseEntity> testCaseEntities, String source, String tmpName, int timeLimit, int memoryLimit) {
+    public String genSubmitScriptFile(
+            List<TestCaseEntity> testCaseEntities,
+            String source,
+            String tmpName,
+            int timeLimit,
+            int memoryLimit,
+            ComputerLanguage.Languages language
+    ) {
         StringBuilder genTestCase = new StringBuilder();
         for (int i = 0; i < testCaseEntities.size(); i++) {
             String testcase = "cat <<EOF >> testcase" + i + ".txt \n"
@@ -135,7 +130,7 @@ public class GccExecutor {
                 + "cat <<EOF >> main" + suffixes + "\n"
                 + source + "\n"
                 + "EOF" + "\n"
-                + buildCmd + "\n"
+                + getBuildCmd(language) + "\n"
                 + "FILE=main" + "\n"
                 + "if test -f \"$FILE\"; then" + "\n"
                 + genTestCase + "\n"
