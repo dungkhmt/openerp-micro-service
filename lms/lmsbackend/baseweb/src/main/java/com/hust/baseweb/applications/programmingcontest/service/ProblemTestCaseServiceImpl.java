@@ -2158,7 +2158,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
 
         if (userRegistrationContest != null && userRegistrationContest.getStatus().equals(Constants.RegistrationType.SUCCESSFUL.getValue())) {
-            response.setStatus("Already existed");
+            response.setStatus("Added");
             return response;
         }
 
@@ -2175,7 +2175,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             userRegistrationContest.setStatus(Constants.RegistrationType.SUCCESSFUL.getValue());
             userRegistrationContestRepo.save(userRegistrationContest);
         }
-        response.setStatus("SUCCESSFUL");
+        response.setStatus("Successful");
         return response;
     }
     @Override
@@ -2197,7 +2197,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             .findByContestIdAndUserIdAndParticipantId(contestId, userId, participantId);
 
         if (cupg != null) {
-            response.setStatus("Already existed");
+            response.setStatus("Added");
             return response;
         }
 
@@ -2207,7 +2207,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                       .userId(userId)
                                                                       .participantId(participantId)
                                                                       .build());
-        response.setStatus("SUCCESSFUL");
+        response.setStatus("Successful");
 
         return response;
     }

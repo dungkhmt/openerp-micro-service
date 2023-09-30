@@ -89,7 +89,7 @@ export default function UploadUserToContestDialog(props) {
   };
 
   const getUploadStatusColor = (status) => {
-    if (status === 'SUCCESSFUL') return 'green';
+    if (status === 'Successful' || status === 'Added') return 'green';
     return 'red';
   }
 
