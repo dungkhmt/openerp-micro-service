@@ -16,6 +16,8 @@ import ContestManagerUserSubmission from "./ContestManagerUserSubmission";
 import ContestManagerUserSubmissionGroup from "./ContestManagerUserSubmissionGroup";
 
 import ContestManagerRankingNew from "./ContestManagerRankingNew";
+import ContestManagerRankingGroupNew from "./ContestManagerRankingGroupNew";
+
 import ContestResultDistribution from "./ContestResultDistribution";
 import {ContestManagerManageProblem} from "./ContestManagerManageProblem";
 
@@ -101,6 +103,8 @@ export function ContestManager() {
 
       <TabPanelVertical value={value} index={5}>
         <ContestManagerRankingNew contestId={contestId}/>
+        <ContestManagerRankingGroupNew contestId={contestId}/>
+        
       </TabPanelVertical>
 
       <TabPanelVertical value={value} index={6}>

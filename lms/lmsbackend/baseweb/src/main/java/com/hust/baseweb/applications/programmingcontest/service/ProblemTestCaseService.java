@@ -148,7 +148,11 @@ public interface ProblemTestCaseService {
         String contestId,
         Constants.GetPointForRankingType getPointForRankingType
     );
-
+    List<ContestSubmissionsByUser> getRankingGroupByContestIdNew(
+        String userId,
+        String contestId,
+        Constants.GetPointForRankingType getPointForRankingType
+    );
     Page<ProblemEntity> getPublicProblemPaging(Pageable pageable);
 
     List<ModelGetTestCase> getTestCaseByProblem(String problemId);

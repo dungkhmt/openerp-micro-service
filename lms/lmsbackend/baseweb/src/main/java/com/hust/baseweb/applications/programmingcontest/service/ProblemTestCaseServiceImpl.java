@@ -2049,6 +2049,28 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
+    public List<ContestSubmissionsByUser> getRankingGroupByContestIdNew(
+        String userId,
+        String contestId,
+        Constants.GetPointForRankingType getPointForRankingType
+    ) {
+        List<ContestSubmissionsByUser> listContestSubmissionsByUser = getRankingByContestIdNew(contestId,getPointForRankingType);
+        List<ContestSubmissionsByUser> selectedlistContestSubmissionsByUser = new ArrayList<>();
+        List<ContestUserParticipantGroup> contestUserParticipantGroups = contestUserParticipantGroupRepo
+            .findAllByContestIdAndUserId(contestId, userId);
+        HashSet<String> participantIds = new HashSet();
+        for(ContestUserParticipantGroup e: contestUserParticipantGroups){
+            participantIds.add(e.getParticipantId());
+        }
+        for(ContestSubmissionsByUser e: listContestSubmissionsByUser){
+            if(participantIds.contains(e.getUserId())){
+                selectedlistContestSubmissionsByUser.add(e);
+            }
+        }
+        return selectedlistContestSubmissionsByUser;
+    }
+
+    @Override
     public Page<ProblemEntity> getPublicProblemPaging(Pageable pageable) {
         return problemPagingAndSortingRepo.findAllByPublicIs(pageable);
     }

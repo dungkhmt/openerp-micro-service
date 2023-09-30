@@ -431,6 +431,18 @@ public class ContestController {
             getPointForRankingType);
         return ResponseEntity.status(200).body(res);
     }
+    @GetMapping("/contests/group/ranking/{contestId}")
+    public ResponseEntity<?> getRankingContestGroupNewVersion(
+        Principal principal,
+        @PathVariable("contestId") String contestId,
+        @RequestParam Constants.GetPointForRankingType getPointForRankingType
+    ) {
+        String userId = principal.getName();
+        List<ContestSubmissionsByUser> res = problemTestCaseService.getRankingGroupByContestIdNew(userId,
+            contestId,
+            getPointForRankingType);
+        return ResponseEntity.status(200).body(res);
+    }
 
     @GetMapping("/contests/{contestId}/users/submissions")
     public ResponseEntity<?> getContestSubmissionPagingOfCurrentUser(
