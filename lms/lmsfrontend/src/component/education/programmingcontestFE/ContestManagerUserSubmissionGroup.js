@@ -221,6 +221,7 @@ export default function ContestManagerUserSubmissionGroup(props) {
               <MTableToolbar {...props} searchFieldStyle={{width: 320}}/>
               <MuiThemeProvider>
                 <Box display="flex" justifyContent="flex-end" width="100%" sx={{padding: "8px 0 16px 16px"}}>
+                  {/*
                   <Tooltip title="Submit code as a participant">
                     <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
                                    sx={{marginRight: "16px"}} color="primary"
@@ -242,6 +243,7 @@ export default function ContestManagerUserSubmissionGroup(props) {
                       Rejudge All
                     </LoadingButton>
                   </Tooltip>
+                  */}
                   <Tooltip title="Export all submissions in this contest">
                     <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
                                    sx={{marginRight: "16px"}} color="primary"
