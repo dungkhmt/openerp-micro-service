@@ -9,7 +9,6 @@ public class ComputerLanguage {
         CPP14,
         CPP17,
         PYTHON3,
-        JAVA,
-        GOLANG
+        JAVA
     }
 }

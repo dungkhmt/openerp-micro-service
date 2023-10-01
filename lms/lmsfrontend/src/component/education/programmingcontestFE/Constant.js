@@ -37,6 +37,10 @@ export const mapLanguageToDisplayName = (language) => {
       return "C++ 14";
     case COMPUTER_LANGUAGES.CPP17:
       return "C++ 17";
+    case COMPUTER_LANGUAGES.JAVA:
+      return "JAVA 13";
+    case COMPUTER_LANGUAGES.PYTHON:
+      return "PYTHON 3.6.15";
     default:
       return language;
   }

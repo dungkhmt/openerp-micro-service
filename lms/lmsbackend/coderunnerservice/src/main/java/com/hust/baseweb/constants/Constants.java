@@ -42,7 +42,7 @@ public class Constants {
     }
 
     public enum DockerImage {
-        GCC("gcc:13.2.0"), JAVA("openjdk:13-buster"), PYTHON3("python:3.6-buster"), GOLANG("golang:1.16-buster");
+        GCC("gcc:13.2.0"), JAVA("openjdk:13-buster"), PYTHON3("python:3.6-buster");
 
         private final String value;
 
@@ -57,7 +57,7 @@ public class Constants {
 
 
     public enum DockerContainer {
-        GCC("/gcc"), JAVA("/java"), PYTHON3("/python3"), GOLANG("/golang");
+        GCC("/gcc"), JAVA("/java"), PYTHON3("/python3");
 
         private final String value;
 

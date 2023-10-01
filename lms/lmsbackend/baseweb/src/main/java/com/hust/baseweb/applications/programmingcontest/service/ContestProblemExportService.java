@@ -92,7 +92,7 @@ public class ContestProblemExportService {
     }
 
     public File exportProblemCorrectSolutionToFile(ModelCreateContestProblemResponse problem) throws IOException {
-        String ext = Constants.Languages.mapLanguageToExtension(ComputerLanguage.Languages.valueOf(problem.getCorrectSolutionLanguage()));
+        String ext = ComputerLanguage.mapLanguageToExtension(ComputerLanguage.Languages.valueOf(problem.getCorrectSolutionLanguage()));
         File file = new File("Solution" + ext);
 
         FileWriter fileWriter = new FileWriter(file);
@@ -107,7 +107,7 @@ public class ContestProblemExportService {
     }
 
     public File exportProblemCustomCheckerToFile(ModelCreateContestProblemResponse problem) throws IOException {
-        String ext = Constants.Languages.mapLanguageToExtension(ComputerLanguage.Languages.valueOf(problem.getSolutionCheckerSourceLanguage()));
+        String ext = ComputerLanguage.mapLanguageToExtension(ComputerLanguage.Languages.valueOf(problem.getSolutionCheckerSourceLanguage()));
         File file = new File("CustomSolutionChecker" + ext);
 
         FileWriter fileWriter = new FileWriter(file);

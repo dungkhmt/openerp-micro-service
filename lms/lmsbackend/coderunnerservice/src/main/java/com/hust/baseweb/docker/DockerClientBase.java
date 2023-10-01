@@ -151,17 +151,6 @@ public class DockerClientBase {
                                 .build();
                         dockerClient.createContainer(containerConfig, "python3");
                         break;
-                    case GOLANG:
-                        containerConfig = ContainerConfig.builder()
-                                .image(Constants.DockerImage.GOLANG.getValue())
-                                .cmd("sh", "-c", "while :; do sleep 1; done")
-                                .labels(m)
-                                .workingDir("/workdir")
-                                .attachStdout(true)
-                                .attachStdin(true)
-                                .build();
-                        dockerClient.createContainer(containerConfig, "golang");
-                        break;
                 }
             }
         }
@@ -187,9 +176,6 @@ public class DockerClientBase {
                 break;
             case PYTHON3:
                 containerId = m.get("/python3");
-                break;
-            case GOLANG:
-                containerId = m.get("/golang");
                 break;
             default:
                 log.info("language err");

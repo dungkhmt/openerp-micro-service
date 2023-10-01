@@ -2,7 +2,6 @@ package com.hust.baseweb.applications.programmingcontest.utils;
 
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
 import com.hust.baseweb.applications.programmingcontest.utils.executor.GccExecutor;
-import com.hust.baseweb.applications.programmingcontest.utils.executor.GolangExecutor;
 import com.hust.baseweb.applications.programmingcontest.utils.executor.JavaExecutor;
 import com.hust.baseweb.applications.programmingcontest.utils.executor.Python3Executor;
 import com.hust.baseweb.config.FileSystemStorageProperties;
@@ -29,8 +28,6 @@ public class TempDir {
     private final JavaExecutor javaExecutor = new JavaExecutor();
 
     private final Python3Executor python3Executor = new Python3Executor();
-
-    private final GolangExecutor golangExecutor = new GolangExecutor();
 
     public static ConcurrentLinkedQueue<String> concurrentLinkedQueue = new ConcurrentLinkedQueue<>();
 
@@ -138,13 +135,6 @@ public class TempDir {
                     tmpName,
                     timeLimit);
                 break;
-            case GOLANG:
-                sourceSh = golangExecutor.generateScriptFileWithTestCaseAndCorrectSolution(
-                    source,
-                    testCase,
-                    tmpName,
-                    timeLimit);
-                break;
             default:
                 sourceSh = null;
         }
@@ -181,9 +171,6 @@ public class TempDir {
                 break;
             case PYTHON3:
                 sourceSh = python3Executor.checkCompile(source, tmpName);
-                break;
-            case GOLANG:
-                sourceSh = golangExecutor.checkCompile(source, tmpName);
                 break;
             default:
                 sourceSh = null;
@@ -224,9 +211,6 @@ public class TempDir {
                 break;
             case PYTHON3:
                 sourceSh = python3Executor.genSubmitScriptFile(testCases, source, tmpName, timeout, memoryLimit);
-                break;
-            case GOLANG:
-                sourceSh = golangExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout);
                 break;
             default:
                 sourceSh = null;
@@ -291,9 +275,6 @@ public class TempDir {
                 break;
             case PYTHON3:
                 //sourceSh = python3Executor.genSubmitScriptFile(testCases, source, tmpName, timeout);
-                break;
-            case GOLANG:
-                //sourceSh = golangExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout);
                 break;
             default:
                 sourceSh = null;
