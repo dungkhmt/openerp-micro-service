@@ -168,23 +168,6 @@ public class DockerClientBase {
         }
     }
 
-    public String createGccContainer() throws DockerException, InterruptedException {
-        Map<String, String> m = new HashMap<>();
-        m.put("names", "leetcode");
-        ContainerConfig gccContainerConfig = ContainerConfig.builder()
-                                                            .image("gcc:8.5-buster")
-                                                            .workingDir("/workdir")
-                                                            .hostname("test1")
-                                                            .cmd("sh", "-c", "while :; do sleep 1; done")
-                                                            .labels(m)
-                                                            .attachStdout(true)
-                                                            .attachStdin(true)
-                                                            .build();
-        ContainerCreation gccCreation = dockerClient.createContainer(gccContainerConfig, "gcc");
-        dockerClient.startContainer(gccCreation.id());
-        return gccCreation.id();
-    }
-
     public String runExecutable(
         ComputerLanguage.Languages languages,
         String dirName
