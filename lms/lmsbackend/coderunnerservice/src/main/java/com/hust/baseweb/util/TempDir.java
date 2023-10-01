@@ -2,6 +2,7 @@ package com.hust.baseweb.util;
 
 import com.hust.baseweb.config.FileSystemStorageProperties;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
+import com.hust.baseweb.constants.ComputerLanguage;
 import com.hust.baseweb.util.executor.GccExecutor;
 import com.hust.baseweb.util.executor.JavaExecutor;
 import com.hust.baseweb.util.executor.Python3Executor;
@@ -76,13 +77,43 @@ public class TempDir {
         return startName + "/" + startName + ".sh";
     }
 
-    public void createScriptFile(String source, String testCase, int timeLimit, Constants.Languages languages, String tmpName) throws IOException {
+    public void createScriptFile(String source, String testCase, int timeLimit, ComputerLanguage.Languages languages, String tmpName) throws IOException {
         File theDir = new File(TEMPDIR + tmpName);
         theDir.mkdirs();
         String sourceSh;
         switch (languages) {
+            case C:
+                sourceSh = gccExecutor.generateScriptFileWithTestCaseAndCorrectSolution(
+                        source,
+                        testCase,
+                        tmpName,
+                        timeLimit,
+                        ComputerLanguage.Languages.C);
+                break;
+            case CPP11:
+                sourceSh = gccExecutor.generateScriptFileWithTestCaseAndCorrectSolution(
+                        source,
+                        testCase,
+                        tmpName,
+                        timeLimit,
+                        ComputerLanguage.Languages.CPP11);
+                break;
+            case CPP14:
+                sourceSh = gccExecutor.generateScriptFileWithTestCaseAndCorrectSolution(
+                        source,
+                        testCase,
+                        tmpName,
+                        timeLimit,
+                        ComputerLanguage.Languages.CPP14);
+                break;
             case CPP:
-                sourceSh = gccExecutor.generateScriptFileWithTestCaseAndCorrectSolution(source, testCase, tmpName, timeLimit);
+            case CPP17:
+                sourceSh = gccExecutor.generateScriptFileWithTestCaseAndCorrectSolution(
+                        source,
+                        testCase,
+                        tmpName,
+                        timeLimit,
+                        ComputerLanguage.Languages.CPP17);
                 break;
             case JAVA:
                 sourceSh = javaExecutor.generateScriptFileWithTestCaseAndCorrectSolution(source, testCase, tmpName, timeLimit);
@@ -99,36 +130,23 @@ public class TempDir {
         writer.close();
     }
 
-    public void createScriptCompileFile(String source, Constants.Languages languages, String tmpName) throws IOException {
+    public void createScriptSubmissionFile(ComputerLanguage.Languages languages, String tmpName, List<TestCaseEntity> testCases, String source, int timeout, int memoryLimit) throws IOException {
         File theDir = new File(TEMPDIR + tmpName);
         theDir.mkdirs();
         String sourceSh;
         switch (languages) {
+            case C:
+                sourceSh = gccExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout, memoryLimit, ComputerLanguage.Languages.C);
+                break;
+            case CPP11:
+                sourceSh = gccExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout, memoryLimit, ComputerLanguage.Languages.CPP11);
+                break;
+            case CPP14:
+                sourceSh = gccExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout, memoryLimit, ComputerLanguage.Languages.CPP14);
+                break;
             case CPP:
-                sourceSh = gccExecutor.checkCompile(source, tmpName);
-                break;
-            case JAVA:
-                sourceSh = javaExecutor.checkCompile(source, tmpName);
-                break;
-            case PYTHON3:
-                sourceSh = python3Executor.checkCompile(source, tmpName);
-                break;
-            default:
-                sourceSh = null;
-        }
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter(TEMPDIR + tmpName + "/" + tmpName + ".sh"));
-        writer.write(sourceSh);
-        writer.close();
-    }
-
-    public void createScriptSubmissionFile(Constants.Languages languages, String tmpName, List<TestCaseEntity> testCases, String source, int timeout, int memoryLimit) throws IOException {
-        File theDir = new File(TEMPDIR + tmpName);
-        theDir.mkdirs();
-        String sourceSh;
-        switch (languages) {
-            case CPP:
-                sourceSh = gccExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout, memoryLimit);
+            case CPP17:
+                sourceSh = gccExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout, memoryLimit, ComputerLanguage.Languages.CPP17);
                 break;
             case JAVA:
                 sourceSh = javaExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout, memoryLimit);
@@ -145,13 +163,47 @@ public class TempDir {
         writer.close();
     }
 
-    public void createScriptSubmissionSolutionOutputFile(Constants.Languages languages, String tmpName, String solutionOutput, TestCaseEntity testCase, String sourceChecker, int timeout) throws IOException {
+    public void createScriptSubmissionSolutionOutputFile(ComputerLanguage.Languages languages, String tmpName, String solutionOutput, TestCaseEntity testCase, String sourceChecker, int timeout) throws IOException {
         File theDir = new File(TEMPDIR + tmpName);
         theDir.mkdirs();
         String sourceSh = "";
         switch (languages) {
+            case C:
+                sourceSh = gccExecutor.genSubmitScriptFileChecker(
+                        sourceChecker,
+                        testCase,
+                        solutionOutput,
+                        tmpName,
+                        timeout,
+                        ComputerLanguage.Languages.C);
+                break;
+            case CPP11:
+                sourceSh = gccExecutor.genSubmitScriptFileChecker(
+                        sourceChecker,
+                        testCase,
+                        solutionOutput,
+                        tmpName,
+                        timeout,
+                        ComputerLanguage.Languages.CPP11);
+                break;
+            case CPP14:
+                sourceSh = gccExecutor.genSubmitScriptFileChecker(
+                        sourceChecker,
+                        testCase,
+                        solutionOutput,
+                        tmpName,
+                        timeout,
+                        ComputerLanguage.Languages.CPP14);
+                break;
             case CPP:
-                sourceSh = gccExecutor.genSubmitScriptFileChecker(sourceChecker, testCase, solutionOutput, tmpName, timeout);
+            case CPP17:
+                sourceSh = gccExecutor.genSubmitScriptFileChecker(
+                        sourceChecker,
+                        testCase,
+                        solutionOutput,
+                        tmpName,
+                        timeout,
+                        ComputerLanguage.Languages.CPP17);
                 break;
             case JAVA:
                 //sourceSh = javaExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout);

@@ -29,7 +29,7 @@ import RichTextEditor from "../../common/editor/RichTextEditor";
 import HustCodeEditor from "../../common/HustCodeEditor";
 import {LoadingButton} from "@mui/lab";
 import {errorNoti, successNoti, warningNoti} from "../../../utils/notification";
-import {CUSTOM_EVALUATION, NORMAL_EVALUATION} from "./Constant";
+import {COMPUTER_LANGUAGES, CUSTOM_EVALUATION, NORMAL_EVALUATION} from "./Constant";
 import ListTestCase from "./ListTestCase";
 import {getAllTags} from "./service/TagService";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -65,10 +65,10 @@ function EditProblem() {
   const [codeSolution, setCodeSolution] = useState("");
   const [isPreloadCode, setIsPreloadCode] = useState(false);
   const [preloadCode, setPreloadCode] = useState("");
-  const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState("CPP");
+  const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState(COMPUTER_LANGUAGES.CPP17);
   const [solutionChecker, setSolutionChecker] = useState("");
   const [isCustomEvaluated, setIsCustomEvaluated] = useState(false);
-  const [languageSolution, setLanguageSolution] = useState("CPP");
+  const [languageSolution, setLanguageSolution] = useState(COMPUTER_LANGUAGES.CPP17);
   const [showCompile, setShowCompile] = useState(false);
   const [statusSuccessful, setStatusSuccessful] = useState(false);
   const [isPublic, setIsPublic] = useState(false);
@@ -358,7 +358,7 @@ function EditProblem() {
               setTimeLimitCPP(event.target.value);
             }}
             InputProps={{
-              startAdornment: <InputAdornment position="start">CPP: </InputAdornment>,
+              startAdornment: <InputAdornment position="start">C/CPP: </InputAdornment>,
               endAdornment: <InputAdornment position="end">s</InputAdornment>
             }}
           />

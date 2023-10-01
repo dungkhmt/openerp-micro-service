@@ -1,5 +1,8 @@
 package com.hust.baseweb.docker;
 
+import com.hust.baseweb.constants.ComputerLanguage;
+import com.hust.baseweb.constants.Constants;
+import com.hust.baseweb.util.TempDir;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerClient.ExecCreateParam;
@@ -7,10 +10,11 @@ import com.spotify.docker.client.DockerClient.ListContainersParam;
 import com.spotify.docker.client.DockerClient.ListImagesParam;
 import com.spotify.docker.client.LogStream;
 import com.spotify.docker.client.exceptions.DockerException;
-import com.spotify.docker.client.messages.*;
+import com.spotify.docker.client.messages.Container;
+import com.spotify.docker.client.messages.ContainerConfig;
+import com.spotify.docker.client.messages.ExecCreation;
+import com.spotify.docker.client.messages.Image;
 import lombok.extern.slf4j.Slf4j;
-import com.hust.baseweb.constants.Constants;
-import com.hust.baseweb.util.TempDir;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +26,6 @@ import java.util.*;
 
 @Configuration
 @Slf4j
-//@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class DockerClientBase {
 
     @Value("${DOCKER_SERVER_HOST}")
@@ -32,12 +35,11 @@ public class DockerClientBase {
 
     private static final HashMap<String, String> m = new HashMap<>();
 
-    //private FileSystemStorageProperties properties;
     public DockerClientBase() {
     }
 
     @Bean
-    public void initDockerClientBase() throws Exception {
+    public void initDockerClientBase() {
         dockerClient = DefaultDockerClient.builder()
                 .uri(URI.create(DOCKER_SERVER_HOST))
                 .connectionPoolSize(100)
@@ -165,32 +167,19 @@ public class DockerClientBase {
         }
     }
 
-    public String createGccContainer() throws DockerException, InterruptedException {
-        Map<String, String> m = new HashMap<>();
-        m.put("names", "leetcode");
-        ContainerConfig gccContainerConfig = ContainerConfig.builder()
-                .image("gcc:8.5-buster")
-                .workingDir("/workdir")
-                .hostname("test1")
-                .cmd("sh", "-c", "while :; do sleep 1; done")
-                .labels(m)
-                .attachStdout(true)
-                .attachStdin(true)
-                .build();
-        ContainerCreation gccCreation = dockerClient.createContainer(gccContainerConfig, "gcc");
-        dockerClient.startContainer(gccCreation.id());
-        return gccCreation.id();
-    }
-
     public String runExecutable(
-            Constants.Languages languages,
+            ComputerLanguage.Languages languages,
             String dirName
     ) throws DockerException, InterruptedException, IOException {
         //log.info("runExecutable, dirName = " + dirName + " language = " + languages);
         String[] runCommand = {"bash", dirName + ".sh"};
         String containerId;
         switch (languages) {
+            case C:
             case CPP:
+            case CPP11:
+            case CPP14:
+            case CPP17:
                 containerId = m.get("/gcc");
                 break;
             case JAVA:

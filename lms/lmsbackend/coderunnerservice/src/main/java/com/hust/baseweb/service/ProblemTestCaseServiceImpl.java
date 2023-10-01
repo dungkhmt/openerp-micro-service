@@ -1,7 +1,7 @@
 package com.hust.baseweb.service;
 
 import com.hust.baseweb.applications.programmingcontest.entity.*;
-import com.hust.baseweb.constants.Constants;
+import com.hust.baseweb.constants.ComputerLanguage;
 import com.hust.baseweb.docker.DockerClientBase;
 import com.hust.baseweb.model.ModelRunCodeFromIDE;
 import com.hust.baseweb.repo.ContestSubmissionRepo;
@@ -56,23 +56,30 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     ) throws Exception {
         String ans;
         tempName = tempName.replaceAll(" ", "");
-        switch (computerLanguage) {
-            case "CPP":
-                tempDir.createScriptFile(sourceCode, input, timeLimit, Constants.Languages.CPP, tempName);
-                ans = dockerClientBase.runExecutable(Constants.Languages.CPP, tempName);
+        switch (ComputerLanguage.Languages.valueOf(computerLanguage)) {
+            case C:
+            case CPP:
+            case CPP11:
+            case CPP14:
+            case CPP17:
+                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.CPP17, tempName);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP17, tempName);
                 break;
-            case "JAVA":
-                tempDir.createScriptFile(sourceCode, input, timeLimit, Constants.Languages.JAVA, tempName);
-                ans = dockerClientBase.runExecutable(Constants.Languages.JAVA, tempName);
+            case JAVA:
+                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.JAVA, tempName);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.JAVA, tempName);
                 break;
-            case "PYTHON3":
-                tempDir.createScriptFile(sourceCode, input, timeLimit, Constants.Languages.PYTHON3, tempName);
-                ans = dockerClientBase.runExecutable(Constants.Languages.PYTHON3, tempName);
+            case PYTHON3:
+                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.PYTHON3, tempName);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.PYTHON3, tempName);
+                break;
+            case GOLANG:
+                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.GOLANG, tempName);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.GOLANG, tempName);
                 break;
             default:
                 throw new Exception(exception);
         }
-//        tempDir.pushToConcurrentLinkedQueue(tempName);
         return ans;
     }
 
@@ -208,46 +215,77 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     ) throws Exception {
         String ans;
         tempName = tempName.replace(" ", "");
-        switch (computerLanguage) {
-            case "CPP":
+        switch (ComputerLanguage.Languages.valueOf(computerLanguage)) {
+            case C:
                 tempDir.createScriptSubmissionFile(
-                        Constants.Languages.CPP,
+                        ComputerLanguage.Languages.C,
                         tempName,
                         testCaseList,
                         source,
                         timeLimit,
                         memoryLimit);
-                ans = dockerClientBase.runExecutable(Constants.Languages.CPP, tempName);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.C, tempName);
                 break;
-            case "JAVA":
+            case CPP11:
                 tempDir.createScriptSubmissionFile(
-                        Constants.Languages.JAVA,
+                        ComputerLanguage.Languages.CPP11,
                         tempName,
                         testCaseList,
                         source,
                         timeLimit,
                         memoryLimit);
-                ans = dockerClientBase.runExecutable(Constants.Languages.JAVA, tempName);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP11, tempName);
                 break;
-            case "PYTHON3":
+            case CPP14:
                 tempDir.createScriptSubmissionFile(
-                        Constants.Languages.PYTHON3,
+                        ComputerLanguage.Languages.CPP14,
                         tempName,
                         testCaseList,
                         source,
                         timeLimit,
                         memoryLimit);
-                ans = dockerClientBase.runExecutable(Constants.Languages.PYTHON3, tempName);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP14, tempName);
                 break;
-            case "GOLANG":
+            case CPP:
+            case CPP17:
                 tempDir.createScriptSubmissionFile(
-                        Constants.Languages.GOLANG,
+                        ComputerLanguage.Languages.CPP17,
                         tempName,
                         testCaseList,
                         source,
                         timeLimit,
                         memoryLimit);
-                ans = dockerClientBase.runExecutable(Constants.Languages.GOLANG, tempName);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP17, tempName);
+                break;
+            case JAVA:
+                tempDir.createScriptSubmissionFile(
+                        ComputerLanguage.Languages.JAVA,
+                        tempName,
+                        testCaseList,
+                        source,
+                        timeLimit,
+                        memoryLimit);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.JAVA, tempName);
+                break;
+            case PYTHON3:
+                tempDir.createScriptSubmissionFile(
+                        ComputerLanguage.Languages.PYTHON3,
+                        tempName,
+                        testCaseList,
+                        source,
+                        timeLimit,
+                        memoryLimit);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.PYTHON3, tempName);
+                break;
+            case GOLANG:
+                tempDir.createScriptSubmissionFile(
+                        ComputerLanguage.Languages.GOLANG,
+                        tempName,
+                        testCaseList,
+                        source,
+                        timeLimit,
+                        memoryLimit);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.GOLANG, tempName);
                 break;
             default:
                 throw new Exception(exception);
@@ -266,28 +304,27 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             int timeLimit,
             int memoryLimit
     ) throws Exception {
-        //log.info("submissionSolutionOutput, sourceChecker = " + sourceChecker + " solutionOutput = " + solutionOutput + " testCase = " + testCase.getTestCase());
 
         String ans = "";
         tempName = tempName.replaceAll(" ", "");
-        switch (computerLanguage) {
-            case "CPP":
+        switch (ComputerLanguage.Languages.valueOf(computerLanguage)) {
+            case C:
+            case CPP:
+            case CPP11:
+            case CPP14:
+            case CPP17:
                 tempDir.createScriptSubmissionSolutionOutputFile(
-                        Constants.Languages.CPP,
+                        ComputerLanguage.Languages.CPP17,
                         tempName,
                         solutionOutput,
                         testCase,
                         sourceChecker,
                         timeLimit);
-                ans = dockerClientBase.runExecutable(Constants.Languages.CPP, tempName);
-                //  log.info("submissionSolutionOutput, sourceChecker = " + sourceChecker + " solutionOutput = " + solutionOutput + " testCase = " + testCase.getTestCase()
-                //  + " ans = " + ans);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP17, tempName);
                 break;
-            case "JAVA":
-                break;
-            case "PYTHON3":
-                break;
-            case "GOLANG":
+            case JAVA:
+            case GOLANG:
+            case PYTHON3:
                 break;
             default:
                 throw new Exception(exception);

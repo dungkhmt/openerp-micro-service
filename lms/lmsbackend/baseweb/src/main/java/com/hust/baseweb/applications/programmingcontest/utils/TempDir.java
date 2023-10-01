@@ -91,12 +91,38 @@ public class TempDir {
         theDir.mkdirs();
         String sourceSh;
         switch (languages) {
-            case CPP:
+            case C:
                 sourceSh = gccExecutor.generateScriptFileWithTestCaseAndCorrectSolution(
                     source,
                     testCase,
                     tmpName,
-                    timeLimit);
+                    timeLimit,
+                    ComputerLanguage.Languages.C);
+                break;
+            case CPP11:
+                sourceSh = gccExecutor.generateScriptFileWithTestCaseAndCorrectSolution(
+                    source,
+                    testCase,
+                    tmpName,
+                    timeLimit,
+                    ComputerLanguage.Languages.CPP11);
+                break;
+            case CPP14:
+                sourceSh = gccExecutor.generateScriptFileWithTestCaseAndCorrectSolution(
+                    source,
+                    testCase,
+                    tmpName,
+                    timeLimit,
+                    ComputerLanguage.Languages.CPP14);
+                break;
+            case CPP:
+            case CPP17:
+                sourceSh = gccExecutor.generateScriptFileWithTestCaseAndCorrectSolution(
+                    source,
+                    testCase,
+                    tmpName,
+                    timeLimit,
+                    ComputerLanguage.Languages.CPP17);
                 break;
             case JAVA:
                 sourceSh = javaExecutor.generateScriptFileWithTestCaseAndCorrectSolution(
@@ -137,8 +163,18 @@ public class TempDir {
         theDir.mkdirs();
         String sourceSh;
         switch (languages) {
+            case C:
+                sourceSh = gccExecutor.checkCompile(source, tmpName, ComputerLanguage.Languages.C);
+                break;
+            case CPP11:
+                sourceSh = gccExecutor.checkCompile(source, tmpName, ComputerLanguage.Languages.CPP11);
+                break;
+            case CPP14:
+                sourceSh = gccExecutor.checkCompile(source, tmpName, ComputerLanguage.Languages.CPP14);
+                break;
             case CPP:
-                sourceSh = gccExecutor.checkCompile(source, tmpName);
+            case CPP17:
+                sourceSh = gccExecutor.checkCompile(source, tmpName, ComputerLanguage.Languages.CPP17);
                 break;
             case JAVA:
                 sourceSh = javaExecutor.checkCompile(source, tmpName);
@@ -170,8 +206,18 @@ public class TempDir {
         theDir.mkdirs();
         String sourceSh;
         switch (languages) {
+            case C:
+                sourceSh = gccExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout, memoryLimit, ComputerLanguage.Languages.C);
+                break;
+            case CPP11:
+                sourceSh = gccExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout, memoryLimit, ComputerLanguage.Languages.CPP11);
+                break;
+            case CPP14:
+                sourceSh = gccExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout, memoryLimit, ComputerLanguage.Languages.CPP14);
+                break;
             case CPP:
-                sourceSh = gccExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout, memoryLimit);
+            case CPP17:
+                sourceSh = gccExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout, memoryLimit, ComputerLanguage.Languages.CPP17);
                 break;
             case JAVA:
                 sourceSh = javaExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout, memoryLimit);
@@ -203,13 +249,42 @@ public class TempDir {
         theDir.mkdirs();
         String sourceSh = "";
         switch (languages) {
-            case CPP:
+            case C:
                 sourceSh = gccExecutor.genSubmitScriptFileChecker(
                     sourceChecker,
                     testCase,
                     solutionOutput,
                     tmpName,
-                    timeout);
+                    timeout,
+                    ComputerLanguage.Languages.C);
+                break;
+            case CPP11:
+                sourceSh = gccExecutor.genSubmitScriptFileChecker(
+                    sourceChecker,
+                    testCase,
+                    solutionOutput,
+                    tmpName,
+                    timeout,
+                    ComputerLanguage.Languages.CPP11);
+                break;
+            case CPP14:
+                sourceSh = gccExecutor.genSubmitScriptFileChecker(
+                    sourceChecker,
+                    testCase,
+                    solutionOutput,
+                    tmpName,
+                    timeout,
+                    ComputerLanguage.Languages.CPP14);
+                break;
+            case CPP:
+            case CPP17:
+                sourceSh = gccExecutor.genSubmitScriptFileChecker(
+                    sourceChecker,
+                    testCase,
+                    solutionOutput,
+                    tmpName,
+                    timeout,
+                    ComputerLanguage.Languages.CPP17);
                 break;
             case JAVA:
                 //sourceSh = javaExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout);

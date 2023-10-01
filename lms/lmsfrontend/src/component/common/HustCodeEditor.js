@@ -6,6 +6,7 @@ import "ace-builds/src-noconflict/mode-java";
 import "ace-builds/src-noconflict/mode-c_cpp";
 import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/theme-monokai";
+import {COMPUTER_LANGUAGES} from "../education/programmingcontestFE/Constant";
 
 const HustCodeEditor = (props) => {
   const {
@@ -22,11 +23,14 @@ const HustCodeEditor = (props) => {
 
   const convertLanguageToEditorMode = (language) => {
     switch (language) {
-      case "CPP":
+      case COMPUTER_LANGUAGES.C:
+      case COMPUTER_LANGUAGES.CPP11:
+      case COMPUTER_LANGUAGES.CPP14:
+      case COMPUTER_LANGUAGES.CPP17:
         return "c_cpp";
-      case "JAVA":
+      case COMPUTER_LANGUAGES.JAVA:
         return "java";
-      case "PYTHON3":
+      case COMPUTER_LANGUAGES.PYTHON:
         return "python";
       default:
         return "c_cpp";

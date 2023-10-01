@@ -30,7 +30,7 @@ import HustCodeEditor from "../../common/HustCodeEditor";
 import {LoadingButton} from "@mui/lab";
 import RichTextEditor from "../../common/editor/RichTextEditor";
 import HustContainerCard from "../../common/HustContainerCard";
-import {CUSTOM_EVALUATION, NORMAL_EVALUATION} from "./Constant";
+import {COMPUTER_LANGUAGES, CUSTOM_EVALUATION, NORMAL_EVALUATION} from "./Constant";
 import {getAllTags} from "./service/TagService";
 import ModelAddNewTag from "./ModelAddNewTag";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -63,9 +63,9 @@ function CreateProblem() {
   const [codeSolution, setCodeSolution] = useState("");
   const [isPreloadCode, setIsPreloadCode] = useState(false);
   const [preloadCode, setPreloadCode] = useState("");
-  const [languageSolution, setLanguageSolution] = useState("CPP");
+  const [languageSolution, setLanguageSolution] = useState(COMPUTER_LANGUAGES.CPP17);
   const [solutionChecker, setSolutionChecker] = useState("");
-  const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState("CPP");
+  const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState(COMPUTER_LANGUAGES.CPP17);
   const [isPublic, setIsPublic] = useState(false);
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
@@ -308,7 +308,7 @@ function CreateProblem() {
               setTimeLimitCPP(event.target.value);
             }}
             InputProps={{
-              startAdornment: <InputAdornment position="start">CPP: </InputAdornment>,
+              startAdornment: <InputAdornment position="start">C/CPP: </InputAdornment>,
               endAdornment: <InputAdornment position="end">s</InputAdornment>
             }}
           />

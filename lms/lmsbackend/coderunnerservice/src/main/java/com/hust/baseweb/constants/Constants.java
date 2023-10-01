@@ -41,36 +41,6 @@ public class Constants {
         }
     }
 
-    public enum Languages {
-        CPP("CPP"),
-        PYTHON3("PYTHON3"),
-        JAVA("JAVA"),
-        GOLANG("GOLANG");
-
-        private final String value;
-
-        Languages(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return this.value;
-        }
-
-        public static String mapLanguageToExtension(String languages) {
-            switch (languages) {
-                case "CPP":
-                    return ".cpp";
-                case "PYTHON3":
-                    return ".py";
-                case "JAVA":
-                    return ".java";
-            }
-            return null;
-        }
-
-    }
-
     public enum DockerImage {
         GCC("gcc:8.5-buster"), JAVA("openjdk:13-buster"), PYTHON3("python:3.6-buster"), GOLANG("golang:1.16-buster");
 

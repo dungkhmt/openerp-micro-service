@@ -38,7 +38,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
   const [problem, setProblem] = useState(null);
   const [testCases, setTestCases] = useState([]);
   const [file, setFile] = useState(null);
-  const [language, setLanguage] = useState(COMPUTER_LANGUAGES.CPP);
+  const [language, setLanguage] = useState(COMPUTER_LANGUAGES.CPP17);
   const [status, setStatus] = useState("");
   const [message, setMessage] = useState("");
   const [codeSolution, setCodeSolution] = useState("");
@@ -182,7 +182,10 @@ export default function StudentViewProgrammingContestProblemDetail() {
   useEffect(() => {
     if (problem && problem.isPreloadCode === true) return;
     switch (language) {
-      case COMPUTER_LANGUAGES.CPP:
+      case COMPUTER_LANGUAGES.C:
+      case COMPUTER_LANGUAGES.CPP11:
+      case COMPUTER_LANGUAGES.CPP14:
+      case COMPUTER_LANGUAGES.CPP17:
         setCodeSolution(DEFAULT_CODE_SEGMENT_CPP);
         break;
       case COMPUTER_LANGUAGES.JAVA:
@@ -192,7 +195,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
         setCodeSolution(DEFAULT_CODE_SEGMENT_PYTHON);
         break;
     }
-  }, [language])
+  }, [])
 
   const ModalPreview = (chosenTestcase) => {
     return (
