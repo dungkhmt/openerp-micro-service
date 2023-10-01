@@ -12,7 +12,6 @@ import com.hust.baseweb.applications.programmingcontest.entity.*;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
 import com.hust.baseweb.applications.programmingcontest.model.*;
 import com.hust.baseweb.applications.programmingcontest.repo.*;
-import com.hust.baseweb.applications.programmingcontest.service.helper.SubmissionResponseHandler;
 import com.hust.baseweb.applications.programmingcontest.service.helper.cache.ProblemTestCaseServiceCache;
 import com.hust.baseweb.applications.programmingcontest.utils.ComputerLanguage;
 import com.hust.baseweb.applications.programmingcontest.utils.DateTimeUtils;
@@ -82,7 +81,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     private ContestService contestService;
     private TestCaseService testCaseService;
     private RabbitTemplate rabbitTemplate;
-    private SubmissionResponseHandler submissionResponseHandler;
     private ProblemTestCaseServiceCache cacheService;
     private ContestProblemExportService exporter;
     private ContestUserParticipantGroupRepo contestUserParticipantGroupRepo;
@@ -1242,130 +1240,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .status("IN_PROGRESS")
                                              .message("Submission is being evaluated")
                                              .build();
-    }
-
-    @Override
-    public void submitContestProblemTestCaseByTestCaseWithFileProcessor(
-        UUID submissionId
-    ) throws Exception {
-
-        ContestSubmissionEntity submission = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(
-            submissionId);
-        ProblemEntity problem = problemService.findProblemWithCache(submission.getProblemId());
-        ContestEntity contest = contestService.findContestWithCache(submission.getContestId());
-
-        String userId = submission.getUserId();
-
-        List<TestCaseEntity> testCaseEntityList = null;
-        boolean evaluatePrivateTestcase = contest != null &&
-                                        contest.getEvaluateBothPublicPrivateTestcase() != null &&
-                                        contest.getEvaluateBothPublicPrivateTestcase()
-                                               .equals(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES);
-
-        testCaseEntityList = testCaseService.findListTestCaseWithCache(
-            submission.getProblemId(),
-            evaluatePrivateTestcase);
-
-        List<TestCaseEntity> listTestCaseAvailable = new ArrayList<>();
-        for (TestCaseEntity tc : testCaseEntityList) {
-            if (tc.getStatusId() != null && tc.getStatusId().equals(TestCaseEntity.STATUS_DISABLED)) {
-                continue;
-            }
-            listTestCaseAvailable.add(tc);
-        }
-        testCaseEntityList = listTestCaseAvailable;
-
-        String tempName = tempDir.createRandomScriptFileName(userId + "-" +
-                                                             submission.getContestId() + "-" +
-                                                             submission.getProblemId() + "-" +
-                                                             Math.random());
-
-        List<String> listSubmissionResponse = new ArrayList<>();
-        for (TestCaseEntity testCaseEntity : testCaseEntityList) {
-            List<TestCaseEntity> L = new ArrayList();
-            L.add(testCaseEntity);
-
-            String response = submission(
-                submission.getSourceCode(),
-                submission.getSourceCodeLanguage(),
-                tempName,
-                L,
-                "language not found",
-//                problem.getTimeLimit(),
-                getTimeLimitByLanguage(problem, submission.getSourceCodeLanguage()),
-                problem.getMemoryLimit());
-
-            listSubmissionResponse.add(response);
-        }
-
-        tempDir.removeDir(tempName);
-        submissionResponseHandler.processSubmissionResponse(
-            testCaseEntityList,
-            listSubmissionResponse,
-            submission,
-            problem.getScoreEvaluationType());
-    }
-
-    @Override
-    public void evaluateCustomProblemSubmission(UUID submissionId) throws Exception {
-
-        ContestSubmissionEntity submission = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(
-            submissionId);
-        ProblemEntity problemEntity = problemService.findProblemWithCache(submission.getProblemId());
-        ContestEntity contest = contestService.findContestWithCache(submission.getContestId());
-        List<ContestSubmissionTestCaseEntity> submissionTestCases = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionId(
-            submissionId);
-
-        String userId = submission.getUserId();
-
-        List<TestCaseEntity> testCaseEntityList;
-        boolean evaluatePrivateTestcase = contest != null &&
-                                        contest.getEvaluateBothPublicPrivateTestcase() != null &&
-                                        contest.getEvaluateBothPublicPrivateTestcase()
-                                               .equals(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES);
-
-        testCaseEntityList = testCaseService.findListTestCaseWithCache(
-            submission.getProblemId(),
-            evaluatePrivateTestcase);
-
-        List<TestCaseEntity> listTestCaseAvailable = new ArrayList<>();
-        for (TestCaseEntity tc : testCaseEntityList) {
-            if (tc.getStatusId() != null && tc.getStatusId().equals(TestCaseEntity.STATUS_DISABLED)) {
-                continue;
-            }
-            listTestCaseAvailable.add(tc);
-        }
-        testCaseEntityList = listTestCaseAvailable;
-
-        String tempName = tempDir.createRandomScriptFileName(userId + "-" +
-                                                             submission.getContestId() + "-" +
-                                                             submission.getProblemId() + "-" +
-                                                             "custom-" +
-                                                             Math.random());
-
-        Map<UUID, String> submissionResponses = new HashMap<>();
-        for (TestCaseEntity testCaseEntity : testCaseEntityList) {
-            ContestSubmissionTestCaseEntity submissionTestCase = submissionTestCases
-                .stream()
-                .filter(tc -> tc.getTestCaseId().equals(testCaseEntity.getTestCaseId()))
-                .findFirst().get();
-
-            String response = submissionSolutionOutput(
-                problemEntity.getSolutionCheckerSourceCode(),
-                problemEntity.getSolutionCheckerSourceLanguage(),
-                submissionTestCase.getParticipantSolutionOtput(),
-                tempName,
-                testCaseEntity,
-                "language not found",
-//                problemEntity.getTimeLimit(),
-                getTimeLimitByLanguage(problemEntity, problemEntity.getSolutionCheckerSourceLanguage()),
-                problemEntity.getMemoryLimit());
-
-            submissionResponses.put(submissionTestCase.getContestSubmissionTestcaseId(), response);
-        }
-
-        tempDir.removeDir(tempName);
-        submissionResponseHandler.processCustomSubmissionResponse(submission, submissionResponses);
     }
 
 

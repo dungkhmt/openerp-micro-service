@@ -86,8 +86,6 @@ public interface ProblemTestCaseService {
         String submittedByUserId
     ) throws Exception;
 
-    void submitContestProblemTestCaseByTestCaseWithFileProcessor(UUID contestSubmissionId) throws Exception;
-
     ModelContestSubmissionResponse submitContestProblemStoreOnlyNotExecute(
         ModelContestSubmission modelContestSubmission,
         String userName,
@@ -253,8 +251,6 @@ public interface ProblemTestCaseService {
     boolean addUserProblemRole(String userName, ModelUserProblemRole input)  throws Exception;
 
     boolean removeUserProblemRole(String userName, ModelUserProblemRole input)  throws Exception;
-
-    void evaluateCustomProblemSubmission(UUID contestSubmissionId) throws Exception;
 
     List<TagEntity> getAllTags();
 

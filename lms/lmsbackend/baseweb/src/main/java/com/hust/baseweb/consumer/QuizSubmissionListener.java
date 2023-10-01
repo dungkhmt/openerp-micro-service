@@ -57,7 +57,6 @@ public class QuizSubmissionListener extends BaseRabbitListener {
     protected void retryMessage(Message message, String messageBody, Channel channel) throws IOException {
         try {
             UUID quizId = UUID.fromString(messageBody);
-            //problemTestCaseService.evaluateCustomProblemSubmission(quizId);
             quizTestService.updateFromQuizTestExecutionSubmission(quizId);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
