@@ -198,6 +198,8 @@ public interface ProblemTestCaseService {
     void deleteTestcase(UUID testcaseId, String userId) throws MiniLeetCodeException;
 
     ModelCodeSimilarityOutput checkSimilarity(String contestId, ModelCheckSimilarityInput I);
+    ModelCodeSimilarityOutput computeSimilarity(String contestId, ModelCheckSimilarityInput I);
+
 
     ModelEvaluateBatchSubmissionResponse reJudgeAllSubmissionsOfContest(String contestId);
 

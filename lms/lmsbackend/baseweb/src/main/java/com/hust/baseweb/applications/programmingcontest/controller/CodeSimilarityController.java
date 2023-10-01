@@ -51,5 +51,14 @@ public class CodeSimilarityController {
         ModelCodeSimilarityOutput res = problemTestCaseService.checkSimilarity(contestId, I);
         return ResponseEntity.ok().body(res);
     }
+    @PostMapping("/compute-code-similarity/{contestId}")
+    public ResponseEntity<?> computeCodeSimilarity(
+        @RequestBody ModelCheckSimilarityInput I,
+        @PathVariable String contestId
+    ) {
+        log.info("computeCodeSimilarity, contestId = " + contestId);
+        ModelCodeSimilarityOutput res = problemTestCaseService.computeSimilarity(contestId, I);
+        return ResponseEntity.ok().body(res);
+    }
 
 }

@@ -2504,6 +2504,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                         continue;
                     }
 
+
                     CodeSimilarityElement e = new CodeSimilarityElement();
                     e.setScore(score);
                     e.setSource1(s1.getSourceCode());
@@ -2518,51 +2519,155 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
                     list.add(e);
 
+                    List<CodePlagiarism> codePlagiarisms = codePlagiarismRepo
+                        .findAllByContestIdAndProblemIdAndUserId1AndUserId2(contestId,problemId,s1.getUserId(), s2.getUserId());
+                    if(codePlagiarisms != null){
+                        for(CodePlagiarism cp: codePlagiarisms){
+                            cp.setScore(score);
+                            cp.setCreatedStamp(new Date());
+                            cp = codePlagiarismRepo.save(cp);
+                        }
+                    }else {
 
-                    CodePlagiarism codePlagiarism = new CodePlagiarism();
-                    codePlagiarism.setContestId(contestId);
-                    codePlagiarism.setProblemId(problemId);
-                    codePlagiarism.setUserId1(s1.getUserId());
-                    codePlagiarism.setUserId2(s2.getUserId());
-                    codePlagiarism.setSourceCode1(s1.getSourceCode());
-                    codePlagiarism.setSourceCode2(s2.getSourceCode());
-                    codePlagiarism.setSubmitDate1(s1.getCreatedAt());
-                    codePlagiarism.setSubmitDate2(s2.getCreatedAt());
-                    codePlagiarism.setScore(score);
-                    codePlagiarism.setCreatedStamp(new Date());
+                        CodePlagiarism codePlagiarism = new CodePlagiarism();
+                        codePlagiarism.setContestId(contestId);
+                        codePlagiarism.setProblemId(problemId);
+                        codePlagiarism.setUserId1(s1.getUserId());
+                        codePlagiarism.setUserId2(s2.getUserId());
+                        codePlagiarism.setSourceCode1(s1.getSourceCode());
+                        codePlagiarism.setSourceCode2(s2.getSourceCode());
+                        codePlagiarism.setSubmitDate1(s1.getCreatedAt());
+                        codePlagiarism.setSubmitDate2(s2.getCreatedAt());
+                        codePlagiarism.setScore(score);
+                        codePlagiarism.setCreatedStamp(new Date());
 
-                    codePlagiarism = codePlagiarismRepo.save(codePlagiarism);
-                    //  log.info("checkSimilarity, save score = " + score);
+                        codePlagiarism = codePlagiarismRepo.save(codePlagiarism);
+                        log.info("checkSimilarity, add new item score = " + score);
+                    }
                 }
             }
         }
 
+        Collections.sort(list, new CodeSimilatiryComparator());
 
-        /*
-        List<ContestSubmissionEntity> submissions = contestSubmissionPagingAndSortingRepo.findAllByContestId(contestId);
-        for(int i = 0; i < submissions.size(); i++){
-            ContestSubmissionEntity s1 = submissions.get(i);
-            for(int j = i+1; j < submissions.size(); j++){
-                ContestSubmissionEntity s2 = submissions.get(j);
-                if(s1.getUserId().equals(s2.getUserId())) continue;
+        ModelCodeSimilarityOutput model = new ModelCodeSimilarityOutput();
+        model.setCodeSimilarityElementList(list);
+        return model;
+    }
+    @Override
+    public ModelCodeSimilarityOutput computeSimilarity(String contestId, ModelCheckSimilarityInput I) {
+        List<CodeSimilarityElement> list = new ArrayList();
 
-                double score = CodeSimilarityCheck.check(s1.getSourceCode(), s2.getSourceCode());
-                CodeSimilarityElement e = new CodeSimilarityElement();
-                e.setScore(score);
-                e.setSource1(s1.getSourceCode());
-                e.setUserLoginId1(s1.getUserId());
-                e.setSubmitDate1(s1.getCreatedAt());
-                e.setProblemId1(s1.getProblemId());
+        List<UserRegistrationContestEntity> participants = userRegistrationContestRepo
+            .findAllByContestIdAndStatus(contestId, UserRegistrationContestEntity.STATUS_SUCCESSFUL);
 
-                e.setSource2(s2.getSourceCode());
-                e.setUserLoginId2(s2.getUserId());
-                e.setSubmitDate2(s2.getCreatedAt());
-                e.setProblemId2(s2.getProblemId());
+        ContestEntity contestEntity = contestRepo.findContestByContestId(contestId);
+        List<ProblemEntity> problems = contestEntity.getProblems();
 
-                list.add(e);
+        for (ProblemEntity p : problems) {
+            String problemId = p.getProblemId();
+            log.info("computeSimilarity, consider problem " + problemId + " threshold  = " + I.getThreshold());
+            List<ContestSubmissionEntity> listSubmissions = new ArrayList();
+            for (UserRegistrationContestEntity participant : participants) {
+                String userLoginId = participant.getUserId();
+                log.info("computeSimilarity, consider problem " + problemId + " participant " + userLoginId);
+                List<ContestSubmissionEntity> submissions = contestSubmissionRepo.findAllByContestIdAndUserIdAndProblemId(
+                    contestId,
+                    userLoginId,
+                    problemId);
+                log.info("computeSimilarity, consider problem " + problemId + " participant " + userLoginId
+                         + " submissions.sz = " +
+                         submissions.size() +
+                         "");
+
+                if (submissions != null && submissions.size() > 0) {// take the last submission in the sorted list
+                    for(ContestSubmissionEntity sub: submissions) {
+                        //ContestSubmissionEntity sub = submissions.get(0);
+                        if(sub.getPoint() > 0)// consider only submissions having points
+                            listSubmissions.add(sub);
+                    }
+                }
+            }
+
+            // SORT listSubmissions in an increasing order of userId
+            Collections.sort(listSubmissions, new Comparator<ContestSubmissionEntity>() {
+                @Override
+                public int compare(ContestSubmissionEntity o1, ContestSubmissionEntity o2) {
+                    return o1.getUserId().compareTo(o2.getUserId());
+                }
+            });
+
+            log.info("computeSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size());
+            for(ContestSubmissionEntity e: listSubmissions){
+                log.info("computeSimilarity, user " + e.getUserId() + " submissionId " + e.getContestSubmissionId() + " point " + e.getPoint());
+            }
+
+            // check similarity of submissions to the current problemId
+            for (int i = 0; i < listSubmissions.size(); i++) {
+                ContestSubmissionEntity s1 = listSubmissions.get(i);
+                for (int j = i + 1; j < listSubmissions.size(); j++) {
+                    ContestSubmissionEntity s2 = listSubmissions.get(j);
+                    if (s1.getUserId().equals(s2.getUserId())) {
+                        continue;
+                    }
+
+                    double score = CodeSimilarityCheck.check(s1.getSourceCode(), s2.getSourceCode());
+                    //  log.info("checkSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size()
+                    //     + " score between codes " + i + " and " + j + " = " + score + " threshold = " + I.getThreshold());
+
+                    //if(score <= 0.0001) continue;
+                    if (score <= I.getThreshold() * 0.01) {
+                        continue;
+                    }
+
+
+                    CodeSimilarityElement e = new CodeSimilarityElement();
+                    e.setScore(score);
+                    e.setSource1(s1.getSourceCode());
+                    e.setUserLoginId1(s1.getUserId());
+                    e.setSubmitDate1(s1.getCreatedAt());
+                    e.setProblemId1(s1.getProblemId());
+
+                    e.setSource2(s2.getSourceCode());
+                    e.setUserLoginId2(s2.getUserId());
+                    e.setSubmitDate2(s2.getCreatedAt());
+                    e.setProblemId2(s2.getProblemId());
+
+                    list.add(e);
+
+                    List<CodePlagiarism> codePlagiarisms = codePlagiarismRepo
+                        .findAllByContestIdAndProblemIdAndSubmissionId1AndSubmissionId2(contestId,problemId,
+                                                                                        s1.getContestSubmissionId(),
+                                                                                        s2.getContestSubmissionId());
+
+                    if(codePlagiarisms != null){
+                        for(CodePlagiarism cp: codePlagiarisms){
+                            cp.setScore(score);
+                            cp.setCreatedStamp(new Date());
+                            cp = codePlagiarismRepo.save(cp);
+                        }
+                    }else {
+
+                        CodePlagiarism codePlagiarism = new CodePlagiarism();
+                        codePlagiarism.setContestId(contestId);
+                        codePlagiarism.setProblemId(problemId);
+                        codePlagiarism.setUserId1(s1.getUserId());
+                        codePlagiarism.setUserId2(s2.getUserId());
+                        codePlagiarism.setSourceCode1(s1.getSourceCode());
+                        codePlagiarism.setSourceCode2(s2.getSourceCode());
+                        codePlagiarism.setSubmitDate1(s1.getCreatedAt());
+                        codePlagiarism.setSubmitDate2(s2.getCreatedAt());
+                        codePlagiarism.setSubmissionId1(s1.getContestSubmissionId());
+                        codePlagiarism.setSubmissionId2(s2.getContestSubmissionId());
+                        codePlagiarism.setScore(score);
+                        codePlagiarism.setCreatedStamp(new Date());
+
+                        codePlagiarism = codePlagiarismRepo.save(codePlagiarism);
+                        log.info("computeSimilarity, add new item score = " + score);
+                    }
+                }
             }
         }
-        */
 
         Collections.sort(list, new CodeSimilatiryComparator());
 

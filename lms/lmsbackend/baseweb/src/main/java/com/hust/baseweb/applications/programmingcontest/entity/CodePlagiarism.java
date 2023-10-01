@@ -27,8 +27,14 @@ public class CodePlagiarism {
     @Column(name = "problem_id")
     private String problemId;
 
+    @Column(name="submission_id1")
+    private UUID submissionId1;
+
     @Column(name = "user_id_1")
     private String userId1;
+
+    @Column(name="submission_id2")
+    private UUID submissionId2;
 
     @Column(name = "user_id_2")
     private String userId2;

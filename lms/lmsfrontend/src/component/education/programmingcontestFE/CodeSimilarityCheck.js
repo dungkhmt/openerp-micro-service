@@ -111,7 +111,8 @@ export default function CodeSimilarityCheck(props) {
     };
     request(
       "post",
-      "/check-code-similarity/" + contestId,
+      //"/check-code-similarity/" + contestId,
+      "/compute-code-similarity/" + contestId,
       {},
       {},
       body
@@ -126,8 +127,8 @@ export default function CodeSimilarityCheck(props) {
     };
     request(
       "post",
-      "/check-code-similarity/" + contestId,
-
+      //"/check-code-similarity/" + contestId,
+      "/compute-code-similarity/" + contestId,
       (res) => {
         console.log("getCodeChecking, res = ", res.data);
         let data = res.data.codeSimilarityElementList.map((c) => ({
@@ -166,7 +167,7 @@ export default function CodeSimilarityCheck(props) {
           onClick={handleCheckPlagiarism}
           sx={{marginLeft: "24px"}}
         >
-          Check Plagiarism
+          Compute Plagiarism
         </Button>
       </Box>
 
