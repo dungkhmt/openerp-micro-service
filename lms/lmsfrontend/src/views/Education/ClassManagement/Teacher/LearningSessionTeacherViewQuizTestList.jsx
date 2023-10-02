@@ -6,6 +6,7 @@ import {Button, Tooltip} from "@material-ui/core/";
 import AddIcon from "@material-ui/icons/Add";
 import {Link,} from "react-router-dom";
 import LearningSessionFormAddQuizTest from "./LearningSessionFormAddQuizTest";
+import LearningSessionFormAddQuizInClassTests from "./LearningSessionFormAddQuizInClassTests";
 
 export default function LearningSessionTeacherViewQuizTestList(props) {
   const sessionId = props.sessionId;
@@ -116,7 +117,7 @@ export default function LearningSessionTeacherViewQuizTestList(props) {
           },
         ]}
       />
-      <LearningSessionFormAddQuizTest
+      <LearningSessionFormAddQuizInClassTests
         open={open}
         setOpen={setOpen}
         sessionId={sessionId}

@@ -45,5 +45,7 @@ public class EduClassSession {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "created_stamp")
+    private Date createdStamp;
 
 }

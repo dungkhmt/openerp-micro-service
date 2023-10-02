@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ModelCreateQuizTestsOfClassSessionInput {
     private UUID sessionId;
-    private String sessionSequenceIndex;
+    //private String sessionSequenceIndex;
     private int numberTests;
     private int duration;
 }

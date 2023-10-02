@@ -113,8 +113,7 @@ public class EduClassSessionServiceImpl implements EduClassSessionService {
 
 
     @Override
-    public List<EduQuizTest> createQuizTestsOfClassSession(UUID sessionId, String sessionSequenceIndex,
-                                                           int numberOfTests, int duration) {
+    public List<EduQuizTest> createQuizTestsOfClassSession(UUID sessionId, int numberOfTests, int duration) {
         List<EduQuizTest> res = new ArrayList<>();
         String testId = "";
         String testName = "";
@@ -135,8 +134,14 @@ public class EduClassSessionServiceImpl implements EduClassSessionService {
                 @Override
                 public int compare(EduClassSession o1, EduClassSession o2) {
                     int res = 1;
-                    if(o1.getStartDatetime().equals(o2.getStartDatetime())) res = 0;
-                    else if(o1.getStartDatetime().before(o2.getStartDatetime())) res = -1;
+                    //if(o1.getStartDatetime() == null) return -1;
+                    //if(o2.getStartDatetime() == null) return 1;
+                    if(o1.getCreatedStamp() == null) return -1;
+                    if(o2.getCreatedStamp() == null) return 1;
+                    //if(o1.getStartDatetime().equals(o2.getStartDatetime())) res = 0;
+                    //else if(o1.getStartDatetime().before(o2.getStartDatetime())) res = -1;
+                    if(o1.getCreatedStamp().equals(o2.getCreatedStamp())) res = 0;
+                    else if(o1.getCreatedStamp().before(o2.getCreatedStamp())) res = -1;
                     return res;
                 }
             });
@@ -150,6 +155,7 @@ public class EduClassSessionServiceImpl implements EduClassSessionService {
 
             EduClass eduClass = classRepo.findById(classId).orElse(null);
             if (eduClass != null) {
+                classCode = eduClass.getClassCode();
                 EduCourse eduCourse = eduClass.getEduCourse();
                 if (eduCourse != null) {
                     courseId = eduCourse.getId();

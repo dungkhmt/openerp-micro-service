@@ -15,7 +15,7 @@ public interface EduClassSessionService {
 
     EduQuizTest createQuizTestOfClassSession(UUID sessionId, String testId, String testName, int duration);
 
-    List<EduQuizTest> createQuizTestsOfClassSession(UUID sessionId, String sessionName, int numberOfTests, int duration);
+    List<EduQuizTest> createQuizTestsOfClassSession(UUID sessionId, int numberOfTests, int duration);
 
     List<EduQuizTest> findAllBySession(UUID sessionId);
 

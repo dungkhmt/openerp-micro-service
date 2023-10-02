@@ -84,7 +84,7 @@ public class EduClassSessionController {
         //log.info("addQuizTestOfClassSession....testName = " + input.getTestName());
         List<EduQuizTest> eduQuizTests = eduClassSessionService.createQuizTestsOfClassSession(
             input.getSessionId(),
-            input.getSessionSequenceIndex(),
+            //input.getSessionSequenceIndex(),
             input.getNumberTests(),
             input.getDuration());
         return ResponseEntity.ok().body(eduQuizTests);
