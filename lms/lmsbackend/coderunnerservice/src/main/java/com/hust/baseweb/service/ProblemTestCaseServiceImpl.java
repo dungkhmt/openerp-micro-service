@@ -73,10 +73,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.PYTHON3, tempName);
                 ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.PYTHON3, tempName);
                 break;
-            case GOLANG:
-                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.GOLANG, tempName);
-                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.GOLANG, tempName);
-                break;
             default:
                 throw new Exception(exception);
         }
@@ -277,20 +273,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                         memoryLimit);
                 ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.PYTHON3, tempName);
                 break;
-            case GOLANG:
-                tempDir.createScriptSubmissionFile(
-                        ComputerLanguage.Languages.GOLANG,
-                        tempName,
-                        testCaseList,
-                        source,
-                        timeLimit,
-                        memoryLimit);
-                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.GOLANG, tempName);
-                break;
             default:
                 throw new Exception(exception);
         }
-//        tempDir.pushToConcurrentLinkedQueue(tempName);
         return ans;
     }
 
@@ -323,13 +308,11 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP17, tempName);
                 break;
             case JAVA:
-            case GOLANG:
             case PYTHON3:
                 break;
             default:
                 throw new Exception(exception);
         }
-//        tempDir.pushToConcurrentLinkedQueue(tempName);
         return ans;
     }
 

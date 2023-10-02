@@ -211,9 +211,6 @@ public class TempDir {
             case PYTHON3:
                 //sourceSh = python3Executor.genSubmitScriptFile(testCases, source, tmpName, timeout);
                 break;
-            case GOLANG:
-                //sourceSh = golangExecutor.genSubmitScriptFile(testCases, source, tmpName, timeout);
-                break;
             default:
                 sourceSh = null;
         }

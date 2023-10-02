@@ -9,7 +9,19 @@ public class ComputerLanguage {
         CPP14,
         CPP17,
         PYTHON3,
-        JAVA,
-        GOLANG
+        JAVA
+    }
+
+    public static String mapLanguageToExtension(ComputerLanguage.Languages language) {
+        switch (language) {
+            case C:
+                return ".c";
+            case PYTHON3:
+                return ".py";
+            case JAVA:
+                return ".java";
+            default:
+                return ".cpp";
+        }
     }
 }

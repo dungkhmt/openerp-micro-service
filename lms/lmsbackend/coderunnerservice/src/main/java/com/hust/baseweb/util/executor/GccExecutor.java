@@ -6,9 +6,10 @@ import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class GccExecutor {
-    private static final String BUILD_COMMAND_C = "gcc -w -o main main.cpp";
+    private static final String BUILD_COMMAND_C = "gcc -std=c17 -w -o main main.c";
     private static final String BUILD_COMMAND_CPP_11 = "g++ -std=c++11 -w -o main main.cpp";
     private static final String BUILD_COMMAND_CPP_14 = "g++ -std=c++14 -w -o main main.cpp";
     private static final String BUILD_COMMAND_CPP_17 = "g++ -std=c++17 -w -o main main.cpp";
@@ -26,7 +27,15 @@ public class GccExecutor {
         }
     }
 
-    private static final String suffixes = ".cpp";
+    private String getFileExtension(ComputerLanguage.Languages language){
+        if (language == ComputerLanguage.Languages.C) {
+            return FILE_EXTENSION_C;
+        }
+        return FILE_EXTENSION_CPP;
+    }
+
+    private static final String FILE_EXTENSION_C = ".c";
+    private static final String FILE_EXTENSION_CPP = ".cpp";
     private static final String SHFileStart = "#!/bin/bash\n";
 
     private static final String TIME_LIMIT_ERROR = Constants.TestCaseSubmissionError.TIME_LIMIT.getValue();
@@ -76,7 +85,7 @@ public class GccExecutor {
         String sourceSH = SHFileStart
                 + "mkdir -p " + tmpName + "\n"
                 + "cd " + tmpName + "\n"
-                + "cat <<EOF >> main" + suffixes + "\n"
+                + "cat <<EOF >> main" + getFileExtension(language) + "\n"
                 + sourceChecker + "\n"
                 + "EOF" + "\n"
                 + getBuildCmd(language) + "\n"
@@ -127,7 +136,7 @@ public class GccExecutor {
         String sourceSH = SHFileStart
                 + "mkdir -p " + tmpName + "\n"
                 + "cd " + tmpName + "\n"
-                + "cat <<EOF >> main" + suffixes + "\n"
+                + "cat <<EOF >> main" + getFileExtension(language) + "\n"
                 + source + "\n"
                 + "EOF" + "\n"
                 + getBuildCmd(language) + "\n"

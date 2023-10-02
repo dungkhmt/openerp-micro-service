@@ -152,37 +152,9 @@ public class DockerClientBase {
                                                          .build();
                         dockerClient.createContainer(containerConfig, "python3");
                         break;
-                    case GOLANG:
-                        containerConfig = ContainerConfig.builder()
-                                                         .image(Constants.DockerImage.GOLANG.getValue())
-                                                         .cmd("sh", "-c", "while :; do sleep 1; done")
-                                                         .labels(m)
-                                                         .workingDir("/workdir")
-                                                         .attachStdout(true)
-                                                         .attachStdin(true)
-                                                         .build();
-                        dockerClient.createContainer(containerConfig, "golang");
-                        break;
                 }
             }
         }
-    }
-
-    public String createGccContainer() throws DockerException, InterruptedException {
-        Map<String, String> m = new HashMap<>();
-        m.put("names", "leetcode");
-        ContainerConfig gccContainerConfig = ContainerConfig.builder()
-                                                            .image("gcc:8.5-buster")
-                                                            .workingDir("/workdir")
-                                                            .hostname("test1")
-                                                            .cmd("sh", "-c", "while :; do sleep 1; done")
-                                                            .labels(m)
-                                                            .attachStdout(true)
-                                                            .attachStdin(true)
-                                                            .build();
-        ContainerCreation gccCreation = dockerClient.createContainer(gccContainerConfig, "gcc");
-        dockerClient.startContainer(gccCreation.id());
-        return gccCreation.id();
     }
 
     public String runExecutable(
@@ -205,9 +177,6 @@ public class DockerClientBase {
                 break;
             case PYTHON3:
                 containerId = m.get("/python3");
-                break;
-            case GOLANG:
-                containerId = m.get("/golang");
                 break;
             default:
                 log.info("language err");

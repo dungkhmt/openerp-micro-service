@@ -30,13 +30,17 @@ export const COMPUTER_LANGUAGES = Object.freeze({
 export const mapLanguageToDisplayName = (language) => {
   switch (language) {
     case COMPUTER_LANGUAGES.C:
-      return "C";
+      return "C 17";
     case COMPUTER_LANGUAGES.CPP11:
       return "C++ 11";
     case COMPUTER_LANGUAGES.CPP14:
       return "C++ 14";
     case COMPUTER_LANGUAGES.CPP17:
       return "C++ 17";
+    case COMPUTER_LANGUAGES.JAVA:
+      return "JAVA 13";
+    case COMPUTER_LANGUAGES.PYTHON:
+      return "PYTHON 3.6.15";
     default:
       return language;
   }

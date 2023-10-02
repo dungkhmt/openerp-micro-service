@@ -319,6 +319,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
                 type="submit"
                 onChange={onInputChange}
                 width="100%"
+                sx={{marginLeft: "28px"}}
               >
                 SUBMIT
               </Button>
