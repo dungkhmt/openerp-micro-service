@@ -46,7 +46,13 @@ export const mapLanguageToDisplayName = (language) => {
   }
 }
 
-export const DEFAULT_CODE_SEGMENT_CPP = "//C/C++ \n" +
+export const DEFAULT_CODE_SEGMENT_C = "//C \n" +
+  "#include <stdio.h> \n\n" +
+  "int main() \n" +
+  "{ \n\n" +
+  "}";
+
+export const DEFAULT_CODE_SEGMENT_CPP = "//C++ \n" +
   "#include <bits/stdc++.h> \n\n" +
   "int main() \n" +
   "{ \n\n" +

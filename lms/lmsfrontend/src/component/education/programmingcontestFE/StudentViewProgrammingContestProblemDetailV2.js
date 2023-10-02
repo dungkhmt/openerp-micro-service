@@ -13,6 +13,7 @@ import HustCodeEditor from "../../common/HustCodeEditor";
 import {request} from "../../../api";
 import {
   COMPUTER_LANGUAGES,
+  DEFAULT_CODE_SEGMENT_C,
   DEFAULT_CODE_SEGMENT_CPP,
   DEFAULT_CODE_SEGMENT_JAVA,
   DEFAULT_CODE_SEGMENT_PYTHON,
@@ -183,6 +184,8 @@ export default function StudentViewProgrammingContestProblemDetail() {
     if (problem && problem.isPreloadCode === true) return;
     switch (language) {
       case COMPUTER_LANGUAGES.C:
+        setCodeSolution(DEFAULT_CODE_SEGMENT_C);
+        break;
       case COMPUTER_LANGUAGES.CPP11:
       case COMPUTER_LANGUAGES.CPP14:
       case COMPUTER_LANGUAGES.CPP17:
@@ -195,7 +198,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
         setCodeSolution(DEFAULT_CODE_SEGMENT_PYTHON);
         break;
     }
-  }, [])
+  }, [language])
 
   const ModalPreview = (chosenTestcase) => {
     return (
