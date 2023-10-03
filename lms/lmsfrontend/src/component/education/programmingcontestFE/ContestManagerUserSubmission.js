@@ -7,7 +7,7 @@ import StandardTable from "component/table/StandardTable";
 import HustModal from "component/common/HustModal";
 import {Link} from "react-router-dom";
 import {getStatusColor} from "./lib";
-import {errorNoti, successNoti} from "../../../utils/notification";
+import {errorNoti, infoNoti, successNoti} from "../../../utils/notification";
 import {LoadingButton} from "@mui/lab";
 import CodeIcon from '@mui/icons-material/Code';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -63,10 +63,14 @@ export default function ContestManagerUserSubmission(props) {
       "post",
       "/submissions/" + contestId + "/batch-evaluation",
       (res) => {
-        setIsProcessing(false);
         successNoti("Submissions will be rejudged", 5000)
-      }
-    ).then();
+      },
+      {
+        403: () => {
+          infoNoti("You don't have privilege to perform this action. Contact admin if needed", 10000);
+        },
+      },
+    ).then(() => setIsProcessing(false));
   }
 
   function handleJudgeAll() {
@@ -75,10 +79,14 @@ export default function ContestManagerUserSubmission(props) {
       "post",
       "/submissions/" + contestId + "/batch-non-evaluated-evaluation",
       (res) => {
-        setIsProcessing(false);
         successNoti("Submissions will be judged", 5000)
-      }
-    ).then();
+      },
+      {
+        403: () => {
+          infoNoti("You don't have privilege to perform this action. Contact admin if needed", 10000);
+        },
+      },
+    ).then(() => setIsProcessing(false));
   }
 
   const generatePdfDocument = async (documentData, fileName) => {
@@ -228,20 +236,20 @@ export default function ContestManagerUserSubmission(props) {
                       Submit Participant Code
                     </LoadingButton>
                   </Tooltip>
-                  {/*<Tooltip title="Judge all submissions that are NOT EVALUATED">*/}
-                  {/*  <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"*/}
-                  {/*                 sx={{marginRight: "16px"}} color="primary"*/}
-                  {/*                 onClick={handleJudgeAll}>*/}
-                  {/*    Judge All*/}
-                  {/*  </LoadingButton>*/}
-                  {/*</Tooltip>*/}
-                  {/*<Tooltip title="Rejudge all submissions in this contest">*/}
-                  {/*  <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"*/}
-                  {/*                 sx={{marginRight: "16px"}} color="primary"*/}
-                  {/*                 onClick={handleRejudgeAll}>*/}
-                  {/*    Rejudge All*/}
-                  {/*  </LoadingButton>*/}
-                  {/*</Tooltip>*/}
+                  <Tooltip title="Judge all submissions that are NOT EVALUATED">
+                    <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
+                                   sx={{marginRight: "16px"}} color="primary"
+                                   onClick={handleJudgeAll}>
+                      Judge All
+                    </LoadingButton>
+                  </Tooltip>
+                  <Tooltip title="Rejudge all submissions in this contest">
+                    <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
+                                   sx={{marginRight: "16px"}} color="primary"
+                                   onClick={handleRejudgeAll}>
+                      Rejudge All
+                    </LoadingButton>
+                  </Tooltip>
                   <Tooltip title="Export all submissions in this contest">
                     <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
                                    sx={{marginRight: "16px"}} color="primary"

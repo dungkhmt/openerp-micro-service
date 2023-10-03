@@ -114,6 +114,7 @@ public class SubmissionController {
         return ResponseEntity.ok().body("ok");
     }
 
+    @Secured("ROLE_ADMIN")
     @PostMapping("/submissions/{contestId}/batch-evaluation")
     public ResponseEntity<?> evaluateBatchSubmissionContest(@PathVariable String contestId) {
         log.info("evaluateBatchSubmissionContest, contestId = " + contestId);
@@ -121,6 +122,7 @@ public class SubmissionController {
         return ResponseEntity.ok().body(res);
     }
 
+    @Secured("ROLE_ADMIN")
     @PostMapping("/submissions/{contestId}/batch-non-evaluated-evaluation")
     public ResponseEntity<?> evaluateBatchNotEvaluatedSubmissionContest(
         @PathVariable String contestId
