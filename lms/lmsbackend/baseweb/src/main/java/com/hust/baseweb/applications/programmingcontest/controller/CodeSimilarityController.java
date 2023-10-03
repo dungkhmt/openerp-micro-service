@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -53,11 +54,13 @@ public class CodeSimilarityController {
     }
     @PostMapping("/compute-code-similarity/{contestId}")
     public ResponseEntity<?> computeCodeSimilarity(
+        Principal principal,
         @RequestBody ModelCheckSimilarityInput I,
         @PathVariable String contestId
     ) {
+        String userLoginId = principal.getName();
         log.info("computeCodeSimilarity, contestId = " + contestId);
-        ModelCodeSimilarityOutput res = problemTestCaseService.computeSimilarity(contestId, I);
+        ModelCodeSimilarityOutput res = problemTestCaseService.computeSimilarity(userLoginId,contestId, I);
         return ResponseEntity.ok().body(res);
     }
 

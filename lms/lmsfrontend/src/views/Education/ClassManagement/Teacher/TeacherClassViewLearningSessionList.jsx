@@ -31,6 +31,7 @@ export default function TeacherClassViewLearningSessionList(props) {
     { title: "Mô tả", field: "description" },
     { title: "Người tạo", field: "createdByUserLoginId" },
     { title: "Trạng thái", field: "statusId" },
+    { title: "Ngày tạo", field: "createdStamp" },
   ];
   function getSessionsOfClass() {
     request(
@@ -60,7 +61,7 @@ export default function TeacherClassViewLearningSessionList(props) {
         </CardContent>
       </Card>
 
-      <h1>Danh sách buổi học {classId}</h1>
+      <h1>DS buổi học {classId}</h1>
       <MaterialTable
         title="Danh sách buổi học"
         columns={columns}

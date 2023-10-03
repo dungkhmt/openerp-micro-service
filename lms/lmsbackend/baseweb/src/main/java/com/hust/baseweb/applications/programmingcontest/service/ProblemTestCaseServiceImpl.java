@@ -51,6 +51,7 @@ import static com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestConfig.EX
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
+    public static final Integer MAX_SUBMISSIONS_CHECKSIMILARITY = 1000;
 
     private final ProblemRepo problemRepo;
     private TestCaseRepo testCaseRepo;
@@ -2438,9 +2439,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return model;
     }
     @Override
-    public ModelCodeSimilarityOutput computeSimilarity(String contestId, ModelCheckSimilarityInput I) {
+    public ModelCodeSimilarityOutput computeSimilarity(String userLoginId, String contestId, ModelCheckSimilarityInput I) {
         List<CodeSimilarityElement> list = new ArrayList();
-
+        ModelCodeSimilarityOutput model = new ModelCodeSimilarityOutput();
         List<UserRegistrationContestEntity> participants = userRegistrationContestRepo
             .findAllByContestIdAndStatus(contestId, UserRegistrationContestEntity.STATUS_SUCCESSFUL);
 
@@ -2452,13 +2453,13 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             log.info("computeSimilarity, consider problem " + problemId + " threshold  = " + I.getThreshold());
             List<ContestSubmissionEntity> listSubmissions = new ArrayList();
             for (UserRegistrationContestEntity participant : participants) {
-                String userLoginId = participant.getUserId();
-                log.info("computeSimilarity, consider problem " + problemId + " participant " + userLoginId);
+                String userId = participant.getUserId();
+                log.info("computeSimilarity, consider problem " + problemId + " participant " + userId);
                 List<ContestSubmissionEntity> submissions = contestSubmissionRepo.findAllByContestIdAndUserIdAndProblemId(
                     contestId,
-                    userLoginId,
+                    userId,
                     problemId);
-                log.info("computeSimilarity, consider problem " + problemId + " participant " + userLoginId
+                log.info("computeSimilarity, consider problem " + problemId + " participant " + userId
                          + " submissions.sz = " +
                          submissions.size() +
                          "");
@@ -2471,7 +2472,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     }
                 }
             }
-
+            if(listSubmissions.size() > MAX_SUBMISSIONS_CHECKSIMILARITY){
+                if(!userLoginId.equals("admin")){
+                    model.setMessage("Too Many submissions, only admin can do this task");
+                    return model;
+                }
+            }
             // SORT listSubmissions in an increasing order of userId
             Collections.sort(listSubmissions, new Comparator<ContestSubmissionEntity>() {
                 @Override
@@ -2554,7 +2560,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
         Collections.sort(list, new CodeSimilatiryComparator());
 
-        ModelCodeSimilarityOutput model = new ModelCodeSimilarityOutput();
+
         model.setCodeSimilarityElementList(list);
         return model;
     }

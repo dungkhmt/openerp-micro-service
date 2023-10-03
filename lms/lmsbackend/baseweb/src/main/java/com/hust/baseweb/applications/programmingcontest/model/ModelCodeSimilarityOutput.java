@@ -14,5 +14,5 @@ import java.util.List;
 public class ModelCodeSimilarityOutput {
 
     private List<CodeSimilarityElement> codeSimilarityElementList;
-
+    private String message;
 }

@@ -47,6 +47,7 @@ export default function LearningSessionListOfClass(props) {
     { title: "Mô tả", field: "description" },
     { title: "Người tạo", field: "createdByUserLoginId" },
     { title: "Trạng thái", field: "statusId" },
+    { title: "Ngày tạo", field: "createdStamp" },
   ];
   const actions = props.enableCreateSession
     ? [{ icon: () => CreateLearningSessionButton, isFreeAction: true }]

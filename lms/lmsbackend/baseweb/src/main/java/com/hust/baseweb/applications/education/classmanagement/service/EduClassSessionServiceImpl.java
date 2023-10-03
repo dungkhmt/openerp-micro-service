@@ -44,6 +44,7 @@ public class EduClassSessionServiceImpl implements EduClassSessionService {
         o.setCreatedByUserLoginId(userLoginId);
         o.setDescription(description);
         o.setStatusId(EduClassSession.STATUS_CREATED);
+        o.setCreatedStamp(new Date());
         o = eduClassSessionRepo.save(o);
         return o;
     }
@@ -142,12 +143,14 @@ public class EduClassSessionServiceImpl implements EduClassSessionService {
                     //else if(o1.getStartDatetime().before(o2.getStartDatetime())) res = -1;
                     if(o1.getCreatedStamp().equals(o2.getCreatedStamp())) res = 0;
                     else if(o1.getCreatedStamp().before(o2.getCreatedStamp())) res = -1;
+                    else if(o2.getCreatedStamp().before(o1.getCreatedStamp())) res = 1;
                     return res;
                 }
             });
             for(int i = 0; i < sessions.size(); i++){
                 EduClassSession s = sessions.get(i);
-                log.info("createQuizTestsOfClassSession, sorted sessions " + s.getSessionId() + " date " + s.getStartDatetime());
+                log.info("createQuizTestsOfClassSession, sorted sessions " + s.getSessionId() + " date "
+                         + s.getStartDatetime() + " created at " + s.getCreatedStamp());
                 if(s.getSessionId() == sessionId){
                     sessionIndex = i+1;
                 }
@@ -156,9 +159,11 @@ public class EduClassSessionServiceImpl implements EduClassSessionService {
             EduClass eduClass = classRepo.findById(classId).orElse(null);
             if (eduClass != null) {
                 classCode = eduClass.getClassCode();
+
                 EduCourse eduCourse = eduClass.getEduCourse();
                 if (eduCourse != null) {
                     courseId = eduCourse.getId();
+                    courseName = eduCourse.getName();
                 }
             }
 

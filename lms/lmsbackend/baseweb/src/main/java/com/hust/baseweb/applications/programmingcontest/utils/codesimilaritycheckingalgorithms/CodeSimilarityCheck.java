@@ -52,7 +52,7 @@ public class CodeSimilarityCheck {
         code2 = code2.replaceAll("\t", "");
         code2 = code2.replaceAll("\n", "");
 
-        System.out.println("check, after std, code1 = " + code1 + " code2 = " + code2);
+        //System.out.println("check, after std, code1 = " + code1 + " code2 = " + code2);
 
         int n1 = code1.length();
         int n2 = code2.length();
