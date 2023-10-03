@@ -228,20 +228,20 @@ export default function ContestManagerUserSubmission(props) {
                       Submit Participant Code
                     </LoadingButton>
                   </Tooltip>
-                  <Tooltip title="Judge all submissions that are NOT EVALUATED">
-                    <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
-                                   sx={{marginRight: "16px"}} color="primary"
-                                   onClick={handleJudgeAll}>
-                      Judge All
-                    </LoadingButton>
-                  </Tooltip>
-                  <Tooltip title="Rejudge all submissions in this contest">
-                    <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
-                                   sx={{marginRight: "16px"}} color="primary"
-                                   onClick={handleRejudgeAll}>
-                      Rejudge All
-                    </LoadingButton>
-                  </Tooltip>
+                  {/*<Tooltip title="Judge all submissions that are NOT EVALUATED">*/}
+                  {/*  <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"*/}
+                  {/*                 sx={{marginRight: "16px"}} color="primary"*/}
+                  {/*                 onClick={handleJudgeAll}>*/}
+                  {/*    Judge All*/}
+                  {/*  </LoadingButton>*/}
+                  {/*</Tooltip>*/}
+                  {/*<Tooltip title="Rejudge all submissions in this contest">*/}
+                  {/*  <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"*/}
+                  {/*                 sx={{marginRight: "16px"}} color="primary"*/}
+                  {/*                 onClick={handleRejudgeAll}>*/}
+                  {/*    Rejudge All*/}
+                  {/*  </LoadingButton>*/}
+                  {/*</Tooltip>*/}
                   <Tooltip title="Export all submissions in this contest">
                     <LoadingButton loading={isProcessing} loadingPosition="start" variant="contained"
                                    sx={{marginRight: "16px"}} color="primary"
