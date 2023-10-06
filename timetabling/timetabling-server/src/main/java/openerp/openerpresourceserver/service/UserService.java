@@ -1,6 +1,6 @@
 package openerp.openerpresourceserver.service;
 
-import openerp.openerpresourceserver.entity.User;
+import openerp.openerpresourceserver.model.entity.User;
 
 import java.util.List;
 

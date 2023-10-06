@@ -1,7 +1,7 @@
 package openerp.openerpresourceserver.controller;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.entity.User;
+import openerp.openerpresourceserver.model.entity.User;
 import openerp.openerpresourceserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
