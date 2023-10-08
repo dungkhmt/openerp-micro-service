@@ -247,6 +247,13 @@ public class ContestController {
             .getManagedContestOfTeacher(principal.getName());
         return ResponseEntity.status(200).body(resp);
     }
+    @Secured("ROLE_TEACHER")
+    @GetMapping("/all-contests")
+    public ResponseEntity<?> getAllContest(Principal principal) {
+        List<ModelGetContestResponse> resp = problemTestCaseService
+            .getAllContests(principal.getName());
+        return ResponseEntity.status(200).body(resp);
+    }
 
     @PostMapping("contests/{contestId}/register-student")
     public ResponseEntity<?> studentRegisterContest(@PathVariable("contestId") String contestId, Principal principal)

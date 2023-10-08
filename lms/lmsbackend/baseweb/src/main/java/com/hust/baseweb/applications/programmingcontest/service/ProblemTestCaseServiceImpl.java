@@ -1686,6 +1686,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
         for (Map.Entry<String, String> e : mapContestIdToRoleListString.entrySet()) {
             ContestEntity contest = contestRepo.findContestByContestId(e.getKey());
+            if(contest.getStatusId().equals(ContestEntity.CONTEST_STATUS_DISABLED)){
+                continue;
+            }
             ModelGetContestResponse modelGetContestResponse = ModelGetContestResponse.builder()
                                                                                      .contestId(contest.getContestId())
                                                                                      .contestName(contest.getContestName())
@@ -1697,6 +1700,73 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             res.add(modelGetContestResponse);
         }
 
+        res.sort((a, b) -> {
+            if (a.getStartAt() == null && b.getStartAt() == null) {
+                return 0;
+            } else if (a.getStartAt() == null) {
+                return 1;
+            } else if (b.getStartAt() == null) {
+                return -1;
+            } else {
+                return b.getStartAt().compareTo(a.getStartAt());
+            }
+        });
+        return res;
+    }
+
+    @Override
+    public List<ModelGetContestResponse> getAllContests(String userName) {
+        /*
+        List<String> roles = new ArrayList<>();
+        roles.add(UserRegistrationContestEntity.ROLE_OWNER);
+        roles.add(UserRegistrationContestEntity.ROLE_MANAGER);
+        List<UserRegistrationContestEntity> userRegistrationContestList = userRegistrationContestRepo.findAllByUserIdAndRoleIdIn(userName, roles);
+
+        Map<String, List<String>> mapContestIdToRoleList = new HashMap<>();
+        for (UserRegistrationContestEntity userRegistrationContest : userRegistrationContestList) {
+            String contestId = userRegistrationContest.getContestId();
+            String role = userRegistrationContest.getRoleId();
+            mapContestIdToRoleList.computeIfAbsent(contestId, k -> new ArrayList<>())
+                                  .add(role);
+        }
+
+        Map<String, String> mapContestIdToRoleListString = new HashMap<>();
+        mapContestIdToRoleList.forEach((contestId, roleList) -> {
+            String rolesString = String.join(", ", roles);
+            mapContestIdToRoleListString.put(contestId, rolesString);
+        });
+        */
+
+        List<ModelGetContestResponse> res = new ArrayList<>();
+        List<ContestEntity> allContests = contestRepo.findAll();
+        for(ContestEntity contest: allContests){
+            ModelGetContestResponse modelGetContestResponse = ModelGetContestResponse.builder()
+                                                                                     .contestId(contest.getContestId())
+                                                                                     .contestName(contest.getContestName())
+                                                                                     .startAt(contest.getStartedAt())
+                                                                                     .statusId(contest.getStatusId())
+                                                                                     .userId(contest.getUserId())
+                                                                                     .roleId("")
+                                                                                     .build();
+            res.add(modelGetContestResponse);
+        }
+        /*
+        for (Map.Entry<String, String> e : mapContestIdToRoleListString.entrySet()) {
+            ContestEntity contest = contestRepo.findContestByContestId(e.getKey());
+            if(contest.getStatusId().equals(ContestEntity.CONTEST_STATUS_DISABLED)){
+                continue;
+            }
+            ModelGetContestResponse modelGetContestResponse = ModelGetContestResponse.builder()
+                                                                                     .contestId(contest.getContestId())
+                                                                                     .contestName(contest.getContestName())
+                                                                                     .startAt(contest.getStartedAt())
+                                                                                     .statusId(contest.getStatusId())
+                                                                                     .userId(contest.getUserId())
+                                                                                     .roleId(e.getValue())
+                                                                                     .build();
+            res.add(modelGetContestResponse);
+        }
+        */
         res.sort((a, b) -> {
             if (a.getStartAt() == null && b.getStartAt() == null) {
                 return 0;
