@@ -14,7 +14,4 @@ public class ModelSubmissionInfoRanking {
     private Long point;
     private Double pointPercentage;
 
-    public ModelSubmissionInfoRanking(String problemId, Long point){
-        this.problemId = problemId; this.point = point;
-    }
 }
