@@ -1927,8 +1927,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         List<String> problemIds = contestRepo.findContestByContestId(contestId)
                                              .getProblems().stream().map(ProblemEntity::getProblemId).collect(Collectors.toList());
 
-        Map<String, String> mapProblemIdToProblemName = contestProblemRepo.findAllByContestId(contestId)
-            .stream().collect(Collectors.toMap(ContestProblem::getProblemId, ContestProblem::getProblemRename));
+        LinkedHashMap<String, String> mapProblemIdToProblemName = new LinkedHashMap<>();
+        for (ContestProblem contestProblem : contestProblemRepo.findAllByContestId(contestId)) {
+            mapProblemIdToProblemName.put(contestProblem.getProblemId(), contestProblem.getProblemRename());
+        }
 
         int nbProblems = problemIds.size();
 
@@ -1947,7 +1949,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             ContestSubmissionsByUser contestSubmission = new ContestSubmissionsByUser();
             contestSubmission.setUserId(userId);
 
-            HashMap<String, Long> mapProblemToPoint = new HashMap<>();
+            LinkedHashMap<String, Long> mapProblemToPoint = new LinkedHashMap<>();
             HashMap<String, Double> mapProblem2PointPercentage = new HashMap<>();
 
             for (String problemId : problemIds) {
