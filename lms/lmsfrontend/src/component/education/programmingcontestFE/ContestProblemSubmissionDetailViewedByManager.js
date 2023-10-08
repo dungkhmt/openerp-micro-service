@@ -90,7 +90,7 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
         }}
       >
         <Paper
-          elevation={0}
+          elevation={1}
           sx={{
             p: 2,
             borderRadius: 2,
