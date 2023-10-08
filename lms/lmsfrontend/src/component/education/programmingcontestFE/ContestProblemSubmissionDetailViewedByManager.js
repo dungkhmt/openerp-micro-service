@@ -106,15 +106,16 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
         sx={{
           display: "flex",
           flexGrow: 1,
+          boxShadow: 1,
+          overflowY: "scroll",
+          borderTopLeftRadius: 8,
+          borderBottomLeftRadius: 8,
+          height: "calc(100vh - 112px)",
         }}
       >
         <Paper
-          elevation={1}
           sx={{
             p: 2,
-            borderRadius: 2,
-            overflowY: "scroll",
-            height: "calc(100vh - 112px)",
           }}
         >
           <Box sx={{ mb: 4 }}>
@@ -189,8 +190,9 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
           sx={{
             p: 2,
             width: 300,
-            borderRadius: 2,
             overflowY: "scroll",
+            borderTopRightRadius: 8,
+            borderBottomRightRadius: 8,
             height: "calc(100vh - 112px)",
           }}
         >
