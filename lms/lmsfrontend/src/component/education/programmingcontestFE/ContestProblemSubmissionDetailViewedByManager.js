@@ -106,8 +106,6 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
         sx={{
           display: "flex",
           flexGrow: 1,
-          height: "calc(100vh - 112px)",
-          overflowY: "scroll",
         }}
       >
         <Paper
@@ -115,6 +113,8 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
           sx={{
             p: 2,
             borderRadius: 2,
+            overflowY: "scroll",
+            height: "calc(100vh - 112px)",
           }}
         >
           <Box sx={{ mb: 4 }}>
@@ -187,11 +187,11 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
         <Paper
           elevation={1}
           sx={{
-            width: 300,
-            height: "calc(100vh - 112px)",
             p: 2,
+            width: 300,
             borderRadius: 2,
             overflowY: "scroll",
+            height: "calc(100vh - 112px)",
           }}
         >
           <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
