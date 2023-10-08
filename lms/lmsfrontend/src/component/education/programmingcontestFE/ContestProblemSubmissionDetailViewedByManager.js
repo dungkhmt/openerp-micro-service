@@ -8,7 +8,7 @@ import displayTime from "utils/DateTimeUtils";
 import ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase from "./ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase";
 import { getStatusColor } from "./lib";
 
-const detail = (key, value) => (
+export const detail = (key, value) => (
   <>
     <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
       {key}
@@ -23,6 +23,28 @@ const detail = (key, value) => (
     </Typography>
   </>
 );
+
+export const resolveLanguage = (str) => {
+  if (str) {
+    if (str.startsWith("CPP")) {
+      return "cpp";
+    }
+
+    if (str.startsWith("JAVA")) {
+      return "java";
+    }
+
+    if (str.startsWith("PYTHON")) {
+      return "python";
+    }
+
+    if (str === "C") {
+      return "c";
+    }
+  }
+
+  return undefined;
+};
 
 export default function ContestProblemSubmissionDetailViewedByManager() {
   const { problemSubmissionId } = useParams();
@@ -61,7 +83,6 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
       "/teacher/submissions/" + problemSubmissionId + "/general-info",
       (res) => {
         setSubmission(res.data);
-
         setSubmissionSource(res.data.sourceCode);
       },
       {}
@@ -97,12 +118,17 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
           }}
         >
           <Box sx={{ mb: 4 }}>
-            <Typography variant={"h6"} sx={{ mb: 1 }}>
-              Source code
-            </Typography>
             <HustCopyCodeBlock
-              // title="User output"
+              title="Compile message"
+              text={submission.message}
+              language="bash"
+            />
+          </Box>
+          <Box sx={{ mb: 4 }}>
+            <HustCopyCodeBlock
+              title="Source code"
               text={submission.sourceCode}
+              language={resolveLanguage(submission.sourceCodeLanguage)}
             />
             {/* <TextField
             style={{
@@ -117,12 +143,6 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
               console.log(submissionSource);
             }}
           ></TextField> */}
-          </Box>
-          <Box sx={{ mb: 4 }}>
-            <Typography variant={"h6"} sx={{ mb: 1 }}>
-              Compile message
-            </Typography>
-            <HustCopyCodeBlock text={submission.message} />
           </Box>
           <Box>
             {/* <TextField
@@ -193,7 +213,12 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
             {submission.status}
           </Typography>
           {[
-            ["Pass", `${submission.testCasePass} test cases`],
+            [
+              "Pass",
+              submission.testCasePass
+                ? `${submission.testCasePass} test cases`
+                : "",
+            ],
             ["Point", submission.point],
             ["Language", submission.sourceCodeLanguage],
             ["Run time", `${submission.runtime} ms`],
