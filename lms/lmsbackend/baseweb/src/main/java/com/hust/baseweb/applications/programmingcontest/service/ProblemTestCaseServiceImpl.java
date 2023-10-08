@@ -1883,17 +1883,19 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         if (lst != null) {
             lst.forEach(ur -> {
                 ContestEntity contest = contestRepo.findContestByContestId(ur.getContestId());
-                ModelGetContestResponse modelGetContestResponse = ModelGetContestResponse.builder()
-                                                                                         .contestId(contest.getContestId())
-                                                                                         .contestName(contest.getContestName())
-                                                                                         .contestTime(contest.getContestSolvingTime())
-                                                                                         .countDown(contest.getCountDown())
-                                                                                         .startAt(contest.getStartedAt())
-                                                                                         .statusId(contest.getStatusId())
-                                                                                         .userId(contest.getUserId())
-                                                                                         .createdAt(contest.getCreatedAt())
-                                                                                         .build();
-                lists.add(modelGetContestResponse);
+                if(!contest.getStatusId().equals(ContestEntity.CONTEST_STATUS_DISABLED)) {
+                    ModelGetContestResponse modelGetContestResponse = ModelGetContestResponse.builder()
+                                                                                             .contestId(contest.getContestId())
+                                                                                             .contestName(contest.getContestName())
+                                                                                             .contestTime(contest.getContestSolvingTime())
+                                                                                             .countDown(contest.getCountDown())
+                                                                                             .startAt(contest.getStartedAt())
+                                                                                             .statusId(contest.getStatusId())
+                                                                                             .userId(contest.getUserId())
+                                                                                             .createdAt(contest.getCreatedAt())
+                                                                                             .build();
+                    lists.add(modelGetContestResponse);
+                }
             });
         }
 
