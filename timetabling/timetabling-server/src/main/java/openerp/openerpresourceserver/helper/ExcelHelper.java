@@ -18,9 +18,9 @@ import java.util.List;
 
 public class ExcelHelper {
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    static String[] HEADERs = {"semester", "institute", "classCode", "bundleClassCode", "moduleCode", "moduleName", "moduleNameByEnglish",
-            "mass", "notes", "sessionNo", "weekDay", "studyTime", "start", "finish", "crew", "studyWeek", "classRoom",
-            "isNeedExperiment", "numberOfRegistrations", "maxQuantity", "state", "classType", "openBatch", "managementCode"};
+    static String[] HEADERs = {"Kỳ", "Trường_Viện_Khoa", "Mã_lớp", "Mã_lớp_kèm", "Mã_HP", "Tên_HP", "Tên_HP_Tiếng_Anh",
+            "Khối_lượng", "Ghi_chú", "Buổi_số", "Thứ", "Thời_gian", "BĐ", "KT", "Kíp", "Tuần", "Phòng",
+            "Cần_TN", "SLĐK", "SL_Max", "Trạng_thái", "Loại_lớp", "Đợt_mở", "Mã_QL"};
     static String SHEET = "Schedules";
 
     public static ByteArrayInputStream schedulesToExcelExport(List<Schedule> schedules) {
