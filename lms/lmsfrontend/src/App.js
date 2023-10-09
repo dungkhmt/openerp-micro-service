@@ -1,6 +1,6 @@
-// import {SvgIcon, Typography} from "@mui/material";
+import Typography from '@mui/material/Typography';
 // import {Box} from "@mui/system";
-import {Box, CssBaseline, SvgIcon, Typography} from "@material-ui/core";
+import {Box, CssBaseline, SvgIcon} from "@material-ui/core";
 import {createTheme, MuiThemeProvider} from "@material-ui/core/styles";
 import {ReactKeycloakProvider} from "@react-keycloak/web";
 import {request} from "api";
