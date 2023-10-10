@@ -39,6 +39,9 @@ export async function request(
   data,
   config
 ) {
+  if (config !== undefined  ) {
+    axiosInstance.defaults.headers.common["Content-Type"] = "multipart/form-data";
+  }
   try {
     const res = await axiosInstance.request({
       method: method.toLowerCase(),

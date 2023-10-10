@@ -1,7 +1,7 @@
 import React, { useEffect, useState, forwardRef } from "react";
 import { request } from "../api";
 import MaterialTable, { MTableToolbar } from "material-table";
-import { Card } from "@material-ui/core";
+import { Card, Button, CircularProgress} from "@material-ui/core";
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
 import Check from '@material-ui/icons/Check';
@@ -22,7 +22,7 @@ function ScheduleScreen() {
 
     const [schedules, setSchedules] = useState([]);
     const [openLoading, setOpenLoading] = React.useState(false);
-    const [toggle, setToggle] = useState(false)
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         request("get", "/excel/schedules", (res) => { 
@@ -153,7 +153,7 @@ function ScheduleScreen() {
         ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
       };
 
-    async function getAllSchedule() {
+      async function getAllSchedule() {
         setOpenLoading(true)
         request(
             "GET",
@@ -166,12 +166,41 @@ function ScheduleScreen() {
         );
     }
 
-    useEffect(() => {
-        getAllSchedule();
-    }, [toggle]);
+    const handleFileUpload = async (event) => {
+        const file = event.target.files[0];
+        
+        if (file) {
+            setUploading(true);
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                // Use your API endpoint for file upload
+                await request(
+                    "POST", 
+                    "/excel/upload", 
+                    (res) => {
+                    console.log(res.data);
+                    setUploading(false);
+                    // You may want to update the table data here
+                    getAllSchedule()
+                },{
+
+                }
+                ,formData, 
+                {
+                    "Content-Type": "multipart/form-data",
+                });
+            } catch (error) {
+                console.error("Error uploading file:", error);
+                setUploading(false);
+            }
+        }
+    };
 
     return (
-        <Card>
+        <div>
             <MaterialTable
                 title={"Danh sách thời khóa biểu"}
                 columns={columns}
@@ -186,12 +215,30 @@ function ScheduleScreen() {
                             <div
                                 style={{ position: "absolute", top: "16px", right: "350px" }}
                             >
+                                <input
+                                    accept=".xlsx, .xls"
+                                    style={{ display: "none" }}
+                                    id="fileInput"
+                                    type="file"
+                                    onChange={handleFileUpload}
+                                />
+                                <label htmlFor="fileInput">
+                                    <Button
+                                        variant="contained"
+                                        component="span"
+                                        color="primary"
+                                        disabled={uploading}
+                                    >
+                                        Import Excel
+                                    </Button>
+                                </label>
+                                {uploading && <CircularProgress size={24} />}
                             </div>
                         </div>
                     ),
                 }}
             />
-        </Card>
+        </div>
 
     );
 }
