@@ -120,7 +120,7 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
         >
           <Box sx={{ mb: 4 }}>
             <HustCopyCodeBlock
-              title="Compile message"
+              title="Message"
               text={submission.message}
               language="bash"
             />
@@ -223,8 +223,8 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
             ],
             ["Point", submission.point],
             ["Language", submission.sourceCodeLanguage],
-            ["Run time", `${submission.runtime} ms`],
-            ["Memory usage", `${submission.memoryUsage} KB`],
+            ["Total runtime", `${submission.runtime} ms`],
+            // ["Memory usage", `${submission.memoryUsage} KB`],
             ["Submited by", submission.submittedByUserId],
             ["Submited at", displayTime(new Date(submission.createdAt))],
             ["Last modified", displayTime(new Date(submission.updateAt))],
