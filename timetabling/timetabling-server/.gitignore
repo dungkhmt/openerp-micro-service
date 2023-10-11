@@ -32,3 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 /src/main/resources/application.yml
+
+# Ignore .idea directory
+.idea/
