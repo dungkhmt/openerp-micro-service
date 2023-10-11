@@ -1,7 +1,6 @@
 import React, { useEffect, useState, forwardRef } from "react";
 import { request } from "../api";
 import MaterialTable, { MTableToolbar } from "material-table";
-import { Card, Button, CircularProgress} from "@material-ui/core";
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
 import Check from '@material-ui/icons/Check';
@@ -17,6 +16,7 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import InputIcon from '@mui/icons-material/Input';
 
 function ScheduleScreen() {
 
@@ -25,7 +25,7 @@ function ScheduleScreen() {
     const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
-        request("get", "/excel/schedules", (res) => { 
+        request("get", "/excel/schedules", (res) => {
             setSchedules(res.data);
         }).then();
     }, [])
@@ -151,52 +151,49 @@ function ScheduleScreen() {
         SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
         ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
         ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
-      };
+    };
 
-      async function getAllSchedule() {
-        setOpenLoading(true)
-        request(
-            "GET",
-            "/excel/schedule",
-            (res) => {
-                console.log(res.data.content)
-                setOpenLoading(false)
-                setSchedules(res.data.content);
-            }
-        );
-    }
+    const handleImportExcel = () => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', '.xlsx, .xls');
 
-    const handleFileUpload = async (event) => {
-        const file = event.target.files[0];
-        
-        if (file) {
-            setUploading(true);
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                try {
+                    setOpenLoading(true);
+                    const formData = new FormData();
+                    formData.append('file', file);
 
-            const formData = new FormData();
-            formData.append("file", file);
+                    // Assuming you have an API endpoint for file upload
+                    const response = await request(
+                        "POST",
+                        "/excel/upload",
+                        (res) => {
+                            console.log(res.data);
+                            setUploading(false);
+                            // You may want to update the table data here
+                            window.location.reload();
+                        }, {
 
-            try {
-                // Use your API endpoint for file upload
-                await request(
-                    "POST", 
-                    "/excel/upload", 
-                    (res) => {
-                    console.log(res.data);
-                    setUploading(false);
-                    // You may want to update the table data here
-                    getAllSchedule()
-                },{
+                    }
+                        , formData,
+                        {
+                            "Content-Type": "multipart/form-data",
+                        });
 
+                    // Handle the response as needed
+                    console.log(response);
+                } catch (error) {
+                    console.error("Error uploading file", error);
+                } finally {
+                    setOpenLoading(false);
                 }
-                ,formData, 
-                {
-                    "Content-Type": "multipart/form-data",
-                });
-            } catch (error) {
-                console.error("Error uploading file:", error);
-                setUploading(false);
             }
-        }
+        };
+
+        input.click();
     };
 
     return (
@@ -215,28 +212,18 @@ function ScheduleScreen() {
                             <div
                                 style={{ position: "absolute", top: "16px", right: "350px" }}
                             >
-                                <input
-                                    accept=".xlsx, .xls"
-                                    style={{ display: "none" }}
-                                    id="fileInput"
-                                    type="file"
-                                    onChange={handleFileUpload}
-                                />
-                                <label htmlFor="fileInput">
-                                    <Button
-                                        variant="contained"
-                                        component="span"
-                                        color="primary"
-                                        disabled={uploading}
-                                    >
-                                        Import Excel
-                                    </Button>
-                                </label>
-                                {uploading && <CircularProgress size={24} />}
                             </div>
                         </div>
                     ),
                 }}
+                actions={[
+                    {
+                        icon: () => <InputIcon><input type="file" style={{ display: 'none' }} /></InputIcon>,
+                        tooltip: "import excel",
+                        onClick: handleImportExcel,
+                        isFreeAction: true,
+                    },
+                ]}
             />
         </div>
 
