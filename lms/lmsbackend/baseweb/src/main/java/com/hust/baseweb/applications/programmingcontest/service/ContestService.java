@@ -127,4 +127,10 @@ public class ContestService {
     public void updateContestSubmissionStatus(UUID submissionId, String status) {
         contestSubmissionRepo.updateContestSubmissionStatus(submissionId, status);
     }
+
+    public String getProblemNameInContest(String contestId, String problemId){
+        ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(contestId,problemId);
+        if(cp == null) return null;
+        return cp.getProblemRename();
+    }
 }

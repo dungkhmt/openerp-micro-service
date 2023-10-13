@@ -143,6 +143,8 @@ export default function ContestManagerUserSubmission(props) {
       },
 
       { title: "Problem ID", field: "problemId" },
+      { title: "Problem Name", field: "problemName" },
+      
       {
         title: "Testcases Passed",
         field: "testCasePass",
@@ -185,6 +187,7 @@ export default function ContestManagerUserSubmission(props) {
           </IconButton>
         ),
       },
+      {title: "Man. Status", field: "managementStatus"},
       {
         title: "View By User",
         sortable: false,

@@ -1,4 +1,4 @@
-import { Divider, Link, Paper, Stack, Typography } from "@mui/material";
+import { Divider, Link, Paper, Stack, Typography, Button } from "@mui/material";
 import Box from "@mui/material/Box";
 import { request } from "api";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
@@ -7,6 +7,9 @@ import { useParams } from "react-router-dom";
 import displayTime from "utils/DateTimeUtils";
 import ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase from "./ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase";
 import { getStatusColor } from "./lib";
+import {errorNoti, successNoti} from "utils/notification";
+
+//import { Button } from "@material-ui/core";
 
 export const detail = (key, value) => (
   <>
@@ -77,6 +80,35 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
     ).then();
   }
 
+  function handleDisableSubmission(){
+    //alert('disable submission ' + problemSubmissionId);
+    request(
+      "get",
+      "/teacher/disable-submissions/" + problemSubmissionId,
+      (res) => {
+        setSubmission(res.data);
+
+        setSubmissionSource(res.data.sourceCode);
+        successNoti("Submission disabled successfully");
+      },
+      {}
+    );
+  }
+  function handleEnableSubmission(){
+    //alert('disable submission ' + problemSubmissionId);
+    request(
+      "get",
+      "/teacher/enable-submissions/" + problemSubmissionId,
+      (res) => {
+        setSubmission(res.data);
+
+        setSubmissionSource(res.data.sourceCode);
+        successNoti("Submission enabled successfully");
+      },
+      {}
+    );
+  }
+
   useEffect(() => {
     request(
       "get",
@@ -100,6 +132,7 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
     );
   }, []);
 
+
   return (
     <Stack direction="row">
       <Stack
@@ -118,6 +151,9 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
             p: 2,
           }}
         >
+          <Button variant="outlined" onClick={handleDisableSubmission}>DISABLE</Button>
+          <Button variant="outlined" onClick={handleEnableSubmission}>ENABLE</Button>
+          
           <Box sx={{ mb: 4 }}>
             <HustCopyCodeBlock
               title="Message"

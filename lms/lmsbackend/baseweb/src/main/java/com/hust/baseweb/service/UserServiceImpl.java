@@ -86,6 +86,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private String getUserFullName(ModelSearchUserResult user) {
+        if(user == null) return "";
         String firstName = user.getFirstName() != null ? user.getFirstName() : "";
         String lastName = user.getLastName() != null ? user.getLastName() : "";
         return firstName + " " + lastName;

@@ -16,6 +16,7 @@ public class ContestSubmission {
 
     private UUID contestSubmissionId;
     private String problemId;
+    private String problemName;
     private String contestId;
     private String userId;
     private String fullname;
@@ -27,4 +28,5 @@ public class ContestSubmission {
     private String message;
     private String createAt;
     private Date submissionDate;
+    private String managementStatus;
 }

@@ -30,6 +30,13 @@ public class ProblemService {
         return problemRepo.findByProblemIdWithTagFetched(problemId);
     }
 
+    public String getProblemName(String problemId){
+        ProblemEntity p = problemRepo.findByProblemIdWithTagFetched(problemId);
+        if(p == null) return "";
+        else return p.getProblemName();
+    }
+
+
     public ProblemEntity saveProblem(ProblemEntity problem) {
         return problemRepo.save(problem);
     }
