@@ -100,7 +100,8 @@ public class ContestSubmissionEntity {
     private Date updateAt;
 
     @Column(name = "last_updated_by_user_id")
-    private Date lastUpdatedByUserId;
+    private String lastUpdatedByUserId;
+
 
     @Column(name = "message")
     private String message;

@@ -970,6 +970,19 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
+    public boolean teacherDisableSubmission(String userId, UUID submissionId) {
+        ContestSubmissionEntity sub = contestSubmissionRepo.findById(submissionId).orElse(null);
+        if(sub != null){
+            sub.setManagementStatus(ContestSubmissionEntity.MANAGEMENT_STATUS_DISABLED);
+            sub.setLastUpdatedByUserId(userId);
+            sub.setUpdateAt(new Date());
+            sub = contestSubmissionRepo.save(sub);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public List<ModelProblemSubmissionDetailByTestCaseResponse> getContestProblemSubmissionDetailByTestCaseOfASubmissionViewedByParticipant(
         String userId, UUID submissionId
     ) {
@@ -2309,6 +2322,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 .sourceCodeLanguage(contestSubmissionEntity.getSourceCodeLanguage())
                 .point(contestSubmissionEntity.getPoint())
                 .problemId(contestSubmissionEntity.getProblemId())
+                .problemName(problemService.getProblemName(contestSubmissionEntity.getProblemId()))
                 .testCasePass(contestSubmissionEntity.getTestCasePass())
                 .status(contestSubmissionEntity.getStatus())
                 .message(contestSubmissionEntity.getMessage())

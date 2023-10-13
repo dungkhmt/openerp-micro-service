@@ -161,6 +161,7 @@ export default function ContestManagerUserSubmission(props) {
           </IconButton>
         )
       },
+      {title: "Man. Status", field: managementStatus},
       {
         title: "View By User",
         sortable: false,

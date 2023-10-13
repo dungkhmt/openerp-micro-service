@@ -71,6 +71,8 @@ public interface ProblemTestCaseService {
 
     List<ModelProblemSubmissionDetailByTestCaseResponse> getContestProblemSubmissionDetailByTestCaseOfASubmission(UUID submissionId);
 
+    boolean teacherDisableSubmission(String userId, UUID submissionId);
+
     List<ModelProblemSubmissionDetailByTestCaseResponse> getContestProblemSubmissionDetailByTestCaseOfASubmissionViewedByParticipant(
         String userId, UUID submissionId
     );
