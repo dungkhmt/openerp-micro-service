@@ -983,6 +983,19 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
+    public boolean teacherEnableSubmission(String userId, UUID submissionId) {
+        ContestSubmissionEntity sub = contestSubmissionRepo.findById(submissionId).orElse(null);
+        if(sub != null){
+            sub.setManagementStatus(ContestSubmissionEntity.MANAGEMENT_STATUS_ENABLED);
+            sub.setLastUpdatedByUserId(userId);
+            sub.setUpdateAt(new Date());
+            sub = contestSubmissionRepo.save(sub);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public List<ModelProblemSubmissionDetailByTestCaseResponse> getContestProblemSubmissionDetailByTestCaseOfASubmissionViewedByParticipant(
         String userId, UUID submissionId
     ) {
@@ -1980,8 +1993,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     submissionsByUser = contestSubmissionRepo.getLatestSubmissions(userId, contestId);
                     break;
             }
+            //log.info("getRankingByContestIdNew, submisionByUser.sz = " + submissionsByUser.size());
 
             for (ModelSubmissionInfoRanking submission : submissionsByUser) {
+                //log.info("getRankingByContestIdNew, submisionByUser, point = " + submission.getPoint());
                 String problemId = submission.getProblemId();
                 if (mapProblemToPoint.containsKey(problemId))
                     mapProblemToPoint.put(problemId, submission.getPoint());
@@ -2324,9 +2339,11 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 .sourceCodeLanguage(contestSubmissionEntity.getSourceCodeLanguage())
                 .point(contestSubmissionEntity.getPoint())
                 .problemId(contestSubmissionEntity.getProblemId())
-                .problemName(problemService.getProblemName(contestSubmissionEntity.getProblemId()))
+                //.problemName(problemService.getProblemName(contestSubmissionEntity.getProblemId()))
+                .problemName(contestService.getProblemNameInContest(contestSubmissionEntity.getContestId(), contestSubmissionEntity.getProblemId()))
                 .testCasePass(contestSubmissionEntity.getTestCasePass())
                 .status(contestSubmissionEntity.getStatus())
+                .managementStatus(contestSubmissionEntity.getManagementStatus())
                 .message(contestSubmissionEntity.getMessage())
                 .userId(contestSubmissionEntity.getUserId())
                 .fullname(userService.getUserFullName(contestSubmissionEntity.getUserId()))

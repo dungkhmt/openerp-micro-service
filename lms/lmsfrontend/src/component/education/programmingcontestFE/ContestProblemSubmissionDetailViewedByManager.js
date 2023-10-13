@@ -7,6 +7,8 @@ import { useParams } from "react-router-dom";
 import displayTime from "utils/DateTimeUtils";
 import ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase from "./ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase";
 import { getStatusColor } from "./lib";
+import {errorNoti, successNoti} from "utils/notification";
+
 //import { Button } from "@material-ui/core";
 
 export const detail = (key, value) => (
@@ -87,10 +89,26 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
         setSubmission(res.data);
 
         setSubmissionSource(res.data.sourceCode);
+        successNoti("Submission disabled successfully");
       },
       {}
     );
   }
+  function handleEnableSubmission(){
+    //alert('disable submission ' + problemSubmissionId);
+    request(
+      "get",
+      "/teacher/enable-submissions/" + problemSubmissionId,
+      (res) => {
+        setSubmission(res.data);
+
+        setSubmissionSource(res.data.sourceCode);
+        successNoti("Submission enabled successfully");
+      },
+      {}
+    );
+  }
+
   useEffect(() => {
     request(
       "get",
@@ -134,6 +152,8 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
           }}
         >
           <Button variant="outlined" onClick={handleDisableSubmission}>DISABLE</Button>
+          <Button variant="outlined" onClick={handleEnableSubmission}>ENABLE</Button>
+          
           <Box sx={{ mb: 4 }}>
             <HustCopyCodeBlock
               title="Message"
