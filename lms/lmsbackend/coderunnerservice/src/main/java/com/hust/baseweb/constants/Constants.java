@@ -42,7 +42,7 @@ public class Constants {
     }
 
     public enum DockerImage {
-        GCC("gcc:12.3"), JAVA("openjdk:17.0-jdk-buster"), PYTHON3("python:3.7-bookworm");
+        GCC("gcc:12.3"), JAVA("eclipse-temurin:17"), PYTHON3("python:3.7-bookworm");
 
         private final String value;
 
