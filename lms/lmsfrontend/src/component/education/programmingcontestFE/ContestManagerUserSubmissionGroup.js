@@ -121,7 +121,7 @@ export default function ContestManagerUserSubmissionGroup(props) {
           </Link>
         ),
       },
-      // { title: "User ID", field: "userId" },
+      { title: "User ID", field: "userId" },
       {
         title: "FullName",
         field: "fullname",

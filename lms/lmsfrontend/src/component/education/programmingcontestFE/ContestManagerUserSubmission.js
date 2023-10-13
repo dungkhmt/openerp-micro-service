@@ -135,7 +135,7 @@ export default function ContestManagerUserSubmission(props) {
           </Link>
         ),
       },
-      // { title: "User ID", field: "userId" },
+      { title: "User ID", field: "userId" },
       {
         title: "FullName",
         field: "fullname",
