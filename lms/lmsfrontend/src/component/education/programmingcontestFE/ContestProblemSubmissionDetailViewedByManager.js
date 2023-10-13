@@ -9,7 +9,7 @@ import ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase from "./M
 import { getStatusColor } from "./lib";
 //import { Button } from "@material-ui/core";
 
-const detail = (key, value) => (
+export const detail = (key, value) => (
   <>
     <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
       {key}
@@ -24,6 +24,28 @@ const detail = (key, value) => (
     </Typography>
   </>
 );
+
+export const resolveLanguage = (str) => {
+  if (str) {
+    if (str.startsWith("CPP")) {
+      return "cpp";
+    }
+
+    if (str.startsWith("JAVA")) {
+      return "java";
+    }
+
+    if (str.startsWith("PYTHON")) {
+      return "python";
+    }
+
+    if (str === "C") {
+      return "c";
+    }
+  }
+
+  return undefined;
+};
 
 export default function ContestProblemSubmissionDetailViewedByManager() {
   const { problemSubmissionId } = useParams();
@@ -75,7 +97,6 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
       "/teacher/submissions/" + problemSubmissionId + "/general-info",
       (res) => {
         setSubmission(res.data);
-
         setSubmissionSource(res.data.sourceCode);
       },
       {}
@@ -100,25 +121,31 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
         sx={{
           display: "flex",
           flexGrow: 1,
-          height: "calc(100vh - 112px)",
+          boxShadow: 1,
           overflowY: "scroll",
+          borderTopLeftRadius: 8,
+          borderBottomLeftRadius: 8,
+          height: "calc(100vh - 112px)",
         }}
       >
         <Paper
-          elevation={0}
           sx={{
             p: 2,
-            borderRadius: 2,
           }}
         >
           <Button variant="outlined" onClick={handleDisableSubmission}>DISABLE</Button>
           <Box sx={{ mb: 4 }}>
-            <Typography variant={"h6"} sx={{ mb: 1 }}>
-              Source code
-            </Typography>
             <HustCopyCodeBlock
-              // title="User output"
+              title="Message"
+              text={submission.message}
+              language="bash"
+            />
+          </Box>
+          <Box sx={{ mb: 4 }}>
+            <HustCopyCodeBlock
+              title="Source code"
               text={submission.sourceCode}
+              language={resolveLanguage(submission.sourceCodeLanguage)}
             />
             {/* <TextField
             style={{
@@ -133,12 +160,6 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
               console.log(submissionSource);
             }}
           ></TextField> */}
-          </Box>
-          <Box sx={{ mb: 4 }}>
-            <Typography variant={"h6"} sx={{ mb: 1 }}>
-              Compile message
-            </Typography>
-            <HustCopyCodeBlock text={submission.message} />
           </Box>
           <Box>
             {/* <TextField
@@ -183,11 +204,12 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
         <Paper
           elevation={1}
           sx={{
-            width: 300,
-            height: "calc(100vh - 112px)",
             p: 2,
-            borderRadius: 2,
+            width: 300,
             overflowY: "scroll",
+            borderTopRightRadius: 8,
+            borderBottomRightRadius: 8,
+            height: "calc(100vh - 112px)",
           }}
         >
           <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
@@ -209,11 +231,16 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
             {submission.status}
           </Typography>
           {[
-            ["Pass", `${submission.testCasePass} test cases`],
+            [
+              "Pass",
+              submission.testCasePass
+                ? `${submission.testCasePass} test cases`
+                : "",
+            ],
             ["Point", submission.point],
             ["Language", submission.sourceCodeLanguage],
-            ["Run time", `${submission.runtime} ms`],
-            ["Memory usage", `${submission.memoryUsage} KB`],
+            ["Total runtime", `${submission.runtime} ms`],
+            // ["Memory usage", `${submission.memoryUsage} KB`],
             ["Submited by", submission.submittedByUserId],
             ["Submited at", displayTime(new Date(submission.createdAt))],
             ["Last modified", displayTime(new Date(submission.updateAt))],

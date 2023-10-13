@@ -227,13 +227,14 @@ public class TempDir {
 
     class RmTempDirTheard extends Thread {
         public void run() {
-            String dirName;
-            while (true) {
-                while ((dirName = concurrentLinkedQueue.poll()) != null) {
-//                    System.out.println("rm dir " + dirName);
-                    FileSystemUtils.deleteRecursively(new File(TEMPDIR + dirName));
-                }
-            }
+//            String dirName;
+//            while (true) {
+//                while ((dirName = concurrentLinkedQueue.poll()) != null) {
+////                    System.out.println("rm dir " + dirName);
+//                    FileSystemUtils.deleteRecursively(new File(TEMPDIR + dirName));
+//                }
+//            }
+            FileSystemUtils.deleteRecursively(new File(TEMPDIR));
         }
     }
 }

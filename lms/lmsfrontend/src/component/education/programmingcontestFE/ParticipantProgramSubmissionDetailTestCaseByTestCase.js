@@ -1,17 +1,17 @@
 import InfoIcon from "@mui/icons-material/Info";
-import {CircularProgress, IconButton, LinearProgress} from "@mui/material";
+import { CircularProgress, IconButton, LinearProgress } from "@mui/material";
+import Box from "@mui/material/Box";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import HustModal from "component/common/HustModal";
-import {React, useEffect, useState} from "react";
-import {request} from "../../../api";
-import {toFormattedDateTime} from "../../../utils/dateutils";
-import Box from "@mui/material/Box";
+import { useEffect, useState } from "react";
+import { request } from "../../../api";
+import { toFormattedDateTime } from "../../../utils/dateutils";
 import StandardTable from "../../table/StandardTable";
 
 export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
   props
 ) {
-  const {submissionId} = props;
+  const { submissionId } = props;
   const [submissionTestCase, setSubmissionTestCase] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [testcaseDetailList, setTestcaseDetailList] = useState([]);
@@ -22,13 +22,13 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
   const [score, setScore] = useState(0);
 
   const columns = [
-    {title: "Contest", field: "contestId"},
-    {title: "Problem", field: "problemId"},
-    {title: "Message", field: "message"},
-    {title: "Point", field: "point"},
+    { title: "Contest", field: "contestId" },
+    { title: "Problem", field: "problemId" },
+    { title: "Message", field: "message" },
+    { title: "Point", field: "point" },
     // {title: "Correct result", field: "testCaseAnswer"},
     // {title: "Participant's result", field: "participantAnswer"},
-    {title: "Submit at", field: "createdAt"},
+    { title: "Submit at", field: "createdAt" },
     {
       title: "Detail",
       render: (rowData) => (
@@ -43,7 +43,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
             setOpenModal(true);
           }}
         >
-          <InfoIcon/>
+          <InfoIcon />
         </IconButton>
       ),
     },
@@ -52,7 +52,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
       render: (rowData) =>
         rowData.viewSubmitSolutionOutputMode == "Y" ? (
           <div>
-            {isProcessing ? <CircularProgress/> : ""}
+            {isProcessing ? <CircularProgress /> : ""}
             <button
               color="primary"
               type="submit"
@@ -119,8 +119,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
         //setFilename("");
       },
       {
-        onError: (e) => {
-        },
+        onError: (e) => {},
       },
       formData,
       config
@@ -166,8 +165,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
         setTestcaseDetailList(tcl);
       },
       {
-        401: () => {
-        },
+        401: () => {},
       }
     ).then(() => setIsProcessing(false));
   }
@@ -216,7 +214,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
 
   return (
     <Box>
-      {isProcessing && <LinearProgress/>}
+      {isProcessing && <LinearProgress />}
       <StandardTable
         title={"Problem's Test cases"}
         columns={columns}
@@ -229,7 +227,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
           sorting: true,
         }}
       />
-      <ModalPreview chosenTestcase={selectedTestcase}/>
+      <ModalPreview chosenTestcase={selectedTestcase} />
     </Box>
   );
 }

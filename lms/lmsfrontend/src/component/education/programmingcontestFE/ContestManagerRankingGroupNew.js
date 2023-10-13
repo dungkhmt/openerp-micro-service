@@ -1,11 +1,11 @@
-import {Box, LinearProgress} from "@mui/material";
+import { Box, LinearProgress } from "@mui/material";
 import Button from "@mui/material/Button";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import XLSX from "xlsx";
+import { request } from "../../../api";
+import { successNoti } from "../../../utils/notification";
 import HustContainerCard from "../../common/HustContainerCard";
 import StandardTable from "../../table/StandardTable";
-import {request} from "../../../api";
-import {successNoti} from "../../../utils/notification";
 
 export default function ContestManagerRankingGroupNew(props) {
   const contestId = props.contestId;
@@ -15,8 +15,15 @@ export default function ContestManagerRankingGroupNew(props) {
   const [loading, setLoading] = useState(false);
 
   const copyLinkHandler = () => {
-    navigator.clipboard.writeText(window.location.host + "/programming-contest/public/" + contestId + "/ranking").then(() => successNoti("URL copied to clipboard", 1000));
-  }
+    navigator.clipboard
+      .writeText(
+        window.location.host +
+          "/programming-contest/public/" +
+          contestId +
+          "/ranking"
+      )
+      .then(() => successNoti("URL copied to clipboard", 1000));
+  };
   const downloadHandler = (event) => {
     if (ranking.length === 0) {
       return;
@@ -24,13 +31,13 @@ export default function ContestManagerRankingGroupNew(props) {
 
     var wbcols = [];
 
-    wbcols.push({wpx: 80});
-    wbcols.push({wpx: 120});
+    wbcols.push({ wpx: 80 });
+    wbcols.push({ wpx: 120 });
     let numOfProblem = ranking[0].mapProblemsToPoints.length;
     for (let i = 0; i < numOfProblem; i++) {
-      wbcols.push({wpx: 50});
+      wbcols.push({ wpx: 50 });
     }
-    wbcols.push({wpx: 50});
+    wbcols.push({ wpx: 50 });
 
     let datas = [];
 
@@ -54,10 +61,7 @@ export default function ContestManagerRankingGroupNew(props) {
     sheet["!cols"] = wbcols;
 
     XLSX.utils.book_append_sheet(wb, sheet, "ranking");
-    XLSX.writeFile(
-      wb,
-      contestId + "-RANKING.xlsx"
-    );
+    XLSX.writeFile(wb, contestId + "-RANKING.xlsx");
   };
 
   function getRanking() {
@@ -65,8 +69,8 @@ export default function ContestManagerRankingGroupNew(props) {
     request(
       "get",
       "/contests/group/ranking/" +
-      contestId +
-      "?getPointForRankingType=HIGHEST",
+        contestId +
+        "?getPointForRankingType=HIGHEST",
       (res) => {
         let sortedResult = res.data.sort((a, b) => b.totalPoint - a.totalPoint);
         setRanking(sortedResult);
@@ -76,66 +80,90 @@ export default function ContestManagerRankingGroupNew(props) {
 
   useEffect(() => {
     if (ranking.length > 0) {
-      const problemIdsExtracted = ranking[0].mapProblemsToPoints.map(item => item.problemId);
+      const problemIdsExtracted = ranking[0].mapProblemsToPoints.map(
+        (item) => item.problemId
+      );
       setProblemIds(problemIdsExtracted);
 
       let arr = [];
-      ranking.forEach(record => {
+      ranking.forEach((record) => {
         const convertedData = {
-          ...Object.fromEntries(record.mapProblemsToPoints.map(item => [item.problemId, item.point])),
+          ...Object.fromEntries(
+            record.mapProblemsToPoints.map((item) => [
+              item.problemId,
+              item.point,
+            ])
+          ),
           userId: record.userId,
           fullname: record.fullname,
           totalPoint: record.totalPoint,
-          totalPercentagePoint: record.stringTotalPercentagePoint
+          totalPercentagePoint: record.stringTotalPercentagePoint,
         };
         arr.push(convertedData);
-      })
+      });
       setRankingDetail(arr);
     }
-
-  }, [ranking])
+  }, [ranking]);
 
   const generateColumns = () => {
     const columns = [
-      {title: "Username", field: "userId"},
+      { title: "Username", field: "userId" },
       {
         title: "Fullname",
         field: "fullname",
+        cellStyle: { minWidth: "170px" },
         render: (rankingRecord) => (
-          <span style={{width: "150px", display: "block"}}>
+          <span style={{ display: "block" }}>
             <em>{`${rankingRecord.fullname}`}</em>
           </span>
-        )
+        ),
       },
       {
         title: "TOTAL",
         field: "totalPoint",
         render: (rankingRecord) => (
-          <span style={{fontWeight: 600, color: "#2e7d32", width: "100%", display: "inline-block", textAlign: "right"}}>
-            {`${rankingRecord.totalPoint.toLocaleString('en-US')}`}
+          <span
+            style={{
+              fontWeight: 600,
+              color: "#2e7d32",
+              width: "100%",
+              display: "inline-block",
+              textAlign: "right",
+            }}
+          >
+            {`${rankingRecord.totalPoint.toLocaleString("en-US")}`}
           </span>
-        )
+        ),
       },
       {
         title: "PERCENT",
         field: "totalPercentagePoint",
         render: (rankingRecord) => (
-          <span style={{fontWeight: 600, color: "#2e7d32", width: "100%", display: "inline-block", textAlign: "right"}}>
-            {`${rankingRecord.totalPercentagePoint.toLocaleString('en-US')}`}
+          <span
+            style={{
+              fontWeight: 600,
+              color: "#2e7d32",
+              width: "100%",
+              display: "inline-block",
+              textAlign: "right",
+            }}
+          >
+            {`${rankingRecord.totalPercentagePoint.toLocaleString("en-US")}`}
           </span>
-        )
-      }
+        ),
+      },
     ];
 
-    problemIds.length > 0 && problemIds.forEach((problemId) => {
-      columns.push({
-        title: problemId,
-        field: problemId,
+    problemIds.length > 0 &&
+      problemIds.forEach((problemId) => {
+        columns.push({
+          title: problemId,
+          field: problemId,
+        });
       });
-    });
 
     return columns;
-  }
+  };
 
   useEffect(() => {
     getRanking();
@@ -143,9 +171,8 @@ export default function ContestManagerRankingGroupNew(props) {
 
   return (
     <HustContainerCard title={"My Group: Contest Ranking"}>
-
       <Box>
-        {loading && <LinearProgress/>}
+        {loading && <LinearProgress />}
         <StandardTable
           title={contestId}
           columns={generateColumns()}
@@ -160,24 +187,35 @@ export default function ContestManagerRankingGroupNew(props) {
           actions={[
             {
               icon: () => {
-                return <Button variant="contained" onClick={downloadHandler} color="success"
-                               className={"no-background-btn"}>
-                  Export
-                </Button>
+                return (
+                  <Button
+                    variant="contained"
+                    onClick={downloadHandler}
+                    color="success"
+                    className={"no-background-btn"}
+                  >
+                    Export
+                  </Button>
+                );
               },
-              tooltip: 'Export Ranking as Excel file',
-              isFreeAction: true
+              tooltip: "Export Ranking as Excel file",
+              isFreeAction: true,
             },
             {
               icon: () => {
-                return <Button variant="outlined" onClick={copyLinkHandler}
-                               className={"no-background-btn"}>
-                  Get link
-                </Button>
+                return (
+                  <Button
+                    variant="outlined"
+                    onClick={copyLinkHandler}
+                    className={"no-background-btn"}
+                  >
+                    Get link
+                  </Button>
+                );
               },
-              tooltip: 'Get public URL to this ranking',
-              isFreeAction: true
-            }
+              tooltip: "Get public URL to this ranking",
+              isFreeAction: true,
+            },
           ]}
         />
       </Box>
