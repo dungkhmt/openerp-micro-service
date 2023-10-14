@@ -228,10 +228,13 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
           <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
             Enabled
           </Typography>
-          {submission.managementStatus && (
+          {submission.managementStatus !== undefined && (
             <Switch
               color="success"
-              checked={submission.managementStatus === "ENABLED"}
+              checked={
+                submission.managementStatus === "ENABLED" ||
+                submission.managementStatus === null
+              }
               onChange={handleChange}
               inputProps={{ "aria-label": "Switch enable submission" }}
               sx={{ ml: -1.25, mb: 1.25, mt: -1 }}
