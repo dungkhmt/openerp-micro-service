@@ -56,17 +56,10 @@ export default function ContestProblemSubmissionDetail() {
               language="bash"
             />
           </Box>
-          <Box sx={{ mb: 4 }}>
-            <HustCopyCodeBlock
-              title="Source code"
-              text={submission.sourceCode}
-              language={resolveLanguage(submission.sourceCodeLanguage)}
-            />
-          </Box>
           {submission.status &&
             submission.status !== "Compile Error" &&
             submission.status !== "In Progress" && (
-              <Box>
+              <Box sx={{ mb: 4 }}>
                 <Typography variant={"h6"} sx={{ mb: 1 }}>
                   Test cases
                 </Typography>
@@ -75,6 +68,13 @@ export default function ContestProblemSubmissionDetail() {
                 />
               </Box>
             )}
+          <Box>
+            <HustCopyCodeBlock
+              title="Source code"
+              text={submission.sourceCode}
+              language={resolveLanguage(submission.sourceCodeLanguage)}
+            />
+          </Box>
         </Paper>
       </Stack>
       <Box>
