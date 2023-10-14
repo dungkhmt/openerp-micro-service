@@ -3,6 +3,7 @@ package com.hust.baseweb.util.executor;
 
 import com.hust.baseweb.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
+import com.hust.baseweb.util.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ public class Python3Executor {
     private static final String suffixes = ".py";
     private static final String SHFileStart = "#!/bin/bash\n";
     private static final String buildCmd = "python3 -m py_compile main.py";
+    private static final String SOURCECODE_DELIMITER = "PYTHON_FILE" + CommonUtils.generateRandomString(10);
 
     private static final String TIME_LIMIT_ERROR = Constants.TestCaseSubmissionError.TIME_LIMIT.getValue();
     private static final String FILE_LIMIT_ERROR = Constants.TestCaseSubmissionError.FILE_LIMIT.getValue();
@@ -21,25 +23,6 @@ public class Python3Executor {
     }
 
     public String generateScriptFileWithTestCaseAndCorrectSolution(String source, String testCase, String tmpName, int timeLimit) {
-//        String sourceSH = SHFileStart
-//                + "mkdir -p " + tmpName + "\n"
-//                + "cd " + tmpName + "\n"
-//                + "cat <<EOF >> main" + suffixes + "\n"
-//                + source + "\n"
-//                + "EOF" + "\n"
-//                + "cat <<EOF >> testcase.txt \n"
-//                + testCase + "\n"
-//                + "EOF" + "\n"
-//                + "FILE=main.py" + "\n"
-//                + "if test -f \"$FILE\"; then" + "\n"
-//                + "    cat testcase.txt | timeout " + timeLimit + "s " + " python3 main.py && echo -e \"\\nnSuccessful\"  || echo Time Limit Exceeded" + "\n"
-//                + "else\n"
-//                + "  echo Compile Error\n"
-//                + "fi" + "\n"
-//                + "cd .. \n"
-//                + "rm -rf " + tmpName + " & " + "\n"
-//                + "rm -rf " + tmpName + ".sh" + " & " + "\n";
-//        return sourceSH;
 
         List<TestCaseEntity> testCaseEntities = new ArrayList<>();
         TestCaseEntity testCaseEntity = new TestCaseEntity();
@@ -53,9 +36,9 @@ public class Python3Executor {
         String sourceSH = SHFileStart
                 + "mkdir -p " + tmpName + "\n"
                 + "cd " + tmpName + "\n"
-                + "cat <<EOF >> main" + suffixes + "\n"
+                + "cat <<'" + SOURCECODE_DELIMITER + "' >> main" + suffixes + "\n"
                 + source + "\n"
-                + "EOF" + "\n"
+                + SOURCECODE_DELIMITER + "\n"
                 + buildCmd + "\n"
                 + "if  [ -d __pycache__ ]; then" + "\n"
                 + "  echo Successful\n"
@@ -71,9 +54,9 @@ public class Python3Executor {
     public String genSubmitScriptFile(List<TestCaseEntity> testCases, String source, String tmpName, int timeLimit, int memoryLimit) {
         StringBuilder genTestCase = new StringBuilder();
         for (int i = 0; i < testCases.size(); i++) {
-            String testcase = "cat <<EOF >> testcase" + i + ".txt \n"
+            String testcase = "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase" + i + ".txt \n"
                     + testCases.get(i).getTestCase() + "\n"
-                    + "EOF" + "\n";
+                    + SOURCECODE_DELIMITER + "\n";
             genTestCase.append(testcase);
         }
 
@@ -83,9 +66,9 @@ public class Python3Executor {
         String sourceSH = SHFileStart
                 + "mkdir -p " + tmpName + "\n"
                 + "cd " + tmpName + "\n"
-                + "cat <<EOF >> main" + suffixes + "\n"
+                + "cat <<'" + SOURCECODE_DELIMITER + "' >> main" + suffixes + "\n"
                 + source + "\n"
-                + "EOF" + "\n"
+                + SOURCECODE_DELIMITER + "\n"
                 + buildCmd + "\n"
                 + "if  [ -d __pycache__ ]; then" + "\n"
                 + genTestCase + "\n"

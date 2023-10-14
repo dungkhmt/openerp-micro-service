@@ -4,6 +4,7 @@ package com.hust.baseweb.applications.programmingcontest.utils.executor;
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
 import com.hust.baseweb.applications.programmingcontest.utils.ComputerLanguage;
+import com.hust.baseweb.utils.CommonUtils;
 
 import java.util.List;
 
@@ -13,6 +14,8 @@ public class GccExecutor {
     private static final String BUILD_COMMAND_CPP_11 = "g++ -std=c++11 -w -o main main.cpp";
     private static final String BUILD_COMMAND_CPP_14 = "g++ -std=c++14 -w -o main main.cpp";
     private static final String BUILD_COMMAND_CPP_17 = "g++ -std=c++17 -w -o main main.cpp";
+
+    private static final String SOURCECODE_DELIMITER = "CPP_FILE" + CommonUtils.generateRandomString(10);
 
     private String getBuildCmd(ComputerLanguage.Languages language) {
         switch (language) {
@@ -66,22 +69,22 @@ public class GccExecutor {
                           tmpName +
                           "\n"
                           +
-                          "cat <<EOF >> main" +
+                          "cat <<'" + SOURCECODE_DELIMITER + "' >> main" +
                           getFileExtension(cppVersion) +
                           "\n"
                           +
                           source +
                           "\n"
                           +
-                          "EOF" +
+                          SOURCECODE_DELIMITER +
                           "\n"
                           +
-                          "cat <<EOF >> testcase.txt \n"
+                          "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase.txt \n"
                           +
                           testCase +
                           "\n"
                           +
-                          "EOF" +
+                          SOURCECODE_DELIMITER +
                           "\n"
                           +
                           getBuildCmd(cppVersion) +
@@ -127,9 +130,9 @@ public class GccExecutor {
         String sourceSH = SHFileStart
                           + "mkdir -p " + tmpName + "\n"
                           + "cd " + tmpName + "\n"
-                          + "cat <<EOF >> main" + getFileExtension(language) + "\n"
+                          + "cat <<'" + SOURCECODE_DELIMITER + "' >> main" + getFileExtension(language) + "\n"
                           + source + "\n"
-                          + "EOF" + "\n"
+                          + SOURCECODE_DELIMITER + "\n"
                           + getBuildCmd(language) + "\n"
                           + "FILE=main" + "\n"
                           + "if test -f \"$FILE\"; then" + "\n"
@@ -154,20 +157,20 @@ public class GccExecutor {
     ) {
         String genTestCase = "";
         //for(int i = 0; i < testCaseEntities.size(); i++){
-        String testcase = "cat <<EOF >> testcase" + 0 + ".txt \n"
+        String testcase = "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase" + 0 + ".txt \n"
                           + testCase.getTestCase() + "\n"
                           + testCase.getCorrectAnswer() + "\n"
                           + solutionOutput + "\n"
-                          + "EOF" + "\n";
+                          + SOURCECODE_DELIMITER + "\n";
         genTestCase += testcase;
         //}
 
         String sourceSH = SHFileStart
                           + "mkdir -p " + tmpName + "\n"
                           + "cd " + tmpName + "\n"
-                          + "cat <<EOF >> main" + getFileExtension(language) + "\n"
+                          + "cat <<'" + SOURCECODE_DELIMITER + "' >> main" + getFileExtension(language) + "\n"
                           + sourceChecker + "\n"
-                          + "EOF" + "\n"
+                          + SOURCECODE_DELIMITER + "\n"
                           + getBuildCmd(language) + "\n"
                           + "FILE=main" + "\n"
                           + "if test -f \"$FILE\"; then" + "\n"
@@ -205,9 +208,9 @@ public class GccExecutor {
     ) {
         StringBuilder genTestCase = new StringBuilder();
         for (int i = 0; i < testCaseEntities.size(); i++) {
-            String testcase = "cat <<EOF >> testcase" + i + ".txt \n"
+            String testcase = "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase" + i + ".txt \n"
                               + testCaseEntities.get(i).getTestCase() + "\n"
-                              + "EOF" + "\n";
+                              + SOURCECODE_DELIMITER + "\n";
             genTestCase.append(testcase);
         }
 
@@ -216,9 +219,9 @@ public class GccExecutor {
         String sourceSH = SHFileStart
                           + "mkdir -p " + tmpName + "\n"
                           + "cd " + tmpName + "\n"
-                          + "cat <<EOF >> main" + getFileExtension(language) + "\n"
+                          + "cat <<'" + SOURCECODE_DELIMITER + "' >> main" + getFileExtension(language) + "\n"
                           + source + "\n"
-                          + "EOF" + "\n"
+                          + SOURCECODE_DELIMITER + "\n"
                           + getBuildCmd(language) + "\n"
                           + "FILE=main" + "\n"
                           + "if test -f \"$FILE\"; then" + "\n"

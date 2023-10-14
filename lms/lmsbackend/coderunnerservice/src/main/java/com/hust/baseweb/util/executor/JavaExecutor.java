@@ -2,6 +2,7 @@ package com.hust.baseweb.util.executor;
 
 import com.hust.baseweb.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
+import com.hust.baseweb.util.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ public class JavaExecutor {
     private static final String buildCmd = "javac Main.java";
     private static final String suffixes = ".java";
     private static final String SHFileStart = "#!/bin/bash\n";
+    private static final String SOURCECODE_DELIMITER = "JAVA_FILE" + CommonUtils.generateRandomString(10);
 
     private static final String TIME_LIMIT_ERROR = Constants.TestCaseSubmissionError.TIME_LIMIT.getValue();
     private static final String FILE_LIMIT_ERROR = Constants.TestCaseSubmissionError.FILE_LIMIT.getValue();
@@ -22,26 +24,6 @@ public class JavaExecutor {
     }
 
     public String generateScriptFileWithTestCaseAndCorrectSolution(String source, String testCase, String tmpName, int timeLimit) {
-//        String sourceSH = SHFileStart
-//                + "mkdir -p " + tmpName + "\n"
-//                + "cd " + tmpName + "\n"
-//                + "cat <<EOF >> Main" + suffixes + "\n"
-//                + source + "\n"
-//                + "EOF" + "\n"
-//                + "cat <<EOF >> testcase.txt \n"
-//                + testCase + "\n"
-//                + "EOF" + "\n"
-//                + buildCmd + "\n"
-//                + "FILE=Main.class" + "\n"
-//                + "if test -f \"$FILE\"; then" + "\n"
-//                + "    cat testcase.txt | timeout " + timeLimit + "s " + "java Main  && echo -e \"\\nSuccessful\"  || echo Time Limit Exceeded" + "\n"
-//                + "else\n"
-//                + "  echo Compile Error\n"
-//                + "fi" + "\n"
-//                + "cd .. \n"
-//                + "rm -rf " + tmpName + " & " + "\n"
-//                + "rm -rf " + tmpName + ".sh" + " & " + "\n";
-//        return sourceSH;
 
         List<TestCaseEntity> testCaseEntities = new ArrayList<>();
         TestCaseEntity testCaseEntity = new TestCaseEntity();
@@ -55,9 +37,9 @@ public class JavaExecutor {
         String sourceSH = SHFileStart
                 + "mkdir -p " + tmpName + "\n"
                 + "cd " + tmpName + "\n"
-                + "cat <<EOF >> Main" + suffixes + "\n"
+                + "cat <<'" + SOURCECODE_DELIMITER + "' >> Main" + suffixes + "\n"
                 + source + "\n"
-                + "EOF" + "\n"
+                + SOURCECODE_DELIMITER + "\n"
                 + buildCmd + "\n"
                 + "FILE=Main.class" + "\n"
                 + "if test -f \"$FILE\"; then" + "\n"
@@ -74,9 +56,9 @@ public class JavaExecutor {
     public String genSubmitScriptFile(List<TestCaseEntity> testCases, String source, String tmpName, int timeLimit, int memoryLimit) {
         StringBuilder genTestCase = new StringBuilder();
         for (int i = 0; i < testCases.size(); i++) {
-            String testcase = "cat <<EOF >> testcase" + i + ".txt \n"
+            String testcase = "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase" + i + ".txt \n"
                     + testCases.get(i).getTestCase() + "\n"
-                    + "EOF" + "\n";
+                    + SOURCECODE_DELIMITER + "\n";
             genTestCase.append(testcase);
         }
 
@@ -86,9 +68,9 @@ public class JavaExecutor {
         String sourceSH = SHFileStart
                 + "mkdir -p " + tmpName + "\n"
                 + "cd " + tmpName + "\n"
-                + "cat <<EOF >> Main" + suffixes + "\n"
+                + "cat <<'" + SOURCECODE_DELIMITER + "' >> Main" + suffixes + "\n"
                 + source + "\n"
-                + "EOF" + "\n"
+                + SOURCECODE_DELIMITER + "\n"
                 + buildCmd + "\n"
                 + "FILE=Main.class" + "\n"
                 + "if test -f \"$FILE\"; then" + "\n"
