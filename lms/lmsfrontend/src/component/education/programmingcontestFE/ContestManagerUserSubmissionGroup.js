@@ -123,11 +123,19 @@ export default function ContestManagerUserSubmissionGroup(props) {
       },
       { title: "User ID", field: "userId" },
       {
-        title: "FullName",
+        title: "Full name",
         field: "fullname",
         cellStyle: { minWidth: "170px" },
       },
-      { title: "Problem ID", field: "problemId" },
+      {
+        title: "Problem ID",
+        field: "problemId",
+        render: (rowData) => (
+          <Tooltip title={rowData.problemName} placement="bottom-start" arrow>
+            {rowData.problemId}
+          </Tooltip>
+        ),
+      },
       { title: "Testcases Passed", field: "testCasePass" },
       { title: "Lang", field: "sourceCodeLanguage" },
       {
@@ -152,6 +160,7 @@ export default function ContestManagerUserSubmissionGroup(props) {
       {
         title: "Rejudge",
         sortable: "false",
+        headerStyle: { textAlign: "center" },
         cellStyle: { textAlign: "center" },
         render: (rowData) => (
           <IconButton
@@ -168,6 +177,7 @@ export default function ContestManagerUserSubmissionGroup(props) {
       {
         title: "View By User",
         sortable: false,
+        headerStyle: { textAlign: "center" },
         cellStyle: { textAlign: "center", minWidth: 96 },
         render: (rowData) => (
           <IconButton

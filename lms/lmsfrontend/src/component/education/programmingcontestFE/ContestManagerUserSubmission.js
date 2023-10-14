@@ -146,7 +146,7 @@ export default function ContestManagerUserSubmission(props) {
         title: "Problem ID",
         field: "problemId",
         render: (rowData) => (
-          <Tooltip title={rowData.problemName} placement="bottom" arrow>
+          <Tooltip title={rowData.problemName} placement="bottom-start" arrow>
             {rowData.problemId}
           </Tooltip>
         ),
@@ -182,6 +182,7 @@ export default function ContestManagerUserSubmission(props) {
       {
         title: "Rejudge",
         sortable: "false",
+        headerStyle: { textAlign: "center" },
         cellStyle: { textAlign: "center" },
         render: (rowData) => (
           <IconButton
@@ -199,6 +200,7 @@ export default function ContestManagerUserSubmission(props) {
       {
         title: "View By User",
         sortable: false,
+        headerStyle: { textAlign: "center" },
         cellStyle: { textAlign: "center", minWidth: 96 },
         render: (rowData) => (
           <IconButton
