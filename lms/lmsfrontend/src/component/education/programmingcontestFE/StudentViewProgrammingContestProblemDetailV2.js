@@ -1,16 +1,20 @@
-import {Box, Button, CircularProgress, Divider, Grid, Typography,} from "@mui/material";
-import React, {useEffect, useRef, useState} from "react";
-import {useParams} from "react-router";
-import HustModal from "component/common/HustModal";
+import { LoadingButton } from "@mui/lab";
+import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
-import StudentViewSubmission from "./StudentViewSubmission";
-import {randomImageName,} from "utils/FileUpload/covert";
-import {errorNoti, successNoti} from "../../../utils/notification";
-import HustCodeLanguagePicker from "../../common/HustCodeLanguagePicker";
+import HustModal from "component/common/HustModal";
+import { ContentState, EditorState } from "draft-js";
+import htmlToDraft from "html-to-draftjs";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
+import { Editor } from "react-draft-wysiwyg";
+import { useParams } from "react-router";
+import { randomImageName } from "utils/FileUpload/covert";
+import { errorNoti, successNoti } from "utils/notification";
+import { request } from "../../../api";
 import FileUploadZone from "../../../utils/FileUpload/FileUploadZone";
-import HustContainerCard from "../../common/HustContainerCard";
 import HustCodeEditor from "../../common/HustCodeEditor";
-import {request} from "../../../api";
+import HustCodeLanguagePicker from "../../common/HustCodeLanguagePicker";
+import HustContainerCard from "../../common/HustContainerCard";
 import {
   COMPUTER_LANGUAGES,
   DEFAULT_CODE_SEGMENT_C,
@@ -18,12 +22,36 @@ import {
   DEFAULT_CODE_SEGMENT_JAVA,
   DEFAULT_CODE_SEGMENT_PYTHON,
   SUBMISSION_MODE_NOT_ALLOWED,
-  SUBMISSION_MODE_SOURCE_CODE
+  SUBMISSION_MODE_SOURCE_CODE,
 } from "./Constant";
-import ReactHtmlParser from 'react-html-parser';
-import {ContentState, EditorState} from "draft-js";
-import htmlToDraft from "html-to-draftjs";
-import {Editor} from "react-draft-wysiwyg";
+import StudentViewSubmission from "./StudentViewSubmission";
+
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
+
+const InputFileUpload = forwardRef((props, ref) => {
+  const { label, startIcon, ...otherProps } = props;
+  return (
+    <Button
+      component="label"
+      variant="outlined"
+      startIcon={startIcon}
+      sx={{ textTransform: "none" }}
+    >
+      {label}
+      <VisuallyHiddenInput type="file" ref={ref} {...otherProps} />
+    </Button>
+  );
+});
 
 const editorStyle = {
   editor: {
@@ -31,6 +59,16 @@ const editorStyle = {
     // minHeight: "300px",
   },
 };
+
+const ERR_STATUS = [
+  "TIME_OUT",
+  "PARTICIPANT_NOT_APPROVED_OR_REGISTERED",
+  "PARTICIPANT_HAS_NOT_PERMISSION_TO_SUBMIT",
+  "MAX_NUMBER_SUBMISSIONS_REACHED",
+  "MAX_SOURCE_CODE_LENGTH_VIOLATIONS",
+  "SUBMISSION_INTERVAL_VIOLATIONS",
+  "SUBMISSION_NOT_ALLOWED",
+];
 
 export default function StudentViewProgrammingContestProblemDetail() {
   const params = useParams();
@@ -43,7 +81,9 @@ export default function StudentViewProgrammingContestProblemDetail() {
   const [status, setStatus] = useState("");
   const [message, setMessage] = useState("");
   const [codeSolution, setCodeSolution] = useState("");
-  const [submissionMode, setSubmissionMode] = useState(SUBMISSION_MODE_SOURCE_CODE);
+  const [submissionMode, setSubmissionMode] = useState(
+    SUBMISSION_MODE_SOURCE_CODE
+  );
   const [isSubmitCode, setIsSubmitCode] = useState(0);
 
   const [openModalPreview, setOpenModalPreview] = useState(false);
@@ -56,16 +96,6 @@ export default function StudentViewProgrammingContestProblemDetail() {
     EditorState.createEmpty()
   );
   const [fetchedImageArray, setFetchedImageArray] = useState([]);
-
-  const ERR_STATUS = [
-    "TIME_OUT",
-    "PARTICIPANT_NOT_APPROVED_OR_REGISTERED",
-    "PARTICIPANT_HAS_NOT_PERMISSION_TO_SUBMIT",
-    "MAX_NUMBER_SUBMISSIONS_REACHED",
-    "MAX_SOURCE_CODE_LENGTH_VIOLATIONS",
-    "SUBMISSION_INTERVAL_VIOLATIONS",
-    "SUBMISSION_NOT_ALLOWED",
-  ];
 
   const inputRef = useRef();
   const listSubmissionRef = useRef(null);
@@ -82,6 +112,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
   const handleFormSubmit = async (event) => {
     if (event) event.preventDefault();
     setIsProcessing(true);
+
     let body = {
       problemId: problemId,
       contestId: contestId,
@@ -93,6 +124,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
       setIsProcessing(false);
       return;
     }
+
     let formData = new FormData();
     formData.append("inputJson", JSON.stringify(body));
     formData.append("file", file);
@@ -140,15 +172,12 @@ export default function StudentViewProgrammingContestProblemDetail() {
   function getProblemDetail() {
     request(
       "get",
-      "/contests/" +
-      contestId +
-      "/problems/" +
-      problemId,
+      "/contests/" + contestId + "/problems/" + problemId,
       (res) => {
         res = res.data;
         setProblem(res);
-        if(res.isPreloadCode) setCodeSolution(res.preloadCode);
-        if(res.submissionMode) setSubmissionMode(res.submissionMode);
+        if (res.isPreloadCode) setCodeSolution(res.preloadCode);
+        if (res.submissionMode) setSubmissionMode(res.submissionMode);
         if (res.attachment && res.attachment.length !== 0) {
           const newFileURLArray = res.attachment.map((url) => ({
             id: randomImageName(),
@@ -162,7 +191,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
 
         // setProblemDescription(res?.problemStatement || "");
         let problemDescriptionHtml = htmlToDraft(res.problemStatement);
-        let {contentBlocks, entityMap} = problemDescriptionHtml;
+        let { contentBlocks, entityMap } = problemDescriptionHtml;
         let contentDescriptionState = ContentState.createFromBlockArray(
           contentBlocks,
           entityMap
@@ -172,7 +201,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
         );
         setEditorStateDescription(statementDescription);
       },
-      {onError: (e) => console.log(e)}
+      { onError: (e) => console.log(e) }
     );
   }
 
@@ -198,7 +227,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
         setCodeSolution(DEFAULT_CODE_SEGMENT_PYTHON);
         break;
     }
-  }, [language])
+  }, [language]);
 
   const ModalPreview = (chosenTestcase) => {
     return (
@@ -222,27 +251,25 @@ export default function StudentViewProgrammingContestProblemDetail() {
   };
 
   async function submitCode() {
-    const blob = new Blob(
-      [codeSolution],
-      {type: "text/plain;charset=utf-8"}
-    );
+    const blob = new Blob([codeSolution], { type: "text/plain;charset=utf-8" });
     const now = new Date();
     const file = new File(
       [blob],
       "SourceCode_" + problemId + now.toLocaleTimeString() + ".txt",
-      {type: "text/plain;charset=utf-8"}
+      { type: "text/plain;charset=utf-8" }
     );
     setFile(file);
     setIsSubmitCode(isSubmitCode + 1);
   }
 
   useEffect(() => {
-    if (isSubmitCode > 0)
-      handleFormSubmit(null);
-  }, [isSubmitCode])
+    if (isSubmitCode > 0) handleFormSubmit(null);
+  }, [isSubmitCode]);
 
   return (
-    <HustContainerCard title={"Problem: " + (problem ? problem.problemName : "")}>
+    <HustContainerCard
+      title={"Problem: " + (problem ? problem.problemName : "")}
+    >
       <Box>
         <Typography variant="h5">Description</Typography>
         {/*{ReactHtmlParser(problemDescription)}*/}
@@ -255,14 +282,14 @@ export default function StudentViewProgrammingContestProblemDetail() {
         />
         {fetchedImageArray.length !== 0 &&
           fetchedImageArray.map((file) => (
-            <FileUploadZone file={file} removable={false}/>
+            <FileUploadZone file={file} removable={false} />
           ))}
       </Box>
 
-      <Divider/>
+      <Divider />
 
-      <ModalPreview chosenTestcase={selectedTestcase}/>
-      <Box sx={{mt: 2}}>
+      <ModalPreview chosenTestcase={selectedTestcase} />
+      <Box sx={{ mt: 2 }}>
         <Box>
           <HustCodeEditor
             title={"Source code"}
@@ -276,71 +303,89 @@ export default function StudentViewProgrammingContestProblemDetail() {
             }}
             height={"480px"}
           />
-          <Box sx={{width: "100%", display: "flex", justifyContent: "center", alignItems: "center"}}>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <Button
-              disabled={isProcessing || submissionMode === SUBMISSION_MODE_NOT_ALLOWED}
+              disabled={
+                isProcessing || submissionMode === SUBMISSION_MODE_NOT_ALLOWED
+              }
               color="primary"
               variant="contained"
               type="submit"
               onClick={submitCode}
-              sx={{mt: 1, mb: 1}}
+              sx={{ mt: 1, mb: 1 }}
             >
               SUBMIT CODE
             </Button>
-            {submissionMode === SUBMISSION_MODE_NOT_ALLOWED &&
+            {submissionMode === SUBMISSION_MODE_NOT_ALLOWED && (
               <Typography color="gray" ml={1}>
                 Currently, this contest problem is not open for submissions
               </Typography>
-            }
+            )}
           </Box>
-
         </Box>
 
-        <Divider>or</Divider>
+        <Divider>Or</Divider>
 
         <form onSubmit={handleFormSubmit}>
-          <Grid container spacing={1} alignItems="center" mt={1}>
-            <Grid item xs={3}/>
-            <Grid item xs={3}>
-              <input
-                type="file"
-                accept=".c, .cpp, .java, .py"
-                id="selected-upload-file"
-                onChange={onFileChange}
-                ref={inputRef}
+          <Stack alignItems={"center"} spacing={2} sx={{ mt: 1 }}>
+            <Stack
+              direction="row"
+              justifyContent={"center"}
+              alignItems="center"
+              spacing={4}
+            >
+              <HustCodeLanguagePicker
+                language={language}
+                onChangeLanguage={(e) => setLanguage(e.target.value)}
               />
-            </Grid>
-            <Grid item xs={1} mr={1}>
-              <HustCodeLanguagePicker language={language} onChangeLanguage={(e) => setLanguage(e.target.value)}/>
-            </Grid>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <InputFileUpload
+                  id="selected-upload-file"
+                  label="Select file"
+                  accept=".c, .cpp, .java, .py"
+                  onChange={onFileChange}
+                  ref={inputRef}
+                />
+                {file && <Typography variant="body1">{file.name}</Typography>}
+              </Stack>
+            </Stack>
 
-            <Grid item xs={2}>
-              <Button
-                disabled={isProcessing || submissionMode === SUBMISSION_MODE_NOT_ALLOWED}
-                color="primary"
-                variant="contained"
-                type="submit"
-                onChange={onInputChange}
-                width="100%"
-                sx={{marginLeft: "28px"}}
-              >
-                SUBMIT
-              </Button>
-            </Grid>
-            <Grid item xs={3}/>
-
-            {isProcessing ? <CircularProgress/> : ""}
-          </Grid>
+            <LoadingButton
+              disabled={
+                isProcessing || submissionMode === SUBMISSION_MODE_NOT_ALLOWED
+              }
+              sx={{ width: 128 }}
+              // loading={isProcessing}
+              // loadingIndicator="Submitting…"
+              variant="contained"
+              color="primary"
+              type="submit"
+              onChange={onInputChange}
+            >
+              <span>Submit</span>
+            </LoadingButton>
+          </Stack>
         </form>
         <div>
-          <h3>Status: <em>{status}</em></h3>
+          <h3>
+            Status: <em>{status}</em>
+          </h3>
         </div>
         <div>
-          <h3>Message: <em>{message}</em></h3>
+          <h3>
+            Message: <em>{message}</em>
+          </h3>
         </div>
       </Box>
-      <Box sx={{paddingTop: 2}}>
-        <StudentViewSubmission problemId={problemId} ref={listSubmissionRef}/>
+      <Box sx={{ paddingTop: 2 }}>
+        <StudentViewSubmission problemId={problemId} ref={listSubmissionRef} />
       </Box>
     </HustContainerCard>
   );

@@ -1,23 +1,22 @@
+import { MenuItem, TextField } from "@mui/material";
 import React from "react";
-import {MenuItem, TextField} from "@mui/material";
-import {COMPUTER_LANGUAGES, mapLanguageToDisplayName} from "../education/programmingcontestFE/Constant";
+import {
+  COMPUTER_LANGUAGES,
+  mapLanguageToDisplayName,
+} from "../education/programmingcontestFE/Constant";
 
 const HustCodeLanguagePicker = (props) => {
-  const {
-    language,
-    onChangeLanguage,
-    classRoot,
-    ...remainProps
-  } = props;
+  const { language, onChangeLanguage, classRoot, ...remainProps } = props;
 
   const getLanguage = (language) => {
     if (!language) return COMPUTER_LANGUAGES.CPP17;
-    if (language === 'CPP') return COMPUTER_LANGUAGES.CPP17;
+    if (language === "CPP") return COMPUTER_LANGUAGES.CPP17;
     return language;
-  }
+  };
 
   return (
     <TextField
+      sx={{ minWidth: 128 }}
       {...remainProps}
       className={`${classRoot}`}
       variant={"outlined"}
