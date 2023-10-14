@@ -129,7 +129,7 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmissionEn
                    "from ContestSubmissionEntity c " +
                    "where c.userId = ?1 " +
                    "and c.contestId = ?2 " +
-                   "and c.managementStatus != 'DISABLED' " +
+                   "and c.managementStatus is null or c.managementStatus != 'DISABLED' " +
                    "group by c.problemId")
     List<ModelSubmissionInfoRanking> getHighestSubmissions(String userId, String contestId);
 
