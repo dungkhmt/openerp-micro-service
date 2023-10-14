@@ -311,18 +311,21 @@ export default function StudentViewProgrammingContestProblemDetail() {
               alignItems: "center",
             }}
           >
-            <Button
+            <LoadingButton
               disabled={
                 isProcessing || submissionMode === SUBMISSION_MODE_NOT_ALLOWED
               }
-              color="primary"
+              sx={{ width: 160, mt: 1, mb: 1 }}
+              // loading={isProcessing}
+              // loadingIndicator="Submitting…"
               variant="contained"
+              color="primary"
               type="submit"
               onClick={submitCode}
-              sx={{ mt: 1, mb: 1 }}
             >
-              SUBMIT CODE
-            </Button>
+              <span>SUBMIT CODE</span>
+            </LoadingButton>
+
             {submissionMode === SUBMISSION_MODE_NOT_ALLOWED && (
               <Typography color="gray" ml={1}>
                 Currently, this contest problem is not open for submissions
@@ -373,7 +376,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
             </LoadingButton>
           </Stack>
         </form>
-        <div>
+        {/* <div>
           <h3>
             Status: <em>{status}</em>
           </h3>
@@ -382,7 +385,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
           <h3>
             Message: <em>{message}</em>
           </h3>
-        </div>
+        </div> */}
       </Box>
       <Box sx={{ paddingTop: 2 }}>
         <StudentViewSubmission problemId={problemId} ref={listSubmissionRef} />

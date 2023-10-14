@@ -1,25 +1,20 @@
-import {Box, Button, CircularProgress, IconButton} from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import ReplayIcon from "@mui/icons-material/Replay";
+import { LoadingButton } from "@mui/lab";
+import { Box, IconButton, Stack } from "@mui/material";
 import StandardTable from "component/table/StandardTable";
-import React, {forwardRef, useEffect, useImperativeHandle, useState} from "react";
-import {useTranslation} from "react-i18next";
-import {Link, useParams} from "react-router-dom";
-import {request} from "../../../api";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useParams } from "react-router-dom";
+import { request } from "../../../api";
 import HustCopyCodeBlock from "../../common/HustCopyCodeBlock";
 import HustModal from "../../common/HustModal";
 
-const commandBarStyles = {
-  position: "sticky",
-  top: 60,
-  zIndex: 11,
-  mt: -3,
-  mb: 3,
-};
 const StudentViewSubmission = forwardRef((props, ref) => {
-  const {t} = useTranslation(
+  const { t } = useTranslation(
     "education/programmingcontest/studentviewcontestdetail"
   );
-  const {contestId} = useParams();
+  const { contestId } = useParams();
   const problemId = props?.problemId || "";
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +25,11 @@ const StudentViewSubmission = forwardRef((props, ref) => {
   const getSubmissions = async () => {
     let requestUrl = "";
     if (problemId !== "")
-      requestUrl = "/contests/users/submissions?contestid=" + contestId + "&problemid=" + problemId;
+      requestUrl =
+        "/contests/users/submissions?contestid=" +
+        contestId +
+        "&problemid=" +
+        problemId;
     else requestUrl = "/contests/" + contestId + "/users/submissions";
 
     await request(
@@ -66,27 +65,29 @@ const StudentViewSubmission = forwardRef((props, ref) => {
         </Link>
       ),
     },
-    {title: t("problem"), field: "problemId"},
+    { title: t("problem"), field: "problemId" },
     {
       title: t("submissionList.status"),
       field: "status",
       cellStyle: (status) => {
         switch (status) {
           case "Accept":
-            return {color: "green"};
+            return { color: "green" };
           case "In Progress":
-            return {color: "gold"};
+            return { color: "gold" };
           case "Pending Evaluation":
-            return {color: "goldenrod"};
+            return { color: "goldenrod" };
           case "Evaluated":
-            return {color: "darkcyan"};
+            return { color: "darkcyan" };
           default:
-            return {color: "red"};
+            return { color: "red" };
         }
       },
     },
     {
-      title: "Message", field: "message", render: (rowData) => (
+      title: "Message",
+      field: "message",
+      render: (rowData) => (
         <IconButton
           color="primary"
           onClick={() => {
@@ -94,18 +95,22 @@ const StudentViewSubmission = forwardRef((props, ref) => {
             setOpenModalMessage(true);
           }}
         >
-          <InfoIcon/>
+          <InfoIcon />
         </IconButton>
       ),
     },
-    {title: t("submissionList.point"), field: "point", cellStyle: {fontWeight: 500}},
-    {title: t("submissionList.language"), field: "sourceCodeLanguage"},
+    {
+      title: t("submissionList.point"),
+      field: "point",
+      cellStyle: { fontWeight: 500 },
+    },
+    { title: t("submissionList.language"), field: "sourceCodeLanguage" },
     {
       title: t("submissionList.numTestCases"),
       field: "testCasePass",
       align: "center",
     },
-    {title: t("submissionList.at"), field: "createAt"},
+    { title: t("submissionList.at"), field: "createAt" },
   ];
 
   function handleRefresh() {
@@ -115,17 +120,17 @@ const StudentViewSubmission = forwardRef((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     refreshSubmission() {
-      handleRefresh()
-    }
+      handleRefresh();
+    },
   }));
 
-
-  const ModalMessage = ({rowData}) => {
+  const ModalMessage = ({ rowData }) => {
     let message = "";
     let detailLink = "";
     if (rowData) {
       if (rowData["message"]) message = rowData["message"];
-      if (rowData["contestSubmissionId"]) detailLink = rowData["contestSubmissionId"];
+      if (rowData["contestSubmissionId"])
+        detailLink = rowData["contestSubmissionId"];
     }
     return (
       <HustModal
@@ -134,10 +139,7 @@ const StudentViewSubmission = forwardRef((props, ref) => {
         isNotShowCloseButton
         showCloseBtnTitle={false}
       >
-        <HustCopyCodeBlock
-          title="Response"
-          text={message}
-        />
+        <HustCopyCodeBlock title="Response" text={message} />
         <Box paddingTop={2}>
           <Link
             to={{
@@ -154,42 +156,39 @@ const StudentViewSubmission = forwardRef((props, ref) => {
   };
 
   return (
-    <Box sx={{marginTop: "20px"}}>
-      <div>
-        <StandardTable
-          title={t("submissionList.title")}
-          columns={columns}
-          data={submissions}
-          options={{
-            selection: false,
-            pageSize: 10,
-            search: true,
-            sorting: true,
+    <Box sx={{ marginTop: "20px" }}>
+      <Stack direction={"row"} justifyContent={"flex-end"} sx={{ mb: 2 }}>
+        <LoadingButton
+          disabled={loading}
+          color="primary"
+          variant="contained"
+          loading={loading}
+          loadingPosition="start"
+          startIcon={<ReplayIcon />}
+          sx={{ mr: 2 }}
+          onClick={() => {
+            setLoading(true);
+            setTimeout(handleRefresh, 2000);
           }}
-          sx={{
-            commandBar: commandBarStyles,
-          }}
-          commandBarComponents={
-            <>
-              <Button
-                variant="contained"
-                disabled={loading}
-                onClick={() => {
-                  setLoading(true);
-                  setTimeout(handleRefresh, 2000);
-                }}
-              >
-                {" "}
-                REFRESH
-              </Button>
-              {loading && <CircularProgress/>}
-              <ModalMessage rowData={selectedRowData}/>
-            </>
-          }
-        />
-      </div>
+        >
+          <span style={{ textTransform: "none" }}>Refresh</span>
+        </LoadingButton>
+      </Stack>
+      <ModalMessage rowData={selectedRowData} />
+      <StandardTable
+        title={t("submissionList.title")}
+        columns={columns}
+        data={submissions}
+        hideCommandBar
+        options={{
+          selection: false,
+          pageSize: 10,
+          search: true,
+          sorting: true,
+        }}
+      />
     </Box>
   );
-})
+});
 
 export default StudentViewSubmission;
