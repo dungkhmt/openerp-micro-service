@@ -50,20 +50,17 @@ export const resolveLanguage = (str) => {
 export default function ContestProblemSubmissionDetailViewedByManager() {
   const { problemSubmissionId } = useParams();
 
-  //
   const [submission, setSubmission] = useState({});
 
-  //
-  const [contestId, setContestId] = useState();
-  const [listProblemIds, setListProblemIds] = useState([]);
-  const [listProblems, setListProblems] = useState([]);
   const [submissionSource, setSubmissionSource] = useState("");
 
-  //
-  const [checked, setChecked] = useState(true);
-
   const handleChange = (event) => {
-    setChecked(event.target.checked);
+    // console.log(event);
+    if (event.target.checked === true) {
+      handleEnableSubmission();
+    } else {
+      handleDisableSubmission();
+    }
   };
 
   function updateCode() {
@@ -86,29 +83,24 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
   }
 
   function handleDisableSubmission() {
-    //alert('disable submission ' + problemSubmissionId);
     request(
-      "get",
-      "/teacher/disable-submissions/" + problemSubmissionId,
+      "post",
+      "/teacher/submissions/" + problemSubmissionId + "/disable",
       (res) => {
         setSubmission(res.data);
-
-        setSubmissionSource(res.data.sourceCode);
-        successNoti("Submission disabled successfully");
+        successNoti("Submission disabled");
       },
       {}
     );
   }
+
   function handleEnableSubmission() {
-    //alert('disable submission ' + problemSubmissionId);
     request(
-      "get",
-      "/teacher/enable-submissions/" + problemSubmissionId,
+      "post",
+      "/teacher/submissions/" + problemSubmissionId + "/enable",
       (res) => {
         setSubmission(res.data);
-
-        setSubmissionSource(res.data.sourceCode);
-        successNoti("Submission enabled successfully");
+        successNoti("Submission enabled");
       },
       {}
     );
@@ -121,17 +113,6 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
       (res) => {
         setSubmission(res.data);
         setSubmissionSource(res.data.sourceCode);
-      },
-      {}
-    );
-
-    request(
-      "get",
-      "/subsmissions/" + problemSubmissionId + "/contest",
-      (res) => {
-        setListProblemIds(res.data.problemIds);
-        setListProblems(res.data.problems);
-        setContestId(res.data.contestId);
       },
       {}
     );
@@ -158,12 +139,6 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
             backgroundColor: "transparent",
           }}
         >
-          {/* <Button variant="outlined" onClick={handleDisableSubmission}>
-            DISABLE
-          </Button>
-          <Button variant="outlined" onClick={handleEnableSubmission}>
-            ENABLE
-          </Button> */}
           <Box sx={{ mb: 4 }}>
             <HustCopyCodeBlock
               title="Message"
@@ -253,13 +228,15 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
           <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
             Enabled
           </Typography>
-          <Switch
-            color="success"
-            checked={checked}
-            onChange={handleChange}
-            inputProps={{ "aria-label": "Switch enable submission" }}
-            sx={{ ml: -1.25, mb: 1.25, mt: -1 }}
-          />
+          {submission.managementStatus && (
+            <Switch
+              color="success"
+              checked={submission.managementStatus === "ENABLED"}
+              onChange={handleChange}
+              inputProps={{ "aria-label": "Switch enable submission" }}
+              sx={{ ml: -1.25, mb: 1.25, mt: -1 }}
+            />
+          )}
           {[
             [
               "Status",
@@ -306,6 +283,37 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
               </Link>,
             ],
           ].map(([key, value, sx]) => detail(key, value, sx))}
+
+          {/* <Divider />
+          {submission.managementStatus === "ENABLED" && (
+            <Button
+              fullWidth
+              variant="outlined"
+              color="error"
+              onClick={handleDisableSubmission}
+              sx={{ marginTop: "18px" }}
+            >
+              DISABLE THIS SUBMISSION
+            </Button>
+          )}
+          {submission.managementStatus === "DISABLED" && (
+            <>
+              <Typography
+                sx={{ color: "gray", fontSize: "14px", marginTop: "12px" }}
+              >
+                This submission is currently disabled
+              </Typography>
+              <Button
+                fullWidth
+                variant="outlined"
+                color="primary"
+                onClick={handleEnableSubmission}
+                sx={{ marginTop: "8px" }}
+              >
+                ENABLE THIS SUBMISSION
+              </Button>
+            </>
+          )} */}
         </Paper>
       </Box>
     </Stack>
