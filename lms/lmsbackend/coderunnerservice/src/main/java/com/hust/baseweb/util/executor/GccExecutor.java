@@ -75,44 +75,47 @@ public class GccExecutor {
             ComputerLanguage.Languages language
     ) {
         String genTestCase = "";
-        //for(int i = 0; i < testCaseEntities.size(); i++){
         String testcase = "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase" + 0 + ".txt \n"
                 + testCase.getTestCase() + "\n"
                 + testCase.getCorrectAnswer() + "\n"
                 + solutionOutput + "\n"
                 + SOURCECODE_DELIMITER + "\n";
         genTestCase += testcase;
-        //}
 
-        String sourceSH = SHFileStart
-                + "mkdir -p " + tmpName + "\n"
-                + "cd " + tmpName + "\n"
-                + "cat <<'" + SOURCECODE_DELIMITER + "' >> main" + getFileExtension(language) + "\n"
-                + sourceChecker + "\n"
-                + SOURCECODE_DELIMITER + "\n"
-                + getBuildCmd(language) + "\n"
-                + "FILE=main" + "\n"
-                + "if test -f \"$FILE\"; then" + "\n"
-                + genTestCase + "\n"
-                + "n=0\n"
-                + "start=$(date +%s%N)\n"
-                + "while [ \"$n\" -lt " + 1 + " ]" + "\n"
-                + "do\n"
-                + "f=\"testcase\"$n\".txt\"" + "\n"
-                + "cat $f | timeout " + timeLimit + "s " + "./main  || echo Time Limit Exceeded" + "\n"
-                + "echo " + Constants.SPLIT_TEST_CASE + "\n"
-                + "n=`expr $n + 1`\n"
-                + "done\n"
-                + "end=$(date +%s%N)\n"
-                + "echo \n"
-                + "echo \"$(($(($end-$start))/1000000))\"\n"
-                + "echo successful\n"
-                + "else\n"
-                + "echo Compile Error\n"
-                + "fi" + "\n"
-                + "cd .. \n"
-                + "rm -rf " + tmpName + " & " + "\n"
-                + "rm -rf " + tmpName + ".sh" + " & " + "\n";
+        String[] commands = {
+                SHFileStart,
+                "mkdir -p " + tmpName,
+                "cd " + tmpName,
+                "cat <<'" + SOURCECODE_DELIMITER + "' >> main" + getFileExtension(language),
+                sourceChecker,
+                SOURCECODE_DELIMITER,
+                getBuildCmd(language),
+                "FILE=main",
+                "if test -f \"$FILE\"; then",
+                genTestCase,
+                "n=0",
+                "start=$(date +%s%N)",
+                "while [ \"$n\" -lt 1 ]",
+                "do",
+                "f=\"testcase\"$n\".txt\"",
+                "cat $f | timeout " + timeLimit + "s " + "./main  || echo Time Limit Exceeded",
+                Constants.SPLIT_TEST_CASE,
+                "n=`expr $n + 1`",
+                "done",
+                "end=$(date +%s%N)",
+                "",
+                "echo",
+                "echo \"$(($(($end-$start))/1000000))\"",
+                "echo successful",
+                "else",
+                "echo Compile Error",
+                "fi",
+                "cd ..",
+                "rm -rf " + tmpName + " &",
+                "rm -rf " + tmpName + ".sh" + " &"
+        };
+
+        String sourceSH = String.join("\n", commands);
         return sourceSH;
 
     }
@@ -145,7 +148,7 @@ public class GccExecutor {
                 getBuildCmd(language),
                 "FILE=main",
                 "if test -f \"$FILE\"; then",
-                String.valueOf(genTestCase),
+                genTestCase.toString(),
                 "n=0",
                 "start=$(date +%s%N)",
                 "while [ \"$n\" -lt " + testCaseEntities.size() + " ]",
