@@ -1,26 +1,24 @@
-import { Divider, Link, Paper, Stack, Typography, Button } from "@mui/material";
+import { Divider, Link, Paper, Stack, Switch, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { request } from "api";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import displayTime from "utils/DateTimeUtils";
+import { successNoti } from "utils/notification";
 import ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase from "./ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase";
 import { getStatusColor } from "./lib";
-import {errorNoti, successNoti} from "utils/notification";
 
-//import { Button } from "@material-ui/core";
-
-export const detail = (key, value) => (
+export const detail = (key, value, sx) => (
   <>
-    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+    <Typography variant="subtitle2" sx={{ fontWeight: 600, ...sx?.key }}>
       {key}
     </Typography>
 
     <Typography
       variant="subtitle2"
       gutterBottom
-      sx={{ mb: 2, fontWeight: 400 }}
+      sx={{ mb: 2, fontWeight: 400, ...sx?.value }}
     >
       {value}{" "}
     </Typography>
@@ -61,6 +59,13 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
   const [listProblems, setListProblems] = useState([]);
   const [submissionSource, setSubmissionSource] = useState("");
 
+  //
+  const [checked, setChecked] = useState(true);
+
+  const handleChange = (event) => {
+    setChecked(event.target.checked);
+  };
+
   function updateCode() {
     let body = {
       contestSubmissionId: problemSubmissionId,
@@ -80,7 +85,7 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
     ).then();
   }
 
-  function handleDisableSubmission(){
+  function handleDisableSubmission() {
     //alert('disable submission ' + problemSubmissionId);
     request(
       "get",
@@ -94,7 +99,7 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
       {}
     );
   }
-  function handleEnableSubmission(){
+  function handleEnableSubmission() {
     //alert('disable submission ' + problemSubmissionId);
     request(
       "get",
@@ -132,7 +137,6 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
     );
   }, []);
 
-
   return (
     <Stack direction="row">
       <Stack
@@ -143,17 +147,23 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
           overflowY: "scroll",
           borderTopLeftRadius: 8,
           borderBottomLeftRadius: 8,
+          backgroundColor: "#fff",
           height: "calc(100vh - 112px)",
         }}
       >
         <Paper
+          elevation={0}
           sx={{
             p: 2,
+            backgroundColor: "transparent",
           }}
         >
-          <Button variant="outlined" onClick={handleDisableSubmission}>DISABLE</Button>
-          <Button variant="outlined" onClick={handleEnableSubmission}>ENABLE</Button>
-          
+          {/* <Button variant="outlined" onClick={handleDisableSubmission}>
+            DISABLE
+          </Button>
+          <Button variant="outlined" onClick={handleEnableSubmission}>
+            ENABLE
+          </Button> */}
           <Box sx={{ mb: 4 }}>
             <HustCopyCodeBlock
               title="Message"
@@ -181,8 +191,11 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
             }}
           ></TextField> */}
           </Box>
-          <Box>
-            {/* <TextField
+          {submission.status &&
+            submission.status !== "Compile Error" &&
+            submission.status !== "In Progress" && (
+              <Box>
+                {/* <TextField
           autoFocus
           // required
           select
@@ -201,7 +214,7 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
           ))}
         </TextField>
         <Button onClick={updateCode}>Update Code</Button> */}
-            {/*
+                {/*
       <CodeMirror
         height={"400px"}
         width="100%"
@@ -211,13 +224,14 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
         value={submissionSource}
       />
       */}
-            <Typography variant={"h6"} sx={{ mb: 1 }}>
-              Test cases
-            </Typography>
-            <ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase
-              submissionId={problemSubmissionId}
-            />
-          </Box>
+                <Typography variant={"h6"} sx={{ mb: 1 }}>
+                  Test cases
+                </Typography>
+                <ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase
+                  submissionId={problemSubmissionId}
+                />
+              </Box>
+            )}
         </Paper>
       </Stack>
       <Box>
@@ -237,20 +251,25 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
           </Typography>
           <Divider sx={{ mb: 1 }} />
           <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-            Status
+            Enabled
           </Typography>
-          <Typography
-            variant="subtitle2"
-            gutterBottom
-            sx={{
-              color: getStatusColor(`${submission.status}`),
-              mb: 2,
-              fontWeight: 400,
-            }}
-          >
-            {submission.status}
-          </Typography>
+          <Switch
+            color="success"
+            checked={checked}
+            onChange={handleChange}
+            inputProps={{ "aria-label": "Switch enable submission" }}
+            sx={{ ml: -1.25, mb: 1.25, mt: -1 }}
+          />
           {[
+            [
+              "Status",
+              submission.status,
+              {
+                value: {
+                  color: getStatusColor(`${submission.status}`),
+                },
+              },
+            ],
             [
               "Pass",
               submission.testCasePass
@@ -286,7 +305,7 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
                 {submission.contestId}
               </Link>,
             ],
-          ].map(([key, value]) => detail(key, value))}
+          ].map(([key, value, sx]) => detail(key, value, sx))}
         </Paper>
       </Box>
     </Stack>
