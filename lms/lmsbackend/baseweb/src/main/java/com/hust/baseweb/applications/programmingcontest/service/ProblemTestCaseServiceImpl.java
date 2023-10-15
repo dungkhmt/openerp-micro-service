@@ -2577,7 +2577,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 if (submissions != null && submissions.size() > 0) {// take the last submission in the sorted list
                     for(ContestSubmissionEntity sub: submissions) {
                         //ContestSubmissionEntity sub = submissions.get(0);
-                        if(sub.getPoint() > 0)// consider only submissions having points
+                        //if(sub.getPoint() > 0)// consider only submissions having points
                             listSubmissions.add(sub);
                     }
                 }
@@ -2611,8 +2611,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     }
 
                     double score = CodeSimilarityCheck.check(s1.getSourceCode(), s2.getSourceCode());
-                    //  log.info("checkSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size()
-                    //     + " score between codes " + i + " and " + j + " = " + score + " threshold = " + I.getThreshold());
+                    log.info("checkSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size()
+                         + " score between codes " + i + " and " + j + " = " + score + " threshold = " + I.getThreshold());
 
                     //if(score <= 0.0001) continue;
                     if (score <= I.getThreshold() * 0.01) {
@@ -2639,11 +2639,13 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                                         s1.getContestSubmissionId(),
                                                                                         s2.getContestSubmissionId());
 
-                    if(codePlagiarisms != null){
+                    if(codePlagiarisms != null && codePlagiarisms.size() > 0){
+                        log.info("checkSimilarity, codePlagiarism sz = " + codePlagiarisms.size());
                         for(CodePlagiarism cp: codePlagiarisms){
                             cp.setScore(score);
                             cp.setCreatedStamp(new Date());
                             cp = codePlagiarismRepo.save(cp);
+                            log.info("checkSimilarity, codePlagiarism sz = " + codePlagiarisms.size() + " exist -> update score " + score);
                         }
                     }else {
 
