@@ -4,7 +4,7 @@ package com.hust.baseweb.applications.programmingcontest.utils.executor;
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
 import com.hust.baseweb.applications.programmingcontest.utils.ComputerLanguage;
-import com.hust.baseweb.utils.CommonUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class GccExecutor {
     private static final String BUILD_COMMAND_CPP_14 = "g++ -std=c++14 -w -o main main.cpp";
     private static final String BUILD_COMMAND_CPP_17 = "g++ -std=c++17 -w -o main main.cpp";
 
-    private static final String SOURCECODE_DELIMITER = "CPP_FILE" + CommonUtils.generateRandomString(10);
+    private static final String SOURCECODE_DELIMITER = "CPP_FILE" + RandomStringUtils.randomAlphabetic(10);
 
     private String getBuildCmd(ComputerLanguage.Languages language) {
         switch (language) {

@@ -3,7 +3,7 @@ package com.hust.baseweb.applications.programmingcontest.utils.executor;
 
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
-import com.hust.baseweb.utils.CommonUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.List;
 
@@ -12,7 +12,8 @@ public class Python3Executor {
     private static final String suffixes = ".py";
     private static final String SHFileStart = "#!/bin/bash\n";
     private static final String buildCmd = "python3 -m py_compile main.py";
-    private static final String SOURCECODE_DELIMITER = "CPP_FILE" + CommonUtils.generateRandomString(10);
+    private static final String SOURCECODE_DELIMITER = "PYTHON_FILE" + RandomStringUtils.randomAlphabetic(10);
+    ;
 
     private static final String TIME_LIMIT_ERROR = Constants.TestCaseSubmissionError.TIME_LIMIT.getValue();
     private static final String FILE_LIMIT_ERROR = Constants.TestCaseSubmissionError.FILE_LIMIT.getValue();
