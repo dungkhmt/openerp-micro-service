@@ -15,7 +15,7 @@ public class GccExecutor {
     private static final String BUILD_COMMAND_CPP_14 = "g++ -std=c++14 -w -o main main.cpp";
     private static final String BUILD_COMMAND_CPP_17 = "g++ -std=c++17 -w -o main main.cpp";
 
-    private static final String SOURCECODE_DELIMITER = "CPP_FILE" + RandomStringUtils.randomAlphabetic(10);
+    private static final String HEREDOC_DELIMITER = "CPP_FILE" + RandomStringUtils.randomAlphabetic(10);
 
     private String getBuildCmd(ComputerLanguage.Languages language) {
         switch (language) {
@@ -30,7 +30,7 @@ public class GccExecutor {
         }
     }
 
-    private String getFileExtension(ComputerLanguage.Languages language){
+    private String getFileExtension(ComputerLanguage.Languages language) {
         if (language == ComputerLanguage.Languages.C) {
             return FILE_EXTENSION_C;
         }
@@ -39,7 +39,7 @@ public class GccExecutor {
 
     private static final String FILE_EXTENSION_C = ".c";
     private static final String FILE_EXTENSION_CPP = ".cpp";
-    private static final String SHFileStart = "#!/bin/bash\n";
+    private static final String SHEBANG = "#!/bin/bash\n";
 
     private static final String TIME_LIMIT_ERROR = Constants.TestCaseSubmissionError.TIME_LIMIT.getValue();
     private static final String FILE_LIMIT_ERROR = Constants.TestCaseSubmissionError.FILE_LIMIT.getValue();
@@ -59,92 +59,54 @@ public class GccExecutor {
         ComputerLanguage.Languages cppVersion
     ) {
 
-        String sourceSH = SHFileStart
-                          +
-                          "mkdir -p " +
-                          tmpName +
-                          "\n"
-                          +
-                          "cd " +
-                          tmpName +
-                          "\n"
-                          +
-                          "cat <<'" + SOURCECODE_DELIMITER + "' >> main" +
-                          getFileExtension(cppVersion) +
-                          "\n"
-                          +
-                          source +
-                          "\n"
-                          +
-                          SOURCECODE_DELIMITER +
-                          "\n"
-                          +
-                          "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase.txt \n"
-                          +
-                          testCase +
-                          "\n"
-                          +
-                          SOURCECODE_DELIMITER +
-                          "\n"
-                          +
-                          getBuildCmd(cppVersion) +
-                          "\n"
-                          +
-                          "FILE=main" +
-                          "\n"
-                          +
-                          "if test -f \"$FILE\"; then" +
-                          "\n"
-                          +
-                          "    cat testcase.txt | timeout " +
-                          timeLimit +
-                          "s " +
-                          "./main && echo -e \"\\nSuccessful\" || echo Time Limit Exceeded" +
-                          "\n"
-                          +
-                          "else\n"
-                          +
-                          "  echo Compile Error\n"
-                          +
-                          "fi" +
-                          "\n"
-                          +
-                          "cd .. \n"
-                          +
-                          "rm -rf " +
-                          tmpName +
-                          " & " +
-                          "\n"
-                          +
-                          "rm -rf " +
-                          tmpName +
-                          ".sh" +
-                          " & " +
-                          "\n";
+        String[] sourceSH = {
+            SHEBANG,
+            "mkdir -p " + tmpName,
+            "cd " + tmpName,
+            "cat <<'" + HEREDOC_DELIMITER + "' >> main" + getFileExtension(cppVersion),
+            source,
+            HEREDOC_DELIMITER,
+            "cat <<'" + HEREDOC_DELIMITER + "' >> testcase.txt ",
+            testCase,
+            HEREDOC_DELIMITER,
+            getBuildCmd(cppVersion),
+            "FILE=main",
+            "if test -f \"$FILE\"; then",
+            "    cat testcase.txt | timeout " +
+            timeLimit +
+            "s " +
+            "./main && echo -e \"\\nSuccessful\" || echo Time Limit Exceeded",
+            "else",
+            "  echo Compile Error",
+            "fi",
+            "cd .. ",
+            "rm -rf " + tmpName + " & ",
+            "rm -rf " + tmpName + ".sh" + " & " + "\n"};
 
-        return sourceSH;
+        return String.join("\n", sourceSH);
     }
 
     public String checkCompile(String source, String tmpName, ComputerLanguage.Languages language) {
 
-        String sourceSH = SHFileStart
-                          + "mkdir -p " + tmpName + "\n"
-                          + "cd " + tmpName + "\n"
-                          + "cat <<'" + SOURCECODE_DELIMITER + "' >> main" + getFileExtension(language) + "\n"
-                          + source + "\n"
-                          + SOURCECODE_DELIMITER + "\n"
-                          + getBuildCmd(language) + "\n"
-                          + "FILE=main" + "\n"
-                          + "if test -f \"$FILE\"; then" + "\n"
-                          + "  echo Successful\n"
-                          + "else\n"
-                          + "  echo Compile Error\n"
-                          + "fi" + "\n"
-                          + "cd .. \n"
-                          + "rm -rf " + tmpName + " & " + "\n"
-                          + "rm -rf " + tmpName + ".sh" + " & " + "\n";
+        String[] sourceSH = {
+            SHEBANG,
+            "mkdir -p " + tmpName,
+            "cd " + tmpName,
+            "cat <<'" + HEREDOC_DELIMITER + "' >> main" + getFileExtension(language),
+            source,
+            HEREDOC_DELIMITER,
+            getBuildCmd(language),
+            "FILE=main",
+            "if test -f \"$FILE\"; then",
+            "  echo Successful",
+            "else",
+            "  echo Compile Error",
+            "fi",
+            "cd .. ",
+            "rm -rf " + tmpName + " & ",
+            "rm -rf " + tmpName + ".sh" + " & " + "\n"};
 
-        return sourceSH;
+        return String.join("\n", sourceSH);
     }
 
     public String genSubmitScriptFileChecker(
@@ -157,44 +119,48 @@ public class GccExecutor {
     ) {
         String genTestCase = "";
         //for(int i = 0; i < testCaseEntities.size(); i++){
-        String testcase = "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase" + 0 + ".txt \n"
-                          + testCase.getTestCase() + "\n"
-                          + testCase.getCorrectAnswer() + "\n"
-                          + solutionOutput + "\n"
-                          + SOURCECODE_DELIMITER + "\n";
+        String testcase = String.join("\n", new String[]{
+            "cat <<'" + HEREDOC_DELIMITER + "' >> testcase" + 0 + ".txt ",
+            testCase.getTestCase(),
+            testCase.getCorrectAnswer(),
+            solutionOutput,
+            HEREDOC_DELIMITER + "\n"
+        });
+
         genTestCase += testcase;
         //}
 
-        String sourceSH = SHFileStart
-                          + "mkdir -p " + tmpName + "\n"
-                          + "cd " + tmpName + "\n"
-                          + "cat <<'" + SOURCECODE_DELIMITER + "' >> main" + getFileExtension(language) + "\n"
-                          + sourceChecker + "\n"
-                          + SOURCECODE_DELIMITER + "\n"
-                          + getBuildCmd(language) + "\n"
-                          + "FILE=main" + "\n"
-                          + "if test -f \"$FILE\"; then" + "\n"
-                          + genTestCase + "\n"
-                          + "n=0\n"
-                          + "start=$(date +%s%N)\n"
-                          + "while [ \"$n\" -lt " + 1 + " ]" + "\n"
-                          + "do\n"
-                          + "f=\"testcase\"$n\".txt\"" + "\n"
-                          + "cat $f | timeout " + timeLimit + "s " + "./main  || echo Time Limit Exceeded" + "\n"
-                          + "echo " + Constants.SPLIT_TEST_CASE + "\n"
-                          + "n=`expr $n + 1`\n"
-                          + "done\n"
-                          + "end=$(date +%s%N)\n"
-                          + "echo \n"
-                          + "echo \"$(($(($end-$start))/1000000))\"\n"
-                          + "echo successful\n"
-                          + "else\n"
-                          + "echo Compile Error\n"
-                          + "fi" + "\n"
-                          + "cd .. \n"
-                          + "rm -rf " + tmpName + " & " + "\n"
-                          + "rm -rf " + tmpName + ".sh" + " & " + "\n";
-        return sourceSH;
+        String[] sourceSH = {
+            SHEBANG,
+            "mkdir -p " + tmpName,
+            "cd " + tmpName,
+            "cat <<'" + HEREDOC_DELIMITER + "' >> main" + getFileExtension(language),
+            sourceChecker,
+            HEREDOC_DELIMITER,
+            getBuildCmd(language),
+            "FILE=main",
+            "if test -f \"$FILE\"; then",
+            genTestCase,
+            "n=0",
+            "start=$(date +%s%N)",
+            "while [ \"$n\" -lt " + 1 + " ]",
+            "do",
+            "f=\"testcase\"$n\".txt\"",
+            "cat $f | timeout " + timeLimit + "s " + "./main  || echo Time Limit Exceeded",
+            "echo " + Constants.SPLIT_TEST_CASE,
+            "n=`expr $n + 1`",
+            "done",
+            "end=$(date +%s%N)",
+            "echo ",
+            "echo \"$(($(($end-$start))/1000000))\"",
+            "echo successful",
+            "else",
+            "echo Compile Error",
+            "fi",
+            "cd .. ",
+            "rm -rf " + tmpName + " & ",
+            "rm -rf " + tmpName + ".sh" + " & " + "\n"};
+        return String.join("\n", sourceSH);
 
     }
 
@@ -208,20 +174,20 @@ public class GccExecutor {
     ) {
         StringBuilder genTestCase = new StringBuilder();
         for (int i = 0; i < testCaseEntities.size(); i++) {
-            String testcase = "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase" + i + ".txt \n"
+            String testcase = "cat <<'" + HEREDOC_DELIMITER + "' >> testcase" + i + ".txt \n"
                               + testCaseEntities.get(i).getTestCase() + "\n"
-                              + SOURCECODE_DELIMITER + "\n";
+                              + HEREDOC_DELIMITER + "\n";
             genTestCase.append(testcase);
         }
 
         String outputFileName = tmpName + "_output.txt";
         String errorFileName = tmpName + "_error.txt";
-        String sourceSH = SHFileStart
+        String sourceSH = SHEBANG
                           + "mkdir -p " + tmpName + "\n"
                           + "cd " + tmpName + "\n"
-                          + "cat <<'" + SOURCECODE_DELIMITER + "' >> main" + getFileExtension(language) + "\n"
+                          + "cat <<'" + HEREDOC_DELIMITER + "' >> main" + getFileExtension(language) + "\n"
                           + source + "\n"
-                          + SOURCECODE_DELIMITER + "\n"
+                          + HEREDOC_DELIMITER + "\n"
                           + getBuildCmd(language) + "\n"
                           + "FILE=main" + "\n"
                           + "if test -f \"$FILE\"; then" + "\n"
