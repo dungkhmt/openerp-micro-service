@@ -3,16 +3,18 @@ package com.hust.baseweb.util.executor;
 import com.hust.baseweb.constants.ComputerLanguage;
 import com.hust.baseweb.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
+import com.hust.baseweb.util.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class GccExecutor {
     private static final String BUILD_COMMAND_C = "gcc -std=c17 -w -o main main.c -lm";
     private static final String BUILD_COMMAND_CPP_11 = "g++ -std=c++11 -w -o main main.cpp";
     private static final String BUILD_COMMAND_CPP_14 = "g++ -std=c++14 -w -o main main.cpp";
     private static final String BUILD_COMMAND_CPP_17 = "g++ -std=c++17 -w -o main main.cpp";
+
+    private static final String SOURCECODE_DELIMITER = "CPP_FILE" + CommonUtils.generateRandomString(10);
 
     private String getBuildCmd(ComputerLanguage.Languages language) {
         switch (language) {
@@ -73,44 +75,47 @@ public class GccExecutor {
             ComputerLanguage.Languages language
     ) {
         String genTestCase = "";
-        //for(int i = 0; i < testCaseEntities.size(); i++){
-        String testcase = "cat <<EOF >> testcase" + 0 + ".txt \n"
+        String testcase = "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase" + 0 + ".txt \n"
                 + testCase.getTestCase() + "\n"
                 + testCase.getCorrectAnswer() + "\n"
                 + solutionOutput + "\n"
-                + "EOF" + "\n";
+                + SOURCECODE_DELIMITER + "\n";
         genTestCase += testcase;
-        //}
 
-        String sourceSH = SHFileStart
-                + "mkdir -p " + tmpName + "\n"
-                + "cd " + tmpName + "\n"
-                + "cat <<EOF >> main" + getFileExtension(language) + "\n"
-                + sourceChecker + "\n"
-                + "EOF" + "\n"
-                + getBuildCmd(language) + "\n"
-                + "FILE=main" + "\n"
-                + "if test -f \"$FILE\"; then" + "\n"
-                + genTestCase + "\n"
-                + "n=0\n"
-                + "start=$(date +%s%N)\n"
-                + "while [ \"$n\" -lt " + 1 + " ]" + "\n"
-                + "do\n"
-                + "f=\"testcase\"$n\".txt\"" + "\n"
-                + "cat $f | timeout " + timeLimit + "s " + "./main  || echo Time Limit Exceeded" + "\n"
-                + "echo " + Constants.SPLIT_TEST_CASE + "\n"
-                + "n=`expr $n + 1`\n"
-                + "done\n"
-                + "end=$(date +%s%N)\n"
-                + "echo \n"
-                + "echo \"$(($(($end-$start))/1000000))\"\n"
-                + "echo successful\n"
-                + "else\n"
-                + "echo Compile Error\n"
-                + "fi" + "\n"
-                + "cd .. \n"
-                + "rm -rf " + tmpName + " & " + "\n"
-                + "rm -rf " + tmpName + ".sh" + " & " + "\n";
+        String[] commands = {
+                SHFileStart,
+                "mkdir -p " + tmpName,
+                "cd " + tmpName,
+                "cat <<'" + SOURCECODE_DELIMITER + "' >> main" + getFileExtension(language),
+                sourceChecker,
+                SOURCECODE_DELIMITER,
+                getBuildCmd(language),
+                "FILE=main",
+                "if test -f \"$FILE\"; then",
+                genTestCase,
+                "n=0",
+                "start=$(date +%s%N)",
+                "while [ \"$n\" -lt 1 ]",
+                "do",
+                "f=\"testcase\"$n\".txt\"",
+                "cat $f | timeout " + timeLimit + "s " + "./main  || echo Time Limit Exceeded",
+                Constants.SPLIT_TEST_CASE,
+                "n=`expr $n + 1`",
+                "done",
+                "end=$(date +%s%N)",
+                "",
+                "echo",
+                "echo \"$(($(($end-$start))/1000000))\"",
+                "echo successful",
+                "else",
+                "echo Compile Error",
+                "fi",
+                "cd ..",
+                "rm -rf " + tmpName + " &",
+                "rm -rf " + tmpName + ".sh" + " &"
+        };
+
+        String sourceSH = String.join("\n", commands);
         return sourceSH;
 
     }
@@ -125,66 +130,70 @@ public class GccExecutor {
     ) {
         StringBuilder genTestCase = new StringBuilder();
         for (int i = 0; i < testCaseEntities.size(); i++) {
-            String testcase = "cat <<EOF >> testcase" + i + ".txt \n"
+            String testcase = "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase" + i + ".txt \n"
                     + testCaseEntities.get(i).getTestCase() + "\n"
-                    + "EOF" + "\n";
+                    + SOURCECODE_DELIMITER + "\n";
             genTestCase.append(testcase);
         }
 
         String outputFileName = tmpName + "_output.txt";
         String errorFileName = tmpName + "_error.txt";
-        String sourceSH = SHFileStart
-                + "mkdir -p " + tmpName + "\n"
-                + "cd " + tmpName + "\n"
-                + "cat <<EOF >> main" + getFileExtension(language) + "\n"
-                + source + "\n"
-                + "EOF" + "\n"
-                + getBuildCmd(language) + "\n"
-                + "FILE=main" + "\n"
-                + "if test -f \"$FILE\"; then" + "\n"
-                + genTestCase + "\n"
-                + "n=0\n"
-                + "start=$(date +%s%N)\n"
-                + "while [ \"$n\" -lt " + testCaseEntities.size() + " ]" + "\n"
-                + "do\n"
-                + "f=\"testcase\"$n\".txt\"" + "\n"
-                //   + "cat $f | timeout " + timeLimit + "s " + "./main  || echo Time Limit Exceeded" + "\n"
-                + "cat $f | (ulimit -t " + timeLimit
-                + " -v " + (memoryLimit * 1024 + DEFAULT_INITIAL_MEMORY)
-                + " -f 30000; "
-                + "./main > " + outputFileName + "; ) &> " + errorFileName + "\n"
-                + "ERROR=$(head -1 " + errorFileName + ") \n"
-                + "FILE_LIMIT='" + FILE_LIMIT_ERROR + "' \n"
-                + "TIME_LIMIT='" + TIME_LIMIT_ERROR + "' \n"
-                + "MEMORY_LIMIT='" + MEMORY_LIMIT_ERROR + "' \n"
-                + "case $ERROR in \n"
-                + "  *\"$FILE_LIMIT\"*) \n"
-                + "    echo $FILE_LIMIT \n"
-                + "    ;; \n"
-                + "  *\"$TIME_LIMIT\"*) \n"
-                + "    echo $TIME_LIMIT \n"
-                + "    ;; \n"
-                + "  *\"$MEMORY_LIMIT\"*) \n"
-                + "    echo $MEMORY_LIMIT \n"
-                + "    ;; \n"
-                + "  *) \n"
-                + "    cat " + outputFileName + " \n"
-                + "    ;; \n"
-                + "esac \n"
-                + "echo " + Constants.SPLIT_TEST_CASE + "\n"
-                + "n=`expr $n + 1`\n"
-                + "done\n"
-                + "end=$(date +%s%N)\n"
-                + "echo \n"
-                + "echo \"$(($(($end-$start))/1000000))\"\n"
-                + "echo successful\n"
-                + "else\n"
-                + "echo Compile Error\n"
-                + "fi" + "\n"
-                + "cd .. \n"
-                + "rm -rf " + tmpName + " & " + "\n"
-                + "rm -rf " + tmpName + ".sh" + " & " + "\n"
-                + "rm -rf " + tmpName + "\n";
+        String[] commands = {
+                SHFileStart,
+                "mkdir -p " + tmpName,
+                "cd " + tmpName,
+                "cat <<'DELIMITER' >> main" + getFileExtension(language),
+                source,
+                "DELIMITER",
+                getBuildCmd(language),
+                "FILE=main",
+                "if test -f \"$FILE\"; then",
+                genTestCase.toString(),
+                "n=0",
+                "start=$(date +%s%N)",
+                "while [ \"$n\" -lt " + testCaseEntities.size() + " ]",
+                "do",
+                "f=\"testcase\"$n\".txt\"",
+                // "cat $f | timeout " + timeLimit + "s " + "./main  || echo Time Limit Exceeded",
+                "cat $f | (ulimit -t " + timeLimit
+                        + " -v " + (memoryLimit * 1024 + DEFAULT_INITIAL_MEMORY)
+                        + " -f 30000; "
+                        + "./main > " + outputFileName + "; ) &> " + errorFileName,
+                "ERROR=$(head -1 " + errorFileName + ")",
+                "FILE_LIMIT='" + FILE_LIMIT_ERROR + "'",
+                "TIME_LIMIT='" + TIME_LIMIT_ERROR + "'",
+                "MEMORY_LIMIT='" + MEMORY_LIMIT_ERROR + "'",
+                "case $ERROR in",
+                "*\"$FILE_LIMIT\"*)",
+                "echo $FILE_LIMIT",
+                ";;",
+                "*\"$TIME_LIMIT\"*)",
+                "echo $TIME_LIMIT",
+                ";;",
+                "*\"$MEMORY_LIMIT\"*)",
+                "echo $MEMORY_LIMIT",
+                ";;",
+                "*)",
+                "cat " + outputFileName,
+                ";;",
+                "esac",
+                "echo " + Constants.SPLIT_TEST_CASE,
+                "n=`expr $n + 1`",
+                "done",
+                "end=$(date +%s%N)",
+                "echo",
+                "echo \"$(($(($end-$start))/1000000))\"",
+                "echo successful",
+                "else",
+                "echo Compile Error",
+                "fi",
+                "cd ..",
+                "rm -rf " + tmpName + " &",
+                "rm -rf " + tmpName + ".sh" + " &",
+                "rm -rf " + tmpName
+        };
+
+        String sourceSH = String.join("\n", commands);
         return sourceSH;
     }
 }

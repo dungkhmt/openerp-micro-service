@@ -970,29 +970,29 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public boolean teacherDisableSubmission(String userId, UUID submissionId) {
+    public ContestSubmissionEntity teacherDisableSubmission(String userId, UUID submissionId) {
         ContestSubmissionEntity sub = contestSubmissionRepo.findById(submissionId).orElse(null);
-        if(sub != null){
+        if (sub != null) {
             sub.setManagementStatus(ContestSubmissionEntity.MANAGEMENT_STATUS_DISABLED);
             sub.setLastUpdatedByUserId(userId);
             sub.setUpdateAt(new Date());
             sub = contestSubmissionRepo.save(sub);
-            return true;
+            return sub;
         }
-        return false;
+        return null;
     }
 
     @Override
-    public boolean teacherEnableSubmission(String userId, UUID submissionId) {
+    public ContestSubmissionEntity teacherEnableSubmission(String userId, UUID submissionId) {
         ContestSubmissionEntity sub = contestSubmissionRepo.findById(submissionId).orElse(null);
-        if(sub != null){
+        if (sub != null) {
             sub.setManagementStatus(ContestSubmissionEntity.MANAGEMENT_STATUS_ENABLED);
             sub.setLastUpdatedByUserId(userId);
             sub.setUpdateAt(new Date());
             sub = contestSubmissionRepo.save(sub);
-            return true;
+            return sub;
         }
-        return false;
+        return null;
     }
 
     @Override

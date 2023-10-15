@@ -137,7 +137,7 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
         hideCommandBar
         options={{
           selection: false,
-          pageSize: 10,
+          pageSize: 5,
           search: false,
           sorting: true,
         }}

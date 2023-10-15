@@ -2,6 +2,7 @@ package com.hust.baseweb.applications.programmingcontest.utils.executor;
 
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
+import com.hust.baseweb.utils.CommonUtils;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ public class JavaExecutor {
     private static final String buildCmd = "javac Main.java";
     private static final String suffixes = ".java";
     private static final String SHFileStart = "#!/bin/bash\n";
+    private static final String SOURCECODE_DELIMITER = "CPP_FILE" + CommonUtils.generateRandomString(10);
 
     private static final String TIME_LIMIT_ERROR = Constants.TestCaseSubmissionError.TIME_LIMIT.getValue();
     private static final String FILE_LIMIT_ERROR = Constants.TestCaseSubmissionError.FILE_LIMIT.getValue();
@@ -37,22 +39,22 @@ public class JavaExecutor {
                           tmpName +
                           "\n"
                           +
-                          "cat <<EOF >> Main" +
+                          "cat <<'" + SOURCECODE_DELIMITER + "' >> Main" +
                           suffixes +
                           "\n"
                           +
                           source +
                           "\n"
                           +
-                          "EOF" +
+                          SOURCECODE_DELIMITER +
                           "\n"
                           +
-                          "cat <<EOF >> testcase.txt \n"
+                          "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase.txt \n"
                           +
                           testCase +
                           "\n"
                           +
-                          "EOF" +
+                          SOURCECODE_DELIMITER +
                           "\n"
                           +
                           buildCmd +
@@ -96,9 +98,9 @@ public class JavaExecutor {
         String sourceSH = SHFileStart
                           + "mkdir -p " + tmpName + "\n"
                           + "cd " + tmpName + "\n"
-                          + "cat <<EOF >> Main" + suffixes + "\n"
+                          + "cat <<'" + SOURCECODE_DELIMITER + "' >> Main" + suffixes + "\n"
                           + source + "\n"
-                          + "EOF" + "\n"
+                          + SOURCECODE_DELIMITER + "\n"
                           + buildCmd + "\n"
                           + "FILE=Main.class" + "\n"
                           + "if test -f \"$FILE\"; then" + "\n"
@@ -121,9 +123,9 @@ public class JavaExecutor {
     ) {
         StringBuilder genTestCase = new StringBuilder();
         for (int i = 0; i < testCases.size(); i++) {
-            String testcase = "cat <<EOF >> testcase" + i + ".txt \n"
+            String testcase = "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase" + i + ".txt \n"
                               + testCases.get(i).getTestCase() + "\n"
-                              + "EOF" + "\n";
+                              + SOURCECODE_DELIMITER + "\n";
             genTestCase.append(testcase);
         }
 
@@ -140,14 +142,14 @@ public class JavaExecutor {
                           tmpName +
                           "\n"
                           +
-                          "cat <<EOF >> Main" +
+                          "cat <<'" + SOURCECODE_DELIMITER + "' >> Main" +
                           suffixes +
                           "\n"
                           +
                           source +
                           "\n"
                           +
-                          "EOF" +
+                          SOURCECODE_DELIMITER +
                           "\n"
                           +
                           buildCmd +

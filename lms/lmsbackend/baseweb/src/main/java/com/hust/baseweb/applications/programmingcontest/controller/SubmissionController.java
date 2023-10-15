@@ -43,16 +43,16 @@ public class SubmissionController {
     ProblemTestCaseServiceCache cacheService;
 
     @Secured("ROLE_TEACHER")
-    @GetMapping("/teacher/disable-submissions/{submissionId}")
+    @PostMapping("/teacher/submissions/{submissionId}/disable")
     public ResponseEntity<?> teacherDisableSubmission(Principal principal, @PathVariable UUID submissionId){
-        boolean ok = problemTestCaseService.teacherDisableSubmission(principal.getName(),submissionId);
-        return ResponseEntity.ok().body(ok);
+        ContestSubmissionEntity managementStatus = problemTestCaseService.teacherDisableSubmission(principal.getName(),submissionId);
+        return ResponseEntity.ok().body(managementStatus);
     }
     @Secured("ROLE_TEACHER")
-    @GetMapping("/teacher/enable-submissions/{submissionId}")
+    @PostMapping("/teacher/submissions/{submissionId}/enable")
     public ResponseEntity<?> teacherEnableSubmission(Principal principal, @PathVariable UUID submissionId){
-        boolean ok = problemTestCaseService.teacherEnableSubmission(principal.getName(),submissionId);
-        return ResponseEntity.ok().body(ok);
+        ContestSubmissionEntity managementStatus = problemTestCaseService.teacherEnableSubmission(principal.getName(),submissionId);
+        return ResponseEntity.ok().body(managementStatus);
     }
 
 

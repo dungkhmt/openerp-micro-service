@@ -222,7 +222,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
         hideCommandBar
         options={{
           selection: false,
-          pageSize: 10,
+          pageSize: 5,
           search: true,
           sorting: true,
         }}

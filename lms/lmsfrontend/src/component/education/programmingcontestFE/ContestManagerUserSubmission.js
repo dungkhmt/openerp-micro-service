@@ -4,14 +4,14 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { LoadingButton } from "@mui/lab";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import { pdf } from "@react-pdf/renderer";
+import { request } from "api";
 import HustModal from "component/common/HustModal";
 import StandardTable from "component/table/StandardTable";
 import FileSaver from "file-saver";
 import { MTableToolbar } from "material-table";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { request } from "../../../api";
-import { errorNoti, infoNoti, successNoti } from "../../../utils/notification";
+import { errorNoti, infoNoti, successNoti } from "utils/notification";
 import ContestManagerViewSubmissionOfAUserDialog from "./ContestManagerViewSubmissionOfAUserDialog";
 import ManagerSubmitCodeOfParticipant from "./ManagerSubmitCodeOfParticipant";
 import { getStatusColor } from "./lib";
@@ -137,14 +137,22 @@ export default function ContestManagerUserSubmission(props) {
       },
       { title: "User ID", field: "userId" },
       {
-        title: "FullName",
+        title: "Full name",
         field: "fullname",
         cellStyle: { minWidth: "170px" },
       },
 
-      { title: "Problem ID", field: "problemId" },
-      { title: "Problem Name", field: "problemName" },
-      
+      {
+        title: "Problem ID",
+        field: "problemId",
+        render: (rowData) => (
+          <Tooltip title={rowData.problemName} placement="bottom-start" arrow>
+            {rowData.problemId}
+          </Tooltip>
+        ),
+      },
+      // { title: "Problem Name", field: "problemName" },
+
       {
         title: "Testcases Passed",
         field: "testCasePass",
@@ -174,6 +182,7 @@ export default function ContestManagerUserSubmission(props) {
       {
         title: "Rejudge",
         sortable: "false",
+        headerStyle: { textAlign: "center" },
         cellStyle: { textAlign: "center" },
         render: (rowData) => (
           <IconButton
@@ -187,10 +196,11 @@ export default function ContestManagerUserSubmission(props) {
           </IconButton>
         ),
       },
-      {title: "Man. Status", field: "managementStatus"},
+      { title: "Man. Status", field: "managementStatus" },
       {
         title: "View By User",
         sortable: false,
+        headerStyle: { textAlign: "center" },
         cellStyle: { textAlign: "center", minWidth: 96 },
         render: (rowData) => (
           <IconButton
@@ -266,7 +276,7 @@ export default function ContestManagerUserSubmission(props) {
                   width="100%"
                   sx={{ padding: "8px 0 16px 16px" }}
                 >
-                  <Tooltip title="Submit code as a participant">
+                  <Tooltip title="Submit code as a participant" arrow>
                     <LoadingButton
                       loading={isProcessing}
                       loadingPosition="start"
@@ -278,7 +288,10 @@ export default function ContestManagerUserSubmission(props) {
                       Submit Participant Code
                     </LoadingButton>
                   </Tooltip>
-                  <Tooltip title="Judge all submissions that are NOT EVALUATED">
+                  <Tooltip
+                    title="Judge all submissions that are NOT EVALUATED"
+                    arrow
+                  >
                     <LoadingButton
                       loading={isProcessing}
                       loadingPosition="start"
@@ -290,7 +303,10 @@ export default function ContestManagerUserSubmission(props) {
                       Judge All
                     </LoadingButton>
                   </Tooltip>
-                  <Tooltip title="Rejudge all submissions in this contest">
+                  <Tooltip
+                    title="Rejudge all submissions in this contest"
+                    arrow
+                  >
                     <LoadingButton
                       loading={isProcessing}
                       loadingPosition="start"
@@ -302,7 +318,7 @@ export default function ContestManagerUserSubmission(props) {
                       Rejudge All
                     </LoadingButton>
                   </Tooltip>
-                  <Tooltip title="Export all submissions in this contest">
+                  <Tooltip title="Export all submissions in this contest" arrow>
                     <LoadingButton
                       loading={isProcessing}
                       loadingPosition="start"

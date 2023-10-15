@@ -38,13 +38,15 @@ export default function ContestProblemSubmissionDetail() {
           overflowY: "scroll",
           borderTopLeftRadius: 8,
           borderBottomLeftRadius: 8,
+          backgroundColor: "#fff",
           height: "calc(100vh - 112px)",
         }}
       >
         <Paper
-          elevation={1}
+          elevation={0}
           sx={{
             p: 2,
+            backgroundColor: "transparent",
           }}
         >
           <Box sx={{ mb: 4 }}>
@@ -54,19 +56,23 @@ export default function ContestProblemSubmissionDetail() {
               language="bash"
             />
           </Box>
-          <Box sx={{ mb: 4 }}>
+          {submission.status &&
+            submission.status !== "Compile Error" &&
+            submission.status !== "In Progress" && (
+              <Box sx={{ mb: 4 }}>
+                <Typography variant={"h6"} sx={{ mb: 1 }}>
+                  Test cases
+                </Typography>
+                <ParticipantProgramSubmissionDetailTestCaseByTestCase
+                  submissionId={problemSubmissionId}
+                />
+              </Box>
+            )}
+          <Box>
             <HustCopyCodeBlock
               title="Source code"
               text={submission.sourceCode}
               language={resolveLanguage(submission.sourceCodeLanguage)}
-            />
-          </Box>
-          <Box>
-            <Typography variant={"h6"} sx={{ mb: 1 }}>
-              Test cases
-            </Typography>
-            <ParticipantProgramSubmissionDetailTestCaseByTestCase
-              submissionId={problemSubmissionId}
             />
           </Box>
         </Paper>
