@@ -2609,7 +2609,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     if (s1.getUserId().equals(s2.getUserId())) {
                         continue;
                     }
-
+                    log.info("checkSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size()
+                             + " score between codes " + i + " length = " + s1.getSourceCode().length() + " " + j + " length = " + s2.getSourceCode().length());
+                    
                     double score = CodeSimilarityCheck.check(s1.getSourceCode(), s2.getSourceCode());
                     log.info("checkSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size()
                          + " score between codes " + i + " and " + j + " = " + score + " threshold = " + I.getThreshold());
