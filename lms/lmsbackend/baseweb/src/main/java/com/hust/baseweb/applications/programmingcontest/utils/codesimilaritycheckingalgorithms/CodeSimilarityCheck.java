@@ -57,7 +57,7 @@ public class CodeSimilarityCheck {
         int n1 = code1.length();
         int n2 = code2.length();
         if(n1 >= 10000 || n2 >= 10000){
-            System.out.println("check: code too long: code1 = " + code1 + " code2 = " + code2);
+            //System.out.println("check: code too long: code1 = " + code1 + " code2 = " + code2);
             if(code1.equals(code2)) return 1; else return 0;// need to be improved
         }
         D = new int[n1 + 1][n2 + 1];

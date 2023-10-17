@@ -2536,7 +2536,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                         codePlagiarism.setCreatedStamp(new Date());
 
                         codePlagiarism = codePlagiarismRepo.save(codePlagiarism);
-                        log.info("checkSimilarity, add new item score = " + score);
+                        //log.info("checkSimilarity, add new item score = " + score);
                     }
                 }
             }
@@ -2560,19 +2560,19 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
         for (ProblemEntity p : problems) {
             String problemId = p.getProblemId();
-            log.info("computeSimilarity, consider problem " + problemId + " threshold  = " + I.getThreshold());
+            //log.info("computeSimilarity, consider problem " + problemId + " threshold  = " + I.getThreshold());
             List<ContestSubmissionEntity> listSubmissions = new ArrayList();
             for (UserRegistrationContestEntity participant : participants) {
                 String userId = participant.getUserId();
-                log.info("computeSimilarity, consider problem " + problemId + " participant " + userId);
+                //log.info("computeSimilarity, consider problem " + problemId + " participant " + userId);
                 List<ContestSubmissionEntity> submissions = contestSubmissionRepo.findAllByContestIdAndUserIdAndProblemId(
                     contestId,
                     userId,
                     problemId);
-                log.info("computeSimilarity, consider problem " + problemId + " participant " + userId
-                         + " submissions.sz = " +
-                         submissions.size() +
-                         "");
+                //log.info("computeSimilarity, consider problem " + problemId + " participant " + userId
+                         //+ " submissions.sz = " +
+                        // submissions.size() +
+                       //  "");
 
                 if (submissions != null && submissions.size() > 0) {// take the last submission in the sorted list
                     for(ContestSubmissionEntity sub: submissions) {
@@ -2596,10 +2596,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 }
             });
 
-            log.info("computeSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size());
-            for(ContestSubmissionEntity e: listSubmissions){
-                log.info("computeSimilarity, user " + e.getUserId() + " submissionId " + e.getContestSubmissionId() + " point " + e.getPoint());
-            }
+            //log.info("computeSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size());
+            //for(ContestSubmissionEntity e: listSubmissions){
+                //log.info("computeSimilarity, user " + e.getUserId() + " submissionId " + e.getContestSubmissionId() + " point " + e.getPoint());
+            //}
 
             // check similarity of submissions to the current problemId
             for (int i = 0; i < listSubmissions.size(); i++) {
@@ -2609,12 +2609,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     if (s1.getUserId().equals(s2.getUserId())) {
                         continue;
                     }
-                    log.info("checkSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size()
-                             + " score between codes " + i + " length = " + s1.getSourceCode().length() + " " + j + " length = " + s2.getSourceCode().length());
+                    //log.info("checkSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size()
+                    //         + " score between codes " + i + " length = " + s1.getSourceCode().length() + " " + j + " length = " + s2.getSourceCode().length());
 
                     double score = CodeSimilarityCheck.check(s1.getSourceCode(), s2.getSourceCode());
-                    log.info("checkSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size()
-                         + " score between codes " + i + " and " + j + " = " + score + " threshold = " + I.getThreshold());
+                    //log.info("checkSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size()
+                    //     + " score between codes " + i + " and " + j + " = " + score + " threshold = " + I.getThreshold());
 
                     //if(score <= 0.0001) continue;
                     if (score <= I.getThreshold() * 0.01) {
@@ -2642,12 +2642,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                                         s2.getContestSubmissionId());
 
                     if(codePlagiarisms != null && codePlagiarisms.size() > 0){
-                        log.info("checkSimilarity, codePlagiarism sz = " + codePlagiarisms.size());
+                        //log.info("checkSimilarity, codePlagiarism sz = " + codePlagiarisms.size());
                         for(CodePlagiarism cp: codePlagiarisms){
                             cp.setScore(score);
                             cp.setCreatedStamp(new Date());
                             cp = codePlagiarismRepo.save(cp);
-                            log.info("checkSimilarity, codePlagiarism sz = " + codePlagiarisms.size() + " exist -> update score " + score);
+                            //log.info("checkSimilarity, codePlagiarism sz = " + codePlagiarisms.size() + " exist -> update score " + score);
                         }
                     }else {
 
@@ -2666,7 +2666,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                         codePlagiarism.setCreatedStamp(new Date());
 
                         codePlagiarism = codePlagiarismRepo.save(codePlagiarism);
-                        log.info("computeSimilarity, add new item score = " + score);
+                        //log.info("computeSimilarity, add new item score = " + score);
                     }
                 }
             }
