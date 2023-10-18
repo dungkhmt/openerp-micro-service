@@ -2620,6 +2620,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     if (score <= I.getThreshold() * 0.01) {
                         continue;
                     }
+                    log.info("checkSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size()
+                                  + " score between codes " + i + " and " + j + " = " + score + " threshold = " + I.getThreshold());
 
 
                     CodeSimilarityElement e = new CodeSimilarityElement();
