@@ -100,20 +100,19 @@ public class GccExecutor {
                 "do",
                 "f=\"testcase\"$n\".txt\"",
                 "cat $f | timeout " + timeLimit + "s " + "./main  || echo Time Limit Exceeded",
-                Constants.SPLIT_TEST_CASE,
+                "echo " + Constants.SPLIT_TEST_CASE,
                 "n=`expr $n + 1`",
                 "done",
                 "end=$(date +%s%N)",
-                "",
-                "echo",
+                "echo ",
                 "echo \"$(($(($end-$start))/1000000))\"",
                 "echo successful",
                 "else",
                 "echo Compile Error",
                 "fi",
-                "cd ..",
-                "rm -rf " + tmpName + " &",
-                "rm -rf " + tmpName + ".sh" + " &"
+                "cd .. ",
+                "rm -rf " + tmpName + " & ",
+                "rm -rf " + tmpName + ".sh" + " & " + "\n"
         };
 
         String sourceSH = String.join("\n", commands);
