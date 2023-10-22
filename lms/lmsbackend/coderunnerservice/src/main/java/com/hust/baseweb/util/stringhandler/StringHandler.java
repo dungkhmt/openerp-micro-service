@@ -116,76 +116,6 @@ public class StringHandler {
                 .build();
     }
 
-    public static ProblemSubmission handleContestResponseV2(String response, List<String> testCaseAns, List<Integer> points, String problemEvaluationType) {
-        // log.info("handleContestResponse, response {}", response);
-        if (response.length() == 0) throw new IllegalArgumentException("Docker Judging client error");
-
-        String originalMessage = response;
-
-        //remove the last '\n' character, which is redundant
-        response = response.substring(0, response.length() - 1);
-        int statusIndex = response.lastIndexOf("\n") + 1;
-        String status = response.substring(statusIndex);
-
-        if (status.contains(ContestSubmissionEntity.SUBMISSION_STATUS_COMPILE_ERROR)) {
-            return buildCompileErrorForSubmission(testCaseAns.size(), originalMessage);
-        }
-
-        String responseWithoutStatus = response.substring(0, statusIndex - 1);
-        int runTimeIndex = responseWithoutStatus.lastIndexOf("\n") + 1;
-        String runtimeString = responseWithoutStatus.substring(runTimeIndex);
-        Long runtime = Long.parseLong(runtimeString);
-
-        String participantAns = responseWithoutStatus.substring(0, runTimeIndex - 1);
-        String[] ansArray = participantAns.split(Constants.SPLIT_TEST_CASE);
-
-        status = null;
-        int cnt = 0;
-        int score = 0;
-        for (int i = 0; i < testCaseAns.size(); i++) {
-            String participantTestcaseAns = replaceSpaceV2(ansArray[i]);
-
-            if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.TIME_LIMIT.getValue())) {
-                status = ContestSubmissionEntity.SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED;
-                ansArray[i] = ContestSubmissionEntity.SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED;
-            } else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.FILE_LIMIT.getValue())) {
-                status = ContestSubmissionEntity.SUBMISSION_STATUS_OUTPUT_LIMIT_EXCEEDED;
-                ansArray[i] = ContestSubmissionEntity.SUBMISSION_STATUS_OUTPUT_LIMIT_EXCEEDED;
-            } else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.MEMORY_LIMIT.getValue())) {
-                status = ContestSubmissionEntity.SUBMISSION_STATUS_MEMORY_ALLOCATION_ERROR;
-                ansArray[i] = ContestSubmissionEntity.SUBMISSION_STATUS_MEMORY_ALLOCATION_ERROR;
-            } else {
-                String correctTestcaseAns = replaceSpaceV2(testCaseAns.get(i));
-
-                if (problemEvaluationType.equals(Constants.ProblemResultEvaluationType.NORMAL.getValue())) {
-                    if (!correctTestcaseAns.equals(participantTestcaseAns))
-                        status = ContestSubmissionEntity.SUBMISSION_STATUS_WRONG;
-                    else {
-                        score += points.get(i);
-                        cnt++;
-                    }
-                } else if (problemEvaluationType.equals(Constants.ProblemResultEvaluationType.CUSTOM.getValue())) {
-                    status = ContestSubmissionEntity.SUBMISSION_STATUS_WAIT_FOR_CUSTOM_EVALUATION;
-                }
-
-            }
-        }
-
-        if (status == null) {
-            status = ContestSubmissionEntity.SUBMISSION_STATUS_ACCEPTED;
-        }
-        return ProblemSubmission.builder()
-                .runtime(runtime)
-                .score(score)
-                .status(status)
-                .message(originalMessage)
-                .testCasePass(cnt + " / " + testCaseAns.size())
-                .nbTestCasePass(cnt)
-                .testCaseAns(testCaseAns)
-                .participantAns(Arrays.asList(ansArray))
-                .build();
-    }
-
     public static ProblemSubmission handleContestResponseSingleTestcase(
             String response,
             String testCaseAns,
@@ -230,7 +160,7 @@ public class StringHandler {
         int cnt = 0;
         int score = 0;
 
-        String participantTestcaseAns = replaceSpaceV2(participantAns);
+        String participantTestcaseAns = replaceSpace(participantAns);
 //        String participantTestcaseAns = participantAns;
 
         if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.TIME_LIMIT.getValue())) {
@@ -243,7 +173,7 @@ public class StringHandler {
             status = ContestSubmissionEntity.SUBMISSION_STATUS_MEMORY_ALLOCATION_ERROR;
             participantAns = status;
         } else {
-            String correctTestcaseAns = replaceSpaceV2(testCaseAns);
+            String correctTestcaseAns = replaceSpace(testCaseAns);
 //            String correctTestcaseAns = testCaseAns;
             if (problemEvaluationType == null || problemEvaluationType.equals(""))
                 problemEvaluationType = Constants.ProblemResultEvaluationType.NORMAL.getValue();
