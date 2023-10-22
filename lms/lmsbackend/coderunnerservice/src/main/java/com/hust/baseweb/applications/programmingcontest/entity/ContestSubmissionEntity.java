@@ -20,7 +20,7 @@ public class ContestSubmissionEntity {
     public static final String SUBMISSION_STATUS_WRONG = "Wrong Answer";
     public static final String SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED = "Time Limit Exceeded";
     public static final String SUBMISSION_STATUS_OUTPUT_LIMIT_EXCEEDED = "Output Size Limit Exceeded";
-    public static final String SUBMISSION_STATUS_MEMORY_ALLOCATION_ERROR = "Memory Allocation Error";
+    public static final String SEGMENTATION_FAULT = "Segmentation Fault";
     public static final String SUBMISSION_STATUS_COMPILE_ERROR = "Compile Error";
     public static final String SUBMISSION_STATUS_NOT_AVAILABLE = "NA";
     public static final String SUBMISSION_STATUS_EVALUATION_IN_PROGRESS = "In Progress";

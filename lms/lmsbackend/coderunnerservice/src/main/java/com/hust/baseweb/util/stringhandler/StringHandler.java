@@ -170,7 +170,7 @@ public class StringHandler {
             status = ContestSubmissionEntity.SUBMISSION_STATUS_OUTPUT_LIMIT_EXCEEDED;
             participantAns = status;
         } else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.MEMORY_LIMIT.getValue())) {
-            status = ContestSubmissionEntity.SUBMISSION_STATUS_MEMORY_ALLOCATION_ERROR;
+            status = ContestSubmissionEntity.SEGMENTATION_FAULT;
             participantAns = status;
         } else {
             String correctTestcaseAns = replaceSpace(testCaseAns);
