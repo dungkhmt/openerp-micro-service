@@ -139,18 +139,31 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
             backgroundColor: "transparent",
           }}
         >
-          <Box sx={{ mb: 4 }}>
+          <Box
+            sx={{
+              mb: 4,
+              fontFamily: "'Fira Code', 'JetBrains Mono', monospace",
+              fontVariantLigatures: "none",
+            }}
+          >
             <HustCopyCodeBlock
               title="Message"
               text={submission.message}
               language="bash"
             />
           </Box>
-          <Box sx={{ mb: 4 }}>
+          <Box
+            sx={{
+              mb: 4,
+              fontFamily: "'JetBrains Mono', monospace",
+              fontVariantLigatures: "none",
+            }}
+          >
             <HustCopyCodeBlock
               title="Source code"
               text={submission.sourceCode}
               language={resolveLanguage(submission.sourceCodeLanguage)}
+              showLineNumbers
             />
             {/* <TextField
             style={{

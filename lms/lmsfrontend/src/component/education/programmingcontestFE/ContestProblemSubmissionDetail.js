@@ -49,7 +49,13 @@ export default function ContestProblemSubmissionDetail() {
             backgroundColor: "transparent",
           }}
         >
-          <Box sx={{ mb: 4 }}>
+          <Box
+            sx={{
+              mb: 4,
+              fontFamily: "'Fira Code', 'JetBrains Mono', monospace",
+              fontVariantLigatures: "none",
+            }}
+          >
             <HustCopyCodeBlock
               title="Message"
               text={submission.message}
@@ -68,11 +74,17 @@ export default function ContestProblemSubmissionDetail() {
                 />
               </Box>
             )}
-          <Box>
+          <Box
+            sx={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontVariantLigatures: "none",
+            }}
+          >
             <HustCopyCodeBlock
               title="Source code"
               text={submission.sourceCode}
               language={resolveLanguage(submission.sourceCodeLanguage)}
+              showLineNumbers
             />
           </Box>
         </Paper>

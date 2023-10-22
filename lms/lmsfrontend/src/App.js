@@ -1,30 +1,27 @@
-import Typography from '@mui/material/Typography';
-// import {Box} from "@mui/system";
-import {Box, CssBaseline, SvgIcon} from "@material-ui/core";
-import {createTheme, MuiThemeProvider} from "@material-ui/core/styles";
-import {ReactKeycloakProvider} from "@react-keycloak/web";
-import {request} from "api";
-import {FacebookCircularProgress} from "component/common/progressBar/CustomizedCircularProgress.jsx";
-import keycloak, {initOptions} from "config/keycloak.js";
-import React, {useEffect} from "react";
-import {I18nextProvider} from "react-i18next";
-import {QueryClient, QueryClientProvider} from "react-query";
-import {Router} from "react-router-dom";
-import {Slide, ToastContainer} from "react-toastify";
+import { Box, CssBaseline, SvgIcon } from "@material-ui/core";
+import { MuiThemeProvider, createTheme } from "@material-ui/core/styles";
+import Typography from "@mui/material/Typography";
+import { ReactKeycloakProvider } from "@react-keycloak/web";
+import { request } from "api";
+import { FacebookCircularProgress } from "component/common/progressBar/CustomizedCircularProgress.jsx";
+import keycloak, { initOptions } from "config/keycloak.js";
+import { useEffect } from "react";
+import { I18nextProvider } from "react-i18next";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { Router } from "react-router-dom";
+import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {menuState} from "state/MenuState";
-import {notificationState} from "state/NotificationState";
-import history from "./history.js";
+import { menuState } from "state/MenuState";
+import { notificationState } from "state/NotificationState";
 import Routes from "./Routes";
+import { ReactComponent as HustProgrammingLogo } from "./assets/icons/hust-programming-icon.svg";
+import { PLATFORM_NAME } from "./config/config";
+import history from "./history.js";
 import i18n from "./translation/i18n";
-import {PLATFORM_NAME} from "./config/config";
-import {ReactComponent as HustProgrammingLogo} from "./assets/icons/hust-programming-icon.svg";
 
 const theme = createTheme({
   typography: {
-    fontFamily: `-apple-system, "Segoe UI", BlinkMacSystemFont, "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif`,
+    fontFamily: `"IBM Plex Sans", -apple-system, "Segoe UI", BlinkMacSystemFont,  "Roboto", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`,
   },
   overrides: {
     MuiCssBaseline: {
@@ -62,17 +59,17 @@ const AppLoading = (
       }}
     >
       <SvgIcon
-        style={{fontSize: "150px", marginBottom: "20px"}}
+        style={{ fontSize: "150px", marginBottom: "20px" }}
         viewBox="0 0 150 150"
       >
-        <HustProgrammingLogo width={140} height={128} x={9} y={9}/>
+        <HustProgrammingLogo width={140} height={128} x={9} y={9} />
       </SvgIcon>
       <Box>
-        <FacebookCircularProgress/>
+        <FacebookCircularProgress />
       </Box>
     </Box>
     <Box>
-      <Typography sx={{mb: 4}}>{PLATFORM_NAME} Team</Typography>
+      <Typography sx={{ mb: 4 }}>{PLATFORM_NAME} Team</Typography>
     </Box>
   </Box>
 );
@@ -91,7 +88,6 @@ function App() {
   const onKeycloakEvent = async (event, error) => {
     if (event === "onAuthSuccess") {
       request("get", `/`);
-      // console.log(keycloak.tokenParsed.preferred_username);
       // // Currently maybe not necessary
       // // Check token validity every 10 seconds (10 000 ms) and, if necessary, update the token.
       // // Refresh token if it's valid for less then 60 seconds
@@ -138,9 +134,9 @@ function App() {
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={queryClient}>
           <MuiThemeProvider theme={theme}>
-            <CssBaseline/>
+            <CssBaseline />
             <Router history={history}>
-              <Routes/>
+              <Routes />
               <ToastContainer
                 position="bottom-center"
                 transition={Slide}
