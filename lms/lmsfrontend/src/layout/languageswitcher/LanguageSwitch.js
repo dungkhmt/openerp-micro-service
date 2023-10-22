@@ -13,10 +13,17 @@ const LanguageSwitch = () => {
     i18n.changeLanguage(lng);
   };
 
+  const getDefaultLanguage = () => {
+    let language = localStorage.getItem("i18nextLng") || "en";
+    if (language.includes("vi")) language = "vi-VN";
+    if (language.includes("en")) language = "en";
+    return language
+  }
+
   return (
     <Box sx={{marginRight: "18px"}}>
       <Select
-        defaultValue={localStorage.getItem("i18nextLng") || "en"}
+        defaultValue={getDefaultLanguage()}
         onChange={event => changeLanguage(event.target.value)}
         sx={{
           boxShadow: 'none',
