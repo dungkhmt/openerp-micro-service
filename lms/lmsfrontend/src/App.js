@@ -21,7 +21,10 @@ import i18n from "./translation/i18n";
 
 const theme = createTheme({
   typography: {
-    fontFamily: `"IBM Plex Sans", -apple-system, "Segoe UI", BlinkMacSystemFont,  "Roboto", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`,
+    fontFamily: `-apple-system, "Segoe UI", BlinkMacSystemFont, "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif`,
+    // fontFamily: `"IBM Plex Sans", -apple-system, "Segoe UI", BlinkMacSystemFont,  "Roboto", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`,
   },
   overrides: {
     MuiCssBaseline: {
