@@ -58,17 +58,10 @@ public class SubmissionResponseHandler {
         long startTime1 = System.nanoTime();
         for (TestCaseEntity testCaseEntity : testCaseEntityList) {
             String response = listSubmissionResponse.get(i++);
-//            List<String> testCaseAns = Collections.singletonList(testCaseEntity.getCorrectAnswer());
-//            List<Integer> points = Collections.singletonList(testCaseEntity.getTestCasePoint());
 
             ProblemSubmission problemSubmission;
 
             try {
-//                problemSubmission = StringHandler.handleContestResponseV2(
-//                        response,
-//                        testCaseAns,
-//                        points,
-//                        problemEvaluationType);
 
                 problemSubmission = StringHandler.handleContestResponseSingleTestcase(
                         response,
