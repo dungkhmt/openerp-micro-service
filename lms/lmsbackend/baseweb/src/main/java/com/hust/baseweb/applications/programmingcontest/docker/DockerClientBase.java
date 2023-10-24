@@ -10,7 +10,10 @@ import com.spotify.docker.client.DockerClient.ListContainersParam;
 import com.spotify.docker.client.DockerClient.ListImagesParam;
 import com.spotify.docker.client.LogStream;
 import com.spotify.docker.client.exceptions.DockerException;
-import com.spotify.docker.client.messages.*;
+import com.spotify.docker.client.messages.Container;
+import com.spotify.docker.client.messages.ContainerConfig;
+import com.spotify.docker.client.messages.ExecCreation;
+import com.spotify.docker.client.messages.Image;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -122,6 +125,7 @@ public class DockerClientBase {
                     case GCC:
                         containerConfig = ContainerConfig.builder()
                                                          .image(Constants.DockerImage.GCC.getValue())
+                                                         .networkDisabled(true)
                                                          .cmd("sh", "-c", "while :; do sleep 1; done")
                                                          .labels(m)
                                                          .attachStdout(true)
@@ -133,6 +137,7 @@ public class DockerClientBase {
                     case JAVA:
                         containerConfig = ContainerConfig.builder()
                                                          .image(Constants.DockerImage.JAVA.getValue())
+                                                         .networkDisabled(true)
                                                          .cmd("sh", "-c", "while :; do sleep 1; done")
                                                          .labels(m)
                                                          .attachStdout(true)
@@ -144,6 +149,7 @@ public class DockerClientBase {
                     case PYTHON3:
                         containerConfig = ContainerConfig.builder()
                                                          .image(Constants.DockerImage.PYTHON3.getValue())
+                                                         .networkDisabled(true)
                                                          .cmd("sh", "-c", "while :; do sleep 1; done")
                                                          .labels(m)
                                                          .attachStdout(true)
