@@ -133,7 +133,7 @@ public class DockerClientBase {
                     case JAVA:
                         containerConfig = ContainerConfig.builder()
                                 .image(Constants.DockerImage.JAVA.getValue())
-                                .networkDisabled(true)
+//                                .networkDisabled(true)
                                 .cmd("sh", "-c", "while :; do sleep 1; done")
                                 .labels(m)
                                 .attachStdout(true)
@@ -145,7 +145,7 @@ public class DockerClientBase {
                     case PYTHON3:
                         containerConfig = ContainerConfig.builder()
                                 .image(Constants.DockerImage.PYTHON3.getValue())
-                                .networkDisabled(true)
+//                                .networkDisabled(true)
                                 .cmd("sh", "-c", "while :; do sleep 1; done")
                                 .labels(m)
                                 .attachStdout(true)
