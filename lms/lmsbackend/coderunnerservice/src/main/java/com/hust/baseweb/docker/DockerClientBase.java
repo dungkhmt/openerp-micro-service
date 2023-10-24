@@ -121,7 +121,7 @@ public class DockerClientBase {
                     case GCC:
                         containerConfig = ContainerConfig.builder()
                                 .image(Constants.DockerImage.GCC.getValue())
-                                .networkDisabled(true)
+//                                .networkDisabled(true)
                                 .cmd("sh", "-c", "while :; do sleep 1; done")
                                 .labels(m)
                                 .attachStdout(true)
