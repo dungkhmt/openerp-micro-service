@@ -1,0 +1,12 @@
+package openerp.openerpresourceserver.repo;
+
+import openerp.openerpresourceserver.model.entity.Institute;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface InstituteRepo extends JpaRepository<Institute, Long> {
+    List<Institute> findAll();
+}
