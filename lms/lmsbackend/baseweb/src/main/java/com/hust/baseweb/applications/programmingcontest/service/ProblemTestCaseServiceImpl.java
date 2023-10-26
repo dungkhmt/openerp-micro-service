@@ -2618,6 +2618,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
                     //if(score <= 0.0001) continue;
                     if (score <= I.getThreshold() * 0.01) {
+                        log.info("checkSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size()
+                                 + " score SMALL between codes " + i + " and " + j + " = " + score + " threshold = " + I.getThreshold());
+
                         continue;
                     }
                     log.info("checkSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size()
@@ -3189,9 +3192,22 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         tempName = tempName.replaceAll(" ", "");
         switch (ComputerLanguage.Languages.valueOf(computerLanguage)) {
             case C:
+                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.C, tempName);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.C, tempName);
+                break;
             case CPP:
+                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.CPP, tempName);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP, tempName);
+                break;
+
             case CPP11:
+                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.CPP11, tempName);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP11, tempName);
+                break;
             case CPP14:
+                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.CPP14, tempName);
+                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP14, tempName);
+                break;
             case CPP17:
                 tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.CPP17, tempName);
                 ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP17, tempName);
