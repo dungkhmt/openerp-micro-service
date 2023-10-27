@@ -51,7 +51,8 @@ public class DockerClientBase {
             if ("https".equalsIgnoreCase(dockerHost.getScheme())) {
                 dockerClient = DefaultDockerClient.builder()
                         .uri(dockerHost)
-                        .dockerCertificates(new DockerCertificates(Paths.get(DOCKER_CERT_PATH))).build();
+                        .dockerCertificates(new DockerCertificates(Paths.get(DOCKER_CERT_PATH)))
+                        .build();
             } else {
                 dockerClient = DefaultDockerClient.builder()
                         .uri(dockerHost)
