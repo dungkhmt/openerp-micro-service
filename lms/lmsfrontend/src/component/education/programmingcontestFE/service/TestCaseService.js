@@ -1,5 +1,6 @@
 import FileSaver from "file-saver";
-import {successNoti, warningNoti} from "../../../../utils/notification";
+import {errorNoti, successNoti, warningNoti} from "utils/notification";
+import JSZip from "jszip";
 
 export const copyAllTestCases = (testCases) => {
   let allTestCases = "";
@@ -13,7 +14,7 @@ export const copyAllTestCases = (testCases) => {
   }
   if (allTestCases.length > 0)
     navigator.clipboard.writeText(allTestCases).then(() => successNoti("Copied", 2000));
-  else warningNoti("No testcases satisfied", 2000);
+  else warningNoti("No testcase satisfies the requirement", 2000);
 };
 
 export const copyTestCasesWithPublicMode = (testCases, publicOnly) => {
@@ -31,43 +32,57 @@ export const copyTestCasesWithPublicMode = (testCases, publicOnly) => {
 
   if (allTestCases.length > 0)
     navigator.clipboard.writeText(allTestCases).then(() => successNoti("Copied", 1000));
-  else warningNoti("No testcases satisfied", 2000);};
-
-export const downloadAllTestCases = (testCases) => {
-  for (let i = 0; i < testCases.length; i++) {
-    const testCase_ith = testCases[i];
-    const blob = new Blob(
-      [
-        "INPUT: \n" +
-        testCase_ith.testCase +
-        "\n\nOUTPUT: \n" +
-        testCase_ith.correctAns,
-      ],
-      {type: "text/plain;charset=utf-8"}
-    );
-    FileSaver.saveAs(blob, "Testcase_" + (i + 1) + ".txt");
-  }
+  else warningNoti("No testcase satisfies the requirement", 2000);
 };
 
-export const downloadAllTestCasesWithPublicMode = (testCases, publicOnly) => {
-  let count = 0;
-  for (let i = 0; i < testCases.length; i++) {
-    const testCase_ith = testCases[i];
-    if (publicOnly && testCase_ith?.isPublic !== "Y") continue;
-    const blob = new Blob(
+// export const downloadAllTestCases = (testcases) => {
+//   for (let i = 0; i < testcases.length; i++) {
+//     const testCase_ith = testcases[i];
+//     const blob = new Blob(
+//       [
+//         "INPUT: \n" +
+//         testCase_ith.testCase +
+//         "\n\nOUTPUT: \n" +
+//         testCase_ith.correctAns,
+//       ],
+//       {type: "text/plain;charset=utf-8"}
+//     );
+//     FileSaver.saveAs(blob, "Testcase_" + (i + 1) + ".txt");
+//   }
+// };
+
+export const downloadAllTestCasesWithPublicMode = (testcases, publicOnly) => {
+  const zip = new JSZip();
+  const files = []
+
+  for (const testcase of testcases) {
+    if (publicOnly && testcase?.isPublic !== "Y") continue;
+
+    files.push(new Blob(
       [
         "INPUT: \n" +
-        testCase_ith.testCase +
+        testcase.testCase +
         "\n\nOUTPUT: \n" +
-        testCase_ith.correctAns,
+        testcase.correctAns,
       ],
       {type: "text/plain;charset=utf-8"}
-    );
-    FileSaver.saveAs(blob, "Testcase_" + (i + 1) + ".txt");
-    count++;
+    ))
   }
 
-  if (count > 0)
-    successNoti(count + " testcases downloaded", 2000);
-  else warningNoti("No testcases satisfied", 2000);
+  if (files.length > 0) {
+    files.forEach((file, index) => {
+      zip.file(`Testcase-${index + 1}.txt`, file)
+    })
+
+    zip.generateAsync({type: 'blob'})
+      .then(content => {
+        // successNoti(files.length + " testcases downloaded", 2000);
+        FileSaver.saveAs(content, 'testcases.zip');
+      })
+      .catch(e => {
+        errorNoti('Error generating archive')
+      });
+  } else {
+    warningNoti("No testcase satisfies the requirement", 2000);
+  }
 };
