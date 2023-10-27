@@ -4,6 +4,7 @@ import com.hust.baseweb.constants.ComputerLanguage;
 import com.hust.baseweb.constants.Constants;
 import com.hust.baseweb.util.TempDir;
 import com.spotify.docker.client.DefaultDockerClient;
+import com.spotify.docker.client.DockerCertificates;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerClient.ExecCreateParam;
 import com.spotify.docker.client.DockerClient.ListContainersParam;
@@ -22,14 +23,18 @@ import org.springframework.context.annotation.Configuration;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Configuration
 @Slf4j
 public class DockerClientBase {
 
-    @Value("${DOCKER_SERVER_HOST}")
-    private String DOCKER_SERVER_HOST;
+    @Value("${DOCKER_HOST}")
+    private String DOCKER_HOST;
+
+    @Value("${DOCKER_CERT_PATH}")
+    private String DOCKER_CERT_PATH;
 
     private static DockerClient dockerClient;
 
@@ -40,11 +45,19 @@ public class DockerClientBase {
 
     @Bean
     public void initDockerClientBase() {
-        dockerClient = DefaultDockerClient.builder()
-                .uri(URI.create(DOCKER_SERVER_HOST))
-                .connectionPoolSize(100)
-                .build();
         try {
+            URI dockerHost = URI.create(DOCKER_HOST);
+
+            if ("https".equalsIgnoreCase(dockerHost.getScheme())) {
+                dockerClient = DefaultDockerClient.builder()
+                        .uri(dockerHost)
+                        .dockerCertificates(new DockerCertificates(Paths.get(DOCKER_CERT_PATH))).build();
+            } else {
+                dockerClient = DefaultDockerClient.builder()
+                        .uri(dockerHost)
+                        .build();
+            }
+
             log.info("ping {}", dockerClient.ping());
             loadNotExistedImage();
             containerExist();
