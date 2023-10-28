@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import displayTime from "utils/DateTimeUtils";
+import { localeOption } from "utils/NumberFormat";
 import { request } from "../../../api";
 import HustCopyCodeBlock from "../../common/HustCopyCodeBlock";
 import {
@@ -126,13 +127,24 @@ export default function ContestProblemSubmissionDetail() {
                 ? `${submission.testCasePass} test cases`
                 : "",
             ],
-            ["Point", submission.point],
+            [
+              "Point",
+              submission.point &&
+                submission.point.toLocaleString("fr-FR", localeOption),
+            ],
             ["Language", submission.sourceCodeLanguage],
-            ["Total runtime", `${submission.runtime} ms`],
+            [
+              "Total runtime",
+              submission.runtime &&
+                `${submission.runtime.toLocaleString(
+                  "fr-FR",
+                  localeOption
+                )} ms`,
+            ],
             // ["Memory usage", `${submission.memoryUsage} KB`],
             ["Submited by", submission.submittedByUserId],
-            ["Submited at", displayTime(new Date(submission.createdAt))],
-            ["Last modified", displayTime(new Date(submission.updateAt))],
+            ["Submited at", displayTime(submission.createdAt)],
+            ["Last modified", displayTime(submission.updateAt)],
             [
               "Problem",
               <Link

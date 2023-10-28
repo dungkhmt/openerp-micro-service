@@ -5,6 +5,7 @@ import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import displayTime from "utils/DateTimeUtils";
+import { localeOption } from "utils/NumberFormat";
 import { successNoti } from "utils/notification";
 import ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase from "./ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase";
 import { getStatusColor } from "./lib";
@@ -18,7 +19,14 @@ export const detail = (key, value, sx) => (
     <Typography
       variant="subtitle2"
       gutterBottom
-      sx={{ mb: 2, fontWeight: 400, ...sx?.value }}
+      sx={{
+        mb: 1.5,
+        fontWeight: 400,
+        whiteSpace: "pre-wrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        ...sx?.value,
+      }}
     >
       {value}{" "}
     </Typography>
@@ -269,13 +277,24 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
                 ? `${submission.testCasePass} test cases`
                 : "",
             ],
-            ["Point", submission.point],
+            [
+              "Point",
+              submission.point &&
+                submission.point.toLocaleString("fr-FR", localeOption),
+            ],
             ["Language", submission.sourceCodeLanguage],
-            ["Total runtime", `${submission.runtime} ms`],
+            [
+              "Total runtime",
+              submission.runtime &&
+                `${submission.runtime.toLocaleString(
+                  "fr-FR",
+                  localeOption
+                )} ms`,
+            ],
             // ["Memory usage", `${submission.memoryUsage} KB`],
             ["Submited by", submission.submittedByUserId],
-            ["Submited at", displayTime(new Date(submission.createdAt))],
-            ["Last modified", displayTime(new Date(submission.updateAt))],
+            ["Submited at", displayTime(submission.createdAt)],
+            ["Last modified", displayTime(submission.updateAt)],
             [
               "Problem",
               <Link

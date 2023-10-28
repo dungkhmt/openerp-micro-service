@@ -1,6 +1,7 @@
 import { Box, LinearProgress } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useEffect, useState } from "react";
+import { localeOption } from "utils/NumberFormat";
 import XLSX from "xlsx";
 import { request } from "../../../api";
 import { successNoti } from "../../../utils/notification";
@@ -91,7 +92,7 @@ export default function ContestManagerRankingGroupNew(props) {
           ...Object.fromEntries(
             record.mapProblemsToPoints.map((item) => [
               item.problemId,
-              item.point,
+              item.point.toLocaleString("fr-FR", localeOption),
             ])
           ),
           userId: record.userId,
@@ -121,6 +122,8 @@ export default function ContestManagerRankingGroupNew(props) {
       {
         title: "TOTAL",
         field: "totalPoint",
+        headerStyle: { textAlign: "right" },
+        cellStyle: { paddingRight: 40 },
         render: (rankingRecord) => (
           <span
             style={{
@@ -131,13 +134,18 @@ export default function ContestManagerRankingGroupNew(props) {
               textAlign: "right",
             }}
           >
-            {`${rankingRecord.totalPoint.toLocaleString("en-US")}`}
+            {`${rankingRecord.totalPoint.toLocaleString(
+              "fr-FR",
+              localeOption
+            )}`}
           </span>
         ),
       },
       {
         title: "PERCENT",
         field: "totalPercentagePoint",
+        headerStyle: { textAlign: "right" },
+        cellStyle: { paddingRight: 40 },
         render: (rankingRecord) => (
           <span
             style={{
@@ -159,6 +167,8 @@ export default function ContestManagerRankingGroupNew(props) {
         columns.push({
           title: problemId,
           field: problemId,
+          headerStyle: { textAlign: "right" },
+          cellStyle: { textAlign: "right", paddingRight: 40 },
         });
       });
 
@@ -201,21 +211,21 @@ export default function ContestManagerRankingGroupNew(props) {
               tooltip: "Export Ranking as Excel file",
               isFreeAction: true,
             },
-            {
-              icon: () => {
-                return (
-                  <Button
-                    variant="outlined"
-                    onClick={copyLinkHandler}
-                    className={"no-background-btn"}
-                  >
-                    Get link
-                  </Button>
-                );
-              },
-              tooltip: "Get public URL to this ranking",
-              isFreeAction: true,
-            },
+            // {
+            //   icon: () => {
+            //     return (
+            //       <Button
+            //         variant="outlined"
+            //         onClick={copyLinkHandler}
+            //         className={"no-background-btn"}
+            //       >
+            //         Get link
+            //       </Button>
+            //     );
+            //   },
+            //   tooltip: "Get public URL to this ranking",
+            //   isFreeAction: true,
+            // },
           ]}
         />
       </Box>

@@ -4,3 +4,7 @@
 //     currency: "VND",
 //   }).format(number);
 // }
+
+export const localeOption = {
+  style: "decimal",
+};

@@ -1,6 +1,7 @@
 import { Box, LinearProgress } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useEffect, useState } from "react";
+import { localeOption } from "utils/NumberFormat";
 import XLSX from "xlsx";
 import { request } from "../../../api";
 import { successNoti } from "../../../utils/notification";
@@ -89,7 +90,7 @@ export default function ContestManagerRankingNew(props) {
           ...Object.fromEntries(
             record.mapProblemsToPoints.map((item) => [
               item.problemId,
-              item.point,
+              item.point.toLocaleString("fr-FR", localeOption),
             ])
           ),
           userId: record.userId,
@@ -119,6 +120,8 @@ export default function ContestManagerRankingNew(props) {
       {
         title: "TOTAL",
         field: "totalPoint",
+        headerStyle: { textAlign: "right" },
+        cellStyle: { paddingRight: 40 },
         render: (rankingRecord) => (
           <span
             style={{
@@ -129,13 +132,18 @@ export default function ContestManagerRankingNew(props) {
               textAlign: "right",
             }}
           >
-            {`${rankingRecord.totalPoint.toLocaleString("en-US")}`}
+            {`${rankingRecord.totalPoint.toLocaleString(
+              "fr-FR",
+              localeOption
+            )}`}
           </span>
         ),
       },
       {
         title: "PERCENT",
         field: "totalPercentagePoint",
+        headerStyle: { textAlign: "right" },
+        cellStyle: { paddingRight: 40 },
         render: (rankingRecord) => (
           <span
             style={{
@@ -157,6 +165,8 @@ export default function ContestManagerRankingNew(props) {
         columns.push({
           title: problemId,
           field: problemId,
+          headerStyle: { textAlign: "right" },
+          cellStyle: { textAlign: "right", paddingRight: 40 },
         });
       });
 

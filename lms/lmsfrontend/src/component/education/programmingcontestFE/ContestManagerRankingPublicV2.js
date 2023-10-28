@@ -1,10 +1,11 @@
-import {Box, LinearProgress} from "@mui/material";
-import {useEffect, useState} from "react";
+import { Box, LinearProgress } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
+import { localeOption } from "utils/NumberFormat";
+import { request } from "../../../api";
+import { errorNoti } from "../../../utils/notification";
 import HustContainerCard from "../../common/HustContainerCard";
 import StandardTable from "../../table/StandardTable";
-import {request} from "../../../api";
-import {useParams} from "react-router";
-import {errorNoti} from "../../../utils/notification";
 
 export default function ContestManagerRankingPublicV2(props) {
   const { contestId } = useParams();
@@ -18,39 +19,45 @@ export default function ContestManagerRankingPublicV2(props) {
     request(
       "get",
       "contests/public-ranking/" +
-      contestId +
-      "?getPointForRankingType=HIGHEST",
+        contestId +
+        "?getPointForRankingType=HIGHEST",
       (res) => {
         let sortedResult = res.data.sort((a, b) => b.totalPoint - a.totalPoint);
         setRanking(sortedResult);
       },
       {
         onError: (err) => {
-          errorNoti(err?.response?.data, 5000)
-        }
+          errorNoti(err?.response?.data, 5000);
+        },
       }
     ).then(() => setLoading(false));
   }
 
   useEffect(() => {
     if (ranking.length > 0) {
-      const problemIdsExtracted = ranking[0].mapProblemsToPoints.map(item => item.problemId);
+      const problemIdsExtracted = ranking[0].mapProblemsToPoints.map(
+        (item) => item.problemId
+      );
       setProblemIds(problemIdsExtracted);
 
       let arr = [];
-      ranking.forEach(record => {
+      ranking.forEach((record) => {
         const convertedData = {
-          ...Object.fromEntries(record.mapProblemsToPoints.map(item => [item.problemId, item.point])),
+          ...Object.fromEntries(
+            record.mapProblemsToPoints.map((item) => [
+              item.problemId,
+              item.point.toLocaleString("fr-FR", localeOption),
+            ])
+          ),
           userId: record.userId,
           fullname: record.fullname,
-          totalPoint: record.totalPoint
+          totalPoint: record.totalPoint,
         };
         arr.push(convertedData);
-      })
+      });
       setRankingDetail(arr);
     }
-
-  }, [ranking])
+  }, [ranking]);
 
   const generateColumns = () => {
     let problems = [];
@@ -58,36 +65,43 @@ export default function ContestManagerRankingPublicV2(props) {
       problems = ranking[0].mapProblemsToPoints;
     }
     const columns = [
-      {title: "Username", field: "userId"},
+      { title: "Username", field: "userId" },
       {
         title: "Fullname",
         field: "fullname",
         render: (rankingRecord) => (
-          <span style={{width: "150px", display: "block"}}>
+          <span style={{ width: "150px", display: "block" }}>
             <em>{`${rankingRecord.fullname}`}</em>
           </span>
-        )
+        ),
       },
       {
         title: "TOTAL",
         field: "totalPoint",
-        render: (rankingRecord) => (
-          <span style={{fontWeight: 600, color: "#2e7d32", width: "100%", display: "inline-block", textAlign: "right"}}>
-            {`${rankingRecord.totalPoint.toLocaleString('en-US')}`}
-          </span>
-        )
-      }
+        headerStyle: { textAlign: "right" },
+        cellStyle: {
+          fontWeight: 600,
+          color: "#2e7d32",
+          textAlign: "right",
+          paddingRight: 40,
+        },
+        render: (rankingRecord) =>
+          `${rankingRecord.totalPoint.toLocaleString("fr-FR", localeOption)}`,
+      },
     ];
 
-    problemIds.length > 0 && problemIds.forEach((problemId) => {
-      columns.push({
-        title: problemId,
-        field: problemId,
+    problemIds.length > 0 &&
+      problemIds.forEach((problemId) => {
+        columns.push({
+          title: problemId,
+          field: problemId,
+          headerStyle: { textAlign: "right" },
+          cellStyle: { textAlign: "right", paddingRight: 40 },
+        });
       });
-    });
 
     return columns;
-  }
+  };
 
   useEffect(() => {
     getRanking();
@@ -95,9 +109,8 @@ export default function ContestManagerRankingPublicV2(props) {
 
   return (
     <HustContainerCard title={"Contest Ranking"}>
-
       <Box>
-        {loading && <LinearProgress/>}
+        {loading && <LinearProgress />}
         <StandardTable
           title={"Contest: " + contestId}
           columns={generateColumns()}
