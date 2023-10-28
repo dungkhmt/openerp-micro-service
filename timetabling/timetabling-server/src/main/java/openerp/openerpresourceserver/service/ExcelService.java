@@ -31,7 +31,11 @@ public class ExcelService {
     public void save(MultipartFile file) {
         try {
             List<Schedule> tutorials = ExcelHelper.excelToSchedules(file.getInputStream());
-            scheduleRepo.saveAll(tutorials);
+            tutorials.forEach(el -> {
+                if (el != null && !el.getState().equals("Huỷ lớp")) {
+                    scheduleRepo.save(el);
+                }
+            });
         } catch (IOException e) {
             throw new RuntimeException("fail to store excel data: " + e.getMessage());
         }

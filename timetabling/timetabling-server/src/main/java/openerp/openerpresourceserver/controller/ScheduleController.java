@@ -1,9 +1,6 @@
 package openerp.openerpresourceserver.controller;
 
-import openerp.openerpresourceserver.model.entity.ClassCode;
-import openerp.openerpresourceserver.model.entity.Institute;
-import openerp.openerpresourceserver.model.entity.Schedule;
-import openerp.openerpresourceserver.model.entity.Semester;
+import openerp.openerpresourceserver.model.entity.*;
 import openerp.openerpresourceserver.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,6 +52,19 @@ public class ScheduleController {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             return new ResponseEntity<>(classCodeList, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/classroom")
+    public ResponseEntity<List<Classroom>> getAllClassroom() {
+        try {
+            List<Classroom> classroomList = scheduleService.getClassroom();
+            if (classroomList.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(classroomList, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

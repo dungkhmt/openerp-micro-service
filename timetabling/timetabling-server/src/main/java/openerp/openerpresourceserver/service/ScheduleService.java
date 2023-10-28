@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.service;
 
 import openerp.openerpresourceserver.model.entity.ClassCode;
+import openerp.openerpresourceserver.model.entity.Classroom;
 import openerp.openerpresourceserver.model.entity.Institute;
 import openerp.openerpresourceserver.model.entity.Semester;
 
@@ -12,4 +13,6 @@ public interface ScheduleService {
     List<Institute> getInstitute();
 
     List<ClassCode> getClassCode();
+
+    List<Classroom> getClassroom();
 }

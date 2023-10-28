@@ -1,10 +1,8 @@
 package openerp.openerpresourceserver.helper;
 
 import openerp.openerpresourceserver.model.entity.Schedule;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +20,7 @@ public class ExcelHelper {
             "Khối_lượng", "Ghi_chú", "Buổi_số", "Thứ", "Thời_gian", "BĐ", "KT", "Kíp", "Tuần", "Phòng",
             "Cần_TN", "SLĐK", "SL_Max", "Trạng_thái", "Loại_lớp", "Đợt_mở", "Mã_QL"};
     static String SHEET = "Schedules";
+    static String DEFAULT_SHEET = "Sheet1";
 
     public static ByteArrayInputStream schedulesToExcelExport(List<Schedule> schedules) {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
@@ -68,10 +67,19 @@ public class ExcelHelper {
     }
 
     public static ByteArrayInputStream schedulesToExcel(List<Schedule> schedules) {
-        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream out = new ByteArrayOutputStream();) {
             Sheet sheet = workbook.createSheet(SHEET);
+
+            // Add title row
+            Row titleRow = sheet.createRow(0);
+            Cell titleCell = titleRow.createCell(0);
+            titleCell.setCellValue("THỜI KHÓA BIỂU");
+            titleCell.setCellStyle(getCenteredStyle(workbook));
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, HEADERs.length - 1));
+
             // Header
-            Row headerRow = sheet.createRow(0);
+            Row headerRow = sheet.createRow(2);
             for (int col = 0; col < HEADERs.length; col++) {
                 Cell cell = headerRow.createCell(col);
                 cell.setCellValue(HEADERs[col]);
@@ -90,18 +98,31 @@ public class ExcelHelper {
         return true;
     }
 
+    private static CellStyle getCenteredStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setAlignment(CellStyle.ALIGN_CENTER);
+        style.setVerticalAlignment(CellStyle.ALIGN_CENTER);
+        return style;
+    }
+
     public static List<Schedule> excelToSchedules(InputStream is) {
         try {
             Workbook workbook = new XSSFWorkbook(is);
             Sheet sheet = workbook.getSheet(SHEET);
+            if (sheet == null) {
+                sheet = workbook.getSheet(DEFAULT_SHEET);
+            }
             Iterator<Row> rows = sheet.iterator();
             List<Schedule> schedules = new ArrayList<Schedule>();
             int rowNumber = 0;
+            if (rows.hasNext()){
+                rows.next();
+            }
             while (rows.hasNext()) {
                 Row currentRow = rows.next();
                 // skip header
                 if (rowNumber == 0) {
-                    rowNumber++;
+                    rowNumber += 2;
                     continue;
                 }
                 Iterator<Cell> cellsInRow = currentRow.iterator();

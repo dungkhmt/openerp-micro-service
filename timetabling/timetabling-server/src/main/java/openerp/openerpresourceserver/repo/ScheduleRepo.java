@@ -1,10 +1,6 @@
 package openerp.openerpresourceserver.repo;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import openerp.openerpresourceserver.model.entity.ClassCode;
-import openerp.openerpresourceserver.model.entity.Module;
 import openerp.openerpresourceserver.model.entity.Schedule;
-import openerp.openerpresourceserver.model.entity.StudyTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
