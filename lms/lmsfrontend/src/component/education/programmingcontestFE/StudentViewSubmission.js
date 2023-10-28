@@ -6,6 +6,7 @@ import StandardTable from "component/table/StandardTable";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
+import { localeOption } from "utils/NumberFormat";
 import { request } from "../../../api";
 import HustCopyCodeBlock from "../../common/HustCopyCodeBlock";
 import HustModal from "../../common/HustModal";
@@ -83,10 +84,14 @@ const StudentViewSubmission = forwardRef((props, ref) => {
             return { color: "red" };
         }
       },
+      minWidth: "128px",
+      align: "left",
     },
     {
       title: "Message",
       field: "message",
+      headerStyle: { textAlign: "center" },
+      cellStyle: { textAlign: "center", paddingRight: 40 },
       render: (rowData) => (
         <IconButton
           color="primary"
@@ -102,15 +107,22 @@ const StudentViewSubmission = forwardRef((props, ref) => {
     {
       title: t("submissionList.point"),
       field: "point",
-      cellStyle: { fontWeight: 500 },
+      headerStyle: { textAlign: "right" },
+      cellStyle: { fontWeight: 500, textAlign: "right", paddingRight: 40 },
+      render: (row) => `${row.point.toLocaleString("fr-FR", localeOption)}`,
     },
-    { title: t("submissionList.language"), field: "sourceCodeLanguage" },
+    {
+      title: t("submissionList.language"),
+      field: "sourceCodeLanguage",
+      minWidth: "128px",
+    },
     {
       title: t("submissionList.numTestCases"),
       field: "testCasePass",
-      align: "center",
+      align: "right",
+      minWidth: "150px",
     },
-    { title: t("submissionList.at"), field: "createAt" },
+    { title: t("submissionList.at"), field: "createAt", minWidth: "128px" },
   ];
 
   function handleRefresh() {

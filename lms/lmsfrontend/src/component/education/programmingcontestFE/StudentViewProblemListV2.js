@@ -1,16 +1,18 @@
-import {Box, Checkbox, Chip, LinearProgress} from "@mui/material";
-import React, {useEffect, useState} from "react";
-import {useTranslation} from "react-i18next";
-import {Link, useParams} from "react-router-dom";
-import {request} from "../../../api";
+import DoneIcon from "@mui/icons-material/Done";
+import { Box, Chip, LinearProgress } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useParams } from "react-router-dom";
+import { localeOption } from "utils/NumberFormat";
+import { request } from "../../../api";
 import StandardTable from "../../table/StandardTable";
 
 export default function StudentViewProblemList() {
-  const {t} = useTranslation(
+  const { t } = useTranslation(
     "education/programmingcontest/studentviewcontestdetail"
   );
 
-  const {contestId} = useParams();
+  const { contestId } = useParams();
   const [problems, setProblems] = useState([]);
 
   const [loading, setLoading] = useState(true);
@@ -22,8 +24,7 @@ export default function StudentViewProblemList() {
       (res) => {
         setProblems(res.data);
         for (let i = 0; i < res.data.length; i++) {
-          let idSource =
-            contestId + "-" + res.data[i].problemId + "-source";
+          let idSource = contestId + "-" + res.data[i].problemId + "-source";
           let tmpSource = localStorage.getItem(idSource);
           let idLanguage =
             contestId + "-" + res.data[i].problemId + "-language";
@@ -79,46 +80,60 @@ export default function StudentViewProblemList() {
       field: "maxSubmittedPoint",
       render: (rowData) => (
         <>
-          {rowData.maxSubmittedPoint != null &&
-            <Chip
-              size="small"
-              color="primary"
-              variant="outlined"
-              label={rowData.maxSubmittedPoint}
-              sx={{padding: "4px", border: "2px solid lightgray", width: "52px"}}
-            />
+          {
+            rowData.maxSubmittedPoint &&
+              rowData.maxSubmittedPoint.toLocaleString("fr-FR", localeOption)
+            // (
+            //   <Chip
+            //     size="small"
+            //     color="primary"
+            //     variant="outlined"
+            //     label={rowData.maxSubmittedPoint}
+            //     sx={{
+            //       padding: "4px",
+            //       border: "2px solid lightgray",
+            //       width: "52px",
+            //     }}
+            //   />
+            // )
           }
         </>
-
       ),
+      align: "right",
+      minWidth: 160,
     },
     {
       title: t("accepted"),
       field: "accepted",
-      render: (rowData) => (
-        <Checkbox
-          onChange={() => {}}
-          checked={rowData.accepted} color="success"
-        />
-      ),
+      cellStyle: { paddingRight: 40 },
+      render: (rowData) => rowData.accepted && <DoneIcon color="success" />,
+      align: "center",
+      minWidth: 160,
     },
     {
-      title: "Tags",
+      title: t("tags"),
       render: (rowData) => (
         <Box>
-          {rowData?.tags.length > 0 && rowData.tags.map(tag =>
-            <Chip
-              size="small"
-              label={tag}
-              sx={{marginRight: "6px", marginBottom: "6px", border: "1px solid lightgray", fontStyle: "italic"}}
-            />)}
+          {rowData?.tags.length > 0 &&
+            rowData.tags.map((tag) => (
+              <Chip
+                size="small"
+                label={tag}
+                sx={{
+                  marginRight: "6px",
+                  marginBottom: "6px",
+                  border: "1px solid lightgray",
+                  fontStyle: "italic",
+                }}
+              />
+            ))}
         </Box>
       ),
     },
   ];
   return (
     <Box>
-      {loading && <LinearProgress/>}
+      {loading && <LinearProgress />}
       <StandardTable
         title={t("problemList.title")}
         columns={columns}

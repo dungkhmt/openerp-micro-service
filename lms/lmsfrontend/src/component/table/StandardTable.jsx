@@ -1,16 +1,21 @@
-import {makeStyles, MuiThemeProvider, styled} from "@material-ui/core/styles";
-import {Box, IconButton, Paper, Typography} from "@mui/material";
-import MaterialTable, {MTableCell, MTableToolbar} from "material-table";
-import PropTypes from "prop-types";
-import React, {useCallback} from "react";
-import {components, localization, tableIcons, themeTable,} from "utils/MaterialTableUtils";
-import {useTranslation} from "react-i18next";
+import { makeStyles, MuiThemeProvider, styled } from "@material-ui/core/styles";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
+import { Box, IconButton, Paper, Typography } from "@mui/material";
+import MaterialTable, { MTableCell, MTableToolbar } from "material-table";
+import PropTypes from "prop-types";
+import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  components,
+  localization,
+  tableIcons,
+  themeTable,
+} from "utils/MaterialTableUtils";
 
-export const Offset = styled("div")(({theme}) => ({
+export const Offset = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   padding: theme.spacing(0, 1),
@@ -20,7 +25,7 @@ export const Offset = styled("div")(({theme}) => ({
 }));
 
 export function TablePaginationActions(props) {
-  const {count, page, rowsPerPage, onPageChange} = props;
+  const { count, page, rowsPerPage, onPageChange } = props;
 
   const handleFirstPageButtonClick = (event) => {
     onPageChange(event, 0);
@@ -39,47 +44,46 @@ export function TablePaginationActions(props) {
   };
 
   return (
-    <Box sx={{flexShrink: 0, ml: 2.5}}>
+    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
         aria-label="first page"
       >
-        <FirstPageIcon/>
+        <FirstPageIcon />
       </IconButton>
       <IconButton
         onClick={handleBackButtonClick}
         disabled={page === 0}
         aria-label="previous page"
       >
-        <KeyboardArrowLeft/>
+        <KeyboardArrowLeft />
       </IconButton>
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
         aria-label="next page"
       >
-        <KeyboardArrowRight/>
+        <KeyboardArrowRight />
       </IconButton>
       <IconButton
         onClick={handleLastPageButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
         aria-label="last page"
       >
-        <LastPageIcon/>
+        <LastPageIcon />
       </IconButton>
     </Box>
   );
 }
 
-
 const useStyles = makeStyles(() => ({
-  tableToolbarHighlight: {backgroundColor: "transparent"},
+  tableToolbarHighlight: { backgroundColor: "transparent" },
 }));
 
 export default function StandardTable(props) {
   const classes = useStyles();
-  const {t} = useTranslation(["common"]);
+  const { t } = useTranslation(["common"]);
 
   const rowStyle = useCallback(
     (rowData) => ({
@@ -114,7 +118,13 @@ export default function StandardTable(props) {
       <MuiThemeProvider theme={themeTable}>
         <MaterialTable
           {...props}
-          title={props.title ? <Typography variant="h5">{props.title}</Typography> : <></>}
+          title={
+            props.title ? (
+              <Typography variant="h5">{props.title}</Typography>
+            ) : (
+              <></>
+            )
+          }
           localization={{
             ...localization,
             toolbar: {
@@ -130,6 +140,7 @@ export default function StandardTable(props) {
               backgroundColor: "#f4f4f4",
               color: "#404040",
               fontWeight: 600,
+              padding: 12,
             },
             rowStyle: rowStyle,
             ...props.options,
@@ -140,12 +151,7 @@ export default function StandardTable(props) {
           onRowClick={props.onRowClick}
           components={{
             ...components,
-            Container: (props) => (
-              <Paper
-                {...props}
-                elevation={2}
-              />
-            ),
+            Container: (props) => <Paper {...props} elevation={2} />,
             Toolbar: (props) => (
               <MTableToolbar
                 {...props}
@@ -158,10 +164,7 @@ export default function StandardTable(props) {
               />
             ),
             Cell: (props) => (
-              <MTableCell
-                {...props}
-                style={{padding: "12px"}}
-              />
+              <MTableCell {...props} style={{ padding: "12px" }} />
             ),
             ...props.components,
           }}
@@ -186,6 +189,5 @@ StandardTable.propTypes = {
   actions: PropTypes.array,
   data: PropTypes.array,
   commandBarComponents: PropTypes.element,
-  editable: PropTypes.object
+  editable: PropTypes.object,
 };
-
