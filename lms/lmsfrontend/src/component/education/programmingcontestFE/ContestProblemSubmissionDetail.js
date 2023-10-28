@@ -129,17 +129,20 @@ export default function ContestProblemSubmissionDetail() {
             ],
             [
               "Point",
-              submission.point &&
-                submission.point.toLocaleString("fr-FR", localeOption),
+              `${
+                submission.point
+                  ? submission.point.toLocaleString("fr-FR", localeOption)
+                  : 0
+              }`,
             ],
             ["Language", submission.sourceCodeLanguage],
             [
               "Total runtime",
-              submission.runtime &&
-                `${submission.runtime.toLocaleString(
-                  "fr-FR",
-                  localeOption
-                )} ms`,
+              `${
+                submission.runtime
+                  ? submission.runtime.toLocaleString("fr-FR", localeOption)
+                  : 0
+              } ms`,
             ],
             // ["Memory usage", `${submission.memoryUsage} KB`],
             ["Submited by", submission.submittedByUserId],
