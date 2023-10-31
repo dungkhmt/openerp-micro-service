@@ -1,14 +1,27 @@
 //import { Button, Box, Checkbox, Typography } from "@material-ui/core";
 
-import {Box, Button, Typography} from "@material-ui/core";
-import {grey} from "@material-ui/core/colors";
-import {makeStyles} from "@material-ui/core/styles";
-//import { makeStyles } from "@material-ui/core/styles";
+import {
+  Box,
+  Button,
+  Typography,
+  Checkbox,
+  FormGroup,
+  FormControlLabel,
+} from "@mui/material";
+import { grey, green } from "@material-ui/core/colors";
+import { makeStyle, withStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import parse from "html-react-parser";
-import {useEffect, useState} from "react";
-import {useHistory} from "react-router";
-import {request} from "../../../api";
-import {randomImageName} from "../../../utils/FileUpload/covert";
+import { useEffect, useState } from "react";
+import { useHistory } from "react-router";
+import { request } from "../../../api";
+import { randomImageName } from "../../../utils/FileUpload/covert";
+
+function isPDF(base64Data) {
+  const decodedData = atob(base64Data);
+  // Check for PDF header
+  return decodedData.startsWith("%PDF");
+}
 
 const useStyles = makeStyles(() => ({
   testBtn: {
@@ -67,18 +80,18 @@ const useStyles = makeStyles(() => ({
 /**
  * Customized checkbox.
  */
-// const GreenCheckbox = withStyles({
-//   root: {
-//     color: green[400],
-//     "&$checked": {
-//       color: green[600],
-//     },
-//     paddingLeft: 20,
-//     paddingTop: 0,
-//     paddingBottom: 0,
-//   },
-//   checked: {},
-// })((props) => <Checkbox color="default" disableRipple {...props} />);
+const GreenCheckbox = withStyles({
+  root: {
+    color: green[400],
+    "&$checked": {
+      color: green[600],
+    },
+    paddingLeft: 20,
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
+  checked: {},
+})((props) => <Checkbox color="default" disableRipple {...props} />);
 
 /**
  * Describe a multiple-choice quiz.
@@ -102,16 +115,16 @@ export default function TeacherViewQuizDetail({ quiz, index, courseId }) {
   }, [quiz]);
 
   //
-  // const [result, setResult] = useState({ submited: false, isCorrect: false });
-  // const [chkState, setChkState] = useState(() => {
-  //   const isChecked = {};
+  const [result, setResult] = useState({ submited: false, isCorrect: false });
+  const [chkState, setChkState] = useState(() => {
+    const isChecked = {};
 
-  //   quiz.quizChoiceAnswerList.forEach((ans) => {
-  //     isChecked[ans.choiceAnswerId] = false;
-  //   });
+    quiz.quizChoiceAnswerList.forEach((ans) => {
+      isChecked[ans.choiceAnswerId] = false;
+    });
 
-  //   return isChecked;
-  // });
+    return isChecked;
+  });
 
   function handleUpdateQuizQuestion() {
     history.push(
@@ -134,6 +147,10 @@ export default function TeacherViewQuizDetail({ quiz, index, courseId }) {
     );
   }
 
+  const handleChange = (event) => {
+    setChkState({ ...chkState, [event.target.name]: event.target.checked });
+  };
+
   function handleViewDetailQuizQuestion() {
     history.push(
       "/edu/teacher/course/quiz/view/detail/" + quiz.questionId + "/" + courseId
@@ -148,7 +165,7 @@ export default function TeacherViewQuizDetail({ quiz, index, courseId }) {
         {quiz.statusId})&nbsp;&nbsp; Created By: {quiz.createdByUserLoginId}
         {parse(quiz.statement)}
       </Box>
-      {/*<FormGroup row className={classes.answerWrapper}>
+      <FormGroup row className={classes.answerWrapper}>
         {quiz.quizChoiceAnswerList.map((answer) => (
           <FormControlLabel
             key={answer.choiceAnswerId}
@@ -162,17 +179,30 @@ export default function TeacherViewQuizDetail({ quiz, index, courseId }) {
             }
             label={parse(answer.choiceAnswerContent)}
           />
-          ))}
-          </FormGroup>*/}
+        ))}
+      </FormGroup>
       {fileAttachments.length !== 0 &&
         fileAttachments.map((file) => (
           <div key={file.id} className={classes.imageContainer}>
             <div className={classes.imageWrapper}>
-              <img
+              {/* <img
                 src={`data:image/jpeg;base64,${file.url}`}
                 alt="quiz test"
                 className={classes.imageQuiz}
-              />
+              /> */}
+              {isPDF(file.url) ? (
+                <iframe
+                  width={"860px"}
+                  height={"500px"}
+                  src={`data:application/pdf;base64,${file.url}`}
+                />
+              ) : (
+                <img
+                  src={`data:image/jpeg;base64,${file.url}`}
+                  alt="quiz test"
+                  className={classes.imageQuiz}
+                />
+              )}
             </div>
           </div>
         ))}
