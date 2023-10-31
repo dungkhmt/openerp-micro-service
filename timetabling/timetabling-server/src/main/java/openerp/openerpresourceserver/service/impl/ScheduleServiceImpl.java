@@ -1,10 +1,8 @@
 package openerp.openerpresourceserver.service.impl;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import openerp.openerpresourceserver.model.entity.ClassCode;
-import openerp.openerpresourceserver.model.entity.Classroom;
-import openerp.openerpresourceserver.model.entity.Institute;
-import openerp.openerpresourceserver.model.entity.Semester;
+import openerp.openerpresourceserver.common.CommonUtil;
+import openerp.openerpresourceserver.model.dto.request.FilterScheduleDto;
+import openerp.openerpresourceserver.model.entity.*;
 import openerp.openerpresourceserver.repo.*;
 import openerp.openerpresourceserver.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +10,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
+
+    public static final Integer MAX_CREW_PER_DAY = 12;
 
     @Autowired
     private ScheduleRepo scheduleRepo;
@@ -32,8 +31,19 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Autowired
     private ClassroomRepo classroomRepo;
 
+    @Autowired
+    private StudyWeekRepo studyWeekRepo;
+
+    @Autowired
+    private WeekDayRepo weekDayRepo;
+
     @Override
     public List<Semester> getSemester() {
+        return semesterRepo.findAll();
+    }
+
+    @Override
+    public void updateSemester() {
         List<String> semesterDataList = scheduleRepo.getSemester();
         if (!semesterDataList.isEmpty()) {
             semesterRepo.deleteAll();
@@ -46,11 +56,15 @@ public class ScheduleServiceImpl implements ScheduleService {
             semesterList.add(semester);
         });
         semesterRepo.saveAll(semesterList);
-        return semesterRepo.findAll();
     }
 
     @Override
     public List<Institute> getInstitute() {
+        return instituteRepo.findAll();
+    }
+
+    @Override
+    public void updateInstitute() {
         List<String> instituteDataList = scheduleRepo.getInstitute();
         if (!instituteDataList.isEmpty()) {
             instituteRepo.deleteAll();
@@ -63,11 +77,15 @@ public class ScheduleServiceImpl implements ScheduleService {
             instituteList.add(institute);
         });
         instituteRepo.saveAll(instituteList);
-        return instituteRepo.findAll();
     }
 
     @Override
     public List<ClassCode> getClassCode() {
+        return classCodeRepo.findAll();
+    }
+
+    @Override
+    public void updateClassCode() {
         List<String> classCodeDataList = scheduleRepo.getClassCode();
         if (!classCodeDataList.isEmpty()) {
             classCodeRepo.deleteAll();
@@ -82,14 +100,18 @@ public class ScheduleServiceImpl implements ScheduleService {
             classCodeList.add(classCode);
         });
         classCodeRepo.saveAll(classCodeList);
-        return classCodeRepo.findAll();
     }
 
     @Override
     public List<Classroom> getClassroom() {
+        return classroomRepo.findAll();
+    }
+
+    @Override
+    public void updateClassroom() {
         List<String> classroomDataList = scheduleRepo.getClassroom();
         if (!classroomDataList.isEmpty()) {
-            classCodeRepo.deleteAll();
+            classroomRepo.deleteAll();
         }
         List<Classroom> classroomList = new ArrayList<>();
         classroomDataList.forEach(el -> {
@@ -99,6 +121,74 @@ public class ScheduleServiceImpl implements ScheduleService {
             classroomList.add(classroom);
         });
         classroomRepo.saveAll(classroomList);
-        return classroomRepo.findAll();
     }
+
+    @Override
+    public List<StudyWeek> getStudyWeek() {
+        return studyWeekRepo.findAll();
+    }
+
+    @Override
+    public void updateStudyWeek() {
+        List<String> studyWeekDataList = scheduleRepo.getStudyWeek();
+        if (!studyWeekDataList.isEmpty()) {
+            studyWeekRepo.deleteAll();
+        }
+        List<StudyWeek> studyWeekList = new ArrayList<>();
+        studyWeekDataList.forEach(el -> {
+            StudyWeek studyWeek = StudyWeek.builder()
+                    .studyweek(el)
+                    .build();
+            studyWeekList.add(studyWeek);
+        });
+        studyWeekRepo.saveAll(studyWeekList);
+    }
+
+    @Override
+    public List<WeekDay> getWeekDay() {
+        return weekDayRepo.findAll();
+    }
+
+    @Override
+    public void updateWeekDay() {
+        List<String> weekDayDataList = scheduleRepo.getWeekDay();
+        if (!weekDayDataList.isEmpty()) {
+            weekDayRepo.deleteAll();
+        }
+        List<WeekDay> weekDayList = new ArrayList<>();
+        weekDayDataList.forEach(el -> {
+            WeekDay weekDay = WeekDay.builder()
+                    .weekDay(el)
+                    .build();
+            weekDayList.add(weekDay);
+        });
+        weekDayRepo.saveAll(weekDayList);
+    }
+
+    @Override
+    public List<Schedule> searchSchedule(FilterScheduleDto requestDto) {
+        return scheduleRepo.getSchedulesByClassRoomAndStudyWeekAndWeekDay(requestDto.getClassRoom(),
+                requestDto.getStudyWeek(), requestDto.getWeekDay());
+    }
+
+    @Override
+    public String calculateTimePerformance(FilterScheduleDto requestDto) {
+        List<Schedule> scheduleList = this.searchSchedule(requestDto);
+        int totalTimeUsing = 0;
+        for (int i = 0; i < scheduleList.size(); i++) {
+            Schedule schedule = scheduleList.get(i);
+            String start = schedule.getStart();
+            String finish = schedule.getFinish();
+            int countCrew = CommonUtil.calculateTimeCrew(start, finish);
+            totalTimeUsing += countCrew;
+        }
+        double result = (double) totalTimeUsing * 100 / MAX_CREW_PER_DAY;
+        double roundedResult = Math.round(result * 100.0) / 100.0;
+
+        return roundedResult + " %";
+    }
+
+//    public String calculateSeatPerformance(List<Schedule> scheduleList) {
+//
+//    }
 }

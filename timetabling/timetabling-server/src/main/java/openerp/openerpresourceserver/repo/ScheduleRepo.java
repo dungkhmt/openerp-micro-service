@@ -10,6 +10,8 @@ import java.util.List;
 @Repository
 public interface ScheduleRepo extends JpaRepository<Schedule, Long> {
 
+    List<Schedule> getSchedulesByClassRoomAndStudyWeekAndWeekDay(String classRoom, String studyWeek, String weekDay);
+
     @Query(value = "SELECT DISTINCT semester FROM public.timetabling_schedule", nativeQuery = true)
     List<String> getSemester();
 
@@ -33,6 +35,9 @@ public interface ScheduleRepo extends JpaRepository<Schedule, Long> {
 
     @Query(value = "SELECT DISTINCT class_room FROM public.timetabling_schedule", nativeQuery = true)
     List<String> getClassroom();
+
+    @Query(value = "SELECT DISTINCT week_day FROM public.timetabling_schedule", nativeQuery = true)
+    List<String> getWeekDay();
 
     @Query(value = "SELECT DISTINCT state FROM public.timetabling_schedule", nativeQuery = true)
     List<String> getState();
