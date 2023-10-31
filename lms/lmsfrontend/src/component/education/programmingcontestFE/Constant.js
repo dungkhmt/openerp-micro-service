@@ -61,7 +61,7 @@ export const DEFAULT_CODE_SEGMENT_CPP = "//C++ \n" +
 export const DEFAULT_CODE_SEGMENT_JAVA = "//JAVA \n" +
   "import java.util.*; \n\n" +
   "@SuppressWarnings({\"unchecked\", \"deprecation\"})\n" +
-  "// IMPORTANT: class name for JAVA code must be 'Main' \n" +
+  "// IMPORTANT: class name for JAVA code MUST be public and named 'Main' \n" +
   "public class Main { \n" +
   "    public static void main(String[] args) { \n\n" +
   "    }\n" +
