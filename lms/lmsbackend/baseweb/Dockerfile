@@ -21,15 +21,15 @@ RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
 FROM eclipse-temurin:8-jdk
 
-# Install ortools and Apache POI dependencies
-RUN apk update && apk add --no-cache \
-    gcompat \
-    ncurses-libs \
-    libgcc \
-    libstdc++ \
-    && apk add \
-    --update ttf-dejavu \
-    && rm -rf /var/cache/apk/*
+## Install ortools and Apache POI dependencies
+#RUN apk update && apk add --no-cache \
+#    gcompat \
+#    ncurses-libs \
+#    libgcc \
+#    libstdc++ \
+#    && apk add \
+#    --update ttf-dejavu \
+#    && rm -rf /var/cache/apk/* \
 
 # RUN addgroup -S spring && adduser -S spring -G spring
 # USER spring:spring
