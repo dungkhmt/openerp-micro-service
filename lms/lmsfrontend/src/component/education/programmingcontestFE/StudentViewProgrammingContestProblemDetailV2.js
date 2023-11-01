@@ -387,20 +387,21 @@ export default function StudentViewProgrammingContestProblemDetail() {
           </h3>
         </div> */}
       </Box>
-      <Alert
-        variant="outlined"
-        severity="info"
-        sx={{
-          borderRadius: 1.5,
-          bgcolor: "#e5f6fd",
-          my: 2,
-          mt: 3,
-        }}
-      >
-        With Java, the public class must be declared as:{" "}
-        <b>public class Main {"{...}"}</b>
-      </Alert>
-      <Box>
+      {language === COMPUTER_LANGUAGES.JAVA && (
+        <Alert
+          variant="outlined"
+          severity="info"
+          sx={{
+            borderRadius: 1.5,
+            bgcolor: "#e5f6fd",
+            mt: 3,
+          }}
+        >
+          With Java, the public class must be declared as:{" "}
+          <b>public class Main {"{...}"}</b>
+        </Alert>
+      )}
+      <Box sx={{ mt: 3 }}>
         <StudentViewSubmission problemId={problemId} ref={listSubmissionRef} />
       </Box>
     </HustContainerCard>
