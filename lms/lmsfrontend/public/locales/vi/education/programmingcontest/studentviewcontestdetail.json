@@ -6,11 +6,12 @@
   "submitted": "Đã nộp",
   "accepted": "Đã hoàn thành",
   "maxPoint": "Điểm đạt được",
+  "tags": "Nhãn",
   "problemList": {
-    "title": "Danh sách bài tập"
+    "title": "Bài tập"
   },
   "submissionList": {
-    "title": "Danh sách bài nộp",
+    "title": "Bài nộp",
     "status": "Trạng thái",
     "language": "Ngôn ngữ",
     "point": "Điểm",

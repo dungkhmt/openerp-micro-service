@@ -1,5 +1,5 @@
 import { LoadingButton } from "@mui/lab";
-import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, Divider, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import HustModal from "component/common/HustModal";
@@ -387,7 +387,20 @@ export default function StudentViewProgrammingContestProblemDetail() {
           </h3>
         </div> */}
       </Box>
-      <Box sx={{ paddingTop: 2 }}>
+      <Alert
+        variant="outlined"
+        severity="info"
+        sx={{
+          borderRadius: 1.5,
+          bgcolor: "#e5f6fd",
+          my: 2,
+          mt: 3,
+        }}
+      >
+        With Java, the public class must be declared as:{" "}
+        <b>public class Main {"{...}"}</b>
+      </Alert>
+      <Box>
         <StudentViewSubmission problemId={problemId} ref={listSubmissionRef} />
       </Box>
     </HustContainerCard>
