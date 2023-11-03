@@ -21,7 +21,7 @@ public class ScheduleController {
     @Autowired
     private ScheduleService scheduleService;
 
-    @GetMapping("/get-by-condition")
+    @GetMapping("/search")
     public ResponseEntity<List<Schedule>> getScheduleByCondition(@Valid @RequestBody FilterScheduleDto requestDto) {
         try {
             List<Schedule> result = scheduleService.searchSchedule(requestDto);

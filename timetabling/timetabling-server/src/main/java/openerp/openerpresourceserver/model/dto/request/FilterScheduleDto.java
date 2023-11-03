@@ -11,10 +11,30 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FilterScheduleDto {
+    private String classCode;
+
     @NotBlank(message = "Classroom is not be null")
     private String classRoom;
+
+    private String classType;
+
+    private String institute;
+
+    private String managementCode;
+
+    private String moduleCode;
+
+    private String openBatch;
+
+    @NotBlank(message = "Semester is not be null")
+    private String semester;
+
+    private String state;
+
+    private String studyTime;
+
     @NotBlank(message = "Study Week is not be null")
     private String studyWeek;
-    @NotBlank(message = "Week Day is not be null")
+
     private String weekDay;
 }

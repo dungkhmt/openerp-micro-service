@@ -7,7 +7,9 @@ import java.math.RoundingMode;
 @Service
 public class CommonUtil {
 
-    public static final Integer TIME_FOR_A_CREW = 45;
+    public static final Integer TIME_FOR_A_CREW = 50;
+
+    public static final Integer MINUTE_PER_HOUR = 60;
 
     public static Integer roundUpDivision(Integer dividend, Integer divisor) {
         BigDecimal result = new BigDecimal(dividend).divide(new BigDecimal(divisor), 0, RoundingMode.CEILING);
@@ -21,14 +23,17 @@ public class CommonUtil {
             Integer end = Integer.parseInt(finish);
             return (end - begin) + 1;
         }
-        Integer hourStart = Integer.parseInt(start.substring(0, 1));
-        Integer minuteStart = Integer.parseInt(start.substring(2, 3));
-        Integer hourFinish = Integer.parseInt(finish.substring(0, 1));
-        Integer minuteFinish = Integer.parseInt(finish.substring(2, 3));
-        if (minuteFinish - minuteStart < 0) {
-            timeStudy = (hourFinish - hourStart - 1) * 60 + (minuteFinish + 60 - minuteStart);
+        Integer hourStart = Integer.parseInt(start.substring(0, 2));
+        Integer minuteStart = Integer.parseInt(start.substring(2, 4));
+        Integer hourFinish = Integer.parseInt(finish.substring(0, 2));
+        Integer minuteFinish = Integer.parseInt(finish.substring(2, 4));
+
+        int tmpMinute = minuteFinish - minuteStart;
+        int tmpHour = hourFinish - hourStart;
+        if (tmpMinute < 0) {
+            timeStudy = ( tmpHour - 1) * MINUTE_PER_HOUR + (tmpMinute + MINUTE_PER_HOUR);
         } else {
-            timeStudy = (hourFinish - hourStart) * 60 + (minuteFinish - minuteStart);
+            timeStudy = tmpHour * MINUTE_PER_HOUR + tmpMinute;
         }
         return roundUpDivision(timeStudy, TIME_FOR_A_CREW);
     }
