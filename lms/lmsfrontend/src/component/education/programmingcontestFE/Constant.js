@@ -2,7 +2,8 @@ export const NORMAL_EVALUATION = "NORMAL_EVALUATION";
 export const CUSTOM_EVALUATION = "CUSTOM_EVALUATION";
 
 export const SUBMISSION_MODE_SOURCE_CODE = "SUBMISSION_MODE_SOURCE_CODE";
-export const SUBMISSION_MODE_SOLUTION_OUTPUT = "SUBMISSION_MODE_SOLUTION_OUTPUT";
+export const SUBMISSION_MODE_SOLUTION_OUTPUT =
+  "SUBMISSION_MODE_SOLUTION_OUTPUT";
 export const SUBMISSION_MODE_NOT_ALLOWED = "SUBMISSION_MODE_NOT_ALLOWED";
 
 export const getSubmissionModeFromConstant = (mode) => {
@@ -16,16 +17,16 @@ export const getSubmissionModeFromConstant = (mode) => {
     default:
       return "NORMAL";
   }
-}
+};
 
 export const COMPUTER_LANGUAGES = Object.freeze({
-  C: 'C',
-  CPP11: 'CPP11',
-  CPP14: 'CPP14',
-  CPP17: 'CPP17',
-  JAVA: 'JAVA',
-  PYTHON: 'PYTHON3'
-})
+  C: "C",
+  CPP11: "CPP11",
+  CPP14: "CPP14",
+  CPP17: "CPP17",
+  JAVA: "JAVA",
+  PYTHON: "PYTHON3",
+});
 
 export const mapLanguageToDisplayName = (language) => {
   switch (language) {
@@ -44,24 +45,22 @@ export const mapLanguageToDisplayName = (language) => {
     default:
       return language;
   }
-}
+};
 
-export const DEFAULT_CODE_SEGMENT_C = "//C \n" +
-  "#include <stdio.h> \n\n" +
-  "int main() \n" +
-  "{ \n\n" +
-  "}";
+export const DEFAULT_CODE_SEGMENT_C =
+  "//C \n" + "#include <stdio.h> \n\n" + "int main() \n" + "{ \n\n" + "}";
 
-export const DEFAULT_CODE_SEGMENT_CPP = "//C++ \n" +
+export const DEFAULT_CODE_SEGMENT_CPP =
+  "//C++ \n" +
   "#include <bits/stdc++.h> \n\n" +
   "int main() \n" +
   "{ \n\n" +
   "}";
 
-export const DEFAULT_CODE_SEGMENT_JAVA = "//JAVA \n" +
+export const DEFAULT_CODE_SEGMENT_JAVA =
+  "//JAVA \n" +
   "import java.util.*; \n\n" +
-  "@SuppressWarnings({\"unchecked\", \"deprecation\"})\n" +
-  "// IMPORTANT: class name for JAVA code MUST be public and named 'Main' \n" +
+  '@SuppressWarnings({"unchecked", "deprecation"})\n' +
   "public class Main { \n" +
   "    public static void main(String[] args) { \n\n" +
   "    }\n" +

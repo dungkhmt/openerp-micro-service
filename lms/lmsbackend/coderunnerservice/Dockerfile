@@ -19,7 +19,7 @@ RUN ./mvnw install -DskipTests
 # Unpack Spring Boot fat JAR
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
-FROM eclipse-temurin:8-jdk
+FROM eclipse-temurin:8-jre
 
 ENV JAVA_OPTS=""
 

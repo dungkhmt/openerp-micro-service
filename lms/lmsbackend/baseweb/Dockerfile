@@ -19,7 +19,7 @@ RUN --mount=type=cache,target=/root/.m2 ./mvnw install -DskipTests
 # Unpack Spring Boot fat JAR
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
-FROM eclipse-temurin:8-jdk
+FROM eclipse-temurin:8-jre
 
 ## Install ortools and Apache POI dependencies
 #RUN apk update && apk add --no-cache \
