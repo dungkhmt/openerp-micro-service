@@ -1,13 +1,15 @@
 package com.hust.baseweb.applications.programmingcontest.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -82,7 +84,7 @@ public class ContestSubmissionEntity {
     private Date updateAt;
 
     @Column(name = "last_updated_by_user_id")
-    private Date lastUpdatedByUserId;
+    private String lastUpdatedByUserId;
 
     @Column(name = "message")
     private String message;
