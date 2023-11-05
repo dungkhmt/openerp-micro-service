@@ -23,8 +23,6 @@ public interface ProblemTestCaseService {
         MultipartFile[] files
     ) throws Exception;
 
-    List<ProblemEntity> getAllProblems();
-
     List<ModelProblemGeneralInfo> getAllProblemsGeneralInfo();
 
     ModelCreateContestProblemResponse getContestProblem(String problemId) throws Exception;
@@ -54,20 +52,8 @@ public interface ProblemTestCaseService {
 
     void removeProblemFromContest(String contestId, String problemId, String userName);
 
-    ModelProblemSubmissionDetailResponse findProblemSubmissionById(
-        UUID id,
-        String userName
-    ) throws MiniLeetCodeException;
-
-    ModelGetContestPageResponse getContestPaging(Pageable pageable);
-
     ModelGetContestDetailResponse getContestDetailByContestIdAndTeacher(String contestId, String userName);
 
-    ModelGetContestDetailResponse getContestDetailByContestId(String contestId);
-
-//    ModelGetContestDetailResponse getContestSolvingDetailByContestId(String contestId, String userName) throws MiniLeetCodeException;
-
-    Page<ModelProblemSubmissionDetailByTestCaseResponse> getContestProblemSubmissionDetailByTestCase(Pageable page);
 
     List<ModelProblemSubmissionDetailByTestCaseResponse> getContestProblemSubmissionDetailByTestCaseOfASubmission(UUID submissionId);
 
@@ -78,11 +64,6 @@ public interface ProblemTestCaseService {
     List<ModelProblemSubmissionDetailByTestCaseResponse> getContestProblemSubmissionDetailByTestCaseOfASubmissionViewedByParticipant(
         String userId, UUID submissionId
     );
-
-    ModelContestSubmissionResponse submitContestProblemTestCaseByTestCase(
-        ModelContestSubmission modelContestSubmission,
-        String userName
-    ) throws Exception;
 
     ModelContestSubmissionResponse submitContestProblemTestCaseByTestCaseWithFile(
         ModelContestSubmission modelContestSubmission,
@@ -125,8 +106,6 @@ public interface ProblemTestCaseService {
         String teacherId,
         ModelApproveRegisterUser2ContestInput input
     ) throws MiniLeetCodeException;
-
-    void calculateContestResult(String contestId);
 
     ModelGetContestPageResponse getAllContestsPagingByAdmin(String userName, Pageable pageable);
 

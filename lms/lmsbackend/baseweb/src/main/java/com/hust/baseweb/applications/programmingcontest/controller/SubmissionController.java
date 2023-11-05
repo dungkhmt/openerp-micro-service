@@ -163,7 +163,6 @@ public class SubmissionController {
             while (in.hasNext()) {
                 String line = in.nextLine();
                 solutionOutput.append(line).append("\n");
-                //System.out.println("submitSolutionOutputOfATestCase: read line: " + line);
             }
             in.close();
             ModelContestSubmissionResponse resp = problemTestCaseService.submitSolutionOutputOfATestCase(
@@ -196,7 +195,6 @@ public class SubmissionController {
             while (in.hasNext()) {
                 String line = in.nextLine();
                 solutionOutput.append(line).append("\n");
-                System.out.println("submitSolutionOutput: read line: " + line);
             }
             in.close();
             ModelContestSubmissionResponse resp = problemTestCaseService.submitSolutionOutput(
@@ -205,7 +203,6 @@ public class SubmissionController {
                 model.getProblemId(),
                 model.getTestCaseId(),
                 principale.getName());
-            log.info("resp {}", resp);
             return ResponseEntity.status(200).body(resp);
         } catch (Exception e) {
             e.printStackTrace();
@@ -219,174 +216,7 @@ public class SubmissionController {
         @RequestParam("inputJson") String inputJson,
         @RequestParam("file") MultipartFile file
     ) {
-        Gson gson = new Gson();
-        ModelContestSubmitProgramViaUploadFile model = gson.fromJson(
-            inputJson,
-            ModelContestSubmitProgramViaUploadFile.class);
-        ContestEntity contestEntity = contestRepo.findContestByContestId(model.getContestId());
-        if (contestEntity.getJudgeMode() != null &&
-            contestEntity.getJudgeMode().equals(ContestEntity.ASYNCHRONOUS_JUDGE_MODE_QUEUE)) {
-            return contestSubmitProblemViaUploadFileV2(principal, inputJson, file);
-        }
-        return contestSubmitProblemViaUploadFile(principal, inputJson, file);
-    }
-
-    public ResponseEntity<?> contestSubmitProblemViaUploadFile(
-        Principal principal,
-        @RequestParam("inputJson") String inputJson,
-        @RequestParam("file") MultipartFile file
-    ) {
-        //log.info("contestSubmitProblemViaUploadFile, inputJson = " + inputJson);
-        Gson gson = new Gson();
-        ModelContestSubmitProgramViaUploadFile model = gson.fromJson(
-            inputJson,
-            ModelContestSubmitProgramViaUploadFile.class);
-        ContestEntity contestEntity = contestRepo.findContestByContestId(model.getContestId());
-        ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(model.getContestId(), model.getProblemId());
-        Date currentDate = new Date();
-        int timeTest = ((int) (currentDate.getTime() - contestEntity.getStartedAt().getTime())) /
-                       (60 * 1000); // minutes
-        // System.out.println(currentDate);
-        // System.out.println(testStartDate);
-        // System.out.println(timeTest);
-        // System.out.println(test.getDuration());
-        //log.info("contestSubmitProblemViaUploadFile, currentDate = " + currentDate + ", contest started at"
-        //        + contestEntity.getStartedAt()
-        //        + " timeTest = " + timeTest + " contestSolvingTime = " + contestEntity.getContestSolvingTime());
-
-        // if (timeTest > contestEntity.getContestSolvingTime()) {
-        if (!contestEntity.getStatusId().equals(ContestEntity.CONTEST_STATUS_RUNNING)) {
-            //log.info("contestSubmitProblemViaUploadFile, TIME OUT!!!!! currentDate = " + currentDate
-            //        + ", contest started at" + contestEntity.getStartedAt()
-            //        + " timeTest = " + timeTest + " contestSolvingTime = " +
-            //       contestEntity.getContestSolvingTime());
-
-            // return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
-
-            ModelContestSubmissionResponse resp = ModelContestSubmissionResponse.builder()
-                                                                                .status("TIME_OUT")
-                                                                                .testCasePass("0")
-                                                                                .runtime(new Long(0))
-                                                                                .memoryUsage(new Float(0))
-                                                                                .problemName("")
-                                                                                .contestSubmissionID(null)
-                                                                                .submittedAt(null)
-                                                                                .score(0L)
-                                                                                .numberTestCasePassed(0)
-                                                                                .totalNumberTestCase(0)
-                                                                                .build();
-            return ResponseEntity.ok().body(resp);
-        }
-
-        List<UserRegistrationContestEntity> userRegistrations = userRegistrationContestRepo
-            .findUserRegistrationContestEntityByContestIdAndUserIdAndStatusAndRoleId(
-                model.getContestId(),
-                principal.getName(),
-                UserRegistrationContestEntity.STATUS_SUCCESSFUL,
-                UserRegistrationContestEntity.ROLE_PARTICIPANT);
-        if (userRegistrations == null || userRegistrations.size() == 0) {
-            ModelContestSubmissionResponse resp = ModelContestSubmissionResponse.builder()
-                                                                                .status(
-                                                                                    "PARTICIPANT_NOT_APPROVED_OR_REGISTERED")
-                                                                                .message(
-                                                                                    "Participant is not approved or not registered")
-                                                                                .build();
-            return ResponseEntity.ok().body(resp);
-
-        }
-
-        for (UserRegistrationContestEntity u : userRegistrations) {
-            if (u.getPermissionId() != null
-                && u.getPermissionId().equals(UserRegistrationContestEntity.PERMISSION_FORBIDDEN_SUBMIT)) {
-                ModelContestSubmissionResponse resp = ModelContestSubmissionResponse.builder()
-                                                                                    .status(
-                                                                                        "PARTICIPANT_HAS_NOT_PERMISSION_TO_SUBMIT")
-                                                                                    .message(
-                                                                                        "Participant has not permission to submit")
-                                                                                    .build();
-                return ResponseEntity.ok().body(resp);
-
-            }
-        }
-
-        List<ContestSubmissionEntity> submissions = contestSubmissionRepo
-            .findAllByContestIdAndUserIdAndProblemId(model.getContestId(), principal.getName(),
-                                                     model.getProblemId());
-
-        if (cp != null &&
-            cp.getSubmissionMode() != null &&
-            cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_NOT_ALLOWED)) {
-            ModelContestSubmissionResponse resp = ModelContestSubmissionResponse.builder()
-                                                                                .status("SUBMISSION_NOT_ALLOWED")
-                                                                                .message(
-                                                                                    "This problem is not opened for submitting solution")
-                                                                                .build();
-            return ResponseEntity.ok().body(resp);
-        }
-
-        if (submissions.size() >= contestEntity.getMaxNumberSubmissions()) {
-            ModelContestSubmissionResponse resp = ModelContestSubmissionResponse.builder()
-                                                                                .status("MAX_NUMBER_SUBMISSIONS_REACHED")
-                                                                                .message(
-                                                                                    "Maximum Number of Submissions " +
-                                                                                    contestEntity.getMaxNumberSubmissions()
-                                                                                    + " Reached! Cannot submit more")
-                                                                                .build();
-            return ResponseEntity.ok().body(resp);
-        }
-
-        try {
-            StringBuilder source = new StringBuilder();
-            InputStream inputStream = file.getInputStream();
-            Scanner in = new Scanner(inputStream);
-            while (in.hasNext()) {
-                String line = in.nextLine();
-                source.append(line).append("\n");
-            }
-            in.close();
-
-            if (source.length() > contestEntity.getMaxSourceCodeLength()) {
-                ModelContestSubmissionResponse resp = ModelContestSubmissionResponse.builder()
-                                                                                    .status(
-                                                                                        "MAX_SOURCE_CODE_LENGTH_VIOLATIONS")
-                                                                                    .message(
-                                                                                        "Max source code length violations: " +
-                                                                                        source.length() +
-                                                                                        " exceeded")
-                                                                                    .build();
-                return ResponseEntity.ok().body(resp);
-            }
-            ModelContestSubmission request = new ModelContestSubmission(model.getContestId(), model.getProblemId(),
-                                                                        source.toString(), model.getLanguage());
-            ModelContestSubmissionResponse resp = null;
-            if (contestEntity.getSubmissionActionType()
-                             .equals(ContestEntity.CONTEST_SUBMISSION_ACTION_TYPE_STORE_AND_EXECUTE)) {
-                if (cp != null &&
-                    cp.getSubmissionMode() != null &&
-                    cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_SOLUTION_OUTPUT)) {
-                    //log.info("contestSubmitProblemViaUploadFile, mode submit output");
-                    resp = problemTestCaseService.submitContestProblemStoreOnlyNotExecute(
-                        request,
-                        principal.getName(),
-                        principal.getName());
-                } else {
-                    resp = problemTestCaseService.submitContestProblemTestCaseByTestCase(
-                        request,
-                        principal.getName());
-
-                }
-            } else {
-                resp = problemTestCaseService.submitContestProblemStoreOnlyNotExecute(
-                    request,
-                    principal.getName(),
-                    principal.getName());
-            }
-            //log.info("resp {}", resp);
-            return ResponseEntity.status(200).body(resp);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.ok().body("OK");
+        return contestSubmitProblemViaUploadFileV2(principal, inputJson, file);
     }
 
     public ResponseEntity<?> contestSubmitProblemViaUploadFileV2(
@@ -414,7 +244,7 @@ public class SubmissionController {
                 userId,
                 UserRegistrationContestEntity.STATUS_SUCCESSFUL,
                 UserRegistrationContestEntity.ROLE_PARTICIPANT);
-        if (userRegistrations == null || userRegistrations.size() == 0) {
+        if (userRegistrations == null || userRegistrations.isEmpty()) {
             ModelContestSubmissionResponse resp = buildSubmissionResponseNotRegistered();
             return ResponseEntity.ok().body(resp);
 

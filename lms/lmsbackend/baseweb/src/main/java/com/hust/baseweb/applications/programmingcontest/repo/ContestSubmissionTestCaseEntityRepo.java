@@ -11,14 +11,6 @@ public interface ContestSubmissionTestCaseEntityRepo extends JpaRepository<Conte
 
     List<ContestSubmissionTestCaseEntity> findAllByContestSubmissionId(UUID contestSubmissionId);
 
-    List<ContestSubmissionTestCaseEntity> findAllByContestSubmissionIdAndContestIdAndProblemIdAndSubmittedByUserLoginIdAndTestCaseId(
-        UUID contestSubmissionId,
-        String contestId,
-        String problemId,
-        String submittedByUserLoginId,
-        UUID testCaseId
-    );
-
     List<ContestSubmissionTestCaseEntity> findAllByContestSubmissionIdAndTestCaseId(
         UUID contestSubmissionId,
         UUID testCaseId
