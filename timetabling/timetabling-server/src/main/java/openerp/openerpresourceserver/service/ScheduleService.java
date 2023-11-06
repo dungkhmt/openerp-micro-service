@@ -9,5 +9,9 @@ public interface ScheduleService {
 
     List<Schedule> searchSchedule(FilterScheduleDto requestDto);
 
-    String calculateTimePerformance(FilterScheduleDto requestDto);
+    String calculateTimePerformancePerDay(List<Schedule> scheduleList);
+
+    void calculateTimePerformance(FilterScheduleDto requestDto);
+
+    List<TimePerformance> getTimePerformance(FilterScheduleDto requestDto);
 }

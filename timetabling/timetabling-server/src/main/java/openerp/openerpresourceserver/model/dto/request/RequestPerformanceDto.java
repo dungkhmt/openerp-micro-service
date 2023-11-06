@@ -10,10 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FilterScheduleDto {
-
-    private String classCode;
-
+public class RequestPerformanceDto {
     @NotBlank(message = "Classroom is not be null")
     private String classRoom;
 

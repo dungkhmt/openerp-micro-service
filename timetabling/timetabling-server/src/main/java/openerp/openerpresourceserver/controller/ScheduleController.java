@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -34,14 +35,24 @@ public class ScheduleController {
         }
     }
 
-    @GetMapping("/calculate-time")
-    public ResponseEntity<String> calculateTimePerformance(@Valid @RequestBody FilterScheduleDto requestDto) {
+    @PostMapping("/calculate-time")
+    public ResponseEntity<Void> calculateTimePerformance(@Valid @RequestBody FilterScheduleDto requestDto) {
         try {
-            String result = scheduleService.calculateTimePerformance(requestDto);
-            if (result.isEmpty()) {
+            scheduleService.calculateTimePerformance(requestDto);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get-time-performance")
+    public ResponseEntity<List<TimePerformance>> getTimePerformance(@Valid @RequestBody FilterScheduleDto requestDto) {
+        try {
+            List<TimePerformance> timePerformanceList = scheduleService.getTimePerformance(requestDto);
+            if (timePerformanceList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            return new ResponseEntity<>(result, HttpStatus.OK);
+            return new ResponseEntity<>(timePerformanceList, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
