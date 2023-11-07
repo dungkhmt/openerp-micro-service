@@ -42,8 +42,10 @@ public class Python3Executor {
             genTestCase.append(testcase);
         }
 
-        String outputFileName = tmpName + "_output.txt";
-        String errorFileName = tmpName + "_error.txt";
+        String outputCombinedFile = tmpName + "_output_combined.txt";
+        String shellFile = tmpName + "_shell.txt";
+        String errorFile = tmpName + "_error.txt";
+        String runCommand = "timeout " + (timeLimit + 1) + "s python3 main" + suffixes + " > " + outputCombinedFile + " 2> " + errorFile;
 
         String[] lines = {
                 SHFileStart,
@@ -55,42 +57,63 @@ public class Python3Executor {
                 buildCmd,
                 "if  [ -d __pycache__ ]; then",
                 genTestCase.toString(),
-                "n=0",
-                "start=$(date +%s%N)",
-                "while [ \"$n\" -lt " + testCases.size() + " ]",
-                "do",
-                "f=\"testcase\"$n\".txt\"",
-                "cat $f | (ulimit -t " + timeLimit
-                        // + " -v " + (memoryLimit * 1024)
-                        + " -f 25000; "
-                        + "python3 main.py > " + outputFileName + " 2>&1; ) &> " + errorFileName,
-                "ERROR=$(head -1 " + errorFileName + ")",
-                "FILE_LIMIT='" + FILE_LIMIT_ERROR + "'",
-                "TIME_LIMIT='" + TIME_LIMIT_ERROR + "'",
-                "MEMORY_LIMIT='" + MEMORY_LIMIT_ERROR + "'",
-                "case $ERROR in",
-                "*\"$FILE_LIMIT\"*)",
-                "echo $FILE_LIMIT",
-                ";;",
-                "*\"$TIME_LIMIT\"*)",
-                "echo $TIME_LIMIT",
-                ";;",
-                "*\"$MEMORY_LIMIT\"*)",
-                "echo $MEMORY_LIMIT",
-                ";;",
-                "*)",
-                "cat " + outputFileName,
-                ";;",
-                "esac",
-                "echo " + Constants.SPLIT_TEST_CASE,
-                "n=`expr $n + 1`",
-                "done",
-                "end=$(date +%s%N)",
-                "echo",
-                "echo \"$(($(($end-$start))/1000000))\"",
-                "echo successful",
+                "  CPU_TIME_LIMIT=" + timeLimit + " # second",
+                "  VIRTUAL_MEM_LIMIT=" + (memoryLimit * 1024) + " # KB",
+                "  OUTPUT_SIZE_LIMIT=25000 # KB",
+                "  WALL_CLOCK_TIME_LIMIT=" + (timeLimit + 1) + " # second",
+                "  OUTPUT_FILE=\"" + outputCombinedFile + "\"",
+                "  ERROR_FILE=\"" + errorFile + "\"",
+                "  SHELL_FILE=\"" + shellFile + "\"",
+                "  n=0",
+                "  while [ \"$n\" -lt " + testCases.size() + " ]",
+                "  do",
+                "    f=\"testcase\"$n\".txt\"",
+                "    start=$(date +%s%N)",
+                "    cat $f | (ulimit -t $CPU_TIME_LIMIT; ulimit -v $VIRTUAL_MEM_LIMIT; ulimit -f $OUTPUT_SIZE_LIMIT; " + runCommand + " ) &> \"$SHELL_FILE\"",
+                "    exit_status=$?",
+                "    end=$(date +%s%N)",
+                "    # Check if $SHELL_FILE is empty",
+                "    if [ -s $SHELL_FILE ]; then",
+                "      # Extract the error message",
+                "      extracted_message=$(awk -F ':' '{ sub(/ *[0-9]+ */, \"\", $3); sub(/ \\(core dumped\\) /, \" \", $3); sub(/ *" + runCommand + "/, \" \", $3); print $3 }' \"$SHELL_FILE\")",
+                "      FILE_LIMIT_EXCEED='" + FILE_LIMIT_ERROR + "'",
+                "      TIME_LIMIT_EXCEED='" + TIME_LIMIT_ERROR + "'",
+                "      MEMORY_RELATED_ERROR='" + MEMORY_LIMIT_ERROR + "'",
+                "      case $extracted_message in",
+                "        *\"$TIME_LIMIT_EXCEED\"\\ *)",
+                "          echo \"$TIME_LIMIT_EXCEED\"",
+                "          ;;",
+                "        *\"$MEMORY_RELATED_ERROR\"\\ *)",
+                "          echo \"$MEMORY_RELATED_ERROR\"",
+                "          ;;",
+                "        *\"$FILE_LIMIT_EXCEED\"\\ *)",
+                "          echo \"$FILE_LIMIT_EXCEED\"",
+                "          ;;",
+                "        *)",
+                "          echo \"$extracted_message\"",
+                "          ;;",
+                "      esac",
+                "    else",
+                "      # Check the exit status if terminated due to timeout",
+                "      if [ $exit_status -eq 124 ]; then",
+                "        echo \"" + TIME_LIMIT_ERROR + "\"",
+                "      else",
+                "        cat $OUTPUT_FILE",
+                "        if [ -s $ERROR_FILE ]; then",
+                "            # combine stdout and stderr",
+                "            echo",
+                "            cat $ERROR_FILE",
+                "        fi",
+                "      fi",
+                "    fi",
+                "    echo " + Constants.SPLIT_TEST_CASE,
+                "    n=`expr $n + 1`",
+                "  done",
+                "  echo",
+                "  echo \"$(($(($end-$start))/1000000))\"",
+                "  echo successful",
                 "else",
-                "echo Compile Error",
+                "  echo Compile Error",
                 "fi",
                 "cd ..",
                 "rm -rf " + tmpName + " &",
@@ -98,7 +121,6 @@ public class Python3Executor {
                 "rm -rf " + tmpName
         };
 
-        String sourceSH = String.join("\n", lines);
-        return sourceSH;
+        return String.join("\n", lines);
     }
 }
