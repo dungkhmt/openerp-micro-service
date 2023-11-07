@@ -13,11 +13,12 @@ public class Python3Executor {
     private static final String SHFileStart = "#!/bin/bash\n";
     private static final String buildCmd = "python3 -m py_compile main.py";
     private static final String SOURCECODE_DELIMITER = "PYTHON_FILE" + RandomStringUtils.randomAlphabetic(10);
-    ;
 
     private static final String TIME_LIMIT_ERROR = Constants.TestCaseSubmissionError.TIME_LIMIT.getValue();
     private static final String FILE_LIMIT_ERROR = Constants.TestCaseSubmissionError.FILE_LIMIT.getValue();
     private static final String MEMORY_LIMIT_ERROR = Constants.TestCaseSubmissionError.MEMORY_LIMIT.getValue();
+
+    private static final int DEFAULT_INITIAL_MEMORY = 10 * 1024;
 
     public Python3Executor() {
 
@@ -60,10 +61,15 @@ public class Python3Executor {
                 "while [ \"$n\" -lt " + testCases.size() + " ]",
                 "do",
                 "f=\"testcase\"$n\".txt\"",
-                "cat $f | (ulimit -t " + timeLimit
-                        // + " -v " + (memoryLimit * 1024)
+//                "cat $f | (ulimit -t " + timeLimit
+//                         + " -v " + (memoryLimit * 1024)
+//                        + " -f 25000; "
+//                        + "python3 main.py > " + outputFileName + " 2>&1; ) &> " + errorFileName,
+                "cat $f | ((timeout " + (timeLimit + 1) + "s bash -c"
+                        + " \"ulimit -t " + timeLimit
+                        + " -v " + (memoryLimit * 1024 + DEFAULT_INITIAL_MEMORY)
                         + " -f 25000; "
-                        + "python3 main.py > " + outputFileName + " 2>&1; ) &> " + errorFileName,
+                        + "python3 main.py > " + outputFileName + " 2>&1; \") || echo \"Killed\") &> " + errorFileName,
                 "ERROR=$(head -1 " + errorFileName + ")",
                 "FILE_LIMIT='" + FILE_LIMIT_ERROR + "'",
                 "TIME_LIMIT='" + TIME_LIMIT_ERROR + "'",
