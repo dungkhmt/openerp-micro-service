@@ -1,13 +1,13 @@
 export const schedule = {
     id: "MENU_SCHEDULE",
-    icon: "DashboardIcon",
-    text: "Dashboard",
+    icon: "ScheduleIcon",
+    text: "Time Schedule",
     child: [
       {
         id: "MENU_SCHEDULE.SCHEDULE",
         path: "/schedule",
         isPublic: true,
-        text: "SCHEDULE",
+        text: "Time Schedule",
         child: [],
       },
     ],

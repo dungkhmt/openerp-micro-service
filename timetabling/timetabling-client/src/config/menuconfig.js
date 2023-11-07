@@ -20,36 +20,34 @@ import PersonIcon from "@mui/icons-material/Person";
 import StarBorder from "@mui/icons-material/StarBorder";
 import StoreMallDirectorySharpIcon from "@mui/icons-material/StoreMallDirectorySharp";
 import TeachingIcon from "assets/icons/mathematics.svg";
+import InfoIcon from '@mui/icons-material/Info';
+import BusinessIcon from '@mui/icons-material/Business';
 import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
 import { buildMapPathMenu } from "utils/MenuUtils";
 import { general } from "./menuconfig/general";
-import { student } from "./menuconfig/student";
 import { teacher } from "./menuconfig/teacher";
 import { user } from "./menuconfig/user";
-import {demo} from "./menuconfig/demo";
 import {schedule} from "./menuconfig/schedule"
+import {scheduleInformation} from "./menuconfig/scheduleInformation"
 
 export const MENUS = [];
 
 MENUS.push(general);
 MENUS.push(user);
 MENUS.push(teacher);
-MENUS.push(student);
-MENUS.push(demo);
 MENUS.push(schedule);
+MENUS.push(scheduleInformation);
 
 export const menuIconMap = new Map();
 
-menuIconMap.set(
-  "Schedule",
-  <EventNoteIcon />
-  //   <img alt="Task Schedule icon" src={TaskScheduleIcon} height={24} width={24} />
-);
+menuIconMap.set("ScheduleIcon",<EventNoteIcon />);
 menuIconMap.set(
   "Teaching",
   <img alt="Teaching icon" src={TeachingIcon} height={24} width={24} />
 );
+menuIconMap.set("BusinessIcon", <BusinessIcon />);
+menuIconMap.set("InfoIcon", <InfoIcon />);
 menuIconMap.set("DashboardIcon", <DashboardRoundedIcon />);
 menuIconMap.set("GiTeacher", <GiTeacher size={24} />);
 menuIconMap.set("InboxIcon", <InboxIcon />);
