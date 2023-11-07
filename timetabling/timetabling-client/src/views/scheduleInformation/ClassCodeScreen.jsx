@@ -16,12 +16,11 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import SyncIcon from '@mui/icons-material/Sync';
 
 function ClassCodeScreen() {
 
     const [classCodes, setClassCodes] = useState([]);
-    const [openLoading, setOpenLoading] = React.useState(false);
-    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         request("get", "/class-code/get-all", (res) => {
@@ -64,48 +63,18 @@ function ClassCodeScreen() {
         ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
     };
 
-    // const handleImportExcel = () => {
-    //     const input = document.createElement('input');
-    //     input.setAttribute('type', 'file');
-    //     input.setAttribute('accept', '.xlsx, .xls');
-
-    //     input.onchange = async (e) => {
-    //         const file = e.target.files[0];
-    //         if (file) {
-    //             try {
-    //                 setOpenLoading(true);
-    //                 const formData = new FormData();
-    //                 formData.append('file', file);
-
-    //                 // Assuming you have an API endpoint for file upload
-    //                 const response = await request(
-    //                     "POST",
-    //                     "/excel/upload",
-    //                     (res) => {
-    //                         console.log(res.data);
-    //                         setUploading(false);
-    //                         // You may want to update the table data here
-    //                         window.location.reload();
-    //                     }, {
-
-    //                 }
-    //                     , formData,
-    //                     {
-    //                         "Content-Type": "multipart/form-data",
-    //                     });
-
-    //                 // Handle the response as needed
-    //                 console.log(response);
-    //             } catch (error) {
-    //                 console.error("Error uploading file", error);
-    //             } finally {
-    //                 setOpenLoading(false);
-    //             }
-    //         }
-    //     };
-
-    //     input.click();
-    // };
+    const handleUpdateData = () => {
+        // Call your API for updating data
+        request("get", "/class-code/update")
+            .then(() => {
+                // Reload the page upon successful update
+                window.location.reload();
+            })
+            .catch((error) => {
+                // Handle error if needed
+                console.error("Error updating data:", error);
+            });
+    };
 
     return (
         <div>
@@ -127,14 +96,14 @@ function ClassCodeScreen() {
                         </div>
                     ),
                 }}
-                // actions={[
-                //     {
-                //         icon: () => <InputIcon><input type="file" style={{ display: 'none' }} /></InputIcon>,
-                //         tooltip: "import excel",
-                //         onClick: handleImportExcel,
-                //         isFreeAction: true,
-                //     },
-                // ]}
+                actions={[
+                    {
+                        icon: () => <SyncIcon><input type="file" style={{ display: 'none' }} /></SyncIcon>,
+                        tooltip: "Update data",
+                        onClick: handleUpdateData,
+                        isFreeAction: true,
+                    },
+                ]}
             />
         </div>
 
