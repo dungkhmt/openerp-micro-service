@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1
  
 # JDK is required to provide compiler
-FROM eclipse-temurin:8-jdk-alpine as build
+FROM eclipse-temurin:8-jdk as build
 WORKDIR /workspace/app
 
 # Split source code into four layers
