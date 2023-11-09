@@ -2,8 +2,6 @@
 
 <div align="center">
 
-Base infrastructure for web application.
-
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 </div>
