@@ -45,14 +45,11 @@ public class ScheduleController {
         }
     }
 
-    @GetMapping("/get-time-performance")
-    public ResponseEntity<List<TimePerformance>> getTimePerformance(@Valid @RequestBody FilterScheduleDto requestDto) {
+    @PostMapping("/calculate-time-all")
+    public ResponseEntity<Void> calculateAllTimePerformance() {
         try {
-            List<TimePerformance> timePerformanceList = scheduleService.getTimePerformance(requestDto);
-            if (timePerformanceList.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            return new ResponseEntity<>(timePerformanceList, HttpStatus.OK);
+            scheduleService.calculateAllTimePerformance();
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

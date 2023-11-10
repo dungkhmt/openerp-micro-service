@@ -176,8 +176,8 @@ function ScheduleScreen() {
                             // You may want to update the table data here
                             window.location.reload();
                         }, {
-
-                    }
+                            
+                        }
                         , formData,
                         {
                             "Content-Type": "multipart/form-data",

@@ -13,5 +13,4 @@ public class OpenerpResourceServerApplication {
     public static void main(String[] args) {
         SpringApplication.run(OpenerpResourceServerApplication.class, args);
     }
-
 }

@@ -22,6 +22,7 @@ import StoreMallDirectorySharpIcon from "@mui/icons-material/StoreMallDirectoryS
 import TeachingIcon from "assets/icons/mathematics.svg";
 import InfoIcon from '@mui/icons-material/Info';
 import BusinessIcon from '@mui/icons-material/Business';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
 import { buildMapPathMenu } from "utils/MenuUtils";
@@ -30,6 +31,7 @@ import { teacher } from "./menuconfig/teacher";
 import { user } from "./menuconfig/user";
 import {schedule} from "./menuconfig/schedule"
 import {scheduleInformation} from "./menuconfig/scheduleInformation"
+import {schedulePerformance} from "./menuconfig/schedulePerformance"
 
 export const MENUS = [];
 
@@ -38,10 +40,12 @@ MENUS.push(user);
 MENUS.push(teacher);
 MENUS.push(schedule);
 MENUS.push(scheduleInformation);
+MENUS.push(schedulePerformance);
 
 export const menuIconMap = new Map();
 
 menuIconMap.set("ScheduleIcon",<EventNoteIcon />);
+menuIconMap.set("AnalyticsIcon",<AnalyticsIcon />);
 menuIconMap.set(
   "Teaching",
   <img alt="Teaching icon" src={TeachingIcon} height={24} width={24} />

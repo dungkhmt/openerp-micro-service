@@ -13,5 +13,5 @@ public interface ScheduleService {
 
     void calculateTimePerformance(FilterScheduleDto requestDto);
 
-    List<TimePerformance> getTimePerformance(FilterScheduleDto requestDto);
+    void calculateAllTimePerformance();
 }

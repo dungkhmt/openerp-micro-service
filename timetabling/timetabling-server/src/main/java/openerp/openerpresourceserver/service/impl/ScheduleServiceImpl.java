@@ -37,94 +37,35 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Autowired
     private TimePerformanceRepo timePerformanceRepo;
 
-    //Search for schedule
+    @Autowired
+    private SemesterRepo semesterRepo;
+
+    @Autowired
+    private ClassroomRepo classroomRepo;
+
+    //---------------Search for schedule--------------------
 
     @Override
     public List<Schedule> searchSchedule(FilterScheduleDto searchDto) {
         StringBuilder jpql = this.getStringBuilder(searchDto);
 
-        Query query = entityManager.createQuery(jpql.toString());
-        query.setParameter("classRoom", searchDto.getClassRoom());
-
-        if (searchDto.getClassCode() != null) {
-            query.setParameter("classCode", searchDto.getClassCode());
-        }
-        if (searchDto.getClassType() != null) {
-            query.setParameter("classType", searchDto.getClassType());
-        }
-        if (searchDto.getInstitute() != null) {
-            query.setParameter("institute", searchDto.getInstitute());
-        }
-        if (searchDto.getManagementCode() != null) {
-            query.setParameter("managementCode", searchDto.getManagementCode());
-        }
-        if (searchDto.getModuleCode() != null) {
-            query.setParameter("moduleCode", searchDto.getModuleCode());
-        }
-        if (searchDto.getOpenBatch() != null) {
-            query.setParameter("openBatch", searchDto.getOpenBatch());
-        }
-        if (searchDto.getSemester() != null) {
-            query.setParameter("semester", searchDto.getSemester());
-        }
-        if (searchDto.getState() != null) {
-            query.setParameter("state", searchDto.getState());
-        }
-        if (searchDto.getStudyTime() != null) {
-            query.setParameter("studyTime", searchDto.getStudyTime());
-        }
-        if (searchDto.getStudyWeek() != null) {
-            query.setParameter("studyWeek", searchDto.getStudyWeek());
-        }
-        if (searchDto.getWeekDay() != null) {
-            query.setParameter("weekDay", searchDto.getWeekDay());
-        }
+        Query query = CommonUtil.buildQuery(jpql, searchDto);
 
         // Execute the query and return the result list
         return query.getResultList();
     }
 
     private StringBuilder getStringBuilder(FilterScheduleDto searchDto) {
-        StringBuilder jpql = new StringBuilder("SELECT s FROM Schedule s WHERE ");
-        jpql.append(" s.classRoom = :classRoom");
+        StringBuilder jpql = new StringBuilder("SELECT s FROM Schedule s WHERE 1 = 1");
 
-        if (searchDto.getClassCode() != null) {
-            jpql.append(" AND s.classCode = :classCode");
-        }
-        if (searchDto.getClassType() != null) {
-            jpql.append(" AND s.classType = :classType");
-        }
-        if (searchDto.getInstitute() != null) {
-            jpql.append(" AND s.institute = :institute");
-        }
-        if (searchDto.getManagementCode() != null) {
-            jpql.append(" AND s.managementCode = :managementCode");
-        }
-        if (searchDto.getModuleCode() != null) {
-            jpql.append(" AND s.moduleCode = :moduleCode");
-        }
-        if (searchDto.getOpenBatch() != null) {
-            jpql.append(" AND s.openBatch = :openBatch");
-        }
-        if (searchDto.getSemester() != null) {
-            jpql.append(" AND s.semester = :semester");
-        }
-        if (searchDto.getState() != null) {
-            jpql.append(" AND s.state = :state");
-        }
-        if (searchDto.getStudyTime() != null) {
-            jpql.append(" AND s.studyTime = :studyTime");
-        }
-        if (searchDto.getStudyWeek() != null) {
-            jpql.append(" AND s.studyWeek = :studyWeek");
-        }
-        if (searchDto.getWeekDay() != null) {
-            jpql.append(" AND s.weekDay = :weekDay");
-        }
-        return jpql;
+        return CommonUtil.appendAttributes(jpql, searchDto);
     }
 
-    //Calculate performance schedule
+
+
+
+
+    //-------------Calculate performance schedule--------------
     @Override
     public void calculateTimePerformance(FilterScheduleDto requestDto) {
         List<Schedule> scheduleList = this.searchSchedule(requestDto);
@@ -144,7 +85,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                     //for week day from 2 to 8
                     for (int j = FIRST_DAY_OF_WEEK; j <= LAST_DAY_OF_WEEK; j++) {
                         TimePerformance timePerformance = TimePerformance.builder()
-                                .studyWeek("week" + i)
+                                .studyWeek("" + i)
                                 .weekDay("" + j)
                                 .classRoom(requestDto.getClassRoom())
                                 .semester(requestDto.getSemester())
@@ -202,22 +143,28 @@ public class ScheduleServiceImpl implements ScheduleService {
         return roundedResult + " %";
     }
 
+    @Override
+    public void calculateAllTimePerformance() {
+        timePerformanceRepo.deleteAll();
+        List<Semester> semesterList = semesterRepo.findAll();
+        List<Classroom> classroomList = classroomRepo.findAll();
+        for (Semester semester : semesterList) {
+            for (Classroom classroom : classroomList) {
+                FilterScheduleDto filterScheduleDto = FilterScheduleDto.builder()
+                        .semester(semester.getSemester())
+                        .classRoom(classroom.getClassroom())
+                        .build();
+                this.calculateTimePerformance(filterScheduleDto);
+            }
+        }
+    }
+
     public Double calculateTimePerformPerSchedule(Schedule schedule) {
         String start = schedule.getStart();
         String finish = schedule.getFinish();
         int countCrew = CommonUtil.calculateTimeCrew(start, finish);
 
         return (double) countCrew * 100 / MAX_CREW_PER_DAY;
-    }
-
-    //Search time performance
-    @Override
-    public List<TimePerformance> getTimePerformance(FilterScheduleDto requestDto) {
-        if (requestDto.getWeekDay() != null) {
-            return timePerformanceRepo.getTimePerformancesByClassRoomAndSemesterAndWeekDay(
-                    requestDto.getClassRoom(), requestDto.getSemester(), requestDto.getWeekDay());
-        } else return timePerformanceRepo.getTimePerformancesByClassRoomAndSemester(
-                requestDto.getClassRoom(), requestDto.getSemester());
     }
 
 

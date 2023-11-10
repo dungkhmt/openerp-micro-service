@@ -13,4 +13,6 @@ public interface TimePerformanceRepo extends JpaRepository<TimePerformance, Long
     List<TimePerformance> getTimePerformancesByClassRoomAndSemester(String classRoom, String semester);
 
     List<TimePerformance> getTimePerformancesByClassRoomAndSemesterAndWeekDay(String classRoom, String semester, String weekDay);
+
+    void deleteAll();
 }

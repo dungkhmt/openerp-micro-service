@@ -14,7 +14,6 @@ public class FilterScheduleDto {
 
     private String classCode;
 
-    @NotBlank(message = "Classroom is not be null")
     private String classRoom;
 
     private String classType;
@@ -27,7 +26,6 @@ public class FilterScheduleDto {
 
     private String openBatch;
 
-    @NotBlank(message = "Semester is not be null")
     private String semester;
 
     private String state;
