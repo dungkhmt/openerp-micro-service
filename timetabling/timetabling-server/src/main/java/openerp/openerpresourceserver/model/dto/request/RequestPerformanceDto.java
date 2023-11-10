@@ -11,27 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestPerformanceDto {
+
     @NotBlank(message = "Classroom is not be null")
     private String classRoom;
 
-    private String classType;
-
-    private String institute;
-
-    private String managementCode;
-
-    private String moduleCode;
-
-    private String openBatch;
-
     @NotBlank(message = "Semester is not be null")
     private String semester;
-
-    private String state;
-
-    private String studyTime;
-
-    private String studyWeek;
-
-    private String weekDay;
 }

@@ -4,16 +4,17 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import openerp.openerpresourceserver.common.CommonUtil;
 import openerp.openerpresourceserver.model.dto.request.FilterScheduleDto;
+import openerp.openerpresourceserver.model.dto.request.RequestPerformanceDto;
 import openerp.openerpresourceserver.model.entity.*;
 import openerp.openerpresourceserver.repo.*;
 import openerp.openerpresourceserver.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
@@ -49,10 +50,10 @@ public class ScheduleServiceImpl implements ScheduleService {
     public List<Schedule> searchSchedule(FilterScheduleDto searchDto) {
         StringBuilder jpql = this.getStringBuilder(searchDto);
 
-        Query query = CommonUtil.buildQuery(jpql, searchDto);
+        Query query = entityManager.createQuery(jpql.toString());
 
         // Execute the query and return the result list
-        return query.getResultList();
+        return CommonUtil.buildQuery(query, searchDto).getResultList();
     }
 
     private StringBuilder getStringBuilder(FilterScheduleDto searchDto) {
@@ -61,13 +62,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         return CommonUtil.appendAttributes(jpql, searchDto);
     }
 
-
-
-
-
     //-------------Calculate performance schedule--------------
-    @Override
-    public void calculateTimePerformance(FilterScheduleDto requestDto) {
+    public void calculateTimePerformancePerClassroom(FilterScheduleDto requestDto) {
         List<Schedule> scheduleList = this.searchSchedule(requestDto);
         HashMap<Long, Double> performanceList = new HashMap<>();
         //calculate for each schedule
@@ -154,7 +150,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                         .semester(semester.getSemester())
                         .classRoom(classroom.getClassroom())
                         .build();
-                this.calculateTimePerformance(filterScheduleDto);
+                this.calculateTimePerformancePerClassroom(filterScheduleDto);
             }
         }
     }
@@ -167,6 +163,16 @@ public class ScheduleServiceImpl implements ScheduleService {
         return (double) countCrew * 100 / MAX_CREW_PER_DAY;
     }
 
+    @Override
+    @Transactional
+    public void calculateTimePerformance(RequestPerformanceDto requestDto) {
+        timePerformanceRepo.deleteAllByClassRoomAndSemester(requestDto.getClassRoom(), requestDto.getSemester());
+        FilterScheduleDto filterScheduleDto = FilterScheduleDto.builder()
+                .semester(requestDto.getSemester())
+                .classRoom(requestDto.getClassRoom())
+                .build();
+        this.calculateTimePerformancePerClassroom(filterScheduleDto);
+    }
 
 //    public String calculateSeatPerformance(List<Schedule> scheduleList) {
 //

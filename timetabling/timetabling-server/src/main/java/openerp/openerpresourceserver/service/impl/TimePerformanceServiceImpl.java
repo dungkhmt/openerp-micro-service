@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.service.impl;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import openerp.openerpresourceserver.common.CommonUtil;
 import openerp.openerpresourceserver.model.dto.request.FilterScheduleDto;
@@ -17,15 +18,18 @@ public class TimePerformanceServiceImpl implements TimePerformanceService {
     @Autowired
     private TimePerformanceRepo timePerformanceRepo;
 
+    @Autowired
+    private EntityManager entityManager;
+
     //--------------------Search time performance------------------
     @Override
     public List<TimePerformance> getTimePerformance(FilterScheduleDto requestDto) {
         StringBuilder jpql = this.getStringBuilderForTimePerformance(requestDto);
 
-        Query query = CommonUtil.buildQuery(jpql, requestDto);
+        Query query = entityManager.createQuery(jpql.toString());
 
         // Execute the query and return the result list
-        return query.getResultList();
+        return CommonUtil.buildQuery(query, requestDto).getResultList();
     }
 
     private StringBuilder getStringBuilderForTimePerformance(FilterScheduleDto searchDto) {

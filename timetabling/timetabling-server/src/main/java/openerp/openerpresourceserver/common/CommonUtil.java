@@ -1,18 +1,13 @@
 package openerp.openerpresourceserver.common;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import openerp.openerpresourceserver.model.dto.request.FilterScheduleDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Service
 public class CommonUtil {
-
-    @Autowired
-    private static EntityManager entityManager;
 
     public static final Integer TIME_FOR_A_CREW = 50;
 
@@ -85,9 +80,7 @@ public class CommonUtil {
         return jpql;
     }
 
-    public static Query buildQuery(StringBuilder jpql, FilterScheduleDto searchDto) {
-
-        Query query = entityManager.createQuery(jpql.toString());
+    public static Query buildQuery(Query query, FilterScheduleDto searchDto) {
 
         if (searchDto.getClassRoom() != null) {
             query.setParameter("classRoom", searchDto.getClassRoom());

@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.controller;
 
 import jakarta.validation.Valid;
 import openerp.openerpresourceserver.model.dto.request.FilterScheduleDto;
+import openerp.openerpresourceserver.model.dto.request.RequestPerformanceDto;
 import openerp.openerpresourceserver.model.entity.*;
 import openerp.openerpresourceserver.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class ScheduleController {
     }
 
     @PostMapping("/calculate-time")
-    public ResponseEntity<Void> calculateTimePerformance(@Valid @RequestBody FilterScheduleDto requestDto) {
+    public ResponseEntity<Void> calculateTimePerformance(@Valid @RequestBody RequestPerformanceDto requestDto) {
         try {
             scheduleService.calculateTimePerformance(requestDto);
             return new ResponseEntity<>(HttpStatus.OK);
