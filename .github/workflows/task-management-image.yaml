@@ -1,4 +1,4 @@
-name: task-managment Image CI
+name: task-management Image CI
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
           context: ./task-management/task-managment-backend
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/task-managment:${{ steps.construct-tag.outputs.TAG_NAME }}
-            ${{ secrets.DOCKER_USERNAME }}/task-managment:latest
-          cache-from: type=gha,scope=$GITHUB_REF_NAME-task-managment
-          cache-to: type=gha,mode=max,scope=$GITHUB_REF_NAME-task-managment
+            ${{ secrets.DOCKER_USERNAME }}/task-management:${{ steps.construct-tag.outputs.TAG_NAME }}
+            ${{ secrets.DOCKER_USERNAME }}/task-management:latest
+          cache-from: type=gha,scope=$GITHUB_REF_NAME-task-management
+          cache-to: type=gha,mode=max,scope=$GITHUB_REF_NAME-task-management
