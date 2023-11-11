@@ -16,31 +16,31 @@ import java.util.Collection;
 public class Jwt2AuthenticationConverter
     implements Converter<Jwt, AbstractAuthenticationToken> {
 
-  private Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-  private String principalClaimName = "sub";
+    private Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+    private String principalClaimName = "sub";
 
-  public final AbstractAuthenticationToken convert(Jwt jwt) {
-    Collection<GrantedAuthority> authorities = this.extractAuthorities(jwt);
-    String principalClaimValue = jwt.getClaimAsString(this.principalClaimName);
-    return new JwtAuthenticationToken(jwt, authorities, principalClaimValue);
-  }
+    public final AbstractAuthenticationToken convert(Jwt jwt) {
+        Collection<GrantedAuthority> authorities = this.extractAuthorities(jwt);
+        String principalClaimValue = jwt.getClaimAsString(this.principalClaimName);
+        return new JwtAuthenticationToken(jwt, authorities, principalClaimValue);
+    }
 
-  /**
-   * @deprecated
-   */
-  @Deprecated
-  protected Collection<GrantedAuthority> extractAuthorities(Jwt jwt) {
-    return this.jwtGrantedAuthoritiesConverter.convert(jwt);
-  }
+    /**
+     * @deprecated
+     */
+    @Deprecated
+    protected Collection<GrantedAuthority> extractAuthorities(Jwt jwt) {
+        return this.jwtGrantedAuthoritiesConverter.convert(jwt);
+    }
 
-  public void setJwtGrantedAuthoritiesConverter(
-      Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter) {
-    Assert.notNull(jwtGrantedAuthoritiesConverter, "jwtGrantedAuthoritiesConverter cannot be null");
-    this.jwtGrantedAuthoritiesConverter = jwtGrantedAuthoritiesConverter;
-  }
+    public void setJwtGrantedAuthoritiesConverter(
+        Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter) {
+        Assert.notNull(jwtGrantedAuthoritiesConverter, "jwtGrantedAuthoritiesConverter cannot be null");
+        this.jwtGrantedAuthoritiesConverter = jwtGrantedAuthoritiesConverter;
+    }
 
-  public void setPrincipalClaimName(String principalClaimName) {
-    Assert.hasText(principalClaimName, "principalClaimName cannot be empty");
-    this.principalClaimName = principalClaimName;
-  }
+    public void setPrincipalClaimName(String principalClaimName) {
+        Assert.hasText(principalClaimName, "principalClaimName cannot be empty");
+        this.principalClaimName = principalClaimName;
+    }
 }

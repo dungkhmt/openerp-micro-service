@@ -1,12 +1,11 @@
 package com.hust.openerp.taskmanagement.dto.dao;
 
-import java.text.SimpleDateFormat;
-import java.util.UUID;
-
 import com.hust.openerp.taskmanagement.entity.Comment;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import java.text.SimpleDateFormat;
+import java.util.UUID;
 
 @Getter
 @Setter

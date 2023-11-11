@@ -1,11 +1,10 @@
 package com.hust.openerp.taskmanagement.service;
 
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-
 import com.hust.openerp.taskmanagement.dto.dao.AssignedTaskPagination;
 import com.hust.openerp.taskmanagement.entity.TaskAssignment;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public interface TaskAssignableService {

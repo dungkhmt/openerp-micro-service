@@ -1,8 +1,7 @@
 package com.hust.openerp.taskmanagement.service;
 
-import org.springframework.stereotype.Service;
-
 import com.hust.openerp.taskmanagement.entity.Skill;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 

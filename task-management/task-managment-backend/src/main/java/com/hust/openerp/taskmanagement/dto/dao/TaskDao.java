@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.dto.dao;
 
+import com.hust.openerp.taskmanagement.entity.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,12 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import com.hust.openerp.taskmanagement.entity.Project;
-import com.hust.openerp.taskmanagement.entity.StatusItem;
-import com.hust.openerp.taskmanagement.entity.Task;
-import com.hust.openerp.taskmanagement.entity.TaskCategory;
-import com.hust.openerp.taskmanagement.entity.TaskPriority;
 
 @Getter
 @Setter
@@ -71,31 +66,31 @@ public class TaskDao {
             Date d2 = new Date();
             long differenceInTime = d1.getTime() - d2.getTime();
             long differenceInSeconds = TimeUnit.MILLISECONDS
-                    .toSeconds(differenceInTime)
-                    % 60;
+                .toSeconds(differenceInTime)
+                % 60;
 
             long differenceInMinutes = TimeUnit.MILLISECONDS
-                    .toMinutes(differenceInTime)
-                    % 60;
+                .toMinutes(differenceInTime)
+                % 60;
 
             long differenceInHours = TimeUnit.MILLISECONDS
-                    .toHours(differenceInTime)
-                    % 24;
+                .toHours(differenceInTime)
+                % 24;
 
             long differenceInDays = TimeUnit.MILLISECONDS
-                    .toDays(differenceInTime)
-                    % 365;
+                .toDays(differenceInTime)
+                % 365;
             if (differenceInSeconds <= 0) {
                 this.setTimeRemaining("Quá hạn " + String.valueOf(-differenceInDays) + "ngày, "
-                        + String.valueOf(-differenceInHours) + "giờ, "
-                        + String.valueOf(-differenceInMinutes) + "phút, "
-                        + String.valueOf(-differenceInSeconds) + "giây");
+                    + String.valueOf(-differenceInHours) + "giờ, "
+                    + String.valueOf(-differenceInMinutes) + "phút, "
+                    + String.valueOf(-differenceInSeconds) + "giây");
                 this.setOutOfDate(true);
             } else {
                 this.setTimeRemaining("Còn " + String.valueOf(differenceInDays) + "ngày, "
-                        + String.valueOf(differenceInHours) + "giờ, "
-                        + String.valueOf(differenceInMinutes) + "phút, "
-                        + String.valueOf(differenceInSeconds) + "giây tới hạn!");
+                    + String.valueOf(differenceInHours) + "giờ, "
+                    + String.valueOf(differenceInMinutes) + "phút, "
+                    + String.valueOf(differenceInSeconds) + "giây tới hạn!");
                 this.setOutOfDate(false);
             }
 
@@ -110,8 +105,8 @@ public class TaskDao {
         String[] arrOfStr = task.getAttachmentPaths().split(",");
         this.setFileName(arrOfStr[0] != "" ? arrOfStr[0] : "Không có tệp đính kèm");
         this.setFileId(arrOfStr.length > 1
-                ? (!arrOfStr[1].equals("null") && !arrOfStr[1].equals("undefined") ? arrOfStr[1] : null)
-                : null);
+            ? (!arrOfStr[1].equals("null") && !arrOfStr[1].equals("undefined") ? arrOfStr[1] : null)
+            : null);
         this.setAssignee(assignee);
         this.setDueDateOrigin(task.getDueDate());
         this.setCreatedByUserLoginId(task.getCreatedByUserId());

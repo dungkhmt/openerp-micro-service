@@ -48,16 +48,16 @@ public class PersonModel {
     }
 
     public PersonModel(
-            String userName,
-            String password,
-            List<String> roles,
-            String partyCode,
-            String firstName,
-            String lastName,
-            String middleName,
-            String gender,
-            Date birthDate,
-            String affiliations) {
+        String userName,
+        String password,
+        List<String> roles,
+        String partyCode,
+        String firstName,
+        String lastName,
+        String middleName,
+        String gender,
+        Date birthDate,
+        String affiliations) {
         this.userName = userName;
         this.password = password;
         this.roles = roles;

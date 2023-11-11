@@ -1,12 +1,11 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.hust.openerp.taskmanagement.entity.Skill;
 import com.hust.openerp.taskmanagement.repository.SkillRepository;
 import com.hust.openerp.taskmanagement.service.SkillService;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 

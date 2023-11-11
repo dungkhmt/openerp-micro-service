@@ -1,12 +1,11 @@
 package com.hust.openerp.taskmanagement.dto.dao;
 
+import com.hust.openerp.taskmanagement.entity.Project;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
 import java.util.UUID;
-
-import com.hust.openerp.taskmanagement.entity.Project;
 
 @Getter
 @Setter

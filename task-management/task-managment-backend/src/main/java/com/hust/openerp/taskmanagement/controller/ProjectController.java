@@ -1,6 +1,6 @@
 /*
  * package com.hust.openerp.taskmanagement.controller;
- * 
+ *
  * import java.security.Principal;
  * import java.text.ParseException;
  * import java.util.ArrayList;
@@ -8,7 +8,7 @@
  * import java.util.List;
  * import java.util.Map;
  * import java.util.UUID;
- * 
+ *
  * import org.springframework.beans.factory.annotation.Autowired;
  * import org.springframework.http.ResponseEntity;
  * import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,7 +17,7 @@
  * import org.springframework.web.bind.annotation.PostMapping;
  * import org.springframework.web.bind.annotation.RequestBody;
  * import org.springframework.web.bind.annotation.RestController;
- * 
+ *
  * import com.hust.openerp.taskmanagement.dto.dao.PersonDao;
  * import com.hust.openerp.taskmanagement.dto.dao.ProjectDao;
  * import com.hust.openerp.taskmanagement.dto.dao.ProjectPagination;
@@ -34,39 +34,39 @@
  * import com.hust.openerp.taskmanagement.service.ProjectService;
  * import com.hust.openerp.taskmanagement.service.TaskAssignableService;
  * import com.hust.openerp.taskmanagement.service.TaskService;
- * 
+ *
  * import lombok.AllArgsConstructor;
- * 
+ *
  * @RestController("/projects")
- * 
+ *
  * @CrossOrigin
- * 
+ *
  * @AllArgsConstructor(onConstructor = @__(@Autowired))
  * public class ProjectController {
  * private ProjectService projectService;
- * 
+ *
  * private final ProjectMemberService projectMemberService;
- * 
+ *
  * private final TaskService taskService;
- * 
+ *
  * private final TaskAssignableService taskAssignableService;
- * 
+ *
  * @GetMapping("/page={pageNo}/size={pageSize}")
  * public ResponseEntity<Object> getListProjects(
- * 
+ *
  * @PathVariable("pageNo") int pageNo,
- * 
+ *
  * @PathVariable("pageSize") int pageSize) {
  * ProjectPagination pagination = projectService.findPaginated(pageNo,
  * pageSize);
  * return ResponseEntity.ok().body(pagination);
  * }
- * 
+ *
  * @GetMapping
  * public ResponseEntity<Object> getAllProjects() {
  * return ResponseEntity.ok().body(projectService.getAllProjects());
  * }
- * 
+ *
  * @PostMapping
  * public ResponseEntity<Object> postProjects(Principal principal, @RequestBody
  * Project project) {
@@ -79,24 +79,24 @@
  * projectMemberService.create(projectMember);
  * return ResponseEntity.ok().body(projectRes);
  * }
- * 
+ *
  * @GetMapping("/projects/{projectId}")
  * public ResponseEntity<Object> getProject(@PathVariable("projectId") UUID
  * projectId) {
  * return ResponseEntity.ok(new
  * ProjectDao(projectService.getProjectById(projectId)));
  * }
- * 
+ *
  * @GetMapping("/projects/{projectId}/members")
  * public ResponseEntity<List<User>>
  * getMembersJoinedProject(@PathVariable("projectId") UUID projectId) {
  * List<User> users = projectMemberService.getMemberIdJoinedProject(projectId);
  * return ResponseEntity.ok(users);
  * }
- * 
+ *
  * @PostMapping("/projects/{projectId}/members")
  * public ResponseEntity<Object> addMemberToProject(
- * 
+ *
  * @PathVariable("projectId") UUID projectId, @RequestBody ProjectMemberForm
  * projectMemberForm) {
  * if (projectMemberService.checkAddedMemberInProject(
@@ -110,7 +110,7 @@
  * ResponseEntity.ok(projectMemberService.addMemberToProject(projectMemberForm))
  * ;
  * }
- * 
+ *
  * @GetMapping("/projects/{projectId}/tasks")
  * public ResponseEntity<Object> getAllTasksInProject(@PathVariable("projectId")
  * UUID projectId) {
@@ -128,20 +128,20 @@
  * fullName = new PersonDao(personService.findByPartyId(userId),
  * userLoginIdTemp).getFullName();
  * }
- * 
+ *
  * taskDaoList.add(new TaskDao(task, userLoginIdTemp + " (" + fullName + ")",
  * userId));
  * }
- * 
+ *
  * return ResponseEntity.ok(taskDaoList);
  * }
- * 
+ *
  * @PostMapping("/projects/{projectId}/tasks")
  * public ResponseEntity<Object> createNewTask(
  * Principal principal,
- * 
+ *
  * @RequestBody TaskForm taskForm,
- * 
+ *
  * @PathVariable("projectId") UUID projectId) throws ParseException {
  * Task task = new Task();
  * task.setName(taskForm.getName());
@@ -157,24 +157,24 @@
  * getPriorityId()));
  * task.setCreatedByUserLoginId(principal.getName());
  * Task taskRes = taskService.createTask(task);
- * 
+ *
  * TaskAssignment taskAssignment = new TaskAssignment();
  * taskAssignment.setTask(task);
  * taskAssignment.setUserId(taskForm.getPartyId());
  * taskAssignableService.create(taskAssignment);
- * 
+ *
  * TaskExecution taskExecution = new TaskExecution();
  * taskExecution.setTask(taskRes);
  * taskExecution.setCreatedByUserLoginId(principal.getName());
  * taskExecution.setExecutionTags("issue");
  * taskExecution.setProjectId(projectId);
  * taskExecutionService.create(taskExecution);
- * 
+ *
  * for (String skillId : taskForm.getSkillIds()) {
  * taskService.addTaskSkill(taskRes.getId(), skillId);
  * }
  * return ResponseEntity.ok(taskRes);
  * }
- * 
+ *
  * }
  */
