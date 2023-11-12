@@ -1,10 +1,9 @@
 package com.hust.openerp.taskmanagement.service;
 
-import java.util.List;
-
+import com.hust.openerp.taskmanagement.entity.TaskCategory;
 import org.springframework.stereotype.Service;
 
-import com.hust.openerp.taskmanagement.entity.TaskCategory;
+import java.util.List;
 
 @Service
 public interface TaskCategoryService {

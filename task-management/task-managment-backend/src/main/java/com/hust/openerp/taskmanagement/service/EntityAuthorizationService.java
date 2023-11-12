@@ -5,6 +5,6 @@ import java.util.Set;
 
 public interface EntityAuthorizationService {
 
-  Set<String> getEntityAuthorization(String id, List<String> roleIds);
+    Set<String> getEntityAuthorization(String id, List<String> roleIds);
 
 }

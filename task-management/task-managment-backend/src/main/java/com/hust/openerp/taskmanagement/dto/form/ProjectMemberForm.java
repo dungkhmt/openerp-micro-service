@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class ProjectMemberForm {
 
-  private String projectId;
-  private String memberId;
+    private String projectId;
+    private String memberId;
 }

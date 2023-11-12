@@ -1,14 +1,13 @@
 package com.hust.openerp.taskmanagement.service;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-
 import com.hust.openerp.taskmanagement.dto.dao.ProjectPagination;
 import com.hust.openerp.taskmanagement.dto.dao.StatusTaskDao;
 import com.hust.openerp.taskmanagement.dto.form.BoardFilterInputForm;
 import com.hust.openerp.taskmanagement.entity.Project;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public interface ProjectService {

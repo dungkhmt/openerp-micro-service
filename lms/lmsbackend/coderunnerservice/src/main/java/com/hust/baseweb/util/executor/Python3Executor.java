@@ -13,11 +13,12 @@ public class Python3Executor {
     private static final String SHFileStart = "#!/bin/bash\n";
     private static final String buildCmd = "python3 -m py_compile main.py";
     private static final String SOURCECODE_DELIMITER = "PYTHON_FILE" + RandomStringUtils.randomAlphabetic(10);
-    ;
 
     private static final String TIME_LIMIT_ERROR = Constants.TestCaseSubmissionError.TIME_LIMIT.getValue();
     private static final String FILE_LIMIT_ERROR = Constants.TestCaseSubmissionError.FILE_LIMIT.getValue();
     private static final String MEMORY_LIMIT_ERROR = Constants.TestCaseSubmissionError.MEMORY_LIMIT.getValue();
+
+    private static final int DEFAULT_INITIAL_MEMORY = 10 * 1024;
 
     public Python3Executor() {
 
@@ -58,7 +59,7 @@ public class Python3Executor {
                 "if  [ -d __pycache__ ]; then",
                 genTestCase.toString(),
                 "  CPU_TIME_LIMIT=" + timeLimit + " # second",
-                "  VIRTUAL_MEM_LIMIT=" + (memoryLimit * 1024) + " # KB",
+                "  VIRTUAL_MEM_LIMIT=" + (memoryLimit * 1024 + DEFAULT_INITIAL_MEMORY) + " # KB",
                 "  OUTPUT_SIZE_LIMIT=25000 # KB",
                 "  WALL_CLOCK_TIME_LIMIT=" + (timeLimit + 1) + " # second",
                 "  OUTPUT_FILE=\"" + outputCombinedFile + "\"",
@@ -117,8 +118,7 @@ public class Python3Executor {
                 "fi",
                 "cd ..",
                 "rm -rf " + tmpName + " &",
-                "rm -rf " + tmpName + ".sh &",
-                "rm -rf " + tmpName
+                "rm -rf " + tmpName + ".sh &"
         };
 
         return String.join("\n", lines);

@@ -1,16 +1,22 @@
 const prod = {
   url: {
-    KEYCLOAK_BASE_URL: "https://lms.dailyopt.ai/iam",
-    // KEYCLOAK_BASE_URL: "https://openerp3.dailyopt.ai/iam",
     API_URL: "/api",
+  },
+  keycloak: {
+    url: "https://lms.dailyopt.ai/iam",
+    realm: "LMS",
+    clientId: "task-management",
   },
 };
 
 const dev = {
   url: {
-    // KEYCLOAK_BASE_URL: "https://lms.dailyopt.ai/iam",
-    KEYCLOAK_BASE_URL: "https://openerp3.dailyopt.ai/iam",
     API_URL: "http://localhost:8080/api",
+  },
+  keycloak: {
+    url: "https://openerp3.dailyopt.ai/iam",
+    realm: "LMS",
+    clientId: "task-management",
   },
 };
 

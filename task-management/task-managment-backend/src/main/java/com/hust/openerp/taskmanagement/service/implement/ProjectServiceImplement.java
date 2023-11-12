@@ -1,16 +1,5 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import com.hust.openerp.taskmanagement.dto.dao.ProjectDao;
 import com.hust.openerp.taskmanagement.dto.dao.ProjectPagination;
 import com.hust.openerp.taskmanagement.dto.dao.StatusTaskDao;
@@ -26,8 +15,17 @@ import com.hust.openerp.taskmanagement.service.ProjectService;
 import com.hust.openerp.taskmanagement.service.TaskAssignableService;
 import com.hust.openerp.taskmanagement.service.TaskStatusService;
 import com.hust.openerp.taskmanagement.service.UserService;
-
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -91,66 +89,66 @@ public class ProjectServiceImplement implements ProjectService {
         List<StatusItem> taskStatuses = taskStatusService.getAllTaskStatus();
         for (StatusItem statusItem : taskStatuses) {
             if (statusItem.getStatusId().equals("ASSIGNMENT_ACTIVE") ||
-                    statusItem.getStatusId().equals("ASSIGNMENT_INACTIVE")) {
+                statusItem.getStatusId().equals("ASSIGNMENT_INACTIVE")) {
                 continue;
             }
             List<Task> taskList = null;
             if (boardFilterInputForm.getUserId() != null) {
                 if (boardFilterInputForm.getStartDate() == null) {
                     taskList = taskRepository.getAllTaskByFiltersWithPartyId(
-                            boardFilterInputForm.getProjectId(),
-                            statusItem.getStatusId(),
-                            boardFilterInputForm.getCategoryId(),
-                            boardFilterInputForm.getUserId(),
-                            boardFilterInputForm.getPriorityId(),
-                            boardFilterInputForm.getKeyName());
+                        boardFilterInputForm.getProjectId(),
+                        statusItem.getStatusId(),
+                        boardFilterInputForm.getCategoryId(),
+                        boardFilterInputForm.getUserId(),
+                        boardFilterInputForm.getPriorityId(),
+                        boardFilterInputForm.getKeyName());
                 } else if (boardFilterInputForm.getEndDate() == null) {
                     taskList = taskRepository.getAllTaskByFiltersWithPartyIdAndRangeDate(
-                            boardFilterInputForm.getProjectId(),
-                            statusItem.getStatusId(),
-                            boardFilterInputForm.getCategoryId(),
-                            boardFilterInputForm.getUserId(),
-                            boardFilterInputForm.getPriorityId(),
-                            boardFilterInputForm.getKeyName(),
-                            boardFilterInputForm.getStartDate(),
-                            new Date());
+                        boardFilterInputForm.getProjectId(),
+                        statusItem.getStatusId(),
+                        boardFilterInputForm.getCategoryId(),
+                        boardFilterInputForm.getUserId(),
+                        boardFilterInputForm.getPriorityId(),
+                        boardFilterInputForm.getKeyName(),
+                        boardFilterInputForm.getStartDate(),
+                        new Date());
                 } else {
                     taskList = taskRepository.getAllTaskByFiltersWithPartyIdAndRangeDate(
-                            boardFilterInputForm.getProjectId(),
-                            statusItem.getStatusId(),
-                            boardFilterInputForm.getCategoryId(),
-                            boardFilterInputForm.getUserId(),
-                            boardFilterInputForm.getPriorityId(),
-                            boardFilterInputForm.getKeyName(),
-                            boardFilterInputForm.getStartDate(),
-                            boardFilterInputForm.getEndDate());
+                        boardFilterInputForm.getProjectId(),
+                        statusItem.getStatusId(),
+                        boardFilterInputForm.getCategoryId(),
+                        boardFilterInputForm.getUserId(),
+                        boardFilterInputForm.getPriorityId(),
+                        boardFilterInputForm.getKeyName(),
+                        boardFilterInputForm.getStartDate(),
+                        boardFilterInputForm.getEndDate());
                 }
             } else {
                 if (boardFilterInputForm.getStartDate() == null) {
                     taskList = taskRepository.getAllTaskByFiltersWithoutPartyId(
-                            boardFilterInputForm.getProjectId(),
-                            statusItem.getStatusId(),
-                            boardFilterInputForm.getCategoryId(),
-                            boardFilterInputForm.getPriorityId(),
-                            boardFilterInputForm.getKeyName());
+                        boardFilterInputForm.getProjectId(),
+                        statusItem.getStatusId(),
+                        boardFilterInputForm.getCategoryId(),
+                        boardFilterInputForm.getPriorityId(),
+                        boardFilterInputForm.getKeyName());
                 } else if (boardFilterInputForm.getEndDate() == null) {
                     taskList = taskRepository.getAllTaskByFiltersWithoutPartyIdAndRangeDate(
-                            boardFilterInputForm.getProjectId(),
-                            statusItem.getStatusId(),
-                            boardFilterInputForm.getCategoryId(),
-                            boardFilterInputForm.getPriorityId(),
-                            boardFilterInputForm.getKeyName(),
-                            boardFilterInputForm.getStartDate(),
-                            new Date());
+                        boardFilterInputForm.getProjectId(),
+                        statusItem.getStatusId(),
+                        boardFilterInputForm.getCategoryId(),
+                        boardFilterInputForm.getPriorityId(),
+                        boardFilterInputForm.getKeyName(),
+                        boardFilterInputForm.getStartDate(),
+                        new Date());
                 } else {
                     taskList = taskRepository.getAllTaskByFiltersWithoutPartyIdAndRangeDate(
-                            boardFilterInputForm.getProjectId(),
-                            statusItem.getStatusId(),
-                            boardFilterInputForm.getCategoryId(),
-                            boardFilterInputForm.getPriorityId(),
-                            boardFilterInputForm.getKeyName(),
-                            boardFilterInputForm.getStartDate(),
-                            boardFilterInputForm.getEndDate());
+                        boardFilterInputForm.getProjectId(),
+                        statusItem.getStatusId(),
+                        boardFilterInputForm.getCategoryId(),
+                        boardFilterInputForm.getPriorityId(),
+                        boardFilterInputForm.getKeyName(),
+                        boardFilterInputForm.getStartDate(),
+                        boardFilterInputForm.getEndDate());
                 }
             }
             List<TaskDao> taskDaoList = new ArrayList<>();
@@ -162,7 +160,7 @@ public class ProjectServiceImplement implements ProjectService {
                     memberId = taskAssignableService.getByTaskId(taskId).getAssigneeId();
                     User assigneeUser = userService.findById(memberId);
                     assignee = userService.findById(memberId).getId() + " (" + assigneeUser.getFirstName() + " "
-                            + assigneeUser.getLastName() + ")";
+                        + assigneeUser.getLastName() + ")";
                 }
                 taskDaoList.add(new TaskDao(task, assignee));
             }

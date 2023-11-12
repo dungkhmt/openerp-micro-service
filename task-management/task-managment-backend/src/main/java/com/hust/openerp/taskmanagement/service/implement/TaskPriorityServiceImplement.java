@@ -1,15 +1,13 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.hust.openerp.taskmanagement.entity.TaskPriority;
 import com.hust.openerp.taskmanagement.repository.TaskPriorityRepository;
 import com.hust.openerp.taskmanagement.service.TaskPriorityService;
-
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))

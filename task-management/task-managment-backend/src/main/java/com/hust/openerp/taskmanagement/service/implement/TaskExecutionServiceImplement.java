@@ -1,9 +1,5 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.hust.openerp.taskmanagement.dto.dao.TaskExecutionDao;
 import com.hust.openerp.taskmanagement.dto.form.CommentForm;
 import com.hust.openerp.taskmanagement.entity.Comment;
@@ -12,6 +8,9 @@ import com.hust.openerp.taskmanagement.entity.TaskExecution;
 import com.hust.openerp.taskmanagement.repository.TaskCommentRepository;
 import com.hust.openerp.taskmanagement.repository.TaskExecutionRepository;
 import com.hust.openerp.taskmanagement.service.TaskExecutionService;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -81,9 +80,9 @@ public class TaskExecutionServiceImplement implements TaskExecutionService {
         }
 
         List<TaskExecution> taskExecutionList = taskExecutionRepository.getAllTaskExecutionByDate(
-                startDate,
-                endDate,
-                projectId);
+            startDate,
+            endDate,
+            projectId);
         List<TaskExecutionDao> taskExecutionDaoList = new ArrayList<>();
         for (TaskExecution taskExecution : taskExecutionList) {
             taskExecutionDaoList.add(new TaskExecutionDao(taskExecution));
