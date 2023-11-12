@@ -17,4 +17,6 @@ public interface TimePerformanceRepo extends JpaRepository<TimePerformance, Long
     void deleteAll();
 
     void deleteAllByClassRoomAndSemester(String classRoom, String semester);
+
+    void deleteById(Long id);
 }

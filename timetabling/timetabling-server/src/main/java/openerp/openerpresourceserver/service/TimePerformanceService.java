@@ -9,4 +9,6 @@ public interface TimePerformanceService {
     List<TimePerformance> getTimePerformance(FilterScheduleDto requestDto);
 
     List<TimePerformance> getAll();
+
+    void deleteByIdList(List<Long> idList);
 }

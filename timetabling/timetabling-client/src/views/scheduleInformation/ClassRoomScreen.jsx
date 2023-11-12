@@ -20,11 +20,11 @@ import SyncIcon from '@mui/icons-material/Sync';
 
 function ClassRoomScreen() {
 
-    const [classrooms, seClassrooms] = useState([]);
+    const [classrooms, setClassrooms] = useState([]);
 
     useEffect(() => {
         request("get", "/classroom/get-all", (res) => {
-            seClassrooms(res.data);
+            setClassrooms(res.data);
         }).then();
     }, [])
 

@@ -9,6 +9,7 @@ import openerp.openerpresourceserver.repo.TimePerformanceRepo;
 import openerp.openerpresourceserver.service.TimePerformanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -41,5 +42,18 @@ public class TimePerformanceServiceImpl implements TimePerformanceService {
     @Override
     public List<TimePerformance> getAll() {
         return timePerformanceRepo.findAll();
+    }
+
+    @Override
+    @Transactional
+    public void deleteByIdList(List<Long> idList) {
+        try {
+            idList.forEach(el -> {
+                timePerformanceRepo.deleteById(el);
+            });
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+
     }
 }
