@@ -3,19 +3,17 @@ package com.hust.baseweb.util.executor;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
 import com.hust.baseweb.constants.ComputerLanguage;
 import com.hust.baseweb.constants.Constants;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.hust.baseweb.constants.Constants.SOURCECODE_HEREDOC_DELIMITER;
 
 public class GccExecutor {
     private static final String BUILD_COMMAND_C = "gcc -std=c17 -w -o main main.c -lm";
     private static final String BUILD_COMMAND_CPP_11 = "g++ -std=c++11 -w -o main main.cpp";
     private static final String BUILD_COMMAND_CPP_14 = "g++ -std=c++14 -w -o main main.cpp";
     private static final String BUILD_COMMAND_CPP_17 = "g++ -std=c++17 -w -o main main.cpp";
-
-    private static final String SOURCECODE_DELIMITER = "CPP_FILE" + RandomStringUtils.randomAlphabetic(10);
-    ;
 
     private String getBuildCmd(ComputerLanguage.Languages language) {
         switch (language) {
@@ -30,7 +28,7 @@ public class GccExecutor {
         }
     }
 
-    private String getFileExtension(ComputerLanguage.Languages language){
+    private String getFileExtension(ComputerLanguage.Languages language) {
         if (language == ComputerLanguage.Languages.C) {
             return FILE_EXTENSION_C;
         }
@@ -76,20 +74,20 @@ public class GccExecutor {
             ComputerLanguage.Languages language
     ) {
         String genTestCase = "";
-        String testcase = "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase" + 0 + ".txt \n"
+        String testcase = "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> testcase" + 0 + ".txt \n"
                 + testCase.getTestCase() + "\n"
                 + testCase.getCorrectAnswer() + "\n"
                 + solutionOutput + "\n"
-                + SOURCECODE_DELIMITER + "\n";
+                + SOURCECODE_HEREDOC_DELIMITER + "\n";
         genTestCase += testcase;
 
         String[] commands = {
                 SHFileStart,
                 "mkdir -p " + tmpName,
                 "cd " + tmpName,
-                "cat <<'" + SOURCECODE_DELIMITER + "' >> main" + getFileExtension(language),
+                "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> main" + getFileExtension(language),
                 sourceChecker,
-                SOURCECODE_DELIMITER,
+                SOURCECODE_HEREDOC_DELIMITER,
                 getBuildCmd(language),
                 "FILE=main",
                 "if test -f \"$FILE\"; then",
@@ -130,9 +128,9 @@ public class GccExecutor {
     ) {
         StringBuilder genTestCase = new StringBuilder();
         for (int i = 0; i < testCaseEntities.size(); i++) {
-            String testcase = "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase" + i + ".txt \n"
+            String testcase = "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> testcase" + i + ".txt \n"
                     + testCaseEntities.get(i).getTestCase() + "\n"
-                    + SOURCECODE_DELIMITER + "\n";
+                    + SOURCECODE_HEREDOC_DELIMITER + "\n";
             genTestCase.append(testcase);
         }
 

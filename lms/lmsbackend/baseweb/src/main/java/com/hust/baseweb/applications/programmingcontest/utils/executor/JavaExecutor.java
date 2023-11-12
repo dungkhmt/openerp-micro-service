@@ -2,16 +2,16 @@ package com.hust.baseweb.applications.programmingcontest.utils.executor;
 
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.List;
+
+import static com.hust.baseweb.applications.programmingcontest.constants.Constants.SOURCECODE_HEREDOC_DELIMITER;
 
 public class JavaExecutor {
 
     private static final String buildCmd = "javac Main.java";
     private static final String suffixes = ".java";
     private static final String SHFileStart = "#!/bin/bash\n";
-    private static final String SOURCECODE_DELIMITER = "JAVA_FILE" + RandomStringUtils.randomAlphabetic(10);
 
     private static final String TIME_LIMIT_ERROR = Constants.TestCaseSubmissionError.TIME_LIMIT.getValue();
     private static final String FILE_LIMIT_ERROR = Constants.TestCaseSubmissionError.FILE_LIMIT.getValue();
@@ -39,22 +39,22 @@ public class JavaExecutor {
                           tmpName +
                           "\n"
                           +
-                          "cat <<'" + SOURCECODE_DELIMITER + "' >> Main" +
+                          "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> Main" +
                           suffixes +
                           "\n"
                           +
                           source +
                           "\n"
                           +
-                          SOURCECODE_DELIMITER +
+                          SOURCECODE_HEREDOC_DELIMITER +
                           "\n"
                           +
-                          "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase.txt \n"
+                          "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> testcase.txt \n"
                           +
                           testCase +
                           "\n"
                           +
-                          SOURCECODE_DELIMITER +
+                          SOURCECODE_HEREDOC_DELIMITER +
                           "\n"
                           +
                           buildCmd +
@@ -98,9 +98,9 @@ public class JavaExecutor {
         String sourceSH = SHFileStart
                           + "mkdir -p " + tmpName + "\n"
                           + "cd " + tmpName + "\n"
-                          + "cat <<'" + SOURCECODE_DELIMITER + "' >> Main" + suffixes + "\n"
+                          + "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> Main" + suffixes + "\n"
                           + source + "\n"
-                          + SOURCECODE_DELIMITER + "\n"
+                          + SOURCECODE_HEREDOC_DELIMITER + "\n"
                           + buildCmd + "\n"
                           + "FILE=Main.class" + "\n"
                           + "if test -f \"$FILE\"; then" + "\n"
@@ -123,9 +123,9 @@ public class JavaExecutor {
     ) {
         StringBuilder genTestCase = new StringBuilder();
         for (int i = 0; i < testCases.size(); i++) {
-            String testcase = "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase" + i + ".txt \n"
+            String testcase = "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> testcase" + i + ".txt \n"
                               + testCases.get(i).getTestCase() + "\n"
-                              + SOURCECODE_DELIMITER + "\n";
+                              + SOURCECODE_HEREDOC_DELIMITER + "\n";
             genTestCase.append(testcase);
         }
 
@@ -142,14 +142,16 @@ public class JavaExecutor {
                           tmpName +
                           "\n"
                           +
-                          "cat <<'" + SOURCECODE_DELIMITER + "' >> Main" +
+                          "cat <<'" +
+                          SOURCECODE_HEREDOC_DELIMITER +
+                          "' >> Main" +
                           suffixes +
                           "\n"
                           +
                           source +
                           "\n"
                           +
-                          SOURCECODE_DELIMITER +
+                          SOURCECODE_HEREDOC_DELIMITER +
                           "\n"
                           +
                           buildCmd +

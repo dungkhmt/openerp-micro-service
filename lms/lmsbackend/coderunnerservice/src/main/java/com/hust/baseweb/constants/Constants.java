@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class Constants {
 
     public static final String SPLIT_TEST_CASE = "testcasedone" + RandomStringUtils.randomAlphabetic(10);
+    public static final String SOURCECODE_HEREDOC_DELIMITER = RandomStringUtils.randomAlphabetic(10);
 
     public enum TestCaseSubmissionError {
         FILE_LIMIT("File size limit exceeded"),
