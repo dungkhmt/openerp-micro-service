@@ -3,7 +3,7 @@ const prod = {
     API_URL: "/api",
   },
   keycloak: {
-    url: "https://openerp3.dailyopt.ai/iam",
+    url: "https://lms.dailyopt.ai/iam",
     realm: "LMS",
     clientId: "task-management",
   },
