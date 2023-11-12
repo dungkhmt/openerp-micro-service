@@ -158,6 +158,130 @@ public class SubmissionResponseHandler {
     }
 
     @Transactional
+    public void processSubmissionResponseNewPythonVersion(
+            List<TestCaseEntity> testCaseEntityList,
+            List<String> listSubmissionResponse,
+            ContestSubmissionEntity submission,
+            String problemEvaluationType,
+            int problemTimeLimit
+    ) throws Exception {
+        int runtime = 0;
+        long score = 0;
+        int nbTestCasePass = 0;
+
+        String totalStatus;
+        String message = "";
+        boolean compileError = false;
+        boolean processing = false;
+
+        int mb = 1000 * 1000;
+        MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
+
+        int i = 0;
+
+        long startTime1 = System.nanoTime();
+        for (TestCaseEntity testCaseEntity : testCaseEntityList) {
+            String response = listSubmissionResponse.get(i++);
+
+            ProblemSubmission problemSubmission;
+
+            try {
+
+                problemSubmission = StringHandler.handleContestResponseSingleTestcasePython(
+                        response,
+                        testCaseEntity.getCorrectAnswer(),
+                        testCaseEntity.getTestCasePoint(),
+                        problemEvaluationType,
+                        problemTimeLimit);
+
+                if (problemSubmission.getStatus().equals(ContestSubmissionEntity.SUBMISSION_STATUS_COMPILE_ERROR)) {
+                    message = problemSubmission.getMessage();
+                    compileError = true;
+                    break;
+                } else if (problemSubmission
+                        .getStatus()
+                        .equals(ContestSubmissionEntity.SUBMISSION_STATUS_WAIT_FOR_CUSTOM_EVALUATION)) {
+                    processing = true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new Exception("error from StringHandler");
+            }
+
+            runtime = runtime + problemSubmission.getRuntime().intValue();
+            score = score + problemSubmission.getScore();
+            nbTestCasePass += problemSubmission.getNbTestCasePass();
+
+            List<String> output = problemSubmission.getParticipantAns();
+            String participantAns = output != null && output.size() > 0 ? output.get(0) : "";
+
+            ContestSubmissionTestCaseEntity cste = ContestSubmissionTestCaseEntity.builder()
+                    .contestId(submission.getContestId())
+                    .contestSubmissionId(submission.getContestSubmissionId())
+                    .problemId(submission.getProblemId())
+                    .testCaseId(testCaseEntity.getTestCaseId())
+                    .submittedByUserLoginId(submission.getUserId())
+                    .point(problemSubmission.getScore())
+                    .status(StringHandler.removeNullCharacter(
+                            problemSubmission.getStatus()))
+                    .participantSolutionOtput(
+                            StringHandler.removeNullCharacter(
+                                    participantAns))
+                    .runtime(problemSubmission.getRuntime())
+                    .createdStamp(submission.getCreatedAt())
+                    .build();
+
+            long startTime = System.nanoTime();
+            contestSubmissionTestCaseEntityRepo.saveAndFlush(cste);
+            long endTime = System.nanoTime();
+            log.debug(
+                    "Save contestSubmissionTestCaseEntity to DB, execution time = {} ms",
+                    (endTime - startTime) / 1000000);
+
+        }
+
+        long endTime1 = System.nanoTime();
+        log.debug(
+                "Total handle response time = {} ms",
+                (endTime1 - startTime1) / 1000000);
+
+        long used = memoryBean.getHeapMemoryUsage().getUsed() / mb;
+        long committed = memoryBean.getHeapMemoryUsage().getCommitted() / mb;
+        log.debug("Memory used / committed :  " + used + "mb / " + committed + "mb");
+
+        if (compileError) {
+            totalStatus = ContestSubmissionEntity.SUBMISSION_STATUS_COMPILE_ERROR;
+        } else if (processing) {
+            message = "Evaluating";
+            totalStatus = ContestSubmissionEntity.SUBMISSION_STATUS_WAIT_FOR_CUSTOM_EVALUATION;
+        } else if (nbTestCasePass == 0) {
+            totalStatus = ContestSubmissionEntity.SUBMISSION_STATUS_FAILED;
+        } else if (nbTestCasePass > 0 && nbTestCasePass < testCaseEntityList.size()) {
+            totalStatus = ContestSubmissionEntity.SUBMISSION_STATUS_PARTIAL;
+        } else {
+            message = "Successful";
+            totalStatus = ContestSubmissionEntity.SUBMISSION_STATUS_ACCEPTED;
+        }
+
+        submission.setStatus(totalStatus);
+        submission.setPoint(score);
+        submission.setTestCasePass(nbTestCasePass + " / " + testCaseEntityList.size());
+        submission.setSourceCode(submission.getSourceCode());
+        submission.setSourceCodeLanguage(submission.getSourceCodeLanguage());
+        submission.setRuntime((long) runtime);
+        submission.setMessage(message);
+        submission.setUpdateAt(new Date());
+        contestSubmissionRepo.saveAndFlush(submission);
+
+        if (processing) {
+            rabbitTemplate.convertAndSend(
+                    RabbitProgrammingContestConfig.EXCHANGE,
+                    JUDGE_CUSTOM_PROBLEM,
+                    submission.getContestSubmissionId());
+        }
+    }
+
+    @Transactional
     public void processCustomSubmissionResponse(
             ContestSubmissionEntity submission,
             Map<UUID, String> submissionResponses
