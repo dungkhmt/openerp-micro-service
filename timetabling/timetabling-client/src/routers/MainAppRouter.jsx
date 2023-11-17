@@ -10,6 +10,7 @@ import TeacherRouter from "./TeacherRouter";
 import ScheduleInformationRouter from "./ScheduleInformationRouter";
 import SchedulePerformanceRouter from "./SchedulePerformanceRouter";
 import ScheduleScreen from "views/ScheduleScreen";
+import CourseTimeTablingRouter from "./CourseTimeTablingRouter";
 
 const styles = {
   loadingProgress: {
@@ -41,6 +42,7 @@ function MainAppRouter(props) {
           <PrivateRoute component={ScheduleScreen} path="/schedule" />
           <PrivateRoute component={ScheduleInformationRouter} path="/schedule-information" />
           <PrivateRoute component={SchedulePerformanceRouter} path="/schedule-performance" />
+          <PrivateRoute component={CourseTimeTablingRouter} path="/course-time-tabling" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>

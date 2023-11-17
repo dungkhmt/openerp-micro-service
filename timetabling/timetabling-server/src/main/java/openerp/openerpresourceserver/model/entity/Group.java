@@ -11,14 +11,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "timetabling_semester")
-public class Semester {
+@Table(name = "timetabling_group")
+public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "semester_id", updatable = false, nullable = false)
+    @Column(name = "group_id", updatable = false, nullable = false)
     private Long id;
 
-    private String semester;
-
-    private String description;
+    private String groupName;
 }

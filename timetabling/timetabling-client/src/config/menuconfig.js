@@ -32,15 +32,17 @@ import { user } from "./menuconfig/user";
 import {schedule} from "./menuconfig/schedule"
 import {scheduleInformation} from "./menuconfig/scheduleInformation"
 import {schedulePerformance} from "./menuconfig/schedulePerformance"
+import {courseTimeTabling} from "./menuconfig/courseTimeTabling"
 
 export const MENUS = [];
 
 MENUS.push(general);
 MENUS.push(user);
 MENUS.push(teacher);
-MENUS.push(schedule);
+// MENUS.push(schedule);
 MENUS.push(scheduleInformation);
 MENUS.push(schedulePerformance);
+MENUS.push(courseTimeTabling);
 
 export const menuIconMap = new Map();
 

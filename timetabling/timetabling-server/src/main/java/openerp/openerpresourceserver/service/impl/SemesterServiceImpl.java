@@ -1,5 +1,7 @@
 package openerp.openerpresourceserver.service.impl;
 
+import openerp.openerpresourceserver.mapper.SemesterMapper;
+import openerp.openerpresourceserver.model.dto.request.SemesterDto;
 import openerp.openerpresourceserver.model.entity.Semester;
 import openerp.openerpresourceserver.repo.SemesterRepo;
 import openerp.openerpresourceserver.service.SemesterService;
@@ -14,6 +16,9 @@ public class SemesterServiceImpl implements SemesterService {
 
     @Autowired
     private SemesterRepo semesterRepo;
+
+    @Autowired
+    private SemesterMapper semesterMapper;
 
     @Override
     public List<Semester> getSemester() {
@@ -34,5 +39,12 @@ public class SemesterServiceImpl implements SemesterService {
             semesterList.add(semester);
         });
         semesterRepo.saveAll(semesterList);
+    }
+
+    @Override
+    public SemesterDto create(SemesterDto semesterDto) {
+        Semester semester = semesterMapper.mapDtoToEntity(semesterDto);
+        semesterRepo.save(semester);
+        return semesterMapper.mapEntityToDto(semester);
     }
 }
