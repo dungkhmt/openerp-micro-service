@@ -1,6 +1,6 @@
-import SemesterScreen from "views/courseTimeTabling/SemesterScreen";
-import ClassListOpenedScreen from "views/courseTimeTabling/ClassListOpenedScreen";
-import ScheduleScreen from "views/courseTimeTabling/ScheduleScreen";
+import SemesterScreen from "views/courseTimeTabling/semester/SemesterScreen";
+import ClassListOpenedScreen from "views/courseTimeTabling/classListOpened/ClassListOpenedScreen";
+import ScheduleScreen from "views/courseTimeTabling/schedule/ScheduleScreen";
 import { Route, Switch, useRouteMatch } from "react-router";
 
 export default function CourseTimeTablingRouter() {

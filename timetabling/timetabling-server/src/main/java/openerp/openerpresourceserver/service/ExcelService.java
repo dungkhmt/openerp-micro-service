@@ -1,6 +1,8 @@
 package openerp.openerpresourceserver.service;
 
+import openerp.openerpresourceserver.model.entity.ClassOpened;
 import openerp.openerpresourceserver.model.entity.Schedule;
+import openerp.openerpresourceserver.repo.ClassOpenedRepo;
 import openerp.openerpresourceserver.repo.ScheduleRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,8 +15,12 @@ import openerp.openerpresourceserver.helper.ExcelHelper;
 
 @Service
 public class ExcelService {
+
     @Autowired
-    ScheduleRepo scheduleRepo;
+    private ScheduleRepo scheduleRepo;
+
+    @Autowired
+    private ClassOpenedRepo classOpenedRepo;
 
     public ByteArrayInputStream load() {
         List<Schedule> schedules = this.getAllSchedules();
@@ -40,6 +46,21 @@ public class ExcelService {
             throw new RuntimeException("fail to store excel data: " + e.getMessage());
         }
     }
+
+    public void saveClassOpened(MultipartFile file, String semester) {
+        try {
+            List<ClassOpened> tutorials = ExcelHelper.excelToClassOpened(file.getInputStream());
+            tutorials.forEach(el -> {
+                if (el != null && !el.getCourse().isEmpty() && !el.getStudyClass().isEmpty()) {
+                    el.setSemester(semester);
+                    classOpenedRepo.save(el);
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException("fail to store excel data: " + e.getMessage());
+        }
+    }
+
     public List<Schedule> getAllSchedules() {
         return scheduleRepo.findAll();
     }

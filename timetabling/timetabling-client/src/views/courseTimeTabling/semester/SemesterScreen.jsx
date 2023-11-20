@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from "react";
-import { request } from "../../api";
+import { request } from "../../../api";
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography, Button } from '@mui/material'
 import CreateNewSemester from "./CreateNewSemesterScreen";
@@ -22,24 +22,6 @@ const columns = [
         width: 300
     }
 ];
-
-const dataExams = [
-    {
-        id: 1,
-        semester: "20221",
-        description: "Kỳ 1 2022"
-    },
-    {
-        id: 2,
-        semester: "20222",
-        description: "Kỳ 2 2022"
-    },
-    {
-        id: 3,
-        semester: "20223",
-        description: "Kỳ 3 2022"
-    }
-]
 
 export default function TimePerformanceScreen() {
     const [semesters, setSemesters] = useState([]);
@@ -127,7 +109,7 @@ export default function TimePerformanceScreen() {
                         </>
                     ),
                 }}
-                rows={dataExams}
+                rows={semesters}
                 columns={columns}
                 pageSize={10}
             />

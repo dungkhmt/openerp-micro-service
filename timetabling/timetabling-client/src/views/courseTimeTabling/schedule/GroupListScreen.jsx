@@ -21,7 +21,7 @@ const AddToExistingGroupDialog = ({ open, handleClose, existingData, handleSelec
         <ul>
           {existingData.map((item) => (
             <li key={item.id}>
-              {item.name}
+              {item.groupName}
               <Button onClick={() => handleSelectItem(item)}>Select</Button>
             </li>
           ))}

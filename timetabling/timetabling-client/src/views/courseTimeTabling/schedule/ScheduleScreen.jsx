@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from "react";
-import { request } from "../../api";
+import { request } from "../../../api";
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography, Button } from '@mui/material'
 import CreateNewGroupScreen from "./CreateNewGroupScreen";
@@ -104,6 +104,13 @@ export default function ScheduleScreen() {
     const [refreshKey, setRefreshKey] = useState(0);
     const [isGroupListOpen, setGroupListOpen] = useState(false);
     const [existingGroupData, setExistingGroupData] = useState([]); // Replace with your actual existing group data
+    const [classOpeneds, setClassOpeneds] = useState([]);
+
+    useEffect(() => {
+        request("get", "/class-opened/get-all", (res) => {
+            setClassOpeneds(res.data);
+        }).then();
+    }, [refreshKey])
 
     const handleOpenGroupList = () => {
         setGroupListOpen(true);
@@ -201,7 +208,7 @@ export default function ScheduleScreen() {
                     <GroupListScreen
                         open={isGroupListOpen}
                         handleClose={handleCloseGroupList}
-                        existingData={existingGroupData}
+                        existingData={classOpeneds}
                         handleSelect={handleSelectExistingGroup}
                     />
                     <Button
@@ -245,7 +252,7 @@ export default function ScheduleScreen() {
                         </>
                     ),
                 }}
-                rows={timePerformances}
+                rows={classOpeneds}
                 columns={columns}
                 pageSize={10}
                 checkboxSelection

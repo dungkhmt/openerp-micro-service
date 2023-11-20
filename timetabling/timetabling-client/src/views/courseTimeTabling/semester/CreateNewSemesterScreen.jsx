@@ -1,28 +1,33 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
-import { request } from "../../api";
+import { request } from "../../../api";
 
 export default function CreateNewSemester({ open, handleClose, handleUpdate, handleRefreshData }) {
   const [newSemester, setNewSemester] = useState('');
+  const [description, setDescription] = useState('');
 
   const handleCreate = () => {
     // Call your API to create a new semester here
     // Assume there is a function `createSemester` that makes the API call
     // Replace it with your actual API call logic
-    request(newSemester)
-      .then(() => {
-        // Close the dialog and trigger data update
-        handleClose();
-        handleRefreshData();
-      })
-      .catch((error) => {
-        // Handle API error, if any
-        console.error('Error creating semester:', error);
-      });
-  };
+    const requestData = {
+      semester: newSemester,
+      description: description
+    };
+    request("post", "/semester/create", (res) => {
+      // Call your handleUpdate function if needed
+      handleUpdate(res.data);
+      // Call handleRefreshData to refresh the data 
+      handleRefreshData();
+      //close dialog
+      handleClose();
+    },
+      {},
+      requestData
+    ).then();
 
-  const handleInputChange = (event) => {
-    setNewSemester(event.target.value);
+    // Close the dialog
+    handleClose();
   };
 
   return (
@@ -35,7 +40,15 @@ export default function CreateNewSemester({ open, handleClose, handleUpdate, han
           label="Semester Name"
           fullWidth
           value={newSemester}
-          onChange={handleInputChange}
+          onChange={(event) => setNewSemester(event.target.value)}
+        />
+        <div style={{ margin: '16px' }} />
+        <TextField
+          margin="dense"
+          label="Description"
+          fullWidth
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
         />
       </DialogContent>
       <DialogActions>

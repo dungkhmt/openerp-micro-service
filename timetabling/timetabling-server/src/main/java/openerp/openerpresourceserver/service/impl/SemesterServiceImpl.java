@@ -42,9 +42,9 @@ public class SemesterServiceImpl implements SemesterService {
     }
 
     @Override
-    public SemesterDto create(SemesterDto semesterDto) {
+    public Semester create(SemesterDto semesterDto) {
         Semester semester = semesterMapper.mapDtoToEntity(semesterDto);
         semesterRepo.save(semester);
-        return semesterMapper.mapEntityToDto(semester);
+        return semester;
     }
 }

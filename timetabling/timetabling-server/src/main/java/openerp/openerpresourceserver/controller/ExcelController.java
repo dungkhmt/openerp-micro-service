@@ -53,6 +53,24 @@ public class ExcelController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(message));
     }
 
+    @PostMapping(value = "/upload-class-opened")
+    public ResponseEntity<ResponseMessage> uploadFileCLassOpened(@RequestParam("file") MultipartFile file,
+                                                                 @RequestParam("semester") String semester) {
+        String message = "";
+        if (ExcelHelper.hasExcelFormat(file)) {
+            try {
+                fileService.saveClassOpened(file, semester);
+                message = "Uploaded the file successfully: " + file.getOriginalFilename();
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+            } catch (Exception e) {
+                message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
+            }
+        }
+        message = "Please upload an excel file!";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(message));
+    }
+
     @GetMapping("/schedules")
     public ResponseEntity<List<Schedule>> getAllSchedules() {
         try {

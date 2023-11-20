@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.helper;
 
+import openerp.openerpresourceserver.model.entity.ClassOpened;
 import openerp.openerpresourceserver.model.entity.Schedule;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -214,6 +215,92 @@ public class ExcelHelper {
             return schedules;
         } catch (IOException e) {
             throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
+        }
+    }
+
+    public static List<ClassOpened> excelToClassOpened(InputStream is) {
+        try {
+            Workbook workbook = new XSSFWorkbook(is);
+            Sheet sheet = workbook.getSheet(SHEET);
+            if (sheet == null) {
+                sheet = workbook.getSheet(DEFAULT_SHEET);
+            }
+            Iterator<Row> rows = sheet.iterator();
+            List<ClassOpened> classOpeneds = new ArrayList<ClassOpened>();
+            int rowNumber = 0;
+//            if (rows.hasNext()){
+//                rows.next();
+//            }
+            while (rows.hasNext()) {
+                Row currentRow = rows.next();
+                // skip header
+                if (rowNumber++ < 4) {
+                    continue;
+                }
+                Iterator<Cell> cellsInRow = currentRow.iterator();
+                ClassOpened classOpened = new ClassOpened();
+                int cellIdx = 0;
+                while (cellsInRow.hasNext()) {
+                    Cell currentCell = cellsInRow.next();
+                    String cellValue = getCellValueAsString(currentCell);
+                    switch (cellIdx) {
+                        case 0:
+                            classOpened.setQuantity(cellValue);
+                            break;
+                        case 1:
+                            classOpened.setClassType(cellValue);
+                            break;
+                        case 2:
+                            classOpened.setModuleCode(cellValue);
+                            break;
+                        case 3:
+                            classOpened.setModuleName(cellValue);
+                            break;
+                        case 4:
+                            classOpened.setMass(cellValue);
+                            break;
+                        case 5:
+                            classOpened.setQuantityMax(cellValue);
+                            break;
+                        case 7:
+                            classOpened.setStudyClass(cellValue);
+                            break;
+                        case 8:
+                            classOpened.setState(cellValue);
+                            break;
+                        case 11:
+                            classOpened.setClassCode(cellValue);
+                            break;
+                        case 12:
+                            classOpened.setCrew(cellValue);
+                            break;
+                        case 14:
+                            classOpened.setOpenBatch(cellValue);
+                            break;
+                        case 15:
+                            classOpened.setCourse(cellValue);
+                            break;
+                        default:
+                            break;
+                    }
+                    cellIdx++;
+                }
+                classOpeneds.add(classOpened);
+            }
+            workbook.close();
+            return classOpeneds;
+        } catch (IOException e) {
+            throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
+        }
+    }
+
+    private static String getCellValueAsString(Cell cell) {
+        if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
+            return cell.getStringCellValue();
+        } else if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+            return String.valueOf(cell.getNumericCellValue());
+        } else {
+            return "";
         }
     }
 }

@@ -11,5 +11,5 @@ public interface SemesterService {
 
     void updateSemester();
 
-    SemesterDto create(SemesterDto semesterDto);
+    Semester create(SemesterDto semesterDto);
 }

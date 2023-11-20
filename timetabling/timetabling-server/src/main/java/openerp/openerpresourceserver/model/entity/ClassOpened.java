@@ -27,8 +27,8 @@ public class ClassOpened {
     private String crew;
     private String openBatch;
     private String course;
-    private String group;
-    private String start;
+    private String groupName;
+    private String startTime;
     private String weekday;
     private String classroom;
 }

@@ -9,5 +9,5 @@ public interface GroupService {
 
     List<Group> getGroup();
 
-    GroupDto create(GroupDto groupDto);
+    Group create(GroupDto groupDto);
 }

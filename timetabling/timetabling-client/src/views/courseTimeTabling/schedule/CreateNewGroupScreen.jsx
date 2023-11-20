@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
-import { request } from "../../api";
+import { request } from "../../../api";
 
 export default function CreateNewGroupScreen({ open, handleClose, handleUpdate, handleRefreshData }) {
   const [newGroup, setNewGroup] = useState('');
