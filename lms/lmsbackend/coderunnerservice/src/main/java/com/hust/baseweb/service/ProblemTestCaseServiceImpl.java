@@ -133,6 +133,17 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         }
 
         tempDir.removeDir(tempName);
+
+        if (Objects.equals(submission.getSourceCodeLanguage(), ContestSubmissionEntity.LANGUAGE_PYTHON)) {
+            submissionResponseHandler.processSubmissionResponseNewPythonVersion(
+                    testCaseEntityList,
+                    listSubmissionResponse,
+                    submission,
+                    problem.getScoreEvaluationType(),
+                    getTimeLimitByLanguage(problem, submission.getSourceCodeLanguage()));
+            return;
+        }
+
         submissionResponseHandler.processSubmissionResponse(
                 testCaseEntityList,
                 listSubmissionResponse,

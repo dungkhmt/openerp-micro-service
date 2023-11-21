@@ -1,5 +1,4 @@
 import { MuiThemeProvider } from "@material-ui/core/styles";
-import ReplayIcon from "@mui/icons-material/Replay";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { LoadingButton } from "@mui/lab";
 import { Box, IconButton, Tooltip } from "@mui/material";
@@ -14,6 +13,7 @@ import { Link } from "react-router-dom";
 import { errorNoti, infoNoti, successNoti } from "utils/notification";
 import ContestManagerViewSubmissionOfAUserDialog from "./ContestManagerViewSubmissionOfAUserDialog";
 import ManagerSubmitCodeOfParticipant from "./ManagerSubmitCodeOfParticipant";
+import { RejudgeButton } from "./RejudgeButton";
 import { getStatusColor } from "./lib";
 import SubmissionOfParticipantPDFDocument from "./template/SubmissionOfParticipantPDFDocument";
 
@@ -185,15 +185,7 @@ export default function ContestManagerUserSubmission(props) {
         headerStyle: { textAlign: "center" },
         cellStyle: { textAlign: "center" },
         render: (rowData) => (
-          <IconButton
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              handleRejudge(rowData.contestSubmissionId);
-            }}
-          >
-            <ReplayIcon />
-          </IconButton>
+          <RejudgeButton submissionId={rowData.contestSubmissionId} />
         ),
       },
       { title: "Man. Status", field: "managementStatus" },
@@ -218,12 +210,6 @@ export default function ContestManagerUserSubmission(props) {
     ];
     return columns;
   };
-
-  function handleRejudge(submissionId) {
-    request("post", "/submissions/" + submissionId + "/evaluation", (res) => {
-      console.log("evaluate submission", res.data);
-    }).then();
-  }
 
   function handleSubmitCodeParticipant() {
     setIsOpenManagerSubmitCodeOfParticipant(true);

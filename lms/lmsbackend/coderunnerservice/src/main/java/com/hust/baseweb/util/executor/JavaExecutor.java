@@ -2,17 +2,16 @@ package com.hust.baseweb.util.executor;
 
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
 import com.hust.baseweb.constants.Constants;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.hust.baseweb.constants.Constants.SOURCECODE_HEREDOC_DELIMITER;
 
 public class JavaExecutor {
     private static final String buildCmd = "javac Main.java";
     private static final String suffixes = ".java";
     private static final String SHFileStart = "#!/bin/bash\n";
-    private static final String SOURCECODE_DELIMITER = "JAVA_FILE" + RandomStringUtils.randomAlphabetic(10);
-    ;
 
     private static final String TIME_LIMIT_ERROR = Constants.TestCaseSubmissionError.TIME_LIMIT.getValue();
     private static final String FILE_LIMIT_ERROR = Constants.TestCaseSubmissionError.FILE_LIMIT.getValue();
@@ -37,9 +36,9 @@ public class JavaExecutor {
     public String genSubmitScriptFile(List<TestCaseEntity> testCases, String source, String tmpName, int timeLimit, int memoryLimit) {
         StringBuilder genTestCase = new StringBuilder();
         for (int i = 0; i < testCases.size(); i++) {
-            String testcase = "cat <<'" + SOURCECODE_DELIMITER + "' >> testcase" + i + ".txt \n"
+            String testcase = "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> testcase" + i + ".txt \n"
                     + testCases.get(i).getTestCase() + "\n"
-                    + SOURCECODE_DELIMITER + "\n";
+                    + SOURCECODE_HEREDOC_DELIMITER + "\n";
             genTestCase.append(testcase);
         }
 
@@ -50,9 +49,9 @@ public class JavaExecutor {
                 SHFileStart,
                 "mkdir -p " + tmpName,
                 "cd " + tmpName,
-                "cat <<'" + SOURCECODE_DELIMITER + "' >> Main" + suffixes,
+                "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> Main" + suffixes,
                 source,
-                SOURCECODE_DELIMITER,
+                SOURCECODE_HEREDOC_DELIMITER,
                 buildCmd,
                 "FILE=Main.class",
                 "if test -f \"$FILE\"; then",

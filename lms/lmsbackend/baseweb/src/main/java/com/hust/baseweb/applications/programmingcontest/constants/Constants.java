@@ -1,8 +1,8 @@
 package com.hust.baseweb.applications.programmingcontest.constants;
 
-import com.hust.baseweb.applications.programmingcontest.utils.ComputerLanguage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +15,9 @@ import java.util.Map;
 @Data
 public class Constants {
 
+    public static final String SPLIT_TEST_CASE = "testcasedone" + RandomStringUtils.randomAlphabetic(10);
+    public static final String SOURCECODE_HEREDOC_DELIMITER = RandomStringUtils.randomAlphabetic(10);
+
     private Map<String, Integer> MapLevelOrder = new HashMap<>();
 
     @Bean
@@ -23,8 +26,6 @@ public class Constants {
         MapLevelOrder.put("medium", 2);
         MapLevelOrder.put("hard", 3);
     }
-
-    public static final String SPLIT_TEST_CASE = "testcasedone";
 
     public enum RegistrationType {
         PENDING("PENDING"),
