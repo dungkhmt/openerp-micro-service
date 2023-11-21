@@ -1,6 +1,6 @@
 package com.hust.baseweb.applications.admin.dataadmin.education.controller;
 
-import com.hust.baseweb.applications.admin.dataadmin.education.service.ProgrammingContestSubmissionService;
+import com.hust.baseweb.applications.admin.dataadmin.education.service.ProgrammingContestSubmissionServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin/data/programming-contests/submissions")
 public class ProgrammingContestSubmissionController {
 
-    private final ProgrammingContestSubmissionService contestSubmissionService;
+    private final ProgrammingContestSubmissionServiceImpl contestSubmissionService;
 
     @GetMapping("/{studentId}")
     public ResponseEntity<?> getContestSubmissionsOfStudent(
