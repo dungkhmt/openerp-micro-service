@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.repo;
 
 import openerp.openerpresourceserver.model.entity.ClassOpened;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,8 +14,9 @@ public interface ClassOpenedRepo extends JpaRepository<ClassOpened, Long> {
 
     void deleteById(Long id);
 
-    List<ClassOpened> findAll();
+    List<ClassOpened> findAll(Sort sort);
 
-    @Query(value = "SELECT t FROM public.timetabling_class_opened t WHERE t.class_opened_id IN :ids", nativeQuery = true)
-    List<ClassOpened> getAllByIds(@Param("ids") List<Long> ids);
+    List<ClassOpened> getAllByIdIn(List<Long> ids, Sort sort);
+
+    List<ClassOpened> getAllBySemester(String semester, Sort sort);
 }

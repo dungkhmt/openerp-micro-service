@@ -6,6 +6,8 @@ import { Box, Typography, Button } from '@mui/material'
 import CreateNewGroupScreen from "./CreateNewGroupScreen";
 import SelectSemester from "./SelectSemesterScreen";
 import GroupListScreen from './GroupListScreen';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 const columns = [
     {
@@ -15,7 +17,7 @@ const columns = [
     },
     {
         headerName: "Nhóm",
-        field: "group",
+        field: "groupName",
         width: 170
     },
     {
@@ -105,11 +107,18 @@ export default function ScheduleScreen() {
     const [isGroupListOpen, setGroupListOpen] = useState(false);
     const [existingGroupData, setExistingGroupData] = useState([]); // Replace with your actual existing group data
     const [classOpeneds, setClassOpeneds] = useState([]);
+    const [semesters, setSemesters] = useState([]); // State to store the list of semesters
+    const [selectedSemester, setSelectedSemester] = useState(null); // State to store the selected semester
+    const [rowSelectionModel, setRowSelectionModel] = React.useState([]);
 
     useEffect(() => {
         request("get", "/class-opened/get-all", (res) => {
             setClassOpeneds(res.data);
         }).then();
+
+        request("get", "/semester/get-all", (res) => {
+            setSemesters(res.data);
+        });
     }, [refreshKey])
 
     const handleOpenGroupList = () => {
@@ -125,18 +134,35 @@ export default function ScheduleScreen() {
         console.log('Selected item from dialog:', selectedItem);
     };
 
-
-    useEffect(() => {
-        request("get", "/time-performance/get-all", (res) => {
-            setTimePerformances(res.data);
-        }).then();
-    }, [refreshKey])
+    const handleSemesterChange = (event, newValue) => {
+        setSelectedSemester(newValue);
+        if (newValue) {
+            handleFilterData({ semester: newValue });
+        }
+    };
 
     function handleDeleteSelected() {
         // Implement your logic to delete selected items using an API
         // You can use the selectedIds state to get the IDs of selected items
         console.log("Delete selected items:", selectionModel);
     }
+
+    const handleFilterData = ({ semester }) => {
+        const url = "/class-opened/get-all"
+
+        // Extract the relevant value from the selectedSemester object
+        const semesterName = semester.semester;
+
+        // Add the semester parameter to the URL
+        const fullUrl = `${url}?semester=${semesterName}`;
+
+        request("get", fullUrl, (res) => {
+            setClassOpeneds(res.data);
+        }).then();
+
+        // Set dataChanged to true to trigger a re-render
+        setDataChanged(true);
+    };
 
     const handleUpdateData = ({ semester }) => {
         // Implement your logic to update data using an API
@@ -178,23 +204,15 @@ export default function ScheduleScreen() {
         return (
             <div>
                 <div style={{ display: "flex", gap: 16, justifyContent: "flex-start" }}>
-                    <Button
-                        variant="outlined"
-                        color="secondary"
-                        style={{ marginLeft: "8px" }}
-                        onClick={handleOpenSelectSemester}
-                    // disabled={isDeleteButtonDisabled}
-                    >
-                        Chọn kỳ học
-                    </Button>
+                    <Autocomplete
+                        options={semesters}
+                        getOptionLabel={(option) => option.semester} // Update with the actual property name for semester name
+                        style={{ width: 150, marginLeft: "8px" }}
+                        value={selectedSemester}
+                        renderInput={(params) => <TextField {...params} label="Chọn kỳ học" />}
+                        onChange={handleSemesterChange}
+                    />
                 </div>
-
-                <SelectSemester
-                    open={isSelectSemester}
-                    handleClose={handleCloseSelectSemester}
-                    handleUpdate={handleUpdateData}
-                    handleRefreshData={handleRefreshData}
-                />
 
                 <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
                     <Button
@@ -224,6 +242,7 @@ export default function ScheduleScreen() {
                 <CreateNewGroupScreen
                     open={isDialogOpen}
                     handleClose={handleCloseDialog}
+                    existingData={rowSelectionModel}
                     handleUpdate={handleUpdateData}
                     handleRefreshData={handleRefreshData}
                 />
@@ -256,11 +275,10 @@ export default function ScheduleScreen() {
                 columns={columns}
                 pageSize={10}
                 checkboxSelection
-                onSelectionModelChange={(el) => {
-                    console.log("New selection model:", el);
-                    setSelectionModel(el.selectionModel);
+                onRowSelectionModelChange={(newRowSelectionModel) => {
+                    setRowSelectionModel(newRowSelectionModel);
                 }}
-                selectionModel={selectionModel}
+                rowSelectionModel={rowSelectionModel}
             />
         </div>
     );

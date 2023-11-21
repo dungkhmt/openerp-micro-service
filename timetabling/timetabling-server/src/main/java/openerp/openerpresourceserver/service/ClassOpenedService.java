@@ -10,4 +10,6 @@ public interface ClassOpenedService {
     List<ClassOpened> getAll();
 
     List<ClassOpened> updateClassOpenedList(UpdateClassOpenedDto requestDto);
+
+    List<ClassOpened> getBySemester(String semester);
 }

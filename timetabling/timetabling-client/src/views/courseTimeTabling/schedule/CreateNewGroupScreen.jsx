@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
 import { request } from "../../../api";
 
-export default function CreateNewGroupScreen({ open, handleClose, handleUpdate, handleRefreshData }) {
+export default function CreateNewGroupScreen({ open, handleClose, existingData, handleUpdate, handleRefreshData }) {
   const [newGroup, setNewGroup] = useState('');
+
+  useEffect(() => {
+    console.log("data list: ", existingData)
+  }, [])
 
   const handleCreate = () => {
     request(newGroup)

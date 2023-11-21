@@ -9,11 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -24,9 +22,12 @@ public class ClassOpenedController {
     private ClassOpenedService service;
 
     @GetMapping("/get-all")
-    public ResponseEntity<List<ClassOpened>> getAll() {
+    public ResponseEntity<List<ClassOpened>> getAll(@RequestParam(required = false) String semester) {
         try {
-            List<ClassOpened> classOpenedList = service.getAll();
+            List<ClassOpened> classOpenedList;
+            if (semester != null) {
+                classOpenedList = service.getBySemester(semester);
+            } else classOpenedList = service.getAll();
             if (classOpenedList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
