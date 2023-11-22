@@ -18,7 +18,7 @@ const columns = [
     {
         headerName: "Nhóm",
         field: "groupName",
-        width: 170
+        width: 120
     },
     {
         headerName: "SL thực",
@@ -38,7 +38,7 @@ const columns = [
     {
         headerName: "Tên học phần",
         field: "moduleName",
-        width: 100
+        width: 150
     },
     {
         headerName: "Thời lượng",
@@ -53,7 +53,7 @@ const columns = [
     {
         headerName: "Lớp học",
         field: "studyClass",
-        width: 100
+        width: 150
     },
     {
         headerName: "Trạng thái",
@@ -98,10 +98,8 @@ const columns = [
 ];
 
 export default function ScheduleScreen() {
-    const [timePerformances, setTimePerformances] = useState([]);
     const [selectionModel, setSelectionModel] = useState([]);
     const [isDialogOpen, setDialogOpen] = useState(false);
-    const [isSelectSemester, setSelectSemester] = useState(false);
     const [dataChanged, setDataChanged] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
     const [isGroupListOpen, setGroupListOpen] = useState(false);
@@ -141,12 +139,6 @@ export default function ScheduleScreen() {
         }
     };
 
-    function handleDeleteSelected() {
-        // Implement your logic to delete selected items using an API
-        // You can use the selectedIds state to get the IDs of selected items
-        console.log("Delete selected items:", selectionModel);
-    }
-
     const handleFilterData = ({ semester }) => {
         const url = "/class-opened/get-all"
 
@@ -164,17 +156,6 @@ export default function ScheduleScreen() {
         setDataChanged(true);
     };
 
-    const handleUpdateData = ({ semester }) => {
-        // Implement your logic to update data using an API
-        console.log("Update data", { semester });
-
-        // Set dataChanged to true to trigger a re-render
-        setDataChanged(true);
-
-        // Tăng giá trị của refreshKey để làm mới useEffect và fetch dữ liệu mới
-        setRefreshKey((prevKey) => prevKey + 1);
-    };
-
     const handleRefreshData = () => {
         setDataChanged(true);
         // Tăng giá trị của refreshKey để làm mới useEffect và fetch dữ liệu mới
@@ -189,17 +170,9 @@ export default function ScheduleScreen() {
         setDialogOpen(false);
     };
 
-    const handleOpenSelectSemester = () => {
-        setSelectSemester(true);
-    };
-
-    const handleCloseSelectSemester = () => {
-        setSelectSemester(false);
-    };
-
     function DataGridToolbar() {
 
-        const isDeleteButtonDisabled = selectionModel.length < 2;
+        const isButtonDisabled = rowSelectionModel.length < 1;
 
         return (
             <div>
@@ -219,7 +192,7 @@ export default function ScheduleScreen() {
                         variant="outlined"
                         color="secondary"
                         onClick={handleOpenGroupList}
-                    // disabled={isDeleteButtonDisabled}
+                        disabled={isButtonDisabled}
                     >
                         Thêm vào nhóm đã có
                     </Button>
@@ -234,6 +207,7 @@ export default function ScheduleScreen() {
                         color="primary"
                         style={{ marginRight: "8px" }}
                         onClick={handleOpenDialog}
+                        disabled={isButtonDisabled}
                     >
                         Thêm vào nhóm mới
                     </Button>
@@ -243,7 +217,6 @@ export default function ScheduleScreen() {
                     open={isDialogOpen}
                     handleClose={handleCloseDialog}
                     existingData={rowSelectionModel}
-                    handleUpdate={handleUpdateData}
                     handleRefreshData={handleRefreshData}
                 />
             </div>

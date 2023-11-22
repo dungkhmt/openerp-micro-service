@@ -19,7 +19,7 @@ public class GroupController {
     @Autowired
     private GroupService groupService;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Group> createNewGroup(@Valid @RequestBody GroupDto groupDto) {
         try {
             Group group = groupService.create(groupDto);

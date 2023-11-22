@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
 import { request } from "../../../api";
 
-export default function CreateNewGroupScreen({ open, handleClose, existingData, handleUpdate, handleRefreshData }) {
+export default function CreateNewGroupScreen({ open, handleClose, existingData, handleRefreshData }) {
   const [newGroup, setNewGroup] = useState('');
 
   useEffect(() => {
@@ -10,16 +10,32 @@ export default function CreateNewGroupScreen({ open, handleClose, existingData, 
   }, [])
 
   const handleCreate = () => {
-    request(newGroup)
-      .then(() => {
-        // Close the dialog and trigger data update
-        handleClose();
-        handleRefreshData();
-      })
-      .catch((error) => {
-        // Handle API error, if any
-        console.error('Error creating group:', error);
-      });
+    const requestNewGroup = {
+      groupName: newGroup,
+    };
+    request("post", "/group/create", (res) => {
+      // Call handleRefreshData to refresh the data 
+      handleRefreshData();
+      //close dialog
+      handleClose();
+    },
+      {},
+      requestNewGroup
+    ).then();
+
+    const requestUpdateClassOpened = {
+      ids: existingData,
+      groupName: newGroup
+    };
+    request("post", "/class-opened/update", (res) => {
+      // Call handleRefreshData to refresh the data 
+      handleRefreshData();
+      //close dialog
+      handleClose();
+    },
+      {},
+      requestUpdateClassOpened
+    ).then();
   };
 
   const handleInputChange = (event) => {
