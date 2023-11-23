@@ -1,29 +1,40 @@
 package com.hust.baseweb.applications.programmingcontest.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.Date;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ModelProblemSubmissionDetailByTestCaseResponse {
+public class SubmissionDetailByTestcaseOM {
 
-    private UUID problemSubmissionDetailByTestCaseId;
-    private String contestId;
-    private String problemId;
-    private String userLoginId;
+//    private UUID contestSubmissionTestcaseId;
+//
+//    private String contestId;
+//
+//    private String problemId;
+//
+//    private String userLoginId;
+
     private UUID testCaseId;
+
     private String testCase;
+
     private String message;
+
     private int point;
+
+    private Long runtime;
+
     private String testCaseAnswer;
+
     private String participantAnswer;
+
     private Date createdAt;
+
     private String viewSubmitSolutionOutputMode;
 }
