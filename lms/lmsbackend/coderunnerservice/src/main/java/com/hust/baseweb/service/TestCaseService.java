@@ -1,8 +1,8 @@
 package com.hust.baseweb.service;
 
-import lombok.AllArgsConstructor;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
 import com.hust.baseweb.repo.TestCaseRepo;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -22,9 +22,9 @@ public class TestCaseService {
         return findListTestCase(problemId, evaluatePrivateTestcase);
     }
 
-    public List<TestCaseEntity> findListTestCase(String problemId, boolean evaluatePrivateTestcase) {
+    public List<TestCaseEntity> findListTestCase(String problemId, boolean includePrivateTest) {
         List<TestCaseEntity> testCaseEntityList;
-        if (evaluatePrivateTestcase) {
+        if (includePrivateTest) {
             testCaseEntityList = testCaseRepo.findAllByProblemId(problemId);
         } else {
             testCaseEntityList = testCaseRepo.findAllByProblemIdAndIsPublic(problemId, "Y");

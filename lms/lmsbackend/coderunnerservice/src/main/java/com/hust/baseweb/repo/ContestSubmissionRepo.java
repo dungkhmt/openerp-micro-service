@@ -8,5 +8,5 @@ import java.util.UUID;
 
 public interface ContestSubmissionRepo extends JpaRepository<ContestSubmissionEntity, UUID> {
 
-    ContestSubmissionEntity findContestSubmissionEntityByContestSubmissionId(UUID contestSubmissionId);
+    ContestSubmissionEntity findByContestSubmissionId(UUID contestSubmissionId);
 }

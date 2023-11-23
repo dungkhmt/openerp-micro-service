@@ -1,16 +1,16 @@
 package com.hust.baseweb.service.helper;
 
-import com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestConfig;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import com.hust.baseweb.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionTestCaseEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
+import com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestConfig;
+import com.hust.baseweb.constants.Constants;
 import com.hust.baseweb.repo.ContestSubmissionRepo;
 import com.hust.baseweb.repo.ContestSubmissionTestCaseEntityRepo;
 import com.hust.baseweb.util.stringhandler.ProblemSubmission;
 import com.hust.baseweb.util.stringhandler.StringHandler;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -284,22 +284,24 @@ public class SubmissionResponseHandler {
     @Transactional
     public void processCustomSubmissionResponse(
             ContestSubmissionEntity submission,
-            Map<UUID, String> submissionResponses
+            Map<UUID, String> evaluationResults
     ) {
-
         long totalPoint = 0;
 
-        for (Map.Entry<UUID, String> testCaseResponse : submissionResponses.entrySet()) {
-            UUID submissionTestCaseId = testCaseResponse.getKey();
-            ContestSubmissionTestCaseEntity submissionTestCase = contestSubmissionTestCaseEntityRepo
+        for (Map.Entry<UUID, String> result : evaluationResults.entrySet()) {
+            UUID submissionTestCaseId = result.getKey();
+            String response = result.getValue();
+            ContestSubmissionTestCaseEntity submissionTestcase = contestSubmissionTestCaseEntityRepo
                     .findById(submissionTestCaseId)
                     .get();
 
-            String response = testCaseResponse.getValue();
+            if (response == null) {
+                submissionTestcase.setPoint(0);
+                submissionTestcase.setStatus("Empty participant's program output");
+            } else {
+                int point = 0;
+                String message = "";
 
-            int point = 0;
-            String message = "";
-            if (response.length() > 0) {
                 if (response.indexOf(' ') < 0) {
                     message = "Invalid response";
                 } else {
@@ -311,21 +313,21 @@ public class SubmissionResponseHandler {
                     } catch (NumberFormatException e) {
                         message = "Invalid response";
                     }
+
                     totalPoint += point;
                 }
 
+                submissionTestcase.setPoint(point);
+                submissionTestcase.setStatus(message);
             }
 
-            submissionTestCase.setPoint(point);
-            submissionTestCase.setStatus(message);
-
-            contestSubmissionTestCaseEntityRepo.save(submissionTestCase);
+            contestSubmissionTestCaseEntityRepo.save(submissionTestcase);
         }
 
         submission.setPoint(totalPoint);
         submission.setStatus(ContestSubmissionEntity.SUBMISSION_STATUS_CUSTOM_EVALUATED);
         submission.setMessage(ContestSubmissionEntity.SUBMISSION_STATUS_CUSTOM_EVALUATED);
-        submission.setTestCasePass("_ / " + submissionResponses.size());
+        submission.setTestCasePass("_ / " + evaluationResults.size());
         submission.setUpdateAt(new Date());
 
         contestSubmissionRepo.save(submission);

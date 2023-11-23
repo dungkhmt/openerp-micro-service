@@ -13,8 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -85,7 +87,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             UUID submissionId
     ) throws Exception {
 
-        ContestSubmissionEntity submission = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(submissionId);
+        ContestSubmissionEntity submission = contestSubmissionRepo.findByContestSubmissionId(submissionId);
         ProblemEntity problem = problemService.findProblemWithCache(submission.getProblemId());
         ContestEntity contest = contestService.findContestWithCache(submission.getContestId());
 
@@ -153,34 +155,26 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
+    @Transactional
     public void evaluateCustomProblemSubmission(UUID submissionId) throws Exception {
-        ContestSubmissionEntity submission = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(submissionId);
+        ContestSubmissionEntity submission = contestSubmissionRepo.findByContestSubmissionId(submissionId);
         ProblemEntity problem = problemService.findProblemWithCache(submission.getProblemId());
         ContestEntity contest = contestService.findContestWithCache(submission.getContestId());
         List<ContestSubmissionTestCaseEntity> submissionTestcases = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionId(submissionId);
 
-        String userId = submission.getUserId();
-
-        List<TestCaseEntity> testcases;
-        boolean includePublicTest = contest != null &&
+        boolean includePrivateTest = contest != null &&
                 contest.getEvaluateBothPublicPrivateTestcase() != null &&
                 contest.getEvaluateBothPublicPrivateTestcase()
                         .equals(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES);
 
-        testcases = testCaseService.findListTestCaseWithCache(submission.getProblemId(), includePublicTest);
-
-        List<TestCaseEntity> enabledTests = new ArrayList<>();
-        for (TestCaseEntity tc : testcases) {
-            if (tc.getStatusId() != null && tc.getStatusId().equals(TestCaseEntity.STATUS_DISABLED)) {
-                continue;
-            }
-            enabledTests.add(tc);
-        }
-        testcases = enabledTests;
+        List<TestCaseEntity> testcases = testCaseService.findListTestCaseWithCache(submission.getProblemId(), includePrivateTest)
+                .stream()
+                .filter(tc1 -> tc1.getStatusId() == null || !tc1.getStatusId().equals(TestCaseEntity.STATUS_DISABLED))
+                .collect(Collectors.toList());
 
         Map<UUID, String> evaluationResults = new HashMap<>();
         String tempName = tempDir.createRandomScriptFileName(
-                userId + "-" +
+                submission.getUserId() + "-" +
                         submission.getContestId() + "-" +
                         submission.getProblemId() + "-" +
                         "custom" + "-" +
@@ -189,17 +183,15 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         for (TestCaseEntity testcase : testcases) {
             ContestSubmissionTestCaseEntity submissionTestcase = submissionTestcases
                     .stream()
-                    .filter(tc -> tc.getTestCaseId().equals(testcase.getTestCaseId()))
+                    .filter(st -> st.getTestCaseId().equals(testcase.getTestCaseId()))
                     .findFirst()
                     .get();
 
+            String response;
             if (StringUtils.isBlank(submissionTestcase.getParticipantSolutionOtput())) {
-                submissionTestcase.setPoint(0);
-                submissionTestcase.setStatus("Empty participant's program output");
-
-                contestSubmissionTestCaseEntityRepo.save(submissionTestcase);
+                response = null;
             } else {
-                String response = submissionSolutionOutput(
+                response = submissionSolutionOutput(
                         problem.getSolutionCheckerSourceCode(),
                         problem.getSolutionCheckerSourceLanguage(),
                         submissionTestcase.getParticipantSolutionOtput(),
@@ -209,13 +201,13 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 //                    problem.getTimeLimit(),
                         getTimeLimitByLanguage(problem, problem.getSolutionCheckerSourceLanguage()),
                         problem.getMemoryLimit());
-
-                evaluationResults.put(submissionTestcase.getContestSubmissionTestcaseId(), response);
             }
+
+            evaluationResults.put(submissionTestcase.getContestSubmissionTestcaseId(), response);
         }
 
-        tempDir.removeDir(tempName);
         submissionResponseHandler.processCustomSubmissionResponse(submission, evaluationResults);
+        tempDir.removeDir(tempName);
     }
 
     private String submission(
