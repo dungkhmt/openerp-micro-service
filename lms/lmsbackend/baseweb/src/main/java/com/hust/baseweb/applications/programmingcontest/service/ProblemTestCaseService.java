@@ -55,13 +55,13 @@ public interface ProblemTestCaseService {
     ModelGetContestDetailResponse getContestDetailByContestIdAndTeacher(String contestId, String userName);
 
 
-    List<ModelProblemSubmissionDetailByTestCaseResponse> getContestProblemSubmissionDetailByTestCaseOfASubmission(UUID submissionId);
+    List<SubmissionDetailByTestcaseOM> getSubmissionDetailByTestcase(UUID submissionId);
 
     ContestSubmissionEntity teacherDisableSubmission(String userId, UUID submissionId);
     ContestSubmissionEntity teacherEnableSubmission(String userId, UUID submissionId);
 
 
-    List<ModelProblemSubmissionDetailByTestCaseResponse> getContestProblemSubmissionDetailByTestCaseOfASubmissionViewedByParticipant(
+    List<SubmissionDetailByTestcaseOM> getParticipantSubmissionDetailByTestCase(
         String userId, UUID submissionId
     );
 

@@ -27,7 +27,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.security.Principal;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Scanner;
+import java.util.UUID;
 
 @RestController
 @CrossOrigin
@@ -61,19 +64,19 @@ public class SubmissionController {
     public ResponseEntity<?> getContestProblemSubmissionDetailByTestCaseOfASubmission(
         @PathVariable UUID submissionId
     ) {
-        List<ModelProblemSubmissionDetailByTestCaseResponse> retLst = problemTestCaseService
-            .getContestProblemSubmissionDetailByTestCaseOfASubmission(submissionId);
-        return ResponseEntity.ok().body(retLst);
+        List<SubmissionDetailByTestcaseOM> result = problemTestCaseService
+            .getSubmissionDetailByTestcase(submissionId);
+        return ResponseEntity.ok().body(result);
     }
 
     @GetMapping("/student/submissions/{submissionId}")
     public ResponseEntity<?> getContestProblemSubmissionDetailByTestCaseOfASubmissionViewedByParticipant(
         Principal principal, @PathVariable UUID submissionId
     ) {
-        List<ModelProblemSubmissionDetailByTestCaseResponse> retLst;
+        List<SubmissionDetailByTestcaseOM> retLst;
         try {
             retLst = problemTestCaseService
-                .getContestProblemSubmissionDetailByTestCaseOfASubmissionViewedByParticipant(
+                .getParticipantSubmissionDetailByTestCase(
                     principal.getName(),
                     submissionId);
         } catch (AccessDeniedException e) {
