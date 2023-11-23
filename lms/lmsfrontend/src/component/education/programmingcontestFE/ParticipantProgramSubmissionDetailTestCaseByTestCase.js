@@ -1,11 +1,11 @@
 import InfoIcon from "@mui/icons-material/Info";
 import { CircularProgress, IconButton, LinearProgress } from "@mui/material";
 import Box from "@mui/material/Box";
+import { request } from "api";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import HustModal from "component/common/HustModal";
 import { useEffect, useState } from "react";
-import { request } from "../../../api";
-import { toFormattedDateTime } from "../../../utils/dateutils";
+import { toFormattedDateTime } from "utils/dateutils";
 import StandardTable from "../../table/StandardTable";
 
 export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
@@ -22,15 +22,23 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
   const [score, setScore] = useState(0);
 
   const columns = [
-    { title: "Contest", field: "contestId" },
-    { title: "Problem", field: "problemId" },
-    { title: "Message", field: "message" },
     { title: "Point", field: "point" },
-    // {title: "Correct result", field: "testCaseAnswer"},
-    // {title: "Participant's result", field: "participantAnswer"},
-    { title: "Submit at", field: "createdAt" },
+    // {
+    //   title: "Runtime (ms)",
+    //   // align: "right",
+    //   cellStyle: { minWidth: 150 },
+    //   render: (rowData) =>
+    //     rowData.runtime.toLocaleString("fr-FR", localeOption),
+    // },
+    {
+      title: "Message",
+      field: "message",
+      sorting: false,
+      cellStyle: { minWidth: 200 },
+    },
     {
       title: "Detail",
+      sorting: false,
       render: (rowData) => (
         <IconButton
           color="primary"
@@ -40,6 +48,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
                 setSelectedTestcase(testcaseDetailList[i]);
               }
             }
+
             setOpenModal(true);
           }}
         >
@@ -169,11 +178,12 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
       }
     ).then(() => setIsProcessing(false));
   }
+
   useEffect(() => {
     getSubmissionDetailTestCaseByTestCase();
   }, []);
 
-  const ModalPreview = (chosenTestcase) => {
+  const ModalPreview = ({ testCase }) => {
     return (
       <HustModal
         open={openModal}
@@ -182,10 +192,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
         showCloseBtnTitle={false}
         maxWidthPaper={800}
       >
-        <HustCopyCodeBlock
-          title="Input"
-          text={chosenTestcase?.chosenTestcase?.testCase}
-        />
+        <HustCopyCodeBlock title="Input" text={testCase?.testCase} />
         <Box
           sx={{
             display: "flex",
@@ -198,13 +205,13 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
           <Box width="48%">
             <HustCopyCodeBlock
               title="Correct output"
-              text={chosenTestcase?.chosenTestcase?.testCaseAnswer}
+              text={testCase?.testCaseAnswer}
             />
           </Box>
           <Box width="48%">
             <HustCopyCodeBlock
               title="User output"
-              text={chosenTestcase?.chosenTestcase?.participantAnswer}
+              text={testCase?.participantAnswer}
             />
           </Box>
         </Box>
@@ -216,18 +223,17 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
     <Box>
       {isProcessing && <LinearProgress />}
       <StandardTable
-        title={"Problem's Test cases"}
         columns={columns}
         data={submissionTestCase}
         hideCommandBar
         options={{
           selection: false,
           pageSize: 5,
-          search: true,
+          search: false,
           sorting: true,
         }}
       />
-      <ModalPreview chosenTestcase={selectedTestcase} />
+      <ModalPreview testCase={selectedTestcase} />
     </Box>
   );
 }
