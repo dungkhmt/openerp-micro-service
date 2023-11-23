@@ -153,62 +153,68 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     @Override
     public void evaluateCustomProblemSubmission(UUID submissionId) throws Exception {
-
         ContestSubmissionEntity submission = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(submissionId);
-        ProblemEntity problemEntity = problemService.findProblemWithCache(submission.getProblemId());
+        ProblemEntity problem = problemService.findProblemWithCache(submission.getProblemId());
         ContestEntity contest = contestService.findContestWithCache(submission.getContestId());
-        List<ContestSubmissionTestCaseEntity> submissionTestCases = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionId(submissionId);
+        List<ContestSubmissionTestCaseEntity> submissionTestcases = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionId(submissionId);
 
         String userId = submission.getUserId();
 
-        List<TestCaseEntity> testCaseEntityList;
-        boolean evaluatePrivatePublic = contest != null &&
+        List<TestCaseEntity> testcases;
+        boolean includePublicTest = contest != null &&
                 contest.getEvaluateBothPublicPrivateTestcase() != null &&
                 contest.getEvaluateBothPublicPrivateTestcase()
                         .equals(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES);
 
-        testCaseEntityList = testCaseService.findListTestCaseWithCache(
-                submission.getProblemId(),
-                evaluatePrivatePublic);
+        testcases = testCaseService.findListTestCaseWithCache(submission.getProblemId(), includePublicTest);
 
-        List<TestCaseEntity> listTestCaseAvailable = new ArrayList<>();
-        for (TestCaseEntity tc : testCaseEntityList) {
+        List<TestCaseEntity> enabledTests = new ArrayList<>();
+        for (TestCaseEntity tc : testcases) {
             if (tc.getStatusId() != null && tc.getStatusId().equals(TestCaseEntity.STATUS_DISABLED)) {
                 continue;
             }
-            listTestCaseAvailable.add(tc);
+            enabledTests.add(tc);
         }
-        testCaseEntityList = listTestCaseAvailable;
+        testcases = enabledTests;
 
-        String tempName = tempDir.createRandomScriptFileName(userId + "-" +
-                submission.getContestId() + "-" +
-                submission.getProblemId() + "-" +
-                "custom-" +
-                Math.random());
+        Map<UUID, String> evaluationResults = new HashMap<>();
+        String tempName = tempDir.createRandomScriptFileName(
+                userId + "-" +
+                        submission.getContestId() + "-" +
+                        submission.getProblemId() + "-" +
+                        "custom" + "-" +
+                        Math.random());
 
-        Map<UUID, String> submissionResponses = new HashMap<>();
-        for (TestCaseEntity testCaseEntity : testCaseEntityList) {
-            ContestSubmissionTestCaseEntity submissionTestCase = submissionTestCases
+        for (TestCaseEntity testcase : testcases) {
+            ContestSubmissionTestCaseEntity submissionTestcase = submissionTestcases
                     .stream()
-                    .filter(tc -> tc.getTestCaseId().equals(testCaseEntity.getTestCaseId()))
-                    .findFirst().get();
+                    .filter(tc -> tc.getTestCaseId().equals(testcase.getTestCaseId()))
+                    .findFirst()
+                    .get();
 
-            String response = submissionSolutionOutput(
-                    problemEntity.getSolutionCheckerSourceCode(),
-                    problemEntity.getSolutionCheckerSourceLanguage(),
-                    submissionTestCase.getParticipantSolutionOtput(),
-                    tempName,
-                    testCaseEntity,
-                    "language not found",
-//                    problemEntity.getTimeLimit(),
-                    getTimeLimitByLanguage(problemEntity, problemEntity.getSolutionCheckerSourceLanguage()),
-                    problemEntity.getMemoryLimit());
+            if (StringUtils.isBlank(submissionTestcase.getParticipantSolutionOtput())) {
+                submissionTestcase.setPoint(0);
+                submissionTestcase.setStatus("Empty participant's program output");
 
-            submissionResponses.put(submissionTestCase.getContestSubmissionTestcaseId(), response);
+                contestSubmissionTestCaseEntityRepo.save(submissionTestcase);
+            } else {
+                String response = submissionSolutionOutput(
+                        problem.getSolutionCheckerSourceCode(),
+                        problem.getSolutionCheckerSourceLanguage(),
+                        submissionTestcase.getParticipantSolutionOtput(),
+                        tempName,
+                        testcase,
+                        "Language not found",
+//                    problem.getTimeLimit(),
+                        getTimeLimitByLanguage(problem, problem.getSolutionCheckerSourceLanguage()),
+                        problem.getMemoryLimit());
+
+                evaluationResults.put(submissionTestcase.getContestSubmissionTestcaseId(), response);
+            }
         }
 
         tempDir.removeDir(tempName);
-        submissionResponseHandler.processCustomSubmissionResponse(submission, submissionResponses);
+        submissionResponseHandler.processCustomSubmissionResponse(submission, evaluationResults);
     }
 
     private String submission(
