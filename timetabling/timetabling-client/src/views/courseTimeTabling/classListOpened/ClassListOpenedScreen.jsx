@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { request } from "../../../api";
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography, Button } from '@mui/material'
-import SelectSemester from "../schedule/SelectSemesterScreen";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 
@@ -82,7 +81,6 @@ const columns = [
 
 export default function TimePerformanceScreen() {
     const [classOpeneds, setClassOpeneds] = useState([]);
-    // const [selectionModel, setSelectionModel] = useState([]);
     const [dataChanged, setDataChanged] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
     const [openLoading, setOpenLoading] = React.useState(false);
@@ -166,14 +164,16 @@ export default function TimePerformanceScreen() {
 
         return (
             <div>
-                <Autocomplete
-                    options={semesters}
-                    getOptionLabel={(option) => option.semester} // Update with the actual property name for semester name
-                    style={{ width: 150, marginLeft: "8px" }}
-                    value={selectedSemester}
-                    onChange={handleSelectSemester}
-                    renderInput={(params) => <TextField {...params} label="Chọn kỳ học" variant="outlined" />}
-                />
+                <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
+                    <Autocomplete
+                        options={semesters}
+                        getOptionLabel={(option) => option.semester} // Update with the actual property name for semester name
+                        style={{ width: 150, margin: "8px" }}
+                        value={selectedSemester}
+                        onChange={handleSelectSemester}
+                        renderInput={(params) => <TextField {...params} label="Chọn kỳ học" variant="outlined" />}
+                    />
+                </div>
                 <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
                     <Button
                         variant="outlined"
@@ -185,7 +185,7 @@ export default function TimePerformanceScreen() {
                         Import Excel
                     </Button>
                 </div>
-            </div>
+            </div >
 
         );
     }

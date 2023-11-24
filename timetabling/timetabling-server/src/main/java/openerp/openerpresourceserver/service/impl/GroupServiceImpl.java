@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.service.impl;
 
+import openerp.openerpresourceserver.exception.EntityAlreadyExistsException;
 import openerp.openerpresourceserver.mapper.GroupMapper;
 import openerp.openerpresourceserver.model.dto.request.GroupDto;
 import openerp.openerpresourceserver.model.entity.Group;
@@ -26,6 +27,10 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group create(GroupDto groupDto) {
+        List<Group> groupExist = groupRepo.getAllByGroupName(groupDto.getGroupName());
+        if (!groupExist.isEmpty()) {
+            throw new EntityAlreadyExistsException("Group existed: " + groupDto.getGroupName());
+        }
         Group group = groupMapper.mapDtoToEntity(groupDto);
         groupRepo.save(group);
         return group;

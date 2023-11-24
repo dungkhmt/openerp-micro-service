@@ -5,36 +5,38 @@ import { request } from "../../../api";
 export default function CreateNewGroupScreen({ open, handleClose, existingData, handleRefreshData }) {
   const [newGroup, setNewGroup] = useState('');
 
-  useEffect(() => {
-    console.log("data list: ", existingData)
-  }, [])
-
   const handleCreate = () => {
+
     const requestNewGroup = {
       groupName: newGroup,
     };
-    request("post", "/group/create", (res) => {
-      // Call handleRefreshData to refresh the data 
-      handleRefreshData();
-      //close dialog
-      handleClose();
-    },
-      {},
-      requestNewGroup
-    ).then();
 
     const requestUpdateClassOpened = {
       ids: existingData,
       groupName: newGroup
     };
-    request("post", "/class-opened/update", (res) => {
+
+    request("post", "/group/create", (res) => {
+
+      //if success, do request update class opened
+      request("post", "/class-opened/update", (res) => {
+        // Call handleRefreshData to refresh the data 
+        handleRefreshData();
+        //close dialog
+        handleClose();
+      },
+        {},
+        requestUpdateClassOpened
+      ).then();
+
       // Call handleRefreshData to refresh the data 
       handleRefreshData();
       //close dialog
       handleClose();
     },
-      {},
-      requestUpdateClassOpened
+      {
+      },
+      requestNewGroup
     ).then();
   };
 

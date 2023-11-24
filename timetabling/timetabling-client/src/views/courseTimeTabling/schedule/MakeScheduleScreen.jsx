@@ -2,11 +2,10 @@ import * as React from 'react';
 import { useEffect, useState } from "react";
 import { request } from "../../../api";
 import { DataGrid } from '@mui/x-data-grid';
-import { Box, Typography, Button } from '@mui/material'
-import CreateNewGroupScreen from "./CreateNewGroupScreen";
-import GroupListScreen from './GroupListScreen';
+import { Box, Typography, Button, IconButton } from '@mui/material'
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import SearchIcon from '@mui/icons-material/Search';
 
 const columns = [
     {
@@ -97,15 +96,14 @@ const columns = [
 ];
 
 export default function ScheduleScreen() {
-    const [isDialogOpen, setDialogOpen] = useState(false);
     const [dataChanged, setDataChanged] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
-    const [isGroupListOpen, setGroupListOpen] = useState(false);
     const [classOpeneds, setClassOpeneds] = useState([]);
     const [semesters, setSemesters] = useState([]); // State to store the list of semesters
+    const [groups, setGroups] = useState([]); // State to store the list of semesters
     const [selectedSemester, setSelectedSemester] = useState(null); // State to store the selected semester
-    const [rowSelectionModel, setRowSelectionModel] = React.useState([]);
-
+    const [selectedGroup, setSelectedGroup] = useState(null); // State to store the selected semester
+    
     useEffect(() => {
         request("get", "/class-opened/get-all", (res) => {
             setClassOpeneds(res.data);
@@ -114,57 +112,59 @@ export default function ScheduleScreen() {
         request("get", "/semester/get-all", (res) => {
             setSemesters(res.data);
         });
+
+        request("get", "/group/get-all", (res) => {
+            setGroups(res.data);
+        });
     }, [refreshKey])
-
-    const handleOpenGroupList = () => {
-        setGroupListOpen(true);
-    };
-
-    const handleCloseGroupList = () => {
-        setGroupListOpen(false);
-    };
 
     const handleSemesterChange = (event, newValue) => {
         setSelectedSemester(newValue);
-        if (newValue) {
-            handleFilterData({ semester: newValue });
-        }
     };
 
-    const handleFilterData = ({ semester }) => {
-        const url = "/class-opened/get-all"
+    const handleGroupChange = (event, newValue) => {
+        setSelectedGroup(newValue);
+    };
 
-        // Extract the relevant value from the selectedSemester object
-        const semesterName = semester.semester;
+    const handleFilterData = () => {
+        const url = "/class-opened/search"
 
-        // Add the semester parameter to the URL
-        const fullUrl = `${url}?semester=${semesterName}`;
+        var semesterName = null
+        var groupName = null
 
-        request("get", fullUrl, (res) => {
+        if (selectedSemester != null) {
+            semesterName = selectedSemester.semester;
+        }
+        if (selectedGroup != null) {
+            groupName = selectedGroup.groupName
+        }
+
+        const requestSearch = {
+            semester: semesterName,
+            groupName: groupName
+        };
+
+        request("post", url, (res) => {
+            //set data filter
             setClassOpeneds(res.data);
-        }).then();
+        },
+            {},
+            requestSearch
+        ).then();
 
         // Set dataChanged to true to trigger a re-render
         setDataChanged(true);
     };
 
-    const handleRefreshData = () => {
-        setDataChanged(true);
-        // Tăng giá trị của refreshKey để làm mới useEffect và fetch dữ liệu mới
-        setRefreshKey((prevKey) => prevKey + 1);
-    };
-
-    const handleOpenDialog = () => {
-        setDialogOpen(true);
-    };
-
-    const handleCloseDialog = () => {
-        setDialogOpen(false);
-    };
+    // const handleRefreshData = () => {
+    //     setDataChanged(true);
+    //     // Tăng giá trị của refreshKey để làm mới useEffect và fetch dữ liệu mới
+    //     setRefreshKey((prevKey) => prevKey + 1);
+    // };
 
     function DataGridToolbar() {
 
-        const isButtonDisabled = rowSelectionModel.length < 1;
+        // const isButtonDisabled = rowSelectionModel.length < 1;
 
         return (
             <div>
@@ -172,45 +172,28 @@ export default function ScheduleScreen() {
                     <Autocomplete
                         options={semesters}
                         getOptionLabel={(option) => option.semester} // Update with the actual property name for semester name
-                        style={{ width: 150, marginLeft: "8px" }}
+                        style={{ width: 135, marginLeft: "8px" }}
                         value={selectedSemester}
                         renderInput={(params) => <TextField {...params} label="Chọn kỳ học" />}
                         onChange={handleSemesterChange}
                     />
-                </div>
-
-                <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
-                    <Button
-                        variant="outlined"
-                        color="secondary"
-                        onClick={handleOpenGroupList}
-                        disabled={isButtonDisabled}
-                    >
-                        Thêm vào nhóm đã có
-                    </Button>
-                    <GroupListScreen
-                        open={isGroupListOpen}
-                        handleClose={handleCloseGroupList}
-                        existingData={[classOpeneds, rowSelectionModel]}
-                        handleRefreshData={handleRefreshData}
+                    <Autocomplete
+                        options={groups}
+                        getOptionLabel={(option) => option.groupName} // Update with the actual property name for semester name
+                        style={{ width: 160 }}
+                        value={selectedGroup}
+                        renderInput={(params) => <TextField {...params} label="Chọn nhóm học" />}
+                        onChange={handleGroupChange}
                     />
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        style={{ marginRight: "8px" }}
-                        onClick={handleOpenDialog}
-                        disabled={isButtonDisabled}
+                    <IconButton
+                        variant="contained"
+                        onClick={handleFilterData}
+                        aria-label="search"
+                        size="large"
                     >
-                        Thêm vào nhóm mới
-                    </Button>
+                        <SearchIcon fontSize="inherit" />
+                    </IconButton>
                 </div>
-
-                <CreateNewGroupScreen
-                    open={isDialogOpen}
-                    handleClose={handleCloseDialog}
-                    existingData={rowSelectionModel}
-                    handleRefreshData={handleRefreshData}
-                />
             </div>
 
         );
@@ -219,7 +202,7 @@ export default function ScheduleScreen() {
     function DataGridTitle() {
         return (
             <Box style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <Typography variant="h5">Danh sách nhóm thời khóa biểu</Typography>
+                <Typography variant="h5">Sắp xếp thời khóa biểu</Typography>
             </Box>
         )
     }
@@ -239,11 +222,6 @@ export default function ScheduleScreen() {
                 rows={classOpeneds}
                 columns={columns}
                 pageSize={10}
-                checkboxSelection
-                onRowSelectionModelChange={(newRowSelectionModel) => {
-                    setRowSelectionModel(newRowSelectionModel);
-                }}
-                rowSelectionModel={rowSelectionModel}
             />
         </div>
     );

@@ -11,4 +11,6 @@ import java.util.List;
 public interface GroupRepo extends JpaRepository<Group, Long> {
     @Query(value = "SELECT DISTINCT semester FROM public.timetabling_group", nativeQuery = true)
     List<String> getSemester();
+
+    List<Group> getAllByGroupName(String groupName);
 }

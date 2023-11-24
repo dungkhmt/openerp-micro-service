@@ -19,4 +19,6 @@ public interface ClassOpenedRepo extends JpaRepository<ClassOpened, Long> {
     List<ClassOpened> getAllByIdIn(List<Long> ids, Sort sort);
 
     List<ClassOpened> getAllBySemester(String semester, Sort sort);
+
+    List<ClassOpened> getAllByGroupName(String groupName, Sort sort);
 }

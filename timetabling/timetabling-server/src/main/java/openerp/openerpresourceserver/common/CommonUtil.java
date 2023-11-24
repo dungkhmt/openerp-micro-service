@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.common;
 
 import jakarta.persistence.Query;
+import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.model.dto.request.FilterScheduleDto;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
@@ -117,6 +118,63 @@ public class CommonUtil {
         }
         if (searchDto.getWeekDay() != null) {
             query.setParameter("weekDay", searchDto.getWeekDay());
+        }
+        return query;
+    }
+
+    public static StringBuilder appendAttributesForClassOpened(StringBuilder jpql, FilterClassOpenedDto searchDto ){
+        if (searchDto.getSemester() != null) {
+            jpql.append(" AND s.semester = :semester");
+        }
+        if (searchDto.getGroupName() != null) {
+            jpql.append(" AND s.groupName = :groupName");
+        }
+        if (searchDto.getClassRoom() != null) {
+            jpql.append(" AND s.classRoom = :classRoom");
+        }
+        if (searchDto.getModuleCode() != null) {
+            jpql.append(" AND s.moduleCode = :moduleCode");
+        }
+        if (searchDto.getModuleName() != null) {
+            jpql.append(" AND s.moduleName = :moduleName");
+        }
+        if (searchDto.getStudyClass() != null) {
+            jpql.append(" AND s.studyClass = :studyClass");
+        }
+        if (searchDto.getCrew() != null) {
+            jpql.append(" AND s.crew = :crew");
+        }
+        if (searchDto.getOpenBatch() != null) {
+            jpql.append(" AND s.openBatch = :openBatch");
+        }
+        return jpql;
+    }
+
+    public static Query buildQueryForClassOpened(Query query, FilterClassOpenedDto searchDto) {
+
+        if (searchDto.getSemester() != null) {
+            query.setParameter("semester", searchDto.getSemester());
+        }
+        if (searchDto.getGroupName() != null) {
+            query.setParameter("groupName", searchDto.getGroupName());
+        }
+        if (searchDto.getClassRoom() != null) {
+            query.setParameter("classRoom", searchDto.getClassRoom());
+        }
+        if (searchDto.getModuleCode() != null) {
+            query.setParameter("moduleCode", searchDto.getModuleCode());
+        }
+        if (searchDto.getModuleName() != null) {
+            query.setParameter("moduleName", searchDto.getModuleName());
+        }
+        if (searchDto.getStudyClass() != null) {
+            query.setParameter("studyClass", searchDto.getStudyClass());
+        }
+        if (searchDto.getCrew() != null) {
+            query.setParameter("crew", searchDto.getCrew());
+        }
+        if (searchDto.getOpenBatch() != null) {
+            query.setParameter("openBatch", searchDto.getOpenBatch());
         }
         return query;
     }
