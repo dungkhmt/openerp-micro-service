@@ -1,6 +1,8 @@
 package com.hust.baseweb.applications.programmingcontest.entity;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -50,6 +52,11 @@ public class ContestSubmissionTestCaseEntity {
     @Column(name = "memory_usage")
     private int memoryUsage;
 
+    @UpdateTimestamp
+    @Column(name = "last_updated_stamp")
+    private Date lastUpdatedStamp;
+
+    @CreationTimestamp
     @Column(name = "created_stamp")
     private Date createdStamp;
 

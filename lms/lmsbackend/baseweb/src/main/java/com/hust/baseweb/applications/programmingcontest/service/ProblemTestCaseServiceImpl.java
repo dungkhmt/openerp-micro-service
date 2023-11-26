@@ -837,21 +837,31 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         }
 
         String viewSubmitSolutionOutputMode = "N";
-        ContestProblem problem = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
-        if (problem != null) {
-            if (problem.getSubmissionMode() != null) {
-                if (problem.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_SOLUTION_OUTPUT)) {
+        ContestProblem contestProblem = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
+        if (contestProblem != null) {
+            if (contestProblem.getSubmissionMode() != null) {
+                if (contestProblem.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_SOLUTION_OUTPUT)) {
                     viewSubmitSolutionOutputMode = "Y";
                 }
             }
         }
 
+        List<UUID> activeTestcaseIds = testCaseRepo
+            .findAllActiveTestcaseOfProblem(problemId)
+            .stream()
+            .map(TestCaseEntity::getTestCaseId)
+            .collect(Collectors.toList());
+
         List<ContestSubmissionTestCaseEntity> submissionTestcases = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionId(
             (submissionId));
-        //log.info("getSubmissionDetailByTestcase, submissionId  = " + submissionId + " retList = " + submissionTestcases.size());
+
+        Map<UUID, ContestSubmissionTestCaseEntity> mapTestcaseIdToLatestSubmission = getMapTestcaseToLatestSubmission(
+            activeTestcaseIds,
+            submissionTestcases);
+
         List<SubmissionDetailByTestcaseOM> result = new ArrayList<>();
 
-        for (ContestSubmissionTestCaseEntity st : submissionTestcases) {
+        for (ContestSubmissionTestCaseEntity st : mapTestcaseIdToLatestSubmission.values()) {
             TestCaseEntity tc = testCaseRepo.findTestCaseByTestCaseId(st.getTestCaseId());
             String testcaseContent = "";
             String testcaseOutput = "";
@@ -909,6 +919,31 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return null;
     }
 
+    private Map<UUID, ContestSubmissionTestCaseEntity> getMapTestcaseToLatestSubmission(
+        List<UUID> activeTestcaseIds,
+        List<ContestSubmissionTestCaseEntity> submissionTestcases
+    ) {
+
+        submissionTestcases = submissionTestcases.stream()
+                                                 .filter(testcase -> activeTestcaseIds.contains(testcase.getTestCaseId()))
+                                                 .collect(Collectors.toList());
+
+        Map<UUID, ContestSubmissionTestCaseEntity> mapTestcaseIdToLatestSubmission = new HashMap<>();
+        for (ContestSubmissionTestCaseEntity submissionTestCase : submissionTestcases) {
+            UUID testCaseId = submissionTestCase.getTestCaseId();
+            if (!mapTestcaseIdToLatestSubmission.containsKey(testCaseId)) {
+                mapTestcaseIdToLatestSubmission.put(testCaseId, submissionTestCase);
+            } else {
+                ContestSubmissionTestCaseEntity oldSubmissionTestcase = mapTestcaseIdToLatestSubmission.get(testCaseId);
+                if (submissionTestCase.getLastUpdatedStamp().after(oldSubmissionTestcase.getLastUpdatedStamp())) {
+                    mapTestcaseIdToLatestSubmission.put(testCaseId, submissionTestCase);
+                }
+            }
+        }
+
+        return mapTestcaseIdToLatestSubmission;
+    }
+
     @Override
     public List<SubmissionDetailByTestcaseOM> getParticipantSubmissionDetailByTestCase(
         String userId, UUID submissionId
@@ -938,12 +973,21 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             }
         }
 
+        List<UUID> activeTestcaseIds = testCaseRepo
+            .findAllActiveTestcaseOfProblem(problemId)
+            .stream()
+            .map(TestCaseEntity::getTestCaseId)
+            .collect(Collectors.toList());
+
         List<ContestSubmissionTestCaseEntity> submissionTestcases = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionId(
             (submissionId));
-        //log.info("getSubmissionDetailByTestcase, submissionId  = " + submissionId + " retList = " + submissionTestcases.size());
+
+        Map<UUID, ContestSubmissionTestCaseEntity> mapTestcaseIdToLatestSubmission = getMapTestcaseToLatestSubmission(
+            activeTestcaseIds,
+            submissionTestcases);
 
         List<SubmissionDetailByTestcaseOM> result = new ArrayList<>();
-        for (ContestSubmissionTestCaseEntity st : submissionTestcases) {
+        for (ContestSubmissionTestCaseEntity st : mapTestcaseIdToLatestSubmission.values()) {
             String testCaseContent = "";
             String testCaseOutput = "";
             String participantSolutionOutput = "";
