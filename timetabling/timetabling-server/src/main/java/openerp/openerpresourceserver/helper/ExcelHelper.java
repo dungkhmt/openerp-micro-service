@@ -228,9 +228,7 @@ public class ExcelHelper {
             Iterator<Row> rows = sheet.iterator();
             List<ClassOpened> classOpeneds = new ArrayList<ClassOpened>();
             int rowNumber = 0;
-//            if (rows.hasNext()){
-//                rows.next();
-//            }
+
             while (rows.hasNext()) {
                 Row currentRow = rows.next();
                 // skip header
@@ -265,7 +263,7 @@ public class ExcelHelper {
                         case 7:
                             classOpened.setStudyClass(cellValue);
                             break;
-                        case 8:
+                        case 10:
                             classOpened.setState(cellValue);
                             break;
                         case 11:

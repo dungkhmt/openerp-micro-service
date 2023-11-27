@@ -11,4 +11,6 @@ import java.util.List;
 public interface ClassroomRepo extends JpaRepository<Classroom, Long> {
     @Query(value = "SELECT DISTINCT class_room FROM public.timetabling_schedule", nativeQuery = true)
     List<String> getClassroom();
+
+    void deleteById(Long id);
 }

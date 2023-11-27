@@ -147,6 +147,7 @@ public class CommonUtil {
         if (searchDto.getOpenBatch() != null) {
             jpql.append(" AND s.openBatch = :openBatch");
         }
+        jpql.append(" ORDER BY id ASC");
         return jpql;
     }
 

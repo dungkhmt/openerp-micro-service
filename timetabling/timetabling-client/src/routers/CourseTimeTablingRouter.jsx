@@ -1,7 +1,8 @@
 import SemesterScreen from "views/courseTimeTabling/semester/SemesterScreen";
 import ClassListOpenedScreen from "views/courseTimeTabling/classListOpened/ClassListOpenedScreen";
 import ScheduleScreen from "views/courseTimeTabling/schedule/ScheduleScreen";
-import MakeScheduleScreen from "views/courseTimeTabling/schedule/MakeScheduleScreen";
+import MakeScheduleScreen from "views/courseTimeTabling/makeSchedule/MakeScheduleScreen";
+import ClassroomListScreen from "views/courseTimeTabling/classroom/ClassroomListScreen";
 import { Route, Switch, useRouteMatch } from "react-router";
 
 export default function CourseTimeTablingRouter() {
@@ -24,10 +25,15 @@ export default function CourseTimeTablingRouter() {
           exact
           path={`${path}/schedule`}
         ></Route>
-                <Route
+        <Route
           component={MakeScheduleScreen}
           exact
           path={`${path}/make-schedule`}
+        ></Route>
+        <Route
+          component={ClassroomListScreen}
+          exact
+          path={`${path}/classroom`}
         ></Route>
       </Switch>
     </div>

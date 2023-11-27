@@ -1,6 +1,10 @@
 package openerp.openerpresourceserver.service.impl;
 
+import openerp.openerpresourceserver.mapper.ClassroomMapper;
+import openerp.openerpresourceserver.model.dto.request.ClassroomDto;
+import openerp.openerpresourceserver.model.dto.request.SemesterDto;
 import openerp.openerpresourceserver.model.entity.Classroom;
+import openerp.openerpresourceserver.model.entity.Semester;
 import openerp.openerpresourceserver.repo.ClassroomRepo;
 import openerp.openerpresourceserver.service.ClassroomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +18,9 @@ public class ClassroomServiceImpl implements ClassroomService {
 
     @Autowired
     private ClassroomRepo classroomRepo;
+
+    @Autowired
+    private ClassroomMapper classroomMapper;
 
     @Override
     public List<Classroom> getClassroom() {
@@ -36,4 +43,22 @@ public class ClassroomServiceImpl implements ClassroomService {
         classroomRepo.saveAll(classroomList);
     }
 
+    @Override
+    public Classroom create(ClassroomDto classroomDto) {
+        Classroom classroom = classroomMapper.mapDtoToEntity(classroomDto);
+        classroomRepo.save(classroom);
+        return classroom;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        classroomRepo.deleteById(id);
+    }
+
+    @Override
+    public void deleteByIds(List<Long> ids) {
+        ids.forEach(el -> {
+            classroomRepo.deleteById(el);
+        });
+    }
 }

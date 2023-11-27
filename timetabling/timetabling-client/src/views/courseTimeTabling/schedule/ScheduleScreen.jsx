@@ -81,9 +81,14 @@ const columns = [
     },
     {
         headerName: "Tiết BĐ",
-        field: "start",
+        field: "startPeriod",
         width: 100
     },
+    // {
+    //     headerName: "Tiết KT",
+    //     field: "finishPeriod",
+    //     width: 100
+    // },
     {
         headerName: "Thứ",
         field: "weekday",
@@ -203,16 +208,14 @@ export default function ScheduleScreen() {
                     >
                         Thêm vào nhóm mới
                     </Button>
+                    <CreateNewGroupScreen
+                        open={isDialogOpen}
+                        handleClose={handleCloseDialog}
+                        existingData={rowSelectionModel}
+                        handleRefreshData={handleRefreshData}
+                    />
                 </div>
-
-                <CreateNewGroupScreen
-                    open={isDialogOpen}
-                    handleClose={handleCloseDialog}
-                    existingData={rowSelectionModel}
-                    handleRefreshData={handleRefreshData}
-                />
             </div>
-
         );
     }
 

@@ -6,19 +6,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "timetabling_classroom")
-public class Classroom {
+@NoArgsConstructor
+@Data
+@Entity
+@Table(name = "timetabling_class_period")
+public class ClassPeriod {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "classroom_id", updatable = false, nullable = false)
+    @Column(name = "class_period_id", updatable = false, nullable = false)
     private Long id;
-    private String classroom;
-    private String building;
-    private String quantityMax;
-    private String description;
+    private String classPeriod;
 }

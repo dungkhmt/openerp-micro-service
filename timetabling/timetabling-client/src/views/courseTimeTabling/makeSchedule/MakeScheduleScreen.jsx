@@ -14,6 +14,11 @@ const columns = [
         width: 170
     },
     {
+        headerName: "Kỳ học",
+        field: "semester",
+        width: 170
+    },
+    {
         headerName: "Nhóm",
         field: "groupName",
         width: 120
@@ -80,9 +85,14 @@ const columns = [
     },
     {
         headerName: "Tiết BĐ",
-        field: "start",
+        field: "startPeriod",
         width: 100
     },
+    // {
+    //     headerName: "Tiết KT",
+    //     field: "finishPeriod",
+    //     width: 100
+    // },
     {
         headerName: "Thứ",
         field: "weekday",
@@ -103,7 +113,7 @@ export default function ScheduleScreen() {
     const [groups, setGroups] = useState([]); // State to store the list of semesters
     const [selectedSemester, setSelectedSemester] = useState(null); // State to store the selected semester
     const [selectedGroup, setSelectedGroup] = useState(null); // State to store the selected semester
-    
+
     useEffect(() => {
         request("get", "/class-opened/get-all", (res) => {
             setClassOpeneds(res.data);
@@ -125,6 +135,10 @@ export default function ScheduleScreen() {
     const handleGroupChange = (event, newValue) => {
         setSelectedGroup(newValue);
     };
+
+    const handleAutoMakeSchedule = () => {
+
+    }
 
     const handleFilterData = () => {
         const url = "/class-opened/search"
@@ -193,6 +207,16 @@ export default function ScheduleScreen() {
                     >
                         <SearchIcon fontSize="inherit" />
                     </IconButton>
+                </div>
+                <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
+                    <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={handleAutoMakeSchedule}
+                        disabled={!selectedSemester && !selectedGroup}
+                    >
+                        Sắp xếp tự động
+                    </Button>
                 </div>
             </div>
 

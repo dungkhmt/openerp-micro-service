@@ -28,7 +28,8 @@ public class ClassOpened {
     private String openBatch;
     private String course;
     private String groupName;
-    private String startTime;
+    private String startPeriod;
+    private String finishPeriod;
     private String weekday;
     private String classroom;
 }
