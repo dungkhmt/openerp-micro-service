@@ -3,7 +3,7 @@ const prod = {
     API_URL: "/api",
   },
   keycloak: {
-    url: "https://lms.dailyopt.ai/iam",
+    url: "https://programming.daotao.ai/iam",
     realm: "LMS",
     clientId: "task-management",
   },
