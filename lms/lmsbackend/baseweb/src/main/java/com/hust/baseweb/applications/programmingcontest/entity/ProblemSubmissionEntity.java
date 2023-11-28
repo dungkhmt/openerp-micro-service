@@ -15,7 +15,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Builder
-//@Table(name = "problem_submission")
 @Table(name = "problem_submission_new")
 public class ProblemSubmissionEntity {
 

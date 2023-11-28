@@ -10,7 +10,6 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Builder
-//@Table(name = "problem_source_code")
 @Table(name = "problem_source_code_new")
 public class ProblemSourceCodeEntity {
 

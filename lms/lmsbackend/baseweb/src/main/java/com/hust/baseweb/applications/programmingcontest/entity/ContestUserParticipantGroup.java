@@ -12,7 +12,6 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Builder
-//@Table(name = "contest")
 @Table(name = "contest_user_participant_group")
 @IdClass(CompositeContestUserParticipantGroupId.class)
 public class ContestUserParticipantGroup {

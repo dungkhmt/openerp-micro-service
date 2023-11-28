@@ -12,7 +12,6 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Builder
-//@Table(name = "user_submission_contest_result")
 @Table(name = "user_submission_contest_result_new")
 @IdClass(UserSubmissionContestResultID.class)
 public class UserSubmissionContestResultNativeEntity {

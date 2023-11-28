@@ -13,7 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Builder
-//@Table(name = "contest_problem")
 @Table(name = "contest_problem_new")
 public class ProblemEntity implements Serializable {
     private static final long serialVersionUID = 3487495895819800L;

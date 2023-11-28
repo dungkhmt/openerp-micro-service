@@ -12,7 +12,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Builder
-//@Table(name = "test_case")
 @Table(name = "test_case_new")
 public class TestCaseEntity implements Serializable {
     private static final long serialVersionUID = 3487495895819801L;

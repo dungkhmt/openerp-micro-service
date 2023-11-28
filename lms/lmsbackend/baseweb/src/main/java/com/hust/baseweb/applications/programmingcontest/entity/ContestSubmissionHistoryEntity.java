@@ -12,7 +12,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Builder
-//@Table(name = "contest_problem")
 @Table(name = "contest_submission_history")
 public class ContestSubmissionHistoryEntity {
 

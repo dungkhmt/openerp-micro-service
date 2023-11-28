@@ -14,7 +14,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Builder
-//@Table(name = "user_registration_contest")
 @Table(name = "user_registration_contest_new")
 public class UserRegistrationContestEntity {
 
