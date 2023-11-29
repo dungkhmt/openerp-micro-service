@@ -23,16 +23,6 @@ public class ProblemEntity implements Serializable {
     @Column(name = "problem_id")
     private String problemId;
 
-//    @JoinTable(name = "contest_problem_problem_source_code",
-//        joinColumns = @JoinColumn(name = "problem_id", referencedColumnName = "problem_id"),
-//        inverseJoinColumns = @JoinColumn(name = "problem_source_code_id", referencedColumnName = "problem_source_code_id")
-//    )
-//    @OneToMany(fetch = FetchType.LAZY)
-//    private List<ProblemSourceCode> problemSourceCode;
-
-//    @OneToMany(mappedBy = "problem")
-//    private Set<ProblemSourceCodeEntity> problemSourceCodes;
-
     @Column(name = "problem_name", unique = true)
     private String problemName;
 
