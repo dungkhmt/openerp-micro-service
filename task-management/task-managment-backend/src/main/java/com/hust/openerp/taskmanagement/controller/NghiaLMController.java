@@ -111,9 +111,9 @@ public class NghiaLMController {
             String fullName = "Không xác định";
             if (taskAssignment != null) {
                 User user = userService.findById(taskAssignment.getAssigneeId());
-                fullName = user.getFirstName() + " " + user.getLastName();
+                fullName = taskAssignment.getAssigneeId() + " (" + user.getFirstName() + " " + user.getLastName() + ")";
             }
-            taskDaoList.add(new TaskDao(task, taskAssignment.getAssigneeId() + " (" + fullName + ")"));
+            taskDaoList.add(new TaskDao(task, fullName));
         }
 
         return ResponseEntity.ok(taskDaoList);

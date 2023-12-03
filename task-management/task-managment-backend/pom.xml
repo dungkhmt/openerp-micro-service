@@ -96,12 +96,6 @@
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
 
-    <!-- Rabbit MQ -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-amqp</artifactId>
-    </dependency>
-
     <!-- send email -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
