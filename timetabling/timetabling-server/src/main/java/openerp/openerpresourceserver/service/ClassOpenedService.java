@@ -1,7 +1,7 @@
 package openerp.openerpresourceserver.service;
 
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
-import openerp.openerpresourceserver.model.dto.request.FilterScheduleDto;
+import openerp.openerpresourceserver.model.dto.request.MakeScheduleDto;
 import openerp.openerpresourceserver.model.dto.request.UpdateClassOpenedDto;
 import openerp.openerpresourceserver.model.entity.ClassOpened;
 import openerp.openerpresourceserver.model.entity.Schedule;
@@ -19,4 +19,6 @@ public interface ClassOpenedService {
     List<ClassOpened> getByGroupName(String groupName);
 
     List<Schedule> searchClassOpened(FilterClassOpenedDto requestDto);
+
+    void makeSchedule(MakeScheduleDto requestDto);
 }

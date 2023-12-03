@@ -2,10 +2,9 @@ package openerp.openerpresourceserver.controller;
 
 import jakarta.validation.Valid;
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
-import openerp.openerpresourceserver.model.dto.request.FilterScheduleDto;
+import openerp.openerpresourceserver.model.dto.request.MakeScheduleDto;
 import openerp.openerpresourceserver.model.dto.request.UpdateClassOpenedDto;
 import openerp.openerpresourceserver.model.entity.ClassOpened;
-import openerp.openerpresourceserver.model.entity.Classroom;
 import openerp.openerpresourceserver.model.entity.Schedule;
 import openerp.openerpresourceserver.service.ClassOpenedService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -61,6 +59,16 @@ public class ClassOpenedController {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/make-schedule")
+    public ResponseEntity<Void> makeSchedule(@Valid @RequestBody MakeScheduleDto requestDto) {
+        try {
+            service.makeSchedule(requestDto);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

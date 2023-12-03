@@ -4,7 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import openerp.openerpresourceserver.common.CommonUtil;
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
-import openerp.openerpresourceserver.model.dto.request.FilterScheduleDto;
+import openerp.openerpresourceserver.model.dto.request.MakeScheduleDto;
 import openerp.openerpresourceserver.model.dto.request.UpdateClassOpenedDto;
 import openerp.openerpresourceserver.model.entity.ClassOpened;
 import openerp.openerpresourceserver.model.entity.Schedule;
@@ -69,5 +69,26 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         StringBuilder jpql = new StringBuilder("SELECT s FROM ClassOpened s WHERE 1 = 1");
 
         return CommonUtil.appendAttributesForClassOpened(jpql, searchDto);
+    }
+
+    @Override
+    public void makeSchedule(MakeScheduleDto requestDto) {
+        ClassOpened classOpened = classOpenedRepo.findById(requestDto.getId()).orElse(null);
+        if (classOpened == null) {
+            return;
+        }
+        String startPeriod = requestDto.getStartPeriod();
+        String weekday = requestDto.getWeekday();
+        String classroom = requestDto.getClassroom();
+        if (startPeriod != null) {
+            classOpened.setStartPeriod(startPeriod);
+        }
+        if (weekday != null) {
+            classOpened.setWeekday(weekday);
+        }
+        if (classroom != null) {
+            classOpened.setClassroom(classroom);
+        }
+        classOpenedRepo.save(classOpened);
     }
 }

@@ -84,11 +84,6 @@ const columns = [
         field: "startPeriod",
         width: 100
     },
-    // {
-    //     headerName: "Tiết KT",
-    //     field: "finishPeriod",
-    //     width: 100
-    // },
     {
         headerName: "Thứ",
         field: "weekday",
