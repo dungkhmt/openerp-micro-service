@@ -35,7 +35,7 @@ export async function request(
   method,
   url,
   successHandler,
-  errorHandlers = {},
+  errorHandlers,
   data,
   config
 ) {
@@ -60,8 +60,8 @@ export async function request(
     return res;
   } catch (e) {
     // Handling work to do when encountering all kinds of errors, e.g turn off the loading icon.
-    if (isFunction(errorHandlers["onError"])) {
-      errorHandlers["onError"](e);
+    if (isFunction(errorHandlers)) {
+      errorHandlers(e);
     }
 
     if (e.response) {

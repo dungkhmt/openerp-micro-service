@@ -1,6 +1,8 @@
 package openerp.openerpresourceserver.controller;
 
 import jakarta.validation.Valid;
+import openerp.openerpresourceserver.exception.ConflictScheduleException;
+import openerp.openerpresourceserver.exception.UnableStartPeriodException;
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.model.dto.request.MakeScheduleDto;
 import openerp.openerpresourceserver.model.dto.request.UpdateClassOpenedDto;
@@ -65,10 +67,14 @@ public class ClassOpenedController {
     }
 
     @PostMapping("/make-schedule")
-    public ResponseEntity<Void> makeSchedule(@Valid @RequestBody MakeScheduleDto requestDto) {
+    public ResponseEntity<String> makeSchedule(@Valid @RequestBody MakeScheduleDto requestDto) {
         try {
             service.makeSchedule(requestDto);
             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (UnableStartPeriodException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
+        } catch (ConflictScheduleException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -3,6 +3,8 @@ package openerp.openerpresourceserver.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import openerp.openerpresourceserver.common.CommonUtil;
+import openerp.openerpresourceserver.exception.ConflictScheduleException;
+import openerp.openerpresourceserver.exception.UnableStartPeriodException;
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.model.dto.request.MakeScheduleDto;
 import openerp.openerpresourceserver.model.dto.request.UpdateClassOpenedDto;
@@ -24,6 +26,8 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
 
     @Autowired
     private EntityManager entityManager;
+
+    public static final Long MAX_PERIOD = 6L;
 
     @Override
     public List<ClassOpened> getAll() {
@@ -80,15 +84,63 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         String startPeriod = requestDto.getStartPeriod();
         String weekday = requestDto.getWeekday();
         String classroom = requestDto.getClassroom();
-        if (startPeriod != null) {
-            classOpened.setStartPeriod(startPeriod);
+
+        String subStartPeriod = startPeriod != null ? startPeriod : classOpened.getStartPeriod();
+        String subClassroom = classroom != null ? classroom : classOpened.getClassroom();
+        String subWeekday = weekday != null ? weekday : classOpened.getWeekday();
+
+        if (subStartPeriod != null && subClassroom != null && subWeekday != null) {
+            this.checkConflictSchedule(classOpened, requestDto);
         }
-        if (weekday != null) {
-            classOpened.setWeekday(weekday);
+
+        if(subStartPeriod != null){
+            classOpened.setStartPeriod(subStartPeriod);
         }
-        if (classroom != null) {
-            classOpened.setClassroom(classroom);
-        }
+
+        classOpened.setWeekday(subWeekday);
+        classOpened.setClassroom(subClassroom);
         classOpenedRepo.save(classOpened);
+    }
+
+    public void checkConflictSchedule(ClassOpened classOpened, MakeScheduleDto requestDto) {
+        String classroomOfClass = requestDto.getClassroom() != null ? requestDto.getClassroom() : classOpened.getClassroom();
+        String weekdayOfClass = requestDto.getWeekday() != null ? requestDto.getWeekday() : classOpened.getWeekday();
+        String mass = classOpened.getMass();
+        String crew = classOpened.getCrew();
+
+        long startPeriod = Long.parseLong(requestDto.getStartPeriod() != null ?
+                requestDto.getStartPeriod() : classOpened.getStartPeriod());
+        long finishPeriod = this.calculateFinishPeriod(mass, startPeriod);
+
+        List<ClassOpened> listClassOpened = classOpenedRepo
+                .getAllByClassroomAndWeekdayAndCrewAndStartPeriodIsNotNullAndIdNot
+                        (classroomOfClass, weekdayOfClass, crew, requestDto.getId());
+
+        listClassOpened.forEach(el -> {
+            String supMass = el.getMass();
+            long existedStartPeriod = Long.parseLong(el.getStartPeriod());
+            long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod);
+
+            if (startPeriod > existedStartPeriod) {
+                if (startPeriod < existedFinishPeriod) {
+                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
+                }
+            } else {
+                if (finishPeriod > existedStartPeriod) {
+                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
+                }
+            }
+        });
+    }
+
+    public Long calculateFinishPeriod(String mass, Long startPeriod) {
+        //a(b-c-d-e)
+        String numbersString = mass.substring(2, mass.indexOf(')'));
+        String[] numbersArray = numbersString.split("-");
+        Long finishPeriod = startPeriod + Long.parseLong(numbersArray[0]) + Long.parseLong(numbersArray[1]) - 1;
+        if (finishPeriod > MAX_PERIOD) {
+            throw new UnableStartPeriodException("Tiết bắt đầu lỗi: tiết " + startPeriod);
+        }
+        return finishPeriod;
     }
 }

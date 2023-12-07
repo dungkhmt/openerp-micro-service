@@ -6,6 +6,8 @@ import { Box, Typography, Button, IconButton } from '@mui/material'
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import SearchIcon from '@mui/icons-material/Search';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function ScheduleScreen() {
     const [dataChanged, setDataChanged] = useState(false);
@@ -13,15 +15,14 @@ export default function ScheduleScreen() {
     const [classOpeneds, setClassOpeneds] = useState([]);
     const [semesters, setSemesters] = useState([]);
     const [groups, setGroups] = useState([]);
+    const [error, setError] = useState(null);
 
     const [selectedSemester, setSelectedSemester] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
 
     const [classPeriods, setClassPeriods] = useState([]);
     const [weekdays, setWeekdays] = useState([]);
-
     const [classrooms, setClassrooms] = useState([]);
-    const [selectedClassrooms, setSelectedClassrooms] = useState([]);
 
     const columns = [
         {
@@ -257,9 +258,13 @@ export default function ScheduleScreen() {
             request("post", url, (res) => {
                 handleRefreshData();
             },
-                {},
-                requestData
-            ).then();
+            (error) => {
+                console.log("error: ", error)
+                setError(error.message); // Update error state on API error},
+                toast.error(error.response.data);
+            },
+            requestData
+            ).then();;
         }
     };
 
@@ -277,7 +282,11 @@ export default function ScheduleScreen() {
             request("post", url, (res) => {
                 handleRefreshData();
             },
-                {},
+            (error) => {
+                console.log("error: ", error)
+                setError(error.message); // Update error state on API error},
+                toast.error(error.response.data);
+            },
                 requestData
             ).then();
         }
@@ -297,7 +306,11 @@ export default function ScheduleScreen() {
             request("post", url, (res) => {
                 handleRefreshData();
             },
-                {},
+            (error) => {
+                console.log("error: ", error)
+                setError(error.message); // Update error state on API error},
+                toast.error(error.response.data);
+            },
                 requestData
             ).then();
         }
@@ -378,6 +391,7 @@ export default function ScheduleScreen() {
                 columns={columns}
                 pageSize={10}
             />
+            {/* <ToastContainer /> */}
         </div>
     );
 }
