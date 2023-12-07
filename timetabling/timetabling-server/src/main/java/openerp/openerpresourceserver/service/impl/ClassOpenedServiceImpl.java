@@ -122,11 +122,11 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
             long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod);
 
             if (startPeriod > existedStartPeriod) {
-                if (startPeriod < existedFinishPeriod) {
+                if (startPeriod <= existedFinishPeriod) {
                     throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
                 }
             } else {
-                if (finishPeriod > existedStartPeriod) {
+                if (finishPeriod >= existedStartPeriod) {
                     throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
                 }
             }
