@@ -15,8 +15,7 @@ export default function ScheduleScreen() {
     const [classOpeneds, setClassOpeneds] = useState([]);
     const [semesters, setSemesters] = useState([]);
     const [groups, setGroups] = useState([]);
-    const [error, setError] = useState(null);
-
+    
     const [selectedSemester, setSelectedSemester] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
 
@@ -259,8 +258,6 @@ export default function ScheduleScreen() {
                 handleRefreshData();
             },
             (error) => {
-                console.log("error: ", error)
-                setError(error.message); // Update error state on API error},
                 toast.error(error.response.data);
             },
             requestData
@@ -283,8 +280,6 @@ export default function ScheduleScreen() {
                 handleRefreshData();
             },
             (error) => {
-                console.log("error: ", error)
-                setError(error.message); // Update error state on API error},
                 toast.error(error.response.data);
             },
                 requestData
@@ -307,8 +302,6 @@ export default function ScheduleScreen() {
                 handleRefreshData();
             },
             (error) => {
-                console.log("error: ", error)
-                setError(error.message); // Update error state on API error},
                 toast.error(error.response.data);
             },
                 requestData
