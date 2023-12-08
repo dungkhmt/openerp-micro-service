@@ -7,6 +7,8 @@ import com.hust.openerp.taskmanagement.service.*;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -39,6 +41,16 @@ public class NghiaLMController {
 
     private final SkillService skillService;
 
+    @GetMapping
+    public void syncUser(JwtAuthenticationToken token) {
+        Jwt principal = (Jwt) token.getPrincipal();
+        userService.synchronizeUser(
+                principal.getClaim("preferred_username"),
+                principal.getClaim("email"),
+                principal.getClaim("given_name"),
+                principal.getClaim("family_name"));
+    }
+
     @GetMapping("/nghialm")
     public ResponseEntity<?> testController() {
         String bodyResponse = "Hello Nghia Le Minh, test spring boot api";
@@ -47,8 +59,8 @@ public class NghiaLMController {
 
     @GetMapping("/projects/page={pageNo}/size={pageSize}")
     public ResponseEntity<Object> getListProjects(
-        @PathVariable("pageNo") int pageNo,
-        @PathVariable("pageSize") int pageSize) {
+            @PathVariable("pageNo") int pageNo,
+            @PathVariable("pageSize") int pageSize) {
         ProjectPagination pagination = projectService.findPaginated(pageNo, pageSize);
         return ResponseEntity.ok().body(pagination);
     }
@@ -63,10 +75,10 @@ public class NghiaLMController {
         String userId = principal.getName();
         Project projectRes = projectService.createProject(project);
         ProjectMember projectMember = ProjectMember.builder()
-            .projectId(projectRes.getId())
-            .userId(userId)
-            .roleId("maintainer")
-            .build();
+                .projectId(projectRes.getId())
+                .userId(userId)
+                .roleId("maintainer")
+                .build();
         projectMemberService.create(projectMember);
         return ResponseEntity.ok().body(projectRes);
     }
@@ -84,10 +96,10 @@ public class NghiaLMController {
 
     @PostMapping("/projects/{projectId}/members")
     public ResponseEntity<Object> addMemberToProject(
-        @PathVariable("projectId") UUID projectId, @RequestBody ProjectMemberForm projectMemberForm) {
+            @PathVariable("projectId") UUID projectId, @RequestBody ProjectMemberForm projectMemberForm) {
         if (projectMemberService.checkAddedMemberInProject(
-            projectMemberForm.getMemberId(),
-            UUID.fromString(projectMemberForm.getProjectId()))) {
+                projectMemberForm.getMemberId(),
+                UUID.fromString(projectMemberForm.getProjectId()))) {
             Map<String, String> map = new HashMap<>();
             map.put("error", "Thành viên đã trong dự án !");
             return ResponseEntity.ok(map);
@@ -121,9 +133,9 @@ public class NghiaLMController {
 
     @PostMapping("/projects/{projectId}/tasks")
     public ResponseEntity<Object> createNewTask(
-        Principal principal,
-        @RequestBody TaskForm taskForm,
-        @PathVariable("projectId") UUID projectId) throws ParseException {
+            Principal principal,
+            @RequestBody TaskForm taskForm,
+            @PathVariable("projectId") UUID projectId) throws ParseException {
         String userId = principal.getName();
 
         Task task = new Task();
@@ -181,21 +193,21 @@ public class NghiaLMController {
 
     @GetMapping("/assigned-tasks-user-login/page={pageNo}/size={pageSize}")
     public ResponseEntity<Object> getAssignedTasksUserLogin(
-        Principal principal,
-        @PathVariable("pageNo") int pageNo,
-        @PathVariable("pageSize") int pageSize) {
+            Principal principal,
+            @PathVariable("pageNo") int pageNo,
+            @PathVariable("pageSize") int pageSize) {
         String userLoginId = principal.getName();
         AssignedTaskPagination assignedTaskPagination = taskAssignableService.getAssignedTaskPaginated(
-            userLoginId,
-            pageNo,
-            pageSize);
+                userLoginId,
+                pageNo,
+                pageSize);
         return ResponseEntity.ok(assignedTaskPagination);
     }
 
     @GetMapping("/projects/{projectId}/statics/{type}")
     public ResponseEntity<Object> getTasksStaticsInProject(
-        @PathVariable("projectId") UUID projectID,
-        @PathVariable("type") String type) {
+            @PathVariable("projectId") UUID projectID,
+            @PathVariable("type") String type) {
         int sumTasks = 0;
         List<Object[]> listTasks = null;
 
@@ -215,8 +227,8 @@ public class NghiaLMController {
                 temp.put("id", (String) objects[0]);
                 temp.put("name", (String) objects[1]);
                 temp.put(
-                    "value",
-                    String.valueOf(Math.round(((int) objects[2] * 100 / (sumTasks * 1.0)) * 100.0) / 100.0));
+                        "value",
+                        String.valueOf(Math.round(((int) objects[2] * 100 / (sumTasks * 1.0)) * 100.0) / 100.0));
                 result.add(temp);
             }
         }
@@ -231,8 +243,8 @@ public class NghiaLMController {
 
     @GetMapping("/tasks/{taskId}/status/{statusId}")
     public ResponseEntity<Object> updateStatusTask(
-        @PathVariable("taskId") UUID taskId,
-        @PathVariable("statusId") String statusId) {
+            @PathVariable("taskId") UUID taskId,
+            @PathVariable("statusId") String statusId) {
         Task task = taskService.getTask(taskId);
         task.setStatusItem(taskService.getStatusItemByStatusId(statusId));
         return ResponseEntity.ok(taskService.updateTasks(task));
@@ -240,8 +252,8 @@ public class NghiaLMController {
 
     @PutMapping("/projects/{projectId}")
     public ResponseEntity<Object> updateProject(
-        @PathVariable("projectId") UUID projectId,
-        @RequestBody ProjectForm projectForm) {
+            @PathVariable("projectId") UUID projectId,
+            @RequestBody ProjectForm projectForm) {
         Project project = projectService.getProjectById(projectId);
         project.setName(projectForm.getName());
         project.setCode(projectForm.getCode());
@@ -270,9 +282,9 @@ public class NghiaLMController {
 
     @PostMapping("/tasks/{taskId}/comment")
     public ResponseEntity<Object> commentOnTask(
-        Principal principal,
-        @PathVariable("taskId") UUID taskId,
-        @RequestBody CommentForm commentForm) {
+            Principal principal,
+            @PathVariable("taskId") UUID taskId,
+            @RequestBody CommentForm commentForm) {
         Task task = taskService.getTask(taskId);
         String userLoginId = principal.getName();
         return ResponseEntity.ok(taskExecutionService.createTaskComment(task, commentForm, userLoginId));
@@ -286,8 +298,8 @@ public class NghiaLMController {
 
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<Object> updateCommentOnTask(
-        @PathVariable("commentId") UUID commentId,
-        @RequestBody CommentForm commentForm) {
+            @PathVariable("commentId") UUID commentId,
+            @RequestBody CommentForm commentForm) {
         taskExecutionService.updateTaskComment(commentId, commentForm);
         return ResponseEntity.ok("update comment success!");
     }
@@ -321,18 +333,18 @@ public class NghiaLMController {
 
     @PutMapping("/tasks/{taskId}/status")
     public ResponseEntity<Object> updateStatusTask(
-        @PathVariable("taskId") UUID taskId,
-        @RequestBody TaskStatusForm taskStatusForm,
-        Principal principal) {
+            @PathVariable("taskId") UUID taskId,
+            @RequestBody TaskStatusForm taskStatusForm,
+            Principal principal) {
         String userLoginId = principal.getName();
         return ResponseEntity.ok(taskService.updateStatusTask(taskId, taskStatusForm, userLoginId));
     }
 
     @PutMapping("/tasks/{taskId}")
     public ResponseEntity<Object> updateTask(
-        @PathVariable("taskId") UUID taskId,
-        @RequestBody TaskForm taskForm,
-        Principal principal) {
+            @PathVariable("taskId") UUID taskId,
+            @RequestBody TaskForm taskForm,
+            Principal principal) {
         String createdByUserLoginId = principal.getName();
         taskService.updateTask(taskId, taskForm, createdByUserLoginId);
         return ResponseEntity.ok("ok");
