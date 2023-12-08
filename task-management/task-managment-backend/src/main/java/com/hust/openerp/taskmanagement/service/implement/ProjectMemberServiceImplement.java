@@ -7,7 +7,6 @@ import com.hust.openerp.taskmanagement.entity.User;
 import com.hust.openerp.taskmanagement.repository.ProjectMemberRepository;
 import com.hust.openerp.taskmanagement.repository.ProjectRepository;
 import com.hust.openerp.taskmanagement.service.MailService;
-import com.hust.openerp.taskmanagement.service.NotificationService;
 import com.hust.openerp.taskmanagement.service.ProjectMemberService;
 import com.hust.openerp.taskmanagement.service.UserService;
 import lombok.AllArgsConstructor;
@@ -23,8 +22,6 @@ import java.util.UUID;
 public class ProjectMemberServiceImplement implements ProjectMemberService {
 
     private final ProjectMemberRepository projectMemberRepository;
-
-    private final NotificationService notificationsService;
 
     private final ProjectRepository projectRepository;
 
@@ -60,12 +57,12 @@ public class ProjectMemberServiceImplement implements ProjectMemberService {
             .userId(memberId).roleId("member").build();
         ProjectMember projectMemberRes = projectMemberRepository.save(projectMember);
 
-        // push notification
-        notificationsService.create(
-            "admin",
-            memberId,
-            "Bạn được thêm vào dự án " + project.getName(),
-            "/taskmanagement/project/" + projectId + "/tasks");
+        // FIXME: push notification
+        // notificationsService.create(
+        //     "admin",
+        //     memberId,
+        //     "Bạn được thêm vào dự án " + project.getName(),
+        //     "/taskmanagement/project/" + projectId + "/tasks");
 
         // send mail to anounce user to join project
 
