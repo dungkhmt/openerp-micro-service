@@ -8,7 +8,7 @@ import React, {useEffect} from "react";
 import {useHistory} from "react-router-dom";
 import {request} from "../../../api";
 import Quiz from "./Quiz";
-
+import {LinearProgress} from "@mui/material";
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -41,6 +41,7 @@ export default function StudentQuizDetailListForm(props) {
   const checkState = useState([]);
 
   function getQuestionList() {
+    setLoading(true);
     request(
       "get",
       "/get-quiz-test-participation-group-question/" + testQuizId,
@@ -83,6 +84,8 @@ export default function StudentQuizDetailListForm(props) {
         });
 
         checkState.set(chkState);
+
+        setLoading(false);
       },
       {
         401: () => {},
@@ -209,6 +212,7 @@ export default function StudentQuizDetailListForm(props) {
 
   return (
     <div className={classes.root}>
+      {loading && <LinearProgress/>}
       <Card style={{ padding: "20px 20px 20px 20px" }}>
         <Snackbar
           open={requestSuccessfully}

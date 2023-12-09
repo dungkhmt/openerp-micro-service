@@ -209,7 +209,6 @@ public class EduQuizTestGroupController {
         @PathVariable String testID, @PathVariable String groupCode
     ) {
         boolean ok = quizTestService.confirmUpdateGroupInQuizTest(principal.getName(), groupCode, testID);
-
         return ResponseEntity.ok().body(ok);
 
     }
