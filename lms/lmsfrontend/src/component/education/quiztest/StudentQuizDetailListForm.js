@@ -9,6 +9,7 @@ import {useHistory} from "react-router-dom";
 import {request} from "../../../api";
 import Quiz from "./Quiz";
 import {LinearProgress} from "@mui/material";
+import {LoadingButton} from "@mui/lab";
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -233,13 +234,14 @@ export default function StudentQuizDetailListForm(props) {
           </Alert>
         </Snackbar>
         <div style={{}}>
-          <Button
+          <LoadingButton
             variant="contained"
             color="secondary"
+            loading={loading}
             onClick={handleClickViewQuestion}
           >
             View Questions
-          </Button>
+          </LoadingButton>
           {quizGroupTestDetail.judgeMode === "BATCH_LAZY_EVALUATION" ? (
             <Button
               variant="contained"
