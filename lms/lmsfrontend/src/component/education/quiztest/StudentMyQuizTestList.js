@@ -5,13 +5,14 @@ import {useEffect, useState} from "react";
 import {useParams} from "react-router";
 import {useHistory} from "react-router-dom";
 import {request} from "../../../api";
+import {LinearProgress} from "@mui/material";
 
 function StudentMyQuizTestList() {
   const params = useParams();
 
   const history = useHistory();
   const [ListQuiz, setListQuizs] = useState([]);
-
+  const [loading, setLoading] = useState(true);
   const onClickQuizId = (quizid, viewTypeId) => {
     console.log("click " + quizid);
 
@@ -45,6 +46,7 @@ function StudentMyQuizTestList() {
   ];
 
   async function getQuizList() {
+    setLoading(true);
     request(
       // token,
       // history,
@@ -53,6 +55,7 @@ function StudentMyQuizTestList() {
       (res) => {
         console.log(res);
         setListQuizs(res.data);
+        setLoading(false);
       },
       { 401: () => {} }
     );
@@ -65,6 +68,7 @@ function StudentMyQuizTestList() {
   return (
     <Card>
       <CardContent>
+      {loading && <LinearProgress/>}
         <MaterialTable title={"Quiz Tests"} columns={columns} data={ListQuiz} />
       </CardContent>
     </Card>

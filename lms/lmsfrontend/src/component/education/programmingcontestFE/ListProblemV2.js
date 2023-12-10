@@ -14,7 +14,7 @@ import {PROBLEM_STATUS} from "utils/constants";
 import {errorNoti} from "utils/notification";
 import HustContainerCard from "../../common/HustContainerCard";
 import StandardTable from "../../table/StandardTable";
-
+import {LinearProgress} from "@mui/material";
 function ListProblemV2() {
   const {keycloak} = useKeycloak();
   const [value, setValue] = useState(0);
@@ -22,6 +22,7 @@ function ListProblemV2() {
 
   const [sharedProblems, setSharedProblems] = useState([]);
   const [allProblems, setAllProblems] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const {t} = useTranslation("education/programmingcontest/problem");
 
@@ -158,33 +159,40 @@ function ListProblemV2() {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
     getProblems(
       "/teacher/owned-problems",
       (data) => {
         setMyProblems(data);
+        setLoading(false);
       }
     );
   }, [getProblems]);
 
   useEffect(() => {
+  setLoading(true)
     getProblems(
       "/teacher/shared-problems",
       (data) => {
         setSharedProblems(data);
+        setLoading(false);
       }
     );
   }, [getProblems]);
 
   useEffect(() => {
+    setLoading(true);
     getProblems(
       "/teacher/all-problems",
       (data) => {
         setAllProblems(data);
+        setLoading(false);
       }
     );
   }, [getProblems]);
   return (
     <HustContainerCard>
+    {loading && <LinearProgress/>}
       <Box sx={{borderBottom: 2, borderColor: "divider"}}>
         <Tabs
           value={value}

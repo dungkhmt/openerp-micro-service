@@ -3,6 +3,7 @@ import {useHistory, useParams} from "react-router-dom";
 import {Button, Grid, TextField} from "@mui/material";
 import {request} from "../../../api";
 import QuizViewForCheckCode from "./QuizViewForCheckCode";
+import { LoadingButton } from "@mui/lab";
 
 export default function StudentQuizDetailCheckAndConfirmGroupCode() {
   const { testId } = useParams();
@@ -13,13 +14,15 @@ export default function StudentQuizDetailCheckAndConfirmGroupCode() {
   const [quizGroupTestDetail, setQuizGroupTestDetail] = useState({});
   const [messageRequest, setMessageRequest] = useState(false);
   const [requestFailed, setRequestFailed] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   function onConfirmCode() {
+    setLoading(true);
     request(
       "get",
       "/confirm-update-group-code-quiz-test/" + testId + "/" + groupCode,
       (res) => {
         alert("update " + res.data);
+        setLoading(false);
         history.push("/edu/class/student/quiztest/detail/" + testId);
         //setOpen(false);
       },
@@ -102,17 +105,26 @@ export default function StudentQuizDetailCheckAndConfirmGroupCode() {
           }}
           value={groupCode}
         />
+        {/*
         <Button onClick={onCheckCode}>Check Out</Button>
+         */}
       </div>
       <div>
-        <Button
+        <LoadingButton
           //variant="contained"
           //color="light"
           //style={{ marginLeft: "45px" }}
+          variant="contained"
+                  color="primary"
           onClick={onConfirmCode}
+          loading={loading}
+                  style={{
+                    textTransform: "none",
+                    width: 100,
+                  }}
         >
           CONFIRM
-        </Button>
+        </LoadingButton>
       </div>
       <Grid container spacing={3}>
         {quizGroupTestDetail.quizGroupId ? (
