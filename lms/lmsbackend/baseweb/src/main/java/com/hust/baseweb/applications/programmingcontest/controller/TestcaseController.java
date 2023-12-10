@@ -102,8 +102,10 @@ public class TestcaseController {
                 Scanner in = new Scanner(inputStream);
                 while (in.hasNext()) {
                     String line = in.nextLine();
-                    testCase.append(line).append("\n");
-                    // System.out.println("contestSubmitProblemViaUploadFile: read line: " + line);
+                    testCase.append(line);
+                    if (in.hasNext()) {
+                        testCase.append("\n");
+                    }
                 }
                 in.close();
                 log.info("uploadUpdateTestCase, testCase not null, testCase = " + testCase.length());
