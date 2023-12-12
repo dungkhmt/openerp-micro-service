@@ -18,6 +18,8 @@ public interface ClassOpenedService {
 
     List<ClassOpened> getByGroupName(String groupName);
 
+    void setSeparateClass(Long id, Boolean isSeparateClass);
+
     List<Schedule> searchClassOpened(FilterClassOpenedDto requestDto);
 
     void makeSchedule(MakeScheduleDto requestDto);

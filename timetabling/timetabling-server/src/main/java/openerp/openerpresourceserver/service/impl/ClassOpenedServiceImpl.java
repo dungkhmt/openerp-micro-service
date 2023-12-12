@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import openerp.openerpresourceserver.common.CommonUtil;
 import openerp.openerpresourceserver.exception.ConflictScheduleException;
+import openerp.openerpresourceserver.exception.UnableSeparateClassException;
 import openerp.openerpresourceserver.exception.UnableStartPeriodException;
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.model.dto.request.MakeScheduleDto;
@@ -28,6 +29,8 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
     private EntityManager entityManager;
 
     public static final Long MAX_PERIOD = 6L;
+
+    public static final Long CLASS_ENABLE_SEPARATE = 4L;
 
     @Override
     public List<ClassOpened> getAll() {
@@ -76,29 +79,64 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
     }
 
     @Override
+    public void setSeparateClass(Long id, Boolean isSeparateClass) {
+        ClassOpened classOpened = classOpenedRepo.findById(id).orElse(null);
+        if (classOpened == null) {
+            return;
+        }
+        long totalPeriod = this.calculateTotalPeriod(classOpened.getMass());
+        if (isSeparateClass && totalPeriod != CLASS_ENABLE_SEPARATE) {
+            throw new UnableSeparateClassException("Chỉ chia lớp có 4 tiết!");
+        }
+        classOpened.setIsSeparateClass(isSeparateClass);
+
+        classOpened.setClassroom(null);
+        classOpened.setStartPeriod(null);
+        classOpened.setWeekday(null);
+        classOpened.setSecondClassroom(null);
+        classOpened.setSecondStartPeriod(null);
+        classOpened.setSecondWeekday(null);
+
+        classOpenedRepo.save(classOpened);
+    }
+
+    @Override
     public void makeSchedule(MakeScheduleDto requestDto) {
         ClassOpened classOpened = classOpenedRepo.findById(requestDto.getId()).orElse(null);
         if (classOpened == null) {
             return;
         }
+
+        //main class
         String startPeriod = requestDto.getStartPeriod();
         String weekday = requestDto.getWeekday();
         String classroom = requestDto.getClassroom();
-
         String subStartPeriod = startPeriod != null ? startPeriod : classOpened.getStartPeriod();
         String subClassroom = classroom != null ? classroom : classOpened.getClassroom();
         String subWeekday = weekday != null ? weekday : classOpened.getWeekday();
 
+        //second class
+        String secondStartPeriod = requestDto.getSecondStartPeriod();
+        String secondWeekday = requestDto.getSecondWeekday();
+        String secondClassroom = requestDto.getSecondClassroom();
+        String secondSubStartPeriod = secondStartPeriod != null ? secondStartPeriod : classOpened.getSecondStartPeriod();
+        String secondSubClassroom = secondClassroom != null ? secondClassroom : classOpened.getSecondClassroom();
+        String secondSubWeekday = secondWeekday != null ? secondWeekday : classOpened.getSecondWeekday();
+
         if (subStartPeriod != null && subClassroom != null && subWeekday != null) {
             this.checkConflictSchedule(classOpened, requestDto);
         }
-
-        if(subStartPeriod != null){
-            classOpened.setStartPeriod(subStartPeriod);
+        if (secondSubStartPeriod != null && secondSubClassroom != null && secondSubWeekday != null) {
+            this.checkConflictScheduleForSecondClass(classOpened, requestDto);
         }
 
+        classOpened.setStartPeriod(subStartPeriod);
         classOpened.setWeekday(subWeekday);
         classOpened.setClassroom(subClassroom);
+        classOpened.setSecondStartPeriod(secondSubStartPeriod);
+        classOpened.setSecondWeekday(secondSubWeekday);
+        classOpened.setSecondClassroom(secondSubClassroom);
+
         classOpenedRepo.save(classOpened);
     }
 
@@ -107,19 +145,41 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         String weekdayOfClass = requestDto.getWeekday() != null ? requestDto.getWeekday() : classOpened.getWeekday();
         String mass = classOpened.getMass();
         String crew = classOpened.getCrew();
+        Boolean isSeparateClass = classOpened.getIsSeparateClass() != null ? classOpened.getIsSeparateClass() : false;
 
         long startPeriod = Long.parseLong(requestDto.getStartPeriod() != null ?
                 requestDto.getStartPeriod() : classOpened.getStartPeriod());
-        long finishPeriod = this.calculateFinishPeriod(mass, startPeriod);
+        long finishPeriod = this.calculateFinishPeriod(mass, startPeriod, isSeparateClass);
 
-        List<ClassOpened> listClassOpened = classOpenedRepo
-                .getAllByClassroomAndWeekdayAndCrewAndStartPeriodIsNotNullAndIdNot
+        List<ClassOpened> listClassOpened = classOpenedRepo.
+                getAllByClassroomAndWeekdayAndCrewAndStartPeriodIsNotNullAndIdNot
                         (classroomOfClass, weekdayOfClass, crew, requestDto.getId());
+        List<ClassOpened> listSecondClassOpened = classOpenedRepo.
+                getAllBySecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull
+                        (classroomOfClass, weekdayOfClass, crew);
 
         listClassOpened.forEach(el -> {
             String supMass = el.getMass();
+            Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
             long existedStartPeriod = Long.parseLong(el.getStartPeriod());
-            long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod);
+            long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
+
+            if (startPeriod > existedStartPeriod) {
+                if (startPeriod <= existedFinishPeriod) {
+                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
+                }
+            } else {
+                if (finishPeriod >= existedStartPeriod) {
+                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
+                }
+            }
+        });
+
+        listSecondClassOpened.forEach(el -> {
+            String supMass = el.getMass();
+            Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
+            long existedStartPeriod = Long.parseLong(el.getSecondStartPeriod());
+            long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
 
             if (startPeriod > existedStartPeriod) {
                 if (startPeriod <= existedFinishPeriod) {
@@ -133,14 +193,90 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         });
     }
 
-    public Long calculateFinishPeriod(String mass, Long startPeriod) {
-        //a(b-c-d-e)
-        String numbersString = mass.substring(2, mass.indexOf(')'));
-        String[] numbersArray = numbersString.split("-");
-        Long finishPeriod = startPeriod + Long.parseLong(numbersArray[0]) + Long.parseLong(numbersArray[1]) - 1;
+    public void checkConflictScheduleForSecondClass(ClassOpened classOpened, MakeScheduleDto requestDto) {
+        String classroomOfClass = requestDto.getSecondClassroom() != null ? requestDto.getSecondClassroom() : classOpened.getSecondClassroom();
+        String weekdayOfClass = requestDto.getSecondWeekday() != null ? requestDto.getSecondWeekday() : classOpened.getSecondWeekday();
+        String mass = classOpened.getMass();
+        String crew = classOpened.getCrew();
+        Boolean isSeparateClass = classOpened.getIsSeparateClass() != null ? classOpened.getIsSeparateClass() : false;
+
+        long startPeriod = Long.parseLong(requestDto.getSecondStartPeriod() != null ?
+                requestDto.getSecondStartPeriod() : classOpened.getSecondStartPeriod());
+        long finishPeriod = this.calculateFinishPeriod(mass, startPeriod, isSeparateClass);
+
+        List<ClassOpened> listClassOpened = classOpenedRepo
+                .getAllByClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull
+                        (classroomOfClass, weekdayOfClass, crew);
+        List<ClassOpened> listSecondClassOpened = classOpenedRepo.
+                getAllBySecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot
+                        (classroomOfClass, weekdayOfClass, crew, requestDto.getId());
+
+        listClassOpened.forEach(el -> {
+            String supMass = el.getMass();
+            Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
+            long existedStartPeriod = Long.parseLong(el.getStartPeriod());
+            long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
+
+            if (startPeriod > existedStartPeriod) {
+                if (startPeriod <= existedFinishPeriod) {
+                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
+                }
+            } else {
+                if (finishPeriod >= existedStartPeriod) {
+                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
+                }
+            }
+        });
+
+        listSecondClassOpened.forEach(el -> {
+            String supMass = el.getMass();
+            Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
+            long existedStartPeriod = Long.parseLong(el.getSecondStartPeriod());
+            long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
+
+            if (startPeriod > existedStartPeriod) {
+                if (startPeriod <= existedFinishPeriod) {
+                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
+                }
+            } else {
+                if (finishPeriod >= existedStartPeriod) {
+                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
+                }
+            }
+        });
+    }
+
+    public Long calculateFinishPeriod(String mass, Long startPeriod, Boolean isSeparateClass) {
+        //a(b-c-d-e) => b-c-d-e => b,c,d,e => b+c
+        long totalPeriod = this.calculateTotalPeriod(mass);
+        long finishPeriod = isSeparateClass ? (startPeriod + (totalPeriod / 2) - 1) : startPeriod + totalPeriod - 1;
+
         if (finishPeriod > MAX_PERIOD) {
             throw new UnableStartPeriodException("Tiết bắt đầu lỗi: tiết " + startPeriod);
         }
         return finishPeriod;
+    }
+
+    public Long calculateTotalPeriod(String mass) {
+        String numbersString = mass.substring(2, mass.indexOf(')'));
+        String[] numbersArray = numbersString.split("-");
+        return Long.parseLong(numbersArray[0]) + Long.parseLong(numbersArray[1]);
+    }
+
+    // ----------------Automation make schedule---------------------
+    public void automationMakeScheduleForCTTT(String semester, String groupName) {
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        List<ClassOpened> listClassMakeSchedule = classOpenedRepo.getAllBySemesterAndGroupName(semester, groupName, sort);
+        if (listClassMakeSchedule.isEmpty()) {
+            return;
+        }
+
+        long startPeriod = 1;
+        String weekday = "2";
+        listClassMakeSchedule.forEach(el -> {
+            String mass = el.getMass();
+            el.setWeekday(weekday);
+
+        });
     }
 }

@@ -6,7 +6,7 @@ import { Box, Typography, Button, IconButton } from '@mui/material'
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import SearchIcon from '@mui/icons-material/Search';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function ScheduleScreen() {
@@ -15,7 +15,7 @@ export default function ScheduleScreen() {
     const [classOpeneds, setClassOpeneds] = useState([]);
     const [semesters, setSemesters] = useState([]);
     const [groups, setGroups] = useState([]);
-    
+
     const [selectedSemester, setSelectedSemester] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
 
@@ -174,6 +174,97 @@ export default function ScheduleScreen() {
                 />
             ),
         },
+        {
+            headerName: "Tách lớp",
+            field: "isSeparateClass",
+            width: 100,
+            renderCell: (params) => (
+                <input
+                    type="checkbox"
+                    checked={params.row.isSeparateClass}
+                    style={{ transform: "scale(1.5)" }}
+                    onChange={(event) => handleSeparateClassChange(event, params.row)}
+                />
+            ),
+        },
+        {
+            headerName: "Tiết BĐ",
+            field: "secondStartPeriod",
+            width: 80,
+        },
+        {
+            headerName: "Đổi tiết",
+            field: "setSecondPeriod",
+            width: 100,
+            renderCell: (params) => (
+                <Autocomplete
+                    options={classPeriods}
+                    getOptionLabel={(option) => option.classPeriod}
+                    style={{ width: 100 }}
+                    disabled={!params.row.isSeparateClass}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label=""
+                            value={params.row ? params.row.classPeriod : null}
+                        />
+                    )}
+                    onChange={(event, selectedValue) => handleSecondClassPeriodChange(event, params.row, selectedValue)}
+                />
+            ),
+        },
+        {
+            headerName: "Thứ",
+            field: "secondWeekday",
+            width: 80,
+        },
+        {
+            headerName: "Đổi thứ",
+            field: "setSecondWeekday",
+            width: 100,
+            renderCell: (params) => (
+                <Autocomplete
+                    options={weekdays}
+                    getOptionLabel={(option) => option.weekDay}
+                    style={{ width: 100 }}
+                    disabled={!params.row.isSeparateClass}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label=""
+                            value={params.row ? params.row.weekDay : null}
+                        />
+                    )}
+                    onChange={(event, selectedValue) => handleSecondWeekdayChange(event, params.row, selectedValue)}
+                />
+            ),
+        },
+        {
+            headerName: "Phòng",
+            field: "secondClassroom",
+            width: 120,
+        },
+        {
+            headerName: "Đổi phòng",
+            field: "setSecondClassroom",
+            width: 150,
+            renderCell: (params) => (
+                <Autocomplete
+                    options={classrooms}
+                    getOptionLabel={(option) => option.classroom}
+                    style={{ width: 150 }}
+                    disabled={!params.row.isSeparateClass}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label=""
+                            value={params.row ? params.row.classroom : null}
+                        />
+                    )}
+                    onChange={(event, selectedValue) => handleSecondClassroomChange(event, params.row, selectedValue)}
+                />
+            ),
+        },
     ];
 
     useEffect(() => {
@@ -257,10 +348,33 @@ export default function ScheduleScreen() {
             request("post", url, (res) => {
                 handleRefreshData();
             },
-            (error) => {
-                toast.error(error.response.data);
+                (error) => {
+                    toast.error(error.response.data);
+                },
+                requestData
+            ).then();;
+        }
+    };
+
+    const handleSecondClassPeriodChange = (event, row, selectedValue) => {
+        console.log("data: ", row)
+        if (selectedValue) {
+            const secondStartPeriod = selectedValue.classPeriod
+            const id = row.id
+
+            const url = "/class-opened/make-schedule";
+            const requestData = {
+                id: id,
+                secondStartPeriod: secondStartPeriod,
+            };
+
+            request("post", url, (res) => {
+                handleRefreshData();
             },
-            requestData
+                (error) => {
+                    toast.error(error.response.data);
+                },
+                requestData
             ).then();;
         }
     };
@@ -279,9 +393,31 @@ export default function ScheduleScreen() {
             request("post", url, (res) => {
                 handleRefreshData();
             },
-            (error) => {
-                toast.error(error.response.data);
+                (error) => {
+                    toast.error(error.response.data);
+                },
+                requestData
+            ).then();
+        }
+    };
+
+    const handleSecondWeekdayChange = (event, row, selectedValue) => {
+        if (selectedValue) {
+            const secondWeekday = selectedValue.weekDay
+            const id = row.id
+
+            const url = "/class-opened/make-schedule";
+            const requestData = {
+                id: id,
+                secondWeekday: secondWeekday,
+            };
+
+            request("post", url, (res) => {
+                handleRefreshData();
             },
+                (error) => {
+                    toast.error(error.response.data);
+                },
                 requestData
             ).then();
         }
@@ -301,9 +437,31 @@ export default function ScheduleScreen() {
             request("post", url, (res) => {
                 handleRefreshData();
             },
-            (error) => {
-                toast.error(error.response.data);
+                (error) => {
+                    toast.error(error.response.data);
+                },
+                requestData
+            ).then();
+        }
+    };
+
+    const handleSecondClassroomChange = (event, row, selectedValue) => {
+        if (selectedValue) {
+            const secondClassroom = selectedValue.classroom
+            const id = row.id
+
+            const url = "/class-opened/make-schedule";
+            const requestData = {
+                id: id,
+                secondClassroom: secondClassroom,
+            };
+
+            request("post", url, (res) => {
+                handleRefreshData();
             },
+                (error) => {
+                    toast.error(error.response.data);
+                },
                 requestData
             ).then();
         }
@@ -311,8 +469,26 @@ export default function ScheduleScreen() {
 
     const handleRefreshData = () => {
         setDataChanged(true);
-        // Tăng giá trị của refreshKey để làm mới useEffect và fetch dữ liệu mới
         setRefreshKey((prevKey) => prevKey + 1);
+    };
+
+    const handleSeparateClassChange = (event, row) => {
+        const { checked } = event.target;
+        const id = row.id;
+
+        const url = "/class-opened/separate-class";
+        const requestData = {
+            id: id,
+            isSeparateClass: checked,
+        };
+
+        request("post", url, (res) => {
+            handleRefreshData();
+        },
+            (error) => {
+                toast.error(error.response.data);
+            },
+            requestData).then();
     };
 
     function DataGridToolbar() {
@@ -384,7 +560,6 @@ export default function ScheduleScreen() {
                 columns={columns}
                 pageSize={10}
             />
-            {/* <ToastContainer /> */}
         </div>
     );
 }

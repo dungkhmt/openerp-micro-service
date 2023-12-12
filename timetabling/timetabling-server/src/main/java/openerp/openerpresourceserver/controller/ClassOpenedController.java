@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.controller;
 
 import jakarta.validation.Valid;
 import openerp.openerpresourceserver.exception.ConflictScheduleException;
+import openerp.openerpresourceserver.exception.UnableSeparateClassException;
 import openerp.openerpresourceserver.exception.UnableStartPeriodException;
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.model.dto.request.MakeScheduleDto;
@@ -61,6 +62,18 @@ public class ClassOpenedController {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/separate-class")
+    public ResponseEntity<String> separateClass(@RequestBody MakeScheduleDto requestDto) {
+        try {
+            service.setSeparateClass(requestDto.getId(), requestDto.getIsSeparateClass());
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (UnableSeparateClassException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

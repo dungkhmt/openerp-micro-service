@@ -21,4 +21,12 @@ public class MakeScheduleDto {
     private String weekday;
 
     private String classroom;
+
+    private String secondStartPeriod;
+
+    private String secondWeekday;
+
+    private String secondClassroom;
+
+    private Boolean isSeparateClass;
 }

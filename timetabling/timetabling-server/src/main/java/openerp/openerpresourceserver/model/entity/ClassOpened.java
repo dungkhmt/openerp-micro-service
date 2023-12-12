@@ -29,7 +29,10 @@ public class ClassOpened {
     private String course;
     private String groupName;
     private String startPeriod;
-    private String finishPeriod;
     private String weekday;
     private String classroom;
+    private String secondStartPeriod;
+    private String secondWeekday;
+    private String secondClassroom;
+    private Boolean isSeparateClass;
 }
