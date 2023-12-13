@@ -17,6 +17,6 @@ public interface TaskAssignmentRepository
     @Query(value = "SELECT e.* FROM task_management_task_assignment e WHERE e.assigned_to_user_id = :assigneeId ORDER BY e.created_stamp DESC", nativeQuery = true)
     Page<TaskAssignment> getByAssigneeId(@Param("assigneeId") String assigneeId, Pageable pageable);
 
-    @Query(value = "SELECT * FROM task_management_task_assignment e WHERE e.task_id = :taskId", nativeQuery = true)
+    @Query(value = "SELECT * FROM task_management_task_assignment e WHERE e.task_id = :taskId LIMIT 1", nativeQuery = true)
     TaskAssignment getByTaskId(@Param("taskId") UUID taskId);
 }
