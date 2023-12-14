@@ -92,4 +92,16 @@ public class ClassOpenedController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping("/auto-make-schedule")
+    public ResponseEntity<String> autoMakeSchedule(@RequestParam String semester,
+                                                   @RequestParam String groupName,
+                                                   @RequestParam String weekdayPriority) {
+        try {
+            service.automationMakeScheduleForCTTT(semester, groupName, weekdayPriority);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

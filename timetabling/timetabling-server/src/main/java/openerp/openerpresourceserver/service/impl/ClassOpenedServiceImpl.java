@@ -32,6 +32,8 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
 
     public static final Long CLASS_ENABLE_SEPARATE = 4L;
 
+    public static final String DEFAULT_START_PERIOD = "1";
+
     @Override
     public List<ClassOpened> getAll() {
         Sort sort = Sort.by(Sort.Direction.ASC, "id");
@@ -264,19 +266,70 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
     }
 
     // ----------------Automation make schedule---------------------
-    public void automationMakeScheduleForCTTT(String semester, String groupName) {
+    @Override
+    public void automationMakeScheduleForCTTT(String semester, String groupName, String weekdayPriority) {
         Sort sort = Sort.by(Sort.Direction.ASC, "id");
         List<ClassOpened> listClassMakeSchedule = classOpenedRepo.getAllBySemesterAndGroupName(semester, groupName, sort);
         if (listClassMakeSchedule.isEmpty()) {
             return;
         }
+        String[] weekdayArray = weekdayPriority.split(",");
 
-        long startPeriod = 1;
-        String weekday = "2";
-        listClassMakeSchedule.forEach(el -> {
-            String mass = el.getMass();
-            el.setWeekday(weekday);
+        int outOfDay = 0;
+        int countClass4Period = 0;
+        for(ClassOpened elClass : listClassMakeSchedule) {
+            long totalPeriodOfClass = this.calculateTotalPeriod(elClass.getMass());
+            if (totalPeriodOfClass == CLASS_ENABLE_SEPARATE) countClass4Period++;
+            if (countClass4Period % 2 == 0) {
+                elClass.setIsSeparateClass(true);
+                classOpenedRepo.save(elClass);
+            }
+            for (String elWeekday : weekdayArray) {
+                List<ClassOpened> existedClasses = listClassMakeSchedule.stream().filter(obj -> elWeekday.equals(obj.getWeekday()))
+                        .toList();
+                if (existedClasses.isEmpty()) {
+                    elClass.setWeekday(elWeekday);
+                    elClass.setStartPeriod(DEFAULT_START_PERIOD);
+                    classOpenedRepo.save(elClass);
+                    break;
+                } else {
+                    long startPeriod = this.calculateStartPeriod(existedClasses);
+                    long totalPeriod = this.calculateTotalPeriod(elClass.getMass());
+                    long finishPeriod = /* elClass.getIsSeparateClass() ? (startPeriod + (totalPeriod / 2) - 1) : */startPeriod + totalPeriod - 1;
+                    if (finishPeriod > MAX_PERIOD) {
+                        continue;
+                    }
+                    elClass.setWeekday(elWeekday);
+                    elClass.setStartPeriod(startPeriod + "");
+                    classOpenedRepo.save(elClass);
+                    break;
+                }
+            }
 
-        });
+            //check class has set time study?
+            if (elClass.getStartPeriod() == null) {
+                elClass.setStartPeriod(DEFAULT_START_PERIOD);
+                elClass.setWeekday(weekdayArray[outOfDay]);
+                outOfDay++;
+                classOpenedRepo.save(elClass);
+            }
+        }
+    }
+
+    public Long calculateStartPeriod(List<ClassOpened> existedClasses) {
+        long minStartPeriod = Long.parseLong(existedClasses.get(0).getStartPeriod());
+        for (ClassOpened classOpened : existedClasses) {
+            long startPeriod = Long.parseLong(classOpened.getStartPeriod());
+            if (minStartPeriod >= startPeriod) {
+                minStartPeriod = startPeriod;
+            }
+        }
+
+        long startPeriodForClass = minStartPeriod;
+        for (ClassOpened classOpened : existedClasses) {
+            long totalPeriod = this.calculateTotalPeriod(classOpened.getMass());
+            startPeriodForClass += /*classOpened.getIsSeparateClass() ? (totalPeriod / 2) : */totalPeriod;
+        }
+        return startPeriodForClass;
     }
 }

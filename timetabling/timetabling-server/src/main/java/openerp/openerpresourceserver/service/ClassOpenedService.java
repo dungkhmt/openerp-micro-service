@@ -23,4 +23,6 @@ public interface ClassOpenedService {
     List<Schedule> searchClassOpened(FilterClassOpenedDto requestDto);
 
     void makeSchedule(MakeScheduleDto requestDto);
+
+    void automationMakeScheduleForCTTT(String semester, String groupName, String weekdayPriority);
 }
