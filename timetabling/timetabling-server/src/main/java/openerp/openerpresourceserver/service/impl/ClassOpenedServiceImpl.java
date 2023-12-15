@@ -34,6 +34,8 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
 
     public static final String DEFAULT_START_PERIOD = "1";
 
+    public static final Integer MAX_CLASS_FOR_CLASS_OPENED = 2;
+
     @Override
     public List<ClassOpened> getAll() {
         Sort sort = Sort.by(Sort.Direction.ASC, "id");
@@ -279,34 +281,43 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         int countClass4Period = 0;
         for(ClassOpened elClass : listClassMakeSchedule) {
             long totalPeriodOfClass = this.calculateTotalPeriod(elClass.getMass());
-            if (totalPeriodOfClass == CLASS_ENABLE_SEPARATE) countClass4Period++;
-            if (countClass4Period % 2 == 0) {
+            if (totalPeriodOfClass == CLASS_ENABLE_SEPARATE) {
+                countClass4Period++;
+            }
+            if (countClass4Period % 3 == 2) {
                 elClass.setIsSeparateClass(true);
                 classOpenedRepo.save(elClass);
             }
+            int countClassForSeparate = 0;
             for (String elWeekday : weekdayArray) {
-                List<ClassOpened> existedClasses = listClassMakeSchedule.stream().filter(obj -> elWeekday.equals(obj.getWeekday()))
+                List<ClassOpened> existedClasses = listClassMakeSchedule.stream()
+                        .filter(obj -> elWeekday.equals(obj.getWeekday()))
                         .toList();
-                if (existedClasses.isEmpty()) {
-                    elClass.setWeekday(elWeekday);
-                    elClass.setStartPeriod(DEFAULT_START_PERIOD);
-                    classOpenedRepo.save(elClass);
-                    break;
+                List<ClassOpened> existedSecondClasses = listClassMakeSchedule.stream()
+                        .filter(obj -> elWeekday.equals(obj.getSecondWeekday()))
+                        .toList();
+                if (existedClasses.isEmpty() && existedSecondClasses.isEmpty()) {
+                    //ngày hôm elWeekday chưa được gán lớp học nào
+                    countClassForSeparate = this.setTimeStudyForElClass(elClass, elWeekday, DEFAULT_START_PERIOD, countClassForSeparate);
+                    //check thoát khỏi vòng lặp từng ngày trong tuần
+                    if (!elClass.getIsSeparateClass() ||  countClassForSeparate == MAX_CLASS_FOR_CLASS_OPENED) break;
                 } else {
-                    long startPeriod = this.calculateStartPeriod(existedClasses);
+                    //Đã có lớp học vào ngày hôm đó
+                    long startPeriod = this.calculateStartPeriod(existedClasses, existedSecondClasses);
                     long totalPeriod = this.calculateTotalPeriod(elClass.getMass());
-                    long finishPeriod = /* elClass.getIsSeparateClass() ? (startPeriod + (totalPeriod / 2) - 1) : */startPeriod + totalPeriod - 1;
+                    long finishPeriod =  elClass.getIsSeparateClass() ? (startPeriod + (totalPeriod / 2) - 1) : (startPeriod + totalPeriod - 1);
                     if (finishPeriod > MAX_PERIOD) {
                         continue;
                     }
-                    elClass.setWeekday(elWeekday);
-                    elClass.setStartPeriod(startPeriod + "");
-                    classOpenedRepo.save(elClass);
-                    break;
+                    String startPeriodForElClass = startPeriod + "";
+                    countClassForSeparate = this.setTimeStudyForElClass(elClass, elWeekday, startPeriodForElClass, countClassForSeparate);
+                    //check thoát khỏi vòng lặp từng ngày trong tuần
+                    if (!elClass.getIsSeparateClass() || countClassForSeparate == MAX_CLASS_FOR_CLASS_OPENED) break;
                 }
             }
 
-            //check class has set time study?
+            //kiểm tra lớp học đã được gán thời gian học chưa
+            //Sảy ra khi tất cả các ngày trong tuần đều đã được gán lớp học
             if (elClass.getStartPeriod() == null) {
                 elClass.setStartPeriod(DEFAULT_START_PERIOD);
                 elClass.setWeekday(weekdayArray[outOfDay]);
@@ -316,20 +327,53 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         }
     }
 
-    public Long calculateStartPeriod(List<ClassOpened> existedClasses) {
-        long minStartPeriod = Long.parseLong(existedClasses.get(0).getStartPeriod());
+    public Integer setTimeStudyForElClass(ClassOpened elClass, String elWeekday,
+                                          String startPeriod,int countClassForSeparate) {
+        if (elClass.getIsSeparateClass()) {
+            //Nếu tách lớp
+            switch (countClassForSeparate) {
+                case 0: //Lớp tách chưa được gán
+                    elClass.setWeekday(elWeekday);
+                    elClass.setStartPeriod(startPeriod);
+                    break;
+                case 1: //Lớp tách đã được gán 1 lớp
+                    elClass.setSecondWeekday(elWeekday);
+                    elClass.setSecondStartPeriod(startPeriod);
+                    break;
+                default:
+                    break;
+            }
+            countClassForSeparate++;
+        } else {
+            elClass.setWeekday(elWeekday);
+            elClass.setStartPeriod(startPeriod);
+        }
+        classOpenedRepo.save(elClass);
+        return countClassForSeparate;
+    }
+
+    public Long calculateStartPeriod(List<ClassOpened> existedClasses, List<ClassOpened> existedSecondClasses) {
+        long minStartPeriod = 1;
+        long sumTotalPeriod = 0;
+
         for (ClassOpened classOpened : existedClasses) {
             long startPeriod = Long.parseLong(classOpened.getStartPeriod());
             if (minStartPeriod >= startPeriod) {
                 minStartPeriod = startPeriod;
             }
+            long totalPeriod = this.calculateTotalPeriod(classOpened.getMass());
+            sumTotalPeriod += classOpened.getIsSeparateClass() ? (totalPeriod / 2) : totalPeriod;
         }
 
-        long startPeriodForClass = minStartPeriod;
-        for (ClassOpened classOpened : existedClasses) {
+        for (ClassOpened classOpened : existedSecondClasses) {
+            long secondStartPeriod = Long.parseLong(classOpened.getSecondStartPeriod());
+            if (minStartPeriod >= secondStartPeriod) {
+                minStartPeriod = secondStartPeriod;
+            }
             long totalPeriod = this.calculateTotalPeriod(classOpened.getMass());
-            startPeriodForClass += /*classOpened.getIsSeparateClass() ? (totalPeriod / 2) : */totalPeriod;
+            sumTotalPeriod += totalPeriod / 2;
         }
-        return startPeriodForClass;
+
+        return minStartPeriod + sumTotalPeriod;
     }
 }

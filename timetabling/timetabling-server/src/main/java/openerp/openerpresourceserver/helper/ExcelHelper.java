@@ -283,6 +283,7 @@ public class ExcelHelper {
                     }
                     cellIdx++;
                 }
+                classOpened.setIsSeparateClass(false);
                 classOpeneds.add(classOpened);
             }
             workbook.close();

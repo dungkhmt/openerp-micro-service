@@ -34,5 +34,5 @@ public class ClassOpened {
     private String secondStartPeriod;
     private String secondWeekday;
     private String secondClassroom;
-    private Boolean isSeparateClass;
+    private Boolean isSeparateClass = false;
 }
