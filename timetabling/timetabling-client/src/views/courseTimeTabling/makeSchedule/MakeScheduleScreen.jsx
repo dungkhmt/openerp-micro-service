@@ -8,6 +8,7 @@ import TextField from '@mui/material/TextField';
 import SearchIcon from '@mui/icons-material/Search';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AutomationMakeSchedule from "./AutomationMakeSchedule";
 
 export default function ScheduleScreen() {
     const [dataChanged, setDataChanged] = useState(false);
@@ -15,6 +16,7 @@ export default function ScheduleScreen() {
     const [classOpeneds, setClassOpeneds] = useState([]);
     const [semesters, setSemesters] = useState([]);
     const [groups, setGroups] = useState([]);
+    const [isDialogOpen, setDialogOpen] = useState(false);
 
     const [selectedSemester, setSelectedSemester] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
@@ -301,10 +303,6 @@ export default function ScheduleScreen() {
         setSelectedGroup(newValue);
     };
 
-    const handleAutoMakeSchedule = () => {
-
-    }
-
     const handleFilterData = () => {
         const url = "/class-opened/search"
 
@@ -491,8 +489,15 @@ export default function ScheduleScreen() {
             requestData).then();
     };
 
-    function DataGridToolbar() {
+    const handleOpenDialog = () => {
+        setDialogOpen(true);
+    };
 
+    const handleCloseDialog = () => {
+        setDialogOpen(false);
+    };
+
+    function DataGridToolbar() {
         return (
             <div>
                 <div style={{ display: "flex", gap: 16, justifyContent: "flex-start" }}>
@@ -525,12 +530,18 @@ export default function ScheduleScreen() {
                     <Button
                         variant="outlined"
                         color="secondary"
-                        onClick={handleAutoMakeSchedule}
-                        disabled={!selectedSemester && !selectedGroup}
+                        style={{ marginRight: "8px" }}
+                        onClick={handleOpenDialog}
                     >
                         Sắp xếp tự động
                     </Button>
                 </div>
+
+                <AutomationMakeSchedule
+                    open={isDialogOpen}
+                    handleClose={handleCloseDialog}
+                    handleRefreshData={handleRefreshData}
+                />
             </div>
 
         );

@@ -283,11 +283,12 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
             long totalPeriodOfClass = this.calculateTotalPeriod(elClass.getMass());
             if (totalPeriodOfClass == CLASS_ENABLE_SEPARATE) {
                 countClass4Period++;
+                if (countClass4Period % 3 == 2) {
+                    elClass.setIsSeparateClass(true);
+                    classOpenedRepo.save(elClass);
+                }
             }
-            if (countClass4Period % 3 == 2) {
-                elClass.setIsSeparateClass(true);
-                classOpenedRepo.save(elClass);
-            }
+
             int countClassForSeparate = 0;
             for (String elWeekday : weekdayArray) {
                 List<ClassOpened> existedClasses = listClassMakeSchedule.stream()
