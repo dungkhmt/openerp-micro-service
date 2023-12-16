@@ -3039,7 +3039,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         String userName
     ) {
         TestCaseEntity tc = testCaseRepo.findTestCaseByTestCaseId(testCaseId);
-        if (testCase != null && !testCase.equals("")) {
+        if (testCase != null && !testCase.isEmpty()) {
             String problemId = modelUploadTestCase.getProblemId();
             ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
             String tempName = tempDir.createRandomScriptFileName(userName +

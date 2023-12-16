@@ -7,6 +7,7 @@ import com.hust.baseweb.applications.programmingcontest.model.*;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +15,9 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
-import java.util.Scanner;
 import java.util.UUID;
 
 @RestController
@@ -47,22 +48,15 @@ public class TestcaseController {
         ModelProgrammingContestUploadTestCase modelUploadTestCase = gson.fromJson(
             inputJson,
             ModelProgrammingContestUploadTestCase.class);
-        String problemId = modelUploadTestCase.getProblemId();
-        log.info("uploadTestCase, problemId = " + problemId);
-        StringBuilder testCase = new StringBuilder();
+
         ModelUploadTestCaseOutput res = new ModelUploadTestCaseOutput();
+        String testCase;
         try {
-            InputStream inputStream = file.getInputStream();
-            Scanner in = new Scanner(inputStream);
-            while (in.hasNext()) {
-                String line = in.nextLine();
-                testCase.append(line);
-                if (in.hasNext()) {
-                    testCase.append("\n");
-                }
-            }
-            in.close();
-            res = problemTestCaseService.addTestCase(testCase.toString(), modelUploadTestCase, principal.getName());
+            ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
+            testCase = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            stream.close();
+
+            res = problemTestCaseService.addTestCase(testCase, modelUploadTestCase, principal.getName());
             return ResponseEntity.ok().body(res);
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,24 +85,14 @@ public class TestcaseController {
         ModelProgrammingContestUploadTestCase modelUploadTestCase = gson.fromJson(
             inputJson,
             ModelProgrammingContestUploadTestCase.class);
-        String problemId = modelUploadTestCase.getProblemId();
+
         UUID testCaseUUID = UUID.fromString(testCaseId);
-        log.info("uploadUpdateTestCase, problemId = " + problemId + " tesCaseId = " + testCaseId + " testCaseUUID = "
-                 + testCaseUUID);
-        StringBuilder testCase = new StringBuilder();
+        String testCase = "";
         if (file != null) {
             try {
-                InputStream inputStream = file.getInputStream();
-                Scanner in = new Scanner(inputStream);
-                while (in.hasNext()) {
-                    String line = in.nextLine();
-                    testCase.append(line);
-                    if (in.hasNext()) {
-                        testCase.append("\n");
-                    }
-                }
-                in.close();
-                log.info("uploadUpdateTestCase, testCase not null, testCase = " + testCase.length());
+                ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
+                testCase = IOUtils.toString(stream, StandardCharsets.UTF_8);
+                stream.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -116,10 +100,11 @@ public class TestcaseController {
             log.info("uploadUpdateTestCase, multipart file is null");
         }
 
-        ModelUploadTestCaseOutput res = problemTestCaseService.uploadUpdateTestCase(testCaseUUID,
-                                                                                    testCase.toString(),
-                                                                                    modelUploadTestCase,
-                                                                                    principal.getName());
+        ModelUploadTestCaseOutput res = problemTestCaseService.uploadUpdateTestCase(
+            testCaseUUID,
+            testCase,
+            modelUploadTestCase,
+            principal.getName());
         return ResponseEntity.ok().body(res);
     }
 
