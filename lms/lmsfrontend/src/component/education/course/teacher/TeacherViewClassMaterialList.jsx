@@ -94,16 +94,19 @@ export default function TeacherViewClassMaterialList(props) {
   const columns = [
     {
       title: "Material ID",
-      field: "materialId",
+      field: "eduCourseChapterMaterial.eduCourseMaterialName",
       render: (material) => (
         <Link
           to={`/edu/teacher/course/chapter/material/detail/${material.materialId}`}
         >
-          {material.materialId}
+          {material.eduCourseChapterMaterial.eduCourseMaterialName}
         </Link>
       ),
     },
-    { title: "Tên chapter", field: "chapterId" },
+    {
+      title: "Tên chapter",
+      field: "eduCourseChapterMaterial.eduCourseChapter.chapterName",
+    },
     {
       title: "Trạng thái",
       field: "status",
