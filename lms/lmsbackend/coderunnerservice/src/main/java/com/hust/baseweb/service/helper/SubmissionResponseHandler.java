@@ -303,7 +303,7 @@ public class SubmissionResponseHandler {
                 String message = "";
 
                 if (response.indexOf(' ') < 0) {
-                    message = "Invalid response";
+                    message = "---Invalid response: Checker output not in format <SCORE> <MESSAGE>\n" + response;
                 } else {
                     String pointString = response.substring(0, response.indexOf(' '));
 //                    point = Integer.parseInt(pointString);
@@ -311,7 +311,7 @@ public class SubmissionResponseHandler {
                         point = Integer.parseInt(pointString);
                         message = response.substring(response.indexOf(' '), response.indexOf(Constants.SPLIT_TEST_CASE));
                     } catch (NumberFormatException e) {
-                        message = "Invalid response";
+                        message = "---Invalid response: Checker output not in format <SCORE> <MESSAGE>\n" + response;
                     }
 
                     totalPoint += point;
