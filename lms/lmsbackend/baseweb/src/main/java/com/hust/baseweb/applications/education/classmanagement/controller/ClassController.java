@@ -66,6 +66,7 @@ public class ClassController {
     private EduDepartmentService eduDepartmentService;
     private EduCourseChapterService eduCourseChapterService;
     private EduCourseChapterMaterialService eduCourseChapterMaterialService;
+    private EduClassMaterialService eduClassMaterialService;
     private LogUserLoginCourseChapterMaterialService logUserLoginCourseChapterMaterialService;
     private LogUserLoginQuizQuestionService logUserLoginQuizQuestionService;
     private VideoService videoService;
@@ -734,6 +735,14 @@ public class ClassController {
         return ResponseEntity.ok().body(eduCourseChapterMaterials);
     }
 
+    @GetMapping("/get-chapter-materials-of-class/{classId}/{chapterId}")
+    public ResponseEntity<?> getChapterMaterialsOfClass(Principal principal, @PathVariable UUID classId, @PathVariable UUID chapterId) {
+        //List<EduCourseChapterMaterial> eduCourseChapterMaterials = eduCourseChapterMaterialService.findAll();
+        List<EduClassMaterial> eduClassChapterMaterials = eduClassMaterialService.getMaterialByClassIdAndChapterId(
+            classId, chapterId);
+        return ResponseEntity.ok().body(eduClassChapterMaterials);
+    }
+
     @Secured("ROLE_TEACHER")
     @GetMapping("/get-all-semesters")
     public ResponseEntity<?> getAllSemesters(Principal principal) {
@@ -844,5 +853,22 @@ public class ClassController {
 
         return ResponseEntity.ok().body(uploadedUsers);
     }
+
+    @Secured("ROLE_TEACHER")
+    @PostMapping("/update-material-status")
+    public ResponseEntity<?> updateMaterialStatus(@RequestBody EduClassMaterial eduClassMaterial){
+        EduClassMaterial response = eduClassMaterialService.update(eduClassMaterial.getClassId(), eduClassMaterial.getChapterId(), eduClassMaterial.getMaterialId(), eduClassMaterial.getStatus());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @Secured("ROLE_TEACHER")
+    @GetMapping("/get-material/{classId}")
+    public ResponseEntity<?> getMaterialByClassId(@PathVariable UUID classId){
+        List<EduClassMaterial> response = eduClassMaterialService.getMaterialByClassId(classId);
+
+        return ResponseEntity.ok().body(response);
+    }
+
 
 }

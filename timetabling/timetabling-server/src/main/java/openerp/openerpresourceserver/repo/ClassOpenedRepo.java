@@ -22,5 +22,13 @@ public interface ClassOpenedRepo extends JpaRepository<ClassOpened, Long> {
 
     List<ClassOpened> getAllByGroupName(String groupName, Sort sort);
 
+    List<ClassOpened> getAllBySemesterAndGroupName(String semester, String groupName, Sort sort);
+
     List<ClassOpened> getAllByClassroomAndWeekdayAndCrewAndStartPeriodIsNotNullAndIdNot(String classroom, String weekday,String crew, Long id);
+
+    List<ClassOpened> getAllByClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull(String classroom, String weekday,String crew);
+
+    List<ClassOpened> getAllBySecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot(String secondClassroom, String secondWeekday,String crew, Long id);
+
+    List<ClassOpened> getAllBySecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull(String secondClassroom, String secondWeekday,String crew);
 }

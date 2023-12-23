@@ -1,6 +1,11 @@
-import React, {useState} from "react";
-import {useParams} from "react-router";
-import {a11yProps, AntTab, AntTabs, TabPanel,} from "../../../../component/tab";
+import React, { useState } from "react";
+import { useParams } from "react-router";
+import {
+  a11yProps,
+  AntTab,
+  AntTabs,
+  TabPanel,
+} from "../../../../component/tab";
 /*
 import {
   Avatar,
@@ -13,7 +18,7 @@ import {
 } from "@material-ui/core";
 */
 //import EditIcon from "@material-ui/icons/Edit";
-import {useTheme} from "@material-ui/core/styles";
+import { useTheme } from "@material-ui/core/styles";
 import TeacherViewDetailClassStudentList from "./TeacherViewDetailClassStudentList";
 import TeacherViewDetailClassStudentRegistered from "./TeacherViewDetailClassStudentRegistered";
 //import TClassUpdatePopup from "./TClassUpdatePopup";
@@ -25,6 +30,7 @@ import TeacherViewLogUserQuizList from "../../../../component/education/course/T
 import TeacherClassViewLearningSessionList from "./TeacherClassViewLearningSessionList";
 import withScreenSecurity from "../../../../component/withScreenSecurity";
 import TeacherViewAnalyzeDoQuizInClass from "../../../../component/education/course/TeacherViewAnalyzeDoQuizInClass";
+import TeacherViewClassMaterialList from "component/education/course/teacher/TeacherViewClassMaterialList";
 
 /*
 const useStyles = makeStyles((theme) => ({
@@ -55,6 +61,7 @@ const tabsLabel = [
   "DS nộp bài tập",
   "Lịch sử học",
   "Buổi học",
+  "Tài liệu lớp học",
 ];
 
 function TeacherViewDetailClass() {
@@ -104,6 +111,9 @@ function TeacherViewDetailClass() {
       </TabPanel>
       <TabPanel value={selectedTab} index={6} dir={theme.direction}>
         <TeacherClassViewLearningSessionList classId={classId} />
+      </TabPanel>
+      <TabPanel value={selectedTab} index={7} dir={theme.direction}>
+        <TeacherViewClassMaterialList classId={classId} />
       </TabPanel>
     </div>
   );

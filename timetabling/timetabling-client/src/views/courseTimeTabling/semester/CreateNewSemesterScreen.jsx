@@ -7,9 +7,6 @@ export default function CreateNewSemester({ open, handleClose, handleUpdate, han
   const [description, setDescription] = useState('');
 
   const handleCreate = () => {
-    // Call your API to create a new semester here
-    // Assume there is a function `createSemester` that makes the API call
-    // Replace it with your actual API call logic
     const requestData = {
       semester: newSemester,
       description: description
@@ -37,7 +34,7 @@ export default function CreateNewSemester({ open, handleClose, handleUpdate, han
         <TextField
           autoFocus
           margin="dense"
-          label="Semester Name"
+          label="Tên kỳ học"
           fullWidth
           value={newSemester}
           onChange={(event) => setNewSemester(event.target.value)}
@@ -45,7 +42,7 @@ export default function CreateNewSemester({ open, handleClose, handleUpdate, han
         <div style={{ margin: '16px' }} />
         <TextField
           margin="dense"
-          label="Description"
+          label="Mô tả"
           fullWidth
           value={description}
           onChange={(event) => setDescription(event.target.value)}

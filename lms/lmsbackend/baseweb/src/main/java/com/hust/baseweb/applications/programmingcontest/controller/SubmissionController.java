@@ -14,6 +14,7 @@ import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseS
 import com.hust.baseweb.applications.programmingcontest.service.helper.cache.ProblemTestCaseServiceCache;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,11 +26,11 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
 import java.util.UUID;
 
 @RestController
@@ -47,14 +48,17 @@ public class SubmissionController {
 
     @Secured("ROLE_TEACHER")
     @PostMapping("/teacher/submissions/{submissionId}/disable")
-    public ResponseEntity<?> teacherDisableSubmission(Principal principal, @PathVariable UUID submissionId){
-        ContestSubmissionEntity managementStatus = problemTestCaseService.teacherDisableSubmission(principal.getName(),submissionId);
+    public ResponseEntity<?> teacherDisableSubmission(Principal principal, @PathVariable UUID submissionId) {
+        ContestSubmissionEntity managementStatus = problemTestCaseService.teacherDisableSubmission(principal.getName(),
+                                                                                                   submissionId);
         return ResponseEntity.ok().body(managementStatus);
     }
+
     @Secured("ROLE_TEACHER")
     @PostMapping("/teacher/submissions/{submissionId}/enable")
-    public ResponseEntity<?> teacherEnableSubmission(Principal principal, @PathVariable UUID submissionId){
-        ContestSubmissionEntity managementStatus = problemTestCaseService.teacherEnableSubmission(principal.getName(),submissionId);
+    public ResponseEntity<?> teacherEnableSubmission(Principal principal, @PathVariable UUID submissionId) {
+        ContestSubmissionEntity managementStatus = problemTestCaseService.teacherEnableSubmission(principal.getName(),
+                                                                                                  submissionId);
         return ResponseEntity.ok().body(managementStatus);
     }
 
@@ -92,7 +96,7 @@ public class SubmissionController {
     ) {
         ContestSubmissionEntity contestSubmission;
         try {
-             contestSubmission = problemTestCaseService.getContestSubmissionDetailForStudent(
+            contestSubmission = problemTestCaseService.getContestSubmissionDetailForStudent(
                 principal.getName(), submissionId);
              if(contestSubmission != null){
                  String contestId = contestSubmission.getContestId();
@@ -116,7 +120,8 @@ public class SubmissionController {
     public ResponseEntity<?> getContestSubmissionDetailViewedByManager(
         @PathVariable("submissionId") UUID submissionId
     ) {
-        ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetailForTeacher(submissionId);
+        ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetailForTeacher(
+            submissionId);
         return ResponseEntity.status(200).body(contestSubmission);
     }
 
@@ -170,17 +175,13 @@ public class SubmissionController {
             inputJson,
             ModelSubmitSolutionOutputOfATestCase.class);
         try {
-            StringBuilder solutionOutput = new StringBuilder();
-            InputStream inputStream = file.getInputStream();
-            Scanner in = new Scanner(inputStream);
-            while (in.hasNext()) {
-                String line = in.nextLine();
-                solutionOutput.append(line).append("\n");
-            }
-            in.close();
+            ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
+            String solutionOutput = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            stream.close();
+
             ModelContestSubmissionResponse resp = problemTestCaseService.submitSolutionOutputOfATestCase(
                 principale.getName(),
-                solutionOutput.toString(),
+                solutionOutput,
                 model
             );
             log.info("resp {}", resp);
@@ -202,16 +203,12 @@ public class SubmissionController {
         Gson gson = new Gson();
         ModelSubmitSolutionOutput model = gson.fromJson(inputJson, ModelSubmitSolutionOutput.class);
         try {
-            StringBuilder solutionOutput = new StringBuilder();
-            InputStream inputStream = file.getInputStream();
-            Scanner in = new Scanner(inputStream);
-            while (in.hasNext()) {
-                String line = in.nextLine();
-                solutionOutput.append(line).append("\n");
-            }
-            in.close();
+            ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
+            String solutionOutput = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            stream.close();
+
             ModelContestSubmissionResponse resp = problemTestCaseService.submitSolutionOutput(
-                solutionOutput.toString(),
+                solutionOutput,
                 model.getContestId(),
                 model.getProblemId(),
                 model.getTestCaseId(),
@@ -301,14 +298,9 @@ public class SubmissionController {
         }
 
         try {
-            StringBuilder source = new StringBuilder();
-            InputStream inputStream = file.getInputStream();
-            Scanner in = new Scanner(inputStream);
-            while (in.hasNext()) {
-                String line = in.nextLine();
-                source.append(line).append("\n");
-            }
-            in.close();
+            ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
+            String source = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            stream.close();
 
             if (source.length() > contestEntity.getMaxSourceCodeLength()) {
                 ModelContestSubmissionResponse resp = buildSubmissionResponseReachMaxSourceLength(
@@ -317,7 +309,7 @@ public class SubmissionController {
                 return ResponseEntity.ok().body(resp);
             }
             ModelContestSubmission request = new ModelContestSubmission(model.getContestId(), model.getProblemId(),
-                                                                        source.toString(), model.getLanguage());
+                                                                        source, model.getLanguage());
             ModelContestSubmissionResponse resp = null;
             if (contestEntity.getSubmissionActionType()
                              .equals(ContestEntity.CONTEST_SUBMISSION_ACTION_TYPE_STORE_AND_EXECUTE)) {
@@ -529,14 +521,9 @@ public class SubmissionController {
         }
 
         try {
-            StringBuilder source = new StringBuilder();
-            InputStream inputStream = file.getInputStream();
-            Scanner in = new Scanner(inputStream);
-            while (in.hasNext()) {
-                String line = in.nextLine();
-                source.append(line).append("\n");
-            }
-            in.close();
+            ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
+            String source = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            stream.close();
 
             if (source.length() > contestEntity.getMaxSourceCodeLength()) {
                 ModelContestSubmissionResponse resp = buildSubmissionResponseReachMaxSourceLength(
@@ -545,7 +532,7 @@ public class SubmissionController {
                 return ResponseEntity.ok().body(resp);
             }
             ModelContestSubmission request = new ModelContestSubmission(model.getContestId(), problemId,
-                                                                        source.toString(), language);
+                                                                        source, language);
             ModelContestSubmissionResponse resp = null;
             if (contestEntity.getSubmissionActionType()
                              .equals(ContestEntity.CONTEST_SUBMISSION_ACTION_TYPE_STORE_AND_EXECUTE)) {
