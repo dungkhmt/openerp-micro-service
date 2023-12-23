@@ -120,6 +120,8 @@ public class ContestService {
             .maxSourceCodeLength(contestEntity.getMaxSourceCodeLength())
             .minTimeBetweenTwoSubmissions(contestEntity.getMinTimeBetweenTwoSubmissions())
             .judgeMode(contestEntity.getJudgeMode())
+            .participantViewSubmissionMode(contestEntity.getParticipantViewSubmissionMode())
+            .listParticipantViewSubmissionModes(ContestEntity.getListParticipantViewSubmissionModes())
             .build();
     }
 

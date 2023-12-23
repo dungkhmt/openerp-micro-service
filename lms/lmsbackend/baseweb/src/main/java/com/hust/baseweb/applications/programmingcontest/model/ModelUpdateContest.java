@@ -24,4 +24,5 @@ public class ModelUpdateContest {
     private int minTimeBetweenTwoSubmissions;
     private String judgeMode;
     private String sendConfirmEmailUponSubmission;
+    private String participantViewSubmissionMode;
 }

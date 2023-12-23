@@ -34,6 +34,7 @@ export function ContestManagerDetail(props) {
   const [evaluateBothPublicPrivateTestcase, setEvaluateBothPublicPrivateTestcase,] = useState("");
   const [maxSourceCodeLength, setMaxSourceCodeLength] = useState(50000);
   const [minTimeBetweenTwoSubmissions, setMinTimeBetweenTwoSubmissions] = useState(0);
+  const [participantViewSubmissionMode, setParticipantViewSubmissionMode] = useState("");
 
   const [loading, setLoading] = useState(true);
 
@@ -50,6 +51,7 @@ export function ContestManagerDetail(props) {
       setMinTimeBetweenTwoSubmissions(res.data.minTimeBetweenTwoSubmissions);
       setEvaluateBothPublicPrivateTestcase(res.data.evaluateBothPublicPrivateTestcase);
       setMaxSourceCodeLength(res.data.maxSourceCodeLength);
+      setParticipantViewSubmissionMode(res.data.participantViewSubmissionMode);
     }).then(() => setLoading(false));
   }
 
@@ -174,6 +176,16 @@ export function ContestManagerDetail(props) {
             id="problemDescriptionViewType"
             label="Problem Description View Mode"
             value={problemDescriptionViewType}
+          >
+          </CssTextField>
+        </Grid>
+        <Grid item xs={3}>
+          <CssTextField
+            disabled
+            fullWidth
+            id="participantViewSubmissionMode"
+            label="Participant View Submission Mode"
+            value={participantViewSubmissionMode}
           >
           </CssTextField>
         </Grid>

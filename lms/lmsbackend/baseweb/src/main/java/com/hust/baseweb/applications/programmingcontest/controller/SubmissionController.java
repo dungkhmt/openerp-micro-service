@@ -94,6 +94,16 @@ public class SubmissionController {
         try {
              contestSubmission = problemTestCaseService.getContestSubmissionDetailForStudent(
                 principal.getName(), submissionId);
+             if(contestSubmission != null){
+                 String contestId = contestSubmission.getContestId();
+                 if(contestId != null) {
+                     ContestEntity contest = contestRepo.findContestByContestId(contestId);
+                    if(contest.getParticipantViewSubmissionMode() != null)
+                       if(contest.getParticipantViewSubmissionMode().equals(ContestEntity.PARTICIPANT_VIEW_SUBMISSION_MODE_DISABLED)){
+                        contestSubmission.setSourceCode("HIDDEN");
+                    }
+                 }
+             }
         } catch (AccessDeniedException e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }

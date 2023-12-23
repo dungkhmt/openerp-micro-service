@@ -640,4 +640,10 @@ public class ContestController {
 
         return ResponseEntity.status(200).body(lst);
     }
+    @Secured("ROLE_TEACHER")
+    @GetMapping("/contest/get-participant-view-submission-modes")
+    public ResponseEntity<?> getParticipantViewSubmissionModes(){
+        List<String> res = ContestEntity.getListParticipantViewSubmissionModes();
+        return ResponseEntity.ok().body(res);
+    }
 }

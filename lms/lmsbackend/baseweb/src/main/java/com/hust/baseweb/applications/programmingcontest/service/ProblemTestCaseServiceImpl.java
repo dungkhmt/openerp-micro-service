@@ -746,6 +746,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .minTimeBetweenTwoSubmissions(modelUpdateContest.getMinTimeBetweenTwoSubmissions())
                                                    .judgeMode(modelUpdateContest.getJudgeMode())
                                                    .sendConfirmEmailUponSubmission(modelUpdateContest.getSendConfirmEmailUponSubmission())
+                                                    .participantViewSubmissionMode(modelUpdateContest.getParticipantViewSubmissionMode())
                                                    .build();
         return contestService.updateContestWithCache(contestEntity);
 

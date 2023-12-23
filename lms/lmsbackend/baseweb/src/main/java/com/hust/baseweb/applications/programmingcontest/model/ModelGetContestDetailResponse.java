@@ -27,6 +27,7 @@ public class ModelGetContestDetailResponse implements Serializable {
     private int maxSourceCodeLength;
     private long minTimeBetweenTwoSubmissions;
     private String judgeMode;
+    private String participantViewSubmissionMode;
     private List<String> listStatusIds;
     private List<String> listSubmissionActionTypes;
     private List<String> listParticipantViewModes;
@@ -34,4 +35,5 @@ public class ModelGetContestDetailResponse implements Serializable {
     private List<String> listUseCacheContestProblems;
     private List<String> listEvaluateBothPublicPrivateTestcases;
     private List<String> listJudgeModes;
+    private List<String> listParticipantViewSubmissionModes;
 }

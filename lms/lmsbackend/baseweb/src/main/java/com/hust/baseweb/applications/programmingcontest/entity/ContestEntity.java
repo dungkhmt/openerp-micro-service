@@ -50,6 +50,15 @@ public class ContestEntity implements Serializable {
     public static final String SEND_CONFIRM_EMAIL_UPON_SUBMISSION_YES = "Y";
     public static final String SEND_CONFIRM_EMAIL_UPON_SUBMISSION_NO = "N";
 
+    public static final String PARTICIPANT_VIEW_SUBMISSION_MODE_ENABLED = "ALLOW_VIEW";
+    public static final String PARTICIPANT_VIEW_SUBMISSION_MODE_DISABLED = "FORBIDDEN";
+
+    public static List<String> getListParticipantViewSubmissionModes(){
+        List<String> L = new ArrayList();
+        L.add(PARTICIPANT_VIEW_SUBMISSION_MODE_ENABLED);
+        L.add(PARTICIPANT_VIEW_SUBMISSION_MODE_DISABLED);
+        return L;
+    }
     public static List<String> getJudgeModes() {
         List<String> L = new ArrayList();
         L.add(SYNCHRONOUS_JUDGE_MODE);
@@ -170,4 +179,7 @@ public class ContestEntity implements Serializable {
 
     @Column(name="send_confirm_email_upon_submission")
     private String sendConfirmEmailUponSubmission;
+
+    @Column(name="participant_view_submission_mode")
+    private String participantViewSubmissionMode;
 }

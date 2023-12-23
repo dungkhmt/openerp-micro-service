@@ -48,6 +48,8 @@ export default function EditContest() {
 
   const [minTimeBetweenTwoSubmissions, setMinTimeBetweenTwoSubmissions] = useState(0);
   const [judgeMode, setJudgeMode] = useState("");
+  const [participantViewSubmissionMode, setParticipantViewSubmissionMode] = useState(null);
+  const [listParticipantViewSubmissionModes, setListParticipantViewSubmissionModes] = useState([]);
 
   const handleSubmit = () => {
     setLoading(true);
@@ -66,6 +68,7 @@ export default function EditContest() {
       evaluateBothPublicPrivateTestcase: evaluateBothPublicPrivateTestcase,
       minTimeBetweenTwoSubmissions: minTimeBetweenTwoSubmissions,
       judgeMode: judgeMode,
+      participantViewSubmissionMode: participantViewSubmissionMode
     };
 
     request("put", "/contests/" + contestId, () => {
@@ -97,6 +100,8 @@ export default function EditContest() {
       setEvaluateBothPublicPrivateTestcase(res.data.evaluateBothPublicPrivateTestcase);
       setMaxSourceCodeLength(res.data.maxSourceCodeLength);
       setListEvaluateBothPublicPrivateTestcases(res.data.listEvaluateBothPublicPrivateTestcases);
+      setParticipantViewSubmissionMode(res.data.participantViewSubmissionMode);
+      setListParticipantViewSubmissionModes(res.data.listParticipantViewSubmissionModes);
     }).then(() => setLoading(false));
   }
 
@@ -252,7 +257,22 @@ export default function EditContest() {
                 </MenuItem>))}
               </TextField>
             </Grid>
-
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                select
+                id="participantViewSubmissionMode"
+                label="Participant View Submissions Mode"
+                onChange={(event) => {
+                  setParticipantViewSubmissionMode(event.target.value);
+                }}
+                value={participantViewSubmissionMode}
+              >
+                {listParticipantViewSubmissionModes.map((item) => (<MenuItem key={item} value={item}>
+                  {item}
+                </MenuItem>))}
+              </TextField>
+            </Grid>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DateTimePicker
                 label="Date&Time picker"
