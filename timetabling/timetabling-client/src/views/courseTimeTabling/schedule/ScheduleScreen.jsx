@@ -217,7 +217,7 @@ export default function ScheduleScreen() {
     function DataGridTitle() {
         return (
             <Box style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <Typography variant="h5">Danh sách nhóm thời khóa biểu</Typography>
+                <Typography variant="h5">Nhóm các lớp học</Typography>
             </Box>
         )
     }

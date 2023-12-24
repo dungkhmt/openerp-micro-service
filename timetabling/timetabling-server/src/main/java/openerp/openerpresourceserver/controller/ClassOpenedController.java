@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import openerp.openerpresourceserver.exception.ConflictScheduleException;
 import openerp.openerpresourceserver.exception.UnableSeparateClassException;
 import openerp.openerpresourceserver.exception.UnableStartPeriodException;
+import openerp.openerpresourceserver.model.dto.request.AutoMakeScheduleDto;
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.model.dto.request.MakeScheduleDto;
 import openerp.openerpresourceserver.model.dto.request.UpdateClassOpenedDto;
@@ -94,11 +95,9 @@ public class ClassOpenedController {
     }
 
     @PostMapping("/auto-make-schedule")
-    public ResponseEntity<String> autoMakeSchedule(@RequestParam String semester,
-                                                   @RequestParam String groupName,
-                                                   @RequestParam String weekdayPriority) {
+    public ResponseEntity<String> autoMakeSchedule(@Valid @RequestBody AutoMakeScheduleDto autoMakeScheduleDto) {
         try {
-            service.automationMakeScheduleForCTTT(semester, groupName, weekdayPriority);
+            service.automationMakeScheduleForCTTT(autoMakeScheduleDto);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

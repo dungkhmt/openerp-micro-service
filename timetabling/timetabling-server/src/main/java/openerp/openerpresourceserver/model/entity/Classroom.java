@@ -19,6 +19,6 @@ public class Classroom {
     private Long id;
     private String classroom;
     private String building;
-    private String quantityMax;
+    private Long quantityMax;
     private String description;
 }

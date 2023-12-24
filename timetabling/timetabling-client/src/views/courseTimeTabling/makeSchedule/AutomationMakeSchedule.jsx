@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Autocomplete } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Autocomplete, Checkbox, FormControlLabel } from '@mui/material';
 import { request } from "../../../api";
 
 export default function AutomationMakeSchedule({ open, handleClose, handleRefreshData }) {
@@ -8,6 +8,7 @@ export default function AutomationMakeSchedule({ open, handleClose, handleRefres
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedWeekdayPriority, setSelectedWeekdayPriority] = useState(null);
+  const [autoAssignClassroom, setAutoAssignClassroom] = useState(false);
 
   useEffect(() => {
     request("get", "/semester/get-all", (res) => {
@@ -24,7 +25,8 @@ export default function AutomationMakeSchedule({ open, handleClose, handleRefres
     "2,4,5,3,6",
     "3,5,2,4,6",
     "4,6,2,3,5",
-    "2,4,6,3,5"
+    "2,4,6,3,5",
+    "2,4,3,5,6"
   ]
 
   const handleMakeSchedule = () => {
@@ -34,15 +36,21 @@ export default function AutomationMakeSchedule({ open, handleClose, handleRefres
     const groupName = selectedGroup.groupName;
     const weekdayPriority = selectedWeekdayPriority;
 
-    const fullUrl = `${url}?semester=${semesterName}&groupName=${groupName}&weekdayPriority=${weekdayPriority}`;
+    const requestData = {
+      semester: semesterName,
+      groupName: groupName,
+      weekdayPriority: weekdayPriority,
+      isClassroomArranged: autoAssignClassroom,
+  };
 
-    request("post", fullUrl, (res) => {
+    request("post", url, (res) => {
       // Call handleRefreshData to refresh the data 
       handleRefreshData();
       //close dialog
       handleClose();
     },
-      {}
+      {},
+      requestData
     ).then();
 
     // Close the dialog
@@ -59,6 +67,10 @@ export default function AutomationMakeSchedule({ open, handleClose, handleRefres
 
   const handleWeekdaypriorityChange = (event, newValue) => {
     setSelectedWeekdayPriority(newValue);
+  };
+
+  const handleAutoAssignClassroomChange = (event) => {
+    setAutoAssignClassroom(event.target.checked);
   };
 
   return (
@@ -89,6 +101,10 @@ export default function AutomationMakeSchedule({ open, handleClose, handleRefres
           value={selectedWeekdayPriority}
           renderInput={(params) => <TextField {...params} label="Độ ưu tiên ngày học" />}
           onChange={handleWeekdaypriorityChange}
+        />
+        <FormControlLabel
+          control={<Checkbox checked={autoAssignClassroom} onChange={handleAutoAssignClassroomChange} />}
+          label="Tự động sắp xếp phòng học"
         />
       </DialogContent>
       <DialogActions>

@@ -182,7 +182,7 @@ export default function TimePerformanceScreen() {
                         onClick={handleImportExcel}
                         disabled={!selectedSemester}
                     >
-                        Import Excel
+                        Tải lên danh sách lớp
                     </Button>
                 </div>
             </div >

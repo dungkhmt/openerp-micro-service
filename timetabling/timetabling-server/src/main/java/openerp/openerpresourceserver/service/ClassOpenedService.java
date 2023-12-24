@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.service;
 
+import openerp.openerpresourceserver.model.dto.request.AutoMakeScheduleDto;
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.model.dto.request.MakeScheduleDto;
 import openerp.openerpresourceserver.model.dto.request.UpdateClassOpenedDto;
@@ -24,5 +25,5 @@ public interface ClassOpenedService {
 
     void makeSchedule(MakeScheduleDto requestDto);
 
-    void automationMakeScheduleForCTTT(String semester, String groupName, String weekdayPriority);
+    void automationMakeScheduleForCTTT(AutoMakeScheduleDto autoMakeScheduleDto);
 }

@@ -6,6 +6,7 @@ import openerp.openerpresourceserver.common.CommonUtil;
 import openerp.openerpresourceserver.exception.ConflictScheduleException;
 import openerp.openerpresourceserver.exception.UnableSeparateClassException;
 import openerp.openerpresourceserver.exception.UnableStartPeriodException;
+import openerp.openerpresourceserver.model.dto.request.AutoMakeScheduleDto;
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.model.dto.request.MakeScheduleDto;
 import openerp.openerpresourceserver.model.dto.request.UpdateClassOpenedDto;
@@ -269,7 +270,11 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
 
     // ----------------Automation make schedule---------------------
     @Override
-    public void automationMakeScheduleForCTTT(String semester, String groupName, String weekdayPriority) {
+    public void automationMakeScheduleForCTTT(AutoMakeScheduleDto autoMakeScheduleDto) {
+        String semester = autoMakeScheduleDto.getSemester();
+        String groupName = autoMakeScheduleDto.getGroupName();
+        String weekdayPriority = autoMakeScheduleDto.getWeekdayPriority();
+
         Sort sort = Sort.by(Sort.Direction.ASC, "id");
         List<ClassOpened> listClassMakeSchedule = classOpenedRepo.getAllBySemesterAndGroupName(semester, groupName, sort);
         if (listClassMakeSchedule.isEmpty()) {
@@ -377,4 +382,6 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
 
         return minStartPeriod + sumTotalPeriod;
     }
+
+
 }

@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.helper;
 
 import openerp.openerpresourceserver.model.entity.ClassOpened;
+import openerp.openerpresourceserver.model.entity.Classroom;
 import openerp.openerpresourceserver.model.entity.Schedule;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -301,5 +302,59 @@ public class ExcelHelper {
         } else {
             return "";
         }
+    }
+
+    public static List<Classroom> excelToClassroom(InputStream is) {
+        try {
+            Workbook workbook = new XSSFWorkbook(is);
+            Sheet sheet = workbook.getSheet(SHEET);
+            if (sheet == null) {
+                sheet = workbook.getSheet(DEFAULT_SHEET);
+            }
+            Iterator<Row> rows = sheet.iterator();
+            List<Classroom> classroomList = new ArrayList<Classroom>();
+            int rowNumber = 0;
+
+            while (rows.hasNext()) {
+                Row currentRow = rows.next();
+                // skip header
+                if (rowNumber++ < 4) {
+                    continue;
+                }
+                Iterator<Cell> cellsInRow = currentRow.iterator();
+                Classroom classroom = new Classroom();
+                int cellIdx = 0;
+                while (cellsInRow.hasNext()) {
+                    Cell currentCell = cellsInRow.next();
+                    String cellValue = getCellValueAsString(currentCell);
+                    if (cellValue.isEmpty() || cellValue.isBlank()) break;
+                    switch (cellIdx) {
+                        case 0:
+                            classroom.setClassroom(cellValue);
+                            classroom.setBuilding(getBuildingFromClassroom(cellValue));
+                            break;
+                        case 1:
+                            cellValue = cellValue.contains(".") ? cellValue.substring(0, cellValue.indexOf(".")) : cellValue;
+                            classroom.setQuantityMax(Long.parseLong(cellValue));
+                            break;
+                        default:
+                            break;
+                    }
+                    cellIdx++;
+                }
+                classroomList.add(classroom);
+            }
+            workbook.close();
+            return classroomList;
+        } catch (IOException e) {
+            throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
+        }
+    }
+
+    public static String getBuildingFromClassroom(String classroom) {
+        String[] classroomArray = classroom.split("-");
+        if (classroomArray.length == 3) {
+            return classroomArray[0] + "-" + classroomArray[1];
+        } else return classroomArray[0];
     }
 }

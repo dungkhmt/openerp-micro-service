@@ -14,14 +14,14 @@ export const courseTimeTabling = {
       id: "MENU_COURSE_TIME_TABLING.CLASS_LIST_OPENED",
       path: "/course-time-tabling/class-list-opened",
       isPublic: true,
-      text: "Danh sách lớp được mở",
+      text: "Danh sách lớp",
       child: [],
     },
     {
       id: "MENU_COURSE_TIME_TABLING.SCHEDULE",
       path: "/course-time-tabling/schedule",
       isPublic: true,
-      text: "Danh sách nhóm thời khóa biểu",
+      text: "Nhóm các lớp học",
       child: [],
     },
     {
