@@ -1,6 +1,7 @@
 const prod = {
   url: {
     API_URL: "/api",
+    NOTIFICATION_SERVER_URL: "http://localhost:8081/api",
   },
   keycloak: {
     url: "https://programming.daotao.ai/iam",
@@ -12,6 +13,7 @@ const prod = {
 const dev = {
   url: {
     API_URL: "http://localhost:8080/api",
+    NOTIFICATION_SERVER_URL: "http://localhost:8081/api",
   },
   keycloak: {
     url: "https://openerp3.dailyopt.ai/iam",

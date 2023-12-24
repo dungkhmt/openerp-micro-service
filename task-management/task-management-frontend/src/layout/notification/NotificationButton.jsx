@@ -95,7 +95,11 @@ function NotificationButton() {
           numUnRead.set(data.numUnRead);
           hasMore.set(!data.notifications.last);
         },
-        { 401: () => {} }
+        { 401: () => {} },
+        null,
+        {
+          baseURL: config.url.NOTIFICATION_SERVER_URL,
+        }
       );
     } catch (e) {
       notifications.set([]);
@@ -219,7 +223,7 @@ function NotificationButton() {
       fetchNotification();
 
       es = new EventSourcePolyfill(
-        `${config.url.API_URL}/notification/subscription`,
+        `${config.url.NOTIFICATION_SERVER_URL}/notification/subscription`,
         {
           headers: {
             Authorization: bearerAuth(keycloak.token),
