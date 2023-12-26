@@ -28,6 +28,11 @@ public class ClassroomServiceImpl implements ClassroomService {
     }
 
     @Override
+    public List<String> getBuilding() {
+        return classroomRepo.getBuilding();
+    }
+
+    @Override
     public void updateClassroom() {
         List<String> classroomDataList = classroomRepo.getClassroom();
         if (!classroomDataList.isEmpty()) {

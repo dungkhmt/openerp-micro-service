@@ -16,4 +16,6 @@ public class GroupDto {
 
     @NotBlank(message = "Group name is required not null")
     private String groupName;
+
+    private String priorityBuilding;
 }

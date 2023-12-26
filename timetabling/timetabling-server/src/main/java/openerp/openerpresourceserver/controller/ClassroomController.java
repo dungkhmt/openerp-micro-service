@@ -34,6 +34,19 @@ public class ClassroomController {
         }
     }
 
+    @GetMapping("/get-all-building")
+    public ResponseEntity<List<String>> getAllBuilding() {
+        try {
+            List<String> buildingList = service.getBuilding();
+            if (buildingList.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(buildingList, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/update")
     public ResponseEntity<Void> updateClassroom() {
         try {

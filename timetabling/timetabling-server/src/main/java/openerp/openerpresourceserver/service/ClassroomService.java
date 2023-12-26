@@ -11,6 +11,8 @@ public interface ClassroomService {
 
     List<Classroom> getClassroom();
 
+    List<String> getBuilding();
+
     void updateClassroom();
 
     Classroom create(ClassroomDto classroomDto);
