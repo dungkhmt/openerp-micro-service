@@ -1,14 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Autocomplete } from '@mui/material';
 import { request } from "../../../api";
 
 export default function CreateNewGroupScreen({ open, handleClose, existingData, handleRefreshData }) {
   const [newGroup, setNewGroup] = useState('');
+  const [newPriorityBuilding, setNewPriorityBuilding] = useState('');
+  const [buildings, setBuildings] = useState([]);
+
+  useEffect(() => {
+    request("get", "/classroom/get-all-building", (res) => {
+      setBuildings(res.data);
+    });
+  }, [])
 
   const handleCreate = () => {
 
     const requestNewGroup = {
       groupName: newGroup,
+      priorityBuilding: newPriorityBuilding
     };
 
     const requestUpdateClassOpened = {
@@ -44,6 +53,10 @@ export default function CreateNewGroupScreen({ open, handleClose, existingData, 
     setNewGroup(event.target.value);
   };
 
+  const handleBuildingpriorityChange = (event, newValue) => {
+    setNewPriorityBuilding(newValue);
+  };
+
   return (
     <Dialog open={open} onClose={handleClose} aria-labelledby="create-new-semester-dialog">
       <DialogTitle id="create-new-semester-dialog-title">Thêm vào nhóm mới</DialogTitle>
@@ -55,6 +68,14 @@ export default function CreateNewGroupScreen({ open, handleClose, existingData, 
           fullWidth
           value={newGroup}
           onChange={handleInputChange}
+        />
+        <Autocomplete
+          options={buildings}
+          getOptionLabel={(option) => option}
+          style={{ width: 250, marginTop: '8px' }}
+          value={newPriorityBuilding}
+          renderInput={(params) => <TextField {...params} label="Tòa nhà ưu tiên" />}
+          onChange={handleBuildingpriorityChange}
         />
       </DialogContent>
       <DialogActions>
