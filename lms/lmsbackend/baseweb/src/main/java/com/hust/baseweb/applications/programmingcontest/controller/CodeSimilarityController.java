@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.Path;
 import java.security.Principal;
 import java.util.List;
 
@@ -51,6 +52,11 @@ public class CodeSimilarityController {
         log.info("checkCodeSimilarity, contestId = " + contestId);
         ModelCodeSimilarityOutput res = problemTestCaseService.checkSimilarity(contestId, I);
         return ResponseEntity.ok().body(res);
+    }
+    @GetMapping("/check-forbidden-instructions/{contestId}")
+    public ResponseEntity<?> checkForbiddenInstructions(Principal principal, @PathVariable String contestId){
+        int cnt = problemTestCaseService.checkForbiddenInstructions(contestId);
+        return ResponseEntity.ok().body(cnt);
     }
     @PostMapping("/compute-code-similarity/{contestId}")
     public ResponseEntity<?> computeCodeSimilarity(

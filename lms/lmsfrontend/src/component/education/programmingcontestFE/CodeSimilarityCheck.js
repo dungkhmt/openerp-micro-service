@@ -103,6 +103,19 @@ export default function CodeSimilarityCheck(props) {
     );
   }
 
+  function handleCheckForbiddenInstructions(){
+    event.preventDefault();
+    setIsProcessing(true);
+   
+    request(
+      "get",
+      //"/check-code-similarity/" + contestId,
+      "/check-forbidden-instructions/" + contestId,
+      {},
+      {},
+      body
+    ).then(() => setIsProcessing(false))
+  }
   function handleCheckPlagiarism(event) {
     event.preventDefault();
     setIsProcessing(true);
@@ -169,6 +182,15 @@ export default function CodeSimilarityCheck(props) {
         >
           Compute Plagiarism
         </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleCheckForbiddenInstructions}
+          sx={{marginLeft: "24px"}}
+        >
+          Check Forbidden Instructions
+        </Button>
+        
       </Box>
 
       {isProcessing ? <CircularProgress/> : ""}

@@ -35,6 +35,10 @@ public class ContestSubmissionEntity {
     public static final String MANAGEMENT_STATUS_ENABLED = "ENABLED";
     public static final String MANAGEMENT_STATUS_DISABLED = "DISABLED";
 
+    public static final String VIOLATION_FORBIDDEN_YES = "Y";
+    public static final String VIOLATION_FORBIDDEN_NO = "N";
+
+
     @Id
     @Column(name = "contest_submission_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -104,4 +108,11 @@ public class ContestSubmissionEntity {
 
     @Column(name = "message")
     private String message;
+
+    @Column(name="violate_forbidden_instruction")
+    private String violateForbiddenInstruction;
+
+    @Column(name="violate_forbidden_instruction_message")
+    private String violateForbiddenInstructionMessage;
+
 }

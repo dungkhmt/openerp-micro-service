@@ -78,10 +78,12 @@ public class ContestService {
             String submissionMode = "";
             String problemRename = "";
             String problemRecode = "";
+            String forbiddenInstructions = "";
             if (cp != null) {
                 submissionMode = cp.getSubmissionMode();
                 problemRename = cp.getProblemRename();
                 problemRecode = cp.getProblemRecode();
+                forbiddenInstructions = cp.getForbiddenInstructions();
             }
             ModelGetProblemDetailResponse p = ModelGetProblemDetailResponse.builder()
                                                                            .levelId(contestProblem.getLevelId())
@@ -89,6 +91,7 @@ public class ContestService {
                                                                            .problemName(contestProblem.getProblemName())
                                                                            .problemRename(problemRename)
                                                                            .problemRecode(problemRecode)
+                                                                           .forbiddenInstructions(forbiddenInstructions)
                                                                            .levelOrder(contestProblem.getLevelOrder())
                                                                            .problemDescription(contestProblem.getProblemDescription())
                                                                            .createdByUserId(contestProblem.getUserId())

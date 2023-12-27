@@ -66,6 +66,7 @@ export function ContestManagerDetail(props) {
   return (
     <HustContainerCard
       title={"Contest: " + contestId}
+      
       action={
         <Button
           variant="contained"
@@ -75,7 +76,9 @@ export function ContestManagerDetail(props) {
         >
           Edit
         </Button>
+        
       }
+      
     >
       {loading && <LinearProgress/>}
       <Grid container rowSpacing={3} spacing={2} mb="16px" display={loading ? "none" : ""}>

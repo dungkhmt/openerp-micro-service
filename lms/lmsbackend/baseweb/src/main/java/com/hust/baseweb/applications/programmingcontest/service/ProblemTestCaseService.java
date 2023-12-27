@@ -182,6 +182,7 @@ public interface ProblemTestCaseService {
     ModelCodeSimilarityOutput checkSimilarity(String contestId, ModelCheckSimilarityInput I);
     ModelCodeSimilarityOutput computeSimilarity(String userLoginId, String contestId, ModelCheckSimilarityInput I);
 
+    int checkForbiddenInstructions(String contestId);
 
     ModelEvaluateBatchSubmissionResponse reJudgeAllSubmissionsOfContest(String contestId);
 

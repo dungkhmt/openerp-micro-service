@@ -29,4 +29,7 @@ public class ContestSubmission {
     private String createAt;
     private Date submissionDate;
     private String managementStatus;
+    private String violationForbiddenInstruction;
+    private String violationForbiddenInstructionMessage;
+
 }

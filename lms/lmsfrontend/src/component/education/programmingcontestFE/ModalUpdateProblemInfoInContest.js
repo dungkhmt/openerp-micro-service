@@ -21,10 +21,12 @@ const ModalUpdateProblemInfoInContest = (props) => {
   const [problemRecode, setProblemRecode] = useState("");
   const [submissionMode, setSubmissionMode] = useState(SUBMISSION_MODE_SOURCE_CODE)
   const [loading, setLoading] = useState(false);
+  const [forbiddenInstructions, setForbiddenInstructions] = useState("");
 
   useEffect(() =>  {
     setProblemRename(editingProblem?.problemRename || "");
     setProblemRecode(editingProblem?.problemRecode || "");
+    setForbiddenInstructions(editingProblem?.forbiddenInstructions||"");
     setSubmissionMode(editingProblem?.submissionMode || SUBMISSION_MODE_SOURCE_CODE);
   }, [isOpen])
 
@@ -36,6 +38,7 @@ const ModalUpdateProblemInfoInContest = (props) => {
       problemRename: problemRename,
       problemRecode: problemRecode,
       submissionMode: submissionMode,
+      forbiddenInstructions: forbiddenInstructions,
     };
 
     setLoading(true);
@@ -93,6 +96,17 @@ const ModalUpdateProblemInfoInContest = (props) => {
         }}
         sx={{marginTop: "16px"}}
       />
+      <TextField
+        fullWidth
+        label={"Forbidden instructions"}
+        placeholder={"If this field is left blank, a default value will be generated"}
+        value={forbiddenInstructions}
+        onChange={(event) => {
+          setForbiddenInstructions(event.target.value);
+        }}
+        sx={{marginTop: "16px"}}
+      />
+      
       <TextField
         fullWidth
         autoFocus

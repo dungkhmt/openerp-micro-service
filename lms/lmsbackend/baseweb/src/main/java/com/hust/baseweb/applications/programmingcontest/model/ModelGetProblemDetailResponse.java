@@ -19,4 +19,5 @@ public class ModelGetProblemDetailResponse implements Serializable {
     private boolean unauthorized;
     private String problemRename;
     private String problemRecode;
+    private String forbiddenInstructions;
 }

@@ -45,4 +45,7 @@ public class ContestProblem {
 
     @Column(name = "submission_mode")
     private String submissionMode;
+
+    @Column(name="forbidden_instructions")
+    private String forbiddenInstructions;
 }

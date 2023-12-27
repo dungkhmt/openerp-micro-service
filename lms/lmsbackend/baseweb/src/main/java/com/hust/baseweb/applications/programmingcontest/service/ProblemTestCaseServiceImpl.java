@@ -778,6 +778,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             contestProblem = new ContestProblem();
             contestProblem.setContestId(contestId);
             contestProblem.setProblemId(problemId);
+            contestProblem.setForbiddenInstructions(modelProblemInfoInContest.getForbiddenInstructions());
         }
 
         if (modelProblemInfoInContest.getProblemRename().isEmpty()) {
@@ -793,6 +794,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         }
 
         contestProblem.setSubmissionMode(modelProblemInfoInContest.getSubmissionMode());
+        contestProblem.setForbiddenInstructions(modelProblemInfoInContest.getForbiddenInstructions());
 
         return contestProblemRepo.save(contestProblem);
     }
@@ -2112,6 +2114,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 .testCasePass(contestSubmissionEntity.getTestCasePass())
                 .status(contestSubmissionEntity.getStatus())
                 .managementStatus(contestSubmissionEntity.getManagementStatus())
+                .violationForbiddenInstruction(contestSubmissionEntity.getViolateForbiddenInstruction())
+                .violationForbiddenInstructionMessage(contestSubmissionEntity.getViolateForbiddenInstructionMessage())
                 .message(contestSubmissionEntity.getMessage())
                 .userId(contestSubmissionEntity.getUserId())
                 .fullname(userService.getUserFullName(contestSubmissionEntity.getUserId()))
@@ -2321,6 +2325,36 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return model;
     }
 
+    @Override
+    public int checkForbiddenInstructions(String contestId){
+        List<ContestProblem> contestProblems = contestProblemRepo.findAllByContestId(contestId);
+        Map<String, List<String>> mPro2ForbiddenIns = new HashMap();
+        for(ContestProblem cp: contestProblems){
+            String[] forbiddens = cp.getForbiddenInstructions().split(",");
+            if(forbiddens != null){
+                List<String> L = new ArrayList();
+                for(String s: forbiddens) L.add(s.trim());
+                mPro2ForbiddenIns.put(cp.getProblemId(),L);
+            }
+        }
+        List<ContestSubmissionEntity> submissions = contestSubmissionRepo.findAllByContestId(contestId);
+        int cnt = 0;
+        for(ContestSubmissionEntity sub: submissions){
+            String problemId = sub.getProblemId();
+            String msg = "";
+            if(mPro2ForbiddenIns.get(problemId)!=null){
+                for(String f: mPro2ForbiddenIns.get(problemId)){
+                    if(sub.getSourceCode().contains(f)){
+                        sub.setViolateForbiddenInstruction(ContestSubmissionEntity.VIOLATION_FORBIDDEN_YES);
+                        msg = msg + f + ",";
+                        cnt++;
+                    }
+                }
+            }
+            sub.setViolateForbiddenInstructionMessage(msg);
+        }
+        return cnt;
+    }
     @Override
     public ModelCodeSimilarityOutput computeSimilarity(
         String userLoginId,

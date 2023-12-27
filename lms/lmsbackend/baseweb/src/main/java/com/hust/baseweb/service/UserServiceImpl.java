@@ -505,23 +505,26 @@ public class UserServiceImpl implements UserService {
             affiliations = userRegister.getAffiliations();
         }
         //log.info("findPersonByUserLoginId, affiliations of " + userLoginId + " = " + affiliations);
-        Person person = personRepo.findByPartyId(userLogin.getParty().getPartyId());
-        if (person == null) {
-            log.info("findPersonByUserLoginId, person of " + userLoginId + " not exists");
-            return new PersonModel();
-        }
+        //Person person = personRepo.findByPartyId(userLogin.getParty().getPartyId());
+        //if (person == null) {
+        //    log.info("findPersonByUserLoginId, person of " + userLoginId + " not exists");
+        //    return new PersonModel();
+        //}
         //log.info("findPersonByUserLoginId, found person {}", person);
         PersonModel personModel = new PersonModel();
         personModel.setUserName(userLoginId);
         if (userRegister != null) {
             personModel.setEmail(userRegister.getEmail());
         }
-        personModel.setGender(person.getGender());
-        personModel.setBirthDate(person.getBirthDate());
-        personModel.setFirstName(person.getFirstName());
-        personModel.setMiddleName(person.getMiddleName());
-        personModel.setLastName(person.getLastName());
-        personModel.setAffiliations(affiliations);
+        //personModel.setGender(person.getGender());
+        //personModel.setBirthDate(person.getBirthDate());
+        //personModel.setFirstName(person.getFirstName());
+        //personModel.setMiddleName(person.getMiddleName());
+        //personModel.setLastName(person.getLastName());
+        //personModel.setAffiliations(affiliations);
+        personModel.setLastName(userLogin.getLastName());
+        personModel.setFirstName(userLogin.getFirstName());
+
         return personModel;
         //mId2Person.put(userLoginId, personModel);
         //}

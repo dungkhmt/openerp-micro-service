@@ -22,6 +22,8 @@ const ModalAddProblemToContest = (props) => {
   const [problemRecode, setProblemRecode] = useState("");
   const [submissionMode, setSubmissionMode] = useState(SUBMISSION_MODE_SOURCE_CODE)
   const [loading, setLoading] = useState(false);
+  const [forbiddenInstructions, setForbiddenInstructions] = useState("");
+
 
   const handleAddProblemToContest = () => {
     let body = {
@@ -31,6 +33,7 @@ const ModalAddProblemToContest = (props) => {
       problemRename: problemRename,
       problemRecode: problemRecode,
       submissionMode: submissionMode,
+      forbiddenInstructions: forbiddenInstructions,
     };
 
     setLoading(true);

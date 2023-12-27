@@ -11,5 +11,6 @@ public class ModelProblemInfoInContest {
     private String problemRename;
     private String problemRecode;
     private String submissionMode;
+    private String forbiddenInstructions;
 
 }
