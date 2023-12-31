@@ -1,72 +1,55 @@
 import EditIcon from "@mui/icons-material/Edit";
 import { Grid } from "@mui/material";
-import TextField from "@mui/material/TextField";
-import { styled } from "@mui/material/styles";
+import { request } from "api";
 import PrimaryButton from "component/button/PrimaryButton";
+import HustContainerCard from "component/common/HustContainerCard";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { localeOption } from "utils/NumberFormat";
-import { request } from "../../../api";
-import HustContainerCard from "../../common/HustContainerCard";
 import { detail } from "./ContestProblemSubmissionDetailViewedByManager";
-
-const CssTextField = styled(TextField)({
-  ".MuiInputBase-input.Mui-disabled": {
-    WebkitTextFillColor: "gray",
-    color: "gray",
-  },
-  "& label.Mui-disabled": {
-    color: "gray",
-  },
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": {
-      borderColor: "darkgray",
-    },
-  },
-});
 
 export function ContestManagerDetail(props) {
   const contestId = props.contestId;
-  const [contestName, setContestName] = useState("");
-  const [statusId, setStatusId] = useState("");
-  const [submissionActionType, setSubmissionActionType] = useState("");
-  const [maxNumberSubmission, setMaxNumberSubmission] = useState(10);
-  const [participantViewResultMode, setParticipantViewResultMode] =
-    useState("");
-  const [problemDescriptionViewType, setProblemDescriptionViewType] =
-    useState("");
-  const [
-    evaluateBothPublicPrivateTestcase,
-    setEvaluateBothPublicPrivateTestcase,
-  ] = useState("");
-  const [maxSourceCodeLength, setMaxSourceCodeLength] = useState(50000);
-  const [minTimeBetweenTwoSubmissions, setMinTimeBetweenTwoSubmissions] =
-    useState(0);
-  const [participantViewSubmissionMode, setParticipantViewSubmissionMode] =
-    useState("");
+  const history = useHistory();
+
+  const [contestDetail, setContestDetail] = useState({
+    name: "",
+    statusId: "",
+    submissionActionType: "",
+    maxNumberSubmission: 10,
+    participantViewResultMode: "",
+    problemDescriptionViewType: "",
+    evaluateBothPublicPrivateTestcase: "",
+    maxSourceCodeLength: 50000,
+    minTimeBetweenTwoSubmissions: 0,
+    participantViewSubmissionMode: "",
+  });
 
   const [loading, setLoading] = useState(true);
 
-  const history = useHistory();
-
-  function getContestDetail() {
-    request("get", "/contests/" + contestId, (res) => {
-      setContestName(res.data.contestName);
-      setStatusId(res.data.statusId);
-      setSubmissionActionType(res.data.submissionActionType);
-      setParticipantViewResultMode(res.data.participantViewResultMode);
-      setMaxNumberSubmission(res.data.maxNumberSubmission);
-      setProblemDescriptionViewType(res.data.problemDescriptionViewType);
-      setMinTimeBetweenTwoSubmissions(res.data.minTimeBetweenTwoSubmissions);
-      setEvaluateBothPublicPrivateTestcase(
-        res.data.evaluateBothPublicPrivateTestcase
-      );
-      setMaxSourceCodeLength(res.data.maxSourceCodeLength);
-      setParticipantViewSubmissionMode(res.data.participantViewSubmissionMode);
-    }).then(() => setLoading(false));
-  }
-
   useEffect(() => {
+    const getContestDetail = () => {
+      request("get", "/contests/" + contestId, (res) => {
+        setLoading(false);
+
+        const data = res.data;
+        setContestDetail((prev) => ({
+          ...prev,
+          name: data.contestName,
+          statusId: data.statusId,
+          submissionActionType: data.submissionActionType,
+          participantViewResultMode: data.participantViewResultMode,
+          maxNumberSubmission: data.maxNumberSubmission,
+          problemDescriptionViewType: data.problemDescriptionViewType,
+          minTimeBetweenTwoSubmissions: data.minTimeBetweenTwoSubmissions,
+          evaluateBothPublicPrivateTestcase:
+            data.evaluateBothPublicPrivateTestcase,
+          maxSourceCodeLength: data.maxSourceCodeLength,
+          participantViewSubmissionMode: data.participantViewSubmissionMode,
+        }));
+      });
+    };
+
     getContestDetail();
   }, []);
 
@@ -90,37 +73,46 @@ export function ContestManagerDetail(props) {
       {/* {loading && <LinearProgress />} */}
       <Grid container spacing={2} display={loading ? "none" : ""}>
         {[
-          ["Name", contestName],
-          ["Status", statusId],
-          ["View problem description", problemDescriptionViewType],
-          ["Max submissions", `${maxNumberSubmission} (per problem)`],
+          ["Name", contestDetail.name],
+          ["Status", contestDetail.statusId],
+          [
+            "View problem description",
+            contestDetail.problemDescriptionViewType,
+          ],
+          [
+            "Max submissions",
+            `${contestDetail.maxNumberSubmission} (per problem)`,
+          ],
           [
             "Source length limit",
-            `${maxSourceCodeLength.toLocaleString(
+            `${contestDetail.maxSourceCodeLength.toLocaleString(
               "fr-FR",
               localeOption
             )} (chars)`,
           ],
           [
             "Submission interval",
-            `${minTimeBetweenTwoSubmissions.toLocaleString(
+            `${contestDetail.minTimeBetweenTwoSubmissions.toLocaleString(
               "fr-FR",
               localeOption
             )} (s)`,
             undefined,
             "Minimum time between two consecutive submissions by a participant",
           ],
-          ["Action on submission", submissionActionType],
-          ["Evaluate private testcases", evaluateBothPublicPrivateTestcase],
+          ["Action on submission", contestDetail.submissionActionType],
+          [
+            "Evaluate private testcases",
+            contestDetail.evaluateBothPublicPrivateTestcase,
+          ],
           [
             "View testcase detail",
-            participantViewResultMode,
+            contestDetail.participantViewResultMode,
             undefined,
             "Allow or disallow participant to view the input and output of each testcase",
           ],
           [
             "Participant view submission",
-            participantViewSubmissionMode,
+            contestDetail.participantViewSubmissionMode,
             undefined,
             "Allow or disallow participant to view their own submissions",
           ],
