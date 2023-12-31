@@ -135,7 +135,7 @@ export default function StudentViewProblemList() {
     <Box>
       {loading && <LinearProgress />}
       <StandardTable
-        title={t("problemList.title")}
+        // title={t("problemList.title")}
         columns={columns}
         data={problems}
         hideCommandBar

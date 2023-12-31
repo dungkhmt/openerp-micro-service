@@ -4,8 +4,8 @@ import Tab from "@mui/material/Tab";
 
 export function a11yProps(index) {
   return {
-    id: `full-width-tab-${index}`,
-    "aria-controls": `full-width-tabpanel-${index}`,
+    id: `hustack-tab-${index}`,
+    "aria-controls": `hustack-tabpanel-${index}`,
   };
 }
 
