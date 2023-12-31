@@ -141,7 +141,7 @@ export default function StudentViewProblemList() {
         hideCommandBar
         options={{
           selection: false,
-          pageSize: 10,
+          pageSize: 5,
           search: true,
           sorting: true,
         }}
