@@ -1,13 +1,13 @@
+import { LoadingButton } from "@mui/lab";
+import { Box, TextField } from "@mui/material";
+import { request } from "api";
 import HustModal from "component/common/HustModal";
-import React, {useState} from "react";
-import {Box, TextField} from "@mui/material";
-import {LoadingButton} from "@mui/lab";
-import {request} from "../../../api";
-import {errorNoti} from "../../../utils/notification";
+import React, { useState } from "react";
+import { errorNoti } from "utils/notification";
 import StandardTable from "../../table/StandardTable";
 
 const ModalImportProblemsFromContest = (props) => {
-  const {contestId, isOpen, handleClose} = props;
+  const { contestId, isOpen, handleClose } = props;
 
   const [fromContestId, setFromContestId] = useState("");
   const [importedProblems, setImportedProblems] = useState([]);
@@ -21,7 +21,7 @@ const ModalImportProblemsFromContest = (props) => {
     setLoading(true);
     let body = {
       contestId: contestId,
-      fromContestId: fromContestId
+      fromContestId: fromContestId,
     };
 
     request(
@@ -32,27 +32,27 @@ const ModalImportProblemsFromContest = (props) => {
       },
       {
         onError: (err) => {
-          errorNoti("An error happened", 5000)
-        }
+          errorNoti("An error happened", 5000);
+        },
       },
       body
     )
       .then()
       .finally(() => setLoading(false));
-  }
+  };
 
   const getUploadStatusColor = (status) => {
-    if (status === 'SUCCESSFUL') return 'green';
-    return 'red';
-  }
+    if (status === "SUCCESSFUL") return "green";
+    return "red";
+  };
 
   const columns = [
-    {title: "Problem ID", field: "problemId"},
+    { title: "Problem ID", field: "problemId" },
     {
       title: "Status",
       field: "status",
       render: (rowData) => (
-        <span style={{color: getUploadStatusColor(`${rowData.status}`)}}>
+        <span style={{ color: getUploadStatusColor(`${rowData.status}`) }}>
           {`${rowData.status}`}
         </span>
       ),
@@ -61,17 +61,23 @@ const ModalImportProblemsFromContest = (props) => {
 
   return (
     <HustModal
-      title={"Import Problems from Contest"}
+      title={"Import all Problems from Contest"}
       open={isOpen}
       onClose={handleClose}
       isLoading={loading}
       isNotShowCloseButton
       maxWidthPaper={importedProblems.length > 0 ? 680 : 480}
     >
-      <Box display="flex" alignItems="center" justifyContent="space-between" sx={{mb: 2}}>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ mb: 2 }}
+      >
         <TextField
           autoFocus
           required
+          size="small"
           value={fromContestId}
           id="importFromContestId"
           label="Contest ID"
@@ -84,21 +90,28 @@ const ModalImportProblemsFromContest = (props) => {
               ? "Contest ID must not contain special characters including %^/\\|.?;[]"
               : ""
           }
-          sx={{width: "75%", mr: 2}}
+          sx={{ width: "75%", mr: 2 }}
         />
         <LoadingButton
+          // sx={{ textTransform: "none" }}
           loading={loading}
           variant="contained"
           onClick={handleImportProblems}
           disabled={isValidContestId()}
-          size="large"
         >
           Import
         </LoadingButton>
       </Box>
-      {importedProblems.length > 0 &&
+      {importedProblems.length > 0 && (
         <StandardTable
-          title={importedProblems.filter(problem => problem.status === 'SUCCESSFUL').length + "/" + importedProblems.length + " Successful"}
+          title={
+            importedProblems.filter(
+              (problem) => problem.status === "SUCCESSFUL"
+            ).length +
+            "/" +
+            importedProblems.length +
+            " Successful"
+          }
           columns={columns}
           data={importedProblems}
           options={{
@@ -109,9 +122,9 @@ const ModalImportProblemsFromContest = (props) => {
           }}
           hideCommandBar
         />
-      }
+      )}
     </HustModal>
   );
-}
+};
 
 export default React.memo(ModalImportProblemsFromContest);
