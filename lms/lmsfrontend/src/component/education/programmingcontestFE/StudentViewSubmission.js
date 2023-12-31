@@ -1,6 +1,5 @@
 import InfoIcon from "@mui/icons-material/Info";
 import ReplayIcon from "@mui/icons-material/Replay";
-import { LoadingButton } from "@mui/lab";
 import { Box, IconButton, Stack } from "@mui/material";
 import { request } from "api";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
@@ -170,7 +169,7 @@ const StudentViewSubmission = forwardRef((props, ref) => {
   return (
     <>
       <Stack direction={"row"} justifyContent={"flex-end"} sx={{ mb: 2 }}>
-        <LoadingButton
+        {/* <LoadingButton
           disabled={loading}
           color="primary"
           variant="contained"
@@ -184,7 +183,7 @@ const StudentViewSubmission = forwardRef((props, ref) => {
           }}
         >
           <span style={{ textTransform: "none" }}>Refresh</span>
-        </LoadingButton>
+        </LoadingButton> */}
       </Stack>
       <ModalMessage rowData={selectedRowData} />
       <StandardTable
@@ -198,6 +197,18 @@ const StudentViewSubmission = forwardRef((props, ref) => {
           search: true,
           sorting: true,
         }}
+        actions={[
+          {
+            disabled: loading,
+            icon: () => <ReplayIcon color={loading ? "disabled" : "primary"} />,
+            tooltip: "Refresh",
+            isFreeAction: true,
+            onClick: (event) => {
+              setLoading(true);
+              setTimeout(handleRefresh, 1000);
+            },
+          },
+        ]}
       />
     </>
   );
