@@ -1,7 +1,7 @@
-import {teal} from "@mui/material/colors";
-import {styled} from "@mui/material/styles";
 import Tabs from "@mui/material/Tabs";
-import {AntScrollButton} from "./AntScrollButton";
+import { teal } from "@mui/material/colors";
+import { styled } from "@mui/material/styles";
+import { AntScrollButton } from "./AntScrollButton";
 
 export const AntTabs = styled((props) => (
   <Tabs ScrollButtonComponent={AntScrollButton} {...props}>

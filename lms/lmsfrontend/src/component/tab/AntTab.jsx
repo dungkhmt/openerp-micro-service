@@ -1,5 +1,5 @@
-import {teal} from "@mui/material/colors";
-import {styled} from "@mui/material/styles";
+import { teal } from "@mui/material/colors";
+import { styled } from "@mui/material/styles";
 import Tab from "@mui/material/Tab";
 
 export function a11yProps(index) {
