@@ -225,8 +225,7 @@ export function ContestManagerManageProblem(props) {
         <Autocomplete
           id="add-problem"
           size="small"
-          sx={{ minWidth: "400px", width: "30%" }}
-          // autoHighlight
+          sx={{ minWidth: "500px", width: "100%" }}
           disableClearable
           inputValue={searchProblemValue}
           onInputChange={(event, newInputValue, reason) => {
