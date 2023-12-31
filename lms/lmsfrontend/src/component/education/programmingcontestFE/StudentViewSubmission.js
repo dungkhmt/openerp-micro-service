@@ -1,6 +1,6 @@
 import InfoIcon from "@mui/icons-material/Info";
 import ReplayIcon from "@mui/icons-material/Replay";
-import { Box, IconButton, Stack } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { request } from "api";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import HustModal from "component/common/HustModal";
@@ -56,9 +56,7 @@ const StudentViewSubmission = forwardRef((props, ref) => {
       render: (rowData) => (
         <Link
           to={{
-            pathname:
-              "/programming-contest/contest-problem-submission-detail/" +
-              rowData["contestSubmissionId"],
+            pathname: `/programming-contest/contest-problem-submission-detail/${rowData["contestSubmissionId"]}`,
           }}
         >
           {rowData["contestSubmissionId"].substring(0, 6)}
@@ -153,7 +151,7 @@ const StudentViewSubmission = forwardRef((props, ref) => {
         showCloseBtnTitle={false}
       >
         <HustCopyCodeBlock title="Response" text={message} />
-        <Box paddingTop={2}>
+        {/* <Box paddingTop={2}>
           <Link
             to={{
               pathname: `/programming-contest/contest-problem-submission-detail/${detailLink}`,
@@ -161,15 +159,15 @@ const StudentViewSubmission = forwardRef((props, ref) => {
           >
             View detail here
           </Link>
-        </Box>
+        </Box> */}
       </HustModal>
     );
   };
 
   return (
     <>
-      <Stack direction={"row"} justifyContent={"flex-end"} sx={{ mb: 2 }}>
-        {/* <LoadingButton
+      {/* <Stack direction={"row"} justifyContent={"flex-end"} sx={{ mb: 2 }}>
+        <LoadingButton
           disabled={loading}
           color="primary"
           variant="contained"
@@ -183,8 +181,8 @@ const StudentViewSubmission = forwardRef((props, ref) => {
           }}
         >
           <span style={{ textTransform: "none" }}>Refresh</span>
-        </LoadingButton> */}
-      </Stack>
+        </LoadingButton>
+      </Stack> */}
       <ModalMessage rowData={selectedRowData} />
       <StandardTable
         // title={t("submissionList.title")}
