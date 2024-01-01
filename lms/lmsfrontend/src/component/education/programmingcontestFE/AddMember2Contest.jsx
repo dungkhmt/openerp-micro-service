@@ -18,6 +18,7 @@ import { request } from "api";
 import PrimaryButton from "component/button/PrimaryButton";
 import Select from "component/select/StyledSelect";
 import { getTextAvatar } from "layout/account/AccountButton";
+import { isEmpty, trim } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import UploadUserToContestDialog from "./UploadUserToContestDialog";
 
@@ -142,10 +143,19 @@ export default function AddMember2Contest(props) {
           : ""
       }`,
       (res) => {
-        const data = res.data.content.map((e) => ({
-          userName: e.userLoginId,
-          fullName: `${e.firstName || ""} ${e.lastName || ""}`,
-        }));
+        const data = res.data.content.map((e) => {
+          const user = {
+            userName: e.userLoginId,
+            fullName: `${e.firstName || ""} ${e.lastName || ""}`,
+          };
+
+          if (isEmpty(trim(user.fullName))) {
+            user.fullName = "Anonymous";
+          }
+
+          return user;
+        });
+
         callback(data);
       }
     );
