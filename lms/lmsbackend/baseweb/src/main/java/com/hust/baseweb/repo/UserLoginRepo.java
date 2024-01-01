@@ -14,7 +14,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 @RepositoryRestResource(exported = false)
 public interface UserLoginRepo extends JpaRepository<UserLogin, String> {
@@ -24,19 +23,22 @@ public interface UserLoginRepo extends JpaRepository<UserLogin, String> {
         "inner join Party pa on ul.party = pa inner join Person p on p.partyId = ul.party and  (ul.userLoginId like %:keyword% )")
     Page<PersonModel> searchUser(Pageable pageable, @Param("keyword") String keyword);
 
-    @Query(value = "select new com.hust.baseweb.applications.programmingcontest.model.ModelSearchUserResult(ul.userLoginId, ul.firstName, ul.lastName, ul.email) " +
-                   "from UserLogin ul \n" +
-                   "where ul.userLoginId like CONCAT('%', :keyword, '%') " +
-                   "or ul.firstName like CONCAT('%', :keyword, '%') " +
-                   "or ul.lastName like CONCAT('%', :keyword, '%') ")
-    Page<ModelSearchUserResult> findUserLoginByUserLoginIdLikeOrFirstNameLikeOrLastNameLike(
+    @Query(value =
+        "select new com.hust.baseweb.applications.programmingcontest.model.ModelSearchUserResult(ul.userLoginId, ul.firstName, ul.lastName, ul.email) " +
+        "from UserLogin ul \n" +
+        "where (COALESCE(:excludeIds) is null or ul.userLoginId not in :excludeIds) " +
+        "and (LOWER(ul.userLoginId) like CONCAT('%', LOWER(:keyword), '%') " +
+        "or LOWER(CONCAT(ul.firstName, ' ', ul.lastName)) like CONCAT('%', LOWER(:keyword), '%'))")
+    Page<ModelSearchUserResult> search(
         @Param("keyword") String keyword,
+        @Param("excludeIds") List<String> excludeIds,
         Pageable pageable
     );
 
-    @Query(value = "select new com.hust.baseweb.applications.programmingcontest.model.ModelSearchUserResult(ul.userLoginId, ul.firstName, ul.lastName, ul.email) " +
-                   "from UserLogin ul \n" +
-                   "where ul.userLoginId = :userId")
+    @Query(value =
+        "select new com.hust.baseweb.applications.programmingcontest.model.ModelSearchUserResult(ul.userLoginId, ul.firstName, ul.lastName, ul.email) " +
+        "from UserLogin ul \n" +
+        "where ul.userLoginId = :userId")
     ModelSearchUserResult getUserGeneralInfo(String userId);
 
     UserLogin findByUserLoginId(String userLoginId);

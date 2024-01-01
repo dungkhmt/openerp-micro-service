@@ -1,7 +1,6 @@
 package com.hust.baseweb.rest.user;
 
 import com.hust.baseweb.applications.programmingcontest.model.ModelSearchUserResult;
-import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;
 import io.lettuce.core.dynamic.annotation.Param;
 import lombok.AllArgsConstructor;
@@ -17,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 // @RepositoryRestController
 // @ExposesResourceFor(DPerson.class)
@@ -37,14 +38,20 @@ public class UserController {
 //    private UserRegisterRepo userRegisterRepo;
 
     @GetMapping("/users")
-    public ResponseEntity<?> searchUserBaseKeyword(
+    public ResponseEntity<?> search(
         Pageable pageable,
-        @Param("keyword") String keyword
+        @Param("keyword") String keyword,
+        @RequestParam(required = false, name = "exclude") List<String> excludeIds
     ) {
         if (keyword == null) {
             keyword = "";
         }
-        Page<ModelSearchUserResult> resp = userService.findUserByKeyword(pageable, keyword);
+
+        if (excludeIds == null) {
+            excludeIds = Collections.emptyList();
+        }
+
+        Page<ModelSearchUserResult> resp = userService.search(keyword, excludeIds, pageable);
         return ResponseEntity.status(200).body(resp);
     }
 
@@ -104,7 +111,7 @@ public class UserController {
         Pageable page,
         @RequestParam(name = "search", required = false) String searchString
     ) {
-        Page<ModelSearchUserResult> res = userService.findUserByKeyword(page, searchString);
+        Page<ModelSearchUserResult> res = userService.search(searchString, Collections.emptyList(), page);
         return ResponseEntity.ok().body(res);
     }
 
