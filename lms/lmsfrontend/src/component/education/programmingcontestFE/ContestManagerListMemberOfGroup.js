@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from "react";
-import {request} from "../../../api";
-import StandardTable from "component/table/StandardTable";
-import {Button, IconButton, LinearProgress} from "@mui/material";
-import {errorNoti, successNoti} from "utils/notification";
-import {toFormattedDateTime} from "utils/dateutils";
-import UpdatePermissionMemberOfContestDialog from "./UpdatePermissionMemberOfContestDialog";
 import DeleteIcon from "@mui/icons-material/Delete";
-import HustContainerCard from "../../common/HustContainerCard";
 import EditIcon from "@mui/icons-material/Edit";
+import { Button, IconButton, LinearProgress } from "@mui/material";
+import StandardTable from "component/table/StandardTable";
+import { useEffect, useState } from "react";
+import { toFormattedDateTime } from "utils/dateutils";
+import { errorNoti, successNoti } from "utils/notification";
+import { request } from "../../../api";
+import HustContainerCard from "../../common/HustContainerCard";
+import UpdatePermissionMemberOfContestDialog from "./UpdatePermissionMemberOfContestDialog";
 import UploadUserToContestGroupDialog from "./UploadUserToContestGroupDialog";
 
 export default function ContestManagerListMemberOfGroup(props) {
@@ -21,28 +21,36 @@ export default function ContestManagerListMemberOfGroup(props) {
   const [openUploadDialog, setOpenUploadDialog] = useState(false);
 
   const columns = [
-    {title: "No.", field: "index"},
-    {title: "User ID", field: "userId"},
-    {title: "Name", field: "fullName"},
-    {title: "Role", field: "roleId"},
+    { title: "No.", field: "index" },
+    { title: "User ID", field: "userId" },
+    { title: "Name", field: "fullName" },
+    { title: "Role", field: "roleId" },
     // {title: "Updated At", field: "lastUpdatedDate"},
-    {title: "Permission", field: "permissionId"},
+    { title: "Permission", field: "permissionId" },
     {
       title: "Update Permission",
       render: (row) => (
-        <IconButton variant="contained" color="info" onClick={() => handleForbidSubmit(row.id)}>
-          <EditIcon/>
+        <IconButton
+          variant="contained"
+          color="info"
+          onClick={() => handleForbidSubmit(row.id)}
+        >
+          <EditIcon />
         </IconButton>
       ),
     },
     {
       title: "Remove",
-      render: (row) => (
-        row.userId != 'admin' && <IconButton variant="contained" color="error" onClick={() => handleRemove(row.userId)}>
-          <DeleteIcon/>
-        </IconButton>
-        
-      )
+      render: (row) =>
+        row.userId != "admin" && (
+          <IconButton
+            variant="contained"
+            color="error"
+            onClick={() => handleRemove(row.userId)}
+          >
+            <DeleteIcon />
+          </IconButton>
+        ),
     },
   ];
 
@@ -55,7 +63,7 @@ export default function ContestManagerListMemberOfGroup(props) {
     setIsProcessing(true);
     let body = {
       contestId: contestId,
-      participantId: userId
+      participantId: userId,
     };
     request(
       "delete",
@@ -70,8 +78,7 @@ export default function ContestManagerListMemberOfGroup(props) {
           setIsProcessing(false);
           errorNoti("An error happened");
         },
-        401: () => {
-        },
+        401: () => {},
       },
       body
     );
@@ -115,8 +122,7 @@ export default function ContestManagerListMemberOfGroup(props) {
           setIsProcessing(false);
           errorNoti("An error happened");
         },
-        401: () => {
-        },
+        401: () => {},
       },
       body
     );
@@ -135,7 +141,7 @@ export default function ContestManagerListMemberOfGroup(props) {
   const handleCloseUploadUserDialog = () => {
     getMembersOfContest();
     setOpenUploadDialog(false);
-  }
+  };
 
   useEffect(() => {
     getMembersOfContest();
@@ -144,7 +150,7 @@ export default function ContestManagerListMemberOfGroup(props) {
 
   return (
     <HustContainerCard>
-      {isProcessing && <LinearProgress/>}
+      {isProcessing && <LinearProgress />}
       <StandardTable
         title={"My Group"}
         columns={columns}
@@ -152,22 +158,28 @@ export default function ContestManagerListMemberOfGroup(props) {
         hideCommandBar
         options={{
           selection: false,
-          pageSize: 20,
+          pageSize: 5,
           search: true,
           sorting: true,
         }}
         actions={[
           {
             icon: () => {
-              return <Button variant="contained" sx={{ml: 2, mr: 2}} onClick={() => {
-                setOpenUploadDialog(true)
-              }}>
-                Upload
-              </Button>
+              return (
+                <Button
+                  variant="contained"
+                  sx={{ ml: 2, mr: 2 }}
+                  onClick={() => {
+                    setOpenUploadDialog(true);
+                  }}
+                >
+                  Upload
+                </Button>
+              );
             },
-            tooltip: 'Upload Users with Excel file',
-            isFreeAction: true
-          }
+            tooltip: "Upload Users with Excel file",
+            isFreeAction: true,
+          },
         ]}
       />
       <UpdatePermissionMemberOfContestDialog

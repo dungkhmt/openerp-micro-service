@@ -1,5 +1,7 @@
-import { Box, LinearProgress } from "@mui/material";
-import Button from "@mui/material/Button";
+import { Box, LinearProgress, Tooltip } from "@mui/material";
+import PrimaryButton from "component/button/PrimaryButton";
+import TertiaryButton from "component/button/TertiaryButton";
+import { MTableToolbar } from "material-table";
 import { useEffect, useState } from "react";
 import { localeOption } from "utils/NumberFormat";
 import XLSX from "xlsx";
@@ -8,8 +10,19 @@ import { successNoti } from "../../../utils/notification";
 import HustContainerCard from "../../common/HustContainerCard";
 import StandardTable from "../../table/StandardTable";
 
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles({
+  actions: {
+    minWidth: 180,
+  },
+});
+
 export default function ContestManagerRankingNew(props) {
   const contestId = props.contestId;
+  const classes = useStyles();
+
+  //
   const [ranking, setRanking] = useState([]);
   const [rankingDetail, setRankingDetail] = useState([]);
   const [problemIds, setProblemIds] = useState([]);
@@ -192,37 +205,54 @@ export default function ContestManagerRankingNew(props) {
             search: true,
             sorting: true,
           }}
+          components={{
+            Toolbar: (props) => (
+              <MTableToolbar
+                {...props}
+                classes={{ actions: classes.actions }}
+              />
+            ),
+            Action: (props) => {
+              if (props.action.icon === "download") {
+                return (
+                  <Tooltip arrow title="Export Ranking as Excel file">
+                    <PrimaryButton
+                      sx={{ ml: 1 }}
+                      onClick={(event) =>
+                        props.action.onClick(event, props.data)
+                      }
+                    >
+                      Export
+                    </PrimaryButton>
+                  </Tooltip>
+                );
+              } else if (props.action.icon === "getLink") {
+                return (
+                  <Tooltip arrow title="Get public URL to this ranking">
+                    <TertiaryButton
+                      variant="outlined"
+                      sx={{ ml: 1 }}
+                      onClick={(event) =>
+                        props.action.onClick(event, props.data)
+                      }
+                    >
+                      Get link
+                    </TertiaryButton>
+                  </Tooltip>
+                );
+              }
+            },
+          }}
           actions={[
             {
-              icon: () => {
-                return (
-                  <Button
-                    variant="contained"
-                    onClick={downloadHandler}
-                    color="success"
-                    className={"no-background-btn"}
-                  >
-                    Export
-                  </Button>
-                );
-              },
-              tooltip: "Export Ranking as Excel file",
+              icon: "download",
               isFreeAction: true,
+              onClick: downloadHandler,
             },
             {
-              icon: () => {
-                return (
-                  <Button
-                    variant="outlined"
-                    onClick={copyLinkHandler}
-                    className={"no-background-btn"}
-                  >
-                    Get link
-                  </Button>
-                );
-              },
-              tooltip: "Get public URL to this ranking",
+              icon: "getLink",
               isFreeAction: true,
+              onClick: copyLinkHandler,
             },
           ]}
         />

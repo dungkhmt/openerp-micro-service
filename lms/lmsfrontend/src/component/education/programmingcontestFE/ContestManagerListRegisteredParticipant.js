@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from "react";
-import {Button} from "@mui/material";
-import {request} from "../../../api";
+import { Button } from "@mui/material";
 import StandardTable from "component/table/StandardTable";
-import {errorNoti, successNoti} from "utils/notification";
+import { useEffect, useState } from "react";
+import { errorNoti, successNoti } from "utils/notification";
+import { request } from "../../../api";
 
 export default function ContestManagerListRegisteredParticipant(props) {
   const contestId = props.contestId;
@@ -46,22 +46,18 @@ export default function ContestManagerListRegisteredParticipant(props) {
 
   function getRegisteredMembers() {
     setIsProcessing(true);
-    request(
-      "get",
-      "/contests/" + contestId + "/pending-users-v2",
-      (res) => {
-        const data = res.data.map((e, i) => ({
-          index: i + 1,
-          id: e.id,
-          userId: e.userId,
-          fullName: e.fullName,
-          roleId: e.roleId,
-          date: e.date,
-        }));
-        setRegisteredMembers(data);
-        setIsProcessing(false);
-      }
-    );
+    request("get", "/contests/" + contestId + "/pending-users-v2", (res) => {
+      const data = res.data.map((e, i) => ({
+        index: i + 1,
+        id: e.id,
+        userId: e.userId,
+        fullName: e.fullName,
+        roleId: e.roleId,
+        date: e.date,
+      }));
+      setRegisteredMembers(data);
+      setIsProcessing(false);
+    });
   }
   useEffect(() => {
     getRegisteredMembers();
@@ -75,7 +71,7 @@ export default function ContestManagerListRegisteredParticipant(props) {
         hideCommandBar
         options={{
           selection: false,
-          pageSize: 20,
+          pageSize: 5,
           search: true,
           sorting: true,
         }}
