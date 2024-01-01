@@ -243,7 +243,7 @@ export function ContestManagerManageProblem(props) {
             addNewProblem(newValue);
           }}
           PopperComponent={PopperComponent}
-          noOptionsText="Not found"
+          noOptionsText="No matches found"
           renderOption={(props, option, { selected }) => {
             // console.log(props);
             // if (option.addNew === "true") {
