@@ -25,7 +25,7 @@ public interface UserService {
 
     Page<UserRestBriefProjection> findPersonByFullName(Pageable page, String sString);
 
-    Page<ModelSearchUserResult> findUserByKeyword(Pageable page, String keyword);
+    Page<ModelSearchUserResult> search(String keyword, List<String> excludeIds, Pageable page);
 
     Page<UserRestBriefProjection> findUsersByUserLoginId(Pageable page, String sString);
 

@@ -4,7 +4,6 @@ import com.hust.baseweb.applications.mail.service.MailService;
 import com.hust.baseweb.applications.notifications.service.NotificationsService;
 import com.hust.baseweb.applications.programmingcontest.model.ModelSearchUserResult;
 import com.hust.baseweb.entity.PartyType.PartyTypeEnum;
-import com.hust.baseweb.entity.Person;
 import com.hust.baseweb.entity.Status.StatusEnum;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.entity.UserRegister;
@@ -86,7 +85,9 @@ public class UserServiceImpl implements UserService {
     }
 
     private String getUserFullName(ModelSearchUserResult user) {
-        if(user == null) return "";
+        if (user == null) {
+            return "";
+        }
         String firstName = user.getFirstName() != null ? user.getFirstName() : "";
         String lastName = user.getLastName() != null ? user.getLastName() : "";
         return firstName + " " + lastName;
@@ -221,8 +222,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<ModelSearchUserResult> findUserByKeyword(Pageable page, String keyword) {
-        return userLoginRepo.findUserLoginByUserLoginIdLikeOrFirstNameLikeOrLastNameLike(keyword, page);
+    public Page<ModelSearchUserResult> search(String keyword, List<String> excludeIds, Pageable page) {
+        if (excludeIds.isEmpty()) {
+            excludeIds = null;
+        }
+        return userLoginRepo.search(keyword, excludeIds, page);
     }
 
     @Override
