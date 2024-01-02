@@ -25,4 +25,5 @@ public class ModelStudentViewProblemDetail {
     private List<String> attachmentNames;
     private Boolean isPreloadCode;
     private String preloadCode;
+    private List<String> listLanguagesAllowed;
 }

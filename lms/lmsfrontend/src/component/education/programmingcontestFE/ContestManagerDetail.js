@@ -46,6 +46,7 @@ export function ContestManagerDetail(props) {
             data.evaluateBothPublicPrivateTestcase,
           maxSourceCodeLength: data.maxSourceCodeLength,
           participantViewSubmissionMode: data.participantViewSubmissionMode,
+          languagesAllowed: data.languagesAllowed,
         }));
       });
     };
@@ -78,6 +79,10 @@ export function ContestManagerDetail(props) {
           [
             "View problem description",
             contestDetail.problemDescriptionViewType,
+          ],
+          [
+            "Selected languages allowed",
+            contestDetail.languagesAllowed,
           ],
           [
             "Max submissions",

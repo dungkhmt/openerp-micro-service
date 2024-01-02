@@ -36,4 +36,6 @@ public class ModelGetContestDetailResponse implements Serializable {
     private List<String> listEvaluateBothPublicPrivateTestcases;
     private List<String> listJudgeModes;
     private List<String> listParticipantViewSubmissionModes;
+    private String languagesAllowed;
+    private List<String> listLanguagesAllowed;
 }

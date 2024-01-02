@@ -6,7 +6,8 @@ import {
 } from "../education/programmingcontestFE/Constant";
 
 const HustCodeLanguagePicker = (props) => {
-  const { language, onChangeLanguage, classRoot, ...remainProps } = props;
+  const { listLanguagesAllowed, language, onChangeLanguage, classRoot, ...remainProps } = props;
+  //const { language, onChangeLanguage, classRoot, ...remainProps } = props;
 
   const getLanguage = (language) => {
     if (!language) return COMPUTER_LANGUAGES.CPP17;
@@ -32,6 +33,11 @@ const HustCodeLanguagePicker = (props) => {
           {mapLanguageToDisplayName(item)}
         </MenuItem>
       ))}
+      {/*listLanguagesAllowed != null ? listLanguagesAllowed.map((item) => (
+        <MenuItem key={item} value={item}>
+          {mapLanguageToDisplayName(item)}
+        </MenuItem>
+      )):""*/}
     </TextField>
   );
 };

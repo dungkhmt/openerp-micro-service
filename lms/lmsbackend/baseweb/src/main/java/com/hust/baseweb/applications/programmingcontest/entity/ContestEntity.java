@@ -120,6 +120,27 @@ public class ContestEntity implements Serializable {
         return L;
     }
 
+    public List<String> getListLanguagesAllowed(){
+        List<String> L = new ArrayList<>();
+        if(languagesAllowed != null && !languagesAllowed.equals("")){
+            String[] s = languagesAllowed.split(",");
+            if(s != null && s.length > 0){
+                for(String l: s){
+                    if(l != null && !l.equals(""))
+                        L.add(l.trim());
+                }
+            }
+        }else{// no limitation, take all languages
+            L.add(ContestEntity.PROG_LANGUAGES_C);
+            L.add(ContestEntity.PROG_LANGUAGES_CPP11);
+            L.add(ContestEntity.PROG_LANGUAGES_CPP14);
+            L.add(ContestEntity.PROG_LANGUAGES_CPP17);
+            L.add(ContestEntity.PROG_LANGUAGES_JAVA);
+            L.add(ContestEntity.PROG_LANGUAGES_PYTHON3);
+        }
+        return L;
+    }
+
     @Id
     @Column(name = "contest_id")
     private String contestId;

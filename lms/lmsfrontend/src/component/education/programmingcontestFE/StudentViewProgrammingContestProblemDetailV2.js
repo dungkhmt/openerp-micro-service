@@ -68,6 +68,7 @@ const ERR_STATUS = [
   "MAX_SOURCE_CODE_LENGTH_VIOLATIONS",
   "SUBMISSION_INTERVAL_VIOLATIONS",
   "SUBMISSION_NOT_ALLOWED",
+  "ILLEGAL_LANGUAGE",
 ];
 
 export default function StudentViewProgrammingContestProblemDetail() {
@@ -78,6 +79,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
   const [testCases, setTestCases] = useState([]);
   const [file, setFile] = useState(null);
   const [language, setLanguage] = useState(COMPUTER_LANGUAGES.CPP17);
+  const [listLanguagesAllowed, setListLanguagesAllowed] = useState([]);
   const [status, setStatus] = useState("");
   const [message, setMessage] = useState("");
   const [codeSolution, setCodeSolution] = useState("");
@@ -175,7 +177,9 @@ export default function StudentViewProgrammingContestProblemDetail() {
       "/contests/" + contestId + "/problems/" + problemId,
       (res) => {
         res = res.data;
+        console.log('getProblemDetail, res = ',res);
         setProblem(res);
+        setListLanguagesAllowed(res.listLanguagesAllowed);
         if (res.isPreloadCode) setCodeSolution(res.preloadCode);
         if (res.submissionMode) setSubmissionMode(res.submissionMode);
         if (res.attachment && res.attachment.length !== 0) {
@@ -345,6 +349,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
               spacing={4}
             >
               <HustCodeLanguagePicker
+                listLanguagesAllowed={listLanguagesAllowed}
                 language={language}
                 onChangeLanguage={(e) => setLanguage(e.target.value)}
               />
