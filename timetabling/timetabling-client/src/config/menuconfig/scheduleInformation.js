@@ -18,6 +18,13 @@ export const scheduleInformation = {
         child: [],
       },
       {
+        id: "MENU_SCHEDULE_INFORMATION.GROUP",
+        path: "/schedule-information/group",
+        isPublic: true,
+        text: "Nhóm lớp",
+        child: [],
+      },
+      {
         id: "MENU_SCHEDULE_INFORMATION.CLASS_PERIOD",
         path: "/schedule-information/class-period",
         isPublic: true,
@@ -31,12 +38,5 @@ export const scheduleInformation = {
         text: "Ngày trong tuần",
         child: [],
       },
-      {
-        id: "MENU_SCHEDULE_INFORMATION.GROUP",
-        path: "/schedule-information/group",
-        isPublic: true,
-        text: "Nhóm lớp",
-        child: [],
-      }
     ],
   };
