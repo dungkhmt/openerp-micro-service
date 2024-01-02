@@ -109,14 +109,14 @@ export default function AutomationMakeSchedule({ open, handleClose, handleRefres
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="secondary">
-          Cancel
+          Hủy
         </Button>
         <Button
           onClick={handleMakeSchedule}
           color="primary"
           disabled={!selectedSemester || !selectedGroup || !selectedWeekdayPriority} // Disable the button if the input is empty
         >
-          Create
+          Sắp xếp
         </Button>
       </DialogActions>
     </Dialog>

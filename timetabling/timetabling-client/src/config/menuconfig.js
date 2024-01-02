@@ -29,9 +29,9 @@ import { buildMapPathMenu } from "utils/MenuUtils";
 import { general } from "./menuconfig/general";
 import { teacher } from "./menuconfig/teacher";
 import { user } from "./menuconfig/user";
-import {schedule} from "./menuconfig/schedule"
+// import {schedule} from "./menuconfig/schedule"
 import {scheduleInformation} from "./menuconfig/scheduleInformation"
-import {schedulePerformance} from "./menuconfig/schedulePerformance"
+// import {schedulePerformance} from "./menuconfig/schedulePerformance"
 import {courseTimeTabling} from "./menuconfig/courseTimeTabling"
 
 export const MENUS = [];
@@ -41,7 +41,7 @@ MENUS.push(user);
 MENUS.push(teacher);
 // MENUS.push(schedule);
 MENUS.push(scheduleInformation);
-MENUS.push(schedulePerformance);
+// MENUS.push(schedulePerformance);
 MENUS.push(courseTimeTabling);
 
 export const menuIconMap = new Map();

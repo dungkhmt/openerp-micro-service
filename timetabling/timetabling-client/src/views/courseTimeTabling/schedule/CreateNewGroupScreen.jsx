@@ -80,14 +80,14 @@ export default function CreateNewGroupScreen({ open, handleClose, existingData, 
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="secondary">
-          Cancel
+          Hủy
         </Button>
         <Button
           onClick={handleCreate}
           color="primary"
           disabled={!newGroup} // Disable the button if the input is empty
         >
-          Create
+          Tạo mới
         </Button>
       </DialogActions>
     </Dialog>

@@ -73,14 +73,14 @@ export default function CreateNewSemester({ open, handleClose, handleUpdate, han
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="secondary">
-          Cancel
+          Hủy
         </Button>
         <Button
           onClick={handleCreate}
           color="primary"
           disabled={!newClassroom} // Disable the button if the input is empty
         >
-          Create
+          Tạo mới
         </Button>
       </DialogActions>
     </Dialog>
