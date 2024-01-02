@@ -1,15 +1,8 @@
 export const courseTimeTabling = {
   id: "MENU_COURSE_TIME_TABLING",
   icon: "AnalyticsIcon",
-  text: "Course Time Tabling",
+  text: "Quản lý lịch học",
   child: [
-    {
-      id: "MENU_COURSE_TIME_TABLING.SEMESTER",
-      path: "/course-time-tabling/semester",
-      isPublic: true,
-      text: "Học kỳ",
-      child: [],
-    },
     {
       id: "MENU_COURSE_TIME_TABLING.CLASS_LIST_OPENED",
       path: "/course-time-tabling/class-list-opened",
@@ -29,13 +22,6 @@ export const courseTimeTabling = {
       path: "/course-time-tabling/make-schedule",
       isPublic: true,
       text: "Sắp xếp thời khóa biểu",
-      child: [],
-    },
-    {
-      id: "MENU_COURSE_TIME_TABLING.CLASSROOM",
-      path: "/course-time-tabling/classroom",
-      isPublic: true,
-      text: "Danh sách phòng học",
       child: [],
     },
   ],

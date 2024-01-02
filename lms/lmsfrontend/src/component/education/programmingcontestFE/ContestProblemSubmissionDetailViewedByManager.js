@@ -1,4 +1,14 @@
-import { Divider, Link, Paper, Stack, Switch, Typography } from "@mui/material";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import {
+  Divider,
+  IconButton,
+  Link,
+  Paper,
+  Stack,
+  Switch,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import Box from "@mui/material/Box";
 import { request } from "api";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
@@ -10,10 +20,23 @@ import { successNoti } from "utils/notification";
 import ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase from "./ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase";
 import { getStatusColor } from "./lib";
 
-export const detail = (key, value, sx) => (
+export const detail = (key, value, sx, helpText) => (
   <>
     <Typography variant="subtitle2" sx={{ fontWeight: 600, ...sx?.key }}>
-      {key}
+      {helpText ? (
+        <>
+          {key}
+          {
+            <Tooltip arrow title={helpText}>
+              <IconButton sx={{ p: 0.5, pt: 0 }}>
+                <HelpOutlineIcon sx={{ fontSize: 16, color: "#000000de" }} />
+              </IconButton>
+            </Tooltip>
+          }
+        </>
+      ) : (
+        key
+      )}
     </Typography>
 
     <Typography

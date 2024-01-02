@@ -38,14 +38,14 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-const InputFileUpload = forwardRef((props, ref) => {
-  const { label, startIcon, ...otherProps } = props;
+export const InputFileUpload = forwardRef((props, ref) => {
+  const { label, buttonProps, ...otherProps } = props;
   return (
     <Button
       component="label"
       variant="outlined"
-      startIcon={startIcon}
       sx={{ textTransform: "none" }}
+      {...buttonProps}
     >
       {label}
       <VisuallyHiddenInput type="file" ref={ref} {...otherProps} />

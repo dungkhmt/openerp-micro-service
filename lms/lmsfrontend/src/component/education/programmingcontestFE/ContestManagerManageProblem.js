@@ -1,23 +1,75 @@
-import * as React from "react";
-import {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
-import {request} from "../../../api";
-import Typography from "@mui/material/Typography";
-import {Autocomplete, Button, Divider, Grid, IconButton, LinearProgress, TextField} from "@mui/material";
-import StandardTable from "component/table/StandardTable";
-import Box from "@mui/material/Box";
-import {errorNoti, successNoti} from "../../../utils/notification";
-import ModalAddProblemToContest from "./ModalAddProblemToContest";
-import EditIcon from "@mui/icons-material/Edit";
-import ModalUpdateProblemInfoInContest from "./ModalUpdateProblemInfoInContest";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {getColorLevel} from "./lib";
-import {getSubmissionModeFromConstant} from "./Constant";
+import EditIcon from "@mui/icons-material/Edit";
+import {
+  Autocomplete,
+  IconButton,
+  LinearProgress,
+  Link,
+  Paper,
+  Popper,
+  Stack,
+  TextField,
+  Tooltip,
+} from "@mui/material";
+import { autocompleteClasses } from "@mui/material/Autocomplete";
+import Box from "@mui/material/Box";
+import { styled, useTheme } from "@mui/material/styles";
+import { request } from "api";
+import PrimaryButton from "component/button/PrimaryButton";
+import StandardTable from "component/table/StandardTable";
+import { useEffect, useState } from "react";
+import { infoNoti, successNoti } from "utils/notification";
+import { getSubmissionModeFromConstant } from "./Constant";
+import ModalAddProblemToContest from "./ModalAddProblemToContest";
 import ModalImportProblemsFromContest from "./ModalImportProblemsFromContest";
+import ModalUpdateProblemInfoInContest from "./ModalUpdateProblemInfoInContest";
+import { getColorLevel } from "./lib";
+
+const StyledAutocompletePopper = styled(Popper)(({ theme }) => ({
+  [`& .${autocompleteClasses.paper}`]: {
+    boxShadow:
+      "0 12px 28px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.5)",
+    margin: 0,
+    color: "inherit",
+    padding: 8,
+    borderRadius: 8,
+  },
+  [`& .${autocompleteClasses.listbox}`]: {
+    backgroundColor: theme.palette.mode === "light" ? "#fff" : "#1c2128",
+    padding: 0,
+    [`& .${autocompleteClasses.option}`]: {
+      minHeight: "auto",
+      alignItems: "flex-start",
+      padding: 8,
+      borderRadius: 8,
+      // borderBottom: `1px solid  ${
+      //   theme.palette.mode === "light" ? " #eaecef" : "#30363d"
+      // }`,
+      '&[aria-selected="true"]': {
+        backgroundColor: "transparent",
+      },
+      [`&.${autocompleteClasses.focused}, &.${autocompleteClasses.focused}[aria-selected="true"]`]:
+        {
+          backgroundColor: theme.palette.action.hover,
+        },
+    },
+  },
+  // [`&.${autocompleteClasses.popperDisablePortal}`]: {
+  //   position: "relative",
+  // },
+}));
+
+function PopperComponent(props) {
+  // console.log(props);
+  // const { disablePortal, anchorEl, open, ...other } = props;
+  return <StyledAutocompletePopper {...props} />;
+}
 
 export function ContestManagerManageProblem(props) {
   const contestId = props.contestId;
-  const [allProblems, setAllProblems] = useState([]);
+  const theme = useTheme();
+
+  const [problems, setProblems] = useState([]);
   const [contestProblems, setContestProblems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -29,63 +81,68 @@ export function ContestManagerManageProblem(props) {
   const [openModalUpdateProblem, setOpenModalUpdateProblem] = useState(false);
   const [openModalImportProblem, setOpenModalImportProblem] = useState(false);
 
-
+  //
   const columns = [
     {
-      title: "Problem",
+      title: "Name",
+      minWidth: 170,
       render: (rowData) => (
         <Link
-          to={{
-            pathname:
-              "/programming-contest/manager-view-problem-detail/" +
-              rowData["problemId"],
-          }}
-          style={{
-            textDecoration: "none",
-            color: "blue",
-            cursor: "",
-          }}
+          href={`/programming-contest/manager-view-problem-detail/${rowData["problemId"]}`}
+          variant="subtitle2"
+          underline="none"
+          target="_blank"
         >
           {rowData["problemName"]}
         </Link>
       ),
     },
-    {title: "Created By", field: "createdByUserId"},
-    {title: "Problem Name in Contest", field: "problemRename"},
-    {title: "Problem Code in Contest", field: "problemRecode"},
+    {
+      title: "Name in Contest",
+      field: "problemRename",
+      minWidth: 170,
+    },
+    {
+      title: "Code in Contest",
+      field: "problemRecode",
+      minWidth: 170,
+    },
     {
       title: "Level",
       render: (problem) => (
-        <span style={{color: getColorLevel(`${problem.levelId}`)}}>
+        <span style={{ color: getColorLevel(`${problem.levelId}`) }}>
           {`${problem.levelId}`}
         </span>
-      )
+      ),
     },
     {
       title: "Submission Mode",
-      render: (problem) => (
-        <span>
-          {getSubmissionModeFromConstant(problem?.submissionMode)}
-        </span>
-      )
+      minWidth: 180,
+      render: (problem) =>
+        getSubmissionModeFromConstant(problem?.submissionMode),
     },
     {
-      title: "Edit",
+      title: "Created By",
+      field: "createdByUserId",
+      minWidth: 130,
+    },
+    {
+      title: "",
       render: (problem) => (
         <IconButton
           onClick={() => {
-            setEditingProblem(problem)
+            setEditingProblem(problem);
             setOpenModalUpdateProblem(true);
           }}
           variant="contained"
           color="success"
         >
-          <EditIcon/>
+          <EditIcon />
         </IconButton>
       ),
     },
     {
-      title: "Remove",
+      title: "",
       render: (problem) => (
         <IconButton
           variant="contained"
@@ -93,42 +150,48 @@ export function ContestManagerManageProblem(props) {
           onClick={() => {
             request(
               "delete",
-              "/contest-problem?contestId=" + contestId + "&problemId=" + problem.problemId,
+              `/contest-problem?contestId=${contestId}&problemId=${problem.problemId}`,
               () => {
                 successNoti("Problem removed from contest", 5000);
-                getAllProblemsInContest();
+                getProblemsInContest();
               },
               {}
-            ).then();
+            );
           }}
         >
-          <DeleteIcon/>
+          <DeleteIcon />
         </IconButton>
       ),
-    }
+    },
   ];
-  const getAllProblems = () => {
-    request("get", "/problems/general-info", (res) => {
-      setAllProblems(res.data || []);
-    }).then();
-  }
 
-  const getAllProblemsInContest = () => {
+  const getProblems = () => {
+    request("get", "/problems/general-info", (res) => {
+      setProblems(res.data);
+    });
+  };
+
+  const getProblemsInContest = () => {
     request("get", "/contests/" + contestId, (res) => {
-      setContestProblems(res.data.list || []);
-    }).then(() => setLoading(false));
-  }
+      setLoading(false);
+      setContestProblems(res.data.list);
+    });
+  };
 
   useEffect(() => {
-    getAllProblems();
-    getAllProblemsInContest()
-  }, [])
+    getProblems();
+    getProblemsInContest();
+  }, []);
 
   function addNewProblem(newProblem) {
     if (newProblem?.addNew) return;
 
-    if (contestProblems.filter(problem => problem.problemId === newProblem.problemId).length > 0) {
-      errorNoti("Problem is already in contest", 3000);
+    if (
+      contestProblems.filter(
+        (problem) => problem.problemId === newProblem.problemId
+      ).length > 0
+    ) {
+      infoNoti("Problem added", 3000);
       return;
     }
     setChosenProblem(newProblem);
@@ -137,100 +200,142 @@ export function ContestManagerManageProblem(props) {
 
   const handleAddProblemToContestSuccess = () => {
     successNoti("Problem saved to contest successfully", 5000);
-    getAllProblemsInContest();
-  }
+    getProblemsInContest();
+  };
   const handleCloseModal = () => {
     setOpenModalAddProblem(false);
     setOpenModalUpdateProblem(false);
-  }
+  };
 
   const handleCloseModalImportProblems = () => {
     setOpenModalImportProblem(false);
-    getAllProblemsInContest();
-  }
+    getProblemsInContest();
+  };
 
   return (
-    <Box sx={{margin: "14px 0"}}>
-      {loading && <LinearProgress/>}
-      <Grid container spacing={2} sx={{mb: 2}} alignItems="center">
-        <Grid item xs={9}>
-          <Autocomplete
-            id="problem-select"
-            onChange={(event, value) => addNewProblem(value)}
-            options={[{addNew: "true"}, ...allProblems]}
-            sx={{width: "100%"}}
-            autoHighlight
-            getOptionLabel={(option) => option.problemName || ""}
-            inputValue={searchProblemValue}
-            onInputChange={(event, newInputValue, reason) => {
-              if (reason === "reset") setSearchProblemValue("");
-              else setSearchProblemValue(newInputValue);
+    <Paper sx={{ p: 2 }}>
+      {loading && <LinearProgress />}
+      <Stack
+        direction={"row"}
+        spacing={2}
+        alignItems="center"
+        justifyContent={"flex-end"}
+        sx={{ mb: 1.5 }}
+      >
+        <Autocomplete
+          id="add-problem"
+          size="small"
+          sx={{ minWidth: "500px", width: "100%" }}
+          disableClearable
+          inputValue={searchProblemValue}
+          onInputChange={(event, newInputValue, reason) => {
+            if (reason === "reset") setSearchProblemValue("");
+            else setSearchProblemValue(newInputValue);
+          }}
+          onChange={(event, newValue, reason) => {
+            if (
+              event.type === "keydown" &&
+              event.key === "Backspace" &&
+              reason === "removeOption"
+            ) {
+              return;
+            }
+            addNewProblem(newValue);
+          }}
+          PopperComponent={PopperComponent}
+          noOptionsText="No matches found"
+          renderOption={(props, option, { selected }) => {
+            // console.log(props);
+            // if (option.addNew === "true") {
+            //   return (
+            //     <Box {...props} key={"btn-create-new-problem"}>
+            //       <PrimaryButton
+            //         sx={{
+            //           width: "100%",
+            //         }}
+            //         onClick={() =>
+            //           window.open("/programming-contest/create-problem")
+            //         }
+            //       >
+            //         Create new Problem
+            //       </PrimaryButton>
+            //     </Box>
+            //   );
+            // } else {
+            return (
+              <li {...props} key={option.problemId}>
+                <Box
+                  component="span"
+                  sx={{
+                    width: 14,
+                    height: 14,
+                    flexShrink: 0,
+                    borderRadius: 1,
+                    mr: 1,
+                    mt: "2px",
+                  }}
+                  style={{ backgroundColor: getColorLevel(option.levelId) }}
+                />
+                <Box
+                  sx={{
+                    flexGrow: 1,
+                    "& span": {
+                      color:
+                        theme.palette.mode === "light" ? "#586069" : "#8b949e",
+                    },
+                  }}
+                >
+                  {option.problemName}
+                  <br />
+                  <span>{option.problemId}</span>
+                </Box>
+              </li>
+            );
+            // }
+          }}
+          options={[
+            // { addNew: "true" },
+            ...problems,
+          ]}
+          getOptionLabel={(option) => option.problemName || ""}
+          renderInput={(params) => {
+            return (
+              <TextField
+                {...params}
+                autoFocus
+                placeholder="Search by problem name"
+              />
+            );
+          }}
+        />
+        <Tooltip arrow title="Import all problems from other contest">
+          <PrimaryButton
+            onClick={() => {
+              setOpenModalImportProblem(true);
             }}
-            renderOption={(props, option) => {
-              if (option.addNew === "true") {
-                return (
-                  <Box {...props} key={option.label}>
-                    <Button
-                      variant="outlined"
-                      sx={{
-                        width: "100%",
-                      }}
-                      onClick={() => window.open("/programming-contest/create-problem")}
-                    >
-                      <Typography>{"Create new Problem"}</Typography>
-                    </Button>
-                  </Box>
-                );
-              } else {
-                return (
-                  <Box {...props} key={option.problemId}>
-                    <Grid container>
-                      <Grid item xs={5}>
-                        {option.problemName}
-                      </Grid>
-                      <Grid item xs={5} sx={{display: "flex"}}>
-                        <Typography>
-                          {" "}
-                          {"ID"}: {option.problemId}{" "}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={2} sx={{display: "flex"}}>
-                        <Typography sx={{color: getColorLevel(option.levelId)}}>
-                          {option.levelId}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Box>
-                )
-              }
-            }}
-            renderInput={(params) => {
-              return <TextField {...params} autoFocus placeholder="Search problem to add to contest"/>;
-            }}
-          />
-        </Grid>
-        <Grid item xs={1}>
-          <Divider>OR</Divider>
-        </Grid>
-
-        <Grid item xs={2}>
-          <Button variant="outlined" onClick={() => {
-            setOpenModalImportProblem(true)
-          }}>
-            Import problems from contest
-          </Button>
-        </Grid>
-      </Grid>
+          >
+            Import
+          </PrimaryButton>
+        </Tooltip>
+        <PrimaryButton
+          href={"/programming-contest/create-problem"}
+          target="_blank"
+          sx={{ minWidth: "136px" }}
+          // endIcon={<ArrowRightAltRoundedIcon />}
+        >
+          Create Problem
+        </PrimaryButton>
+      </Stack>
 
       <StandardTable
-        title={"Problems in Contest"}
+        // title={"Problems in Contest"}
         columns={columns}
         data={contestProblems}
         hideCommandBar
         options={{
           selection: false,
-          pageSize: 10,
-          search: true,
+          pageSize: 5,
+          search: false,
           sorting: true,
         }}
       />
@@ -256,6 +361,6 @@ export function ContestManagerManageProblem(props) {
         isOpen={openModalImportProblem}
         handleClose={handleCloseModalImportProblems}
       />
-    </Box>
+    </Paper>
   );
 }

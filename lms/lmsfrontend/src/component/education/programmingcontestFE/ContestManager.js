@@ -1,126 +1,98 @@
-import * as React from "react";
-import {useState} from "react";
-import {useParams} from "react-router-dom";
-
-import {Tab, Tabs} from "@mui/material";
-import {a11yProps, TabPanelVertical} from "./TabPanel";
+import { AntTab, AntTabs, TabPanel, a11yProps } from "component/tab";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 import CodeSimilarityCheck from "./CodeSimilarityCheck";
-import {ContestManagerDetail} from "./ContestManagerDetail";
+import { ContestManagerDetail } from "./ContestManagerDetail";
 import ContestManagerListMember from "./ContestManagerListMember";
 import ContestManagerListMemberOfGroup from "./ContestManagerListMemberOfGroup";
-
 import ContestManagerListRegisteredParticipant from "./ContestManagerListRegisteredParticipant";
-import ContestManagerAddMember2Contest from "./ContestManagerAddMember2Contest";
-
+import { ContestManagerManageProblem } from "./ContestManagerManageProblem";
+import ContestManagerRankingGroupNew from "./ContestManagerRankingGroupNew";
+import ContestManagerRankingNew from "./ContestManagerRankingNew";
 import ContestManagerUserSubmission from "./ContestManagerUserSubmission";
 import ContestManagerUserSubmissionGroup from "./ContestManagerUserSubmissionGroup";
-
-import ContestManagerRankingNew from "./ContestManagerRankingNew";
-import ContestManagerRankingGroupNew from "./ContestManagerRankingGroupNew";
-
 import ContestResultDistribution from "./ContestResultDistribution";
-import {ContestManagerManageProblem} from "./ContestManagerManageProblem";
 
 export function ContestManager() {
-  const {contestId} = useParams();
+  const { contestId } = useParams();
 
-  const [value, setValue] = useState(0);
+  const [selectedTab, setSelectedTab] = useState(0);
+
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    setSelectedTab(newValue);
   };
 
   return (
-    <div>
-      <Tabs
-        value={value}
+    <>
+      <AntTabs
+        value={selectedTab}
         onChange={handleChange}
-        indicatorColor={"primary"}
-        autoFocus
-        sx={{
-          width: "100%",
-          display: "inline-table",
-          border: "1px solid transparent ",
-          position: "relative",
-          borderBottom: "none",
-          marginBottom: "6px"
-        }}
-        aria-label="basic tabs example"
+        aria-label="contest manager tabs"
+        scrollButtons="auto"
+        variant="scrollable"
       >
-        <Tab
-          label="Contest Detail"
-          {...a11yProps(0)}
-          style={{width: "11%"}}
+        <AntTab label="General" {...a11yProps(0)} />
+        <AntTab label="Problems" {...a11yProps(1)} />
+        <AntTab label="Member" {...a11yProps(2)} />
+        <AntTab
+          label="Registered User"
+          {...a11yProps(3)}
+          style={{ width: 140 }}
         />
-        <Tab
-          label="Manage Problems"
-          {...a11yProps(1)}
-          style={{width: "11%"}}
-        />
-        <Tab label="List User" {...a11yProps(2)} style={{width: "11%"}}/>
-        <Tab label="Registered User" {...a11yProps(3)} style={{width: "11%"}}/>
-        <Tab label="Add User" {...a11yProps(4)} style={{width: "11%"}}/>
-        <Tab label="Ranking" {...a11yProps(5)} style={{width: "11%"}}/>
-        <Tab
+        {/* <AntTab label="Add Member" {...a11yProps(4)} /> */}
+        <AntTab label="Submissions" {...a11yProps(4)} />
+        <AntTab label="Ranking" {...a11yProps(5)} />
+        <AntTab
           label="Result Distribution"
           {...a11yProps(6)}
-          style={{width: "11%"}}
+          style={{ width: 160 }}
         />
-        <Tab
-          label="User Submissions"
-          {...a11yProps(7)}
-          style={{width: "11%"}}
-        />
-        <Tab
-          label="Check Plagiarism"
-          {...a11yProps(8)}
-          style={{width: "11%"}}
-        />
-      </Tabs>
 
-      <TabPanelVertical value={value} index={0}>
-        <ContestManagerDetail contestId={contestId}/>
-      </TabPanelVertical>
+        <AntTab label="Plagiarism" {...a11yProps(7)} />
+      </AntTabs>
 
-      <TabPanelVertical value={value} index={1}>
-        <ContestManagerManageProblem contestId={contestId}/>
-      </TabPanelVertical>
+      <TabPanel value={selectedTab} index={0} dir={"ltr"}>
+        <ContestManagerDetail contestId={contestId} />
+      </TabPanel>
 
-      <TabPanelVertical value={value} index={2}>
-        <ContestManagerListMember contestId={contestId}/>
-        <ContestManagerListMemberOfGroup contestId={contestId}/>
-        
+      <TabPanel value={selectedTab} index={1} dir={"ltr"}>
+        <ContestManagerManageProblem contestId={contestId} />
+      </TabPanel>
+
+      <TabPanel value={selectedTab} index={2} dir={"ltr"}>
+        <ContestManagerListMember contestId={contestId} />
+        <ContestManagerListMemberOfGroup contestId={contestId} />
+
         {/* <ContestManagerListParticipant contestId={contestId}/> */}
-      </TabPanelVertical>
+      </TabPanel>
 
-      <TabPanelVertical value={value} index={3}>
-        <ContestManagerListRegisteredParticipant contestId={contestId}/>
+      <TabPanel value={selectedTab} index={3} dir={"ltr"}>
+        <ContestManagerListRegisteredParticipant contestId={contestId} />
+
         {/* <ContestManagerListRequestingParticipant contestId={contestId}/> */}
-      </TabPanelVertical>
+      </TabPanel>
 
-      <TabPanelVertical value={value} index={4}>
-        <ContestManagerAddMember2Contest contestId={contestId}/>
-      </TabPanelVertical>
+      {/* <TabPanel value={selectedTab} index={4} dir={"ltr"}>
+        <ContestManagerAddMember2Contest contestId={contestId} />
+      </TabPanel> */}
 
-      <TabPanelVertical value={value} index={5}>
-        <ContestManagerRankingNew contestId={contestId}/>
-        <ContestManagerRankingGroupNew contestId={contestId}/>
-        
-      </TabPanelVertical>
+      <TabPanel value={selectedTab} index={4} dir={"ltr"}>
+        <ContestManagerUserSubmission contestId={contestId} />
+        <ContestManagerUserSubmissionGroup contestId={contestId} />
+      </TabPanel>
 
-      <TabPanelVertical value={value} index={6}>
-        <ContestResultDistribution contestId={contestId}/>
-      </TabPanelVertical>
+      <TabPanel value={selectedTab} index={5} dir={"ltr"}>
+        <ContestManagerRankingNew contestId={contestId} />
+        <ContestManagerRankingGroupNew contestId={contestId} />
+      </TabPanel>
 
-      <TabPanelVertical value={value} index={7}>
-        <ContestManagerUserSubmission contestId={contestId}/>
-        <ContestManagerUserSubmissionGroup contestId={contestId}/>
-        
-      </TabPanelVertical>
+      <TabPanel value={selectedTab} index={6} dir={"ltr"}>
+        <ContestResultDistribution contestId={contestId} />
+      </TabPanel>
 
-
-      <TabPanelVertical value={value} index={8}>
-        <CodeSimilarityCheck contestId={contestId}/>
-      </TabPanelVertical>
-    </div>
+      <TabPanel value={selectedTab} index={7} dir={"ltr"}>
+        <CodeSimilarityCheck contestId={contestId} />
+      </TabPanel>
+    </>
   );
 }

@@ -1,15 +1,14 @@
 import InfoIcon from "@mui/icons-material/Info";
 import ReplayIcon from "@mui/icons-material/Replay";
-import { LoadingButton } from "@mui/lab";
-import { Box, IconButton, Stack } from "@mui/material";
+import { IconButton } from "@mui/material";
+import { request } from "api";
+import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
+import HustModal from "component/common/HustModal";
 import StandardTable from "component/table/StandardTable";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 import { localeOption } from "utils/NumberFormat";
-import { request } from "../../../api";
-import HustCopyCodeBlock from "../../common/HustCopyCodeBlock";
-import HustModal from "../../common/HustModal";
 
 const StudentViewSubmission = forwardRef((props, ref) => {
   const { t } = useTranslation(
@@ -57,9 +56,7 @@ const StudentViewSubmission = forwardRef((props, ref) => {
       render: (rowData) => (
         <Link
           to={{
-            pathname:
-              "/programming-contest/contest-problem-submission-detail/" +
-              rowData["contestSubmissionId"],
+            pathname: `/programming-contest/contest-problem-submission-detail/${rowData["contestSubmissionId"]}`,
           }}
         >
           {rowData["contestSubmissionId"].substring(0, 6)}
@@ -139,11 +136,13 @@ const StudentViewSubmission = forwardRef((props, ref) => {
   const ModalMessage = ({ rowData }) => {
     let message = "";
     let detailLink = "";
+
     if (rowData) {
       if (rowData["message"]) message = rowData["message"];
       if (rowData["contestSubmissionId"])
         detailLink = rowData["contestSubmissionId"];
     }
+
     return (
       <HustModal
         open={openModalMessage}
@@ -152,24 +151,22 @@ const StudentViewSubmission = forwardRef((props, ref) => {
         showCloseBtnTitle={false}
       >
         <HustCopyCodeBlock title="Response" text={message} />
-        <Box paddingTop={2}>
+        {/* <Box paddingTop={2}>
           <Link
             to={{
-              pathname:
-                "/programming-contest/contest-problem-submission-detail/" +
-                detailLink,
+              pathname: `/programming-contest/contest-problem-submission-detail/${detailLink}`,
             }}
           >
             View detail here
           </Link>
-        </Box>
+        </Box> */}
       </HustModal>
     );
   };
 
   return (
-    <Box sx={{ marginTop: "20px" }}>
-      <Stack direction={"row"} justifyContent={"flex-end"} sx={{ mb: 2 }}>
+    <>
+      {/* <Stack direction={"row"} justifyContent={"flex-end"} sx={{ mb: 2 }}>
         <LoadingButton
           disabled={loading}
           color="primary"
@@ -185,10 +182,10 @@ const StudentViewSubmission = forwardRef((props, ref) => {
         >
           <span style={{ textTransform: "none" }}>Refresh</span>
         </LoadingButton>
-      </Stack>
+      </Stack> */}
       <ModalMessage rowData={selectedRowData} />
       <StandardTable
-        title={t("submissionList.title")}
+        // title={t("submissionList.title")}
         columns={columns}
         data={submissions}
         hideCommandBar
@@ -198,8 +195,20 @@ const StudentViewSubmission = forwardRef((props, ref) => {
           search: true,
           sorting: true,
         }}
+        actions={[
+          {
+            disabled: loading,
+            icon: () => <ReplayIcon color={loading ? "disabled" : "primary"} />,
+            tooltip: "Refresh",
+            isFreeAction: true,
+            onClick: (event) => {
+              setLoading(true);
+              setTimeout(handleRefresh, 1000);
+            },
+          },
+        ]}
       />
-    </Box>
+    </>
   );
 });
 

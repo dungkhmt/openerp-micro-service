@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Autocomplete } from '@mui/material';
 import { request } from "../../../api";
 
-export default function CreateNewGroupScreen({ open, handleClose, existingData, handleRefreshData }) {
+export default function CreateNewSemester({ open, handleClose, handleUpdate, handleRefreshData }) {
   const [newGroup, setNewGroup] = useState('');
+  const [buildings, setBuildings] = useState('');
   const [newPriorityBuilding, setNewPriorityBuilding] = useState('');
-  const [buildings, setBuildings] = useState([]);
 
   useEffect(() => {
     request("get", "/classroom/get-all-building", (res) => {
@@ -14,43 +14,24 @@ export default function CreateNewGroupScreen({ open, handleClose, existingData, 
   }, [])
 
   const handleCreate = () => {
-
-    const requestNewGroup = {
+    const requestData = {
       groupName: newGroup,
-      priorityBuilding: newPriorityBuilding
+      priorityBuilding: newPriorityBuilding,
     };
-
-    const requestUpdateClassOpened = {
-      ids: existingData,
-      groupName: newGroup
-    };
-
     request("post", "/group/create", (res) => {
-
-      //if success, do request update class opened
-      request("post", "/class-opened/update", (res) => {
-        // Call handleRefreshData to refresh the data 
-        handleRefreshData();
-        //close dialog
-        handleClose();
-      },
-        {},
-        requestUpdateClassOpened
-      ).then();
-
+      // Call your handleUpdate function if needed
+      handleUpdate(res.data);
       // Call handleRefreshData to refresh the data 
       handleRefreshData();
       //close dialog
       handleClose();
     },
-      {
-      },
-      requestNewGroup
+      {},
+      requestData
     ).then();
-  };
 
-  const handleInputChange = (event) => {
-    setNewGroup(event.target.value);
+    // Close the dialog
+    handleClose();
   };
 
   const handleBuildingpriorityChange = (event, newValue) => {
@@ -59,7 +40,7 @@ export default function CreateNewGroupScreen({ open, handleClose, existingData, 
 
   return (
     <Dialog open={open} onClose={handleClose} aria-labelledby="create-new-semester-dialog">
-      <DialogTitle id="create-new-semester-dialog-title">Thêm vào nhóm mới</DialogTitle>
+      <DialogTitle id="create-new-group-dialog-title">Thêm nhóm mới</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
@@ -67,8 +48,9 @@ export default function CreateNewGroupScreen({ open, handleClose, existingData, 
           label="Tên nhóm"
           fullWidth
           value={newGroup}
-          onChange={handleInputChange}
+          onChange={(event) => setNewGroup(event.target.value)}
         />
+        <div style={{ margin: '16px' }} />
         <Autocomplete
           options={buildings}
           getOptionLabel={(option) => option}

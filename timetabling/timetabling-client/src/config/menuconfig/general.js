@@ -1,13 +1,13 @@
 export const general = {
   id: "MENU_GENERAL",
   icon: "DashboardIcon",
-  text: "Dashboard",
+  text: "Tổng quan",
   child: [
     {
       id: "MENU_GENERAL.DASHBOARD",
       path: "/",
       isPublic: true,
-      text: "Dashboard",
+      text: "Tổng quan",
       child: [],
     },
   ],

@@ -1,4 +1,4 @@
-import {Box} from "@mui/material";
+import { Box } from "@mui/material";
 import PropTypes from "prop-types";
 
 export function TabPanel(props) {
@@ -12,7 +12,7 @@ export function TabPanel(props) {
       aria-labelledby={`full-width-tab-${index}`}
       {...other}
     >
-      {value === index && <Box pt={3}>{children}</Box>}
+      {value === index && <Box pt={1.5}>{children}</Box>}
     </div>
   );
 }
