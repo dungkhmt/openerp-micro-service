@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Secured("ROLE_ADMIN")
 @RequestMapping("/admin/data/programming-contests/submissions")
 public class ProgrammingContestSubmissionController {
 

@@ -125,6 +125,8 @@ public class ContestService {
             .judgeMode(contestEntity.getJudgeMode())
             .participantViewSubmissionMode(contestEntity.getParticipantViewSubmissionMode())
             .listParticipantViewSubmissionModes(ContestEntity.getListParticipantViewSubmissionModes())
+            //.languagesAllowed(contestEntity.getListLanguagesAllowed())
+            .languagesAllowed(contestEntity.getLanguagesAllowed())
             .build();
     }
 

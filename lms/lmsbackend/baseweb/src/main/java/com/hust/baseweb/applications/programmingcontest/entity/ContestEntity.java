@@ -53,6 +53,17 @@ public class ContestEntity implements Serializable {
     public static final String PARTICIPANT_VIEW_SUBMISSION_MODE_ENABLED = "ALLOW_VIEW";
     public static final String PARTICIPANT_VIEW_SUBMISSION_MODE_DISABLED = "FORBIDDEN";
 
+    public static final String PROG_LANGUAGES_C = "C";
+    public static final String PROG_LANGUAGES_CPP11 = "CPP11";
+    public static final String PROG_LANGUAGES_CPP14 = "CPP14";
+    public static final String PROG_LANGUAGES_CPP17 = "CPP17";
+    public static final String PROG_LANGUAGES_JAVA = "JAVA";
+    public static final String PROG_LANGUAGES_PYTHON3 = "PYTHON3";
+
+
+
+
+
     public static List<String> getListParticipantViewSubmissionModes(){
         List<String> L = new ArrayList();
         L.add(PARTICIPANT_VIEW_SUBMISSION_MODE_ENABLED);
@@ -106,6 +117,27 @@ public class ContestEntity implements Serializable {
 //        L.add(CONTEST_PARTICIPANT_VIEW_MODE_SEE_CORRECT_ANSWER_AND_PRIVATE_TESTCASE_SHORT);
         L.add(CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_ENABLED);
         L.add(CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_DISABLED);
+        return L;
+    }
+
+    public List<String> getListLanguagesAllowed(){
+        List<String> L = new ArrayList<>();
+        if(languagesAllowed != null && !languagesAllowed.equals("")){
+            String[] s = languagesAllowed.split(",");
+            if(s != null && s.length > 0){
+                for(String l: s){
+                    if(l != null && !l.equals(""))
+                        L.add(l.trim());
+                }
+            }
+        }else{// no limitation, take all languages
+            L.add(ContestEntity.PROG_LANGUAGES_C);
+            L.add(ContestEntity.PROG_LANGUAGES_CPP11);
+            L.add(ContestEntity.PROG_LANGUAGES_CPP14);
+            L.add(ContestEntity.PROG_LANGUAGES_CPP17);
+            L.add(ContestEntity.PROG_LANGUAGES_JAVA);
+            L.add(ContestEntity.PROG_LANGUAGES_PYTHON3);
+        }
         return L;
     }
 
@@ -182,4 +214,8 @@ public class ContestEntity implements Serializable {
 
     @Column(name="participant_view_submission_mode")
     private String participantViewSubmissionMode;
+
+    @Column(name="languages_allowed")
+    private String languagesAllowed;
+
 }

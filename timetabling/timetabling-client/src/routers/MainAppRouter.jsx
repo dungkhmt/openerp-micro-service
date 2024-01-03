@@ -8,8 +8,8 @@ import NotFound from "views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import TeacherRouter from "./TeacherRouter";
 import ScheduleInformationRouter from "./ScheduleInformationRouter";
-import SchedulePerformanceRouter from "./SchedulePerformanceRouter";
-import ScheduleScreen from "views/ScheduleScreen";
+// import SchedulePerformanceRouter from "./SchedulePerformanceRouter";
+// import ScheduleScreen from "views/ScheduleScreen";
 import CourseTimeTablingRouter from "./CourseTimeTablingRouter";
 
 const styles = {
@@ -39,9 +39,9 @@ function MainAppRouter(props) {
         <Switch>
           <Route component={() => <></>} exact path="/" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
-          <PrivateRoute component={ScheduleScreen} path="/schedule" />
+          {/* <PrivateRoute component={ScheduleScreen} path="/schedule" /> */}
           <PrivateRoute component={ScheduleInformationRouter} path="/schedule-information" />
-          <PrivateRoute component={SchedulePerformanceRouter} path="/schedule-performance" />
+          {/* <PrivateRoute component={SchedulePerformanceRouter} path="/schedule-performance" /> */}
           <PrivateRoute component={CourseTimeTablingRouter} path="/course-time-tabling" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />

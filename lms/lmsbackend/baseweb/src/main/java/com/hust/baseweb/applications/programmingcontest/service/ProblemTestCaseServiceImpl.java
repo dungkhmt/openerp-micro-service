@@ -704,7 +704,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         if (contestEntityExist == null) {
             throw new MiniLeetCodeException("Contest does not exist");
         }
-
+        log.info("updateContest, languages = " + modelUpdateContest.getLanguagesAllowed());
         List<UserRegistrationContestEntity> L = userRegistrationContestRepo
             .findUserRegistrationContestEntityByContestIdAndUserIdAndStatus(
                 contestId,
@@ -747,6 +747,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .judgeMode(modelUpdateContest.getJudgeMode())
                                                    .sendConfirmEmailUponSubmission(modelUpdateContest.getSendConfirmEmailUponSubmission())
                                                     .participantViewSubmissionMode(modelUpdateContest.getParticipantViewSubmissionMode())
+                                                    .languagesAllowed(modelUpdateContest.getLanguagesAllowed())
                                                    .build();
         return contestService.updateContestWithCache(contestEntity);
 

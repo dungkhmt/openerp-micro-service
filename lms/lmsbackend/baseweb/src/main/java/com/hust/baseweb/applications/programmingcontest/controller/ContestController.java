@@ -156,6 +156,7 @@ public class ContestController {
             model.setPreloadCode(problemEntity.getPreloadCode());
             model.setAttachment(problemEntity.getAttachment());
             model.setAttachmentNames(problemEntity.getAttachmentNames());
+            model.setListLanguagesAllowed(contestEntity.getListLanguagesAllowed());
             return ResponseEntity.ok().body(model);
         } catch (Exception e) {
             e.printStackTrace();

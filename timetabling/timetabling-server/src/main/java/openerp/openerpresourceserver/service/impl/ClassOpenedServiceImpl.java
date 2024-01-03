@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -71,12 +70,6 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
     public List<ClassOpened> getBySemester(String semester) {
         Sort sort = Sort.by(Sort.Direction.ASC, "id");
         return classOpenedRepo.getAllBySemester(semester, sort);
-    }
-
-    @Override
-    public List<ClassOpened> getByGroupName(String groupName) {
-        Sort sort = Sort.by(Sort.Direction.ASC, "id");
-        return classOpenedRepo.getAllByGroupName(groupName, sort);
     }
 
     @Override
@@ -157,7 +150,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         classOpenedRepo.save(classOpened);
     }
 
-    public void checkConflictSchedule(ClassOpened classOpened, MakeScheduleDto requestDto) {
+    private void checkConflictSchedule(ClassOpened classOpened, MakeScheduleDto requestDto) {
         String classroomOfClass = requestDto.getClassroom() != null ? requestDto.getClassroom() : classOpened.getClassroom();
         String weekdayOfClass = requestDto.getWeekday() != null ? requestDto.getWeekday() : classOpened.getWeekday();
         String mass = classOpened.getMass();
@@ -175,42 +168,11 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
                 getAllBySecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull
                         (classroomOfClass, weekdayOfClass, crew);
 
-        listClassOpened.forEach(el -> {
-            String supMass = el.getMass();
-            Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
-            long existedStartPeriod = Long.parseLong(el.getStartPeriod());
-            long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
-
-            if (startPeriod > existedStartPeriod) {
-                if (startPeriod <= existedFinishPeriod) {
-                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
-                }
-            } else {
-                if (finishPeriod >= existedStartPeriod) {
-                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
-                }
-            }
-        });
-
-        listSecondClassOpened.forEach(el -> {
-            String supMass = el.getMass();
-            Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
-            long existedStartPeriod = Long.parseLong(el.getSecondStartPeriod());
-            long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
-
-            if (startPeriod > existedStartPeriod) {
-                if (startPeriod <= existedFinishPeriod) {
-                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
-                }
-            } else {
-                if (finishPeriod >= existedStartPeriod) {
-                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
-                }
-            }
-        });
+        this.checkForFirstListClasses(listClassOpened, startPeriod, finishPeriod);
+        this.checkForSecondListClasses(listSecondClassOpened, startPeriod, finishPeriod);
     }
 
-    public void checkConflictScheduleForSecondClass(ClassOpened classOpened, MakeScheduleDto requestDto) {
+    private void checkConflictScheduleForSecondClass(ClassOpened classOpened, MakeScheduleDto requestDto) {
         String classroomOfClass = requestDto.getSecondClassroom() != null ? requestDto.getSecondClassroom() : classOpened.getSecondClassroom();
         String weekdayOfClass = requestDto.getSecondWeekday() != null ? requestDto.getSecondWeekday() : classOpened.getSecondWeekday();
         String mass = classOpened.getMass();
@@ -228,42 +190,46 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
                 getAllBySecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot
                         (classroomOfClass, weekdayOfClass, crew, requestDto.getId());
 
+        this.checkForFirstListClasses(listClassOpened, startPeriod, finishPeriod);
+        this.checkForSecondListClasses(listSecondClassOpened, startPeriod, finishPeriod);
+    }
+
+    private void checkForFirstListClasses(List<ClassOpened> listClassOpened, long startPeriod, long finishPeriod) {
         listClassOpened.forEach(el -> {
             String supMass = el.getMass();
             Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
             long existedStartPeriod = Long.parseLong(el.getStartPeriod());
             long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
 
-            if (startPeriod > existedStartPeriod) {
-                if (startPeriod <= existedFinishPeriod) {
-                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
-                }
-            } else {
-                if (finishPeriod >= existedStartPeriod) {
-                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
-                }
-            }
+            this.compareTimePeriod(startPeriod, finishPeriod, el, existedStartPeriod, existedFinishPeriod);
         });
+    }
 
+    private void checkForSecondListClasses(List<ClassOpened> listSecondClassOpened, long startPeriod, long finishPeriod) {
         listSecondClassOpened.forEach(el -> {
             String supMass = el.getMass();
             Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
             long existedStartPeriod = Long.parseLong(el.getSecondStartPeriod());
             long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
 
-            if (startPeriod > existedStartPeriod) {
-                if (startPeriod <= existedFinishPeriod) {
-                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
-                }
-            } else {
-                if (finishPeriod >= existedStartPeriod) {
-                    throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
-                }
-            }
+            this.compareTimePeriod(startPeriod, finishPeriod, el, existedStartPeriod, existedFinishPeriod);
         });
     }
 
-    public Long calculateFinishPeriod(String mass, Long startPeriod, Boolean isSeparateClass) {
+    private void compareTimePeriod(long startPeriod, long finishPeriod, ClassOpened el,
+                                  long existedStartPeriod, long existedFinishPeriod) {
+        if (startPeriod > existedStartPeriod) {
+            if (startPeriod <= existedFinishPeriod) {
+                throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
+            }
+        } else {
+            if (finishPeriod >= existedStartPeriod) {
+                throw new ConflictScheduleException("Trùng lịch với lớp: " + el.getModuleName());
+            }
+        }
+    }
+
+    private Long calculateFinishPeriod(String mass, Long startPeriod, Boolean isSeparateClass) {
         long totalPeriod = this.calculateTotalPeriod(mass);
         long finishPeriod = isSeparateClass ? (startPeriod + (totalPeriod / 2) - 1) : startPeriod + totalPeriod - 1;
 
@@ -273,7 +239,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         return finishPeriod;
     }
 
-    public Long calculateTotalPeriod(String mass) {
+    private Long calculateTotalPeriod(String mass) {
         //a(b-c-d-e) => b-c-d-e => b,c,d,e => b+c
         String numbersString = mass.substring(2, mass.indexOf(')'));
         String[] numbersArray = numbersString.split("-");
@@ -350,149 +316,130 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
 
         //Tự động sắp xếp phòng khi yêu cầu
         if (isClassroomArranged) {
-            for (ClassOpened elClass : listClassMakeSchedule) {
-                Boolean isSeparateClass = elClass.getIsSeparateClass();
-                String currentCrew = elClass.getCrew();
-                String currentMass = elClass.getMass();
-                String quantity = !elClass.getQuantity().isEmpty() ? elClass.getQuantity() : elClass.getQuantityMax();
-                long currentStartPeriod = Long.parseLong(elClass.getStartPeriod());
-                String currentWeekday = elClass.getWeekday();
-                long currentFinish = this.calculateFinishPeriod(currentMass, currentStartPeriod, isSeparateClass);
-                long amountStudent = Long.parseLong(quantity.contains(".") ? quantity.substring(0, quantity.indexOf(".")) : quantity);
+            this.autoSetClassroom(listClassMakeSchedule, priorityBuilding);
+        }
+    }
 
-                List<Classroom> classroomList = priorityBuilding != null ?
-                        classroomRepo.findClassroomByBuildingAndQuantityMaxAfter(priorityBuilding, amountStudent) :
-                        classroomRepo.findClassroomByQuantityMaxAfter(amountStudent);
-                if (classroomList.isEmpty()) {
-                    throw new NotClassroomSuitableException("Không có phòng học phù hợp cho lớp:" + elClass.getModuleName());
+    private void autoSetClassroom(List<ClassOpened> listClassMakeSchedule, String priorityBuilding) {
+        for (ClassOpened elClass : listClassMakeSchedule) {
+            Boolean isSeparateClass = elClass.getIsSeparateClass();
+            String currentCrew = elClass.getCrew();
+            String currentMass = elClass.getMass();
+            String quantity = !elClass.getQuantity().isEmpty() ? elClass.getQuantity() : elClass.getQuantityMax();
+            long currentStartPeriod = Long.parseLong(elClass.getStartPeriod());
+            String currentWeekday = elClass.getWeekday();
+            long currentFinish = this.calculateFinishPeriod(currentMass, currentStartPeriod, isSeparateClass);
+            long amountStudent = Long.parseLong(quantity.contains(".") ? quantity.substring(0, quantity.indexOf(".")) : quantity);
+
+            List<Classroom> classroomList = priorityBuilding != null ?
+                    classroomRepo.findClassroomByBuildingAndQuantityMaxAfter(priorityBuilding, amountStudent) :
+                    classroomRepo.findClassroomByQuantityMaxAfter(amountStudent);
+            if (classroomList.isEmpty()) {
+                throw new NotClassroomSuitableException("Không có phòng học phù hợp cho lớp:" + elClass.getModuleName());
+            }
+
+            //Gán phòng học cho lớp học đơn hoặc lớp đầu tiên của lớp tách
+            for (Classroom classroom : classroomList) {
+                boolean setClassroomDone;
+                List<ClassOpened> listClassOpened = classOpenedRepo.
+                        getAllByClassroomAndWeekdayAndCrewAndStartPeriodIsNotNullAndIdNot
+                                (classroom.getClassroom(), currentWeekday, currentCrew, elClass.getId());
+                List<ClassOpened> listSecondClassOpened = classOpenedRepo.
+                        getAllBySecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull
+                                (classroom.getClassroom(), currentWeekday, currentCrew);
+
+                //Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
+                setClassroomDone = this.checkConflictTimeForListFirstClass(listClassOpened, currentStartPeriod, currentFinish);
+
+                //Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
+                setClassroomDone = this.checkConflictTimeForListSecondClass(listSecondClassOpened, currentStartPeriod, currentFinish);
+
+                if (setClassroomDone) {
+                    elClass.setClassroom(classroom.getClassroom());
+                    classOpenedRepo.save(elClass);
+                    break;
                 }
+            }
 
-                //Gán phòng học cho lớp học đơn hoặc lớp đầu tiên của lớp tách
+            //Gán phòng học cho lớp học thứ hai của lớp tách
+            if (isSeparateClass) {
+                currentStartPeriod = Long.parseLong(elClass.getSecondStartPeriod());
+                currentWeekday = elClass.getSecondWeekday();
+                currentFinish = this.calculateFinishPeriod(currentMass, currentStartPeriod, isSeparateClass);
                 for (Classroom classroom : classroomList) {
-                    boolean setClassroomDone = true;
+                    boolean setClassroomDone;
                     List<ClassOpened> listClassOpened = classOpenedRepo.
-                            getAllByClassroomAndWeekdayAndCrewAndStartPeriodIsNotNullAndIdNot
-                                    (classroom.getClassroom(), currentWeekday, currentCrew, elClass.getId());
-                    List<ClassOpened> listSecondClassOpened = classOpenedRepo.
-                            getAllBySecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull
+                            getAllByClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull
                                     (classroom.getClassroom(), currentWeekday, currentCrew);
+                    List<ClassOpened> listSecondClassOpened = classOpenedRepo.
+                            getAllBySecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot
+                                    (classroom.getClassroom(), currentWeekday, currentCrew, elClass.getId());
 
                     //Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
-                    for (ClassOpened el : listClassOpened) {
-                        String supMass = el.getMass();
-                        Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
-                        long existedStartPeriod = Long.parseLong(el.getStartPeriod());
-                        long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
-
-                        if (currentStartPeriod > existedStartPeriod) {
-                            if (currentStartPeriod <= existedFinishPeriod) {
-                                setClassroomDone = false;
-                            }
-                        } else {
-                            if (currentFinish >= existedStartPeriod) {
-                                setClassroomDone = false;
-                            }
-                        }
-                    }
+                    setClassroomDone = this.checkConflictTimeForListFirstClass(listClassOpened, currentStartPeriod, currentFinish);
 
                     //Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
-                    for (ClassOpened el : listSecondClassOpened) {
-                        String supMass = el.getMass();
-                        Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
-                        long existedStartPeriod = Long.parseLong(el.getSecondStartPeriod());
-                        long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
-
-                        if (currentStartPeriod > existedStartPeriod) {
-                            if (currentStartPeriod <= existedFinishPeriod) {
-                                setClassroomDone = false;
-                            }
-                        } else {
-                            if (currentFinish >= existedStartPeriod) {
-                                setClassroomDone = false;
-                            }
-                        }
-                    }
+                    setClassroomDone = this.checkConflictTimeForListSecondClass(listSecondClassOpened, currentStartPeriod, currentFinish);
 
                     if (setClassroomDone) {
-                        elClass.setClassroom(classroom.getClassroom());
+                        elClass.setSecondClassroom(classroom.getClassroom());
                         classOpenedRepo.save(elClass);
                         break;
                     }
                 }
+            }
 
-                //Gán phòng học cho lớp học thứ hai của lớp tách
-                if (isSeparateClass) {
-                    currentStartPeriod = Long.parseLong(elClass.getSecondStartPeriod());
-                    currentWeekday = elClass.getSecondWeekday();
-                    currentFinish = this.calculateFinishPeriod(currentMass, currentStartPeriod, isSeparateClass);
-                    for (Classroom classroom : classroomList) {
-                        boolean setClassroomDone = true;
-                        List<ClassOpened> listClassOpened = classOpenedRepo.
-                                getAllByClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull
-                                        (classroom.getClassroom(), currentWeekday, currentCrew);
-                        List<ClassOpened> listSecondClassOpened = classOpenedRepo.
-                                getAllBySecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot
-                                        (classroom.getClassroom(), currentWeekday, currentCrew, elClass.getId());
-
-                        //Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
-                        for (ClassOpened el : listClassOpened) {
-                            String supMass = el.getMass();
-                            Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
-                            long existedStartPeriod = Long.parseLong(el.getStartPeriod());
-                            long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
-
-                            if (currentStartPeriod > existedStartPeriod) {
-                                if (currentStartPeriod <= existedFinishPeriod) {
-                                    setClassroomDone = false;
-                                }
-                            } else {
-                                if (currentFinish >= existedStartPeriod) {
-                                    setClassroomDone = false;
-                                }
-                            }
-                        }
-
-                        //Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
-                        for (ClassOpened el : listSecondClassOpened) {
-                            String supMass = el.getMass();
-                            Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
-                            long existedStartPeriod = Long.parseLong(el.getSecondStartPeriod());
-                            long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
-
-                            if (currentStartPeriod > existedStartPeriod) {
-                                if (currentStartPeriod <= existedFinishPeriod) {
-                                    setClassroomDone = false;
-                                    ;
-                                }
-                            } else {
-                                if (currentFinish >= existedStartPeriod) {
-                                    setClassroomDone = false;
-                                    ;
-                                }
-                            }
-                        }
-
-                        if (setClassroomDone) {
-                            elClass.setSecondClassroom(classroom.getClassroom());
-                            classOpenedRepo.save(elClass);
-                            break;
-                        }
-                    }
-                }
-
-                //kiểm tra đã gán được lớp hay chưa
-                if (elClass.getClassroom() == null) {
+            //kiểm tra đã gán được lớp hay chưa
+            if (elClass.getClassroom() == null) {
+                throw new NotClassroomSuitableException("Không có phòng học phù hợp cho lớp:" + elClass.getModuleName());
+            } else {
+                if (isSeparateClass && elClass.getSecondClassroom() == null) {
                     throw new NotClassroomSuitableException("Không có phòng học phù hợp cho lớp:" + elClass.getModuleName());
-                } else {
-                    if (isSeparateClass && elClass.getSecondClassroom() == null) {
-                        throw new NotClassroomSuitableException("Không có phòng học phù hợp cho lớp:" + elClass.getModuleName());
-                    }
                 }
             }
         }
     }
 
-    public Integer setTimeStudyForElClass(ClassOpened elClass, String elWeekday,
+    private Boolean checkConflictTimeForListFirstClass(List<ClassOpened> listClassOpened, long currentStartPeriod, long currentFinish) {
+        boolean setClassroomDone = true;
+        for (ClassOpened el : listClassOpened) {
+            String supMass = el.getMass();
+            Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
+            long existedStartPeriod = Long.parseLong(el.getStartPeriod());
+            long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
+
+            if (!this.compareTimeForSetClassroom(currentStartPeriod, currentFinish, existedStartPeriod, existedFinishPeriod)) {
+                setClassroomDone = false;
+            }
+        }
+        return setClassroomDone;
+    }
+
+    private Boolean checkConflictTimeForListSecondClass(List<ClassOpened> listSecondClassOpened, long currentStartPeriod, long currentFinish) {
+        boolean setClassroomDone = true;
+        for (ClassOpened el : listSecondClassOpened) {
+            String supMass = el.getMass();
+            Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
+            long existedStartPeriod = Long.parseLong(el.getSecondStartPeriod());
+            long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
+
+            if (!this.compareTimeForSetClassroom(currentStartPeriod, currentFinish, existedStartPeriod, existedFinishPeriod)) {
+                setClassroomDone = false;
+            }
+        }
+        return setClassroomDone;
+    }
+
+    private Boolean compareTimeForSetClassroom(long currentStartPeriod, long currentFinish,
+                                              long existedStartPeriod, long existedFinishPeriod) {
+        if (currentStartPeriod > existedStartPeriod) {
+            return currentStartPeriod > existedFinishPeriod;
+        } else {
+            return currentFinish < existedStartPeriod;
+        }
+    }
+
+    private Integer setTimeStudyForElClass(ClassOpened elClass, String elWeekday,
                                           String startPeriod, int countClassForSeparate) {
         if (elClass.getIsSeparateClass()) {
             //Nếu tách lớp
@@ -517,7 +464,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         return countClassForSeparate;
     }
 
-    public Long calculateStartPeriod(List<ClassOpened> existedClasses, List<ClassOpened> existedSecondClasses) {
+    private Long calculateStartPeriod(List<ClassOpened> existedClasses, List<ClassOpened> existedSecondClasses) {
         long minStartPeriod = 1;
         long sumTotalPeriod = 0;
 
@@ -542,7 +489,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         return minStartPeriod + sumTotalPeriod;
     }
 
-    public String getPriorityBuilding(String groupName) {
+    private String getPriorityBuilding(String groupName) {
         List<Group> groupList = groupRepo.getAllByGroupName(groupName);
         if (!groupList.isEmpty()) {
             return groupList.get(0).getPriorityBuilding();

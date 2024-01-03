@@ -51,6 +51,8 @@ export default function EditContest() {
   const [participantViewSubmissionMode, setParticipantViewSubmissionMode] = useState(null);
   const [listParticipantViewSubmissionModes, setListParticipantViewSubmissionModes] = useState([]);
 
+  const [languages, setLanguages] = useState("");
+
   const handleSubmit = () => {
     setLoading(true);
 
@@ -68,7 +70,8 @@ export default function EditContest() {
       evaluateBothPublicPrivateTestcase: evaluateBothPublicPrivateTestcase,
       minTimeBetweenTwoSubmissions: minTimeBetweenTwoSubmissions,
       judgeMode: judgeMode,
-      participantViewSubmissionMode: participantViewSubmissionMode
+      participantViewSubmissionMode: participantViewSubmissionMode,
+      languagesAllowed: languages
     };
 
     request("put", "/contests/" + contestId, () => {
@@ -159,6 +162,20 @@ export default function EditContest() {
                 }}
                 value={maxNumberSubmission}
                 InputProps={{endAdornment: <InputAdornment position="end">per problem</InputAdornment>}}
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                //type="number"
+                required
+                id="languages"
+                label="Languages"
+                onChange={(event) => {
+                  setLanguages(event.target.value);
+                }}
+                value={languages}
+                
               />
             </Grid>
 

@@ -242,7 +242,21 @@ public class SubmissionController {
             ModelContestSubmitProgramViaUploadFile.class);
         ContestEntity contestEntity = contestRepo.findContestByContestId(model.getContestId());
         ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(model.getContestId(), model.getProblemId());
+        List<String> languagesAllowed = contestEntity.getListLanguagesAllowed();
+        boolean languageOK = false;
+        for(String l: languagesAllowed){
+            if(l.equals(model.getLanguage())){
+                languageOK = true; break;
+            }
+        }
+        if(!languageOK){
+            ModelContestSubmissionResponse resp = buildSubmissionNotLegalLanguage(model.getLanguage());
+            //log.info("contestSubmitProblemViaUploadFileV2, not legal language " + model.getLanguage());
+            return ResponseEntity.ok().body(resp);
+        }else{
+            //log.info("contestSubmitProblemViaUploadFileV2, legal language " + model.getLanguage());
 
+        }
         if (!contestEntity.getStatusId().equals(ContestEntity.CONTEST_STATUS_RUNNING)) {
             ModelContestSubmissionResponse resp = buildSubmissionResponseTimeOut();
             return ResponseEntity.ok().body(resp);
@@ -337,6 +351,22 @@ public class SubmissionController {
     private ModelContestSubmissionResponse buildSubmissionResponseTimeOut() {
         return ModelContestSubmissionResponse.builder()
                                              .status("TIME_OUT")
+                                             .testCasePass("0")
+                                             .runtime(0L)
+                                             .memoryUsage((float) 0)
+                                             .problemName("")
+                                             .contestSubmissionID(null)
+                                             .submittedAt(null)
+                                             .score(0L)
+                                             .numberTestCasePassed(0)
+                                             .totalNumberTestCase(0)
+                                             .build();
+    }
+    private ModelContestSubmissionResponse buildSubmissionNotLegalLanguage(String lang) {
+        return ModelContestSubmissionResponse.builder()
+                                             //.status("ILLEGAL LANGUAGE " + lang)
+                                             .status("ILLEGAL_LANGUAGE")
+                                            .message("Illegal language " + lang)
                                              .testCasePass("0")
                                              .runtime(0L)
                                              .memoryUsage((float) 0)
