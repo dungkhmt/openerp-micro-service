@@ -73,12 +73,6 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
     }
 
     @Override
-    public List<ClassOpened> getByGroupName(String groupName) {
-        Sort sort = Sort.by(Sort.Direction.ASC, "id");
-        return classOpenedRepo.getAllByGroupName(groupName, sort);
-    }
-
-    @Override
     public List<Schedule> searchClassOpened(FilterClassOpenedDto searchDto) {
         StringBuilder jpql = this.getStringBuilder(searchDto);
 
@@ -156,7 +150,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         classOpenedRepo.save(classOpened);
     }
 
-    public void checkConflictSchedule(ClassOpened classOpened, MakeScheduleDto requestDto) {
+    private void checkConflictSchedule(ClassOpened classOpened, MakeScheduleDto requestDto) {
         String classroomOfClass = requestDto.getClassroom() != null ? requestDto.getClassroom() : classOpened.getClassroom();
         String weekdayOfClass = requestDto.getWeekday() != null ? requestDto.getWeekday() : classOpened.getWeekday();
         String mass = classOpened.getMass();
@@ -178,7 +172,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         this.checkForSecondListClasses(listSecondClassOpened, startPeriod, finishPeriod);
     }
 
-    public void checkConflictScheduleForSecondClass(ClassOpened classOpened, MakeScheduleDto requestDto) {
+    private void checkConflictScheduleForSecondClass(ClassOpened classOpened, MakeScheduleDto requestDto) {
         String classroomOfClass = requestDto.getSecondClassroom() != null ? requestDto.getSecondClassroom() : classOpened.getSecondClassroom();
         String weekdayOfClass = requestDto.getSecondWeekday() != null ? requestDto.getSecondWeekday() : classOpened.getSecondWeekday();
         String mass = classOpened.getMass();
@@ -200,7 +194,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         this.checkForSecondListClasses(listSecondClassOpened, startPeriod, finishPeriod);
     }
 
-    public void checkForFirstListClasses(List<ClassOpened> listClassOpened, long startPeriod, long finishPeriod) {
+    private void checkForFirstListClasses(List<ClassOpened> listClassOpened, long startPeriod, long finishPeriod) {
         listClassOpened.forEach(el -> {
             String supMass = el.getMass();
             Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
@@ -211,7 +205,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         });
     }
 
-    public void checkForSecondListClasses(List<ClassOpened> listSecondClassOpened, long startPeriod, long finishPeriod) {
+    private void checkForSecondListClasses(List<ClassOpened> listSecondClassOpened, long startPeriod, long finishPeriod) {
         listSecondClassOpened.forEach(el -> {
             String supMass = el.getMass();
             Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
@@ -222,7 +216,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         });
     }
 
-    public void compareTimePeriod(long startPeriod, long finishPeriod, ClassOpened el,
+    private void compareTimePeriod(long startPeriod, long finishPeriod, ClassOpened el,
                                   long existedStartPeriod, long existedFinishPeriod) {
         if (startPeriod > existedStartPeriod) {
             if (startPeriod <= existedFinishPeriod) {
@@ -235,7 +229,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         }
     }
 
-    public Long calculateFinishPeriod(String mass, Long startPeriod, Boolean isSeparateClass) {
+    private Long calculateFinishPeriod(String mass, Long startPeriod, Boolean isSeparateClass) {
         long totalPeriod = this.calculateTotalPeriod(mass);
         long finishPeriod = isSeparateClass ? (startPeriod + (totalPeriod / 2) - 1) : startPeriod + totalPeriod - 1;
 
@@ -245,7 +239,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         return finishPeriod;
     }
 
-    public Long calculateTotalPeriod(String mass) {
+    private Long calculateTotalPeriod(String mass) {
         //a(b-c-d-e) => b-c-d-e => b,c,d,e => b+c
         String numbersString = mass.substring(2, mass.indexOf(')'));
         String[] numbersArray = numbersString.split("-");
@@ -326,7 +320,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         }
     }
 
-    public void autoSetClassroom(List<ClassOpened> listClassMakeSchedule, String priorityBuilding) {
+    private void autoSetClassroom(List<ClassOpened> listClassMakeSchedule, String priorityBuilding) {
         for (ClassOpened elClass : listClassMakeSchedule) {
             Boolean isSeparateClass = elClass.getIsSeparateClass();
             String currentCrew = elClass.getCrew();
@@ -406,7 +400,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         }
     }
 
-    public Boolean checkConflictTimeForListFirstClass(List<ClassOpened> listClassOpened, long currentStartPeriod, long currentFinish) {
+    private Boolean checkConflictTimeForListFirstClass(List<ClassOpened> listClassOpened, long currentStartPeriod, long currentFinish) {
         boolean setClassroomDone = true;
         for (ClassOpened el : listClassOpened) {
             String supMass = el.getMass();
@@ -421,7 +415,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         return setClassroomDone;
     }
 
-    public Boolean checkConflictTimeForListSecondClass(List<ClassOpened> listSecondClassOpened, long currentStartPeriod, long currentFinish) {
+    private Boolean checkConflictTimeForListSecondClass(List<ClassOpened> listSecondClassOpened, long currentStartPeriod, long currentFinish) {
         boolean setClassroomDone = true;
         for (ClassOpened el : listSecondClassOpened) {
             String supMass = el.getMass();
@@ -436,7 +430,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         return setClassroomDone;
     }
 
-    public Boolean compareTimeForSetClassroom(long currentStartPeriod, long currentFinish,
+    private Boolean compareTimeForSetClassroom(long currentStartPeriod, long currentFinish,
                                               long existedStartPeriod, long existedFinishPeriod) {
         if (currentStartPeriod > existedStartPeriod) {
             return currentStartPeriod > existedFinishPeriod;
@@ -445,7 +439,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         }
     }
 
-    public Integer setTimeStudyForElClass(ClassOpened elClass, String elWeekday,
+    private Integer setTimeStudyForElClass(ClassOpened elClass, String elWeekday,
                                           String startPeriod, int countClassForSeparate) {
         if (elClass.getIsSeparateClass()) {
             //Nếu tách lớp
@@ -470,7 +464,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         return countClassForSeparate;
     }
 
-    public Long calculateStartPeriod(List<ClassOpened> existedClasses, List<ClassOpened> existedSecondClasses) {
+    private Long calculateStartPeriod(List<ClassOpened> existedClasses, List<ClassOpened> existedSecondClasses) {
         long minStartPeriod = 1;
         long sumTotalPeriod = 0;
 
@@ -495,7 +489,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         return minStartPeriod + sumTotalPeriod;
     }
 
-    public String getPriorityBuilding(String groupName) {
+    private String getPriorityBuilding(String groupName) {
         List<Group> groupList = groupRepo.getAllByGroupName(groupName);
         if (!groupList.isEmpty()) {
             return groupList.get(0).getPriorityBuilding();
