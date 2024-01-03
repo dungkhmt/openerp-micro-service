@@ -19,22 +19,22 @@ import ViewColumn from '@material-ui/icons/ViewColumn';
 
 function WeekDayScreen() {
 
-    const [weekDays, setWeekDays] = useState([]);
+    const [classPeriods, setClassPeriods] = useState([]);
 
     useEffect(() => {
-        request("get", "/weekday/get-all", (res) => {
-            setWeekDays(res.data);
+        request("get", "/class-period/get-all", (res) => {
+            setClassPeriods(res.data);
         }).then();
     }, [])
 
     const columns = [
         {
-            title: "Weekday ID",
+            title: "Class Period ID",
             field: "id",
         },
         {
-            title: "Thứ",
-            field: "weekDay",
+            title: "Tiết học",
+            field: "classPeriod",
         }
     ];
 
@@ -61,9 +61,9 @@ function WeekDayScreen() {
     return (
         <div>
             <MaterialTable
-                title={"Danh sách ngày học trong tuần"}
+                title={"Danh sách Tiết học"}
                 columns={columns}
-                data={weekDays}
+                data={classPeriods}
                 icons={tableIcons}
                 components={{
                     Toolbar: (props) => (

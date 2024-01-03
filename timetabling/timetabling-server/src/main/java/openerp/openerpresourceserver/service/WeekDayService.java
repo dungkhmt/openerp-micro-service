@@ -9,5 +9,4 @@ public interface WeekDayService {
     List<WeekDay> getWeekDay();
 
     void updateWeekDay();
-
 }

@@ -1,5 +1,5 @@
 import ClassRoomScreen from "views/courseTimeTabling/classroom/ClassroomListScreen";
-import ManagementCodeScreen from "views/scheduleInformation/ManagementCodeScreen";
+import ClassPeriodScreen from "views/scheduleInformation/ClassPeriodScreen";
 import GroupScreen from "views/courseTimeTabling/group/ClassGroupList";
 import SemesterScreen from "views/courseTimeTabling/semester/SemesterScreen";
 import WeekDayScreen from "views/scheduleInformation/WeekDayScreen";
@@ -26,9 +26,9 @@ export default function TeacherRouter() {
           path={`${path}/group`}
         ></Route>
         <Route
-          component={ManagementCodeScreen}
+          component={ClassPeriodScreen}
           exact
-          path={`${path}/class-pertiod`}
+          path={`${path}/class-period`}
         ></Route>
         <Route
           component={WeekDayScreen}
