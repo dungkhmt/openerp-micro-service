@@ -31,7 +31,7 @@ export default function TimePerformanceScreen() {
     function DataGridTitle() {
         return (
             <Box style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <Typography variant="h5">Danh sách Tiết học</Typography>
+                <Typography variant="h5">Danh sách Ngày học trong tuần</Typography>
             </Box>
         )
     }
