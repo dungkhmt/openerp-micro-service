@@ -746,8 +746,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .minTimeBetweenTwoSubmissions(modelUpdateContest.getMinTimeBetweenTwoSubmissions())
                                                    .judgeMode(modelUpdateContest.getJudgeMode())
                                                    .sendConfirmEmailUponSubmission(modelUpdateContest.getSendConfirmEmailUponSubmission())
-                                                    .participantViewSubmissionMode(modelUpdateContest.getParticipantViewSubmissionMode())
-                                                    .languagesAllowed(modelUpdateContest.getLanguagesAllowed())
+                                                   .participantViewSubmissionMode(modelUpdateContest.getParticipantViewSubmissionMode())
+                                                   .languagesAllowed(modelUpdateContest.getLanguagesAllowed())
                                                    .build();
         return contestService.updateContestWithCache(contestEntity);
 
@@ -1919,6 +1919,18 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return response;
     }
 
+    @Transactional
+    @Override
+    public void addUsers2ToContest(String contestId, AddUsers2Contest addUsers2Contest) {
+        addUsers2Contest
+            .getUserIds()
+            .stream()
+            .forEach(userId -> addUserToContest(new ModelAddUserToContest(
+                contestId,
+                userId,
+                addUsers2Contest.getRole())));
+    }
+
     @Override
     public ModelAddUserToContestGroupResponse addUserToContestGroup(ModelAddUserToContestGroup modelAddUserToContestGroup) {
         String contestId = modelAddUserToContestGroup.getContestId();
@@ -2327,25 +2339,27 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public int checkForbiddenInstructions(String contestId){
+    public int checkForbiddenInstructions(String contestId) {
         List<ContestProblem> contestProblems = contestProblemRepo.findAllByContestId(contestId);
         Map<String, List<String>> mPro2ForbiddenIns = new HashMap();
-        for(ContestProblem cp: contestProblems){
+        for (ContestProblem cp : contestProblems) {
             String[] forbiddens = cp.getForbiddenInstructions().split(",");
-            if(forbiddens != null){
+            if (forbiddens != null) {
                 List<String> L = new ArrayList();
-                for(String s: forbiddens) L.add(s.trim());
-                mPro2ForbiddenIns.put(cp.getProblemId(),L);
+                for (String s : forbiddens) {
+                    L.add(s.trim());
+                }
+                mPro2ForbiddenIns.put(cp.getProblemId(), L);
             }
         }
         List<ContestSubmissionEntity> submissions = contestSubmissionRepo.findAllByContestId(contestId);
         int cnt = 0;
-        for(ContestSubmissionEntity sub: submissions){
+        for (ContestSubmissionEntity sub : submissions) {
             String problemId = sub.getProblemId();
             String msg = "";
-            if(mPro2ForbiddenIns.get(problemId)!=null){
-                for(String f: mPro2ForbiddenIns.get(problemId)){
-                    if(sub.getSourceCode().contains(f)){
+            if (mPro2ForbiddenIns.get(problemId) != null) {
+                for (String f : mPro2ForbiddenIns.get(problemId)) {
+                    if (sub.getSourceCode().contains(f)) {
                         sub.setViolateForbiddenInstruction(ContestSubmissionEntity.VIOLATION_FORBIDDEN_YES);
                         msg = msg + f + ",";
                         cnt++;
@@ -2356,6 +2370,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         }
         return cnt;
     }
+
     @Override
     public ModelCodeSimilarityOutput computeSimilarity(
         String userLoginId,

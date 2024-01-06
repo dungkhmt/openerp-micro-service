@@ -58,6 +58,7 @@ public interface ProblemTestCaseService {
     List<SubmissionDetailByTestcaseOM> getSubmissionDetailByTestcase(UUID submissionId);
 
     ContestSubmissionEntity teacherDisableSubmission(String userId, UUID submissionId);
+
     ContestSubmissionEntity teacherEnableSubmission(String userId, UUID submissionId);
 
 
@@ -110,11 +111,13 @@ public interface ProblemTestCaseService {
     ModelGetContestPageResponse getAllContestsPagingByAdmin(String userName, Pageable pageable);
 
     List<ModelGetContestResponse> getManagedContestOfTeacher(String userName);
+
     List<ModelGetContestResponse> getAllContests(String userName);
 
     ListModelUserRegisteredContestInfo getListUserRegisterContestSuccessfulPaging(Pageable pageable, String contestId);
 
     List<ModelMemberOfContestResponse> getListMemberOfContest(String contestId);
+
     List<ModelMemberOfContestResponse> getListMemberOfContestGroup(String contestId, String userId);
 
 
@@ -130,11 +133,13 @@ public interface ProblemTestCaseService {
         String contestId,
         Constants.GetPointForRankingType getPointForRankingType
     );
+
     List<ContestSubmissionsByUser> getRankingGroupByContestIdNew(
         String userId,
         String contestId,
         Constants.GetPointForRankingType getPointForRankingType
     );
+
     Page<ProblemEntity> getPublicProblemPaging(Pageable pageable);
 
     List<ModelGetTestCase> getTestCaseByProblem(String problemId);
@@ -145,13 +150,24 @@ public interface ProblemTestCaseService {
 
     ModelAddUserToContestResponse addUserToContest(ModelAddUserToContest modelAddUserToContest);
 
+    void addUsers2ToContest(String contestId, AddUsers2Contest addUsers2Contest);
+
     ModelAddUserToContestGroupResponse addUserToContestGroup(ModelAddUserToContestGroup modelAddUserToContestGroup);
 
     void deleteUserContest(ModelAddUserToContest modelAddUserToContest) throws MiniLeetCodeException;
 
-    Page<ContestSubmission> findContestSubmissionByContestIdPaging(Pageable pageable, String contestId, String searchTerm);
+    Page<ContestSubmission> findContestSubmissionByContestIdPaging(
+        Pageable pageable,
+        String contestId,
+        String searchTerm
+    );
 
-    Page<ContestSubmission> findContestGroupSubmissionByContestIdPaging(Pageable pageable, String contestId, String userId, String searchTerm);
+    Page<ContestSubmission> findContestGroupSubmissionByContestIdPaging(
+        Pageable pageable,
+        String contestId,
+        String userId,
+        String searchTerm
+    );
 
     Page<ContestSubmission> findContestSubmissionByUserLoginIdPaging(Pageable pageable, String userLoginId);
 
@@ -180,6 +196,7 @@ public interface ProblemTestCaseService {
     void deleteTestcase(UUID testcaseId, String userId) throws MiniLeetCodeException;
 
     ModelCodeSimilarityOutput checkSimilarity(String contestId, ModelCheckSimilarityInput I);
+
     ModelCodeSimilarityOutput computeSimilarity(String userLoginId, String contestId, ModelCheckSimilarityInput I);
 
     int checkForbiddenInstructions(String contestId);
@@ -230,14 +247,13 @@ public interface ProblemTestCaseService {
     boolean removeMemberFromContestGroup(String contestId, String userId, String participantId);
 
 
-
     boolean updatePermissionMemberToContest(String userId, ModelUpdatePermissionMemberToContestInput input);
 
     List<ModelResponseUserProblemRole> getUserProblemRoles(String problemId);
 
-    boolean addUserProblemRole(String userName, ModelUserProblemRole input)  throws Exception;
+    boolean addUserProblemRole(String userName, ModelUserProblemRole input) throws Exception;
 
-    boolean removeUserProblemRole(String userName, ModelUserProblemRole input)  throws Exception;
+    boolean removeUserProblemRole(String userName, ModelUserProblemRole input) throws Exception;
 
     List<TagEntity> getAllTags();
 
@@ -257,7 +273,10 @@ public interface ProblemTestCaseService {
 
     List<ProblemEntity> getAllProblems(String userId);
 
-    ModelCreateContestProblemResponse getContestProblemDetailByIdAndTeacher(String problemId, String teacherId) throws Exception;
+    ModelCreateContestProblemResponse getContestProblemDetailByIdAndTeacher(
+        String problemId,
+        String teacherId
+    ) throws Exception;
 
     List<ModelImportProblemFromContestResponse> importProblemsFromAContest(ModelImportProblemsFromAContestInput I);
 }
