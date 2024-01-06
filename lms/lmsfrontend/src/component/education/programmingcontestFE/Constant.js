@@ -5,6 +5,8 @@ export const SUBMISSION_MODE_SOURCE_CODE = "SUBMISSION_MODE_SOURCE_CODE";
 export const SUBMISSION_MODE_SOLUTION_OUTPUT =
   "SUBMISSION_MODE_SOLUTION_OUTPUT";
 export const SUBMISSION_MODE_NOT_ALLOWED = "SUBMISSION_MODE_NOT_ALLOWED";
+export const SUBMISSION_MODE_HIDDEN = "SUBMISSION_MODE_HIDDEN";
+
 
 export const getSubmissionModeFromConstant = (mode) => {
   switch (mode) {
@@ -14,6 +16,9 @@ export const getSubmissionModeFromConstant = (mode) => {
       return "Submit only output";
     case SUBMISSION_MODE_NOT_ALLOWED:
       return "NOT allow submitting";
+    case SUBMISSION_MODE_HIDDEN:
+        return "Hidden";
+        
     default:
       return "NORMAL";
   }

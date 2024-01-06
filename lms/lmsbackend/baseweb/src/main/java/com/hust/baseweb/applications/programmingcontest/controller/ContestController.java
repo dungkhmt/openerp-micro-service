@@ -200,6 +200,8 @@ public class ContestController {
                 String problemId = problem.getProblemId();
 
                 ContestProblem contestProblem = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
+                if(contestProblem.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_HIDDEN))
+                    continue;
 
                 ModelStudentOverviewProblem response = new ModelStudentOverviewProblem();
                 response.setProblemId(problemId);
