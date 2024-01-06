@@ -62,15 +62,15 @@ public class ContestController {
         //ContestEntity contest = problemTestCaseService.createContest(modelCreateContest, principal.getName());
         return ResponseEntity.status(200).body(contest);
     }
+
     @Secured("ROLE_TEACHER")
     @PostMapping("/contests/import-problems")
-    public ResponseEntity<?> importProblemsFromAContest(@RequestBody ModelImportProblemsFromAContestInput input){
+    public ResponseEntity<?> importProblemsFromAContest(@RequestBody ModelImportProblemsFromAContestInput input) {
 
         try {
             List<ModelImportProblemFromContestResponse> res = problemTestCaseService.importProblemsFromAContest(input);
             return ResponseEntity.ok().body(res);
-        }
-        catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -248,6 +248,7 @@ public class ContestController {
             .getManagedContestOfTeacher(principal.getName());
         return ResponseEntity.status(200).body(resp);
     }
+
     @Secured("ROLE_TEACHER")
     @GetMapping("/all-contests")
     public ResponseEntity<?> getAllContest(Principal principal) {
@@ -284,6 +285,7 @@ public class ContestController {
         List<ModelMemberOfContestResponse> res = problemTestCaseService.getListMemberOfContest(contestId);
         return ResponseEntity.ok().body(res);
     }
+
     @GetMapping("/contests/{contestId}/group/members")
     public ResponseEntity<?> getMembersOfContestGroup(Principal principal, @PathVariable String contestId) {
         String userId = principal.getName();
@@ -307,9 +309,13 @@ public class ContestController {
         @RequestBody ModelRemoveMemberFromContestGroupInput input
     ) {
         String userId = principal.getName();
-        boolean res = problemTestCaseService.removeMemberFromContestGroup(input.getContestId(), userId, input.getParticipantId());
+        boolean res = problemTestCaseService.removeMemberFromContestGroup(
+            input.getContestId(),
+            userId,
+            input.getParticipantId());
         return ResponseEntity.ok().body(res);
     }
+
     @Secured("ROLE_TEACHER")
     @PutMapping("/contests/permissions")
     public ResponseEntity<?> updatePermissionOfMemberToContest(
@@ -389,9 +395,19 @@ public class ContestController {
         return ResponseEntity.status(200).body(modelGetContestPageResponse);
     }
 
+    @Deprecated
     @PostMapping("/contests/users")
     public ResponseEntity<?> addUserContest(@RequestBody ModelAddUserToContest modelAddUserToContest) {
         problemTestCaseService.addUserToContest(modelAddUserToContest);
+        return ResponseEntity.status(200).body(null);
+    }
+
+    @PostMapping("/contests/{id}/users")
+    public ResponseEntity<?> addUsers2Contest(
+        @PathVariable(name = "id") String contestId,
+        @RequestBody AddUsers2Contest addUsers2Contest
+    ) {
+        problemTestCaseService.addUsers2ToContest(contestId, addUsers2Contest);
         return ResponseEntity.status(200).body(null);
     }
 
@@ -439,6 +455,7 @@ public class ContestController {
             getPointForRankingType);
         return ResponseEntity.status(200).body(res);
     }
+
     @GetMapping("/contests/group/ranking/{contestId}")
     public ResponseEntity<?> getRankingContestGroupNewVersion(
         Principal principal,
@@ -446,7 +463,8 @@ public class ContestController {
         @RequestParam Constants.GetPointForRankingType getPointForRankingType
     ) {
         String userId = principal.getName();
-        List<ContestSubmissionsByUser> res = problemTestCaseService.getRankingGroupByContestIdNew(userId,
+        List<ContestSubmissionsByUser> res = problemTestCaseService.getRankingGroupByContestIdNew(
+            userId,
             contestId,
             getPointForRankingType);
         return ResponseEntity.status(200).body(res);
@@ -493,6 +511,7 @@ public class ContestController {
             search);
         return ResponseEntity.status(200).body(res);
     }
+
     @Secured("ROLE_TEACHER")
     @GetMapping("/teacher/contests/{contestId}/group/submissions")
     public ResponseEntity<?> getContestGroupSubmissionPaging(
@@ -578,7 +597,9 @@ public class ContestController {
                 Row row = sheet.getRow(i);
                 Cell c = row.getCell(0);
 
-                if (c == null || c.getStringCellValue().equals("")) continue;
+                if (c == null || c.getStringCellValue().equals("")) {
+                    continue;
+                }
                 String userId = c.getStringCellValue();
                 ModelAddUserToContest m = new ModelAddUserToContest();
                 m.setContestId(contestId);
@@ -615,7 +636,9 @@ public class ContestController {
                 Row row = sheet.getRow(i);
                 Cell c = row.getCell(0);
 
-                if (c == null || c.getStringCellValue().equals("")) continue;
+                if (c == null || c.getStringCellValue().equals("")) {
+                    continue;
+                }
                 String participantId = c.getStringCellValue();
                 ModelAddUserToContestGroup m = new ModelAddUserToContestGroup();
                 m.setContestId(contestId);
@@ -641,9 +664,10 @@ public class ContestController {
 
         return ResponseEntity.status(200).body(lst);
     }
+
     @Secured("ROLE_TEACHER")
     @GetMapping("/contest/get-participant-view-submission-modes")
-    public ResponseEntity<?> getParticipantViewSubmissionModes(){
+    public ResponseEntity<?> getParticipantViewSubmissionModes() {
         List<String> res = ContestEntity.getListParticipantViewSubmissionModes();
         return ResponseEntity.ok().body(res);
     }
