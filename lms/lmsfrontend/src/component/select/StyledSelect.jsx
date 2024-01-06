@@ -2,21 +2,27 @@ import {
   MenuItem,
   TextField,
   menuClasses,
+  menuItemClasses,
   popoverClasses,
 } from "@mui/material";
 
-function Select({ options, children, ...others }) {
+function StyledSelect({ options, children, SelectProps, ...others }) {
   return (
     <TextField
       size="small"
       select
       sx={{ minWidth: 300, mr: 2 }}
       SelectProps={{
+        ...SelectProps,
         MenuProps: {
           sx: {
             [`& .${menuClasses.list}`]: {
               paddingLeft: 1,
               paddingRight: 1,
+              [`& .${menuItemClasses.root}`]: {
+                borderRadius: 2,
+                my: 0.25,
+              },
               "& .Mui-selected, .Mui-selected:hover": {
                 color: "#ffffff",
                 backgroundColor: "#1976d2", // updated backgroundColor
@@ -49,4 +55,4 @@ function Select({ options, children, ...others }) {
   );
 }
 
-export default Select;
+export default StyledSelect;

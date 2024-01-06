@@ -1,26 +1,28 @@
-import React, {useEffect, useState} from "react";
-import TextField from "@mui/material/TextField";
 import DateFnsUtils from "@date-io/date-fns";
-import {MuiPickersUtilsProvider} from "@material-ui/pickers";
-import {Grid, InputAdornment, LinearProgress, MenuItem} from "@mui/material";
-import {useParams} from "react-router-dom";
-
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import { LoadingButton } from "@mui/lab";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import DateTimePicker from "@mui/lab/DateTimePicker";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import {errorNoti, successNoti} from "../../../utils/notification";
-import {useTranslation} from "react-i18next";
-import {request} from "../../../api";
-import {LoadingButton} from "@mui/lab";
+import { Grid, InputAdornment, LinearProgress } from "@mui/material";
+import TextField from "@mui/material/TextField";
+import { request } from "api";
+import StyledSelect from "component/select/StyledSelect";
+import _ from "lodash";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
+import { errorNoti, successNoti } from "utils/notification";
 import HustContainerCard from "../../common/HustContainerCard";
-import Box from "@mui/material/Box";
 
 export default function EditContest() {
-  const {t} = useTranslation(
-    ["education/programmingcontest/contest", "common", "validation"]
-  );
+  const { t } = useTranslation([
+    "education/programmingcontest/contest",
+    "common",
+    "validation",
+  ]);
 
-  const {contestId} = useParams();
+  const { contestId } = useParams();
 
   const [loading, setLoading] = useState(true);
 
@@ -29,39 +31,45 @@ export default function EditContest() {
 
   const [startDate, setStartDate] = React.useState(new Date());
   const [countDown, setCountDown] = useState(Number(0));
-  const [statusId, setStatusId] = useState("");
-  const [listStatusIds, setListStatusIds] = useState([]);
+
+  const [options, setOptions] = useState({
+    status: [],
+    submissionActionType: [],
+    participantViewResultMode: [],
+    problemDescriptionViewType: [],
+    evaluateBothPublicPrivateTestcase: [],
+    participantViewSubmissionMode: [],
+    supportedLanguage: [],
+  });
+
+  const [status, setStatus] = useState("");
   const [submissionActionType, setSubmissionActionType] = useState("");
-  const [listSubmissionActionType, setListSubmissionActionType] = useState([]);
   const [maxNumberSubmission, setMaxNumberSubmission] = useState(10);
-  const [participantViewResultMode, setParticipantViewResultMode] = useState("");
-  const [listParticipantViewResultModes, setListParticipantViewResultModes] = useState([]);
-
-  const [problemDescriptionViewType, setProblemDescriptionViewType] = useState("");
-  const [listProblemDescriptionViewTypes, setListProblemDescriptionViewTypes] = useState([]);
-
-  const [evaluateBothPublicPrivateTestcase, setEvaluateBothPublicPrivateTestcase,] = useState("");
-
-  const [listEvaluateBothPublicPrivateTestcases, setListEvaluateBothPublicPrivateTestcases,] = useState([]);
-
+  const [participantViewResultMode, setParticipantViewResultMode] =
+    useState("");
+  const [problemDescriptionViewType, setProblemDescriptionViewType] =
+    useState("");
+  const [
+    evaluateBothPublicPrivateTestcase,
+    setEvaluateBothPublicPrivateTestcase,
+  ] = useState("");
   const [maxSourceCodeLength, setMaxSourceCodeLength] = useState(50000);
-
-  const [minTimeBetweenTwoSubmissions, setMinTimeBetweenTwoSubmissions] = useState(0);
+  const [minTimeBetweenTwoSubmissions, setMinTimeBetweenTwoSubmissions] =
+    useState(0);
   const [judgeMode, setJudgeMode] = useState("");
-  const [participantViewSubmissionMode, setParticipantViewSubmissionMode] = useState(null);
-  const [listParticipantViewSubmissionModes, setListParticipantViewSubmissionModes] = useState([]);
-
-  const [languages, setLanguages] = useState("");
+  const [participantViewSubmissionMode, setParticipantViewSubmissionMode] =
+    useState(null);
+  const [allowedLanguages, setAllowedLanguages] = useState([]);
 
   const handleSubmit = () => {
-    setLoading(true);
+    // setLoading(true);
 
     let body = {
       contestName: contestName,
       contestSolvingTime: contestTime,
       startedAt: startDate,
       countDownTime: countDown,
-      statusId: statusId,
+      statusId: status,
       submissionActionType: submissionActionType,
       maxNumberSubmission: maxNumberSubmission,
       participantViewResultMode: participantViewResultMode,
@@ -71,247 +79,281 @@ export default function EditContest() {
       minTimeBetweenTwoSubmissions: minTimeBetweenTwoSubmissions,
       judgeMode: judgeMode,
       participantViewSubmissionMode: participantViewSubmissionMode,
-      languagesAllowed: languages
+      languagesAllowed: allowedLanguages,
     };
 
-    request("put", "/contests/" + contestId, () => {
-        successNoti("Save contest successfully", 3000);
+    request(
+      "put",
+      "/contests/" + contestId,
+      () => {
+        successNoti("Contest updated", 3000);
+        // getContestInfo();
       },
       {
-        onError: () => errorNoti(t("error", {ns: "common"}), 3000)
-      }
-      , body)
-      .then(() => getContestInfo())
-  }
+        onError: () => errorNoti(t("error", { ns: "common" }), 3000),
+      },
+      body
+    );
+  };
 
   function getContestInfo() {
     request("get", "/contests/" + contestId, (res) => {
-      setContestTime(res.data.contestTime);
-      setContestName(res.data.contestName);
-      setStartDate(res.data.startAt);
-      setStatusId(res.data.statusId);
-      setListStatusIds(res.data.listStatusIds);
-      setSubmissionActionType(res.data.submissionActionType);
-      setListSubmissionActionType(res.data.listSubmissionActionTypes);
-      setParticipantViewResultMode(res.data.participantViewResultMode);
-      setListParticipantViewResultModes(res.data.listParticipantViewModes);
-      setMaxNumberSubmission(res.data.maxNumberSubmission);
-      setProblemDescriptionViewType(res.data.problemDescriptionViewType);
-      setMinTimeBetweenTwoSubmissions(res.data.minTimeBetweenTwoSubmissions);
-      setJudgeMode(res.data.judgeMode);
-      setListProblemDescriptionViewTypes(res.data.listProblemDescriptionViewTypes);
-      setEvaluateBothPublicPrivateTestcase(res.data.evaluateBothPublicPrivateTestcase);
-      setMaxSourceCodeLength(res.data.maxSourceCodeLength);
-      setListEvaluateBothPublicPrivateTestcases(res.data.listEvaluateBothPublicPrivateTestcases);
-      setParticipantViewSubmissionMode(res.data.participantViewSubmissionMode);
-      setListParticipantViewSubmissionModes(res.data.listParticipantViewSubmissionModes);
-    }).then(() => setLoading(false));
+      setLoading(false);
+
+      const data = res.data;
+
+      setOptions({
+        status: data.listStatusIds.map((status) => ({
+          label: status,
+          value: status,
+        })),
+        submissionActionType: data.listSubmissionActionTypes.map((type) => ({
+          label: type,
+          value: type,
+        })),
+        participantViewResultMode: data.listParticipantViewModes.map(
+          (mode) => ({
+            label: mode,
+            value: mode,
+          })
+        ),
+        problemDescriptionViewType: data.listProblemDescriptionViewTypes.map(
+          (type) => ({
+            label: type,
+            value: type,
+          })
+        ),
+        evaluateBothPublicPrivateTestcase:
+          data.listEvaluateBothPublicPrivateTestcases.map((option) => ({
+            label: option,
+            value: option,
+          })),
+        participantViewSubmissionMode:
+          data.listParticipantViewSubmissionModes.map((mode) => ({
+            label: mode,
+            value: mode,
+          })),
+        supportedLanguage: data.listLanguagesAllowed.map((language) => ({
+          label: language,
+          value: language,
+        })),
+      });
+
+      setContestTime(data.contestTime);
+      setContestName(data.contestName);
+      setStartDate(data.startAt);
+      setStatus(data.statusId);
+      setSubmissionActionType(data.submissionActionType);
+      setParticipantViewResultMode(data.participantViewResultMode);
+      setMaxNumberSubmission(data.maxNumberSubmission);
+      setProblemDescriptionViewType(data.problemDescriptionViewType);
+      setMinTimeBetweenTwoSubmissions(data.minTimeBetweenTwoSubmissions);
+      setJudgeMode(data.judgeMode);
+      setEvaluateBothPublicPrivateTestcase(
+        data.evaluateBothPublicPrivateTestcase
+      );
+      setMaxSourceCodeLength(data.maxSourceCodeLength);
+      setParticipantViewSubmissionMode(data.participantViewSubmissionMode);
+      setAllowedLanguages(
+        !data.languagesAllowed || _.isEmpty(data.languagesAllowed.trim())
+          ? []
+          : data.languagesAllowed.split(",")
+      );
+    });
   }
 
   useEffect(() => {
     getContestInfo();
   }, []);
 
-
-  return (<div>
-    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-      <HustContainerCard title={"Edit Contest " + contestId}>
-        {loading && <LinearProgress/>}
-        {!loading && <Box>
-          <Grid container rowSpacing={3} spacing={2}>
-            <Grid item xs={9}>
-              <TextField
-                fullWidth
-                autoFocus
-                required
-                value={contestName}
-                id="contestName"
-                label="Contest Name"
-                onChange={(event) => {
-                  setContestName(event.target.value);
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={3}>
-              <TextField
-                fullWidth
-                select
-                id="statusId"
-                label="Status"
-                onChange={(event) => {
-                  setStatusId(event.target.value);
-                }}
-                value={statusId}
+  return (
+    <div>
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <HustContainerCard title={contestId}>
+          {loading ? (
+            <LinearProgress />
+          ) : (
+            <>
+              <Grid
+                container
+                rowSpacing={3}
+                spacing={2}
+                display={loading ? "none" : ""}
               >
-                {listStatusIds.map((item) => (<MenuItem key={item} value={item}>
-                  {item}
-                </MenuItem>))}
-              </TextField>
-            </Grid>
-
-            <Grid item xs={3}>
-              <TextField
-                fullWidth
-                type="number"
-                required
-                id="maxNumberSubmission"
-                label="Max number of Submissions"
-                onChange={(event) => {
-                  setMaxNumberSubmission(event.target.value);
-                }}
-                value={maxNumberSubmission}
-                InputProps={{endAdornment: <InputAdornment position="end">per problem</InputAdornment>}}
-              />
-            </Grid>
-            <Grid item xs={3}>
-              <TextField
-                fullWidth
-                //type="number"
-                required
-                id="languages"
-                label="Languages"
-                onChange={(event) => {
-                  setLanguages(event.target.value);
-                }}
-                value={languages}
-                
-              />
-            </Grid>
-
-            <Grid item xs={3}>
-              <TextField
-                fullWidth
-                type="number"
-                id="Max Source Code Length"
-                label="Source Length Limit"
-                onChange={(event) => {
-                  setMaxSourceCodeLength(event.target.value);
-                }}
-                value={maxSourceCodeLength}
-                InputProps={{endAdornment: <InputAdornment position="end">chars</InputAdornment>}}
-              />
-            </Grid>
-
-            <Grid item xs={3}>
-              <TextField
-                fullWidth
-                type="number"
-                id="Submission Interval"
-                label="Submission Interval"
-                onChange={(event) => {
-                  setMinTimeBetweenTwoSubmissions(Number(event.target.value));
-                }}
-                value={minTimeBetweenTwoSubmissions}
-                InputProps={{endAdornment: <InputAdornment position="end">s</InputAdornment>}}
-              />
-            </Grid>
-
-            <Grid item xs={3}>
-              <TextField
-                fullWidth
-                select
-                id="evaluateBothPublicPrivateTestcase"
-                label="Evaluate Private Testcases"
-                onChange={(event) => {
-                  setEvaluateBothPublicPrivateTestcase(event.target.value);
-                }}
-                value={evaluateBothPublicPrivateTestcase}
+                {[
+                  <TextField
+                    required
+                    fullWidth
+                    autoFocus
+                    size="small"
+                    id="contestName"
+                    label="Contest name"
+                    value={contestName}
+                    onChange={(event) => {
+                      setContestName(event.target.value);
+                    }}
+                  />,
+                  <StyledSelect
+                    fullWidth
+                    id="statusId"
+                    key={"statusId"}
+                    label="Status"
+                    value={status}
+                    options={options.status}
+                    onChange={(event) => {
+                      setStatus(event.target.value);
+                    }}
+                  />,
+                  <StyledSelect
+                    fullWidth
+                    id="problemDescriptionViewType"
+                    label="View problem description"
+                    key={"problemDescriptionViewType"}
+                    value={problemDescriptionViewType}
+                    options={options.problemDescriptionViewType}
+                    onChange={(event) => {
+                      setProblemDescriptionViewType(event.target.value);
+                    }}
+                  />,
+                  <TextField
+                    required
+                    fullWidth
+                    type="number"
+                    size="small"
+                    id="maxSubmissions"
+                    label="Max submissions"
+                    value={maxNumberSubmission}
+                    onChange={(event) => {
+                      setMaxNumberSubmission(event.target.value);
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          per problem
+                        </InputAdornment>
+                      ),
+                    }}
+                  />,
+                  <TextField
+                    fullWidth
+                    type="number"
+                    size="small"
+                    id="maxSourceCodeLength"
+                    label="Source length limit"
+                    value={maxSourceCodeLength}
+                    onChange={(event) => {
+                      setMaxSourceCodeLength(event.target.value);
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">chars</InputAdornment>
+                      ),
+                    }}
+                  />,
+                  <TextField
+                    fullWidth
+                    type="number"
+                    size="small"
+                    id="submissionInterval"
+                    label="Submission interval"
+                    value={minTimeBetweenTwoSubmissions}
+                    onChange={(event) => {
+                      setMinTimeBetweenTwoSubmissions(
+                        Number(event.target.value)
+                      );
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">s</InputAdornment>
+                      ),
+                    }}
+                  />,
+                  <StyledSelect
+                    fullWidth
+                    multiple
+                    id="languages"
+                    key={"languages"}
+                    label="Programming languages"
+                    SelectProps={{ multiple: true }}
+                    value={allowedLanguages}
+                    helperText="Leave blank to allow all supported languages"
+                    options={options.supportedLanguage}
+                    onChange={(event) => {
+                      setAllowedLanguages(event.target.value);
+                    }}
+                  />,
+                  <StyledSelect
+                    fullWidth
+                    id="submissionActionType"
+                    label="Action on submission"
+                    key={"submissionActionType"}
+                    value={submissionActionType}
+                    options={options.submissionActionType}
+                    onChange={(event) => {
+                      setSubmissionActionType(event.target.value);
+                    }}
+                  />,
+                  <StyledSelect
+                    fullWidth
+                    id="evaluateBothPublicPrivateTestcase"
+                    label="Evaluate private testcases"
+                    key={"evaluateBothPublicPrivateTestcase"}
+                    value={evaluateBothPublicPrivateTestcase}
+                    options={options.evaluateBothPublicPrivateTestcase}
+                    onChange={(event) => {
+                      setEvaluateBothPublicPrivateTestcase(event.target.value);
+                    }}
+                  />,
+                  <StyledSelect
+                    fullWidth
+                    id="participantViewResultMode"
+                    label="View testcase detail"
+                    key={"participantViewResultMode"}
+                    value={participantViewResultMode}
+                    options={options.participantViewResultMode}
+                    onChange={(event) => {
+                      setParticipantViewResultMode(event.target.value);
+                    }}
+                  />,
+                  <StyledSelect
+                    fullWidth
+                    id="participantViewSubmissionMode"
+                    label="Participant view submission"
+                    key={"participantViewSubmissionMode"}
+                    value={participantViewSubmissionMode}
+                    options={options.participantViewSubmissionMode}
+                    onChange={(event) => {
+                      setParticipantViewSubmissionMode(event.target.value);
+                    }}
+                  />,
+                ].map((input, index) => (
+                  <Grid item sm={12} md={4} key={index}>
+                    {input}
+                  </Grid>
+                ))}
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DateTimePicker
+                    label="Date&Time picker"
+                    value={startDate}
+                    onChange={(value) => {
+                      setStartDate(value);
+                    }}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </LocalizationProvider>
+              </Grid>
+              <LoadingButton
+                loading={loading}
+                variant="contained"
+                sx={{ textTransform: "none", mt: 4 }}
+                onClick={handleSubmit}
               >
-                {listEvaluateBothPublicPrivateTestcases.map((item) => (<MenuItem key={item} value={item}>
-                  {item}
-                </MenuItem>))}
-              </TextField>
-            </Grid>
-
-            <Grid item xs={3}>
-              <TextField
-                fullWidth
-                select
-                id="participantViewResultMode"
-                label="Allow viewing testcase detail"
-                onChange={(event) => {
-                  setParticipantViewResultMode(event.target.value);
-                }}
-                value={participantViewResultMode}
-              >
-                {listParticipantViewResultModes.map((item) => (<MenuItem key={item} value={item}>
-                  {item}
-                </MenuItem>))}
-              </TextField>
-            </Grid>
-
-            <Grid item xs={3}>
-              <TextField
-                fullWidth
-                select
-                id="submissionActionType"
-                label="Action on Submission"
-                onChange={(event) => {
-                  setSubmissionActionType(event.target.value);
-                }}
-                value={submissionActionType}
-              >
-                {listSubmissionActionType.map((item) => (<MenuItem key={item} value={item}>
-                  {item}
-                </MenuItem>))}
-              </TextField>
-            </Grid>
-
-            <Grid item xs={3}>
-              <TextField
-                fullWidth
-                select
-                id="problemDescriptionViewType"
-                label="Problem Description View Mode"
-                onChange={(event) => {
-                  setProblemDescriptionViewType(event.target.value);
-                }}
-                value={problemDescriptionViewType}
-              >
-                {listProblemDescriptionViewTypes.map((item) => (<MenuItem key={item} value={item}>
-                  {item}
-                </MenuItem>))}
-              </TextField>
-            </Grid>
-            <Grid item xs={3}>
-              <TextField
-                fullWidth
-                select
-                id="participantViewSubmissionMode"
-                label="Participant View Submissions Mode"
-                onChange={(event) => {
-                  setParticipantViewSubmissionMode(event.target.value);
-                }}
-                value={participantViewSubmissionMode}
-              >
-                {listParticipantViewSubmissionModes.map((item) => (<MenuItem key={item} value={item}>
-                  {item}
-                </MenuItem>))}
-              </TextField>
-            </Grid>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DateTimePicker
-                label="Date&Time picker"
-                value={startDate}
-                onChange={(value) => {
-                  setStartDate(value);
-                }}
-                renderInput={(params) => <TextField {...params} />}
-              />
-            </LocalizationProvider>
-          </Grid>
-        </Box>}
-
-        <LoadingButton
-          loading={loading}
-          variant="contained"
-          style={{marginTop: "36px"}}
-          onClick={handleSubmit}
-        >
-          Save
-        </LoadingButton>
-      </HustContainerCard>
-    </MuiPickersUtilsProvider>
-  </div>);
+                Save
+              </LoadingButton>
+            </>
+          )}
+        </HustContainerCard>
+      </MuiPickersUtilsProvider>
+    </div>
+  );
 }

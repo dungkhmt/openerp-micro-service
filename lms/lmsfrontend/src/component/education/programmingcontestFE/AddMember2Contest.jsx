@@ -16,10 +16,11 @@ import { styled } from "@mui/material/styles";
 import { debounce } from "@mui/material/utils";
 import { request } from "api";
 import PrimaryButton from "component/button/PrimaryButton";
-import Select from "component/select/StyledSelect";
+import StyledSelect from "component/select/StyledSelect";
 import { getTextAvatar } from "layout/account/AccountButton";
 import { isEmpty, trim } from "lodash";
 import { useEffect, useMemo, useState } from "react";
+import { successNoti } from "utils/notification";
 import UploadUserToContestDialog from "./UploadUserToContestDialog";
 
 // https://mui.com/material-ui/react-avatar/#letter-avatars
@@ -92,12 +93,12 @@ const useStyles = makeStyles((theme) => ({
 
 const roles = [
   {
-    label: "Manager",
-    value: "MANAGER",
-  },
-  {
     label: "Participant",
     value: "PARTICIPANT",
+  },
+  {
+    label: "Manager",
+    value: "MANAGER",
   },
   {
     label: "Owner",
@@ -111,7 +112,7 @@ export default function AddMember2Contest(props) {
   const contestId = props.contestId;
 
   const classes = useStyles();
-  const [selectRole, setSelectRole] = useState(roles[0].value);
+  const [selectedRole, setSelectedRole] = useState(roles[0].value);
 
   //
   const [openUploadDialog, setOpenUploadDialog] = useState(false);
@@ -161,19 +162,17 @@ export default function AddMember2Contest(props) {
     );
   }
 
-  function onUpdateInfo(selectRole) {
-    //alert("onUpdateInfo " + selectRole + ":" + selectedUserId);
+  function onAddMembers() {
     let body = {
-      contestId: contestId,
-      userId: value[0].userName,
-      role: selectRole,
+      userIds: value.map((user) => user.userName),
+      role: selectedRole,
     };
 
     request(
       "post",
-      "/contests/users",
+      `/contests/${contestId}/users`,
       (res) => {
-        alert("Add successully");
+        successNoti("Users were successfully added", 3000);
         props.onAddedSuccessfully();
       },
       {},
@@ -286,21 +285,21 @@ export default function AddMember2Contest(props) {
               );
           }}
         />
-        <Select
+        <StyledSelect
           required
           key={"Role"}
           label="Role"
           options={roles}
-          value={selectRole}
+          value={selectedRole}
           onChange={(e) => {
-            setSelectRole(e.target.value);
+            setSelectedRole(e.target.value);
           }}
         />
         <Stack direction={"row"} spacing={2}>
           <PrimaryButton
             disabled={!value?.length > 0}
             className={classes.btn}
-            onClick={() => onUpdateInfo(selectRole)}
+            onClick={onAddMembers}
           >
             Add
           </PrimaryButton>
