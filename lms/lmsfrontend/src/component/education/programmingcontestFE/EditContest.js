@@ -58,7 +58,7 @@ export default function EditContest() {
     useState(0);
   const [judgeMode, setJudgeMode] = useState("");
   const [participantViewSubmissionMode, setParticipantViewSubmissionMode] =
-    useState(null);
+    useState("");
   const [allowedLanguages, setAllowedLanguages] = useState([]);
 
   const handleSubmit = () => {
