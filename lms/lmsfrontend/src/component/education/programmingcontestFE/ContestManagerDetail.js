@@ -3,6 +3,7 @@ import { Grid } from "@mui/material";
 import { request } from "api";
 import PrimaryButton from "component/button/PrimaryButton";
 import HustContainerCard from "component/common/HustContainerCard";
+import _ from "lodash";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { localeOption } from "utils/NumberFormat";
@@ -81,10 +82,6 @@ export function ContestManagerDetail(props) {
             contestDetail.problemDescriptionViewType,
           ],
           [
-            "Selected languages allowed",
-            contestDetail.languagesAllowed,
-          ],
-          [
             "Max submissions",
             `${contestDetail.maxNumberSubmission} (per problem)`,
           ],
@@ -103,6 +100,13 @@ export function ContestManagerDetail(props) {
             )} (s)`,
             undefined,
             "Minimum time between two consecutive submissions by a participant",
+          ],
+          [
+            "Languages allowed",
+            !contestDetail.languagesAllowed ||
+            _.isEmpty(contestDetail.languagesAllowed.trim())
+              ? "All supported languages"
+              : contestDetail.languagesAllowed,
           ],
           ["Action on submission", contestDetail.submissionActionType],
           [
