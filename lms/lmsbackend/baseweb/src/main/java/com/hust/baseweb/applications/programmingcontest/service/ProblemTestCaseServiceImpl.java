@@ -747,7 +747,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .judgeMode(modelUpdateContest.getJudgeMode())
                                                    .sendConfirmEmailUponSubmission(modelUpdateContest.getSendConfirmEmailUponSubmission())
                                                    .participantViewSubmissionMode(modelUpdateContest.getParticipantViewSubmissionMode())
-                                                   .languagesAllowed(modelUpdateContest.getLanguagesAllowed())
+                                                   .languagesAllowed(String.join(", ",
+                                                                                 modelUpdateContest.getLanguagesAllowed()))
                                                    .build();
         return contestService.updateContestWithCache(contestEntity);
 

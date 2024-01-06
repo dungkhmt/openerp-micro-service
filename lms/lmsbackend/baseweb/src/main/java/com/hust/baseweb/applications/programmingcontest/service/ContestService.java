@@ -1,10 +1,7 @@
 package com.hust.baseweb.applications.programmingcontest.service;
 
-import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestProblem;
-import com.hust.baseweb.applications.programmingcontest.entity.UserRegistrationContestEntity;
-import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
 import com.hust.baseweb.applications.programmingcontest.model.ModelGetContestDetailResponse;
 import com.hust.baseweb.applications.programmingcontest.model.ModelGetProblemDetailResponse;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestProblemRepo;
@@ -127,6 +124,7 @@ public class ContestService {
             .listParticipantViewSubmissionModes(ContestEntity.getListParticipantViewSubmissionModes())
             //.languagesAllowed(contestEntity.getListLanguagesAllowed())
             .languagesAllowed(contestEntity.getLanguagesAllowed())
+            .listLanguagesAllowed(contestEntity.getListLanguagesAllowed())
             .build();
     }
 
