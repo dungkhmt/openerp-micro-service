@@ -1,7 +1,10 @@
 package com.hust.baseweb.applications.programmingcontest.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,14 +12,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Builder
 @Table(name = "contest_new")
 public class ContestEntity implements Serializable {
+
     private static final long serialVersionUID = 3487495895819802L;
 
     public static final String CONTEST_STATUS_CREATED = "CREATED";
@@ -61,15 +64,13 @@ public class ContestEntity implements Serializable {
     public static final String PROG_LANGUAGES_PYTHON3 = "PYTHON3";
 
 
-
-
-
-    public static List<String> getListParticipantViewSubmissionModes(){
+    public static List<String> getListParticipantViewSubmissionModes() {
         List<String> L = new ArrayList();
         L.add(PARTICIPANT_VIEW_SUBMISSION_MODE_ENABLED);
         L.add(PARTICIPANT_VIEW_SUBMISSION_MODE_DISABLED);
         return L;
     }
+
     public static List<String> getJudgeModes() {
         List<String> L = new ArrayList();
         L.add(SYNCHRONOUS_JUDGE_MODE);
@@ -120,24 +121,25 @@ public class ContestEntity implements Serializable {
         return L;
     }
 
-    public List<String> getListLanguagesAllowed(){
+    public List<String> getListLanguagesAllowed() {
         List<String> L = new ArrayList<>();
-        if(languagesAllowed != null && !languagesAllowed.equals("")){
-            String[] s = languagesAllowed.split(",");
-            if(s != null && s.length > 0){
-                for(String l: s){
-                    if(l != null && !l.equals(""))
-                        L.add(l.trim());
-                }
-            }
-        }else{// no limitation, take all languages
-            L.add(ContestEntity.PROG_LANGUAGES_C);
-            L.add(ContestEntity.PROG_LANGUAGES_CPP11);
-            L.add(ContestEntity.PROG_LANGUAGES_CPP14);
-            L.add(ContestEntity.PROG_LANGUAGES_CPP17);
-            L.add(ContestEntity.PROG_LANGUAGES_JAVA);
-            L.add(ContestEntity.PROG_LANGUAGES_PYTHON3);
-        }
+//        if (languagesAllowed != null && !languagesAllowed.equals("")) {
+//            String[] s = languagesAllowed.split(",");
+//            if (s != null && s.length > 0) {
+//                for (String l : s) {
+//                    if (l != null && !l.equals("")) {
+//                        L.add(l.trim());
+//                    }
+//                }
+//            }
+//        } else {// no limitation, take all languages
+        L.add(ContestEntity.PROG_LANGUAGES_C);
+        L.add(ContestEntity.PROG_LANGUAGES_CPP11);
+        L.add(ContestEntity.PROG_LANGUAGES_CPP14);
+        L.add(ContestEntity.PROG_LANGUAGES_CPP17);
+        L.add(ContestEntity.PROG_LANGUAGES_JAVA);
+        L.add(ContestEntity.PROG_LANGUAGES_PYTHON3);
+//        }
         return L;
     }
 
@@ -209,13 +211,13 @@ public class ContestEntity implements Serializable {
     @Column(name = "judge_mode")
     private String judgeMode; // synchronous or asynchronous using queue
 
-    @Column(name="send_confirm_email_upon_submission")
+    @Column(name = "send_confirm_email_upon_submission")
     private String sendConfirmEmailUponSubmission;
 
-    @Column(name="participant_view_submission_mode")
+    @Column(name = "participant_view_submission_mode")
     private String participantViewSubmissionMode;
 
-    @Column(name="languages_allowed")
+    @Column(name = "languages_allowed")
     private String languagesAllowed;
 
 }
