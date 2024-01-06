@@ -16,7 +16,7 @@ import { styled } from "@mui/material/styles";
 import { debounce } from "@mui/material/utils";
 import { request } from "api";
 import PrimaryButton from "component/button/PrimaryButton";
-import Select from "component/select/StyledSelect";
+import StyledSelect from "component/select/StyledSelect";
 import { getTextAvatar } from "layout/account/AccountButton";
 import { isEmpty, trim } from "lodash";
 import { useEffect, useMemo, useState } from "react";
@@ -285,7 +285,7 @@ export default function AddMember2Contest(props) {
               );
           }}
         />
-        <Select
+        <StyledSelect
           required
           key={"Role"}
           label="Role"
