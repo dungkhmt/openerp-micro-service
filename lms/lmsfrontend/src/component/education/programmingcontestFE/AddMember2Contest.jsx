@@ -45,7 +45,7 @@ function stringToColor(string) {
   return color;
 }
 
-function stringAvatar(id, name) {
+export function stringAvatar(id, name) {
   return {
     children: getTextAvatar(name)?.toLocaleUpperCase(),
     sx: {
