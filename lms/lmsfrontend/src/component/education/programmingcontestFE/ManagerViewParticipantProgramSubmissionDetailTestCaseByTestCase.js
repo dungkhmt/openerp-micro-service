@@ -9,10 +9,6 @@ import { useEffect, useState } from "react";
 import { localeOption } from "utils/NumberFormat";
 import { toFormattedDateTime } from "utils/dateutils";
 
-function isNumeric(x) {
-  return (typeof x === "number" || typeof x === "string") && !isNaN(Number(x));
-}
-
 export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase(
   props
 ) {
@@ -39,9 +35,7 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
       // align: "right",
       cellStyle: { minWidth: 150 },
       render: (rowData) =>
-        isNumeric(rowData.runtime)
-          ? rowData.runtime.toLocaleString("fr-FR", localeOption)
-          : rowData.runtime,
+        rowData.runtime?.toLocaleString("fr-FR", localeOption),
     },
     {
       title: "Message",
