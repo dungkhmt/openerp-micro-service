@@ -1,6 +1,7 @@
 package com.hust.baseweb.applications.programmingcontest.repo;
 
 import com.hust.baseweb.applications.programmingcontest.entity.UserRegistrationContestEntity;
+import com.hust.baseweb.applications.programmingcontest.model.ContestMembers;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -53,12 +54,36 @@ public interface UserRegistrationContestRepo extends JpaRepository<UserRegistrat
 
     List<UserRegistrationContestEntity> findAllByContestIdAndStatus(String contestId, String status);
 
+    @Query(value = "select\n" +
+                   "\tcast(user_registration_contest_id as varchar) as id,\n" +
+//                   "\tcontest_id as contestId,\n" +
+                   "\tuser_id as userId,\n" +
+                   "\tul.first_name as firstName,\n" +
+                   "\tul.last_name as lastName,\n" +
+                   "\trole_id as roleId,\n" +
+                   "\tupdated_by_user_login_id as updatedByUserId,\n" +
+                   "\tlast_updated as lastUpdatedDate,\n" +
+                   "\tpermission_id as permissionId\n" +
+                   "from\n" +
+                   "\tuser_registration_contest_new urcn\n" +
+                   "inner join user_login ul on\n" +
+                   "\turcn.user_id = ul.user_login_id\n" +
+                   "where\n" +
+                   "\tcontest_id = ?1\n" +
+                   "\tand status = ?2",
+           nativeQuery = true)
+    List<ContestMembers> findByContestIdAndStatus(String contestId, String status);
+
     @Query(value = "select * from user_registration_contest_new u " +
                    "where u.contest_id = ?1 " +
                    "and u.status = ?3 " +
-                   " and u.user_id in (select participant_id from contest_user_participant_group where contest_id = ?1 and user_id = ?2) " ,
+                   " and u.user_id in (select participant_id from contest_user_participant_group where contest_id = ?1 and user_id = ?2) ",
            nativeQuery = true)
-    List<UserRegistrationContestEntity> findAllInGroupByContestIdAndStatus(String contestId, String userId, String status);
+    List<UserRegistrationContestEntity> findAllInGroupByContestIdAndStatus(
+        String contestId,
+        String userId,
+        String status
+    );
 
     @Query(value = "select user_id from user_registration_contest_new " +
                    "where contest_id = ?1 " +
