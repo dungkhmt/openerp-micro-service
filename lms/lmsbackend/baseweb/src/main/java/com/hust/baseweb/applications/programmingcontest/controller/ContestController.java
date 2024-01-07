@@ -156,7 +156,9 @@ public class ContestController {
             model.setPreloadCode(problemEntity.getPreloadCode());
             model.setAttachment(problemEntity.getAttachment());
             model.setAttachmentNames(problemEntity.getAttachmentNames());
-            model.setListLanguagesAllowed(contestEntity.getListLanguagesAllowed());
+            //model.setListLanguagesAllowed(contestEntity.getListLanguagesAllowed());
+            model.setListLanguagesAllowed(contestEntity.getListLanguagesAllowedInContest());
+
             return ResponseEntity.ok().body(model);
         } catch (Exception e) {
             e.printStackTrace();
@@ -198,6 +200,8 @@ public class ContestController {
                 String problemId = problem.getProblemId();
 
                 ContestProblem contestProblem = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
+                if(contestProblem.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_HIDDEN))
+                    continue;
 
                 ModelStudentOverviewProblem response = new ModelStudentOverviewProblem();
                 response.setProblemId(problemId);
