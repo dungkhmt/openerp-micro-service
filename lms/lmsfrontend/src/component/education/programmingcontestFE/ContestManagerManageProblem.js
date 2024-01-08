@@ -335,7 +335,7 @@ export function ContestManagerManageProblem(props) {
         options={{
           selection: false,
           pageSize: 5,
-          search: false,
+          search: true,
           sorting: true,
         }}
       />

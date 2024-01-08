@@ -5,40 +5,64 @@ import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography, Button } from '@mui/material'
 import CreateNewClassroomScreen from "./CreateNewClassroomScreen";
 
-const columns = [
-    {
-        headerName: "Classroom ID",
-        field: "id",
-        width: 150
-    },
-    {
-        headerName: "Lớp học",
-        field: "classroom",
-        width: 150
-    },
-    {
-        headerName: "Tòa nhà",
-        field: "building",
-        width: 120
-    },
-    {
-        headerName: "Số lượng chỗ ngồi",
-        field: "quantityMax",
-        width: 170
-    },
-    {
-        headerName: "Mô tả",
-        field: "description",
-        width: 300
-    }
-];
-
 export default function TimePerformanceScreen() {
     const [classrooms, setClassrooms] = useState([]);
     // const [selectionModel, setSelectionModel] = useState([]);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [dataChanged, setDataChanged] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
+
+    const columns = [
+        {
+            headerName: "Classroom ID",
+            field: "id",
+            width: 150
+        },
+        {
+            headerName: "Lớp học",
+            field: "classroom",
+            width: 150
+        },
+        {
+            headerName: "Tòa nhà",
+            field: "building",
+            width: 120
+        },
+        {
+            headerName: "Số lượng chỗ ngồi",
+            field: "quantityMax",
+            width: 170
+        },
+        {
+            headerName: "Mô tả",
+            field: "description",
+            width: 300
+        },
+        {
+            headerName: "Hành động",
+            field: "actions",
+            width: 200,
+            renderCell: (params) => (
+                <div>
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => handleUpdate(params.row)}
+                        style={{ marginRight: "8px" }}
+                    >
+                        Sửa
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => handleDelete(params.row.id)}
+                    >
+                        Xóa
+                    </Button>
+                </div>
+            ),
+        },
+    ];
 
     useEffect(() => {
         request("get", "/classroom/get-all", (res) => {
@@ -69,6 +93,17 @@ export default function TimePerformanceScreen() {
 
     const handleCloseDialog = () => {
         setDialogOpen(false);
+    };
+
+    const handleUpdate = (selectedRow) => {
+        // Implement your logic for handling the update action
+        console.log("Update semester", selectedRow);
+    };
+
+    const handleDelete = (semesterId) => {
+        // Implement your logic for handling the delete action
+        console.log("Delete semester with ID", semesterId);
+        // You may want to show a confirmation dialog before deleting
     };
 
     function DataGridToolbar() {

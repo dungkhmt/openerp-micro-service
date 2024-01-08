@@ -352,7 +352,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
                 setClassroomDone = this.checkConflictTimeForListFirstClass(listClassOpened, currentStartPeriod, currentFinish);
 
                 //Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
-                setClassroomDone = this.checkConflictTimeForListSecondClass(listSecondClassOpened, currentStartPeriod, currentFinish);
+                setClassroomDone = this.checkConflictTimeForListSecondClass(listSecondClassOpened, currentStartPeriod, currentFinish) && setClassroomDone;
 
                 if (setClassroomDone) {
                     elClass.setClassroom(classroom.getClassroom());
@@ -379,7 +379,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
                     setClassroomDone = this.checkConflictTimeForListFirstClass(listClassOpened, currentStartPeriod, currentFinish);
 
                     //Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
-                    setClassroomDone = this.checkConflictTimeForListSecondClass(listSecondClassOpened, currentStartPeriod, currentFinish);
+                    setClassroomDone = this.checkConflictTimeForListSecondClass(listSecondClassOpened, currentStartPeriod, currentFinish) && setClassroomDone;
 
                     if (setClassroomDone) {
                         elClass.setSecondClassroom(classroom.getClassroom());
@@ -410,6 +410,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
 
             if (!this.compareTimeForSetClassroom(currentStartPeriod, currentFinish, existedStartPeriod, existedFinishPeriod)) {
                 setClassroomDone = false;
+                break;
             }
         }
         return setClassroomDone;

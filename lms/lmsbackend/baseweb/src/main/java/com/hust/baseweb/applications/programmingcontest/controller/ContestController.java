@@ -200,9 +200,10 @@ public class ContestController {
                 String problemId = problem.getProblemId();
 
                 ContestProblem contestProblem = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
-                if(contestProblem.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_HIDDEN))
-                    continue;
-
+                if(contestProblem.getSubmissionMode()!=null) {
+                    if (contestProblem.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_HIDDEN))
+                        continue;
+                }
                 ModelStudentOverviewProblem response = new ModelStudentOverviewProblem();
                 response.setProblemId(problemId);
                 response.setProblemName(contestProblem.getProblemRename());
@@ -286,7 +287,7 @@ public class ContestController {
     //@Secured("ROLE_TEACHER")
     @GetMapping("/contests/{contestId}/members")
     public ResponseEntity<?> getMembersOfContest(@PathVariable String contestId) {
-        List<ModelMemberOfContestResponse> res = problemTestCaseService.getListMemberOfContest(contestId);
+        List<ContestMembers> res = problemTestCaseService.getListMemberOfContest(contestId);
         return ResponseEntity.ok().body(res);
     }
 
