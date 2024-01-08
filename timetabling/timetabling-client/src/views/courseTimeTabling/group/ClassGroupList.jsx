@@ -34,7 +34,7 @@ export default function ClassGroupList() {
             renderCell: (params) => (
                 <div>
                     <Button
-                        variant="contained"
+                        variant="outlined"
                         color="primary"
                         onClick={() => handleUpdate(params.row)}
                         style={{ marginRight: "8px" }}
@@ -42,7 +42,7 @@ export default function ClassGroupList() {
                         Sửa
                     </Button>
                     <Button
-                        variant="contained"
+                        variant="outlined"
                         color="secondary"
                         onClick={() => handleDelete(params.row.id)}
                     >

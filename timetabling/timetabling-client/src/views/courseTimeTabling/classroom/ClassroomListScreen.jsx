@@ -45,7 +45,7 @@ export default function TimePerformanceScreen() {
             renderCell: (params) => (
                 <div>
                     <Button
-                        variant="contained"
+                        variant="outlined"
                         color="primary"
                         onClick={() => handleUpdate(params.row)}
                         style={{ marginRight: "8px" }}
@@ -53,7 +53,7 @@ export default function TimePerformanceScreen() {
                         Sửa
                     </Button>
                     <Button
-                        variant="contained"
+                        variant="outlined"
                         color="secondary"
                         onClick={() => handleDelete(params.row.id)}
                     >
