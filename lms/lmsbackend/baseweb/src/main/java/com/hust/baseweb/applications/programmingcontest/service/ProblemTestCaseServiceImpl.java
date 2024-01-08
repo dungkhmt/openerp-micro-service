@@ -1582,24 +1582,31 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public List<ModelMemberOfContestResponse> getListMemberOfContest(String contestId) {
-        List<UserRegistrationContestEntity> lst = userRegistrationContestRepo.findAllByContestIdAndStatus(
+    public List<ContestMembers> getListMemberOfContest(String contestId) {
+////       BUG: This implementation meet N+1 problem
+//        List<UserRegistrationContestEntity> lst = userRegistrationContestRepo.findAllByContestIdAndStatus(
+//            contestId,
+//            UserRegistrationContestEntity.STATUS_SUCCESSFUL);
+//
+//        List<ModelMemberOfContestResponse> res = new ArrayList<>();
+//        for (UserRegistrationContestEntity u : lst) {
+//            ModelMemberOfContestResponse m = new ModelMemberOfContestResponse();
+//            m.setId(u.getId());
+//            m.setContestId(contestId);
+//            m.setUserId(u.getUserId());
+//            m.setRoleId(u.getRoleId());
+//            m.setFullName(userService.getUserFullName(u.getUserId()));
+//            m.setLastUpdatedDate(u.getLastUpdated());
+//            m.setUpdatedByUserId(u.getUpdatedByUserLogin_id());
+//            m.setPermissionId(u.getPermissionId());
+//            res.add(m);
+//        }
+//
+//        return res;
+
+        return userRegistrationContestRepo.findByContestIdAndStatus(
             contestId,
             UserRegistrationContestEntity.STATUS_SUCCESSFUL);
-        List<ModelMemberOfContestResponse> res = new ArrayList<>();
-        for (UserRegistrationContestEntity u : lst) {
-            ModelMemberOfContestResponse m = new ModelMemberOfContestResponse();
-            m.setId(u.getId());
-            m.setContestId(contestId);
-            m.setUserId(u.getUserId());
-            m.setRoleId(u.getRoleId());
-            m.setFullName(userService.getUserFullName(u.getUserId()));
-            m.setLastUpdatedDate(u.getLastUpdated());
-            m.setUpdatedByUserId(u.getUpdatedByUserLogin_id());
-            m.setPermissionId(u.getPermissionId());
-            res.add(m);
-        }
-        return res;
     }
 
     @Override

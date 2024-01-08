@@ -35,7 +35,7 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
       // align: "right",
       cellStyle: { minWidth: 150 },
       render: (rowData) =>
-        rowData.runtime.toLocaleString("fr-FR", localeOption),
+        rowData.runtime?.toLocaleString("fr-FR", localeOption),
     },
     {
       title: "Message",

@@ -286,7 +286,7 @@ public class ContestController {
     //@Secured("ROLE_TEACHER")
     @GetMapping("/contests/{contestId}/members")
     public ResponseEntity<?> getMembersOfContest(@PathVariable String contestId) {
-        List<ModelMemberOfContestResponse> res = problemTestCaseService.getListMemberOfContest(contestId);
+        List<ContestMembers> res = problemTestCaseService.getListMemberOfContest(contestId);
         return ResponseEntity.ok().body(res);
     }
 

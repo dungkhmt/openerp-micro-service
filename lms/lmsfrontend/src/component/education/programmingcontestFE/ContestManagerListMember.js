@@ -1,13 +1,20 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { IconButton, LinearProgress } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  IconButton,
+  ListItemAvatar,
+  ListItemText,
+  Stack,
+} from "@mui/material";
 import { request } from "api";
-import HustContainerCard from "component/common/HustContainerCard";
 import StandardTable from "component/table/StandardTable";
+import { isEmpty, trim } from "lodash";
 import { useEffect, useState } from "react";
 import { toFormattedDateTime } from "utils/dateutils";
 import { errorNoti, successNoti } from "utils/notification";
-import AddMember2Contest from "./AddMember2Contest";
+import AddMember2Contest, { stringAvatar } from "./AddMember2Contest";
 import UpdatePermissionMemberOfContestDialog from "./UpdatePermissionMemberOfContestDialog";
 
 export default function ContestManagerListMember(props) {
@@ -20,14 +27,33 @@ export default function ContestManagerListMember(props) {
   const [selectedUserRegisId, setSelectedUserRegisId] = useState(null);
 
   const columns = [
-    { title: "No.", field: "index" },
-    { title: "User ID", field: "userId" },
-    { title: "Name", field: "fullName" },
+    // { title: "No.", field: "index" },
+    {
+      title: "Member",
+      field: "userId",
+      minWidth: 300,
+      render: (rowData) => (
+        <Stack direction={"row"} alignItems={"center"}>
+          {/* TODO: extract this component from AddMember2Contest */}
+          <ListItemAvatar>
+            <Avatar
+              alt="account avatar"
+              {...stringAvatar(rowData.userId, rowData.fullName)}
+            />
+          </ListItemAvatar>
+          <ListItemText
+            primary={rowData.fullName}
+            secondary={`${rowData.userId}`}
+          />
+        </Stack>
+      ),
+    },
+    // { title: "Name", field: "fullName" },
     { title: "Role", field: "roleId" },
     // {title: "Updated At", field: "lastUpdatedDate"},
     { title: "Permission", field: "permissionId" },
     {
-      title: "Update Permission",
+      // title: "Update Permission",
       render: (row) => (
         <IconButton
           variant="contained"
@@ -39,7 +65,7 @@ export default function ContestManagerListMember(props) {
       ),
     },
     {
-      title: "Remove",
+      // title: "Remove",
       render: (row) =>
         row.userId != "admin" && (
           <IconButton
@@ -69,7 +95,7 @@ export default function ContestManagerListMember(props) {
       (res) => {
         successNoti("Participant removed successfully");
         setIsProcessing(false);
-        getMembersOfContest();
+        getContestMembers();
       },
       {
         onError: () => {
@@ -82,18 +108,27 @@ export default function ContestManagerListMember(props) {
     );
   }
 
-  function getMembersOfContest() {
+  function getContestMembers() {
     request("get", `/contests/${contestId}/members`, (res) => {
-      const data = res.data.map((e, i) => ({
-        index: i + 1,
-        id: e.id,
-        userId: e.userId,
-        fullName: e.fullName,
-        roleId: e.roleId,
-        permissionId: e.permissionId,
-        lastUpdatedDate: toFormattedDateTime(e.lastUpdatedDate),
-        updatedByUserId: e.updatedByUserId,
-      }));
+      const data = res.data.map((e, i) => {
+        const member = {
+          // index: i + 1,
+          id: e.id,
+          userId: e.userId,
+          fullName: `${e.firstName || ""} ${e.lastName || ""}`,
+          roleId: e.roleId,
+          permissionId: e.permissionId,
+          lastUpdatedDate: toFormattedDateTime(e.lastUpdatedDate),
+          updatedByUserId: e.updatedByUserId,
+        };
+
+        if (isEmpty(trim(member.fullName))) {
+          member.fullName = "Anonymous";
+        }
+
+        return member;
+      });
+
       setMembers(data);
 
       setIsProcessing(false);
@@ -113,7 +148,7 @@ export default function ContestManagerListMember(props) {
         successNoti("Updated Successfully");
         setIsProcessing(false);
         setOpenUpdateMemberDialog(false);
-        getMembersOfContest();
+        getContestMembers();
       },
       {
         onError: () => {
@@ -137,7 +172,7 @@ export default function ContestManagerListMember(props) {
   }
 
   useEffect(() => {
-    getMembersOfContest();
+    getContestMembers();
     getPermissions();
   }, []);
 
@@ -145,12 +180,13 @@ export default function ContestManagerListMember(props) {
     <>
       <AddMember2Contest
         contestId={contestId}
-        onAddedSuccessfully={getMembersOfContest}
+        onAddedSuccessfully={getContestMembers}
       />
-      <HustContainerCard>
-        {isProcessing && <LinearProgress />}
+      {/* <HustContainerCard>
+        {isProcessing && <LinearProgress />} */}
+      <Box mb={2}>
         <StandardTable
-          title={"Members"}
+          // title={"Members"}
           columns={columns}
           data={members}
           hideCommandBar
@@ -161,14 +197,15 @@ export default function ContestManagerListMember(props) {
             sorting: true,
           }}
         />
-        <UpdatePermissionMemberOfContestDialog
-          open={openUpdateMemberDialog}
-          onClose={handleModelClose}
-          onUpdateInfo={onUpdateInfo}
-          selectedUserRegisId={selectedUserRegisId}
-          permissionIds={permissionIds}
-        />
-      </HustContainerCard>
+      </Box>
+      <UpdatePermissionMemberOfContestDialog
+        open={openUpdateMemberDialog}
+        onClose={handleModelClose}
+        onUpdateInfo={onUpdateInfo}
+        selectedUserRegisId={selectedUserRegisId}
+        permissionIds={permissionIds}
+      />
+      {/* </HustContainerCard> */}
     </>
   );
 }
