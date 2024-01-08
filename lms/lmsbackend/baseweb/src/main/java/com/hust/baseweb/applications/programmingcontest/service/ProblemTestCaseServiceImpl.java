@@ -1468,23 +1468,22 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             mapContestIdToRoleListString.put(contestId, rolesString);
         });
 
-        List<ModelGetContestResponse> res = new ArrayList<>();
-
-        for (Map.Entry<String, String> e : mapContestIdToRoleListString.entrySet()) {
-            ContestEntity contest = contestRepo.findContestByContestId(e.getKey());
-            if (contest.getStatusId().equals(ContestEntity.CONTEST_STATUS_DISABLED)) {
-                continue;
-            }
-            ModelGetContestResponse modelGetContestResponse = ModelGetContestResponse.builder()
-                                                                                     .contestId(contest.getContestId())
-                                                                                     .contestName(contest.getContestName())
-                                                                                     .startAt(contest.getStartedAt())
-                                                                                     .statusId(contest.getStatusId())
-                                                                                     .userId(contest.getUserId())
-                                                                                     .roleId(e.getValue())
-                                                                                     .build();
-            res.add(modelGetContestResponse);
-        }
+        Set<String> contestIds = mapContestIdToRoleListString.keySet();
+        List<ContestEntity> contests = contestRepo.findByContestIdInAndStatusIdNot(
+            contestIds,
+            ContestEntity.CONTEST_STATUS_DISABLED);
+        List<ModelGetContestResponse> res = contests.stream()
+                                                    .map(contest -> ModelGetContestResponse.builder()
+                                                                                           .contestId(contest.getContestId())
+                                                                                           .contestName(contest.getContestName())
+                                                                                           .startAt(contest.getStartedAt())
+                                                                                           .statusId(contest.getStatusId())
+                                                                                           .userId(contest.getUserId())
+                                                                                           .roleId(
+                                                                                               mapContestIdToRoleListString.get(
+                                                                                                   contest.getContestId()))
+                                                                                           .build())
+                                                    .collect(Collectors.toList());
 
         res.sort((a, b) -> {
             if (a.getStartAt() == null && b.getStartAt() == null) {
@@ -1497,6 +1496,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 return b.getStartAt().compareTo(a.getStartAt());
             }
         });
+
         return res;
     }
 
