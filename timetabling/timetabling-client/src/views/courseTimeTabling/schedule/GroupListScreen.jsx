@@ -36,6 +36,7 @@ const GroupListScreen = ({ open, handleClose, existingData, handleRefreshData })
           variant="contained"
           color="primary"
           onClick={() => handleSelectItem(existingData[0].find((item) => item.id === params.row.id))}
+          disabled={params.row.group === null}
         >
           Select
         </Button>
