@@ -5,29 +5,53 @@ import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography, Button } from '@mui/material'
 import CreateNewGroupScreen from "./CreateNewGroupScreen";
 
-const columns = [
-    {
-        headerName: "Group ID",
-        field: "id",
-        width: 150
-    },
-    {
-        headerName: "Tên nhóm",
-        field: "groupName",
-        width: 150
-    },
-    {
-        headerName: "Tòa nhà ưu tiên",
-        field: "priorityBuilding",
-        width: 120
-    }
-];
-
 export default function ClassGroupList() {
     const [groups, setGroups] = useState([]);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [dataChanged, setDataChanged] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
+
+    const columns = [
+        {
+            headerName: "Group ID",
+            field: "id",
+            width: 150
+        },
+        {
+            headerName: "Tên nhóm",
+            field: "groupName",
+            width: 150
+        },
+        {
+            headerName: "Tòa nhà ưu tiên",
+            field: "priorityBuilding",
+            width: 120
+        },
+        {
+            headerName: "Hành động",
+            field: "actions",
+            width: 200,
+            renderCell: (params) => (
+                <div>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleUpdate(params.row)}
+                        style={{ marginRight: "8px" }}
+                    >
+                        Sửa
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => handleDelete(params.row.id)}
+                    >
+                        Xóa
+                    </Button>
+                </div>
+            ),
+        },
+    ];
 
     useEffect(() => {
         request("get", "/group/get-all", (res) => {
@@ -58,6 +82,17 @@ export default function ClassGroupList() {
 
     const handleCloseDialog = () => {
         setDialogOpen(false);
+    };
+
+    const handleUpdate = (selectedRow) => {
+        // Implement your logic for handling the update action
+        console.log("Update semester", selectedRow);
+    };
+
+    const handleDelete = (semesterId) => {
+        // Implement your logic for handling the delete action
+        console.log("Delete semester with ID", semesterId);
+        // You may want to show a confirmation dialog before deleting
     };
 
     function DataGridToolbar() {
