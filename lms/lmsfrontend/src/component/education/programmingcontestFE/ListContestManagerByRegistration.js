@@ -1,12 +1,10 @@
-import React, {useEffect, useState} from "react";
-import {request} from "../../../api";
-import {Link} from "react-router-dom";
-import StandardTable from "../../table/StandardTable";
-import Typography from "@mui/material/Typography";
-import {toFormattedDateTime} from "../../../utils/dateutils";
 import AddIcon from "@material-ui/icons/Add";
-import HustContainerCard from "../../common/HustContainerCard";
-import {LinearProgress} from "@mui/material";
+import { Box, LinearProgress } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { request } from "../../../api";
+import { toFormattedDateTime } from "../../../utils/dateutils";
+import StandardTable from "../../table/StandardTable";
 
 export function ListContestManagerByRegistration() {
   const [contests, setContests] = useState([]);
@@ -27,18 +25,14 @@ export function ListContestManagerByRegistration() {
         </Link>
       ),
     },
-    {title: "Created By", field: "userId"},
+    { title: "Status", field: "statusId" },
+    { title: "Role", field: "roleId" },
+    { title: "Created By", field: "userId" },
     {
       title: "Created At",
       field: "startAt",
-      render: (rowData) => (
-        <Typography>
-          {toFormattedDateTime(rowData["startAt"])}
-        </Typography>
-      ),
+      render: (rowData) => toFormattedDateTime(rowData["startAt"]),
     },
-    {title: "Status", field: "statusId"},
-    {title: "Role", field: "roleId"},
   ];
 
   function getContestListByUserRole() {
@@ -52,15 +46,15 @@ export function ListContestManagerByRegistration() {
   }, []);
 
   return (
-    <HustContainerCard>
-      {loading && <LinearProgress/>}
+    <Box mb={2}>
+      {loading && <LinearProgress />}
       <StandardTable
-        title="Contests"
+        title="My Contests"
         columns={columns}
         data={contests}
         hideCommandBar
         options={{
-          pageSize: 10,
+          pageSize: 5,
           selection: false,
           search: true,
           sorting: true,
@@ -68,16 +62,16 @@ export function ListContestManagerByRegistration() {
         actions={[
           {
             icon: () => {
-              return <AddIcon fontSize="large"/>;
+              return <AddIcon fontSize="large" />;
             },
             tooltip: "Create new Contest",
             isFreeAction: true,
             onClick: () => {
-              window.open("/programming-contest/create-contest")
-            }
-          }
+              window.open("/programming-contest/create-contest");
+            },
+          },
         ]}
       />
-    </HustContainerCard>
+    </Box>
   );
 }
