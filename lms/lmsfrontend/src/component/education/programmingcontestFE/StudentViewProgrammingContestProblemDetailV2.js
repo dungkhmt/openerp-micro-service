@@ -177,9 +177,11 @@ export default function StudentViewProgrammingContestProblemDetail() {
       "/contests/" + contestId + "/problems/" + problemId,
       (res) => {
         res = res.data;
-        console.log('getProblemDetail, res = ',res);
         setProblem(res);
-        setListLanguagesAllowed(res.listLanguagesAllowed);
+        if (res.listLanguagesAllowed != null && res.listLanguagesAllowed.length > 0) {
+          setLanguage(res.listLanguagesAllowed[0])
+          setListLanguagesAllowed(res.listLanguagesAllowed);
+        }
         if (res.isPreloadCode) setCodeSolution(res.preloadCode);
         if (res.submissionMode) setSubmissionMode(res.submissionMode);
         if (res.attachment && res.attachment.length !== 0) {
