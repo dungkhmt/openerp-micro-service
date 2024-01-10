@@ -308,6 +308,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
               setCodeSolution(code);
             }}
             height={"480px"}
+            listLanguagesAllowed={listLanguagesAllowed}
           />
           <Box
             sx={{
