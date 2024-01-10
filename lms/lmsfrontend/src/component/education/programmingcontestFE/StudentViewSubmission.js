@@ -1,6 +1,6 @@
 import InfoIcon from "@mui/icons-material/Info";
 import ReplayIcon from "@mui/icons-material/Replay";
-import { IconButton } from "@mui/material";
+import { IconButton, LinearProgress } from "@mui/material";
 import { request } from "api";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import HustModal from "component/common/HustModal";
@@ -184,6 +184,7 @@ const StudentViewSubmission = forwardRef((props, ref) => {
         </LoadingButton>
       </Stack> */}
       <ModalMessage rowData={selectedRowData} />
+      {loading && <LinearProgress />}
       <StandardTable
         // title={t("submissionList.title")}
         columns={columns}

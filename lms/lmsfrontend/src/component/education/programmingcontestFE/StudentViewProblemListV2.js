@@ -132,7 +132,7 @@ export default function StudentViewProblemList() {
     },
   ];
   return (
-    <Box>
+    <>
       {loading && <LinearProgress />}
       <StandardTable
         // title={t("problemList.title")}
@@ -146,6 +146,6 @@ export default function StudentViewProblemList() {
           sorting: true,
         }}
       />
-    </Box>
+    </>
   );
 }

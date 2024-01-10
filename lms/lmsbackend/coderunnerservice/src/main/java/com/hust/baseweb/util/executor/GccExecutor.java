@@ -156,7 +156,7 @@ public class GccExecutor {
                 "cat $f | (ulimit -t " + timeLimit
                         + " -v " + (memoryLimit * 1024 + DEFAULT_INITIAL_MEMORY)
                         + " -f 30000; "
-                        + "./main > " + outputFileName + "; ) &> " + errorFileName,
+                        + "timeout " + (timeLimit + 5) + "./main > " + outputFileName + "; ) &> " + errorFileName,
                 "ERROR=$(head -1 " + errorFileName + ")",
                 "FILE_LIMIT='" + FILE_LIMIT_ERROR + "'",
                 "TIME_LIMIT='" + TIME_LIMIT_ERROR + "'",
