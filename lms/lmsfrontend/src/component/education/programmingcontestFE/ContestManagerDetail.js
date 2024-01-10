@@ -1,5 +1,5 @@
 import EditIcon from "@mui/icons-material/Edit";
-import { Grid } from "@mui/material";
+import { Grid, LinearProgress } from "@mui/material";
 import { request } from "api";
 import PrimaryButton from "component/button/PrimaryButton";
 import HustContainerCard from "component/common/HustContainerCard";
@@ -72,7 +72,7 @@ export function ContestManagerDetail(props) {
         </PrimaryButton>
       }
     >
-      {/* {loading && <LinearProgress />} */}
+      {loading && <LinearProgress />}
       <Grid container spacing={2} display={loading ? "none" : ""}>
         {[
           ["Name", contestDetail.name],
@@ -126,7 +126,7 @@ export function ContestManagerDetail(props) {
             "Allow or disallow participant to view their own submissions",
           ],
         ].map(([key, value, sx, helpText]) => (
-          <Grid item sm={12} md={4}>
+          <Grid item xs={12} sm={12} md={4}>
             {detail(key, value, sx, helpText)}
           </Grid>
         ))}
