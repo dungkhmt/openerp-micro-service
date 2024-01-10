@@ -1,15 +1,13 @@
-import {request} from "api";
+import { LinearProgress } from "@mui/material";
+import { request } from "api";
 import StandardTable from "component/table/StandardTable";
-import React, {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
-import {toFormattedDateTime} from "utils/dateutils";
-import HustContainerCard from "../../common/HustContainerCard";
-import {LinearProgress} from "@mui/material";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { toFormattedDateTime } from "utils/dateutils";
 
 export default function ContestStudentList() {
   const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
-
 
   const columns = [
     {
@@ -27,9 +25,9 @@ export default function ContestStudentList() {
         </Link>
       ),
     },
-    {title: "Status", field: "status"},
-    {title: "Created By", field: "createdBy"},
-    {title: "Created At", field: "createdAt"},
+    { title: "Status", field: "status" },
+    { title: "Created By", field: "createdBy" },
+    { title: "Created At", field: "createdAt" },
   ];
 
   function getContestList() {
@@ -51,8 +49,8 @@ export default function ContestStudentList() {
   }, []);
 
   return (
-    <HustContainerCard>
-      {loading && <LinearProgress/>}
+    <>
+      {loading && <LinearProgress />}
       <StandardTable
         title={"Registered Contest"}
         columns={columns}
@@ -60,11 +58,11 @@ export default function ContestStudentList() {
         hideCommandBar
         options={{
           selection: false,
-          pageSize: 20,
+          pageSize: 10,
           search: true,
           sorting: true,
         }}
       />
-    </HustContainerCard>
+    </>
   );
 }
