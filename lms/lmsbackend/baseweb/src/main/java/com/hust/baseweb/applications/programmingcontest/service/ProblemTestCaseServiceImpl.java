@@ -1662,40 +1662,44 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return res;
     }
 
+    // TODO: try approach one join query
     @Override
-    public ModelGetContestPageResponse getRegisteredContestsByUser(String userName) {
-        List<UserRegistrationContestEntity> lst = userRegistrationContestRepo
+    public ModelGetContestPageResponse getRegisteredContestsByUser(String userId) {
+        List<UserRegistrationContestEntity> registrations = userRegistrationContestRepo
             .findAllByUserIdAndRoleIdAndStatus(
-                userName,
+                userId,
                 UserRegistrationContestEntity.ROLE_PARTICIPANT,
                 UserRegistrationContestEntity.STATUS_SUCCESSFUL);
 
-        List<ModelGetContestResponse> lists = new ArrayList<>();
-        if (lst != null) {
-            lst.forEach(ur -> {
-                ContestEntity contest = contestRepo.findContestByContestId(ur.getContestId());
-                if (!contest.getStatusId().equals(ContestEntity.CONTEST_STATUS_DISABLED)) {
-                    ModelGetContestResponse modelGetContestResponse = ModelGetContestResponse.builder()
-                                                                                             .contestId(contest.getContestId())
-                                                                                             .contestName(contest.getContestName())
-                                                                                             .contestTime(contest.getContestSolvingTime())
-                                                                                             .countDown(contest.getCountDown())
-                                                                                             .startAt(contest.getStartedAt())
-                                                                                             .statusId(contest.getStatusId())
-                                                                                             .userId(contest.getUserId())
-                                                                                             .createdAt(contest.getCreatedAt())
-                                                                                             .build();
-                    lists.add(modelGetContestResponse);
-                }
-            });
+        List<ModelGetContestResponse> res = new ArrayList<>();
+        if (registrations != null) {
+            Set<String> contestIds = registrations
+                .stream()
+                .map(UserRegistrationContestEntity::getContestId)
+                .collect(Collectors.toSet());
+
+            List<ContestEntity> contests = contestRepo.findByContestIdInAndStatusIdNot(
+                contestIds,
+                ContestEntity.CONTEST_STATUS_DISABLED);
+
+            res = contests.stream()
+                          .map(contest -> ModelGetContestResponse.builder()
+                                                                 .contestId(contest.getContestId())
+                                                                 .contestName(contest.getContestName())
+                                                                 .contestTime(contest.getContestSolvingTime())
+                                                                 .countDown(contest.getCountDown())
+                                                                 .startAt(contest.getStartedAt())
+                                                                 .statusId(contest.getStatusId())
+                                                                 .userId(contest.getUserId())
+                                                                 .createdAt(contest.getCreatedAt())
+                                                                 .build())
+                          .collect(Collectors.toList());
         }
 
-        Collections.reverse(lists);
-
+        Collections.reverse(res);
         return ModelGetContestPageResponse.builder()
-                                          .contests(lists)
+                                          .contests(res)
                                           .build();
-
     }
 
     @Override
