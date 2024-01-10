@@ -5,6 +5,7 @@ import com.hust.baseweb.applications.programmingcontest.entity.ContestProblem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ContestProblemRepo extends JpaRepository<ContestProblem, CompositeContestProblemId> {
 
@@ -15,4 +16,6 @@ public interface ContestProblemRepo extends JpaRepository<ContestProblem, Compos
     ContestProblem findByContestIdAndProblemId(String contestId, String problemId);
 
     ContestProblem findByContestIdAndProblemRecode(String contestId, String problemRecode);
+
+    List<ContestProblem> findByContestIdAndProblemIdIn(String contestId, Set<String> problemIds);
 }

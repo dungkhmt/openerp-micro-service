@@ -31,10 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.InputStream;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -180,30 +177,40 @@ public class ContestController {
         Principal principal
     ) {
         String userId = principal.getName();
-        ContestEntity contestEntity = contestService.findContest(contestId);
+        ContestEntity contest = contestService.findContest(contestId);
 
-        List<ProblemEntity> listProblem = contestEntity.getProblems();
-        List<String> listAcceptedProblem = contestSubmissionRepo.findAcceptedProblemsOfUser(userId, contestId);
-        List<ModelProblemMaxSubmissionPoint> listTriedProblem = contestSubmissionRepo.findSubmittedProblemsOfUser(
+        List<ProblemEntity> problems = contest.getProblems();
+        List<String> acceptedProblems = contestSubmissionRepo.findAcceptedProblemsOfUser(userId, contestId);
+        List<ModelProblemMaxSubmissionPoint> submittedProblems = contestSubmissionRepo.findSubmittedProblemsOfUser(
             userId,
             contestId);
 
         Map<String, Long> mapProblemToMaxSubmissionPoint = new HashMap<>();
-        for (ModelProblemMaxSubmissionPoint problem : listTriedProblem) {
+        for (ModelProblemMaxSubmissionPoint problem : submittedProblems) {
             mapProblemToMaxSubmissionPoint.put(problem.getProblemId(), problem.getMaxPoint());
         }
 
         List<ModelStudentOverviewProblem> responses = new ArrayList<>();
 
-        if (contestEntity.getStatusId().equals(ContestEntity.CONTEST_STATUS_RUNNING)) {
-            for (ProblemEntity problem : listProblem) {
+        if (contest.getStatusId().equals(ContestEntity.CONTEST_STATUS_RUNNING)) {
+            Set<String> problemIds = problems.stream().map(ProblemEntity::getProblemId).collect(Collectors.toSet());
+            List<ContestProblem> contestProblems = contestProblemRepo.findByContestIdAndProblemIdIn(
+                contestId,
+                problemIds);
+
+            Map<String, ContestProblem> problemId2ContestProblem = new HashMap<>();
+            contestProblems.forEach(p -> problemId2ContestProblem.put(p.getProblemId(), p));
+
+            for (ProblemEntity problem : problems) {
                 String problemId = problem.getProblemId();
 
-                ContestProblem contestProblem = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
-                if(contestProblem.getSubmissionMode()!=null) {
-                    if (contestProblem.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_HIDDEN))
+                ContestProblem contestProblem = problemId2ContestProblem.get(problemId);
+                if (contestProblem.getSubmissionMode() != null) {
+                    if (contestProblem.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_HIDDEN)) {
                         continue;
+                    }
                 }
+
                 ModelStudentOverviewProblem response = new ModelStudentOverviewProblem();
                 response.setProblemId(problemId);
                 response.setProblemName(contestProblem.getProblemRename());
@@ -218,13 +225,14 @@ public class ContestController {
                     response.setMaxSubmittedPoint(mapProblemToMaxSubmissionPoint.get(problemId));
                 }
 
-                if (listAcceptedProblem.contains(problemId)) {
+                if (acceptedProblems.contains(problemId)) {
                     response.setAccepted(true);
                 }
 
                 responses.add(response);
             }
         }
+
         return ResponseEntity.status(200).body(responses);
     }
 
