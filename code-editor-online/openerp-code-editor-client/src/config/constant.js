@@ -1,13 +1,13 @@
 const prod = {
   url: {
-    KEYCLOAK_BASE_URL: "https://erp3.soict.ai/iam",
+    KEYCLOAK_BASE_URL: "https://erp3.soict.ai
     API_URL: "/api",
   },
 };
 
 const dev = {
   url: {
-    KEYCLOAK_BASE_URL: "https://erp3.soict.ai/iam",
+    KEYCLOAK_BASE_URL: "https://erp3.soict.ai
     API_URL: "http://localhost/api",
   },
 };

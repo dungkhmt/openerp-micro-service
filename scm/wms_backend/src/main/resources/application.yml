@@ -1,4 +1,4 @@
-SQL_DB_HOST: openerp3.dailyopt.ai
+SQL_DB_HOST: erp3.soict.ai
 SQL_DB_PORT: 6543
 SQL_DB_USER: postgres
 SQL_DB_PASS: openerp
@@ -10,7 +10,7 @@ POSTGRES_DB: openerp_dev
 #POSTGRES_DB: postgres
 server:
   servlet:
-    context-path: '/api'
+    context-path: "/api"
   compression:
     enabled: true # Enable response compression
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json # The comma-separated list of mime types that should be compressed
@@ -21,7 +21,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: https://openerp3.dailyopt.ai/iam/realms/OpenERP-Dev/protocol/openid-connect/certs
+          jwk-set-uri: https://erp3.soict.ai/iam/realms/OpenERP-Dev/protocol/openid-connect/certs
   jmx:
     enabled: false
   datasource:
@@ -82,7 +82,6 @@ redis:
   port: 6379
   password: ${REDIS_PASSWORD:123456}
   expired: ${REDIS_EXPIRED:3600000}
-
 
 graphhopper:
   apiKey: f1ca6ef8-2158-46e7-82ca-749cea4be153

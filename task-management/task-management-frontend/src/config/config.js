@@ -16,7 +16,7 @@ const dev = {
     NOTIFICATION_SERVER_URL: "http://localhost:8081/api",
   },
   keycloak: {
-    url: "https://openerp3.dailyopt.ai/iam",
+    url: "https://erp3.soict.ai/iam",
     realm: "LMS",
     clientId: "task-management",
   },
