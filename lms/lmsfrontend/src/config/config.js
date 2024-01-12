@@ -14,4 +14,4 @@ const dev = {
 
 export const config = process.env.NODE_ENV === "development" ? dev : prod;
 
-export const PLATFORM_NAME = "HUSTack"
+export const PLATFORM_NAME = "HUSTack";
