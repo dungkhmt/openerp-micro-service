@@ -180,6 +180,7 @@ function ListProblemV2() {
     );
   }, [getProblems]);
 
+  /*
   useEffect(() => {
     setLoading(true);
     getProblems(
@@ -190,6 +191,7 @@ function ListProblemV2() {
       }
     );
   }, [getProblems]);
+  */
   return (
     <HustContainerCard>
     {loading && <LinearProgress/>}
@@ -201,7 +203,7 @@ function ListProblemV2() {
         >
           <Tab label={t("problemList.myProblems")} {...a11yProps(0)} />
           <Tab label={t("problemList.sharedProblems")} {...a11yProps(1)} />
-          <Tab label={t("problemList.allProblems")} {...a11yProps(2)} />
+          {/*<Tab label={t("problemList.allProblems")} {...a11yProps(2)} />*/}
         </Tabs>
       </Box>
 
@@ -250,6 +252,7 @@ function ListProblemV2() {
           sx={{marginTop: "8px"}}
         />
       </TabPanelVertical>
+      {/*
       <TabPanelVertical value={value} index={2}>
         <StandardTable
           title="All Problems"
@@ -266,6 +269,7 @@ function ListProblemV2() {
           sx={{marginTop: "8px"}}
         />
       </TabPanelVertical>
+        */}
     </HustContainerCard>
   );
 }

@@ -7,7 +7,8 @@ import {
   getSubmissionModeFromConstant,
   SUBMISSION_MODE_NOT_ALLOWED,
   SUBMISSION_MODE_SOLUTION_OUTPUT,
-  SUBMISSION_MODE_SOURCE_CODE
+  SUBMISSION_MODE_SOURCE_CODE,
+  SUBMISSION_MODE_HIDDEN
 } from "./Constant";
 
 const ModalUpdateProblemInfoInContest = (props) => {
@@ -128,6 +129,11 @@ const ModalUpdateProblemInfoInContest = (props) => {
         <MenuItem value={SUBMISSION_MODE_NOT_ALLOWED}>
           {getSubmissionModeFromConstant(SUBMISSION_MODE_NOT_ALLOWED)}
         </MenuItem>
+        <MenuItem value={SUBMISSION_MODE_HIDDEN}>
+          {getSubmissionModeFromConstant(SUBMISSION_MODE_HIDDEN)}
+        </MenuItem>
+
+        
       </TextField>
     </HustModal>
   );

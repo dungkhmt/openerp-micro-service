@@ -242,7 +242,7 @@ public class SubmissionController {
             ModelContestSubmitProgramViaUploadFile.class);
         ContestEntity contestEntity = contestRepo.findContestByContestId(model.getContestId());
         ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(model.getContestId(), model.getProblemId());
-        List<String> languagesAllowed = contestEntity.getListLanguagesAllowed();
+        List<String> languagesAllowed = contestEntity.getListLanguagesAllowedInContest();
         boolean languageOK = false;
         for(String l: languagesAllowed){
             if(l.equals(model.getLanguage())){
