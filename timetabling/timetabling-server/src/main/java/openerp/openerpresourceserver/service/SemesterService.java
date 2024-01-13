@@ -9,7 +9,9 @@ public interface SemesterService {
 
     List<Semester> getSemester();
 
-    void updateSemester();
+    void updateSemester(SemesterDto requestDto);
 
     Semester create(SemesterDto semesterDto);
+
+    void deleteById(Long id);
 }

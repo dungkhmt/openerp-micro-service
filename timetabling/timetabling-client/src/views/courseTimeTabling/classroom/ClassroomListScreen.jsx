@@ -7,10 +7,11 @@ import CreateNewClassroomScreen from "./CreateNewClassroomScreen";
 
 export default function TimePerformanceScreen() {
     const [classrooms, setClassrooms] = useState([]);
-    // const [selectionModel, setSelectionModel] = useState([]);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [dataChanged, setDataChanged] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
+    const [openLoading, setOpenLoading] = React.useState(false);
+    const [uploading, setUploading] = useState(false);
 
     const columns = [
         {
@@ -71,19 +72,13 @@ export default function TimePerformanceScreen() {
     }, [refreshKey])
 
     const handleUpdateData = ({ classrooms, semester }) => {
-        // Implement your logic to update data using an API
-        console.log("Update data", { classrooms, semester });
-
-        // Set dataChanged to true to trigger a re-render
         setDataChanged(true);
 
-        // Tăng giá trị của refreshKey để làm mới useEffect và fetch dữ liệu mới
         setRefreshKey((prevKey) => prevKey + 1);
     };
 
     const handleRefreshData = () => {
         setDataChanged(true);
-        // Tăng giá trị của refreshKey để làm mới useEffect và fetch dữ liệu mới
         setRefreshKey((prevKey) => prevKey + 1);
     };
 
@@ -96,14 +91,55 @@ export default function TimePerformanceScreen() {
     };
 
     const handleUpdate = (selectedRow) => {
-        // Implement your logic for handling the update action
         console.log("Update semester", selectedRow);
     };
 
     const handleDelete = (semesterId) => {
-        // Implement your logic for handling the delete action
         console.log("Delete semester with ID", semesterId);
-        // You may want to show a confirmation dialog before deleting
+    };
+
+    const handleImportExcel = () => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', '.xlsx, .xls');
+
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            const url = "/excel/upload-classroom"
+
+            if (file) {
+                try {
+                    setOpenLoading(true);
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    const response = await request(
+                        "POST",
+                        url,
+                        (res) => {
+                            console.log(res.data);
+                            setUploading(false);
+                            // You may want to update the table data here
+                            window.location.reload();
+                        }, {
+
+                    }
+                        , formData,
+                        {
+                            "Content-Type": "multipart/form-data",
+                        });
+
+                    // Handle the response as needed
+                    console.log(response);
+                } catch (error) {
+                    console.error("Error uploading file", error);
+                } finally {
+                    setOpenLoading(false);
+                }
+            }
+        };
+
+        input.click();
     };
 
     function DataGridToolbar() {
@@ -129,6 +165,17 @@ export default function TimePerformanceScreen() {
                     handleUpdate={handleUpdateData}
                     handleRefreshData={handleRefreshData}
                 />
+
+                <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        style={{ marginRight: "8px", marginTop: "8px" }}
+                        onClick={handleImportExcel}
+                    >
+                        Tải lên danh sách phòng
+                    </Button>
+                </div>
             </div>
 
         );

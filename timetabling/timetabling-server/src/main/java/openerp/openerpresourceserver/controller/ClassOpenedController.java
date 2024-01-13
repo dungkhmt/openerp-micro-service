@@ -55,6 +55,16 @@ public class ClassOpenedController {
         }
     }
 
+    @DeleteMapping("/delete-ids")
+    public ResponseEntity<Void> deleteByIds(@RequestParam List<Long> ids) {
+        try {
+            service.deleteByIds(ids);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/search")
     public ResponseEntity<List<Schedule>> getClassOpenedByCondition(@Valid @RequestBody FilterClassOpenedDto requestDto) {
         try {

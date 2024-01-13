@@ -48,9 +48,9 @@ public class ClassroomController {
     }
 
     @GetMapping("/update")
-    public ResponseEntity<Void> updateClassroom() {
+    public ResponseEntity<Void> updateClassroom(@Valid @RequestBody ClassroomDto requestDto) {
         try {
-            service.updateClassroom();
+            service.updateClassroom(requestDto);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -13,4 +13,6 @@ public interface GroupRepo extends JpaRepository<Group, Long> {
     List<String> getSemester();
 
     List<Group> getAllByGroupName(String groupName);
+
+    void deleteById(Long id);
 }

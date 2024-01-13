@@ -11,4 +11,6 @@ import java.util.List;
 public interface SemesterRepo extends JpaRepository<Semester, Long> {
     @Query(value = "SELECT DISTINCT semester FROM public.timetabling_schedule", nativeQuery = true)
     List<String> getSemester();
+
+    void deleteById(Long id);
 }

@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.service.impl;
 
+import openerp.openerpresourceserver.exception.SemesterNotFoundException;
 import openerp.openerpresourceserver.mapper.SemesterMapper;
 import openerp.openerpresourceserver.model.dto.request.SemesterDto;
 import openerp.openerpresourceserver.model.entity.Semester;
@@ -26,19 +27,15 @@ public class SemesterServiceImpl implements SemesterService {
     }
 
     @Override
-    public void updateSemester() {
-        List<String> semesterDataList = semesterRepo.getSemester();
-        if (!semesterDataList.isEmpty()) {
-            semesterRepo.deleteAll();
+    public void updateSemester(SemesterDto requestDto) {
+        Long id = requestDto.getId();
+        Semester semester = semesterRepo.findById(id).orElse(null);
+        if (semester == null) {
+            throw new SemesterNotFoundException("Not found semester with ID: " + id);
         }
-        List<Semester> semesterList = new ArrayList<>();
-        semesterDataList.forEach(el -> {
-            Semester semester = Semester.builder()
-                    .semester(el)
-                    .build();
-            semesterList.add(semester);
-        });
-        semesterRepo.saveAll(semesterList);
+        semester.setSemester(requestDto.getSemester());
+        semester.setDescription(requestDto.getDescription());
+        semesterRepo.save(semester);
     }
 
     @Override
@@ -46,5 +43,10 @@ public class SemesterServiceImpl implements SemesterService {
         Semester semester = semesterMapper.mapDtoToEntity(semesterDto);
         semesterRepo.save(semester);
         return semester;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        semesterRepo.deleteById(id);
     }
 }

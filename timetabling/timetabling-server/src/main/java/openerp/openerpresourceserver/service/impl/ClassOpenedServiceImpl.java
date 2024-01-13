@@ -111,6 +111,11 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
     }
 
     @Override
+    public void deleteByIds(List<Long> ids) {
+        classOpenedRepo.deleteByIds(ids);
+    }
+
+    @Override
     public void makeSchedule(MakeScheduleDto requestDto) {
         ClassOpened classOpened = classOpenedRepo.findById(requestDto.getId()).orElse(null);
         if (classOpened == null) {

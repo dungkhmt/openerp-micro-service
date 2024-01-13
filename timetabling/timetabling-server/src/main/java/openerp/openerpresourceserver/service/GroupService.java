@@ -10,4 +10,8 @@ public interface GroupService {
     List<Group> getGroup();
 
     Group create(GroupDto groupDto);
+
+    void updateGroup(GroupDto requestDto);
+
+    void deleteById(Long id);
 }

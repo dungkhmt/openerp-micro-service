@@ -1,16 +1,14 @@
 package openerp.openerpresourceserver.service.impl;
 
+import openerp.openerpresourceserver.exception.ClassroomNotFoundException;
 import openerp.openerpresourceserver.mapper.ClassroomMapper;
 import openerp.openerpresourceserver.model.dto.request.ClassroomDto;
-import openerp.openerpresourceserver.model.dto.request.SemesterDto;
 import openerp.openerpresourceserver.model.entity.Classroom;
-import openerp.openerpresourceserver.model.entity.Semester;
 import openerp.openerpresourceserver.repo.ClassroomRepo;
 import openerp.openerpresourceserver.service.ClassroomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,19 +31,18 @@ public class ClassroomServiceImpl implements ClassroomService {
     }
 
     @Override
-    public void updateClassroom() {
-        List<String> classroomDataList = classroomRepo.getClassroom();
-        if (!classroomDataList.isEmpty()) {
-            classroomRepo.deleteAll();
+    public void updateClassroom(ClassroomDto requestDto) {
+        Long id = requestDto.getId();
+        Classroom classroom = classroomRepo.findById(id).orElse(null);
+        if (classroom == null) {
+            throw new ClassroomNotFoundException("Not found semester with ID: " + id);
         }
-        List<Classroom> classroomList = new ArrayList<>();
-        classroomDataList.forEach(el -> {
-            Classroom classroom = Classroom.builder()
-                    .classroom(el)
-                    .build();
-            classroomList.add(classroom);
-        });
-        classroomRepo.saveAll(classroomList);
+        classroom.setClassroom(requestDto.getClassroom());
+        classroom.setBuilding(requestDto.getBuilding());
+        classroom.setQuantityMax(Long.parseLong(requestDto.getQuantityMax()));
+        classroom.setDescription(requestDto.getDescription());
+        classroom.setBuilding(requestDto.getBuilding());
+        classroomRepo.save(classroom);
     }
 
     @Override

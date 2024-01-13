@@ -13,7 +13,7 @@ public interface ClassroomService {
 
     List<String> getBuilding();
 
-    void updateClassroom();
+    void updateClassroom(ClassroomDto requestDto);
 
     Classroom create(ClassroomDto classroomDto);
 

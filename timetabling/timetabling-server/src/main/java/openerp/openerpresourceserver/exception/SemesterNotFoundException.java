@@ -3,13 +3,12 @@ package openerp.openerpresourceserver.exception;
 import lombok.Getter;
 
 @Getter
-public class NotClassroomSuitableException extends RuntimeException {
+public class SemesterNotFoundException extends RuntimeException {
 
     private final String customMessage;
 
-    public NotClassroomSuitableException(String customMessage) {
+    public SemesterNotFoundException(String customMessage) {
         super();
         this.customMessage = customMessage;
-    }
-}
+    }}
 

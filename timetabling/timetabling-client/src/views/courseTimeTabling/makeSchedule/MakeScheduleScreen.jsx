@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 import SearchIcon from '@mui/icons-material/Search';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import AutomationMakeSchedule from "./AutomationMakeSchedule";
+import FormAutoMakeSchedule from "./FormAutoMakeSchedule";
 
 export default function ScheduleScreen() {
     const [dataChanged, setDataChanged] = useState(false);
@@ -537,7 +537,7 @@ export default function ScheduleScreen() {
                     </Button>
                 </div>
 
-                <AutomationMakeSchedule
+                <FormAutoMakeSchedule
                     open={isDialogOpen}
                     handleClose={handleCloseDialog}
                     handleRefreshData={handleRefreshData}

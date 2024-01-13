@@ -13,6 +13,8 @@ public interface ClassOpenedService {
 
     List<ClassOpened> getAll();
 
+    void deleteByIds(List<Long> ids);
+
     List<ClassOpened> updateClassOpenedList(UpdateClassOpenedDto requestDto);
 
     List<ClassOpened> getBySemester(String semester);
