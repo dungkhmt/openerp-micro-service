@@ -104,16 +104,19 @@ export default function CodeSimilarityCheck(props) {
   }
 
   function handleCheckForbiddenInstructions(){
-    event.preventDefault();
+    //alert('check forbidden');
+    //event.preventDefault();
     setIsProcessing(true);
    
     request(
       "get",
       //"/check-code-similarity/" + contestId,
       "/check-forbidden-instructions/" + contestId,
-      {},
-      {},
-      body
+      (res) => {
+        console.log("handleCheckForbiddenInstructions, res = ", res.data);     
+       
+      }
+      
     ).then(() => setIsProcessing(false))
   }
   function handleCheckPlagiarism(event) {

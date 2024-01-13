@@ -1721,13 +1721,30 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             .stream()
             .distinct()
             .collect(Collectors.toList());
+
+        ContestEntity contest = contestRepo.findContestByContestId(contestId);
+        List<String> problemIds = new ArrayList<>();
+
+        List<ContestProblem> contestProblems = contestProblemRepo.findAllByContestId(contestId);
+        if(contestProblems!=null){
+            for(ContestProblem cp: contestProblems){
+                if(cp.getSubmissionMode()!=null){
+                    if(!cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_HIDDEN)){
+                        problemIds.add(cp.getProblemId());
+                    }
+                }
+            }
+        }
+
+
+        /*
         List<String> problemIds = contestRepo
             .findContestByContestId(contestId)
             .getProblems()
             .stream()
             .map(ProblemEntity::getProblemId)
             .collect(Collectors.toList());
-
+        */
         LinkedHashMap<String, String> mapProblemIdToProblemName = new LinkedHashMap<>();
         for (ContestProblem contestProblem : contestProblemRepo.findAllByContestId(contestId)) {
             mapProblemIdToProblemName.put(contestProblem.getProblemId(), contestProblem.getProblemRename());
@@ -2356,13 +2373,17 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         List<ContestProblem> contestProblems = contestProblemRepo.findAllByContestId(contestId);
         Map<String, List<String>> mPro2ForbiddenIns = new HashMap();
         for (ContestProblem cp : contestProblems) {
+           // log.info("checkForbiddenInstructions, forbidden instructions = " + cp.getForbiddenInstructions());
             String[] forbiddens = cp.getForbiddenInstructions().split(",");
             if (forbiddens != null) {
                 List<String> L = new ArrayList();
                 for (String s : forbiddens) {
-                    L.add(s.trim());
+                    s = s.trim();
+                    if(s != null && s != "" && !s.equals("") && s.length() > 0)
+                        L.add(s.trim());
                 }
                 mPro2ForbiddenIns.put(cp.getProblemId(), L);
+                //log.info("checkForbiddenInstructions, forbidden list L = " + L.toString());
             }
         }
         List<ContestSubmissionEntity> submissions = contestSubmissionRepo.findAllByContestId(contestId);
@@ -2371,15 +2392,27 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             String problemId = sub.getProblemId();
             String msg = "";
             if (mPro2ForbiddenIns.get(problemId) != null) {
+                List<String> forbiddenFound = new ArrayList<String>();
                 for (String f : mPro2ForbiddenIns.get(problemId)) {
-                    if (sub.getSourceCode().contains(f)) {
+                    //log.info("checkForbiddenInstructions, , sourcecode " + sub.getSourceCode() + " forbidden f = " + f);
+                    if(sub.getSourceCode()!=null)
+                        if (sub.getSourceCode().contains(f)) {
                         sub.setViolateForbiddenInstruction(ContestSubmissionEntity.VIOLATION_FORBIDDEN_YES);
-                        msg = msg + f + ",";
+                        //msg = msg + f + ",";
+                            forbiddenFound.add(f);
                         cnt++;
-                    }
+                            //log.info("checkForbiddenInstructions, , sourcecode " + sub.getSourceCode() + " forbidden f = " + f + " DISCOVER violations!!!");
+
+                        }
+                }
+                for(int i = 0; i < forbiddenFound.size(); i++){
+                    msg = msg + forbiddenFound.get(i);
+                    if(i < forbiddenFound.size()-1)
+                        msg = msg + " :: ";
                 }
             }
             sub.setViolateForbiddenInstructionMessage(msg);
+            contestSubmissionRepo.save(sub);
         }
         return cnt;
     }
