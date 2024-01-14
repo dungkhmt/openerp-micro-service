@@ -16,6 +16,7 @@ import com.hust.baseweb.applications.education.model.*;
 import com.hust.baseweb.applications.education.model.educlassuserloginrole.AddEduClassUserLoginRoleIM;
 import com.hust.baseweb.applications.education.model.educlassuserloginrole.ClassOfUserOM;
 import com.hust.baseweb.applications.education.model.educlassuserloginrole.EduClassUserLoginRoleType;
+import com.hust.baseweb.applications.education.repo.ClassRegistrationRepo;
 import com.hust.baseweb.applications.education.repo.ClassRepo;
 import com.hust.baseweb.applications.education.report.model.courseparticipation.StudentCourseParticipationModel;
 import com.hust.baseweb.applications.education.report.model.quizparticipation.StudentQuizParticipationModel;
@@ -73,6 +74,7 @@ public class ClassController {
     private NotificationsService notificationsService;
     private ClassRepo classRepo;
     private FileSystemStorageProperties properties;
+    private ClassRegistrationRepo classRegistrationRepo;
 
     @Autowired
     private MongoContentService mongoContentService;
@@ -220,8 +222,13 @@ public class ClassController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getClassDetail(@PathVariable UUID id) {
-        return ResponseEntity.ok().body(classService.getClassDetail(id));
+    public ResponseEntity<?> getClassDetail(Principal principal, @PathVariable UUID id) {
+        String registrationStatus = classRegistrationRepo.checkRegistration(id, principal.getName());
+        if ("APPROVED".equals(registrationStatus)) {
+            return ResponseEntity.ok().body(classService.getClassDetail(id));
+        } else {
+            return ResponseEntity.status(403).build();
+        }
     }
 
     @Secured("ROLE_TEACHER")
@@ -276,14 +283,19 @@ public class ClassController {
 
     @GetMapping("/get-chapters-of-class/{classId}")
     public ResponseEntity<?> getChaptersOfClass(Principal principal, @PathVariable UUID classId) {
-        GetClassDetailOM eduClass = classService.getClassDetail(classId);
-        String courseId = eduClass.getCourseId();
+        String registrationStatus = classRegistrationRepo.checkRegistration(classId, principal.getName());
+        if ("APPROVED".equals(registrationStatus)) {
 
-        List<EduCourseChapter> eduCourseChapters = eduCourseChapterService.findAllByCourseId(courseId);
-//        log.info("getChaptersOfClass, classId = " + classId + ", courseId = " + courseId
-//                 + " RETURN list.sz = " + eduCourseChapters.size());
+            GetClassDetailOM eduClass = classService.getClassDetail(classId);
+            String courseId = eduClass.getCourseId();
+            
+            List<EduCourseChapter> eduCourseChapters = eduCourseChapterService.findAllByCourseId(courseId);
+            //        log.info("getChaptersOfClass, classId = " + classId + ", courseId = " + courseId
+            //                 + " RETURN list.sz = " + eduCourseChapters.size());
+            
+            return ResponseEntity.ok().body(eduCourseChapters);
+        } else return ResponseEntity.status(403).build();
 
-        return ResponseEntity.ok().body(eduCourseChapters);
     }
 
     @Secured("ROLE_TEACHER")
