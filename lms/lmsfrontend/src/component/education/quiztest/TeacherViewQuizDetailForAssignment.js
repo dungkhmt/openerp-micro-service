@@ -1,15 +1,30 @@
-import {Box, Button, List, ListItem, ListItemIcon, ListItemText, Typography,} from "@material-ui/core";
-import {blue, grey} from "@material-ui/core/colors";
-import {makeStyles} from "@material-ui/core/styles";
+import {
+  Box,
+  Button,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from "@material-ui/core";
+import { blue, grey, green } from "@material-ui/core/colors";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
 import parse from "html-react-parser";
-import React, {useState} from "react";
-import {FcDocument} from "react-icons/fc";
+import React, { useEffect, useState } from "react";
+import { FcDocument } from "react-icons/fc";
 import SimpleBar from "simplebar-react";
-import {request} from "../../../api";
+import { request } from "../../../api";
 import PrimaryButton from "../../button/PrimaryButton";
 import TertiaryButton from "../../button/TertiaryButton";
 import CustomizedDialogs from "../../dialog/CustomizedDialogs";
 import ErrorDialog from "../../dialog/ErrorDialog";
+import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import { randomImageName } from "utils/FileUpload/covert";
+
+function isPDF(base64Data) {
+  const decodedData = atob(base64Data);
+  return decodedData.startsWith("%PDF");
+}
 
 export const style = (theme) => ({
   testBtn: {
@@ -61,9 +76,31 @@ export const style = (theme) => ({
   btn: {
     textTransform: "none",
   },
+  imageContainer: {
+    marginTop: "12px",
+  },
+  imageWrapper: {
+    position: "relative",
+  },
+  imageQuiz: {
+    maxWidth: "100%",
+  },
 });
 
 const useStyles = makeStyles((theme) => style(theme));
+
+const GreenCheckbox = withStyles({
+  root: {
+    color: green[400],
+    "&$checked": {
+      color: green[600],
+    },
+    paddingLeft: 20,
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
+  checked: {},
+})((props) => <Checkbox color="default" disableRipple {...props} />);
 
 export default function TeacherViewQuizDetailForAssignment({
   quiz,
@@ -75,15 +112,15 @@ export default function TeacherViewQuizDetailForAssignment({
 
   //
   // const [result, setResult] = useState({ submited: false, isCorrect: false });
-  // const [chkState, setChkState] = useState(() => {
-  //   const isChecked = {};
+  const [chkState, setChkState] = useState(() => {
+    const isChecked = {};
 
-  //   quiz.quizChoiceAnswerList.forEach((ans) => {
-  //     isChecked[ans.choiceAnswerId] = false;
-  //   });
+    quiz.quizChoiceAnswerList.forEach((ans) => {
+      isChecked[ans.choiceAnswerId] = false;
+    });
 
-  //   return isChecked;
-  // });
+    return isChecked;
+  });
 
   // Modals.
   const [open, setOpen] = useState(false);
@@ -92,7 +129,17 @@ export default function TeacherViewQuizDetailForAssignment({
 
   const [openQuizTest, setOpenQuizTest] = useState(null);
   const [selectedTestId, setSelectedTestId] = useState(null);
+  const [fileAttachments, setFileAttachments] = useState([]);
 
+  useEffect(() => {
+    if (quiz.attachment && quiz.attachment.length !== 0) {
+      const newFileURLArray = quiz.attachment.map((url) => ({
+        id: randomImageName(),
+        url,
+      }));
+      setFileAttachments(newFileURLArray);
+    }
+  }, [quiz]);
   //
   const onOpenDialog = () => {
     setOpen(true);
@@ -136,7 +183,9 @@ export default function TeacherViewQuizDetailForAssignment({
   const handleCloseQuizTest = () => {
     setOpenQuizTest(false);
   };
-
+  const handleChange = (event) => {
+    setChkState({ ...chkState, [event.target.name]: event.target.checked });
+  };
   return (
     <div className={classes.wrapper}>
       <Box className={classes.quizzStatement}>
@@ -145,7 +194,42 @@ export default function TeacherViewQuizDetailForAssignment({
         {quiz.statusId})&nbsp;&nbsp;
         {parse(quiz.statement)}
       </Box>
+      {fileAttachments.length !== 0 &&
+        fileAttachments.map((file) => (
+          <div key={file.id} className={classes.imageContainer}>
+            <div className={classes.imageWrapper}>
+              {isPDF(file.url) ? (
+                <iframe
+                  width={"860px"}
+                  height={"500px"}
+                  src={`data:application/pdf;base64,${file.url}`}
+                />
+              ) : (
+                <img
+                  src={`data:image/jpeg;base64,${file.url}`}
+                  alt="quiz test"
+                  className={classes.imageQuiz}
+                />
+              )}
+            </div>
+          </div>
+        ))}
 
+      <FormGroup row>
+        {quiz.quizChoiceAnswerList.map((answer) => (
+          <FormControlLabel
+            key={answer.choiceAnswerId}
+            control={
+              <GreenCheckbox
+                checked={chkState[answer.choiceAnswerId]}
+                onChange={handleChange}
+                name={answer.choiceAnswerId}
+              />
+            }
+            label={parse(answer.choiceAnswerContent)}
+          />
+        ))}
+      </FormGroup>
       <Button
         color="primary"
         variant="contained"
