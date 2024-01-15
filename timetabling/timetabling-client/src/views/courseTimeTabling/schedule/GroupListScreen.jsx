@@ -7,6 +7,7 @@ const GroupListScreen = ({ open, handleClose, existingData, handleRefreshData })
   const [selectedItem, setSelectedItem] = useState(null);
 
   const handleSelectItem = (item) => {
+    console.log("data item: ", item)
     setSelectedItem(item);
 
     const groupName = item.groupName
@@ -15,7 +16,7 @@ const GroupListScreen = ({ open, handleClose, existingData, handleRefreshData })
       ids: existingData[1],
       groupName: groupName
     };
-    request("post", "/class-opened/update", (res) => {
+    request("post", "/class-opened/group-assign", (res) => {
       // Call handleRefreshData to refresh the data 
       handleRefreshData();
       //close dialog
@@ -36,9 +37,8 @@ const GroupListScreen = ({ open, handleClose, existingData, handleRefreshData })
           variant="contained"
           color="primary"
           onClick={() => handleSelectItem(existingData[0].find((item) => item.id === params.row.id))}
-          disabled={params.row.group === null}
         >
-          Select
+          Chọn
         </Button>
       ),
     },

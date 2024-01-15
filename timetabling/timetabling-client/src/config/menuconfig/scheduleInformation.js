@@ -1,7 +1,7 @@
 export const scheduleInformation = {
     id: "MENU_SCHEDULE_INFORMATION",
     icon: "InfoIcon",
-    text: "Các thông tin cơ bản",
+    text: "Quản lý thông tin",
     child: [
       {
         id: "MENU_SCHEDULE_INFORMATION.SEMESTER",

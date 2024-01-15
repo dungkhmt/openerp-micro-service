@@ -2,15 +2,18 @@ import * as React from 'react';
 import { useEffect, useState } from "react";
 import { request } from "../../../api";
 import { DataGrid } from '@mui/x-data-grid';
-import { Box, Typography, Button } from '@mui/material'
+import { toast } from 'react-toastify';
+import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
 import CreateNewSemester from "./CreateNewSemesterScreen";
 
 export default function SemesterScreen() {
     const [semesters, setSemesters] = useState([]);
-    // const [selectionModel, setSelectionModel] = useState([]);
+    const [selectedSemester, setSelectedSemester] = useState(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [dataChanged, setDataChanged] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
+    const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+    const [deleteSemesterId, setDeleteSemesterId] = useState(null);
 
     const columns = [
         {
@@ -61,35 +64,49 @@ export default function SemesterScreen() {
     }, [refreshKey])
 
     const handleUpdateData = ({ classrooms, semester }) => {
-        // Implement your logic to update data using an API
-        console.log("Update data", { classrooms, semester });
-
-        // Set dataChanged to true to trigger a re-render
         setDataChanged(true);
 
-        // Tăng giá trị của refreshKey để làm mới useEffect và fetch dữ liệu mới
         setRefreshKey((prevKey) => prevKey + 1);
     };
 
     const handleRefreshData = () => {
         setDataChanged(true);
-        // Tăng giá trị của refreshKey để làm mới useEffect và fetch dữ liệu mới
         setRefreshKey((prevKey) => prevKey + 1);
     };
 
+    const handleCreate = () => {
+        setSelectedSemester(null);
+        setDialogOpen(true);
+    };
+
     const handleUpdate = (selectedRow) => {
-        // Implement your logic for handling the update action
-        console.log("Update semester", selectedRow);
+        setSelectedSemester(selectedRow);
+        setDialogOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (deleteSemesterId) {
+            request("delete", `/semester/delete?id=${deleteSemesterId}`, (res) => {
+                console.log("Semester deleted successfully");
+                handleRefreshData();
+            },
+                (error) => {
+                    toast.error(error.response.data);
+                }).then();
+        }
+
+        setConfirmDeleteOpen(false);
+        setDeleteSemesterId(null);
+    };
+
+    const handleCancelDelete = () => {
+        setConfirmDeleteOpen(false);
+        setDeleteSemesterId(null);
     };
 
     const handleDelete = (semesterId) => {
-        // Implement your logic for handling the delete action
-        console.log("Delete semester with ID", semesterId);
-        // You may want to show a confirmation dialog before deleting
-    };
-
-    const handleOpenDialog = () => {
-        setDialogOpen(true);
+        setDeleteSemesterId(semesterId);
+        setConfirmDeleteOpen(true);
     };
 
     const handleCloseDialog = () => {
@@ -105,7 +122,7 @@ export default function SemesterScreen() {
                         variant="outlined"
                         color="primary"
                         style={{ marginRight: "8px" }}
-                        onClick={handleOpenDialog}
+                        onClick={handleCreate}
                     >
                         Thêm mới
                     </Button>
@@ -117,8 +134,26 @@ export default function SemesterScreen() {
                     handleUpdate={handleUpdateData}
                     handleRefreshData={handleRefreshData}
                 />
-            </div>
 
+                <Dialog
+                    open={confirmDeleteOpen}
+                    onClose={handleCancelDelete}
+                    aria-labelledby="confirm-delete-dialog"
+                >
+                    <DialogTitle id="confirm-delete-dialog-title">Xác nhận xóa kỳ học</DialogTitle>
+                    <DialogContent>
+                        <Typography>Bạn có chắc chắn muốn xóa kỳ học này?</Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCancelDelete} color="secondary">
+                            Hủy
+                        </Button>
+                        <Button onClick={handleConfirmDelete} color="primary">
+                            Xóa
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
         );
     }
 
@@ -145,6 +180,17 @@ export default function SemesterScreen() {
                 rows={semesters}
                 columns={columns}
                 pageSize={10}
+            />
+
+            <CreateNewSemester
+                open={isDialogOpen}
+                handleClose={() => {
+                    setDialogOpen(false);
+                    setSelectedSemester(null);
+                }}
+                handleUpdate={handleUpdateData}
+                handleRefreshData={handleRefreshData}
+                selectedSemester={selectedSemester}
             />
         </div>
     );

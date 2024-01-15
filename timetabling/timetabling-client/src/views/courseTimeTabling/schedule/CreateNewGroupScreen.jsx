@@ -28,7 +28,7 @@ export default function CreateNewGroupScreen({ open, handleClose, existingData, 
     request("post", "/group/create", (res) => {
 
       //if success, do request update class opened
-      request("post", "/class-opened/update", (res) => {
+      request("post", "/class-opened/group-assign", (res) => {
         // Call handleRefreshData to refresh the data 
         handleRefreshData();
         //close dialog

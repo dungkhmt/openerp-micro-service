@@ -2,11 +2,12 @@ import * as React from 'react';
 import { useEffect, useState } from "react";
 import { request } from "../../../api";
 import { DataGrid } from '@mui/x-data-grid';
-import { Box, Typography, Button } from '@mui/material'
+import { Box, Typography, Button, IconButton } from '@mui/material'
 import CreateNewGroupScreen from "./CreateNewGroupScreen";
 import GroupListScreen from './GroupListScreen';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import SearchIcon from '@mui/icons-material/Search';
 
 const columns = [
     {
@@ -100,10 +101,12 @@ export default function ScheduleScreen() {
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [dataChanged, setDataChanged] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
+    const [groups, setGroups] = useState([]);
     const [isGroupListOpen, setGroupListOpen] = useState(false);
     const [classOpeneds, setClassOpeneds] = useState([]);
-    const [semesters, setSemesters] = useState([]); // State to store the list of semesters
-    const [selectedSemester, setSelectedSemester] = useState(null); // State to store the selected semester
+    const [semesters, setSemesters] = useState([]);
+    const [selectedSemester, setSelectedSemester] = useState(null);
+    const [selectedGroup, setSelectedGroup] = useState(null);
     const [rowSelectionModel, setRowSelectionModel] = React.useState([]);
 
     useEffect(() => {
@@ -113,6 +116,10 @@ export default function ScheduleScreen() {
 
         request("get", "/semester/get-all", (res) => {
             setSemesters(res.data);
+        });
+        
+        request("get", "/group/get-all", (res) => {
+            setGroups(res.data);
         });
     }, [refreshKey])
 
@@ -126,25 +133,38 @@ export default function ScheduleScreen() {
 
     const handleSemesterChange = (event, newValue) => {
         setSelectedSemester(newValue);
-        if (newValue) {
-            handleFilterData({ semester: newValue });
-        }
     };
 
-    const handleFilterData = ({ semester }) => {
-        const url = "/class-opened/get-all"
+    const handleGroupChange = (event, newValue) => {
+        setSelectedGroup(newValue);
+    };
 
-        // Extract the relevant value from the selectedSemester object
-        const semesterName = semester.semester;
+    const handleFilterData = () => {
+        const url = "/class-opened/search"
 
-        // Add the semester parameter to the URL
-        const fullUrl = `${url}?semester=${semesterName}`;
+        var semesterName = null
+        var groupName = null
 
-        request("get", fullUrl, (res) => {
+        if (selectedSemester != null) {
+            semesterName = selectedSemester.semester;
+        }
+        if (selectedGroup != null) {
+            groupName = selectedGroup.groupName
+        }
+
+        const requestSearch = {
+            semester: semesterName,
+            groupName: groupName
+        };
+
+        request("post", url, (res) => {
+            //set data filter
             setClassOpeneds(res.data);
-        }).then();
+        },
+            {},
+            requestSearch
+        ).then();
 
-        // Set dataChanged to true to trigger a re-render
         setDataChanged(true);
     };
 
@@ -171,12 +191,28 @@ export default function ScheduleScreen() {
                 <div style={{ display: "flex", gap: 16, justifyContent: "flex-start" }}>
                     <Autocomplete
                         options={semesters}
-                        getOptionLabel={(option) => option.semester} // Update with the actual property name for semester name
-                        style={{ width: 150, marginLeft: "8px" }}
+                        getOptionLabel={(option) => option.semester}
+                        style={{ width: 135, marginLeft: "8px" }}
                         value={selectedSemester}
                         renderInput={(params) => <TextField {...params} label="Chọn kỳ học" />}
                         onChange={handleSemesterChange}
                     />
+                    <Autocomplete
+                        options={groups}
+                        getOptionLabel={(option) => option.groupName}
+                        style={{ width: 160 }}
+                        value={selectedGroup}
+                        renderInput={(params) => <TextField {...params} label="Chọn nhóm học" />}
+                        onChange={handleGroupChange}
+                    />
+                    <IconButton
+                        variant="contained"
+                        onClick={handleFilterData}
+                        aria-label="search"
+                        size="large"
+                    >
+                        <SearchIcon fontSize="inherit" />
+                    </IconButton>
                 </div>
 
                 <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
