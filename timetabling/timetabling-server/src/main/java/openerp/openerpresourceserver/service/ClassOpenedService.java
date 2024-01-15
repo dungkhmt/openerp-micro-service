@@ -21,7 +21,7 @@ public interface ClassOpenedService {
 
     void setSeparateClass(Long id, Boolean isSeparateClass);
 
-    List<Schedule> searchClassOpened(FilterClassOpenedDto requestDto);
+    List<ClassOpened> searchClassOpened(FilterClassOpenedDto requestDto);
 
     void makeSchedule(MakeScheduleDto requestDto);
 

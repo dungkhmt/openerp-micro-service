@@ -1,9 +1,7 @@
 package openerp.openerpresourceserver.controller;
 
 import jakarta.validation.Valid;
-import openerp.openerpresourceserver.exception.ConflictScheduleException;
-import openerp.openerpresourceserver.exception.UnableSeparateClassException;
-import openerp.openerpresourceserver.exception.UnableStartPeriodException;
+import openerp.openerpresourceserver.exception.*;
 import openerp.openerpresourceserver.model.dto.request.AutoMakeScheduleDto;
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.model.dto.request.MakeScheduleDto;
@@ -27,7 +25,8 @@ public class ClassOpenedController {
     private ClassOpenedService service;
 
     @GetMapping("/get-all")
-    public ResponseEntity<List<ClassOpened>> getAll(@RequestParam(required = false) String semester) {
+    public ResponseEntity<List<ClassOpened>> getAll(@RequestParam(required = false) String semester,
+                                                    @RequestParam(required = false) String groupName) {
         try {
             List<ClassOpened> classOpenedList;
             if (semester != null) {
@@ -42,14 +41,16 @@ public class ClassOpenedController {
         }
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<List<ClassOpened>> update(@Valid @RequestBody UpdateClassOpenedDto requestDto) {
+    @PostMapping("/group-assign")
+    public ResponseEntity<String> update(@Valid @RequestBody UpdateClassOpenedDto requestDto) {
         try {
             List<ClassOpened> classOpenedList = service.updateClassOpenedList(requestDto);
             if (classOpenedList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            return new ResponseEntity<>(classOpenedList, HttpStatus.OK);
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (NotFoundGroupException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -66,9 +67,9 @@ public class ClassOpenedController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<List<Schedule>> getClassOpenedByCondition(@Valid @RequestBody FilterClassOpenedDto requestDto) {
+    public ResponseEntity<List<ClassOpened>> getClassOpenedByCondition(@Valid @RequestBody FilterClassOpenedDto requestDto) {
         try {
-            List<Schedule> result = service.searchClassOpened(requestDto);
+            List<ClassOpened> result = service.searchClassOpened(requestDto);
             if (result.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
@@ -109,6 +110,8 @@ public class ClassOpenedController {
         try {
             service.automationMakeScheduleForCTTT(autoMakeScheduleDto);
             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NotClassroomSuitableException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

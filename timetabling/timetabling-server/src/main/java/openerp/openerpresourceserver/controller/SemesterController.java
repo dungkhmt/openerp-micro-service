@@ -1,6 +1,8 @@
 package openerp.openerpresourceserver.controller;
 
 import jakarta.validation.Valid;
+import openerp.openerpresourceserver.exception.SemesterNotFoundException;
+import openerp.openerpresourceserver.exception.SemesterUsedException;
 import openerp.openerpresourceserver.model.dto.request.SemesterDto;
 import openerp.openerpresourceserver.model.entity.Semester;
 import openerp.openerpresourceserver.service.SemesterService;
@@ -32,7 +34,7 @@ public class SemesterController {
         }
     }
 
-    @GetMapping("/update")
+    @PostMapping("/update")
     public ResponseEntity<Void> updateSemester(@Valid @RequestBody SemesterDto requestDto) {
         try {
             service.updateSemester(requestDto);
@@ -43,20 +45,26 @@ public class SemesterController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Semester> createNewSemester(@Valid @RequestBody SemesterDto semesterDto) {
+    public ResponseEntity<String> createNewSemester(@Valid @RequestBody SemesterDto semesterDto) {
         try {
             Semester semester = service.create(semesterDto);
-            return new ResponseEntity<>(semester, HttpStatus.OK);
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (SemesterUsedException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteById(@RequestParam Long id) {
+    public ResponseEntity<String> deleteById(@RequestParam Long id) {
         try {
             service.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (SemesterNotFoundException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
+        } catch (SemesterUsedException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

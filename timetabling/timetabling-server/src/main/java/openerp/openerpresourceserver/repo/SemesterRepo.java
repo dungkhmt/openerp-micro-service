@@ -13,4 +13,6 @@ public interface SemesterRepo extends JpaRepository<Semester, Long> {
     List<String> getSemester();
 
     void deleteById(Long id);
+
+    List<Semester> getSemestersBySemester(String semester);
 }

@@ -3,10 +3,7 @@ package openerp.openerpresourceserver.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import openerp.openerpresourceserver.common.CommonUtil;
-import openerp.openerpresourceserver.exception.ConflictScheduleException;
-import openerp.openerpresourceserver.exception.NotClassroomSuitableException;
-import openerp.openerpresourceserver.exception.UnableSeparateClassException;
-import openerp.openerpresourceserver.exception.UnableStartPeriodException;
+import openerp.openerpresourceserver.exception.*;
 import openerp.openerpresourceserver.model.dto.request.AutoMakeScheduleDto;
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.model.dto.request.MakeScheduleDto;
@@ -59,6 +56,9 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         Sort sort = Sort.by(Sort.Direction.ASC, "id");
         List<ClassOpened> classOpenedList = classOpenedRepo.getAllByIdIn(requestDto.getIds(), sort);
         String groupName = requestDto.getGroupName();
+        if (groupName == null) {
+            throw new NotFoundGroupException("Không tìm được nhóm!");
+        }
         classOpenedList.forEach(el -> {
             el.setGroupName(groupName);
         });
@@ -73,7 +73,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
     }
 
     @Override
-    public List<Schedule> searchClassOpened(FilterClassOpenedDto searchDto) {
+    public List<ClassOpened> searchClassOpened(FilterClassOpenedDto searchDto) {
         StringBuilder jpql = this.getStringBuilder(searchDto);
 
         Query query = entityManager.createQuery(jpql.toString());

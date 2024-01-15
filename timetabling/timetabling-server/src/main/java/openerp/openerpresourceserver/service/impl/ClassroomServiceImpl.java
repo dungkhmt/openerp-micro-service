@@ -1,9 +1,15 @@
 package openerp.openerpresourceserver.service.impl;
 
 import openerp.openerpresourceserver.exception.ClassroomNotFoundException;
+import openerp.openerpresourceserver.exception.ClassroomUsedException;
+import openerp.openerpresourceserver.exception.SemesterNotFoundException;
+import openerp.openerpresourceserver.exception.SemesterUsedException;
 import openerp.openerpresourceserver.mapper.ClassroomMapper;
 import openerp.openerpresourceserver.model.dto.request.ClassroomDto;
+import openerp.openerpresourceserver.model.entity.ClassOpened;
 import openerp.openerpresourceserver.model.entity.Classroom;
+import openerp.openerpresourceserver.model.entity.Semester;
+import openerp.openerpresourceserver.repo.ClassOpenedRepo;
 import openerp.openerpresourceserver.repo.ClassroomRepo;
 import openerp.openerpresourceserver.service.ClassroomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +22,9 @@ public class ClassroomServiceImpl implements ClassroomService {
 
     @Autowired
     private ClassroomRepo classroomRepo;
+
+    @Autowired
+    private ClassOpenedRepo classOpenedRepo;
 
     @Autowired
     private ClassroomMapper classroomMapper;
@@ -47,6 +56,10 @@ public class ClassroomServiceImpl implements ClassroomService {
 
     @Override
     public Classroom create(ClassroomDto classroomDto) {
+        List<Classroom> classroomList = classroomRepo.getClassroomByClassroom(classroomDto.getClassroom());
+        if (!classroomList.isEmpty()) {
+            throw new ClassroomUsedException("Lớp học đã tồn tại!!");
+        }
         Classroom classroom = classroomMapper.mapDtoToEntity(classroomDto);
         classroomRepo.save(classroom);
         return classroom;
@@ -54,6 +67,14 @@ public class ClassroomServiceImpl implements ClassroomService {
 
     @Override
     public void deleteById(Long id) {
+        Classroom classroom = classroomRepo.findById(id).orElse(null);
+        if (classroom == null) {
+            throw new ClassroomNotFoundException("Không tồn tại phòng học với ID: " + id);
+        }
+        List<ClassOpened> classOpenedList = classOpenedRepo.getAllByClassroom(classroom.getClassroom(), null);
+        if (!classOpenedList.isEmpty()) {
+            throw new ClassroomUsedException("Phòng học đang được sử dụng. Không thể xóa!");
+        }
         classroomRepo.deleteById(id);
     }
 
