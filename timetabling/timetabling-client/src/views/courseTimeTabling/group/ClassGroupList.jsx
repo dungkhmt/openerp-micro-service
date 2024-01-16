@@ -2,14 +2,18 @@ import * as React from 'react';
 import { useEffect, useState } from "react";
 import { request } from "../../../api";
 import { DataGrid } from '@mui/x-data-grid';
-import { Box, Typography, Button } from '@mui/material'
+import { toast } from 'react-toastify';
+import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
 import CreateNewGroupScreen from "./CreateNewGroupScreen";
 
 export default function ClassGroupList() {
     const [groups, setGroups] = useState([]);
+    const [selectedGroup, setSelectedGroup] = useState(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [dataChanged, setDataChanged] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
+    const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+    const [deleteGroupId, setDeleteGroupId] = useState(null);
 
     const columns = [
         {
@@ -60,39 +64,51 @@ export default function ClassGroupList() {
     }, [refreshKey])
 
     const handleUpdateData = ({ classrooms, semester }) => {
-        // Implement your logic to update data using an API
-        console.log("Update data", { classrooms, semester });
-
-        // Set dataChanged to true to trigger a re-render
         setDataChanged(true);
-
-        // Tăng giá trị của refreshKey để làm mới useEffect và fetch dữ liệu mới
         setRefreshKey((prevKey) => prevKey + 1);
     };
 
     const handleRefreshData = () => {
         setDataChanged(true);
-        // Tăng giá trị của refreshKey để làm mới useEffect và fetch dữ liệu mới
         setRefreshKey((prevKey) => prevKey + 1);
     };
 
-    const handleOpenDialog = () => {
+    const handleCreate = () => {
+        setSelectedGroup(null);
         setDialogOpen(true);
+    };
+
+    const handleUpdate = (selectedRow) => {
+        setSelectedGroup(selectedRow);
+        setDialogOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (deleteGroupId) {
+            request("delete", `/group/delete?id=${deleteGroupId}`, (res) => {
+                handleRefreshData();
+            },
+                (error) => {
+                    toast.error(error.response.data);
+                }).then();
+        }
+
+        setConfirmDeleteOpen(false);
+        setDeleteGroupId(null);
+    };
+
+    const handleCancelDelete = () => {
+        setConfirmDeleteOpen(false);
+        setDeleteGroupId(null);
+    };
+
+    const handleDelete = (semesterId) => {
+        setDeleteGroupId(semesterId);
+        setConfirmDeleteOpen(true);
     };
 
     const handleCloseDialog = () => {
         setDialogOpen(false);
-    };
-
-    const handleUpdate = (selectedRow) => {
-        // Implement your logic for handling the update action
-        console.log("Update semester", selectedRow);
-    };
-
-    const handleDelete = (semesterId) => {
-        // Implement your logic for handling the delete action
-        console.log("Delete semester with ID", semesterId);
-        // You may want to show a confirmation dialog before deleting
     };
 
     function DataGridToolbar() {
@@ -104,7 +120,7 @@ export default function ClassGroupList() {
                         variant="outlined"
                         color="primary"
                         style={{ marginRight: "8px" }}
-                        onClick={handleOpenDialog}
+                        onClick={handleCreate}
                     >
                         Thêm mới
                     </Button>
@@ -116,6 +132,25 @@ export default function ClassGroupList() {
                     handleUpdate={handleUpdateData}
                     handleRefreshData={handleRefreshData}
                 />
+
+                <Dialog
+                    open={confirmDeleteOpen}
+                    onClose={handleCancelDelete}
+                    aria-labelledby="confirm-delete-dialog"
+                >
+                    <DialogTitle id="confirm-delete-dialog-title">Xác nhận xóa nhóm</DialogTitle>
+                    <DialogContent>
+                        <Typography>Bạn có chắc chắn muốn xóa nhóm này?</Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCancelDelete} color="secondary">
+                            Hủy
+                        </Button>
+                        <Button onClick={handleConfirmDelete} color="primary">
+                            Xóa
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </div>
 
         );
@@ -144,6 +179,17 @@ export default function ClassGroupList() {
                 rows={groups}
                 columns={columns}
                 pageSize={10}
+            />
+
+            <CreateNewGroupScreen
+                open={isDialogOpen}
+                handleClose={() => {
+                    setDialogOpen(false);
+                    setSelectedGroup(null);
+                }}
+                handleUpdate={handleUpdateData}
+                handleRefreshData={handleRefreshData}
+                selectedGroup={selectedGroup}
             />
         </div>
     );

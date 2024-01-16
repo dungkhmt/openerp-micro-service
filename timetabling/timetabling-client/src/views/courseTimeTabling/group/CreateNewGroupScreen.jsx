@@ -1,37 +1,54 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Autocomplete } from '@mui/material';
 import { request } from "../../../api";
 
-export default function CreateNewSemester({ open, handleClose, handleUpdate, handleRefreshData }) {
+export default function CreateNewSemester({ open, handleClose, handleUpdate, handleRefreshData, selectedGroup }) {
   const [newGroup, setNewGroup] = useState('');
   const [buildings, setBuildings] = useState('');
   const [newPriorityBuilding, setNewPriorityBuilding] = useState('');
+  const [id, setId] = useState('');
+  const [isUpdate, setIsUpdate] = useState(false);
 
   useEffect(() => {
     request("get", "/classroom/get-all-building", (res) => {
       setBuildings(res.data);
     });
-  }, [])
+
+    if (selectedGroup) {
+      setNewGroup(selectedGroup.groupName);
+      setNewPriorityBuilding(selectedGroup.priorityBuilding);
+      setId(selectedGroup.id);
+      setIsUpdate(true);
+    } else {
+      setNewGroup('');
+      setNewPriorityBuilding('');
+      setId('');
+      setIsUpdate(false);
+    }
+  }, [selectedGroup]);
 
   const handleCreate = () => {
     const requestData = {
+      id: id,
       groupName: newGroup,
       priorityBuilding: newPriorityBuilding,
     };
-    request("post", "/group/create", (res) => {
-      // Call your handleUpdate function if needed
+
+    const apiEndpoint = isUpdate ? `/group/update` : "/group/create";
+
+    request("post", apiEndpoint, (res) => {
       handleUpdate(res.data);
-      // Call handleRefreshData to refresh the data 
       handleRefreshData();
-      //close dialog
       handleClose();
     },
-      {},
+      (error) => {
+        toast.error(error.response.data);
+      },
       requestData
     ).then();
 
-    // Close the dialog
-    handleClose();
+    // handleClose();
   };
 
   const handleBuildingpriorityChange = (event, newValue) => {
@@ -40,7 +57,9 @@ export default function CreateNewSemester({ open, handleClose, handleUpdate, han
 
   return (
     <Dialog open={open} onClose={handleClose} aria-labelledby="create-new-semester-dialog">
-      <DialogTitle id="create-new-group-dialog-title">Thêm nhóm mới</DialogTitle>
+      <DialogTitle id="create-new-group-dialog-title">
+        {isUpdate ? 'Chỉnh sửa thông tin' : 'Thêm nhóm mới'}
+      </DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
@@ -67,9 +86,9 @@ export default function CreateNewSemester({ open, handleClose, handleUpdate, han
         <Button
           onClick={handleCreate}
           color="primary"
-          disabled={!newGroup} // Disable the button if the input is empty
+          disabled={!newGroup || !newPriorityBuilding}
         >
-          Tạo mới
+          {isUpdate ? 'Cập nhật' : 'Tạo mới'}
         </Button>
       </DialogActions>
     </Dialog>

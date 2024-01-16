@@ -87,7 +87,6 @@ export default function SemesterScreen() {
     const handleConfirmDelete = () => {
         if (deleteSemesterId) {
             request("delete", `/semester/delete?id=${deleteSemesterId}`, (res) => {
-                console.log("Semester deleted successfully");
                 handleRefreshData();
             },
                 (error) => {

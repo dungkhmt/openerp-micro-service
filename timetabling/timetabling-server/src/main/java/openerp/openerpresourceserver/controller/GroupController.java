@@ -1,6 +1,8 @@
 package openerp.openerpresourceserver.controller;
 
 import jakarta.validation.Valid;
+import openerp.openerpresourceserver.exception.GroupNotFoundException;
+import openerp.openerpresourceserver.exception.GroupUsedException;
 import openerp.openerpresourceserver.model.dto.request.GroupDto;
 import openerp.openerpresourceserver.model.entity.Group;
 import openerp.openerpresourceserver.service.GroupService;
@@ -19,10 +21,12 @@ public class GroupController {
     private GroupService groupService;
 
     @PostMapping("/create")
-    public ResponseEntity<Group> createNewGroup(@Valid @RequestBody GroupDto groupDto) {
+    public ResponseEntity<String> createNewGroup(@Valid @RequestBody GroupDto groupDto) {
         try {
-            Group group = groupService.create(groupDto);
-            return new ResponseEntity<>(group, HttpStatus.OK);
+            groupService.create(groupDto);
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (GroupUsedException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -41,21 +45,27 @@ public class GroupController {
         }
     }
 
-    @GetMapping("/update")
-    public ResponseEntity<Void> updateGroup(@Valid @RequestBody GroupDto requestDto) {
+    @PostMapping("/update")
+    public ResponseEntity<String> updateGroup(@Valid @RequestBody GroupDto requestDto) {
         try {
             groupService.updateGroup(requestDto);
             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (GroupNotFoundException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteById(@RequestParam Long id) {
+    public ResponseEntity<String> deleteById(@RequestParam Long id) {
         try {
             groupService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (GroupNotFoundException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
+        } catch (GroupUsedException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

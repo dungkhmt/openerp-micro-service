@@ -2,16 +2,20 @@ import * as React from 'react';
 import { useEffect, useState } from "react";
 import { request } from "../../../api";
 import { DataGrid } from '@mui/x-data-grid';
-import { Box, Typography, Button } from '@mui/material'
+import { toast } from 'react-toastify';
+import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
 import CreateNewClassroomScreen from "./CreateNewClassroomScreen";
 
 export default function TimePerformanceScreen() {
     const [classrooms, setClassrooms] = useState([]);
+    const [selectedClassroom, setSelectedClassroom] = useState(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [dataChanged, setDataChanged] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
     const [openLoading, setOpenLoading] = React.useState(false);
     const [uploading, setUploading] = useState(false);
+    const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+    const [deleteClassroomId, setDeleteClassroomId] = useState(null);
 
     const columns = [
         {
@@ -82,20 +86,42 @@ export default function TimePerformanceScreen() {
         setRefreshKey((prevKey) => prevKey + 1);
     };
 
-    const handleOpenDialog = () => {
+    const handleCreate = () => {
+        setSelectedClassroom(null);
         setDialogOpen(true);
+    };
+
+    const handleUpdate = (selectedRow) => {
+        setSelectedClassroom(selectedRow);
+        setDialogOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (deleteClassroomId) {
+            request("delete", `/classroom/delete?id=${deleteClassroomId}`, (res) => {
+                handleRefreshData();
+            },
+                (error) => {
+                    toast.error(error.response.data);
+                }).then();
+        }
+
+        setConfirmDeleteOpen(false);
+        setDeleteClassroomId(null);
+    };
+
+    const handleCancelDelete = () => {
+        setConfirmDeleteOpen(false);
+        setDeleteClassroomId(null);
+    };
+
+    const handleDelete = (semesterId) => {
+        setDeleteClassroomId(semesterId);
+        setConfirmDeleteOpen(true);
     };
 
     const handleCloseDialog = () => {
         setDialogOpen(false);
-    };
-
-    const handleUpdate = (selectedRow) => {
-        console.log("Update semester", selectedRow);
-    };
-
-    const handleDelete = (semesterId) => {
-        console.log("Delete semester with ID", semesterId);
     };
 
     const handleImportExcel = () => {
@@ -153,7 +179,7 @@ export default function TimePerformanceScreen() {
                         variant="outlined"
                         color="primary"
                         style={{ marginRight: "8px" }}
-                        onClick={handleOpenDialog}
+                        onClick={handleCreate}
                     >
                         Thêm mới
                     </Button>
@@ -165,6 +191,25 @@ export default function TimePerformanceScreen() {
                     handleUpdate={handleUpdateData}
                     handleRefreshData={handleRefreshData}
                 />
+
+                <Dialog
+                    open={confirmDeleteOpen}
+                    onClose={handleCancelDelete}
+                    aria-labelledby="confirm-delete-dialog"
+                >
+                    <DialogTitle id="confirm-delete-dialog-title">Xác nhận xóa phòng học</DialogTitle>
+                    <DialogContent>
+                        <Typography>Bạn có chắc chắn muốn xóa phòng học này?</Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCancelDelete} color="secondary">
+                            Hủy
+                        </Button>
+                        <Button onClick={handleConfirmDelete} color="primary">
+                            Xóa
+                        </Button>
+                    </DialogActions>
+                </Dialog>
 
                 <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
                     <Button
@@ -204,6 +249,17 @@ export default function TimePerformanceScreen() {
                 rows={classrooms}
                 columns={columns}
                 pageSize={10}
+            />
+
+<CreateNewClassroomScreen
+                open={isDialogOpen}
+                handleClose={() => {
+                    setDialogOpen(false);
+                    setSelectedClassroom(null);
+                }}
+                handleUpdate={handleUpdateData}
+                handleRefreshData={handleRefreshData}
+                selectedClassroom={selectedClassroom}
             />
         </div>
     );

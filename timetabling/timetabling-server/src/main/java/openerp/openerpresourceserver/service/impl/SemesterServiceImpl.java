@@ -37,7 +37,7 @@ public class SemesterServiceImpl implements SemesterService {
         Long id = requestDto.getId();
         Semester semester = semesterRepo.findById(id).orElse(null);
         if (semester == null) {
-            throw new SemesterNotFoundException("Not found semester with ID: " + id);
+            throw new SemesterNotFoundException("Không tìm thấy kỳ học với ID: " + id);
         }
         semester.setSemester(requestDto.getSemester());
         semester.setDescription(requestDto.getDescription());

@@ -11,7 +11,6 @@ import openerp.openerpresourceserver.model.dto.request.UpdateClassOpenedDto;
 import openerp.openerpresourceserver.model.entity.ClassOpened;
 import openerp.openerpresourceserver.model.entity.Classroom;
 import openerp.openerpresourceserver.model.entity.Group;
-import openerp.openerpresourceserver.model.entity.Schedule;
 import openerp.openerpresourceserver.repo.ClassOpenedRepo;
 import openerp.openerpresourceserver.repo.ClassroomRepo;
 import openerp.openerpresourceserver.repo.GroupRepo;
@@ -57,7 +56,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         List<ClassOpened> classOpenedList = classOpenedRepo.getAllByIdIn(requestDto.getIds(), sort);
         String groupName = requestDto.getGroupName();
         if (groupName == null) {
-            throw new NotFoundGroupException("Không tìm được nhóm!");
+            throw new GroupNotFoundException("Không tìm được nhóm!");
         }
         classOpenedList.forEach(el -> {
             el.setGroupName(groupName);

@@ -1,13 +1,12 @@
 package openerp.openerpresourceserver.service.impl;
 
-import openerp.openerpresourceserver.exception.EntityAlreadyExistsException;
 import openerp.openerpresourceserver.exception.GroupNotFoundException;
-import openerp.openerpresourceserver.exception.SemesterNotFoundException;
+import openerp.openerpresourceserver.exception.GroupUsedException;
 import openerp.openerpresourceserver.mapper.GroupMapper;
 import openerp.openerpresourceserver.model.dto.request.GroupDto;
-import openerp.openerpresourceserver.model.dto.request.SemesterDto;
+import openerp.openerpresourceserver.model.entity.ClassOpened;
 import openerp.openerpresourceserver.model.entity.Group;
-import openerp.openerpresourceserver.model.entity.Semester;
+import openerp.openerpresourceserver.repo.ClassOpenedRepo;
 import openerp.openerpresourceserver.repo.GroupRepo;
 import openerp.openerpresourceserver.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,9 @@ public class GroupServiceImpl implements GroupService {
     private GroupRepo groupRepo;
 
     @Autowired
+    private ClassOpenedRepo classOpenedRepo;
+
+    @Autowired
     private GroupMapper groupMapper;
 
     @Override
@@ -33,7 +35,7 @@ public class GroupServiceImpl implements GroupService {
     public Group create(GroupDto groupDto) {
         List<Group> groupExist = groupRepo.getAllByGroupName(groupDto.getGroupName());
         if (!groupExist.isEmpty()) {
-            throw new EntityAlreadyExistsException("Group existed: " + groupDto.getGroupName());
+            throw new GroupUsedException("Nhóm đã tồn tại: " + groupDto.getGroupName());
         }
         Group group = groupMapper.mapDtoToEntity(groupDto);
         groupRepo.save(group);
@@ -45,7 +47,7 @@ public class GroupServiceImpl implements GroupService {
         Long id = requestDto.getId();
         Group group = groupRepo.findById(id).orElse(null);
         if (group == null) {
-            throw new GroupNotFoundException("Not found semester with ID: " + id);
+            throw new GroupNotFoundException("Không tồn tại nhóm với ID: " + id);
         }
         group.setGroupName(requestDto.getGroupName());
         group.setPriorityBuilding(requestDto.getPriorityBuilding());
@@ -54,6 +56,14 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void deleteById(Long id) {
+        Group group = groupRepo.findById(id).orElse(null);
+        if (group == null) {
+            throw new GroupNotFoundException("Không tồn tại nhóm học với ID: " + id);
+        }
+        List<ClassOpened> classOpenedList = classOpenedRepo.getAllByGroupName(group.getGroupName(), null);
+        if (!classOpenedList.isEmpty()) {
+            throw new GroupUsedException("Nhóm đang được sử dụng. Không thể xóa!");
+        }
         groupRepo.deleteById(id);
     }
 }

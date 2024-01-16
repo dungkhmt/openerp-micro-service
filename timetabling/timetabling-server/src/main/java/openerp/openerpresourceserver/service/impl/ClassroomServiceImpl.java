@@ -58,7 +58,7 @@ public class ClassroomServiceImpl implements ClassroomService {
     public Classroom create(ClassroomDto classroomDto) {
         List<Classroom> classroomList = classroomRepo.getClassroomByClassroom(classroomDto.getClassroom());
         if (!classroomList.isEmpty()) {
-            throw new ClassroomUsedException("Lớp học đã tồn tại!!");
+            throw new ClassroomUsedException("Phòng học đã tồn tại!!");
         }
         Classroom classroom = classroomMapper.mapDtoToEntity(classroomDto);
         classroomRepo.save(classroom);

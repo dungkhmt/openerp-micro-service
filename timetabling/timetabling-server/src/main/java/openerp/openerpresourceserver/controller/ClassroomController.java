@@ -3,12 +3,8 @@ package openerp.openerpresourceserver.controller;
 import jakarta.validation.Valid;
 import openerp.openerpresourceserver.exception.ClassroomNotFoundException;
 import openerp.openerpresourceserver.exception.ClassroomUsedException;
-import openerp.openerpresourceserver.exception.SemesterNotFoundException;
-import openerp.openerpresourceserver.exception.SemesterUsedException;
 import openerp.openerpresourceserver.model.dto.request.ClassroomDto;
-import openerp.openerpresourceserver.model.dto.request.SemesterDto;
 import openerp.openerpresourceserver.model.entity.Classroom;
-import openerp.openerpresourceserver.model.entity.Semester;
 import openerp.openerpresourceserver.service.ClassroomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,7 +47,7 @@ public class ClassroomController {
         }
     }
 
-    @GetMapping("/update")
+    @PostMapping("/update")
     public ResponseEntity<String> updateClassroom(@Valid @RequestBody ClassroomDto requestDto) {
         try {
             service.updateClassroom(requestDto);
@@ -84,7 +80,7 @@ public class ClassroomController {
             return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
         } catch (ClassroomUsedException e) {
             return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
-        }catch (Exception e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

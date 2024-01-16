@@ -49,7 +49,7 @@ public class ClassOpenedController {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             return new ResponseEntity<>(null, HttpStatus.OK);
-        } catch (NotFoundGroupException e) {
+        } catch (GroupNotFoundException e) {
             return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

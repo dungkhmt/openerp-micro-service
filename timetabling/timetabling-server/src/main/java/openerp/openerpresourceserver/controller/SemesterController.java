@@ -35,10 +35,12 @@ public class SemesterController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Void> updateSemester(@Valid @RequestBody SemesterDto requestDto) {
+    public ResponseEntity<String> updateSemester(@Valid @RequestBody SemesterDto requestDto) {
         try {
             service.updateSemester(requestDto);
             return new ResponseEntity<>(HttpStatus.OK);
+        }  catch (SemesterNotFoundException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
