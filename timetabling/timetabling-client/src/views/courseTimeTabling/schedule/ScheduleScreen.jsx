@@ -111,9 +111,27 @@ export default function ScheduleScreen() {
     const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
     useEffect(() => {
-        request("get", "/class-opened/get-all", (res) => {
+        var semesterName = null
+        var groupName = null
+
+        if (selectedSemester != null) {
+            semesterName = selectedSemester.semester;
+        }
+        if (selectedGroup != null) {
+            groupName = selectedGroup.groupName
+        }
+
+        const requestSearch = {
+            semester: semesterName,
+            groupName: groupName
+        };
+
+        request("post", "/class-opened/search", (res) => {
             setClassOpeneds(res.data);
-        }).then();
+        },
+            {},
+            requestSearch
+        ).then();
 
         request("get", "/semester/get-all", (res) => {
             setSemesters(res.data);
