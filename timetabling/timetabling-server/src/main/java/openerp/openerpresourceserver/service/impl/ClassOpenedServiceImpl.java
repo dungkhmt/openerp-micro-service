@@ -111,7 +111,9 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
 
     @Override
     public void deleteByIds(List<Long> ids) {
-        classOpenedRepo.deleteByIds(ids);
+        ids.forEach(el -> {
+            classOpenedRepo.deleteById(el);
+        });
     }
 
     @Override

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from "react";
 import { request } from "../../../api";
 import { DataGrid } from '@mui/x-data-grid';
-import { Box, Typography, Button, IconButton } from '@mui/material'
+import { Box, Typography, Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
 import CreateNewGroupScreen from "./CreateNewGroupScreen";
 import GroupListScreen from './GroupListScreen';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -108,6 +108,7 @@ export default function ScheduleScreen() {
     const [selectedSemester, setSelectedSemester] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [rowSelectionModel, setRowSelectionModel] = React.useState([]);
+    const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
     useEffect(() => {
         request("get", "/class-opened/get-all", (res) => {
@@ -117,7 +118,7 @@ export default function ScheduleScreen() {
         request("get", "/semester/get-all", (res) => {
             setSemesters(res.data);
         });
-        
+
         request("get", "/group/get-all", (res) => {
             setGroups(res.data);
         });
@@ -158,7 +159,6 @@ export default function ScheduleScreen() {
         };
 
         request("post", url, (res) => {
-            //set data filter
             setClassOpeneds(res.data);
         },
             {},
@@ -170,7 +170,6 @@ export default function ScheduleScreen() {
 
     const handleRefreshData = () => {
         setDataChanged(true);
-        // Tăng giá trị của refreshKey để làm mới useEffect và fetch dữ liệu mới
         setRefreshKey((prevKey) => prevKey + 1);
     };
 
@@ -181,6 +180,22 @@ export default function ScheduleScreen() {
     const handleCloseDialog = () => {
         setDialogOpen(false);
     };
+
+    const handleDeleteClick = () => {
+        setDeleteDialogOpen(true);
+    };
+
+    const handleDeleteConfirmation = () => {
+        setDeleteDialogOpen(false);
+        request("delete", `/class-opened/delete-ids?ids=${rowSelectionModel}`, (res) => {
+            handleRefreshData();
+        }, {});
+    };
+
+    const handleDeleteCancel = () => {
+        setDeleteDialogOpen(false);
+    };
+
 
     function DataGridToolbar() {
 
@@ -219,6 +234,14 @@ export default function ScheduleScreen() {
                     <Button
                         variant="outlined"
                         color="secondary"
+                        onClick={handleDeleteClick}
+                        disabled={isButtonDisabled}
+                    >
+                        Xóa
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="secondary"
                         onClick={handleOpenGroupList}
                         disabled={isButtonDisabled}
                     >
@@ -245,7 +268,26 @@ export default function ScheduleScreen() {
                         existingData={rowSelectionModel}
                         handleRefreshData={handleRefreshData}
                     />
+
+
+                    {/* Delete Confirmation Dialog */}
+                    <Dialog open={isDeleteDialogOpen} onClose={handleDeleteCancel}>
+                        <DialogTitle>Xác nhận xóa</DialogTitle>
+                        <DialogContent>
+                            <Typography>Bạn có chắc chắn muốn xóa các lớp học đã chọn?</Typography>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleDeleteCancel} color="primary">
+                                Hủy
+                            </Button>
+                            <Button onClick={handleDeleteConfirmation} color="secondary">
+                                Xóa
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
                 </div>
+
+
             </div>
         );
     }
