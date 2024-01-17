@@ -497,6 +497,30 @@ export default function ScheduleScreen() {
         setDialogOpen(false);
     };
 
+    const handleExportExcel = () => {
+        const url = "/excel/export-schedules";
+        const requestData = {
+            semester: selectedSemester ? selectedSemester.semester : null,
+            groupName: selectedGroup ? selectedGroup.groupName : null
+        };
+
+        request("post", url, (res) => {
+            const blob = new Blob([res.data], { type: res.headers['content-type'] });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = 'Schedules.xlsx';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            },
+            (error) => {
+                console.error('Error exporting Excel:', error);
+            },
+            requestData,
+            {responseType: 'arraybuffer'}).then();
+    };
+
     function DataGridToolbar() {
         return (
             <div>
@@ -529,6 +553,14 @@ export default function ScheduleScreen() {
                 <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
                     <Button
                         variant="outlined"
+                        color="primary"
+                        onClick={handleExportExcel}
+                    >
+                        Xuất Excel
+                    </Button>
+
+                    <Button
+                        variant="outlined"
                         color="secondary"
                         style={{ marginRight: "8px" }}
                         onClick={handleOpenDialog}
@@ -536,7 +568,6 @@ export default function ScheduleScreen() {
                         Sắp xếp tự động
                     </Button>
                 </div>
-
                 <FormAutoMakeSchedule
                     open={isDialogOpen}
                     handleClose={handleCloseDialog}

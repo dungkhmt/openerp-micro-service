@@ -83,13 +83,13 @@ public class ExcelController {
         }
     }
 
-    @GetMapping(value = "/export-schedules")
+    @PostMapping(value = "/export-schedules")
     public ResponseEntity<Resource> getFileSchedule(@Valid @RequestBody FilterClassOpenedDto requestDto) {
         String filename = "Schedules.xlsx";
         InputStreamResource file = new InputStreamResource(fileService.loadExport(requestDto));
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-                .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(file);
     }
 
