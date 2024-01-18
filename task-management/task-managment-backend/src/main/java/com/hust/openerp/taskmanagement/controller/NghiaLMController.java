@@ -1,20 +1,69 @@
 package com.hust.openerp.taskmanagement.controller;
 
-import com.hust.openerp.taskmanagement.dto.dao.*;
-import com.hust.openerp.taskmanagement.dto.form.*;
-import com.hust.openerp.taskmanagement.entity.*;
-import com.hust.openerp.taskmanagement.service.*;
-import lombok.AllArgsConstructor;
+import java.security.Principal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.hust.openerp.taskmanagement.dto.dao.AssignedTaskPagination;
+import com.hust.openerp.taskmanagement.dto.dao.CommentDao;
+import com.hust.openerp.taskmanagement.dto.dao.HistoryDao;
+import com.hust.openerp.taskmanagement.dto.dao.ProjectDao;
+import com.hust.openerp.taskmanagement.dto.dao.ProjectPagination;
+import com.hust.openerp.taskmanagement.dto.dao.TaskDao;
+import com.hust.openerp.taskmanagement.dto.form.BoardFilterInputForm;
+import com.hust.openerp.taskmanagement.dto.form.CategoryForm;
+import com.hust.openerp.taskmanagement.dto.form.CommentForm;
+import com.hust.openerp.taskmanagement.dto.form.PriorityForm;
+import com.hust.openerp.taskmanagement.dto.form.ProjectForm;
+import com.hust.openerp.taskmanagement.dto.form.ProjectMemberForm;
+import com.hust.openerp.taskmanagement.dto.form.SkillForm;
+import com.hust.openerp.taskmanagement.dto.form.SuggestForm;
+import com.hust.openerp.taskmanagement.dto.form.TaskForm;
+import com.hust.openerp.taskmanagement.dto.form.TaskStatusForm;
+import com.hust.openerp.taskmanagement.entity.Comment;
+import com.hust.openerp.taskmanagement.entity.Project;
+import com.hust.openerp.taskmanagement.entity.ProjectMember;
+import com.hust.openerp.taskmanagement.entity.Skill;
+import com.hust.openerp.taskmanagement.entity.Task;
+import com.hust.openerp.taskmanagement.entity.TaskAssignment;
+import com.hust.openerp.taskmanagement.entity.TaskCategory;
+import com.hust.openerp.taskmanagement.entity.TaskExecution;
+import com.hust.openerp.taskmanagement.entity.TaskPriority;
+import com.hust.openerp.taskmanagement.entity.User;
+import com.hust.openerp.taskmanagement.service.MailService;
+import com.hust.openerp.taskmanagement.service.NotificationService;
+import com.hust.openerp.taskmanagement.service.ProjectMemberService;
+import com.hust.openerp.taskmanagement.service.ProjectService;
+import com.hust.openerp.taskmanagement.service.SkillService;
+import com.hust.openerp.taskmanagement.service.TaskAssignableService;
+import com.hust.openerp.taskmanagement.service.TaskCategoryService;
+import com.hust.openerp.taskmanagement.service.TaskExecutionService;
+import com.hust.openerp.taskmanagement.service.TaskPriorityService;
+import com.hust.openerp.taskmanagement.service.TaskService;
+import com.hust.openerp.taskmanagement.service.TaskStatusService;
+import com.hust.openerp.taskmanagement.service.UserService;
+
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 
 @RestController
 @CrossOrigin
@@ -40,6 +89,10 @@ public class NghiaLMController {
     private final TaskExecutionService taskExecutionService;
 
     private final SkillService skillService;
+
+    private final NotificationService notificationsService;
+
+    private final MailService mailService;
 
     @GetMapping
     public void syncUser(JwtAuthenticationToken token) {
@@ -132,11 +185,17 @@ public class NghiaLMController {
     }
 
     @PostMapping("/projects/{projectId}/tasks")
+    @Transactional
     public ResponseEntity<Object> createNewTask(
             Principal principal,
             @RequestBody TaskForm taskForm,
             @PathVariable("projectId") UUID projectId) throws ParseException {
         String userId = principal.getName();
+        User assignee = userService.findById(taskForm.getAssigneeId());
+
+        if (assignee == null) {
+            return ResponseEntity.badRequest().body("Không tìm thấy người được giao nhiệm vụ");
+        }
 
         Task task = new Task();
         task.setName(taskForm.getName());
@@ -152,7 +211,7 @@ public class NghiaLMController {
 
         TaskAssignment taskAssignment = new TaskAssignment();
         taskAssignment.setTask(task);
-        taskAssignment.setAssigneeId(userId);
+        taskAssignment.setAssigneeId(taskForm.getAssigneeId());
         taskAssignableService.create(taskAssignment);
 
         TaskExecution taskExecution = new TaskExecution();
@@ -172,6 +231,31 @@ public class NghiaLMController {
         for (String skillId : taskForm.getSkillIds()) {
             taskService.addTaskSkill(taskRes.getId(), skillId);
         }
+
+        // push notification and send mail
+        // TODO: refactor this into a service
+
+        try {
+            notificationsService.sendNotification(
+                    "admin",
+                    assignee.getId(),
+                    "Bạn được giao nhiệm vụ mới: " + taskRes.getName(),
+                    "/project/" + projectId + "/tasks");
+
+            String assigneeMail = assignee.getEmail();
+            // FIXME: this is a hack, we should use a template engine
+            mailService.sendSimpleMail(
+                    new String[] { assigneeMail },
+                    "OPEN ERP - Thông báo bạn đã được giao nhiệm vụ mới",
+                    "Bạn đã được giao nhiệm vụ mới: " +
+                            taskRes.getName() +
+                            ". Đây là email tự động, bạn không trả lời lại email này!",
+                    "OpenERP");
+        } catch (Exception e) {
+            e.printStackTrace();
+            // TODO: handle async exception
+        }
+
         return ResponseEntity.ok(taskRes);
     }
 

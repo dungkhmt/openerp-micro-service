@@ -222,16 +222,13 @@ function NotificationButton() {
     function setupEventSource() {
       fetchNotification();
 
-      es = new EventSourcePolyfill(
-        `${config.url.NOTIFICATION_SERVER_URL}/notification/subscription`,
-        {
-          headers: {
-            Authorization: bearerAuth(keycloak.token),
-            // Count: count++,
-          },
-          heartbeatTimeout: 120000,
-        }
-      );
+      es = new EventSourcePolyfill(`/notification/subscription`, {
+        headers: {
+          Authorization: bearerAuth(keycloak.token),
+          // Count: count++,
+        },
+        heartbeatTimeout: 120000,
+      });
 
       // In fact, this callback function is usually not fired as soon as the connection is opened,
       // but fired when the first event is received. Don't know the reason but this doesn't matter

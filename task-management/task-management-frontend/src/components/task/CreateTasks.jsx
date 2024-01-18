@@ -133,7 +133,7 @@ export default function CreateTask() {
     let projectIdForm = projectIdUrl ? projectIdUrl : projectId;
     const dataForm = {
       ...data,
-      partyId: person.partyId,
+      assigneeId: person.id,
       categoryId,
       dueDate,
       priorityId,
@@ -192,7 +192,12 @@ export default function CreateTask() {
           setTypeAlert("error");
           setMessage("Upload tệp bị lỗi");
         },
-        formData
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
     } else {
       onHandleData(data);

@@ -60,25 +60,30 @@ public class ProjectMemberServiceImplement implements ProjectMemberService {
                 .userId(memberId).roleId("member").build();
         ProjectMember projectMemberRes = projectMemberRepository.save(projectMember);
 
-        notificationsService.sendNotification(
-                "admin",
-                memberId,
-                "Bạn được thêm vào dự án " + project.getName(),
-                "/taskmanagement/project/" + projectId + "/tasks");
+        try {
+            notificationsService.sendNotification(
+                    "admin",
+                    memberId,
+                    "Bạn được thêm vào dự án " + project.getName(),
+                    "/project/" + projectId + "/tasks");
 
-        // send mail to anounce user to join project
+            // send mail to anounce user to join project
 
-        User member = userService.findById(memberId);
+            User member = userService.findById(memberId);
 
-        if (member != null) {
-            String emailUser = member.getEmail();
-            mailService.sendSimpleMail(
-                    new String[] { emailUser },
-                    "OPEN ERP - Thông báo bạn đã được thêm vào dự án mới",
-                    "Bạn đã được thêm dự án " +
-                            project.getName() +
-                            ". Đây là email tự động, bạn không trả lời lại email này!",
-                    "OpenERP");
+            if (member != null) {
+                String emailUser = member.getEmail();
+                mailService.sendSimpleMail(
+                        new String[] { emailUser },
+                        "OPEN ERP - Thông báo bạn đã được thêm vào dự án mới",
+                        "Bạn đã được thêm dự án " +
+                                project.getName() +
+                                ". Đây là email tự động, bạn không trả lời lại email này!",
+                        "OpenERP");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // TODO: handle exception
         }
 
         return projectMemberRes;
