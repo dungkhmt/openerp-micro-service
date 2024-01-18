@@ -73,7 +73,7 @@ function ManagerViewProblemDetailV2() {
   const [fetchedImageArray, setFetchedImageArray] = useState([]);
   const [status, setStatus] = useState("");
   const [roles, setRoles] = useState([]);
-
+  const [sampleTestCase, setSampleTestCase] = useState(null);
 
   useEffect(() => {
     request("get", "teacher/problems/" + problemId, (res) => {
@@ -108,6 +108,7 @@ function ManagerViewProblemDetailV2() {
       setSelectedTags(res.tags);
       setRoles(res.roles);
       setStatus(res.status);
+      setSampleTestCase(res.sampleTestCase);
     });
   }, [problemId]);
 
@@ -276,6 +277,11 @@ function ManagerViewProblemDetailV2() {
           {t("problemDescription")}
         </Typography>
         <RichTextEditor toolbarHidden content={description} onContentChange={text => setDescription(text)}/>
+        <HustCodeEditor
+        title="Sample TestCase"
+        language={COMPUTER_LANGUAGES.C}
+        sourceCode={sampleTestCase}
+         />             
       </Box>
 
       {fetchedImageArray.length !== 0 &&

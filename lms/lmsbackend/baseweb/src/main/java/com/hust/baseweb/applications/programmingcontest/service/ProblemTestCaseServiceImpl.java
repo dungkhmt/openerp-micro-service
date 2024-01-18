@@ -3581,6 +3581,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         problemResponse.setPublicProblem(problemEntity.isPublicProblem());
         problemResponse.setTags(problemEntity.getTags());
         problemResponse.setStatus(problemEntity.getStatusId());
+        problemResponse.setSampleTestCase(problemEntity.getSampleTestcase());
 
         if (problemEntity.getAttachment() != null) {
             String[] fileId = problemEntity.getAttachment().split(";", -1);

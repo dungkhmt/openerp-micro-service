@@ -306,9 +306,9 @@ export default function StudentViewProgrammingContestProblemDetail() {
           readOnly
           editorStyle={editorStyle.editor}
         />
-
-        <Typography variant="h5">Sample Testcase</Typography>
         {/*
+        <Typography variant="h5">Sample Testcase</Typography>
+        
         <Editor
           toolbarHidden
           editorState={sampleTestCase}
@@ -318,7 +318,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
         />
       */}
         {/*ReactHtmlParser(sampleTestCase)*/}
-        {sampleTestCase}
+        {/*sampleTestCase*/}
         
         <HustCodeEditor
         title="Sample TestCase"
