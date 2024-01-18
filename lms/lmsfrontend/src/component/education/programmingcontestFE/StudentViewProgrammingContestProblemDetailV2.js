@@ -319,7 +319,13 @@ export default function StudentViewProgrammingContestProblemDetail() {
       */}
         {/*ReactHtmlParser(sampleTestCase)*/}
         {sampleTestCase}
-         
+        
+        <HustCodeEditor
+        title="Sample TestCase"
+        language={COMPUTER_LANGUAGES.C}
+        sourceCode={sampleTestCase}
+         /> 
+
         {fetchedImageArray.length !== 0 &&
           fetchedImageArray.map((file) => (
             <FileUploadZone file={file} removable={false} />

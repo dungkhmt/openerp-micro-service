@@ -472,8 +472,18 @@ function EditProblem() {
           {t("problemDescription")}
         </Typography>
         <RichTextEditor content={description} onContentChange={text => setDescription(text)}/>
+        {/*
         <RichTextEditor content={sampleTestCase} onContentChange={text => setSampleTestCase(text)}/>
-        
+              */}
+        <HustCodeEditor
+        title="Sample TestCase"
+        language={COMPUTER_LANGUAGES.C}        
+        sourceCode={sampleTestCase}
+        onChangeSourceCode={(code) => {
+          setSampleTestCase(code);
+        }}
+      />
+
         <HustDropzoneArea onChangeAttachment={(files) => handleAttachmentFiles(files)}/>
       </Box>
 
@@ -505,6 +515,7 @@ function EditProblem() {
           setCodeSolution(code);
         }}
       />
+
       <LoadingButton
         variant="contained"
         loading={loading}
