@@ -68,4 +68,7 @@ public class ModelCreateContestProblemResponse {
     private String status;
 
     private List<String> roles;
+
+    private String sampleTestCase;
 }
+

@@ -30,4 +30,5 @@ public class ModelCreateContestProblem {
     private String scoreEvaluationType;
     private String[] fileId;
     private Integer[] tagIds;
+    private String sampleTestCase;
 }

@@ -69,6 +69,7 @@ function CreateProblem() {
   const [isPublic, setIsPublic] = useState(false);
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [sampleTestCase, setSampleTestCase] = useState(null);
 
   const [isCustomEvaluated, setIsCustomEvaluated] = useState(false);
   const [compileMessage, setCompileMessage] = useState("");
@@ -178,6 +179,7 @@ function CreateProblem() {
       fileId: fileId,
       scoreEvaluationType: isCustomEvaluated ? CUSTOM_EVALUATION : NORMAL_EVALUATION,
       tagIds: tagIds,
+      sampleTestCase: sampleTestCase
     };
 
     let formData = new FormData();
@@ -429,6 +431,7 @@ function CreateProblem() {
           {t("problemDescription")}
         </Typography>
         <RichTextEditor content={description} onContentChange={text => setDescription(text)}/>
+        <RichTextEditor content={sampleTestCase} onContentChange={text => setSampleTestCase(text)}/>
         <HustDropzoneArea onChangeAttachment={(files) => handleAttachmentFiles(files)}/>
       </Box>
       {/* this function is not implemented yet

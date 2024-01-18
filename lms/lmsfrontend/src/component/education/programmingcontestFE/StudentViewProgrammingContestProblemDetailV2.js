@@ -97,6 +97,10 @@ export default function StudentViewProgrammingContestProblemDetail() {
   const [editorStateDescription, setEditorStateDescription] = useState(
     EditorState.createEmpty()
   );
+  const [sampleTestCase, setSampleTestCase] = useState(
+    null//EditorState.createEmpty()
+  );
+  
   const [fetchedImageArray, setFetchedImageArray] = useState([]);
 
   const inputRef = useRef();
@@ -206,6 +210,22 @@ export default function StudentViewProgrammingContestProblemDetail() {
           contentDescriptionState
         );
         setEditorStateDescription(statementDescription);
+
+        // public testcase    
+        /*  
+        let sampleTestCaseHtml = htmlToDraft(res.sampleTestCase);
+        let { contentBlocksTestCase, entityMapTestCase } = sampleTestCaseHtml;
+        let contentDescriptionStateTestCase = ContentState.createFromBlockArray(
+          contentBlocksTestCase,
+          entityMapTestCase
+        );
+        let editorSampleTestCase = EditorState.createWithContent(
+          contentDescriptionStateTestCase
+        );
+        //setSampleTestCase(editorSampleTestCase);
+        */
+        setSampleTestCase(res.sampleTestCase);    
+        //console.log('GetProblemDetail, res = ',res);
       },
       { onError: (e) => console.log(e) }
     );
@@ -286,6 +306,20 @@ export default function StudentViewProgrammingContestProblemDetail() {
           readOnly
           editorStyle={editorStyle.editor}
         />
+
+        <Typography variant="h5">Sample Testcase</Typography>
+        {/*
+        <Editor
+          toolbarHidden
+          editorState={sampleTestCase}
+          handlePastedText={() => false}
+          readOnly
+          editorStyle={editorStyle.editor}
+        />
+      */}
+        {/*ReactHtmlParser(sampleTestCase)*/}
+        {sampleTestCase}
+         
         {fetchedImageArray.length !== 0 &&
           fetchedImageArray.map((file) => (
             <FileUploadZone file={file} removable={false} />

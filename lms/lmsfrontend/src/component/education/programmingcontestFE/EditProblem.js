@@ -80,6 +80,7 @@ function EditProblem() {
   const [removedFilesId, setRemovedFileIds] = useState([]);
   const [status, setStatus] = useState("");
   const [isOwner, setIsOwner] = useState(false);
+  const [sampleTestCase, setSampleTestCase] = useState(null);
 
   const defaultLevel = ["easy", "medium", "hard"];
 
@@ -144,6 +145,7 @@ function EditProblem() {
       setDescription(res.problemDescription);
       setSelectedTags(res.tags);
       setStatus(res.status);
+      setSampleTestCase(res.sampleTestCase);
       setIsOwner(res.roles?.includes("OWNER"));
     });
   }, [problemId]);
@@ -233,6 +235,7 @@ function EditProblem() {
       scoreEvaluationType: isCustomEvaluated ? CUSTOM_EVALUATION : NORMAL_EVALUATION,
       tagIds: tagIds,
       status: status,
+      sampleTestCase: sampleTestCase
     };
 
     let formData = new FormData();
@@ -469,6 +472,8 @@ function EditProblem() {
           {t("problemDescription")}
         </Typography>
         <RichTextEditor content={description} onContentChange={text => setDescription(text)}/>
+        <RichTextEditor content={sampleTestCase} onContentChange={text => setSampleTestCase(text)}/>
+        
         <HustDropzoneArea onChangeAttachment={(files) => handleAttachmentFiles(files)}/>
       </Box>
 

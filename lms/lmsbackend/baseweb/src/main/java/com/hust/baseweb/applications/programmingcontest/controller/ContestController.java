@@ -155,7 +155,7 @@ public class ContestController {
             model.setAttachmentNames(problemEntity.getAttachmentNames());
             //model.setListLanguagesAllowed(contestEntity.getListLanguagesAllowed());
             model.setListLanguagesAllowed(contestEntity.getListLanguagesAllowedInContest());
-
+            model.setSampleTestCase(problemEntity.getSampleTestCase());
             return ResponseEntity.ok().body(model);
         } catch (Exception e) {
             e.printStackTrace();

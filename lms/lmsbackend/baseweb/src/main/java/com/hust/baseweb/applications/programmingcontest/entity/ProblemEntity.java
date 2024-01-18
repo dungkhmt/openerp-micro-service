@@ -110,4 +110,8 @@ public class ProblemEntity implements Serializable {
 
     @Column(name = "status_id")
     private String statusId;
+
+    @Column(name = "sample_testcase")
+    private String sampleTestcase;
+
 }

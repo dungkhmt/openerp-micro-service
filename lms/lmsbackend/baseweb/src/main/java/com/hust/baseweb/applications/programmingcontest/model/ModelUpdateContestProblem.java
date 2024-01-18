@@ -34,4 +34,5 @@ public class ModelUpdateContestProblem {
     private Integer[] tagIds;
     private List<String> removedFilesId;
     private String status;
+    private String sampleTestCase;
 }

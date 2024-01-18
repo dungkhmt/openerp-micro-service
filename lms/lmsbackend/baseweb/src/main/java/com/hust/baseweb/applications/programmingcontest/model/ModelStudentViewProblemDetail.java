@@ -26,4 +26,5 @@ public class ModelStudentViewProblemDetail {
     private Boolean isPreloadCode;
     private String preloadCode;
     private List<String> listLanguagesAllowed;
+    private String sampleTestCase;
 }

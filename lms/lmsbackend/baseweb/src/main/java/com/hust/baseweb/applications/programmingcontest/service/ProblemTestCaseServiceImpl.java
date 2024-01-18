@@ -160,6 +160,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .tags(tags)
                                                    .userId(userID)
                                                    .statusId(ProblemEntity.PROBLEM_STATUS_HIDDEN)
+                                                    .sampleTestcase(modelCreateContestProblem.getSampleTestCase())
                                                    .build();
         problemEntity = problemService.saveProblemWithCache(problemEntity);
 
@@ -318,7 +319,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         if (userId.equals(problemEntity.getUserId())) {
             problemEntity.setStatusId(modelUpdateContestProblem.getStatus());
         }
-
+        problemEntity.setSampleTestcase(modelUpdateContestProblem.getSampleTestCase());
         problemEntity = problemService.saveProblemWithCache(problemEntity);
         return problemEntity;
     }
@@ -359,7 +360,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             problemResponse.setCreatedAt(problemEntity.getCreatedAt());
             problemResponse.setPublicProblem(problemEntity.isPublicProblem());
             problemResponse.setTags(problemEntity.getTags());
-
+            problemResponse.setSampleTestCase(problemEntity.getSampleTestcase());
             if (problemEntity.getAttachment() != null) {
                 String[] fileId = problemEntity.getAttachment().split(";", -1);
                 if (fileId.length != 0) {
