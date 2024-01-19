@@ -161,6 +161,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         String weekdayOfClass = requestDto.getWeekday() != null ? requestDto.getWeekday() : classOpened.getWeekday();
         String mass = classOpened.getMass();
         String crew = classOpened.getCrew();
+        String semester = classOpened.getSemester();
         Boolean isSeparateClass = classOpened.getIsSeparateClass() != null ? classOpened.getIsSeparateClass() : false;
 
         long startPeriod = Long.parseLong(requestDto.getStartPeriod() != null ?
@@ -168,11 +169,11 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         long finishPeriod = this.calculateFinishPeriod(mass, startPeriod, isSeparateClass);
 
         List<ClassOpened> listClassOpened = classOpenedRepo.
-                getAllByClassroomAndWeekdayAndCrewAndStartPeriodIsNotNullAndIdNot
-                        (classroomOfClass, weekdayOfClass, crew, requestDto.getId());
+                getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNullAndIdNot
+                        (semester, classroomOfClass, weekdayOfClass, crew, requestDto.getId());
         List<ClassOpened> listSecondClassOpened = classOpenedRepo.
-                getAllBySecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull
-                        (classroomOfClass, weekdayOfClass, crew);
+                getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull
+                        (semester, classroomOfClass, weekdayOfClass, crew);
 
         this.checkForFirstListClasses(listClassOpened, startPeriod, finishPeriod);
         this.checkForSecondListClasses(listSecondClassOpened, startPeriod, finishPeriod);
@@ -183,6 +184,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         String weekdayOfClass = requestDto.getSecondWeekday() != null ? requestDto.getSecondWeekday() : classOpened.getSecondWeekday();
         String mass = classOpened.getMass();
         String crew = classOpened.getCrew();
+        String semester = classOpened.getSemester();
         Boolean isSeparateClass = classOpened.getIsSeparateClass() != null ? classOpened.getIsSeparateClass() : false;
 
         long startPeriod = Long.parseLong(requestDto.getSecondStartPeriod() != null ?
@@ -190,11 +192,11 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         long finishPeriod = this.calculateFinishPeriod(mass, startPeriod, isSeparateClass);
 
         List<ClassOpened> listClassOpened = classOpenedRepo
-                .getAllByClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull
-                        (classroomOfClass, weekdayOfClass, crew);
+                .getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull
+                        (semester, classroomOfClass, weekdayOfClass, crew);
         List<ClassOpened> listSecondClassOpened = classOpenedRepo.
-                getAllBySecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot
-                        (classroomOfClass, weekdayOfClass, crew, requestDto.getId());
+                getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot
+                        (semester, classroomOfClass, weekdayOfClass, crew, requestDto.getId());
 
         this.checkForFirstListClasses(listClassOpened, startPeriod, finishPeriod);
         this.checkForSecondListClasses(listSecondClassOpened, startPeriod, finishPeriod);
@@ -331,6 +333,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
             Boolean isSeparateClass = elClass.getIsSeparateClass();
             String currentCrew = elClass.getCrew();
             String currentMass = elClass.getMass();
+            String semester = elClass.getSemester();
             String quantity = !elClass.getQuantity().isEmpty() ? elClass.getQuantity() : elClass.getQuantityMax();
             long currentStartPeriod = Long.parseLong(elClass.getStartPeriod());
             String currentWeekday = elClass.getWeekday();
@@ -348,11 +351,11 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
             for (Classroom classroom : classroomList) {
                 boolean setClassroomDone;
                 List<ClassOpened> listClassOpened = classOpenedRepo.
-                        getAllByClassroomAndWeekdayAndCrewAndStartPeriodIsNotNullAndIdNot
-                                (classroom.getClassroom(), currentWeekday, currentCrew, elClass.getId());
+                        getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNullAndIdNot
+                                (semester, classroom.getClassroom(), currentWeekday, currentCrew, elClass.getId());
                 List<ClassOpened> listSecondClassOpened = classOpenedRepo.
-                        getAllBySecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull
-                                (classroom.getClassroom(), currentWeekday, currentCrew);
+                        getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull
+                                (semester, classroom.getClassroom(), currentWeekday, currentCrew);
 
                 //Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
                 setClassroomDone = this.checkConflictTimeForListFirstClass(listClassOpened, currentStartPeriod, currentFinish);
@@ -375,11 +378,11 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
                 for (Classroom classroom : classroomList) {
                     boolean setClassroomDone;
                     List<ClassOpened> listClassOpened = classOpenedRepo.
-                            getAllByClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull
-                                    (classroom.getClassroom(), currentWeekday, currentCrew);
+                            getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull
+                                    (semester, classroom.getClassroom(), currentWeekday, currentCrew);
                     List<ClassOpened> listSecondClassOpened = classOpenedRepo.
-                            getAllBySecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot
-                                    (classroom.getClassroom(), currentWeekday, currentCrew, elClass.getId());
+                            getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot
+                                    (semester, classroom.getClassroom(), currentWeekday, currentCrew, elClass.getId());
 
                     //Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
                     setClassroomDone = this.checkConflictTimeForListFirstClass(listClassOpened, currentStartPeriod, currentFinish);

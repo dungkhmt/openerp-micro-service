@@ -36,7 +36,7 @@ import {courseTimeTabling} from "./menuconfig/courseTimeTabling"
 
 export const MENUS = [];
 
-MENUS.push(general);
+// MENUS.push(general);
 MENUS.push(user);
 MENUS.push(teacher);
 // MENUS.push(schedule);

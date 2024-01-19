@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from "react";
 import { request } from "../../../api";
 import { DataGrid } from '@mui/x-data-grid';
-import { Box, Typography, Button } from '@mui/material'
+import { Box, Typography, Button, CircularProgress } from '@mui/material'
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 
@@ -99,11 +99,6 @@ export default function TimePerformanceScreen() {
     }, [refreshKey])
 
     const handleImportExcel = () => {
-        if (!selectedSemester) {
-            // If no semester is selected, show an alert or handle it as needed
-            alert("Please select a semester.");
-            return;
-        }
 
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
@@ -119,20 +114,16 @@ export default function TimePerformanceScreen() {
                     const formData = new FormData();
                     formData.append('file', file);
 
-                    // Extract the relevant value from the selectedSemester object
                     const semesterName = selectedSemester.semester;
 
-                    // Add the semester parameter to the URL
                     const fullUrl = `${url}?semester=${semesterName}`;
 
-                    // Assuming you have an API endpoint for file upload
                     const response = await request(
                         "POST",
                         fullUrl,
                         (res) => {
                             console.log(res.data);
                             setUploading(false);
-                            // You may want to update the table data here
                             window.location.reload();
                         }, {
 
@@ -141,9 +132,6 @@ export default function TimePerformanceScreen() {
                         {
                             "Content-Type": "multipart/form-data",
                         });
-
-                    // Handle the response as needed
-                    console.log(response);
                 } catch (error) {
                     console.error("Error uploading file", error);
                 } finally {
@@ -156,7 +144,6 @@ export default function TimePerformanceScreen() {
     };
 
     const handleSelectSemester = (event, newValue) => {
-        // Update the selected semester when the Autocomplete value changes
         setSelectedSemester(newValue);
     };
 
@@ -167,7 +154,7 @@ export default function TimePerformanceScreen() {
                 <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
                     <Autocomplete
                         options={semesters}
-                        getOptionLabel={(option) => option.semester} // Update with the actual property name for semester name
+                        getOptionLabel={(option) => option.semester}
                         style={{ width: 150, margin: "8px" }}
                         value={selectedSemester}
                         onChange={handleSelectSemester}
@@ -200,6 +187,7 @@ export default function TimePerformanceScreen() {
 
     return (
         <div style={{ height: 600, width: '100%' }}>
+            {openLoading && <CircularProgress style={{ position: 'absolute', top: '50%', left: '50%' }} />}
             <DataGrid
                 key={dataChanged}
                 components={{
