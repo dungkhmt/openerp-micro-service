@@ -590,6 +590,7 @@ export default function ScheduleScreen() {
                     open={isDialogOpen}
                     handleClose={handleCloseDialog}
                     handleRefreshData={handleRefreshData}
+                    filterData={[selectedSemester, selectedGroup]}
                 />
             </div>
 

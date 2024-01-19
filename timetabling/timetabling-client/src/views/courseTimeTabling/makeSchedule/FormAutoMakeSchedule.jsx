@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Autocomplete, Checkbox, FormControlLabel } from '@mui/material';
 import { request } from "../../../api";
 
-export default function AutomationMakeSchedule({ open, handleClose, handleRefreshData }) {
+export default function AutomationMakeSchedule({ open, handleClose, handleRefreshData, filterData }) {
   const [semesters, setSemesters] = useState([]);
   const [groups, setGroups] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState(null);
@@ -18,6 +18,9 @@ export default function AutomationMakeSchedule({ open, handleClose, handleRefres
     request("get", "/group/get-all", (res) => {
       setGroups(res.data);
     });
+
+    setSelectedSemester(filterData[0]);
+    setSelectedGroup(filterData[1])
   }, [])
 
   const weekdayPriorities = [
