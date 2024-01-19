@@ -39,6 +39,12 @@ public class SemesterServiceImpl implements SemesterService {
         if (semester == null) {
             throw new SemesterNotFoundException("Không tìm thấy kỳ học với ID: " + id);
         }
+        if (!semester.getSemester().equals(requestDto.getSemester())) {
+            List<Semester> existedSemesters = semesterRepo.getSemestersBySemester(requestDto.getSemester());
+            if (!existedSemesters.isEmpty()) {
+                throw new SemesterUsedException("Kỳ học " + requestDto.getSemester() + " đã tồn tại!");
+            }
+        }
         semester.setSemester(requestDto.getSemester());
         semester.setDescription(requestDto.getDescription());
         semesterRepo.save(semester);
@@ -48,7 +54,7 @@ public class SemesterServiceImpl implements SemesterService {
     public Semester create(SemesterDto semesterDto) {
         List<Semester> semesterList = semesterRepo.getSemestersBySemester(semesterDto.getSemester());
         if (!semesterList.isEmpty()) {
-            throw new SemesterUsedException("Kỳ học đã tồn tại!");
+            throw new SemesterUsedException("Kỳ học " + semesterDto.getSemester() + " đã tồn tại!");
         }
         Semester semester = semesterMapper.mapDtoToEntity(semesterDto);
         semesterRepo.save(semester);

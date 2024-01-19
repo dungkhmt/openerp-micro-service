@@ -35,7 +35,7 @@ public class GroupServiceImpl implements GroupService {
     public Group create(GroupDto groupDto) {
         List<Group> groupExist = groupRepo.getAllByGroupName(groupDto.getGroupName());
         if (!groupExist.isEmpty()) {
-            throw new GroupUsedException("Nhóm đã tồn tại: " + groupDto.getGroupName());
+            throw new GroupUsedException("Nhóm " + groupDto.getGroupName() + " đã tồn tại!");
         }
         Group group = groupMapper.mapDtoToEntity(groupDto);
         groupRepo.save(group);
@@ -48,6 +48,12 @@ public class GroupServiceImpl implements GroupService {
         Group group = groupRepo.findById(id).orElse(null);
         if (group == null) {
             throw new GroupNotFoundException("Không tồn tại nhóm với ID: " + id);
+        }
+        if (!group.getGroupName().equals(requestDto.getGroupName())) {
+            List<Group> groupList = groupRepo.getAllByGroupName(requestDto.getGroupName());
+            if (!groupList.isEmpty()) {
+                throw new GroupUsedException("Nhóm " + requestDto.getGroupName() + "đã tồn tại! ");
+            }
         }
         group.setGroupName(requestDto.getGroupName());
         group.setPriorityBuilding(requestDto.getPriorityBuilding());

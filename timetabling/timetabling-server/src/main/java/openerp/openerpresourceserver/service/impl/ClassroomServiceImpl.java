@@ -44,7 +44,13 @@ public class ClassroomServiceImpl implements ClassroomService {
         Long id = requestDto.getId();
         Classroom classroom = classroomRepo.findById(id).orElse(null);
         if (classroom == null) {
-            throw new ClassroomNotFoundException("Not found semester with ID: " + id);
+            throw new ClassroomNotFoundException("Không tìm thấy phòng học với ID: " + id);
+        }
+        if (!classroom.getClassroom().equals(requestDto.getClassroom())) {
+            List<Classroom> classroomList = classroomRepo.getClassroomByClassroom(requestDto.getClassroom());
+            if (!classroomList.isEmpty()) {
+                throw new ClassroomUsedException("Phòng học " + requestDto.getClassroom() + " đã tồn tại!!");
+            }
         }
         classroom.setClassroom(requestDto.getClassroom());
         classroom.setBuilding(requestDto.getBuilding());
@@ -58,7 +64,7 @@ public class ClassroomServiceImpl implements ClassroomService {
     public Classroom create(ClassroomDto classroomDto) {
         List<Classroom> classroomList = classroomRepo.getClassroomByClassroom(classroomDto.getClassroom());
         if (!classroomList.isEmpty()) {
-            throw new ClassroomUsedException("Phòng học đã tồn tại!!");
+            throw new ClassroomUsedException("Phòng học " + classroomDto.getClassroom() + " đã tồn tại!!");
         }
         Classroom classroom = classroomMapper.mapDtoToEntity(classroomDto);
         classroomRepo.save(classroom);

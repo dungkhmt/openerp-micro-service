@@ -52,6 +52,8 @@ public class GroupController {
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (GroupNotFoundException e) {
             return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
+        } catch (GroupUsedException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
