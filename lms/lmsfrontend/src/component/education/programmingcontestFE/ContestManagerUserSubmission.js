@@ -189,7 +189,7 @@ export default function ContestManagerUserSubmission(props) {
         ),
       },
       { title: "Man. Status", field: "managementStatus" },
-      { title: "Violation", field: "violateForbiddenInstruction" },
+      { title: "Violation", field: "violationForbiddenInstruction" },
       {
         title: "View By User",
         sortable: false,

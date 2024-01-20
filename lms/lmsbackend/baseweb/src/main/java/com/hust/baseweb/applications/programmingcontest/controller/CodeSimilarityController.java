@@ -66,7 +66,12 @@ public class CodeSimilarityController {
     ) {
         String userLoginId = principal.getName();
         log.info("computeCodeSimilarity, contestId = " + contestId);
-        ModelCodeSimilarityOutput res = problemTestCaseService.computeSimilarity(userLoginId,contestId, I);
+        ModelCodeSimilarityOutput res = null;
+        if(userLoginId.equals("admin")) {
+            res = problemTestCaseService.computeSimilarity(userLoginId, contestId, I);
+        }else{
+            res = new ModelCodeSimilarityOutput(null,"Only admin can perform this functionality");
+        }
         return ResponseEntity.ok().body(res);
     }
 
