@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import openerp.openerpresourceserver.helper.ExcelHelper;
 import openerp.openerpresourceserver.message.ResponseMessage;
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
+import openerp.openerpresourceserver.model.entity.ClassOpened;
 import openerp.openerpresourceserver.model.entity.Schedule;
 import openerp.openerpresourceserver.service.ExcelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,21 +54,32 @@ public class ExcelController {
 //    }
 
     @PostMapping(value = "/upload-class-opened")
-    public ResponseEntity<ResponseMessage> uploadFileCLassOpened(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<List<ClassOpened>> uploadFileCLassOpened(@RequestParam("file") MultipartFile file,
                                                                  @RequestParam("semester") String semester) {
         String message = "";
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
-                fileService.saveClassOpened(file, semester);
-                message = "Uploaded the file successfully: " + file.getOriginalFilename();
-                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+                List<ClassOpened> classOpenedConflict = fileService.saveClassOpened(file, semester);
+//                message = "Uploaded the file successfully: " + file.getOriginalFilename();
+//                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+                return ResponseEntity.status(HttpStatus.OK).body(classOpenedConflict);
             } catch (Exception e) {
-                message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
+//                message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
             }
         }
         message = "Please upload an excel file!";
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(message));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
+    @PostMapping(value = "/export/class-opened-conflict")
+    public ResponseEntity<Resource> getFileClassConflict(@Valid @RequestBody List<ClassOpened> classOpenedList) {
+        String filename = "Class_Conflict_List.xlsx";
+        InputStreamResource file = new InputStreamResource(fileService.loadClassConflict(classOpenedList));
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(file);
     }
 
     @GetMapping("/schedules")

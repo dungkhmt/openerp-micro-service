@@ -268,6 +268,8 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         if (listClassMakeSchedule.isEmpty()) {
             return;
         }
+
+        this.resetTimeBeforeAutoMakeSchedule(listClassMakeSchedule);
         String[] weekdayArray = weekdayPriority.split(",");
 
         int outOfDay = 0;
@@ -505,5 +507,17 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
             return groupList.get(0).getPriorityBuilding();
         }
         return null;
+    }
+
+    private void resetTimeBeforeAutoMakeSchedule(List<ClassOpened> classOpenedList) {
+        classOpenedList.forEach(el -> {
+            el.setWeekday(null);
+            el.setClassroom(null);
+            el.setStartPeriod(null);
+            el.setSecondWeekday(null);
+            el.setSecondClassroom(null);
+            el.setSecondStartPeriod(null);
+            classOpenedRepo.save(el);
+        });
     }
 }

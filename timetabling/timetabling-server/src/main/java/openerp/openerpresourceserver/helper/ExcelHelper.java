@@ -23,49 +23,9 @@ public class ExcelHelper {
     static String SHEET = "Schedules";
     static String DEFAULT_SHEET = "Sheet1";
 
-//    public static ByteArrayInputStream schedulesToExcelExport(List<Schedule> schedules) {
-//        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
-//            Sheet sheet = workbook.createSheet(SHEET);
-//            // Header
-//            Row headerRow = sheet.createRow(0);
-//            for (int col = 0; col < HEADERs.length; col++) {
-//                Cell cell = headerRow.createCell(col);
-//                cell.setCellValue(HEADERs[col]);
-//            }
-//            int rowIdx = 1;
-//            for (Schedule schedule : schedules) {
-//                Row row = sheet.createRow(rowIdx++);
-//                row.createCell(0).setCellValue(schedule.getSemester());
-//                row.createCell(1).setCellValue(schedule.getInstitute() );
-//                row.createCell(2).setCellValue(schedule.getClassCode());
-//                row.createCell(3).setCellValue(schedule.getBundleClassCode());
-//                row.createCell(4).setCellValue(schedule.getModuleCode());
-//                row.createCell(5).setCellValue(schedule.getModuleName());
-//                row.createCell(6).setCellValue(schedule.getModuleNameByEnglish());
-//                row.createCell(7).setCellValue(schedule.getMass());
-//                row.createCell(8).setCellValue(schedule.getNotes());
-//                row.createCell(9).setCellValue(schedule.getSessionNo());
-//                row.createCell(10).setCellValue(schedule.getWeekDay());
-//                row.createCell(11).setCellValue(schedule.getStudyTime());
-//                row.createCell(12).setCellValue(schedule.getStart());
-//                row.createCell(13).setCellValue(schedule.getFinish());
-//                row.createCell(14).setCellValue(schedule.getCrew());
-//                row.createCell(15).setCellValue(schedule.getStudyWeek());
-//                row.createCell(16).setCellValue(schedule.getClassRoom());
-//                row.createCell(17).setCellValue(schedule.getIsNeedExperiment());
-//                row.createCell(18).setCellValue(schedule.getNumberOfRegistrations());
-//                row.createCell(19).setCellValue(schedule.getMaxQuantity());
-//                row.createCell(20).setCellValue(schedule.getState());
-//                row.createCell(21).setCellValue(schedule.getClassType());
-//                row.createCell(22).setCellValue(schedule.getOpenBatch());
-//                row.createCell(23).setCellValue(schedule.getManagementCode());
-//            }
-//            workbook.write(out);
-//            return new ByteArrayInputStream(out.toByteArray());
-//        } catch (IOException e) {
-//            throw new RuntimeException("fail to import data to Excel file: " + e.getMessage());
-//        }
-//    }
+    public static final Integer NUMBER_PERIODS_PER_DAY = 6;
+
+    public static final Integer DEFAULT_VALUE_CALCULATE_TIME = 15;
 
     public static ByteArrayInputStream classOpenedToExcelExport(List<ClassOpened> classOpenedList) {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
@@ -89,7 +49,7 @@ public class ExcelHelper {
                 row.createCell(7).setCellValue(classOpened.getMass());
                 row.createCell(8).setCellValue(classOpened.getQuantityMax());
                 row.createCell(9).setCellValue(classOpened.getStudyClass());
-                row.createCell(10).setCellValue(classOpened.getClassType());
+                row.createCell(10).setCellValue(classOpened.getState());
                 row.createCell(11).setCellValue(classOpened.getClassCode());
                 row.createCell(12).setCellValue(classOpened.getCrew());
                 row.createCell(13).setCellValue(classOpened.getOpenBatch());
@@ -279,9 +239,31 @@ public class ExcelHelper {
                 Iterator<Cell> cellsInRow = currentRow.iterator();
                 ClassOpened classOpened = new ClassOpened();
                 int cellIdx = 0;
+                if (classOpened.getModuleCode().equals("IT3150")) {
+                    String count = null;
+                }
+                String startPeriod;
+                String weekday;
+                String classroom;
+
                 while (cellsInRow.hasNext()) {
                     Cell currentCell = cellsInRow.next();
                     String cellValue = getCellValueAsString(currentCell);
+                    //check and set study time
+                    if (cellIdx > 15 && !cellValue.isEmpty()) {
+                        weekday = (cellIdx - DEFAULT_VALUE_CALCULATE_TIME) / NUMBER_PERIODS_PER_DAY + 2 + "";
+                        startPeriod = (cellIdx - DEFAULT_VALUE_CALCULATE_TIME) % NUMBER_PERIODS_PER_DAY + "";
+                        classroom = cellValue;
+                        if (classOpened.getStartPeriod() == null) {
+                            classOpened.setWeekday(weekday);
+                            classOpened.setStartPeriod(startPeriod);
+                            classOpened.setClassroom(classroom);
+                        } else {
+                            classOpened.setSecondWeekday(weekday);
+                            classOpened.setSecondStartPeriod(startPeriod);
+                            classOpened.setSecondClassroom(classroom);
+                        }
+                    }
                     switch (cellIdx) {
                         case 0:
                             classOpened.setQuantity(cellValue);
@@ -324,7 +306,7 @@ public class ExcelHelper {
                     }
                     cellIdx++;
                 }
-                classOpened.setIsSeparateClass(false);
+                classOpened.setIsSeparateClass(classOpened.getSecondStartPeriod() != null);
                 classOpeneds.add(classOpened);
             }
             workbook.close();

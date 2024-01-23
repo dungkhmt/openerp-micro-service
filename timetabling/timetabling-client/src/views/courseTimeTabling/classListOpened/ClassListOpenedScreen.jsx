@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from "react";
 import { request } from "../../../api";
 import { DataGrid } from '@mui/x-data-grid';
-import { Box, Typography, Button, CircularProgress } from '@mui/material'
+import { Box, Typography, Button, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 
@@ -84,9 +84,11 @@ export default function TimePerformanceScreen() {
     const [dataChanged, setDataChanged] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
     const [openLoading, setOpenLoading] = React.useState(false);
-    const [uploading, setUploading] = useState(false);
-    const [semesters, setSemesters] = useState([]); // State to store the list of semesters
-    const [selectedSemester, setSelectedSemester] = useState(null); // State to store the selected semester
+    const [semesters, setSemesters] = useState([]);
+    const [selectedSemester, setSelectedSemester] = useState(null);
+    const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+    const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
+    const [conflictList, setConflictList] = useState([]);
 
     useEffect(() => {
         request("get", "/class-opened/get-all", (res) => {
@@ -118,15 +120,20 @@ export default function TimePerformanceScreen() {
 
                     const fullUrl = `${url}?semester=${semesterName}`;
 
-                    const response = await request(
+                    await request(
                         "POST",
                         fullUrl,
                         (res) => {
-                            console.log(res.data);
-                            setUploading(false);
-                            window.location.reload();
+                            if (res.data.length === 0) {
+                                // No conflicts, show success dialog
+                                setSuccessDialogOpen(true);
+                            } else {
+                                // Conflicts exist, show conflict dialog
+                                setConflictList(res.data);
+                                setConflictDialogOpen(true);
+                            }
                         }, {
-
+                        //handle when error
                     }
                         , formData,
                         {
@@ -145,6 +152,34 @@ export default function TimePerformanceScreen() {
 
     const handleSelectSemester = (event, newValue) => {
         setSelectedSemester(newValue);
+    };
+
+    const handleDialogClose = () => {
+        setSuccessDialogOpen(false);
+        setConflictDialogOpen(false);
+        window.location.reload();
+    };
+
+    const handleDownloadConflictList = () => {
+        const url = "/excel/export/class-opened-conflict";
+        console.log("data conflict: ", conflictList)
+        const requestData = conflictList;
+
+        request("post", url, (res) => {
+            const blob = new Blob([res.data], { type: res.headers['content-type'] });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = 'Class_Conflict_List.xlsx';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            },
+            (error) => {
+                console.error('Error exporting Excel:', error);
+            },
+            requestData,
+            {responseType: 'arraybuffer'}).then();
     };
 
     function DataGridToolbar() {
@@ -172,6 +207,30 @@ export default function TimePerformanceScreen() {
                         Tải lên danh sách lớp
                     </Button>
                 </div>
+                <Dialog open={successDialogOpen || conflictDialogOpen} onClose={handleDialogClose}>
+                    <DialogTitle>
+                        {successDialogOpen ? "Tải lên danh sách thành công" : "Danh sách lớp bị trùng"}
+                    </DialogTitle>
+                    <DialogContent>
+                        {conflictDialogOpen ? (
+                            <ul>
+                                {conflictList.map((conflict) => (
+                                    <li key={conflict.id}>{conflict.moduleName}</li>
+                                ))}
+                            </ul>
+                        ) : null}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleDialogClose} color="primary" autoFocus>
+                            OK
+                        </Button>
+                        {conflictDialogOpen && (
+                            <Button onClick={handleDownloadConflictList} color="primary">
+                                Tải xuống
+                            </Button>
+                        )}
+                    </DialogActions>
+                </Dialog>
             </div >
 
         );
