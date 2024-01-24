@@ -116,14 +116,14 @@ export default function ClassGroupList() {
         return (
             <div>
                 <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
-                    <Button
+                    {/* <Button
                         variant="outlined"
                         color="primary"
                         style={{ marginRight: "8px" }}
                         onClick={handleCreate}
                     >
                         Thêm mới
-                    </Button>
+                    </Button> */}
                 </div>
 
                 <CreateNewGroupScreen

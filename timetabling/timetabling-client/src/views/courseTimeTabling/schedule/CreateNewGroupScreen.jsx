@@ -85,7 +85,7 @@ export default function CreateNewGroupScreen({ open, handleClose, existingData, 
         <Button
           onClick={handleCreate}
           color="primary"
-          disabled={!newGroup} // Disable the button if the input is empty
+          disabled={!newGroup || !newPriorityBuilding} // Disable the button if the input is empty
         >
           Tạo mới
         </Button>
