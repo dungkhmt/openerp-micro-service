@@ -137,13 +137,14 @@ public class ProblemController {
         s = s.concat("Hello");
         return ResponseEntity.ok().body(s);
     }
-
+    @Secured("ROLE_TEACHER")
     @GetMapping("/problems/{problemId}/testcases")
     public ResponseEntity<?> getTestCaseListByProblem(@PathVariable("problemId") String problemId) {
         List<ModelGetTestCase> list = problemTestCaseService.getTestCaseByProblem(problemId);
         return ResponseEntity.status(200).body(list);
     }
 
+    @Secured("ROLE_TEACHER")
     @GetMapping("/problems/{problemId}/contests")
     public ResponseEntity<?> getContestsUsingAProblem(@PathVariable String problemId) {
         List<ModelGetContestResponse> res = problemTestCaseService.getContestsUsingAProblem(problemId);
