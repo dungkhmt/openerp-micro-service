@@ -3,10 +3,11 @@ import { request } from "api";
 import { RejudgeButton } from "component/education/programmingcontestFE/RejudgeButton";
 import { getStatusColor } from "component/education/programmingcontestFE/lib";
 import StandardTable from "component/table/StandardTable";
+import withScreenSecurity from "component/withScreenSecurity";
 import { Link } from "react-router-dom";
 import { toFormattedDateTime } from "utils/dateutils";
 
-export default function ViewProgrammingContestSubmission() {
+function ViewProgrammingContestSubmission() {
   const columns = [
     {
       title: "ID",
@@ -138,3 +139,10 @@ export default function ViewProgrammingContestSubmission() {
     </div>
   );
 }
+
+const screenName = "SCR_ADMIN_CONTEST_SUBMISSION";
+export default withScreenSecurity(
+  ViewProgrammingContestSubmission,
+  screenName,
+  true
+);

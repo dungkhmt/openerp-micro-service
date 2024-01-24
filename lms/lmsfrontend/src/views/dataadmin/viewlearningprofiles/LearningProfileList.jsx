@@ -1,16 +1,19 @@
-import React from 'react';
-import StudentList from "./StudentList";
+import withScreenSecurity from "component/withScreenSecurity";
 import LearningStatisticResults from "./LearningStatisticResults";
+import StudentList from "./StudentList";
 
-export default function LearningProfileList(props) {
+function LearningProfileList(props) {
   return (
     <>
-      <div style={{ marginBottom: '20px'}}>
-        <StudentList/>
+      <div style={{ marginBottom: "20px" }}>
+        <StudentList />
       </div>
       <div>
-        <LearningStatisticResults/>
+        <LearningStatisticResults />
       </div>
     </>
   );
 }
+
+const screenName = "SCR_ADMIN_USER_LEARNING_PROFILE_LIST";
+export default withScreenSecurity(LearningProfileList, screenName, true);

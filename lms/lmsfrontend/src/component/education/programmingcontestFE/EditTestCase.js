@@ -1,14 +1,18 @@
-import {Button, CircularProgress, Grid, MenuItem, TextField,} from "@mui/material";
 import PublishIcon from "@mui/icons-material/Publish";
-import * as React from "react";
-import {useEffect, useState} from "react";
-import Typography from "@mui/material/Typography";
-import {useHistory, useParams} from "react-router-dom";
-import {request} from "../../../api";
-import {successNoti, warningNoti} from "../../../utils/notification";
+import {
+  Button,
+  CircularProgress,
+  Grid,
+  MenuItem,
+  TextField,
+} from "@mui/material";
+import { request } from "api";
 import HustContainerCard from "component/common/HustContainerCard";
+import withScreenSecurity from "component/withScreenSecurity";
+import { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
 
-export default function EditTestCase(props) {
+function EditTestCase(props) {
   const history = useHistory();
 
   const [value, setValue] = useState(0);
@@ -17,7 +21,7 @@ export default function EditTestCase(props) {
   const [screenHeight, setScreenHeight] = useState(
     (window.innerHeight - 300) / 2 + "px"
   );
-  const {problemId, testCaseId} = useParams();
+  const { problemId, testCaseId } = useParams();
   const [description, setDescription] = useState("");
   const [solution, setSolution] = useState("");
   const [load, setLoad] = useState(false);
@@ -31,7 +35,6 @@ export default function EditTestCase(props) {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
 
   const getTestCaseResult = () => {
     console.log("get test case result");
@@ -160,7 +163,7 @@ export default function EditTestCase(props) {
 
   return (
     <div>
-      <HustContainerCard title={'Edit Testcase'}>
+      <HustContainerCard title={"Edit Testcase"}>
         <Grid container spacing={2}>
           <Grid item xs={2}>
             <TextField
@@ -183,7 +186,7 @@ export default function EditTestCase(props) {
               id="Public TestCase"
               label="Public TestCase"
               placeholder="Public TestCase"
-              style={{width: '150px'}}
+              style={{ width: "150px" }}
               onChange={(event) => {
                 setIsPublic(event.target.value);
               }}
@@ -196,15 +199,20 @@ export default function EditTestCase(props) {
                 {"N"}
               </MenuItem>
             </TextField>
-            <br/>
+            <br />
           </Grid>
         </Grid>
         <form onSubmit={handleFormSubmit}>
           <Grid container spacing={1} alignItems="flex-end" mt={1}>
             <Grid item xs={12}>
               <Button color="primary" variant="outlined" component="label">
-                <PublishIcon/> Upload testcase file
-                <input hidden type="file" id="selected-upload-file" onChange={onFileChange}/>
+                <PublishIcon /> Upload testcase file
+                <input
+                  hidden
+                  type="file"
+                  id="selected-upload-file"
+                  onChange={onFileChange}
+                />
               </Button>
             </Grid>
             <br></br>
@@ -252,10 +260,13 @@ export default function EditTestCase(props) {
               </Button>
               {!isProcessing && <h2> Status: {uploadMessage}</h2>}
             </Grid>
-            {isProcessing ? <CircularProgress/> : ""}
+            {isProcessing ? <CircularProgress /> : ""}
           </Grid>
         </form>
       </HustContainerCard>
     </div>
   );
 }
+
+const screenName = "SCR_EDIT_TEST_CASE";
+export default withScreenSecurity(EditTestCase, screenName, true);

@@ -1,10 +1,10 @@
 import { Divider, Link, Paper, Stack, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
+import { request } from "api";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import displayTime from "utils/DateTimeUtils";
 import { localeOption } from "utils/NumberFormat";
-import { request } from "../../../api";
 import HustCopyCodeBlock from "../../common/HustCopyCodeBlock";
 import {
   detail,

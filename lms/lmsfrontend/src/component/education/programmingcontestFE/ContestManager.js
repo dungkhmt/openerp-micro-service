@@ -1,4 +1,5 @@
 import { AntTab, AntTabs, TabPanel, a11yProps } from "component/tab";
+import withScreenSecurity from "component/withScreenSecurity";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import CodeSimilarityCheck from "./CodeSimilarityCheck";
@@ -13,7 +14,7 @@ import ContestManagerUserSubmission from "./ContestManagerUserSubmission";
 import ContestManagerUserSubmissionGroup from "./ContestManagerUserSubmissionGroup";
 import ContestResultDistribution from "./ContestResultDistribution";
 
-export function ContestManager() {
+function ContestManager() {
   const { contestId } = useParams();
 
   const [selectedTab, setSelectedTab] = useState(0);
@@ -96,3 +97,6 @@ export function ContestManager() {
     </>
   );
 }
+
+const screenName = "SCR_CONTEST_MANAGER";
+export default withScreenSecurity(ContestManager, screenName, true);

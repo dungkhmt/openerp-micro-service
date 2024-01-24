@@ -1,3 +1,6 @@
+import { makeStyles } from "@material-ui/core/styles";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { LoadingButton } from "@mui/lab";
 import {
   Box,
   Button,
@@ -13,45 +16,49 @@ import {
   OutlinedInput,
   Select,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
-import {makeStyles} from "@material-ui/core/styles";
-import React, {useEffect, useState} from "react";
+import { request } from "api";
+import withScreenSecurity from "component/withScreenSecurity";
+import { useEffect, useState } from "react";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import {request} from "../../../api";
-import {CompileStatus} from "./CompileStatus";
-import {useParams} from "react-router";
-import {randomImageName,} from "../../../utils/FileUpload/covert";
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router";
+import FileUploadZone from "utils/FileUpload/FileUploadZone";
+import { randomImageName } from "utils/FileUpload/covert";
+import { PROBLEM_STATUS } from "utils/constants";
+import { errorNoti, successNoti, warningNoti } from "utils/notification";
+import HustCodeEditor from "../../common/HustCodeEditor";
 import HustContainerCard from "../../common/HustContainerCard";
 import HustDropzoneArea from "../../common/HustDropzoneArea";
 import RichTextEditor from "../../common/editor/RichTextEditor";
-import HustCodeEditor from "../../common/HustCodeEditor";
-import {LoadingButton} from "@mui/lab";
-import {errorNoti, successNoti, warningNoti} from "../../../utils/notification";
-import {COMPUTER_LANGUAGES, CUSTOM_EVALUATION, NORMAL_EVALUATION} from "./Constant";
+import { CompileStatus } from "./CompileStatus";
+import {
+  COMPUTER_LANGUAGES,
+  CUSTOM_EVALUATION,
+  NORMAL_EVALUATION,
+} from "./Constant";
 import ListTestCase from "./ListTestCase";
-import {getAllTags} from "./service/TagService";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ModelAddNewTag from "./ModelAddNewTag";
-import FileUploadZone from "../../../utils/FileUpload/FileUploadZone";
-import {PROBLEM_STATUS} from "utils/constants";
+import { getAllTags } from "./service/TagService";
 
 const useStyles = makeStyles((theme) => ({
   description: {
     marginTop: theme.spacing(3),
     marginBottom: theme.spacing(2),
-  }
+  },
 }));
 
 function EditProblem() {
-  const {t} = useTranslation(
-    ["education/programmingcontest/problem", "common", "validation"]
-  );
+  const { t } = useTranslation([
+    "education/programmingcontest/problem",
+    "common",
+    "validation",
+  ]);
 
   const classes = useStyles();
 
-  const {problemId} = useParams();
+  const { problemId } = useParams();
 
   const [problemName, setProblemName] = useState("");
   const [description, setDescription] = useState("");
@@ -65,10 +72,14 @@ function EditProblem() {
   const [codeSolution, setCodeSolution] = useState("");
   const [isPreloadCode, setIsPreloadCode] = useState(false);
   const [preloadCode, setPreloadCode] = useState("");
-  const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState(COMPUTER_LANGUAGES.CPP17);
+  const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState(
+    COMPUTER_LANGUAGES.CPP17
+  );
   const [solutionChecker, setSolutionChecker] = useState("");
   const [isCustomEvaluated, setIsCustomEvaluated] = useState(false);
-  const [languageSolution, setLanguageSolution] = useState(COMPUTER_LANGUAGES.CPP17);
+  const [languageSolution, setLanguageSolution] = useState(
+    COMPUTER_LANGUAGES.CPP17
+  );
   const [showCompile, setShowCompile] = useState(false);
   const [statusSuccessful, setStatusSuccessful] = useState(false);
   const [isPublic, setIsPublic] = useState(false);
@@ -91,13 +102,14 @@ function EditProblem() {
   const handleGetTagsSuccess = (res) => setTags(res.data);
   useEffect(() => {
     getAllTags(handleGetTagsSuccess);
-  }, [])
-
+  }, []);
 
   const handleSelectTags = (event) => {
     const selectingTags = event.target.value;
 
-    const filteredTags = [...new Map(selectingTags.map(tag => [tag.tagId, tag])).values()]
+    const filteredTags = [
+      ...new Map(selectingTags.map((tag) => [tag.tagId, tag])).values(),
+    ];
 
     setSelectedTags(filteredTags);
   };
@@ -178,15 +190,41 @@ function EditProblem() {
 
   const validateSubmit = () => {
     if (problemName === "") {
-      errorNoti(t("missingField", {ns: "validation", fieldName: t("problemName")}), 3000);
+      errorNoti(
+        t("missingField", { ns: "validation", fieldName: t("problemName") }),
+        3000
+      );
       return false;
     }
-    if (timeLimitCPP <= 0 || timeLimitJAVA <= 0 || timeLimitPYTHON <=0 || timeLimitCPP > 300 || timeLimitJAVA > 300 || timeLimitPYTHON > 300) {
-      errorNoti(t("numberBetween", {ns: "validation", fieldName: t("timeLimit"), min: 1, max: 300}), 3000);
+    if (
+      timeLimitCPP <= 0 ||
+      timeLimitJAVA <= 0 ||
+      timeLimitPYTHON <= 0 ||
+      timeLimitCPP > 300 ||
+      timeLimitJAVA > 300 ||
+      timeLimitPYTHON > 300
+    ) {
+      errorNoti(
+        t("numberBetween", {
+          ns: "validation",
+          fieldName: t("timeLimit"),
+          min: 1,
+          max: 300,
+        }),
+        3000
+      );
       return false;
     }
     if (memoryLimit <= 0 || memoryLimit > 1024) {
-      errorNoti(t("numberBetween", {ns: "validation", fieldName: t("memoryLimit"), min: 1, max: 1024}), 3000);
+      errorNoti(
+        t("numberBetween", {
+          ns: "validation",
+          fieldName: t("memoryLimit"),
+          min: 1,
+          max: 1024,
+        }),
+        3000
+      );
       return false;
     }
     if (!statusSuccessful) {
@@ -194,7 +232,7 @@ function EditProblem() {
       return false;
     }
     return true;
-  }
+  };
 
   function handleSubmit() {
     if (!validateSubmit()) return;
@@ -232,10 +270,12 @@ function EditProblem() {
       isPublic: isPublic,
       fileId: fileId,
       removedFilesId: removedFilesId,
-      scoreEvaluationType: isCustomEvaluated ? CUSTOM_EVALUATION : NORMAL_EVALUATION,
+      scoreEvaluationType: isCustomEvaluated
+        ? CUSTOM_EVALUATION
+        : NORMAL_EVALUATION,
       tagIds: tagIds,
       status: status,
-      sampleTestCase: sampleTestCase
+      sampleTestCase: sampleTestCase,
     };
 
     let formData = new FormData();
@@ -261,7 +301,7 @@ function EditProblem() {
       },
       {
         onError: (e) => {
-          errorNoti(t("error", {ns: "common"}), 3000);
+          errorNoti(t("error", { ns: "common" }), 3000);
           setLoading(false);
         },
       },
@@ -334,17 +374,17 @@ function EditProblem() {
             required
             select
             id="isPublicProblem"
-            label={t("public", {ns: "common"})}
+            label={t("public", { ns: "common" })}
             onChange={(event) => {
               setIsPublic(event.target.value);
             }}
             value={isPublic}
           >
             <MenuItem key={"true"} value={true}>
-              {t("yes", {ns: "common"})}
+              {t("yes", { ns: "common" })}
             </MenuItem>
             <MenuItem key={"false"} value={false}>
-              {t("no", {ns: "common"})}
+              {t("no", { ns: "common" })}
             </MenuItem>
           </TextField>
         </Grid>
@@ -361,8 +401,10 @@ function EditProblem() {
               setTimeLimitCPP(event.target.value);
             }}
             InputProps={{
-              startAdornment: <InputAdornment position="start">C/CPP: </InputAdornment>,
-              endAdornment: <InputAdornment position="end">s</InputAdornment>
+              startAdornment: (
+                <InputAdornment position="start">C/CPP: </InputAdornment>
+              ),
+              endAdornment: <InputAdornment position="end">s</InputAdornment>,
             }}
           />
         </Grid>
@@ -379,8 +421,10 @@ function EditProblem() {
               setTimeLimitJAVA(event.target.value);
             }}
             InputProps={{
-              startAdornment: <InputAdornment position="start">JAVA: </InputAdornment>,
-              endAdornment: <InputAdornment position="end">s</InputAdornment>
+              startAdornment: (
+                <InputAdornment position="start">JAVA: </InputAdornment>
+              ),
+              endAdornment: <InputAdornment position="end">s</InputAdornment>,
             }}
           />
         </Grid>
@@ -397,8 +441,10 @@ function EditProblem() {
               setTimeLimitPYTHON(event.target.value);
             }}
             InputProps={{
-              startAdornment: <InputAdornment position="start">PYTHON: </InputAdornment>,
-              endAdornment: <InputAdornment position="end">s</InputAdornment>
+              startAdornment: (
+                <InputAdornment position="start">PYTHON: </InputAdornment>
+              ),
+              endAdornment: <InputAdornment position="end">s</InputAdornment>,
             }}
           />
         </Grid>
@@ -414,12 +460,14 @@ function EditProblem() {
             onChange={(event) => {
               setMemoryLimit(event.target.value);
             }}
-            InputProps={{endAdornment: <InputAdornment position="end">MB</InputAdornment>}}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">MB</InputAdornment>,
+            }}
           />
         </Grid>
 
         <Grid item xs={12}>
-          <FormControl sx={{width: "100%"}}>
+          <FormControl sx={{ width: "100%" }}>
             <InputLabel id="select-tag-label">Tags</InputLabel>
             <Select
               labelId="select-tag-label"
@@ -427,24 +475,27 @@ function EditProblem() {
               multiple
               value={selectedTags}
               onChange={handleSelectTags}
-              input={<OutlinedInput label="Tags"/>}
+              input={<OutlinedInput label="Tags" />}
               renderValue={(selectedTags) => (
-                <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.8}}>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.8 }}>
                   {selectedTags?.map((selectedTag) => (
-                    <Chip size="small" label={selectedTag.name} sx={{
-                      marginRight: "6px",
-                      marginBottom: "6px",
-                      border: "1px solid lightgray",
-                      fontStyle: "italic"
-                    }}/>
+                    <Chip
+                      size="small"
+                      label={selectedTag.name}
+                      sx={{
+                        marginRight: "6px",
+                        marginBottom: "6px",
+                        border: "1px solid lightgray",
+                        fontStyle: "italic",
+                      }}
+                    />
                   ))}
-
                 </Box>
               )}
             >
               <Button
-                sx={{marginLeft: "20px"}}
-                startIcon={<AddCircleIcon/>}
+                sx={{ marginLeft: "20px" }}
+                startIcon={<AddCircleIcon />}
                 onClick={() => setOpenModalAddNewTag(true)}
               >
                 {t("common:addNew")}
@@ -452,14 +503,21 @@ function EditProblem() {
               <ModelAddNewTag
                 isOpen={openModalAddNewTag}
                 handleSuccess={() => {
-                  getAllTags(handleGetTagsSuccess)
+                  getAllTags(handleGetTagsSuccess);
                 }}
                 handleClose={() => setOpenModalAddNewTag(false)}
               />
               {tags.map((tag) => (
                 <MenuItem key={tag.tagId} value={tag}>
-                  <Checkbox checked={selectedTags.some(selectedTag => selectedTag.tagId === tag.tagId)}/>
-                  <ListItemText primary={tag.name} secondary={tag?.description}/>
+                  <Checkbox
+                    checked={selectedTags.some(
+                      (selectedTag) => selectedTag.tagId === tag.tagId
+                    )}
+                  />
+                  <ListItemText
+                    primary={tag.name}
+                    secondary={tag?.description}
+                  />
                 </MenuItem>
               ))}
             </Select>
@@ -468,28 +526,41 @@ function EditProblem() {
       </Grid>
 
       <Box className={classes.description}>
-        <Typography variant="h5" component="div" sx={{marginTop: "12px", marginBottom: "8px"}}>
+        <Typography
+          variant="h5"
+          component="div"
+          sx={{ marginTop: "12px", marginBottom: "8px" }}
+        >
           {t("problemDescription")}
         </Typography>
-        <RichTextEditor content={description} onContentChange={text => setDescription(text)}/>
+        <RichTextEditor
+          content={description}
+          onContentChange={(text) => setDescription(text)}
+        />
         {/*
         <RichTextEditor content={sampleTestCase} onContentChange={text => setSampleTestCase(text)}/>
               */}
         <HustCodeEditor
-        title="Sample TestCase"
-        language={COMPUTER_LANGUAGES.C}        
-        sourceCode={sampleTestCase}
-        onChangeSourceCode={(code) => {
-          setSampleTestCase(code);
-        }}
-      />
+          title="Sample TestCase"
+          language={COMPUTER_LANGUAGES.C}
+          sourceCode={sampleTestCase}
+          onChangeSourceCode={(code) => {
+            setSampleTestCase(code);
+          }}
+        />
 
-        <HustDropzoneArea onChangeAttachment={(files) => handleAttachmentFiles(files)}/>
+        <HustDropzoneArea
+          onChangeAttachment={(files) => handleAttachmentFiles(files)}
+        />
       </Box>
 
       {fetchedImageArray.length !== 0 &&
         fetchedImageArray.map((file) => (
-          <FileUploadZone file={file} removable={true} onRemove={() => handleDeleteImageAttachment(file.fileName)}/>
+          <FileUploadZone
+            file={file}
+            removable={true}
+            onRemove={() => handleDeleteImageAttachment(file.fileName)}
+          />
         ))}
       {/* this function is not implemented yet
               <Box>
@@ -503,7 +574,7 @@ function EditProblem() {
               </Box>
               */}
 
-      <Box sx={{marginTop: "32px"}}/>
+      <Box sx={{ marginTop: "32px" }} />
       <HustCodeEditor
         title={t("correctSourceCode")}
         language={languageSolution}
@@ -520,7 +591,7 @@ function EditProblem() {
         variant="contained"
         loading={loading}
         onClick={checkCompile}
-        sx={{marginTop: "12px", marginBottom: "6px"}}
+        sx={{ marginTop: "12px", marginBottom: "6px" }}
       >
         {t("checkSolutionCompile")}
       </LoadingButton>
@@ -531,16 +602,17 @@ function EditProblem() {
         message={compileMessage}
       />
 
-      <Box sx={{marginTop: "12px"}}>
+      <Box sx={{ marginTop: "12px" }}>
         <FormControlLabel
           label={t("isPreloadCode")}
           control={
             <Checkbox
               checked={isPreloadCode}
               onChange={() => setIsPreloadCode(!isPreloadCode)}
-            />}
+            />
+          }
         />
-        {isPreloadCode &&
+        {isPreloadCode && (
           <HustCodeEditor
             title={t("preloadCode")}
             sourceCode={preloadCode}
@@ -550,21 +622,24 @@ function EditProblem() {
             height="280px"
             placeholder="Write the initial code segment that provided to the participants here"
           />
-        }
+        )}
       </Box>
 
-      <Box sx={{marginTop: "12px"}}>
+      <Box sx={{ marginTop: "12px" }}>
         <FormControlLabel
           label={t("isCustomEvaluated")}
           control={
             <Checkbox
               checked={isCustomEvaluated}
               onChange={() => setIsCustomEvaluated(!isCustomEvaluated)}
-            />}
+            />
+          }
         />
-        <Typography variant="body2" color="gray">{t("customEvaluationNote1")}</Typography>
+        <Typography variant="body2" color="gray">
+          {t("customEvaluationNote1")}
+        </Typography>
 
-        {isCustomEvaluated &&
+        {isCustomEvaluated && (
           <HustCodeEditor
             title={t("checkerSourceCode")}
             language={solutionCheckerLanguage}
@@ -577,23 +652,24 @@ function EditProblem() {
             }}
             placeholder={t("checkerSourceCodePlaceholder")}
           />
-        }
+        )}
       </Box>
 
-      <ListTestCase/>
+      <ListTestCase />
 
-      <Box width="100%" sx={{marginTop: "16px"}}>
+      <Box width="100%" sx={{ marginTop: "16px" }}>
         <LoadingButton
           variant="contained"
           color="success"
           loading={loading}
           onClick={handleSubmit}
         >
-          {t("save", {ns: "common"})}
+          {t("save", { ns: "common" })}
         </LoadingButton>
       </Box>
     </HustContainerCard>
   );
 }
 
-export default EditProblem;
+const screenName = "SCR_EDIT_PROBLEM";
+export default withScreenSecurity(EditProblem, screenName, true);

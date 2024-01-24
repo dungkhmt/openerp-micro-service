@@ -1,22 +1,30 @@
-import React, {useCallback, useEffect, useState} from "react";
-import {Link} from "react-router-dom";
-import {BASE_URL, request} from "../../../api";
-import {useTranslation} from "react-i18next";
-import {toFormattedDateTime} from "../../../utils/dateutils";
-import {Box, Chip, IconButton, Tab, Tabs} from "@mui/material";
-import {GetApp} from "@material-ui/icons";
-import {getColorLevel} from "./lib";
+import { GetApp } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
-import {a11yProps} from "component/tab";
-import {TabPanelVertical} from "./TabPanel";
-import {useKeycloak} from "@react-keycloak/web";
-import {PROBLEM_STATUS} from "utils/constants";
-import {errorNoti} from "utils/notification";
+import {
+  Box,
+  Chip,
+  IconButton,
+  LinearProgress,
+  Tab,
+  Tabs,
+} from "@mui/material";
+import { useKeycloak } from "@react-keycloak/web";
+import { BASE_URL, request } from "api";
+import { a11yProps } from "component/tab";
+import withScreenSecurity from "component/withScreenSecurity";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { PROBLEM_STATUS } from "utils/constants";
+import { toFormattedDateTime } from "utils/dateutils";
+import { errorNoti } from "utils/notification";
 import HustContainerCard from "../../common/HustContainerCard";
 import StandardTable from "../../table/StandardTable";
-import {LinearProgress} from "@mui/material";
+import { TabPanelVertical } from "./TabPanel";
+import { getColorLevel } from "./lib";
+
 function ListProblemV2() {
-  const {keycloak} = useKeycloak();
+  const { keycloak } = useKeycloak();
   const [value, setValue] = useState(0);
   const [myProblems, setMyProblems] = useState([]);
 
@@ -24,7 +32,7 @@ function ListProblemV2() {
   const [allProblems, setAllProblems] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const {t} = useTranslation("education/programmingcontest/problem");
+  const { t } = useTranslation("education/programmingcontest/problem");
 
   const onSingleDownload = (problem) => {
     const form = document.createElement("form");
@@ -53,7 +61,10 @@ function ListProblemV2() {
               encodeURIComponent(rowData["problemId"]),
           }}
           onClick={(e) => {
-            if (rowData["userId"] !== keycloak.tokenParsed.preferred_username && rowData["statusId"] !== PROBLEM_STATUS.OPEN) {
+            if (
+              rowData["userId"] !== keycloak.tokenParsed.preferred_username &&
+              rowData["statusId"] !== PROBLEM_STATUS.OPEN
+            ) {
               errorNoti("Problem is not open", 3000);
               e.preventDefault();
             }
@@ -68,19 +79,19 @@ function ListProblemV2() {
         </Link>
       ),
     },
-    {title: t("problemName"), field: "problemName"},
-    {title: t("problemList.createdBy"), field: "userId"},
-    {title: t("problemList.createdAt"), field: "createdAt"},
+    { title: t("problemName"), field: "problemName" },
+    { title: t("problemList.createdBy"), field: "userId" },
+    { title: t("problemList.createdAt"), field: "createdAt" },
     {
       title: t("problemList.level"),
       field: "levelId",
       render: (rowData) => (
-        <span style={{color: getColorLevel(`${rowData.levelId}`)}}>
+        <span style={{ color: getColorLevel(`${rowData.levelId}`) }}>
           {`${rowData.levelId}`}
         </span>
       ),
     },
-    {title: t("problemList.status"), field: "statusId"},
+    { title: t("problemList.status"), field: "statusId" },
     {
       title: "Tags",
       render: (rowData) => (
@@ -106,7 +117,7 @@ function ListProblemV2() {
       field: "appearances",
       render: (rowData) => {
         return (
-          <span style={{marginLeft: "24px"}}>{rowData.appearances}</span>
+          <span style={{ marginLeft: "24px" }}>{rowData.appearances}</span>
         );
       },
     },
@@ -119,7 +130,7 @@ function ListProblemV2() {
             color="primary"
             onClick={() => onSingleDownload(rowData)}
           >
-            <GetApp/>
+            <GetApp />
           </IconButton>
         );
       },
@@ -160,24 +171,18 @@ function ListProblemV2() {
 
   useEffect(() => {
     setLoading(true);
-    getProblems(
-      "/teacher/owned-problems",
-      (data) => {
-        setMyProblems(data);
-        setLoading(false);
-      }
-    );
+    getProblems("/teacher/owned-problems", (data) => {
+      setMyProblems(data);
+      setLoading(false);
+    });
   }, [getProblems]);
 
   useEffect(() => {
-  setLoading(true)
-    getProblems(
-      "/teacher/shared-problems",
-      (data) => {
-        setSharedProblems(data);
-        setLoading(false);
-      }
-    );
+    setLoading(true);
+    getProblems("/teacher/shared-problems", (data) => {
+      setSharedProblems(data);
+      setLoading(false);
+    });
   }, [getProblems]);
 
   /*
@@ -194,8 +199,8 @@ function ListProblemV2() {
   */
   return (
     <HustContainerCard>
-    {loading && <LinearProgress/>}
-      <Box sx={{borderBottom: 2, borderColor: "divider"}}>
+      {loading && <LinearProgress />}
+      <Box sx={{ borderBottom: 2, borderColor: "divider" }}>
         <Tabs
           value={value}
           onChange={(e, value) => setValue(value)}
@@ -223,7 +228,7 @@ function ListProblemV2() {
           actions={[
             {
               icon: () => {
-                return <AddIcon fontSize="large"/>;
+                return <AddIcon fontSize="large" />;
               },
               tooltip: t("createProblem"),
               isFreeAction: true,
@@ -232,7 +237,7 @@ function ListProblemV2() {
               },
             },
           ]}
-          sx={{marginTop: "8px"}}
+          sx={{ marginTop: "8px" }}
         />
       </TabPanelVertical>
 
@@ -249,7 +254,7 @@ function ListProblemV2() {
             search: true,
             sorting: true,
           }}
-          sx={{marginTop: "8px"}}
+          sx={{ marginTop: "8px" }}
         />
       </TabPanelVertical>
       {/*
@@ -274,4 +279,5 @@ function ListProblemV2() {
   );
 }
 
-export default ListProblemV2;
+const screenName = "SCR_MANAGE_PROBLEMS";
+export default withScreenSecurity(ListProblemV2, screenName, true);

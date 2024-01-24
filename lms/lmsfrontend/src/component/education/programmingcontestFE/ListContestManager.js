@@ -1,11 +1,15 @@
-import React from "react";
-import {ListContestManagerByRegistration} from "./ListContestManagerByRegistration";
-import {ListContestAll} from "./ListContestAll";
-export function ListContestManager() {
+import withScreenSecurity from "component/withScreenSecurity";
+import { ListContestAll } from "./ListContestAll";
+import { ListContestManagerByRegistration } from "./ListContestManagerByRegistration";
+
+function ListContestManager() {
   return (
     <div>
-      <ListContestManagerByRegistration/>
-      <ListContestAll/>
+      <ListContestManagerByRegistration />
+      <ListContestAll />
     </div>
   );
 }
+
+const screenName = "SCR_MANAGER_CONTEST_LIST";
+export default withScreenSecurity(ListContestManager, screenName, true);

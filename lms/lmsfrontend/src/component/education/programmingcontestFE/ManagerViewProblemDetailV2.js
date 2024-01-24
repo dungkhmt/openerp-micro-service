@@ -1,5 +1,7 @@
+import EditIcon from "@mui/icons-material/Edit";
 import {
-  Box, Button,
+  Box,
+  Button,
   Checkbox,
   Chip,
   FormControl,
@@ -10,47 +12,49 @@ import {
   OutlinedInput,
   Select,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
-import React, {useEffect, useState} from "react";
+import { styled } from "@mui/material/styles";
+import { request } from "api";
+import withScreenSecurity from "component/withScreenSecurity";
+import { useEffect, useState } from "react";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import {request} from "../../../api";
-import {useParams} from "react-router";
-import {randomImageName,} from "../../../utils/FileUpload/covert";
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router";
+import { useHistory } from "react-router-dom";
+import FileUploadZone from "utils/FileUpload/FileUploadZone";
+import { randomImageName } from "utils/FileUpload/covert";
+import { PROBLEM_ROLE, PROBLEM_STATUS } from "utils/constants";
+import HustCodeEditor from "../../common/HustCodeEditor";
 import HustContainerCard from "../../common/HustContainerCard";
 import RichTextEditor from "../../common/editor/RichTextEditor";
-import HustCodeEditor from "../../common/HustCodeEditor";
-import {COMPUTER_LANGUAGES, CUSTOM_EVALUATION} from "./Constant";
-import ListTestCase from "./ListTestCase";
-import FileUploadZone from "../../../utils/FileUpload/FileUploadZone";
+import { COMPUTER_LANGUAGES, CUSTOM_EVALUATION } from "./Constant";
 import ContestsUsingAProblem from "./ContestsUsingAProblem";
-import EditIcon from "@mui/icons-material/Edit";
-import {useHistory} from "react-router-dom";
-import {styled} from "@mui/material/styles";
-import { PROBLEM_ROLE, PROBLEM_STATUS } from "utils/constants";
+import ListTestCase from "./ListTestCase";
 
 const CssTextField = styled(TextField)({
   ".MuiInputBase-input.Mui-disabled": {
     WebkitTextFillColor: "gray",
-    color: "gray"
+    color: "gray",
   },
-  '& label.Mui-disabled': {
-    color: 'gray',
+  "& label.Mui-disabled": {
+    color: "gray",
   },
-  '& .MuiOutlinedInput-root': {
-    '& fieldset': {
-      borderColor: 'darkgray',
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: "darkgray",
     },
   },
 });
 
 function ManagerViewProblemDetailV2() {
-  const {t} = useTranslation(
-    ["education/programmingcontest/problem", "common", "validation"]
-  );
+  const { t } = useTranslation([
+    "education/programmingcontest/problem",
+    "common",
+    "validation",
+  ]);
 
-  const {problemId} = useParams();
+  const { problemId } = useParams();
   const history = useHistory();
 
   const [problemName, setProblemName] = useState("");
@@ -61,11 +65,15 @@ function ManagerViewProblemDetailV2() {
   const [timeLimitPYTHON, setTimeLimitPYTHON] = useState(1);
   const [memoryLimit, setMemoryLimit] = useState(1);
   const [levelId, setLevelId] = useState("");
-  const [languageSolution, setLanguageSolution] = useState(COMPUTER_LANGUAGES.CPP17);
+  const [languageSolution, setLanguageSolution] = useState(
+    COMPUTER_LANGUAGES.CPP17
+  );
   const [codeSolution, setCodeSolution] = useState("");
   const [isPreloadCode, setIsPreloadCode] = useState(false);
   const [preloadCode, setPreloadCode] = useState("");
-  const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState(COMPUTER_LANGUAGES.CPP17);
+  const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState(
+    COMPUTER_LANGUAGES.CPP17
+  );
   const [solutionChecker, setSolutionChecker] = useState("");
   const [isCustomEvaluated, setIsCustomEvaluated] = useState(false);
   const [isPublic, setIsPublic] = useState(false);
@@ -125,26 +133,28 @@ function ManagerViewProblemDetailV2() {
             }}
             startIcon={<EditIcon sx={{ marginRight: "4px" }} />}
             sx={{ marginRight: "8px" }}
-            disabled={!roles.includes(PROBLEM_ROLE.OWNER) && (
-              !roles.includes(PROBLEM_ROLE.EDITOR) || status !== PROBLEM_STATUS.OPEN
-            )}
+            disabled={
+              !roles.includes(PROBLEM_ROLE.OWNER) &&
+              (!roles.includes(PROBLEM_ROLE.EDITOR) ||
+                status !== PROBLEM_STATUS.OPEN)
+            }
           >
             Edit
           </Button>
-          {
-          roles.includes(PROBLEM_ROLE.OWNER) && <Button
-            variant="contained"
-            color="info"
-            onClick={() => {
-              history.push(
-                "/programming-contest/user-contest-problem-role-management/" +
-                  problemId
-              );
-            }}
-          >
-            Manage Role
-          </Button>
-          }
+          {roles.includes(PROBLEM_ROLE.OWNER) && (
+            <Button
+              variant="contained"
+              color="info"
+              onClick={() => {
+                history.push(
+                  "/programming-contest/user-contest-problem-role-management/" +
+                    problemId
+                );
+              }}
+            >
+              Manage Role
+            </Button>
+          )}
         </>
       }
     >
@@ -184,8 +194,10 @@ function ManagerViewProblemDetailV2() {
             disabled
             fullWidth
             id="isPublicProblem"
-            label={t("public", {ns: "common"})}
-            value={isPublic ? t("yes", {ns: "common"}) : t("no", {ns: "common"})}
+            label={t("public", { ns: "common" })}
+            value={
+              isPublic ? t("yes", { ns: "common" }) : t("no", { ns: "common" })
+            }
           />
         </Grid>
 
@@ -198,8 +210,10 @@ function ManagerViewProblemDetailV2() {
             type="number"
             value={timeLimitCPP}
             InputProps={{
-              startAdornment: <InputAdornment position="start">C/CPP: </InputAdornment>,
-              endAdornment: <InputAdornment position="end">s</InputAdornment>
+              startAdornment: (
+                <InputAdornment position="start">C/CPP: </InputAdornment>
+              ),
+              endAdornment: <InputAdornment position="end">s</InputAdornment>,
             }}
           />
         </Grid>
@@ -213,8 +227,10 @@ function ManagerViewProblemDetailV2() {
             type="number"
             value={timeLimitJAVA}
             InputProps={{
-              startAdornment: <InputAdornment position="start">JAVA: </InputAdornment>,
-              endAdornment: <InputAdornment position="end">s</InputAdornment>
+              startAdornment: (
+                <InputAdornment position="start">JAVA: </InputAdornment>
+              ),
+              endAdornment: <InputAdornment position="end">s</InputAdornment>,
             }}
           />
         </Grid>
@@ -228,8 +244,10 @@ function ManagerViewProblemDetailV2() {
             type="number"
             value={timeLimitPYTHON}
             InputProps={{
-              startAdornment: <InputAdornment position="start">PYTHON: </InputAdornment>,
-              endAdornment: <InputAdornment position="end">s</InputAdornment>
+              startAdornment: (
+                <InputAdornment position="start">PYTHON: </InputAdornment>
+              ),
+              endAdornment: <InputAdornment position="end">s</InputAdornment>,
             }}
           />
         </Grid>
@@ -242,103 +260,105 @@ function ManagerViewProblemDetailV2() {
             label={t("memoryLimit")}
             type="number"
             value={memoryLimit}
-            InputProps={{endAdornment: <InputAdornment position="end">MB</InputAdornment>}}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">MB</InputAdornment>,
+            }}
           />
         </Grid>
 
         <Grid item xs={12}>
-          <FormControl sx={{width: "100%"}}>
+          <FormControl sx={{ width: "100%" }}>
             <InputLabel id="select-tag-label">Tags</InputLabel>
             <Select
               id="select-tag"
               multiple
               value={selectedTags}
-              input={<OutlinedInput label="Tags"/>}
+              input={<OutlinedInput label="Tags" />}
               renderValue={(selectedTags) => (
-                <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.8}}>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.8 }}>
                   {selectedTags?.map((selectedTag) => (
-                    <Chip size="small" label={selectedTag.name} sx={{
-                      marginRight: "6px",
-                      marginBottom: "6px",
-                      border: "1px solid lightgray",
-                      fontStyle: "italic"
-                    }}/>
+                    <Chip
+                      size="small"
+                      label={selectedTag.name}
+                      sx={{
+                        marginRight: "6px",
+                        marginBottom: "6px",
+                        border: "1px solid lightgray",
+                        fontStyle: "italic",
+                      }}
+                    />
                   ))}
                 </Box>
               )}
-            >
-            </Select>
+            ></Select>
           </FormControl>
         </Grid>
       </Grid>
 
-      <Box sx={{marginTop: "24px", marginBottom: "24px"}}>
-        <Typography variant="h5" component="div" sx={{marginBottom: "8px"}}>
+      <Box sx={{ marginTop: "24px", marginBottom: "24px" }}>
+        <Typography variant="h5" component="div" sx={{ marginBottom: "8px" }}>
           {t("problemDescription")}
         </Typography>
-        <RichTextEditor toolbarHidden content={description} onContentChange={text => setDescription(text)}/>
+        <RichTextEditor
+          toolbarHidden
+          content={description}
+          onContentChange={(text) => setDescription(text)}
+        />
         <HustCodeEditor
-        title="Sample TestCase"
-        language={COMPUTER_LANGUAGES.C}
-        sourceCode={sampleTestCase}
-         />             
+          title="Sample TestCase"
+          language={COMPUTER_LANGUAGES.C}
+          sourceCode={sampleTestCase}
+        />
       </Box>
 
       {fetchedImageArray.length !== 0 &&
         fetchedImageArray.map((file) => (
-          <FileUploadZone file={file} removable={false}/>
+          <FileUploadZone file={file} removable={false} />
         ))}
 
-      <Box sx={{marginTop: "28px"}}/>
+      <Box sx={{ marginTop: "28px" }} />
       <HustCodeEditor
         title={t("correctSourceCode")}
         language={languageSolution}
         sourceCode={codeSolution}
       />
 
-      <Box sx={{marginTop: "12px"}}>
+      <Box sx={{ marginTop: "12px" }}>
         <FormControlLabel
           label={t("isPreloadCode")}
-          control={
-            <Checkbox
-              disabled
-              checked={isPreloadCode}
-            />}
+          control={<Checkbox disabled checked={isPreloadCode} />}
         />
-        {isPreloadCode &&
+        {isPreloadCode && (
           <HustCodeEditor
             title={t("preloadCode")}
             sourceCode={preloadCode}
             height="280px"
           />
-        }
+        )}
       </Box>
 
-      <Box sx={{marginTop: "24px"}}>
+      <Box sx={{ marginTop: "24px" }}>
         <FormControlLabel
           label={t("isCustomEvaluated")}
-          control={
-            <Checkbox
-              disabled
-              checked={isCustomEvaluated}
-            />}
+          control={<Checkbox disabled checked={isCustomEvaluated} />}
         />
 
-        {isCustomEvaluated &&
+        {isCustomEvaluated && (
           <HustCodeEditor
             title={t("checkerSourceCode")}
             language={solutionCheckerLanguage}
             sourceCode={solutionChecker}
             placeholder={t("checkerSourceCodePlaceholder")}
           />
-        }
+        )}
       </Box>
 
-      <ListTestCase/>
+      <ListTestCase />
 
-      <ContestsUsingAProblem problemId={problemId}/>
+      <ContestsUsingAProblem problemId={problemId} />
     </HustContainerCard>
   );
 }
 
-export default ManagerViewProblemDetailV2;
+const screenName = "SCR_MANAGER_PROBLEM_DETAIL";
+export default withScreenSecurity(ManagerViewProblemDetailV2, screenName, true);

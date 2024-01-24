@@ -12,6 +12,7 @@ import {
 import Box from "@mui/material/Box";
 import { request } from "api";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
+import withScreenSecurity from "component/withScreenSecurity";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import displayTime from "utils/DateTimeUtils";
@@ -78,7 +79,7 @@ export const resolveLanguage = (str) => {
   return undefined;
 };
 
-export default function ContestProblemSubmissionDetailViewedByManager() {
+function ContestProblemSubmissionDetailViewedByManager() {
   const { problemSubmissionId } = useParams();
 
   const [submission, setSubmission] = useState({});
@@ -380,3 +381,10 @@ export default function ContestProblemSubmissionDetailViewedByManager() {
     </Stack>
   );
 }
+
+const screenName = "SCR_MANAGER_CONTEST_SUBMISSION_DETAIL";
+export default withScreenSecurity(
+  ContestProblemSubmissionDetailViewedByManager,
+  screenName,
+  true
+);

@@ -1,8 +1,8 @@
-import {Box, Grid, Paper} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
-import {useEffect, useState} from "react";
-import {Bar, Doughnut, HorizontalBar, Line} from "react-chartjs-2";
-import {request} from "../../api";
+import { Box, Grid, Paper } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import { request } from "api";
+import { useEffect, useState } from "react";
+import { Bar, Doughnut, HorizontalBar, Line } from "react-chartjs-2";
 import withScreenSecurity from "../withScreenSecurity";
 
 const useStyles = makeStyles((theme) => ({
@@ -540,5 +540,5 @@ function MainDashBoard(props) {
   );
 }
 
-const screenName = "SCREEN_DATA_ADMIN_VIEW_MAIN_DASHBOARD";
-export default MainDashBoard;
+const screenName = "SCR_ADMIN_MAIN_DASHBOARD";
+export default withScreenSecurity(MainDashBoard, screenName, true);

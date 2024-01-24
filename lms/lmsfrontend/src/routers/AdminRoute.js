@@ -1,14 +1,13 @@
-import React from "react";
-import {Route, Switch, useRouteMatch} from "react-router";
-import ViewCourseVideo from "../component/dataadmin/ViewCourseVideo";
-import ViewLogUserDoPraticeQuizs from "../component/dataadmin/ViewLogUserDoPraticeQuizs";
-import MainDashBoard from "../component/dataadmin/MainDashBoard";
-import ViewProgrammingContestSubmission from "../component/dataadmin/ViewProgrammingContestSubmission";
-import StudentLearningProfiles from "../views/dataadmin/viewlearningprofiles/StudentLearningProfiles";
-import LearningProfileList from "../views/dataadmin/viewlearningprofiles/LearningProfileList";
+import MainDashBoard from "component/dataadmin/MainDashBoard";
+import ViewCourseVideo from "component/dataadmin/ViewCourseVideo";
+import ViewLogUserDoPraticeQuizs from "component/dataadmin/ViewLogUserDoPraticeQuizs";
+import ViewProgrammingContestSubmission from "component/dataadmin/ViewProgrammingContestSubmission";
+import { Route, Switch, useRouteMatch } from "react-router";
+import LearningProfileList from "views/dataadmin/viewlearningprofiles/LearningProfileList";
+import StudentLearningProfiles from "views/dataadmin/viewlearningprofiles/StudentLearningProfiles";
 
 export default function AdminRoute() {
-  let {path} = useRouteMatch();
+  let { path } = useRouteMatch();
   return (
     <div>
       <Switch>
@@ -34,12 +33,16 @@ export default function AdminRoute() {
           path={`${path}/view-log-user-do-pratice-quiz/list`}
         ></Route>
 
-        <Route path={`${path}/view-learning-profiles/users`}
-               component={LearningProfileList}
-               exact/>
-        <Route path={`${path}/view-learning-profiles/users/:studentLoginId`}
-               component={StudentLearningProfiles}
-               exact/>
+        <Route
+          path={`${path}/view-learning-profiles/users`}
+          component={LearningProfileList}
+          exact
+        />
+        <Route
+          path={`${path}/view-learning-profiles/users/:studentLoginId`}
+          component={StudentLearningProfiles}
+          exact
+        />
       </Switch>
     </div>
   );

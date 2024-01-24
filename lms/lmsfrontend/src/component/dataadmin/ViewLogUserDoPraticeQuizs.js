@@ -1,7 +1,6 @@
+import { request } from "api";
 import MaterialTable from "material-table";
-import React from "react";
-import {request} from "../../api";
-import {toFormattedDateTime} from "../../utils/dateutils";
+import { toFormattedDateTime } from "utils/dateutils";
 import withScreenSecurity from "../withScreenSecurity";
 
 function ViewLogUserDoPraticeQuizs() {
@@ -63,5 +62,5 @@ function ViewLogUserDoPraticeQuizs() {
   );
 }
 
-const screenName = "SCREEN_DATA_ADMIN_VIEW_USER_DO_QUIZS";
-export default ViewLogUserDoPraticeQuizs;
+const screenName = "SCR_ADMIN_LOG_DOING_QUIZ";
+export default withScreenSecurity(ViewLogUserDoPraticeQuizs, screenName, true);

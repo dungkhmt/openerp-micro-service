@@ -8,6 +8,7 @@ import { Grid, InputAdornment, LinearProgress } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { request } from "api";
 import StyledSelect from "component/select/StyledSelect";
+import withScreenSecurity from "component/withScreenSecurity";
 import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,7 +16,7 @@ import { useParams } from "react-router-dom";
 import { errorNoti, successNoti } from "utils/notification";
 import HustContainerCard from "../../common/HustContainerCard";
 
-export default function EditContest() {
+function EditContest() {
   const { t } = useTranslation([
     "education/programmingcontest/contest",
     "common",
@@ -357,3 +358,6 @@ export default function EditContest() {
     </div>
   );
 }
+
+const screenName = "SCR_EDIT_CONTEST";
+export default withScreenSecurity(EditContest, screenName, true);

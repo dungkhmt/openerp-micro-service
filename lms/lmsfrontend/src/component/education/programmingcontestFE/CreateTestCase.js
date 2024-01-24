@@ -1,20 +1,28 @@
-import {Box, Button, Chip, CircularProgress, Grid, MenuItem, TextField} from "@mui/material";
 import PublishIcon from "@mui/icons-material/Publish";
+import {
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Grid,
+  MenuItem,
+  TextField,
+} from "@mui/material";
+import { request } from "api";
+import withScreenSecurity from "component/withScreenSecurity";
+import { useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
+import { successNoti, warningNoti } from "utils/notification";
 import HustContainerCard from "../../common/HustContainerCard";
-import * as React from "react";
-import {useState} from "react";
-import {useHistory, useParams} from "react-router-dom";
-import {successNoti, warningNoti} from "../../../utils/notification";
-import {request} from "../../../api";
 
 //TODO: improve this screen
 // 1. Add sample file: When user choose upload -> open a modal with sample file to download
 // 2. Show the output of the testcase after submitting
-export default function CreateTestCase(props) {
+function CreateTestCase(props) {
   const history = useHistory();
   const [input, setInput] = useState("");
   const [result, setResult] = useState("");
-  const {problemId} = useParams();
+  const { problemId } = useParams();
   const [description, setDescription] = useState("");
   const [load, setLoad] = useState(false);
   const [checkTestcaseResult, setCheckTestcaseResult] = useState(false);
@@ -130,14 +138,19 @@ export default function CreateTestCase(props) {
   };
 
   return (
-    <HustContainerCard title={'Create new Test case'}>
+    <HustContainerCard title={"Create new Test case"}>
       <Button color="primary" variant="outlined" component="label">
-        <PublishIcon/> Upload testcase file
-        <input hidden type="file" id="selected-upload-file" onChange={onFileChange}/>
+        <PublishIcon /> Upload testcase file
+        <input
+          hidden
+          type="file"
+          id="selected-upload-file"
+          onChange={onFileChange}
+        />
       </Button>
       {filename && (
         <Chip
-          style={{marginLeft: "20px"}}
+          style={{ marginLeft: "20px" }}
           color="success"
           variant="outlined"
           label={filename.name}
@@ -149,7 +162,7 @@ export default function CreateTestCase(props) {
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-          marginTop: "24px"
+          marginTop: "24px",
         }}
       >
         <TextField
@@ -163,7 +176,7 @@ export default function CreateTestCase(props) {
           onChange={(event) => {
             setPoint(event.target.value);
           }}
-          sx={{width: "10%"}}
+          sx={{ width: "10%" }}
         />
         <TextField
           select
@@ -173,7 +186,7 @@ export default function CreateTestCase(props) {
             setIsPublic(event.target.value);
           }}
           value={isPublic}
-          sx={{width: "10%"}}
+          sx={{ width: "10%" }}
         >
           <MenuItem key={"Y"} value={"Y"}>
             {"Yes"}
@@ -191,7 +204,7 @@ export default function CreateTestCase(props) {
             setUploadMode(event.target.value);
           }}
           value={uploadMode}
-          sx={{width: "15%"}}
+          sx={{ width: "15%" }}
         >
           <MenuItem key={"NOT_EXECUTE"} value={"NOT_EXECUTE"}>
             {"NOT_EXECUTE"}
@@ -207,7 +220,7 @@ export default function CreateTestCase(props) {
           onChange={(event) => {
             setDescription(event.target.value);
           }}
-          sx={{width: "60%"}}
+          sx={{ width: "60%" }}
         />
       </Box>
 
@@ -237,10 +250,17 @@ export default function CreateTestCase(props) {
             >
               SUBMIT
             </Button>
-            {isProcessing ? <CircularProgress/> : <h2> Status: {uploadMessage}</h2>}
+            {isProcessing ? (
+              <CircularProgress />
+            ) : (
+              <h2> Status: {uploadMessage}</h2>
+            )}
           </Grid>
         </Grid>
       </form>
     </HustContainerCard>
   );
 }
+
+const screenName = "SCR_CREATE_TESTCASE";
+export default withScreenSecurity(CreateTestCase, screenName, true);

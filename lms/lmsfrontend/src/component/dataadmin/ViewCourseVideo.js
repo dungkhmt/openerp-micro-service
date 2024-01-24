@@ -1,7 +1,6 @@
+import { request } from "api";
 import MaterialTable from "material-table";
-import React from "react";
-import {request} from "../../api";
-import {toFormattedDateTime} from "../../utils/dateutils";
+import { toFormattedDateTime } from "utils/dateutils";
 import withScreenSecurity from "../withScreenSecurity";
 
 function ViewCourseVideo() {
@@ -82,5 +81,5 @@ function ViewCourseVideo() {
   );
 }
 
-const screenName = "SCREEN_DATA_ADMIN_VIEW_COURSE_VIDEO";
-export default ViewCourseVideo;
+const screenName = "SCR_ADMIN_VIEW_COURSE_VIDEO";
+export default withScreenSecurity(ViewCourseVideo, screenName, true);

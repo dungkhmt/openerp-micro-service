@@ -1,14 +1,17 @@
-import React, {useEffect, useState} from "react";
-import {request} from "../../../api";
-import {Box, Button, IconButton,} from "@mui/material";
-import {Link} from "react-router-dom";
-import {successNoti} from "../../../utils/notification";
 import EditIcon from "@mui/icons-material/Edit";
-import StandardTable, {TablePaginationActions} from "../../table/StandardTable";
+import { Box, Button, IconButton } from "@mui/material";
 import TablePagination from "@mui/material/TablePagination";
-import {defaultDatetimeFormat} from "../../../utils/dateutils";
+import { request } from "api";
+import withScreenSecurity from "component/withScreenSecurity";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { defaultDatetimeFormat } from "utils/dateutils";
+import { successNoti } from "utils/notification";
+import StandardTable, {
+  TablePaginationActions,
+} from "../../table/StandardTable";
 
-export default function AllContestsManager() {
+function AllContestsManager() {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPage] = useState(0);
@@ -16,12 +19,10 @@ export default function AllContestsManager() {
   const [contests, setContests] = useState([]);
 
   const switchJudgeMode = (mode) => {
-    request(
-      "post",
-      "/contests/switch-judge-mode?mode=" + mode,
-      () => successNoti("Saved", 5000)
+    request("post", "/contests/switch-judge-mode?mode=" + mode, () =>
+      successNoti("Saved", 5000)
     ).then();
-  }
+  };
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -36,10 +37,7 @@ export default function AllContestsManager() {
   async function getContestList() {
     request(
       "get",
-      "/admin/contests?size=" +
-      pageSize +
-      "&page=" +
-      page,
+      "/admin/contests?size=" + pageSize + "&page=" + page,
       (res) => {
         setTotalPage(res.data.count);
         setContests(res.data.contests);
@@ -52,61 +50,59 @@ export default function AllContestsManager() {
   }, [page, pageSize]);
 
   const columns = [
-      {
-        title: "Contest",
-        render: (contest) => (
-          <Link
-            to={
-              "/programming-contest/contest-manager/" +
-              encodeURIComponent(contest.contestId)
-            }
-            style={{
-              textDecoration: "none",
-              color: "blue",
-            }}
-          >
-            {contest.contestName}
-          </Link>
-        )
-      },
-      {title: "Status", field: "statusId"},
-      {title: "Created By", field: "userId"},
-      {
-        title: "Created At",
-        field: "createdAt",
-        render: (contest) => defaultDatetimeFormat(contest.createdAt)
-      },
-      {
-        title: "Edit",
-        render: (contest) => (
-          <Link
-            to={
-              "/programming-contest/contest-edit/" +
-              encodeURIComponent(contest.contestId)
-            }
-          >
-            <IconButton variant="contained" color="success">
-              <EditIcon/>
-            </IconButton>
-          </Link>
-        ),
-      },
-    ]
-  ;
-
+    {
+      title: "Contest",
+      render: (contest) => (
+        <Link
+          to={
+            "/programming-contest/contest-manager/" +
+            encodeURIComponent(contest.contestId)
+          }
+          style={{
+            textDecoration: "none",
+            color: "blue",
+          }}
+        >
+          {contest.contestName}
+        </Link>
+      ),
+    },
+    { title: "Status", field: "statusId" },
+    { title: "Created By", field: "userId" },
+    {
+      title: "Created At",
+      field: "createdAt",
+      render: (contest) => defaultDatetimeFormat(contest.createdAt),
+    },
+    {
+      title: "Edit",
+      render: (contest) => (
+        <Link
+          to={
+            "/programming-contest/contest-edit/" +
+            encodeURIComponent(contest.contestId)
+          }
+        >
+          <IconButton variant="contained" color="success">
+            <EditIcon />
+          </IconButton>
+        </Link>
+      ),
+    },
+  ];
   return (
     <>
-      <Box sx={{marginBottom: 4}}>
+      <Box sx={{ marginBottom: 4 }}>
         <Button
           variant="contained"
-          sx={{marginBottom: "12px", marginRight: "16px"}}
+          sx={{ marginBottom: "12px", marginRight: "16px" }}
           onClick={() => switchJudgeMode("ASYNCHRONOUS_JUDGE_MODE_QUEUE")}
         >
           Switch all to judge mode QUEUE
         </Button>
         <Button
           variant="contained"
-          sx={{marginBottom: "12px"}}
+          sx={{ marginBottom: "12px" }}
           onClick={() => switchJudgeMode("SYNCHRONOUS_JUDGE_MODE")}
         >
           Switch all to judge mode non-QUEUE
@@ -125,7 +121,7 @@ export default function AllContestsManager() {
           }}
           key={contests.length}
           components={{
-            Pagination: props => (
+            Pagination: (props) => (
               <TablePagination
                 {...props}
                 rowsPerPageOptions={pageSizes}
@@ -143,3 +139,6 @@ export default function AllContestsManager() {
     </>
   );
 }
+
+const screenName = "SCR_ALL_CONTESTS";
+export default withScreenSecurity(AllContestsManager, screenName, true);
