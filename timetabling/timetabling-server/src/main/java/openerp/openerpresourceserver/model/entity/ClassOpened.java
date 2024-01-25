@@ -3,6 +3,8 @@ package openerp.openerpresourceserver.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Objects;
+
 @Entity
 @Data
 @Builder
@@ -35,4 +37,21 @@ public class ClassOpened {
     private String secondWeekday;
     private String secondClassroom;
     private Boolean isSeparateClass = false;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ClassOpened that = (ClassOpened) o;
+
+        return Objects.equals(moduleName, that.moduleName) &&
+                Objects.equals(moduleCode, that.moduleCode) &&
+                Objects.equals(classCode, that.classCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(moduleName, moduleCode, classCode);
+    }
 }

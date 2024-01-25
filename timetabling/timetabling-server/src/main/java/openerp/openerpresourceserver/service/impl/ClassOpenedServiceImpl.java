@@ -249,7 +249,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
 
     private Long calculateTotalPeriod(String mass) {
         //a(b-c-d-e) => b-c-d-e => b,c,d,e => b+c
-        String numbersString = mass.substring(2, mass.indexOf(')'));
+        String numbersString = mass.trim().substring(2, mass.indexOf(')'));
         String[] numbersArray = numbersString.split("-");
         return Long.parseLong(numbersArray[0]) + Long.parseLong(numbersArray[1]);
     }

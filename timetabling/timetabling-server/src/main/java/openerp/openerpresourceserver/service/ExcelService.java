@@ -16,7 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import openerp.openerpresourceserver.helper.ExcelHelper;
 
@@ -83,66 +85,73 @@ public class ExcelService {
             List<ClassOpened> classOpenedConflictList = new ArrayList<>();
             for (ClassOpened el : tutorials) {
                 if (el != null && !el.getCourse().isEmpty() && !el.getStudyClass().isEmpty()) {
-//                    if (el.getStartPeriod() != null && el.getClassroom() != null && el.getWeekday() != null) {
-//                        el.setSemester(semester);
-//                        String crew = el.getCrew();
-//                        Long startPeriod = Long.parseLong(el.getStartPeriod());
-//                        String weekday = el.getWeekday();
-//                        String classroom = el.getClassroom();
-//                        long currentFinish = this.calculateFinishPeriod(el.getMass(), startPeriod, el.getIsSeparateClass());
-//
-//                        boolean setClassroomDone;
-//                        List<ClassOpened> existedClassOpened = classOpenedRepo
-//                                .getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull(semester, classroom, weekday, crew);
-//                        List<ClassOpened> existedClassOpenedSecond = classOpenedRepo
-//                                .getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull(semester, classroom, weekday, crew);
-//
-//                        //Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
-//                        setClassroomDone = this.checkConflictTimeForListFirstClass(existedClassOpened, startPeriod, currentFinish);
-//
-//                        //Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
-//                        setClassroomDone = this.checkConflictTimeForListSecondClass(existedClassOpenedSecond, startPeriod, currentFinish) && setClassroomDone;
-//
-//                        if (!setClassroomDone) {
-//                            classOpenedConflictList.add(el);
-//                            el.setState(CONFLICT_CLASS);
-//                            el.setClassroom(null);
-//                            el.setWeekday(null);
-//                            el.setStartPeriod(null);
-//                        }
-//                        classOpenedRepo.save(el);
-//
-//                        if (el.getIsSeparateClass()) {
-//                            startPeriod = Long.parseLong(el.getSecondStartPeriod());
-//                            weekday = el.getSecondWeekday();
-//                            classroom = el.getSecondClassroom();
-//                            currentFinish = this.calculateFinishPeriod(el.getMass(), startPeriod, el.getIsSeparateClass());
-//                            boolean setClassroomDoneSecond;
-//                            List<ClassOpened> listClassOpened = classOpenedRepo.
-//                                    getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull
-//                                            (semester, classroom, weekday, crew);
-//                            List<ClassOpened> listSecondClassOpened = classOpenedRepo.
-//                                    getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot
-//                                            (semester, classroom, weekday, crew, el.getId());
-//
-//                            //Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
-//                            setClassroomDoneSecond = this.checkConflictTimeForListFirstClass(listClassOpened, startPeriod, currentFinish);
-//
-//                            //Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
-//                            setClassroomDoneSecond = this.checkConflictTimeForListSecondClass(listSecondClassOpened, startPeriod, currentFinish) && setClassroomDoneSecond;
-//
-//                            if (!setClassroomDoneSecond) {
-//                                classOpenedConflictList.add(el);
-//                                el.setState(CONFLICT_SECOND_CLASS);
-//                                el.setSecondClassroom(null);
-//                                el.setSecondStartPeriod(null);
-//                                el.setSecondWeekday(null);
-//                            }
-//                            classOpenedRepo.save(el);
-//                        }
-//                    } else
                     el.setSemester(semester);
-                    classOpenedRepo.save(el);
+                    if (el.getStartPeriod() != null && el.getClassroom() != null && el.getWeekday() != null) {
+                        String crew = el.getCrew();
+                        Long startPeriod = Long.parseLong(el.getStartPeriod());
+                        String weekday = el.getWeekday();
+                        String classroom = el.getClassroom();
+                        long currentFinish = this.calculateFinishPeriod(el.getMass(), startPeriod, el.getIsSeparateClass());
+
+                        boolean setClassroomDone;
+                        List<ClassOpened> existedClassOpened = classOpenedRepo
+                                .getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull(semester, classroom, weekday, crew);
+                        List<ClassOpened> existedClassOpenedSecond = classOpenedRepo
+                                .getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull(semester, classroom, weekday, crew);
+
+                        //Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
+                        setClassroomDone = this.checkConflictTimeForListFirstClass(existedClassOpened, startPeriod, currentFinish);
+
+                        //Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
+                        setClassroomDone = this.checkConflictTimeForListSecondClass(existedClassOpenedSecond, startPeriod, currentFinish) && setClassroomDone;
+
+                        if (!setClassroomDone) {
+                            classOpenedConflictList.add(el);
+                            el.setState(CONFLICT_CLASS);
+                            el.setClassroom(null);
+                            el.setWeekday(null);
+                            el.setStartPeriod(null);
+                        }
+                        classOpenedRepo.save(el);
+
+                        if (el.getIsSeparateClass()) {
+                            startPeriod = Long.parseLong(el.getSecondStartPeriod());
+                            weekday = el.getSecondWeekday();
+                            classroom = el.getSecondClassroom();
+                            currentFinish = this.calculateFinishPeriod(el.getMass(), startPeriod, el.getIsSeparateClass());
+                            boolean setClassroomDoneSecond;
+                            List<ClassOpened> listClassOpened = classOpenedRepo.
+                                    getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull
+                                            (semester, classroom, weekday, crew);
+                            List<ClassOpened> listSecondClassOpened = classOpenedRepo.
+                                    getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot
+                                            (semester, classroom, weekday, crew, el.getId());
+
+                            //Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
+                            setClassroomDoneSecond = this.checkConflictTimeForListFirstClass(listClassOpened, startPeriod, currentFinish);
+
+                            //Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
+                            setClassroomDoneSecond = this.checkConflictTimeForListSecondClass(listSecondClassOpened, startPeriod, currentFinish) && setClassroomDoneSecond;
+
+                            if (!setClassroomDoneSecond) {
+                                boolean isExisted = classOpenedConflictList.contains(el);
+                                if (isExisted) {
+                                    String stateExisted = el.getState();
+                                    el.setState(stateExisted + "," + CONFLICT_SECOND_CLASS);
+                                } else {
+                                    classOpenedConflictList.add(el);
+                                    el.setState(CONFLICT_SECOND_CLASS);
+                                }
+                                el.setSecondClassroom(null);
+                                el.setSecondStartPeriod(null);
+                                el.setSecondWeekday(null);
+                            }
+                            classOpenedRepo.save(el);
+                        }
+                    } else classOpenedRepo.save(el);
+
+//                    el.setSemester(semester);
+//                    classOpenedRepo.save(el);
                 }
             }
             return classOpenedConflictList;

@@ -248,20 +248,20 @@ public class ExcelHelper {
                     Cell currentCell = cellsInRow.next();
                     String cellValue = getCellValueAsString(currentCell);
                     //check and set study time
-//                    if (cellIdx > 15 && !cellValue.isEmpty()) {
-//                        weekday = (cellIdx - DEFAULT_VALUE_CALCULATE_TIME) / NUMBER_PERIODS_PER_DAY + 2 + "";
-//                        startPeriod = (cellIdx - DEFAULT_VALUE_CALCULATE_TIME) % NUMBER_PERIODS_PER_DAY + "";
-//                        classroom = cellValue;
-//                        if (classOpened.getStartPeriod() == null) {
-//                            classOpened.setWeekday(weekday);
-//                            classOpened.setStartPeriod(startPeriod);
-//                            classOpened.setClassroom(classroom);
-//                        } else {
-//                            classOpened.setSecondWeekday(weekday);
-//                            classOpened.setSecondStartPeriod(startPeriod);
-//                            classOpened.setSecondClassroom(classroom);
-//                        }
-//                    }
+                    if (cellIdx > 15 && !cellValue.isEmpty()) {
+                        weekday = (cellIdx - DEFAULT_VALUE_CALCULATE_TIME) / NUMBER_PERIODS_PER_DAY + 2 + "";
+                        startPeriod = (cellIdx - DEFAULT_VALUE_CALCULATE_TIME) % NUMBER_PERIODS_PER_DAY + "";
+                        classroom = cellValue;
+                        if (classOpened.getStartPeriod() == null) {
+                            classOpened.setWeekday(weekday);
+                            classOpened.setStartPeriod(startPeriod);
+                            classOpened.setClassroom(classroom);
+                        } else {
+                            classOpened.setSecondWeekday(weekday);
+                            classOpened.setSecondStartPeriod(startPeriod);
+                            classOpened.setSecondClassroom(classroom);
+                        }
+                    }
                     switch (cellIdx) {
                         case 0:
                             classOpened.setQuantity(cellValue);
