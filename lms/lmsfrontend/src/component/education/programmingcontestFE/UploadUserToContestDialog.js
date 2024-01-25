@@ -153,7 +153,7 @@ export default function UploadUserToContestDialog(props) {
         {uploadedUsers.length > 0 && (
           <StandardTable
             title={
-              uploadedUsers.filter((user) => user.status === "SUCCESSFUL")
+              uploadedUsers.filter((user) => user.status === "Successful")
                 .length +
               "/" +
               uploadedUsers.length +
