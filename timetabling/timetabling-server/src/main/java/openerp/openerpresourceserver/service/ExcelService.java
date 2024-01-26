@@ -25,9 +25,7 @@ import openerp.openerpresourceserver.helper.ExcelHelper;
 @Service
 public class ExcelService {
 
-    public static final String CONFLICT_CLASS = "Lịch học bị trùng";
-
-    public static final String CONFLICT_SECOND_CLASS = "Lịch học của lớp thứ hai bị trùng";
+    public static final String CONFLICT_CLASS = "Trùng lịch với lớp: ";
 
     @Autowired
     private ScheduleRepo scheduleRepo;
@@ -93,25 +91,30 @@ public class ExcelService {
                         String classroom = el.getClassroom();
                         long currentFinish = this.calculateFinishPeriod(el.getMass(), startPeriod, el.getIsSeparateClass());
 
-                        boolean setClassroomDone;
+                        String conflictClass = null;
+                        String conflictSecondClass = null;
                         List<ClassOpened> existedClassOpened = classOpenedRepo
                                 .getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull(semester, classroom, weekday, crew);
                         List<ClassOpened> existedClassOpenedSecond = classOpenedRepo
                                 .getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull(semester, classroom, weekday, crew);
 
                         //Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
-                        setClassroomDone = this.checkConflictTimeForListFirstClass(existedClassOpened, startPeriod, currentFinish);
+                        conflictClass = this.checkConflictTimeForListFirstClass(existedClassOpened, startPeriod, currentFinish);
 
                         //Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
-                        setClassroomDone = this.checkConflictTimeForListSecondClass(existedClassOpenedSecond, startPeriod, currentFinish) && setClassroomDone;
+                        conflictSecondClass = this.checkConflictTimeForListSecondClass(existedClassOpenedSecond, startPeriod, currentFinish);
 
-                        if (!setClassroomDone) {
+                        if (conflictClass != null || conflictSecondClass != null ) {
                             classOpenedConflictList.add(el);
-                            el.setState(CONFLICT_CLASS);
+                            String stateConflict =
+                                    conflictClass != null ? conflictClass + "," : "" + " "
+                                    + conflictSecondClass != null ? conflictSecondClass + "," : "";
+                            el.setState(CONFLICT_CLASS + stateConflict);
                             el.setClassroom(null);
                             el.setWeekday(null);
                             el.setStartPeriod(null);
                         }
+
                         classOpenedRepo.save(el);
 
                         if (el.getIsSeparateClass()) {
@@ -119,7 +122,8 @@ public class ExcelService {
                             weekday = el.getSecondWeekday();
                             classroom = el.getSecondClassroom();
                             currentFinish = this.calculateFinishPeriod(el.getMass(), startPeriod, el.getIsSeparateClass());
-                            boolean setClassroomDoneSecond;
+                            String conflictClassSecond = null;
+                            String conflictSecondClassSecond = null;
                             List<ClassOpened> listClassOpened = classOpenedRepo.
                                     getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull
                                             (semester, classroom, weekday, crew);
@@ -128,19 +132,22 @@ public class ExcelService {
                                             (semester, classroom, weekday, crew, el.getId());
 
                             //Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
-                            setClassroomDoneSecond = this.checkConflictTimeForListFirstClass(listClassOpened, startPeriod, currentFinish);
+                            conflictClassSecond = this.checkConflictTimeForListFirstClass(listClassOpened, startPeriod, currentFinish);
 
                             //Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
-                            setClassroomDoneSecond = this.checkConflictTimeForListSecondClass(listSecondClassOpened, startPeriod, currentFinish) && setClassroomDoneSecond;
+                            conflictSecondClassSecond = this.checkConflictTimeForListSecondClass(listSecondClassOpened, startPeriod, currentFinish);
 
-                            if (!setClassroomDoneSecond) {
+                            if (conflictClassSecond != null || conflictSecondClassSecond != null) {
                                 boolean isExisted = classOpenedConflictList.contains(el);
+                                String stateConflict =
+                                        conflictClassSecond != null ? conflictClassSecond + "," : "" + " "
+                                                + conflictSecondClassSecond != null ? conflictSecondClassSecond + "," : "";
                                 if (isExisted) {
                                     String stateExisted = el.getState();
-                                    el.setState(stateExisted + "," + CONFLICT_SECOND_CLASS);
+                                    el.setState(stateExisted + " " + stateConflict);
                                 } else {
                                     classOpenedConflictList.add(el);
-                                    el.setState(CONFLICT_SECOND_CLASS);
+                                    el.setState(CONFLICT_CLASS + stateConflict);
                                 }
                                 el.setSecondClassroom(null);
                                 el.setSecondStartPeriod(null);
@@ -160,35 +167,34 @@ public class ExcelService {
         }
     }
 
-    private Boolean checkConflictTimeForListFirstClass(List<ClassOpened> listClassOpened, long currentStartPeriod, long currentFinish) {
-        boolean setClassroomDone = true;
+    private String checkConflictTimeForListFirstClass(List<ClassOpened> listClassOpened, long currentStartPeriod, long currentFinish) {
         for (ClassOpened el : listClassOpened) {
             String supMass = el.getMass();
+            String moduleName = el.getModuleName();
             Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
             long existedStartPeriod = Long.parseLong(el.getStartPeriod());
             long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
 
             if (!this.compareTimeForSetClassroom(currentStartPeriod, currentFinish, existedStartPeriod, existedFinishPeriod)) {
-                setClassroomDone = false;
-                break;
+                return moduleName;
             }
         }
-        return setClassroomDone;
+        return null;
     }
 
-    private Boolean checkConflictTimeForListSecondClass(List<ClassOpened> listSecondClassOpened, long currentStartPeriod, long currentFinish) {
-        boolean setClassroomDone = true;
+    private String checkConflictTimeForListSecondClass(List<ClassOpened> listSecondClassOpened, long currentStartPeriod, long currentFinish) {
         for (ClassOpened el : listSecondClassOpened) {
             String supMass = el.getMass();
+            String moduleName = el.getModuleName();
             Boolean isSeparateClassExisted = el.getIsSeparateClass() != null ? el.getIsSeparateClass() : false;
             long existedStartPeriod = Long.parseLong(el.getSecondStartPeriod());
             long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
 
             if (!this.compareTimeForSetClassroom(currentStartPeriod, currentFinish, existedStartPeriod, existedFinishPeriod)) {
-                setClassroomDone = false;
+                return moduleName;
             }
         }
-        return setClassroomDone;
+        return null;
     }
 
     private Boolean compareTimeForSetClassroom(long currentStartPeriod, long currentFinish,

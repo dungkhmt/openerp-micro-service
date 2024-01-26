@@ -76,6 +76,36 @@ const columns = [
         headerName: "Khóa",
         field: "course",
         width: 100
+    },
+    {
+        headerName: "Tiết BĐ",
+        field: "startPeriod",
+        width: 100
+    },
+    {
+        headerName: "Thứ",
+        field: "weekday",
+        width: 100
+    },
+    {
+        headerName: "Phòng",
+        field: "classroom",
+        width: 100
+    },
+    {
+        headerName: "Tiết BĐ thứ hai",
+        field: "secondStartPeriod",
+        width: 100
+    },
+    {
+        headerName: "Thứ",
+        field: "secondWeekday",
+        width: 100
+    },
+    {
+        headerName: "Phòng",
+        field: "secondClassroom",
+        width: 100
     }
 ];
 

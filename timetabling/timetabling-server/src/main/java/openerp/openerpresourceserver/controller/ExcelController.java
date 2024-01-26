@@ -68,7 +68,7 @@ public class ExcelController {
                 return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
             }
         }
-        message = "Please upload an excel file!";
+//        message = "Please upload an excel file!";
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 

@@ -94,6 +94,21 @@ const columns = [
         headerName: "Phòng",
         field: "classroom",
         width: 100
+    },
+    {
+        headerName: "Tiết BĐ thứ hai",
+        field: "secondStartPeriod",
+        width: 100
+    },
+    {
+        headerName: "Thứ",
+        field: "secondWeekday",
+        width: 100
+    },
+    {
+        headerName: "Phòng",
+        field: "secondClassroom",
+        width: 100
     }
 ];
 
