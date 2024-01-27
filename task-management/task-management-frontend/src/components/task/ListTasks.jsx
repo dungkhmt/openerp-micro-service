@@ -1,4 +1,3 @@
-import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
@@ -13,38 +12,29 @@ import {
   MenuItem,
   Paper,
   Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { request } from "../../api";
 import PieChart from "../chart/PieChart";
-import CategoryElement from "../common/CategoryElement";
 import HistoryStatus from "../common/HistoryStatus";
-import { useScroll } from "../customhook/useScroll";
 import ExportExcelButton from "../exportexcel/ExportExcelButton";
 import AddNewMemberModal from "../projects/AddNewMemberModal";
+import StandardTable from "../table/StandardTable";
 import { boxChildComponent, boxComponentStyle } from "../utils/constant";
 import { LimitString } from "../utils/helpers";
 import MemberTable from "./MemberTable";
 
 const ListTasks = () => {
   const [openAddNewMemberModal, setOpenAddNewMemberModal] = useState(false);
-
+  const navigate = useNavigate();
   const [members, setMembers] = useState([]);
   const [isLoadMember, setIsLoadMember] = useState(false);
   const { projectId } = useParams();
   const [projectName, setProjectName] = useState("");
-
-  const [executeScroll, elRef] = useScroll();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const openMenu = Boolean(anchorEl);
@@ -57,45 +47,38 @@ const ListTasks = () => {
 
   const columns = [
     {
-      id: "category",
-      label: "Loại nhiệm vụ",
-      minWidth: 170,
+      field: "category",
+      title: "Loại nhiệm vụ",
       align: "center",
     },
     {
-      id: "taskName",
-      label: "Tên nhiệm vụ",
-      minWidth: 170,
+      field: "taskName",
+      title: "Tên nhiệm vụ",
+      align: "center",
+      render: (rowData) => (
+        <Tooltip title={rowData.taskName}>
+          <span>{LimitString(50, rowData.taskName)}</span>
+        </Tooltip>
+      ),
+    },
+    {
+      field: "status",
+      title: "Trạng thái",
       align: "center",
     },
     {
-      id: "description",
-      label: "Mô tả",
-      minWidth: 170,
+      field: "priority",
+      title: "Mức độ ưu tiên",
       align: "center",
     },
     {
-      id: "status",
-      label: "Trạng thái",
-      minWidth: 170,
+      field: "assignee",
+      title: "Gán cho",
       align: "center",
     },
     {
-      id: "priority",
-      label: "Mức độ ưu tiên",
-      minWidth: 170,
-      align: "center",
-    },
-    {
-      id: "assignee",
-      label: "Gán cho",
-      minWidth: 170,
-      align: "center",
-    },
-    {
-      id: "dueDate",
-      label: "Hạn kết thúc",
-      minWidth: 170,
+      field: "dueDate",
+      title: "Hạn kết thúc",
       align: "center",
     },
   ];
@@ -110,18 +93,6 @@ const ListTasks = () => {
   const [dataChartStatus, setDataChartStatus] = useState([]);
 
   const [rows, setRows] = useState([]);
-
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
 
   const [value, setValue] = React.useState("4");
 
@@ -143,8 +114,6 @@ const ListTasks = () => {
   }, [isLoadMember]);
 
   useEffect(() => {
-    executeScroll;
-
     request(
       "get",
       `/projects/${projectId}/tasks`,
@@ -154,8 +123,8 @@ const ListTasks = () => {
           return {
             id: task.id,
             category: task.taskCategory?.categoryName,
-            taskName: LimitString(50, task.name),
-            description: LimitString(50, task.description),
+            taskName: task.name,
+            description: task.description,
             status:
               task.statusItem === null
                 ? "Không xác định !"
@@ -437,142 +406,44 @@ const ListTasks = () => {
             </Box>
           </TabPanel>
           <TabPanel value="4">
-            <Box sx={boxComponentStyle} ref={elRef}>
-              <Box
-                sx={{ mb: 3, display: "flex", justifyContent: "space-between" }}
-              >
-                <Typography variant="h5">Danh sách các nhiệm vụ</Typography>
-                <Box display={"flex"} alignItems={"center"}>
-                  <Link
-                    to={`/project/tasks/create/${projectId}`}
-                    style={{ textDecoration: "none", marginRight: "15px" }}
+            {/* <Box sx={boxComponentStyle} ref={elRef}> */}
+            <Box
+              sx={{ mb: 3, display: "flex", justifyContent: "space-between" }}
+            >
+              <Typography variant="h5">Danh sách các nhiệm vụ</Typography>
+              <Box display={"flex"} alignItems={"center"}>
+                <Link
+                  to={`/project/tasks/create/${projectId}`}
+                  style={{ textDecoration: "none", marginRight: "15px" }}
+                >
+                  <Button variant="outlined" color="primary">
+                    Thêm nhiệm vụ
+                  </Button>
+                </Link>
+                <Box>
+                  <IconButton
+                    aria-label="delete"
+                    size="large"
+                    onClick={handleClickMenu}
                   >
-                    <Button variant="outlined" color="primary">
-                      Thêm nhiệm vụ
-                    </Button>
-                  </Link>
-                  <Box>
-                    <IconButton
-                      aria-label="delete"
-                      size="large"
-                      onClick={handleClickMenu}
-                    >
-                      <SettingsOutlinedIcon />
-                    </IconButton>
-                  </Box>
+                    <SettingsOutlinedIcon />
+                  </IconButton>
                 </Box>
               </Box>
-              <Paper sx={{ width: "100%", overflow: "hidden" }}>
-                <TableContainer sx={{ maxHeight: 440 }}>
-                  <Table stickyHeader aria-label="sticky table">
-                    <TableHead>
-                      <TableRow>
-                        {columns.map((column) => (
-                          <TableCell
-                            key={column.id}
-                            align={column.align}
-                            style={{ minWidth: column.minWidth }}
-                          >
-                            {column.label}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {rows
-                        .slice(
-                          page * rowsPerPage,
-                          page * rowsPerPage + rowsPerPage
-                        )
-                        .map((row) => {
-                          return (
-                            <TableRow
-                              hover
-                              role="checkbox"
-                              tabIndex={-1}
-                              key={row.id}
-                            >
-                              {columns.map((column) => {
-                                const value = row[column.id];
-                                if (column.id === "category") {
-                                  return (
-                                    <TableCell
-                                      key={column.id}
-                                      align={column.align}
-                                    >
-                                      <CategoryElement
-                                        categoryId={row.categoryId}
-                                        value={value}
-                                      />
-                                    </TableCell>
-                                  );
-                                }
-
-                                if (column.id === "dueDate") {
-                                  return (
-                                    <TableCell
-                                      key={column.id}
-                                      align={column.align}
-                                    >
-                                      <Box
-                                        sx={{
-                                          display: "flex",
-                                          alignItems: "center",
-                                        }}
-                                      >
-                                        {row.outOfDate && (
-                                          <>
-                                            <LocalFireDepartmentIcon color="error" />
-                                          </>
-                                        )}{" "}
-                                        {value}
-                                      </Box>
-                                    </TableCell>
-                                  );
-                                }
-
-                                if (column.id === "taskName") {
-                                  return (
-                                    <TableCell
-                                      key={column.id}
-                                      align={column.align}
-                                    >
-                                      <Link
-                                        to={`/tasks/${row.id}`}
-                                        style={{ textDecoration: "none" }}
-                                      >
-                                        {value}
-                                      </Link>
-                                    </TableCell>
-                                  );
-                                }
-
-                                return (
-                                  <TableCell
-                                    key={column.id}
-                                    align={column.align}
-                                  >
-                                    {value}
-                                  </TableCell>
-                                );
-                              })}
-                            </TableRow>
-                          );
-                        })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                <TablePagination
-                  rowsPerPageOptions={[10, 25, 100]}
-                  component="div"
-                  count={rows.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-              </Paper>
             </Box>
+            <Paper sx={{ width: "100%", overflow: "hidden" }}>
+              <StandardTable
+                title=""
+                hideCommandBar
+                columns={columns}
+                onRowClick={(event, rowData) => {
+                  navigate(`/tasks/${rowData.id}`);
+                }}
+                data={rows}
+                options={{ selection: false, pageSize: 10 }}
+              />
+            </Paper>
+            {/* </Box> */}
           </TabPanel>
         </TabContext>
       </Box>
