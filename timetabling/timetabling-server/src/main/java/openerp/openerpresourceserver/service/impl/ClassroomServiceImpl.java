@@ -51,6 +51,10 @@ public class ClassroomServiceImpl implements ClassroomService {
             if (!classroomList.isEmpty()) {
                 throw new ClassroomUsedException("Phòng học " + requestDto.getClassroom() + " đã tồn tại!!");
             }
+            List<ClassOpened> classOpenedList = classOpenedRepo.getAllByClassroom(classroom.getClassroom(), null);
+            if (!classOpenedList.isEmpty()) {
+                throw new ClassroomUsedException("Phòng học " + classroom.getClassroom() + " đang được sử dụng. Không thể sửa đổi!");
+            }
         }
         classroom.setClassroom(requestDto.getClassroom());
         classroom.setBuilding(requestDto.getBuilding());

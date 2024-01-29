@@ -54,6 +54,11 @@ public class GroupServiceImpl implements GroupService {
             if (!groupList.isEmpty()) {
                 throw new GroupUsedException("Nhóm " + requestDto.getGroupName() + "đã tồn tại! ");
             }
+            List<ClassOpened> classOpenedList = classOpenedRepo.getAllByGroupName(group.getGroupName(), null);
+            classOpenedList.forEach(el -> {
+                el.setGroupName(requestDto.getGroupName());
+                classOpenedRepo.save(el);
+            });
         }
         group.setGroupName(requestDto.getGroupName());
         group.setPriorityBuilding(requestDto.getPriorityBuilding());

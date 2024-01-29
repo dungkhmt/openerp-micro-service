@@ -44,6 +44,10 @@ public class SemesterServiceImpl implements SemesterService {
             if (!existedSemesters.isEmpty()) {
                 throw new SemesterUsedException("Kỳ học " + requestDto.getSemester() + " đã tồn tại!");
             }
+            List<ClassOpened> classOpenedList = classOpenedRepo.getAllBySemester(semester.getSemester(), null);
+            if (!classOpenedList.isEmpty()) {
+                throw new SemesterUsedException("Kỳ học " + semester.getSemester() + " đang được sử dụng. Không thể sửa đổi!");
+            }
         }
         semester.setSemester(requestDto.getSemester());
         semester.setDescription(requestDto.getDescription());
