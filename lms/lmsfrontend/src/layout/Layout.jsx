@@ -10,7 +10,7 @@ import clsx from "clsx";
 import React, {useEffect, useState} from "react";
 import {useLocation} from "react-router-dom";
 import {ReactComponent as HustProgrammingLogo} from "../assets/icons/hust-programming-icon.svg";
-import bgImage from "../assets/img/sidebar-2.webp";
+import bgImage from "../assets/img/sidebar1.jpg";
 import AccountButton from "./account/AccountButton";
 import LanguageSwitch from "./languageswitcher/LanguageSwitch";
 import NotificationButton from "./notification/NotificationButton";

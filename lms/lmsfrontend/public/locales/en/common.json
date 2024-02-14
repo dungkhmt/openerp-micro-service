@@ -11,5 +11,7 @@
   "no": "No",
   "missingField": "must not be null",
   "addNew": "Add new",
-  "status": "Status"
+  "status": "Status",
+  "login": "Login",
+  "loginSubtext": "Discover the future of technology with code"
 }

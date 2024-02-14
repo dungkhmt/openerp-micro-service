@@ -1,17 +1,18 @@
-import { Box, Typography } from "@material-ui/core";
+import {Box, Typography} from "@material-ui/core";
 import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import { useKeycloak } from "@react-keycloak/web";
+import {useKeycloak} from "@react-keycloak/web";
 import PropTypes from "prop-types";
-import { useEffect } from "react";
+import {useEffect} from "react";
 import SimpleBar from "simplebar-react";
 import "simplebar/dist/simplebar.min.css";
-import PrimaryButton from "../../../component/button/PrimaryButton";
-import { fetchMenu } from "../../../state/MenuState";
-import GroupMenuItem, { menuItemBaseStyle } from "./GroupMenuItem";
-import { blackColor, whiteColor } from "./MenuItem";
+import {fetchMenu} from "../../../state/MenuState";
+import GroupMenuItem, {menuItemBaseStyle} from "./GroupMenuItem";
+import {blackColor, whiteColor} from "./MenuItem";
 import {MENU_LIST} from "../../../config/menuconfig";
+import {useTranslation} from "react-i18next";
+import {Button} from "@mui/material";
 
 export const drawerWidth = 300;
 export const miniDrawerWidth = 50;
@@ -35,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
   signInText: {
     ...menuItemBaseStyle(theme).menuItemText,
-    fontSize: "1rem",
+    fontSize: "1.1rem",
     whiteSpace: "break-spaces",
     color: whiteColor,
     textAlign: "center",
@@ -65,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
       content: '""',
       display: "block",
       background: blackColor,
-      opacity: ".8",
+      opacity: ".7",
     },
   },
 
@@ -83,9 +84,10 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SideBar(props) {
   const classes = useStyles();
-  const { open, image, color: bgColor } = props;
+  const {t} = useTranslation(["common"]);
+  const {open, image, color: bgColor} = props;
 
-  const { keycloak } = useKeycloak();
+  const {keycloak} = useKeycloak();
 
   useEffect(() => {
     if (keycloak.authenticated) fetchMenu();
@@ -115,7 +117,7 @@ export default function SideBar(props) {
       >
         <List component="nav">
           {MENU_LIST.map((group) => (
-            <GroupMenuItem key={group.text} group={group} color={bgColor} />
+            <GroupMenuItem key={group.text} group={group} color={bgColor}/>
           ))}
         </List>
       </SimpleBar>
@@ -130,21 +132,21 @@ export default function SideBar(props) {
           mr="auto"
         >
           <Typography className={classes.signInText}>
-            Đăng nhập ngay để sử dụng những tính năng dành riêng cho bạn
+            {t("loginSubtext")}
           </Typography>
-          <PrimaryButton
+          <Button
             onClick={() => keycloak.login()}
-            style={{ width: 160, borderRadius: 25 }}
+            sx={{width: 160, borderRadius: 20, backgroundColor: "#00acc1 !important", color: "#fff"}}
           >
-            Đăng nhập
-          </PrimaryButton>
+            {t("login")}
+          </Button>
         </Box>
       )}
       {/* </div> */}
       {image && (
         <div
           className={classes.background}
-          style={{ backgroundImage: "url(" + image + ")" }}
+          style={{backgroundImage: "url(" + image + ")"}}
         />
       )}
     </Drawer>
