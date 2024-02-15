@@ -7,30 +7,30 @@ import WordCloud from "react-d3-cloud"
 export default function TopicWordCloud() {
 
   const words = [
-    {text: 'Data Structures', value: 1000},
+    {text: 'Data Structures', value: 5000},
     {text: 'Linked List', value: 120},
-    {text: 'Stack', value: 180},
+    {text: 'Stack', value: 220},
     {text: 'Queue', value: 240},
     {text: 'Heap', value: 160},
-    {text: 'Tree', value: 340},
+    {text: 'Tree', value: 380},
     {text: 'Graph', value: 80},
     {text: 'Matrix', value: 80},
-    {text: 'Searching', value: 800},
-    {text: 'BFS', value: 160},
+    {text: 'Searching', value: 1600},
+    {text: 'BFS', value: 150},
     {text: 'DFS', value: 240},
     {text: 'NP-hard', value: 290},
     {text: 'Bitwise', value: 30},
-    {text: 'Divide & Conquer', value: 160},
+    {text: 'Divide & Conquer', value: 140},
     {text: 'Greedy', value: 120},
-    {text: 'Sorting', value: 720},
+    {text: 'Sorting', value: 920},
     {text: 'HeapSort', value: 80},
-    {text: 'MergeSort', value: 210},
+    {text: 'MergeSort', value: 180},
     {text: 'QuickSort', value: 140},
     {text: 'BubbleSort', value: 30},
     {text: 'SelectionSort', value: 120},
     {text: 'Shortest Path', value: 480},
     {text: 'Spanning Tree', value: 20},
-    {text: 'Tree Traversal', value: 180},
+    {text: 'Tree Traversal', value: 280},
     {text: 'Bellman-Ford', value: 10},
     {text: 'Dijkstra', value: 40},
     {text: 'Backtracking', value: 160},
@@ -38,23 +38,23 @@ export default function TopicWordCloud() {
     {text: 'Java', value: 520},
     {text: 'C++', value: 580},
     {text: 'Python', value: 210},
-    {text: 'ReactJS', value: 190},
+    {text: 'ReactJS', value: 160},
     {text: 'Hashing', value: 280},
     {text: 'Software Development', value: 340},
-    {text: 'Optimization', value: 620},
+    {text: 'Optimization', value: 820},
     {text: 'Game Theory', value: 40},
     {text: 'Binary Tree', value: 190},
     {text: 'Array', value: 520},
     {text: 'Discrete Math', value: 380},
-    {text: 'Probability', value: 150},
-    {text: 'OOP', value: 320},
-    {text: 'Security', value: 90},
+    {text: 'Probability', value: 120},
+    {text: 'OOP', value: 420},
+    {text: 'Security', value: 50},
     {text: 'AI', value: 90},
     {text: 'Database', value: 140},
     {text: 'Networking', value: 40},
     {text: 'Operating System', value: 50},
-    {text: 'Complexity', value: 290},
-    {text: 'User Interface', value: 80},
+    {text: 'Complexity', value: 390},
+    {text: 'User Interface', value: 60},
   ]
 
   const fontSize = useCallback((word) => Math.log2(word.value) * 4, []);
@@ -65,7 +65,6 @@ export default function TopicWordCloud() {
       sx={{paddingBottom: "4px"}}
     />
     <CardContent sx={{padding: "0 !important"}}>
-      {/*<ReactWordcloud words={words} />*/}
       <WordCloud
         data={words}
         rotate={0}
@@ -74,8 +73,6 @@ export default function TopicWordCloud() {
         fontSize={fontSize}
         padding={5}
         spiral="archimedean"
-        // width={20}
-        // height={20}
       />
     </CardContent>
   </Card>;
