@@ -29,20 +29,20 @@ export default function DailyProgramming() {
         opacity: 0.8
       }}>{todayProblem.description}</Typography>
     </CardContent>
-    <Divider/>
-    <CardActions sx={{justifyContent: "flex-end"}}>
-      <Button
-        endIcon={(
-          <SvgIcon fontSize="small">
-            <ArrowRightIcon/>
-          </SvgIcon>
-        )}
-        size="small"
-        onClick={() => warningNoti("This function will be updated soon", 5000)}
-        sx={{color: "#00acc1"}}
-      >
-        Solve it
-      </Button>
-    </CardActions>
+    {/*<Divider/>*/}
+    {/*<CardActions sx={{justifyContent: "flex-end"}}>*/}
+    {/*  <Button*/}
+    {/*    endIcon={(*/}
+    {/*      <SvgIcon fontSize="small">*/}
+    {/*        <ArrowRightIcon/>*/}
+    {/*      </SvgIcon>*/}
+    {/*    )}*/}
+    {/*    size="small"*/}
+    {/*    onClick={() => warningNoti("This function will be updated soon", 5000)}*/}
+    {/*    sx={{color: "#00acc1"}}*/}
+    {/*  >*/}
+    {/*    Solve it*/}
+    {/*  </Button>*/}
+    {/*</CardActions>*/}
   </Card>;
 }

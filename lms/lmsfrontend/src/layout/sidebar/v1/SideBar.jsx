@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
     whiteSpace: "break-spaces",
     color: whiteColor,
     textAlign: "center",
-    paddingBottom: 16,
+    paddingBottom: 18,
   },
   signInContainer: {
     width: drawerWidth - 20,
@@ -104,23 +104,25 @@ export default function SideBar(props) {
       }}
     >
       {/* <div className={classNames(classes.sidebarWrapper)}> */}
-      <SimpleBar
-        style={{
-          // marginTop: 64,
-          marginBottom: 16,
-          position: "relative",
-          height: "100%",
-          zIndex: "4",
-          overflowX: "hidden",
-          overscrollBehaviorY: "none", // To prevent tag <main> be scrolled when menu'scrollbar reach end
-        }}
-      >
-        <List component="nav">
-          {MENU_LIST.map((group) => (
-            <GroupMenuItem key={group.text} group={group} color={bgColor}/>
-          ))}
-        </List>
-      </SimpleBar>
+      {keycloak.authenticated &&
+        <SimpleBar
+          style={{
+            // marginTop: 64,
+            marginBottom: 16,
+            position: "relative",
+            height: "100%",
+            zIndex: "4",
+            overflowX: "hidden",
+            overscrollBehaviorY: "none", // To prevent tag <main> be scrolled when menu'scrollbar reach end
+          }}
+        >
+          <List component="nav">
+            {MENU_LIST.map((group) => (
+              <GroupMenuItem key={group.text} group={group} color={bgColor}/>
+            ))}
+          </List>
+        </SimpleBar>
+      }
       {!keycloak.authenticated && open && (
         <Box
           className={classes.signInContainer}
@@ -128,8 +130,7 @@ export default function SideBar(props) {
           flexDirection="column"
           alignItems="center"
           justifyContent="center"
-          ml="auto"
-          mr="auto"
+          margin="auto"
         >
           <Typography className={classes.signInText}>
             {t("loginSubtext")}

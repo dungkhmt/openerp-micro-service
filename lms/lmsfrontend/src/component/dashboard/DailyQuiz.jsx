@@ -66,10 +66,10 @@ export default function DailyQuiz() {
             control={<Radio size="small" sx={{padding: "4px"}}/>}
             label={<Typography sx={{fontSize: "14px"}}>{option}</Typography>}/>)}
         </RadioGroup>
-        {isError && <FormHelperText>* Please select an option</FormHelperText>}
-        <Button sx={{marginTop: "12px", marginX: "auto"}} variant="outlined" color="success" onClick={handleSubmit}>
-          Check Answer
-        </Button>
+        {/*{isError && <FormHelperText>* Please select an option</FormHelperText>}*/}
+        {/*<Button sx={{marginTop: "12px", marginX: "auto"}} variant="outlined" color="success" onClick={handleSubmit}>*/}
+        {/*  Check Answer*/}
+        {/*</Button>*/}
       </FormControl>
     </CardContent>
 
