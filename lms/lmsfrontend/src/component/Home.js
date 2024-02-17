@@ -27,7 +27,7 @@ export default function Home() {
             variant="h6"
             sx={{color: "#ae1d2c", fontSize: "24px", fontWeight: 800, textShadow: "2px 1px 2px #e3e3e3"}}
           >
-            HUSTack - Stack your Acknowledgement
+            HUSTack
           </Typography>
           <Typography
             variant="body2"
@@ -99,19 +99,19 @@ export default function Home() {
         </Grid>
       </Grid>
       <Grid container justifyContent="space-between" sx={{marginTop: "20px"}}>
-        <Grid item xs={6.8}>
+        <Grid item xs={7}>
           <motion.div
             initial={{opacity: 0, y: 20}}
             animate={{opacity: 1, y: 0}}
             transition={{delay: 1.8, duration: 0.8}}
             children={<Box>
-              <DailyQuiz/>
-              <Box sx={{height: "24px"}}/>
+              {/*<DailyQuiz/>*/}
+              {/*<Box sx={{height: "24px"}}/>*/}
               <DailyProgramming/>
             </Box>}
           />
         </Grid>
-        <Grid item xs={4.8}>
+        <Grid item xs={4.75}>
           <motion.div
             initial={{opacity: 0, y: 20}}
             animate={{opacity: 1, y: 0}}
