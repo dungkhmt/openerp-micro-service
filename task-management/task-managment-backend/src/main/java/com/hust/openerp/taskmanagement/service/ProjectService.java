@@ -1,9 +1,11 @@
 package com.hust.openerp.taskmanagement.service;
 
-import com.hust.openerp.taskmanagement.dto.dao.ProjectPagination;
 import com.hust.openerp.taskmanagement.dto.dao.StatusTaskDao;
 import com.hust.openerp.taskmanagement.dto.form.BoardFilterInputForm;
 import com.hust.openerp.taskmanagement.entity.Project;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,7 +24,7 @@ public interface ProjectService {
 
     Project save(Project project);
 
-    ProjectPagination findPaginated(int pageNo, int pageSize);
+    Page<Project> findPaginated(Pageable pageable, String searchString);
 
     List<StatusTaskDao> getDataBoardWithFilters(BoardFilterInputForm boardFilterInputForm);
 

@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -21,13 +23,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hust.openerp.taskmanagement.dto.dao.AssignedTaskPagination;
 import com.hust.openerp.taskmanagement.dto.dao.CommentDao;
 import com.hust.openerp.taskmanagement.dto.dao.HistoryDao;
 import com.hust.openerp.taskmanagement.dto.dao.ProjectDao;
-import com.hust.openerp.taskmanagement.dto.dao.ProjectPagination;
 import com.hust.openerp.taskmanagement.dto.dao.TaskDao;
 import com.hust.openerp.taskmanagement.dto.form.BoardFilterInputForm;
 import com.hust.openerp.taskmanagement.dto.form.CategoryForm;
@@ -110,18 +112,17 @@ public class NghiaLMController {
         return ResponseEntity.ok().body(bodyResponse);
     }
 
-    @GetMapping("/projects/page={pageNo}/size={pageSize}")
-    public ResponseEntity<Object> getListProjects(
-            @PathVariable("pageNo") int pageNo,
-            @PathVariable("pageSize") int pageSize) {
-        ProjectPagination pagination = projectService.findPaginated(pageNo, pageSize);
-        return ResponseEntity.ok().body(pagination);
+    @GetMapping("/projects")
+    public ResponseEntity<Object> getListProjects(Pageable pageable,
+            @RequestParam(value = "search", required = false) String search) {
+        Page<ProjectDao> result = projectService.findPaginated(pageable, search).map(ProjectDao::new);
+        return ResponseEntity.ok().body(result);
     }
 
-    @GetMapping("/projects")
-    public ResponseEntity<Object> getAllProjects() {
-        return ResponseEntity.ok().body(projectService.getAllProjects());
-    }
+    // @GetMapping("/projects")
+    // public ResponseEntity<Object> getAllProjects() {
+    // return ResponseEntity.ok().body(projectService.getAllProjects());
+    // }
 
     @PostMapping("/projects")
     public ResponseEntity<Object> postProjects(Principal principal, @RequestBody Project project) {
