@@ -65,8 +65,8 @@ const useStyles = makeStyles((theme) => ({
       height: "100%",
       content: '""',
       display: "block",
-      background: blackColor,
-      opacity: ".7",
+      background: "#141414",
+      opacity: ".88",
     },
   },
 
