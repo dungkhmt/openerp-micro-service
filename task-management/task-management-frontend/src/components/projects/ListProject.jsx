@@ -41,8 +41,10 @@ export default function ListProject() {
       onRowClick={(_, rowData) => {
         navigate(`/project/${rowData.id}/tasks`);
       }}
-      data={({ page, pageSize, search }) =>
-        new Promise((resolve, reject) => {
+      data={({ page, pageSize, search }) => {
+        // replace the ' ' by '%1F' to avoid the error when searching
+        search = search.replace(/ /g, "%1F");
+        return new Promise((resolve, reject) => {
           request(
             "get",
             `/projects?page=${page}&size=${pageSize}${
@@ -62,8 +64,8 @@ export default function ListProject() {
               reject(err);
             }
           );
-        })
-      }
+        });
+      }}
       options={{
         selection: false,
         pageSize: 5,

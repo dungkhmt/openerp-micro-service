@@ -16,7 +16,7 @@ public class CriteriaParser {
   private static Map<String, Operator> ops;
 
   private static Pattern criteriaRegex = Pattern.compile("^(\\w+?)(" + Joiner.on("|")
-      .join(SearchOperation.SIMPLE_OPERATION_SET) + ")(\\p{Punct}?)([\\w-]+?)(\\p{Punct}?)$");
+      .join(SearchOperation.SIMPLE_OPERATION_SET) + ")(\\p{Punct}?)([\\p{L}\\w-\u001F]+?)(\\p{Punct}?)$");
 
   private enum Operator {
     OR(1), AND(2);
@@ -66,7 +66,8 @@ public class CriteriaParser {
 
         Matcher matcher = criteriaRegex.matcher(token);
         while (matcher.find()) {
-          output.push(new SearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4),
+          output.push(new SearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3),
+              matcher.group(4).replace('\u001F', ' '),
               matcher.group(5)));
         }
       }
