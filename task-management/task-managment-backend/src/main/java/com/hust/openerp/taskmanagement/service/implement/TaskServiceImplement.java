@@ -5,9 +5,18 @@ import com.hust.openerp.taskmanagement.dto.form.TaskStatusForm;
 import com.hust.openerp.taskmanagement.entity.*;
 import com.hust.openerp.taskmanagement.repository.*;
 import com.hust.openerp.taskmanagement.service.*;
+import com.hust.openerp.taskmanagement.specification.TaskSpecification;
+import com.hust.openerp.taskmanagement.specification.builder.GenericSpecificationsBuilder;
+import com.hust.openerp.taskmanagement.util.CriteriaParser;
+
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -161,7 +170,7 @@ public class TaskServiceImplement implements TaskService {
         }
 
         if (taskForm.getStatusId() != null && task.getStatusItem() != null
-            && !taskForm.getStatusId().equals(task.getStatusItem().getStatusId())) {
+                && !taskForm.getStatusId().equals(task.getStatusItem().getStatusId())) {
             taskExecution.setStatus(statusItem.getDescription());
         }
 
@@ -171,8 +180,8 @@ public class TaskServiceImplement implements TaskService {
 
         if (!taskForm.getPriorityId().equals(task.getTaskPriority().getPriorityId())) {
             taskExecution.setPriority(taskPriorityService
-                .getTaskPriorityById(taskForm.getPriorityId())
-                .getPriorityName());
+                    .getTaskPriorityById(taskForm.getPriorityId())
+                    .getPriorityName());
         }
 
         if (!taskForm.getAttachmentPaths().equals(task.getAttachmentPaths())) {
@@ -211,7 +220,7 @@ public class TaskServiceImplement implements TaskService {
         HashMap<String, List<String>> collection = new HashMap<>();
         for (int i = 0; i < userList.size(); i++) {
             userIds
-                .add(userList.get(i).getId());
+                    .add(userList.get(i).getId());
             rs.put(userIds.get(i), 0);
         }
 
@@ -257,5 +266,27 @@ public class TaskServiceImplement implements TaskService {
 
         userList.stream().filter(user -> userLoginRs.contains(user.getId())).forEach(personRs::add);
         return personRs;
+    }
+
+    public Page<Task> getTasksAssignedToUser(Pageable pageable, String assignee, @Nullable String search) {
+        // replace "assignee:value" if exist in search by "assignee:`assignee`"
+        if (search != null && !search.equals("")) {
+            if (search.contains("assignee:"))
+                search = search.replaceAll("assignee:[^ ]+", "assignee:" + assignee);
+            else
+                search = search + " AND assignee:" + assignee;
+        } else {
+            search = "assignee:" + assignee;
+        }
+
+        // default sort by created date
+        if (pageable.getSort() == null || pageable.getSort().isUnsorted()) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                    Sort.by("createdStamp").descending());
+        }
+
+        GenericSpecificationsBuilder<Task> builder = new GenericSpecificationsBuilder<>();
+        var specs = builder.build(new CriteriaParser().parse(search), TaskSpecification::new);
+        return taskRepository.findAll(specs, pageable);
     }
 }

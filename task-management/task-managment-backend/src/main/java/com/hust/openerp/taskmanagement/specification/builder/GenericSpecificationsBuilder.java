@@ -1,4 +1,4 @@
-package com.hust.openerp.taskmanagement.dto.dao;
+package com.hust.openerp.taskmanagement.specification.builder;
 
 import java.util.ArrayList;
 import java.util.Collections;

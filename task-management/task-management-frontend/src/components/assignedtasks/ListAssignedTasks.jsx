@@ -1,56 +1,101 @@
-import { Pagination, Stack, Box, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
+import { Tooltip, Typography } from "@mui/material";
 import { request } from "../../api";
-import { boxComponentStyle } from "../utils/constant";
-import AssignedTaskItem from "./AssignedTaskItem";
+import CategoryElement from "../common/CategoryElement";
+import StandardTable from "../table/StandardTable";
+import { LimitString } from "../utils/helpers";
+import { Link } from "react-router-dom";
 
 const ListAssignedTasks = () => {
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(1);
-  const [taskAssigned, setTaskAssigned] = useState([]);
-
-  const url = `/assigned-tasks-user-login/page=${page - 1}/size=5`;
-
-  useEffect(() => {
-    request(
-      "get",
-      url,
-      (res) => {
-        setLoading(false);
-        setTaskAssigned(res.data.data);
-        setTotal(res.data.totalPage);
-      },
-      (err) => {
-        console.log(err);
-      }
-    );
-  }, [url]);
+  const columns = [
+    {
+      title: "Tag",
+      align: "left",
+      render: (rowData) => (
+        <CategoryElement
+          categoryId={rowData.taskCategory.categoryId}
+          value={rowData.taskCategory.categoryName}
+        />
+      ),
+    },
+    {
+      title: "Tiêu đề",
+      align: "left",
+      render: (rowData) => (
+        <Link to={`/tasks/${rowData.id}`}>
+          <Tooltip title={rowData.name}>
+            <b>{LimitString(50, rowData.name)}</b>
+          </Tooltip>
+        </Link>
+      ),
+    },
+    {
+      title: "Dự án",
+      align: "left",
+      render: (rowData) => (
+        <Tooltip title={rowData.project.name}>
+          <b>{LimitString(50, rowData.project.name)}</b>
+        </Tooltip>
+      ),
+    },
+    {
+      title: "Thời hạn",
+      align: "center",
+      render: (rowData) => (
+        <>
+          <div>{rowData.dueDate}</div>
+          {rowData.outOfDate && <LocalFireDepartmentIcon color="error" />}
+        </>
+      ),
+    },
+    {
+      title: "Trạng thái",
+      align: "center",
+      render: (rowData) => (
+        <Typography variant="caption" sx={{ color: "red" }}>
+          {rowData.timeRemaining}
+        </Typography>
+      ),
+    },
+  ];
 
   return (
-    <>
-      <Box sx={boxComponentStyle}>
-        <Box mb={4}>
-          <Typography variant="h4" mb={4} component={"h4"}>
-            Danh sách các nhiệm vụ được giao
-          </Typography>
-        </Box>
-        {loading && <Typography variant="body2">Loading......</Typography>}
-        {taskAssigned.map((task) => (
-          <AssignedTaskItem key={task.id} task={task} />
-        ))}
-      </Box>
-      <Box display={"flex"} justifyContent="center">
-        <Stack spacing={2}>
-          <Pagination
-            count={total}
-            page={page}
-            onChange={(e, value) => setPage(value)}
-            color="primary"
-          />
-        </Stack>
-      </Box>
-    </>
+    <StandardTable
+      title="Danh sách các nhiệm vụ được giao"
+      hideCommandBar
+      columns={columns}
+      onRowClick={(_, rowData) => {
+        navigate(`/tasks/${rowData.id}`);
+      }}
+      data={({ page, pageSize, search }) => {
+        search = search.replace(/ /g, "%1F");
+        return new Promise((resolve, reject) => {
+          request(
+            "get",
+            `/assigned-tasks-user-login?page=${page}&size=${pageSize}${
+              search === ""
+                ? ""
+                : `&search=name:*${search}* OR description:*${search}*`
+            }`,
+            (res) => {
+              resolve({
+                data: res.data.content,
+                page,
+                totalCount: res.data.totalElements,
+              });
+            },
+            (err) => {
+              console.log(err);
+              reject(err);
+            }
+          );
+        });
+      }}
+      options={{
+        selection: false,
+        pageSize: 5,
+      }}
+    />
   );
 };
 

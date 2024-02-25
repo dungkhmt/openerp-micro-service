@@ -13,8 +13,9 @@ const CategoryElement = ({ categoryId, value }) => {
         borderColor: TASK_CATEGORY_COLOR[categoryId],
         backgroundColor: TASK_CATEGORY_COLOR[categoryId],
         px: 2,
-        mr: 2,
         color: "#fff",
+        width: "fit-content",
+        textAlign: "center",
       }}
     >
       {value}

@@ -82,4 +82,8 @@ public class Task {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_user_id", insertable = false, updatable = false)
     private User createdByUser;
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "task")
+    @JoinColumn(name = "id", insertable = false, updatable = false)
+    private TaskAssignment assignment;
 }

@@ -10,8 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.hust.openerp.taskmanagement.dto.dao.GenericSpecificationsBuilder;
-import com.hust.openerp.taskmanagement.dto.dao.ProjectSpecification;
 import com.hust.openerp.taskmanagement.dto.dao.StatusTaskDao;
 import com.hust.openerp.taskmanagement.dto.dao.TaskDao;
 import com.hust.openerp.taskmanagement.dto.form.BoardFilterInputForm;
@@ -25,6 +23,8 @@ import com.hust.openerp.taskmanagement.service.ProjectService;
 import com.hust.openerp.taskmanagement.service.TaskAssignableService;
 import com.hust.openerp.taskmanagement.service.TaskStatusService;
 import com.hust.openerp.taskmanagement.service.UserService;
+import com.hust.openerp.taskmanagement.specification.ProjectSpecification;
+import com.hust.openerp.taskmanagement.specification.builder.GenericSpecificationsBuilder;
 import com.hust.openerp.taskmanagement.util.CriteriaParser;
 
 import lombok.AllArgsConstructor;

@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hust.openerp.taskmanagement.dto.dao.AssignedTaskPagination;
 import com.hust.openerp.taskmanagement.dto.dao.CommentDao;
 import com.hust.openerp.taskmanagement.dto.dao.HistoryDao;
 import com.hust.openerp.taskmanagement.dto.dao.ProjectDao;
@@ -276,17 +275,14 @@ public class NghiaLMController {
         return ResponseEntity.ok(persons);
     }
 
-    @GetMapping("/assigned-tasks-user-login/page={pageNo}/size={pageSize}")
+    @GetMapping("/assigned-tasks-user-login")
     public ResponseEntity<Object> getAssignedTasksUserLogin(
             Principal principal,
-            @PathVariable("pageNo") int pageNo,
-            @PathVariable("pageSize") int pageSize) {
-        String userLoginId = principal.getName();
-        AssignedTaskPagination assignedTaskPagination = taskAssignableService.getAssignedTaskPaginated(
-                userLoginId,
-                pageNo,
-                pageSize);
-        return ResponseEntity.ok(assignedTaskPagination);
+            Pageable pageable, @RequestParam(value = "search", required = false) String search) {
+        String assignee = principal.getName();
+        var tasks = taskService.getTasksAssignedToUser(pageable, assignee, search);
+        var result = tasks.map(task -> new TaskDao(task, assignee));
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/projects/{projectId}/statics/{type}")

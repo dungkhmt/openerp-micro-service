@@ -5,6 +5,11 @@ import com.hust.openerp.taskmanagement.dto.form.TaskStatusForm;
 import com.hust.openerp.taskmanagement.entity.StatusItem;
 import com.hust.openerp.taskmanagement.entity.Task;
 import com.hust.openerp.taskmanagement.entity.User;
+
+import jakarta.annotation.Nullable;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,4 +40,6 @@ public interface TaskService {
     void addTaskSkill(UUID taskId, String skillId);
 
     List<User> suggestAssignTask(UUID projectId, List<String> skillIds);
+
+    Page<Task> getTasksAssignedToUser(Pageable pageable, String assignee, @Nullable String search);
 }
