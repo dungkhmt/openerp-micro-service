@@ -235,26 +235,26 @@ public class NghiaLMController {
         // push notification and send mail
         // TODO: refactor this into a service
 
-        try {
-            notificationsService.sendNotification(
-                    "admin",
-                    assignee.getId(),
-                    "Bạn được giao nhiệm vụ mới: " + taskRes.getName(),
-                    "/project/" + projectId + "/tasks");
+        // try {
+        // notificationsService.sendNotification(
+        // "admin",
+        // assignee.getId(),
+        // "Bạn được giao nhiệm vụ mới: " + taskRes.getName(),
+        // "/project/" + projectId + "/tasks");
 
-            String assigneeMail = assignee.getEmail();
-            // FIXME: this is a hack, we should use a template engine
-            mailService.sendSimpleMail(
-                    new String[] { assigneeMail },
-                    "OPEN ERP - Thông báo bạn đã được giao nhiệm vụ mới",
-                    "Bạn đã được giao nhiệm vụ mới: " +
-                            taskRes.getName() +
-                            ". Đây là email tự động, bạn không trả lời lại email này!",
-                    "OpenERP");
-        } catch (Exception e) {
-            e.printStackTrace();
-            // TODO: handle async exception
-        }
+        // String assigneeMail = assignee.getEmail();
+        // // FIXME: this is a hack, we should use a template engine
+        // mailService.sendSimpleMail(
+        // new String[] { assigneeMail },
+        // "OPEN ERP - Thông báo bạn đã được giao nhiệm vụ mới",
+        // "Bạn đã được giao nhiệm vụ mới: " +
+        // taskRes.getName() +
+        // ". Đây là email tự động, bạn không trả lời lại email này!",
+        // "OpenERP");
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // // TODO: handle async exception
+        // }
 
         return ResponseEntity.ok(taskRes);
     }
