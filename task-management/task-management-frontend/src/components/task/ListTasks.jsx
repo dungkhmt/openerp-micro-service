@@ -77,6 +77,11 @@ const ListTasks = () => {
       align: "center",
     },
     {
+      field: "createdStamp",
+      title: "Ngày tạo",
+      align: "center",
+    },
+    {
       field: "dueDate",
       title: "Hạn kết thúc",
       align: "center",
@@ -134,9 +139,9 @@ const ListTasks = () => {
             dueDate: task.dueDate,
             categoryId: task.taskCategory?.categoryId,
             outOfDate: task.outOfDate,
+            createdStamp: task.createdStamp,
           };
         });
-        console.log(rowsTask);
         setRows(rowsTask);
       },
       (err) => {

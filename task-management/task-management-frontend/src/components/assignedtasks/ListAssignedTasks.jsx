@@ -49,6 +49,16 @@ const ListAssignedTasks = () => {
       ),
     },
     {
+      title: "Người tạo",
+      align: "center",
+      render: (rowData) => <div>{rowData.createdByUserLoginId}</div>,
+    },
+    {
+      title: "Ngày tạo",
+      align: "center",
+      render: (rowData) => <div>{rowData.createdStamp}</div>,
+    },
+    {
       title: "Trạng thái",
       align: "center",
       render: (rowData) => (
@@ -93,7 +103,7 @@ const ListAssignedTasks = () => {
       }}
       options={{
         selection: false,
-        pageSize: 5,
+        pageSize: 10,
       }}
     />
   );

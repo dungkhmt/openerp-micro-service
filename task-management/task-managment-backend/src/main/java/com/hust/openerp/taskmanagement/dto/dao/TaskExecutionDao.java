@@ -1,6 +1,5 @@
 package com.hust.openerp.taskmanagement.dto.dao;
 
-import com.hust.openerp.taskmanagement.entity.Task;
 import com.hust.openerp.taskmanagement.entity.TaskExecution;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +11,7 @@ import java.util.*;
 public class TaskExecutionDao {
 
     private UUID id;
-    private Task task;
+    private TaskDao task;
     private String createdByUserLoginId;
     private String executionTags;
     private String comment;
@@ -27,7 +26,7 @@ public class TaskExecutionDao {
 
     public TaskExecutionDao(TaskExecution taskExecution) {
         this.setId(taskExecution.getId());
-        this.setTask(taskExecution.getTask());
+        this.setTask(new TaskDao(taskExecution.getTask(), null));
         this.setCreatedByUserLoginId(taskExecution.getCreatedByUserId());
         this.setExecutionTags(taskExecution.getExecutionTags());
         this.setComment(taskExecution.getComment());
