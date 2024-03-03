@@ -171,26 +171,26 @@ function NotificationButton() {
 
     const onError = function (e) {
       // When server SseEmitters timeout, it cause error
-      console.error(
-        `EventSource connection state: ${
-          es.readyState
-        }, error occurred: ${JSON.stringify(e)}`
-      );
+      // console.error(
+      //   `EventSource connection state: ${
+      //     es.readyState
+      //   }, error occurred: ${JSON.stringify(e)}`
+      // );
 
       if (e.target.readyState === EventSource.CLOSED) {
-        console.log(
-          new Date(),
-          `SSE closed (event readyState = ${e.target.readyState})`
-        );
+        // console.log(
+        //   new Date(),
+        //   `SSE closed (event readyState = ${e.target.readyState})`
+        // );
       } else if (e.target.readyState === EventSource.CONNECTING) {
-        console.log(
-          new Date(),
-          `SSE reconnecting (event readyState = ${e.target.readyState})`
-        );
+        // console.log(
+        //   new Date(),
+        //   `SSE reconnecting (event readyState = ${e.target.readyState})`
+        // );
       }
 
       es.close();
-      console.info(new Date(), `SSE closed`);
+      // console.info(new Date(), `SSE closed`);
       reconnect();
     };
 
@@ -233,7 +233,7 @@ function NotificationButton() {
       // In fact, this callback function is usually not fired as soon as the connection is opened,
       // but fired when the first event is received. Don't know the reason but this doesn't matter
       es.onopen = () => {
-        console.info(new Date(), `SSE opened`);
+        // console.info(new Date(), `SSE opened`);
         // reconnectFrequencySeconds = 1;
       };
 
@@ -253,7 +253,7 @@ function NotificationButton() {
     return () => {
       es.close();
       es = null;
-      console.info(new Date(), `SSE closed`);
+      // console.info(new Date(), `SSE closed`);
     };
   }, []);
 

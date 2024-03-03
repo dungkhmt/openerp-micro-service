@@ -418,7 +418,8 @@ public class NghiaLMController {
             @RequestBody TaskStatusForm taskStatusForm,
             Principal principal) {
         String userLoginId = principal.getName();
-        return ResponseEntity.ok(taskService.updateStatusTask(taskId, taskStatusForm, userLoginId));
+        taskService.updateStatusTask(taskId, taskStatusForm, userLoginId);
+        return ResponseEntity.ok("Success");
     }
 
     @PutMapping("/tasks/{taskId}")

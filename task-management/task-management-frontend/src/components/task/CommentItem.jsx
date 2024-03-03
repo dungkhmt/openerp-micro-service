@@ -7,6 +7,7 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
+import MDEditor from "@uiw/react-md-editor";
 import { useState } from "react";
 import PropTypes from "prop-types";
 
@@ -78,7 +79,7 @@ const CommentItem = ({
           )}
         </Box>
         <Box>
-          <Typography variant="body2">{comment.comment}</Typography>
+          <MDEditor.Markdown source={comment.comment} />
 
           <Typography variant="caption" sx={{ color: "#9a9191" }}>
             {comment.status ? <>[edited]</> : <></>}
