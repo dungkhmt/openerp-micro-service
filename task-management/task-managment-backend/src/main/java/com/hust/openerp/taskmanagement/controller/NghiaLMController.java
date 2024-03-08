@@ -170,6 +170,7 @@ public class NghiaLMController {
     @GetMapping("/projects/{projectId}/tasks")
     public ResponseEntity<Object> getAllTasksInProject(@PathVariable("projectId") UUID projectId) {
         List<Task> tasks = taskService.getAllTaskInProject(projectId);
+
         List<TaskDao> taskDaoList = new ArrayList<>();
         for (Task task : tasks) {
             TaskAssignment taskAssignment = taskAssignableService.getByTaskId(task.getId());
@@ -368,7 +369,8 @@ public class NghiaLMController {
             @RequestBody CommentForm commentForm) {
         Task task = taskService.getTask(taskId);
         String userLoginId = principal.getName();
-        return ResponseEntity.ok(taskExecutionService.createTaskComment(task, commentForm, userLoginId));
+        taskExecutionService.createTaskComment(task, commentForm, userLoginId);
+        return ResponseEntity.ok("Success");
     }
 
     @DeleteMapping("/comments/{commentId}")
@@ -449,7 +451,8 @@ public class NghiaLMController {
         TaskCategory taskCategory = new TaskCategory();
         taskCategory.setCategoryId(categoryForm.getCategoryId());
         taskCategory.setCategoryName(categoryForm.getCategoryName());
-        return ResponseEntity.ok(taskCategoryService.create(taskCategory));
+        taskCategoryService.create(taskCategory);
+        return ResponseEntity.ok("Success");
     }
 
     @DeleteMapping("/task-category/{categoryId}")
