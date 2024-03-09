@@ -1,11 +1,13 @@
-import React, {useEffect, useState} from "react";
-import {request} from "../../../../api";
+import React, { useEffect, useState } from "react";
+import { request } from "../../../../api";
 //import { Card, CardContent } from "@material-ui/core";
 import StandardTable from "../../../../component/table/StandardTable";
 //import { makeStyles, MuiThemeProvider } from "@material-ui/core/styles";
 //import { defaultDatetimeFormat } from "../../utils/dateutils";
 //import { TextField, Button } from "@mui/material";
-import {useHistory} from "react-router";
+import { useHistory } from "react-router";
+import { Button } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 
 export default function TAllClassList() {
   const [eduClassList, setEduClassList] = useState([]);
@@ -21,6 +23,16 @@ export default function TAllClassList() {
     history.push(`/edu/teacher/class/detail/${rowData.id}`);
   }
 
+  const CreateClassButton = (
+    <Button
+      color="primary"
+      variant="contained"
+      onClick={() => history.push(`/edu/class/add`)}
+    >
+      <AddIcon /> Thêm mới
+    </Button>
+  );
+
   function getAllClass() {
     request("get", "/edu/class/get-all-class", (res) => {
       setEduClassList(res.data);
@@ -29,6 +41,9 @@ export default function TAllClassList() {
   useEffect(() => {
     getAllClass();
   }, []);
+
+  const actions = [{ icon: () => CreateClassButton, isFreeAction: true }];
+
   return (
     <div>
       <StandardTable
@@ -43,6 +58,7 @@ export default function TAllClassList() {
           sorting: true,
         }}
         onRowClick={navigateToClassDetailPage}
+        actions={actions}
       />
     </div>
   );

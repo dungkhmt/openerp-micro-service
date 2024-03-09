@@ -1,11 +1,7 @@
-import DateFnsUtils from "@date-io/date-fns";
-import {Button, Card, Grid, MenuItem, TextField} from "@material-ui/core/";
-import {KeyboardDatePicker, KeyboardTimePicker, MuiPickersUtilsProvider,} from "@material-ui/pickers";
-import {Typography} from "@mui/material";
-import {useEffect, useState} from "react";
-import {useParams} from "react-router";
-import {useHistory} from "react-router-dom";
-import {request} from "../../../api";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
+import { useHistory } from "react-router-dom";
+import { request } from "../../../api";
 import EditQuizTest from "./detail/EditQuizTest";
 
 const styles = {
@@ -61,13 +57,6 @@ function QuizTestEdit() {
   const [listStatusIds, setListStatusIds] = useState([]);
   const [judgeMode, setJudgeMode] = useState(null);
   const [listJudgeModes, setListJudgeModes] = useState([]);
-
-  const handleChangeDuration = (e) => {
-    setDuration(e.target.value);
-  };
-  const handleDateChange = (event) => {
-    setSelectedDate(event);
-  };
 
   function getListJudgeModes() {
     request(
@@ -171,62 +160,6 @@ function QuizTestEdit() {
     );
   }
 
-  function handleOpenQuizTest() {
-    request(
-      // token,
-      // history,
-      "get",
-      "open-quiz-test/" + testId,
-      (res) => {
-        console.log(res);
-        //alert('assign questions to groups OK');
-      },
-      { 401: () => {} }
-    );
-    history.push("/edu/class/quiztest/detail/" + testId);
-  }
-
-  function handleHideQuizTest() {
-    request(
-      // token,
-      // history,
-      "get",
-      "hide-quiz-test/" + testId,
-      (res) => {
-        console.log(res);
-        //alert('assign questions to groups OK');
-      },
-      { 401: () => {} }
-    );
-    history.push("/edu/class/quiztest/detail/" + testId);
-  }
-  function handleSubmit() {
-    let datasend = {
-      testId: testId,
-      scheduleDate: selectedDate,
-      duration: duration,
-      statusId: statusId,
-      questionStatementViewTypeId: questionStatementViewTypeId,
-      viewTypeId: viewTypeId,
-      participantQuizGroupAssignmentMode: participantQuizGroupAssignmentMode,
-      judgeMode: judgeMode,
-    };
-    request(
-      // token,
-      // history,
-      "post",
-      "update-quiz-test",
-      (res) => {
-        console.log(res);
-        //alert('assign questions to groups OK');
-      },
-      { 401: () => {} },
-      datasend
-    );
-    console.log(datasend);
-
-    history.push("/edu/class/quiztest/detail/" + testId);
-  }
   useEffect(() => {
     getListQuizTestStatusIds();
     getListQuestionStatementViewTypeId();
@@ -241,7 +174,7 @@ function QuizTestEdit() {
       <EditQuizTest />
       <br />
 
-      <Grid container spacing={1} justify="center">
+      {/* <Grid container spacing={1} justify="center">
         <Card
           style={{
             padding: "3% 10% 7% 10%",
@@ -424,9 +357,9 @@ function QuizTestEdit() {
               </div>
 
               {/* <div style={styles.label}>Ngày thi </div> */}
-            </MuiPickersUtilsProvider>
-          </form>
-          {/*
+      {/* </MuiPickersUtilsProvider>
+          </form> */}
+      {/*
             <Button
               variant="contained"
               color="primary"
@@ -448,8 +381,8 @@ function QuizTestEdit() {
               Ẩn
             </Button>
             */}
-        </Card>
-      </Grid>
+      {/* </Card>
+      </Grid> */}
     </div>
   );
 }

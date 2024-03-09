@@ -28,14 +28,14 @@ export const eduTeachingManagement = {
       child: [],
     },
 
-    {
-      id: "MENU_EDUCATION_TEACHING_MANAGEMENT_TEACHER.MENU_EDUCATION_TEACHING_MANAGEMENT_TEACHER_CREATE_CLASS",
-      path: "/edu/class/add",
-      isPublic: false,
-      icon: null,
-      text: "Create Class",
-      child: [],
-    },
+    // {
+    //   id: "MENU_EDUCATION_TEACHING_MANAGEMENT_TEACHER.MENU_EDUCATION_TEACHING_MANAGEMENT_TEACHER_CREATE_CLASS",
+    //   path: "/edu/class/add",
+    //   isPublic: false,
+    //   icon: null,
+    //   text: "Create Class",
+    //   child: [],
+    // },
     {
       id: "MENU_EDUCATION_TEACHING_MANAGEMENT_TEACHER.MENU_EDUCATION_TEACHING_MANAGEMENT_TEACHER_QUIZ_TEST_LIST",
       path: "/edu/class/quiztest/list",

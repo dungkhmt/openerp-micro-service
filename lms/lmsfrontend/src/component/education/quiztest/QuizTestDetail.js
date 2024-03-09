@@ -1,28 +1,14 @@
-import {Card, CardContent} from "@material-ui/core";
-import {Box, CircularProgress, Typography} from "@material-ui/core/";
-import {teal} from "@material-ui/core/colors";
-import {useTheme} from "@material-ui/core/styles";
-import {Skeleton} from "@material-ui/lab";
-import {request} from "api";
-import PrimaryButton from "component/button/PrimaryButton";
-import TertiaryButton from "component/button/TertiaryButton";
-import {a11yProps, AntTab, AntTabs, TabPanel} from "component/tab";
-import {useEffect, useState} from "react";
-import {FcCalendar, FcClock} from "react-icons/fc";
-import {useParams} from "react-router";
-import {Link as RouterLink} from "react-router-dom";
-import {addZeroBefore} from "utils/dateutils";
+import { Card, CardContent } from "@material-ui/core";
+import { Box, CircularProgress, Typography } from "@material-ui/core/";
+import { teal } from "@material-ui/core/colors";
+import { useTheme } from "@material-ui/core/styles";
+import { Skeleton } from "@material-ui/lab";
+import { request } from "api";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
+import { addZeroBefore } from "utils/dateutils";
 import withScreenSecurity from "../../withScreenSecurity";
 import TeacherViewQuizTestDetail from "./detail/TeacherViewQuizTestDetail";
-import ParticipantRolesOfQuizTest from "./ParticipantRolesOfQuizTest";
-import QuizListForAssignment from "./QuizListForAssignment";
-import QuizQuestionsInQuizTest from "./QuizQuestionsInQuizTest";
-import QuizTestGroupList from "./QuizTestGroupList";
-import QuizTestGroupParticipants from "./QuizTestGroupParticipants";
-import QuizTestJoinRequestList from "./QuizTestJoinRequestList";
-import QuizTestResultChart from "./QuizTestResultChart";
-import QuizTestStudentListResult from "./QuizTestResultList";
-import QuizTestStudentList from "./QuizTestStudentList";
 
 const styles = {
   btn: {
@@ -38,18 +24,18 @@ const styles = {
   },
 };
 
-const tabsLabel = [
-  "Thí sinh",
-  "Thí sinh đăng ký",
-  "Đề",
-  "Phân đề cho thí sinh",
-  "DS quiz",
-  "DS quiz trong Kỳ thi",
-  "Kết quả",
-  "Kết quả tổng quát",
-  "Biểu đồ",
-  "User Vai trò",
-];
+// const tabsLabel = [
+//   "Thí sinh",
+//   "Thí sinh đăng ký",
+//   "Đề",
+//   "Phân đề cho thí sinh",
+//   "DS quiz",
+//   "DS quiz trong Kỳ thi",
+//   "Kết quả",
+//   "Kết quả tổng quát",
+//   "Biểu đồ",
+//   "User Vai trò",
+// ];
 
 const weekDay = [
   "Chủ nhật",
@@ -67,70 +53,10 @@ function QuizTestDetail() {
 
   const [testInfo, setTestInfo] = useState([]);
   const [courseInfo, setCourseInfo] = useState();
-  const [isProcessing, setIsProcessing] = useState(false);
+  // const [isProcessing, setIsProcessing] = useState(false);
 
-  const [selectedTab, setSelectedTab] = useState(0);
+  // const [selectedTab, setSelectedTab] = useState(0);
   const theme = useTheme();
-
-  //
-  const handleChangeTab = (event, newValue) => {
-    setSelectedTab(newValue);
-  };
-
-  // function handleEditQuizTes() {
-  //   history.push("/edu/class/quiztest/edit/" + testId);
-  // }
-
-  function handleAssignStudents2QuizGroup() {
-    setIsProcessing(true);
-    let data = { quizTestId: testId };
-
-    request(
-      "post",
-      "auto-assign-participants-2-quiz-test-group",
-      (res) => {
-        console.log("assign students to groups ", res);
-        alert("assign students to groups " + res.data);
-        setIsProcessing(false);
-      },
-      { 401: () => {} },
-      data
-    );
-
-    // console.log(datasend);
-  }
-
-  function handleSummarizeResult() {
-    setIsProcessing(true);
-
-    request(
-      "get",
-      "summarize-quiz-test-execution-choice/" + testId,
-      (res) => {
-        alert("summarize finished " + res.data);
-        setIsProcessing(false);
-      },
-      { 401: () => {} }
-    );
-  }
-  function handleAssignQuestions2QuizGroup() {
-    setIsProcessing(true);
-    let data = { quizTestId: testId, numberQuestions: 10 };
-
-    request(
-      "post",
-      "auto-assign-question-2-quiz-group",
-      (res) => {
-        console.log("assign questions to groups ", res);
-        alert("assign questions to groups " + res.data);
-        setIsProcessing(false);
-      },
-      { 401: () => {} },
-      data
-    );
-
-    // console.log(datasend);
-  }
 
   async function getQuizTestDetail() {
     //do something to get test info from param.id
@@ -188,7 +114,7 @@ function QuizTestDetail() {
       <TeacherViewQuizTestDetail />
       <br />
 
-      <Card>
+      {/* <Card>
         <CardContent>
           <Typography
             variant="h5"
@@ -310,7 +236,7 @@ function QuizTestDetail() {
       </TabPanel>
       <TabPanel value={selectedTab} index={9} dir={theme.direction}>
         <ParticipantRolesOfQuizTest testId={param.id} />
-      </TabPanel>
+      </TabPanel> */}
     </>
   ) : (
     // Loading screen
