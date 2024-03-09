@@ -35,7 +35,7 @@ export default function TAllClassList() {
 
   function getAllClass() {
     request("get", "/edu/class/get-all-class", (res) => {
-      setEduClassList(res.data);
+      setEduClassList(res.data.reverse());
     }).then();
   }
   useEffect(() => {
