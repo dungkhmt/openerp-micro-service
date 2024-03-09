@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { successNoti } from "../../utils/notification";
+import { processingNoti } from "../../utils/notification";
 import { request } from "../../api";
 import DateTimePickerBasic from "../datetimepicker/DateTimePickerBasic";
 
@@ -62,18 +62,25 @@ const ChangeStatusModal = ({
       dueDate: dueDate,
     };
 
-    request(
-      "put",
-      `/tasks/${taskId}/status`,
-      () => {
-        successNoti("Cập nhật trạng thái thành công!", true);
-        handleClose();
-        onLoadTask();
-      },
-      (err) => {
-        console.log(err);
-      },
-      dataForm
+    processingNoti(
+      () =>
+        request(
+          "put",
+          `/tasks/${taskId}/status`,
+          () => {
+            handleClose();
+            onLoadTask();
+          },
+          (err) => {
+            console.log(err);
+          },
+          dataForm
+        ),
+      {
+        loading: "Đang cập nhật...",
+        success: "Cập nhật thành công!",
+        error: "Cập nhật thất bại!",
+      }
     );
   };
 

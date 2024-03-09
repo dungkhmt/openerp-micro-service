@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.util.Date;
 import java.util.UUID;
+import java.util.List;
 
 @Entity
 @Getter
@@ -83,7 +84,7 @@ public class Task {
     @JoinColumn(name = "created_by_user_id", insertable = false, updatable = false)
     private User createdByUser;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "task")
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", insertable = false, updatable = false)
-    private TaskAssignment assignment;
+    private List<TaskAssignment> assignment;
 }

@@ -40,30 +40,35 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-            .oauth2ResourceServer(
-                cfg -> cfg.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter())))
-            .sessionManagement(
-                sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/roles").permitAll())
-            .authorizeHttpRequests(
-                authorizeRequests -> authorizeRequests.requestMatchers("/actuator/prometheus/**").permitAll())
-            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/videos/videos/*").permitAll())
-            .authorizeHttpRequests(
-                authorizeRequests -> authorizeRequests.requestMatchers("/resources/**").permitAll())
-            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/css/**").permitAll())
-            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/image/**").permitAll())
-            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/js/**").permitAll())
-            .authorizeHttpRequests(
-                authorizeRequests -> authorizeRequests.requestMatchers("/export-problem/*").permitAll())
-            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/v2/api-docs").permitAll())
-            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/swagger-ui").permitAll())
-            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/public/**").permitAll())
-            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/nghialm").permitAll())
-            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
-            .requestCache(requestCache -> requestCache.requestCache(new NullRequestCache()))
-            .httpBasic(AbstractHttpConfigurer::disable)
-            .exceptionHandling(exceptionHandling -> exceptionHandling.accessDeniedHandler(accessDeniedHandler()))
-            .headers(headers -> headers.frameOptions(option -> option.disable()));
+                .oauth2ResourceServer(
+                        cfg -> cfg.jwt(jwtConfigurer -> jwtConfigurer
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                .sessionManagement(
+                        sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/roles").permitAll())
+                .authorizeHttpRequests(
+                        authorizeRequests -> authorizeRequests.requestMatchers("/actuator/prometheus/**").permitAll())
+                .authorizeHttpRequests(
+                        authorizeRequests -> authorizeRequests.requestMatchers("/videos/videos/*").permitAll())
+                .authorizeHttpRequests(
+                        authorizeRequests -> authorizeRequests.requestMatchers("/resources/**").permitAll())
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/css/**").permitAll())
+                .authorizeHttpRequests(
+                        authorizeRequests -> authorizeRequests.requestMatchers("/content/img/**").permitAll())
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/js/**").permitAll())
+                .authorizeHttpRequests(
+                        authorizeRequests -> authorizeRequests.requestMatchers("/export-problem/*").permitAll())
+                .authorizeHttpRequests(
+                        authorizeRequests -> authorizeRequests.requestMatchers("/v2/api-docs").permitAll())
+                .authorizeHttpRequests(
+                        authorizeRequests -> authorizeRequests.requestMatchers("/swagger-ui").permitAll())
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/public/**").permitAll())
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/nghialm").permitAll())
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+                .requestCache(requestCache -> requestCache.requestCache(new NullRequestCache()))
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .exceptionHandling(exceptionHandling -> exceptionHandling.accessDeniedHandler(accessDeniedHandler()))
+                .headers(headers -> headers.frameOptions(option -> option.disable()));
 
         return http.build();
     }

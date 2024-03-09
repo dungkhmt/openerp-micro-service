@@ -12,26 +12,26 @@ import {
   MenuItem,
   Skeleton,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
+import MDEditor from "@uiw/react-md-editor";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { successNoti } from "../../utils/notification";
 import { request } from "../../api";
+import { successNoti } from "../../utils/notification";
 import CategoryElement from "../common/CategoryElement";
 import StatusElement from "../common/StatusElement";
 import { boxChildComponent, boxComponentStyle } from "../utils/constant";
 import ChangeStatusModal from "./ChangeStatusModal";
 import CommentSection from "./CommentSection";
+import { CustomEditor } from "../editor/CustomEditor";
 
 const ShowTask = () => {
   const { taskId } = useParams();
   const [task, setTask] = useState(null);
   const navigate = useNavigate();
 
-  const { register, errors, handleSubmit, setValue } = useForm();
+  const [comment, setComment] = useState("");
 
   const [listComment, setListComment] = useState([]);
   const [loadComments, setLoadComments] = useState(false);
@@ -61,19 +61,18 @@ const ShowTask = () => {
     setIsLoadTask(!isLoadTask);
   };
 
-  const onSubmitComment = (data) => {
+  const onSubmitComment = () => {
     let dataForm = {
-      ...data,
+      comment,
       projectId: task.project.id,
     };
     request(
       "post",
       `tasks/${taskId}/comment`,
-      (res) => {
-        console.log(res.data);
+      () => {
         successNoti("Đã thêm mới bình luận thành công!", true);
         setLoadComments(!loadComments);
-        setValue("comment", "");
+        setComment("");
       },
       (err) => {
         console.log(err);
@@ -236,9 +235,7 @@ const ShowTask = () => {
                 </Box>
               </Box>
               <Box mb={3}>
-                <Typography variant="body1" paragraph={true}>
-                  {task.description}
-                </Typography>
+                <MDEditor.Markdown source={task.description} />
               </Box>
               <Box mb={3}>
                 <Grid container columnSpacing={2}>
@@ -340,33 +337,29 @@ const ShowTask = () => {
                 </Box>
               )}
             </Box>
+            <Box>
+              <CustomEditor
+                value={comment}
+                onChange={setComment}
+                setValue={setComment}
+              />
+              <Box display={"flex"} justifyContent={"flex-end"} mt={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={onSubmitComment}
+                  disabled={comment === ""}
+                >
+                  Thêm bình luận
+                </Button>
+              </Box>
+            </Box>
             <CommentSection
               listComment={listComment}
               loadComments={loadComments}
               setLoadCommentsCallBack={(cmt) => setLoadComments(cmt)}
               projectId={task.project.id}
             />
-            <Box>
-              <TextField
-                variant="standard"
-                label="Thêm bình luận"
-                placeholder="..."
-                fullWidth={true}
-                name="comment"
-                inputRef={register({ required: "Thiếu nội dung!" })}
-                error={!!errors?.comment}
-                helperText={errors?.comment?.message}
-              />
-              <Box display={"flex"} justifyContent={"flex-end"} mt={2}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSubmit(onSubmitComment)}
-                >
-                  Thêm bình luận
-                </Button>
-              </Box>
-            </Box>
           </Box>
           <Menu
             anchorEl={anchorEl}

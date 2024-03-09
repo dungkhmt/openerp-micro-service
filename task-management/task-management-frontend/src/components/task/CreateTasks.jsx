@@ -11,15 +11,15 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { errorNoti } from "../../utils/notification";
 import { request } from "../../api";
+import { errorNoti, processingNoti } from "../../utils/notification";
 import { boxChildComponent, boxComponentStyle } from "../utils/constant";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
 import { Link } from "react-router-dom";
-import BasicAlert from "../alert/BasicAlert";
 import DateTimePickerBasic from "../datetimepicker/DateTimePickerBasic";
+import { CustomEditor } from "../editor/CustomEditor";
 
 export default function CreateTask() {
   const navigate = useNavigate();
@@ -29,7 +29,8 @@ export default function CreateTask() {
   const [persons, setPersons] = useState([]);
   const [projects, setProjects] = useState([]);
   const [projectName, setProjectName] = useState("");
-  const { register, errors, handleSubmit } = useForm();
+
+  const { register, errors, handleSubmit, control, setValue } = useForm();
 
   const [categoryId, setCategoryId] = useState("TASK");
   const [priorityId, setPriorityId] = useState("HIGH");
@@ -38,9 +39,6 @@ export default function CreateTask() {
   const [dueDate, setDueDate] = useState(new Date());
 
   const [selectedFile, setSelectedFile] = useState(null);
-
-  const [typeAlert, setTypeAlert] = useState("success");
-  const [message, setMessage] = useState("Đã thêm mới thành công");
 
   const [skills, setSkills] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState([]);
@@ -141,77 +139,62 @@ export default function CreateTask() {
         selectedFile == null
           ? "Không có tệp đính kèm"
           : `${selectedFile.name},${fileId}`,
-      statusId: "TASK_INPROGRESS",
+      statusId: "TASK_OPEN",
       projectId: projectIdForm,
       skillIds: selectedSkills.map((item) => item.skillId),
     };
+    processingNoti(
+      () =>
+        request(
+          "post",
+          `/projects/${projectIdForm}/tasks`,
+          () => {},
+          () => {},
+          dataForm
+        ),
+      {
+        loading: "Đang thêm mới...",
+        success: "Thêm mới thành công",
+        error: "Thêm mới thất bại",
+      }
+    ).then((res) => {
+      setTimeout(() => {
+        navigate(`/tasks/${res.data.id}`);
+      }, 2000);
+    });
+  };
 
-    console.log(dataForm);
+  const uploadFile = (file) => {
+    const body = {
+      id: `file_${new Date().getTime().toString()}`,
+    };
+    const formData = new FormData();
+    formData.append("inputJson", JSON.stringify(body));
+    formData.append("file", file);
 
-    request(
-      "post",
-      `/projects/${projectIdForm}/tasks`,
-      (res) => {
-        console.log(res.data);
-        setOpen(true);
-        setTypeAlert("success");
-        setMessage("Đã thêm mới thành công");
-        setTimeout(() => {
-          navigate(`/tasks/${res.data.id}`);
-        }, 1000);
-      },
-      (err) => {
-        console.log(err);
-        setOpen(true);
-        setTypeAlert("error");
-        setMessage("Đã thêm mới bị lỗi");
-      },
-      dataForm
+    return processingNoti(
+      () =>
+        request("post", "/content/create", () => {}, {}, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }),
+      {
+        loading: "Đang tải lên file",
+        success: "Tải lên file thành công",
+        error: "Tải lên file thất bại",
+      }
     );
   };
 
   const onSubmit = (data) => {
-    console.log(data);
-    let body = {
-      id: `myFile_${new Date().getTime().toString()}`,
-    };
-    let formData = new FormData();
-    formData.append("inputJson", JSON.stringify(body));
-    formData.append("file", selectedFile);
-
     if (selectedFile != null) {
-      request(
-        "post",
-        "/content/create",
-        (res) => {
-          console.log(res.data.id);
-          onHandleData(data, res.data.id);
-        },
-        () => {
-          setOpen(true);
-          setTypeAlert("error");
-          setMessage("Upload tệp bị lỗi");
-        },
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      uploadFile(selectedFile).then((res) => {
+        onHandleData(data, res.data.id);
+      });
     } else {
       onHandleData(data);
     }
-  };
-
-  const [open, setOpen] = useState(false);
-
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpen(false);
   };
 
   const handleSuggest = () => {
@@ -238,283 +221,263 @@ export default function CreateTask() {
   };
 
   return (
-    <>
-      <Box sx={boxComponentStyle}>
-        <Box mb={4}>
-          <Typography variant="h4" component={"h4"}>
-            Thêm nhiệm vụ mới
-          </Typography>
-          {projectIdUrl && (
-            <Link
-              to={`/project/${projectIdUrl}/tasks`}
-              style={{ textDecoration: "none" }}
+    <Box sx={boxComponentStyle}>
+      <Box mb={4}>
+        <Typography variant="h4" component={"h4"}>
+          Thêm nhiệm vụ mới
+        </Typography>
+        {projectIdUrl && (
+          <Link
+            to={`/project/${projectIdUrl}/tasks`}
+            style={{ textDecoration: "none" }}
+          >
+            <Typography variant="caption" mb={3} color="primary">
+              Dự án: {projectName}
+            </Typography>
+          </Link>
+        )}
+      </Box>
+      <form>
+        <Grid container mb={3}>
+          <Grid item={true} xs={3}>
+            <TextField
+              select
+              fullWidth
+              label={"Danh mục"}
+              defaultValue="TASK"
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              required
             >
-              <Typography variant="caption" mb={3} color="primary">
-                Dự án: {projectName}
-              </Typography>
-            </Link>
-          )}
-        </Box>
-        <form>
-          <Grid container mb={3}>
-            <Grid item={true} xs={3}>
-              <TextField
-                select
-                fullWidth
-                label={"Danh mục"}
-                defaultValue="TASK"
-                value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-                required
-              >
-                {categories.map((item) => (
-                  <MenuItem key={item.categoryId} value={item.categoryId}>
-                    {item.categoryName}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
+              {categories.map((item) => (
+                <MenuItem key={item.categoryId} value={item.categoryId}>
+                  {item.categoryName}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
-          <Box mb={3}>
-            <TextField
-              fullWidth={true}
-              label="Tên nhiệm vụ"
-              variant="outlined"
-              name="name"
-              inputRef={register({ required: "Thiếu tên nhiệm vụ!" })}
-              error={!!errors.name}
-              helperText={errors.name?.message}
-            />
-          </Box>
-          <Box sx={boxChildComponent} mb={3}>
-            <TextField
-              label="Mô tả nhiệm vụ"
-              multiline
-              fullWidth={true}
-              rows={5}
-              name="description"
-              inputRef={register}
-              sx={{ mb: 3 }}
-            />
-            <Grid container spacing={2}>
-              <Grid item={true} xs={6} p={2}>
-                <Grid container>
-                  <Grid item={true} xs={4}>
-                    <Typography variant="body1">Trạng thái</Typography>
-                  </Grid>
-                  <Grid item={true} xs={8}>
-                    <Typography variant="body1" color={"InfoText"}>
-                      Open
-                    </Typography>
-                  </Grid>
+        </Grid>
+        <Box mb={3}>
+          <TextField
+            fullWidth={true}
+            label="Tên nhiệm vụ"
+            variant="outlined"
+            name="name"
+            inputRef={register({ required: "Thiếu tên nhiệm vụ!" })}
+            error={!!errors.name}
+            helperText={errors.name?.message}
+          />
+        </Box>
+        <Box sx={boxChildComponent} mb={3}>
+          <label htmlFor="description">Mô tả</label>
+          <Controller
+            name="description"
+            control={control}
+            defaultValue=""
+            render={(field) => (
+              <CustomEditor
+                {...field}
+                setValue={(value) => setValue("description", value)}
+              />
+            )}
+          />
+          <Grid container spacing={2} p={4}>
+            <Grid item={true} xs={6} p={2}>
+              <Grid container>
+                <Grid item={true} xs={4}>
+                  <Typography variant="body1">Trạng thái</Typography>
+                </Grid>
+                <Grid item={true} xs={8}>
+                  <Typography variant="body1" color={"InfoText"}>
+                    Open
+                  </Typography>
                 </Grid>
               </Grid>
+            </Grid>
+            <Grid item={true} xs={6} p={2}>
+              <Grid container>
+                <Grid item={true} xs={4}>
+                  <Typography variant="body1">Mức ưu tiên</Typography>
+                </Grid>
+                <Grid item={true} xs={8}>
+                  <TextField
+                    select
+                    fullWidth
+                    label={"Độ ưu tiên"}
+                    defaultValue="HIGH"
+                    value={priorityId}
+                    onChange={(e) => setPriorityId(e.target.value)}
+                    required
+                  >
+                    {priorities.map((item) => (
+                      <MenuItem key={item.priorityId} value={item.priorityId}>
+                        {item.priorityName}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item={true} xs={6} p={2}>
+              <Grid container>
+                <Grid item={true} xs={4}>
+                  <Typography variant="body1">Gán cho</Typography>
+                </Grid>
+                <Grid item={true} xs={8}>
+                  <Autocomplete
+                    disablePortal
+                    options={persons}
+                    value={person}
+                    onChange={(e, value) => setPerson(value)}
+                    getOptionLabel={(option) => {
+                      return `${option.id} (${option.firstName} ${option.lastName})`;
+                    }}
+                    fullWidth
+                    renderInput={(params) => (
+                      <TextField {...params} label="Danh mục" placeholder="" />
+                    )}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item={true} xs={6} p={2}>
+              <Grid container>
+                <Grid item={true} xs={4}>
+                  <Typography variant="body1">Thời hạn</Typography>
+                </Grid>
+                <Grid item={true} xs={8}>
+                  <DateTimePickerBasic
+                    label={"Chọn thời hạn"}
+                    onChange={(date) => {
+                      setDueDate(date);
+                    }}
+                    value={dueDate}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            {!projectIdUrl && (
               <Grid item={true} xs={6} p={2}>
                 <Grid container>
                   <Grid item={true} xs={4}>
-                    <Typography variant="body1">Mức ưu tiên</Typography>
+                    <Typography variant="body1">Dự án</Typography>
                   </Grid>
                   <Grid item={true} xs={8}>
                     <TextField
                       select
                       fullWidth
-                      label={"Độ ưu tiên"}
-                      defaultValue="HIGH"
-                      value={priorityId}
-                      onChange={(e) => setPriorityId(e.target.value)}
+                      label={"Danh sách dự án"}
+                      defaultValue=""
+                      value={projectId}
+                      onChange={(e) => setProjectId(e.target.value)}
                       required
                     >
-                      {priorities.map((item) => (
-                        <MenuItem key={item.priorityId} value={item.priorityId}>
-                          {item.priorityName}
+                      {projects.map((item) => (
+                        <MenuItem key={item.id} value={item.id}>
+                          {item.name}
                         </MenuItem>
                       ))}
                     </TextField>
                   </Grid>
                 </Grid>
               </Grid>
-              <Grid item={true} xs={6} p={2}>
-                <Grid container>
-                  <Grid item={true} xs={4}>
-                    <Typography variant="body1">Gán cho</Typography>
-                  </Grid>
-                  <Grid item={true} xs={8}>
+            )}
+            <Grid item={true} xs={12} p={2}>
+              <Grid container spacing={2}>
+                <Grid item={true} xs={12}>
+                  <Typography variant="body1">Yêu cầu các kỹ năng</Typography>
+                </Grid>
+                <Grid item={true} xs={10}>
+                  <Stack spacing={3}>
                     <Autocomplete
-                      disablePortal
-                      options={persons}
-                      value={person}
-                      onChange={(e, value) => setPerson(value)}
-                      getOptionLabel={(option) => {
-                        return `${option.id} (${option.firstName} ${option.lastName})`;
-                      }}
-                      fullWidth
+                      multiple
+                      id="required-skills"
+                      options={skills}
+                      getOptionLabel={(option) => option.name}
+                      defaultValue={[]}
+                      onChange={(e, value) => setSelectedSkills(value)}
+                      filterSelectedOptions
+                      fullWidth={true}
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          label="Danh mục"
+                          label="Danh sách các kĩ năng"
                           placeholder=""
                         />
                       )}
                     />
-                    {/* <TextField
-                                            select
-                                            fullWidth
-                                            label={"Danh mục"}
-                                            defaultValue=""
-                                            value={partyId}
-                                            onChange={(e) => setPartyId(e.target.value)}
-                                            required
-                                        >
-                                            {persons.map((item) => (
-                                                <MenuItem key={item.partyId} value={item.partyId}>{item.userLoginId} ({item.fullName})</MenuItem>
-                                            ))}
-                                        </TextField> */}
-                  </Grid>
+                  </Stack>
                 </Grid>
-              </Grid>
-              <Grid item={true} xs={6} p={2}>
-                <Grid container>
-                  <Grid item={true} xs={4}>
-                    <Typography variant="body1">Thời hạn</Typography>
-                  </Grid>
-                  <Grid item={true} xs={8}>
-                    <DateTimePickerBasic
-                      label={"Chọn thời hạn"}
-                      onChange={(date) => {
-                        setDueDate(date);
-                      }}
-                      value={dueDate}
-                    />
-                  </Grid>
+                <Grid item={true} xs={12}>
+                  <Box display={"flex"} alignItems={"center"}>
+                    <Button variant="contained" onClick={handleSuggest}>
+                      Gợi ý gán
+                    </Button>
+                  </Box>
                 </Grid>
-              </Grid>
-              {!projectIdUrl && (
-                <Grid item={true} xs={6} p={2}>
-                  <Grid container>
-                    <Grid item={true} xs={4}>
-                      <Typography variant="body1">Dự án</Typography>
-                    </Grid>
-                    <Grid item={true} xs={8}>
-                      <TextField
-                        select
-                        fullWidth
-                        label={"Danh sách dự án"}
-                        defaultValue=""
-                        value={projectId}
-                        onChange={(e) => setProjectId(e.target.value)}
-                        required
-                      >
-                        {projects.map((item) => (
-                          <MenuItem key={item.id} value={item.id}>
-                            {item.name}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              )}
-              <Grid item={true} xs={12} p={2}>
-                <Grid container spacing={2}>
-                  <Grid item={true} xs={12}>
-                    <Typography variant="body1">Yêu cầu các kỹ năng</Typography>
-                  </Grid>
-                  <Grid item={true} xs={10}>
-                    <Stack spacing={3}>
-                      <Autocomplete
-                        multiple
-                        id="required-skills"
-                        options={skills}
-                        getOptionLabel={(option) => option.name}
-                        defaultValue={[]}
-                        onChange={(e, value) => setSelectedSkills(value)}
-                        filterSelectedOptions
-                        fullWidth={true}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            label="Danh sách các kĩ năng"
-                            placeholder=""
-                          />
-                        )}
-                      />
-                    </Stack>
-                  </Grid>
-                  <Grid item={true} xs={12}>
-                    <Box display={"flex"} alignItems={"center"}>
-                      <Button variant="contained" onClick={handleSuggest}>
-                        Gợi ý gán
-                      </Button>
+                <Grid item={true} xs={12}>
+                  {suggestAssign.map((item, index) => (
+                    <Box key={index}>
+                      {item.fullName} ({item.userLoginId})
                     </Box>
-                  </Grid>
-                  <Grid item={true} xs={12}>
-                    {suggestAssign.map((item, index) => (
-                      <Box key={index}>
-                        {item.fullName} ({item.userLoginId})
-                      </Box>
-                    ))}
-                  </Grid>
+                  ))}
                 </Grid>
               </Grid>
             </Grid>
-          </Box>
-          <Box sx={boxChildComponent} mb={3}>
-            <Grid container>
-              <Grid item={true} xs={2}>
-                <Typography variant="body1">Tài liệu đính kèm</Typography>
-              </Grid>
-              <Grid
-                item={true}
-                xs={10}
-                sx={{ display: "flex", alignItem: "center" }}
-              >
-                <Button
-                  component="label"
-                  variant="contained"
-                  startIcon={<UploadFileIcon />}
-                  sx={{ marginRight: "1rem" }}
-                  color="primary"
-                >
-                  Upload file
-                  <input
-                    type="file"
-                    hidden
-                    onChange={(e) => setSelectedFile(e.target.files[0])}
-                  />
-                </Button>
-                {selectedFile && (
-                  <Typography variant="inherit" color={"primary"}>
-                    {selectedFile.name}
-                  </Typography>
-                )}
-              </Grid>
+          </Grid>
+        </Box>
+        <Box sx={boxChildComponent} mb={3}>
+          <Grid container>
+            <Grid item={true} xs={2}>
+              <Typography variant="body1">Tài liệu đính kèm</Typography>
             </Grid>
-          </Box>
-          <Box sx={{ display: "flex", justifyContent: "end" }}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSubmit(onSubmit)}
-              sx={{ marginRight: 2 }}
+            <Grid
+              item={true}
+              xs={10}
+              sx={{ display: "flex", alignItem: "center" }}
             >
-              Thêm nhiệm vụ
-            </Button>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={() => navigate(-1)}
-            >
-              Hủy
-            </Button>
-          </Box>
-        </form>
-      </Box>
-      <BasicAlert
-        openModal={open}
-        handleClose={handleClose}
-        typeAlert={typeAlert}
-        message={message}
-      />
-    </>
+              <Button
+                component="label"
+                variant="contained"
+                startIcon={<UploadFileIcon />}
+                sx={{ marginRight: "1rem" }}
+                color="primary"
+              >
+                Upload file
+                <input
+                  type="file"
+                  hidden
+                  onChange={(e) => setSelectedFile(e.target.files[0])}
+                />
+              </Button>
+              {selectedFile && (
+                <Typography variant="inherit" color={"primary"}>
+                  {selectedFile.name}
+                </Typography>
+              )}
+            </Grid>
+          </Grid>
+        </Box>
+        <Box sx={{ display: "flex", justifyContent: "end" }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit(onSubmit)}
+            sx={{ marginRight: 2 }}
+            // disable when form is invalid
+            disabled={Object.keys(errors).length > 0}
+          >
+            Thêm nhiệm vụ
+          </Button>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => navigate(-1)}
+          >
+            Hủy
+          </Button>
+        </Box>
+      </form>
+    </Box>
   );
 }

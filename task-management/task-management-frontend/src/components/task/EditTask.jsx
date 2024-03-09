@@ -13,11 +13,12 @@ import {
 import { request } from "../../api";
 import { boxChildComponent, boxComponentStyle } from "../utils/constant";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
 import { Link } from "react-router-dom";
 import BasicAlert from "../alert/BasicAlert";
 import DateTimePickerBasic from "../datetimepicker/DateTimePickerBasic";
+import { CustomEditor } from "../editor/CustomEditor";
 
 export default function EditTask() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function EditTask() {
   const [priorities, setPriorities] = useState([]);
   const [persons, setPersons] = useState([]);
   const [listStatus, setListStatus] = useState([]);
-  const { register, errors, handleSubmit, setValue } = useForm();
+  const { register, errors, handleSubmit, setValue, control } = useForm();
 
   const [statusId, setStatusId] = useState("");
   const [categoryId, setCategoryId] = useState("");
@@ -238,17 +239,19 @@ export default function EditTask() {
               />
             </Box>
             <Box sx={boxChildComponent} mb={3}>
-              <TextField
-                label="Mô tả nhiệm vụ"
-                multiline
-                fullWidth={true}
-                rows={5}
+              <label htmlFor="description">Mô tả</label>
+              <Controller
                 name="description"
+                control={control}
                 defaultValue={task.description}
-                inputRef={register}
-                sx={{ mb: 3 }}
+                render={(field) => (
+                  <CustomEditor
+                    {...field}
+                    setValue={(value) => setValue("description", value)}
+                  />
+                )}
               />
-              <Grid container spacing={2}>
+              <Grid container spacing={2} p={4}>
                 <Grid item={true} xs={6} p={2}>
                   <Grid container>
                     <Grid item={true} xs={4}>

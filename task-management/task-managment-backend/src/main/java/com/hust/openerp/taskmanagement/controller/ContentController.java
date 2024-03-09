@@ -65,4 +65,23 @@ public class ContentController {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+    @GetMapping("/content/img/{id}")
+    public ResponseEntity<byte[]> getImage(@PathVariable String id) {
+        try {
+            GridFsResource content = mongoContentService.getById(id);
+            if (content != null && content.getContentType().startsWith("image")) {
+                InputStream inputStream = content.getInputStream();
+                HttpHeaders headers = new HttpHeaders();
+                headers.add("Content-Type", content.getContentType());
+                headers.add("Content-Disposition", "inline");
+
+                return new ResponseEntity<>(IOUtils.toByteArray(inputStream), headers, HttpStatus.OK);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 }

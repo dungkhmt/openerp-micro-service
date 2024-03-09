@@ -1,17 +1,17 @@
+import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { ReactKeycloakProvider } from "@react-keycloak/web";
-import { request } from "./api";
-import i18n from "./translation/i18n";
-import history from "./history";
-import keycloak, { initOptions } from "./config/keycloak.js";
-import { BrowserRouter } from "react-router-dom";
-import { Slide, ToastContainer } from "react-toastify";
-import { AppLoading } from "./components/common/AppLoading";
-import Routes from "./Routes";
-import { CssBaseline, createTheme, ThemeProvider } from "@mui/material";
+import { useEffect, useMemo } from "react";
+import { Toaster } from "react-hot-toast";
 import { I18nextProvider } from "react-i18next";
+import { BrowserRouter } from "react-router-dom";
+import Routes from "./Routes";
+import { request } from "./api";
+import { AppLoading } from "./components/common/AppLoading";
+import keycloak, { initOptions } from "./config/keycloak.js";
+import history from "./history";
 import { menuState } from "./state/MenuState";
 import { notificationState } from "./state/NotificationState";
-import { useEffect, useMemo } from "react";
+import i18n from "./translation/i18n";
 
 const theme = createTheme({
   typography: {
@@ -66,21 +66,9 @@ function App() {
       <I18nextProvider i18n={i18n}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
+          <Toaster duration={5000} />
           <BrowserRouter history={history}>
             <Routes />
-            <ToastContainer
-              position="bottom-center"
-              transition={Slide}
-              autoClose={3000}
-              limit={3}
-              hideProgressBar={true}
-              newestOnTop
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-            />
           </BrowserRouter>
         </ThemeProvider>
       </I18nextProvider>

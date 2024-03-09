@@ -1,7 +1,6 @@
 import axios from "axios";
-import keycloak from "./config/keycloak";
 import { config } from "./config/config";
-import { infoNoti } from "./utils/notification";
+import keycloak from "./config/keycloak";
 
 export const isFunction = (func) =>
   func &&
@@ -74,20 +73,15 @@ export async function request(
         case 403:
           if (isFunction(errorHandlers[403])) {
             errorHandlers[403](e);
-          } else {
+          } /* else {
             infoNoti("Bạn cần được cấp quyền để thực hiện hành động này.");
-          }
+          } */
           break;
         default:
           if (isFunction(errorHandlers[e.response.status])) {
             errorHandlers[e.response.status](e);
           } else if (isFunction(errorHandlers["rest"])) {
             errorHandlers["rest"](e);
-          } else {
-            // unduplicatedErrorNoti(
-            //   "response error",
-            //   "Rất tiếc! Đã có lỗi xảy ra."
-            // );
           }
       }
     } else if (e.request) {
@@ -111,7 +105,7 @@ export async function request(
         "Something happened in setting up the request that triggered an error: ",
         e.message
       );
+      throw e;
     }
-    console.log("Request config", e.config);
   }
 }
