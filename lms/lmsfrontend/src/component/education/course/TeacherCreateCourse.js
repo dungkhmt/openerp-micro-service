@@ -60,6 +60,7 @@ export default function TeacherCreateCourse() {
   };
   let successHandler = () => {
     successNoti("Thêm mới thành công", 3000);
+    history.push("/edu/teacher/course/list");
   };
 
   const handleSubmit = () => {
