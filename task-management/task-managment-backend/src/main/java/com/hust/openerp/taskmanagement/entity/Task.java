@@ -1,13 +1,28 @@
 package com.hust.openerp.taskmanagement.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.util.Date;
-import java.util.UUID;
-import java.util.List;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -84,7 +99,7 @@ public class Task {
     @JoinColumn(name = "created_by_user_id", insertable = false, updatable = false)
     private User createdByUser;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", insertable = false, updatable = false)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "task")
+    // @JoinColumn(name = "id", insertable = false, updatable = false)
     private List<TaskAssignment> assignment;
 }
