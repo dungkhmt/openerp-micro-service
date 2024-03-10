@@ -43,6 +43,7 @@ public class ClassOpenedController {
 
     @PostMapping("/group-assign")
     public ResponseEntity<String> update(@Valid @RequestBody UpdateClassOpenedDto requestDto) {
+        System.out.printf("assign group");
         try {
             List<ClassOpened> classOpenedList = service.updateClassOpenedList(requestDto);
             if (classOpenedList.isEmpty()) {

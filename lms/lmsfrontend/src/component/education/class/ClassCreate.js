@@ -1,18 +1,19 @@
 import DateFnsUtils from "@date-io/date-fns";
-import {CircularProgress} from "@material-ui/core";
+import { CircularProgress } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import MenuItem from "@material-ui/core/MenuItem";
-import {makeStyles} from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
-import {MuiPickersUtilsProvider} from "@material-ui/pickers";
-import {request} from "api";
-import {useEffect, useState} from "react";
-import {useHistory} from "react-router-dom";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import { request } from "api";
+import { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import withScreenSecurity from "../../withScreenSecurity";
+import { errorNoti, successNoti } from "utils/notification";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -237,13 +238,15 @@ function ClassCreate() {
           return "duplicate";
         } else if (res.status === 409) {
           alert("User exits!!");
-        } else if (res.status === 201) {
+        } else if (res.status === 200) {
           history.push("/edu/teacher/class/list");
+          successNoti("Thêm mới thành công", 3000);
         }
       },
       {
         onError: (error) => {
           console.log(error);
+          errorNoti("Thêm mới thất bại", 3000);
         },
       },
       data

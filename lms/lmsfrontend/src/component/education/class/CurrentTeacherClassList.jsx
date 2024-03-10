@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import {request} from "../../../api";
+import React, { useEffect, useState } from "react";
+import { request } from "../../../api";
 import StandardTable from "../../table/StandardTable";
-import {useHistory} from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 function CurrentTeacherClassList(props) {
   const columns = [
@@ -11,17 +11,17 @@ function CurrentTeacherClassList(props) {
     { title: "Loại lớp", field: "classType" },
     { title: "Khoa/Viện", field: "department" },
     { title: "Học kỳ", field: "semester" },
-    { title: "Trạng thái", field: "statusId" }
+    { title: "Trạng thái", field: "statusId" },
   ];
 
   const history = useHistory();
   const [classesOfCurrentTeacher, setClassesOfCurrentTeacher] = useState([]);
 
-  useEffect(getClassesOfCurrentTeacher, [])
+  useEffect(getClassesOfCurrentTeacher, []);
 
   function getClassesOfCurrentTeacher() {
     request("get", "/edu/class/list/teacher", (res) => {
-      setClassesOfCurrentTeacher(res.data);
+      setClassesOfCurrentTeacher(res.data.reverse());
     });
   }
 

@@ -1,5 +1,5 @@
-import {useState} from "react";
-import {useParams} from "react-router";
+import { useState } from "react";
+import { useParams } from "react-router";
 import withScreenSecurity from "../../withScreenSecurity";
 import TeacherViewCourseDetail from "./teacher/TeacherViewCourseDetail";
 import TeacherCourseChapterList from "./TeacherCourseChapterList";
@@ -20,10 +20,10 @@ function TeacherCourseDetail() {
       <TeacherViewCourseDetail courseId={courseId} />
       <br />
 
-      <TeacherCourseChapterList courseId={courseId} />
+      {/* <TeacherCourseChapterList courseId={courseId} />
       <TeacherCourseQuizList courseId={courseId} />
       <TeacherCourseTopicList courseId={courseId} />
-      <TeacherViewCourseQuizList courseId={courseId} />
+      <TeacherViewCourseQuizList courseId={courseId} /> */}
     </>
   );
 }

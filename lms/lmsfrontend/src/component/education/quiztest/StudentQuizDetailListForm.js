@@ -1,15 +1,15 @@
-import {useState} from "@hookstate/core";
-import {Button, Card} from "@material-ui/core";
+import { useState } from "@hookstate/core";
+import { Button, Card } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import Snackbar from "@material-ui/core/Snackbar";
-import {makeStyles} from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import Alert from "@material-ui/lab/Alert";
-import React, {useEffect} from "react";
-import {useHistory} from "react-router-dom";
-import {request} from "../../../api";
+import React, { useEffect } from "react";
+import { useHistory } from "react-router-dom";
+import { request } from "../../../api";
 import Quiz from "./Quiz";
-import {LinearProgress} from "@mui/material";
-import {LoadingButton} from "@mui/lab";
+import { LinearProgress } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -89,10 +89,13 @@ export default function StudentQuizDetailListForm(props) {
         setLoading(false);
       },
       {
-        401: () => {},
+        401: () => {
+          setLoading(false);
+        },
         406: () => {
           setMessageRequest("Time Out!");
           setRequestFailed(true);
+          setLoading(false);
         },
       }
     );
@@ -213,7 +216,7 @@ export default function StudentQuizDetailListForm(props) {
 
   return (
     <div className={classes.root}>
-      {loading && <LinearProgress/>}
+      {loading && <LinearProgress />}
       <Card style={{ padding: "20px 20px 20px 20px" }}>
         <Snackbar
           open={requestSuccessfully}
