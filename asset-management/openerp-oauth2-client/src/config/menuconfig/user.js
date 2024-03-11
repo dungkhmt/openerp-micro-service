@@ -8,11 +8,12 @@ export const user = {
   child: [
     {
       id: "MENU_USER.ALL_USER", // TODO: change this
-      onClick: () => {
-        window.location.href = `${config.url.KEYCLOAK_BASE_URL}/admin/${KC_REALM}/console/#/${KC_REALM}/users`;
-      },
-      isPublic: false,
-      text: "All users",
+    //   onClick: () => {
+    //     window.location.href = `${config.url.KEYCLOAK_BASE_URL}/admin/${KC_REALM}/console/#/${KC_REALM}/users`;
+    //   },
+      path: "/users",
+      isPublic: true,
+      text: "Users",
       child: [],
     },
     // {

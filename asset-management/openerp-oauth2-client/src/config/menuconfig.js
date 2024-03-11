@@ -9,10 +9,13 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import FastfoodIcon from "@mui/icons-material/Fastfood";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
+import HomeIcon from '@mui/icons-material/Home';
 import HomeSharpIcon from "@mui/icons-material/HomeSharp";
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import LocalGroceryStoreIcon from "@mui/icons-material/LocalGroceryStore";
 import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import MonitorIcon from '@mui/icons-material/Monitor';
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import PeopleIcon from "@mui/icons-material/People";
 import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
@@ -23,19 +26,17 @@ import TeachingIcon from "assets/icons/mathematics.svg";
 import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
 import { buildMapPathMenu } from "utils/MenuUtils";
-import { general } from "./menuconfig/general";
-import { student } from "./menuconfig/student";
-import { teacher } from "./menuconfig/teacher";
+import { AssetManagement } from "./menuconfig/AssetManagement";
+import { AssetOperaion } from "./menuconfig/AssetOperation";
+import { GeneralManagement } from "./menuconfig/General";
 import { user } from "./menuconfig/user";
-import {demo} from "./menuconfig/demo";
 
 export const MENUS = [];
 
-MENUS.push(general);
+MENUS.push(GeneralManagement);
 MENUS.push(user);
-MENUS.push(teacher);
-MENUS.push(student);
-MENUS.push(demo);
+MENUS.push(AssetManagement);
+MENUS.push(AssetOperaion);
 
 export const menuIconMap = new Map();
 
@@ -69,6 +70,9 @@ menuIconMap.set("BlurOnIcon", <BlurOnIcon />);
 menuIconMap.set("LocalLibraryIcon", <LocalLibraryIcon />);
 menuIconMap.set("AssignmentOutlinedIcon", <AssignmentOutlinedIcon />);
 menuIconMap.set("ManageAccountsIcon", <ManageAccountsIcon />);
+menuIconMap.set("LibraryBookIcon", <LibraryBooksIcon/>);
+menuIconMap.set("MonitorIcon", <MonitorIcon/>);
+menuIconMap.set("HomeIcon", <HomeIcon/>);
 menuIconMap.set("CiEdit", <CiEdit />);
 
 export const mapPathMenu = buildMapPathMenu(MENUS);
