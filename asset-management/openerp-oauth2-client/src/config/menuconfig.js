@@ -1,8 +1,10 @@
 import AirportShuttleIcon from "@mui/icons-material/AirportShuttle";
 import ApartmentSharpIcon from "@mui/icons-material/ApartmentSharp";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import AttachMoneySharpIcon from "@mui/icons-material/AttachMoneySharp";
 import BlurOnIcon from "@mui/icons-material/BlurOn";
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
 import DescriptionIcon from "@mui/icons-material/Description";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
@@ -20,6 +22,7 @@ import InboxIcon from "@mui/icons-material/MoveToInbox";
 import PeopleIcon from "@mui/icons-material/People";
 import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import PersonIcon from "@mui/icons-material/Person";
+import SettingsIcon from '@mui/icons-material/Settings';
 import StarBorder from "@mui/icons-material/StarBorder";
 import StoreMallDirectorySharpIcon from "@mui/icons-material/StoreMallDirectorySharp";
 import TeachingIcon from "assets/icons/mathematics.svg";
@@ -29,14 +32,18 @@ import { buildMapPathMenu } from "utils/MenuUtils";
 import { AssetManagement } from "./menuconfig/AssetManagement";
 import { AssetOperaion } from "./menuconfig/AssetOperation";
 import { GeneralManagement } from "./menuconfig/General";
+import { SettingsManagement } from "./menuconfig/SettingsManagement";
+import { ReportsManagement } from "./menuconfig/ReportsManagement";
 import { user } from "./menuconfig/user";
 
 export const MENUS = [];
 
 MENUS.push(GeneralManagement);
+MENUS.push(SettingsManagement);
 MENUS.push(user);
 MENUS.push(AssetManagement);
 MENUS.push(AssetOperaion);
+MENUS.push(ReportsManagement);
 
 export const menuIconMap = new Map();
 
@@ -73,6 +80,8 @@ menuIconMap.set("ManageAccountsIcon", <ManageAccountsIcon />);
 menuIconMap.set("LibraryBookIcon", <LibraryBooksIcon/>);
 menuIconMap.set("MonitorIcon", <MonitorIcon/>);
 menuIconMap.set("HomeIcon", <HomeIcon/>);
+menuIconMap.set("SettingsIcon", <SettingsIcon/>);
+menuIconMap.set("AssessmentIcon", <AssessmentIcon/>);
 menuIconMap.set("CiEdit", <CiEdit />);
 
 export const mapPathMenu = buildMapPathMenu(MENUS);
