@@ -26,7 +26,6 @@ import AnalyticsIcon from '@mui/icons-material/Analytics';
 import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
 import { buildMapPathMenu } from "utils/MenuUtils";
-import { general } from "./menuconfig/general";
 import { teacher } from "./menuconfig/teacher";
 import { user } from "./menuconfig/user";
 // import {schedule} from "./menuconfig/schedule"

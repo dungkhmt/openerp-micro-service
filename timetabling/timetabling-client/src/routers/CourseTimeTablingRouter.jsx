@@ -4,6 +4,7 @@ import ScheduleScreen from "views/courseTimeTabling/schedule/ScheduleScreen";
 import MakeScheduleScreen from "views/courseTimeTabling/makeSchedule/MakeScheduleScreen";
 import ClassroomListScreen from "views/courseTimeTabling/classroom/ClassroomListScreen";
 import { Route, Switch, useRouteMatch } from "react-router";
+import GeneralScheduleScreen from "views/courseTimeTabling/general-schedule/GeneralScheduleScreen";
 
 export default function CourseTimeTablingRouter() {
   let { path } = useRouteMatch();
@@ -29,6 +30,11 @@ export default function CourseTimeTablingRouter() {
           component={MakeScheduleScreen}
           exact
           path={`${path}/make-schedule`}
+        ></Route>
+        <Route
+          component={GeneralScheduleScreen}
+          exact
+          path={`${path}/auto-fill-general-schedule`}
         ></Route>
         <Route
           component={ClassroomListScreen}

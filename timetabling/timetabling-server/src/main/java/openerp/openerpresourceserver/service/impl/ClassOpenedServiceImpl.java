@@ -249,6 +249,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
 
     private Long calculateTotalPeriod(String mass) {
         //a(b-c-d-e) => b-c-d-e => b,c,d,e => b+c
+        //Need validation for pattern.
         String numbersString = mass.trim().substring(2, mass.indexOf(')'));
         String[] numbersArray = numbersString.split("-");
         return Long.parseLong(numbersArray[0]) + Long.parseLong(numbersArray[1]);
@@ -275,7 +276,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         int outOfDay = 0;
         int countClass4Period = 0;
 
-        //Tự động sắp xếp lịch học
+        // Tự động sắp xếp lịch học
         for (ClassOpened elClass : listClassMakeSchedule) {
             long totalPeriodOfClass = this.calculateTotalPeriod(elClass.getMass());
             if (totalPeriodOfClass == CLASS_ENABLE_SEPARATE) {
@@ -295,9 +296,9 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
                         .filter(obj -> elWeekday.equals(obj.getSecondWeekday()))
                         .toList();
                 if (existedClasses.isEmpty() && existedSecondClasses.isEmpty()) {
-                    //ngày hôm elWeekday chưa được gán lớp học nào
+                    // ngày hôm elWeekday chưa được gán lớp học nào
                     countClassForSeparate = this.setTimeStudyForElClass(elClass, elWeekday, DEFAULT_START_PERIOD, countClassForSeparate);
-                    //check thoát khỏi vòng lặp từng ngày trong tuần
+                    // check thoát khỏi vòng lặp từng ngày trong tuần
                     if (!elClass.getIsSeparateClass() || countClassForSeparate == MAX_CLASS_FOR_CLASS_OPENED) break;
                 } else {
                     //Đã có lớp học vào ngày hôm đó
