@@ -16,28 +16,10 @@ public class StringHandler {
             int point,
             String problemEvaluationType
     ) {
-        // log.info("handleContestResponse, response {}", response);
-
         String status = "";
 
-//        // remove the last '\n' character, which is redundant
-//        response = response.substring(0, response.length() - 1);
-
-//        // get status ("testcasedone" / "Compile Error")
-//        int statusIndex = response.lastIndexOf("\n") + 1;
-//        String status = response.substring(statusIndex);
-//
-//        if (status.contains(ContestSubmissionEntity.SUBMISSION_STATUS_COMPILE_ERROR)) {
-//            return buildCompileErrorForSubmission(1, originalMessage);
-//        }
-
-//        response = response.substring(0, statusIndex - 1);
-//        int runTimeIndex = response.lastIndexOf("\n") + 1;
-//        String runtimeString = response.substring(runTimeIndex);
-//        Long runtime = Long.parseLong(runtimeString);
-
         if (response.endsWith(ContestSubmissionEntity.SUBMISSION_STATUS_COMPILE_ERROR + "\n")) {
-            return buildCompileErrorForSubmission(1, response);
+            return buildCompileErrorForSubmission(response);
         }
 
         response = response.trim();
@@ -47,15 +29,15 @@ public class StringHandler {
         String runtime = response.substring(secondLastNewlineIndex + 1, lastNewlineIndex).trim();
 
         // get testcase answer of participant
-        String participantAns = response.substring(
-                0,
-                response.indexOf(Constants.SPLIT_TEST_CASE));
+        String participantAns = response.substring(0, response.indexOf(Constants.SPLIT_TEST_CASE));
 
         int cnt = 0;
         int score = 0;
 
         String participantTestcaseAns = replaceSpace(participantAns);
-//        String participantTestcaseAns = participantAns;
+
+        if (problemEvaluationType == null || problemEvaluationType.isEmpty())
+            problemEvaluationType = Constants.ProblemResultEvaluationType.NORMAL.getValue();
 
         if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.TIME_LIMIT.getValue())) {
             status = ContestSubmissionEntity.SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED;
@@ -68,8 +50,7 @@ public class StringHandler {
             participantAns = status;
         } else {
             String correctTestcaseAns = replaceSpace(testCaseAns);
-//            String correctTestcaseAns = testCaseAns;
-            if (problemEvaluationType == null || problemEvaluationType.equals(""))
+            if (problemEvaluationType == null || problemEvaluationType.isEmpty())
                 problemEvaluationType = Constants.ProblemResultEvaluationType.NORMAL.getValue();
 
             if (problemEvaluationType.equals(Constants.ProblemResultEvaluationType.NORMAL.getValue())) {
@@ -111,7 +92,7 @@ public class StringHandler {
         String status = response.substring(lastNewlineIndex + 1).trim();
 
         if (status.equals(ContestSubmissionEntity.SUBMISSION_STATUS_COMPILE_ERROR)) {
-            return buildCompileErrorForSubmission(1, response);
+            return buildCompileErrorForSubmission(response);
         } else if (status.equals(Constants.TestCaseSubmissionError.TIME_LIMIT.getValue())) {
             status = ContestSubmissionEntity.SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED;
         } else if (status.equals(Constants.TestCaseSubmissionError.MEMORY_LIMIT.getValue())) {
@@ -166,11 +147,11 @@ public class StringHandler {
                 .build();
     }
 
-    private static ProblemSubmission buildCompileErrorForSubmission(int numTestCases, String message) {
+    private static ProblemSubmission buildCompileErrorForSubmission(String message) {
         return ProblemSubmission.builder()
                 .score(0)
                 .runtime(0L)
-                .testCasePass(0 + " / " + numTestCases)
+                .testCasePass("0")
                 .status(ContestSubmissionEntity.SUBMISSION_STATUS_COMPILE_ERROR)
                 .message(message)
                 .build();
