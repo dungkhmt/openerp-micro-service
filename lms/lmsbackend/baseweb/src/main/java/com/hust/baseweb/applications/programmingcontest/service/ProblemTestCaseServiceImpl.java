@@ -1013,6 +1013,11 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                         testCaseOutput = "---HIDDEN---";
                         participantSolutionOutput = "---HIDDEN---";
                         break;
+                    case ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_INPUT_PARTICIPANT_OUTPUT:
+                        testCaseContent = tc.getTestCase();
+                        testCaseOutput = "---HIDDEN---";
+                        participantSolutionOutput = st.getParticipantSolutionOtput();
+                        break;
                 }
 
                 result.add(new SubmissionDetailByTestcaseOM(
