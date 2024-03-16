@@ -7,7 +7,10 @@ import { useNotificationState } from "state/NotificationState";
 import NotFound from "views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import TeacherRouter from "./TeacherRouter";
-import DemoScreen from "views/DemoScreen";
+import { UsersScreen } from "views/UsersScreen";
+import { LocationScreen } from "views/settings/LocationScreen";
+import { VendorScreen } from "views/settings/VendorScreen";
+import { TypeScreen } from "views/settings/TypeScreen";
 
 const styles = {
   loadingProgress: {
@@ -34,8 +37,15 @@ function MainAppRouter(props) {
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
-          <Route component={() => <></>} exact path="/" />
-          <PrivateRoute component={DemoScreen} exact path="/demo" />
+          {/* <Route component={() => <></>} exact path="/" /> */}
+          <PrivateRoute component={UsersScreen} exact path="/" />
+
+          <PrivateRoute component={LocationScreen} exact path="/locations" />
+
+          <PrivateRoute component={VendorScreen} exact path="/vendors" />
+
+          <PrivateRoute component={TypeScreen} exact path="/types" />
+
           <PrivateRoute component={TeacherRouter} path="/teacher" />
 
           {/* <Route component={error} path="*" /> */}
