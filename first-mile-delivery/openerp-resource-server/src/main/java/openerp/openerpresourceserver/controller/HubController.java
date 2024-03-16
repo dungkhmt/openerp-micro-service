@@ -31,8 +31,8 @@ public class HubController {
         return ResponseEntity.ok().body(hubService.saveHub(principal.getName(),hub));
     }
 
-    @PostMapping("/delete")
-    public ResponseEntity<?> delete(@RequestParam UUID id) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable UUID id) {
         return ResponseEntity.ok().body(hubService.deleteHub(id));
     }
 

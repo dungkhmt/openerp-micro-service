@@ -51,7 +51,13 @@ public class HubServiceImpl implements HubService {
 
     @Override
     public boolean deleteHub(UUID id) {
-        hubRepo.deleteById(id);
+        Hub existingHub = hubRepo.findById(id).orElse(null);
+
+        System.out.println("----------existingHub: " + existingHub);
+        if (existingHub == null) {
+            return false;
+        }
+        hubRepo.delete(existingHub);
         return true;
     }
 }

@@ -1,0 +1,266 @@
+[33mcommit 047ba771b65f6b34bce5286f91f5c2bb3e8379a9[m[33m ([m[1;36mHEAD -> [m[1;32mantv_fmd[m[33m)[m
+Author: antran2k2 <tranvietanbn2002@gmail.com>
+Date:   Sat Mar 16 17:36:08 2024 +0700
+
+    crud hubs
+
+[33mcommit dfec120d1f85be0f34f8ed2316d20007795a303a[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: dungkhmt <dungkhmt@gmail.com>
+Date:   Thu Mar 14 11:41:45 2024 +0700
+
+    init module job search platform
+
+[33mcommit 7351f3f2600c8bfc067030f1affbfba32c201871[m
+Author: dungkhmt <dungkhmt@gmail.com>
+Date:   Wed Mar 13 21:11:31 2024 +0700
+
+    upgrade contest add option for view output testcase by participant
+
+[33mcommit 19c1e1a6d8beef77643c14fbe2f7e05448ea24ca[m
+Author: dungkhmt <dungkhmt@gmail.com>
+Date:   Wed Mar 13 17:08:10 2024 +0700
+
+    init first-mile delivery do an tran viet an
+
+[33mcommit f0fcd12b20ecb8fc03066e60e336a0a40ddac394[m
+Author: tienv1per <tienv1perds@gmail.com>
+Date:   Tue Mar 12 00:59:19 2024 +0700
+
+    fe/SF menu
+
+[33mcommit 147c98a233897fa2d7b0ffe2fe75e68b2e9f0237[m
+Author: tienv1per <tienv1perds@gmail.com>
+Date:   Tue Mar 12 00:42:17 2024 +0700
+
+    fe/SF menu layout
+
+[33mcommit 9fe52076d338d93d2aafe4950c303c91a1e83614[m
+Author: dungkhmt <dungkhmt@gmail.com>
+Date:   Mon Mar 11 20:41:26 2024 +0700
+
+    init module san BDS property-platform
+
+[33mcommit d8a5ca7ef047e56216f0e03bb1529ba32f49efdc[m
+Author: dungkhmt <dungkhmt@gmail.com>
+Date:   Mon Mar 11 11:51:37 2024 +0700
+
+    init autotime tabling module
+
+[33mcommit 7dee4c2c35e98cf590d86f940de51444ce9ee00e[m
+Author: dungkhmt <dungkhmt@gmail.com>
+Date:   Mon Mar 11 10:54:02 2024 +0700
+
+    init project asset management with sample frontend & backend
+
+[33mcommit c98f7d48a8582c1aedc5cd032e4303e48b384bad[m
+Merge: ae50df6b 6f86ffeb
+Author: tienv1per <tienv1perds@gmail.com>
+Date:   Mon Mar 11 01:40:56 2024 +0700
+
+    Merge branch 'main' of github.com:dungkhmt/openerp-micro-service into main
+
+[33mcommit ae50df6bedf49f0def9611af5d08128d656fafe2[m
+Author: tienv1per <tienv1perds@gmail.com>
+Date:   Mon Mar 11 01:39:54 2024 +0700
+
+    fe/sidebar components
+
+[33mcommit 6f86ffeb2ce6a18197d2b0e2ec6d11f8255d0d8d[m
+Author: chienhoangvan <chienhoangvanp@gmail.com>
+Date:   Sun Mar 10 23:00:35 2024 +0700
+
+    add log for assign group
+
+[33mcommit 393f3d37fc7932d6e458194003dd5cfc6151ced9[m
+Merge: 820dad1f 5c69560d
+Author: minhquan0509 <quandm@caerux.com>
+Date:   Sun Mar 10 15:37:34 2024 +0700
+
+    Merge branch 'main' of https://github.com/dungkhmt/openerp-micro-service
+
+[33mcommit 820dad1fce740576a18e50529b9e5760f2a8098f[m
+Author: minhquan0509 <quandm@caerux.com>
+Date:   Sun Mar 10 15:36:30 2024 +0700
+
+    [LMS/Student Quiz Detail]: Fix loading
+
+[33mcommit 5c69560d7eece582a865d8d70a10f6dbf3122742[m
+Merge: 499948bf 12a9965c
+Author: hieugiabao <hieugiabao12@gmail.com>
+Date:   Sat Mar 9 23:26:30 2024 +0700
+
+    Merge branch 'main' of https://github.com/dungkhmt/openerp-micro-service
+
+[33mcommit 499948bf4fb88f9c4dad4f4067aa802445c10b12[m
+Author: hieugiabao <hieugiabao12@gmail.com>
+Date:   Sat Mar 9 23:26:25 2024 +0700
+
+    [t-m] fix entity
+
+[33mcommit 12a9965c7ba68c315b210ed0e09049b87e04187e[m
+Author: dungkhmt <dungkhmt@gmail.com>
+Date:   Sat Mar 9 22:50:53 2024 +0700
+
+    init new modules
+
+[33mcommit 9625ac15a40cc551f28947f3f932e92df6cf4388[m
+Author: minhquan0509 <quandm@caerux.com>
+Date:   Sat Mar 9 16:55:16 2024 +0700
+
+    [Fix] Teacher create class - add noti and back to list
+
+[33mcommit cfe741780965bebcace78d900cefb71d8004d863[m
+Merge: 1495d919 1e496ef6
+Author: minhquan0509 <quandm@caerux.com>
+Date:   Sat Mar 9 16:15:56 2024 +0700
+
+    Merge branch 'main' of https://github.com/dungkhmt/openerp-micro-service
+
+[33mcommit 1495d91972f322f7774786365e396b5d7192c00a[m
+Author: minhquan0509 <quandm@caerux.com>
+Date:   Sat Mar 9 16:15:28 2024 +0700
+
+    Relocate Add Class button + remove old components Quiztest
+
+[33mcommit 1e496ef6c967e44bb5513bf223fcfb46a4440d97[m
+Merge: 1abe83e6 7fb8d277
+Author: hieugiabao <hieugiabao12@gmail.com>
+Date:   Fri Mar 8 11:55:02 2024 +0700
+
+    Merge branch 'main' of https://github.com/dungkhmt/openerp-micro-service
+
+[33mcommit 1abe83e6fdc7eefe3c07637d52ce1e45dcfc9ff4[m
+Author: hieugiabao <hieugiabao12@gmail.com>
+Date:   Fri Mar 8 11:54:55 2024 +0700
+
+    [t-m] fix relation
+
+[33mcommit 7fb8d2777e89c5acb825c560099cabbce3f8a15c[m
+Author: tienv1per <tienv1perds@gmail.com>
+Date:   Fri Mar 8 00:26:50 2024 +0700
+
+    SF ui
+
+[33mcommit 754079737850ea980c2bed7525c82d436b6573f5[m
+Author: tienv1per <tienv1perds@gmail.com>
+Date:   Fri Mar 8 00:26:28 2024 +0700
+
+    fe/signup page demo
+
+[33mcommit 8d58a9824c6e9b10e8125c7eb675d6efca8bfb5e[m
+Author: tienv1per <tienv1perds@gmail.com>
+Date:   Fri Mar 8 00:26:16 2024 +0700
+
+    fe/login page demo
+
+[33mcommit c344efadb58943e24bbfc5577947e44dee9bfdec[m
+Author: tienv1per <tienv1perds@gmail.com>
+Date:   Thu Mar 7 23:40:05 2024 +0700
+
+    init fe asset
+
+[33mcommit 92fc3a254ead5800b9162df642d726977ca6bd73[m
+Author: dungkhmt <dungkhmt@gmail.com>
+Date:   Wed Mar 6 20:10:50 2024 +0700
+
+    init module lms analytic
+
+[33mcommit 77d66c94826203e62d53fdb67fe673a7a4a299ba[m
+Merge: 80f4c347 2f24180a
+Author: hieugiabao <hieugiabao12@gmail.com>
+Date:   Sun Mar 3 22:16:20 2024 +0700
+
+    Merge branch 'main' of https://github.com/dungkhmt/openerp-micro-service
+
+[33mcommit 80f4c34777555f47c4f1184954e623fc8520e471[m
+Author: hieugiabao <hieugiabao12@gmail.com>
+Date:   Sun Mar 3 22:16:08 2024 +0700
+
+    [t-m] migrate text-area to markdown editor
+
+[33mcommit 2f24180a02bca78d87002a8e820b010c4cd24c7d[m
+Author: minhquan0509 <quandm@caerux.com>
+Date:   Sun Mar 3 16:24:39 2024 +0700
+
+    Fix cancel button link
+
+[33mcommit 63f98a536e3b83ad4f95a84f633ecccfabc7d9b3[m
+Author: minhquan0509 <quandm@caerux.com>
+Date:   Sun Mar 3 16:08:49 2024 +0700
+
+    Function: Teacher add course
+
+[33mcommit b58699a38fc31939cae7aed4a6d8a4fc4548324e[m
+Author: hieugiabao <hieugiabao12@gmail.com>
+Date:   Sun Mar 3 14:20:06 2024 +0700
+
+    [t-m] add created time for table listing task
+
+[33mcommit 38c597cc56241d2af31ced1bd78e62e56a377dc7[m
+Author: hieugiabao <hieugiabao12@gmail.com>
+Date:   Sat Mar 2 21:52:07 2024 +0700
+
+    [t-m] fix: create task performance
+
+[33mcommit 3df10757c83c50253799c3ac569ecbcfd4a9e2be[m
+Author: dungkhmt <dungkhmt@gmail.com>
+Date:   Thu Feb 29 11:22:01 2024 +0700
+
+    init sample frontend, backend
+
+[33mcommit 47531bcbf791baf4e8e006e07bb8463e03f39997[m
+Author: dungkhmt <dungkhmt@gmail.com>
+Date:   Thu Feb 29 11:16:49 2024 +0700
+
+    init module app share a ride taxi
+
+[33mcommit cd954c542b88466dd71f0d1f664b774e73ece2da[m
+Author: dungkhmt <dungkhmt@gmail.com>
+Date:   Thu Feb 29 10:41:19 2024 +0700
+
+    init module wms for baobi distribution
+
+[33mcommit 896efad4ced64096366246b3117ff0f422ac3cf0[m
+Author: dungkhmt <dungkhmt@gmail.com>
+Date:   Thu Feb 29 09:32:37 2024 +0700
+
+    init module for objective key result management
+
+[33mcommit 533c86a0bc56b0aa4b4cbf98e675bf210b353ff6[m
+Merge: bd9de264 456fbf1c
+Author: hieugiabao <hieugiabao12@gmail.com>
+Date:   Tue Feb 27 00:21:16 2024 +0700
+
+    Merge branch 'main' of https://github.com/dungkhmt/openerp-micro-service
+
+[33mcommit bd9de264a184481c78780b42a0667dd41eddb6e3[m
+Author: hieugiabao <hieugiabao12@gmail.com>
+Date:   Tue Feb 27 00:21:10 2024 +0700
+
+    [t-m] fix: parse query string
+
+[33mcommit 456fbf1c36242d13d65000ecb08a9ceb77d51841[m
+Author: dungkhmt <dungkhmt@gmail.com>
+Date:   Mon Feb 26 10:17:31 2024 +0700
+
+    init module student360 and thesisdefensejuryassignment
+
+[33mcommit a924cf842914ceddc3254de9cbca4b862060e4d1[m
+Author: hieugiabao <hieugiabao12@gmail.com>
+Date:   Sun Feb 25 22:21:36 2024 +0700
+
+    [t-m] upgrade standard table for listing assigned task
+
+[33mcommit b062033f1a77d439a3ad845f920e69d4c4e9dd0f[m
+Author: hieugiabao <hieugiabao12@gmail.com>
+Date:   Sun Feb 25 20:37:33 2024 +0700
+
+    [t-m] chore: update mongo-java-driver version to 3.12.14
+
+[33mcommit f7cabb573460645864d09a41e1fa6a4854511f90[m
+Author: hieugiabao <hieugiabao12@gmail.com>
+Date:   Mon Feb 19 22:34:57 2024 +0700
+
+    [t-m] Fix search error
+
+[33mcommit a8d52284121b5058fc9441b61b98e1315c0d0b4

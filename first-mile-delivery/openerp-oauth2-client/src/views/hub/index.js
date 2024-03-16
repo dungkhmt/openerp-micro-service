@@ -99,12 +99,10 @@ const HubScreen = () => {
         handleOpen();
     }
     const onHubDelete = (hub) => {
-        request("post", "/hub/delete", (res) => {
+        request("delete", `/hub/delete/${hub.id}`, (res) => {
             console.log(res.data);
             setHubs(hubs.filter(h => h.id !== hub.id));
-        }, {}, {
-            id: hub.id
-        }).then()
+        }, {}, {}).then()
     }
 
 
