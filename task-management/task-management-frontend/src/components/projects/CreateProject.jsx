@@ -7,6 +7,9 @@ import { request } from "../../api";
 import BasicAlert from "../alert/BasicAlert";
 import { boxChildComponent, boxComponentStyle } from "../utils/constant";
 
+/**
+ * @deprecated
+ */
 export default function CreateProject() {
   const { projectId, type } = useParams();
 

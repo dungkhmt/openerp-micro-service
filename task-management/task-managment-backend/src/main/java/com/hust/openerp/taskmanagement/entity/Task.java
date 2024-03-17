@@ -1,7 +1,6 @@
 package com.hust.openerp.taskmanagement.entity;
 
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -10,12 +9,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -34,7 +30,7 @@ import lombok.Setter;
 public class Task {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    // @GeneratedValue(strategy = GenerationType.AUTO)
     @Column
     private UUID id;
 
@@ -55,6 +51,12 @@ public class Task {
 
     @Column(name = "due_date")
     private Date dueDate;
+
+    @Column(name = "estimated_time")
+    private Integer estimatedTime;
+
+    @Column(name = "progress")
+    private Integer progress;
 
     @Column(name = "created_by_user_id")
     private String createdByUserId;
@@ -79,27 +81,42 @@ public class Task {
     @Column(name = "priority_id")
     private String priorityId;
 
+    @Column(name = "assignee_id")
+    private String assigneeId;
+
+    @Column(name = "parent_id")
+    private UUID parentId;
+
+    @Column(name = "ancestor_id")
+    private UUID ancestorId;
+
+    @Column(name = "lft")
+    private Integer lft;
+
+    @Column(name = "rgt")
+    private Integer rgt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", insertable = false, updatable = false)
     private Project project;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id", insertable = false, updatable = false)
-    private StatusItem statusItem;
+    private StatusItem status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "priority_id", insertable = false, updatable = false)
-    private TaskPriority taskPriority;
+    private TaskPriority priority;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", insertable = false, updatable = false)
-    private TaskCategory taskCategory;
+    private TaskCategory category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_user_id", insertable = false, updatable = false)
-    private User createdByUser;
+    private User creator;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "task")
-    // @JoinColumn(name = "id", insertable = false, updatable = false)
-    private List<TaskAssignment> assignment;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assignee_id", insertable = false, updatable = false)
+    private User assignee;
 }

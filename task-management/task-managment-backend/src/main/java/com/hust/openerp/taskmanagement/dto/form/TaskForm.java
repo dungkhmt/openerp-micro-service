@@ -9,14 +9,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaskForm {
-
     private String name;
     private String description;
+    private Date fromDate;
     private Date dueDate;
     private String attachmentPaths;
     private UUID projectId;
@@ -24,5 +27,12 @@ public class TaskForm {
     private String priorityId;
     private String categoryId;
     private String assigneeId;
-    private List<String> skillIds;
+    @Min(0)
+    private Integer estimatedTime;
+    @Min(0)
+    @Max(100)
+    private Integer progress;
+    private String note;
+    private UUID parentId;
+    // private List<String> skillIds;
 }

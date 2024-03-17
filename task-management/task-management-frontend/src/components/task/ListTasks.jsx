@@ -28,6 +28,9 @@ import { boxChildComponent, boxComponentStyle } from "../utils/constant";
 import { LimitString } from "../utils/helpers";
 import MemberTable from "./MemberTable";
 
+/**
+ * @deprecated
+ */
 const ListTasks = () => {
   const [openAddNewMemberModal, setOpenAddNewMemberModal] = useState(false);
   const navigate = useNavigate();

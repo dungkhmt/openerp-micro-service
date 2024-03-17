@@ -9,6 +9,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Deprecated
 public class CommentDao {
     private UUID id;
     private UUID taskId;
@@ -24,7 +25,7 @@ public class CommentDao {
         this.setTaskId(comment.getTaskId());
         this.setStatus(comment.isStatus());
         this.setModify(isModify);
-        this.setCreatedByUserId(comment.getCreatedByUserLoginId());
+        this.setCreatedByUserId(comment.getCreatorId());
         this.setComment(comment.getContent());
         this.setCreatedDate(comment.getCreatedStamp() != null ? sdf.format(comment.getCreatedStamp()) : null);
     }

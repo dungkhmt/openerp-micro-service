@@ -7,6 +7,9 @@ export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
 
   return defineConfig({
+    optimizeDeps: {
+      include: ["@mui/material/Tooltip"],
+    },
     plugins: [
       react(),
       svgr({
