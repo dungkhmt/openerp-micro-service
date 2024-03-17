@@ -11,6 +11,9 @@ import MDEditor from "@uiw/react-md-editor";
 import { useState } from "react";
 import PropTypes from "prop-types";
 
+/**
+ * @deprecated
+ */
 const CommentItem = ({
   comment,
   onBottom,

@@ -44,7 +44,7 @@ const ContentContainer = (props) => (
 export const errorNoti = (message) => {
   const content = (
     <ContentContainer>
-      <IconContext.Provider>
+      <IconContext.Provider value={{ className: "react-icons" }}>
         <MdCancel size={20} style={{ marginRight: "5px" }} />
       </IconContext.Provider>
       {message}

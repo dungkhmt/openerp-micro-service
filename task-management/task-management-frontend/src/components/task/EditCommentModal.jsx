@@ -9,6 +9,9 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 
+/**
+ * @deprecated
+ */
 const EditCommentModal = ({
   open,
   handleClose,

@@ -26,6 +26,9 @@ import ChangeStatusModal from "./ChangeStatusModal";
 import CommentSection from "./CommentSection";
 import { CustomEditor } from "../editor/CustomEditor";
 
+/**
+ * @deprecated
+ */
 const ShowTask = () => {
   const { taskId } = useParams();
   const [task, setTask] = useState(null);

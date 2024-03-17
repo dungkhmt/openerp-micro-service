@@ -24,8 +24,6 @@ public interface TaskExecutionService {
 
     TaskExecution save(TaskExecution taskExecution);
 
-    List<Comment> getAllCommentsByTaskId(UUID taskId);
-
     List<Object[]> getAllDistinctDay(UUID projectId);
 
     List<TaskExecutionDao> getAllTaskExecutionByDate(Date date, UUID projectId);

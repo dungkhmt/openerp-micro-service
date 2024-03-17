@@ -1,5 +1,7 @@
 package com.hust.openerp.taskmanagement.specification;
 
+import java.util.UUID;
+
 import org.springframework.data.jpa.domain.Specification;
 
 import com.hust.openerp.taskmanagement.util.SearchCriteria;
@@ -72,6 +74,16 @@ public abstract class BaseSpecification<T> implements Specification<T> {
     return switch (criteria.getOperation()) {
       case EQUALITY -> builder.equal(root.get(criteria.getKey()), criteria.getValue());
       case NEGATION -> builder.notEqual(root.get(criteria.getKey()), criteria.getValue());
+      default -> null;
+    };
+  }
+
+  @Nullable
+  protected Predicate parseUUIDField(final Root<T> root,
+      final CriteriaBuilder builder) {
+    return switch (criteria.getOperation()) {
+      case EQUALITY -> builder.equal(root.get(criteria.getKey()), UUID.fromString(criteria.getValue().toString()));
+      case NEGATION -> builder.notEqual(root.get(criteria.getKey()), UUID.fromString(criteria.getValue().toString()));
       default -> null;
     };
   }

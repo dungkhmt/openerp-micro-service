@@ -7,6 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Deprecated
 public class ProjectPagination {
     private List<ProjectDao> data;
     private long totalPage;

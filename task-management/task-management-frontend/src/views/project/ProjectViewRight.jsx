@@ -1,0 +1,163 @@
+import { Box, CircularProgress, Tab, Typography, styled } from "@mui/material";
+import MuiTabList from "@mui/lab/TabList";
+import { TabContext, TabPanel } from "@mui/lab";
+import { Icon } from "@iconify/react";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import { useEffect } from "react";
+import { ProjectViewTasks } from "./ProjectViewTasks";
+import { useProjectContext } from "../../hooks/useProjectContext";
+import { ProjectViewMembers } from "./ProjectViewMembers";
+
+const TabList = styled(MuiTabList)(({ theme }) => ({
+  "& .MuiTabs-indicator": {
+    display: "none",
+  },
+  "& .Mui-selected": {
+    backgroundColor: theme.palette.primary.main,
+    color: `${theme.palette.common.white} !important`,
+  },
+  "& .MuiTab-root": {
+    minWidth: 65,
+    minHeight: 40,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
+    borderRadius: theme.shape.borderRadius,
+    [theme.breakpoints.up("md")]: {
+      minWidth: 130,
+    },
+  },
+}));
+
+const ProjectViewRight = () => {
+  const { id, tab } = useParams();
+  const { isLoading: projectLoading } = useProjectContext();
+  const [activeTab, setActiveTab] = useState(tab);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setActiveTab(tab);
+  }, [tab]);
+
+  const handleChange = (event, value) => {
+    setActiveTab(value);
+    navigate(`/project/${id}/${value}`);
+  };
+
+  return (
+    <TabContext value={activeTab}>
+      <TabList
+        variant="scrollable"
+        scrollButtons="auto"
+        onChange={handleChange}
+      >
+        bs
+        <Tab
+          value="overview"
+          label={
+            <Box
+              sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
+            >
+              <Icon fontSize={20} icon="mdi:view-quilt-outline" />
+              Tổng quan
+            </Box>
+          }
+        />
+        <Tab
+          value="tasks"
+          label={
+            <Box
+              sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
+            >
+              <Icon fontSize={20} icon="ic:baseline-task" />
+              Nhiệm vụ
+            </Box>
+          }
+        />
+        <Tab
+          value="timeline"
+          label={
+            <Box
+              sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
+            >
+              <Icon fontSize={20} icon="mdi:calendar" />
+              Timeline
+            </Box>
+          }
+        />
+        <Tab
+          value="activity"
+          label={
+            <Box
+              sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
+            >
+              <Icon fontSize={20} icon="ic:baseline-history" />
+              Hoạt động
+            </Box>
+          }
+        />
+        <Tab
+          value="members"
+          label={
+            <Box
+              sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
+            >
+              <Icon fontSize={20} icon="mdi:account-group" />
+              Thành viên
+            </Box>
+          }
+        />
+        <Tab
+          value="setting"
+          label={
+            <Box
+              sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
+            >
+              <Icon fontSize={20} icon="mdi:application-edit-outline" />
+              Quản lý
+            </Box>
+          }
+        />
+      </TabList>
+      <Box sx={{ mt: 4 }}>
+        {projectLoading ? (
+          <Box
+            sx={{
+              mt: 6,
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "column",
+            }}
+          >
+            <CircularProgress sx={{ mb: 4 }} />
+            <Typography>Loading...</Typography>
+          </Box>
+        ) : (
+          <>
+            <TabPanel sx={{ p: 0 }} value="overview">
+              Overview
+            </TabPanel>
+            <TabPanel sx={{ p: 0 }} value="tasks">
+              <ProjectViewTasks />
+            </TabPanel>
+            <TabPanel sx={{ p: 0 }} value="timeline">
+              Timeline
+            </TabPanel>
+            <TabPanel sx={{ p: 0 }} value="activity">
+              History
+            </TabPanel>
+            <TabPanel sx={{ p: 0 }} value="members">
+              <ProjectViewMembers />
+            </TabPanel>
+            <TabPanel sx={{ p: 0 }} value="setting">
+              Quản lý
+            </TabPanel>
+          </>
+        )}
+      </Box>
+    </TabContext>
+  );
+};
+
+export { ProjectViewRight };

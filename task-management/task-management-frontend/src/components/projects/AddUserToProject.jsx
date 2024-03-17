@@ -12,6 +12,9 @@ import { processingNoti, successNoti } from "../../utils/notification";
 import { request } from "../../api";
 import { boxChildComponent, boxComponentStyle } from "../utils/constant";
 
+/**
+ * @deprecated
+ */
 const AddUserToProject = () => {
   const navigate = useNavigate();
 

@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 import BasicModal from "../modal/BasicModal";
 import { boxChildComponent } from "../utils/constant";
 
+/**
+ * @deprecated
+ */
 const MemberModal = ({ open, handleClose, members }) => {
   return (
     <>

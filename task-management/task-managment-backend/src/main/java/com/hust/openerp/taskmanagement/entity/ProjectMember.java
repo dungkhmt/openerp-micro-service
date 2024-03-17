@@ -34,7 +34,7 @@ public class ProjectMember {
     @JoinColumn(name = "project_id", nullable = false, insertable = false, updatable = false)
     private Project project;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
     private User member;
 
@@ -63,7 +63,7 @@ public class ProjectMember {
                 return false;
             ProjectMemberId that = (ProjectMemberId) o;
             return projectId.equals(that.projectId) && userId.equals(that.userId)
-                && roleId.equals(that.roleId);
+                    && roleId.equals(that.roleId);
         }
 
         @Override

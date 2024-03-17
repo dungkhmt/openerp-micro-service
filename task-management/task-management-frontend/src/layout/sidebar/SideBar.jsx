@@ -41,7 +41,7 @@ const Background = styled("div")(() => ({
 const styles = {
   drawerPaper: {
     height: "calc(100% - 64px)",
-    marginTop: 8,
+    marginTop: 16,
     overflowX: "hidden",
     width: drawerWidth,
     flexShrink: 0,
