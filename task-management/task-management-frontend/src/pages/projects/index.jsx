@@ -63,9 +63,9 @@ const columns = [
               fontSize: ".875rem",
             }}
           >
-            {`${row.creator.firstName.charAt(0)}${row.creator.lastName.charAt(
-              0
-            )}`}
+            {`${row.creator?.firstName?.charAt(0) ?? ""}${
+              row?.creator?.lastName?.charAt(0) ?? ""
+            }`}
           </CustomAvatar>
         </Tooltip>
       ) : (

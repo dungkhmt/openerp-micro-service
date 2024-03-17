@@ -302,8 +302,8 @@ const DialogAddTask = ({ open, setOpen }) => {
                               fontSize: ".875rem",
                             }}
                           >
-                            {`${member.firstName.charAt(0) ?? ""}${
-                              member.lastName.charAt(0) ?? ""
+                            {`${member.firstName?.charAt(0) ?? ""}${
+                              member.lastName?.charAt(0) ?? ""
                             }`}
                           </CustomAvatar>
                           <Typography variant="subtitle2">{`${

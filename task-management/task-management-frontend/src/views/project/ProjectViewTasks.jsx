@@ -197,16 +197,16 @@ const ProjectViewTasks = () => {
         row.assignee ? (
           <AvatarGroup max={3} className="pull-up">
             <Tooltip
-              title={`${row.assignee.firstName} ${row.assignee.lastName}`}
-              key={row.assignee.id}
+              title={`${row.assignee?.firstName} ${row.assignee?.lastName}`}
+              key={row.assignee?.id}
             >
               <CustomAvatar
                 skin="light"
-                color={getRandomColorSkin(row.assignee.id)}
+                color={getRandomColorSkin(row.assignee?.id)}
                 sx={{ width: 30, height: 30, fontSize: ".875rem" }}
               >
-                {`${row.assignee.firstName.charAt(0) ?? ""}${
-                  row.assignee.lastName.charAt(0) ?? ""
+                {`${row.assignee?.firstName?.charAt(0) ?? ""}${
+                  row.assignee?.lastName?.charAt(0) ?? ""
                 }`}
               </CustomAvatar>
             </Tooltip>
@@ -476,8 +476,8 @@ const ProjectViewTasks = () => {
                           fontSize: ".875rem",
                         }}
                       >
-                        {`${member.firstName.charAt(0) ?? ""}${
-                          member.lastName.charAt(0) ?? ""
+                        {`${member?.firstName?.charAt(0) ?? ""}${
+                          member?.lastName?.charAt(0) ?? ""
                         }`}
                       </CustomAvatar>
                       <Typography variant="subtitle2">{`${

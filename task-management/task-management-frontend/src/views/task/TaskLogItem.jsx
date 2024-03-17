@@ -56,9 +56,9 @@ const TaskLogItem = ({ item }) => {
               color={getRandomColorSkin(creator?.id)}
               size="large"
             >
-              {`${creator?.firstName.charAt(0).toUpperCase()}${creator?.lastName
-                .charAt(0)
-                .toUpperCase()}`}
+              {`${creator?.firstName?.charAt(0) ?? ""}${
+                creator?.lastName?.charAt(0) ?? ""
+              }`}
             </CustomAvatar>
           </Grid>
           <Grid item xs={12} md={11}>

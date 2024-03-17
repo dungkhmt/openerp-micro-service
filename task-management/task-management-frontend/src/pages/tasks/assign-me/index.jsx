@@ -148,8 +148,8 @@ const TaskAssigned = () => {
                 color={getRandomColorSkin(row.creator.id)}
                 sx={{ width: 30, height: 30, fontSize: ".875rem" }}
               >
-                {`${row.creator.firstName.charAt(0) ?? ""}${
-                  row.creator.lastName.charAt(0) ?? ""
+                {`${row.creator?.firstName?.charAt(0) ?? ""}${
+                  row.creator?.lastName?.charAt(0) ?? ""
                 }`}
               </CustomAvatar>
             </Tooltip>
