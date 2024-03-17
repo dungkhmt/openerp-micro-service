@@ -2,7 +2,7 @@ import { Card, CardHeader, Tooltip, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import TableToolbar from "../../components/table/ToolBar";
+import TableToolbar from "../../components/table/Toolbar";
 import { ProjectService } from "../../services/api/project.service";
 import { useDebounce } from "../../hooks/useDebounce";
 import { Link } from "react-router-dom";
