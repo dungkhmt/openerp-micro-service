@@ -245,12 +245,12 @@ public class TaskServiceImplement implements TaskService {
     public Page<Task> getTasksAssignedToUser(Pageable pageable, String assignee, @Nullable String search) {
         // replace "assignee:value" if exist in search by "assignee:`assignee`"
         if (search != null && !search.equals("")) {
-            if (search.contains("assignee:"))
-                search = search.replaceAll("assignee:[^ ]+", "assignee:" + assignee);
+            if (search.contains("assigneeId:"))
+                search = search.replaceAll("assigneeId:[^ ]+", "assigneeId:" + assignee);
             else
-                search = search + " AND assignee:" + assignee;
+                search = search + " AND assigneeId:" + assignee;
         } else {
-            search = "assignee:" + assignee;
+            search = "assigneeId:" + assignee;
         }
 
         // default sort by due date
