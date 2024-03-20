@@ -25,6 +25,7 @@ import { DialogEditTask } from "./DialogEditTask";
 import TaskViewLog from "./TaskViewLog";
 import { TaskViewHierarchy } from "./TaskViewHierarchy";
 import { DialogAddSubTask } from "./DialogAddSubTask";
+import { useProjectContext } from "../../hooks/useProjectContext";
 
 const TextHighlight = styled(Typography)(({ theme }) => ({
   color: theme.palette.primary.main,
@@ -64,11 +65,12 @@ const Loading = () => (
 );
 
 const TaskViewLeft = () => {
-  const { isLoading, task } = useTaskContext();
+  const { isLoading: taskLoading, task } = useTaskContext();
+  const {isLoading: projectLoading} = useProjectContext();
   const [openEdit, setOpenEdit] = useState(false);
   const [openAddSubTask, setOpenAddSubTask] = useState(false);
 
-  if (isLoading) {
+  if (taskLoading || projectLoading) {
     return <Loading />;
   }
 
