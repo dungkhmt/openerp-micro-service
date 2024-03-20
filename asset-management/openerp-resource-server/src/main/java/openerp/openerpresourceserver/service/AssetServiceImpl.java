@@ -18,4 +18,17 @@ public class AssetServiceImpl implements AssetService{
         List<Asset> assets = assetRepo.findAll();
         return assets;
     }
+
+    @Override
+    public Asset addNewAsset(Asset asset) {
+        Asset newAsset = new Asset();
+        newAsset.setName(asset.getName());
+        newAsset.setCode(asset.getCode());
+        newAsset.setAssignee_id(asset.getAssignee_id());
+        newAsset.setLocation_id(asset.getLocation_id());
+        newAsset.setVendor_id(asset.getVendor_id());
+        newAsset.setActive_date(asset.getActive_date());
+        newAsset.setDescription(asset.getDescription());
+        return newAsset;
+    }
 }
