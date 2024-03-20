@@ -20,6 +20,7 @@ import { useDebounce } from "../../../hooks/useDebounce";
 import { TaskService } from "../../../services/api/task.service";
 import {
   getCategoryColor,
+  getDueDateColor,
   getRandomColorSkin,
 } from "../../../utils/color.util";
 
@@ -46,7 +47,7 @@ const TaskAssigned = () => {
 
   const columns = [
     {
-      flex: 0.3,
+      flex: 0.4,
       field: "name",
       headerName: "Tên",
       filterable: false,
@@ -119,17 +120,19 @@ const TaskAssigned = () => {
       flex: 0.1,
       field: "due",
       headerName: "Thời hạn",
+      align: "center",
+      headerAlign: "center",
       sortable: false,
       renderCell: ({ row }) => (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography variant="body2" sx={{ color: "text.primary" }}>
-            {dayjs(row.dueDate).format("DD/MM/YYYY") ?? ""}
+          <Typography variant="body2" color={getDueDateColor(row.dueDate)}>
+            {row.dueDate ? dayjs(row.dueDate).format("DD/MM/YYYY") : " - "}
           </Typography>
         </Box>
       ),
     },
     {
-      flex: 0.15,
+      flex: 0.1,
       field: "creator",
       headerName: "Người tạo",
       align: "center",
@@ -157,7 +160,7 @@ const TaskAssigned = () => {
         ),
     },
     {
-      flex: 0.15,
+      flex: 0.1,
       minWidth: 100,
       field: "createdStamp",
       headerName: "Ngày tạo",
@@ -186,8 +189,11 @@ const TaskAssigned = () => {
         "%1F"
       );
       const response = await TaskService.getAssignedTasks({
-        ...paginationModel,
-        search: encodedSearch ? `name:*${encodedSearch}*` : "",
+        page: paginationModel.page,
+        size: paginationModel.pageSize,
+        search: encodedSearch
+          ? `name:*${encodedSearch}* OR creatorId:*${encodedSearch}* OR projectName:*${encodedSearch}*`
+          : "",
         sort: `${sortModel.field},${sortModel.sort}`,
       });
       setRows(response.data);

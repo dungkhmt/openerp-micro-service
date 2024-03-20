@@ -59,7 +59,7 @@ public class Task {
     private Integer progress;
 
     @Column(name = "created_by_user_id")
-    private String createdByUserId;
+    private String creatorId;
 
     @Column(name = "attachment_paths")
     private String attachmentPaths;
