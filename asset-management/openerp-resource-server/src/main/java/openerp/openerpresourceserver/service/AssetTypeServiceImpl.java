@@ -19,4 +19,13 @@ public class AssetTypeServiceImpl implements AssetTypeService{
         List<AssetType> assetTypes = assetTypeRepo.findAll();
         return assetTypes;
     }
+
+    @Override
+    public AssetType addNewType(AssetType assetType) {
+        AssetType newType = new AssetType();
+        newType.setName(assetType.getName());
+        newType.setCodePrefix(assetType.getCodePrefix());
+        newType.setDescription(assetType.getDescription());
+        return newType;
+    }
 }
