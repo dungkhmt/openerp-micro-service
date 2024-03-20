@@ -18,4 +18,13 @@ public class LocationServiceImpl implements LocationService{
         List<Location> locations = locationRepo.findAll();
         return locations;
     }
+
+    @Override
+    public Location addNewLocation(Location location) {
+        Location loc = new Location();
+        loc.setName(location.getName());
+        loc.setDescription(location.getDescription());
+        loc.setImage(location.getImage());
+        return locationRepo.save(loc);
+    }
 }

@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface LocationService {
     List<Location> getAllLocations();
+
+    Location addNewLocation(Location location);
 }
