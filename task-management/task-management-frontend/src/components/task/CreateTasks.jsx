@@ -21,6 +21,9 @@ import { Link } from "react-router-dom";
 import DateTimePickerBasic from "../datetimepicker/DateTimePickerBasic";
 import { CustomEditor } from "../editor/CustomEditor";
 
+/**
+ * @deprecated
+ */
 export default function CreateTask() {
   const navigate = useNavigate();
   const { projectIdUrl } = useParams();

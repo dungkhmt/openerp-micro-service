@@ -6,6 +6,9 @@ import CategoryElement from "../common/CategoryElement";
 import StatusElement from "../common/StatusElement";
 import { boxChildComponent } from "../utils/constant";
 
+/**
+ * @deprecated
+ */
 const AssignedTaskItem = ({ task }) => {
   const taskName = task.name;
   const project = task.project.name;

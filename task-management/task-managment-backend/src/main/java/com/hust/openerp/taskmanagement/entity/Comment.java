@@ -30,7 +30,7 @@ public class Comment {
     private UUID taskId;
 
     @Column(name = "created_by_user_id")
-    private String createdByUserLoginId;
+    private String creatorId;
 
     @Column(name = "status")
     private boolean status;
@@ -42,4 +42,8 @@ public class Comment {
     @LastModifiedDate
     @Column(name = "last_updated_stamp")
     private Date lastUpdatedStamp;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "created_by_user_id", referencedColumnName = "user_login_id", insertable = false, updatable = false)
+    private User creator;
 }

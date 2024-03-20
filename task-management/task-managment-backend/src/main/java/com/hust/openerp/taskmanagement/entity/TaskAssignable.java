@@ -17,6 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "task_management_task_assignable")
+@Deprecated
 public class TaskAssignable {
 
     @Id

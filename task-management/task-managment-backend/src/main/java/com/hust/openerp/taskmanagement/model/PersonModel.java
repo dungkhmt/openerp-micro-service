@@ -8,10 +8,14 @@ import lombok.Setter;
 import java.sql.Date;
 import java.util.List;
 
+/**
+ * @deprecated This class is deprecated and should not be used.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Deprecated
 public class PersonModel {
 
     private String userName;
@@ -48,16 +52,16 @@ public class PersonModel {
     }
 
     public PersonModel(
-        String userName,
-        String password,
-        List<String> roles,
-        String partyCode,
-        String firstName,
-        String lastName,
-        String middleName,
-        String gender,
-        Date birthDate,
-        String affiliations) {
+            String userName,
+            String password,
+            List<String> roles,
+            String partyCode,
+            String firstName,
+            String lastName,
+            String middleName,
+            String gender,
+            Date birthDate,
+            String affiliations) {
         this.userName = userName;
         this.password = password;
         this.roles = roles;

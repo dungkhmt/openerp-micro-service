@@ -1,6 +1,5 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
-import com.hust.openerp.taskmanagement.dto.form.ProjectMemberForm;
 import com.hust.openerp.taskmanagement.entity.Project;
 import com.hust.openerp.taskmanagement.entity.ProjectMember;
 import com.hust.openerp.taskmanagement.entity.User;
@@ -14,7 +13,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,16 +31,8 @@ public class ProjectMemberServiceImplement implements ProjectMemberService {
     private final NotificationService notificationsService;
 
     @Override
-    public List<User> getMemberIdJoinedProject(UUID projectId) {
-        List<ProjectMember> projectMembers = projectMemberRepository.findAllProjectMemberByProjectId(projectId);
-        List<User> users = new ArrayList<>();
-        for (ProjectMember projectMember : projectMembers) {
-            User member = projectMember.getMember();
-            if (member != null) {
-                users.add(member);
-            }
-        }
-        return users;
+    public List<ProjectMember> getMembersOfProject(UUID projectId) {
+        return projectMemberRepository.findAllProjectMemberByProjectId(projectId);
     }
 
     @Override
@@ -51,40 +41,45 @@ public class ProjectMemberServiceImplement implements ProjectMemberService {
     }
 
     @Override
-    public ProjectMember addMemberToProject(ProjectMemberForm projectMemberForm) {
-        UUID projectId = UUID.fromString(projectMemberForm.getProjectId());
-        String memberId = projectMemberForm.getMemberId();
+    public ProjectMember addMemberToProject(ProjectMember projectMemberForm) {
+        UUID projectId = projectMemberForm.getProjectId();
+        String memberId = projectMemberForm.getUserId();
         Project project = projectRepository.findById(projectId).orElseThrow();
-        // TODO: fix hard code role
+        User member = userService.findById(memberId);
+        if (member == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        // FIX: hard code
+        if (projectMemberForm.getRoleId() == null) {
+            projectMemberForm.setRoleId("member");
+        }
+
         ProjectMember projectMember = ProjectMember.builder().projectId(projectId)
-                .userId(memberId).roleId("member").build();
+                .userId(memberId).roleId(projectMemberForm.getRoleId()).build();
         ProjectMember projectMemberRes = projectMemberRepository.save(projectMember);
 
-        try {
-            notificationsService.sendNotification(
-                    "admin",
-                    memberId,
-                    "Bạn được thêm vào dự án " + project.getName(),
-                    "/project/" + projectId + "/tasks");
+        // try {
+        // notificationsService.sendNotification(
+        // "admin",
+        // memberId,
+        // "Bạn được thêm vào dự án " + project.getName(),
+        // "/project/" + projectId + "/tasks");
 
-            // send mail to anounce user to join project
+        // // send mail to anounce user to join project
+        // String emailUser = member.getEmail();
+        // mailService.sendSimpleMail(
+        // new String[] { emailUser },
+        // "OPEN ERP - Thông báo bạn đã được thêm vào dự án mới",
+        // "Bạn đã được thêm dự án " +
+        // project.getName() +
+        // ". Đây là email tự động, bạn không trả lời lại email này!",
+        // "OpenERP");
 
-            User member = userService.findById(memberId);
-
-            if (member != null) {
-                String emailUser = member.getEmail();
-                mailService.sendSimpleMail(
-                        new String[] { emailUser },
-                        "OPEN ERP - Thông báo bạn đã được thêm vào dự án mới",
-                        "Bạn đã được thêm dự án " +
-                                project.getName() +
-                                ". Đây là email tự động, bạn không trả lời lại email này!",
-                        "OpenERP");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            // TODO: handle exception
-        }
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // // TODO: handle exception
+        // }
 
         return projectMemberRes;
     }

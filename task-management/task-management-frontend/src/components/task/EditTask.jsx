@@ -20,6 +20,9 @@ import BasicAlert from "../alert/BasicAlert";
 import DateTimePickerBasic from "../datetimepicker/DateTimePickerBasic";
 import { CustomEditor } from "../editor/CustomEditor";
 
+/**
+ * @deprecated
+ */
 export default function EditTask() {
   const navigate = useNavigate();
   const { taskId } = useParams();

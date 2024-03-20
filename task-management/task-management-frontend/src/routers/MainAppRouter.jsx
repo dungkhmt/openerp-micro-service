@@ -1,20 +1,26 @@
 import { LinearProgress } from "@mui/material";
 import { Suspense, useEffect } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
-import ListAssignedTasks from "../components/assignedtasks/ListAssignedTasks";
-import Board from "../components/board/Board";
-import CommonManager from "../components/projects/CommonManager";
-import ListProject from "../components/projects/ListProject";
-import CreateTask from "../components/task/CreateTasks";
-import EditTask from "../components/task/EditTask";
-import ListTasks from "../components/task/ListTasks";
-import ShowTask from "../components/task/ShowTask";
+import {
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useParams,
+} from "react-router-dom";
 import Layout from "../layout/Layout";
 import { drawerWidth } from "../layout/sidebar/SideBar";
+import DashBoard from "../pages/dashboard";
+import { ProjectContextProvider } from "../pages/project/[id]/ProjectContextProvider";
+import Project from "../pages/project/[id]/[tab]";
+import Task from "../pages/project/[id]/task/[id]";
+import { TaskContextProvider } from "../pages/project/[id]/task/[id]/TaskContextProvider";
+import EditTask from "../pages/project/[id]/task/[id]/edit";
+import Projects from "../pages/projects";
+import NewProject from "../pages/projects/new";
+import TaskAssigned from "../pages/tasks/assign-me";
 import { useNotificationState } from "../state/NotificationState";
 import NotFound from "../views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
-import CreateProject from "../components/projects/CreateProject";
 
 const styles = {
   loadingProgress: {
@@ -29,6 +35,11 @@ const styles = {
   },
 };
 
+const RedirectToOverview = () => {
+  const { id } = useParams();
+  return <Navigate to={`/project/${id}/overview`} replace />;
+};
+
 function MainAppRouter() {
   const location = useLocation();
   const notificationState = useNotificationState();
@@ -41,32 +52,36 @@ function MainAppRouter() {
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Routes>
-          <Route element={<h1>Welcome to</h1>} path="/" />
+          {/* Auto redirect to dashboard */}
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route element={<DashBoard />} path="/dashboard" />
           <Route element={<PrivateRoute />}>
-            <Route
-              element={<CreateProject />}
-              path={`/project/type/:type/:projectId?`}
-            ></Route>
-            <Route element={<ListProject />} path={`/project/list`}></Route>
-            <Route
-              element={<CreateTask />}
-              path={`/project/tasks/create/:projectIdUrl?`}
-            ></Route>
-            <Route element={<CommonManager />} path={`/common-manager`}></Route>
-            <Route
-              element={<ListTasks />}
-              path={`/project/:projectId/tasks`}
-            ></Route>
-            <Route
-              element={<ListAssignedTasks />}
-              path={`/tasks/members/assigned`}
-            ></Route>
-            <Route element={<ShowTask />} path={`/tasks/:taskId`}></Route>
-            <Route element={<EditTask />} path={`/tasks/:taskId/edit`}></Route>
-            <Route
-              element={<Board />}
-              path={`/project/:projectId/board`}
-            ></Route>
+            {/* Projects */}
+            <Route element={<Projects />} path={`/projects`} />
+            <Route element={<NewProject />} path={`/projects/new`} />
+
+            {/* Project */}
+            <Route element={<ProjectContextProvider />}>
+              <Route element={<Project />} path={`/project/:id/:tab`} />
+              <Route
+                path="/project/:id"
+                element={
+                  <RedirectToOverview />
+                }
+              />
+
+              {/* Task */}
+              <Route element={<TaskContextProvider />}>
+                <Route element={<Task />} path={`/project/:id/task/:tid`} />
+                <Route
+                  element={<EditTask />}
+                  path={`/project/:id/task/:tid/edit`}
+                />
+              </Route>
+            </Route>
+
+            {/* Tasks */}
+            <Route element={<TaskAssigned />} path={`/tasks/assign-me`} />
           </Route>
           <Route element={<NotFound />} path="*" />
         </Routes>

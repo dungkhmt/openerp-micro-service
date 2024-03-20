@@ -1,6 +1,9 @@
 import StandardTable from "../table/StandardTable";
 import PropTypes from "prop-types";
 
+/**
+ * @deprecated
+ */
 const MemberTable = ({ members }) => {
   // Command delete button
   const cellStyles = { headerStyle: { padding: 8 }, cellStyle: { padding: 8 } };

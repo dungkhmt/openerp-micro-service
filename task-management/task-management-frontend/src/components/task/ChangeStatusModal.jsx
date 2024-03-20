@@ -15,6 +15,9 @@ import { processingNoti } from "../../utils/notification";
 import { request } from "../../api";
 import DateTimePickerBasic from "../datetimepicker/DateTimePickerBasic";
 
+/**
+ * @deprecated
+ */
 const ChangeStatusModal = ({
   open,
   handleClose,

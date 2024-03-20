@@ -5,5 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Deprecated
 public class ProjectStaticDao {
 }

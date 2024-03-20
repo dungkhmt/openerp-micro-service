@@ -20,6 +20,9 @@ public class ProjectSpecification extends BaseSpecification<Project> {
   @Override
   @Nullable
   public Predicate toPredicate(final Root<Project> root, final CriteriaQuery<?> query, final CriteriaBuilder builder) {
+    // load user relation with left join and return it to result
+    root.join(Project_.CREATOR, jakarta.persistence.criteria.JoinType.LEFT);
+
     switch (criteria.getKey()) {
       case Project_.CODE:
       case Project_.NAME:

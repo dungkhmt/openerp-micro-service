@@ -59,11 +59,6 @@ public class TaskExecutionServiceImplement implements TaskExecutionService {
     }
 
     @Override
-    public List<Comment> getAllCommentsByTaskId(UUID taskId) {
-        return taskCommentRepository.getAllCommentsByTaskId(taskId);
-    }
-
-    @Override
     public List<Object[]> getAllDistinctDay(UUID projectId) {
         return taskExecutionRepository.getAllDistinctDay(projectId);
     }
@@ -80,9 +75,9 @@ public class TaskExecutionServiceImplement implements TaskExecutionService {
         }
 
         List<TaskExecution> taskExecutionList = taskExecutionRepository.getAllTaskExecutionByDate(
-            startDate,
-            endDate,
-            projectId);
+                startDate,
+                endDate,
+                projectId);
         List<TaskExecutionDao> taskExecutionDaoList = new ArrayList<>();
         for (TaskExecution taskExecution : taskExecutionList) {
             taskExecutionDaoList.add(new TaskExecutionDao(taskExecution));
@@ -97,7 +92,7 @@ public class TaskExecutionServiceImplement implements TaskExecutionService {
         comment.setContent(commentForm.getComment());
         comment.setTaskId(task.getId());
         comment.setStatus(false);
-        comment.setCreatedByUserLoginId(userLoginId);
+        comment.setCreatorId(userLoginId);
         Comment comment1 = taskCommentRepository.save(comment);
 
         TaskExecution taskExecution = new TaskExecution();
