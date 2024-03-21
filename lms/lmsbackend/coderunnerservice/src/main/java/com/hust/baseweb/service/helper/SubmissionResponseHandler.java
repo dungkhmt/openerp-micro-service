@@ -89,7 +89,7 @@ public class SubmissionResponseHandler {
             nbTestCasePass += problemSubmission.getNbTestCasePass();
 
             List<String> output = problemSubmission.getParticipantAns();
-            String participantAns = output != null && !output.isEmpty() ? output.get(0) : "";
+            String participantAns = output != null && output.size() > 0 ? output.get(0) : "";
 
             ContestSubmissionTestCaseEntity cste = ContestSubmissionTestCaseEntity.builder()
                     .contestId(submission.getContestId())
@@ -158,7 +158,7 @@ public class SubmissionResponseHandler {
     }
 
     @Transactional
-    public void processSubmissionResponseV2(
+    public void processSubmissionResponseNewPythonVersion(
             List<TestCaseEntity> testCaseEntityList,
             List<String> listSubmissionResponse,
             ContestSubmissionEntity submission,
@@ -213,7 +213,7 @@ public class SubmissionResponseHandler {
             nbTestCasePass += problemSubmission.getNbTestCasePass();
 
             List<String> output = problemSubmission.getParticipantAns();
-            String participantAns = output != null && !output.isEmpty() ? output.get(0) : "";
+            String participantAns = output != null && output.size() > 0 ? output.get(0) : "";
 
             ContestSubmissionTestCaseEntity cste = ContestSubmissionTestCaseEntity.builder()
                     .contestId(submission.getContestId())

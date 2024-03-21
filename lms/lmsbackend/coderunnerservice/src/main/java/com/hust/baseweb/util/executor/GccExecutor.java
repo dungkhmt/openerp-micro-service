@@ -113,12 +113,13 @@ public class GccExecutor {
                 "rm -rf " + tmpName + ".sh" + " & " + "\n"
         };
 
-        return String.join("\n", commands);
+        String sourceSH = String.join("\n", commands);
+        return sourceSH;
 
     }
 
     public String genSubmitScriptFile(
-            List<TestCaseEntity> testCases,
+            List<TestCaseEntity> testCaseEntities,
             String source,
             String tmpName,
             int timeLimit,
@@ -126,92 +127,71 @@ public class GccExecutor {
             ComputerLanguage.Languages language
     ) {
         StringBuilder genTestCase = new StringBuilder();
-        for (int i = 0; i < testCases.size(); i++) {
+        for (int i = 0; i < testCaseEntities.size(); i++) {
             String testcase = "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> testcase" + i + ".txt \n"
-                    + testCases.get(i).getTestCase() + "\n"
+                    + testCaseEntities.get(i).getTestCase() + "\n"
                     + SOURCECODE_HEREDOC_DELIMITER + "\n";
             genTestCase.append(testcase);
         }
 
-        String outputCombinedFile = tmpName + "_output_combined.txt";
-        String shellFile = tmpName + "_shell.txt";
-        String errorFile = tmpName + "_error.txt";
-        String runCommand = "timeout " + (timeLimit + 1) + "s ./main > " + outputCombinedFile + " 2> " + errorFile;
-
-        String[] lines = {
+        String outputFileName = tmpName + "_output.txt";
+        String errorFileName = tmpName + "_error.txt";
+        String[] commands = {
                 SHFileStart,
                 "mkdir -p " + tmpName,
                 "cd " + tmpName,
-                "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> main" + getFileExtension(language),
+                "cat <<'DELIMITER' >> main" + getFileExtension(language),
                 source,
-                SOURCECODE_HEREDOC_DELIMITER,
+                "DELIMITER",
                 getBuildCmd(language),
                 "FILE=main",
                 "if test -f \"$FILE\"; then",
                 genTestCase.toString(),
-                "  CPU_TIME_LIMIT=" + timeLimit + " # second",
-                "  VIRTUAL_MEM_LIMIT=" + (memoryLimit * 1024 + DEFAULT_INITIAL_MEMORY) + " # KB",
-                "  OUTPUT_SIZE_LIMIT=25000 # KB",
-                "  WALL_CLOCK_TIME_LIMIT=" + (timeLimit + 1) + " # second",
-                "  OUTPUT_FILE=\"" + outputCombinedFile + "\"",
-                "  ERROR_FILE=\"" + errorFile + "\"",
-                "  SHELL_FILE=\"" + shellFile + "\"",
-                "  FILE_LIMIT_EXCEED='" + FILE_LIMIT_ERROR + "'",
-                "  TIME_LIMIT_EXCEED='" + TIME_LIMIT_ERROR + "'",
-                "  MEMORY_RELATED_ERROR='" + MEMORY_LIMIT_ERROR + "'",
-                "  n=0",
-                "  while [ \"$n\" -lt " + testCases.size() + " ]",
-                "  do",
-                "    f=\"testcase\"$n\".txt\"",
-                "    testcase_submission_status='Successful'",
-                "    start=$(date +%s%N)",
-                "    cat $f | (ulimit -t $CPU_TIME_LIMIT; ulimit -v $VIRTUAL_MEM_LIMIT; ulimit -f $OUTPUT_SIZE_LIMIT; " + runCommand + " ) &> \"$SHELL_FILE\"",
-                "    exit_status=$?",
-                "    end=$(date +%s%N)",
-                "    # Check if $SHELL_FILE is empty",
-                "    if [ -s $SHELL_FILE ]; then",
-                "      # Extract the error message",
-                "      extracted_message=$(awk -F ':' '{ sub(/ *[0-9]+ */, \"\", $3); sub(/ \\(core dumped\\) /, \" \", $3); sub(/ *" + runCommand + "/, \" \", $3); print $3 }' \"$SHELL_FILE\")",
-                "      case $extracted_message in",
-                "        *\"$TIME_LIMIT_EXCEED\"\\ *)",
-                "          testcase_submission_status=\"$TIME_LIMIT_EXCEED\"",
-                "          ;;",
-                "        *\"$MEMORY_RELATED_ERROR\"\\ *)",
-                "          testcase_submission_status=\"$MEMORY_RELATED_ERROR\"",
-                "          ;;",
-                "        *\"$FILE_LIMIT_EXCEED\"\\ *)",
-                "          testcase_submission_status=\"$FILE_LIMIT_EXCEED\"",
-                "          ;;",
-                "        *)",
-                "          testcase_submission_status=\"$extracted_message\"",
-                "          ;;",
-                "      esac",
-                "    else",
-                "      # Check the exit status if terminated due to timeout",
-                "      if [ $exit_status -eq 124 ]; then",
-                "        testcase_submission_status=\"$TIME_LIMIT_EXCEED\"",
-                "      fi",
-                "    fi",
-                "    cat $OUTPUT_FILE",
-                "    if [ -s $ERROR_FILE ]; then",
-                "        # combine stdout and stderr",
-                "        echo",
-                "        cat $ERROR_FILE",
-                "    fi",
-                "    echo " + Constants.SPLIT_TEST_CASE,
-                "    echo",
-                "    echo \"$(($(($end-$start))/1000000))\"",
-                "    echo \"$testcase_submission_status\"",
-                "    n=`expr $n + 1`",
-                "  done",
+                "n=0",
+                "start=$(date +%s%N)",
+                "while [ \"$n\" -lt " + testCaseEntities.size() + " ]",
+                "do",
+                "f=\"testcase\"$n\".txt\"",
+                // "cat $f | timeout " + timeLimit + "s " + "./main  || echo Time Limit Exceeded",
+                "cat $f | (ulimit -t " + timeLimit
+                        + " -v " + (memoryLimit * 1024 + DEFAULT_INITIAL_MEMORY)
+                        + " -f 30000; "
+                        + "./main > " + outputFileName + "; ) &> " + errorFileName,
+                "ERROR=$(head -1 " + errorFileName + ")",
+                "FILE_LIMIT='" + FILE_LIMIT_ERROR + "'",
+                "TIME_LIMIT='" + TIME_LIMIT_ERROR + "'",
+                "MEMORY_LIMIT='" + MEMORY_LIMIT_ERROR + "'",
+                "case $ERROR in",
+                "*\"$FILE_LIMIT\"*)",
+                "echo $FILE_LIMIT",
+                ";;",
+                "*\"$TIME_LIMIT\"*)",
+                "echo $TIME_LIMIT",
+                ";;",
+                "*\"$MEMORY_LIMIT\"*)",
+                "echo $MEMORY_LIMIT",
+                ";;",
+                "*)",
+                "cat " + outputFileName,
+                ";;",
+                "esac",
+                "echo " + Constants.SPLIT_TEST_CASE,
+                "n=`expr $n + 1`",
+                "done",
+                "end=$(date +%s%N)",
+                "echo",
+                "echo \"$(($(($end-$start))/1000000))\"",
+                "echo successful",
                 "else",
-                "  echo Compile Error",
+                "echo Compile Error",
                 "fi",
                 "cd ..",
                 "rm -rf " + tmpName + " &",
-                "rm -rf " + tmpName + ".sh &"
+                "rm -rf " + tmpName + ".sh" + " &",
+                "rm -rf " + tmpName
         };
 
-        return String.join("\n", lines);
+        String sourceSH = String.join("\n", commands);
+        return sourceSH;
     }
 }

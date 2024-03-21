@@ -128,6 +128,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     tempName,
                     L,
                     "language not found",
+//                    problem.getTimeLimit(),
                     getTimeLimitByLanguage(problem, submission.getSourceCodeLanguage()),
                     problem.getMemoryLimit());
 
@@ -136,21 +137,21 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
         tempDir.removeDir(tempName);
 
-        if (Objects.equals(submission.getSourceCodeLanguage(), ContestSubmissionEntity.LANGUAGE_JAVA)) {
-            submissionResponseHandler.processSubmissionResponse(
+        if (Objects.equals(submission.getSourceCodeLanguage(), ContestSubmissionEntity.LANGUAGE_PYTHON)) {
+            submissionResponseHandler.processSubmissionResponseNewPythonVersion(
                     testCaseEntityList,
                     listSubmissionResponse,
                     submission,
-                    problem.getScoreEvaluationType());
+                    problem.getScoreEvaluationType(),
+                    getTimeLimitByLanguage(problem, submission.getSourceCodeLanguage()));
             return;
         }
 
-        submissionResponseHandler.processSubmissionResponseV2(
+        submissionResponseHandler.processSubmissionResponse(
                 testCaseEntityList,
                 listSubmissionResponse,
                 submission,
-                problem.getScoreEvaluationType(),
-                getTimeLimitByLanguage(problem, submission.getSourceCodeLanguage()));
+                problem.getScoreEvaluationType());
     }
 
     @Override
