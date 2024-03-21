@@ -6,6 +6,9 @@ import { Link } from "react-router-dom";
 import { boxChildComponent, centerBox } from "../utils/constant";
 import PropTypes from "prop-types";
 
+/**
+ * @deprecated
+ */
 const ProjectItem = ({ name, id }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);

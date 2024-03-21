@@ -14,6 +14,9 @@ import { useEffect, useState } from "react";
 import { errorNoti, successNoti } from "../../utils/notification";
 import { request } from "../../api";
 
+/**
+ * @deprecated
+ */
 const AddNewMemberModal = ({
   open,
   handleClose,

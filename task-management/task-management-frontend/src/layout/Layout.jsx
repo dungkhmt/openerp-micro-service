@@ -14,6 +14,10 @@ import React, { useState } from "react";
 import AccountButton from "./account/AccountButton";
 import NotificationButton from "./notification/NotificationButton";
 import SideBar, { drawerWidth } from "./sidebar/SideBar";
+import { useLocation } from "react-router";
+import { MENU_LIST } from "../config/menuconfig";
+import { checkExistValue } from "../utils/check-exist-value";
+import { useEffect } from "react";
 
 const Offset = styled("div")(({ theme }) => ({
   display: "flex",
@@ -89,6 +93,17 @@ function Layout({ children }) {
   const [image] = useState(bgImage);
   const [color] = useState("blue");
 
+  // get path
+  const location = useLocation();
+
+  useEffect(() => {
+    if (checkExistValue(MENU_LIST, location.pathname)) {
+      setOpen(true);
+    } else {
+      setOpen(false);
+    }
+  }, [location]);
+
   return (
     <Box sx={styles.root}>
       <AppBar position="fixed" color="inherit" sx={styles.appBar}>
@@ -107,7 +122,7 @@ function Layout({ children }) {
           </SvgIcon>
 
           <Typography sx={styles.appName} variant="h6" noWrap>
-            Open ERP
+            Taskforce
           </Typography>
 
           {/* Use this div tag to push the icons to the right */}

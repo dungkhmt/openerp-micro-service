@@ -11,8 +11,9 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
+@Deprecated
 public interface TaskAssignableRepository
-    extends JpaRepository<TaskAssignable, UUID> {
+        extends JpaRepository<TaskAssignable, UUID> {
 
     @Query(value = "SELECT e.* FROM task_management_task_assignable e WHERE e.assigned_to_user_id = :userId", nativeQuery = true)
     Page<TaskAssignable> getByPartyId(@Param("userId") String userId, Pageable pageable);

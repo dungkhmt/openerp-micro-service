@@ -14,7 +14,7 @@ public class StatusItem {
     private String statusId;
 
     @JoinColumn(name = "status_type_id", referencedColumnName = "status_type_id")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private StatusType type;
 
     @Column(name = "status_code")

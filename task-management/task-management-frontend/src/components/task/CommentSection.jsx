@@ -7,6 +7,9 @@ import { boxChildComponent } from "../utils/constant";
 import CommentItem from "./CommentItem";
 import EditCommentModal from "./EditCommentModal";
 
+/**
+ * @deprecated
+ */
 const CommentSection = ({
   projectId,
   listComment,

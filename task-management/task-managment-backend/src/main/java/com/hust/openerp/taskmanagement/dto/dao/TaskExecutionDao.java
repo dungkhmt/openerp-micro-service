@@ -8,6 +8,7 @@ import java.util.*;
 
 @Getter
 @Setter
+@Deprecated
 public class TaskExecutionDao {
 
     private UUID id;

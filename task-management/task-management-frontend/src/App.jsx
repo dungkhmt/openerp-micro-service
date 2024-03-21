@@ -1,32 +1,25 @@
-import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import createCache from "@emotion/cache";
+import { CacheProvider } from "@emotion/react";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { ReactKeycloakProvider } from "@react-keycloak/web";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { I18nextProvider } from "react-i18next";
 import { BrowserRouter } from "react-router-dom";
 import Routes from "./Routes";
-import { request } from "./api";
 import { AppLoading } from "./components/common/AppLoading";
+import { ReactHotToast } from "./components/react-hot-toast/index.jsx";
 import keycloak, { initOptions } from "./config/keycloak.js";
 import history from "./history";
+import { UserService } from "./services/api/user.service.js";
 import { menuState } from "./state/MenuState";
 import { notificationState } from "./state/NotificationState";
+import ThemeProvider from "./theme/ThemProvider.jsx";
 import i18n from "./translation/i18n";
 
-const theme = createTheme({
-  typography: {
-    fontFamily: `-apple-system, "Segoe UI", BlinkMacSystemFont, "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif`,
-  },
-  overrides: {
-    MuiCssBaseline: {
-      "@global": {},
-    },
-  },
-});
-
 function App() {
+  const clientSideEmotionCache = createCache({ key: "css" });
   const logout = () => {
     menuState.permittedFunctions.set(new Set());
     notificationState.merge({
@@ -38,7 +31,7 @@ function App() {
 
   const onKeycloakEvent = async (event) => {
     if (event === "onAuthSuccess") {
-      request("get", `/`);
+      UserService.sync();
     } else if (event === "onAuthError") {
       console.error("Authenticated failed");
     } else if (event === "onAuthLogout") {
@@ -54,23 +47,32 @@ function App() {
     };
   }, []);
 
-  const keycloak_ = useMemo(() => keycloak, []);
-
   return (
     <ReactKeycloakProvider
-      authClient={keycloak_}
+      authClient={keycloak}
       initOptions={initOptions}
       LoadingComponent={AppLoading}
       onEvent={onKeycloakEvent}
     >
       <I18nextProvider i18n={i18n}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Toaster duration={5000} />
-          <BrowserRouter history={history}>
-            <Routes />
-          </BrowserRouter>
-        </ThemeProvider>
+        <CacheProvider value={clientSideEmotionCache}>
+          <ThemeProvider>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <ReactHotToast>
+                <Toaster
+                  position="top-right"
+                  toastOptions={{
+                    className: "react-hot-toast",
+                    duration: 5000,
+                  }}
+                />
+              </ReactHotToast>
+              <BrowserRouter history={history}>
+                <Routes />
+              </BrowserRouter>
+            </LocalizationProvider>
+          </ThemeProvider>
+        </CacheProvider>
       </I18nextProvider>
     </ReactKeycloakProvider>
   );

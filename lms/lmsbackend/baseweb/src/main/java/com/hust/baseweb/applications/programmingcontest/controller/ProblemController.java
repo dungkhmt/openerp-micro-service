@@ -6,6 +6,7 @@ import com.hust.baseweb.applications.programmingcontest.entity.TagEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.UserContestProblemRole;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
 import com.hust.baseweb.applications.programmingcontest.model.*;
+import com.hust.baseweb.applications.programmingcontest.model.externalapi.ContestProblemModelResponse;
 import com.hust.baseweb.applications.programmingcontest.repo.UserContestProblemRoleRepo;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
 import com.hust.baseweb.service.UserService;
@@ -236,5 +237,10 @@ public class ProblemController {
     public List<ProblemEntity> getAllProblems(Principal owner) {
         return this.problemTestCaseService.getAllProblems(owner.getName());
     }
-
+    //@Secured("ROLE_EXT_DATA_QUERY")
+    @GetMapping("/extapi/all-problems")
+    public ResponseEntity<?> extGetAllProblems(Principal principal){
+        List<ContestProblemModelResponse> problems = problemTestCaseService.extApiGetAllProblems(principal.getName());
+        return ResponseEntity.ok().body(problems);
+    }
 }

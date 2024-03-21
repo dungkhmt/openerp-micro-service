@@ -4,6 +4,9 @@ import { request } from "../../api";
 import StandardTable from "../table/StandardTable";
 import { LimitString } from "../utils/helpers";
 
+/**
+ * @deprecated
+ */
 export default function ListProject() {
   const navigate = useNavigate();
 

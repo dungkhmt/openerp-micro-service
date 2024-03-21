@@ -6,6 +6,9 @@ import StandardTable from "../table/StandardTable";
 import { LimitString } from "../utils/helpers";
 import { Link } from "react-router-dom";
 
+/**
+ * @deprecated
+ */
 const ListAssignedTasks = () => {
   const columns = [
     {
