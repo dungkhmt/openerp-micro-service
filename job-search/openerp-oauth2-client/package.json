@@ -29,7 +29,10 @@
     "react-scripts": "5.0.1",
     "react-toastify": "^6.2.0",
     "simplebar-react": "^2.3.6",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "html-react-parser": "^3.0.16",
+    "react-bootstrap": "^2.5.0",
+    "bootstrap": "^5.2.1"
   },
   "scripts": {
     "start": "react-scripts start",
