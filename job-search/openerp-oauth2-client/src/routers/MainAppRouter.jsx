@@ -8,7 +8,8 @@ import NotFound from "views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import TeacherRouter from "./TeacherRouter";
 import DemoScreen from "views/DemoScreen";
-
+import CreateNewCvForm from "views/cv/CreateCV";
+import UserSkill from "views/skill/Skill";
 const styles = {
   loadingProgress: {
     position: "fixed",
@@ -37,7 +38,8 @@ function MainAppRouter(props) {
           <Route component={() => <></>} exact path="/" />
           <PrivateRoute component={DemoScreen} exact path="/demo" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
-
+          <PrivateRoute component={CreateNewCvForm} path="/create-cv" />
+          <PrivateRoute component={UserSkill} path = "/user-skill" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>
