@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface AssetTypeService {
     List<AssetType> getAllAssetTypes();
+
+    AssetType addNewType(AssetType assetType);
 }

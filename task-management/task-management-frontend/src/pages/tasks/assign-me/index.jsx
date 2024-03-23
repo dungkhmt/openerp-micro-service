@@ -18,9 +18,12 @@ import CustomAvatar from "../../../components/mui/avatar/CustomAvatar";
 import CustomChip from "../../../components/mui/chip";
 import { useDebounce } from "../../../hooks/useDebounce";
 import { TaskService } from "../../../services/api/task.service";
+import { StatusService } from "../../../services/api/task-status.service";
 import {
   getCategoryColor,
+  getDueDateColor,
   getRandomColorSkin,
+  getStatusColor,
 } from "../../../utils/color.util";
 
 const DEFAULT_PAGINATION_MODEL = {
@@ -29,7 +32,7 @@ const DEFAULT_PAGINATION_MODEL = {
 };
 
 const DEFAULT_SORT_MODEL = {
-  field: "dueDate",
+  field: "createdStamp",
   sort: "desc",
 };
 
@@ -42,6 +45,7 @@ const TaskAssigned = () => {
   const [sortModel, setSortModel] = useState(DEFAULT_SORT_MODEL);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [statuses, setStatuses] = useState([]);
   const searchDebounce = useDebounce(search, 1000);
 
   const columns = [
@@ -117,19 +121,43 @@ const TaskAssigned = () => {
     },
     {
       flex: 0.1,
-      field: "due",
-      headerName: "Thời hạn",
+      field: "status",
+      headerName: "Trạng thái",
+      align: "center",
+      headerAlign: "center",
       sortable: false,
+      renderCell: ({ row }) => {
+        const status = statuses?.find((s) => s.statusId === row.statusId);
+        return (
+          status && (
+            <CustomChip
+              title={`Trạng thái: ${status.description}`}
+              size="small"
+              skin="light"
+              sx={{ width: "fit-content" }}
+              label={status.description}
+              color={getStatusColor(status.statusId)}
+            />
+          )
+        );
+      },
+    },
+    {
+      flex: 0.1,
+      field: "dueDate",
+      headerName: "Thời hạn",
+      align: "center",
+      headerAlign: "center",
       renderCell: ({ row }) => (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography variant="body2" sx={{ color: "text.primary" }}>
-            {dayjs(row.dueDate).format("DD/MM/YYYY") ?? ""}
+          <Typography variant="body2" color={getDueDateColor(row.dueDate)}>
+            {row.dueDate ? dayjs(row.dueDate).format("DD/MM/YYYY") : " - "}
           </Typography>
         </Box>
       ),
     },
     {
-      flex: 0.15,
+      flex: 0.1,
       field: "creator",
       headerName: "Người tạo",
       align: "center",
@@ -157,7 +185,7 @@ const TaskAssigned = () => {
         ),
     },
     {
-      flex: 0.15,
+      flex: 0.1,
       minWidth: 100,
       field: "createdStamp",
       headerName: "Ngày tạo",
@@ -171,12 +199,21 @@ const TaskAssigned = () => {
   ];
 
   const handleSortModel = (newModel) => {
-    if (newModel.length) {
-      setSortModel(newModel);
+    if (newModel.length > 0) {
+      setSortModel(newModel[0]);
     } else {
       setSortModel(DEFAULT_SORT_MODEL);
     }
   };
+
+  const getStatuses = useCallback(async () => {
+    try {
+      const res = await StatusService.getStatuses();
+      setStatuses(res);
+    } catch (error) {
+      toast.error("Lỗi khi lấy dữ liệu");
+    }
+  }, []);
 
   const getTasks = useCallback(async () => {
     try {
@@ -186,8 +223,11 @@ const TaskAssigned = () => {
         "%1F"
       );
       const response = await TaskService.getAssignedTasks({
-        ...paginationModel,
-        search: encodedSearch ? `name:*${encodedSearch}*` : "",
+        page: paginationModel.page,
+        size: paginationModel.pageSize,
+        search: encodedSearch
+          ? `name:*${encodedSearch}* OR creatorId:*${encodedSearch}* OR projectName:*${encodedSearch}*`
+          : "",
         sort: `${sortModel.field},${sortModel.sort}`,
       });
       setRows(response.data);
@@ -203,6 +243,10 @@ const TaskAssigned = () => {
   useEffect(() => {
     getTasks();
   }, [getTasks]);
+
+  useEffect(() => {
+    getStatuses();
+  }, [getStatuses]);
 
   return (
     <Card>

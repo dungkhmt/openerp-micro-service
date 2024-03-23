@@ -18,4 +18,16 @@ public class VendorServiceImpl implements VendorService{
         List<Vendor> vendors = vendorRepo.findAll();
         return vendors;
     }
+
+    @Override
+    public Vendor addNewVendor(Vendor vendor) {
+        Vendor savedVendor = new Vendor();
+        savedVendor.setName(vendor.getName());
+        savedVendor.setEmail(vendor.getEmail());
+        savedVendor.setPhone(vendor.getPhone());
+        savedVendor.setAddress(vendor.getAddress());
+        savedVendor.setDescription(vendor.getDescription());
+        savedVendor.setImage(vendor.getImage());
+        return savedVendor;
+    }
 }

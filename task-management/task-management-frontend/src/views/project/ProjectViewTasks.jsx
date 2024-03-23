@@ -41,7 +41,7 @@ const initFilter = {
   categoryId: "",
   statusId: "",
   priorityId: "",
-  assignee: "",
+  assigneeId: "",
 };
 
 const DEFAULT_PAGINATION_MODEL = {
@@ -454,12 +454,12 @@ const ProjectViewTasks = () => {
               <InputLabel id="asignee-select">Phân công cho</InputLabel>
               <Select
                 fullWidth
-                value={filter.assignee}
+                value={filter.assigneeId}
                 id="select-assignee"
                 label="Phân công cho"
                 labelId="assignee-select"
                 onChange={(e) =>
-                  setFilter({ ...filter, assignee: e.target.value })
+                  setFilter({ ...filter, assigneeId: e.target.value })
                 }
                 inputProps={{ placeholder: "Phân công cho" }}
               >

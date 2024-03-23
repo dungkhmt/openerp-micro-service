@@ -62,7 +62,7 @@ public class TaskServiceImplement implements TaskService {
         List<TaskLogDetail> taskLogDetails = new ArrayList<>();
         var task = modelMapper.map(taskForm, Task.class);
         var createdTime = new Date();
-        task.setCreatedByUserId(creatorId);
+        task.setCreatorId(creatorId);
         task.setCreatedStamp(createdTime);
         task.setLastUpdatedStamp(createdTime);
         task.setStatusId("TASK_OPEN");
@@ -248,7 +248,7 @@ public class TaskServiceImplement implements TaskService {
             if (search.contains("assigneeId:"))
                 search = search.replaceAll("assigneeId:[^ ]+", "assigneeId:" + assignee);
             else
-                search = search + " AND assigneeId:" + assignee;
+                search = "( " + search + " ) AND assigneeId:" + assignee;
         } else {
             search = "assigneeId:" + assignee;
         }

@@ -6,9 +6,7 @@ import openerp.openerpresourceserver.service.AssetTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,5 +22,13 @@ public class AssetTypeController {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(assetTypes);
+    }
+
+    @PostMapping("/add-new")
+    public ResponseEntity<?> addNewType(@RequestBody AssetType assetType){
+        AssetType newType = assetTypeService.addNewType(assetType);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(newType);
     }
 }

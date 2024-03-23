@@ -115,6 +115,6 @@ public class TaskDao {
                 : null);
         this.setAssignee(assignee);
         this.setDueDateOrigin(task.getDueDate());
-        this.setCreatedByUserLoginId(task.getCreatedByUserId());
+        this.setCreatedByUserLoginId(task.getCreatorId());
     }
 }

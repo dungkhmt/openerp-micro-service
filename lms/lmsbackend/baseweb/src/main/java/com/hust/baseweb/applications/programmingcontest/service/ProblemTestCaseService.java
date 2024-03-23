@@ -4,6 +4,7 @@ import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.*;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
 import com.hust.baseweb.applications.programmingcontest.model.*;
+import com.hust.baseweb.applications.programmingcontest.model.externalapi.ContestProblemModelResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -272,6 +273,8 @@ public interface ProblemTestCaseService {
     List<ProblemEntity> getSharedProblems(String userId);
 
     List<ProblemEntity> getAllProblems(String userId);
+
+    List<ContestProblemModelResponse> extApiGetAllProblems(String userID);
 
     ModelCreateContestProblemResponse getContestProblemDetailByIdAndTeacher(
         String problemId,
