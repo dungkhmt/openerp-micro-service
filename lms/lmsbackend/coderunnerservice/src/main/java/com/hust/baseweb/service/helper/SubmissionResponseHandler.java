@@ -36,10 +36,10 @@ public class SubmissionResponseHandler {
 
     @Transactional
     public void processSubmissionResponse(
-            List<TestCaseEntity> testCaseEntityList,
-            List<String> listSubmissionResponse,
-            ContestSubmissionEntity submission,
-            String problemEvaluationType
+        List<TestCaseEntity> testCaseEntityList,
+        List<String> listSubmissionResponse,
+        ContestSubmissionEntity submission,
+        String problemEvaluationType
     ) throws Exception {
         int runtime = 0;
         long score = 0;
@@ -64,18 +64,19 @@ public class SubmissionResponseHandler {
             try {
 
                 problemSubmission = StringHandler.handleContestResponseSingleTestcase(
-                        response,
-                        testCaseEntity.getCorrectAnswer(),
-                        testCaseEntity.getTestCasePoint(),
-                        problemEvaluationType);
+                    response,
+                    testCaseEntity.getCorrectAnswer(),
+                    testCaseEntity.getTestCasePoint(),
+                    problemEvaluationType);
 
-                if (problemSubmission.getStatus().equals(ContestSubmissionEntity.SUBMISSION_STATUS_COMPILE_ERROR)) {
+                if (problemSubmission.getStatus()
+                    .equals(ContestSubmissionEntity.SUBMISSION_STATUS_COMPILE_ERROR)) {
                     message = problemSubmission.getMessage();
                     compileError = true;
                     break;
                 } else if (problemSubmission
-                        .getStatus()
-                        .equals(ContestSubmissionEntity.SUBMISSION_STATUS_WAIT_FOR_CUSTOM_EVALUATION)) {
+                    .getStatus()
+                    .equals(ContestSubmissionEntity.SUBMISSION_STATUS_WAIT_FOR_CUSTOM_EVALUATION)) {
                     processing = true;
                 }
             } catch (Exception e) {
@@ -89,37 +90,37 @@ public class SubmissionResponseHandler {
             nbTestCasePass += problemSubmission.getNbTestCasePass();
 
             List<String> output = problemSubmission.getParticipantAns();
-            String participantAns = output != null && output.size() > 0 ? output.get(0) : "";
+            String participantAns = output != null && !output.isEmpty() ? output.get(0) : "";
 
             ContestSubmissionTestCaseEntity cste = ContestSubmissionTestCaseEntity.builder()
-                    .contestId(submission.getContestId())
-                    .contestSubmissionId(submission.getContestSubmissionId())
-                    .problemId(submission.getProblemId())
-                    .testCaseId(testCaseEntity.getTestCaseId())
-                    .submittedByUserLoginId(submission.getUserId())
-                    .point(problemSubmission.getScore())
-                    .status(StringHandler.removeNullCharacter(
-                            problemSubmission.getStatus()))
-                    .participantSolutionOtput(
-                            StringHandler.removeNullCharacter(
-                                    participantAns))
-                    .runtime(problemSubmission.getRuntime())
-                    .createdStamp(submission.getCreatedAt())
-                    .build();
+                .contestId(submission.getContestId())
+                .contestSubmissionId(submission.getContestSubmissionId())
+                .problemId(submission.getProblemId())
+                .testCaseId(testCaseEntity.getTestCaseId())
+                .submittedByUserLoginId(submission.getUserId())
+                .point(problemSubmission.getScore())
+                .status(StringHandler.removeNullCharacter(
+                    problemSubmission.getStatus()))
+                .participantSolutionOtput(
+                    StringHandler.removeNullCharacter(
+                        participantAns))
+                .runtime(problemSubmission.getRuntime())
+                .createdStamp(submission.getCreatedAt())
+                .build();
 
             long startTime = System.nanoTime();
             contestSubmissionTestCaseEntityRepo.saveAndFlush(cste);
             long endTime = System.nanoTime();
             log.debug(
-                    "Save contestSubmissionTestCaseEntity to DB, execution time = {} ms",
-                    (endTime - startTime) / 1000000);
+                "Save contestSubmissionTestCaseEntity to DB, execution time = {} ms",
+                (endTime - startTime) / 1000000);
 
         }
 
         long endTime1 = System.nanoTime();
         log.debug(
-                "Total handle response time = {} ms",
-                (endTime1 - startTime1) / 1000000);
+            "Total handle response time = {} ms",
+            (endTime1 - startTime1) / 1000000);
 
         long used = memoryBean.getHeapMemoryUsage().getUsed() / mb;
         long committed = memoryBean.getHeapMemoryUsage().getCommitted() / mb;
@@ -151,19 +152,19 @@ public class SubmissionResponseHandler {
 
         if (processing) {
             rabbitTemplate.convertAndSend(
-                    RabbitProgrammingContestConfig.EXCHANGE,
-                    JUDGE_CUSTOM_PROBLEM,
-                    submission.getContestSubmissionId());
+                RabbitProgrammingContestConfig.EXCHANGE,
+                JUDGE_CUSTOM_PROBLEM,
+                submission.getContestSubmissionId());
         }
     }
 
     @Transactional
-    public void processSubmissionResponseNewPythonVersion(
-            List<TestCaseEntity> testCaseEntityList,
-            List<String> listSubmissionResponse,
-            ContestSubmissionEntity submission,
-            String problemEvaluationType,
-            int problemTimeLimit
+    public void processSubmissionResponseV2(
+        List<TestCaseEntity> testCaseEntityList,
+        List<String> listSubmissionResponse,
+        ContestSubmissionEntity submission,
+        String problemEvaluationType,
+        int problemTimeLimit
     ) throws Exception {
         int runtime = 0;
         long score = 0;
@@ -187,20 +188,21 @@ public class SubmissionResponseHandler {
 
             try {
 
-                problemSubmission = StringHandler.handleContestResponseSingleTestcasePython(
-                        response,
-                        testCaseEntity.getCorrectAnswer(),
-                        testCaseEntity.getTestCasePoint(),
-                        problemEvaluationType,
-                        problemTimeLimit);
+                problemSubmission = StringHandler.handleContestResponseSingleTestcaseV2(
+                    response,
+                    testCaseEntity.getCorrectAnswer(),
+                    testCaseEntity.getTestCasePoint(),
+                    problemEvaluationType,
+                    problemTimeLimit);
 
-                if (problemSubmission.getStatus().equals(ContestSubmissionEntity.SUBMISSION_STATUS_COMPILE_ERROR)) {
+                if (problemSubmission.getStatus()
+                    .equals(ContestSubmissionEntity.SUBMISSION_STATUS_COMPILE_ERROR)) {
                     message = problemSubmission.getMessage();
                     compileError = true;
                     break;
                 } else if (problemSubmission
-                        .getStatus()
-                        .equals(ContestSubmissionEntity.SUBMISSION_STATUS_WAIT_FOR_CUSTOM_EVALUATION)) {
+                    .getStatus()
+                    .equals(ContestSubmissionEntity.SUBMISSION_STATUS_WAIT_FOR_CUSTOM_EVALUATION)) {
                     processing = true;
                 }
             } catch (Exception e) {
@@ -213,37 +215,37 @@ public class SubmissionResponseHandler {
             nbTestCasePass += problemSubmission.getNbTestCasePass();
 
             List<String> output = problemSubmission.getParticipantAns();
-            String participantAns = output != null && output.size() > 0 ? output.get(0) : "";
+            String participantAns = output != null && !output.isEmpty() ? output.get(0) : "";
 
             ContestSubmissionTestCaseEntity cste = ContestSubmissionTestCaseEntity.builder()
-                    .contestId(submission.getContestId())
-                    .contestSubmissionId(submission.getContestSubmissionId())
-                    .problemId(submission.getProblemId())
-                    .testCaseId(testCaseEntity.getTestCaseId())
-                    .submittedByUserLoginId(submission.getUserId())
-                    .point(problemSubmission.getScore())
-                    .status(StringHandler.removeNullCharacter(
-                            problemSubmission.getStatus()))
-                    .participantSolutionOtput(
-                            StringHandler.removeNullCharacter(
-                                    participantAns))
-                    .runtime(problemSubmission.getRuntime())
-                    .createdStamp(submission.getCreatedAt())
-                    .build();
+                .contestId(submission.getContestId())
+                .contestSubmissionId(submission.getContestSubmissionId())
+                .problemId(submission.getProblemId())
+                .testCaseId(testCaseEntity.getTestCaseId())
+                .submittedByUserLoginId(submission.getUserId())
+                .point(problemSubmission.getScore())
+                .status(StringHandler.removeNullCharacter(
+                    problemSubmission.getStatus()))
+                .participantSolutionOtput(
+                    StringHandler.removeNullCharacter(
+                        participantAns))
+                .runtime(problemSubmission.getRuntime())
+                .createdStamp(submission.getCreatedAt())
+                .build();
 
             long startTime = System.nanoTime();
             contestSubmissionTestCaseEntityRepo.saveAndFlush(cste);
             long endTime = System.nanoTime();
             log.debug(
-                    "Save contestSubmissionTestCaseEntity to DB, execution time = {} ms",
-                    (endTime - startTime) / 1000000);
+                "Save contestSubmissionTestCaseEntity to DB, execution time = {} ms",
+                (endTime - startTime) / 1000000);
 
         }
 
         long endTime1 = System.nanoTime();
         log.debug(
-                "Total handle response time = {} ms",
-                (endTime1 - startTime1) / 1000000);
+            "Total handle response time = {} ms",
+            (endTime1 - startTime1) / 1000000);
 
         long used = memoryBean.getHeapMemoryUsage().getUsed() / mb;
         long committed = memoryBean.getHeapMemoryUsage().getCommitted() / mb;
@@ -275,16 +277,16 @@ public class SubmissionResponseHandler {
 
         if (processing) {
             rabbitTemplate.convertAndSend(
-                    RabbitProgrammingContestConfig.EXCHANGE,
-                    JUDGE_CUSTOM_PROBLEM,
-                    submission.getContestSubmissionId());
+                RabbitProgrammingContestConfig.EXCHANGE,
+                JUDGE_CUSTOM_PROBLEM,
+                submission.getContestSubmissionId());
         }
     }
 
     @Transactional
     public void processCustomSubmissionResponse(
-            ContestSubmissionEntity submission,
-            Map<UUID, String> evaluationResults
+        ContestSubmissionEntity submission,
+        Map<UUID, String> evaluationResults
     ) {
         long totalPoint = 0;
 
@@ -292,8 +294,8 @@ public class SubmissionResponseHandler {
             UUID submissionTestCaseId = result.getKey();
             String response = result.getValue();
             ContestSubmissionTestCaseEntity submissionTestcase = contestSubmissionTestCaseEntityRepo
-                    .findById(submissionTestCaseId)
-                    .get();
+                .findById(submissionTestCaseId)
+                .get();
 
             if (response == null) {
                 submissionTestcase.setPoint(0);
@@ -303,15 +305,20 @@ public class SubmissionResponseHandler {
                 String message = "";
 
                 if (response.indexOf(' ') < 0) {
-                    message = "---Invalid response: Checker output not in format <SCORE> <MESSAGE>\n" + response;
+                    message =
+                        "---Invalid response: Checker output not in format <SCORE> <MESSAGE>\n"
+                            + response;
                 } else {
                     String pointString = response.substring(0, response.indexOf(' '));
 //                    point = Integer.parseInt(pointString);
                     try {
                         point = Integer.parseInt(pointString);
-                        message = response.substring(response.indexOf(' '), response.indexOf(Constants.SPLIT_TEST_CASE));
+                        message = response.substring(response.indexOf(' '),
+                            response.indexOf(Constants.SPLIT_TEST_CASE));
                     } catch (NumberFormatException e) {
-                        message = "---Invalid response: Checker output not in format <SCORE> <MESSAGE>\n" + response;
+                        message =
+                            "---Invalid response: Checker output not in format <SCORE> <MESSAGE>\n"
+                                + response;
                     }
 
                     totalPoint += point;

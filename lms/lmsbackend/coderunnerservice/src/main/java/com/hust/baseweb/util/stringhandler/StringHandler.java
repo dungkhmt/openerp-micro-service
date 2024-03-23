@@ -77,7 +77,7 @@ public class StringHandler {
                 .build();
     }
 
-    public static ProblemSubmission handleContestResponseSingleTestcasePython(
+    public static ProblemSubmission handleContestResponseSingleTestcaseV2(
             String response,
             String testCaseAns,
             int point,
