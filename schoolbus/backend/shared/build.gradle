@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.2'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // database
+    implementation 'org.postgresql:postgresql'
+
+//    // monitoring with opentelemetry, logback, prometheus, micrometer, grafana, loki, tempo
+//    implementation 'io.micrometer:micrometer-registry-otlp'
+//    implementation 'io.opentelemetry:opentelemetry-api'
+//    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+//    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+//    runtimeOnly 'io.opentelemetry:opentelemetry-exporter-common'
+//    implementation 'io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0:2.0.0-alpha', {
+//        exclude group: 'org.jetbrains', module: 'annotations'
+//        exclude group: 'org.jetbrains', module: 'kotlin-logging'
+//    }
+//    implementation 'io.opentelemetry:opentelemetry-sdk'
+//    implementation 'io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv'
+//    runtimeOnly 'io.opentelemetry:opentelemetry-exporter-otlp-common'
+//    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // kafka
+    implementation 'org.springframework.kafka:spring-kafka:3.1.1'
+
+    implementation 'org.apache.commons:commons-lang3'
+    implementation 'com.google.guava:guava:33.0.0-jre'
+    implementation 'jakarta.validation:jakarta.validation-api:2.0.2'
+
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
