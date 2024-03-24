@@ -8,4 +8,6 @@ public interface LocationService {
     List<Location> getAllLocations();
 
     Location addNewLocation(Location location);
+
+    Location editLocation(Integer Id, Location location);
 }

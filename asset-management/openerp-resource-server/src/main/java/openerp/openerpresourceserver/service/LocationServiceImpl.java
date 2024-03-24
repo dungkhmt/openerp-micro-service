@@ -28,4 +28,14 @@ public class LocationServiceImpl implements LocationService{
         loc.setImage(location.getImage());
         return locationRepo.save(loc);
     }
+
+    @Override
+    public Location editLocation(Integer Id, Location location) {
+        Location foundLocation = locationRepo.findById(Id).get();
+        foundLocation.setName(location.getName());
+        foundLocation.setAddress(location.getAddress());
+        foundLocation.setDescription(location.getDescription());
+        foundLocation.setImage(location.getImage());
+        return locationRepo.save(foundLocation);
+    }
 }
