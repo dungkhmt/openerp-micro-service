@@ -31,4 +31,13 @@ public class LocationController {
             .status(HttpStatus.CREATED)
             .body(savedLocation);
     }
+
+    @PutMapping("/edit/{Id}")
+    public ResponseEntity<?> editLocation(@PathVariable Integer Id,
+                                          @RequestBody Location location){
+        Location savedLocation = locationService.editLocation(Id, location);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(savedLocation);
+    }
 }
