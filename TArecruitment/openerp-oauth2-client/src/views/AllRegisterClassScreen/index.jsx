@@ -3,13 +3,14 @@ import { request } from "../../api";
 import { StandardTable } from "erp-hust/lib/StandardTable";
 import { Button } from "@mui/material";
 import { useHistory } from "react-router-dom";
+import { SEMESTER } from "config/localize";
 
 const AllRegisterClassScreen = () => {
   const history = useHistory();
   const [classes, setClasses] = useState([]);
 
   useEffect(() => {
-    request("get", "/class-call/get-all-class", (res) => {
+    request("get", `/class-call/get-class-by-semester/${SEMESTER}`, (res) => {
       setClasses(res.data);
     }).then();
   }, []);

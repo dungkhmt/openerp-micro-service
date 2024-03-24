@@ -36,6 +36,13 @@ public class ClassCallServiceImpl implements ClassCallService {
     }
 
     @Override
+    public List<ClassCall> getClassBySemester(String semester) {
+        List<ClassCall> classCall = classCallRepo.findBySemester(semester);
+        if(classCall.isEmpty()) throw new IllegalArgumentException("No class in semester " + semester);
+        return classCall;
+    }
+
+    @Override
     public ClassCall updateClass(int id, ClassCall classCall) {
         Optional<ClassCall> existingClassCallOptional = classCallRepo.findById(id);
         if (existingClassCallOptional.isEmpty()) {
