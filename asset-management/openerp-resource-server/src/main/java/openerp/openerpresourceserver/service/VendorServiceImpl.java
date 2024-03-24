@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -50,5 +51,13 @@ public class VendorServiceImpl implements VendorService{
         foundVendor.setLast_updated(new Date());
 
         return vendorRepo.save(foundVendor);
+    }
+
+    @Override
+    public void deleteVendor(Integer Id) {
+        Optional<Vendor> vendor = vendorRepo.findById(Id);
+        if(vendor.isPresent()){
+            vendorRepo.deleteById(Id);
+        }
     }
 }
