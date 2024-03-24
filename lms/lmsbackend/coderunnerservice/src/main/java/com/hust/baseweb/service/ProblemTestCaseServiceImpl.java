@@ -34,28 +34,29 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     @Override
     public String executableIDECode(
-            ModelRunCodeFromIDE modelRunCodeFromIDE,
-            String computerLanguage
+        ModelRunCodeFromIDE modelRunCodeFromIDE,
+        String computerLanguage
     ) throws Exception {
-        String tempName = tempDir.createRandomScriptFileName(Math.random() + "-" + computerLanguage);
+        String tempName = tempDir.createRandomScriptFileName(
+            Math.random() + "-" + computerLanguage);
         String response = runCode(
-                modelRunCodeFromIDE.getSource(),
-                computerLanguage,
-                tempName,
-                modelRunCodeFromIDE.getInput(),
-                modelRunCodeFromIDE.getTimeLimit(),
-                "Language Not Found");
+            modelRunCodeFromIDE.getSource(),
+            computerLanguage,
+            tempName,
+            modelRunCodeFromIDE.getInput(),
+            modelRunCodeFromIDE.getTimeLimit(),
+            "Language Not Found");
         tempDir.pushToConcurrentLinkedQueue(tempName);
         return response;
     }
 
     private String runCode(
-            String sourceCode,
-            String computerLanguage,
-            String tempName,
-            String input,
-            int timeLimit,
-            String exception
+        String sourceCode,
+        String computerLanguage,
+        String tempName,
+        String input,
+        int timeLimit,
+        String exception
     ) throws Exception {
         String ans;
         tempName = tempName.replaceAll(" ", "");
@@ -65,15 +66,18 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             case CPP11:
             case CPP14:
             case CPP17:
-                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.CPP17, tempName);
+                tempDir.createScriptFile(sourceCode, input, timeLimit,
+                    ComputerLanguage.Languages.CPP17, tempName);
                 ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP17, tempName);
                 break;
             case JAVA:
-                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.JAVA, tempName);
+                tempDir.createScriptFile(sourceCode, input, timeLimit,
+                    ComputerLanguage.Languages.JAVA, tempName);
                 ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.JAVA, tempName);
                 break;
             case PYTHON3:
-                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.PYTHON3, tempName);
+                tempDir.createScriptFile(sourceCode, input, timeLimit,
+                    ComputerLanguage.Languages.PYTHON3, tempName);
                 ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.PYTHON3, tempName);
                 break;
             default:
@@ -84,10 +88,11 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     @Override
     public void submitContestProblemTestCaseByTestCaseWithFileProcessor(
-            UUID submissionId
+        UUID submissionId
     ) throws Exception {
 
-        ContestSubmissionEntity submission = contestSubmissionRepo.findByContestSubmissionId(submissionId);
+        ContestSubmissionEntity submission = contestSubmissionRepo.findByContestSubmissionId(
+            submissionId);
         ProblemEntity problem = problemService.findProblemWithCache(submission.getProblemId());
         ContestEntity contest = contestService.findContestWithCache(submission.getContestId());
 
@@ -95,17 +100,18 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
         List<TestCaseEntity> testCaseEntityList = null;
         boolean evaluatePrivatePublic = contest != null &&
-                contest.getEvaluateBothPublicPrivateTestcase() != null &&
-                contest.getEvaluateBothPublicPrivateTestcase()
-                        .equals(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES);
+            contest.getEvaluateBothPublicPrivateTestcase() != null &&
+            contest.getEvaluateBothPublicPrivateTestcase()
+                .equals(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES);
 
         testCaseEntityList = testCaseService.findListTestCaseWithCache(
-                submission.getProblemId(),
-                evaluatePrivatePublic);
+            submission.getProblemId(),
+            evaluatePrivatePublic);
 
         List<TestCaseEntity> listTestCaseAvailable = new ArrayList<>();
         for (TestCaseEntity tc : testCaseEntityList) {
-            if (tc.getStatusId() != null && tc.getStatusId().equals(TestCaseEntity.STATUS_DISABLED)) {
+            if (tc.getStatusId() != null && tc.getStatusId()
+                .equals(TestCaseEntity.STATUS_DISABLED)) {
                 continue;
             }
             listTestCaseAvailable.add(tc);
@@ -113,9 +119,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         testCaseEntityList = listTestCaseAvailable;
 
         String tempName = tempDir.createRandomScriptFileName(userId + "-" +
-                submission.getContestId() + "-" +
-                submission.getProblemId() + "-" +
-                Math.random());
+            submission.getContestId() + "-" +
+            submission.getProblemId() + "-" +
+            Math.random());
 
         List<String> listSubmissionResponse = new ArrayList<>();
         for (TestCaseEntity testCaseEntity : testCaseEntityList) {
@@ -123,83 +129,88 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             L.add(testCaseEntity);
 
             String response = submission(
-                    submission.getSourceCode(),
-                    submission.getSourceCodeLanguage(),
-                    tempName,
-                    L,
-                    "language not found",
-                    getTimeLimitByLanguage(problem, submission.getSourceCodeLanguage()),
-                    problem.getMemoryLimit());
+                submission.getSourceCode(),
+                submission.getSourceCodeLanguage(),
+                tempName,
+                L,
+                "language not found",
+                getTimeLimitByLanguage(problem, submission.getSourceCodeLanguage()),
+                problem.getMemoryLimit());
 
             listSubmissionResponse.add(response);
         }
 
         tempDir.removeDir(tempName);
 
-        if (Objects.equals(submission.getSourceCodeLanguage(), ContestSubmissionEntity.LANGUAGE_JAVA)) {
+        if (Objects.equals(submission.getSourceCodeLanguage(),
+            ContestSubmissionEntity.LANGUAGE_JAVA)) {
             submissionResponseHandler.processSubmissionResponse(
-                    testCaseEntityList,
-                    listSubmissionResponse,
-                    submission,
-                    problem.getScoreEvaluationType());
+                testCaseEntityList,
+                listSubmissionResponse,
+                submission,
+                problem.getScoreEvaluationType());
             return;
         }
 
         submissionResponseHandler.processSubmissionResponseV2(
-                testCaseEntityList,
-                listSubmissionResponse,
-                submission,
-                problem.getScoreEvaluationType(),
-                getTimeLimitByLanguage(problem, submission.getSourceCodeLanguage()));
+            testCaseEntityList,
+            listSubmissionResponse,
+            submission,
+            problem.getScoreEvaluationType(),
+            getTimeLimitByLanguage(problem, submission.getSourceCodeLanguage()));
     }
 
     @Override
     @Transactional
     public void evaluateCustomProblemSubmission(UUID submissionId) throws Exception {
-        ContestSubmissionEntity submission = contestSubmissionRepo.findByContestSubmissionId(submissionId);
+        ContestSubmissionEntity submission = contestSubmissionRepo.findByContestSubmissionId(
+            submissionId);
         ProblemEntity problem = problemService.findProblemWithCache(submission.getProblemId());
         ContestEntity contest = contestService.findContestWithCache(submission.getContestId());
-        List<ContestSubmissionTestCaseEntity> submissionTestcases = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionId(submissionId);
+        List<ContestSubmissionTestCaseEntity> submissionTestcases = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionId(
+            submissionId);
 
         boolean includePrivateTest = contest != null &&
-                contest.getEvaluateBothPublicPrivateTestcase() != null &&
-                contest.getEvaluateBothPublicPrivateTestcase()
-                        .equals(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES);
+            contest.getEvaluateBothPublicPrivateTestcase() != null &&
+            contest.getEvaluateBothPublicPrivateTestcase()
+                .equals(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES);
 
-        List<TestCaseEntity> testcases = testCaseService.findListTestCaseWithCache(submission.getProblemId(), includePrivateTest)
-                .stream()
-                .filter(tc1 -> tc1.getStatusId() == null || !tc1.getStatusId().equals(TestCaseEntity.STATUS_DISABLED))
-                .collect(Collectors.toList());
+        List<TestCaseEntity> testcases = testCaseService.findListTestCaseWithCache(
+                submission.getProblemId(), includePrivateTest)
+            .stream()
+            .filter(tc1 -> tc1.getStatusId() == null || !tc1.getStatusId()
+                .equals(TestCaseEntity.STATUS_DISABLED))
+            .collect(Collectors.toList());
 
         Map<UUID, String> evaluationResults = new HashMap<>();
         String tempName = tempDir.createRandomScriptFileName(
-                submission.getUserId() + "-" +
-                        submission.getContestId() + "-" +
-                        submission.getProblemId() + "-" +
-                        "custom" + "-" +
-                        Math.random());
+            submission.getUserId() + "-" +
+                submission.getContestId() + "-" +
+                submission.getProblemId() + "-" +
+                "custom" + "-" +
+                Math.random());
 
         for (TestCaseEntity testcase : testcases) {
             ContestSubmissionTestCaseEntity submissionTestcase = submissionTestcases
-                    .stream()
-                    .filter(st -> st.getTestCaseId().equals(testcase.getTestCaseId()))
-                    .findFirst()
-                    .get();
+                .stream()
+                .filter(st -> st.getTestCaseId().equals(testcase.getTestCaseId()))
+                .findFirst()
+                .get();
 
             String response;
             if (StringUtils.isBlank(submissionTestcase.getParticipantSolutionOtput())) {
                 response = null;
             } else {
                 response = submissionSolutionOutput(
-                        problem.getSolutionCheckerSourceCode(),
-                        problem.getSolutionCheckerSourceLanguage(),
-                        submissionTestcase.getParticipantSolutionOtput(),
-                        tempName,
-                        testcase,
-                        "Language not found",
+                    problem.getSolutionCheckerSourceCode(),
+                    problem.getSolutionCheckerSourceLanguage(),
+                    submissionTestcase.getParticipantSolutionOtput(),
+                    tempName,
+                    testcase,
+                    "Language not found",
 //                    problem.getTimeLimit(),
-                        getTimeLimitByLanguage(problem, problem.getSolutionCheckerSourceLanguage()),
-                        problem.getMemoryLimit());
+                    getTimeLimitByLanguage(problem, problem.getSolutionCheckerSourceLanguage()),
+                    problem.getMemoryLimit());
             }
 
             evaluationResults.put(submissionTestcase.getContestSubmissionTestcaseId(), response);
@@ -210,76 +221,76 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     private String submission(
-            String source,
-            String computerLanguage,
-            String tempName,
-            List<TestCaseEntity> testCaseList,
-            String exception,
-            int timeLimit,
-            int memoryLimit
+        String source,
+        String computerLanguage,
+        String tempName,
+        List<TestCaseEntity> testCaseList,
+        String exception,
+        int timeLimit,
+        int memoryLimit
     ) throws Exception {
         String ans;
         tempName = tempName.replace(" ", "");
         switch (ComputerLanguage.Languages.valueOf(computerLanguage)) {
             case C:
                 tempDir.createScriptSubmissionFile(
-                        ComputerLanguage.Languages.C,
-                        tempName,
-                        testCaseList,
-                        source,
-                        timeLimit,
-                        memoryLimit);
+                    ComputerLanguage.Languages.C,
+                    tempName,
+                    testCaseList,
+                    source,
+                    timeLimit,
+                    memoryLimit);
                 ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.C, tempName);
                 break;
             case CPP11:
                 tempDir.createScriptSubmissionFile(
-                        ComputerLanguage.Languages.CPP11,
-                        tempName,
-                        testCaseList,
-                        source,
-                        timeLimit,
-                        memoryLimit);
+                    ComputerLanguage.Languages.CPP11,
+                    tempName,
+                    testCaseList,
+                    source,
+                    timeLimit,
+                    memoryLimit);
                 ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP11, tempName);
                 break;
             case CPP14:
                 tempDir.createScriptSubmissionFile(
-                        ComputerLanguage.Languages.CPP14,
-                        tempName,
-                        testCaseList,
-                        source,
-                        timeLimit,
-                        memoryLimit);
+                    ComputerLanguage.Languages.CPP14,
+                    tempName,
+                    testCaseList,
+                    source,
+                    timeLimit,
+                    memoryLimit);
                 ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP14, tempName);
                 break;
             case CPP:
             case CPP17:
                 tempDir.createScriptSubmissionFile(
-                        ComputerLanguage.Languages.CPP17,
-                        tempName,
-                        testCaseList,
-                        source,
-                        timeLimit,
-                        memoryLimit);
+                    ComputerLanguage.Languages.CPP17,
+                    tempName,
+                    testCaseList,
+                    source,
+                    timeLimit,
+                    memoryLimit);
                 ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP17, tempName);
                 break;
             case JAVA:
                 tempDir.createScriptSubmissionFile(
-                        ComputerLanguage.Languages.JAVA,
-                        tempName,
-                        testCaseList,
-                        source,
-                        timeLimit,
-                        memoryLimit);
+                    ComputerLanguage.Languages.JAVA,
+                    tempName,
+                    testCaseList,
+                    source,
+                    timeLimit,
+                    memoryLimit);
                 ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.JAVA, tempName);
                 break;
             case PYTHON3:
                 tempDir.createScriptSubmissionFile(
-                        ComputerLanguage.Languages.PYTHON3,
-                        tempName,
-                        testCaseList,
-                        source,
-                        timeLimit,
-                        memoryLimit);
+                    ComputerLanguage.Languages.PYTHON3,
+                    tempName,
+                    testCaseList,
+                    source,
+                    timeLimit,
+                    memoryLimit);
                 ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.PYTHON3, tempName);
                 break;
             default:
@@ -289,14 +300,14 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     private String submissionSolutionOutput(
-            String sourceChecker,
-            String computerLanguage,
-            String solutionOutput,
-            String tempName,
-            TestCaseEntity testCase,
-            String exception,
-            int timeLimit,
-            int memoryLimit
+        String sourceChecker,
+        String computerLanguage,
+        String solutionOutput,
+        String tempName,
+        TestCaseEntity testCase,
+        String exception,
+        int timeLimit,
+        int memoryLimit
     ) throws Exception {
 
         String ans = "";
@@ -308,12 +319,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             case CPP14:
             case CPP17:
                 tempDir.createScriptSubmissionSolutionOutputFile(
-                        ComputerLanguage.Languages.CPP17,
-                        tempName,
-                        solutionOutput,
-                        testCase,
-                        sourceChecker,
-                        timeLimit);
+                    ComputerLanguage.Languages.CPP17,
+                    tempName,
+                    solutionOutput,
+                    testCase,
+                    sourceChecker,
+                    timeLimit);
                 ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP17, tempName);
                 break;
             case JAVA:
