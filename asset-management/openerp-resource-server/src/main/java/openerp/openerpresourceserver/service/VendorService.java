@@ -10,4 +10,6 @@ public interface VendorService {
     Vendor addNewVendor(Vendor vendor);
 
     Vendor editVendor(Integer Id, Vendor vendor);
+
+    void deleteVendor(Integer Id);
 }

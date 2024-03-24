@@ -39,4 +39,10 @@ public class VendorController {
             .status(HttpStatus.OK)
             .body(savedVendor);
     }
+
+    @DeleteMapping("/delete/{Id}")
+    public ResponseEntity<?> deleteVendor(@PathVariable Integer Id){
+        vendorService.deleteVendor(Id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
