@@ -41,7 +41,7 @@ public class LocationController {
             .body(savedLocation);
     }
 
-    @DeleteMapping("/delete/{Id")
+    @DeleteMapping("/delete/{Id}")
     public ResponseEntity<?> deleteLocation(@PathVariable Integer Id){
         locationService.deleteLocation(Id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

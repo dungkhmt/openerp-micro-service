@@ -10,7 +10,11 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
-import "./location.css";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 export const LocationScreen = () => {
     const INITIAL_STATE = {
@@ -24,6 +28,7 @@ export const LocationScreen = () => {
     const [data, setData] = useState(INITIAL_STATE);
     const [currentId, setCurrentId] = useState(null);
     const [title, setTitle] = useState("");
+    const [openDelete, setOpenDelete] = useState(false);
 
     const  errorHandlers = {
         onError: (e) => {
@@ -32,8 +37,33 @@ export const LocationScreen = () => {
         },
     };
 
-    const successHandler = () => {
-        successNoti("SUCESSFULLY", 3000);
+    const successHandler = (res) => {
+        const msg = title === "CREATE NEW LOCATION" ? "CREATE SUCCESSFULLY" : "EDIT SUCCESSFULLY";
+        successNoti(msg, 3000);
+        console.log("res", res.data);
+        const locationIndex = locations.findIndex(location => location.id === res.data.id);
+
+        if (locationIndex !== -1) {
+            // Nếu location đã tồn tại trong mảng, thực hiện cập nhật
+            const updatedLocations = [...locations];
+            updatedLocations[locationIndex] = res.data;
+            setLocations(updatedLocations);
+        } else {
+            // Nếu location chưa tồn tại trong mảng, thực hiện thêm mới
+            setLocations(prevLocations => [...prevLocations, res.data]);
+        }
+    };
+
+    const successHandlerDelete = () => {
+        successNoti("DELETE SUCCESSFULLY", 3000);
+        const updatedLocations = locations.filter(location => location.id !== currentId);
+        setLocations(updatedLocations);
+    }
+
+    const callApi = () => {
+        request("get", "/location/get-all", (res) => {
+            setLocations(res.data);
+        }).then();
     };
 
     const handleInputChange = (e) => {
@@ -50,17 +80,10 @@ export const LocationScreen = () => {
     const handleSubmit = async(e) => {
         e.preventDefault();
         if(title === "CREATE NEW LOCATION"){
-            request("post", "/location/add-new", successHandler, errorHandlers, data, (res) => {
-                setLocations([...locations, res.data]);
-            }).then();
+            request("post", "/location/add-new", successHandler, errorHandlers, data);
         } else if(title === "EDIT LOCATION"){
-            console.log("loca id", currentId);
-            console.log("data", data);
-            request("put", `/location/edit/${currentId}`, successHandler, errorHandlers, data, (res) => {
-                setLocations([...locations, res.data]);
-            }).then();
+            request("put", `/location/edit/${currentId}`, successHandler, errorHandlers, data);
         }
-
         setData(INITIAL_STATE);
         handleClose();
     };
@@ -74,16 +97,24 @@ export const LocationScreen = () => {
         setCurrentId(location.id);
         setTitle("EDIT LOCATION");
         handleOpen();
+    };
+
+    const handleCloseDelete = () => {
+        setOpenDelete(false)
+    };
+
+    const handleDelete = (location) => {
+        setOpenDelete(true);
+        setCurrentId(location.id);
     }
 
-    const handleDelete = async(location) => {
-
+    const deleteApi = () => {
+        request("delete", `/location/delete/${currentId}`, successHandlerDelete, errorHandlers, data);
+        setOpenDelete(false);
     }
 
     useEffect(() => {
-        request("get", "/location/get-all", (res) => {
-            setLocations(res.data);
-        }).then();
+        callApi();
     }, []);
 
     const label = { inputProps: { 'aria-label': 'Size switch demo' } };
@@ -154,7 +185,7 @@ export const LocationScreen = () => {
             render: (rowData) => (
                 <IconButton
                     onClick={() => {
-                        demoFunction(rowData)
+                        handleDelete(rowData)
                     }}
                     variant="contained"
                     color="error"
@@ -164,10 +195,6 @@ export const LocationScreen = () => {
             ),
         },
     ];
-
-    const demoFunction = (user) => {
-        alert("You clicked on User: " + user.id)
-    }
 
 	const handleOpen = () => {
 		setOpen(true);
@@ -207,7 +234,7 @@ export const LocationScreen = () => {
                             variant="outlined"
                             fullWidth
                             margin="normal"
-                            isRequired
+                            required
                             name='name'
                             placeholder='Location name'
                             onChange={handleInputChange}
@@ -218,6 +245,7 @@ export const LocationScreen = () => {
                             variant="outlined"
                             fullWidth
                             margin="normal"
+                            required
                             name='description'
                             placeholder='Location description'
                             onChange={handleInputChange}
@@ -228,6 +256,7 @@ export const LocationScreen = () => {
                             variant="outlined"
                             fullWidth
                             margin="normal"
+                            required
                             name='address'
                             placeholder='Location address'
                             onChange={handleInputChange}
@@ -253,7 +282,27 @@ export const LocationScreen = () => {
                     </form>
 				</Box>
       		</Modal>
+            <Dialog
+                open={openDelete}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"DELETE THIS LOCATION"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        DO you want to delete this location. It cannot be undone?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" onClick={handleCloseDelete}>CANCEL</Button>
+                    <Button variant="outlined" color="error" onClick={deleteApi} autoFocus>
+                        DELETE
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
-
     );
 };
