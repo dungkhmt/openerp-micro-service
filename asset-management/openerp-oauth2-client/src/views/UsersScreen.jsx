@@ -9,12 +9,21 @@ import Switch from '@mui/material/Switch';
 export const UsersScreen = () => {
 
     const [users, setUsers] = useState([]);
+    const [assets, setAssets] = useState([]);
 
     useEffect(() => {
         request("get", "/user/get-all", (res) => {
             setUsers(res.data);
         }).then();
     }, []);
+    
+    useEffect(() => {
+        request("get", "/asset/get-all", (res) => {
+            setAssets(res.data);
+        }).then();
+    }, []);
+    
+    console.log("assets", assets);
 
     const label = { inputProps: { 'aria-label': 'Size switch demo' } };
 
