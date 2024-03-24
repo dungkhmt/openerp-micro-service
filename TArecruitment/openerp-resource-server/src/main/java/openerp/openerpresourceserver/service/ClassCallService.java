@@ -13,6 +13,8 @@ public interface ClassCallService {
 
     Optional<ClassCall> getClassById(int id);
 
+    List<ClassCall> getClassBySemester(String semester);
+
     ClassCall updateClass(int id, ClassCall classCall);
 
     boolean deleteClass(int id);

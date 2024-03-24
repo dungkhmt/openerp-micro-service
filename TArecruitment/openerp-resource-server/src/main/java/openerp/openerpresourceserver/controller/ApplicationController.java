@@ -35,4 +35,19 @@ public class ApplicationController {
         List<Application> applications = applicationService.getMyApplications(userId);
         return ResponseEntity.ok().body(applications);
     }
+
+    @GetMapping("/get-application-by-class/{classCallId}")
+    public ResponseEntity<?> getApplicationByClassId(@PathVariable int classCallId) {
+        List<Application> applications = applicationService.getApplicationByClassId(classCallId);
+        return ResponseEntity.ok().body(applications);
+    }
+
+    /**
+     * @TODO: Search by semester
+     */
+    @GetMapping("/get-unique-applicator")
+    public ResponseEntity<?> getUniqueApplicator() {
+        List<Application> applicators = applicationService.getUniqueApplicator();
+        return ResponseEntity.ok().body(applicators);
+    }
 }

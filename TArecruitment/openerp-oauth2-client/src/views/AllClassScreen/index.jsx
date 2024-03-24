@@ -2,25 +2,91 @@ import { useState, useEffect } from "react";
 import { request } from "../../api";
 import { StandardTable } from "erp-hust/lib/StandardTable";
 import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { useHistory } from "react-router-dom";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import styles from "./index.style";
+import {
+  Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@mui/material";
+import { styles } from "./index.style";
+import { SEMESTER } from "config/localize";
+import DeleteDialog from "components/dialog/DeleteDialog";
+import ApplicatorDialog from "components/dialog/ApplicatorDialog";
 
 const AllClassScreen = () => {
   const [classes, setClasses] = useState([]);
-  const [semester, setSemester] = useState("All");
+  const [semester, setSemester] = useState(SEMESTER);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [deleteId, setDeleteId] = useState("");
+  const [openApplicatorDialog, setOpenApplicatorDialog] = useState(false);
+  const [infoClassId, setInfoClassId] = useState("");
+  const [applicators, setApplicators] = useState([]);
+
   const history = useHistory();
 
   useEffect(() => {
     fetchData();
+  }, [semester]);
+
+  useEffect(() => {
+    fetchApplicatorData();
   }, []);
 
   const fetchData = () => {
-    request("get", "/class-call/get-all-class", (res) => {
+    request("get", `/class-call/get-class-by-semester/${semester}`, (res) => {
       setClasses(res.data);
     }).then();
   };
+
+  const fetchApplicatorData = () => {
+    request("get", `/application/get-unique-applicator`, (res) => {
+      setApplicators(res.data);
+    }).then();
+  };
+
+  const applicatorColumns = [
+    {
+      title: "Mã số sinh viên",
+      field: "mssv",
+      headerStyle: { fontWeight: "bold" },
+      cellStyle: { fontWeight: "bold" },
+    },
+    {
+      title: "Tên sinh viên",
+      field: "name",
+      headerStyle: { fontWeight: "bold" },
+      cellStyle: { fontWeight: "bold" },
+    },
+    {
+      title: "Số điện thoại",
+      field: "phoneNumber",
+      headerStyle: { fontWeight: "bold" },
+      cellStyle: { fontWeight: "bold" },
+    },
+    {
+      title: "Email",
+      field: "email",
+      headerStyle: { fontWeight: "bold" },
+      cellStyle: { fontWeight: "bold" },
+    },
+    {
+      title: "Hành động",
+      sorting: false,
+      render: (rowData) => (
+        <div>
+          <IconButton variant="contained" color="primary">
+            <FormatListBulletedIcon />
+          </IconButton>
+        </div>
+      ),
+      headerStyle: { width: "10%", textAlign: "center" },
+      cellStyle: { width: "10%", textAlign: "center" },
+    },
+  ];
 
   const columns = [
     {
@@ -58,19 +124,28 @@ const AllClassScreen = () => {
       cellStyle: { fontWeight: "bold" },
     },
     {
-      title: "Delete",
+      title: "Hành động",
       sorting: false,
       render: (rowData) => (
-        <IconButton
-          onClick={() => {
-            handleDelete(rowData);
-          }}
-          variant="contained"
-          color="error"
-        >
-          <DeleteIcon />
-        </IconButton>
+        <div>
+          <IconButton variant="contained" color="primary">
+            <FormatListBulletedIcon
+              onClick={() => handleOpenApplicatorDialog(rowData)}
+            />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              handleOpenDialog(rowData);
+            }}
+            variant="contained"
+            color="error"
+          >
+            <DeleteOutlineIcon />
+          </IconButton>
+        </div>
       ),
+      headerStyle: { width: "10%", textAlign: "center" },
+      cellStyle: { width: "10%", textAlign: "center" },
     },
   ];
 
@@ -78,16 +153,36 @@ const AllClassScreen = () => {
     history.push(`/teacher/class-information/${klass.id}`);
   };
 
-  const handleDelete = (klass) => {
+  const handleDelete = () => {
     request(
       "delete",
-      `/class-call/delete-class/${klass.id}`,
+      `/class-call/delete-class/${deleteId}`,
       (res) => {
         fetchData();
+        setOpenDialog(false);
       },
       {},
       {}
     );
+  };
+
+  const handleOpenDialog = (klass) => {
+    console.log(klass, "klass");
+    setOpenDialog(true);
+    setDeleteId(klass.id);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleOpenApplicatorDialog = (klass) => {
+    setInfoClassId(klass.id);
+    setOpenApplicatorDialog(true);
+  };
+
+  const handleCloseApplicatorDialog = () => {
+    setOpenApplicatorDialog(false);
   };
 
   const handleChange = (event) => {
@@ -97,24 +192,48 @@ const AllClassScreen = () => {
   return (
     <div>
       <h1>Danh sách lớp học</h1>
+      <DeleteDialog
+        open={openDialog}
+        handleDelete={handleDelete}
+        handleClose={handleCloseDialog}
+      />
+
+      <ApplicatorDialog
+        open={openApplicatorDialog}
+        handleClose={handleCloseApplicatorDialog}
+        classId={infoClassId}
+      />
 
       <FormControl variant="standard" style={styles.dropdown}>
-        <InputLabel id="ngay-label">Học kì</InputLabel>
+        <InputLabel id="semester-label">Học kì</InputLabel>
         <Select
-          labelId="ngay-label"
-          id="ngay-select"
+          labelId="semester-label"
+          id="semester-select"
           value={semester}
           name="day"
           onChange={handleChange}
+          MenuProps={{ PaperProps: { sx: styles.selection } }}
         >
-          <MenuItem key={0} value="All">
-            All
+          {/**
+           * @TODO Change this to dynamic
+           */}
+          <MenuItem key={1} value="2023-2">
+            2023-2
           </MenuItem>
-          <MenuItem key={1} value="2023.1">
-            2023.1
+          <MenuItem key={2} value="2023-1">
+            2023-1
           </MenuItem>
-          <MenuItem key={2} value="2023.2">
-            2023.2
+          <MenuItem key={3} value="2022-2">
+            2022-2
+          </MenuItem>
+          <MenuItem key={4} value="2022-1">
+            2022-1
+          </MenuItem>
+          <MenuItem key={5} value="2021-2">
+            2021-2
+          </MenuItem>
+          <MenuItem key={6} value="2021-1">
+            2021-1
           </MenuItem>
         </Select>
       </FormControl>
@@ -128,6 +247,22 @@ const AllClassScreen = () => {
           selection: false,
           pageSize: 5,
           search: true,
+          sorting: true,
+        }}
+      />
+
+      <Divider style={{ margin: "20px 0", backgroundColor: "#ccc" }} />
+
+      <h1>Danh sách sinh viên đăng ký trợ giảng</h1>
+      <StandardTable
+        title=""
+        columns={applicatorColumns}
+        data={applicators}
+        hideCommandBar
+        options={{
+          selection: false,
+          pageSize: 5,
+          search: false,
           sorting: true,
         }}
       />
