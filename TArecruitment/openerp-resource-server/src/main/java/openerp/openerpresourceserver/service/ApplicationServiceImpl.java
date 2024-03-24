@@ -43,4 +43,14 @@ public class ApplicationServiceImpl implements ApplicationService{
     public List<Application> getMyApplications(String userId) {
         return applicationRepo.findByUserId(userId);
     }
+
+    @Override
+    public List<Application> getApplicationByClassId(int classCallId) {
+        return applicationRepo.findByClassCallId(classCallId);
+    }
+
+    @Override
+    public List<Application> getUniqueApplicator() {
+        return applicationRepo.findDistinctApplicationsByUser();
+    }
 }
