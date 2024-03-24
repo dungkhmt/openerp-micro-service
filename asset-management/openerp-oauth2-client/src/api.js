@@ -112,6 +112,6 @@ export async function request(
         e.message
       );
     }
-    console.log("Request config", e.config);
+    // console.log("Request config", e.config);
   }
 }
