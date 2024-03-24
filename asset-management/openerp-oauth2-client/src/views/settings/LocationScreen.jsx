@@ -16,24 +16,24 @@ export const LocationScreen = () => {
     const INITIAL_STATE = {
         name: "",
         description: "",
-        email: "",
-        phone: "",
-        url: "",
         address: ""
     };
+
     const [locations, setLocations] = useState([]);
     const [open, setOpen] = useState(false);
     const [data, setData] = useState(INITIAL_STATE);
+    const [currentId, setCurrentId] = useState(null);
+    const [title, setTitle] = useState("");
 
     const  errorHandlers = {
         onError: (e) => {
             console.log(e);
-            errorNoti("Thêm mới thất bại", 3000);
+            errorNoti("FAILED", 3000);
         },
     };
 
     const successHandler = () => {
-        successNoti("Thêm mới thành công", 3000);
+        successNoti("SUCESSFULLY", 3000);
     };
 
     const handleInputChange = (e) => {
@@ -41,15 +41,44 @@ export const LocationScreen = () => {
         setData({...data, [e.target.name]: e.target.value});
     };
 
+    const handleCreate = () => {
+        setTitle("CREATE NEW LOCATION");
+        setData(INITIAL_STATE);
+        handleOpen();
+    }
+
     const handleSubmit = async(e) => {
         e.preventDefault();
-        console.log("data", data);
-        request("post", "/location/all-new", successHandler, errorHandlers, data, (res) => {
-            setLocations([...locations, res.data]);
-        }).then();
+        if(title === "CREATE NEW LOCATION"){
+            request("post", "/location/add-new", successHandler, errorHandlers, data, (res) => {
+                setLocations([...locations, res.data]);
+            }).then();
+        } else if(title === "EDIT LOCATION"){
+            console.log("loca id", currentId);
+            console.log("data", data);
+            request("put", `/location/edit/${currentId}`, successHandler, errorHandlers, data, (res) => {
+                setLocations([...locations, res.data]);
+            }).then();
+        }
+
         setData(INITIAL_STATE);
         handleClose();
     };
+
+    const handleEdit = (location) => {
+        setData({
+        	name: location.name,
+        	description: location.description,
+        	address: location.address
+        });
+        setCurrentId(location.id);
+        setTitle("EDIT LOCATION");
+        handleOpen();
+    }
+
+    const handleDelete = async(location) => {
+
+    }
 
     useEffect(() => {
         request("get", "/location/get-all", (res) => {
@@ -79,6 +108,15 @@ export const LocationScreen = () => {
         {
             title: "Image",
             field: "image",
+            render: (rowData) => (
+                <img
+                    src="https://vcdn-vnexpress.vnecdn.net/2022/05/10/DHBKHN-7506-1652177227.jpg"
+                    alt="Dai hoc Bach khoa Ha Noi"
+                    fit="contain"
+                    width={70}
+                    height={70}
+                />
+            )
         },
         {
             title: "Address",
@@ -101,7 +139,7 @@ export const LocationScreen = () => {
             render: (rowData) => (
                 <IconButton
                     onClick={() => {
-                        demoFunction(rowData)
+                        handleEdit(rowData)
                     }}
                     variant="contained"
                     color="success"
@@ -141,7 +179,7 @@ export const LocationScreen = () => {
 
     return (
         <div className="location-container">
-            <Button variant="contained" onClick={handleOpen}>Create</Button>
+            <Button variant="contained" onClick={handleCreate}>Create</Button>
             <StandardTable
                 title="Location List"
                 columns={columns}
@@ -161,9 +199,9 @@ export const LocationScreen = () => {
 				onClose={handleClose}
 			>
 				<Box sx={style}>
-                    <div>CREATE LOCATION</div>
+                    <div>{title}</div>
                     <hr/>
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={(e) => handleSubmit(e)}>
                         <TextField
                             label="Name"
                             variant="outlined"
@@ -173,6 +211,7 @@ export const LocationScreen = () => {
                             name='name'
                             placeholder='Location name'
                             onChange={handleInputChange}
+                            value={data.name}
                         />
                         <TextField
                             label="Description"
@@ -182,37 +221,8 @@ export const LocationScreen = () => {
                             name='description'
                             placeholder='Location description'
                             onChange={handleInputChange}
+                            value={data.description}
                         />
-                        <TextField
-                            label="Email"
-                            variant="outlined"
-                            fullWidth
-                            isRequired
-                            margin="normal"
-                            name='email'
-                            placeholder='Location email'
-                            onChange={handleInputChange}
-                        />
-                        <div style={{display: "flex", gap: "20px"}}>
-                            <TextField
-                                label="Phone"
-                                variant="outlined"
-                                fullWidth
-                                margin="normal"
-                                name='phone'
-                                placeholder='Location phone'
-                                onChange={handleInputChange}
-                            />
-                            <TextField
-                                label="URL"
-                                variant="outlined"
-                                fullWidth
-                                margin="normal"
-                                name='url'
-                                placeholder='Location url'
-                                onChange={handleInputChange}
-                            />
-                        </div>
                         <TextField
                             label="Address"
                             variant="outlined"
@@ -221,6 +231,7 @@ export const LocationScreen = () => {
                             name='address'
                             placeholder='Location address'
                             onChange={handleInputChange}
+                            value={data.address}
                         />            
                         <div style={{display: "flex", justifyContent: "space-between", marginTop: "20px"}}>
                             <Button
