@@ -6,6 +6,7 @@ import openerp.openerpresourceserver.repo.VendorRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -28,6 +29,26 @@ public class VendorServiceImpl implements VendorService{
         savedVendor.setAddress(vendor.getAddress());
         savedVendor.setDescription(vendor.getDescription());
         savedVendor.setImage(vendor.getImage());
-        return savedVendor;
+        savedVendor.setUrl(vendor.getUrl());
+
+        Date currentDate = new Date();
+        savedVendor.setSince(currentDate);
+        savedVendor.setLast_updated(currentDate);
+
+        return vendorRepo.save(savedVendor);
+    }
+
+    @Override
+    public Vendor editVendor(Integer Id, Vendor vendor) {
+        Vendor foundVendor = vendorRepo.findById(Id).get();
+        foundVendor.setName(vendor.getName());
+        foundVendor.setDescription(vendor.getDescription());
+        foundVendor.setAddress(vendor.getAddress());
+        foundVendor.setEmail(vendor.getEmail());
+        foundVendor.setImage(vendor.getImage());
+        foundVendor.setUrl(vendor.getUrl());
+        foundVendor.setLast_updated(new Date());
+
+        return vendorRepo.save(foundVendor);
     }
 }

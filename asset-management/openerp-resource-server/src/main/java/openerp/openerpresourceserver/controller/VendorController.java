@@ -31,4 +31,12 @@ public class VendorController {
             .status(HttpStatus.CREATED)
             .body(newVendor);
     }
+
+    @PutMapping("/edit/{Id}")
+    public ResponseEntity<?> editVendor(@PathVariable Integer Id, @RequestBody Vendor vendor){
+        Vendor savedVendor = vendorService.editVendor(Id, vendor);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(savedVendor);
+    }
 }

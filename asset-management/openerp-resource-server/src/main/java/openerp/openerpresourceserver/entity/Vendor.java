@@ -30,6 +30,8 @@ public class Vendor {
 
     private String address;
 
+    private String url;
+
     private String image;
 
     @Column(columnDefinition = "TEXT")
