@@ -10,4 +10,6 @@ public interface LocationService {
     Location addNewLocation(Location location);
 
     Location editLocation(Integer Id, Location location);
+
+    void deleteLocation(Integer Id);
 }
