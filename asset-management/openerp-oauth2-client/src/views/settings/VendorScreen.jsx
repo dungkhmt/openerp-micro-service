@@ -9,6 +9,11 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import { errorNoti, successNoti } from "utils/notification";
 import { Image } from "@mui/icons-material";
 
@@ -25,16 +30,36 @@ export const VendorScreen = () => {
 
     const [open, setOpen] = useState(false);
     const [data, setData] = useState(INITIAL_STATE);
+    const [title, setTitle] = useState("");
+    const [currentId, setCurrentId] = useState(null);
+    const [openDelete, setOpenDelete] = useState(false);
 
     const  errorHandlers = {
         onError: (e) => {
             console.log(e);
-            errorNoti("Thêm mới thất bại", 3000);
+            errorNoti("FAILED", 3000);
         },
     };
 
-    const successHandler = () => {
-        successNoti("Thêm mới thành công", 3000);
+    const successHandler = (res) => {
+        const msg = title === "CREATE NEW VENDOR" ? "CREATE SUCCESSFULLY" : "EDIT SUCCESSFULLY";
+        successNoti(msg, 3000);
+        console.log("res", res);
+        const vendorIndex = vendors.findIndex(vendor => vendor.id === res.data.id);
+
+        if (vendorIndex !== -1) {
+            const updatedVendors = [...vendors];
+            updatedVendors[vendorIndex] = res.data;
+            setVendors(updatedVendors);
+        } else {
+            setVendors(prevVendors => [...prevVendors, res.data]);
+        }
+    };
+
+    const successHandlerDelete = () => {
+        successNoti("DELETE SUCCESSFULLY", 3000);
+        const updatedVendors = vendors.filter(vendor => vendor.id !== currentId);
+        setVendors(updatedVendors);
     };
 
 
@@ -43,7 +68,9 @@ export const VendorScreen = () => {
         setData({...data, [e.target.name]: e.target.value});
     };
 
-    const handleOpen = () => {
+    const handleCreate = () => {
+    		setTitle("CREATE NEW VENDOR");
+    		setData(INITIAL_STATE);
 		setOpen(true);
 	};
 
@@ -53,10 +80,12 @@ export const VendorScreen = () => {
 
     const handleSubmit = async(e) => {
         e.preventDefault();
-        console.log("data", data);
-        request("post", "/location/add-new", successHandler, errorHandlers, data, (res) => {
-            setVendors([...vendors, res.data]);
-        }).then();
+        if(title === "CREATE NEW VENDOR"){
+            console.log("data", data);
+            request("post", "/vendor/add-new", successHandler, errorHandlers, data);
+        } else if(title === "EDIT VENDOR"){
+            request("put", `/vendor/edit/${currentId}`, successHandler, errorHandlers, data);
+        }
         setData(INITIAL_STATE);
         handleClose();
     };
@@ -66,6 +95,35 @@ export const VendorScreen = () => {
             setVendors(res.data);
         }).then();
     }, []);
+
+    const handleEdit = (vendor) => {
+        setData({
+            name: vendor.name,
+            address: vendor.address,
+            phone: vendor.phone,
+            email: vendor.email,
+            url: vendor.url
+        });
+        setCurrentId(vendor.id);
+        setTitle("EDIT VENDOR");
+        setOpen(true);
+    };
+
+    const handleDelete = (vendor) => {
+        setOpenDelete(true);
+        setCurrentId(vendor.id);
+    };
+
+    const deleteApi = () => {
+        request("delete", `/vendor/delete/${currentId}`, successHandlerDelete, errorHandlers, data);
+        setOpenDelete(false);
+    };
+
+    const handleCloseDelete = () => {
+        setOpenDelete(false)
+    };
+
+    
 
     const label = { inputProps: { 'aria-label': 'Size switch demo' } };
 
@@ -90,12 +148,12 @@ export const VendorScreen = () => {
             title: "Image",
             field: "image",
             render: (rowData) => (
-                <Image
+                <img
                     src="https://vcdn-vnexpress.vnecdn.net/2022/05/10/DHBKHN-7506-1652177227.jpg"
                     alt="Dai hoc Bach khoa Ha Noi"
                     fit="contain"
-                    width={50}
-                    height={50}
+                    width={70}
+                    height={70}
                 />
             )
         },
@@ -128,7 +186,7 @@ export const VendorScreen = () => {
             render: (rowData) => (
                 <IconButton
                     onClick={() => {
-                        demoFunction(rowData)
+                        handleEdit(rowData)
                     }}
                     variant="contained"
                     color="success"
@@ -160,7 +218,7 @@ export const VendorScreen = () => {
 
     return (
         <div>
-            <Button variant="contained" onClick={handleOpen}>Create</Button>
+            <Button variant="contained" onClick={handleCreate}>Create</Button>
             <StandardTable
                 title="Vendor List"
                 columns={columns}
@@ -188,7 +246,7 @@ export const VendorScreen = () => {
                             variant="outlined"
                             fullWidth
                             margin="normal"
-                            isRequired
+                            required
                             name='name'
                             placeholder='Location name'
                             onChange={handleInputChange}
@@ -207,6 +265,7 @@ export const VendorScreen = () => {
                             variant="outlined"
                             fullWidth
                             margin="normal"
+                            required
                             name='email'
                             placeholder='Location email'
                             onChange={handleInputChange}
@@ -217,6 +276,7 @@ export const VendorScreen = () => {
                                 variant="outlined"
                                 fullWidth
                                 margin="normal"
+                                required
                                 name='phone'
                                 placeholder='Location phone'
                                 onChange={handleInputChange}
@@ -226,6 +286,7 @@ export const VendorScreen = () => {
                                 variant="outlined"
                                 fullWidth
                                 margin="normal"
+                                required
                                 name='url'
                                 placeholder='Location url'
                                 onChange={handleInputChange}
@@ -236,6 +297,7 @@ export const VendorScreen = () => {
                             variant="outlined"
                             fullWidth
                             margin="normal"
+                            required
                             name='address'
                             placeholder='Location address'
                             onChange={handleInputChange}
@@ -259,7 +321,28 @@ export const VendorScreen = () => {
                         </div>
                     </form>
 				</Box>
-      		</Modal>            
+      		</Modal>  
+            <Dialog
+                open={openDelete}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"DELETE THIS VENDOR"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        DO you want to delete this vendor. It cannot be undone!!!
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" onClick={handleCloseDelete}>CANCEL</Button>
+                    <Button variant="outlined" color="error" onClick={deleteApi} autoFocus>
+                        DELETE
+                    </Button>
+                </DialogActions>
+            </Dialog>                      
         </div>
 
     );

@@ -40,16 +40,14 @@ export const LocationScreen = () => {
     const successHandler = (res) => {
         const msg = title === "CREATE NEW LOCATION" ? "CREATE SUCCESSFULLY" : "EDIT SUCCESSFULLY";
         successNoti(msg, 3000);
-        console.log("res", res.data);
+        console.log("res", res);
         const locationIndex = locations.findIndex(location => location.id === res.data.id);
 
         if (locationIndex !== -1) {
-            // Nếu location đã tồn tại trong mảng, thực hiện cập nhật
             const updatedLocations = [...locations];
             updatedLocations[locationIndex] = res.data;
             setLocations(updatedLocations);
         } else {
-            // Nếu location chưa tồn tại trong mảng, thực hiện thêm mới
             setLocations(prevLocations => [...prevLocations, res.data]);
         }
     };
@@ -58,7 +56,7 @@ export const LocationScreen = () => {
         successNoti("DELETE SUCCESSFULLY", 3000);
         const updatedLocations = locations.filter(location => location.id !== currentId);
         setLocations(updatedLocations);
-    }
+    };
 
     const callApi = () => {
         request("get", "/location/get-all", (res) => {
@@ -111,7 +109,7 @@ export const LocationScreen = () => {
     const deleteApi = () => {
         request("delete", `/location/delete/${currentId}`, successHandlerDelete, errorHandlers, data);
         setOpenDelete(false);
-    }
+    };
 
     useEffect(() => {
         callApi();
