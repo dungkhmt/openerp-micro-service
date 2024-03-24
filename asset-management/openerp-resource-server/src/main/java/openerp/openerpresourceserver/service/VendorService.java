@@ -8,4 +8,6 @@ public interface VendorService {
     List<Vendor> getAllVendors();
 
     Vendor addNewVendor(Vendor vendor);
+
+    Vendor editVendor(Integer Id, Vendor vendor);
 }
