@@ -53,4 +53,9 @@ public class ApplicationServiceImpl implements ApplicationService{
     public List<Application> getUniqueApplicator() {
         return applicationRepo.findDistinctApplicationsByUser();
     }
+
+    @Override
+    public List<Application> getApplicationBySemester(String semester) {
+        return applicationRepo.findApplicationsByClassSemester(semester);
+    }
 }

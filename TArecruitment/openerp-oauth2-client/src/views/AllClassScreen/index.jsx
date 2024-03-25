@@ -5,17 +5,11 @@ import IconButton from "@mui/material/IconButton";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { useHistory } from "react-router-dom";
-import {
-  Divider,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-} from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { styles } from "./index.style";
 import { SEMESTER } from "config/localize";
 import DeleteDialog from "components/dialog/DeleteDialog";
-import ApplicatorDialog from "components/dialog/ApplicatorDialog";
+import ApplicatorDialog from "./ApplicatorDialog";
 
 const AllClassScreen = () => {
   const [classes, setClasses] = useState([]);
@@ -24,7 +18,6 @@ const AllClassScreen = () => {
   const [deleteId, setDeleteId] = useState("");
   const [openApplicatorDialog, setOpenApplicatorDialog] = useState(false);
   const [infoClassId, setInfoClassId] = useState("");
-  const [applicators, setApplicators] = useState([]);
 
   const history = useHistory();
 
@@ -32,61 +25,11 @@ const AllClassScreen = () => {
     fetchData();
   }, [semester]);
 
-  useEffect(() => {
-    fetchApplicatorData();
-  }, []);
-
   const fetchData = () => {
     request("get", `/class-call/get-class-by-semester/${semester}`, (res) => {
       setClasses(res.data);
     }).then();
   };
-
-  const fetchApplicatorData = () => {
-    request("get", `/application/get-unique-applicator`, (res) => {
-      setApplicators(res.data);
-    }).then();
-  };
-
-  const applicatorColumns = [
-    {
-      title: "Mã số sinh viên",
-      field: "mssv",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
-    },
-    {
-      title: "Tên sinh viên",
-      field: "name",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
-    },
-    {
-      title: "Số điện thoại",
-      field: "phoneNumber",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
-    },
-    {
-      title: "Email",
-      field: "email",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
-    },
-    {
-      title: "Hành động",
-      sorting: false,
-      render: (rowData) => (
-        <div>
-          <IconButton variant="contained" color="primary">
-            <FormatListBulletedIcon />
-          </IconButton>
-        </div>
-      ),
-      headerStyle: { width: "10%", textAlign: "center" },
-      cellStyle: { width: "10%", textAlign: "center" },
-    },
-  ];
 
   const columns = [
     {
@@ -247,22 +190,6 @@ const AllClassScreen = () => {
           selection: false,
           pageSize: 5,
           search: true,
-          sorting: true,
-        }}
-      />
-
-      <Divider style={{ margin: "20px 0", backgroundColor: "#ccc" }} />
-
-      <h1>Danh sách sinh viên đăng ký trợ giảng</h1>
-      <StandardTable
-        title=""
-        columns={applicatorColumns}
-        data={applicators}
-        hideCommandBar
-        options={{
-          selection: false,
-          pageSize: 5,
-          search: false,
           sorting: true,
         }}
       />

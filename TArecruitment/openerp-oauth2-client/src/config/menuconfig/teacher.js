@@ -19,14 +19,14 @@ export const teacher = {
     },
     {
       id: "MENU_TEACHER.MENU_ITEM_2",
-      path: "/teacher/approving-ta",
+      path: "/teacher/request-approval",
       isPublic: false,
       text: "Xác nhận tuyển dụng",
       child: [],
     },
     {
       id: "MENU_TEACHER.MENU_ITEM_2",
-      path: "/teacher/ta-management",
+      path: "/teacher/ta-assignment",
       isPublic: false,
       text: "Phân công trợ giảng",
       child: [],
