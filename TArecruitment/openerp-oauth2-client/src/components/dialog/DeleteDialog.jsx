@@ -33,9 +33,6 @@ function DeleteDialog({ open, handleDelete, handleClose }) {
       }
       actions={
         <div>
-          <Button variant="contained" sx={styles.btn} onClick={handleClose}>
-            Hủy
-          </Button>
           <Button
             variant="contained"
             color="error"

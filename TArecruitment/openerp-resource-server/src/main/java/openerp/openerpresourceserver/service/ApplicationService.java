@@ -13,4 +13,6 @@ public interface ApplicationService {
     List<Application> getApplicationByClassId(int classCallId);
 
     List<Application> getUniqueApplicator();
+
+    List<Application> getApplicationBySemester(String semester);
 }
