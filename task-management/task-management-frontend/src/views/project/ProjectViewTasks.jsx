@@ -232,13 +232,15 @@ const ProjectViewTasks = () => {
       minWidth: 100,
       field: "dueDate",
       headerName: "Hạn",
+      align: "center",
+      headerAlign: "center",
       filterable: false,
       renderCell: ({ row }) => (
         <Typography
           variant="body2"
           sx={{ color: getDueDateColor(row.dueDate) }}
         >
-          {dayjs(row.dueDate).format("DD/MM/YYYY") ?? ""}
+          {row.dueDate ? dayjs(row.dueDate).format("DD/MM/YYYY") : " - "}
         </Typography>
       ),
     },
