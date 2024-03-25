@@ -50,4 +50,11 @@ public class ApplicationController {
         List<Application> applicators = applicationService.getUniqueApplicator();
         return ResponseEntity.ok().body(applicators);
     }
+
+    @GetMapping("/get-application-by-semester/{semester}")
+    public ResponseEntity<?> getApplicationBySemester(@PathVariable String semester) {
+        List<Application> applications = applicationService.getApplicationBySemester(semester);
+        return ResponseEntity.ok().body(applications);
+    }
+
 }
