@@ -31,7 +31,23 @@ const TaskViewHierarchy = () => {
     const fullName = `${assignee?.firstName ?? ""} ${assignee?.lastName ?? ""}`;
 
     return (
-      <Grid container spacing={2} key={hierarchy.id ?? index} sx={{ mb: 2 }}>
+      <Grid
+        container
+        spacing={2}
+        key={hierarchy.id ?? index}
+        sx={{
+          p: 2,
+          backgroundColor: (theme) =>
+            task.id === hierarchy.id ? theme.palette.grey[100] : "transparent",
+          borderRadius: 1,
+          "&:hover":
+            task.id === hierarchy.id
+              ? {}
+              : {
+                  backgroundColor: (theme) => theme.palette.grey[50],
+                },
+        }}
+      >
         <Grid item xl={5} lg={5} md={5} sm={12}>
           <Box
             sx={{
@@ -39,12 +55,14 @@ const TaskViewHierarchy = () => {
               alignItems: "center",
               ml: 6 * (hierarchy.level ?? 0),
               gap: 0.5,
+              borderLeft: (theme) => `2px solid ${theme.palette.divider}`,
+              paddingLeft: 1,
             }}
           >
             <Icon
               icon={
                 hierarchy.level !== 0
-                  ? "akar-icons:chevron-right"
+                  ? "typcn:flow-children"
                   : "gis:flag-start-b-o"
               }
               width={14}
@@ -90,7 +108,11 @@ const TaskViewHierarchy = () => {
             <Grid
               item
               sm={2}
-              sx={{ display: "flex", justifyContent: "center" }}
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
             >
               {assignee && (
                 <Tooltip title={fullName}>

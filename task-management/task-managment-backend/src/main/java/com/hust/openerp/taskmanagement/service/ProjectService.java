@@ -19,7 +19,7 @@ public interface ProjectService {
 
     void deleteProjectById(UUID id);
 
-    Page<Project> findPaginated(Pageable pageable, String searchString);
+    Page<Project> findPaginated(String memberId, Pageable pageable, String searchString);
 
     // List<StatusTaskDao> getDataBoardWithFilters(BoardFilterInputForm
     // boardFilterInputForm);
