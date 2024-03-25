@@ -64,20 +64,28 @@ public class ProjectServiceImplement implements ProjectService {
     }
 
     @Override
-    public Page<Project> findPaginated(Pageable pageable, String searchString) {
+    public Page<Project> findPaginated(String memberId, Pageable pageable, String searchString) {
         if (pageable.getSort().isUnsorted()) {
             pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
                     Sort.by(Project_.CREATED_STAMP).descending());
         }
-        if (searchString != null && !searchString.equals("")) {
-            var parser = new CriteriaParser();
 
-            GenericSpecificationsBuilder<Project> builder = new GenericSpecificationsBuilder<>();
-            var spec = builder.build(parser.parse(searchString), ProjectSpecification::new);
-            return projectRepository.findAll(spec, pageable);
+        if (searchString != null && !searchString.equals("")) {
+            // find memberId: and replace value
+            if (searchString.contains("memberId:")) {
+                searchString = searchString.replace("memberId:", "memberId:" + memberId);
+            } else {
+                searchString = "( " + searchString + " ) AND memberId:" + memberId;
+            }
         } else {
-            return projectRepository.findAll(pageable);
+            searchString = "memberId:" + memberId;
         }
+
+        var parser = new CriteriaParser();
+
+        GenericSpecificationsBuilder<Project> builder = new GenericSpecificationsBuilder<>();
+        var spec = builder.build(parser.parse(searchString), ProjectSpecification::new);
+        return projectRepository.findAll(spec, pageable);
     }
 
     // @Override
