@@ -5,6 +5,7 @@ import {
   Card,
   CardContent,
   IconButton,
+  LinearProgress,
   TextField,
   Tooltip,
   Typography,
@@ -17,11 +18,12 @@ import { Link } from "react-router-dom";
 import CustomAvatar from "../../../components/mui/avatar/CustomAvatar";
 import CustomChip from "../../../components/mui/chip";
 import { useDebounce } from "../../../hooks/useDebounce";
-import { TaskService } from "../../../services/api/task.service";
 import { StatusService } from "../../../services/api/task-status.service";
+import { TaskService } from "../../../services/api/task.service";
 import {
   getCategoryColor,
   getDueDateColor,
+  getProgressColor,
   getRandomColorSkin,
   getStatusColor,
 } from "../../../utils/color.util";
@@ -50,7 +52,7 @@ const TaskAssigned = () => {
 
   const columns = [
     {
-      flex: 0.3,
+      flex: 0.25,
       field: "name",
       headerName: "Tên",
       filterable: false,
@@ -91,7 +93,7 @@ const TaskAssigned = () => {
       ),
     },
     {
-      flex: 0.2,
+      flex: 0.15,
       field: "project",
       headerName: "Dự án",
       sortable: false,
@@ -139,6 +141,31 @@ const TaskAssigned = () => {
               color={getStatusColor(status.statusId)}
             />
           )
+        );
+      },
+    },
+    {
+      flex: 0.1,
+      field: "progress",
+      headerName: "Tiến độ",
+      align: "center",
+      headerAlign: "center",
+      sortable: false,
+      filterable: false,
+      renderCell: ({ row }) => {
+        const progress = row.progress ?? 0;
+        return (
+          <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+            <Typography variant="body2" sx={{ color: "text.primary" }}>
+              {progress}%
+            </Typography>
+            <LinearProgress
+              variant="determinate"
+              value={progress}
+              color={getProgressColor(progress)}
+              sx={{ height: 6, borderRadius: "5px", width: "100%" }}
+            />
+          </Box>
         );
       },
     },

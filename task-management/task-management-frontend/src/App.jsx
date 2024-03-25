@@ -51,7 +51,7 @@ function App() {
     <ReactKeycloakProvider
       authClient={keycloak}
       initOptions={initOptions}
-      LoadingComponent={AppLoading}
+      LoadingComponent={<AppLoading />}
       onEvent={onKeycloakEvent}
     >
       <I18nextProvider i18n={i18n}>

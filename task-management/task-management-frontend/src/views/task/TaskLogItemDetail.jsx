@@ -28,13 +28,13 @@ import { useTaskContext } from "../../hooks/useTaskContext";
 
 const TextHighlight = styled(Typography)(({ theme }) => ({
   color: theme.palette.secondary.dark,
-  fontWeight: 600,
+  fontWeight: 550,
   cursor: "pointer",
   fontSize: "0.9rem",
 }));
 
 const TextProperty = styled(Typography)({
-  fontWeight: 600,
+  fontWeight: 550,
   fontSize: "0.9rem",
 });
 
@@ -183,20 +183,24 @@ const FieldComponent = ({ field, value, isOld = false }) => {
     case "subtaskId":
       subTask = task.hierarchies.find((sub) => sub.id === value);
       return (
-        <TextHighlight
-          sx={{
-            textDecoration: "underline",
-            "&:hover": {
-              cursor: "pointer",
-              color: "primary.dark",
-              alignContent: "center",
-            },
-          }}
-          component={Link}
-          to={`/project/${project.id}/task/${value}`}
-        >
-          {subTask?.name ?? " - "}
-        </TextHighlight>
+        <Tooltip title={subTask.name}>
+          <TextHighlight
+            sx={{
+              textDecoration: "underline",
+              "&:hover": {
+                cursor: "pointer",
+                color: "primary.dark",
+                alignContent: "center",
+              },
+              maxWidth: "250px",
+            }}
+            noWrap
+            component={Link}
+            to={`/project/${project.id}/task/${value}`}
+          >
+            {subTask?.name ?? " - "}
+          </TextHighlight>
+        </Tooltip>
       );
   }
 };
