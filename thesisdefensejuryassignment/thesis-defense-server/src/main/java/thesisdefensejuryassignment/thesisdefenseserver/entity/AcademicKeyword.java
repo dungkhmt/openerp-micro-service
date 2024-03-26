@@ -33,6 +33,16 @@ public class AcademicKeyword {
     @JsonIgnore
     private List<DefenseJury> defenseJuryList;
 
+    @ManyToMany(mappedBy = "academicKeywordList")
+    @JsonIgnore
+    private List<Teacher> teacherList;
+
+    @ManyToMany(mappedBy = "academicKeywordList")
+    @JsonIgnore
+    private List<Thesis> thesisList;
+
+
+
     public String getKeyword() {
         return keyword;
     }

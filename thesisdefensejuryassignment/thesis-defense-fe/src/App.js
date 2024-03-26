@@ -18,6 +18,7 @@ import { ReactComponent as HustProgrammingLogo } from "./assets/icons/hust-progr
 import { PLATFORM_NAME } from "./config/config";
 // import history from "./history.js";
 import i18n from "./translation/i18n";
+import { AssignTeacherThesisContext } from "context/AssignTeacherThesisContext";
 
 const theme = createTheme({
   typography: {
@@ -120,7 +121,9 @@ function App() {
           <MuiThemeProvider theme={theme}>
             <CssBaseline />
             <BrowserRouter>
-              <MainRoutes />
+              <AssignTeacherThesisContext>
+                <MainRoutes />
+              </AssignTeacherThesisContext>
               <ToastContainer
                 position="bottom-center"
                 transition={Slide}

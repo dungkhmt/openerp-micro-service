@@ -5,15 +5,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.DefenseJury;
+import thesisdefensejuryassignment.thesisdefenseserver.entity.Teacher;
+import thesisdefensejuryassignment.thesisdefenseserver.entity.Thesis;
+import thesisdefensejuryassignment.thesisdefenseserver.models.AssignTeacherAndThesisToDefenseJuryIM;
 import thesisdefensejuryassignment.thesisdefenseserver.models.DefenseJuryIM;
 import thesisdefensejuryassignment.thesisdefenseserver.service.DefenseJuryServiceImpl;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
@@ -22,6 +24,8 @@ import java.security.Principal;
 
 public class DefenseJuryController {
     private DefenseJuryServiceImpl juryService;
+
+
     private static Logger logger = LogManager.getLogger(DefenseJuryController.class);
 
     @PostMapping("/save")
@@ -32,6 +36,37 @@ public class DefenseJuryController {
         if (createdJury == null){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(juryService.createNewDefenseJury(request), HttpStatus.OK);
+        return new ResponseEntity<>(createdJury, HttpStatus.OK);
+    }
+
+    @GetMapping("/teachers")
+
+    public ResponseEntity<List<Teacher>> getAllTeachers() {
+        List<Teacher> res = juryService.getAllTeachers();
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DefenseJury> getDefenseJuryById(@PathVariable String id) {
+        System.out.println(id);
+        DefenseJury res = juryService.getDefenseJuryByID(UUID.fromString(id));
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/thesis/get-all-available/{thesisDefensePlanId}")
+    public ResponseEntity<List<Thesis>> getAllAvailableThesis(@PathVariable String thesisDefensePlanId) {
+        return new ResponseEntity<>(juryService.getAllAvailableThesiss(thesisDefensePlanId), HttpStatus.OK);
+    }
+
+    @PostMapping("/assign")
+    public ResponseEntity<DefenseJury> assignTeacherAndThesisToDefenseJury(
+            @RequestBody AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList
+    ) {
+        DefenseJury defenseJury = juryService.assignTeacherAndThesis(teacherAndThesisList);
+        if (defenseJury == null){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(defenseJury, HttpStatus.OK);
     }
 }

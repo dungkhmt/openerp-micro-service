@@ -6,7 +6,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
+import thesisdefensejuryassignment.thesisdefenseserver.entity.embedded.DefenseJuryTeacherRole;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -20,13 +22,13 @@ import java.util.UUID;
 @Table(name = "defense_jury") // Entity map voi bang defense_jury
 public class DefenseJury {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, nullable = false)
     private UUID id;
 
     @Column(name = "defense_date")
     private Date defenseDate;
-    @Column(name = "name")
+    @Column(name = "name", unique = true, nullable = false)
     private String name;
 
     @ManyToOne
@@ -43,6 +45,28 @@ public class DefenseJury {
     @Column(name = "last_updated_stamp")
     private LocalDateTime updatedDateTime;
 
+    @ManyToOne
+    @JoinColumn(name ="defense_room_id", nullable = false, referencedColumnName = "id")
+    private DefenseRoom defenseRoom;
+
+    @ManyToOne
+    @JoinColumn(name ="defense_session_id", nullable = false, referencedColumnName = "id")
+    private DefenseSession defenseSession;
+
+    @ManyToMany
+    @JoinTable(
+            name ="defense_jury_keyword",
+            joinColumns = @JoinColumn(name = "defense_jury_id"),
+            inverseJoinColumns = @JoinColumn(name="keyword_id")
+    )
+    private List<AcademicKeyword> academicKeywordList;
+
+    @OneToMany(mappedBy = "defenseJury")
+    private List<Thesis> thesisList;
+    @OneToMany(mappedBy = "defenseJury")
+    private List<DefenseJuryTeacherRole> defenseJuryTeacherRoles;
+
+    /*----------------------------------------------------------------*/
     public DefenseJury (Date defenseDate, String name, ThesisDefensePlan thesisDefensePlan, Date createdTime, int maxThesis,LocalDateTime updatedDateTime){
         this.defenseDate = defenseDate;
         this.name = name;
@@ -51,15 +75,6 @@ public class DefenseJury {
         this.updatedDateTime = updatedDateTime;
         this.maxThesis = maxThesis;
     }
-
-    @ManyToMany
-    @JoinTable(
-            name ="defense_jury_keyword",
-            joinColumns = @JoinColumn(name = "defense_jury_id"),
-            inverseJoinColumns = @JoinColumn(name="keyword_id")
-    )
-    List<AcademicKeyword> academicKeywordList;
-
     public Date getDefenseDate() {
         return defenseDate;
     }
@@ -120,5 +135,43 @@ public class DefenseJury {
         return thesisDefensePlan.getId();
     }
 
+    public DefenseRoom getDefenseRoom() {
+        return defenseRoom;
+    }
 
+    public void setDefenseRoom(DefenseRoom defenseRoom) {
+        this.defenseRoom = defenseRoom;
+    }
+
+    public DefenseSession getDefenseSession() {
+        return defenseSession;
+    }
+
+    public void setDefenseSession(DefenseSession defenseSession) {
+        this.defenseSession = defenseSession;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public List<Thesis> getThesisList() {
+        return thesisList;
+    }
+
+    public void setThesisList(List<Thesis> thesisList) {
+        this.thesisList = thesisList;
+    }
+
+    public List<DefenseJuryTeacherRole> getDefenseJuryTeacherRoles() {
+        return defenseJuryTeacherRoles;
+    }
+
+    public void setDefenseJuryTeacherRoles(List<DefenseJuryTeacherRole> defenseJuryTeacherRoles) {
+        this.defenseJuryTeacherRoles = defenseJuryTeacherRoles;
+    }
 }

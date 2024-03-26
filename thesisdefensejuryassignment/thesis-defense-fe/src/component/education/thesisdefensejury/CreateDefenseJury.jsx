@@ -1,273 +1,249 @@
-import DateFnsUtils from "@date-io/date-fns";
-import { Button, Grid, TextField } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
-import SearchIcon from "@mui/icons-material/Search";
+import { Grid, TextField } from "@material-ui/core";
 import { boxChildComponent, boxComponentStyle } from "./constant";
 import {
-  FormControl,
-  InputAdornment,
-  InputLabel,
-  ListSubheader,
-  MenuItem,
-  Select,
   Modal,
-  Backdrop,
   Fade,
   Box,
   Typography,
+  FormControl,
+  MenuItem,
+  Select,
+  OutlinedInput,
+  InputLabel,
 } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
 import { request } from "../../../api";
-import { SubmitSuccess } from "../programmingcontestFE/SubmitSuccess";
-
-const modalStyle = {
-  paper: {
-    boxSizing: "border-box",
+import { errorNoti, successNoti } from "utils/notification";
+import { useForm } from "react-hook-form";
+import PrimaryButton from "component/button/PrimaryButton";
+import Checkbox from "@mui/material/Checkbox";
+import ListItemText from "@mui/material/ListItemText";
+import { useFetchData } from "hooks/useFetchData";
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+const styles = {
+  modal: {
     position: "absolute",
-    width: 600,
-    maxHeight: 600,
-    // border: '2px solid #000',
-    borderRadius: "5px",
-    boxShadow:
-      "0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%)",
-    backgroundColor: "white",
-    zIndex: 999,
-    left: "50%",
-    top: "50%",
-    transform: "translate(-50% , -50%)",
-    padding: "20px 40px",
+    top: "5%",
+    left: "20%",
+    width: 900,
+  },
+  button: {
+    display: "flex",
+    justifyContent: "end",
   },
 };
 
-function CreateDefenseJury({ open, handleClose, handleToggle }) {
-  const [name, setName] = React.useState("");
-  const [thesisPlanName, setThesisPlanName] = React.useState("");
-  const [listProgram, setListProgram] = React.useState([]);
-  const [listPlan, setListPlan] = React.useState([]);
-  const [nbr, setNbr] = React.useState("");
-  const [startDate, setStartDate] = React.useState(new Date());
-  const [openAlert, setOpenAlert] = React.useState(false);
-  const [searchText, setSearchText] = useState("");
-  const [showSubmitSuccess, setShowSubmitSuccess] = React.useState(false);
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
-    let body = {
-      name: name,
-      // program_name: program,
-      // userLoginID: userId,
-      maxThesis: nbr,
-      thesisPlanName: thesisPlanName,
-      defenseDate: startDate,
-    };
-    setTimeout(() => setOpenAlert(true), 3000);
+function CreateDefenseJury({
+  open,
+  handleClose,
+  handleToggle,
+  thesisPlanName,
+}) {
+  const [keyword, setKeyword] = useState([]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      maxThesis: "",
+      defenseDate: "",
+      defenseRoomId: 1,
+      defenseSessionId: 1,
+      academicKeywordList: [],
+    },
+  });
+  const handleFormSubmit = (data) => {
+    data.academicKeywordList = [...data.academicKeywordList, ...keyword];
+    data.thesisPlanName = thesisPlanName;
     request(
       "post",
-      "/defense_jury",
+      "/defense-jury/save",
       (res) => {
-        console.log(res.data);
-        setShowSubmitSuccess(true);
-        //   history.push(`/thesis/defense_jury/${res.data.id}`);
+        if (res.data) {
+          handleClose();
+          handleToggle();
+          successNoti("Create Successfully", true);
+        } else {
+          errorNoti("Create failed", true);
+        }
       },
       {
         onError: (e) => {
-          setShowSubmitSuccess(false);
+          console.log(e);
         },
       },
-      body
+      data
     ).then();
   };
 
-  async function getAllProgram() {
-    request(
-      // token,
-      // history,
-      "GET",
-      "/program_tranings",
-      (res) => {
-        console.log(res.data);
-        setListProgram(res.data);
-      }
-    );
-  }
+  // async function getKeywordList() {
+  //   request("GET", "/academic_keywords/get-all", (res) => {
+  //     console.log(res.data);
+  //     setKeywordList(res.data);
+  //   });
+  // }
 
-  async function getAllPlan() {
-    request(
-      // token,
-      // history,
-      "GET",
-      "/thesis-defense-plan/get-all",
-      (res) => {
-        console.log("Plan", res.data);
-        setListPlan(res.data);
-      }
-    );
-  }
+  // async function getAllRoom() {
+  //   request("GET", "/defense-room/get-all", (res) => {
+  //     console.log("Plan", res.data);
+  //     setRoomList(res.data);
+  //   });
+  // }
 
-  useEffect(() => {
-    // getAllProgram();
-    getAllPlan();
-  }, []);
-  const containsText = (text, searchText) =>
-    text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
-  useMemo(
-    () => listProgram.filter((option) => containsText(option.name, searchText)),
-    [searchText]
-  );
-  const displayedPlanOptions = useMemo(
-    () => listPlan.filter((option) => containsText(option.name, searchText)),
-    [searchText]
-  );
+  // async function getAllSession() {
+  //   request("GET", "/defense-session/get-all", (res) => {
+  //     setSessionList(res.data);
+  //   });
+  // }
+  const roomList = useFetchData("/defense-room/get-all");
+  const keywordList = useFetchData("/academic_keywords/get-all");
+  const sessionList = useFetchData("/defense-session/get-all");
+  const handleChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setKeyword(
+      // On autofill we get a stringified value.
+      typeof value === "string" ? value.split(",") : value
+    );
+  };
+
   return (
-    <div style={modalStyle.paper}>
-      <Modal open={open} onClose={handleClose} closeAfterTransition>
-        <Fade in={open}>
+    <Modal
+      open={open}
+      onClose={handleClose}
+      closeAfterTransition
+      sx={styles.modal}
+    >
+      <Fade in={open}>
+        <form onSubmit={handleSubmit(handleFormSubmit)}>
           <Box sx={boxComponentStyle}>
-            <Typography variant="h2" mb={4} component={"h2"}>
+            <Typography variant="h4" mb={4} component={"h4"}>
               Thêm mới Hội Đồng
             </Typography>
-          </Box>
-          <div>
-            <form>
-              <Box mb={3}>
-                <TextField
-                  value={name}
-                  onChange={(event) => {
-                    setName(event.target.value);
-                  }}
-                  fullWidth={true}
-                  id="input-with-icon-grid"
-                  label="Tên hội đồng"
-                />
-                <TextField
-                  fullWidth={true}
-                  label="Ngày tổ chức"
-                  variant="outlined"
-                  name="name"
-                  value={name}
-                  onChange={(event) => {
-                    setName(event.target.value);
-                  }}
-                  // onBlur={(e) => handleInputValidationThesis(e)}
-                  // {...register("name", { required: "Thiếu tên luận văn!" })}
-                  // error={!!errors?.name}
-                  // helperText={errors?.name?.message}
-                />
-              </Box>
-
-              <Grid container spacing={1} alignItems="flex-end">
-                <Grid item xs={9}>
+            <Box mb={3}>
+              <TextField
+                {...register("name", { required: true })}
+                fullWidth={true}
+                id="input-with-icon-grid"
+                label="Tên hội đồng"
+                variant="outlined"
+                margin="normal"
+              />
+              <TextField
+                fullWidth={true}
+                label="Số lượng đồ án tối đa"
+                name="maxThesis"
+                {...register("maxThesis", { required: true })}
+                variant="outlined"
+                margin="normal"
+                // onBlur={(e) => handleInputValidationThesis(e)}
+                // {...register("name", { required: "Thiếu tên luận văn!" })}
+                // error={!!errors?.name}
+                // helperText={errors?.name?.message}
+              />
+            </Box>
+            <Box sx={boxChildComponent} mb={3}>
+              <Grid container spacing={2}>
+                <Grid item={true} xs={6} spacing={2} p={2}>
+                  <span>Ngày bảo vệ</span>
                   <TextField
-                    value={name}
-                    onChange={(event) => {
-                      setName(event.target.value);
-                    }}
-                    fullWidth={true}
                     id="input-with-icon-grid"
-                    label="Tên hội đồng"
+                    {...register("defenseDate", { required: true })}
+                    fullWidth
+                    variant="outlined"
+                    type="date"
+                    placeholder="Enter"
+                    margin="normal"
                   />
                 </Grid>
-                <Grid item xs={9}>
-                  <FormControl fullWidth style={{ margin: "2% 0px" }}>
-                    <InputLabel id="search-select-label">
-                      Tên đợt bảo vệ
-                    </InputLabel>
+                <Grid item={true} xs={6} spacing={2} p={2}>
+                  <span>Phòng tổ chức</span>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel id="defense-room-id">Chọn phòng</InputLabel>
                     <Select
-                      MenuProps={{ autoFocus: false }}
-                      labelId="search-select-label"
-                      id="search-select"
-                      value={thesisPlanName}
-                      label="Options"
-                      onChange={(e) => setThesisPlanName(e.target.value)}
-                      onClose={() => setSearchText("")}
-                      renderValue={() => thesisPlanName}
+                      MenuProps={MenuProps}
+                      name="defenseRoomId"
+                      {...register("defenseRoomId")}
+                      label="Room"
+                      input={<OutlinedInput label="Tag" />}
                     >
-                      <ListSubheader>
-                        <TextField
-                          size="small"
-                          autoFocus
-                          placeholder="Type to search..."
-                          fullWidth
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <SearchIcon />
-                              </InputAdornment>
-                            ),
-                          }}
-                          onChange={(e) => setSearchText(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key !== "Escape") {
-                              e.stopPropagation();
-                            }
-                          }}
-                        />
-                      </ListSubheader>
-                      {displayedPlanOptions.map((option, i) => (
-                        <MenuItem key={i} value={option.name}>
-                          {option.name}
+                      {roomList.map((item) => (
+                        <MenuItem key={item?.id} value={item?.id}>
+                          {item?.name}
                         </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={9}>
-                  <TextField
-                    onChange={(event) => {
-                      setNbr(parseInt(event.target.value, 10));
-                    }}
-                    fullWidth={true}
-                    value={nbr}
-                    type="number"
-                    id="input-with-icon-grid"
-                    label="Số lượng tối đa Đồ Án"
-                  />
+                <Grid item={true} xs={6} spacing={2} p={2}>
+                  <span>Thời gian tổ chức</span>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel id="defense-session-label">
+                      Chọn ca bảo vệ
+                    </InputLabel>
+                    <Select
+                      MenuProps={MenuProps}
+                      label="defense-session"
+                      name="defenseSessionId"
+                      input={<OutlinedInput label="Tag" />}
+                      {...register("defenseSessionId", { required: true })}
+                    >
+                      {sessionList.map((item) => (
+                        <MenuItem key={item?.id} value={item?.id}>
+                          {item?.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
-                {/* <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <Grid item xs={9}>
-                <KeyboardDatePicker
-                  format="dd/MM/yyyy"
-                  margin="normal"
-                  label="Chọn ngày bảo vệ"
-                  value={startDate}
-                  onChange={(event) => {
-                    setStartDate(event);
-                  }}
-                  KeyboardButtonProps={{
-                    "aria-label": "change date",
-                  }}
-                />
-              </Grid>
-            </MuiPickersUtilsProvider> */}
-                <Grid item xs={2}>
-                  <Button
-                    color="primary"
-                    type="submit"
-                    onClick={handleFormSubmit}
-                    width="100%"
-                  >
-                    Tạo mới
-                  </Button>
+                <Grid item={true} xs={6} spacing={2} p={2}>
+                  <span>Keyword hội đồng</span>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel id="demo-multiple-name-label">
+                      Keyword
+                    </InputLabel>
+                    <Select
+                      multiple
+                      MenuProps={MenuProps}
+                      value={keyword}
+                      name="academicKeywordList"
+                      label="Keyword"
+                      renderValue={(selected) => selected.join(", ")}
+                      input={<OutlinedInput label="Tag" />}
+                      onChange={handleChange}
+                    >
+                      {keywordList.map((item) => (
+                        <MenuItem key={item?.id} value={item?.keyword}>
+                          <Checkbox
+                            checked={keyword.indexOf(item?.keyword) > -1}
+                          />
+                          <ListItemText primary={item?.keyword} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
-                {openAlert === true ? (
-                  <div>
-                    {showSubmitSuccess === true ? (
-                      <SubmitSuccess
-                        showSubmitSuccess={showSubmitSuccess}
-                        content={"You have saved defense jury"}
-                      />
-                    ) : (
-                      <Alert severity="error">Failed</Alert>
-                    )}
-                  </div>
-                ) : (
-                  <></>
-                )}
               </Grid>
-            </form>
-          </div>
-        </Fade>
-      </Modal>
-    </div>
+            </Box>
+            <Box sx={styles.button}>
+              <PrimaryButton type="submit">Create defense jury</PrimaryButton>
+            </Box>
+          </Box>
+        </form>
+      </Fade>
+    </Modal>
   );
 }
 

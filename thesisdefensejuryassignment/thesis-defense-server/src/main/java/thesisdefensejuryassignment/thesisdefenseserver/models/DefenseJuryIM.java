@@ -21,6 +21,10 @@ public class DefenseJuryIM {
     private String thesisPlanName;
     private Date defenseDate;
 
+    private int defenseRoomId;
+
+    private int defenseSessionId;
+
     private List<String> academicKeywordList;
 
     public String getName() {
@@ -69,5 +73,21 @@ public class DefenseJuryIM {
 
     public void setAcademicKeywordList(List<String> academicKeywordList) {
         this.academicKeywordList = academicKeywordList;
+    }
+
+    public int getDefenseRoomId() {
+        return defenseRoomId;
+    }
+
+    public void setDefenseRoomId(int defenseRoomId) {
+        this.defenseRoomId = defenseRoomId;
+    }
+
+    public int getDefenseSessionId() {
+        return defenseSessionId;
+    }
+
+    public void setDefenseSessionId(int defenseSessionId) {
+        this.defenseSessionId = defenseSessionId;
     }
 }

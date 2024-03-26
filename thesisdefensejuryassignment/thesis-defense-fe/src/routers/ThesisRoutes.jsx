@@ -8,7 +8,7 @@ import EditThesis from "../component/education/thesisdefensejury/EditThesis";
 import DefensePlanManager from "../component/education/thesisdefensejury/DefensePlanManager";
 import ThesisDetail from "../component/education/thesisdefensejury/ThesisDetail";
 import ThesisDefensePlans from "../component/education/thesisdefensejury/ThesisDefensePlans";
-import AssginTeacherToPlan from "../component/education/thesisdefensejury/AssignTeacherToPlan";
+import AssginTeacherToPlan from "../component/education/thesisdefensejury/AssignTeacherAndThesisToDefenseJury";
 
 export default function ThesisRoutes() {
   let { pathname } = useLocation();
@@ -17,11 +17,6 @@ export default function ThesisRoutes() {
     <>
       <Route element={<CreateThesis />} path={`${path}/create`} exact />
       <Route element={<EditThesis />} path={`${path}/edit/:id`} exact />
-      <Route
-        element={<CreateDefenseJury />}
-        path={`${path}/defense_jury/create`}
-        exact
-      />
       <Route
         element={<DefenseJuryDetail />}
         path={`${path}/defense_jury/:id`}

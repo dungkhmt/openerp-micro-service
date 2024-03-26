@@ -4,18 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import thesisdefensejuryassignment.thesisdefenseserver.entity.AcademicKeyword;
-import thesisdefensejuryassignment.thesisdefenseserver.entity.DefenseJury;
-import thesisdefensejuryassignment.thesisdefenseserver.entity.ThesisDefensePlan;
+import thesisdefensejuryassignment.thesisdefenseserver.entity.*;
+import thesisdefensejuryassignment.thesisdefenseserver.entity.embedded.DefenseJuryTeacherRole;
+import thesisdefensejuryassignment.thesisdefenseserver.models.AssignTeacherAndThesisToDefenseJuryIM;
 import thesisdefensejuryassignment.thesisdefenseserver.models.DefenseJuryIM;
-import thesisdefensejuryassignment.thesisdefenseserver.repo.AcademicKeywordRepo;
-import thesisdefensejuryassignment.thesisdefenseserver.repo.DefenseJuryRepo;
-import thesisdefensejuryassignment.thesisdefenseserver.repo.ThesisDefensePlanRepo;
+import thesisdefensejuryassignment.thesisdefenseserver.models.DefenseJuryTeacherRoleIM;
+import thesisdefensejuryassignment.thesisdefenseserver.repo.*;
 
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @Log4j2
 @AllArgsConstructor
@@ -30,6 +29,20 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
     private ThesisDefensePlanRepo thesisDefensePlanRepo;
     @Autowired
     private AcademicKeywordRepo academicKeywordRepo;
+    @Autowired
+    private DefenseRoomRepo defenseRoomRepo;
+    @Autowired
+    private DefenseSessionRepo defenseSessionRepo;
+
+    @Autowired
+    private TeacherRepo teacherRepo;
+    @Autowired
+    private ThesisRepo thesisRepo;
+    @Autowired
+    private RoleRepo roleRepo;
+
+    @Autowired
+    private DefenseJuryTeacherRoleRepo defenseJuryTeacherRoleRepo;
     @Override
     public DefenseJury createNewDefenseJury(DefenseJuryIM defenseJury) {
         DefenseJury newDefenseJury = new DefenseJury();
@@ -50,12 +63,71 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
             }
             academicKeywordList.add(foundAcademicKeyword);
         }
+        int defenseRoomId = defenseJury.getDefenseRoomId();
+        DefenseRoom defenseRoom = defenseRoomRepo.findById(defenseRoomId).orElse(null);
+        if (defenseRoom == null){
+            return  null;
+        }
+
+        int defenseSessionId = defenseJury.getDefenseSessionId();
+        DefenseSession defenseSession = defenseSessionRepo.findById(defenseSessionId).orElse(null);
+
+        if (defenseSession == null){
+            return null;
+        }
+        newDefenseJury.setDefenseRoom(defenseRoom);
+        newDefenseJury.setDefenseSession(defenseSession);
         newDefenseJury.setThesisDefensePlan(thesisDefensePlan);
         newDefenseJury.setAcademicKeywordList(academicKeywordList);
         newDefenseJury.setName(defenseJury.getName());
         newDefenseJury.setDefenseDate(defenseJury.getDefenseDate());
         newDefenseJury.setCreatedTime(new Date());
         newDefenseJury.setMaxThesis(defenseJury.getMaxThesis());
+
         return defenseJuryRepo.save(newDefenseJury);
     }
+
+    @Override
+    public List<Teacher> getAllTeachers() {
+        return teacherRepo.findAll();
+    }
+
+    @Override
+    public DefenseJury getDefenseJuryByID(UUID id) {
+        return defenseJuryRepo.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<Thesis> getAllAvailableThesiss(String thesisDefensePlanId) {
+        return thesisRepo.findAllAvailableThesis(thesisDefensePlanId);
+    }
+
+    @Override
+    public DefenseJury assignTeacherAndThesis(AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList) {
+        DefenseJury defenseJury = defenseJuryRepo.findById(UUID.fromString(teacherAndThesisList.getDefenseJuryId())).orElse(null);
+        if (defenseJury == null) return null;
+        List<DefenseJuryTeacherRoleIM> defenseJuryTeacherRole = teacherAndThesisList.getDefenseJuryTeacherRole();
+        for (DefenseJuryTeacherRoleIM defenseJuryTeacherRoleIM : defenseJuryTeacherRole) {
+            String teacherName = defenseJuryTeacherRoleIM.getTeacherName();
+            int roleId = defenseJuryTeacherRoleIM.getRoleId();
+            Teacher teacher = teacherRepo.findByTeacherName(teacherName).orElse(null);
+            Role teacherRole = roleRepo.findById(roleId).orElse(null);
+            if (teacherRole == null) return null;
+            if (teacher == null) return null;
+            DefenseJuryTeacherRole defenseJuryTeacherRole1 = new DefenseJuryTeacherRole(teacher,teacherRole, defenseJury);
+            DefenseJuryTeacherRole newDefenseJuryTeacherRole= defenseJuryTeacherRoleRepo.save(defenseJuryTeacherRole1);
+            defenseJury.getDefenseJuryTeacherRoles().add(newDefenseJuryTeacherRole);
+        }
+        List<String> thesisList = teacherAndThesisList.getThesisIdList();
+        for (String thesisId : thesisList){
+            System.out.println(UUID.fromString(thesisId));
+            Thesis thesis = thesisRepo.findById(UUID.fromString(thesisId)).orElse(null);
+            if (thesis == null)return null;
+            thesis.setDefenseJury(defenseJury);
+            defenseJury.getThesisList().add(thesisRepo.save(thesis));
+        }
+        return defenseJuryRepo.save(defenseJury);
+    }
+
+
 }

@@ -1,70 +1,63 @@
-import {Card} from "@material-ui/core/";
+import { Card } from "@material-ui/core/";
 import Delete from "@material-ui/icons/Delete";
-import {Alert} from "@material-ui/lab";
-import MaterialTable, {MTableToolbar} from "material-table";
-import {useEffect, useState} from "react";
-import {request} from "../../../api";
+import { Alert } from "@material-ui/lab";
+import MaterialTable, { MTableToolbar } from "material-table";
+import { useEffect, useState } from "react";
+import { request } from "../../../api";
 import ModalLoading from "./ModalLoading";
 
 export default function ElementDeleteTeacher({
-                                               teacher,
-                                               defenseJuryID,
-                                               handleToggleTeacher,
-                                               handlerIsLoad,
-                                               handlerNotLoad
-                                             }) {
+  teacher,
+  defenseJuryID,
+  handleToggleTeacher,
+  handlerIsLoad,
+  handlerNotLoad,
+}) {
   const [err, setErr] = useState("");
-  const [openLoading, setOpenLoading] = useState(false)
+  const [openLoading, setOpenLoading] = useState(false);
 
   async function DeleteTeacherById(teacherID, defenseJuryID) {
-    setOpenLoading(true)
-    handlerIsLoad()
+    setOpenLoading(true);
+    handlerIsLoad();
     var body = {
-      teacherId: teacherID
-    }
+      teacherId: teacherID,
+    };
     request(
       "post",
       `/defense_jury/${defenseJuryID}/deleteTeacher`,
       (res) => {
-        console.log(res.data)
+        console.log(res.data);
         if (res.data.ok) {
-          handleToggleTeacher()
-
+          handleToggleTeacher();
         } else if (res.data.err !== "") {
-          setErr(res.data.err)
-          setTimeout(
-            () => setErr(""),
-            5000
-          );
-
+          setErr(res.data.err);
+          setTimeout(() => setErr(""), 5000);
         }
         // setShowSubmitSuccess(true);
         //   history.push(`/thesis/defense_jury/${res.data.id}`);
-        handlerNotLoad()
-        setOpenLoading(false)
+        handlerNotLoad();
+        setOpenLoading(false);
       },
       {
         onError: (e) => {
           // setShowSubmitSuccess(false);
-          console.log(e)
-        }
+          console.log(e);
+        },
       },
       body
     ).then();
   }
 
-
   const columns = [
-    {title: "STT", field: "stt"},
-    {title: "Tên giảng viên", field: "teacherName"},
+    { title: "STT", field: "stt" },
+    { title: "Tên giảng viên", field: "teacherName" },
   ];
   useEffect(() => {
     //   getListTeacherOfDefenseJury();
-
   }, []);
   return (
     <Card>
-      <MaterialTable
+      {/* <MaterialTable
         title={""}
         columns={columns}
         actions={[
@@ -95,7 +88,7 @@ export default function ElementDeleteTeacher({
       />
       {(err !== "") ?
         <Alert severity={(err !== "") ? 'error' : 'success'}>{(err !== "") ? err : "Successed"}</Alert> : <></>}
-      <ModalLoading openLoading={openLoading}/>
+      <ModalLoading openLoading={openLoading}/> */}
     </Card>
   );
 }

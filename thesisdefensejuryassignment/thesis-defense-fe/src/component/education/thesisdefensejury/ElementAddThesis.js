@@ -1,98 +1,57 @@
-import {Card} from "@material-ui/core/";
-import Add from "@mui/icons-material/Add";
-import Alert from "@mui/material/Alert";
-import MaterialTable, {MTableToolbar} from "material-table";
-import {useEffect, useState} from "react";
-import {request} from "../../../api";
-import ModalLoading from "./ModalLoading";
+import React, { useEffect, useState } from "react";
+import { StandardTable } from "erp-hust/lib/StandardTable";
+import KeywordChip from "component/common/KeywordChip";
+import { Checkbox } from "@material-ui/core/";
+import { useAssignTeacherThesis } from "context/AssignTeacherThesisContext";
 
-export default function ElementAddThesis({
-                                           notBelongThesis,
-                                           defenseJuryID,
-                                           handleToggle,
-                                           getAllThesisNotBelongToDefenseJury
-                                         }) {
-  const [err, setErr] = useState("");
-  const [openLoading, setOpenLoading] = useState(false);
-
-  async function AddThesisById(thesisID, defenseJuryID) {
-    setOpenLoading(true)
-    var body = {
-      thesisId: thesisID
-    }
-    request(
-      "post",
-      `/defense_jury/${defenseJuryID}/addJury`,
-      (res) => {
-        console.log(res.data)
-        if (res.data.ok) {
-          handleToggle()
-
-        } else if (res.data.err !== "") {
-          // setShowSubmitSuccess(true)
-          setErr(res.data.err)
-          setTimeout(
-            () => setErr(""),
-            5000
-          );
-
-        }
-
-        setOpenLoading(false)
-        // setShowSubmitSuccess(true);
-        //   history.push(`/thesis/defense_jury/${res.data.id}`);
-      },
-      {
-        onError: (e) => {
-          // setShowSubmitSuccess(false);
-          console.log(e)
-        }
-      },
-      body
-    ).then();
-  }
+export default function ElementAddThesis({ availableThesisList }) {
+  const { assignedThesis, handleSelectThesis } = useAssignTeacherThesis();
 
   const columns = [
-    {title: "STT", field: "stt"},
-    {title: "Tên luận văn", field: "thesisName"},
-    {title: "Người tạo", field: "studentName"},
-  ];
-  useEffect(() => {
-    getAllThesisNotBelongToDefenseJury();
-
-  }, []);
-  return (
-    <Card>
-      <MaterialTable
-        title={""}
-        columns={columns}
-        actions={[
-          {
-            icon: Add,
-            tooltip: "Add Thesis",
-            onClick: (event, rowData) => {
-              AddThesisById(rowData.id, defenseJuryID)
-
-            }
+    {
+      title: "",
+      render: (rowData) => (
+        <Checkbox
+          checked={
+            assignedThesis.find((item) => item === rowData?.id) !== undefined
           }
-        ]}
-        data={notBelongThesis}
-        components={{
-          Toolbar: (props) => (
-            <div style={{position: "relative"}}>
-              <MTableToolbar {...props} />
-              <div
-                style={{position: "absolute", top: "16px", right: "350px"}}
-              >
-
-              </div>
-            </div>
-          ),
-        }}
-      />
-      {(err !== "") ?
-        <Alert severity={(err !== "") ? 'error' : 'success'}>{(err !== "") ? err : "Successed"}</Alert> : <></>}
-      <ModalLoading openLoading={openLoading}/>
-    </Card>
+          onChange={(e) => {
+            handleSelectThesis(rowData);
+          }}
+          color="default"
+        />
+      ),
+    },
+    { title: "Tên đồ án", field: "thesisName" },
+    {
+      title: "Sinh viên",
+      field: "studentName",
+    },
+    {
+      title: "Giáo viên",
+      field: "supervisor",
+      render: (rowData) => rowData?.supervisor?.teacherName,
+    },
+    {
+      title: "Keyword",
+      field: "academicKeywordList",
+      render: (rowData) =>
+        rowData.academicKeywordList.map(({ keyword, description }) => (
+          <KeywordChip key={keyword} keyword={description} />
+        )),
+    },
+  ];
+  return (
+    <StandardTable
+      title={"Danh sách đồ án"}
+      data={availableThesisList}
+      columns={columns}
+      options={{
+        selection: false,
+        pageSize: 5,
+        search: true,
+        sorting: true,
+      }}
+    />
   );
 }

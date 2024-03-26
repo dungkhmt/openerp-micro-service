@@ -9,19 +9,18 @@ import { drawerWidth } from "../layout/sidebar/v1/SideBar";
 import { useNotificationState } from "../state/NotificationState";
 import DefenseJury from "../component/education/thesisdefensejury/DefenseJury";
 import DefenseJuryDetail from "../component/education/thesisdefensejury/DefenseJuryDetail";
-import CreateDefenseJury from "../component/education/thesisdefensejury/CreateDefenseJury";
 import Thesis from "../component/education/thesisdefensejury/Thesis";
 import CreateThesis from "../component/education/thesisdefensejury/CreateThesis";
 import EditThesis from "../component/education/thesisdefensejury/EditThesis";
 import DefensePlanManager from "../component/education/thesisdefensejury/DefensePlanManager";
 import ThesisDetail from "../component/education/thesisdefensejury/ThesisDetail";
 import ThesisDefensePlans from "../component/education/thesisdefensejury/ThesisDefensePlans";
-import AssginTeacherToPlan from "../component/education/thesisdefensejury/AssignTeacherToPlan";
+import AssginTeacherToPlan from "../component/education/thesisdefensejury/AssignTeacherAndThesisToDefenseJury";
+import NotFound from "views/errors/NotFound";
 // import NotFound from "../views/errors/NotFound";
 // import AdminRoute from "./AdminRoute";
 // import ProgrammingContestRoutes from "./ProgrammingContestRoutes";
-import ThesisRoutes from "./ThesisRoutes";
-// import WhiteBoardRoute from "./WhiteBoardRoute";
+import AssignTeacherAndThesisToDefenseJury from "../component/education/thesisdefensejury/AssignTeacherAndThesisToDefenseJury"; // import WhiteBoardRoute from "./WhiteBoardRoute";
 // import UploadUser from "../component/userlogin/UploadUser";
 // import ContestManagerRankingPublicV2 from "../component/education/programmingcontestFE/ContestManagerRankingPublicV2";
 
@@ -56,55 +55,29 @@ function MainAppRoute(props) {
     <Layout>
       <Suspense fallback={<LinearProgress sx={classes.loadingProgress} />}>
         <Routes>
-          <>
-            <Route path="/" element={<Home />} />
-          </>
-          {/* <Route
-            path={"/programming-contest/public/:contestId/ranking"}
-            element={<ContestManagerRankingPublicV2 />}
-          />
- */}
-          {/* consider remove */}
-          {/*<PrivateRoute element={UserLoginRoute} path="/userlogin" />*/}
-
-          {/* <PrivateRoute element={EduRoute} path="/edu" />
-          <PrivateRoute element={WhiteBoardRoute} path="/whiteboard" />
-
-          <PrivateRoute element={AdminRoute} path="/admin/data" /> */}
-          {/*<PrivateRoute element={AccountActivationRoute} path="/activation" />*/}
-          {/* <PrivateRoute
-            element={ProgrammingContestRoutes}
-            path="/programming-contest"
-          />
-          <PrivateRoute element={ThesisRoutes} path="/thesis" />
-
-          <PrivateRoute element={UploadUser} exact path={`/user/upload`} /> */}
-
-          {/* <Route element={error} path="*" /> */}
-          {/* <Route element={<NotFound />} /> */}
+          <Route path="/" element={<Home />} />
+          <Route element={<NotFound />} path="*" />
           <Route element={<PrivateRoute />}>
-            <Route element={<CreateThesis />} path={`/thesis/create`} exact />
-            <Route element={<EditThesis />} path={`/thesis/edit/:id`} exact />
-            <Route
-              element={<CreateDefenseJury />}
-              path={`/thesis/defense_jury/create`}
-              exact
-            />
-            <Route
+            <Route path={`/thesis/thesis_defense_plan`}>
+              <Route index element={<ThesisDefensePlans />} />
+              <Route path={`:id`}>
+                <Route index element={<DefensePlanManager />} />
+                <Route
+                  path="/thesis/thesis_defense_plan/:id/defense_jury/:juryId"
+                  element={<DefenseJuryDetail />}
+                  exact
+                />
+              </Route>
+            </Route>
+            {/* <Route element={<CreateThesis />} path={`/thesis/create`} exact />
+            <Route element={<EditThesis />} path={`/thesis/edit/:id`} exact /> */}
+
+            {/* <Route
               element={<DefenseJuryDetail />}
               path={`/thesis/defense_jury/:id`}
               exact
-            />
-            <Route
-              element={<ThesisDefensePlans />}
-              path={`/thesis/thesis_defense_plan`}
-              exact
-            />
-            <Route
-              element={<DefensePlanManager />}
-              path={`/thesis/thesis_defense_plan/:id`}
-              exact
-            />
+            /> */}
+            {/* 
             <Route
               element={<AssginTeacherToPlan />}
               path={`/thesis/defensePlan/:id/assignTeacher`}
@@ -112,7 +85,7 @@ function MainAppRoute(props) {
             />
             <Route element={<DefenseJury />} path={`/thesis/defense_jury`} />
             <Route element={<ThesisDetail />} path={`/thesis/:id`} exact />
-            <Route element={<Thesis />} path={`/thesis`} />
+            <Route element={<Thesis />} path={`/thesis`} /> */}
           </Route>
         </Routes>
       </Suspense>

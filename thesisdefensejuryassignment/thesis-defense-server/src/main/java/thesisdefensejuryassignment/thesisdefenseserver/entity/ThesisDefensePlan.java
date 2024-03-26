@@ -52,6 +52,10 @@ public class ThesisDefensePlan {
 //    @JsonIgnore
     private List<DefenseJury> defenseJuries;
 
+    @OneToMany(mappedBy = "thesisDefensePlan")
+    @JsonIgnore
+    private List<Thesis> thesisList;
+
     public String getId() {
         return id;
     }
