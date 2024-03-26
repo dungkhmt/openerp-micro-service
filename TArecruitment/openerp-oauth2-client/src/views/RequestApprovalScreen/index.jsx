@@ -61,7 +61,10 @@ const RequestApprovalScreen = () => {
       "put",
       `/application/update-application-status/${id}`,
       (res) => {
-        setOriginalApplications(applications);
+        const updatedOriginalApplications = originalApplications.map((app) =>
+          app.id === id ? { ...app, applicationStatus: value } : app
+        );
+        setOriginalApplications(updatedOriginalApplications);
       },
       {},
       updatedApplication
