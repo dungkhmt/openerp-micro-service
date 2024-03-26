@@ -57,4 +57,15 @@ public class ApplicationController {
         return ResponseEntity.ok().body(applications);
     }
 
+    @PutMapping("/update-application-status/{applicationId}")
+    public ResponseEntity<?> updateApplicationStatus(@PathVariable int applicationId, @RequestBody Application updateApplication) {
+        try {
+            System.out.print(updateApplication.getApplicationStatus());
+            Application application = applicationService.updateApplicationStatus(applicationId, updateApplication.getApplicationStatus());
+            return ResponseEntity.ok().body(application);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
 }
