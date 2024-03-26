@@ -6,6 +6,7 @@ import openerp.openerpresourceserver.message.ResponseMessage;
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.model.entity.ClassOpened;
 import openerp.openerpresourceserver.model.entity.Schedule;
+import openerp.openerpresourceserver.model.entity.general.GeneralClassOpened;
 import openerp.openerpresourceserver.service.ExcelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -26,49 +27,74 @@ public class ExcelController {
     @Autowired
     ExcelService fileService;
 
-//    @GetMapping(value = "/download-template")
-//    public ResponseEntity<Resource> getFile() {
-//        String filename = "schedules_template.xlsx";
-//        InputStreamResource file = new InputStreamResource(fileService.load());
-//        return ResponseEntity.ok()
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-//                .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-//                .body(file);
-//    }
+    // @GetMapping(value = "/download-template")
+    // public ResponseEntity<Resource> getFile() {
+    // String filename = "schedules_template.xlsx";
+    // InputStreamResource file = new InputStreamResource(fileService.load());
+    // return ResponseEntity.ok()
+    // .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+    // .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+    // .body(file);
+    // }
 
-//    @PostMapping(value = "/upload")
-//    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file) {
-//        String message = "";
-//        if (ExcelHelper.hasExcelFormat(file)) {
-//            try {
-//                fileService.save(file);
-//                message = "Uploaded the file successfully: " + file.getOriginalFilename();
-//                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
-//            } catch (Exception e) {
-//                message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-//                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
-//            }
-//        }
-//        message = "Please upload an excel file!";
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(message));
-//    }
+    // @PostMapping(value = "/upload")
+    // public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file")
+    // MultipartFile file) {
+    // String message = "";
+    // if (ExcelHelper.hasExcelFormat(file)) {
+    // try {
+    // fileService.save(file);
+    // message = "Uploaded the file successfully: " + file.getOriginalFilename();
+    // return ResponseEntity.status(HttpStatus.OK).body(new
+    // ResponseMessage(message));
+    // } catch (Exception e) {
+    // message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+    // return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new
+    // ResponseMessage(message));
+    // }
+    // }
+    // message = "Please upload an excel file!";
+    // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new
+    // ResponseMessage(message));
+    // }
+
+    @PostMapping(value = "/upload-general")
+    public ResponseEntity<List<GeneralClassOpened>> uploadFileGeneralCLassOpened(@RequestParam("file") MultipartFile file,
+            @RequestParam("semester") String semester) {
+        String message = "";
+        if (ExcelHelper.hasExcelFormat(file)) {
+            try {
+                List<GeneralClassOpened> classOpenedConflict = fileService.saveGeneralClassOpeneds(file);
+                // message = "Uploaded the file successfully: " + file.getOriginalFilename();
+                // return ResponseEntity.status(HttpStatus.OK).body(new
+                // ResponseMessage(message));
+                return ResponseEntity.status(HttpStatus.OK).body(classOpenedConflict);
+            } catch (Exception e) {
+                // message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
+            }
+        }
+        // message = "Please upload an excel file!";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
 
     @PostMapping(value = "/upload-class-opened")
     public ResponseEntity<List<ClassOpened>> uploadFileCLassOpened(@RequestParam("file") MultipartFile file,
-                                                                 @RequestParam("semester") String semester) {
+            @RequestParam("semester") String semester) {
         String message = "";
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
                 List<ClassOpened> classOpenedConflict = fileService.saveClassOpened(file, semester);
-//                message = "Uploaded the file successfully: " + file.getOriginalFilename();
-//                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+                // message = "Uploaded the file successfully: " + file.getOriginalFilename();
+                // return ResponseEntity.status(HttpStatus.OK).body(new
+                // ResponseMessage(message));
                 return ResponseEntity.status(HttpStatus.OK).body(classOpenedConflict);
             } catch (Exception e) {
-//                message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+                // message = "Could not upload the file: " + file.getOriginalFilename() + "!";
                 return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
             }
         }
-//        message = "Please upload an excel file!";
+        // message = "Please upload an excel file!";
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
@@ -78,7 +104,8 @@ public class ExcelController {
         InputStreamResource file = new InputStreamResource(fileService.loadClassConflict(classOpenedList));
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .contentType(
+                        MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(file);
     }
 
@@ -101,11 +128,12 @@ public class ExcelController {
         InputStreamResource file = new InputStreamResource(fileService.loadExport(requestDto));
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .contentType(
+                        MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(file);
     }
 
-    //-------------Classroom---------------
+    // -------------Classroom---------------
     @PostMapping(value = "/upload-classroom")
     public ResponseEntity<ResponseMessage> uploadFileClassroom(@RequestParam("file") MultipartFile file) {
         String message = "";
