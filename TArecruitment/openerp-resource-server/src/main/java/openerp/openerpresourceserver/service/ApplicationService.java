@@ -15,4 +15,6 @@ public interface ApplicationService {
     List<Application> getUniqueApplicator();
 
     List<Application> getApplicationBySemester(String semester);
+
+    Application updateApplicationStatus(int id, String status);
 }

@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import { request } from "../../api";
 import { warningNoti, successNoti } from "../../utils/notification";
+import { SEMESTER } from "config/localize";
 import styles from "./index.style";
 
 const RegisterClassScreen = () => {
@@ -21,7 +22,7 @@ const RegisterClassScreen = () => {
     subjectName: "",
     classRoom: "",
     note: "",
-    semester: "",
+    semester: SEMESTER,
   });
 
   const handleChange = (event) => {

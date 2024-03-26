@@ -1,5 +1,6 @@
 import { Route, Switch, useRouteMatch } from "react-router";
 import AllClassScreen from "views/AllClassScreen";
+import AssigningScreen from "views/AssigningScreen";
 import ClassInformationScreen from "views/ClassInformationScreen";
 import RegisterClassScreen from "views/RegisterClassScreen";
 import RequestApprovalScreen from "views/RequestApprovalScreen";
@@ -28,6 +29,11 @@ export default function TeacherRouter() {
           component={RequestApprovalScreen}
           exact
           path={`${path}/request-approval`}
+        ></Route>
+        <Route
+          component={AssigningScreen}
+          exact
+          path={`${path}/ta-assignment`}
         ></Route>
       </Switch>
     </div>
