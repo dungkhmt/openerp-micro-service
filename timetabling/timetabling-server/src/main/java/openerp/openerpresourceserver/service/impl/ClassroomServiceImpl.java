@@ -53,7 +53,8 @@ public class ClassroomServiceImpl implements ClassroomService {
             }
             List<ClassOpened> classOpenedList = classOpenedRepo.getAllByClassroom(classroom.getClassroom(), null);
             if (!classOpenedList.isEmpty()) {
-                throw new ClassroomUsedException("Phòng học " + classroom.getClassroom() + " đang được sử dụng. Không thể sửa đổi!");
+                throw new ClassroomUsedException(
+                        "Phòng học " + classroom.getClassroom() + " đang được sử dụng. Không thể sửa đổi!");
             }
         }
         classroom.setClassroom(requestDto.getClassroom());
@@ -93,5 +94,30 @@ public class ClassroomServiceImpl implements ClassroomService {
         ids.forEach(el -> {
             classroomRepo.deleteById(el);
         });
+    }
+
+    @Override
+    public void clearAllClassRoom() {
+        classOpenedRepo.deleteAll();
+    }
+
+    @Override
+    public void clearAllClassRoomTimetable() {
+        // Retrieve the list of ClassOpened entities
+        List<ClassOpened> classOpenedList = classOpenedRepo.findAll();
+
+        // Loop through the entities and clear the timetable fields
+        for (ClassOpened classOpened : classOpenedList) {
+            classOpened.setSecondClassroom(null);
+            classOpened.setSecondStartPeriod(null);
+            classOpened.setWeekday(null);
+            classOpened.setStartPeriod(null);
+            classOpened.setClassroom(null);
+            classOpened.setSecondWeekday(null);
+            classOpened.setIsSeparateClass(false); // Assuming 'isSeparateClass' corresponds to 'separateClass' field
+        }
+
+        // Save the modified entities
+        classOpenedRepo.saveAll(classOpenedList);
     }
 }

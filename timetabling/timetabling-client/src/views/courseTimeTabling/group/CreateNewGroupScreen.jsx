@@ -14,7 +14,7 @@ export default function CreateNewSemester({ open, handleClose, handleUpdate, han
     request("get", "/classroom/get-all-building", (res) => {
       setBuildings(res.data);
     });
-
+    console.log()
     if (selectedGroup) {
       setNewGroup(selectedGroup.groupName);
       setNewPriorityBuilding(selectedGroup.priorityBuilding);
@@ -36,7 +36,6 @@ export default function CreateNewSemester({ open, handleClose, handleUpdate, han
     };
 
     const apiEndpoint = isUpdate ? `/group/update` : "/group/create";
-
     request("post", apiEndpoint, (res) => {
       handleUpdate(res.data);
       handleRefreshData();

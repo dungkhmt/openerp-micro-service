@@ -9,6 +9,8 @@ import openerp.openerpresourceserver.model.entity.Schedule;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 public interface ClassOpenedService {
 
     List<ClassOpened> getAll();
@@ -26,4 +28,6 @@ public interface ClassOpenedService {
     void makeSchedule(MakeScheduleDto requestDto);
 
     void automationMakeScheduleForCTTT(AutoMakeScheduleDto autoMakeScheduleDto);
+
+    void autoMakeGeneralSchedule(@Valid AutoMakeScheduleDto autoMakeScheduleDto);
 }

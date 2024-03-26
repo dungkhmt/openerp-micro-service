@@ -5,6 +5,7 @@ import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.model.entity.ClassOpened;
 import openerp.openerpresourceserver.model.entity.Classroom;
 import openerp.openerpresourceserver.model.entity.Schedule;
+import openerp.openerpresourceserver.model.entity.general.GeneralClassOpened;
 import openerp.openerpresourceserver.repo.ClassOpenedRepo;
 import openerp.openerpresourceserver.repo.ClassroomRepo;
 import openerp.openerpresourceserver.repo.ScheduleRepo;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 import openerp.openerpresourceserver.helper.ExcelHelper;
+import openerp.openerpresourceserver.helper.GeneralExcelHelper;
 
 @Service
 public class ExcelService {
@@ -76,6 +78,15 @@ public class ExcelService {
 //            throw new RuntimeException("fail to store excel data: " + e.getMessage());
 //        }
 //    }
+    public List<GeneralClassOpened> saveGeneralClassOpeneds(MultipartFile file) {
+        try {
+            return GeneralExcelHelper.convertFromExcelToGeneralClassOpened(file.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ArrayList<GeneralClassOpened>();
+        }
+    }
+
 
     public List<ClassOpened> saveClassOpened(MultipartFile file, String semester) {
         try {
