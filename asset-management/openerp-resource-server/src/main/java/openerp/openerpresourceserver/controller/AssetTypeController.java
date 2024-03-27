@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -22,6 +23,14 @@ public class AssetTypeController {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(assetTypes);
+    }
+
+    @GetMapping("/get/{Id}")
+    public ResponseEntity<?> getTypeById(@PathVariable Integer Id){
+        Optional<AssetType> assetType = assetTypeService.getTypeById(Id);
+        return ResponseEntity
+            .status(HttpStatus.FOUND)
+            .body(assetType);
     }
 
     @PostMapping("/add-new")
