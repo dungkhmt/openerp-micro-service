@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -22,6 +23,19 @@ public class LocationController {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(locations);
+    }
+
+    @GetMapping("/get/{Id}")
+    public ResponseEntity<?> getLocationById(@PathVariable Integer Id){
+        Optional<Location> location = locationService.getLocationById(Id);
+        if(location.isPresent()){
+            return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .body(location);
+        } else {
+            return (ResponseEntity<?>) ResponseEntity
+                .status(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/add-new")
