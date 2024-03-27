@@ -21,7 +21,7 @@ const columns = [
     ),
   },
   {
-    flex: 0.45,
+    flex: 0.4,
     field: "name",
     headerName: "Tên dự án",
     renderCell: (params) => (
@@ -42,7 +42,19 @@ const columns = [
     ),
   },
   {
-    flex: 0.2,
+    flex: 0.1,
+    field: "role",
+    headerName: "Vai trò",
+    align: "center",
+    headerAlign: "center",
+    renderCell: (params) => (
+      <Typography variant="body2" sx={{ color: "text.primary" }}>
+        {params.row.role}
+      </Typography>
+    ),
+  },
+  {
+    flex: 0.15,
     field: "creator",
     headerName: "Người tạo",
     align: "center",
@@ -123,7 +135,9 @@ const Projects = () => {
         const projectPagination = await ProjectService.getProjects({
           page: paginationModel.page,
           size: paginationModel.pageSize,
-          search: `code:*${encodedQuery}* OR name:*${encodedQuery}*`,
+          search: encodedQuery
+            ? `code:*${encodedQuery}* OR name:*${encodedQuery}*`
+            : "",
           sort: `${column},${sort}`,
         });
 
@@ -144,7 +158,7 @@ const Projects = () => {
   }, [fetchProjects, searchDebounce, sort, sortColumn]);
 
   return (
-    <Card sx={{ height: "85vh" }}>
+    <Card sx={{ height: "85vh", boxShadow: (theme) => theme.shadows[1] }}>
       <CardHeader title="Danh sách dự án" />
       <DataGrid
         pagination

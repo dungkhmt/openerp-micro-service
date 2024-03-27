@@ -53,4 +53,26 @@ public class ApplicationServiceImpl implements ApplicationService{
     public List<Application> getUniqueApplicator() {
         return applicationRepo.findDistinctApplicationsByUser();
     }
+
+    @Override
+    public List<Application> getApplicationBySemester(String semester) {
+        return applicationRepo.findApplicationsByClassSemester(semester);
+    }
+
+    @Override
+    public Application updateApplicationStatus(int id, String status) {
+        if (!("PENDING".equals(status) || "APPROVED".equals(status) || "REJECTED".equals(status))) {
+            throw new IllegalArgumentException("Invalid status");
+        }
+        else {
+            Optional<Application> application = applicationRepo.findById(id);
+            if(application.isEmpty()) {
+                throw new IllegalArgumentException("Application with id " + id + " did not exist");
+            }
+            Application existApplication = application.get();
+            existApplication.setApplicationStatus(status);
+            applicationRepo.save(existApplication);
+            return existApplication;
+        }
+    }
 }
