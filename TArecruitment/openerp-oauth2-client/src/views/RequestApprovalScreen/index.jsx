@@ -2,8 +2,9 @@ import { request } from "api";
 import { useEffect, useState } from "react";
 import { SEMESTER } from "config/localize";
 import { StandardTable } from "erp-hust/lib/StandardTable";
-import { Chip, IconButton, MenuItem, Select } from "@mui/material";
+import { Chip, IconButton, MenuItem, Select, Tooltip } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
+import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 
 const RequestApprovalScreen = () => {
   const [applications, setApplications] = useState([]);
@@ -138,13 +139,13 @@ const RequestApprovalScreen = () => {
             }}
           >
             <MenuItem value="APPROVED">
-              <Chip label="APPROVED" color="success" />
+              <Chip label="APPROVED" color="success" variant="outlined" />
             </MenuItem>
             <MenuItem value="PENDING">
-              <Chip label="PENDING" color="warning" />
+              <Chip label="PENDING" color="warning" variant="outlined" />
             </MenuItem>
             <MenuItem value="REJECTED">
-              <Chip label="REJECTED" color="error" />
+              <Chip label="REJECTED" color="error" variant="outlined" />
             </MenuItem>
           </Select>
         </span>
@@ -173,6 +174,18 @@ const RequestApprovalScreen = () => {
             }
           >
             <SaveIcon />
+          </IconButton>
+          <IconButton disableRipple>
+            <Tooltip
+              color="info"
+              title={
+                <span style={{ whiteSpace: "pre-line" }}>
+                  {rowData?.note || "Empty"}
+                </span>
+              }
+            >
+              <SpeakerNotesIcon />
+            </Tooltip>
           </IconButton>
         </span>
       ),
