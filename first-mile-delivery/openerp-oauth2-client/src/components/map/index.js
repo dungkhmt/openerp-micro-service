@@ -4,8 +4,6 @@ import { Box, Button, Container } from '@mui/material';
 import L from 'leaflet';
 
 
-
-import HubPopup from '../HubPopup';
 const position = [21.0146843, 105.7660694]
 const myIcon = L.icon({
     iconUrl: require('assets/icons/hub.png'),
@@ -14,7 +12,7 @@ const myIcon = L.icon({
     popupAnchor: [0, -42],
 });
 
-function MapComponent({ hubs, mapRef, isEdit, setCoordinates, onHubEdit, onHubDelete }) {
+function MapComponent({ hubs, mapRef, isEdit, setCoordinates, onHubEdit, onHubDelete, children }) {
 
 
 
@@ -39,7 +37,8 @@ function MapComponent({ hubs, mapRef, isEdit, setCoordinates, onHubEdit, onHubDe
                         icon={myIcon}
                     >
                         <Popup>
-                            <HubPopup hub={hub} onHubDelete={onHubDelete} onHubEdit={onHubEdit} />
+                            {/* <HubPopup hub={hub} onHubDelete={onHubDelete} onHubEdit={onHubEdit} /> */}
+                            {children}
                         </Popup>
                     </Marker>
                 ))}

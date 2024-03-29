@@ -27,6 +27,9 @@ public class HubController {
 
     @PostMapping("/add")
     public ResponseEntity<?> add(Principal principal, @RequestBody HubDTO hub) {
+
+        String userId = principal.getName();
+
         System.out.println(hub);
         return ResponseEntity.ok().body(hubService.saveHub(principal.getName(),hub));
     }

@@ -29,6 +29,9 @@ import { teacher } from "./menuconfig/teacher";
 import { user } from "./menuconfig/user";
 import { demo } from "./menuconfig/demo";
 import { hub } from "./menuconfig/hub";
+import { order } from "./menuconfig/order";
+import { route } from "./menuconfig/route";
+import { collector } from "./menuconfig/collector";
 
 export const MENUS = [];
 
@@ -37,7 +40,12 @@ MENUS.push(user);
 MENUS.push(teacher);
 MENUS.push(student);
 MENUS.push(demo);
-MENUS.push(hub)
+MENUS.push(hub);
+MENUS.push(order);
+MENUS.push(route);
+MENUS.push(collector);
+
+
 
 export const menuIconMap = new Map();
 

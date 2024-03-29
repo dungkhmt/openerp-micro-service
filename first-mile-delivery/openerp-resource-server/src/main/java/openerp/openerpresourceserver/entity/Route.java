@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -15,6 +16,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "fmd_route")
+@Builder
+
 public class Route {
 
 
@@ -23,7 +26,10 @@ public class Route {
     @Column(name = "route_id")
     private UUID id;
 
-    private String collectorId;
+
+    @ManyToOne
+    @JoinColumn(name = "collector_id")
+    private Collector collector;
 
     @CreatedDate
     @Column(name = "created_stamp")

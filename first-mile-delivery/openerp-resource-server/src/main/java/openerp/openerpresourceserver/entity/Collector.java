@@ -2,12 +2,14 @@ package openerp.openerpresourceserver.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -15,6 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "fmd_collector")
+@Builder
 public class Collector {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,6 +30,8 @@ public class Collector {
 
     private String hubId;
 
+    @OneToMany( fetch = FetchType.EAGER, mappedBy = "id")
+    private List<Route> routes;
 
     @CreatedDate
     @Column(name = "created_stamp")
