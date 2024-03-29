@@ -82,23 +82,23 @@ const RegisterClassForStudentScreen = (props) => {
             <div style={styles.textFieldContainer}>
               <h3>Họ tên</h3>
               <TextField
-                label="Họ và tên"
                 name="name"
                 variant="outlined"
                 style={styles.textField}
                 value={formData.name}
                 onChange={handleChange}
+                placeholder="Nguyễn Văn A"
               />
             </div>
             <div style={styles.textFieldContainer}>
               <h3>Mã số sinh viên</h3>
               <TextField
-                label="Mã số sinh viên"
                 name="mssv"
                 variant="outlined"
                 style={styles.textField}
                 value={formData.mssv}
                 onChange={handleChange}
+                placeholder="20200000"
               />
             </div>
           </div>
@@ -107,23 +107,23 @@ const RegisterClassForStudentScreen = (props) => {
             <div style={styles.textFieldContainer}>
               <h3>Email</h3>
               <TextField
-                label="Email"
                 name="email"
                 variant="outlined"
                 style={styles.textField}
                 value={formData.email}
                 onChange={handleChange}
+                placeholder="email@gmail.com"
               />
             </div>
             <div style={styles.textFieldContainer}>
               <h3>Số điện thoại</h3>
               <TextField
-                label="Số điện thoại"
                 name="phoneNumber"
                 variant="outlined"
                 style={styles.textField}
                 value={formData.phoneNumber}
                 onChange={handleChange}
+                placeholder="0912345678"
               />
             </div>
           </div>
@@ -131,23 +131,23 @@ const RegisterClassForStudentScreen = (props) => {
             <div style={styles.textFieldContainer}>
               <h3>CPA</h3>
               <TextField
-                label="CPA"
                 name="cpa"
                 variant="outlined"
                 style={styles.textField}
                 value={formData.cpa}
                 onChange={handleChange}
+                placeholder="4.0"
               />
             </div>
             <div style={styles.textFieldContainer}>
               <h3>Chứng chỉ tiếng Anh</h3>
               <TextField
-                label="Điểm tiếng anh"
                 name="englishScore"
                 variant="outlined"
                 style={styles.textField}
                 value={formData.englishScore}
                 onChange={handleChange}
+                placeholder="990 TOEIC"
               />
             </div>
           </div>
@@ -155,7 +155,6 @@ const RegisterClassForStudentScreen = (props) => {
           <div style={styles.textFieldContainer}>
             <h3>Mã lớp đăng ký</h3>
             <TextField
-              label="Mã lớp đăng ký"
               name="classId"
               variant="outlined"
               style={styles.textField}

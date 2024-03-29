@@ -16,5 +16,9 @@ public interface ApplicationService {
 
     List<Application> getApplicationBySemester(String semester);
 
+    List<Application> getApplicationByApplicationStatusAndSemester(String applicationStatus, String semester);
+
     Application updateApplicationStatus(int id, String status);
+
+    Application updateAssignStatus(int id, String status);
 }

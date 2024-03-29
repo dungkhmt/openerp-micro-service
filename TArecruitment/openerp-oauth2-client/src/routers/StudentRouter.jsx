@@ -1,5 +1,6 @@
 import { Route, Switch, useRouteMatch } from "react-router";
 import AllRegisterClassScreen from "views/AllRegisterClassScreen";
+import ApplicationResultScreen from "views/ApplicationResultScreen";
 import RegisterClassForStudentScreen from "views/RegisterClassForStudentScreen";
 
 export default function StudentRouter() {
@@ -17,9 +18,11 @@ export default function StudentRouter() {
           exact
           path={`${path}/classregister-list`}
         ></Route>
-        {/**
-         * @todo: Add route for what class the student has applied
-         */}
+        <Route
+          component={ApplicationResultScreen}
+          exact
+          path={`${path}/result`}
+        ></Route>
       </Switch>
     </div>
   );
