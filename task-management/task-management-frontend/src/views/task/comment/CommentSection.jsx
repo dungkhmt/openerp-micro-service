@@ -1,10 +1,11 @@
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { CustomEditor } from "../../components/editor/CustomEditor";
-import { useTaskContext } from "../../hooks/useTaskContext";
-import { TaskService } from "../../services/api/task.service";
-import { TitleWrapper } from "./TaskViewLeft";
+import { CustomMDEditor } from "../../../components/editor/md-editor/CustomMDEditor";
+import { LoadingButton } from "../../../components/mui/button/LoadingButton";
+import { useTaskContext } from "../../../hooks/useTaskContext";
+import { TaskService } from "../../../services/api/task.service";
+import { TitleWrapper } from "../TaskViewLeft";
 
 const CommentSection = () => {
   const { isUpdate, setIsUpdate, task } = useTaskContext();
@@ -33,35 +34,21 @@ const CommentSection = () => {
           Bình luận
         </Typography>
       </TitleWrapper>
-      <CustomEditor
+      <CustomMDEditor
         value={comment}
         onChange={setComment}
         setValue={setComment}
       />
       <Box display={"flex"} justifyContent={"flex-end"} mt={2}>
-        <Button
+        <LoadingButton
           variant="contained"
           color="primary"
           onClick={onComment}
-          disabled={comment === "" || loading}
+          disabled={comment === ""}
+          loading={loading}
         >
-          Thêm bình luận
-          {loading && (
-            <Box
-              sx={{
-                position: "absolute",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-                height: "100%",
-                borderRadius: 1,
-              }}
-            >
-              <CircularProgress size={20} />
-            </Box>
-          )}
-        </Button>
+          Bình luận
+        </LoadingButton>
       </Box>
     </>
   );

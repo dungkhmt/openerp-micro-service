@@ -3,7 +3,7 @@ import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import { GridToolbarExport } from "@mui/x-data-grid";
 import PropsTypes from "prop-types";
-import Icon from "../icon";
+import Icon from "../../icon";
 
 const TableToolbar = (props) => {
   return (

@@ -1,18 +1,19 @@
+import { Icon } from "@iconify/react";
 import {
   AvatarGroup,
   Box,
   Card,
   Divider,
+  LinearProgress,
+  Skeleton,
   Tooltip,
   Typography,
-  Skeleton,
   styled,
-  LinearProgress,
 } from "@mui/material";
 import dayjs from "dayjs";
 import { memo } from "react";
 import { Link } from "react-router-dom";
-import CustomAvatar from "../../components/mui/avatar/CustomAvatar";
+import { UserAvatar } from "../../components/common/avatar/UserAvatar";
 import CustomChip from "../../components/mui/chip";
 import { useProjectContext } from "../../hooks/useProjectContext";
 import { useTaskContext } from "../../hooks/useTaskContext";
@@ -21,10 +22,8 @@ import {
   getDueDateColor,
   getPriorityColor,
   getProgressColor,
-  getRandomColorSkin,
   getStatusColor,
 } from "../../utils/color.util";
-import { Icon } from "@iconify/react";
 
 const TitleWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -144,9 +143,8 @@ const TaskViewRight = () => {
                 }`}
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <CustomAvatar
-                    skin="light"
-                    color={getRandomColorSkin(task.assignee.id)}
+                  <UserAvatar
+                    user={task.assignee}
                     sx={{
                       width: 35,
                       height: 35,
@@ -157,11 +155,7 @@ const TaskViewRight = () => {
                           `2px solid ${theme.palette.background.paper}`,
                       },
                     }}
-                  >
-                    {`${task.assignee.firstName?.charAt(0) ?? ""}${
-                      task.assignee.lastName?.charAt(0) ?? ""
-                    }`}{" "}
-                  </CustomAvatar>
+                  />
                   <Typography variant="body2" sx={{ fontWeight: 550 }} noWrap>
                     {`${task.assignee.firstName ?? ""} ${
                       task.assignee.lastName ?? ""

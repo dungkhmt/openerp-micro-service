@@ -22,19 +22,18 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
-import CustomAvatar from "../../components/mui/avatar/CustomAvatar";
-import CustomChip from "../../components/mui/chip";
-import { useDebounce } from "../../hooks/useDebounce";
-import { useProjectContext } from "../../hooks/useProjectContext";
-import { TaskService } from "../../services/api/task.service";
+import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
+import CustomChip from "../../../components/mui/chip";
+import { useDebounce } from "../../../hooks/useDebounce";
+import { useProjectContext } from "../../../hooks/useProjectContext";
+import { TaskService } from "../../../services/api/task.service";
 import {
   getCategoryColor,
   getDueDateColor,
   getPriorityColor,
   getProgressColor,
-  getRandomColorSkin,
   getStatusColor,
-} from "../../utils/color.util";
+} from "../../../utils/color.util";
 import { DialogAddTask } from "./DialogAddTask";
 
 const initFilter = {
@@ -200,15 +199,7 @@ const ProjectViewTasks = () => {
               title={`${row.assignee?.firstName} ${row.assignee?.lastName}`}
               key={row.assignee?.id}
             >
-              <CustomAvatar
-                skin="light"
-                color={getRandomColorSkin(row.assignee?.id)}
-                sx={{ width: 30, height: 30, fontSize: ".875rem" }}
-              >
-                {`${row.assignee?.firstName?.charAt(0) ?? ""}${
-                  row.assignee?.lastName?.charAt(0) ?? ""
-                }`}
-              </CustomAvatar>
+              <UserAvatar user={row.assignee} />
             </Tooltip>
           </AvatarGroup>
         ) : (
@@ -469,19 +460,7 @@ const ProjectViewTasks = () => {
                 {members.map(({ member }) => (
                   <MenuItem key={member.id} value={member.id}>
                     <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-                      <CustomAvatar
-                        skin="light"
-                        color={getRandomColorSkin(member.id)}
-                        sx={{
-                          width: 30,
-                          height: 30,
-                          fontSize: ".875rem",
-                        }}
-                      >
-                        {`${member?.firstName?.charAt(0) ?? ""}${
-                          member?.lastName?.charAt(0) ?? ""
-                        }`}
-                      </CustomAvatar>
+                      <UserAvatar user={member} />
                       <Typography variant="subtitle2">{`${
                         member.firstName ?? ""
                       } ${member.lastName ?? ""}`}</Typography>

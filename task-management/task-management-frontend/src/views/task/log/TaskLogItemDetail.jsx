@@ -10,21 +10,21 @@ import {
   styled,
 } from "@mui/material";
 import PropTypes from "prop-types";
-import CustomChip from "../../components/mui/chip";
-import { useProjectContext } from "../../hooks/useProjectContext";
+import CustomChip from "../../../components/mui/chip";
+import { useProjectContext } from "../../../hooks/useProjectContext";
 import {
   getCategoryColor,
   getPriorityColor,
   getStatusColor,
-} from "../../utils/color.util";
-import { parseLogItemDetail } from "../../utils/text-parse.util";
+} from "../../../utils/color.util";
+import { parseLogItemDetail } from "../../../utils/text-parse.util";
 import { Icon } from "@iconify/react";
 import MDEditor from "@uiw/react-md-editor";
 import { useState } from "react";
-import { FileService } from "../../services/api/file.service";
+import { FileService } from "../../../services/api/file.service";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
-import { useTaskContext } from "../../hooks/useTaskContext";
+import { useTaskContext } from "../../../hooks/useTaskContext";
 
 const TextHighlight = styled(Typography)(({ theme }) => ({
   color: theme.palette.secondary.dark,

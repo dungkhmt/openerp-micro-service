@@ -1,5 +1,6 @@
 import { Typography } from "@mui/material";
 import { useState } from "react";
+import PropsType from "prop-types";
 import PrimaryButton from "../button/PrimaryButton";
 import CustomizedDialogs from "./CustomizedDialogs";
 
@@ -38,5 +39,9 @@ function ErrorDialog({ open }) {
     />
   );
 }
+
+ErrorDialog.propTypes = {
+  open: PropsType.bool.isRequired,
+};
 
 export default ErrorDialog;

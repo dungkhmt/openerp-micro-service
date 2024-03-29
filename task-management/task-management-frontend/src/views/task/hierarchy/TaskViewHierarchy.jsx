@@ -1,16 +1,12 @@
-import { Box, Grid, LinearProgress, Tooltip, Typography } from "@mui/material";
-import { useTaskContext } from "../../hooks/useTaskContext";
-import { useProjectContext } from "../../hooks/useProjectContext";
-import CustomChip from "../../components/mui/chip";
-import {
-  getProgressColor,
-  getRandomColorSkin,
-  getStatusColor,
-} from "../../utils/color.util";
-import CustomAvatar from "../../components/mui/avatar/CustomAvatar";
-import dayjs from "dayjs";
 import { Icon } from "@iconify/react";
+import { Box, Grid, LinearProgress, Tooltip, Typography } from "@mui/material";
+import dayjs from "dayjs";
 import { Link } from "react-router-dom";
+import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
+import CustomChip from "../../../components/mui/chip";
+import { useProjectContext } from "../../../hooks/useProjectContext";
+import { useTaskContext } from "../../../hooks/useTaskContext";
+import { getProgressColor, getStatusColor } from "../../../utils/color.util";
 
 const TaskViewHierarchy = () => {
   const { task } = useTaskContext();
@@ -116,20 +112,7 @@ const TaskViewHierarchy = () => {
             >
               {assignee && (
                 <Tooltip title={fullName}>
-                  <CustomAvatar
-                    skin="light"
-                    color={getRandomColorSkin(assignee.id)}
-                    sx={{
-                      width: 30,
-                      height: 30,
-                      fontSize: ".8rem",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {`${assignee.firstName?.charAt(0) ?? ""}${
-                      assignee.lastName?.charAt(0) ?? ""
-                    }`}
-                  </CustomAvatar>
+                  <UserAvatar user={assignee} sx={{ cursor: "pointer" }} />
                 </Tooltip>
               )}
             </Grid>

@@ -2,7 +2,6 @@ import { Icon } from "@iconify/react";
 import {
   Box,
   Button,
-  CircularProgress,
   Collapse,
   Dialog,
   DialogActions,
@@ -24,9 +23,10 @@ import PropTypes from "prop-types";
 import { forwardRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { CustomEditor } from "../../components/editor/CustomEditor";
+import { UserAvatar } from "../../components/common/avatar/UserAvatar";
+import { CustomMDEditor } from "../../components/editor/md-editor/CustomMDEditor";
 import { FileUploader } from "../../components/file-uploader";
-import CustomAvatar from "../../components/mui/avatar/CustomAvatar";
+import { LoadingButton } from "../../components/mui/button/LoadingButton";
 import CustomChip from "../../components/mui/chip";
 import { useProjectContext } from "../../hooks/useProjectContext";
 import { useTaskContext } from "../../hooks/useTaskContext";
@@ -35,7 +35,6 @@ import { TaskService } from "../../services/api/task.service";
 import {
   getCategoryColor,
   getPriorityColor,
-  getRandomColorSkin,
   getStatusColor,
 } from "../../utils/color.util";
 
@@ -149,7 +148,7 @@ const DialogEditTask = ({ open, setOpen }) => {
                 control={control}
                 defaultValue={task.description}
                 render={(field) => (
-                  <CustomEditor
+                  <CustomMDEditor
                     {...field}
                     setValue={(value) => setValue("description", value)}
                   />
@@ -357,19 +356,7 @@ const DialogEditTask = ({ open, setOpen }) => {
                         <Box
                           sx={{ display: "flex", gap: 2, alignItems: "center" }}
                         >
-                          <CustomAvatar
-                            skin="light"
-                            color={getRandomColorSkin(member.id)}
-                            sx={{
-                              width: 30,
-                              height: 30,
-                              fontSize: ".875rem",
-                            }}
-                          >
-                            {`${member.firstName?.charAt(0) ?? ""}${
-                              member.lastName?.charAt(0) ?? ""
-                            }`}
-                          </CustomAvatar>
+                          <UserAvatar user={member} />
                           <Typography variant="subtitle2">{`${
                             member.firstName ?? ""
                           } ${member.lastName ?? ""}`}</Typography>
@@ -389,7 +376,7 @@ const DialogEditTask = ({ open, setOpen }) => {
                 control={control}
                 defaultValue=""
                 render={(field) => (
-                  <CustomEditor
+                  <CustomMDEditor
                     {...field}
                     setValue={(value) => setValue("note", value)}
                   />
@@ -415,32 +402,14 @@ const DialogEditTask = ({ open, setOpen }) => {
           ],
         }}
       >
-        <Button
+        <LoadingButton
           variant="contained"
           sx={{ mr: 1, position: "relative" }}
           onClick={handleSubmit(onUpdated)}
-          disabled={updateLoading}
+          loading={updateLoading}
         >
           Cập nhật
-          {updateLoading && (
-            <Box
-              component="span"
-              sx={{
-                position: "absolute",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                bgcolor: "rgba(255, 255, 255, 0.7)",
-              }}
-            >
-              <CircularProgress size={24} />
-            </Box>
-          )}
-        </Button>
+        </LoadingButton>
         <Button
           variant="outlined"
           color="secondary"
