@@ -1,11 +1,11 @@
 import MDEditor from "@uiw/react-md-editor";
 import React from "react";
 import PropTypes from "prop-types";
-import { processingNoti } from "../../utils/notification";
-import { request } from "../../api";
-import { config } from "../../config/config";
+import { processingNoti } from "../../../utils/notification";
+import { request } from "../../../api";
+import { config } from "../../../config/config";
 
-const CustomEditor = (props) => {
+const CustomMDEditor = (props) => {
   const editorRef = React.useRef(null);
   const containerRef = React.useRef(null);
 
@@ -107,8 +107,8 @@ const CustomEditor = (props) => {
   );
 };
 
-CustomEditor.propTypes = {
+CustomMDEditor.propTypes = {
   setValue: PropTypes.func,
 };
 
-export { CustomEditor };
+export { CustomMDEditor };

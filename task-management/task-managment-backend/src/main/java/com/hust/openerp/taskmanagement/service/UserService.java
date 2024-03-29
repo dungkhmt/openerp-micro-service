@@ -11,4 +11,6 @@ public interface UserService {
     List<User> getAllUsers();
 
     void synchronizeUser(String userId, String email, String firstName, String lastName);
+
+    List<User> searchUser(String q);
 }

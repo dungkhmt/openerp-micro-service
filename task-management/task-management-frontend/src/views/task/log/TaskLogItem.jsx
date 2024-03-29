@@ -17,12 +17,12 @@ import {
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 
-import CustomAvatar from "../../components/mui/avatar/CustomAvatar";
-import { getDiffDateWithCurrent } from "../../utils/date.util";
-import { TaskLogItemDetail } from "./TaskLogItemDetail";
 import MDEditor from "@uiw/react-md-editor";
 import { useMemo } from "react";
-import { getLogItemColor, getRandomColorSkin } from "../../utils/color.util";
+import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
+import { getLogItemColor } from "../../../utils/color.util";
+import { getDiffDateWithCurrent } from "../../../utils/date.util";
+import { TaskLogItemDetail } from "./TaskLogItemDetail";
 
 const TextHighlight = styled(Typography)(({ theme }) => ({
   color: theme.palette.primary.main,
@@ -51,15 +51,7 @@ const TaskLogItem = ({ item }) => {
             md={0.75}
             sx={{ display: "flex", justifyContent: "center" }}
           >
-            <CustomAvatar
-              skin="light"
-              color={getRandomColorSkin(creator?.id)}
-              size="large"
-            >
-              {`${creator?.firstName?.charAt(0) ?? ""}${
-                creator?.lastName?.charAt(0) ?? ""
-              }`}
-            </CustomAvatar>
+            <UserAvatar user={creator} width={40} height={40} />
           </Grid>
           <Grid item xs={12} md={11}>
             <Card>

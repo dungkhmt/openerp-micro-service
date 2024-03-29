@@ -3,7 +3,7 @@ import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import { styled } from "@mui/material/styles";
 import { useKeycloak } from "@react-keycloak/web";
-import PrimaryButton from "../../components/button/PrimaryButton";
+import PrimaryButton from "../../components/mui/button/PrimaryButton";
 import { MENU_LIST } from "../../config/menuconfig";
 import PropTypes from "prop-types";
 import { useEffect } from "react";

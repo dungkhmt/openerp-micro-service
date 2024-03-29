@@ -13,9 +13,9 @@ import {
   Typography,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
-import PrimaryButton from "../../components/button/PrimaryButton";
-import TertiaryButton from "../../components/button/TertiaryButton";
-import CustomizedDialogs from "../../components/dialog/CustomizedDialogs";
+import PrimaryButton from "../../components/mui/button/PrimaryButton";
+import TertiaryButton from "../../components/mui/button/TertiaryButton";
+import CustomizedDialogs from "../../components/mui/dialog/CustomizedDialogs";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import RejectFeedbackDialog from "./RejectFeedbackDialog";

@@ -2,7 +2,6 @@ import { Icon } from "@iconify/react";
 import {
   Box,
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -23,30 +22,28 @@ import { forwardRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
-import { CustomEditor } from "../../components/editor/CustomEditor";
-import CustomAvatar from "../../components/mui/avatar/CustomAvatar";
-import CustomChip from "../../components/mui/chip";
-import { useProjectContext } from "../../hooks/useProjectContext";
-import { FileService } from "../../services/api/file.service";
-import { TaskService } from "../../services/api/task.service";
+import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
+import { CustomMDEditor } from "../../../components/editor/md-editor/CustomMDEditor";
+import { FileUploader } from "../../../components/file-uploader";
+import { LoadingButton } from "../../../components/mui/button/LoadingButton";
+import CustomChip from "../../../components/mui/chip";
+import { useProjectContext } from "../../../hooks/useProjectContext";
+import { FileService } from "../../../services/api/file.service";
+import { TaskService } from "../../../services/api/task.service";
 import {
   getCategoryColor,
   getPriorityColor,
-  getRandomColorSkin,
   getStatusColor,
-} from "../../utils/color.util";
-import { FileUploader } from "../../components/file-uploader";
-import { useTaskContext } from "../../hooks/useTaskContext";
+} from "../../../utils/color.util";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />;
 });
 
-const DialogAddSubTask = ({ open, setOpen }) => {
+const DialogAddTask = ({ open, setOpen }) => {
   const navigate = useNavigate();
   const { statuses, priorities, categories, members, project } =
     useProjectContext();
-  const { task } = useTaskContext();
   const [files, setFiles] = useState([]);
   const [createLoading, setCreateLoading] = useState(false);
 
@@ -68,13 +65,12 @@ const DialogAddSubTask = ({ open, setOpen }) => {
         attachmentPaths,
         projectId: project.id,
         fromDate: data.fromDate.toISOString(),
-        parentId: task.id,
       });
-      toast.success("Thêm nhiệm vụ con thành công");
+      toast.success("Thêm nhiệm vụ thành công");
       navigate(`/project/${project.id}/task/${res.id}`);
     } catch (e) {
       console.error(e);
-      toast.error("Thêm nhiệm vụ con thất bại. Vui lòng thử lại sau.");
+      toast.error("Thêm nhiệm vụ thất bại. Vui lòng thử lại sau.");
     } finally {
       setOpen(false);
       setCreateLoading(false);
@@ -106,7 +102,7 @@ const DialogAddSubTask = ({ open, setOpen }) => {
 
         <Box sx={{ mb: 8, textAlign: "center" }}>
           <Typography variant="h5" sx={{ mb: 3 }}>
-            Thêm mới nhiệm vụ con
+            Thêm mới nhiệm vụ
           </Typography>
         </Box>
 
@@ -129,9 +125,9 @@ const DialogAddSubTask = ({ open, setOpen }) => {
             <Controller
               name="description"
               control={control}
-              defaultValue=""
+              defaultValue={null}
               render={(field) => (
-                <CustomEditor
+                <CustomMDEditor
                   {...field}
                   setValue={(value) => setValue("description", value)}
                 />
@@ -296,19 +292,7 @@ const DialogAddSubTask = ({ open, setOpen }) => {
                         <Box
                           sx={{ display: "flex", gap: 2, alignItems: "center" }}
                         >
-                          <CustomAvatar
-                            skin="light"
-                            color={getRandomColorSkin(member.id)}
-                            sx={{
-                              width: 30,
-                              height: 30,
-                              fontSize: ".875rem",
-                            }}
-                          >
-                            {`${member.firstName?.charAt(0) ?? ""}${
-                              member.lastName?.charAt(0) ?? ""
-                            }`}
-                          </CustomAvatar>
+                          <UserAvatar user={member} />
                           <Typography variant="subtitle2">{`${
                             member.firstName ?? ""
                           } ${member.lastName ?? ""}`}</Typography>
@@ -317,18 +301,6 @@ const DialogAddSubTask = ({ open, setOpen }) => {
                     ))}
                   </Select>
                 }
-              />
-            </FormControl>
-          </Grid>
-          <Grid item sm={4} xs={12}>
-            <FormControl fullWidth>
-              <TextField
-                name="parentId"
-                defaultValue={task.id}
-                disabled
-                inputRef={register()}
-                label="Nhiệm vụ cha"
-                placeholder="Nhiệm vụ cha"
               />
             </FormControl>
           </Grid>
@@ -351,32 +323,14 @@ const DialogAddSubTask = ({ open, setOpen }) => {
           pt: 1,
         }}
       >
-        <Button
+        <LoadingButton
           variant="contained"
           sx={{ mr: 1, position: "relative" }}
           onClick={handleSubmit(onCreate)}
-          disabled={createLoading}
+          loading={createLoading}
         >
-          Thêm
-          {createLoading && (
-            <Box
-              component="span"
-              sx={{
-                position: "absolute",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                bgcolor: "rgba(255, 255, 255, 0.7)",
-              }}
-            >
-              <CircularProgress size={24} />
-            </Box>
-          )}
-        </Button>
+          Tạo
+        </LoadingButton>
         <Button
           variant="outlined"
           color="secondary"
@@ -389,9 +343,9 @@ const DialogAddSubTask = ({ open, setOpen }) => {
   );
 };
 
-DialogAddSubTask.propTypes = {
+DialogAddTask.propTypes = {
   open: PropTypes.bool.isRequired,
   setOpen: PropTypes.func.isRequired,
 };
 
-export { DialogAddSubTask };
+export { DialogAddTask };

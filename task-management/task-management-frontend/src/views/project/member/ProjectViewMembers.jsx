@@ -1,12 +1,14 @@
 import { Icon } from "@iconify/react";
 import {
   Box,
+  Button,
   Card,
   CardContent,
   CardHeader,
   Divider,
   Grid,
   IconButton,
+  Link,
   Menu,
   MenuItem,
   TextField,
@@ -15,11 +17,11 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import CustomAvatar from "../../components/mui/avatar/CustomAvatar";
-import { useProjectContext } from "../../hooks/useProjectContext";
-import { getRandomColorSkin } from "../../utils/color.util";
+import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
+import { useDebounce } from "../../../hooks/useDebounce";
+import { useProjectContext } from "../../../hooks/useProjectContext";
 import { MenuAddMember } from "./MenuAddMember";
 
 const columns = [
@@ -30,16 +32,11 @@ const columns = [
     headerName: "User",
     renderCell: ({ row }) => {
       const { firstName, lastName, id } = row.member;
-      const fullName = `${firstName} ${lastName}`;
+      const fullName =
+        firstName || lastName ? `${firstName ?? ""} ${lastName ?? ""}` : " - ";
       return (
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <CustomAvatar
-            skin="light"
-            color={getRandomColorSkin(id)}
-            sx={{ mr: 3, width: 30, height: 30, fontSize: ".875rem" }}
-          >
-            {`${firstName?.charAt(0) ?? ""}${lastName?.charAt(0) ?? ""}`}
-          </CustomAvatar>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <UserAvatar user={row.member} />
           <Box
             sx={{
               display: "flex",
@@ -50,7 +47,7 @@ const columns = [
             <Tooltip title={fullName}>
               <Typography
                 sx={{
-                  fontWeight: 600,
+                  fontWeight: 650,
                   fontSize: "0.9rem",
                   color: (theme) => theme.palette.text.secondary,
                   "&:hover": {
@@ -77,8 +74,14 @@ const columns = [
     headerName: "Email",
     renderCell: ({ row }) => {
       return (
-        <Tooltip title={row.member.email}>
-          <Typography noWrap variant="body2">
+        <Tooltip title={`Gửi mail tới: ${row.member.email}`}>
+          <Typography
+            noWrap
+            variant="body2"
+            component={Link}
+            href={`mailto:${row.member.email}`}
+            sx={{ textDecoration: "none", color: "text.secondary" }}
+          >
             {row.member?.email}
           </Typography>
         </Tooltip>
@@ -176,7 +179,36 @@ const RowOptions = ({ id }) => {
 const ProjectViewMembers = () => {
   const { members } = useProjectContext();
 
-  const [value, setValue] = useState("");
+  const [filterMembers, setFilterMembers] = useState(members);
+
+  const [addMemberAnchorEl, setAddMemberAnchorEl] = useState(null);
+  const [search, setSearch] = useState("");
+  const searchDebounce = useDebounce(search, 500);
+
+  const handleAddMenuClick = (event) => {
+    setAddMemberAnchorEl(event.currentTarget);
+  };
+
+  const handleAddMenuClose = () => {
+    setAddMemberAnchorEl(null);
+  };
+
+  useEffect(() => {
+    setFilterMembers(
+      members.filter((member) => {
+        const fullName = `${member.member.firstName ?? ""} ${
+          member.member.lastName ?? ""
+        }`.toLowerCase();
+        const id = member.member.id.toLowerCase();
+        const email = member.member.email.toLowerCase();
+        return (
+          fullName.includes(searchDebounce.toLowerCase()) ||
+          id.includes(searchDebounce.toLowerCase()) ||
+          email.includes(searchDebounce.toLowerCase())
+        );
+      })
+    );
+  }, [searchDebounce, members]);
 
   return (
     <Grid container spacing={6}>
@@ -191,17 +223,23 @@ const ProjectViewMembers = () => {
             >
               <TextField
                 size="small"
-                value={value}
+                value={search}
                 sx={{ mr: 4 }}
                 placeholder="Search User"
-                onChange={(e) => setValue(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
               />
-              <MenuAddMember />
+              <Button variant="outlined" onClick={handleAddMenuClick}>
+                Thêm thành viên
+              </Button>
+              <MenuAddMember
+                anchorEl={addMemberAnchorEl}
+                onClose={handleAddMenuClose}
+              />
             </Box>
           </CardContent>
           <Divider />
           <DataGrid
-            rows={members.map((member) => ({
+            rows={filterMembers.map((member) => ({
               ...member,
               id: member.member.id,
             }))}

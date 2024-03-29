@@ -6,8 +6,10 @@ const endPoints = {
 };
 
 export const UserService = {
-  async getAll() {
-    const res = await privateClient.get(endPoints.getAll);
+  async getAll(params) {
+    const res = await privateClient.get(endPoints.getAll, {
+      params,
+    });
     return res.data;
   },
   async sync() {
