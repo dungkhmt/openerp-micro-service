@@ -7,19 +7,19 @@ import Map from "../Map/Map";
 
 const AddLocation = ({propertyDetails, setPropertyDetails, nextStep}) => {
 
-    const form = useForm({
-        initialValues: {
-            province: propertyDetails?.province,
-            district: propertyDetails?.district,
-            address: propertyDetails?.address,
-        },
-
-        validate: {
-            province: (value) => validateString(value),
-            district: (value) => validateString(value),
-            address: (value) => validateString(value),
-        },
-    });
+    // const form = useForm({
+    //     initialValues: {
+    //         province: propertyDetails?.province,
+    //         district: propertyDetails?.district,
+    //         address: propertyDetails?.address,
+    //     },
+    //
+    //     validate: {
+    //         province: (value) => validateString(value),
+    //         district: (value) => validateString(value),
+    //         address: (value) => validateString(value),
+    //     },
+    // });
 
     const [provinces, setProvinces] = useState([])
     const [districts, setDistricts] = useState([])

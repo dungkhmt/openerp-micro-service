@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="12ee29db-8fb8-4d7d-92ae-3cd84b56e6a2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../../../real-estate/openerp-client/client/.eslintrc.cjs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../real-estate/openerp-client/client/src/components/AddProperty/AddProperty.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../real-estate/openerp-client/client/src/components/Header/Header.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../real-estate/openerp-client/client/src/components/Layout/Layout.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../real-estate/openerp-client/client/src/pages/Home.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../task-management/nginx-1.24.0/conf/nginx.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../../../task-management/nginx-1.24.0/conf/nginx.conf" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
+  </component>
+  <component name="GitToolBoxStore">
+    <option name="projectConfigVersion" value="5" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2eAlBb2a5GS0L5vDgBAUgf3AAtZ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "/home/ltv285/Desktop/DATN/openerp-micro-service/real-estate/openerp-client/client",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "/snap/webstorm/369/plugins/javascript-impl/jsLanguageServicesImpl/external",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="12ee29db-8fb8-4d7d-92ae-3cd84b56e6a2" name="Changes" comment="" />
+      <created>1711355128228</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1711355128228</updated>
+      <workItem from="1711355129353" duration="919000" />
+      <workItem from="1711357446462" duration="224000" />
+      <workItem from="1711465559458" duration="11203000" />
+      <workItem from="1711513057747" duration="74000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

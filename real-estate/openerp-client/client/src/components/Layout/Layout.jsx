@@ -2,10 +2,13 @@ import Header from "../Header/Header";
 
 const Layout = () => {
     return (
-        <div style={{ background: "green", overflow: "hidden" }}>
-            lay out
-            <Header />
-        </div>
+        <>
+            <div style={{ background: "var(--black)", overflow: "hidden" }}>
+                <Header />
+                {/*<Outlet />*/}
+            </div>
+            {/*<Footer />*/}
+        </>
     )
 }
 

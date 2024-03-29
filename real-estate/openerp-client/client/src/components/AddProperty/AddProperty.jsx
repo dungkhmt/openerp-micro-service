@@ -42,7 +42,7 @@ const AddProperty = ({opened, setOpened}) => {
 
     return (
         <Modal
-            opened={true}
+            opened={opened}
             onClose={() => setOpened(false)}
             closeOnClickOutside
             size={"90rem"}

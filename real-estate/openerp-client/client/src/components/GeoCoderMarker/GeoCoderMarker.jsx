@@ -40,4 +40,4 @@ const GeoCoderMarker = ({address, position, setPosition}) => {
     )
 }
 
-export default GeoCoderMarker
+export default GeoCoderMarker;
