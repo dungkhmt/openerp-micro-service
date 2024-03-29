@@ -1,11 +1,22 @@
 import React from 'react'
-import {MapContainer, TileLayer} from 'react-leaflet'
+import {MapContainer, Marker, Popup, TileLayer} from 'react-leaflet'
 import GeoCoderMarker from '../GeoCoderMarker/GeoCoderMarker'
-const Map = ({address, district, province}) => {
+import L from "leaflet";
+import icon from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
+const DefaulIcon = L.icon ({
+    iconUrl : icon,
+    iconSize: [10, 10], // Kích thước của biểu tượng
+    // iconAnchor: [16, 32],
+    shadowUrl: iconShadow
+})
+
+const Map = ({address, district, province, position, setPosition}) => {
     // console.log(address, district, province)
+    console.log("position", position)
     return (
         <MapContainer
-            center={[21.0,105]}
+            center={position.length > 0 ? position : [21.0, 105]}
             zoom={4}
             scrollWheelZoom={false}
             style={{
@@ -18,7 +29,8 @@ const Map = ({address, district, province}) => {
         >
             <TileLayer url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'/>
             {
-                (district !== undefined && province !== undefined && address !== null) && (<GeoCoderMarker address={`${address} ${district} ${province} Việt Nam`} />)
+                (district !== null && province !== null && address !== null) && (
+                    <GeoCoderMarker address={`${address} ${district} ${province} Việt Nam`} setPosition={setPosition}/>)
             }
         </MapContainer>
     )

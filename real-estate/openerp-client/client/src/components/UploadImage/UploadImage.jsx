@@ -16,7 +16,7 @@ const ImageUploader = ({
 
     const [imageUrls, setImageUrls] = useState(propertyDetails?.imageUrls)
     const handleNext = () => {
-        setPropertyDetails((prev) => ({...prev, images: imageUrls}));
+        setPropertyDetails((prev) => ({...prev, imageUrls: imageUrls}));
         nextStep();
     };
     const uploadImage = (image) => {
@@ -82,18 +82,18 @@ const ImageUploader = ({
 
                 <div className="flexColEnd uploadView">
                     {imageUrls?.map((image, index) => {
-                        return (
-                            <div className="imageContainer" key={index + 1}>
-                                <img src={image} alt=""/>
-                                <span
-                                    title='Xóa'
-                                    onClick={() => handleDeleteImage(image)}
-                                    className='deleteImage'
-                                >
+                            return (
+                                <div className="imageContainer" key={index + 1}>
+                                    <img src={image} alt=""/>
+                                    <span
+                                        title='Xóa'
+                                        onClick={() => handleDeleteImage(image)}
+                                        className='deleteImage'
+                                    >
                                                     <ImBin/>
                                 </span>
-                            </div>
-                        )
+                                </div>
+                            )
                         }
                     )
                     }

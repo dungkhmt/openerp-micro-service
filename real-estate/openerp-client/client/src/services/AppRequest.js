@@ -10,10 +10,20 @@ export const apiGetPublicProvinces = async () => {
 };
 
 
-export const apiGetPublicDistrict = async (provinceId) => {
+export const apiGetPublicDistrict = async (nameProvince) => {
+    const encodedNameProvince = encodeURIComponent(nameProvince);
     const response = await axiosDefault({
         method: 'get',
-        url: `http://localhost:2805/public/address/${provinceId}/district`
+        url: `http://localhost:2805/public/address/district?nameProvince=${encodedNameProvince}`
+    })
+    return response
+}
+
+export const apiAddPostSell = async (data) => {
+    const response = await axiosDefault({
+        method: 'post',
+        url: `http://localhost:2805/public/post/sell`,
+        data: data
     })
     return response
 }

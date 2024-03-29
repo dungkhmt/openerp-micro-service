@@ -3,27 +3,33 @@ import {useState} from "react";
 import AddLocation from "../AddLocation/AddLocation";
 import {useAuth0} from "@auth0/auth0-react";
 import UploadImage from "../UploadImage/UploadImage";
-// import BasicDetails from "../BasicDetails/BasicDetails";
-// import Facilities from "../Facilities/Facilities";
+import BasicDetail from "../BasicDetail/BasicDetail";
+import Facilities from "../Facilities/Facilities";
 
 const AddProperty = ({opened, setOpened}) => {
     const [active, setActive] = useState(0);
-    const {user} = useAuth0();
+    // const {user} = useAuth0();
 
     const [propertyDetails, setPropertyDetails] = useState({
+        position:[21,105],
+        province: "",
+        district: "",
+        address: "",
+
+        imageUrls: [],
+
         title: "",
         description: "",
         price: 0,
-        country: "",
-        city: "",
-        address: "",
-        image: null,
-        facilities: {
-            bedrooms: 0,
-            parkings: 0,
-            bathrooms: 0,
-        },
-        userEmail: user?.email,
+
+
+        acreage: 0,
+        bedroom: 0,
+        parking: 0,
+        bathroom: 0,
+        floor: 1,
+
+        // userEmail: user?.email,
     });
 
     const nextStep = () => {
@@ -48,9 +54,8 @@ const AddProperty = ({opened, setOpened}) => {
                     breakpoint="sm"
                     allowNextStepsSelect={false}
                 >
-                    <Stepper.Step label="Basics" description="Details">
-                        <BasicDetails
-                            prevStep={prevStep}
+                    <Stepper.Step label="Location" description="Address">
+                        <AddLocation
                             nextStep={nextStep}
                             propertyDetails={propertyDetails}
                             setPropertyDetails={setPropertyDetails}
@@ -64,32 +69,23 @@ const AddProperty = ({opened, setOpened}) => {
                             setPropertyDetails={setPropertyDetails}
                         />
                     </Stepper.Step>
-                    <Stepper.Step label="Location" description="Address">
-                        <AddLocation
+                    <Stepper.Step label="Basics" description="Details">
+                        <BasicDetail
+                            prevStep={prevStep}
                             nextStep={nextStep}
                             propertyDetails={propertyDetails}
                             setPropertyDetails={setPropertyDetails}
                         />
                     </Stepper.Step>
-
-                    {/*<Stepper.Step label="Basics" description="Details">*/}
-                    {/*    <BasicDetails*/}
-                    {/*        prevStep={prevStep}*/}
-                    {/*        nextStep={nextStep}*/}
-                    {/*        propertyDetails={propertyDetails}*/}
-                    {/*        setPropertyDetails={setPropertyDetails}*/}
-                    {/*    />*/}
-                    {/*</Stepper.Step>*/}
-
-                    {/*<Stepper.Step>*/}
-                    {/*    <Facilities*/}
-                    {/*        prevStep={prevStep}*/}
-                    {/*        propertyDetails={propertyDetails}*/}
-                    {/*        setPropertyDetails={setPropertyDetails}*/}
-                    {/*        setOpened={setOpened}*/}
-                    {/*        setActiveStep={setActive}*/}
-                    {/*    />*/}
-                    {/*</Stepper.Step>*/}
+                    <Stepper.Step>
+                        <Facilities
+                            prevStep={prevStep}
+                            propertyDetails={propertyDetails}
+                            setPropertyDetails={setPropertyDetails}
+                            setOpened={setOpened}
+                            setActiveStep={setActive}
+                        />
+                    </Stepper.Step>
                     <Stepper.Completed>
                         Completed, click back button to get to previous step
                     </Stepper.Completed>

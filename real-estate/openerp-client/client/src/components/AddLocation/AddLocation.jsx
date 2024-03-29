@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {apiGetPublicDistrict, apiGetPublicProvinces} from "../../services/app";
+import {apiGetPublicDistrict, apiGetPublicProvinces} from "../../services/AppRequest";
 import {Button, Group, Select, TextInput} from "@mantine/core";
 import {useForm} from "@mantine/form";
 import {validateString} from "../../utils/common";
@@ -27,83 +27,81 @@ const AddLocation = ({propertyDetails, setPropertyDetails, nextStep}) => {
     const [district, setDistrict] = useState(propertyDetails?.district)
     const [addressInput, setAddressInput] = useState('')
     const [address, setAddress] = useState(propertyDetails?.address)
-    const [showPosition, setShowPosition] = useState(true)
+    const [position, setPosition] = useState(propertyDetails?.position)
 
-    const [reset, setReset] = useState(false)
+    // const [reset, setReset] = useState(false)
 
-    let activeNextPage = false;
+    // let activeNextPage = false;
     useEffect(() => {
         const fetchPublicProvince = async () => {
             const response = await apiGetPublicProvinces()
             if (response.status === 200) {
-                console.log("run", response)
                 setProvinces(response?.data.data)
             }
         }
         fetchPublicProvince()
     }, [])
 
+    const onChangeProvince = (value) => {
+        setProvince(value)
+    }
+
+    const onChangeDistrict = (value) => {
+        setDistrict(value)
+    }
+
     useEffect(() => {
         const fetchPublicDistrict = async () => {
-            const response = await apiGetPublicDistrict(province.provinceId)
+            const response = await apiGetPublicDistrict(province)
             if (response.status === 200) {
                 setDistricts(response.data?.data)
             }
         }
         province && fetchPublicDistrict()
-        setDistrict(null)
+        console.log("set district ve nyll");
+        setDistrict(null);
     }, [province])
 
     useEffect(() => {
         setAddress(null);
     }, [province, district, addressInput])
-    // const { province, district, address } = form.values;
 
-    useEffect(() => {
-        setShowPosition(false);
-    }, [addressInput]);
     const handleSubmit = () => {
-        console.log('Submit')
-        setPropertyDetails((prev) => ({...prev, province, district, address}))
+        // console.log('Submit')
+        setPropertyDetails((prev) => ({...prev, province, district, address, position}))
         nextStep()
     }
 
-    // const onChangeProvince = (value) => {
-    //     setProvince(value.provinceId)
-    // }
-    //
-    // const onChangeDistrict = (value) => {
-    //
-    //     setName(value.nameDistrict)
-    //     // console.log(value)
-    //     setDistrict(value.districtId)
-    // }
-
     const optionsProvince = provinces?.map((item) => ({
-        value: item,
+        value: item.nameProvince,
         label: item.nameProvince,
         key: item.provinceId,
     }));
 
     const optionsDistrict = districts?.map((item) => ({
-        value: item,
+        value: item.nameDistrict,
         label: item.nameDistrict,
         key: item.districtId
     }));
 
-    console.log("gia tri address", address, addressInput)
+    // console.log("gia tri address", address, addressInput)
+    console.log("da luu", propertyDetails)
+    // console.log("district", district)
+    // console.log("gia tri province", province)
     return (
         <div>
-            <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    if (activeNextPage) {
-                        handleSubmit()
-                    } else {
-                        activeNextPage = true;
-                    }
-                }}
-            >
+            {/*<form*/}
+            {/*    onSubmit={(e) => {*/}
+            {/*        e.preventDefault();*/}
+            {/*        handleSubmit()*/}
+
+            {/*        // if (activeNextPage) {*/}
+            {/*        //     handleSubmit()*/}
+            {/*        // } else {*/}
+            {/*        //     activeNextPage = true;*/}
+            {/*        // }*/}
+            {/*    }}*/}
+            {/*>*/}
                 <div
                     className="flexCenter"
                     style={{
@@ -119,12 +117,13 @@ const AddLocation = ({propertyDetails, setPropertyDetails, nextStep}) => {
                     <div className="flexColStart" style={{flex: 1, gap: "1rem"}}>
                         <Select
                             w={"100%"}
-                            withAsterisk
+                            // withAsterisk
                             label="Province"
                             clearable
                             searchable
                             data={optionsProvince}
-                            onChange={value => setProvince(value)}
+                            value={province? province : null}
+                            onChange={onChangeProvince}
                         />
 
                         <Select
@@ -134,14 +133,14 @@ const AddLocation = ({propertyDetails, setPropertyDetails, nextStep}) => {
                             clearable
                             searchable
                             data={optionsDistrict}
-                            onChange={value => setDistrict(value)}
-                            value={district}
+                            onChange={onChangeDistrict}
+                            value={district? district : null}
                         />
                         <TextInput
                             w={"100%"}
                             withAsterisk
                             label="Address"
-                            // value={address}
+                            value={address}
                             onChange={(event) => setAddressInput(event.currentTarget.value)}
                         />
 
@@ -149,29 +148,24 @@ const AddLocation = ({propertyDetails, setPropertyDetails, nextStep}) => {
 
 
                     <div style={{flex: 1}}>
-                        <Map address={address} district={district?.nameDistrict} province={province?.nameProvince}/>
+                        <Map address={address} district={district} province={province} position={position} setPosition={setPosition}/>
                     </div>
                 </div>
 
+            <Group position="center" mt={"xl"}>
+            {
+                (address === '' || address === null || address !== addressInput) ?
+                    (<Button onClick={() => {
+                        setAddress(addressInput)
+                    }}>
+                        Find Position
+                    </Button>) :
+                    (
+                        <Button onClick={handleSubmit}>Next Step</Button>
+                    )
+            }
+            </Group>
 
-                <Group position="center" mt={"xl"}>
-                    {
-                        (address === '' || address === null || address !== addressInput) ?
-                            (<Button onClick={() => {
-                                console.log('run position')
-                                setShowPosition(false)
-                                setAddress(addressInput)
-                            }}>
-                                Find Position
-                            </Button>) :
-                            (
-                                <Button type="submit">Next Step</Button>
-                            )
-                    }
-                </Group>
-
-
-            </form>
         </div>
     )
 }
