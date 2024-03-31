@@ -12,4 +12,5 @@ public interface UserService {
 
     void synchronizeUser(String userId, String email, String firstName, String lastName);
 
+
 }
