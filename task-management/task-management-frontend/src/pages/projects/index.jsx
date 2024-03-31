@@ -2,12 +2,11 @@ import { Card, CardHeader, Tooltip, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import TableToolbar from "../../components/table/Toolbar";
-import { ProjectService } from "../../services/api/project.service";
-import { useDebounce } from "../../hooks/useDebounce";
 import { Link } from "react-router-dom";
-import CustomAvatar from "../../components/mui/avatar/CustomAvatar";
-import { getRandomColorSkin } from "../../utils/color.util";
+import { UserAvatar } from "../../components/common/avatar/UserAvatar";
+import TableToolbar from "../../components/mui/table/Toolbar";
+import { useDebounce } from "../../hooks/useDebounce";
+import { ProjectService } from "../../services/api/project.service";
 
 const columns = [
   {
@@ -66,19 +65,7 @@ const columns = [
         <Tooltip
           title={`${row.creator.firstName ?? ""} ${row.creator.lastName ?? ""}`}
         >
-          <CustomAvatar
-            skin="light"
-            color={getRandomColorSkin(row.creator.id)}
-            sx={{
-              width: 30,
-              height: 30,
-              fontSize: ".875rem",
-            }}
-          >
-            {`${row.creator?.firstName?.charAt(0) ?? ""}${
-              row?.creator?.lastName?.charAt(0) ?? ""
-            }`}
-          </CustomAvatar>
+          <UserAvatar user={row.creator} />
         </Tooltip>
       ) : (
         <Typography variant="body2" sx={{ color: "text.primary" }}>

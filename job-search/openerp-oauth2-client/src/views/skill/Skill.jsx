@@ -29,12 +29,6 @@ const UserSkill = () => {
         setSkills([
             ...skills
         ])
-        // skills = [{
-        //     id: "mine_ide",
-        //     skillName: "nodejs",
-        //     certLink: "facebook.com",
-        //     score: 10.0
-        //  }]
 
         console.log(skills)
         request("post", "/skill",(res) => {
