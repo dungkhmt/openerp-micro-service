@@ -8,4 +8,6 @@ public interface AssetService {
     List<Asset> getAllAssets();
 
     Asset addNewAsset(Asset asset);
+
+    Asset editAsset(Integer Id, Asset asset);
 }
