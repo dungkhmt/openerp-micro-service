@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -20,6 +21,12 @@ public class LocationServiceImpl implements LocationService{
     }
 
     @Override
+    public Optional<Location> getLocationById(Integer Id) {
+        Optional<Location> location = locationRepo.findById(Id);
+        return location;
+    }
+
+    @Override
     public Location addNewLocation(Location location) {
         Location loc = new Location();
         loc.setName(location.getName());
@@ -27,5 +34,23 @@ public class LocationServiceImpl implements LocationService{
         loc.setDescription(location.getDescription());
         loc.setImage(location.getImage());
         return locationRepo.save(loc);
+    }
+
+    @Override
+    public Location editLocation(Integer Id, Location location) {
+        Location foundLocation = locationRepo.findById(Id).get();
+        foundLocation.setName(location.getName());
+        foundLocation.setAddress(location.getAddress());
+        foundLocation.setDescription(location.getDescription());
+        foundLocation.setImage(location.getImage());
+        return locationRepo.save(foundLocation);
+    }
+
+    @Override
+    public void deleteLocation(Integer Id) {
+        Optional<Location> foundLocation = locationRepo.findById(Id);
+        if(foundLocation.isPresent()){
+            locationRepo.deleteById(Id);
+        }
     }
 }

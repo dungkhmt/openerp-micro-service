@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.entity.ClassCall;
 import openerp.openerpresourceserver.repo.ClassCallRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,6 +34,13 @@ public class ClassCallServiceImpl implements ClassCallService {
         Optional<ClassCall> classCall = classCallRepo.findById(id);
         if(classCall.isEmpty()) throw new IllegalArgumentException("Class with ID " + id + " not found");
         else return classCall;
+    }
+
+    @Override
+    public List<ClassCall> getClassBySemester(String semester) {
+        List<ClassCall> classCall = classCallRepo.findBySemester(semester, Sort.by(Sort.Direction.ASC, "id"));
+        if(classCall.isEmpty()) throw new IllegalArgumentException("No class in semester " + semester);
+        return classCall;
     }
 
     @Override

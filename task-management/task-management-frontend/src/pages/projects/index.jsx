@@ -2,12 +2,11 @@ import { Card, CardHeader, Tooltip, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import TableToolbar from "../../components/table/Toolbar";
-import { ProjectService } from "../../services/api/project.service";
-import { useDebounce } from "../../hooks/useDebounce";
 import { Link } from "react-router-dom";
-import CustomAvatar from "../../components/mui/avatar/CustomAvatar";
-import { getRandomColorSkin } from "../../utils/color.util";
+import { UserAvatar } from "../../components/common/avatar/UserAvatar";
+import TableToolbar from "../../components/mui/table/Toolbar";
+import { useDebounce } from "../../hooks/useDebounce";
+import { ProjectService } from "../../services/api/project.service";
 
 const columns = [
   {
@@ -21,7 +20,7 @@ const columns = [
     ),
   },
   {
-    flex: 0.45,
+    flex: 0.4,
     field: "name",
     headerName: "Tên dự án",
     renderCell: (params) => (
@@ -42,7 +41,19 @@ const columns = [
     ),
   },
   {
-    flex: 0.2,
+    flex: 0.1,
+    field: "role",
+    headerName: "Vai trò",
+    align: "center",
+    headerAlign: "center",
+    renderCell: (params) => (
+      <Typography variant="body2" sx={{ color: "text.primary" }}>
+        {params.row.role}
+      </Typography>
+    ),
+  },
+  {
+    flex: 0.15,
     field: "creator",
     headerName: "Người tạo",
     align: "center",
@@ -54,19 +65,7 @@ const columns = [
         <Tooltip
           title={`${row.creator.firstName ?? ""} ${row.creator.lastName ?? ""}`}
         >
-          <CustomAvatar
-            skin="light"
-            color={getRandomColorSkin(row.creator.id)}
-            sx={{
-              width: 30,
-              height: 30,
-              fontSize: ".875rem",
-            }}
-          >
-            {`${row.creator?.firstName?.charAt(0) ?? ""}${
-              row?.creator?.lastName?.charAt(0) ?? ""
-            }`}
-          </CustomAvatar>
+          <UserAvatar user={row.creator} />
         </Tooltip>
       ) : (
         <Typography variant="body2" sx={{ color: "text.primary" }}>
@@ -123,7 +122,9 @@ const Projects = () => {
         const projectPagination = await ProjectService.getProjects({
           page: paginationModel.page,
           size: paginationModel.pageSize,
-          search: `code:*${encodedQuery}* OR name:*${encodedQuery}*`,
+          search: encodedQuery
+            ? `code:*${encodedQuery}* OR name:*${encodedQuery}*`
+            : "",
           sort: `${column},${sort}`,
         });
 
@@ -144,7 +145,7 @@ const Projects = () => {
   }, [fetchProjects, searchDebounce, sort, sortColumn]);
 
   return (
-    <Card sx={{ height: "85vh" }}>
+    <Card sx={{ height: "85vh", boxShadow: (theme) => theme.shadows[1] }}>
       <CardHeader title="Danh sách dự án" />
       <DataGrid
         pagination

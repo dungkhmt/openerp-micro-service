@@ -59,4 +59,15 @@ public class ClassCallController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    @GetMapping("/get-class-by-semester/{semester}")
+    public ResponseEntity<?> getClassBySemester(@PathVariable String semester) {
+        try {
+            List<ClassCall> classCalls = classCallService.getClassBySemester(semester);
+            return ResponseEntity.ok().body(classCalls);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
 }

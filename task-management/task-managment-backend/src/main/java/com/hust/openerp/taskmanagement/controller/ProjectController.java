@@ -29,6 +29,7 @@ import com.hust.openerp.taskmanagement.dto.PaginationDTO;
 import com.hust.openerp.taskmanagement.dto.ProjectDTO;
 import com.hust.openerp.taskmanagement.dto.dao.HistoryDao;
 import com.hust.openerp.taskmanagement.entity.Project;
+import com.hust.openerp.taskmanagement.entity.ProjectMember;
 import com.hust.openerp.taskmanagement.exception.ProjectNotFoundException;
 import com.hust.openerp.taskmanagement.service.ProjectService;
 import com.hust.openerp.taskmanagement.service.TaskExecutionService;
@@ -50,10 +51,17 @@ public class ProjectController {
   private final TaskExecutionService taskExecutionService;
 
   @GetMapping()
-  public PaginationDTO<ProjectDTO> getProjectsPagination(Pageable pageable,
+  public PaginationDTO<ProjectDTO> getProjectsPagination(Principal principal, Pageable pageable,
       @Nullable @RequestParam(value = "search", required = false) String search) {
-    Page<ProjectDTO> result = projectService.findPaginated(pageable, search)
-        .map(project -> modelMapper.map(project, ProjectDTO.class));
+    Page<ProjectDTO> result = projectService.findPaginated(principal.getName(), pageable, search)
+        // TODO: move this logic to service
+        .map(project -> {
+          var dto = modelMapper.map(project, ProjectDTO.class);
+          dto.setRole(project.getMembers().stream()
+              .filter(member -> member.getUserId().equals(principal.getName())).findFirst()
+              .orElse(ProjectMember.builder().roleId("").build()).getRoleId());
+          return dto;
+        });
     return new PaginationDTO<>(result);
   }
 

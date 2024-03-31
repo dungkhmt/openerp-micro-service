@@ -1,7 +1,5 @@
 const typography = {
   fontFamily: [
-    "Inter",
-    "sans-serif",
     "-apple-system",
     "BlinkMacSystemFont",
     '"Segoe UI"',

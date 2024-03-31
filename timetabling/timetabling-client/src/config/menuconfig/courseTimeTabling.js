@@ -24,5 +24,12 @@ export const courseTimeTabling = {
       text: "Xếp thời khóa biểu",
       child: [],
     },
+    {
+      id: "MENU_COURSE_TIME_TABLING.CLASS_LIST_OPENED",
+      path: "/course-time-tabling/class-list-opened-first-year-standard",
+      isPublic: true,
+      text: "Tải lên DS lớp năm 1",
+      child: [],
+    },
   ],
 };

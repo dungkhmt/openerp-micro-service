@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import { request } from "../../api";
 import { warningNoti, successNoti } from "../../utils/notification";
+import { SEMESTER } from "config/localize";
 import styles from "./index.style";
 
 const RegisterClassScreen = () => {
@@ -21,7 +22,7 @@ const RegisterClassScreen = () => {
     subjectName: "",
     classRoom: "",
     note: "",
-    semester: "",
+    semester: SEMESTER,
   });
 
   const handleChange = (event) => {
@@ -73,7 +74,6 @@ const RegisterClassScreen = () => {
               <h3>Mã lớp</h3>
               <TextField
                 style={styles.textField}
-                label="Mã lớp"
                 variant="outlined"
                 name="subjectId"
                 value={formData.subjectId}
@@ -85,7 +85,6 @@ const RegisterClassScreen = () => {
               <h3>Tên lớp</h3>
               <TextField
                 style={styles.rightTextField}
-                label="Tên lớp"
                 variant="outlined"
                 name="subjectName"
                 value={formData.subjectName}
@@ -99,7 +98,6 @@ const RegisterClassScreen = () => {
               <h3>Phòng học</h3>
               <TextField
                 style={styles.textField}
-                label="Phòng học"
                 variant="outlined"
                 name="classRoom"
                 value={formData.classRoom}
@@ -111,7 +109,6 @@ const RegisterClassScreen = () => {
               <h3>Học kì</h3>
               <TextField
                 style={styles.textField}
-                label="Học kì"
                 variant="outlined"
                 name="semester"
                 value={formData.semester}

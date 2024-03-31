@@ -5,17 +5,23 @@ import { Icon } from "@iconify/react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useEffect } from "react";
-import { ProjectViewTasks } from "./ProjectViewTasks";
+import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
 import { useProjectContext } from "../../hooks/useProjectContext";
-import { ProjectViewMembers } from "./ProjectViewMembers";
+import { ProjectViewMembers } from "./member/ProjectViewMembers";
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   "& .MuiTabs-indicator": {
-    display: "none",
+    backgroundColor: theme.palette.primary.main,
+    top: 0,
+    height: "40px",
+    zIndex: -2,
+    borderRadius: theme.shape.borderRadius,
   },
   "& .Mui-selected": {
-    backgroundColor: theme.palette.primary.main,
     color: `${theme.palette.common.white} !important`,
+    "&:hover": {
+      backgroundColor: `${theme.palette.primary.main} !important`,
+    },
   },
   "& .MuiTab-root": {
     minWidth: 65,
@@ -25,6 +31,9 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
     borderRadius: theme.shape.borderRadius,
     [theme.breakpoints.up("md")]: {
       minWidth: 130,
+    },
+    "&:hover": {
+      backgroundColor: theme.palette.grey[200],
     },
   },
 }));
@@ -52,7 +61,6 @@ const ProjectViewRight = () => {
         scrollButtons="auto"
         onChange={handleChange}
       >
-        bs
         <Tab
           value="overview"
           label={
@@ -120,7 +128,7 @@ const ProjectViewRight = () => {
           }
         />
       </TabList>
-      <Box sx={{ mt: 4 }}>
+      <Box>
         {projectLoading ? (
           <Box
             sx={{

@@ -15,17 +15,16 @@ import MDEditor from "@uiw/react-md-editor";
 import dayjs from "dayjs";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import CustomAvatar from "../../components/mui/avatar/CustomAvatar";
+import { UserAvatar } from "../../components/common/avatar/UserAvatar";
+import { useProjectContext } from "../../hooks/useProjectContext";
 import { useTaskContext } from "../../hooks/useTaskContext";
 import { FileService } from "../../services/api/file.service";
-import { getRandomColorSkin } from "../../utils/color.util";
 import { getDiffDateWithCurrent } from "../../utils/date.util";
-import CommentSection from "./CommentSection";
+import CommentSection from "./comment/CommentSection";
+import { DialogAddSubTask } from "./hierarchy/DialogAddSubTask";
 import { DialogEditTask } from "./DialogEditTask";
-import TaskViewLog from "./TaskViewLog";
-import { TaskViewHierarchy } from "./TaskViewHierarchy";
-import { DialogAddSubTask } from "./DialogAddSubTask";
-import { useProjectContext } from "../../hooks/useProjectContext";
+import { TaskViewHierarchy } from "./hierarchy/TaskViewHierarchy";
+import TaskViewLog from "./log/TaskViewLog";
 
 const TextHighlight = styled(Typography)(({ theme }) => ({
   color: theme.palette.primary.main,
@@ -66,7 +65,7 @@ const Loading = () => (
 
 const TaskViewLeft = () => {
   const { isLoading: taskLoading, task } = useTaskContext();
-  const {isLoading: projectLoading} = useProjectContext();
+  const { isLoading: projectLoading } = useProjectContext();
   const [openEdit, setOpenEdit] = useState(false);
   const [openAddSubTask, setOpenAddSubTask] = useState(false);
 
@@ -108,19 +107,12 @@ const TaskViewLeft = () => {
           <CardContent>
             <Grid container spacing={6}>
               <Grid item xs={12} md={1} sm={0.75} xl={0.75}>
-                <CustomAvatar
-                  skin="light"
-                  color={getRandomColorSkin(task.creator?.id)}
-                  sx={{
-                    width: 70,
-                    height: 70,
-                    fontSize: "2rem",
-                  }}
-                >
-                  {`${task.creator?.firstName?.charAt(
-                    0
-                  )}${task.creator?.lastName?.charAt(0)}`}
-                </CustomAvatar>
+                <UserAvatar
+                  user={task.creator}
+                  width={70}
+                  height={70}
+                  fontSize="2rem"
+                />
               </Grid>
 
               <Grid item xs={12} md={10} xl={10.5}>

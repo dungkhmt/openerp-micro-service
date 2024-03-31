@@ -5,6 +5,7 @@ import {
   Card,
   CardContent,
   IconButton,
+  LinearProgress,
   TextField,
   Tooltip,
   Typography,
@@ -14,15 +15,15 @@ import dayjs from "dayjs";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
-import CustomAvatar from "../../../components/mui/avatar/CustomAvatar";
+import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
 import CustomChip from "../../../components/mui/chip";
 import { useDebounce } from "../../../hooks/useDebounce";
-import { TaskService } from "../../../services/api/task.service";
 import { StatusService } from "../../../services/api/task-status.service";
+import { TaskService } from "../../../services/api/task.service";
 import {
   getCategoryColor,
   getDueDateColor,
-  getRandomColorSkin,
+  getProgressColor,
   getStatusColor,
 } from "../../../utils/color.util";
 
@@ -50,7 +51,7 @@ const TaskAssigned = () => {
 
   const columns = [
     {
-      flex: 0.3,
+      flex: 0.25,
       field: "name",
       headerName: "Tên",
       filterable: false,
@@ -91,7 +92,7 @@ const TaskAssigned = () => {
       ),
     },
     {
-      flex: 0.2,
+      flex: 0.15,
       field: "project",
       headerName: "Dự án",
       sortable: false,
@@ -144,6 +145,31 @@ const TaskAssigned = () => {
     },
     {
       flex: 0.1,
+      field: "progress",
+      headerName: "Tiến độ",
+      align: "center",
+      headerAlign: "center",
+      sortable: false,
+      filterable: false,
+      renderCell: ({ row }) => {
+        const progress = row.progress ?? 0;
+        return (
+          <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+            <Typography variant="body2" sx={{ color: "text.primary" }}>
+              {progress}%
+            </Typography>
+            <LinearProgress
+              variant="determinate"
+              value={progress}
+              color={getProgressColor(progress)}
+              sx={{ height: 6, borderRadius: "5px", width: "100%" }}
+            />
+          </Box>
+        );
+      },
+    },
+    {
+      flex: 0.1,
       field: "dueDate",
       headerName: "Thời hạn",
       align: "center",
@@ -171,15 +197,7 @@ const TaskAssigned = () => {
               title={`${row.creator.firstName} ${row.creator.lastName}`}
               key={row.creator.id}
             >
-              <CustomAvatar
-                skin="light"
-                color={getRandomColorSkin(row.creator.id)}
-                sx={{ width: 30, height: 30, fontSize: ".875rem" }}
-              >
-                {`${row.creator?.firstName?.charAt(0) ?? ""}${
-                  row.creator?.lastName?.charAt(0) ?? ""
-                }`}
-              </CustomAvatar>
+              <UserAvatar user={row.creator} />
             </Tooltip>
           </AvatarGroup>
         ),

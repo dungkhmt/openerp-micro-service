@@ -35,4 +35,56 @@ public class ApplicationController {
         List<Application> applications = applicationService.getMyApplications(userId);
         return ResponseEntity.ok().body(applications);
     }
+
+    @GetMapping("/get-application-by-class/{classCallId}")
+    public ResponseEntity<?> getApplicationByClassId(@PathVariable int classCallId) {
+        List<Application> applications = applicationService.getApplicationByClassId(classCallId);
+        return ResponseEntity.ok().body(applications);
+    }
+
+    /**
+     * @TODO: Search by semester
+     */
+    @GetMapping("/get-unique-applicator")
+    public ResponseEntity<?> getUniqueApplicator() {
+        List<Application> applicators = applicationService.getUniqueApplicator();
+        return ResponseEntity.ok().body(applicators);
+    }
+
+    @GetMapping("/get-application-by-semester/{semester}")
+    public ResponseEntity<?> getApplicationBySemester(@PathVariable String semester) {
+        List<Application> applications = applicationService.getApplicationBySemester(semester);
+        return ResponseEntity.ok().body(applications);
+    }
+
+    @PutMapping("/update-application-status/{applicationId}")
+    public ResponseEntity<?> updateApplicationStatus(@PathVariable int applicationId, @RequestBody Application updateApplication) {
+        try {
+            Application application = applicationService.updateApplicationStatus(applicationId, updateApplication.getApplicationStatus());
+            return ResponseEntity.ok().body(application);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/update-assign-status/{applicationId}")
+    public ResponseEntity<?> updateAssignStatus(@PathVariable int applicationId, @RequestBody Application updateApplication) {
+        try {
+            Application application = applicationService.updateAssignStatus(applicationId, updateApplication.getAssignStatus());
+            return ResponseEntity.ok().body(application);
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage().equals("Time conflict with existing approved application")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            }
+        }
+    }
+
+    @GetMapping("/get-application-by-status-and-semester/{semester}/{applicationStatus}")
+    public ResponseEntity<?> getApplicationByApplyStatusAnsSemester(@PathVariable String semester, @PathVariable String applicationStatus) {
+        List<Application> applications = applicationService.getApplicationByApplicationStatusAndSemester(applicationStatus, semester);
+        return ResponseEntity.ok().body(applications);
+    }
+
 }
