@@ -28,7 +28,7 @@ public class AssetServiceImpl implements AssetService{
         Asset newAsset = new Asset();
         newAsset.setName(asset.getName());
         AssetType assetType = assetTypeRepo.findById(asset.getType_id()).get();
-        String prefix = assetType.getCodePrefix();
+        String prefix = assetType.getCode_prefix();
         Utils utils = new Utils();
         newAsset.setCode(prefix + "-" + utils.generateRandomHash(6));
         newAsset.setAssignee_id(asset.getAssignee_id());
