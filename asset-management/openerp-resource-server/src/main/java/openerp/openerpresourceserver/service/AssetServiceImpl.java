@@ -52,6 +52,7 @@ public class AssetServiceImpl implements AssetService{
         Asset foundAsset = assetRepo.findById(Id).get();
         foundAsset.setName(asset.getName());
         foundAsset.setDescription(asset.getDescription());
+        foundAsset.setType_id(asset.getType_id());
         foundAsset.setVendor_id(asset.getVendor_id());
         foundAsset.setLocation_id(asset.getLocation_id());
         foundAsset.setImage(asset.getImage());
