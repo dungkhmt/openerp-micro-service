@@ -10,4 +10,6 @@ public interface AssetService {
     Asset addNewAsset(Asset asset);
 
     Asset editAsset(Integer Id, Asset asset);
+
+    void deleteAsset(Integer Id);
 }

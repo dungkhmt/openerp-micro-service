@@ -39,4 +39,10 @@ public class AssetController {
             .status(HttpStatus.OK)
             .body(foundAsset);
     }
+
+    @DeleteMapping("/delete/{Id}")
+    public ResponseEntity<?> deleteAsset(@PathVariable Integer Id){
+        assetService.deleteAsset(Id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

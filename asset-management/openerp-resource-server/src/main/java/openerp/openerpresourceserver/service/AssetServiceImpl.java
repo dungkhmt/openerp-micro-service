@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -59,5 +60,13 @@ public class AssetServiceImpl implements AssetService{
         Date currentDate = new Date();
         foundAsset.setLast_updated(currentDate);
         return assetRepo.save(foundAsset);
+    }
+
+    @Override
+    public void deleteAsset(Integer Id) {
+        Optional<Asset> asset = assetRepo.findById(Id);
+        if(asset.isPresent()){
+            assetRepo.deleteById(Id);
+        }
     }
 }
