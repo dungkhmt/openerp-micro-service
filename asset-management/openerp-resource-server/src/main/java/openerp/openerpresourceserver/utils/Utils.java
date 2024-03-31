@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 public class Utils {
-    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     public static String generateRandomHash(int length) {
         StringBuilder sb = new StringBuilder();
