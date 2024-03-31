@@ -29,7 +29,7 @@ public class AssetType {
     private String description;
 
     @Column(nullable = false, unique = true)
-    private String codePrefix;
+    private String code_prefix;
 
     @CreatedDate
     private Date since;
