@@ -25,9 +25,12 @@ const ViewAllJobPost = () => {
     useEffect(() => {
         request("get", "/job-post", (res) => {
             setAllJobPostForm(res.data)
-            console.log(res.data)
         }).then();
     }, [])
+
+    function goToUrl(url) {
+        window.location.href = url;
+      }
 
     return (
         <>
@@ -47,7 +50,7 @@ const ViewAllJobPost = () => {
                         <strong>Job salary</strong>: {jobPost.salary ? jobPost.salary : "thương lượng"}
                     </Typography>
                     <CardActions>
-                        <Button size="small">More Detail</Button>
+                        <Button size="small" onClick={() => goToUrl(`/view-job-post/${jobPost.id}`)}>More Detail</Button>
                     </CardActions>
                 </CardContent>
             </Card>

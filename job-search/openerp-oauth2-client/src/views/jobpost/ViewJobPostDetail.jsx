@@ -10,33 +10,54 @@ import {
     FormControl,
     Row,
 } from "react-bootstrap";
-import { Card, CardContent } from '@mui/material';
+import { Card, CardContent, CardActions } from '@mui/material';
+import { useParams } from 'react-router-dom';
 
-const ViewJobPost = (props) => {
+const ViewJobPostDetail = () => {
 
-    const [JobPostForm, setJobPostForm] = useState([])
+    const { id } = useParams();
+    const [JobPostForm, setJobPostForm] = useState({
+
+    })
+
+    useEffect(() => {
+        request("get", `/job-post/${id}`, (res) => {
+            setJobPostForm(res.data)
+            console.log(res.data)
+        }).then();
+    }, [])
+
+    function goToUrl(url) {
+        window.location.href = url;
+      }
 
     return (
         <>
             <Card  sx={{ minWidth: 275 }}>
                 <CardContent>
                     <Typography variant="h4" component="div">
-                        your dream job here
+                        Job Detail
                     </Typography>
                     <Typography variant="body2">
-                        <strong>Job title</strong>: {props.title}
+                        <strong>Job title</strong>: {JobPostForm.jobPost?.title}
                     </Typography>
                     <Typography variant="body2">
-                        <strong>Job location</strong>: {props.locations}
+                        <strong>Job location</strong>: {JobPostForm.jobPost?.locations}
                     </Typography>
                     <Typography variant="body2">
-                        <strong>Job salary</strong>: {props.salary}
+                        <strong>Job salary</strong>: {JobPostForm.jobPost?.salary}
+                    </Typography>
+                    <Typography variant="body2">
+                        <strong>About company</strong>: {JobPostForm.company?.about}
                     </Typography>
                 </CardContent>
+                <CardActions>
+                        <Button size="small" onClick={() => goToUrl(`/view-job-post`)}>Apply this Job</Button>
+                </CardActions>
             </Card>  
         </>
 
     )
 }
 
-export default ViewJobPost;
+export default ViewJobPostDetail;
