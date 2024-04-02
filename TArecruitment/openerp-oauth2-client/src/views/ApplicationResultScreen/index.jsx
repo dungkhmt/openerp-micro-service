@@ -1,6 +1,6 @@
 import { Chip } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
 import { request } from "api";
-import { StandardTable } from "erp-hust/lib/StandardTable";
 import { useEffect, useState } from "react";
 
 const ApplicationResultScreen = () => {
@@ -13,82 +13,105 @@ const ApplicationResultScreen = () => {
     });
   }, []);
 
-  const columns = [
+  const applicationStatusCell = (params) => {
+    const rowData = params.row;
+
+    return (
+      <div>
+        {rowData.applicationStatus === "PENDING" ? (
+          <Chip label="PENDING" color="warning" variant="outlined" />
+        ) : rowData.applicationStatus === "APPROVED" ? (
+          <Chip label="APPROVED" color="success" variant="outlined" />
+        ) : (
+          <Chip label="REJECTED" color="error" variant="outlined" />
+        )}
+      </div>
+    );
+  };
+
+  const assignStatusCell = (params) => {
+    const rowData = params.row;
+
+    return (
+      <div>
+        {rowData.assignStatus === "PENDING" ? (
+          <Chip label="PENDING" color="warning" variant="outlined" />
+        ) : rowData.assignStatus === "APPROVED" ? (
+          <Chip label="APPROVED" color="success" variant="outlined" />
+        ) : (
+          <Chip label="CANCELED" color="error" variant="outlined" />
+        )}
+      </div>
+    );
+  };
+
+  const dataGridColumns = [
     {
-      title: "Mã lớp",
-      field: "classCall.id",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "470" },
+      field: "classId",
+      headerName: "Mã lớp",
+      align: "center",
+      headerAlign: "center",
     },
     {
-      title: "Mã môn học",
-      field: "classCall.subjectId",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "470" },
+      field: "subjectId",
+      headerName: "Mã môn học",
+      flex: 1,
     },
     {
-      title: "Tên môn học",
-      field: "classCall.subjectName",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "470" },
+      field: "subjectName",
+      headerName: "Tên môn học",
+      flex: 1,
     },
     {
-      title: "Thời gian",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "470" },
-      render: (rowData) => (
-        <span>
-          Thứ {rowData.classCall.day}, tiết {rowData.classCall.startPeriod} -{" "}
-          {rowData.classCall.endPeriod}
-        </span>
-      ),
+      field: "day",
+      headerName: "Thời gian",
+      flex: 1,
     },
     {
-      title: "Trạng thái đăng ký",
-      field: "applicationStatus",
-      headerStyle: { fontWeight: "bold" },
-      render: (rowData) => (
-        <div>
-          {rowData.applicationStatus === "PENDING" ? (
-            <Chip label="PENDING" color="warning" variant="outlined" />
-          ) : rowData.applicationStatus === "APPROVED" ? (
-            <Chip label="APPROVED" color="success" variant="outlined" />
-          ) : (
-            <Chip label="REJECTED" color="error" variant="outlined" />
-          )}
-        </div>
-      ),
+      headerName: "Trạng thái đăng ký",
+      flex: 1,
+      renderCell: applicationStatusCell,
+      align: "center",
+      headerAlign: "center",
     },
     {
-      title: "Trạng thái phân công",
-      field: "assignStatus",
-      headerStyle: { fontWeight: "bold" },
-      render: (rowData) => (
-        <div>
-          {rowData.assignStatus === "NONE" ? (
-            <Chip label="PENDING" color="warning" variant="outlined" />
-          ) : (
-            <Chip label="APPROVED" color="success" variant="outlined" />
-          )}
-        </div>
-      ),
+      headerName: "Trạng thái phân công",
+      flex: 1,
+      renderCell: assignStatusCell,
+      align: "center",
+      headerAlign: "center",
     },
   ];
+
+  const dataGridRows = applications.map((application) => ({
+    id: application.id,
+    classId: application.classCall.id,
+    subjectId: application.classCall.subjectId,
+    subjectName: application.classCall.subjectName,
+    day: `Thứ ${application.classCall.day}, tiết ${application.classCall.startPeriod} - ${application.classCall.endPeriod}`,
+    applicationStatus: application.applicationStatus,
+    assignStatus: application.assignStatus,
+  }));
 
   return (
     <div>
       <h1>Kết quả tuyển dụng</h1>
-      <StandardTable
-        title=""
-        columns={columns}
-        data={applications}
-        hideCommandBar
-        options={{
-          selection: false,
-          pageSize: 5,
-          search: true,
-          sorting: true,
+      <DataGrid
+        rowHeight={60}
+        sx={{ fontSize: 16 }}
+        rows={dataGridRows}
+        columns={dataGridColumns}
+        autoHeight
+        initialState={{
+          pagination: {
+            paginationModel: {
+              pageSize: 5,
+            },
+          },
         }}
+        pageSizeOptions={[5, 10, 20]}
+        checkboxSelection={false}
+        disableRowSelectionOnClick
       />
     </div>
   );

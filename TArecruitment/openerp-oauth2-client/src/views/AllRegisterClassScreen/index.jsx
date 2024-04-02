@@ -1,84 +1,97 @@
 import { useState, useEffect } from "react";
 import { request } from "../../api";
-import { StandardTable } from "erp-hust/lib/StandardTable";
 import { Button } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { SEMESTER } from "config/localize";
+import { DataGrid } from "@mui/x-data-grid";
 
 const AllRegisterClassScreen = () => {
   const history = useHistory();
   const [classes, setClasses] = useState([]);
+  const [registeredClass, setRegisteredClass] = useState([]);
 
   useEffect(() => {
     request("get", `/class-call/get-class-by-semester/${SEMESTER}`, (res) => {
       setClasses(res.data);
     }).then();
+    request("get", `/class-call/get-my-registered-class/${SEMESTER}`, (res) => {
+      setRegisteredClass(res.data);
+    });
   }, []);
 
-  const columns = [
+  const handleRegister = (klass) => {
+    history.push("/student/class-register/", { classId: klass.id });
+  };
+
+  const actionCell = (params) => {
+    const rowData = params.row;
+    const isRegistered = registeredClass.some((item) => item.id === rowData.id);
+    return (
+      <Button
+        variant="contained"
+        disabled={isRegistered}
+        onClick={() => handleRegister(rowData)}
+        style={{ width: "130px" }}
+      >
+        {isRegistered ? "ĐÃ ĐĂNG KÝ" : "Đăng ký"}
+      </Button>
+    );
+  };
+
+  const dataGridColumns = [
     {
-      title: "Mã lớp",
       field: "id",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
+      headerName: "Mã lớp",
+      align: "center",
+      headerAlign: "center",
     },
+    { field: "subjectId", headerName: "Mã môn học", flex: 1 },
     {
-      title: "Mã môn học",
-      field: "subjectId",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
-    },
-    {
-      title: "Tên môn học",
       field: "subjectName",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
+      headerName: "Tên môn học",
+      flex: 1,
     },
     {
-      title: "Thời gian",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
-      render: (rowData) => (
-        <span>
-          Thứ {rowData.day}, tiết {rowData.startPeriod} - {rowData.endPeriod}
-        </span>
-      ),
-      customSort: (a, b) => {
-        if (a.day === b.day) {
-          return a.startPeriod - b.startPeriod;
-        }
-        return a.day - b.day;
-      },
+      field: "day",
+      headerName: "Thời gian",
+      flex: 1,
     },
     {
-      title: "Hành động",
-      render: (rowData) => (
-        <Button variant="contained" onClick={() => handleRegister(rowData)}>
-          Đăng ký
-        </Button>
-      ),
+      headerName: "Hành động",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+      renderCell: actionCell,
     },
   ];
 
-  const handleRegister = (klass) => {
-    console.log(klass.id);
-    history.push("/student/class-register/", { classId: klass.id });
-  };
+  const dataGridRows = classes.map((klass) => ({
+    id: klass.id,
+    subjectId: klass.subjectId,
+    subjectName: klass.subjectName,
+    day: `Thứ ${klass.day}, tiết ${klass.startPeriod} - ${klass.endPeriod}`,
+    actions: { rowData: klass },
+  }));
 
   return (
     <div>
       <h1>Danh sách lớp học</h1>
-      <StandardTable
-        title=""
-        columns={columns}
-        data={classes}
-        hideCommandBar
-        options={{
-          selection: false,
-          pageSize: 5,
-          search: true,
-          sorting: true,
+      <DataGrid
+        rowHeight={60}
+        sx={{ fontSize: 16 }}
+        rows={dataGridRows}
+        columns={dataGridColumns}
+        autoHeight
+        initialState={{
+          pagination: {
+            paginationModel: {
+              pageSize: 5,
+            },
+          },
         }}
+        pageSizeOptions={[5, 10, 20]}
+        checkboxSelection={false}
+        disableRowSelectionOnClick
       />
     </div>
   );

@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import openerp.openerpresourceserver.algorithm.MaxMatching;
 import openerp.openerpresourceserver.entity.Application;
 import openerp.openerpresourceserver.entity.ClassCall;
 import openerp.openerpresourceserver.entity.User;
@@ -113,7 +114,7 @@ public class ApplicationServiceImpl implements ApplicationService{
 
                         // Check if there is an overlap in time periods
                         if (!(endPeriod <= existingStartPeriod || startPeriod >= existingEndPeriod)) {
-                            throw new IllegalArgumentException("Time conflict with existing approved application");
+                            throw new IllegalArgumentException("Trùng lịch với mã lớp " + app.getClassCall().getId());
                         }
                     }
                 }
@@ -123,5 +124,28 @@ public class ApplicationServiceImpl implements ApplicationService{
             applicationRepo.save(updateApplication);
             return updateApplication;
         }
+    }
+
+    @Override
+    public int[][] autoAssignApplication(String semester) {
+        List<String> userApplies = applicationRepo.findDistinctUserIdsBySemester(semester);
+        log.info("Found " + userApplies.size() + " user");
+        List<Application> applications = applicationRepo.findApplicationToAutoAssign("APPROVED", "PENDING", semester);
+        log.info("Found " + applications.size() + " applications");
+        List<Integer> classCalls = applicationRepo.findDistinctClassCallIdsBySemester(semester);
+        log.info("Found " + classCalls.size() + " class");
+        MaxMatching maxMatching = new MaxMatching(applications, userApplies, classCalls);
+        List<Application> assignApplications = maxMatching.getAssignApplications();
+
+        for(Application app : applications) {
+            app.setAssignStatus("CANCELED");
+            applicationRepo.save(app);
+        }
+
+        for(Application app : assignApplications) {
+            app.setAssignStatus("APPROVED");
+            applicationRepo.save(app);
+        }
+        return maxMatching.getGraph();
     }
 }

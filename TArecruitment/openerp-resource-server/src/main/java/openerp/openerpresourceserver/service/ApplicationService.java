@@ -21,4 +21,6 @@ public interface ApplicationService {
     Application updateApplicationStatus(int id, String status);
 
     Application updateAssignStatus(int id, String status);
+
+    int[][] autoAssignApplication(String semester);
 }

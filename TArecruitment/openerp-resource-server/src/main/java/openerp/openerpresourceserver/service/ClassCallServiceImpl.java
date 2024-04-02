@@ -76,4 +76,9 @@ public class ClassCallServiceImpl implements ClassCallService {
         classCallRepo.deleteById(id);
         return true;
     }
+
+    @Override
+    public List<ClassCall> getAllMyRegisteredClass(String userId, String semester) {
+        return classCallRepo.getAllMyRegisteredClass(userId, semester);
+    }
 }
