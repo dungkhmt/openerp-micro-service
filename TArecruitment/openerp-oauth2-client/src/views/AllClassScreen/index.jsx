@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { request } from "../../api";
-import { StandardTable } from "erp-hust/lib/StandardTable";
 import IconButton from "@mui/material/IconButton";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
@@ -10,6 +9,7 @@ import { styles } from "./index.style";
 import { SEMESTER, SEMESTER_LIST } from "config/localize";
 import DeleteDialog from "components/dialog/DeleteDialog";
 import ApplicatorDialog from "./ApplicatorDialog";
+import { DataGrid } from "@mui/x-data-grid";
 
 const AllClassScreen = () => {
   const [classes, setClasses] = useState([]);
@@ -29,72 +29,9 @@ const AllClassScreen = () => {
   const fetchData = () => {
     request("get", `/class-call/get-class-by-semester/${semester}`, (res) => {
       setClasses(res.data);
+      console.log(res.data);
     });
   };
-
-  const columns = [
-    {
-      title: "Mã lớp",
-      field: "id",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "470" },
-    },
-    {
-      title: "Mã môn học",
-      field: "subjectId",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "470" },
-    },
-    {
-      title: "Tên môn học",
-      field: "subjectName",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: {
-        fontWeight: "bold",
-        textDecoration: "underline",
-      },
-      render: (rowData) => (
-        <span
-          onClick={() => {
-            handleNavigateSubjectDetail(rowData);
-          }}
-          style={{ cursor: "pointer" }}
-        >
-          {rowData.subjectName}
-        </span>
-      ),
-    },
-    {
-      title: "Lớp học",
-      field: "classRoom",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "470" },
-    },
-    {
-      title: "Hành động",
-      sorting: false,
-      render: (rowData) => (
-        <div>
-          <IconButton variant="contained" color="primary">
-            <FormatListBulletedIcon
-              onClick={() => handleOpenApplicatorDialog(rowData)}
-            />
-          </IconButton>
-          <IconButton
-            onClick={() => {
-              handleOpenDialog(rowData);
-            }}
-            variant="contained"
-            color="error"
-          >
-            <DeleteOutlineIcon />
-          </IconButton>
-        </div>
-      ),
-      headerStyle: { width: "10%", textAlign: "center" },
-      cellStyle: { width: "10%", textAlign: "center" },
-    },
-  ];
 
   const handleNavigateSubjectDetail = (klass) => {
     history.push(`/teacher/class-information/${klass.id}`);
@@ -129,6 +66,72 @@ const AllClassScreen = () => {
     setSemester(event.target.value);
   };
 
+  const actionCell = (params) => {
+    const rowData = params.row;
+
+    return (
+      <div>
+        <IconButton variant="contained" color="primary">
+          <FormatListBulletedIcon
+            onClick={() => handleOpenApplicatorDialog(rowData)}
+          />
+        </IconButton>
+        <IconButton
+          onClick={() => {
+            handleOpenDialog(rowData);
+          }}
+          variant="contained"
+          color="error"
+        >
+          <DeleteOutlineIcon />
+        </IconButton>
+      </div>
+    );
+  };
+
+  const dataGridColumns = [
+    {
+      field: "id",
+      headerName: "Mã lớp",
+      align: "center",
+      headerAlign: "center",
+    },
+    { field: "subjectId", headerName: "Mã môn học", flex: 1 },
+    {
+      field: "subjectName",
+      headerName: "Tên môn học",
+      flex: 1,
+      renderCell: (params) => (
+        <div
+          style={{
+            cursor: "pointer",
+            textDecoration: "underline",
+            fontWeight: "bold",
+          }}
+          onClick={() => handleNavigateSubjectDetail(params.row)}
+        >
+          {params.value}
+        </div>
+      ),
+    },
+    { field: "classRoom", headerName: "Lớp học", flex: 1 },
+    {
+      headerName: "Hành động",
+      renderCell: actionCell,
+      align: "center",
+      headerAlign: "center",
+      flex: 1,
+    },
+  ];
+
+  const dataGridRows = classes.map((klass) => ({
+    id: klass.id,
+    subjectId: klass.subjectId,
+    subjectName: klass.subjectName,
+    classRoom: klass.classRoom,
+    actions: { rowData: klass },
+  }));
+
   return (
     <div>
       <h1>Danh sách lớp học</h1>
@@ -162,17 +165,22 @@ const AllClassScreen = () => {
         </Select>
       </FormControl>
 
-      <StandardTable
-        title=""
-        columns={columns}
-        data={classes}
-        hideCommandBar
-        options={{
-          selection: false,
-          pageSize: 5,
-          search: true,
-          sorting: true,
+      <DataGrid
+        rowHeight={60}
+        sx={{ fontSize: 16 }}
+        rows={dataGridRows}
+        columns={dataGridColumns}
+        autoHeight
+        initialState={{
+          pagination: {
+            paginationModel: {
+              pageSize: 5,
+            },
+          },
         }}
+        pageSizeOptions={[5, 10, 20]}
+        checkboxSelection={false}
+        disableRowSelectionOnClick
       />
     </div>
   );

@@ -87,4 +87,10 @@ public class ApplicationController {
         return ResponseEntity.ok().body(applications);
     }
 
+    @GetMapping("/auto-assign-class/{semester}")
+    public ResponseEntity<?> autoAssignClass(@PathVariable String semester) {
+        int[][] graph = applicationService.autoAssignApplication(semester);
+        return ResponseEntity.ok().body(graph);
+    }
+
 }

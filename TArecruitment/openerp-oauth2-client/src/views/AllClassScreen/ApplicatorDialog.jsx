@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogTitle, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { request } from "api";
-import { StandardTable } from "erp-hust/lib/StandardTable";
+import { DataGrid } from "@mui/x-data-grid";
 
 const ApplicatorDialog = ({ open, handleClose, classId }) => {
   const [applicators, setApplicators] = useState([]);
@@ -12,36 +12,48 @@ const ApplicatorDialog = ({ open, handleClose, classId }) => {
       `/application/get-application-by-class/${classId}`,
       (res) => {
         setApplicators(res.data);
+        console.log(res.data);
       }
     );
   }, [classId]);
 
-  const columns = [
+  const dataGridColumns = [
     {
-      title: "Mã số sinh viên",
       field: "mssv",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
+      headerName: "MSSV",
+      align: "center",
+      headerAlign: "center",
     },
     {
-      title: "Tên sinh viên",
       field: "name",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
+      headerName: "Tên sinh viên",
+      align: "center",
+      headerAlign: "center",
+      flex: 1,
     },
     {
-      title: "Số điện thoại",
       field: "phoneNumber",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
+      headerName: "Số điện thoại",
+      align: "center",
+      headerAlign: "center",
+      flex: 1,
     },
     {
-      title: "Email",
       field: "email",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
+      headerName: "Email",
+      align: "center",
+      headerAlign: "center",
+      flex: 1,
     },
   ];
+
+  const dataGridRows = applicators.map((applicator, index) => ({
+    id: index,
+    mssv: applicator.mssv,
+    name: applicator.name,
+    phoneNumber: applicator.phoneNumber,
+    email: applicator.email,
+  }));
 
   return (
     <div>
@@ -61,21 +73,23 @@ const ApplicatorDialog = ({ open, handleClose, classId }) => {
             Danh sách sinh viên đăng ký mã lớp {classId}
           </Typography>
         </DialogTitle>
-        {/**
-         * @TODO Change the table library, this shit is shit
-         */}
         <DialogContent>
-          <StandardTable
-            title=""
-            columns={columns}
-            data={applicators}
-            hideCommandBar
-            options={{
-              selection: false,
-              pageSize: 5,
-              search: false,
-              sorting: true,
+          <DataGrid
+            rowHeight={60}
+            sx={{ fontSize: 16 }}
+            rows={dataGridRows}
+            columns={dataGridColumns}
+            autoHeight
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 5,
+                },
+              },
             }}
+            pageSizeOptions={[5]}
+            checkboxSelection={false}
+            disableRowSelectionOnClick
           />
         </DialogContent>
       </Dialog>
