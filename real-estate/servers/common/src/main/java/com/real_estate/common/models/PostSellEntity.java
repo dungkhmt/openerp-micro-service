@@ -34,6 +34,7 @@ public class PostSellEntity {
 	String address;
 
 	List<String> imageUrls;
+	String postStatus;
 
 	Boolean isAvailable;
 	Long createdAt;

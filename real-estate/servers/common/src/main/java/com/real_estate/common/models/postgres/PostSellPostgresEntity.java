@@ -2,6 +2,7 @@ package com.real_estate.common.models.postgres;
 
 //import com.vladmihalcea.hibernate.type.array.ListArrayType;
 
+import com.real_estate.common.utils.PostStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -81,6 +82,9 @@ public class PostSellPostgresEntity {
 	@Column(name = "image_urls")
 	@ElementCollection()
 	List<String> imageUrls;
+
+	@Column(name = "post_status", columnDefinition = "varchar(255) default 'OPENING'")
+	String postStatus;
 
 	@Column(name = "is_availble")
 	@ColumnDefault(value = "false")
