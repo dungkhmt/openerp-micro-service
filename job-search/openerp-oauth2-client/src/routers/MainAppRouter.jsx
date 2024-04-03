@@ -10,6 +10,10 @@ import TeacherRouter from "./TeacherRouter";
 import DemoScreen from "views/DemoScreen";
 import CreateNewCvForm from "views/cv/CreateCV";
 import UserSkill from "views/skill/Skill";
+import CreateJobPost from "views/jobpost/CreateJobPost";
+import ViewAllJobPost from "views/jobpost/ViewAllJobPost";
+import ViewJobPostDetail from "views/jobpost/ViewJobPostDetail";
+
 const styles = {
   loadingProgress: {
     position: "fixed",
@@ -40,6 +44,9 @@ function MainAppRouter(props) {
           <PrivateRoute component={TeacherRouter} path="/teacher" />
           <PrivateRoute component={CreateNewCvForm} path="/create-cv" />
           <PrivateRoute component={UserSkill} path = "/user-skill" />
+          <PrivateRoute component={CreateJobPost} path = "/create-job-post" />
+          <PrivateRoute component={ViewJobPostDetail} path = "/view-job-post/:id" />          
+          <PrivateRoute component={ViewAllJobPost} path = "/view-job-post" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>

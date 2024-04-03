@@ -11,6 +11,7 @@ import { UsersScreen } from "views/UsersScreen";
 import { LocationScreen } from "views/settings/LocationScreen";
 import { VendorScreen } from "views/settings/VendorScreen";
 import { TypeScreen } from "views/settings/TypeScreen";
+import AssetsScreen from "views/management/AssetsScreen";
 
 const styles = {
   loadingProgress: {
@@ -45,6 +46,8 @@ function MainAppRouter(props) {
           <PrivateRoute component={VendorScreen} exact path="/vendors" />
 
           <PrivateRoute component={TypeScreen} exact path="/types" />
+
+          <PrivateRoute component={AssetsScreen} exact path="/assets" />
 
           <PrivateRoute component={TeacherRouter} path="/teacher" />
 

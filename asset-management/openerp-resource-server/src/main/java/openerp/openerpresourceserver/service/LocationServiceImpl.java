@@ -21,6 +21,12 @@ public class LocationServiceImpl implements LocationService{
     }
 
     @Override
+    public Optional<Location> getLocationById(Integer Id) {
+        Optional<Location> location = locationRepo.findById(Id);
+        return location;
+    }
+
+    @Override
     public Location addNewLocation(Location location) {
         Location loc = new Location();
         loc.setName(location.getName());

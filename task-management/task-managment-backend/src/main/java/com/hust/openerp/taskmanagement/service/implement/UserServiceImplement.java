@@ -1,12 +1,21 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
+import com.hust.openerp.taskmanagement.entity.Project;
 import com.hust.openerp.taskmanagement.entity.User;
 import com.hust.openerp.taskmanagement.repository.UserRepository;
 import com.hust.openerp.taskmanagement.service.UserService;
+import com.hust.openerp.taskmanagement.specification.ProjectSpecification;
+import com.hust.openerp.taskmanagement.specification.UserSpecification;
+import com.hust.openerp.taskmanagement.specification.builder.GenericSpecificationsBuilder;
+import com.hust.openerp.taskmanagement.util.CriteriaParser;
+
 import lombok.AllArgsConstructor;
+
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,5 +58,19 @@ public class UserServiceImplement implements UserService {
 
             userLoginRepo.save(user);
         }
+    }
+
+    @Override
+    public List<User> searchUser(@Nullable String q) {
+        if (StringUtils.isBlank(q)) {
+            return userLoginRepo.findAll();
+        }
+
+        var parser = new CriteriaParser();
+
+        GenericSpecificationsBuilder<User> builder = new GenericSpecificationsBuilder<>();
+        var spec = builder.build(parser.parse(q), UserSpecification::new);
+
+        return userLoginRepo.findAll(spec);
     }
 }

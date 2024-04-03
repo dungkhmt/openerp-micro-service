@@ -37,7 +37,7 @@ const CreateNewCvForm = () => {
     };
     // education
     const [educations, setEducations] = useState([
-        { major: '', schoolName: '', startingDate: '', endingDate: '', description: '' },
+        { major: '', schoolName: '', startingDate: '', grade: 0, endingDate: '', description: '' },
     ]);
 
     const handleAddEducation = () => {
@@ -298,7 +298,17 @@ const CreateNewCvForm = () => {
                                             fullWidth variant="outlined"
                                             label="school Name"
                                             name="schoolName"
-                                            value={education.companyName}
+                                            value={education.schoolName}
+                                            onChange={(event) => handleEducationChange(index, event)}
+                                            sx={{ mb: 1 }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            fullWidth variant="outlined"
+                                            label="Grade"
+                                            name="grade"
+                                            value={education.grade}
                                             onChange={(event) => handleEducationChange(index, event)}
                                             sx={{ mb: 1 }}
                                         />

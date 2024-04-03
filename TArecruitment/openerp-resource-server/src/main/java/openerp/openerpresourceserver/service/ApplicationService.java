@@ -15,4 +15,12 @@ public interface ApplicationService {
     List<Application> getUniqueApplicator();
 
     List<Application> getApplicationBySemester(String semester);
+
+    List<Application> getApplicationByApplicationStatusAndSemester(String applicationStatus, String semester);
+
+    Application updateApplicationStatus(int id, String status);
+
+    Application updateAssignStatus(int id, String status);
+
+    int[][] autoAssignApplication(String semester);
 }

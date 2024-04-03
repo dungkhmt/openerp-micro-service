@@ -5,9 +5,9 @@ import { Icon } from "@iconify/react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useEffect } from "react";
-import { ProjectViewTasks } from "./ProjectViewTasks";
+import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
 import { useProjectContext } from "../../hooks/useProjectContext";
-import { ProjectViewMembers } from "./ProjectViewMembers";
+import { ProjectViewMembers } from "./member/ProjectViewMembers";
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   "& .MuiTabs-indicator": {

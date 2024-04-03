@@ -69,8 +69,8 @@ export const VendorScreen = () => {
     };
 
     const handleCreate = () => {
-    		setTitle("CREATE NEW VENDOR");
-    		setData(INITIAL_STATE);
+    	setTitle("CREATE NEW VENDOR");
+    	setData(INITIAL_STATE);
 		setOpen(true);
 	};
 
@@ -147,6 +147,7 @@ export const VendorScreen = () => {
         {
             title: "Image",
             field: "image",
+            sorting: false,
             render: (rowData) => (
                 <img
                     src="https://vcdn-vnexpress.vnecdn.net/2022/05/10/DHBKHN-7506-1652177227.jpg"
@@ -174,13 +175,6 @@ export const VendorScreen = () => {
             field: "url",
         },
         {
-            title: "Status",
-            sorting: true,
-            render: (rowData) => (
-                <Switch {...label} defaultChecked />
-            )
-        },
-        {
             title: "Edit",
             sorting: false,
             render: (rowData) => (
@@ -201,7 +195,7 @@ export const VendorScreen = () => {
             render: (rowData) => (
                 <IconButton
                     onClick={() => {
-                        demoFunction(rowData)
+                        handleDelete(rowData)
                     }}
                     variant="contained"
                     color="error"
@@ -211,10 +205,6 @@ export const VendorScreen = () => {
             ),
         },
     ];
-
-    const demoFunction = (user) => {
-        alert("You clicked on User: " + user.id)
-    }
 
     return (
         <div>

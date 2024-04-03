@@ -57,4 +57,40 @@ public class ApplicationController {
         return ResponseEntity.ok().body(applications);
     }
 
+    @PutMapping("/update-application-status/{applicationId}")
+    public ResponseEntity<?> updateApplicationStatus(@PathVariable int applicationId, @RequestBody Application updateApplication) {
+        try {
+            Application application = applicationService.updateApplicationStatus(applicationId, updateApplication.getApplicationStatus());
+            return ResponseEntity.ok().body(application);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/update-assign-status/{applicationId}")
+    public ResponseEntity<?> updateAssignStatus(@PathVariable int applicationId, @RequestBody Application updateApplication) {
+        try {
+            Application application = applicationService.updateAssignStatus(applicationId, updateApplication.getAssignStatus());
+            return ResponseEntity.ok().body(application);
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage().equals("Time conflict with existing approved application")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            }
+        }
+    }
+
+    @GetMapping("/get-application-by-status-and-semester/{semester}/{applicationStatus}")
+    public ResponseEntity<?> getApplicationByApplyStatusAnsSemester(@PathVariable String semester, @PathVariable String applicationStatus) {
+        List<Application> applications = applicationService.getApplicationByApplicationStatusAndSemester(applicationStatus, semester);
+        return ResponseEntity.ok().body(applications);
+    }
+
+    @GetMapping("/auto-assign-class/{semester}")
+    public ResponseEntity<?> autoAssignClass(@PathVariable String semester) {
+        int[][] graph = applicationService.autoAssignApplication(semester);
+        return ResponseEntity.ok().body(graph);
+    }
+
 }

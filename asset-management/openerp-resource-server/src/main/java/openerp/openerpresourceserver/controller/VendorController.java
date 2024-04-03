@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -22,6 +23,14 @@ public class VendorController {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(vendors);
+    }
+
+    @GetMapping("/get/{Id}")
+    public ResponseEntity<?> getVendorById(@PathVariable Integer Id){
+        Optional<Vendor> vendor = vendorService.getVendorById(Id);
+        return ResponseEntity
+            .status(HttpStatus.FOUND)
+            .body(vendor);
     }
 
     @PostMapping("/add-new")

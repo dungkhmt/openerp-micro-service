@@ -15,7 +15,7 @@ import dayjs from "dayjs";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
-import CustomAvatar from "../../../components/mui/avatar/CustomAvatar";
+import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
 import CustomChip from "../../../components/mui/chip";
 import { useDebounce } from "../../../hooks/useDebounce";
 import { StatusService } from "../../../services/api/task-status.service";
@@ -24,7 +24,6 @@ import {
   getCategoryColor,
   getDueDateColor,
   getProgressColor,
-  getRandomColorSkin,
   getStatusColor,
 } from "../../../utils/color.util";
 
@@ -198,15 +197,7 @@ const TaskAssigned = () => {
               title={`${row.creator.firstName} ${row.creator.lastName}`}
               key={row.creator.id}
             >
-              <CustomAvatar
-                skin="light"
-                color={getRandomColorSkin(row.creator.id)}
-                sx={{ width: 30, height: 30, fontSize: ".875rem" }}
-              >
-                {`${row.creator?.firstName?.charAt(0) ?? ""}${
-                  row.creator?.lastName?.charAt(0) ?? ""
-                }`}
-              </CustomAvatar>
+              <UserAvatar user={row.creator} />
             </Tooltip>
           </AvatarGroup>
         ),

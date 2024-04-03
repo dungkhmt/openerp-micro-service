@@ -28,6 +28,8 @@ import { student } from "./menuconfig/student";
 import { teacher } from "./menuconfig/teacher";
 import { user } from "./menuconfig/user";
 import {demo} from "./menuconfig/demo";
+import { createCV } from "./menuconfig/createCV";
+import { createJobPost } from "./menuconfig/jobPost";
 
 export const MENUS = [];
 
@@ -36,6 +38,8 @@ MENUS.push(user);
 MENUS.push(teacher);
 MENUS.push(student);
 MENUS.push(demo);
+MENUS.push(createCV)
+MENUS.push(createJobPost)
 
 export const menuIconMap = new Map();
 

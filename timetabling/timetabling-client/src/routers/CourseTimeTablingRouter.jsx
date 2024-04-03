@@ -1,5 +1,6 @@
 import SemesterScreen from "views/courseTimeTabling/semester/SemesterScreen";
 import ClassListOpenedScreen from "views/courseTimeTabling/classListOpened/ClassListOpenedScreen";
+import FirstYearStandardClass from "views/firstyearstandard/FirstYearStandardClass";
 import ScheduleScreen from "views/courseTimeTabling/schedule/ScheduleScreen";
 import MakeScheduleScreen from "views/courseTimeTabling/makeSchedule/MakeScheduleScreen";
 import ClassroomListScreen from "views/courseTimeTabling/classroom/ClassroomListScreen";
@@ -46,6 +47,12 @@ export default function CourseTimeTablingRouter() {
           component={ClassroomListScreen}
           exact
           path={`${path}/classroom`}
+        ></Route>
+
+        <Route
+          component={FirstYearStandardClass}
+          exact
+          path={`${path}/class-list-opened-first-year-standard`}
         ></Route>
       </Switch>
     </div>

@@ -22,6 +22,12 @@ public class VendorServiceImpl implements VendorService{
     }
 
     @Override
+    public Optional<Vendor> getVendorById(Integer Id) {
+        Optional<Vendor> vendor = vendorRepo.findById(Id);
+        return vendor;
+    }
+
+    @Override
     public Vendor addNewVendor(Vendor vendor) {
         Vendor savedVendor = new Vendor();
         savedVendor.setName(vendor.getName());

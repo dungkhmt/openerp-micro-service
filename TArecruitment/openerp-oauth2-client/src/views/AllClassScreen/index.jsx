@@ -1,20 +1,20 @@
 import { useState, useEffect } from "react";
 import { request } from "../../api";
-import { StandardTable } from "erp-hust/lib/StandardTable";
 import IconButton from "@mui/material/IconButton";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { useHistory } from "react-router-dom";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { styles } from "./index.style";
-import { SEMESTER } from "config/localize";
+import { SEMESTER, SEMESTER_LIST } from "config/localize";
 import DeleteDialog from "components/dialog/DeleteDialog";
 import ApplicatorDialog from "./ApplicatorDialog";
+import { DataGrid } from "@mui/x-data-grid";
 
 const AllClassScreen = () => {
   const [classes, setClasses] = useState([]);
   const [semester, setSemester] = useState(SEMESTER);
-  const [openDialog, setOpenDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [deleteId, setDeleteId] = useState("");
   const [openApplicatorDialog, setOpenApplicatorDialog] = useState(false);
   const [infoClassId, setInfoClassId] = useState("");
@@ -23,100 +23,34 @@ const AllClassScreen = () => {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [semester]);
 
   const fetchData = () => {
     request("get", `/class-call/get-class-by-semester/${semester}`, (res) => {
       setClasses(res.data);
-    }).then();
+      console.log(res.data);
+    });
   };
 
-  const columns = [
-    {
-      title: "Mã lớp",
-      field: "id",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
-    },
-    {
-      title: "Mã môn học",
-      field: "subjectId",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
-    },
-    {
-      title: "Tên môn học",
-      field: "subjectName",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
-      render: (rowData) => (
-        <span
-          onClick={() => {
-            subjectFunction(rowData);
-          }}
-          style={{ cursor: "pointer" }}
-        >
-          {rowData.subjectName}
-        </span>
-      ),
-    },
-    {
-      title: "Lớp học",
-      field: "classRoom",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
-    },
-    {
-      title: "Hành động",
-      sorting: false,
-      render: (rowData) => (
-        <div>
-          <IconButton variant="contained" color="primary">
-            <FormatListBulletedIcon
-              onClick={() => handleOpenApplicatorDialog(rowData)}
-            />
-          </IconButton>
-          <IconButton
-            onClick={() => {
-              handleOpenDialog(rowData);
-            }}
-            variant="contained"
-            color="error"
-          >
-            <DeleteOutlineIcon />
-          </IconButton>
-        </div>
-      ),
-      headerStyle: { width: "10%", textAlign: "center" },
-      cellStyle: { width: "10%", textAlign: "center" },
-    },
-  ];
-
-  const subjectFunction = (klass) => {
+  const handleNavigateSubjectDetail = (klass) => {
     history.push(`/teacher/class-information/${klass.id}`);
   };
 
-  const handleDelete = () => {
-    request(
-      "delete",
-      `/class-call/delete-class/${deleteId}`,
-      (res) => {
-        fetchData();
-        setOpenDialog(false);
-      },
-      {},
-      {}
-    );
+  const handleDeleteClass = () => {
+    request("delete", `/class-call/delete-class/${deleteId}`, (res) => {
+      fetchData();
+      setOpenDeleteDialog(false);
+    });
   };
 
   const handleOpenDialog = (klass) => {
-    console.log(klass, "klass");
-    setOpenDialog(true);
+    setOpenDeleteDialog(true);
     setDeleteId(klass.id);
   };
 
   const handleCloseDialog = () => {
-    setOpenDialog(false);
+    setOpenDeleteDialog(false);
   };
 
   const handleOpenApplicatorDialog = (klass) => {
@@ -128,16 +62,82 @@ const AllClassScreen = () => {
     setOpenApplicatorDialog(false);
   };
 
-  const handleChange = (event) => {
+  const handleChangeSemester = (event) => {
     setSemester(event.target.value);
   };
+
+  const actionCell = (params) => {
+    const rowData = params.row;
+
+    return (
+      <div>
+        <IconButton variant="contained" color="primary">
+          <FormatListBulletedIcon
+            onClick={() => handleOpenApplicatorDialog(rowData)}
+          />
+        </IconButton>
+        <IconButton
+          onClick={() => {
+            handleOpenDialog(rowData);
+          }}
+          variant="contained"
+          color="error"
+        >
+          <DeleteOutlineIcon />
+        </IconButton>
+      </div>
+    );
+  };
+
+  const dataGridColumns = [
+    {
+      field: "id",
+      headerName: "Mã lớp",
+      align: "center",
+      headerAlign: "center",
+    },
+    { field: "subjectId", headerName: "Mã môn học", flex: 1 },
+    {
+      field: "subjectName",
+      headerName: "Tên môn học",
+      flex: 1,
+      renderCell: (params) => (
+        <div
+          style={{
+            cursor: "pointer",
+            textDecoration: "underline",
+            fontWeight: "bold",
+          }}
+          onClick={() => handleNavigateSubjectDetail(params.row)}
+        >
+          {params.value}
+        </div>
+      ),
+    },
+    { field: "classRoom", headerName: "Lớp học", flex: 1 },
+    {
+      headerName: "Hành động",
+      renderCell: actionCell,
+      align: "center",
+      headerAlign: "center",
+      flex: 1,
+    },
+  ];
+
+  const dataGridRows = classes.map((klass) => ({
+    id: klass.id,
+    subjectId: klass.subjectId,
+    subjectName: klass.subjectName,
+    classRoom: klass.classRoom,
+    actions: { rowData: klass },
+  }));
 
   return (
     <div>
       <h1>Danh sách lớp học</h1>
       <DeleteDialog
-        open={openDialog}
-        handleDelete={handleDelete}
+        open={openDeleteDialog}
+        handleDelete={handleDeleteClass}
         handleClose={handleCloseDialog}
       />
 
@@ -154,44 +154,33 @@ const AllClassScreen = () => {
           id="semester-select"
           value={semester}
           name="day"
-          onChange={handleChange}
+          onChange={handleChangeSemester}
           MenuProps={{ PaperProps: { sx: styles.selection } }}
         >
-          {/**
-           * @TODO Change this to dynamic
-           */}
-          <MenuItem key={1} value="2023-2">
-            2023-2
-          </MenuItem>
-          <MenuItem key={2} value="2023-1">
-            2023-1
-          </MenuItem>
-          <MenuItem key={3} value="2022-2">
-            2022-2
-          </MenuItem>
-          <MenuItem key={4} value="2022-1">
-            2022-1
-          </MenuItem>
-          <MenuItem key={5} value="2021-2">
-            2021-2
-          </MenuItem>
-          <MenuItem key={6} value="2021-1">
-            2021-1
-          </MenuItem>
+          {SEMESTER_LIST.map((semester, index) => (
+            <MenuItem key={index} value={semester}>
+              {semester}
+            </MenuItem>
+          ))}
         </Select>
       </FormControl>
 
-      <StandardTable
-        title=""
-        columns={columns}
-        data={classes}
-        hideCommandBar
-        options={{
-          selection: false,
-          pageSize: 5,
-          search: true,
-          sorting: true,
+      <DataGrid
+        rowHeight={60}
+        sx={{ fontSize: 16 }}
+        rows={dataGridRows}
+        columns={dataGridColumns}
+        autoHeight
+        initialState={{
+          pagination: {
+            paginationModel: {
+              pageSize: 5,
+            },
+          },
         }}
+        pageSizeOptions={[5, 10, 20]}
+        checkboxSelection={false}
+        disableRowSelectionOnClick
       />
     </div>
   );
