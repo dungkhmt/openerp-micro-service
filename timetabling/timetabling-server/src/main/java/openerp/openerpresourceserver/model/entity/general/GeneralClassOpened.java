@@ -1,37 +1,58 @@
 package openerp.openerpresourceserver.model.entity.general;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.hibernate.annotations.ColumnTransformer;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import openerp.openerpresourceserver.helper.RoomReservationConverter;
 import openerp.openerpresourceserver.model.entity.ClassOpened;
 
 @Data
 @Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "timetabling_general_classes")
 public class GeneralClassOpened {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String semester;
     private String quantity;
-    private String classType;
+    private String quantityMax;
     private String moduleCode;
     private String moduleName;
-    private String mass;
-    private String quantityMax;
-    private String studyClass;
-    private String state;
+    private String classType;
     private String classCode;
+    private String semester;
+    private String studyClass;
+    private String mass;
+    private String state;
     private String crew;
     private String openBatch;
     private String course;
     private String groupName;
-    private String startPeriod;
-    private String weekday;
-    private List<RoomReservation> timeSlots;
+    @Convert(converter = RoomReservationConverter.class)
+    @Column(name = "time_slots", columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
+    private List<RoomReservation> timeSlots = new ArrayList<RoomReservation>();
+    @Column(name = "is_seperate_class")
     private Boolean isSeparateClass = false;
 
 
@@ -54,5 +75,9 @@ public class GeneralClassOpened {
 
     public void addTimeSlot(RoomReservation roomReservation) {
         timeSlots.add(roomReservation);
+    }
+    @Override
+    public String toString() {
+        return classCode + " " + moduleCode + " " + moduleName + " " + timeSlots.toString();
     }
 }

@@ -61,16 +61,17 @@ public class ExcelController {
     @PostMapping(value = "/upload-general")
     public ResponseEntity<List<GeneralClassOpened>> uploadFileGeneralCLassOpened(@RequestParam("file") MultipartFile file,
             @RequestParam("semester") String semester) {
-        String message = "";
+        System.out.println("\n\n\n\n\nUpload file success! \n\n\n\n" + semester);
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
-                List<GeneralClassOpened> classOpenedConflict = fileService.saveGeneralClassOpeneds(file);
+                List<GeneralClassOpened> classOpenedConflict = fileService.saveGeneralClassOpeneds(file, semester);
                 // message = "Uploaded the file successfully: " + file.getOriginalFilename();
                 // return ResponseEntity.status(HttpStatus.OK).body(new
                 // ResponseMessage(message));
                 return ResponseEntity.status(HttpStatus.OK).body(classOpenedConflict);
             } catch (Exception e) {
                 // message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+                System.err.println("\n\n\nERRROR: " + e + "\n\n\n");
                 return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
             }
         }

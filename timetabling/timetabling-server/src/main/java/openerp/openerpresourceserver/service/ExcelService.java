@@ -6,8 +6,10 @@ import openerp.openerpresourceserver.model.entity.ClassOpened;
 import openerp.openerpresourceserver.model.entity.Classroom;
 import openerp.openerpresourceserver.model.entity.Schedule;
 import openerp.openerpresourceserver.model.entity.general.GeneralClassOpened;
+import openerp.openerpresourceserver.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.repo.ClassOpenedRepo;
 import openerp.openerpresourceserver.repo.ClassroomRepo;
+import openerp.openerpresourceserver.repo.GeneralClassOpenedRepository;
 import openerp.openerpresourceserver.repo.ScheduleRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -36,13 +38,19 @@ public class ExcelService {
     private ClassOpenedRepo classOpenedRepo;
 
     @Autowired
+    private GeneralClassOpenedRepository gcoRepo;
+
+    @Autowired
     private ClassroomRepo classroomRepo;
 
-//    public ByteArrayInputStream load() {
-//        List<Schedule> schedules = this.getAllSchedules();
-//        ByteArrayInputStream in = ExcelHelper.schedulesToExcel(schedules);
-//        return in;
-//    }
+    @Autowired
+    private RoomOccupationService roomOccupationService;
+
+    // public ByteArrayInputStream load() {
+    // List<Schedule> schedules = this.getAllSchedules();
+    // ByteArrayInputStream in = ExcelHelper.schedulesToExcel(schedules);
+    // return in;
+    // }
 
     public ByteArrayInputStream loadExport(FilterClassOpenedDto requestDto) {
         String semester = requestDto.getSemester();
@@ -52,11 +60,13 @@ public class ExcelService {
         if (semester != null) {
             if (groupName != null) {
                 classOpenedList = classOpenedRepo.getAllBySemesterAndGroupName(semester, groupName, sort);
-            } else classOpenedList = classOpenedRepo.getAllBySemester(semester, sort);
+            } else
+                classOpenedList = classOpenedRepo.getAllBySemester(semester, sort);
         } else {
             if (groupName != null) {
                 classOpenedList = classOpenedRepo.getAllByGroupName(groupName, sort);
-            } else classOpenedList = classOpenedRepo.findAll(sort);
+            } else
+                classOpenedList = classOpenedRepo.findAll(sort);
         }
         ByteArrayInputStream in = ExcelHelper.classOpenedToExcelExport(classOpenedList);
         return in;
@@ -66,27 +76,99 @@ public class ExcelService {
         return ExcelHelper.classOpenedToExcelExport(classOpenedList);
     }
 
-//    public void save(MultipartFile file) {
-//        try {
-//            List<Schedule> tutorials = ExcelHelper.excelToSchedules(file.getInputStream());
-//            tutorials.forEach(el -> {
-//                if (el != null && !el.getState().equals("Huỷ lớp")) {
-//                    scheduleRepo.save(el);
-//                }
-//            });
-//        } catch (IOException e) {
-//            throw new RuntimeException("fail to store excel data: " + e.getMessage());
-//        }
-//    }
-    public List<GeneralClassOpened> saveGeneralClassOpeneds(MultipartFile file) {
+    // public void save(MultipartFile file) {
+    // try {
+    // List<Schedule> tutorials =
+    // ExcelHelper.excelToSchedules(file.getInputStream());
+    // tutorials.forEach(el -> {
+    // if (el != null && !el.getState().equals("Huỷ lớp")) {
+    // scheduleRepo.save(el);
+    // }
+    // });
+    // } catch (IOException e) {
+    // throw new RuntimeException("fail to store excel data: " + e.getMessage());
+    // }
+    // }
+    public List<GeneralClassOpened> saveGeneralClassOpeneds(MultipartFile file, String semester) {
         try {
-            return GeneralExcelHelper.convertFromExcelToGeneralClassOpened(file.getInputStream());
+            List<GeneralClassOpened> generalClassOpenedList = GeneralExcelHelper
+                    .convertFromExcelToGeneralClassOpened(file.getInputStream(), semester);
+            if (generalClassOpenedList == null) {
+                return new ArrayList<>();
+            }
+            List<RoomOccupation> roomOccupations = new ArrayList<>();
+            generalClassOpenedList.forEach(generalClass -> {
+                generalClass.getTimeSlots().forEach(timeSlot -> {
+                    switch (generalClass.getOpenBatch().trim()) {
+                        case "AB":
+                            for (int i = 1; i <= 16; i++) {
+                                roomOccupations.add(
+                                        new RoomOccupation(timeSlot.getRoom(),
+                                                generalClass.getClassCode(),
+                                                timeSlot.getStartTime(),
+                                                timeSlot.getEndTime(),
+                                                generalClass.getCrew(),
+                                                timeSlot.getWeekday(),
+                                                i, "study", generalClass.getSemester()));
+                            }
+                            break;
+                        case "A":
+                            for (int i = 1; i <= 8; i++) {
+                                roomOccupations.add(
+                                        new RoomOccupation(timeSlot.getRoom(),
+                                                generalClass.getClassCode(),
+                                                timeSlot.getStartTime(),
+                                                timeSlot.getEndTime(),
+                                                generalClass.getCrew(),
+                                                timeSlot.getWeekday(), i, "study", generalClass.getSemester()));
+                            }
+                            break;
+                        case "B":
+                            for (int i = 9; i <= 16; i++) {
+                                roomOccupations.add(
+                                        new RoomOccupation(timeSlot.getRoom(),
+                                                generalClass.getClassCode(),
+                                                timeSlot.getStartTime(),
+                                                timeSlot.getEndTime(),
+                                                generalClass.getCrew(),
+                                                timeSlot.getWeekday(), i, "study", generalClass.getSemester()));
+                            }
+                            break;
+                        case "chẵn":
+                            for (int i = 2; i <= 16; i += 2) {
+                                roomOccupations.add(
+                                        new RoomOccupation(timeSlot.getRoom(),
+                                                generalClass.getClassCode(),
+                                                timeSlot.getStartTime(),
+                                                timeSlot.getEndTime(),
+                                                generalClass.getCrew(),
+                                                timeSlot.getWeekday(), i, "study", generalClass.getSemester()));
+                            }
+                            break;
+                        case "lẻ":
+                            for (int i = 1; i <= 16; i += 2) {
+                                roomOccupations.add(
+                                        new RoomOccupation(timeSlot.getRoom(),
+                                                generalClass.getClassCode(),
+                                                timeSlot.getStartTime(),
+                                                timeSlot.getEndTime(),
+                                                generalClass.getCrew(),
+                                                timeSlot.getWeekday(), i, "study", generalClass.getSemester()));
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                });
+            });
+            gcoRepo.saveAll(generalClassOpenedList);
+            roomOccupationService.saveAll(roomOccupations);
+            return generalClassOpenedList;
         } catch (IOException e) {
             e.printStackTrace();
             return new ArrayList<GeneralClassOpened>();
         }
     }
-
 
     public List<ClassOpened> saveClassOpened(MultipartFile file, String semester) {
         try {
@@ -100,26 +182,31 @@ public class ExcelService {
                         Long startPeriod = Long.parseLong(el.getStartPeriod());
                         String weekday = el.getWeekday();
                         String classroom = el.getClassroom();
-                        long currentFinish = this.calculateFinishPeriod(el.getMass(), startPeriod, el.getIsSeparateClass());
+                        long currentFinish = this.calculateFinishPeriod(el.getMass(), startPeriod,
+                                el.getIsSeparateClass());
 
                         String conflictClass = null;
                         String conflictSecondClass = null;
                         List<ClassOpened> existedClassOpened = classOpenedRepo
-                                .getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull(semester, classroom, weekday, crew);
+                                .getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull(semester,
+                                        classroom, weekday, crew);
                         List<ClassOpened> existedClassOpenedSecond = classOpenedRepo
-                                .getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull(semester, classroom, weekday, crew);
+                                .getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull(
+                                        semester, classroom, weekday, crew);
 
-                        //Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
-                        conflictClass = this.checkConflictTimeForListFirstClass(existedClassOpened, startPeriod, currentFinish);
+                        // Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
+                        conflictClass = this.checkConflictTimeForListFirstClass(existedClassOpened, startPeriod,
+                                currentFinish);
 
-                        //Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
-                        conflictSecondClass = this.checkConflictTimeForListSecondClass(existedClassOpenedSecond, startPeriod, currentFinish);
+                        // Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
+                        conflictSecondClass = this.checkConflictTimeForListSecondClass(existedClassOpenedSecond,
+                                startPeriod, currentFinish);
 
-                        if (conflictClass != null || conflictSecondClass != null ) {
+                        if (conflictClass != null || conflictSecondClass != null) {
                             classOpenedConflictList.add(el);
-                            String stateConflict =
-                                    conflictClass != null ? conflictClass + "," : "" + " "
-                                    + conflictSecondClass != null ? conflictSecondClass + "," : "";
+                            String stateConflict = conflictClass != null ? conflictClass + ","
+                                    : "" + " "
+                                            + conflictSecondClass != null ? conflictSecondClass + "," : "";
                             el.setState(CONFLICT_CLASS + stateConflict);
                             el.setClassroom(null);
                             el.setWeekday(null);
@@ -132,27 +219,31 @@ public class ExcelService {
                             startPeriod = Long.parseLong(el.getSecondStartPeriod());
                             weekday = el.getSecondWeekday();
                             classroom = el.getSecondClassroom();
-                            currentFinish = this.calculateFinishPeriod(el.getMass(), startPeriod, el.getIsSeparateClass());
+                            currentFinish = this.calculateFinishPeriod(el.getMass(), startPeriod,
+                                    el.getIsSeparateClass());
                             String conflictClassSecond = null;
                             String conflictSecondClassSecond = null;
-                            List<ClassOpened> listClassOpened = classOpenedRepo.
-                                    getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull
-                                            (semester, classroom, weekday, crew);
-                            List<ClassOpened> listSecondClassOpened = classOpenedRepo.
-                                    getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot
-                                            (semester, classroom, weekday, crew, el.getId());
+                            List<ClassOpened> listClassOpened = classOpenedRepo
+                                    .getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull(semester,
+                                            classroom, weekday, crew);
+                            List<ClassOpened> listSecondClassOpened = classOpenedRepo
+                                    .getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot(
+                                            semester, classroom, weekday, crew, el.getId());
 
-                            //Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
-                            conflictClassSecond = this.checkConflictTimeForListFirstClass(listClassOpened, startPeriod, currentFinish);
+                            // Kiểm tra trùng lịch với danh sách lớp đơn hoặc lớp thứ nhất của lớp tách
+                            conflictClassSecond = this.checkConflictTimeForListFirstClass(listClassOpened, startPeriod,
+                                    currentFinish);
 
-                            //Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
-                            conflictSecondClassSecond = this.checkConflictTimeForListSecondClass(listSecondClassOpened, startPeriod, currentFinish);
+                            // Kiểm tra trùng lịch với danh sách lớp thứ hai của lớp tách
+                            conflictSecondClassSecond = this.checkConflictTimeForListSecondClass(listSecondClassOpened,
+                                    startPeriod, currentFinish);
 
                             if (conflictClassSecond != null || conflictSecondClassSecond != null) {
                                 boolean isExisted = classOpenedConflictList.contains(el);
-                                String stateConflict =
-                                        conflictClassSecond != null ? conflictClassSecond + "," : "" + " "
-                                                + conflictSecondClassSecond != null ? conflictSecondClassSecond + "," : "";
+                                String stateConflict = conflictClassSecond != null ? conflictClassSecond + ","
+                                        : "" + " "
+                                                + conflictSecondClassSecond != null ? conflictSecondClassSecond + ","
+                                                        : "";
                                 if (isExisted) {
                                     String stateExisted = el.getState();
                                     el.setState(stateExisted + " " + stateConflict);
@@ -166,10 +257,11 @@ public class ExcelService {
                             }
                             classOpenedRepo.save(el);
                         }
-                    } else classOpenedRepo.save(el);
+                    } else
+                        classOpenedRepo.save(el);
 
-//                    el.setSemester(semester);
-//                    classOpenedRepo.save(el);
+                    // el.setSemester(semester);
+                    // classOpenedRepo.save(el);
                 }
             }
             return classOpenedConflictList;
@@ -178,7 +270,8 @@ public class ExcelService {
         }
     }
 
-    private String checkConflictTimeForListFirstClass(List<ClassOpened> listClassOpened, long currentStartPeriod, long currentFinish) {
+    private String checkConflictTimeForListFirstClass(List<ClassOpened> listClassOpened, long currentStartPeriod,
+            long currentFinish) {
         for (ClassOpened el : listClassOpened) {
             String supMass = el.getMass();
             String moduleName = el.getModuleName();
@@ -186,14 +279,16 @@ public class ExcelService {
             long existedStartPeriod = Long.parseLong(el.getStartPeriod());
             long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
 
-            if (!this.compareTimeForSetClassroom(currentStartPeriod, currentFinish, existedStartPeriod, existedFinishPeriod)) {
+            if (!this.compareTimeForSetClassroom(currentStartPeriod, currentFinish, existedStartPeriod,
+                    existedFinishPeriod)) {
                 return moduleName;
             }
         }
         return null;
     }
 
-    private String checkConflictTimeForListSecondClass(List<ClassOpened> listSecondClassOpened, long currentStartPeriod, long currentFinish) {
+    private String checkConflictTimeForListSecondClass(List<ClassOpened> listSecondClassOpened, long currentStartPeriod,
+            long currentFinish) {
         for (ClassOpened el : listSecondClassOpened) {
             String supMass = el.getMass();
             String moduleName = el.getModuleName();
@@ -201,7 +296,8 @@ public class ExcelService {
             long existedStartPeriod = Long.parseLong(el.getSecondStartPeriod());
             long existedFinishPeriod = this.calculateFinishPeriod(supMass, existedStartPeriod, isSeparateClassExisted);
 
-            if (!this.compareTimeForSetClassroom(currentStartPeriod, currentFinish, existedStartPeriod, existedFinishPeriod)) {
+            if (!this.compareTimeForSetClassroom(currentStartPeriod, currentFinish, existedStartPeriod,
+                    existedFinishPeriod)) {
                 return moduleName;
             }
         }
@@ -209,7 +305,7 @@ public class ExcelService {
     }
 
     private Boolean compareTimeForSetClassroom(long currentStartPeriod, long currentFinish,
-                                               long existedStartPeriod, long existedFinishPeriod) {
+            long existedStartPeriod, long existedFinishPeriod) {
         if (currentStartPeriod > existedStartPeriod) {
             return currentStartPeriod > existedFinishPeriod;
         } else {
@@ -224,7 +320,7 @@ public class ExcelService {
     }
 
     private Long calculateTotalPeriod(String mass) {
-        //a(b-c-d-e) => b-c-d-e => b,c,d,e => b+c
+        // a(b-c-d-e) => b-c-d-e => b,c,d,e => b+c
         String numbersString = mass.trim().substring(2, mass.indexOf(')'));
         String[] numbersArray = numbersString.split("-");
         return Long.parseLong(numbersArray[0]) + Long.parseLong(numbersArray[1]);

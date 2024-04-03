@@ -2,8 +2,7 @@ import { Autocomplete, TextField } from '@mui/material'
 import React, { useState } from 'react'
 import { useSemesters } from '../../hooks/useSemester';
 
-const GeneralSemesterAutoComplete = () => {
-    const [selectedSemester, setSelectedSemester] = useState(null);
+const GeneralSemesterAutoComplete = ({selectedSemester, setSelectedSemester}) => {
     const { loading: semestersLoading, error: semestersError, semesters } = useSemesters();
     console.log(semesters);
     return (
@@ -13,6 +12,7 @@ const GeneralSemesterAutoComplete = () => {
           loadingText="Loading..."
           getOptionLabel={(option) => option && option.semester}
           onChange={(e, semester) => {
+            console.log(semester);
             setSelectedSemester(semester);
           }}
           value={selectedSemester}

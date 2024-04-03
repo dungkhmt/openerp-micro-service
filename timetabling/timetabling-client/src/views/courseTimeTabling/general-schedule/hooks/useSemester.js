@@ -13,6 +13,7 @@ export const useSemesters = () => {
             "get",
             "/semester/get-all",
             (res)=>{
+                console.log(res);
                 setSemesters(res.data || []);
                 setLoading(false);
             },

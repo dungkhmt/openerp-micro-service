@@ -2,12 +2,17 @@ package openerp.openerpresourceserver.helper;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Color;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,25 +24,25 @@ public class GeneralExcelHelper {
     static String[] HEADERs = { "ID", "Kỳ", "Nhóm", "SL thực", "Loại lớp", "Mã HP", "Tên HP", "Thời lượng", "SL Max",
             "Lớp học", "Trạng thái", "Mã lớp", "Kíp", "Đợt", "Khóa", "Tiết BĐ", "Thứ", "Phòng", "Tiết BĐ 2", "Thứ",
             "Phòng" };
-    static String SHEET = "Schedules";
+    static String SHEET = "Sheet1";
     static String DEFAULT_SHEET = "Sheet1";
 
     /**
      * Start row in excel file to classes
      */
-    private final static int START_ROW_TO_READ_CLASS = 5;
+    private final static int START_ROW_TO_READ_CLASS = 4;
     /**
      * Start column in excel to read class information (Start with column A)
      */
-    private final static int START_COL_TO_READ_CLASS_INFO = 1;
+    private final static int START_COL_TO_READ_CLASS_INFO = 0;
     /**
      * End column in excel to read class information (End with column P)
      */
-    private final static int END_COL_TO_READ_CLASS_INFO = 12;
+    private final static int END_COL_TO_READ_CLASS_INFO = 13;
     /**
      * Start column in excel to read class schedule (Start with column Q)
      */
-    private final static int START_COL_TO_READ_CLASS_SCHEDULE = 13;
+    private final static int START_COL_TO_READ_CLASS_SCHEDULE = 14;
     /**
      * End column in excel to read class information (End with column AZ)
      */
@@ -60,7 +65,13 @@ public class GeneralExcelHelper {
         return true;
     }
 
-    public static List<GeneralClassOpened> convertFromExcelToGeneralClassOpened(InputStream inputStream) {
+    /**
+     * @param inputStream
+     * @functionality this function is for get data from excel file and convert it
+     *                to GCO.
+     * @return
+     */
+    public static List<GeneralClassOpened> convertFromExcelToGeneralClassOpened(InputStream inputStream, String semester) {
         try {
             Workbook workbook = new XSSFWorkbook(inputStream);
             Sheet sheet = workbook.getSheet(SHEET);
@@ -68,20 +79,50 @@ public class GeneralExcelHelper {
             if (sheet == null) {
                 sheet = workbook.getSheet(DEFAULT_SHEET);
             }
-            int totalRowsNum = sheet.getLastRowNum() + 1;
-            System.out.println(totalRowsNum+1);
-            for (int i = START_ROW_TO_READ_CLASS; i < totalRowsNum + 1; i++) {
+            int totalRowsNum = sheet.getLastRowNum();
+            for (int i = START_ROW_TO_READ_CLASS; i < totalRowsNum; i++) {
                 Row classRow = sheet.getRow(i);
+                // skip if not exist classs code
+                if (classRow.getCell(8) == null)
+                    continue;
                 GeneralClassOpened generalClassOpened = new GeneralClassOpened();
-                for (int j = START_COL_TO_READ_CLASS_INFO; j < END_COL_TO_READ_CLASS_SCHEDULE; j++) {
+                RoomReservation timeSlot = null;
+                int duration = 0;
+                for (int j = START_COL_TO_READ_CLASS_INFO; j <= END_COL_TO_READ_CLASS_SCHEDULE; j++) {
                     Cell classInfoCell = classRow.getCell(j);
                     if (classInfoCell != null) {
-                        String cellValue = classInfoCell.getStringCellValue();
-                        if (classInfoCell.getColumnIndex() > START_COL_TO_READ_CLASS_SCHEDULE && cellValue != null) {
-                            int weekday = (Integer.parseInt(cellValue) - END_COL_TO_READ_CLASS_INFO) / 6;
-                            int startTime = (Integer.parseInt(cellValue) - END_COL_TO_READ_CLASS_INFO) % 6;
-                            String room = cellValue;
-                            generalClassOpened.addTimeSlot(new RoomReservation(startTime, weekday, room));
+                        String cellValue = "";
+                        switch (classInfoCell.getCellType()) {
+                            case 1:
+                                cellValue = classInfoCell.getStringCellValue();
+                                break;
+                            case 0:
+                                cellValue = String.valueOf((int) classInfoCell.getNumericCellValue());
+                                break;
+                            default:
+                                break;
+                        }
+                        if (classInfoCell.getColumnIndex() >= START_COL_TO_READ_CLASS_SCHEDULE && classInfoCell.getCellStyle() != null) {
+                            XSSFColor bgColor = (XSSFColor) classInfoCell.getCellStyle().getFillBackgroundColorColor();
+                            if (bgColor != null && "FFFFC000".equals(bgColor.getARGBHex())) {
+                                if (cellValue != null && !cellValue.equals("")) {
+                                    timeSlot = new RoomReservation();
+                                    timeSlot.setStartTime(
+                                            (classInfoCell.getColumnIndex() - END_COL_TO_READ_CLASS_INFO) % 6);
+                                    timeSlot.setWeekday(
+                                            (classInfoCell.getColumnIndex() - END_COL_TO_READ_CLASS_INFO) / 6 + 2);
+                                    timeSlot.setRoom(cellValue);
+                                }
+
+                                duration++;
+                            } else {
+                                if (timeSlot != null) {
+                                    timeSlot.setEndTime(timeSlot.getStartTime() + duration - 1);
+                                    generalClassOpened.addTimeSlot(timeSlot);
+                                    timeSlot = null;
+                                    duration = 0;
+                                }
+                            }
                         } else {
                             switch (classInfoCell.getColumnIndex()) {
                                 case 0:
@@ -109,6 +150,7 @@ public class GeneralExcelHelper {
                                     generalClassOpened.setState(cellValue);
                                     break;
                                 case 8:
+                                    if(cellValue.equals("")) continue;
                                     generalClassOpened.setClassCode(cellValue);
                                     break;
                                 case 9:
@@ -125,8 +167,11 @@ public class GeneralExcelHelper {
                             }
                         }
                     }
-                    break;
                 }
+                generalClassOpened.setSemester(semester);
+                // Log for classes imported
+                // System.out.println(generalClassOpened);
+                convertedList.add(generalClassOpened);
             }
             workbook.close();
             return convertedList;

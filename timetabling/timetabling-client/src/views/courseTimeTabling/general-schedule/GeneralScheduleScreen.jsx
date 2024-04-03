@@ -9,14 +9,14 @@ import { request } from "api";
 const GeneralScheduleScreen = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [group, setGroup] = useState([]);
-  const [semeter, setSemeter] = useState([]);
+  const [selectedSemester, setSelectedSemester] = useState(null);
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
     if (selectedFile) {
       const formData = new FormData();
       formData.append('file', selectedFile);
-      request("post", "/excel/upload-general", (res)=> {
+      request("post", `/excel/upload-general?semester=20221`, (res)=> {
         console.log(res);
       }, (err)=>{
         console.log(err);
@@ -32,7 +32,7 @@ const GeneralScheduleScreen = () => {
         Xếp thời khóa biểu cho chương trình đại trà
       </p>
       <div className="">
-        <GeneralSemesterAutoComplete />
+        <GeneralSemesterAutoComplete selectedSemester={selectedSemester} setSelectedSemester={setSelectedSemester}/>
       </div>
       <div className="flex flex-row justify-between">
         <div className="flex flex-row justify-start items-center gap-2">
@@ -42,14 +42,10 @@ const GeneralScheduleScreen = () => {
           </Button>
         </div>
         <div className="flex flex-row justify-end gap-2">
-          <Button variant="outlined">Tự động xếp</Button>
-          <Button variant="outlined" color="green">
-            Xuất Excel
-          </Button>
-          {/* <input type="file" name onChange={handleFileChange}/> */}
+          <input type="file" onChange={handleFileChange}/>
         </div>
       </div>
-      <GeneralScheduleTable group={group} semeter={semeter} />
+      <GeneralScheduleTable group={group} semester={selectedSemester} />
     </div>
   );
 };

@@ -5,7 +5,7 @@ import { useGroups } from "../../hooks/useGroups";
 const GeneralGroupAutoComplete = () => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const { loading: groupsLoading, error: groupsError, groups } = useGroups();
-  console.log(groups);
+
   return (
     <div>
       <Autocomplete

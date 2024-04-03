@@ -31,5 +31,12 @@ export const courseTimeTabling = {
       text: "Xếp thời khóa biểu (Đại trà)",
       child: [],
     },
+    {
+      id: "MENU_COURSE_TIME_TABLING.ROOM_OCCUPATION",
+      path: "/course-time-tabling/room-occupation",
+      isPublic: true,
+      text: "Xem sơ đồ phòng học",
+      child: [],
+    },
   ],
 };
