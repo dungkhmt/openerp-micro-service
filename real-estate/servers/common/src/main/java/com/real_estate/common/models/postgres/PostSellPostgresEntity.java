@@ -32,6 +32,9 @@ public class PostSellPostgresEntity {
 	@Column(name = "description", nullable = true)
 	String description;
 
+	@Column(name = "type_property")
+	String typeProperty;
+
 	@Column(name = "price", nullable = false)
 	Long price;
 

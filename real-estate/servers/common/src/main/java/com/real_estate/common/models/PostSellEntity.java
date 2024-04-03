@@ -16,6 +16,7 @@ public class PostSellEntity {
 	String title;
 	String description;
 
+	String typeProperty;
 	Long price;
 	Float pricePerM2;
 	Long acreage;
