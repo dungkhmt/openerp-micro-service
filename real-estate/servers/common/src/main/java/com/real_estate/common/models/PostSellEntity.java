@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class PostSellEntity {
-	Long postId;
+	Long postSellId;
 	Long authorId;
 
 	String title;

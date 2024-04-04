@@ -2,7 +2,6 @@ package com.real_estate.common.models.postgres;
 
 //import com.vladmihalcea.hibernate.type.array.ListArrayType;
 
-import com.real_estate.common.utils.PostStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,13 +15,13 @@ import java.util.List;
 @Data
 @Entity
 @Table(
-	name = "post"
+	name = "post_sell"
 )
 public class PostSellPostgresEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "post_id")
-	Long postId;
+	@Column(name = "post_sell_id")
+	Long postSellId;
 
 	@Column(name = "author_id")
 	Long authorId;
@@ -57,9 +56,11 @@ public class PostSellPostgresEntity {
 	@Column(name = "floor", nullable = false)
 	Integer floor;
 
+
 	@Column(name = "position")
-	@ElementCollection
-	List<Float> position;
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "post_sell_postgres_entity_position", joinColumns = @JoinColumn(name = "post_sell_id"))
+	List<Long> position;
 
 	@Column(name = "province")
 	String province;
@@ -83,7 +84,8 @@ public class PostSellPostgresEntity {
 	Long vertical;
 
 	@Column(name = "image_urls")
-	@ElementCollection()
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "post_sell_postgres_entity_image_urls", joinColumns = @JoinColumn(name = "post_sell_id"))
 	List<String> imageUrls;
 
 	@Column(name = "post_status", columnDefinition = "varchar(255) default 'OPENING'")
