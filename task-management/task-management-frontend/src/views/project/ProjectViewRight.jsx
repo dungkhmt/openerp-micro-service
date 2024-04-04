@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
 import { useProjectContext } from "../../hooks/useProjectContext";
 import { ProjectViewMembers } from "./member/ProjectViewMembers";
+import { ProjectViewOverview } from "./overview/ProjectViewOverview";
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   "& .MuiTabs-indicator": {
@@ -50,7 +51,6 @@ const ProjectViewRight = () => {
   }, [tab]);
 
   const handleChange = (event, value) => {
-    setActiveTab(value);
     navigate(`/project/${id}/${value}`);
   };
 
@@ -144,7 +144,7 @@ const ProjectViewRight = () => {
         ) : (
           <>
             <TabPanel sx={{ p: 0 }} value="overview">
-              Overview
+              <ProjectViewOverview />
             </TabPanel>
             <TabPanel sx={{ p: 0 }} value="tasks">
               <ProjectViewTasks />

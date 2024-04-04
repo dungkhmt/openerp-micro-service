@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
   Divider,
   Grid,
   IconButton,
@@ -217,7 +216,9 @@ const ProjectViewMembers = () => {
           <CardContent
             sx={{ display: "flex", justifyContent: "space-between" }}
           >
-            <CardHeader title="Danh sách thành viên" />
+            <Typography variant="h5" sx={{ color: "text.secondary" }}>
+              {members.length} thành viên
+            </Typography>
             <Box
               sx={{ display: "flex", flexWrap: "wrap", alignItems: "center" }}
             >
@@ -247,7 +248,7 @@ const ProjectViewMembers = () => {
             // checkboxSelection
             disableRowSelectionOnClick
             pageSizeOptions={[10, 25, 50]}
-            sx={{ height: "60vh" }}
+            sx={{ height: "65vh" }}
           />
         </Card>
       </Grid>

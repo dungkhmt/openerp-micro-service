@@ -40,6 +40,10 @@ const RedirectToOverview = () => {
   return <Navigate to={`/project/${id}/overview`} replace />;
 };
 
+/**
+ * @deprecated use RouterProvider from react-router-dom instead
+ * @returns
+ */
 function MainAppRouter() {
   const location = useLocation();
   const notificationState = useNotificationState();
@@ -63,12 +67,7 @@ function MainAppRouter() {
             {/* Project */}
             <Route element={<ProjectContextProvider />}>
               <Route element={<Project />} path={`/project/:id/:tab`} />
-              <Route
-                path="/project/:id"
-                element={
-                  <RedirectToOverview />
-                }
-              />
+              <Route path="/project/:id" element={<RedirectToOverview />} />
 
               {/* Task */}
               <Route element={<TaskContextProvider />}>

@@ -6,12 +6,11 @@ import { ReactKeycloakProvider } from "@react-keycloak/web";
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { I18nextProvider } from "react-i18next";
-import { BrowserRouter } from "react-router-dom";
-import Routes from "./Routes";
+import { RouterProvider } from "react-router-dom";
 import { AppLoading } from "./components/common/AppLoading";
 import { ReactHotToast } from "./components/react-hot-toast/index.jsx";
 import keycloak, { initOptions } from "./config/keycloak.js";
-import history from "./history";
+import { router } from "./routers/index.jsx";
 import { UserService } from "./services/api/user.service.js";
 import { menuState } from "./state/MenuState";
 import { notificationState } from "./state/NotificationState";
@@ -67,9 +66,10 @@ function App() {
                   }}
                 />
               </ReactHotToast>
-              <BrowserRouter history={history}>
+              {/* <BrowserRouter history={history}>
                 <Routes />
-              </BrowserRouter>
+              </BrowserRouter> */}
+              <RouterProvider router={router} />
             </LocalizationProvider>
           </ThemeProvider>
         </CacheProvider>
