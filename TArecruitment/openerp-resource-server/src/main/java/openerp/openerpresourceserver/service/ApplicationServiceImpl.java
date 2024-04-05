@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.algorithm.MaxMatching;
+import openerp.openerpresourceserver.dto.PaginationDTO;
 import openerp.openerpresourceserver.entity.Application;
 import openerp.openerpresourceserver.entity.ClassCall;
 import openerp.openerpresourceserver.entity.User;
@@ -10,6 +11,9 @@ import openerp.openerpresourceserver.repo.ApplicationRepo;
 import openerp.openerpresourceserver.repo.ClassCallRepo;
 import openerp.openerpresourceserver.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,13 +44,31 @@ public class ApplicationServiceImpl implements ApplicationService{
     }
 
     @Override
-    public List<Application> getMyApplications(String userId) {
-        return applicationRepo.findByUserId(userId);
+    public PaginationDTO<Application> getMyApplications(String userId, int page, int limit) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Application> applicationPage = applicationRepo.findByUserId(userId, pageable);
+
+        PaginationDTO<Application> paginationDTO = new PaginationDTO<>();
+
+        paginationDTO.setPage(applicationPage.getNumber());
+        paginationDTO.setTotalElement((int) applicationPage.getTotalElements());
+        paginationDTO.setData(applicationPage.getContent());
+
+        return paginationDTO;
     }
 
     @Override
-    public List<Application> getApplicationByClassId(int classCallId) {
-        return applicationRepo.findByClassCallId(classCallId);
+    public PaginationDTO<Application> getApplicationByClassId(int classCallId, int page, int limit) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Application> applicationPage = applicationRepo.findByClassCallId(classCallId, pageable);
+
+        PaginationDTO<Application> paginationDTO = new PaginationDTO<>();
+
+        paginationDTO.setPage(applicationPage.getNumber());
+        paginationDTO.setTotalElement((int) applicationPage.getTotalElements());
+        paginationDTO.setData(applicationPage.getContent());
+
+        return paginationDTO;
     }
 
     @Override
@@ -55,13 +77,33 @@ public class ApplicationServiceImpl implements ApplicationService{
     }
 
     @Override
-    public List<Application> getApplicationBySemester(String semester) {
-        return applicationRepo.findApplicationsByClassSemester(semester);
+    public PaginationDTO<Application> getApplicationBySemester(String semester, int page, int limit) {
+
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Application> applicationPage = applicationRepo.findApplicationsByClassSemester(semester, pageable);
+
+        PaginationDTO<Application> paginationDTO = new PaginationDTO<>();
+
+        paginationDTO.setPage(applicationPage.getNumber());
+        paginationDTO.setTotalElement((int) applicationPage.getTotalElements());
+        paginationDTO.setData(applicationPage.getContent());
+
+        return paginationDTO;
     }
 
     @Override
-    public List<Application> getApplicationByApplicationStatusAndSemester(String applicationStatus, String semester) {
-        return applicationRepo.findByApplicationStatusAndSemester(applicationStatus, semester);
+    public PaginationDTO<Application> getApplicationByApplicationStatusAndSemester(String applicationStatus,
+                                                                                   String semester, int page, int limit) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Application> applicationPage = applicationRepo.findByApplicationStatusAndSemester(applicationStatus, semester, pageable);
+
+        PaginationDTO<Application> paginationDTO = new PaginationDTO<>();
+
+        paginationDTO.setPage(applicationPage.getNumber());
+        paginationDTO.setTotalElement((int) applicationPage.getTotalElements());
+        paginationDTO.setData(applicationPage.getContent());
+
+        return paginationDTO;
     }
 
     @Override
@@ -134,6 +176,7 @@ public class ApplicationServiceImpl implements ApplicationService{
         log.info("Found " + applications.size() + " applications");
         List<Integer> classCalls = applicationRepo.findDistinctClassCallIdsBySemester(semester);
         log.info("Found " + classCalls.size() + " class");
+        // could improve this
         MaxMatching maxMatching = new MaxMatching(applications, userApplies, classCalls);
         List<Application> assignApplications = maxMatching.getAssignApplications();
 

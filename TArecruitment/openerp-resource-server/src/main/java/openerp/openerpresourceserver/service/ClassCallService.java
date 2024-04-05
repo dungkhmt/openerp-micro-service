@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.service;
 
+import openerp.openerpresourceserver.dto.PaginationDTO;
 import openerp.openerpresourceserver.entity.ClassCall;
 import org.springframework.data.jpa.repository.Query;
 
@@ -10,11 +11,11 @@ public interface ClassCallService {
 
     ClassCall createNewClass(ClassCall classCall);
 
-    List<ClassCall> getAllClass();
+    PaginationDTO<ClassCall> getAllClass(int page, int limit);
 
     Optional<ClassCall> getClassById(int id);
 
-    List<ClassCall> getClassBySemester(String semester);
+    PaginationDTO<ClassCall> getClassBySemester(String semester, int page, int limit);
 
     ClassCall updateClass(int id, ClassCall classCall);
 

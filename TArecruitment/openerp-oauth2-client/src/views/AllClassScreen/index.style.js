@@ -7,4 +7,9 @@ export const styles = {
     maxHeight: 148,
     overflowY: "scroll",
   },
+  linkedName: {
+    cursor: "pointer",
+    textDecoration: "underline",
+    fontWeight: "bold",
+  },
 };
