@@ -15,22 +15,37 @@ import { errorNoti } from "utils/notification";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
 
+const DEFAULT_PAGINATION_MODEL = {
+  page: 0,
+  pageSize: 5,
+};
+
 const AssigningScreen = () => {
   const [applications, setApplications] = useState([]);
   const [originalApplications, setOriginalApplications] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
+
+  const [paginationModel, setPaginationModel] = useState(
+    DEFAULT_PAGINATION_MODEL
+  );
+
   useEffect(() => {
     handleFetchData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paginationModel]);
 
   const handleFetchData = () => {
+    setIsLoading(true);
     request(
       "get",
-      `/application/get-application-by-status-and-semester/${SEMESTER}/APPROVED`,
+      `/application/get-application-by-status-and-semester/${SEMESTER}/APPROVED?page=${paginationModel.page}&limit=${paginationModel.pageSize}`,
       (res) => {
-        setApplications(res.data);
-        setOriginalApplications(res.data);
-        console.log(res.data);
+        setApplications(res.data.data);
+        setOriginalApplications(res.data.data);
+        setTotalElements(res.data.totalElement);
+        setIsLoading(false);
       }
     );
   };
@@ -99,18 +114,7 @@ const AssigningScreen = () => {
         }}
         id="application-status"
         name="application-status"
-        sx={{
-          boxShadow: "none",
-          ".MuiOutlinedInput-notchedOutline": { border: 0 },
-          "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-            border: 0,
-          },
-          "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-            {
-              border: 0,
-            },
-          width: 145,
-        }}
+        sx={styles.selection}
       >
         <MenuItem value="APPROVED">
           <Chip label="APPROVED" color="success" variant="outlined" />
@@ -204,7 +208,7 @@ const AssigningScreen = () => {
     {
       field: "assignStatus",
       headerName: "Trạng thái",
-      flex: 1,
+      flex: 1.2,
       renderCell: assignStatusCell,
       align: "center",
       headerAlign: "center",
@@ -242,18 +246,17 @@ const AssigningScreen = () => {
         Sắp xếp tự động
       </Button>
       <DataGrid
+        loading={isLoading}
         rowHeight={60}
         sx={{ fontSize: 16 }}
         rows={dataGridRows}
         columns={dataGridColumns}
         autoHeight
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 5,
-            },
-          },
-        }}
+        rowCount={totalElements}
+        pagination
+        paginationMode="server"
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[5, 10, 20]}
         checkboxSelection={false}
         disableRowSelectionOnClick

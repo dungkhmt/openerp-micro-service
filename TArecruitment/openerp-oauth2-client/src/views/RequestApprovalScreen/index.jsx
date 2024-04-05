@@ -5,21 +5,37 @@ import { Chip, IconButton, MenuItem, Select, Tooltip } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import { DataGrid } from "@mui/x-data-grid";
+import styles from "./index.style";
+
+const DEFAULT_PAGINATION_MODEL = {
+  page: 0,
+  pageSize: 5,
+};
 
 const RequestApprovalScreen = () => {
   const [applications, setApplications] = useState([]);
   const [originalApplications, setOriginalApplications] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
+
+  const [paginationModel, setPaginationModel] = useState(
+    DEFAULT_PAGINATION_MODEL
+  );
+
   useEffect(() => {
+    setIsLoading(true);
     request(
       "get",
-      `/application/get-application-by-semester/${SEMESTER}`,
+      `/application/get-application-by-semester/${SEMESTER}?page=${paginationModel.page}&limit=${paginationModel.pageSize}`,
       (res) => {
-        setApplications(res.data);
-        setOriginalApplications(res.data);
+        setApplications(res.data.data);
+        setOriginalApplications(res.data.data);
+        setTotalElements(res.data.totalElement);
+        setIsLoading(false);
       }
     );
-  }, []);
+  }, [paginationModel]);
 
   /**
    * @description Handle change status of application
@@ -83,18 +99,7 @@ const RequestApprovalScreen = () => {
         }}
         id="application-status"
         name="application-status"
-        sx={{
-          boxShadow: "none",
-          ".MuiOutlinedInput-notchedOutline": { border: 0 },
-          "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-            border: 0,
-          },
-          "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-            {
-              border: 0,
-            },
-          width: 145,
-        }}
+        sx={styles.selection}
       >
         <MenuItem value="APPROVED">
           <Chip label="APPROVED" color="success" variant="outlined" />
@@ -188,7 +193,7 @@ const RequestApprovalScreen = () => {
     {
       field: "applicationStatus",
       headerName: "Trạng thái",
-      flex: 1,
+      flex: 1.2,
       renderCell: applicationStatusCell,
       align: "center",
       headerAlign: "center",
@@ -219,18 +224,17 @@ const RequestApprovalScreen = () => {
     <div>
       <h1>Xác nhận tuyển dụng</h1>
       <DataGrid
+        loading={isLoading}
         rowHeight={60}
         sx={{ fontSize: 16 }}
         rows={dataGridRows}
         columns={dataGridColumns}
         autoHeight
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 5,
-            },
-          },
-        }}
+        rowCount={totalElements}
+        pagination
+        paginationMode="server"
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[5, 10, 20]}
         checkboxSelection={false}
         disableRowSelectionOnClick

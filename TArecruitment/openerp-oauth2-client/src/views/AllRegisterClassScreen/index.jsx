@@ -4,20 +4,47 @@ import { Button } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { SEMESTER } from "config/localize";
 import { DataGrid } from "@mui/x-data-grid";
+import styles from "./index.style";
+
+const DEFAULT_PAGINATION_MODEL = {
+  page: 0,
+  pageSize: 5,
+};
 
 const AllRegisterClassScreen = () => {
   const history = useHistory();
   const [classes, setClasses] = useState([]);
   const [registeredClass, setRegisteredClass] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
+
+  const [paginationModel, setPaginationModel] = useState(
+    DEFAULT_PAGINATION_MODEL
+  );
+
   useEffect(() => {
-    request("get", `/class-call/get-class-by-semester/${SEMESTER}`, (res) => {
-      setClasses(res.data);
-    }).then();
+    setIsLoading(true);
+    request(
+      "get",
+      `/class-call/get-class-by-semester/${SEMESTER}?page=${paginationModel.page}&limit=${paginationModel.pageSize}`,
+      (res) => {
+        setClasses(res.data.data);
+        setTotalElements(res.data.totalElement);
+        setIsLoading(false);
+      }
+    ).then();
+  }, [paginationModel]);
+
+  useEffect(() => {
+    fetchRegisteredData();
+  }, []);
+
+  const fetchRegisteredData = () => {
     request("get", `/class-call/get-my-registered-class/${SEMESTER}`, (res) => {
       setRegisteredClass(res.data);
     });
-  }, []);
+  };
 
   const handleRegister = (klass) => {
     history.push("/student/class-register/", { classId: klass.id });
@@ -31,7 +58,7 @@ const AllRegisterClassScreen = () => {
         variant="contained"
         disabled={isRegistered}
         onClick={() => handleRegister(rowData)}
-        style={{ width: "130px" }}
+        style={styles.registeredButton}
       >
         {isRegistered ? "ĐÃ ĐĂNG KÝ" : "Đăng ký"}
       </Button>
@@ -77,18 +104,17 @@ const AllRegisterClassScreen = () => {
     <div>
       <h1>Danh sách lớp học</h1>
       <DataGrid
+        loading={isLoading}
         rowHeight={60}
         sx={{ fontSize: 16 }}
         rows={dataGridRows}
         columns={dataGridColumns}
         autoHeight
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 5,
-            },
-          },
-        }}
+        rowCount={totalElements}
+        pagination
+        paginationMode="server"
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[5, 10, 20]}
         checkboxSelection={false}
         disableRowSelectionOnClick
