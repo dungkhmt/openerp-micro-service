@@ -1,0 +1,228 @@
+x-logging: &default-logging
+  driver: loki
+  options:
+    loki-url: 'http://localhost:3100/api/prom/push'
+    loki-pipeline-stages: |
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{3}'
+          max_wait_time: 3s
+      - regex:
+          expression: '^(?P<date>\d{4}-\d{2}-\d{2}) (?P<time>\d{2}:\d{2}:\d{2}.\d{3}) (?P<message>(?s:.*))$$'
+
+
+version: '3.7'
+services:
+#  mysql:
+#    image: mysql
+#    container_name: mysql
+#    environment:
+#      MYSQL_DATABASE: base_project
+#      MYSQL_ROOT_PASSWORD: 1
+#    ports:
+#      - '3308:3306'
+#      - '33063:33060'
+#    volumes:
+#      - /home/tip/Documents/mysql:/var/lib/mysql
+#      - /home/tip/Documents:/dumpfile
+#      - C:/tmp:/dumpfile
+#    networks:
+#      - my-network
+#    logging: *default-logging
+
+#  postgresql:
+#    image: postgres
+#    container_name: postgresql
+#    environment:
+#      SERVER_PORT: 8080
+#      SERVICE_HOST: localhost
+#      DOCKER_SERVER_HOST: http://erp3.soict.ai:12375
+#      SQL_DB_HOST: erp3.soict.ai
+#      SQL_DB_PORT: 6543
+#      SQL_DB_USER: postgres
+#      SQL_DB_PASS: "0penerp@2023#"
+#      POSTGRES_DB: erp_dev_2024
+#    ports:
+#      - '5432:5432'
+#    volumes:
+#      - /home/tip/Documents/postgresql:/var/lib/postgresql/data
+#    networks:
+#      - my-network
+#    logging: *default-logging
+
+  api:
+    container_name: api
+    image: test-school-bus
+    command:
+      - "java"
+      - "-jar"
+      - "api.jar"
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      DOCKER_SERVER_HOST: http://erp3.soict.ai:12375
+      SQL_DB_HOST: erp3.soict.ai
+      SQL_DB_PORT: 6543
+      SQL_DB_USER: postgres
+      SQL_DB_PASS: "0penerp@2023#"
+      POSTGRES_DB: erp_dev_2024
+      KAFKA_ADDRESSES: kafka:9092
+      KAFKA_EXAMPLE_TOPIC: example-topic
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      OTLP_EXPORT_URL: http://otel-collector:4318/v1/metrics
+      OTLP_TRACE_URL: http://otel-collector:4318/v1/traces
+#    depends_on:
+#      - mysql
+    networks:
+      - my-network
+    logging: *default-logging
+
+  consumer:
+    container_name: consumer
+    image: test-school-bus
+    command:
+      - "java"
+      - "-jar"
+      - "consumer.jar"
+    ports:
+      - "8082:8082"
+    environment:
+      DOCKER_SERVER_HOST: http://erp3.soict.ai:12375
+      SQL_DB_HOST: erp3.soict.ai
+      SQL_DB_PORT: 6543
+      SQL_DB_USER: postgres
+      SQL_DB_PASS: "0penerp@2023#"
+      POSTGRES_DB: erp_dev_2024
+      KAFKA_ADDRESSES: kafka:9092
+      KAFKA_EXAMPLE_TOPIC: example-topic
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      OTLP_EXPORT_URL: http://otel-collector:4318/v1/metrics
+      OTLP_TRACE_URL: http://otel-collector:4318/v1/traces
+      SERVER_PORT: 8082
+    depends_on:
+#      - mysql
+      - kafka
+    networks:
+      - my-network
+    logging: *default-logging
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.82.0
+    restart: always
+    command:
+      - --config=/etc/otelcol-cont/otel-collector.yml
+    volumes:
+      - ./docker/otel-collector.yml:/etc/otelcol-cont/otel-collector.yml
+    networks:
+      - my-network
+    ports:
+      - "1888:1888" # pprof extension
+      - "8888:8888" # Prometheus metrics exposed by the collector
+      - "8889:8889" # Prometheus exporter metrics
+      - "13133:13133" # health_check extension
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP http receiver
+#      - "55679:55679" # zpages extension
+      - ":55679" # zpages extension
+#    logging: *default-logging
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    restart: always
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+#      - --enable-feature=exemplar-storage
+    networks:
+      - my-network
+    ports:
+      - "9090:9090"
+#    logging: *default-logging
+
+  tempo:
+    image: grafana/tempo:latest
+    command: [ "-config.file=/etc/tempo.yml" ]
+    volumes:
+      - ./docker/tempo.yml:/etc/tempo.yml
+    networks:
+      - my-network
+    ports:
+      - "3200:3200"   # tempo
+      - "4317"  # otlp grpc
+#    logging: *default-logging
+
+  loki:
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - my-network
+    ports:
+      - "3100:3100"
+#    logging: *default-logging
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./docker:/etc/grafana/provisioning/datasources
+      - ./docker/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./docker/dashboards/:/etc/grafana/dashboards/
+    networks:
+      - my-network
+    depends_on:
+      - loki
+      - prometheus
+#    logging: *default-logging
+
+  kafka:
+    container_name: kafka-local
+    image: 'bitnami/kafka:3.5.1'
+    ports:
+      - '9092:9092'
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092, CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    networks:
+      - my-network
+    volumes:
+      - kafka-data:/bitnami/kafka
+#    logging: *default-logging
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - '8088:8088'
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      SERVER_PORT: 8088
+    networks:
+      - my-network
+#    logging: *default-logging
+
+volumes:
+  db-data:
+    driver: local
+  kafka-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+networks:
+  my-network:
+    driver: bridge

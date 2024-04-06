@@ -43,6 +43,7 @@ public class ClassOpenedController {
 
     @PostMapping("/group-assign")
     public ResponseEntity<String> update(@Valid @RequestBody UpdateClassOpenedDto requestDto) {
+        System.out.printf("assign group");
         try {
             List<ClassOpened> classOpenedList = service.updateClassOpenedList(requestDto);
             if (classOpenedList.isEmpty()) {
@@ -109,6 +110,18 @@ public class ClassOpenedController {
     public ResponseEntity<String> autoMakeSchedule(@Valid @RequestBody AutoMakeScheduleDto autoMakeScheduleDto) {
         try {
             service.automationMakeScheduleForCTTT(autoMakeScheduleDto);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NotClassroomSuitableException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/auto-make-general-schedule")
+    public ResponseEntity<String> autoMakeGeneralSchedule(@Valid @RequestBody AutoMakeScheduleDto autoMakeScheduleDto) {
+        try {
+            service.autoMakeGeneralSchedule(autoMakeScheduleDto);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (NotClassroomSuitableException e) {
             return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);

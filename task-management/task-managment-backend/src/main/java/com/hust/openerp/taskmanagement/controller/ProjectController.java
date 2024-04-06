@@ -1,180 +1,156 @@
-/*
- * package com.hust.openerp.taskmanagement.controller;
- *
- * import java.security.Principal;
- * import java.text.ParseException;
- * import java.util.ArrayList;
- * import java.util.HashMap;
- * import java.util.List;
- * import java.util.Map;
- * import java.util.UUID;
- *
- * import org.springframework.beans.factory.annotation.Autowired;
- * import org.springframework.http.ResponseEntity;
- * import org.springframework.web.bind.annotation.CrossOrigin;
- * import org.springframework.web.bind.annotation.GetMapping;
- * import org.springframework.web.bind.annotation.PathVariable;
- * import org.springframework.web.bind.annotation.PostMapping;
- * import org.springframework.web.bind.annotation.RequestBody;
- * import org.springframework.web.bind.annotation.RestController;
- *
- * import com.hust.openerp.taskmanagement.dto.dao.PersonDao;
- * import com.hust.openerp.taskmanagement.dto.dao.ProjectDao;
- * import com.hust.openerp.taskmanagement.dto.dao.ProjectPagination;
- * import com.hust.openerp.taskmanagement.dto.dao.TaskDao;
- * import com.hust.openerp.taskmanagement.dto.form.ProjectMemberForm;
- * import com.hust.openerp.taskmanagement.dto.form.TaskForm;
- * import com.hust.openerp.taskmanagement.entity.Project;
- * import com.hust.openerp.taskmanagement.entity.ProjectMember;
- * import com.hust.openerp.taskmanagement.entity.Task;
- * import com.hust.openerp.taskmanagement.entity.TaskAssignment;
- * import com.hust.openerp.taskmanagement.entity.TaskExecution;
- * import com.hust.openerp.taskmanagement.entity.User;
- * import com.hust.openerp.taskmanagement.service.ProjectMemberService;
- * import com.hust.openerp.taskmanagement.service.ProjectService;
- * import com.hust.openerp.taskmanagement.service.TaskAssignableService;
- * import com.hust.openerp.taskmanagement.service.TaskService;
- *
- * import lombok.AllArgsConstructor;
- *
- * @RestController("/projects")
- *
- * @CrossOrigin
- *
- * @AllArgsConstructor(onConstructor = @__(@Autowired))
- * public class ProjectController {
- * private ProjectService projectService;
- *
- * private final ProjectMemberService projectMemberService;
- *
- * private final TaskService taskService;
- *
- * private final TaskAssignableService taskAssignableService;
- *
- * @GetMapping("/page={pageNo}/size={pageSize}")
- * public ResponseEntity<Object> getListProjects(
- *
- * @PathVariable("pageNo") int pageNo,
- *
- * @PathVariable("pageSize") int pageSize) {
- * ProjectPagination pagination = projectService.findPaginated(pageNo,
- * pageSize);
- * return ResponseEntity.ok().body(pagination);
- * }
- *
- * @GetMapping
- * public ResponseEntity<Object> getAllProjects() {
- * return ResponseEntity.ok().body(projectService.getAllProjects());
- * }
- *
- * @PostMapping
- * public ResponseEntity<Object> postProjects(Principal principal, @RequestBody
- * Project project) {
- * String userId = principal.getName();
- * Project projectRes = projectService.createProject(project);
- * ProjectMember projectMember = ProjectMember.builder()
- * .projectId(projectRes.getId())
- * .userId(userId)
- * .build();
- * projectMemberService.create(projectMember);
- * return ResponseEntity.ok().body(projectRes);
- * }
- *
- * @GetMapping("/projects/{projectId}")
- * public ResponseEntity<Object> getProject(@PathVariable("projectId") UUID
- * projectId) {
- * return ResponseEntity.ok(new
- * ProjectDao(projectService.getProjectById(projectId)));
- * }
- *
- * @GetMapping("/projects/{projectId}/members")
- * public ResponseEntity<List<User>>
- * getMembersJoinedProject(@PathVariable("projectId") UUID projectId) {
- * List<User> users = projectMemberService.getMemberIdJoinedProject(projectId);
- * return ResponseEntity.ok(users);
- * }
- *
- * @PostMapping("/projects/{projectId}/members")
- * public ResponseEntity<Object> addMemberToProject(
- *
- * @PathVariable("projectId") UUID projectId, @RequestBody ProjectMemberForm
- * projectMemberForm) {
- * if (projectMemberService.checkAddedMemberInProject(
- * UUID.fromString(projectMemberForm.getPartyId()),
- * UUID.fromString(projectMemberForm.getProjectId()))) {
- * Map<String, String> map = new HashMap<>();
- * map.put("error", "Thành viên đã trong dự án !");
- * return ResponseEntity.ok(map);
- * }
- * return
- * ResponseEntity.ok(projectMemberService.addMemberToProject(projectMemberForm))
- * ;
- * }
- *
- * @GetMapping("/projects/{projectId}/tasks")
- * public ResponseEntity<Object> getAllTasksInProject(@PathVariable("projectId")
- * UUID projectId) {
- * List<Task> tasks = taskService.getAllTaskInProject(projectId);
- * List<TaskDao> taskDaoList = new ArrayList<>();
- * for (Task task : tasks) {
- * TaskAssignment taskAssignment =
- * taskAssignableService.getByTaskId(task.getId());
- * String userLoginIdTemp = "";
- * String userId = null;
- * String fullName = "Không xác định";
- * if (taskAssignment != null) {
- * userId = taskAssignment.getUserId();
- * userLoginIdTemp = projectMemberService.getUserLoginById(userId).getId();
- * fullName = new PersonDao(personService.findByPartyId(userId),
- * userLoginIdTemp).getFullName();
- * }
- *
- * taskDaoList.add(new TaskDao(task, userLoginIdTemp + " (" + fullName + ")",
- * userId));
- * }
- *
- * return ResponseEntity.ok(taskDaoList);
- * }
- *
- * @PostMapping("/projects/{projectId}/tasks")
- * public ResponseEntity<Object> createNewTask(
- * Principal principal,
- *
- * @RequestBody TaskForm taskForm,
- *
- * @PathVariable("projectId") UUID projectId) throws ParseException {
- * Task task = new Task();
- * task.setName(taskForm.getName());
- * task.setDescription(taskForm.getDescription());
- * task.setAttachmentPaths(taskForm.getAttachmentPaths());
- * task.setDueDate(taskForm.getDueDate());
- * task.setProject(projectService.getProjectById(projectId));
- * task.setStatusItem(taskService.getStatusItemByStatusId(taskForm.getStatusId()
- * ));
- * task.setTaskCategory(taskCategoryService.getTaskCategory(taskForm.
- * getCategoryId()));
- * task.setTaskPriority(taskPriorityService.getTaskPriorityById(taskForm.
- * getPriorityId()));
- * task.setCreatedByUserLoginId(principal.getName());
- * Task taskRes = taskService.createTask(task);
- *
- * TaskAssignment taskAssignment = new TaskAssignment();
- * taskAssignment.setTask(task);
- * taskAssignment.setUserId(taskForm.getPartyId());
- * taskAssignableService.create(taskAssignment);
- *
- * TaskExecution taskExecution = new TaskExecution();
- * taskExecution.setTask(taskRes);
- * taskExecution.setCreatedByUserLoginId(principal.getName());
- * taskExecution.setExecutionTags("issue");
- * taskExecution.setProjectId(projectId);
- * taskExecutionService.create(taskExecution);
- *
- * for (String skillId : taskForm.getSkillIds()) {
- * taskService.addTaskSkill(taskRes.getId(), skillId);
- * }
- * return ResponseEntity.ok(taskRes);
- * }
- *
- * }
- */
+package com.hust.openerp.taskmanagement.controller;
+
+import java.security.Principal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hust.openerp.taskmanagement.dto.PaginationDTO;
+import com.hust.openerp.taskmanagement.dto.ProjectDTO;
+import com.hust.openerp.taskmanagement.dto.dao.HistoryDao;
+import com.hust.openerp.taskmanagement.dto.form.ProjectForm;
+import com.hust.openerp.taskmanagement.entity.Project;
+import com.hust.openerp.taskmanagement.entity.ProjectMember;
+import com.hust.openerp.taskmanagement.exception.ProjectNotFoundException;
+import com.hust.openerp.taskmanagement.service.ProjectService;
+import com.hust.openerp.taskmanagement.service.TaskExecutionService;
+import com.hust.openerp.taskmanagement.service.TaskService;
+
+import jakarta.annotation.Nullable;
+import lombok.AllArgsConstructor;
+
+@RestController
+@RequestMapping("/projects")
+@AllArgsConstructor(onConstructor = @__(@Autowired))
+public class ProjectController {
+  private ModelMapper modelMapper;
+
+  private ProjectService projectService;
+
+  private final TaskService taskService;
+
+  private final TaskExecutionService taskExecutionService;
+
+  @GetMapping()
+  public PaginationDTO<ProjectDTO> getProjectsPagination(Principal principal, Pageable pageable,
+      @Nullable @RequestParam(value = "search", required = false) String search) {
+    Page<ProjectDTO> result = projectService.findPaginated(principal.getName(), pageable, search)
+        // TODO: move this logic to service
+        .map(project -> {
+          var dto = modelMapper.map(project, ProjectDTO.class);
+          dto.setRole(project.getMembers().stream()
+              .filter(member -> member.getUserId().equals(principal.getName())).findFirst()
+              .orElse(ProjectMember.builder().roleId("").build()).getRoleId());
+          return dto;
+        });
+    return new PaginationDTO<>(result);
+  }
+
+  @GetMapping("/all")
+  public List<ProjectDTO> getAllProjects() {
+    var projects = projectService.getAllProjects();
+    return projects.stream().map(project -> modelMapper.map(project, ProjectDTO.class)).toList();
+  }
+
+  @PostMapping
+  public ProjectDTO createProject(Principal principal, @RequestBody Project project) {
+    String userId = principal.getName();
+    project.setCreatedUserId(userId);
+    var projectRes = projectService.createProject(project);
+    var projectDto = modelMapper.map(projectRes, ProjectDTO.class);
+    projectDto.setCreator(projectRes.getCreator());
+    projectDto.setTaskCount(0);
+    return projectDto;
+  }
+
+  @GetMapping("{projectId}")
+  public ProjectDTO getProject(@PathVariable("projectId") UUID projectId) {
+    Project project = projectService.getProjectById(projectId);
+    if (project == null) {
+      throw new ProjectNotFoundException("Project not found");
+    }
+    var projectDto = modelMapper.map(project, ProjectDTO.class);
+    projectDto.setTaskCount(taskService.countTasksByProjectId(projectId));
+    return projectDto;
+  }
+
+  @PutMapping("{projectId}")
+  public ProjectDTO updateProject(@PathVariable("projectId") UUID projectId, @RequestBody ProjectForm entity) {
+    var project = projectService.updateProject(projectId, entity);
+    var projectDto = modelMapper.map(project, ProjectDTO.class);
+    // projectDto.setTaskCount(taskService.countTasksByProjectId(projectId));
+    return projectDto;
+  }
+
+  @GetMapping("{projectId}/statics/{type}")
+  public List<Map<String, String>> getTasksStaticsInProject(
+      @PathVariable("projectId") UUID projectID,
+      @PathVariable("type") String type) {
+    int sumTasks = 0;
+    List<Object[]> listTasks = null;
+
+    if (type.equals("category")) {
+      listTasks = taskService.getTaskStaticsCategoryInProject(projectID);
+    } else if (type.equals("status")) {
+      listTasks = taskService.getTaskStaticsStatusInProject(projectID);
+    }
+
+    List<Map<String, String>> result = new ArrayList<>();
+    if (listTasks != null && !listTasks.isEmpty()) {
+      for (Object[] objects : listTasks) {
+        sumTasks += (int) objects[2];
+      }
+      for (Object[] objects : listTasks) {
+        Map<String, String> temp = new HashMap<>();
+        temp.put("id", (String) objects[0]);
+        temp.put("name", (String) objects[1]);
+        temp.put(
+            "value",
+            String.valueOf(Math.round(((int) objects[2] * 100 / (sumTasks * 1.0)) * 100.0) / 100.0));
+        result.add(temp);
+      }
+    }
+
+    return result;
+  }
+
+  @GetMapping("{projectId}/history")
+  public ResponseEntity<Object> getHistory(@PathVariable("projectId") UUID projectId) {
+    List<HistoryDao> historyDaos = new ArrayList<>();
+    List<Object[]> objects = taskExecutionService.getAllDistinctDay(projectId);
+    for (Object[] object : objects) {
+      Date date = (Date) object[0];
+      String dateStr = new SimpleDateFormat("E, dd MMM yyyy").format(date);
+      HistoryDao historyDao = new HistoryDao();
+      historyDao.setDate(dateStr);
+      historyDao.setTaskExecutionList(taskExecutionService.getAllTaskExecutionByDate(date, projectId));
+      historyDaos.add(historyDao);
+    }
+    return ResponseEntity.ok(historyDaos);
+  }
+
+  @ExceptionHandler(ProjectNotFoundException.class)
+  public ResponseEntity<String> handleProjectNotFoundException(ProjectNotFoundException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+  }
+}

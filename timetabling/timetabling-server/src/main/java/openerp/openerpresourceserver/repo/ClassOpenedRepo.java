@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.repo;
 import openerp.openerpresourceserver.model.entity.ClassOpened;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -31,11 +32,18 @@ public interface ClassOpenedRepo extends JpaRepository<ClassOpened, Long> {
 
     List<ClassOpened> getAllBySemesterAndGroupName(String semester, String groupName, Sort sort);
 
-    List<ClassOpened> getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNullAndIdNot(String semester, String classroom, String weekday,String crew, Long id);
+    List<ClassOpened> getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNullAndIdNot(String semester,
+            String classroom, String weekday, String crew, Long id);
 
-    List<ClassOpened> getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull(String semester, String classroom, String weekday,String crew);
+    List<ClassOpened> getAllBySemesterAndClassroomAndWeekdayAndCrewAndStartPeriodIsNotNull(String semester,
+            String classroom, String weekday, String crew);
 
-    List<ClassOpened> getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot(String semester, String secondClassroom, String secondWeekday,String crew, Long id);
+    List<ClassOpened> getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNullAndIdNot(
+            String semester, String secondClassroom, String secondWeekday, String crew, Long id);
 
-    List<ClassOpened> getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull(String semester, String secondClassroom, String secondWeekday,String crew);
+    List<ClassOpened> getAllBySemesterAndSecondClassroomAndSecondWeekdayAndCrewAndSecondStartPeriodIsNotNull(
+            String semester, String secondClassroom, String secondWeekday, String crew);
+
+    
+
 }

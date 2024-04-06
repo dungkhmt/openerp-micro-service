@@ -7,8 +7,14 @@ import lombok.Setter;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * Data access object for Project entity
+ * 
+ * @deprecated This class is deprecated and will be removed in a future release
+ */
 @Getter
 @Setter
+@Deprecated
 public class ProjectDao {
 
     private UUID id;

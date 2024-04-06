@@ -20,4 +20,8 @@ public interface ClassroomService {
     void deleteById(Long id);
 
     void deleteByIds(List<Long> ids);
+
+    void clearAllClassRoom();
+
+    void clearAllClassRoomTimetable();
 }

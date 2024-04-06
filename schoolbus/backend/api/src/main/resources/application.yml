@@ -1,0 +1,118 @@
+app:
+  cors:
+#    allowed-origins: '*'
+    allowed-origins: http://localhost:3000
+  authorizedRedirectUris: http://localhost:3000/oauth2/callback
+
+spring:
+  application:
+    name: api
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${SQL_DB_HOST}:${SQL_DB_PORT}/${POSTGRES_DB}
+    username: ${SQL_DB_USER}
+    password: ${SQL_DB_PASS}
+    hikari: # reference: https://github:com/brettwooldridge/HikariCP#configuration-knobs-baby:
+      maxLifetime: 30000
+      leakDetectionThreshold: 30000
+  jpa:
+    generate-ddl: true
+    show-sql: true
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50
+          time_zone: UTC
+        format_sql: true
+        order_inserts: true
+        ddl-auto: create
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  main:
+    allow-bean-definition-overriding: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - profile
+
+security:
+  jwt:
+    token:
+      secret-key: ${JWT_SECRET}
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  metrics:
+    distribution:
+      percentiles[http.server.requests]: 0.5, 0.90, 0.95, 0.99
+      percentiles-histogram[http.server.requests]: true
+      slo[http.server.requests]: 100ms, 250ms, 500ms, 1s, 2s, 5s, 10s, 30s
+
+      percentiles[http.client.requests]: 0.5, 0.90, 0.95, 0.99
+      percentiles-histogram[http.client.requests]: true
+      slo[http.client.requests]: 100ms, 250ms, 500ms, 1s, 2s, 5s, 10s, 30s
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "health"
+          - "metrics"
+          - "prometheus"
+          - "info"
+    prometheus:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+      probes:
+        enabled: true
+    prometheus:
+      enabled: true
+  otlp:
+    metrics:
+      export:
+        url: ${OTLP_EXPORT_URL:http://localhost:4318/v1/metrics}
+        step: 10s
+    tracing:
+      endpoint: ${OTLP_TRACE_URL:http://localhost:4318/v1/traces}
+      export:
+        step: 10s # Export interval set to 10 seconds
+    tags: #from this i try
+      application: app
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: 'true'
+  tracing:
+    sampling:
+      probability: 1.0
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logging:
+  level:
+    org:
+      springframework: INFO
+      springframework.security: INFO
+
+kafka:
+   addresses: ${KAFKA_ADDRESSES:localhost:9092}
+   example-topic: ${KAFKA_EXAMPLE_TOPIC:example-topic}

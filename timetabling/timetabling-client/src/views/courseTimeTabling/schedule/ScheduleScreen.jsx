@@ -125,9 +125,26 @@ export default function ScheduleScreen() {
     const [rowSelectionModel, setRowSelectionModel] = React.useState([]);
     const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
+
     useEffect(() => {
+        request("get", "/semester/get-all", (res) => {
+            setSemesters(res.data);
+        });
+
+        request("get", "/group/get-all", (res) => {
+            setGroups(res.data);
+        });
+    }, [refreshKey])
+
+    useEffect(()=>{
         var semesterName = null
         var groupName = null
+
+        if(!selectedSemester && !selectedGroup) {
+            setClassOpeneds([]);
+            return;
+        }
+
 
         if (selectedSemester != null) {
             semesterName = selectedSemester.semester;
@@ -147,15 +164,7 @@ export default function ScheduleScreen() {
             {},
             requestSearch
         ).then();
-
-        request("get", "/semester/get-all", (res) => {
-            setSemesters(res.data);
-        });
-
-        request("get", "/group/get-all", (res) => {
-            setGroups(res.data);
-        });
-    }, [refreshKey])
+    }, [selectedGroup, selectedSemester])
 
     const handleOpenGroupList = () => {
         setGroupListOpen(true);
@@ -202,6 +211,26 @@ export default function ScheduleScreen() {
     };
 
     const handleRefreshData = () => {
+        
+        var semesterName = null
+        var groupName = null
+        if (selectedSemester != null) {
+            semesterName = selectedSemester.semester;
+        }
+        if (selectedGroup != null) {
+            groupName = selectedGroup.groupName
+        }
+
+        const requestSearch = {
+            semester: semesterName,
+            groupName: groupName
+        };
+        request("post", "/class-opened/search", (res) => {
+            setClassOpeneds(res.data);
+        },
+            {},
+            requestSearch
+        );
         setDataChanged(true);
         setRefreshKey((prevKey) => prevKey + 1);
     };
@@ -253,14 +282,6 @@ export default function ScheduleScreen() {
                         renderInput={(params) => <TextField {...params} label="Chọn nhóm học" />}
                         onChange={handleGroupChange}
                     />
-                    <IconButton
-                        variant="contained"
-                        onClick={handleFilterData}
-                        aria-label="search"
-                        size="large"
-                    >
-                        <SearchIcon fontSize="inherit" />
-                    </IconButton>
                 </div>
 
                 <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>

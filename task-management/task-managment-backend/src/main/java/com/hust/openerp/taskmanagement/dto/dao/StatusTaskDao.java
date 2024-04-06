@@ -8,6 +8,7 @@ import java.util.List;
 
 @Setter
 @Getter
+@Deprecated
 public class StatusTaskDao {
     private StatusItem statusItem;
     private int total;

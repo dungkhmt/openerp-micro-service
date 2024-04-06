@@ -11,6 +11,7 @@ import com.hust.baseweb.applications.programmingcontest.docker.DockerClientBase;
 import com.hust.baseweb.applications.programmingcontest.entity.*;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
 import com.hust.baseweb.applications.programmingcontest.model.*;
+import com.hust.baseweb.applications.programmingcontest.model.externalapi.ContestProblemModelResponse;
 import com.hust.baseweb.applications.programmingcontest.repo.*;
 import com.hust.baseweb.applications.programmingcontest.service.helper.cache.ProblemTestCaseServiceCache;
 import com.hust.baseweb.applications.programmingcontest.utils.ComputerLanguage;
@@ -1012,6 +1013,11 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                         testCaseContent = "---HIDDEN---";
                         testCaseOutput = "---HIDDEN---";
                         participantSolutionOutput = "---HIDDEN---";
+                        break;
+                    case ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_INPUT_PARTICIPANT_OUTPUT:
+                        testCaseContent = tc.getTestCase();
+                        testCaseOutput = "---HIDDEN---";
+                        participantSolutionOutput = st.getParticipantSolutionOtput();
                         break;
                 }
 
@@ -3675,5 +3681,16 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     public List<ProblemEntity> getAllProblems(String userId) {
         List<ProblemEntity> problems = problemRepo.findAll();
         return problems;
+    }
+
+    @Override
+    public List<ContestProblemModelResponse> extApiGetAllProblems(String userID) {
+        List<ProblemEntity> problems = problemRepo.findAll();
+        List<ContestProblemModelResponse> res = new ArrayList<>();
+        for(ProblemEntity pe: problems){
+            ContestProblemModelResponse p = new ContestProblemModelResponse(
+                pe.getProblemId(),pe.getProblemName(),pe.getLevelId());
+        }
+        return res;
     }
 }

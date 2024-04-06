@@ -1,6 +1,7 @@
 package com.hust.openerp.taskmanagement.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.util.Date;
 import java.util.UUID;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,9 +24,11 @@ public class Project {
     private UUID id;
 
     @Column(name = "code")
+    @NotEmpty
     private String code;
 
     @Column(name = "name")
+    @NotEmpty
     private String name;
 
     @Column(columnDefinition = "TEXT", name = "description")
@@ -34,7 +38,7 @@ public class Project {
     private String status;
 
     @Column(name = "created_by_user_id")
-    private String createdByUserId;
+    private String createdUserId;
 
     @LastModifiedDate
     @Column(name = "last_updated_stamp")
@@ -45,6 +49,12 @@ public class Project {
     private Date createdStamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by_user_id", nullable = false, insertable = false, updatable = false)
-    private User createdByUser;
+    @JoinColumn(name = "created_by_user_id", referencedColumnName = "user_login_id", nullable = false, insertable = false, updatable = false)
+    private User creator;
+
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    private List<Task> tasks;
+
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    private List<ProjectMember> members;
 }

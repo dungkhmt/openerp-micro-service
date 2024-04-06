@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import { GiInfo } from "react-icons/gi";
 import { IconContext } from "react-icons/lib/cjs";
 import { MdCancel, MdWarning } from "react-icons/md";
-import TertiaryButton from "../../components/button/TertiaryButton";
+import TertiaryButton from "../../components/mui/button/TertiaryButton";
 
 // Snackbar
 
@@ -44,7 +44,7 @@ const ContentContainer = (props) => (
 export const errorNoti = (message) => {
   const content = (
     <ContentContainer>
-      <IconContext.Provider>
+      <IconContext.Provider value={{ className: "react-icons" }}>
         <MdCancel size={20} style={{ marginRight: "5px" }} />
       </IconContext.Provider>
       {message}
