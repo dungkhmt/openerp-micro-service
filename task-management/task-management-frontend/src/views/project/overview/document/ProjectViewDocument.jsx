@@ -2,17 +2,17 @@ import { isStyledTextInlineContent } from "@blocknote/core";
 import { Icon } from "@iconify/react";
 import { LoadingButton } from "@mui/lab";
 import { Box, Typography } from "@mui/material";
-import PropTypes from "prop-types";
 import { useTour } from "@reactour/tour";
+import PropTypes from "prop-types";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 import { DashboardCard } from "../../../../components/card/DashboardCard";
 import { PreventPrompt } from "../../../../components/common/PreventFrompt";
 import BlockEditor, {
   cleanDoc,
 } from "../../../../components/editor/block-editor/BlockEditor";
-import { useProjectContext } from "../../../../hooks/useProjectContext";
-import { ProjectService } from "../../../../services/api/project.service";
+import { updateProject } from "../../../../store/project";
 
 const buildMembers = (members) =>
   members.map(({ member, roleId }) => ({
@@ -305,35 +305,39 @@ const ProjectViewDocument = forwardRef(function ProjectViewDocument(
   { style, className, onMouseDown, onMouseUp, onTouchEnd, children, ...props },
   ref
 ) {
-  const { members, project, setIsUpdate } = useProjectContext();
-  const { setIsOpen } = useTour();
-
-  const documentTemplate = useMemo(
-    () => parseDoc(project.description),
-    [project.description]
+  const { members, project, fetchLoading } = useSelector(
+    (state) => state.project
   );
+  const dispatch = useDispatch();
+  const { setIsOpen } = useTour();
+  const [toggleDialog, setToggleDialog] = useState(false);
+
+  const documentTemplate = useMemo(() => {
+    return fetchLoading ? [] : parseDoc(project.description);
+  }, [project, fetchLoading]);
 
   const editorRef = useRef(null);
-  const [toggleDialog, setToggleDialog] = useState(false);
   const [document, setDocument] = useState(documentTemplate);
   const [isEdited, setIsEdited] = useState(false);
 
   const onSave = async () => {
     const doc = cleanDoc(document);
-    await ProjectService.updateProject(project.id, {
-      description: JSON.stringify(doc, null, 0),
-    });
-    setIsUpdate((prev) => !prev);
+    await dispatch(
+      updateProject({
+        id: project.id,
+        data: { description: JSON.stringify(doc) },
+      })
+    );
     setIsEdited(false);
   };
 
   useEffect(() => {
-    if (isEdited) return;
-
     if (
       JSON.stringify(documentTemplate) !== JSON.stringify(cleanDoc(document))
     ) {
       setIsEdited(true);
+    } else {
+      setIsEdited(false);
     }
   }, [documentTemplate, document]);
 
@@ -346,6 +350,13 @@ const ProjectViewDocument = forwardRef(function ProjectViewDocument(
       window.localStorage.setItem("tour", "false");
     }
   }, [setIsOpen, documentTemplate]);
+
+  useEffect(() => {
+    if (!fetchLoading) {
+      setDocument(documentTemplate);
+      setToggleDialog(!toggleDialog);
+    }
+  }, [project, fetchLoading]);
 
   return (
     <DashboardCard

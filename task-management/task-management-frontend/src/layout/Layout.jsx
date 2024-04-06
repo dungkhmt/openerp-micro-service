@@ -8,11 +8,15 @@ import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import { useKeycloak } from "@react-keycloak/web";
 import React, { Suspense, useEffect, useState } from "react";
-import { useLocation, Outlet } from "react-router";
+import { useDispatch } from "react-redux";
+import { Outlet, useLocation } from "react-router";
 import { ReactComponent as Logo } from "../assets/icons/logo.svg";
 import bgImage from "../assets/img/sidebar-2.webp";
 import { MENU_LIST } from "../config/menuconfig";
 import { useNotificationState } from "../state/NotificationState";
+import { fetchCategories } from "../store/category";
+import { fetchPriorities } from "../store/priority";
+import { fetchStatuses } from "../store/status";
 import { checkExistValue } from "../utils/check-exist-value";
 import AccountButton from "./account/AccountButton";
 import NotificationButton from "./notification/NotificationButton";
@@ -96,6 +100,7 @@ function Layout() {
   const location = useLocation();
 
   const notificationState = useNotificationState();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (checkExistValue(MENU_LIST, location.pathname)) {
@@ -108,6 +113,17 @@ function Layout() {
   useEffect(() => {
     notificationState.open.set(false);
   }, [location.pathname, notificationState.open]);
+
+  useEffect(() => {
+    const fetchData = () =>
+      Promise.all([
+        dispatch(fetchStatuses()),
+        dispatch(fetchCategories()),
+        dispatch(fetchPriorities()),
+      ]);
+
+    fetchData();
+  }, [dispatch]);
 
   return (
     <Suspense fallback={<LinearProgress />}>
@@ -152,6 +168,5 @@ function Layout() {
     </Suspense>
   );
 }
-
 
 export default Layout;

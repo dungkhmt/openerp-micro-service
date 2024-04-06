@@ -5,17 +5,16 @@ import {
   Card,
   Divider,
   LinearProgress,
-  Skeleton,
   Tooltip,
   Typography,
   styled,
 } from "@mui/material";
 import dayjs from "dayjs";
 import { memo } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { UserAvatar } from "../../components/common/avatar/UserAvatar";
 import CustomChip from "../../components/mui/chip";
-import { useProjectContext } from "../../hooks/useProjectContext";
 import { useTaskContext } from "../../hooks/useTaskContext";
 import {
   getCategoryColor,
@@ -34,54 +33,22 @@ const TitleWrapper = styled(Box)(({ theme }) => ({
   },
 }));
 
-const Loading = () => (
-  <Card>
-    <Box sx={{ p: 6 }}>
-      <Skeleton variant="text" width={70} />
-      <Skeleton variant="text" width={100} />
-
-      <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
-      <Skeleton variant="text" width={80} />
-      <Skeleton variant="circular" width={35} height={35} />
-
-      <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
-      <Skeleton variant="text" width={70} />
-      <Skeleton variant="text" width={120} />
-
-      <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
-      <Skeleton variant="text" width={80} />
-      <Skeleton variant="text" width={120} />
-
-      <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
-      <Skeleton variant="text" width={70} />
-      <Skeleton variant="text" width={40} />
-
-      <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
-      <Skeleton variant="text" width={60} />
-      <Skeleton variant="text" width={35} />
-
-      <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
-      <Skeleton variant="text" width={65} />
-      <Skeleton variant="text" width={45} />
-    </Box>
-  </Card>
-);
-
 const TaskViewRight = () => {
-  const { isLoading: taskLoading, task } = useTaskContext();
+  const { task } = useTaskContext();
+  const { project } = useSelector((state) => state.project);
   const {
-    isLoading: projectLoading,
-    project,
-    statuses,
-    priorities,
-    categories,
-  } = useProjectContext();
+    category: categoryStore,
+    priority: priorityStore,
+    status: statusStore,
+  } = useSelector((state) => state);
 
-  if (taskLoading || projectLoading) return <Loading />;
-
-  const category = categories.find((c) => c.categoryId === task.categoryId);
-  const priority = priorities.find((p) => p.priorityId === task.priorityId);
-  const status = statuses.find((s) => s.statusId === task.statusId);
+  const category = categoryStore.categories.find(
+    (c) => c.categoryId === task.categoryId
+  );
+  const priority = priorityStore.priorities.find(
+    (p) => p.priorityId === task.priorityId
+  );
+  const status = statusStore.statuses.find((s) => s.statusId === task.statusId);
 
   return (
     <Card>

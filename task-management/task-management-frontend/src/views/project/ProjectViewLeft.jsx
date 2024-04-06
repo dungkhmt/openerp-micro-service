@@ -8,81 +8,21 @@ import {
   Divider,
   Typography,
 } from "@mui/material";
+import { useSelector } from "react-redux";
 import MuiAvatar from "@mui/material/Avatar";
-import Skeleton from "@mui/material/Skeleton";
+import dayjs from "dayjs";
 import { memo, useMemo } from "react";
 import { useNavigate } from "react-router";
 import CustomAvatar from "../../components/mui/avatar/CustomAvatar";
-import { useProjectContext } from "../../hooks/useProjectContext";
-import dayjs from "dayjs";
-
-const Loading = () => (
-  <Card>
-    <CardContent
-      sx={{
-        pt: 15,
-        display: "flex",
-        alignItems: "center",
-        flexDirection: "column",
-        gap: 4,
-        height: "80vh",
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 4,
-        }}
-      >
-        <Skeleton variant="rectangular" width={120} height={120} />
-        <Skeleton variant="text" width={80} />
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 6,
-        }}
-      >
-        <Skeleton variant="rounded" width={80} height={44} />
-        <Skeleton variant="rounded" width={80} height={44} />
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          width: "100%",
-          px: 6,
-          gap: 2,
-        }}
-      >
-        <Divider sx={{ my: `1rem !important` }} />
-        <Skeleton variant="text" width={150} />
-        <Skeleton variant="text" width={80} />
-        <Skeleton variant="text" width={120} />
-        <Skeleton variant="text" width={60} />
-      </Box>
-    </CardContent>
-  </Card>
-);
 
 const ProjectViewLeft = () => {
   const navigate = useNavigate();
-  const { project, isLoading, error, members } = useProjectContext();
+  const { project, members } = useSelector((state) => state.project);
 
   const randomUrl = useMemo(
     () => `/static/images/project${Math.floor(Math.random() * 5) + 1}.png`,
-    [project]
+    []
   );
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (error || !project) return null;
 
   return (
     <Card>
