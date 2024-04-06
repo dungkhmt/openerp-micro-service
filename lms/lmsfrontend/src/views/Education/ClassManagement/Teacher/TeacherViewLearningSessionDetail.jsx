@@ -1,8 +1,13 @@
-import React, {useState} from "react";
-import {useParams} from "react-router";
-import {a11yProps, StyledTab, StyledTabs, TabPanel,} from "../../../../component/tab";
-import {makeStyles} from "@material-ui/core/styles";
-import {Typography} from "@material-ui/core";
+import React, { useState } from "react";
+import { useParams } from "react-router";
+import {
+  a11yProps,
+  StyledTab,
+  StyledTabs,
+  TabPanel,
+} from "../../../../component/tab";
+import { makeStyles } from "@material-ui/core/styles";
+import { Typography } from "@material-ui/core";
 import LearningSessionTeacherViewQuizTestList from "./LearningSessionTeacherViewQuizTestList";
 import ListWhiteBoard from "../../../../component/education/whiteboard/ListWhiteBoard";
 
@@ -28,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function TeacherViewLearningSessionDetail() {
   const params = useParams();
-  const classes = useStyles()
+  const classes = useStyles();
   const sessionId = params.sessionId;
 
   const [activeTab, setActiveTab] = useState(0);

@@ -5,10 +5,9 @@ import { Button, Tooltip } from "@material-ui/core/";
 
 import AddIcon from "@material-ui/icons/Add";
 import { Link } from "react-router-dom";
-import LearningSessionFormAddQuizTest from "./LearningSessionFormAddQuizTest";
-import LearningSessionFormAddQuizInClassTests from "./LearningSessionFormAddQuizInClassTests";
+import { useParams } from "react-router";
 
-export default function LearningSessionTeacherViewQuizTestList(props) {
+export default function StudentViewInteractiveQuizList(props) {
   const sessionId = props.sessionId;
   const [quizTests, setQuizTests] = useState([]);
   const [open, setOpen] = useState(false);
@@ -28,7 +27,7 @@ export default function LearningSessionTeacherViewQuizTestList(props) {
       render: (rowData) => (
         <Link
           to={{
-            pathname: `/edu/teacher/class/detail/interactive-quiz/${rowData.interactive_quiz_id}`,
+            pathname: `/edu/student/class/detail/interactive-quiz/${rowData.interactive_quiz_id}`,
           }}
           style={{
             textDecoration: "none",
@@ -93,34 +92,29 @@ export default function LearningSessionTeacherViewQuizTestList(props) {
         style={{
           fontSize: 14,
         }}
-        actions={[
-          {
-            icon: () => {
-              return (
-                <Tooltip
-                  title="Thêm mới một kỳ thi"
-                  aria-label="Thêm mới một kỳ thi"
-                  placement="top"
-                >
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleAddQuizTest}
-                  >
-                    <AddIcon style={{ color: "white" }} fontSize="default" />
-                    &nbsp;&nbsp;&nbsp;Thêm mới&nbsp;&nbsp;
-                  </Button>
-                </Tooltip>
-              );
-            },
-            isFreeAction: true,
-          },
-        ]}
-      />
-      <LearningSessionFormAddQuizInClassTests
-        open={open}
-        setOpen={setOpen}
-        sessionId={sessionId}
+        // actions={[
+        //   {
+        //     icon: () => {
+        //       return (
+        //         <Tooltip
+        //           title="Thêm mới một kỳ thi"
+        //           aria-label="Thêm mới một kỳ thi"
+        //           placement="top"
+        //         >
+        //           <Button
+        //             variant="contained"
+        //             color="primary"
+        //             onClick={handleAddQuizTest}
+        //           >
+        //             <AddIcon style={{ color: "white" }} fontSize="default" />
+        //             &nbsp;&nbsp;&nbsp;Thêm mới&nbsp;&nbsp;
+        //           </Button>
+        //         </Tooltip>
+        //       );
+        //     },
+        //     isFreeAction: true,
+        //   },
+        // ]}
       />
     </div>
   );

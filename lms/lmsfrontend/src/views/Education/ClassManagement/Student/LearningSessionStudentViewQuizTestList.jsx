@@ -4,11 +4,12 @@ import Checkbox from "@material-ui/core/Checkbox";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Snackbar from "@material-ui/core/Snackbar";
-import {makeStyles} from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import Alert from "@material-ui/lab/Alert";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 //import { useHistory } from "react-router-dom";
-import {request} from "../../../../api";
+import { request } from "../../../../api";
+import { useParams } from "react-router";
 
 // const useCheckBoxStyles = makeStyles((theme) => ({
 //   root: {
@@ -35,9 +36,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function LearningSessionStudentViewQuizTestList(props) {
+  const params = useParams();
   //const testQuizId = history.location.state.testId;
   const [testQuizId, setTestQuizId] = useState(null);
-  const sessionId = props.sessionId;
+  const testId = params.testId;
   const [ListQuestions, setListQuestions] = useState([]);
   const [sucessRequest, setSucessRequest] = useState(false);
   const [errorRequest, setErrorRequest] = useState(false);
@@ -54,7 +56,7 @@ export default function LearningSessionStudentViewQuizTestList(props) {
       // token,
       // history,
       "get",
-      "/get-sessions-of-class/" + sessionId,
+      "/get-sessions-of-class/" + testId,
       (res) => {
         setSessionDetail(res.data);
       }
@@ -65,11 +67,11 @@ export default function LearningSessionStudentViewQuizTestList(props) {
       // token,
       // history,
       "get",
-      "/get-active-quiz-of-session-for-participant/" + sessionId,
+      "/get-questions-of-interactive-quiz/" + testId,
       (res) => {
-        setListQuestions(res.data.listQuestion);
-        setquizGroupTestDetail(res.data);
-        setTestQuizId(res.data.testId);
+        setListQuestions(res.data);
+        // setquizGroupTestDetail(res.data);
+        setTestQuizId(testId);
         let tmpObj = {};
         let tmpMap = {};
         res.data.listQuestion.forEach((element) => {
@@ -111,17 +113,17 @@ export default function LearningSessionStudentViewQuizTestList(props) {
       }
     });
     let tmpOb = {
-      testId: testQuizId,
+      interactiveQuizId: testId,
       questionId: quesId,
-      quizGroupId: quizGroupTestDetail.quizGroupId,
-      chooseAnsIds: listAns,
+      // quizGroupId: quizGroupTestDetail.quizGroupId,
+      choiceAnswerId: listAns,
     };
     console.log(tmpOb);
     request(
       // token,
       // history,
       "post",
-      "/quiz-test-choose_answer-by-user",
+      "/submit-interactive-quiz-answer-by-user",
       (res) => {
         console.log(res);
         setMessageRequest("Đã lưu vào hệ thống!");
@@ -198,81 +200,77 @@ export default function LearningSessionStudentViewQuizTestList(props) {
           </Button>
         </div>
         <Grid container spacing={3}>
-          {quizGroupTestDetail.quizGroupId != null ? (
-            ListQuestions != null ? (
-              ListQuestions.map((element, index) => {
-                return (
-                  <Grid item xs={12} key={index}>
-                    <Paper className={classes.paper}>
-                      <div className={classes.root}>
-                        <h4>Quiz {index + 1}</h4>{" "}
-                        <p
-                          dangerouslySetInnerHTML={{
-                            __html: element["statement"],
-                          }}
-                        />
-                        {element.attachment &&
-                          element.attachment.length !== 0 &&
-                          element.attachment.map((url, index) => (
-                            <div key={index} className={classes.imageContainer}>
-                              <div className={classes.imageWrapper}>
-                                <img
-                                  src={`data:image/jpeg;base64,${url}`}
-                                  alt="quiz test"
-                                  className={classes.imageQuiz}
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        {element["quizChoiceAnswerList"].map((answer, ind) => {
-                          return (
-                            <div key={ind} style={{ display: "flex" }}>
-                              <Checkbox
-                                key={answer["choiceAnswerId"]}
-                                checked={
-                                  stateCheckBox[element["questionId"]]
-                                    ? stateCheckBox[element["questionId"]][
-                                        answer["choiceAnswerId"]
-                                      ]
-                                    : false
-                                }
-                                color="primary"
-                                inputProps={{
-                                  "aria-label": "secondary checkbox",
-                                }}
-                                onChange={(event) =>
-                                  handleChange(event, element["questionId"])
-                                }
-                                name={answer["choiceAnswerId"]}
-                              />
-                              <p
-                                dangerouslySetInnerHTML={{
-                                  __html: answer.choiceAnswerContent,
-                                }}
+          {ListQuestions != null ? (
+            ListQuestions.map((element, index) => {
+              return (
+                <Grid item xs={12} key={index}>
+                  <Paper className={classes.paper}>
+                    <div className={classes.root}>
+                      <h4>Quiz {index + 1}</h4>{" "}
+                      <p
+                        dangerouslySetInnerHTML={{
+                          __html: element["statement"],
+                        }}
+                      />
+                      {element.attachment &&
+                        element.attachment.length !== 0 &&
+                        element.attachment.map((url, index) => (
+                          <div key={index} className={classes.imageContainer}>
+                            <div className={classes.imageWrapper}>
+                              <img
+                                src={`data:image/jpeg;base64,${url}`}
+                                alt="quiz test"
+                                className={classes.imageQuiz}
                               />
                             </div>
-                          );
-                        })}
-                      </div>
-                      <div style={{ textAlign: "right" }}>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          disabled={mapS[element["questionId"]]}
-                          onClick={() => {
-                            handleClick(element["questionId"]);
-                          }}
-                        >
-                          Select
-                        </Button>
-                      </div>
-                    </Paper>
-                  </Grid>
-                );
-              })
-            ) : (
-              <p style={{ justifyContent: "center" }}> </p>
-            )
+                          </div>
+                        ))}
+                      {element["quizChoiceAnswerList"].map((answer, ind) => {
+                        return (
+                          <div key={ind} style={{ display: "flex" }}>
+                            <Checkbox
+                              key={answer["choiceAnswerId"]}
+                              checked={
+                                stateCheckBox[element["questionId"]]
+                                  ? stateCheckBox[element["questionId"]][
+                                      answer["choiceAnswerId"]
+                                    ]
+                                  : false
+                              }
+                              color="primary"
+                              inputProps={{
+                                "aria-label": "secondary checkbox",
+                              }}
+                              onChange={(event) =>
+                                handleChange(event, element["questionId"])
+                              }
+                              name={answer["choiceAnswerId"]}
+                            />
+                            <p
+                              dangerouslySetInnerHTML={{
+                                __html: answer.choiceAnswerContent,
+                              }}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        disabled={mapS[element["questionId"]]}
+                        onClick={() => {
+                          handleClick(element["questionId"]);
+                        }}
+                      >
+                        Select
+                      </Button>
+                    </div>
+                  </Paper>
+                </Grid>
+              );
+            })
           ) : (
             <p style={{ justifyContent: "center" }}> </p>
           )}
