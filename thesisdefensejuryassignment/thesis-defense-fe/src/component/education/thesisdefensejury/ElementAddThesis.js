@@ -1,23 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { StandardTable } from "erp-hust/lib/StandardTable";
 import KeywordChip from "component/common/KeywordChip";
 import { Checkbox } from "@material-ui/core/";
-import { useAssignTeacherThesis } from "context/AssignTeacherThesisContext";
-
+import { useAssignThesis } from "action";
 export default function ElementAddThesis({ availableThesisList }) {
-  const { assignedThesis, handleSelectThesis } = useAssignTeacherThesis();
-
+  const assignedThesis = useAssignThesis((state) => state.assignedThesis);
+  const handleSelectThesis = useAssignThesis(
+    (state) => state.handleSelectThesis
+  );
   const columns = [
     {
       title: "",
       render: (rowData) => (
         <Checkbox
           checked={
-            assignedThesis.find((item) => item === rowData?.id) !== undefined
+            assignedThesis?.find((item) => item === rowData?.id) !== undefined
           }
-          onChange={(e) => {
-            handleSelectThesis(rowData);
-          }}
+          onChange={(e) => handleSelectThesis(rowData)}
           color="default"
         />
       ),
@@ -36,7 +35,7 @@ export default function ElementAddThesis({ availableThesisList }) {
       title: "Keyword",
       field: "academicKeywordList",
       render: (rowData) =>
-        rowData.academicKeywordList.map(({ keyword, description }) => (
+        rowData?.academicKeywordList?.map(({ keyword, description }) => (
           <KeywordChip key={keyword} keyword={description} />
         )),
     },

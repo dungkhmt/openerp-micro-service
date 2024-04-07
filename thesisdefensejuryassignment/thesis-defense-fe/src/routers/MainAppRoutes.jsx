@@ -7,23 +7,18 @@ import { Home } from "../component";
 import { Layout } from "../layout";
 import { drawerWidth } from "../layout/sidebar/v1/SideBar";
 import { useNotificationState } from "../state/NotificationState";
-import DefenseJury from "../component/education/thesisdefensejury/DefenseJury";
 import DefenseJuryDetail from "../component/education/thesisdefensejury/DefenseJuryDetail";
-import Thesis from "../component/education/thesisdefensejury/Thesis";
-import CreateThesis from "../component/education/thesisdefensejury/CreateThesis";
-import EditThesis from "../component/education/thesisdefensejury/EditThesis";
 import DefensePlanManager from "../component/education/thesisdefensejury/DefensePlanManager";
-import ThesisDetail from "../component/education/thesisdefensejury/ThesisDetail";
 import ThesisDefensePlans from "../component/education/thesisdefensejury/ThesisDefensePlans";
-import AssginTeacherToPlan from "../component/education/thesisdefensejury/AssignTeacherAndThesisToDefenseJury";
 import NotFound from "views/errors/NotFound";
-// import NotFound from "../views/errors/NotFound";
-// import AdminRoute from "./AdminRoute";
-// import ProgrammingContestRoutes from "./ProgrammingContestRoutes";
 import AssignTeacherAndThesisToDefenseJury from "../component/education/thesisdefensejury/AssignTeacherAndThesisToDefenseJury"; // import WhiteBoardRoute from "./WhiteBoardRoute";
-// import UploadUser from "../component/userlogin/UploadUser";
-// import ContestManagerRankingPublicV2 from "../component/education/programmingcontestFE/ContestManagerRankingPublicV2";
-
+import AssignedThesisDefensePlan from "views/thesis-defense-jury-assignment/assigned/AssignedThesisDefensePlan";
+import AssignedDefenseJury from "views/thesis-defense-jury-assignment/assigned/AssignedDefenseJury";
+import CreateThesis from "component/education/thesisdefensejury/CreateThesis";
+import StudentAssignedDefenseJury from "views/thesis-defense-jury-assignment/student/StudentAssignedDefenseJury";
+import PresidentAssignedThesisDefensePlan from "views/thesis-defense-jury-assignment/assigned/PresidentAssignedThesisDefensePlan";
+import PresidentAssignedDefenseJury from "views/thesis-defense-jury-assignment/assigned/PresidentAssignedDefenseJury";
+import PresidentAssignJuryDefense from "views/thesis-defense-jury-assignment/assigned/PresidentAssignJuryDefense";
 const EduRoute = lazy(() => import("./EduRoute"));
 // const UserLoginRoute = lazy(() => import("./UserLoginRoute"));
 
@@ -67,25 +62,40 @@ function MainAppRoute(props) {
                   element={<DefenseJuryDetail />}
                   exact
                 />
+                <Route
+                  path="/thesis/thesis_defense_plan/:id/defense_jury/:juryId/create"
+                  element={<AssignTeacherAndThesisToDefenseJury />}
+                  exact
+                />
+              </Route>
+              <Route path="assigned">
+                <Route index element={<AssignedThesisDefensePlan />} />
+                <Route path=":id" element={<AssignedDefenseJury />} exact />
+                <Route
+                  path="/thesis/thesis_defense_plan/assigned/:id/defense_jury/:juryId"
+                  element={<DefenseJuryDetail />}
+                  exact
+                />
+                <Route path="president" element={<PresidentAssignedThesisDefensePlan />} />
+                <Route path="president/:id" element={<PresidentAssignedDefenseJury />} />
+                <Route
+                  path="/thesis/thesis_defense_plan/assigned/president/:id/defense_jury/:juryId"
+                  element={<DefenseJuryDetail />}
+                  exact
+                />
+                <Route path="/thesis/thesis_defense_plan/assigned/president/:id/defense_jury/:juryId/assign" element={<PresidentAssignJuryDefense />} />
               </Route>
             </Route>
-            {/* <Route element={<CreateThesis />} path={`/thesis/create`} exact />
-            <Route element={<EditThesis />} path={`/thesis/edit/:id`} exact /> */}
-
-            {/* <Route
-              element={<DefenseJuryDetail />}
-              path={`/thesis/defense_jury/:id`}
-              exact
-            /> */}
-            {/* 
-            <Route
-              element={<AssginTeacherToPlan />}
-              path={`/thesis/defensePlan/:id/assignTeacher`}
-              exact
-            />
-            <Route element={<DefenseJury />} path={`/thesis/defense_jury`} />
-            <Route element={<ThesisDetail />} path={`/thesis/:id`} exact />
-            <Route element={<Thesis />} path={`/thesis`} /> */}
+            <Route path="/thesis/student">
+              <Route path="thesis_defense_plan/assigned" element={<StudentAssignedDefenseJury />} />
+              <Route path="create" element={<CreateThesis />}>
+              </Route>
+              <Route
+                path="/thesis/student/thesis_defense_plan/assigned/:id/defense_jury/:juryId"
+                element={<DefenseJuryDetail />}
+                exact
+              />
+            </Route>
           </Route>
         </Routes>
       </Suspense>

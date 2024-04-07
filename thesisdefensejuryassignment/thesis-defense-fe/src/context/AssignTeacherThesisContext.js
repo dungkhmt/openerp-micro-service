@@ -6,6 +6,7 @@ const Context = createContext(null);
 export const AssignTeacherThesisContext = ({ children }) => {
   const [assignedTeacher, setAssignedTeacher] = useState([]);
   const [assignedThesis, setAssignedThesis] = useState([]);
+  const [assignedTeacherRole, setAssignedTeacherRole] = useState([]);
   const { register, handleSubmit } = useForm();
   const handleSelectTeacher = useMemo(
     () => (teacher) => {
@@ -42,6 +43,18 @@ export const AssignTeacherThesisContext = ({ children }) => {
     [assignedThesis]
   );
 
+  const handleAssignRole = (e) => {
+    const role = e.target.value;
+    const teacherId = e.target.name;
+    const teacher = assignedTeacher.find((item) => item?.id === teacherId);
+    if (teacher) {
+      teacher.role = role;
+      return setAssignedTeacher((prevAssignedTeacher) => [
+        ...prevAssignedTeacher,
+      ]);
+    }
+  };
+
   return (
     <Context.Provider
       value={{
@@ -51,6 +64,7 @@ export const AssignTeacherThesisContext = ({ children }) => {
         handleSubmit,
         assignedThesis,
         handleSelectThesis,
+        handleAssignRole,
       }}
     >
       {children}

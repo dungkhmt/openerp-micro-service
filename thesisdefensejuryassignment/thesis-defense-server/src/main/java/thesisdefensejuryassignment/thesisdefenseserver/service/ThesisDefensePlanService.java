@@ -10,4 +10,13 @@ public interface ThesisDefensePlanService {
     ThesisDefensePlan createThesisDefensePlan(ThesisDefensePlan graduationTerm);
 
     ThesisDefensePlan getThesisDefensePlanById(String id);
+
+    List<ThesisDefensePlan> getAllThesisDefensePlanAssignedForTeacherWithId(String teacherId);
+
+    ThesisDefensePlan getThesisDefensePlanAssignedForTeacherWithTeacherId(String teacherId, String thesisDefensePlanId);
+
+    ThesisDefensePlan getThesisDefensePlanWithTeacherRoleAsPresidentAndTeacherIdById(String teacherId, String thesisDefensePlanId);
+
+    List<ThesisDefensePlan> getAllThesisDefensePlanAssignedForTeacherAsPresidentWithId(String teacherId);
+
 }

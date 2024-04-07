@@ -37,7 +37,9 @@ public class EntityAuthorizationController {
                     return roleId;
                 })
                 .collect(Collectors.toList());
-
+        for (String t: roleIds){
+            System.out.println(t);
+        }
         return ResponseEntity.ok().body(entityAuthorizationService.getEntityAuthorization(id, roleIds));
     }
 }

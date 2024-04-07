@@ -1,11 +1,20 @@
-import React, { useState } from "react";
-import { Grid, List, ListSubheader } from "@mui/material";
+import React, { useState, useMemo } from "react";
+import { Grid, List, ListSubheader, TextField, InputAdornment } from "@mui/material";
 import TeacherListItem from "component/common/TeacherListItem";
-import { useAssignTeacherThesis } from "context/AssignTeacherThesisContext";
-import AssignedTeacherListItem from "component/common/AssignedTeacherListItem";
+import AssignedTeacherList from "./AssignTeacherList";
+import SearchIcon from "@mui/icons-material/Search";
 
-export default function ElementAddTeacher({ teacherList, register }) {
-  const { assignedTeacher, handleSelectTeacher } = useAssignTeacherThesis();
+export default function ElementAddTeacher({ teacherList }) {
+  const containsText = (text, searchText) =>
+    text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
+  const [searchTeacher, setSearchTeacher] = useState("");
+  const displayedTeacherOptions = useMemo(
+    () =>
+      searchTeacher !== "" ? teacherList?.filter((option) =>
+        containsText(option.teacherName, searchTeacher)
+      ) : teacherList, [searchTeacher]
+  );
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={6}>
@@ -18,15 +27,30 @@ export default function ElementAddTeacher({ teacherList, register }) {
             overflow: "auto",
             maxHeight: 400,
           }}
-          subheader={<ListSubheader>Danh sách giáo viên</ListSubheader>}
-        >
-          {teacherList?.map((item) => (
-            <TeacherListItem
-              key={item?.id}
-              assignedTeacher={assignedTeacher}
-              handleSelectTeacher={handleSelectTeacher}
-              teacher={item}
+          subheader={<ListSubheader>
+            <TextField
+              size="small"
+              autoFocus
+              placeholder="Type to search..."
+              fullWidth
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+              onChange={(e) => setSearchTeacher(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key !== "Escape") {
+                  e.stopPropagation();
+                }
+              }}
             />
+          </ListSubheader>}
+        >
+          {displayedTeacherOptions?.map((item) => (
+            <TeacherListItem key={item?.id} teacher={item} />
           ))}
         </List>
       </Grid>
@@ -44,12 +68,7 @@ export default function ElementAddTeacher({ teacherList, register }) {
             <ListSubheader>Danh sách giáo viên hội đồng</ListSubheader>
           }
         >
-          {assignedTeacher.map((item) => (
-            <AssignedTeacherListItem
-              assignedTeacher={item}
-              register={register}
-            />
-          ))}
+          <AssignedTeacherList />
         </List>
       </Grid>
     </Grid>

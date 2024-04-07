@@ -179,7 +179,7 @@ function CreateDefenseJury({
                       label="Room"
                       input={<OutlinedInput label="Tag" />}
                     >
-                      {roomList.map((item) => (
+                      {roomList?.map((item) => (
                         <MenuItem key={item?.id} value={item?.id}>
                           {item?.name}
                         </MenuItem>
@@ -200,7 +200,7 @@ function CreateDefenseJury({
                       input={<OutlinedInput label="Tag" />}
                       {...register("defenseSessionId", { required: true })}
                     >
-                      {sessionList.map((item) => (
+                      {sessionList?.map((item) => (
                         <MenuItem key={item?.id} value={item?.id}>
                           {item?.name}
                         </MenuItem>
@@ -224,7 +224,7 @@ function CreateDefenseJury({
                       input={<OutlinedInput label="Tag" />}
                       onChange={handleChange}
                     >
-                      {keywordList.map((item) => (
+                      {keywordList?.map((item) => (
                         <MenuItem key={item?.id} value={item?.keyword}>
                           <Checkbox
                             checked={keyword.indexOf(item?.keyword) > -1}

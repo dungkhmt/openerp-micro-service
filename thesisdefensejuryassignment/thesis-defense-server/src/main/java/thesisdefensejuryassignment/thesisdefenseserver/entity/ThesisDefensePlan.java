@@ -53,7 +53,7 @@ public class ThesisDefensePlan {
     private List<DefenseJury> defenseJuries;
 
     @OneToMany(mappedBy = "thesisDefensePlan")
-    @JsonIgnore
+//    @JsonIgnore
     private List<Thesis> thesisList;
 
     public String getId() {
@@ -73,5 +73,69 @@ public class ThesisDefensePlan {
     }
     public ThesisDefensePlan(String id){
         this.id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public LocalDateTime getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(LocalDateTime createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public List<DefenseJury> getDefenseJuries() {
+        return defenseJuries;
+    }
+
+    public void setDefenseJuries(List<DefenseJury> defenseJuries) {
+        this.defenseJuries = defenseJuries;
+    }
+
+    public List<Thesis> getThesisList() {
+        return thesisList;
+    }
+
+    public void setThesisList(List<Thesis> thesisList) {
+        this.thesisList = thesisList;
     }
 }

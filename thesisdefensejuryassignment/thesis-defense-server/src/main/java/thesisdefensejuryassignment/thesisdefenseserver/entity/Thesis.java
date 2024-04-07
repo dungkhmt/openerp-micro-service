@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,7 +39,7 @@ public class Thesis {
     private Teacher supervisor;
 
     @ManyToOne
-    @JoinColumn(name = "scheduled_jury_id", nullable = false)
+    @JoinColumn(name = "scheduled_jury_id", referencedColumnName = "id")
     @JsonBackReference
     private DefenseJury defenseJury;
 
@@ -47,7 +48,7 @@ public class Thesis {
 
     @CreationTimestamp
     @Column(name = "created_stamp")
-    private LocalDateTime createdTime;
+    private Date createdTime;
 
     @ManyToMany
     @JoinTable(
@@ -59,10 +60,39 @@ public class Thesis {
 
 
     @ManyToOne
-    @JoinColumn(name = "thesis_defense_plan_id", nullable = false)
+    @JoinColumn(name = "thesis_defense_plan_id", nullable = false, referencedColumnName = "id")
     @JsonBackReference
     private ThesisDefensePlan thesisDefensePlan;
 
+    public ThesisDefensePlan getThesisDefensePlan() {
+        return thesisDefensePlan;
+    }
+
+    public void setThesisDefensePlan(ThesisDefensePlan thesisDefensePlan) {
+        this.thesisDefensePlan = thesisDefensePlan;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "program_id", nullable = false)
+    private TrainingProgram trainingProgram;
+    @Column(name = "student_id")
+    private String studentId;
+
+    @Column(name = "student_email")
+    private String studentEmail;
+
+    @ManyToOne
+    @JoinColumn(name = "scheduled_reviewer_id")
+    private Teacher scheduledReviewer;
+
+
+    public Teacher getScheduledReviewer() {
+        return scheduledReviewer;
+    }
+
+    public void setScheduledReviewer(Teacher scheduledReviewer) {
+        this.scheduledReviewer = scheduledReviewer;
+    }
     /*-------------------------------------------------------*/
 
     public List<AcademicKeyword> getAcademicKeywordList() {
@@ -129,20 +159,26 @@ public class Thesis {
         this.updatedDateTime = updatedDateTime;
     }
 
-    public LocalDateTime getCreatedTime() {
+    public Date getCreatedTime() {
         return createdTime;
     }
 
-    public void setCreatedTime(LocalDateTime createdTime) {
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Thesis(String thesisName, String thesisAbstract, String studentName, Teacher supervisor, LocalDateTime createdTime, List<AcademicKeyword> academicKeywordList) {
+    public Thesis(String thesisName, String thesisAbstract, String studentName, Teacher supervisor, Date createdTime, List<AcademicKeyword> academicKeywordList, ThesisDefensePlan defensePlan, TrainingProgram program, String studentId, String studentEmail) {
         this.thesisName = thesisName;
         this.thesisAbstract = thesisAbstract;
         this.studentName = studentName;
         this.supervisor = supervisor;
         this.createdTime = createdTime;
         this.academicKeywordList = academicKeywordList;
+        this.thesisDefensePlan = defensePlan;
+        this.trainingProgram = program;
+        this.studentId = studentId;
+        this.studentEmail = studentEmail;
     }
+
+
 }

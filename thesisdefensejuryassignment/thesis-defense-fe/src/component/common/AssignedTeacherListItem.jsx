@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   ListItem,
   ListItemText,
@@ -7,7 +7,10 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  IconButton,
 } from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
+import { useAssignTeacherRole } from "action";
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
@@ -36,7 +39,20 @@ const ROLES = [
     name: "Ủy viên",
   },
 ];
-export default function AssignTeacherListItem({ assignedTeacher, register }) {
+export default function AssignTeacherListItem({ assignedTeacher }) {
+  const [role, setRole] = useState(
+    assignedTeacher?.role ? assignedTeacher.role : ""
+  );
+  const handleSelectTeacher = useAssignTeacherRole(
+    (state) => state.handleSelectTeacher
+  );
+  const handleAssignRole = useAssignTeacherRole(
+    (state) => state.handleAssignRole
+  );
+  const handleChange = (e) => {
+    setRole(e.target.value);
+    handleAssignRole(e);
+  };
   return (
     <React.Fragment>
       <ListItem
@@ -44,7 +60,7 @@ export default function AssignTeacherListItem({ assignedTeacher, register }) {
         alignItems="flex-start"
         sx={{ paddingBottom: 3, paddingTop: 1 }}
       >
-        <ListItemText color="text.primary">
+        <ListItemText color="text.primary" sx={{ padding: "8px 8px 8px 8px" }}>
           {assignedTeacher?.teacherName}
         </ListItemText>
         <FormControl sx={{ width: MenuProps.PaperProps.style.width }} required>
@@ -52,8 +68,9 @@ export default function AssignTeacherListItem({ assignedTeacher, register }) {
           <Select
             MenuProps={MenuProps}
             label="Role"
-            name="role"
-            {...register(`${assignedTeacher?.teacherName}`)}
+            name={`${assignedTeacher?.id}`}
+            value={role}
+            onChange={handleChange}
           >
             {ROLES.map((item) => (
               <MenuItem key={item.id} value={item.id}>
@@ -62,6 +79,16 @@ export default function AssignTeacherListItem({ assignedTeacher, register }) {
             ))}
           </Select>
         </FormControl>
+        <IconButton
+          aria-label="Delete"
+          onClick={(e) => {
+            handleSelectTeacher(assignedTeacher);
+          }}
+          size="small"
+          color="error"
+        >
+          <ClearIcon />
+        </IconButton>
       </ListItem>
       <Divider />
     </React.Fragment>

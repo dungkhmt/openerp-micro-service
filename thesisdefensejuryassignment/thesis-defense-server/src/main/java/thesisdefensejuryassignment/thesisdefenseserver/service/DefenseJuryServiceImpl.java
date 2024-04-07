@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.*;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.embedded.DefenseJuryTeacherRole;
-import thesisdefensejuryassignment.thesisdefenseserver.models.AssignTeacherAndThesisToDefenseJuryIM;
-import thesisdefensejuryassignment.thesisdefenseserver.models.DefenseJuryIM;
-import thesisdefensejuryassignment.thesisdefenseserver.models.DefenseJuryTeacherRoleIM;
+import thesisdefensejuryassignment.thesisdefenseserver.models.*;
 import thesisdefensejuryassignment.thesisdefenseserver.repo.*;
 
 import java.util.Date;
@@ -110,7 +108,7 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         for (DefenseJuryTeacherRoleIM defenseJuryTeacherRoleIM : defenseJuryTeacherRole) {
             String teacherName = defenseJuryTeacherRoleIM.getTeacherName();
             int roleId = defenseJuryTeacherRoleIM.getRoleId();
-            Teacher teacher = teacherRepo.findByTeacherName(teacherName).orElse(null);
+            Teacher teacher = teacherRepo.findById(teacherName).orElse(null);
             Role teacherRole = roleRepo.findById(roleId).orElse(null);
             if (teacherRole == null) return null;
             if (teacher == null) return null;
@@ -126,6 +124,22 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
             thesis.setDefenseJury(defenseJury);
             defenseJury.getThesisList().add(thesisRepo.save(thesis));
         }
+        return defenseJuryRepo.save(defenseJury);
+    }
+
+    @Override
+    public DefenseJury assignReviewerToThesis(AssignReviewerToThesisIM teacherAndThesisList) {
+        DefenseJury defenseJury = defenseJuryRepo.findById(UUID.fromString(teacherAndThesisList.getDefenseJuryId())).orElse(null);
+        if (defenseJury == null) return null;
+        for (ReviewerThesisIM reviewerThesis : teacherAndThesisList.getReviewerThesisList()){
+            Thesis thesis = thesisRepo.findById(UUID.fromString(reviewerThesis.getThesisId())).orElse(null);
+            if (thesis == null) return null;
+            Teacher reviewer = teacherRepo.findById(reviewerThesis.getScheduledReviewerId()).orElse(null);
+            if (reviewer == null) return null;
+            thesis.setScheduledReviewer(reviewer);
+            defenseJury.getThesisList().add(thesisRepo.save(thesis));
+        }
+        defenseJury.setAssigned(true);
         return defenseJuryRepo.save(defenseJury);
     }
 

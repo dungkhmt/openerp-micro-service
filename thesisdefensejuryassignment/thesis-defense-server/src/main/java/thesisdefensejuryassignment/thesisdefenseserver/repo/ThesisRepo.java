@@ -17,4 +17,5 @@ public interface ThesisRepo extends JpaRepository<Thesis, UUID>{
     @Query(value = "select * from thesis d where d.id= :Id", nativeQuery = true)
     Optional<Thesis> findById(UUID Id);
 
+    public Optional<List<Thesis>> findByStudentEmail(String studentEmail);
 }

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card } from "@material-ui/core";
+import { Button, Card, Box } from "@material-ui/core";
 import { useNavigate } from "react-router-dom";
 import { request } from "../../../api";
 import ModalCreateThesisDefensePlan from "./ModalCreateThesisDefensePlan";
 import { StandardTable } from "erp-hust/lib/StandardTable";
 import PrimaryButton from "component/button/PrimaryButton";
+import { useKeycloak } from "@react-keycloak/web";
 function ThesisDefensePlans(props) {
+  const { keycloak } = useKeycloak();
   const navigate = useNavigate();
   const [plans, setPlans] = useState([]);
   const [toggle, setToggle] = React.useState(false);
@@ -15,8 +17,16 @@ function ThesisDefensePlans(props) {
     { title: "ID", field: "id" },
     { title: "Tên đợt bảo vệ", field: "name" },
     { title: "Kì học", field: "semester" },
-    { title: "Ngày bắt đầu", field: "startDate" },
-    { title: "Ngày kết thúc", field: "endDate" },
+    {
+      title: "Ngày bắt đầu",
+      field: "startDate",
+      render: (rowData) => rowData?.startDate?.split("T")[0],
+    },
+    {
+      title: "Ngày kết thúc",
+      field: "endDate",
+      render: (rowData) => rowData?.endDate?.split("T")[0],
+    },
     {
       title: "",
       sorting: false,
@@ -64,40 +74,20 @@ function ThesisDefensePlans(props) {
   useEffect(() => {
     getAllPlan();
   }, [toggle]);
-
+  console.log(keycloak.tokenParsed.email);
   return (
     <Card>
-      {/* <MaterialTable
-        title={"Danh sách đợt bảo vệ"}
-        columns={columns}
-        data={plans}
-        onRowClick={(event, rowData) => {
-          console.log(rowData);
-          navigate(`/thesis/thesis_defense_plan/${rowData.id}`, {
-            state: {},
-          });
-        }}
-        components={{
-          Toolbar: (props) => (
-            <div style={{ position: "relative" }}>
-              <MTableToolbar {...props} />
-              <div
-                style={{ position: "absolute", top: "16px", right: "350px" }}
-              >
-                <Button onClick={handleModalOpen} color="primary">
-                  Thêm mới
-                </Button>
-                <ModalCreateThesisDefensePlan
-                  open={open}
-                  handleClose={handleClose}
-                  handleToggle={handleToggle}
-                />
-              </div>
-            </div>
-          ),
-        }}
-      /> */}
-      <PrimaryButton onClick={handleModalOpen}>Open Modal</PrimaryButton>
+      <Box
+        display={"flex"}
+        flexDirection={"row-reverse"}
+        marginTop={3}
+        paddingRight={6}
+      >
+        <PrimaryButton onClick={handleModalOpen}>
+          Tạo đợt bảo vệ đồ án mới
+        </PrimaryButton>
+      </Box>
+
       <StandardTable
         title={"Danh sách đợt bảo vệ"}
         data={plans}

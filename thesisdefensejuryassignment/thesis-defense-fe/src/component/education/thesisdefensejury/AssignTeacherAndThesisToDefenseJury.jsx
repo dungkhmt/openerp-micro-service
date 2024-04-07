@@ -1,95 +1,71 @@
 import React, { useState } from "react";
-import { Box, Typography } from "@material-ui/core/";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
-import { boxChildComponent } from "./constant";
+import { Box, Typography, Button } from "@material-ui/core/";
+import { useParams } from "react-router-dom";
+import { boxChildComponent, boxComponentStyle } from "./constant";
 import ElementAddTeacher from "./ElementAddTeacher";
 import ElementAddThesis from "./ElementAddThesis";
 import { useFetchData } from "hooks/useFetchData";
-import PrimaryButton from "component/button/PrimaryButton";
-import { useAssignTeacherThesis } from "context/AssignTeacherThesisContext";
-import { request } from "api";
-import { successNoti } from "utils/notification";
-
+import KeywordChip from "component/common/KeywordChip";
+import AssignTeacherThesisButton from "component/common/AssignTeacherThesisButton";
+import { a11yProps, AntTab, AntTabs, TabPanel } from "component/tab";
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 function AssignTeacherAndThesisToDefenseJury() {
   const { id, juryId } = useParams();
-  const navigate = useNavigate();
-  const { register, handleSubmit, assignedTeacher, assignedThesis } =
-    useAssignTeacherThesis();
+  const defenseJury = useFetchData(`/defense-jury/${juryId}`);
   const teacherList = useFetchData("/defense-jury/teachers");
   const availableThesisList = useFetchData(
     `/defense-jury/thesis/get-all-available/${id}`
   );
-  const [open, setOpen] = useState(false);
-  const onAssignTeacherAndThesis = (data) => {
-    const defenseJuryTeacherRole = [];
-    for (const teacherName in data) {
-      if (data.hasOwnProperty(teacherName)) {
-        const roleId = data[teacherName];
-        defenseJuryTeacherRole.push({ teacherName, roleId });
-      }
-    }
-    request(
-      "post",
-      "/defense-jury/assign",
-      (res) => res.data,
-      {
-        onError: (e) => {
-          console.log(e);
-        },
-      },
-      {
-        defenseJuryId: juryId,
-        defenseJuryTeacherRole,
-        thesisIdList: assignedThesis,
-      }
-    ).then((data) => {
-      successNoti("Phân chia hội đồng thành công");
-    });
+  const [activeTab, setActiveTab] = useState(0);
+  const handleChangeTab = (event, tabIndex) => {
+    setActiveTab(tabIndex);
   };
+  const tabsLabel = [
+    "Danh sách giáo viên",
+    "Danh sách đồ án",
+  ];
+
   return (
     <>
-      {!open ? (
-        <Box
-          component="section"
-          sx={{
-            ...boxChildComponent,
-            margin: "5px 2px 5px 2px",
-          }}
-        >
-          <Typography
-            variant="overline"
-            color="#111927"
-            sx={{ fontWeight: 500, fontSize: "14px" }}
-            component={"div"}
-          >
-            Hội đồng này chưa được phân công
-          </Typography>
-          <PrimaryButton
-            onClick={() => {
-              return setOpen(true);
-            }}
-            variant="contained"
-            color="error"
-          >
-            Tạo hội đồng mới
-          </PrimaryButton>
-        </Box>
-      ) : (
-        <form onSubmit={handleSubmit(onAssignTeacherAndThesis)}>
-          <Box sx={{ ...boxChildComponent, margin: "8px 0px 8px 0px" }}>
-            {teacherList && (
-              <ElementAddTeacher
-                teacherList={teacherList}
-                register={register}
-              />
+      <Box sx={{ ...boxComponentStyle, minHeight: "600px" }}>
+        <Typography variant="h4" mb={1} component={"h4"}>
+          {defenseJury?.name}
+        </Typography>
+        <div className="defense-jury-info">
+          Ngày tổ chức: {defenseJury?.defenseDate?.split("T")[0]}
+        </div>
+        {defenseJury?.academicKeywordList.map(({ keyword, description }) => (
+          <KeywordChip key={keyword} keyword={description} />
+        ))}
+
+        <form>
+          <AntTabs value={activeTab}
+            onChange={handleChangeTab}
+            aria-label="student-view-class-detail-tabs"
+            scrollButtons="auto"
+            variant="scrollable">
+            {tabsLabel.map((label, idx) => (
+              <AntTab key={label} label={label} {...a11yProps(idx)} />
+            ))}
+          </AntTabs>
+          <TabPanel value={activeTab} index={0}>
+            <Box sx={{ ...boxChildComponent, margin: "8px 0px 8px 0px" }}>
+              {teacherList && <ElementAddTeacher teacherList={teacherList} />}
+            </Box>
+            <Box display={"flex"} flexDirection={"row-reverse"} sx={{ width: "100%" }}>
+              <Button type="text" sx={{ color: 'blue' }} endIcon={<ArrowForwardIcon />} onClick={(e) => { setActiveTab((prevActiveTab) => prevActiveTab + 1) }}>
+                Lựa chọn đồ án
+              </Button>
+            </Box>
+          </TabPanel>
+          <TabPanel value={activeTab} index={1}>
+            {availableThesisList && (
+              <ElementAddThesis availableThesisList={availableThesisList} />
             )}
-          </Box>
-          {availableThesisList && (
-            <ElementAddThesis availableThesisList={availableThesisList} />
-          )}
-          <PrimaryButton type="submit">Tạo hội đồng</PrimaryButton>
+            <AssignTeacherThesisButton juryId={juryId} />
+          </TabPanel>
         </form>
-      )}
+      </Box>
     </>
   );
 }

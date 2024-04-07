@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.DefenseJury;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.Teacher;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.Thesis;
+import thesisdefensejuryassignment.thesisdefenseserver.models.AssignReviewerToThesisIM;
 import thesisdefensejuryassignment.thesisdefenseserver.models.AssignTeacherAndThesisToDefenseJuryIM;
 import thesisdefensejuryassignment.thesisdefenseserver.models.DefenseJuryIM;
 import thesisdefensejuryassignment.thesisdefenseserver.service.DefenseJuryServiceImpl;
@@ -67,6 +68,17 @@ public class DefenseJuryController {
         if (defenseJury == null){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(defenseJury, HttpStatus.OK);
+        return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/assign-defense-teacher")
+    public ResponseEntity<DefenseJury> assignReviewerToThesis(
+            @RequestBody AssignReviewerToThesisIM teacherAndThesisList
+    ) {
+        DefenseJury defenseJury = juryService.assignReviewerToThesis(teacherAndThesisList);
+        if (defenseJury == null){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);
     }
 }

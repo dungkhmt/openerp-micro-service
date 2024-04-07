@@ -66,6 +66,8 @@ public class DefenseJury {
     @OneToMany(mappedBy = "defenseJury")
     private List<DefenseJuryTeacherRole> defenseJuryTeacherRoles;
 
+    @Column(name = "isassigned")
+    private boolean isAssigned;
     /*----------------------------------------------------------------*/
     public DefenseJury (Date defenseDate, String name, ThesisDefensePlan thesisDefensePlan, Date createdTime, int maxThesis,LocalDateTime updatedDateTime){
         this.defenseDate = defenseDate;
@@ -173,5 +175,13 @@ public class DefenseJury {
 
     public void setDefenseJuryTeacherRoles(List<DefenseJuryTeacherRole> defenseJuryTeacherRoles) {
         this.defenseJuryTeacherRoles = defenseJuryTeacherRoles;
+    }
+
+    public boolean isAssigned() {
+        return isAssigned;
+    }
+
+    public void setAssigned(boolean assigned) {
+        isAssigned = assigned;
     }
 }

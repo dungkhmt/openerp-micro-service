@@ -54,6 +54,9 @@ public class Teacher {
     @JsonIgnore
     private List<DefenseJuryTeacherRole> defenseJuryRole;
 
+    @OneToMany(mappedBy = "scheduledReviewer")
+    @JsonIgnore
+    private List<Thesis> scheduledReviewedThesisList;
 
     /*------------------------------------------------------------------*/
     public List<AcademicKeyword> getAcademicKeywordList() {

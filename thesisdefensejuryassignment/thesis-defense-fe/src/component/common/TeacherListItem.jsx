@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   ListItem,
   ListItemText,
@@ -11,17 +11,22 @@ import {
   Box,
 } from "@mui/material";
 import KeywordChip from "./KeywordChip";
-export default function TeacherListItem({
-  assignedTeacher,
-  handleSelectTeacher,
-  teacher,
-}) {
+import { useAssignTeacherRole } from "action";
+
+export default function TeacherListItem({ teacher }) {
+  const assignedTeacher = useAssignTeacherRole(
+    (state) => state.assignedTeacher
+  );
+  const handleSelectTeacher = useAssignTeacherRole(
+    (state) => state.handleSelectTeacher
+  );
+
   return (
     <>
       <ListItem key={teacher?.id} alignItems="flex-start" disablePadding>
         <ListItemButton
           role={undefined}
-          onClick={() => {
+          onClick={(e) => {
             handleSelectTeacher(teacher);
           }}
         >
@@ -30,9 +35,9 @@ export default function TeacherListItem({
               edge="start"
               disableRipple
               checked={
-                assignedTeacher.find((item) => item?.id === teacher?.id) !==
+                assignedTeacher?.find((item) => item?.id === teacher?.id) !==
                 undefined
-              }
+              } // Use local state for checkbox state
               tabIndex={-1}
             />
           </ListItemIcon>

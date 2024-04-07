@@ -1,8 +1,8 @@
 package thesisdefensejuryassignment.thesisdefenseserver.repo;
 
 
-import thesisdefensejuryassignment.thesisdefenseserver.entity.EntityAuthorization;
 import org.springframework.data.jpa.repository.JpaRepository;
+import thesisdefensejuryassignment.thesisdefenseserver.entity.EntityAuthorization;
 
 import java.util.List;
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { boxComponentStyle, boxChildComponent } from "./constant";
 import { useFetchData } from "hooks/useFetchData";
 import KeywordChip from "component/common/KeywordChip";
@@ -11,6 +11,7 @@ import PrimaryButton from "component/button/PrimaryButton";
 import AssignTeacherAndThesisToDefenseJury from "./AssignTeacherAndThesisToDefenseJury";
 function DefenseJuryDetail(props) {
   const params = useParams();
+  const navigate = useNavigate();
   const columns = [
     { title: "Tên đồ án", field: "thesisName" },
     {
@@ -26,8 +27,14 @@ function DefenseJuryDetail(props) {
           <KeywordChip key={item} keyword={item} />
         )),
     },
+    {
+      title: "Giáo viên phản biện",
+      field: "scheduledReviewer",
+      render: (rowData) => rowData?.scheduledReviewer !== '' ? rowData?.scheduledReviewer : "Đang chờ phân công"
+    }
   ];
   const defenseJury = useFetchData(`/defense-jury/${params?.juryId}`);
+  console.log(defenseJury);
   const defenseJuryTeacherRoles = defenseJury?.defenseJuryTeacherRoles.map(
     (item) => ({
       id: item.id,
@@ -42,6 +49,7 @@ function DefenseJuryDetail(props) {
     studentName: item?.studentName,
     thesisName: item?.thesisName,
     supervisor: item?.supervisor.teacherName,
+    scheduledReviewer: item?.scheduledReviewer ? item?.scheduledReviewer?.teacherName : ''
   }));
   return (
     <>
@@ -87,7 +95,31 @@ function DefenseJuryDetail(props) {
             />
           </>
         ) : (
-          <AssignTeacherAndThesisToDefenseJury />
+          <Box
+            component="section"
+            sx={{
+              ...boxChildComponent,
+              margin: "5px 2px 5px 2px",
+            }}
+          >
+            <Typography
+              variant="overline"
+              color="#111927"
+              sx={{ fontWeight: 500, fontSize: "14px" }}
+              component={"div"}
+            >
+              Hội đồng này chưa được phân công
+            </Typography>
+            <PrimaryButton
+              onClick={() => {
+                navigate("create");
+              }}
+              variant="contained"
+              color="error"
+            >
+              Tạo hội đồng mới
+            </PrimaryButton>
+          </Box>
         )}
       </Box>
     </>

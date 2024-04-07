@@ -18,24 +18,31 @@ import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
 import PersonIcon from "@material-ui/icons/Person";
 import StarBorder from "@material-ui/icons/StarBorder";
 import StoreMallDirectorySharpIcon from "@material-ui/icons/StoreMallDirectorySharp";
-import TerminalIcon from '@mui/icons-material/Terminal';
-import CodeIcon from '@mui/icons-material/Code';
+import TerminalIcon from "@mui/icons-material/Terminal";
+import { Schedule } from "@material-ui/icons";
+import CodeIcon from "@mui/icons-material/Code";
 import React from "react";
-import {GiTeacher} from "react-icons/gi";
-import {RiCodeSSlashLine} from "react-icons/ri";
-import {FaUsers} from "react-icons/fa";
-import {SiManageiq} from "react-icons/si";
+import { GiTeacher } from "react-icons/gi";
+import { RiCodeSSlashLine } from "react-icons/ri";
+import { FaUsers } from "react-icons/fa";
+import { SiManageiq } from "react-icons/si";
 import TeachingIcon from "../assets/icons/mathematics.svg";
-import {buildMapPathMenu} from "../utils/MenuUtils";
-import {eduLearningManagement} from "./menuconfig/classmanagement/student";
-import {eduTeachingManagement} from "./menuconfig/classmanagement/teacher";
-import {DataAdministration} from "./menuconfig/dataadmin";
-import {ThesisDefensePlanManagement} from "./menuconfig/Thesis_defense_plan_managenment";
-import {whiteboard} from "./menuconfig/whiteboard";
-import {ProgrammingContestMenuStudent, ProgrammingContestMenuTeacher,} from "./menuconfig/ProgramingContest";
-import {general} from "./menuconfig/general";
-import {teachingassignment} from "./menuconfig/teachingassignment";
-import {user} from "./menuconfig/user";
+import { buildMapPathMenu } from "../utils/MenuUtils";
+import { eduLearningManagement } from "./menuconfig/classmanagement/student";
+import { eduTeachingManagement } from "./menuconfig/classmanagement/teacher";
+import { DataAdministration } from "./menuconfig/dataadmin";
+import {
+  ThesisDefensePlanManagement,
+  ThesisDefensePlanStudent,
+} from "./menuconfig/Thesis_defense_plan_managenment";
+import { whiteboard } from "./menuconfig/whiteboard";
+import {
+  ProgrammingContestMenuStudent,
+  ProgrammingContestMenuTeacher,
+} from "./menuconfig/ProgramingContest";
+import { general } from "./menuconfig/general";
+import { teachingassignment } from "./menuconfig/teachingassignment";
+import { user } from "./menuconfig/user";
 
 export const MENU_LIST = [];
 MENU_LIST.push(general);
@@ -49,40 +56,37 @@ MENU_LIST.push(ThesisDefensePlanManagement);
 MENU_LIST.push(whiteboard);
 MENU_LIST.push(teachingassignment);
 MENU_LIST.push(user);
-
+MENU_LIST.push(ThesisDefensePlanStudent);
 export const menuIconMap = new Map();
-menuIconMap.set(
-  "Schedule",
-  <EventNoteIcon/>
-);
+menuIconMap.set("Schedule", <EventNoteIcon />);
 menuIconMap.set(
   "Teaching",
-  <img alt="Teaching icon" src={TeachingIcon} height={24} width={24}/>
+  <img alt="Teaching icon" src={TeachingIcon} height={24} width={24} />
 );
-menuIconMap.set("DashboardIcon", <DashboardRoundedIcon/>);
-menuIconMap.set("GiTeacher", <GiTeacher size={24}/>);
-menuIconMap.set("InboxIcon", <InboxIcon/>);
-menuIconMap.set("StarBorder", <StarBorder/>);
-menuIconMap.set("PeopleIcon", <PeopleIcon/>);
-menuIconMap.set("AirportShuttleIcon", <AirportShuttleIcon/>);
-menuIconMap.set("PeopleOutlineIcon", <PeopleOutlineIcon/>);
-menuIconMap.set("PersonIcon", <PersonIcon/>);
-menuIconMap.set("FormatListNumberedIcon", <FormatListNumberedIcon/>);
-menuIconMap.set("DescriptionIcon", <DescriptionIcon/>);
-menuIconMap.set("DescriptionOutlinedIcon", <DescriptionOutlinedIcon/>);
-menuIconMap.set("ApartmentSharpIcon", <ApartmentSharpIcon/>);
-menuIconMap.set("AttachMoneySharpIcon", <AttachMoneySharpIcon/>);
-menuIconMap.set("StoreMallDirectorySharpIcon", <StoreMallDirectorySharpIcon/>);
-menuIconMap.set("HomeSharpIcon", <HomeSharpIcon/>);
-menuIconMap.set("FastfoodIcon", <FastfoodIcon/>);
-menuIconMap.set("LocalGroceryStoreIcon", <LocalGroceryStoreIcon/>);
-menuIconMap.set("BlurOnIcon", <BlurOnIcon/>);
-menuIconMap.set("GiTeacher", <GiTeacher size={24}/>);
-menuIconMap.set("LocalLibraryIcon", <LocalLibraryIcon/>);
-menuIconMap.set("DataManagementIcon", <SiManageiq/>);
-menuIconMap.set("ProgrammingIcon", <TerminalIcon/>)
-menuIconMap.set("CodeIcon", <RiCodeSSlashLine/>)
-menuIconMap.set("UsersIcon", <FaUsers/>)
-menuIconMap.set("AssignmentOutlinedIcon", <AssignmentOutlinedIcon/>);
-
+menuIconMap.set("DashboardIcon", <DashboardRoundedIcon />);
+menuIconMap.set("GiTeacher", <GiTeacher size={24} />);
+menuIconMap.set("InboxIcon", <InboxIcon />);
+menuIconMap.set("StarBorder", <StarBorder />);
+menuIconMap.set("PeopleIcon", <PeopleIcon />);
+menuIconMap.set("AirportShuttleIcon", <AirportShuttleIcon />);
+menuIconMap.set("PeopleOutlineIcon", <PeopleOutlineIcon />);
+menuIconMap.set("PersonIcon", <PersonIcon />);
+menuIconMap.set("FormatListNumberedIcon", <FormatListNumberedIcon />);
+menuIconMap.set("DescriptionIcon", <DescriptionIcon />);
+menuIconMap.set("DescriptionOutlinedIcon", <DescriptionOutlinedIcon />);
+menuIconMap.set("ApartmentSharpIcon", <ApartmentSharpIcon />);
+menuIconMap.set("AttachMoneySharpIcon", <AttachMoneySharpIcon />);
+menuIconMap.set("StoreMallDirectorySharpIcon", <StoreMallDirectorySharpIcon />);
+menuIconMap.set("HomeSharpIcon", <HomeSharpIcon />);
+menuIconMap.set("FastfoodIcon", <FastfoodIcon />);
+menuIconMap.set("LocalGroceryStoreIcon", <LocalGroceryStoreIcon />);
+menuIconMap.set("BlurOnIcon", <BlurOnIcon />);
+menuIconMap.set("GiTeacher", <GiTeacher size={24} />);
+menuIconMap.set("LocalLibraryIcon", <LocalLibraryIcon />);
+menuIconMap.set("DataManagementIcon", <SiManageiq />);
+menuIconMap.set("ProgrammingIcon", <TerminalIcon />);
+menuIconMap.set("CodeIcon", <RiCodeSSlashLine />);
+menuIconMap.set("UsersIcon", <FaUsers />);
+menuIconMap.set("AssignmentOutlinedIcon", <AssignmentOutlinedIcon />);
+menuIconMap.set("Schedule", <Schedule />);
 export const mapPathMenu = buildMapPathMenu(MENU_LIST);
