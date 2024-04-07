@@ -107,6 +107,7 @@ public class GeneralExcelHelper {
                             if (bgColor != null && "FFFFC000".equals(bgColor.getARGBHex())) {
                                 if (cellValue != null && !cellValue.equals("")) {
                                     timeSlot = new RoomReservation();
+                                    timeSlot.setGeneralClassOpened(generalClassOpened);
                                     timeSlot.setStartTime(
                                             (classInfoCell.getColumnIndex() - END_COL_TO_READ_CLASS_INFO) % 6);
                                     timeSlot.setWeekday(
@@ -158,6 +159,9 @@ public class GeneralExcelHelper {
                                     break;
                                 case 11:
                                     generalClassOpened.setOpenBatch(cellValue);
+                                    generalClassOpened.setLearningWeeks(
+                                        Converter.convertOpenBatchToLearningWeeks(generalClassOpened.getOpenBatch())
+                                    );
                                     break;
                                 case 12:
                                     generalClassOpened.setCourse(cellValue);
