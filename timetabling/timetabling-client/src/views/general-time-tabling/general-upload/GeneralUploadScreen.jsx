@@ -4,10 +4,12 @@ import GeneralUploadTable from "./components/GeneralUploadTable";
 import Button from "@mui/material/Button";
 import InputFileUpload from "./components/InputFileUpload";
 import { LoadingProvider } from "./contexts/LoadingContext";
+import { useClasses } from "../hooks/useClasses";
 
 const GeneralUploadScreen = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedSemester, setSelectedSemester] = useState(null);
+  const { loading, error, classes } = useClasses(null, selectedSemester);
 
   return (
     <LoadingProvider>
@@ -34,7 +36,7 @@ const GeneralUploadScreen = () => {
             />
           </div>
         </div>
-        <GeneralUploadTable semester={selectedSemester}/>
+        <GeneralUploadTable classes={classes} dataLoading={loading}/>
       </div>
     </LoadingProvider>
   );
