@@ -5,12 +5,13 @@ export const useClasses = (group, semester) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [classes, setClasses] = useState([]);
-
+  console.log(group, semester);
   useEffect(() => {
+    if (group === null && semester === null) return;
     setLoading(true);
     request(
       "get",
-      `/general-classes/?semester=${semester?.semester}`,
+      `/general-classes/?semester=${semester?.semester}&group=${group?.group}`,
       (res) => {
         console.log(res?.data);
         let generalClasses = [];
@@ -22,7 +23,7 @@ export const useClasses = (group, semester) => {
                   ...classObj,
                   ...timeSlot,
                   classCode: classObj.classCode,
-                  id: classObj.id + `-${index+1}`
+                  id: classObj.id + `-${index + 1}`,
                 })
               );
               delete cloneObj.timeSlots;

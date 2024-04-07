@@ -7,24 +7,10 @@ import GeneralSemesterAutoComplete from "../common-components/GeneralSemesterAut
 import { request } from "api";
 
 const GeneralScheduleScreen = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
   const [group, setGroup] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState(null);
 
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-    if (selectedFile) {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      request("post", `/excel/upload-general?semester=20221`, (res)=> {
-        console.log(res);
-      }, (err)=>{
-        console.log(err);
-      }, formData, {
-        "Content-Type": "multipart/form-data",
-      });
-    }
-  };
+  
 
   return (
     <div className="flex flex-col gap-4 w-full h-[700px]">
@@ -40,9 +26,6 @@ const GeneralScheduleScreen = () => {
           <Button>
             <Search />
           </Button>
-        </div>
-        <div className="flex flex-row justify-end gap-2">
-          <input type="file" onChange={handleFileChange}/>
         </div>
       </div>
       <GeneralScheduleTable group={group} semester={selectedSemester} />
