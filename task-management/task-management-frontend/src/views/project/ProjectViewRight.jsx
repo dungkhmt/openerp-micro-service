@@ -1,13 +1,13 @@
-import { Box, CircularProgress, Tab, Typography, styled } from "@mui/material";
-import MuiTabList from "@mui/lab/TabList";
-import { TabContext, TabPanel } from "@mui/lab";
 import { Icon } from "@iconify/react";
-import { useState } from "react";
+import { TabContext, TabPanel } from "@mui/lab";
+import MuiTabList from "@mui/lab/TabList";
+import { Box, Tab, styled } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useEffect } from "react";
-import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
-import { useProjectContext } from "../../hooks/useProjectContext";
+import { ProjectViewCalendar } from "./calendar/ProjectViewCalendar";
 import { ProjectViewMembers } from "./member/ProjectViewMembers";
+import { ProjectViewOverview } from "./overview/ProjectViewOverview";
+import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   "& .MuiTabs-indicator": {
@@ -40,7 +40,6 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
 
 const ProjectViewRight = () => {
   const { id, tab } = useParams();
-  const { isLoading: projectLoading } = useProjectContext();
   const [activeTab, setActiveTab] = useState(tab);
 
   const navigate = useNavigate();
@@ -50,7 +49,6 @@ const ProjectViewRight = () => {
   }, [tab]);
 
   const handleChange = (event, value) => {
-    setActiveTab(value);
     navigate(`/project/${id}/${value}`);
   };
 
@@ -90,7 +88,7 @@ const ProjectViewRight = () => {
               sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
             >
               <Icon fontSize={20} icon="mdi:calendar" />
-              Timeline
+              Lịch
             </Box>
           }
         />
@@ -129,40 +127,24 @@ const ProjectViewRight = () => {
         />
       </TabList>
       <Box>
-        {projectLoading ? (
-          <Box
-            sx={{
-              mt: 6,
-              display: "flex",
-              alignItems: "center",
-              flexDirection: "column",
-            }}
-          >
-            <CircularProgress sx={{ mb: 4 }} />
-            <Typography>Loading...</Typography>
-          </Box>
-        ) : (
-          <>
-            <TabPanel sx={{ p: 0 }} value="overview">
-              Overview
-            </TabPanel>
-            <TabPanel sx={{ p: 0 }} value="tasks">
-              <ProjectViewTasks />
-            </TabPanel>
-            <TabPanel sx={{ p: 0 }} value="timeline">
-              Timeline
-            </TabPanel>
-            <TabPanel sx={{ p: 0 }} value="activity">
-              History
-            </TabPanel>
-            <TabPanel sx={{ p: 0 }} value="members">
-              <ProjectViewMembers />
-            </TabPanel>
-            <TabPanel sx={{ p: 0 }} value="setting">
-              Quản lý
-            </TabPanel>
-          </>
-        )}
+        <TabPanel sx={{ p: 0 }} value="overview">
+          <ProjectViewOverview />
+        </TabPanel>
+        <TabPanel sx={{ p: 0 }} value="tasks">
+          <ProjectViewTasks />
+        </TabPanel>
+        <TabPanel sx={{ p: 0 }} value="timeline">
+          <ProjectViewCalendar />
+        </TabPanel>
+        <TabPanel sx={{ p: 0 }} value="activity">
+          History
+        </TabPanel>
+        <TabPanel sx={{ p: 0 }} value="members">
+          <ProjectViewMembers />
+        </TabPanel>
+        <TabPanel sx={{ p: 0 }} value="setting">
+          Quản lý
+        </TabPanel>
       </Box>
     </TabContext>
   );

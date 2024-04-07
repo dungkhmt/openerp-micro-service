@@ -6,15 +6,16 @@ import { ReactKeycloakProvider } from "@react-keycloak/web";
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { I18nextProvider } from "react-i18next";
-import { BrowserRouter } from "react-router-dom";
-import Routes from "./Routes";
+import { Provider } from "react-redux";
+import { RouterProvider } from "react-router-dom";
 import { AppLoading } from "./components/common/AppLoading";
 import { ReactHotToast } from "./components/react-hot-toast/index.jsx";
 import keycloak, { initOptions } from "./config/keycloak.js";
-import history from "./history";
+import { router } from "./routers/index.jsx";
 import { UserService } from "./services/api/user.service.js";
 import { menuState } from "./state/MenuState";
 import { notificationState } from "./state/NotificationState";
+import { store } from "./store/index.js";
 import ThemeProvider from "./theme/ThemProvider.jsx";
 import i18n from "./translation/i18n";
 
@@ -54,26 +55,26 @@ function App() {
       LoadingComponent={<AppLoading />}
       onEvent={onKeycloakEvent}
     >
-      <I18nextProvider i18n={i18n}>
-        <CacheProvider value={clientSideEmotionCache}>
-          <ThemeProvider>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <ReactHotToast>
-                <Toaster
-                  position="top-right"
-                  toastOptions={{
-                    className: "react-hot-toast",
-                    duration: 5000,
-                  }}
-                />
-              </ReactHotToast>
-              <BrowserRouter history={history}>
-                <Routes />
-              </BrowserRouter>
-            </LocalizationProvider>
-          </ThemeProvider>
-        </CacheProvider>
-      </I18nextProvider>
+      <Provider store={store}>
+        <I18nextProvider i18n={i18n}>
+          <CacheProvider value={clientSideEmotionCache}>
+            <ThemeProvider>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <ReactHotToast>
+                  <Toaster
+                    position="top-right"
+                    toastOptions={{
+                      className: "react-hot-toast",
+                      duration: 5000,
+                    }}
+                  />
+                </ReactHotToast>
+                <RouterProvider router={router} />
+              </LocalizationProvider>
+            </ThemeProvider>
+          </CacheProvider>
+        </I18nextProvider>
+      </Provider>
     </ReactKeycloakProvider>
   );
 }

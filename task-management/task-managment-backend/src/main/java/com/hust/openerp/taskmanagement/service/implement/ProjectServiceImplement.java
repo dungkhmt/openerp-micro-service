@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hust.openerp.taskmanagement.dto.form.ProjectForm;
 import com.hust.openerp.taskmanagement.entity.Project;
 import com.hust.openerp.taskmanagement.entity.ProjectMember;
 import com.hust.openerp.taskmanagement.entity.Project_;
@@ -50,11 +51,13 @@ public class ProjectServiceImplement implements ProjectService {
     }
 
     @Override
-    public Project updateProject(UUID id, Project project) {
+    public Project updateProject(UUID id, ProjectForm project) {
         Project projectToUpdate = projectRepository.findById(id).orElseThrow();
-        projectToUpdate.setName(project.getName());
-        projectToUpdate.setDescription(project.getDescription());
-        projectToUpdate.setStatus(project.getStatus());
+        if (project.getName() != null && !project.getName().equals(""))
+            projectToUpdate.setName(project.getName());
+        if (project.getDescription() != null && !project.getDescription().equals(""))
+            projectToUpdate.setDescription(project.getDescription());
+        // projectToUpdate.setStatus(project.getStatus());
         return projectRepository.save(projectToUpdate);
     }
 

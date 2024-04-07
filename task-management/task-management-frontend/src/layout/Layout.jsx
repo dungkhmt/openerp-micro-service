@@ -1,5 +1,5 @@
 import { default as MenuIcon } from "@mui/icons-material/Menu";
-import { Box } from "@mui/material";
+import { Box, LinearProgress } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
 import SvgIcon from "@mui/material/SvgIcon";
@@ -7,17 +7,20 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import { useKeycloak } from "@react-keycloak/web";
+import React, { Suspense, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { Outlet, useLocation } from "react-router";
 import { ReactComponent as Logo } from "../assets/icons/logo.svg";
 import bgImage from "../assets/img/sidebar-2.webp";
-import PropTypes from "prop-types";
-import React, { useState } from "react";
+import { MENU_LIST } from "../config/menuconfig";
+import { useNotificationState } from "../state/NotificationState";
+import { fetchCategories } from "../store/category";
+import { fetchPriorities } from "../store/priority";
+import { fetchStatuses } from "../store/status";
+import { checkExistValue } from "../utils/check-exist-value";
 import AccountButton from "./account/AccountButton";
 import NotificationButton from "./notification/NotificationButton";
 import SideBar, { drawerWidth } from "./sidebar/SideBar";
-import { useLocation } from "react-router";
-import { MENU_LIST } from "../config/menuconfig";
-import { checkExistValue } from "../utils/check-exist-value";
-import { useEffect } from "react";
 
 const Offset = styled("div")(({ theme }) => ({
   display: "flex",
@@ -84,7 +87,7 @@ const styles = {
   }),
 };
 
-function Layout({ children }) {
+function Layout() {
   //
   const { keycloak } = useKeycloak();
 
@@ -96,58 +99,74 @@ function Layout({ children }) {
   // get path
   const location = useLocation();
 
+  const notificationState = useNotificationState();
+  const dispatch = useDispatch();
+
   useEffect(() => {
     if (checkExistValue(MENU_LIST, location.pathname)) {
       setOpen(true);
     } else {
       setOpen(false);
     }
-  }, [location]);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    notificationState.open.set(false);
+  }, [location.pathname, notificationState.open]);
+
+  useEffect(() => {
+    const fetchData = () =>
+      Promise.all([
+        dispatch(fetchStatuses()),
+        dispatch(fetchCategories()),
+        dispatch(fetchPriorities()),
+      ]);
+
+    fetchData();
+  }, [dispatch]);
 
   return (
-    <Box sx={styles.root}>
-      <AppBar position="fixed" color="inherit" sx={styles.appBar}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={() => setOpen(!open)}
-            edge="start"
-            sx={styles.menuButton}
-          >
-            <MenuIcon />
-          </IconButton>
-          <SvgIcon fontSize="large">
-            <Logo width={20} height={20} x={2} y={2} />
-          </SvgIcon>
+    <Suspense fallback={<LinearProgress />}>
+      <Box sx={styles.root}>
+        <AppBar position="fixed" color="inherit" sx={styles.appBar}>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={() => setOpen(!open)}
+              edge="start"
+              sx={styles.menuButton}
+            >
+              <MenuIcon />
+            </IconButton>
+            <SvgIcon fontSize="large">
+              <Logo width={20} height={20} x={2} y={2} />
+            </SvgIcon>
 
-          <Typography sx={styles.appName} variant="h6" noWrap>
-            Taskforce
-          </Typography>
+            <Typography sx={styles.appName} variant="h6" noWrap>
+              Taskforce
+            </Typography>
 
-          {/* Use this div tag to push the icons to the right */}
-          <div style={{ flexGrow: 1 }} />
-          <Box sx={styles.sectionDesktop}>
-            {keycloak.authenticated && (
-              <>
-                <NotificationButton />
-                <AccountButton />
-              </>
-            )}
-          </Box>
-        </Toolbar>
-      </AppBar>
-      <SideBar open={open} image={image} color={color} />
-      <Main isOpen={open}>
-        <Offset />
-        {children}
-      </Main>
-    </Box>
+            {/* Use this div tag to push the icons to the right */}
+            <div style={{ flexGrow: 1 }} />
+            <Box sx={styles.sectionDesktop}>
+              {keycloak.authenticated && (
+                <>
+                  <NotificationButton />
+                  <AccountButton />
+                </>
+              )}
+            </Box>
+          </Toolbar>
+        </AppBar>
+        <SideBar open={open} image={image} color={color} />
+        <Main isOpen={open}>
+          <Offset />
+          <Outlet />
+        </Main>
+      </Box>
+    </Suspense>
   );
 }
-
-Layout.propTypes = {
-  children: PropTypes.node.isRequired,
-};
 
 export default Layout;

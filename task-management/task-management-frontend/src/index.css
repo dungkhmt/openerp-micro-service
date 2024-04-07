@@ -1,7 +1,9 @@
+@import "./node_modules/react-grid-layout/css/styles.css";
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    "Arial", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -61,4 +63,17 @@ code {
   opacity: 1 !important;
   color: rgba(0, 0, 0, 0.87);
   margin-top: -2px !important;
+}
+
+.react-grid-layout {
+  position: relative;
+  margin: -8px 0 0 -16px;
+}
+
+.react-grid-layout .react-grid-item.react-grid-placeholder {
+  background-color: blue;
+}
+
+.react-grid-layout .react-grid-item:hover {
+  z-index: 10;
 }

@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
   Divider,
   Grid,
   IconButton,
@@ -19,9 +18,9 @@ import { DataGrid } from "@mui/x-data-grid";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
 import { useDebounce } from "../../../hooks/useDebounce";
-import { useProjectContext } from "../../../hooks/useProjectContext";
 import { MenuAddMember } from "./MenuAddMember";
 
 const columns = [
@@ -177,7 +176,7 @@ const RowOptions = ({ id }) => {
 };
 
 const ProjectViewMembers = () => {
-  const { members } = useProjectContext();
+  const { members } = useSelector((state) => state.project);
 
   const [filterMembers, setFilterMembers] = useState(members);
 
@@ -217,7 +216,9 @@ const ProjectViewMembers = () => {
           <CardContent
             sx={{ display: "flex", justifyContent: "space-between" }}
           >
-            <CardHeader title="Danh sách thành viên" />
+            <Typography variant="h5" sx={{ color: "text.secondary" }}>
+              {members.length} thành viên
+            </Typography>
             <Box
               sx={{ display: "flex", flexWrap: "wrap", alignItems: "center" }}
             >
@@ -247,7 +248,7 @@ const ProjectViewMembers = () => {
             // checkboxSelection
             disableRowSelectionOnClick
             pageSizeOptions={[10, 25, 50]}
-            sx={{ height: "60vh" }}
+            sx={{ height: "65vh" }}
           />
         </Card>
       </Grid>

@@ -69,43 +69,43 @@ function NotificationButton() {
   };
 
   const fetchNotification = () => {
-    let fromId = null;
-    const fetchedNoties = notifications.get();
+    // let fromId = null;
+    // const fetchedNoties = notifications.get();
 
-    if (fetchedNoties && fetchedNoties.length > 0) {
-      fromId = fetchedNoties[fetchedNoties.length - 1].id;
-    }
+    // if (fetchedNoties && fetchedNoties.length > 0) {
+    //   fromId = fetchedNoties[fetchedNoties.length - 1].id;
+    // }
 
-    try {
-      request(
-        "get",
-        `/notification?fromId=${fromId || ""}&page=${0}&size=${20}`,
-        (res) => {
-          let data = res.data;
-          const noties = processNotificationsContent(
-            data.notifications.content
-          );
+    // try {
+    //   request(
+    //     "get",
+    //     `/notification?fromId=${fromId || ""}&page=${0}&size=${20}`,
+    //     (res) => {
+    //       let data = res.data;
+    //       const noties = processNotificationsContent(
+    //         data.notifications.content
+    //       );
 
-          if (fromId === null) {
-            notifications.set(noties);
-          } else {
-            notifications.merge(noties);
-          }
+    //       if (fromId === null) {
+    //         notifications.set(noties);
+    //       } else {
+    //         notifications.merge(noties);
+    //       }
 
-          numUnRead.set(data.numUnRead);
-          hasMore.set(!data.notifications.last);
-        },
-        { 401: () => {} },
-        null,
-        {
-          baseURL: config.url.NOTIFICATION_SERVER_URL,
-        }
-      );
-    } catch (e) {
-      notifications.set([]);
-      numUnRead.set(0);
-      hasMore.set(false);
-    }
+    //       numUnRead.set(data.numUnRead);
+    //       hasMore.set(!data.notifications.last);
+    //     },
+    //     { 401: () => {} },
+    //     null,
+    //     {
+    //       baseURL: config.url.NOTIFICATION_SERVER_URL,
+    //     }
+    //   );
+    // } catch (e) {
+    //   notifications.set([]);
+    //   numUnRead.set(0);
+    //   hasMore.set(false);
+    // }
   };
 
   React.useEffect(() => {

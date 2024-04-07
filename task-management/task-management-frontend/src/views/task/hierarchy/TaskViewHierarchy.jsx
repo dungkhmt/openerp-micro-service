@@ -2,15 +2,16 @@ import { Icon } from "@iconify/react";
 import { Box, Grid, LinearProgress, Tooltip, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
 import CustomChip from "../../../components/mui/chip";
-import { useProjectContext } from "../../../hooks/useProjectContext";
 import { useTaskContext } from "../../../hooks/useTaskContext";
 import { getProgressColor, getStatusColor } from "../../../utils/color.util";
 
 const TaskViewHierarchy = () => {
   const { task } = useTaskContext();
-  const { statuses, members, project } = useProjectContext();
+  const { members, project } = useSelector((state) => state.project);
+  const { status: statusStore } = useSelector((state) => state);
   const hierarchies = task.hierarchies;
 
   if (!hierarchies || hierarchies.length === 1) {
@@ -18,7 +19,7 @@ const TaskViewHierarchy = () => {
   }
 
   return hierarchies.map((hierarchy, index) => {
-    const status = statuses.find(
+    const status = statusStore.statuses.find(
       (status) => status.statusId === hierarchy.statusId
     );
     const assignee = members.find(

@@ -55,6 +55,9 @@ import StudentCreateThesis from "../component/education/thesisdefensejury/Studen
 import NotFound from "../views/errors/NotFound";
 import ClassList from "../views/Education/ClassManagement/Student/ClassList";
 import TeacherCreateCourse from "component/education/course/TeacherCreateCourse";
+import TeacherViewInteractiveQuiz from "views/Education/ClassManagement/Teacher/TeacherViewInteractiveQuiz";
+import StudentViewInteractiveQuizList from "views/Education/ClassManagement/Student/StudentViewInteractiveQuizList";
+import LearningSessionStudentViewQuizTestList from "views/Education/ClassManagement/Student/LearningSessionStudentViewQuizTestList";
 
 export default function EduRoute() {
   let { path } = useRouteMatch();
@@ -276,7 +279,13 @@ export default function EduRoute() {
         />
         <Route
           component={StudentViewLearningSessionDetail}
+          // path={`${path}/student/class/detail/interactive-quiz/:testId`}
           path={`${path}/student/class/session/detail/:sessionId`}
+          exact
+        />
+        <Route
+          component={LearningSessionStudentViewQuizTestList}
+          path={`${path}/student/class/detail/interactive-quiz/:testId`}
           exact
         />
         <Route
@@ -296,6 +305,11 @@ export default function EduRoute() {
           exact
         />
 
+        <Route
+          component={TeacherViewInteractiveQuiz}
+          path={`${path}/teacher/class/detail/interactive-quiz/:testId`}
+          exact
+        />
         <Route
           component={TeacherViewDetailClass}
           path={`${path}/teacher/class/detail/:classId`}

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.hust.openerp.taskmanagement.dto.form.ProjectForm;
 import com.hust.openerp.taskmanagement.entity.Project;
 
 @Service
@@ -15,7 +16,7 @@ public interface ProjectService {
 
     Project createProject(Project project);
 
-    Project updateProject(UUID id, Project project);
+    Project updateProject(UUID id, ProjectForm project);
 
     void deleteProjectById(UUID id);
 

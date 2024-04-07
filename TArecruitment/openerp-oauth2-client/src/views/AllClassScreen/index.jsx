@@ -11,6 +11,11 @@ import DeleteDialog from "components/dialog/DeleteDialog";
 import ApplicatorDialog from "./ApplicatorDialog";
 import { DataGrid } from "@mui/x-data-grid";
 
+const DEFAULT_PAGINATION_MODEL = {
+  page: 0,
+  pageSize: 5,
+};
+
 const AllClassScreen = () => {
   const [classes, setClasses] = useState([]);
   const [semester, setSemester] = useState(SEMESTER);
@@ -19,18 +24,31 @@ const AllClassScreen = () => {
   const [openApplicatorDialog, setOpenApplicatorDialog] = useState(false);
   const [infoClassId, setInfoClassId] = useState("");
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
+
+  const [paginationModel, setPaginationModel] = useState(
+    DEFAULT_PAGINATION_MODEL
+  );
+
   const history = useHistory();
 
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [semester]);
+  }, [semester, paginationModel]);
 
   const fetchData = () => {
-    request("get", `/class-call/get-class-by-semester/${semester}`, (res) => {
-      setClasses(res.data);
-      console.log(res.data);
-    });
+    setIsLoading(true);
+    request(
+      "get",
+      `/class-call/get-class-by-semester/${semester}?page=${paginationModel.page}&limit=${paginationModel.pageSize}`,
+      (res) => {
+        setClasses(res.data.data);
+        setTotalElements(res.data.totalElement);
+        setIsLoading(false);
+      }
+    );
   };
 
   const handleNavigateSubjectDetail = (klass) => {
@@ -103,11 +121,7 @@ const AllClassScreen = () => {
       flex: 1,
       renderCell: (params) => (
         <div
-          style={{
-            cursor: "pointer",
-            textDecoration: "underline",
-            fontWeight: "bold",
-          }}
+          style={styles.linkedName}
           onClick={() => handleNavigateSubjectDetail(params.row)}
         >
           {params.value}
@@ -166,18 +180,17 @@ const AllClassScreen = () => {
       </FormControl>
 
       <DataGrid
+        loading={isLoading}
         rowHeight={60}
         sx={{ fontSize: 16 }}
         rows={dataGridRows}
         columns={dataGridColumns}
         autoHeight
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 5,
-            },
-          },
-        }}
+        rowCount={totalElements}
+        pagination
+        paginationMode="server"
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[5, 10, 20]}
         checkboxSelection={false}
         disableRowSelectionOnClick

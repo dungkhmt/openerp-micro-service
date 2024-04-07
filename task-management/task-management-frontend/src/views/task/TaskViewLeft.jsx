@@ -6,7 +6,6 @@ import {
   Divider,
   Grid,
   IconButton,
-  Skeleton,
   Tooltip,
   Typography,
   styled,
@@ -16,13 +15,12 @@ import dayjs from "dayjs";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { UserAvatar } from "../../components/common/avatar/UserAvatar";
-import { useProjectContext } from "../../hooks/useProjectContext";
 import { useTaskContext } from "../../hooks/useTaskContext";
 import { FileService } from "../../services/api/file.service";
 import { getDiffDateWithCurrent } from "../../utils/date.util";
+import { DialogEditTask } from "./DialogEditTask";
 import CommentSection from "./comment/CommentSection";
 import { DialogAddSubTask } from "./hierarchy/DialogAddSubTask";
-import { DialogEditTask } from "./DialogEditTask";
 import { TaskViewHierarchy } from "./hierarchy/TaskViewHierarchy";
 import TaskViewLog from "./log/TaskViewLog";
 
@@ -42,36 +40,10 @@ export const TitleWrapper = styled(Box)(({ theme }) => ({
   },
 }));
 
-const Loading = () => (
-  <Card sx={{ p: 6 }}>
-    <Box sx={{ display: "flex", gap: 4, mb: 6 }}>
-      <Skeleton variant="circular" width={80} height={80} />
-      <Box>
-        <Skeleton variant="text" width={350} />
-        <Skeleton variant="text" width={160} />
-      </Box>
-    </Box>
-    <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
-    <Box sx={{ display: "flex", gap: 4, flexDirection: "column" }}>
-      <Skeleton variant="text" width={50} />
-      <Skeleton variant="text" width={200} />
-      <Skeleton variant="text" width={70} />
-      <Skeleton variant="rectangular" width={300} height={120} />
-      <Skeleton variant="text" width={200} />
-      <Skeleton variant="text" width={100} />
-    </Box>
-  </Card>
-);
-
 const TaskViewLeft = () => {
-  const { isLoading: taskLoading, task } = useTaskContext();
-  const { isLoading: projectLoading } = useProjectContext();
+  const { task } = useTaskContext();
   const [openEdit, setOpenEdit] = useState(false);
   const [openAddSubTask, setOpenAddSubTask] = useState(false);
-
-  if (taskLoading || projectLoading) {
-    return <Loading />;
-  }
 
   const [fileName, fileId] = task.attachmentPaths?.split(",") ?? [];
 
