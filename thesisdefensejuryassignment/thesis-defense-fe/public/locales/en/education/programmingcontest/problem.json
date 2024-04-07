@@ -1,0 +1,42 @@
+{
+  "problem": "Problem",
+  "problemId": "Problem ID",
+  "problemName": "Problem Name",
+  "level": "Level",
+  "timeLimit": "Time limit",
+  "memoryLimit": "Memory limit",
+  "problemDescription": "Problem description",
+  "problemSuggestion": "Suggestion for solution",
+  "problemSuggesstionPlaceholder": "Provide a suggestion in case of contestants facing difficulties solving the problem effectively",
+  "correctSourceCode": "Solution Source code",
+  "allowSubmittingOutput": "Allow contestants to submit output only (without source code)",
+  "isCustomEvaluated": "Customize function for output evaluation",
+  "customEvaluationNote1": "* Use this mode for problems with many correct output, please do not select this for normal problem (only 1 correct result for each testcase)",
+  "customEvaluationNote2": "** View demo here",
+  "checkerSourceCode": "Checker Source code",
+  "checkerSourceCodePlaceholder": "Source code to evaluate contestant's output",
+  "checkSolutionCompile": "Check compile",
+  "isPreloadCode": "Provide initial Code Segment for participants",
+  "preloadCode": "Provided Code Segment",
+  "problemList": {
+    "title": "Problems",
+    "status": "Status",
+    "solution": "Solution",
+    "level": "Level",
+    "createdBy": "Created By",
+    "createdAt": "Created At",
+    "appearances": "Contests Used",
+    "addTestCase": "Add Test Case",
+    "edit": "Edit",
+    "myProblems": "My Problems",
+    "sharedProblems": "Shared Problems",
+    "allProblems": "All Problems"
+  },
+  "createProblem": "Create new Problem",
+  "editProblem": "Edit problem",
+  "validateSubmit": {
+      "warningCheckSolutionCompile": "Your source code must pass \"CHECK COMPILE\" step",
+      "missingField": "Missing required field: {{fieldName}}"
+    }
+
+}
