@@ -12,6 +12,7 @@ export const useClasses = (group, semester) => {
       "get",
       `/general-classes/?semester=${semester?.semester}`,
       (res) => {
+        console.log(res?.data);
         let generalClasses = [];
         res.data?.forEach((classObj) => {
           if (classObj?.classCode !== null && classObj?.timeSlots) {
@@ -20,7 +21,7 @@ export const useClasses = (group, semester) => {
                 JSON.stringify({
                   ...classObj,
                   ...timeSlot,
-                  classCode: classObj.classCode + `-${index + 1}`,
+                  classCode: classObj.classCode,
                   id: classObj.id + `-${index+1}`
                 })
               );
@@ -41,5 +42,5 @@ export const useClasses = (group, semester) => {
     );
   }, [group, semester]);
 
-  return { loading, error, classes };
+  return { loading, error, classes, setClasses };
 };

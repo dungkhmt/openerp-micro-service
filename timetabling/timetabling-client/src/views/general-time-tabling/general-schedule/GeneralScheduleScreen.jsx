@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import GeneralScheduleTable from "./components/general-table/GeneralScheduleTable";
+import GeneralScheduleTable from "./components/GeneralScheduleTable";
 import { Autocomplete, Button, Input, TextField } from "@mui/material";
 import { Search } from "@mui/icons-material";
-import GeneralGroupAutoComplete from "./components/general-group-choice-box/GeneralGroupAutoComplete";
-import GeneralSemesterAutoComplete from "./components/general-semester-choice-box/GeneralSemesterAutoComplete";
+import GeneralGroupAutoComplete from "../common-components/GeneralGroupAutoComplete";
+import GeneralSemesterAutoComplete from "../common-components/GeneralSemesterAutoComplete";
 import { request } from "api";
 
 const GeneralScheduleScreen = () => {

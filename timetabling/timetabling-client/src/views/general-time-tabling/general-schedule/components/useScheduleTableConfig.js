@@ -3,7 +3,7 @@ import AutocompleteCell from "./AutoCompleteCell";
 import { request } from "api";
 import { useEffect, useState } from "react";
 
-export const useGeneralTableColumns = () => {
+export const useGeneralTableColumns = (setClasses) => {
   const [classRooms, setClassRooms] = useState([]);
   useEffect(() => {
     request("get", "/classroom/get-all", (res) => {
@@ -95,11 +95,12 @@ export const useGeneralTableColumns = () => {
     },
     {
       headerName: "Tiết BĐ",
-      field: "start_time",
+      field: "startTime",
       width: 80,
       editable: true,
       renderCell: (params) => (
         <AutocompleteCell
+          setClasses={setClasses}
           options={Array.from({ length: 5 }).map((_, index) => ({
             label: (index + 1)?.toString(),
           }))}
@@ -113,6 +114,7 @@ export const useGeneralTableColumns = () => {
       width: 80,
       renderCell: (params) => (
         <AutocompleteCell
+          setClasses={setClasses}
           options={Array.from({ length: 7 }).map((_, index) => ({
             label: index + 2 == 8 ? "Chủ nhật" : (index + 2).toString(),
           }))}
@@ -126,6 +128,7 @@ export const useGeneralTableColumns = () => {
       width: 120,
       renderCell: (params) => (
         <AutocompleteCell
+          setClasses={setClasses}
           options={classRooms?.map((classRoom, index) => ({
             label: classRoom?.classroom,
           }))}

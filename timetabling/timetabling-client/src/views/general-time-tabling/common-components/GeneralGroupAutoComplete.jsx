@@ -1,6 +1,6 @@
 import { Autocomplete, TextField } from "@mui/material";
 import React, { useState } from "react";
-import { useGroups } from "../../hooks/useGroups";
+import { useGroups } from "../hooks/useGroups";
 
 const GeneralGroupAutoComplete = () => {
   const [selectedGroup, setSelectedGroup] = useState(null);

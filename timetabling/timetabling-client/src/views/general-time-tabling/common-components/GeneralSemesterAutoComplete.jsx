@@ -1,6 +1,6 @@
 import { Autocomplete, TextField } from '@mui/material'
 import React, { useState } from 'react'
-import { useSemesters } from '../../hooks/useSemester';
+import { useSemesters } from '../hooks/useSemester';
 
 const GeneralSemesterAutoComplete = ({selectedSemester, setSelectedSemester}) => {
     const { loading: semestersLoading, error: semestersError, semesters } = useSemesters();

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import RoomUsageChart from "./components/RoomUsageChart";
 import RoomSelectBox from "./components/RoomSelectBox";
-import { useSemesters } from "../general-schedule/hooks/useSemester";
+import { useSemesters } from "../hooks/useSemester";
 import FilterSelectBox from "./components/FilterSelectBox";
 
 const RoomOccupationScreen = () => {
