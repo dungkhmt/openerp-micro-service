@@ -126,7 +126,7 @@ const ProjectViewRight = () => {
           }
         />
       </TabList>
-      <Box>
+      <Box sx={{ pl: 2 }}>
         <TabPanel sx={{ p: 0 }} value="overview">
           <ProjectViewOverview />
         </TabPanel>

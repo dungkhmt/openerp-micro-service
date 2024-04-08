@@ -126,7 +126,7 @@ const DashboardCard = forwardRef(function DashboardCard(
             {title}
           </Typography>
         </Tooltip>
-        {(isDraggable || true) && (
+        {isDraggable && (
           <Button
             title="Kéo để di chuyển"
             onMouseDown={onMouseDown}
