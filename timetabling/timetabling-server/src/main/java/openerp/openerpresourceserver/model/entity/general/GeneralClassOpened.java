@@ -4,15 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnTransformer;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -48,12 +42,11 @@ public class GeneralClassOpened {
     private String openBatch;
     private String course;
     private String groupName;
-    @Convert(converter = RoomReservationConverter.class)
-    @Column(name = "time_slots", columnDefinition = "jsonb")
-    @ColumnTransformer(write = "?::jsonb")
+    @OneToMany(mappedBy = "generalClassOpened", cascade = CascadeType.ALL)
     private List<RoomReservation> timeSlots = new ArrayList<RoomReservation>();
     @Column(name = "is_seperate_class")
     private Boolean isSeparateClass = false;
+    private String learningWeeks;
 
 
     @Override

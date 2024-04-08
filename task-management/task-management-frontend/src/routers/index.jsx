@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "../layout/Layout";
 import DashBoard from "../pages/dashboard";
-import { ProjectContextProvider } from "../pages/project/[id]/ProjectContextProvider";
+import { ProjectWrapper } from "../pages/project/[id]/ProjectWrapper";
 import Project from "../pages/project/[id]/[tab]";
 import Task from "../pages/project/[id]/task/[id]";
 import { TaskContextProvider } from "../pages/project/[id]/task/[id]/TaskContextProvider";
@@ -29,27 +29,32 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "/projects",
-            element: <Projects />,
             children: [
               {
                 path: "new",
                 element: <NewProject />,
               },
+              {
+                path: "",
+                element: <Projects />,
+              },
             ],
           },
           {
             path: "/project",
-            element: <ProjectContextProvider />,
+            element: <ProjectWrapper />,
             children: [
               {
-                path: ":id",
-                element: <Redirect to="/project/:id/overview" />,
                 children: [
+                  {
+                    path: ":id",
+                    element: <Redirect to="/project/:id/overview" />,
+                  },
                   {
                     element: <TaskContextProvider />,
                     children: [
                       {
-                        path: "task/:id",
+                        path: ":id/task/:tid",
                         element: <Task />,
                       },
                     ],

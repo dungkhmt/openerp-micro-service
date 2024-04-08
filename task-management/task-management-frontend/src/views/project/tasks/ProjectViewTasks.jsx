@@ -19,14 +19,23 @@ import {
 import AvatarGroup from "@mui/material/AvatarGroup";
 import { DataGrid } from "@mui/x-data-grid";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
 import CustomChip from "../../../components/mui/chip";
 import { useDebounce } from "../../../hooks/useDebounce";
-import { useProjectContext } from "../../../hooks/useProjectContext";
-import { TaskService } from "../../../services/api/task.service";
+import {
+  fetchTasks,
+  clearCache,
+  resetSort,
+  setFilters,
+  setPagination,
+  setSort,
+  resetPagination,
+  resetFilters,
+} from "../../../store/project/tasks";
 import {
   getCategoryColor,
   getDueDateColor,
@@ -36,39 +45,27 @@ import {
 } from "../../../utils/color.util";
 import { DialogAddTask } from "./DialogAddTask";
 
-const initFilter = {
-  categoryId: "",
-  statusId: "",
-  priorityId: "",
-  assigneeId: "",
-};
-
-const DEFAULT_PAGINATION_MODEL = {
-  page: 0,
-  pageSize: 10,
-};
-
-const DEFAULT_SORT = {
-  sort: "desc",
-  column: "createdStamp",
-};
-
 const ProjectViewTasks = () => {
-  const [paginationModel, setPaginationModel] = useState(
-    DEFAULT_PAGINATION_MODEL
-  );
-  const [search, setSearch] = useState("");
-  const [toggleFilter, setToggleFilter] = useState(false);
-  const [filter, setFilter] = useState(initFilter);
-  const [sort, setSort] = useState(DEFAULT_SORT);
-  const [rows, setRows] = useState([]);
-  const searchDebounce = useDebounce(search, 1000);
-  const { project, statuses, categories, priorities, members } =
-    useProjectContext();
-  const [totalRows, setTotalRows] = useState(project.taskCount);
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const { members, project } = useSelector((state) => state.project);
+  const { filters, sort, pagination, fetchLoading, totalCount, tasksCache } =
+    useSelector((state) => state.tasks);
+  const {
+    category: categoryStore,
+    priority: priorityStore,
+    status: statusStore,
+  } = useSelector((state) => state);
 
+  const [toggleFilter, setToggleFilter] = useState(false);
+  const [filter, setFilter] = useState(filters);
+
+  const [search, setSearch] = useState("");
+  const searchDebounce = useDebounce(search, 1000);
+
+  const [rows, setRows] = useState([]);
   const [openAddTask, setOpenAddTask] = useState(false);
+
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const columns = [
     {
@@ -77,10 +74,10 @@ const ProjectViewTasks = () => {
       headerName: "Tên",
       filterable: false,
       renderCell: ({ row }) => {
-        const category = categories.find(
+        const category = categoryStore.categories.find(
           (category) => category.categoryId === row.categoryId
         );
-        const priority = priorities.find(
+        const priority = priorityStore.priorities.find(
           (priority) => priority.priorityId === row.priorityId
         );
         return (
@@ -140,7 +137,7 @@ const ProjectViewTasks = () => {
       sortable: false,
       filterable: false,
       renderCell: ({ row }) => {
-        const status = statuses.find(
+        const status = statusStore.statuses.find(
           (status) => status.statusId === row.statusId
         );
         return status ? (
@@ -239,15 +236,26 @@ const ProjectViewTasks = () => {
 
   const handleSortModel = (newModel) => {
     if (newModel.length) {
-      const { sort, field } = newModel[0];
-      setSort({ sort, column: field });
+      dispatch(setSort(newModel[0]));
     } else {
-      setSort(DEFAULT_SORT);
+      dispatch(resetSort());
     }
   };
 
   const handlePaginationModel = (newModel) => {
-    setPaginationModel(newModel);
+    if (
+      newModel.page === pagination.page &&
+      newModel.pageSize !== pagination.size
+    ) {
+      dispatch(clearCache());
+    }
+
+    dispatch(
+      setPagination({
+        page: newModel.page,
+        size: newModel.pageSize,
+      })
+    );
   };
 
   const buildQueryString = () => {
@@ -270,36 +278,54 @@ const ProjectViewTasks = () => {
     return builder.filter((s) => s !== "").join(" AND ");
   };
 
-  const getTasksPagination = async () => {
-    setIsLoading(true);
-    try {
-      const taskPagination = await TaskService.getTasks(project.id, {
-        page: paginationModel.page,
-        size: paginationModel.pageSize,
-        q: buildQueryString(),
-        sort: `${sort.column},${sort.sort}`,
-      });
-      const { data, totalElements } = taskPagination;
-      setRows(data?.map((data, index) => ({ ...data, _id: index })) ?? []);
-      setTotalRows(totalElements ?? 0);
-    } catch (error) {
-      console.log(error);
-      toast.error("Có lỗi khi lấy danh sách nhiệm vụ");
-    } finally {
-      setIsLoading(false);
+  const fetchTasksPagination = useCallback(async () => {
+    if (!tasksCache[pagination.page]) {
+      try {
+        await dispatch(
+          fetchTasks({
+            projectId: project.id,
+            filters: {
+              ...filters,
+              ...pagination,
+              sort: `${sort.field},${sort.sort}`,
+            },
+          })
+        );
+      } catch (error) {
+        console.log(error);
+        toast.error("Có lỗi khi lấy danh sách nhiệm vụ");
+      }
     }
-  };
+  }, [dispatch, filters, pagination, project.id, sort]);
 
   const onFilter = async () => {
-    setPaginationModel(DEFAULT_PAGINATION_MODEL);
-    if (paginationModel === DEFAULT_PAGINATION_MODEL) {
-      getTasksPagination();
-    }
+    dispatch(resetPagination());
+    dispatch(clearCache());
+    dispatch(
+      setFilters({
+        ...filter,
+        q: buildQueryString(),
+      })
+    );
   };
 
   useEffect(() => {
-    getTasksPagination();
-  }, [searchDebounce, paginationModel, project.id, sort]);
+    fetchTasksPagination();
+  }, [fetchTasksPagination]);
+
+  useEffect(() => {
+    if (tasksCache[pagination.page]) {
+      setRows(tasksCache[pagination.page]);
+    }
+  }, [pagination.page, tasksCache]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      onFilter();
+    } else {
+      setIsInitialized(true);
+    }
+  }, [searchDebounce]);
 
   return (
     <Card>
@@ -373,16 +399,18 @@ const ProjectViewTasks = () => {
                 inputProps={{ placeholder: "Thể loại" }}
               >
                 <MenuItem value="">Tất cả</MenuItem>
-                {categories.map(({ categoryId, categoryName }) => (
-                  <MenuItem key={categoryId} value={categoryId}>
-                    <CustomChip
-                      size="medium"
-                      skin="light"
-                      label={categoryName}
-                      color={getCategoryColor(categoryId)}
-                    />
-                  </MenuItem>
-                ))}
+                {categoryStore.categories.map(
+                  ({ categoryId, categoryName }) => (
+                    <MenuItem key={categoryId} value={categoryId}>
+                      <CustomChip
+                        size="medium"
+                        skin="light"
+                        label={categoryName}
+                        color={getCategoryColor(categoryId)}
+                      />
+                    </MenuItem>
+                  )
+                )}
               </Select>
             </FormControl>
           </Grid>
@@ -401,7 +429,7 @@ const ProjectViewTasks = () => {
                 inputProps={{ placeholder: "Trạng thái" }}
               >
                 <MenuItem value="">Tất cả</MenuItem>
-                {statuses.map(({ statusId, description }) => (
+                {statusStore.statuses.map(({ statusId, description }) => (
                   <MenuItem key={statusId} value={statusId}>
                     <CustomChip
                       size="medium"
@@ -429,16 +457,18 @@ const ProjectViewTasks = () => {
                 inputProps={{ placeholder: "Ưu tiên" }}
               >
                 <MenuItem value="">Tất cả</MenuItem>
-                {priorities.map(({ priorityId, priorityName }) => (
-                  <MenuItem key={priorityId} value={priorityId}>
-                    <CustomChip
-                      size="medium"
-                      skin="light"
-                      label={priorityName}
-                      color={getPriorityColor(priorityId)}
-                    />
-                  </MenuItem>
-                ))}
+                {priorityStore.priorities.map(
+                  ({ priorityId, priorityName }) => (
+                    <MenuItem key={priorityId} value={priorityId}>
+                      <CustomChip
+                        size="medium"
+                        skin="light"
+                        label={priorityName}
+                        color={getPriorityColor(priorityId)}
+                      />
+                    </MenuItem>
+                  )
+                )}
               </Select>
             </FormControl>
           </Grid>
@@ -484,7 +514,8 @@ const ProjectViewTasks = () => {
                 color="secondary"
                 sx={{ height: "32px" }}
                 onClick={() => {
-                  setFilter(initFilter);
+                  dispatch(resetFilters());
+                  setFilter(filters);
                 }}
               >
                 Clear
@@ -500,12 +531,15 @@ const ProjectViewTasks = () => {
         columns={columns}
         disableRowSelectionOnClick
         pageSizeOptions={[10, 20, 50]}
-        paginationModel={paginationModel}
+        paginationModel={{
+          page: pagination.page,
+          pageSize: pagination.size,
+        }}
         onPaginationModelChange={handlePaginationModel}
         pagination
         paginationMode="server"
-        rowCount={totalRows}
-        loading={isLoading}
+        rowCount={totalCount}
+        loading={fetchLoading}
         rowHeight={68}
         onSortModelChange={handleSortModel}
         sx={{

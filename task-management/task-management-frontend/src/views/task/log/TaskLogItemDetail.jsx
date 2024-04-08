@@ -1,3 +1,4 @@
+import { Icon } from "@iconify/react";
 import {
   Box,
   Card,
@@ -9,22 +10,21 @@ import {
   Typography,
   styled,
 } from "@mui/material";
+import MDEditor from "@uiw/react-md-editor";
 import PropTypes from "prop-types";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import CustomChip from "../../../components/mui/chip";
-import { useProjectContext } from "../../../hooks/useProjectContext";
+import { useTaskContext } from "../../../hooks/useTaskContext";
+import { FileService } from "../../../services/api/file.service";
 import {
   getCategoryColor,
   getPriorityColor,
   getStatusColor,
 } from "../../../utils/color.util";
 import { parseLogItemDetail } from "../../../utils/text-parse.util";
-import { Icon } from "@iconify/react";
-import MDEditor from "@uiw/react-md-editor";
-import { useState } from "react";
-import { FileService } from "../../../services/api/file.service";
-import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
-import { useTaskContext } from "../../../hooks/useTaskContext";
 
 const TextHighlight = styled(Typography)(({ theme }) => ({
   color: theme.palette.secondary.dark,
@@ -44,8 +44,12 @@ const TextState = styled(Typography)({
 });
 
 const FieldComponent = ({ field, value, isOld = false }) => {
-  const { statuses, categories, priorities, members, project } =
-    useProjectContext();
+  const { members, project } = useSelector((state) => state.project);
+  const {
+    category: categoryStore,
+    priority: priorityStore,
+    status: statusStore,
+  } = useSelector((state) => state);
   const { task } = useTaskContext();
 
   let category, status, priority, assignee, fileName, fileId, subTask;
@@ -106,7 +110,7 @@ const FieldComponent = ({ field, value, isOld = false }) => {
         </TextHighlight>
       );
     case "categoryId":
-      category = categories.find((c) => c.categoryId === value);
+      category = categoryStore.categories.find((c) => c.categoryId === value);
       return (
         category && (
           <CustomChip
@@ -119,7 +123,7 @@ const FieldComponent = ({ field, value, isOld = false }) => {
         )
       );
     case "priorityId":
-      priority = priorities.find((p) => p.priorityId === value);
+      priority = priorityStore.priorities.find((p) => p.priorityId === value);
       return (
         priority && (
           <CustomChip
@@ -132,7 +136,7 @@ const FieldComponent = ({ field, value, isOld = false }) => {
         )
       );
     case "statusId":
-      status = statuses.find((s) => s.statusId === value);
+      status = statusStore.statuses.find((s) => s.statusId === value);
       return (
         status && (
           <CustomChip

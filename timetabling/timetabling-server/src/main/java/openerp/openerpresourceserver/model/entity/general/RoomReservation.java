@@ -1,7 +1,10 @@
 package openerp.openerpresourceserver.model.entity.general;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.google.gson.annotations.SerializedName;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,15 +13,25 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "room_reservation")
+@Entity
 public class RoomReservation {
-    @JsonProperty("start_time")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "general_class_opened_id")
+    @JsonIgnore
+    private GeneralClassOpened generalClassOpened;
+    @JsonProperty("startTime")
     private int startTime;
-    @JsonProperty("end_time")
+    @JsonProperty("endTime")
     private int endTime;
 
     private int weekday;
     private String room;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     public RoomReservation(int startTime, int endTime, int weekday, String room) {
         this.endTime = endTime;

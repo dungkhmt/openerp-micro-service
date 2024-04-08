@@ -1,0 +1,10 @@
+{
+  "title": "Thông tin lớp",
+  "edit": "Chỉnh sửa",
+  "classDetail": {
+    "code": "Mã lớp",
+    "courseId": "Mã học phần",
+    "name": "Tên học phần",
+    "classType": "Loại lớp"
+  }
+}
