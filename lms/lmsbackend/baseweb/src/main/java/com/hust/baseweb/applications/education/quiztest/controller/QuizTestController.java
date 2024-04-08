@@ -148,7 +148,7 @@ public class QuizTestController {
     @PostMapping("/submit-interactive-quiz-answer-by-user")
     public ResponseEntity<?> submitInteractiveQuizAnswer(Principal principal, @RequestBody ModelInteractiveQuizAnswer input) {
         InteractiveQuiz interactiveQuiz = interactiveQuizRepo.findById(input.getInteractiveQuizId()).orElse(null);
-        if (interactiveQuiz == null || !interactiveQuiz.getStatusId().equals("OPENED")) {
+        if (interactiveQuiz == null || interactiveQuiz.getStatusId().equals("HIDDEN") || interactiveQuiz.getStatusId().equals("CREATED")) {
             return ResponseEntity.badRequest().build();
         }
         List<InteractiveQuizAnswer> output = new ArrayList<>();
