@@ -9,7 +9,7 @@ import { useClasses } from "../hooks/useClasses";
 const GeneralUploadScreen = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedSemester, setSelectedSemester] = useState(null);
-  const { loading, error, classes } = useClasses(null, selectedSemester);
+  const { loading, error, classes, setClasses } = useClasses(null, selectedSemester);
 
   return (
     <LoadingProvider>
@@ -23,11 +23,10 @@ const GeneralUploadScreen = () => {
             <Button
               disabled={selectedSemester === null}
               onClick={() => {}}
-              sx={{ width: "200px" }}
               variant="contained"
               color="error"
             >
-              Xóa danh sách
+              Xóa danh sách theo kỳ
             </Button>
             <InputFileUpload
               selectedSemester={selectedSemester}

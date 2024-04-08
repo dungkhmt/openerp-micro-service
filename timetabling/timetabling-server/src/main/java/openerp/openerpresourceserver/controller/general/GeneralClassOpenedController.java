@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.controller.general;
 import java.util.ArrayList;
 import java.util.List;
 
+import openerp.openerpresourceserver.model.dto.request.general.UpdateClassesToNewGroupRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import openerp.openerpresourceserver.model.dto.request.UpdateGeneralClassRequest;
-import openerp.openerpresourceserver.model.dto.request.UpdateGeneralClassScheduleRequest;
+import openerp.openerpresourceserver.model.dto.request.general.UpdateGeneralClassRequest;
+import openerp.openerpresourceserver.model.dto.request.general.UpdateGeneralClassScheduleRequest;
 import openerp.openerpresourceserver.model.entity.general.GeneralClassOpened;
 import openerp.openerpresourceserver.service.GeneralClassOpenedService;
 
@@ -51,5 +52,14 @@ public class GeneralClassOpenedController {
         return ResponseEntity.ok().body(updatedGeneralClass);
     }
 
+    @PostMapping("/update-classes-group")
+    public ResponseEntity updateClassesGroup(@RequestBody UpdateClassesToNewGroupRequest request) {
+        try{
+            if(request.getPriorityBuilding() == null) return ResponseEntity.ok(gService.addClassesToCreatedGroup(request.getIds(), request.getGroupName()));
+            return ResponseEntity.ok(gService.addClassesToNewGroup(request.getIds(),request.getGroupName(),request.getPriorityBuilding()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
 }

@@ -38,5 +38,12 @@ export const scheduleInformation = {
         text: "Ngày trong tuần",
         child: [],
       },
+      {
+        id: "MENU_SCHEDULE_INFORMATION.ACADEMIC_WEEKS",
+        path: "/schedule-information/academic-week",
+        isPublic: true,
+        text: "Danh sách tuần học",
+        child: [],
+      },
     ],
   };

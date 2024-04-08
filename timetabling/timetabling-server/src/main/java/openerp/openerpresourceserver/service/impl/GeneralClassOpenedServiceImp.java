@@ -1,24 +1,17 @@
 package openerp.openerpresourceserver.service.impl;
 
-import java.lang.reflect.Type;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import openerp.openerpresourceserver.model.entity.general.RoomReservation;
+import openerp.openerpresourceserver.model.dto.request.general.UpdateClassesToNewGroupRequest;
+import openerp.openerpresourceserver.model.entity.Group;
+import openerp.openerpresourceserver.repo.GroupRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
-import openerp.openerpresourceserver.controller.general.GeneralClassOpenedController;
-import openerp.openerpresourceserver.helper.MassExtractor;
-import openerp.openerpresourceserver.model.dto.request.UpdateGeneralClassRequest;
-import openerp.openerpresourceserver.model.dto.request.UpdateGeneralClassScheduleRequest;
+import openerp.openerpresourceserver.model.dto.request.general.UpdateGeneralClassRequest;
+import openerp.openerpresourceserver.model.dto.request.general.UpdateGeneralClassScheduleRequest;
 import openerp.openerpresourceserver.model.entity.general.GeneralClassOpened;
 import openerp.openerpresourceserver.repo.GeneralClassOpenedRepository;
 import openerp.openerpresourceserver.service.GeneralClassOpenedService;
@@ -31,6 +24,9 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
 
     @Autowired
     private GeneralClassOpenedRepository gcoRepo;
+
+    @Autowired
+    private GroupRepo groupRepo;
 
     @Override
     public List<GeneralClassOpened> getGeneralClasses(String semester) {
@@ -92,8 +88,46 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
                 gClassOpened.setStudyClass(request.getValue());
                 gcoRepo.save(gClassOpened);
                 break;
+            case "groupName":
+                gClassOpened.setGroupName(request.getValue());
+                gcoRepo.save(gClassOpened);
         }
         return gClassOpened;
     }
+    @Override
+    public List<GeneralClassOpened> addClassesToNewGroup(List<String> ids, String groupName, String priorityBuilding) throws Exception {
+        if(!groupRepo.getAllByGroupName(groupName).isEmpty()) {
+            throw new Exception("Group name has existed!");
+        } else {
+            groupRepo.save(new Group(null, groupName, priorityBuilding));
+        }
+        List<GeneralClassOpened> generalClassOpenedList = new ArrayList<>();
+        for (String id : ids) {
+            GeneralClassOpened generalClassOpened = gcoRepo.findById(Long.valueOf(id)).orElse(null);
+            if (generalClassOpened == null) {
+                System.err.println("Class not exist with id =" + id);
+                continue;
+            }
+            generalClassOpened.setGroupName(groupName);
+            generalClassOpenedList.add(generalClassOpened);
+        }
+        gcoRepo.saveAll(generalClassOpenedList);
+        return gcoRepo.findAll();
+    }
 
+    @Override
+    public List<GeneralClassOpened> addClassesToCreatedGroup(List<String> ids, String groupName) throws Exception {
+        List<GeneralClassOpened> generalClassOpenedList = new ArrayList<>();
+        for (String id : ids) {
+            GeneralClassOpened generalClassOpened = gcoRepo.findById(Long.valueOf(id)).orElse(null);
+            if (generalClassOpened == null) {
+                System.err.println("Class not exist with id =" + id);
+                continue;
+            }
+            generalClassOpened.setGroupName(groupName);
+            generalClassOpenedList.add(generalClassOpened);
+        }
+        gcoRepo.saveAll(generalClassOpenedList);
+        return gcoRepo.findAll();
+    }
 }
