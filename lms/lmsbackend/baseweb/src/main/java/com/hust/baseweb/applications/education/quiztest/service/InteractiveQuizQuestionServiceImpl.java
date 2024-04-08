@@ -37,9 +37,9 @@ public class InteractiveQuizQuestionServiceImpl implements InteractiveQuizQuesti
     public List<QuizQuestionDetailModel> findAllByInteractiveQuizId(UUID interactiveQuizId){
         //List<EduQuizTestQuizQuestion> eduQuizTestQuizQuestions = eduQuizTestQuizQuestionRepo.findAllByTestId(testId);
         InteractiveQuiz interactiveQuiz = interactiveQuizRepo.findById(interactiveQuizId).orElse(null);
-        if (interactiveQuiz == null || !interactiveQuiz.getStatusId().equals("OPENED")) {
-            return new ArrayList<>();
-        }
+        // if (interactiveQuiz == null || !interactiveQuiz.getStatusId().equals("OPENED")) {
+        //     return new ArrayList<>();
+        // }
         List<InteractiveQuizQuestion> interactiveQuizQuestions = interactiveQuizQuestionRepo.findAllByInteractiveQuizId(interactiveQuizId);
             // .findAllByTestIdAndStatusId(testId, EduQuizTestQuizQuestion.STATUS_CREATED);
 
