@@ -11,6 +11,7 @@ import TaskAssigned from "../pages/tasks/assign-me";
 import NotFound from "../views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import Redirect from "./Redirect";
+import Home from "../pages";
 
 export const router = createBrowserRouter([
   {
@@ -18,15 +19,15 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Redirect to="/dashboard" />,
-      },
-      {
-        path: "/dashboard",
-        element: <DashBoard />,
+        element: <Home />,
       },
       {
         element: <PrivateRoute />,
         children: [
+          {
+            path: "/dashboard",
+            element: <DashBoard />,
+          },
           {
             path: "/projects",
             children: [

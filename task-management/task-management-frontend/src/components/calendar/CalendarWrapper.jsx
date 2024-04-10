@@ -278,6 +278,10 @@ const CalendarWrapper = styled(Box)(({ theme }) => {
       },
       "& .fc-scrollgrid": {
         borderColor: theme.palette.divider,
+        "& .fc-scrollgrid-section-header": {
+          position: "sticky",
+          top: 0,
+        },
       },
       "& .fc-day-past, & .fc-day-future": {
         "&.fc-daygrid-day-number": {

@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react";
 import { TabContext, TabPanel } from "@mui/lab";
+import PerfectScrollbar from "react-perfect-scrollbar";
 import MuiTabList from "@mui/lab/TabList";
 import { Box, Tab, styled } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -8,6 +9,7 @@ import { ProjectViewCalendar } from "./calendar/ProjectViewCalendar";
 import { ProjectViewMembers } from "./member/ProjectViewMembers";
 import { ProjectViewOverview } from "./overview/ProjectViewOverview";
 import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
+import { usePreventOverflow } from "../../hooks/usePreventOverflow";
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   "& .MuiTabs-indicator": {
@@ -42,15 +44,21 @@ const ProjectViewRight = () => {
   const { id, tab } = useParams();
   const [activeTab, setActiveTab] = useState(tab);
 
+  const { ref, updateMaxHeight } = usePreventOverflow();
+
   const navigate = useNavigate();
+
+  const handleChange = (event, value) => {
+    navigate(`/project/${id}/${value}`);
+  };
 
   useEffect(() => {
     setActiveTab(tab);
   }, [tab]);
 
-  const handleChange = (event, value) => {
-    navigate(`/project/${id}/${value}`);
-  };
+  useEffect(() => {
+    updateMaxHeight();
+  }, [window?.innerHeight, ref]);
 
   return (
     <TabContext value={activeTab}>
@@ -58,6 +66,12 @@ const ProjectViewRight = () => {
         variant="scrollable"
         scrollButtons="auto"
         onChange={handleChange}
+        sx={{
+          position: "sticky",
+          top: "46px",
+          backgroundColor: "background.default",
+          zIndex: 10,
+        }}
       >
         <Tab
           value="overview"
@@ -126,25 +140,36 @@ const ProjectViewRight = () => {
           }
         />
       </TabList>
-      <Box sx={{ pl: 2 }}>
-        <TabPanel sx={{ p: 0 }} value="overview">
-          <ProjectViewOverview />
-        </TabPanel>
-        <TabPanel sx={{ p: 0 }} value="tasks">
-          <ProjectViewTasks />
-        </TabPanel>
-        <TabPanel sx={{ p: 0 }} value="timeline">
-          <ProjectViewCalendar />
-        </TabPanel>
-        <TabPanel sx={{ p: 0 }} value="activity">
-          History
-        </TabPanel>
-        <TabPanel sx={{ p: 0 }} value="members">
-          <ProjectViewMembers />
-        </TabPanel>
-        <TabPanel sx={{ p: 0 }} value="setting">
-          Quản lý
-        </TabPanel>
+      <Box
+        ref={ref}
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          overflowY: "auto",
+          mt: 1.5,
+        }}
+      >
+        <PerfectScrollbar style={{ flex: 1 }}>
+          <TabPanel sx={{ p: 0 }} value="overview">
+            <ProjectViewOverview />
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="tasks">
+            <ProjectViewTasks />
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="timeline">
+            <ProjectViewCalendar />
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="activity">
+            History
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="members">
+            <ProjectViewMembers />
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="setting">
+            Quản lý
+          </TabPanel>
+        </PerfectScrollbar>
       </Box>
     </TabContext>
   );

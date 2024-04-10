@@ -1,31 +1,28 @@
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import { Avatar, Badge, IconButton } from "@mui/material";
-import { grey } from "@mui/material/colors";
+import { Icon } from "@iconify/react";
+import { Box, Badge, IconButton } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { bearerAuth, request } from "../../api";
-import { config } from "../../config/config";
-import keycloak from "../../config/keycloak";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import randomColor from "randomcolor";
 import React from "react";
-import { useNotificationState } from "../../state/NotificationState";
+import { bearerAuth } from "../../../api";
+import keycloak from "../../../config/keycloak";
+import { useNotificationState } from "../../../state/NotificationState";
 import NotificationMenu from "./NotificationMenu";
 
-const StyledAvatar = styled(Avatar)(({ isOpen }) => ({
-  width: 36,
-  height: 36,
-  color: "#000000",
-  backgroundColor: grey[200],
+const StyledAvatar = styled(Box)(({ isOpen, theme }) => ({
+  width: 25,
+  height: 25,
+  color: "#ddeeddee",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  // backgroundColor: grey[200],
   overflow: "unset",
-  "&:hover": {
-    backgroundColor: grey[300],
+  "& svg": {
+    width: 20,
+    height: 20,
+    ...(isOpen && { color: theme.palette.primary.main }),
   },
-  ...(isOpen
-    ? {
-        backgroundColor: "#e7f3ff",
-        "&:hover": { backgroundColor: "rgba(187, 222, 251, 0.54)" },
-      }
-    : {}),
 }));
 
 const StyledBadge = styled(Badge)(() => ({
@@ -71,11 +68,9 @@ function NotificationButton() {
   const fetchNotification = () => {
     // let fromId = null;
     // const fetchedNoties = notifications.get();
-
     // if (fetchedNoties && fetchedNoties.length > 0) {
     //   fromId = fetchedNoties[fetchedNoties.length - 1].id;
     // }
-
     // try {
     //   request(
     //     "get",
@@ -85,13 +80,11 @@ function NotificationButton() {
     //       const noties = processNotificationsContent(
     //         data.notifications.content
     //       );
-
     //       if (fromId === null) {
     //         notifications.set(noties);
     //       } else {
     //         notifications.merge(noties);
     //       }
-
     //       numUnRead.set(data.numUnRead);
     //       hasMore.set(!data.notifications.last);
     //     },
@@ -268,17 +261,17 @@ function NotificationButton() {
         aria-label="notification button"
         aria-controls={open ? "menu-list-grow" : undefined}
         onClick={handleToggle}
-        sx={{ p: 1.5 }}
+        sx={{ p: 0 }}
       >
         <StyledAvatar alt="notification button" isOpen={open}>
           {open ? (
-            <NotificationsIcon color="primary" />
+            <Icon icon="gravity-ui:bell-dot" />
           ) : (
             <StyledBadge
               badgeContent={numUnRead.get() < 10 ? numUnRead.get() : "+9"}
               color="error"
             >
-              <NotificationsIcon />
+              <Icon icon="gravity-ui:bell-dot" />
             </StyledBadge>
           )}
         </StyledAvatar>

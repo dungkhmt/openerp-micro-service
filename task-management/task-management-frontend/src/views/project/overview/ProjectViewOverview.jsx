@@ -13,8 +13,8 @@ import { ProjectInfo } from "./info/ProjectInfo";
 
 const WIDTH_TASK_MD = 2;
 const WIDTH_TASK_LG = 2;
-const HEIGHT_DOC_MD = 4;
-const HEIGHT_DOC_LG = 5;
+const HEIGHT_DOC_MD = 5;
+const HEIGHT_DOC_LG = 6;
 const HEIGHT_INFO = 3;
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
