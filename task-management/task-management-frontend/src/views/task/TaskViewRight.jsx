@@ -51,7 +51,7 @@ const TaskViewRight = () => {
   const status = statusStore.statuses.find((s) => s.statusId === task.statusId);
 
   return (
-    <Card>
+    <Card sx={{ position: "sticky", top: 0, mr: 2 }}>
       <Box sx={{ p: 6 }}>
         <Typography>Chi tiết</Typography>
 

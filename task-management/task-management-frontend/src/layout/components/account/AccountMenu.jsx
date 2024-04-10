@@ -194,6 +194,7 @@ export function AccountMenu(props) {
                         sx={styles.avatar}
                         style={{
                           background: avatarBgColor,
+                          color: "#fff",
                         }}
                       >
                         {token.name

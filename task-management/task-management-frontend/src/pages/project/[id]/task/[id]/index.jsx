@@ -1,9 +1,12 @@
 import { Grid, Card, Box, Skeleton, Divider } from "@mui/material";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import PerfectScrollbar from "react-perfect-scrollbar";
 import { useTaskContext } from "../../../../../hooks/useTaskContext";
 import { TaskViewLeft } from "../../../../../views/task/TaskViewLeft";
 import TaskViewRight from "../../../../../views/task/TaskViewRight";
+import { usePreventOverflow } from "../../../../../hooks/usePreventOverflow";
+import { useEffect } from "react";
 
 const LeftLoading = () => (
   <Card sx={{ p: 6 }}>
@@ -27,7 +30,7 @@ const LeftLoading = () => (
 );
 
 const RightLoading = () => (
-  <Card>
+  <Card sx={{ mr: 2 }}>
     <Box sx={{ p: 6 }}>
       <Skeleton variant="text" width={70} />
       <Skeleton variant="text" width={100} />
@@ -64,6 +67,12 @@ const Task = () => {
   const { fetchLoading: projectLoading } = useSelector(
     (state) => state.project
   );
+  const { ref, updateMaxHeight } = usePreventOverflow();
+
+  useEffect(() => {
+    updateMaxHeight();
+  }, [window?.innerHeight, ref]);
+
   if (error) {
     if (error.response?.status === 404)
       return <h1>Không tìm thấy công việc</h1>;
@@ -76,14 +85,27 @@ const Task = () => {
   const loading = taskLoading || projectLoading;
 
   return (
-    <Grid container spacing={5}>
-      <Grid item lg={9} xs={12}>
-        {loading ? <LeftLoading /> : <TaskViewLeft />}
-      </Grid>
-      <Grid item lg={3} xs={12}>
-        {loading ? <RightLoading /> : <TaskViewRight />}
-      </Grid>
-    </Grid>
+    <Box
+      ref={ref}
+      sx={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        overflowY: "auto",
+        mt: 1.5,
+      }}
+    >
+      <PerfectScrollbar style={{ flex: 1 }}>
+        <Grid container spacing={5}>
+          <Grid item lg={9} xs={12}>
+            {loading ? <LeftLoading /> : <TaskViewLeft />}
+          </Grid>
+          <Grid item lg={3} xs={12}>
+            {loading ? <RightLoading /> : <TaskViewRight />}
+          </Grid>
+        </Grid>
+      </PerfectScrollbar>
+    </Box>
   );
 };
 

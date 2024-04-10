@@ -1,14 +1,10 @@
 import { useHookstate } from "@hookstate/core";
 import { Avatar, IconButton } from "@mui/material";
 import { useKeycloak } from "@react-keycloak/web";
-import randomColor from "randomcolor";
 import React, { useEffect } from "react";
 import { AccountMenu } from "./AccountMenu";
 
-const bgColor = randomColor({
-  luminosity: "dark",
-  hue: "random",
-});
+const bgColor = "#455963";
 
 const menuId = "primary-search-account-menu";
 
@@ -49,7 +45,13 @@ function AccountButton() {
       >
         <Avatar
           alt="account button"
-          sx={{ width: 36, height: 36, background: bgColor }}
+          sx={{
+            width: 25,
+            height: 25,
+            background: bgColor,
+            color: "#fff",
+            fontSize: "0.85rem",
+          }}
         >
           {keycloak.tokenParsed.name
             ?.split(" ")

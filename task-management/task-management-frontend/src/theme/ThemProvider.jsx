@@ -17,7 +17,7 @@ const themeOptions = {
   shadow: shadows("light"),
   mixins: {
     toolbar: {
-      minHeight: 64,
+      minHeight: 40,
     },
   },
 };
