@@ -16,14 +16,11 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import CustomChip from "../../../components/mui/chip";
+import { TaskCategory } from "../../../components/task/category";
+import { TaskPriority } from "../../../components/task/priority";
+import { TaskStatus } from "../../../components/task/status";
 import { useTaskContext } from "../../../hooks/useTaskContext";
 import { FileService } from "../../../services/api/file.service";
-import {
-  getCategoryColor,
-  getPriorityColor,
-  getStatusColor,
-} from "../../../utils/color.util";
 import { parseLogItemDetail } from "../../../utils/text-parse.util";
 
 const TextHighlight = styled(Typography)(({ theme }) => ({
@@ -111,43 +108,13 @@ const FieldComponent = ({ field, value, isOld = false }) => {
       );
     case "categoryId":
       category = categoryStore.categories.find((c) => c.categoryId === value);
-      return (
-        category && (
-          <CustomChip
-            size="small"
-            skin="light"
-            label={category.categoryName}
-            color={getCategoryColor(category.categoryId)}
-            sx={{ textDecoration: isOld ? "line-through" : "none" }}
-          />
-        )
-      );
+      return category && <TaskCategory category={category} />;
     case "priorityId":
       priority = priorityStore.priorities.find((p) => p.priorityId === value);
-      return (
-        priority && (
-          <CustomChip
-            size="small"
-            skin="light"
-            label={priority.priorityName}
-            color={getPriorityColor(priority.priorityId)}
-            sx={{ textDecoration: isOld ? "line-through" : "none" }}
-          />
-        )
-      );
+      return priority && <TaskPriority priority={priority} />;
     case "statusId":
       status = statusStore.statuses.find((s) => s.statusId === value);
-      return (
-        status && (
-          <CustomChip
-            size="small"
-            skin="light"
-            label={status.description}
-            color={getStatusColor(status.statusId)}
-            sx={{ textDecoration: isOld ? "line-through" : "none" }}
-          />
-        )
-      );
+      return status && <TaskStatus status={status} />;
     case "assigneeId":
       assignee = members.find((m) => m.member.id === value);
 

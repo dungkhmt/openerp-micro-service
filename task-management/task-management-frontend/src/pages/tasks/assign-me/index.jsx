@@ -16,16 +16,12 @@ import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
-import CustomChip from "../../../components/mui/chip";
+import { TaskCategory } from "../../../components/task/category";
+import { TaskStatus } from "../../../components/task/status";
 import { useDebounce } from "../../../hooks/useDebounce";
 import { StatusService } from "../../../services/api/task-status.service";
 import { TaskService } from "../../../services/api/task.service";
-import {
-  getCategoryColor,
-  getDueDateColor,
-  getProgressColor,
-  getStatusColor,
-} from "../../../utils/color.util";
+import { getDueDateColor, getProgressColor } from "../../../utils/color.util";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -79,15 +75,7 @@ const TaskAssigned = () => {
               {row.name}
             </Typography>
           </Tooltip>
-          {row.category && (
-            <CustomChip
-              size="small"
-              skin="light"
-              sx={{ width: "fit-content" }}
-              label={row.category.categoryName}
-              color={getCategoryColor(row.category.categoryId)}
-            />
-          )}
+          {row.category && <TaskCategory category={row.category} />}
         </Box>
       ),
     },
@@ -129,18 +117,7 @@ const TaskAssigned = () => {
       sortable: false,
       renderCell: ({ row }) => {
         const status = statuses?.find((s) => s.statusId === row.statusId);
-        return (
-          status && (
-            <CustomChip
-              title={`Trạng thái: ${status.description}`}
-              size="small"
-              skin="light"
-              sx={{ width: "fit-content" }}
-              label={status.description}
-              color={getStatusColor(status.statusId)}
-            />
-          )
-        );
+        return status && <TaskStatus status={status} />;
       },
     },
     {
