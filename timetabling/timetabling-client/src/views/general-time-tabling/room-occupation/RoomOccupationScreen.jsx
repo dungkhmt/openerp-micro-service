@@ -1,20 +1,31 @@
 import React, { useState } from "react";
 import RoomUsageChart from "./components/RoomUsageChart";
-import RoomSelectBox from "./components/RoomSelectBox";
-import { useSemesters } from "../hooks/useSemester";
 import FilterSelectBox from "./components/FilterSelectBox";
+import GeneralSemesterAutoComplete from "../common-components/GeneralSemesterAutoComplete";
 
 const RoomOccupationScreen = () => {
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedSemester, setSelectedSemester] = useState(null);
   const [selectedWeek, setSelectedWeek] = useState(0);
-  const { loading, error, semesters } = useSemesters();
+  const [startDate, setStartDate] = useState(null);
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-row gap-2">
-        <RoomSelectBox  data={semesters} setSelectedItem={setSelectedItem} />
-        <FilterSelectBox selectedWeek={selectedWeek} setSelectedWeek={setSelectedWeek}/>
+        <GeneralSemesterAutoComplete
+          setSelectedSemester={setSelectedSemester}
+          selectedSemester={selectedSemester}
+        />
+        <FilterSelectBox
+          selectedSemester={selectedSemester}
+          selectedWeek={selectedWeek}
+          setSelectedWeek={setSelectedWeek}
+          setStartDate={setStartDate}
+        />
       </div>
-      <RoomUsageChart selectedWeek = {selectedWeek} semester={selectedItem?.semester} />
+      <RoomUsageChart
+        startDate={startDate}
+        selectedWeek={selectedWeek}
+        semester={selectedSemester?.semester}
+      />
     </div>
   );
 };

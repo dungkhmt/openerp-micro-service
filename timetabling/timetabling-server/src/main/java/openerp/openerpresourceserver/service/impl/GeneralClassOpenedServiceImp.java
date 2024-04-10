@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.model.dto.request.general.UpdateClassesToNewGroupRequest;
 import openerp.openerpresourceserver.model.entity.Group;
 import openerp.openerpresourceserver.repo.GroupRepo;
+import openerp.openerpresourceserver.repo.RoomOccupationRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,18 +17,21 @@ import openerp.openerpresourceserver.model.dto.request.general.UpdateGeneralClas
 import openerp.openerpresourceserver.model.entity.general.GeneralClassOpened;
 import openerp.openerpresourceserver.repo.GeneralClassOpenedRepository;
 import openerp.openerpresourceserver.service.GeneralClassOpenedService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * GeneralClassOpenedServiceImp
  */
 @Service
+@AllArgsConstructor
 public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
 
-    @Autowired
     private GeneralClassOpenedRepository gcoRepo;
 
-    @Autowired
     private GroupRepo groupRepo;
+
+    private RoomOccupationRepo roomOccupationRepo;
+
 
     @Override
     public List<GeneralClassOpened> getGeneralClasses(String semester) {
@@ -129,5 +134,11 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
         }
         gcoRepo.saveAll(generalClassOpenedList);
         return gcoRepo.findAll();
+    }
+    @Transactional
+    @Override
+    public void deleteClassesBySemester(String semester) {
+        gcoRepo.deleteBySemester(semester);
+        roomOccupationRepo.deleteBySemester(semester);
     }
 }

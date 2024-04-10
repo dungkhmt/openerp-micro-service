@@ -11,5 +11,6 @@ import openerp.openerpresourceserver.model.entity.occupation.RoomOccupation;
 public interface RoomOccupationRepo extends JpaRepository<RoomOccupation, String> {
     
     public List<RoomOccupation> findAllBySemester(String semester);
-    
+
+    void deleteBySemester(String semester);
 } 

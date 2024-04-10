@@ -2,9 +2,8 @@ import React from "react";
 import { Chart } from "react-google-charts";
 import { useRoomOccupations } from "../hooks/useRoomOccupations";
 
-const RoomUsageChart = ({ semester, selectedWeek }) => {
-  const { loading, error, data } = useRoomOccupations(semester);
-  console.log(data);
+const RoomUsageChart = ({ semester, selectedWeek, startDate }) => {
+  const { loading, error, data } = useRoomOccupations(semester, startDate);
 
   let roomData = [
     [
