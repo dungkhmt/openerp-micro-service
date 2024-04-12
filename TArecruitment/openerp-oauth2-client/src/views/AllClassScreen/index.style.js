@@ -12,4 +12,18 @@ export const styles = {
     textDecoration: "underline",
     fontWeight: "bold",
   },
+  searchBox: {
+    width: "20%",
+    marginLeft: "auto",
+    marginRight: "1em",
+  },
+  searchArea: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "flex-end",
+  },
+  tableToolBar: {
+    marginLeft: "2em",
+    marginBottom: "1em",
+  },
 };

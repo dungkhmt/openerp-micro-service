@@ -32,6 +32,10 @@ const styles = {
   dropdown: {
     width: "30%",
   },
+  tableToolBar: {
+    marginLeft: "2em",
+    marginBottom: "1em",
+  },
 };
 
 export default styles;

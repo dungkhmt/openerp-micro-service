@@ -64,8 +64,10 @@ const RegisterClassScreen = () => {
   };
 
   return (
-    <div>
-      <h1>Tạo lớp học</h1>
+    <Paper elevation={1} style={{ padding: "1em" }}>
+      <div style={styles.tableToolBar}>
+        <h1>Tạo lớp học</h1>
+      </div>
 
       <Paper elevation={3}>
         <div style={styles.content}>
@@ -199,7 +201,7 @@ const RegisterClassScreen = () => {
           </div>
         </div>
       </Paper>
-    </div>
+    </Paper>
   );
 };
 

@@ -48,9 +48,9 @@ public class ClassCallServiceImpl implements ClassCallService {
     }
 
     @Override
-    public PaginationDTO<ClassCall> getClassBySemester(String semester, int page, int limit) {
+    public PaginationDTO<ClassCall> getClassBySemester(String semester, String search, int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<ClassCall> classCallsPage = classCallRepo.findBySemester(semester, pageable);
+        Page<ClassCall> classCallsPage = classCallRepo.findBySemester(semester, search, pageable);
 
         if (classCallsPage.isEmpty()) {
             throw new IllegalArgumentException("No classes found for semester " + semester);
