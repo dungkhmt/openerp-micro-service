@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component("postSellImpl")
@@ -171,5 +172,15 @@ public class PostSellImpl implements PostSellDao {
 
         return result.isEmpty() || result.get(0) == null ? 0L : result.get(0);
 
+    }
+
+    @Override
+    public PostSellEntity findById(Long postSellId) {
+        Optional<PostSellPostgresEntity> postgresEntityOptional = repository.findById(postSellId);
+        if (postgresEntityOptional.isPresent()) {
+            return this.mapper.map(postgresEntityOptional.get(), PostSellEntity.class);
+        } else {
+            return null;
+        }
     }
 }

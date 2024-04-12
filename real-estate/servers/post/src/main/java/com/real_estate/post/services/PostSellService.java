@@ -10,7 +10,9 @@ import com.real_estate.post.dtos.request.CreatePostSellRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,5 +118,13 @@ public class PostSellService {
 
 			return new PageImpl<>(entities, pageable, totalRecords);
 		}
+	}
+
+	public PostSellEntity getSellById(Long postSellId) {
+		PostSellEntity entity = postSellDao.findById(postSellId);
+		if (entity == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy bài viết");
+		}
+		return entity;
 	}
 }
