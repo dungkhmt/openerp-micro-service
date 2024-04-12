@@ -1,14 +1,14 @@
 package com.real_estate.common.utils;
 
 public enum DirectionsStatus {
-	NORTH("Bắc"),
-	SOUTH("Nam"),
-	WEST("Tây"),
-	EAST("Đông"),
-	EAST_NORTH("Đông Bắc"),
-	EAST_SOUTH("Đông Nam"),
-	WEST_SOUTH("Tây Nam"),
-	WEST_NORTH("Tây Bắc");
+	NORTH("NORTH"),
+	SOUTH("SOUTH"),
+	WEST("WEST"),
+	EAST("EAST"),
+	EAST_NORTH("EAST_NORTH"),
+	EAST_SOUTH("EAST_SOUTH"),
+	WEST_SOUTH("WEST_SOUTH"),
+	WEST_NORTH("WEST_NORTH");
 
 	private final String text;
 
