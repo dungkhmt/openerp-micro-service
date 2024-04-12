@@ -41,4 +41,7 @@ public interface PostSellDao {
             Long minBathroom,
             Long minBedroom,
             Long minParking
-    );}
+    );
+
+    public PostSellEntity findById(Long postSellId);
+}

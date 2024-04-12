@@ -1,6 +1,7 @@
 package com.real_estate.post.controllers;
 
 import com.real_estate.common.dtos.response.PageResponseDto;
+import com.real_estate.common.dtos.response.ResponseDto;
 import com.real_estate.common.models.PostSellEntity;
 import com.real_estate.common.utils.DirectionsStatus;
 import com.real_estate.common.utils.LegalDocuments;
@@ -11,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,6 +72,15 @@ public class PublicPostSellController {
                                                                  minParking
         );
         return ResponseEntity.status(HttpStatus.OK).body(new PageResponseDto<PostSellEntity>(200, sells));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get detail post sell by postsellId", operationId = "sell.getPostById")
+    public ResponseEntity<ResponseDto<PostSellEntity>> getPostSellById(
+            @PathVariable("id") Long postSellId
+    ) {
+        PostSellEntity entity = postSellService.getSellById(postSellId);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, entity));
     }
 
 }
