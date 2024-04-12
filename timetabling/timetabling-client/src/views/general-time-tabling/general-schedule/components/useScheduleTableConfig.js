@@ -3,12 +3,10 @@ import AutocompleteCell from "./AutoCompleteCell";
 import { request } from "api";
 import { useEffect, useState } from "react";
 
-export const useGeneralTableColumns = (setClasses) => {
+export const useGeneralTableColumns = (setClasses, setLoading) => {
   const [classRooms, setClassRooms] = useState([]);
   useEffect(() => {
     request("get", "/classroom/get-all", (res) => {
-      console.log("CLASSROOMs: ");
-      console.log(res.data);
       setClassRooms(res.data);
     });
   }, []);
@@ -29,6 +27,12 @@ export const useGeneralTableColumns = (setClasses) => {
     {
       headerName: "Nhóm",
       field: "groupName",
+      editable: true,
+      width: 120,
+    },
+    {
+      headerName: "Tuần học",
+      field: "learningWeeks",
       editable: true,
       width: 120,
     },
@@ -100,6 +104,7 @@ export const useGeneralTableColumns = (setClasses) => {
       editable: true,
       renderCell: (params) => (
         <AutocompleteCell
+          setLoading={setLoading}
           setClasses={setClasses}
           options={Array.from({ length: 5 }).map((_, index) => ({
             label: (index + 1)?.toString(),
@@ -114,6 +119,7 @@ export const useGeneralTableColumns = (setClasses) => {
       width: 80,
       renderCell: (params) => (
         <AutocompleteCell
+          setLoading={setLoading}
           setClasses={setClasses}
           options={Array.from({ length: 7 }).map((_, index) => ({
             label: index + 2 == 8 ? "Chủ nhật" : (index + 2).toString(),
@@ -128,6 +134,7 @@ export const useGeneralTableColumns = (setClasses) => {
       width: 120,
       renderCell: (params) => (
         <AutocompleteCell
+          setLoading={setLoading}
           setClasses={setClasses}
           options={classRooms?.map((classRoom, index) => ({
             label: classRoom?.classroom,

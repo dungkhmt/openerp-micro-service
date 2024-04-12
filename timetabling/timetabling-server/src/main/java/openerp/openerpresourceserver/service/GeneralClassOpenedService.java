@@ -19,4 +19,6 @@ public interface GeneralClassOpenedService {
     List<GeneralClassOpened> addClassesToNewGroup(List<String> ids, String groupName, String priorityBuilding) throws Exception;
 
     List<GeneralClassOpened> addClassesToCreatedGroup(List<String> ids, String groupName) throws Exception;
+
+    public void deleteClassesBySemester(String semester);
 }

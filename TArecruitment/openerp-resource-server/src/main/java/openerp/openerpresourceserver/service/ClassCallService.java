@@ -15,7 +15,7 @@ public interface ClassCallService {
 
     Optional<ClassCall> getClassById(int id);
 
-    PaginationDTO<ClassCall> getClassBySemester(String semester, int page, int limit);
+    PaginationDTO<ClassCall> getClassBySemester(String semester, String search, int page, int limit);
 
     ClassCall updateClass(int id, ClassCall classCall);
 

@@ -13,7 +13,7 @@ import GeneralSemesterAutoComplete from "views/general-time-tabling/common-compo
 import { request } from "api";
 import { toast } from "react-toastify";
 
-const AddWeekAcademicSemesterDialog = ({ open, setOpen }) => {
+const AddWeekAcademicSemesterDialog = ({ open, setOpen, setWeeks, setUpdateSelectedSemester }) => {
   const [numberOfWeeks, setNumOfWeeks] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const handleClose = () => {
@@ -33,7 +33,9 @@ const AddWeekAcademicSemesterDialog = ({ open, setOpen }) => {
       "/academic-weeks/",
       (res) => {
         setLoading(false);
-        console.log(res);
+        console.log(res.data);
+        setWeeks(res.data);
+        setUpdateSelectedSemester(selectedSemester);
         handleClose();
         toast.info("Tạo danh sách tuần thành công!");
       },
@@ -85,7 +87,10 @@ const AddWeekAcademicSemesterDialog = ({ open, setOpen }) => {
               )}
               label="Chọn ngày bắt đầu kỳ học"
               value={startDate}
-              onChange={(newValue) => setStartDate(newValue)}
+              onChange={(newValue) => {
+                console.log(new Date(newValue)?.getDate());
+                setStartDate(new Date(newValue));
+              }}
             />
           </LocalizationProvider>
         </div>

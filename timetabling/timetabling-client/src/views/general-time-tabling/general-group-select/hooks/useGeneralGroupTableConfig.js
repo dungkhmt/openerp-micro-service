@@ -25,6 +25,12 @@ export const useGroupTableConfig = () => {
       width: 120,
     },
     {
+      headerName: "Tuần học",
+      field: "learningWeeks",
+      editable: true,
+      width: 120,
+    },
+    {
       headerName: "Mã học phần",
       field: "moduleCode",
       editable: true,

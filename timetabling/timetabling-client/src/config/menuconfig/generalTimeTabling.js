@@ -28,7 +28,7 @@ export const generalTimeTabling = {
         id: "MENU_GENERAL_TIME_TABLING.ROOM_OCCUPATION",
         path: "/general-time-tabling/room-occupation",
         isPublic: true,
-        text: "Xem sơ đồ phòng học",
+        text: "Xem tình trạng phòng học",
         child: [],
       },
     ],

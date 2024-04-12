@@ -62,8 +62,10 @@ public class ApplicationController {
     public ResponseEntity<?> getApplicationBySemester(
             @PathVariable String semester,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int limit) {
-        PaginationDTO<Application> applications = applicationService.getApplicationBySemester(semester, page, limit);
+            @RequestParam(defaultValue = "5") int limit,
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "") String appStatus) {
+        PaginationDTO<Application> applications = applicationService.getApplicationBySemester(semester, search, appStatus, page, limit);
         return ResponseEntity.ok().body(applications);
     }
 
@@ -96,9 +98,11 @@ public class ApplicationController {
             @PathVariable String semester,
             @PathVariable String applicationStatus,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int limit) {
+            @RequestParam(defaultValue = "5") int limit,
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "") String assignStatus) {
         PaginationDTO<Application> applications =
-                applicationService.getApplicationByApplicationStatusAndSemester(applicationStatus, semester, page, limit);
+                applicationService.getApplicationByApplicationStatusAndSemester(applicationStatus, semester, search, assignStatus, page, limit);
         return ResponseEntity.ok().body(applications);
     }
 

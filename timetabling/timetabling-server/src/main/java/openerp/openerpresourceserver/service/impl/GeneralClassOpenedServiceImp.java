@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import openerp.openerpresourceserver.model.dto.request.general.UpdateClassesToNewGroupRequest;
+import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.helper.ClassTimeComparator;
 import openerp.openerpresourceserver.model.entity.Group;
+import openerp.openerpresourceserver.model.entity.general.RoomReservation;
+import openerp.openerpresourceserver.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.repo.GroupRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import openerp.openerpresourceserver.repo.RoomOccupationRepo;
 import org.springframework.stereotype.Service;
 
 import openerp.openerpresourceserver.model.dto.request.general.UpdateGeneralClassRequest;
@@ -15,18 +18,21 @@ import openerp.openerpresourceserver.model.dto.request.general.UpdateGeneralClas
 import openerp.openerpresourceserver.model.entity.general.GeneralClassOpened;
 import openerp.openerpresourceserver.repo.GeneralClassOpenedRepository;
 import openerp.openerpresourceserver.service.GeneralClassOpenedService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * GeneralClassOpenedServiceImp
  */
 @Service
+@AllArgsConstructor
 public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
 
-    @Autowired
     private GeneralClassOpenedRepository gcoRepo;
 
-    @Autowired
     private GroupRepo groupRepo;
+
+    private RoomOccupationRepo roomOccupationRepo;
+
 
     @Override
     public List<GeneralClassOpened> getGeneralClasses(String semester) {
@@ -42,37 +48,52 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
         throw new UnsupportedOperationException("Unimplemented method 'deleteAllGeneralClasses'");
     }
 
+    @Transactional
     @Override
     public GeneralClassOpened updateGeneralClassSchedule(UpdateGeneralClassScheduleRequest request) {
         GeneralClassOpened gClassOpened = gcoRepo.findById(Long.parseLong(request.getGeneralClassId())).orElse(null);
+        List<GeneralClassOpened> generalClassOpenedList = gcoRepo.findAll();
+        RoomReservation rr = gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1);
+        int startPeriod = rr.getStartTime();
+        int endPeriod = rr.getEndTime();
+        int weekDay = rr.getWeekday();
+        String classRoom = rr.getRoom();
+        List<RoomOccupation> roomOccupationList = roomOccupationRepo.findAllBySemesterAndClassCodeAndDayIndexAndStartPeriodAndEndPeriodAndClassRoom(gClassOpened.getSemester(), gClassOpened.getClassCode(), weekDay, startPeriod, endPeriod, classRoom);
+
         switch (request.getField()) {
             case "startTime":
-                if (/* Add to check conflict here */ false)
-                    throw new RuntimeException("Invalid schedule time!");
-                int startTime = Integer.parseInt(request.getValue());
-                int endTime = startTime +
-                        (gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex()) - 1).getEndTime()
-                                - gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex()) - 1)
-                                        .getStartTime());
-                gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex()) - 1)
-                        .setStartTime(startTime);
-                gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex()) - 1)
-                        .setEndTime(endTime);
-                gcoRepo.save(gClassOpened);
+                int duration = gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getEndTime() -
+                        gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getStartTime();
+                gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).setStartTime(Integer.parseInt(request.getValue()));
+                gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).setEndTime(Integer.parseInt(request.getValue())+duration);
+                if (!ClassTimeComparator.isConflict(Integer.parseInt(request.getScheduleIndex())-1,gClassOpened, generalClassOpenedList)) {
+                    roomOccupationList.forEach(ro->{
+                        ro.setStartPeriod(gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getStartTime());
+                        ro.setEndPeriod(gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getEndTime());
+                    });
+                    gcoRepo.save(gClassOpened);
+                    roomOccupationRepo.saveAll(roomOccupationList);
+                }
                 break;
             case "room":
-                if (/* Check conflitct room here */ false)
-                    throw new RuntimeException("Invalid schedule time!");
-                gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1)
-                        .setRoom(request.getValue());
-                gcoRepo.save(gClassOpened);
+                if (!ClassTimeComparator.isConflict(Integer.parseInt(request.getScheduleIndex())-1,gClassOpened, generalClassOpenedList)) {
+                    gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).setRoom(request.getValue());
+                    roomOccupationList.forEach(ro->{
+                        ro.setClassRoom(gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getRoom());
+                    });
+                    gcoRepo.save(gClassOpened);
+                    roomOccupationRepo.saveAll(roomOccupationList);
+                }
                 break;
             case "weekday":
-                if (/* Check conflitct room here */ false)
-                    throw new RuntimeException("Invalid schedule time!");
-                gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1)
-                        .setWeekday(Integer.parseInt(request.getValue()));
-                gcoRepo.save(gClassOpened);
+                gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).setWeekday(Integer.parseInt(request.getValue()));
+                if (!ClassTimeComparator.isConflict(Integer.parseInt(request.getScheduleIndex())-1,gClassOpened, generalClassOpenedList)) {
+                    roomOccupationList.forEach(ro->{
+                        ro.setDayIndex(gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getWeekday());
+                    });
+                    gcoRepo.save(gClassOpened);
+                    roomOccupationRepo.saveAll(roomOccupationList);
+                }
                 break;
             default:
                 break;
@@ -129,5 +150,11 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
         }
         gcoRepo.saveAll(generalClassOpenedList);
         return gcoRepo.findAll();
+    }
+    @Transactional
+    @Override
+    public void deleteClassesBySemester(String semester) {
+        gcoRepo.deleteBySemester(semester);
+        roomOccupationRepo.deleteBySemester(semester);
     }
 }

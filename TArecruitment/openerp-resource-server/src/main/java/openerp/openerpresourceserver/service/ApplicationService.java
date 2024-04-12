@@ -15,10 +15,10 @@ public interface ApplicationService {
 
     List<Application> getUniqueApplicator();
 
-    PaginationDTO<Application> getApplicationBySemester(String semester, int page, int limit);
+    PaginationDTO<Application> getApplicationBySemester(String semester, String search, String applicationStatus, int page, int limit);
 
     PaginationDTO<Application> getApplicationByApplicationStatusAndSemester(String applicationStatus,
-                                                                            String semester, int page, int limit);
+                                                                            String semester, String search, String assignStatus, int page, int limit);
 
     Application updateApplicationStatus(int id, String status);
 

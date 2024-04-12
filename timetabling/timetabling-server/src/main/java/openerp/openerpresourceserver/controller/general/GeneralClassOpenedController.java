@@ -3,15 +3,11 @@ package openerp.openerpresourceserver.controller.general;
 import java.util.ArrayList;
 import java.util.List;
 
+import openerp.openerpresourceserver.exception.ConflictScheduleException;
 import openerp.openerpresourceserver.model.dto.request.general.UpdateClassesToNewGroupRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import openerp.openerpresourceserver.model.dto.request.general.UpdateGeneralClassRequest;
 import openerp.openerpresourceserver.model.dto.request.general.UpdateGeneralClassScheduleRequest;
@@ -23,13 +19,15 @@ import openerp.openerpresourceserver.service.GeneralClassOpenedService;
 public class GeneralClassOpenedController {
     @Autowired
     private GeneralClassOpenedService gService;
-
+    @ExceptionHandler(ConflictScheduleException.class)
+    public ResponseEntity scheduleConflict(ConflictScheduleException e) {
+        return ResponseEntity.status(400).body(e.getCustomMessage());
+    }
 
     @GetMapping("/")
     public ResponseEntity<List<GeneralClassOpened>> getClasses(@RequestParam String semester) {
         try {
             List<GeneralClassOpened> generalClassOpenedList = gService.getGeneralClasses(semester);
-            System.out.println(generalClassOpenedList);
             return ResponseEntity.ok(generalClassOpenedList);
         } catch(Exception e) {
             System.err.println(e);
@@ -62,4 +60,9 @@ public class GeneralClassOpenedController {
         }
     }
 
+    @DeleteMapping("/")
+    public ResponseEntity deleteClassesBySemester(@RequestParam("semester") String semester) {
+        gService.deleteClassesBySemester(semester);
+        return ResponseEntity.ok("ok");
+    }
 }

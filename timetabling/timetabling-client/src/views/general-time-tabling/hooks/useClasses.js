@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { request } from "api";
+import { toast } from "react-toastify";
 
 export const useClasses = (group, semester) => {
   const [loading, setLoading] = useState(false);
@@ -36,12 +37,14 @@ export const useClasses = (group, semester) => {
         setLoading(false);
       },
       (error) => {
+        toast.error(error.response.data);
         console.error(error);
         setError(error);
+        setLoading(false);
       },
       { group, semester }
     );
   }, [group, semester]);
 
-  return { loading, error, classes, setClasses };
+  return { loading, error, classes, setClasses, setLoading };
 };

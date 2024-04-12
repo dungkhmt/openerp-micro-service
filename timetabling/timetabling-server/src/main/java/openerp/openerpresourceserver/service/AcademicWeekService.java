@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.model.entity.AcademicWeek;
 import openerp.openerpresourceserver.repo.AcademicWeekRepo;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,5 +36,12 @@ public class AcademicWeekService {
             e.printStackTrace(); // Handle parsing exception if the date string format is incorrect
         }
         return academicWeekRepo.saveAll(academicWeekList);
+    }
+    public List<AcademicWeek> getAllWeeks(String semester) {
+        return academicWeekRepo.findAllBySemester(semester);
+    }
+    @Transactional
+    public void deleteAllBySemester(String semester) {
+        academicWeekRepo.deleteBySemester(semester);
     }
 }
