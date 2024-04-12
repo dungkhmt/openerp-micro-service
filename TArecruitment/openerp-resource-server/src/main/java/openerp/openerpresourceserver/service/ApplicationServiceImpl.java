@@ -77,10 +77,11 @@ public class ApplicationServiceImpl implements ApplicationService{
     }
 
     @Override
-    public PaginationDTO<Application> getApplicationBySemester(String semester, int page, int limit) {
+    public PaginationDTO<Application> getApplicationBySemester(String semester, String search, String applicationStatus, int page, int limit) {
 
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Application> applicationPage = applicationRepo.findApplicationsByClassSemester(semester, pageable);
+        if(applicationStatus.equals("ALL")) applicationStatus = "";
+        Page<Application> applicationPage = applicationRepo.findApplicationsByClassSemester(semester, search, applicationStatus, pageable);
 
         PaginationDTO<Application> paginationDTO = new PaginationDTO<>();
 
@@ -93,9 +94,11 @@ public class ApplicationServiceImpl implements ApplicationService{
 
     @Override
     public PaginationDTO<Application> getApplicationByApplicationStatusAndSemester(String applicationStatus,
-                                                                                   String semester, int page, int limit) {
+                                                                                   String semester, String search, String assignStatus, int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Application> applicationPage = applicationRepo.findByApplicationStatusAndSemester(applicationStatus, semester, pageable);
+        if(assignStatus.equals("ALL")) assignStatus = "";
+        log.info(search + " + " + assignStatus);
+        Page<Application> applicationPage = applicationRepo.findByApplicationStatusAndSemester(applicationStatus, semester, search, assignStatus, pageable);
 
         PaginationDTO<Application> paginationDTO = new PaginationDTO<>();
 

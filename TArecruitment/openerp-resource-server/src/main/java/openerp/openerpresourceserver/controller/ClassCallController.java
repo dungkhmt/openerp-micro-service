@@ -67,9 +67,10 @@ public class ClassCallController {
     public ResponseEntity<?> getClassBySemester(
             @PathVariable String semester,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int limit) {
+            @RequestParam(defaultValue = "5") int limit,
+            @RequestParam(defaultValue = "") String search) {
         try {
-            PaginationDTO<ClassCall> paginationDTO = classCallService.getClassBySemester(semester, page, limit);
+            PaginationDTO<ClassCall> paginationDTO = classCallService.getClassBySemester(semester, search, page, limit);
             return ResponseEntity.ok().body(paginationDTO);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { request } from "../../api";
-import { Button } from "@mui/material";
+import { Button, TextField, Paper } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { SEMESTER } from "config/localize";
 import { DataGrid } from "@mui/x-data-grid";
@@ -19,31 +19,64 @@ const AllRegisterClassScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
 
+  const [search, setSearch] = useState("");
+
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
   );
 
+  const debouncedSearch = useCallback(
+    (search) => {
+      const timer = setTimeout(() => {
+        setPaginationModel({
+          ...DEFAULT_PAGINATION_MODEL,
+          page: 0,
+        });
+        handleFetchData();
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [search]
+  );
+
   useEffect(() => {
-    setIsLoading(true);
-    request(
-      "get",
-      `/class-call/get-class-by-semester/${SEMESTER}?page=${paginationModel.page}&limit=${paginationModel.pageSize}`,
-      (res) => {
-        setClasses(res.data.data);
-        setTotalElements(res.data.totalElement);
-        setIsLoading(false);
-      }
-    ).then();
+    return debouncedSearch(search);
+  }, [search, debouncedSearch]);
+
+  useEffect(() => {
+    handleFetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginationModel]);
 
   useEffect(() => {
     fetchRegisteredData();
   }, []);
 
+  const handleFetchData = () => {
+    const searchParam =
+      search !== "" ? `&search=${encodeURIComponent(search)}` : "";
+    setIsLoading(true);
+    request(
+      "get",
+      `/class-call/get-class-by-semester/${SEMESTER}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}`,
+      (res) => {
+        setClasses(res.data.data);
+        setTotalElements(res.data.totalElement);
+        setIsLoading(false);
+      }
+    );
+  };
+
   const fetchRegisteredData = () => {
     request("get", `/class-call/get-my-registered-class/${SEMESTER}`, (res) => {
       setRegisteredClass(res.data);
     });
+  };
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
   };
 
   const handleRegister = (klass) => {
@@ -101,8 +134,20 @@ const AllRegisterClassScreen = () => {
   }));
 
   return (
-    <div>
-      <h1>Danh sách lớp học</h1>
+    <Paper elevation={3} style={{ paddingTop: "1em" }}>
+      <div style={styles.tableToolBar}>
+        <h1>Danh sách lớp học</h1>
+
+        <TextField
+          style={styles.searchBox}
+          variant="outlined"
+          name="search"
+          value={search}
+          onChange={handleSearch}
+          placeholder="Tìm kiếm"
+        />
+      </div>
+
       <DataGrid
         loading={isLoading}
         rowHeight={60}
@@ -119,7 +164,7 @@ const AllRegisterClassScreen = () => {
         checkboxSelection={false}
         disableRowSelectionOnClick
       />
-    </div>
+    </Paper>
   );
 };
 
