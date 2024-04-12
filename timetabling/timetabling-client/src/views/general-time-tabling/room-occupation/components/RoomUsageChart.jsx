@@ -1,39 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Chart } from "react-google-charts";
 import { useRoomOccupations } from "../hooks/useRoomOccupations";
 
 const RoomUsageChart = ({ semester, selectedWeek, startDate }) => {
   const { loading, error, data } = useRoomOccupations(semester, startDate);
-
-  let roomData = [
+  const [roomData, setRoomData] = useState([
     [
       { type: "string", id: "Room" },
       { type: "string", id: "Name" },
-      { type: "number", id: "Start" },
-      { type: "number", id: "End" },
+      { type: "date", id: "Start" },
+      { type: "date", id: "End" },
     ],
-  ];
+  ]);
 
-  if (data?.length > 1) {
-    roomData = [
-      [
-        { type: "string", id: "Room" },
-        { type: "string", id: "Name" },
-        { type: "number", id: "Start" },
-        { type: "number", id: "End" },
-      ],
-    ];
-    console.log(
-      data?.filter(
-        (room, index) => room?.at(2) > 0 && room?.at(3) < (selectedWeek + 1) * 7 *12
-      )
-    );
-    roomData = roomData.concat(
-      data?.filter(
-        (room, index) => room?.at(2) > 0 && room?.at(3) < (selectedWeek + 1) * 7 *12
-      )
-    );
-  }
+  let initRoomData = [
+    [
+      { type: "string", id: "Room" },
+      { type: "string", id: "Name" },
+      { type: "date", id: "Start" },
+      { type: "date", id: "End" },
+    ],
+  ]
+
+  useEffect(() => {
+    if (selectedWeek === null) return;
+    if (data?.length > 1) {
+      let weekendDate = new Date(startDate);
+      weekendDate.setDate(startDate.getDate() + 7);
+      setRoomData(prevRoomData => initRoomData.concat(
+        data?.filter(
+          (room, index) => room?.at(2) > startDate && room?.at(3) < weekendDate
+        )
+      ));
+    }
+  }, [selectedWeek]);
 
   return data ? (
     <Chart
@@ -44,7 +44,7 @@ const RoomUsageChart = ({ semester, selectedWeek, startDate }) => {
       data={roomData}
       options={{
         timeline: {
-          colorByRowLabel: true
+          colorByRowLabel: true,
         },
         allowHtml: true,
       }}

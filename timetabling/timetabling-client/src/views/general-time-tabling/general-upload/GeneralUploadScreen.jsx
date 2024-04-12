@@ -49,6 +49,7 @@ const GeneralUploadScreen = () => {
               selectedSemester={selectedSemester}
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
+              setClasses={setClasses}
             />
             <div className="flex">
               {deleteLoading && <FacebookCircularProgress />}

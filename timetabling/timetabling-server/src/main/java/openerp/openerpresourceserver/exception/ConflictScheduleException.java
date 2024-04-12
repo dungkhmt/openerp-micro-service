@@ -10,5 +10,7 @@ public class ConflictScheduleException extends RuntimeException {
     public ConflictScheduleException(String customMessage) {
         super();
         this.customMessage = customMessage;
-    }}
+        System.err.println(customMessage);
+    }
+}
 

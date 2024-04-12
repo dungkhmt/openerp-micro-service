@@ -71,7 +71,8 @@ public class GeneralExcelHelper {
      *                to GCO.
      * @return
      */
-    public static List<GeneralClassOpened> convertFromExcelToGeneralClassOpened(InputStream inputStream, String semester) {
+    public static List<GeneralClassOpened> convertFromExcelToGeneralClassOpened(InputStream inputStream,
+            String semester) {
         try {
             Workbook workbook = new XSSFWorkbook(inputStream);
             Sheet sheet = workbook.getSheet(SHEET);
@@ -102,7 +103,8 @@ public class GeneralExcelHelper {
                             default:
                                 break;
                         }
-                        if (classInfoCell.getColumnIndex() >= START_COL_TO_READ_CLASS_SCHEDULE && classInfoCell.getCellStyle() != null) {
+                        if (classInfoCell.getColumnIndex() >= START_COL_TO_READ_CLASS_SCHEDULE
+                                && classInfoCell.getCellStyle() != null) {
                             XSSFColor bgColor = (XSSFColor) classInfoCell.getCellStyle().getFillBackgroundColorColor();
                             if (bgColor != null && "FFFFC000".equals(bgColor.getARGBHex())) {
                                 if (cellValue != null && !cellValue.equals("")) {
@@ -139,31 +141,32 @@ public class GeneralExcelHelper {
                                     generalClassOpened.setModuleName(cellValue);
                                     break;
                                 case 4:
-                                    generalClassOpened.setMass(cellValue);
+                                    generalClassOpened.setLearningWeeks(cellValue);
                                     break;
                                 case 5:
-                                    generalClassOpened.setQuantityMax(cellValue);
+                                    generalClassOpened.setMass(cellValue);
                                     break;
                                 case 6:
-                                    generalClassOpened.setStudyClass(cellValue);
+                                    generalClassOpened.setQuantityMax(cellValue);
                                     break;
                                 case 7:
-                                    generalClassOpened.setState(cellValue);
+                                    generalClassOpened.setStudyClass(cellValue);
                                     break;
                                 case 8:
-                                    if(cellValue.equals("")) continue;
-                                    generalClassOpened.setClassCode(cellValue);
+                                    generalClassOpened.setState(cellValue);
                                     break;
                                 case 9:
+                                    if (cellValue.equals(""))
+                                        continue;
+                                    generalClassOpened.setClassCode(cellValue);
+                                    break;
+                                case 10:
                                     generalClassOpened.setCrew(cellValue);
                                     break;
-                                case 11:
-                                    generalClassOpened.setOpenBatch(cellValue);
-                                    generalClassOpened.setLearningWeeks(
-                                        Converter.convertOpenBatchToLearningWeeks(generalClassOpened.getOpenBatch())
-                                    );
-                                    break;
                                 case 12:
+                                    generalClassOpened.setOpenBatch(cellValue);
+                                    break;
+                                case 13:
                                     generalClassOpened.setCourse(cellValue);
                                     break;
                                 default:
@@ -173,8 +176,6 @@ public class GeneralExcelHelper {
                     }
                 }
                 generalClassOpened.setSemester(semester);
-                // Log for classes imported
-                // System.out.println(generalClassOpened);
                 convertedList.add(generalClassOpened);
             }
             workbook.close();

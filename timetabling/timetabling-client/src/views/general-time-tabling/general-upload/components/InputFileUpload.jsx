@@ -21,6 +21,7 @@ const VisuallyHiddenInput = styled("input")({
 export default function InputFileUpload({
   selectedFile,
   setSelectedFile,
+  setClasses,
   selectedSemester,
 }) {
   const inputRef = React.useRef();
@@ -39,7 +40,26 @@ export default function InputFileUpload({
         "post",
         `/excel/upload-general?semester=${selectedSemester?.semester}`,
         (res) => {
-          console.log(res);
+          console.log(res?.data);
+          let generalClasses = [];
+          res.data?.forEach((classObj) => {
+            if (classObj?.classCode !== null && classObj?.timeSlots) {
+              classObj.timeSlots.forEach((timeSlot, index) => {
+                const cloneObj = JSON.parse(
+                  JSON.stringify({
+                    ...classObj,
+                    ...timeSlot,
+                    classCode: classObj.classCode,
+                    id: classObj.id + `-${index + 1}`,
+                  })
+                );
+                delete cloneObj.timeSlots;
+                generalClasses.push(cloneObj);
+              });
+            }
+          });
+          console.log(generalClasses);
+          setClasses(generalClasses);
           setIsLoading(false);
         },
         (err) => {
@@ -67,7 +87,7 @@ export default function InputFileUpload({
         }
       >
         {selectedFile === null
-          ? "Tải danh sách lớp"
+          ? "Chọn danh sách lớp"
           : `TKB-${selectedSemester.semester}`}
         <VisuallyHiddenInput
           ref={inputRef}

@@ -18,7 +18,6 @@ public class RoomOccupationSeriviceImp implements RoomOccupationService {
 
     @Override
     public List<RoomOccupation> getRoomOccupationsBySemester(String semester) {
-        System.out.println("\n\n\n\n" + roomOccupationRepo.findAllBySemester(semester).get(0).getClassCode());
         return roomOccupationRepo.findAllBySemester(semester);
     }
 
@@ -31,5 +30,5 @@ public class RoomOccupationSeriviceImp implements RoomOccupationService {
     public void saveAll(List<RoomOccupation> roomOccupations) {
         roomOccupationRepo.saveAll(roomOccupations);
     }
-    
+
 }

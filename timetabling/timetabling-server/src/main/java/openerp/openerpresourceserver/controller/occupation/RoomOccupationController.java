@@ -24,7 +24,6 @@ public class RoomOccupationController {
 
     @GetMapping("/get-all")
     public ResponseEntity<List<RoomOccupation>> getRoomOccupation (@RequestParam("semester") String semester) {
-        System.out.println("\n\n\n" + semester + "\n\n\n");
         try {
             return ResponseEntity.ok(roomService.getRoomOccupationsBySemester(semester));
         } catch (Exception e) {

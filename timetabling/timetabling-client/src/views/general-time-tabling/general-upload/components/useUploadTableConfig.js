@@ -13,6 +13,12 @@ export const useUploadTableConfig = () => {
           width: 150,
         },
         {
+          headerName: "Tuần học",
+          field: "learningWeeks",
+          editable: true,
+          width: 120,
+        },
+        {
           headerName: "Nhóm",
           field: "groupName",
           editable: true,

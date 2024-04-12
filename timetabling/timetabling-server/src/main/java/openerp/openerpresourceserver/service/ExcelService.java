@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +26,8 @@ import java.util.Objects;
 
 import openerp.openerpresourceserver.helper.ExcelHelper;
 import openerp.openerpresourceserver.helper.GeneralExcelHelper;
+import openerp.openerpresourceserver.helper.LearningWeekExtractor;
+import openerp.openerpresourceserver.helper.LearningWeekValidator;
 
 @Service
 public class ExcelService {
@@ -99,66 +102,26 @@ public class ExcelService {
             List<RoomOccupation> roomOccupations = new ArrayList<>();
             generalClassOpenedList.forEach(generalClass -> {
                 generalClass.getTimeSlots().forEach(timeSlot -> {
-                    switch (generalClass.getOpenBatch().trim()) {
-                        case "AB":
-                            for (int i = 1; i <= 16; i++) {
-                                roomOccupations.add(
-                                        new RoomOccupation(timeSlot.getRoom(),
-                                                generalClass.getClassCode(),
-                                                timeSlot.getStartTime(),
-                                                timeSlot.getEndTime(),
-                                                generalClass.getCrew(),
-                                                timeSlot.getWeekday(),
-                                                i, "study", generalClass.getSemester()));
-                            }
-                            break;
-                        case "A":
-                            for (int i = 1; i <= 8; i++) {
-                                roomOccupations.add(
-                                        new RoomOccupation(timeSlot.getRoom(),
-                                                generalClass.getClassCode(),
-                                                timeSlot.getStartTime(),
-                                                timeSlot.getEndTime(),
-                                                generalClass.getCrew(),
-                                                timeSlot.getWeekday(), i, "study", generalClass.getSemester()));
-                            }
-                            break;
-                        case "B":
-                            for (int i = 9; i <= 16; i++) {
-                                roomOccupations.add(
-                                        new RoomOccupation(timeSlot.getRoom(),
-                                                generalClass.getClassCode(),
-                                                timeSlot.getStartTime(),
-                                                timeSlot.getEndTime(),
-                                                generalClass.getCrew(),
-                                                timeSlot.getWeekday(), i, "study", generalClass.getSemester()));
-                            }
-                            break;
-                        case "chẵn":
-                            for (int i = 2; i <= 16; i += 2) {
-                                roomOccupations.add(
-                                        new RoomOccupation(timeSlot.getRoom(),
-                                                generalClass.getClassCode(),
-                                                timeSlot.getStartTime(),
-                                                timeSlot.getEndTime(),
-                                                generalClass.getCrew(),
-                                                timeSlot.getWeekday(), i, "study", generalClass.getSemester()));
-                            }
-                            break;
-                        case "lẻ":
-                            for (int i = 1; i <= 16; i += 2) {
-                                roomOccupations.add(
-                                        new RoomOccupation(timeSlot.getRoom(),
-                                                generalClass.getClassCode(),
-                                                timeSlot.getStartTime(),
-                                                timeSlot.getEndTime(),
-                                                generalClass.getCrew(),
-                                                timeSlot.getWeekday(), i, "study", generalClass.getSemester()));
-                            }
-                            break;
-                        default:
-                            break;
-                    }
+                    List<String> learningWeekStrings = Arrays.asList(generalClass.getLearningWeeks().trim().split(","));
+                    learningWeekStrings.forEach(learningWeek -> {
+                        if(
+                            LearningWeekValidator.validate(learningWeek)
+                        ) {
+                            LearningWeekExtractor.extract(learningWeek).forEach(weekInt->{
+                                roomOccupations.add(new RoomOccupation(
+                                    timeSlot.getRoom(),
+                                    generalClass.getClassCode(),
+                                    timeSlot.getStartTime(),
+                                    timeSlot.getEndTime(),
+                                    generalClass.getCrew(),
+                                    timeSlot.getWeekday(),
+                                    weekInt,
+                                    "study",
+                                    generalClass.getSemester()
+                                ));
+                            });
+                        }
+                    });
                 });
             });
             gcoRepo.saveAll(generalClassOpenedList);

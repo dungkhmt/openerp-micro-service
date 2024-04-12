@@ -61,7 +61,6 @@ public class ExcelController {
     @PostMapping(value = "/upload-general")
     public ResponseEntity uploadFileGeneralCLassOpened(@RequestParam("file") MultipartFile file,
             @RequestParam("semester") String semester) {
-        System.out.println("\n\n\n\n\nUpload file success! \n\n\n\n" + semester);
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
                 List<GeneralClassOpened> classOpenedConflict = fileService.saveGeneralClassOpeneds(file, semester);

@@ -5,7 +5,6 @@ export const useRoomOccupations = (semester, startDate) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
-  console.log(startDate);
   useEffect(() => {
     if (!semester || !startDate) return;
 
@@ -20,7 +19,7 @@ export const useRoomOccupations = (semester, startDate) => {
             const formattedData = res.data?.map((timeSlot) =>
               formatTimeSlot(timeSlot, startDate)
             );
-            console.log(formatTimeSlot);
+            console.log(formattedData);
             setData(formattedData);
           },
           (error) => {
@@ -69,24 +68,23 @@ export const useRoomOccupations = (semester, startDate) => {
   };
 
   const formatTimeSlot = (timeSlot, startDate) => {
-    console.log(startDate);
     const offset = timeSlot.crew === "C" ? 6 : 0;
-    const start = startDate;
-    const { startHours, startMinutes } = getTimeByPeriod(
+    const start = new Date(startDate);
+    const { hours: startHours, minutes: startMinutes } = getTimeByPeriod(
       timeSlot.startPeriod + offset
     );
-    const { endHours, endMinutes } = getTimeByPeriod(
+    const { hours: endHours, minutes: endMinutes } = getTimeByPeriod(
       timeSlot.endPeriod + offset
     );
     start.setHours(startHours);
     start.setDate(
-      start.getDate() + (timeSlot.weekIndex - 1) * 7 + timeSlot.dayIndex - 1
+      start.getDate() + (Number(timeSlot.weekIndex) - 1) * 7 + Number(timeSlot.dayIndex) - 2
     );
     start.setMinutes(startMinutes);
     const end = new Date(startDate);
     end.setHours(endHours);
     end.setDate(
-      end.getDate() + (timeSlot.weekIndex - 1) * 7 + timeSlot.dayIndex - 1
+      end.getDate() + (Number(timeSlot.weekIndex) - 1) * 7 + Number(timeSlot.dayIndex) - 2
     );
     end.setMinutes(endMinutes);
     return [timeSlot.classRoom, timeSlot.classCode, start, end];
