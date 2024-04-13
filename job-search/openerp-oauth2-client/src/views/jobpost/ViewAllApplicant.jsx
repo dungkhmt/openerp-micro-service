@@ -11,9 +11,12 @@ import {
     Row,
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
+import { useParams } from 'react-router-dom';
 
-const ViewAllJobPost = () => {
-
+const ViewAllApplicant = () => {
+    
+    let { id } = useParams();
+    id = "dungpq"
     const [title, setTitle] = useState("Thực tập sinh dot net")
     const [description, setDescription] = useState("không có lương đâu")
     const [requirements, setRequirements] = useState("10 năm kinh nghiệm")
@@ -28,7 +31,7 @@ const ViewAllJobPost = () => {
           }).then();
     }, [])
     useEffect(() => {
-        request("get", "/job-post", (res) => {
+        request("get", `/job-post/user/${id}`, (res) => {
             setAllJobPostForm(res.data)
         }).then();
     }, [])
@@ -55,7 +58,7 @@ const ViewAllJobPost = () => {
                         <strong>Job salary</strong>: {jobPost.salary ? jobPost.salary : "thương lượng"}
                     </Typography>
                     <CardActions>
-                        <Button size="small" onClick={() => goToUrl(`/view-job-post/${jobPost.id}`)}>More Detail</Button>
+                        <Button size="small" onClick={() => goToUrl(`/view-job-post-applicant/${jobPost.id}`)}>View All CV Applicant</Button>
                     </CardActions>
                 </CardContent>
             </Card>
@@ -66,4 +69,4 @@ const ViewAllJobPost = () => {
     )
 }
 
-export default ViewAllJobPost;
+export default ViewAllApplicant;

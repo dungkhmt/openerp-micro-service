@@ -25,7 +25,12 @@ const CreateJobPost = () => {
         locations: "location",
         salary: 4.0
     })
-
+    const [user, setUser] = useState({})
+    useEffect(() => {
+        request("get", "/user/get-user-data", (res) => {
+            setUser(res.data)
+          }).then();
+    }, [])
     const handleInputChange = (event) => {
         setJobPostForm({
             ...jobPostForm,

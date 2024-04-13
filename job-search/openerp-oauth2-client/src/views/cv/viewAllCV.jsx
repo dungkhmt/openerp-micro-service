@@ -12,15 +12,9 @@ import {
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
 
-const ViewAllJobPost = () => {
+const ViewAllCV = () => {
 
-    const [title, setTitle] = useState("Thực tập sinh dot net")
-    const [description, setDescription] = useState("không có lương đâu")
-    const [requirements, setRequirements] = useState("10 năm kinh nghiệm")
-    const [location, setLocation] = useState("Hà Nội")
-    const [salary, setSalary] = useState(0)
-
-    const [allJobPostForm, setAllJobPostForm] = useState([])
+    const [allCV, setAllCV] = useState([])
     const [user, setUser] = useState({})
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
@@ -28,8 +22,8 @@ const ViewAllJobPost = () => {
           }).then();
     }, [])
     useEffect(() => {
-        request("get", "/job-post", (res) => {
-            setAllJobPostForm(res.data)
+        request("get", "/employee-cv/user/dungpq", (res) => {
+            setAllCV(res.data)
         }).then();
     }, [])
 
@@ -39,23 +33,26 @@ const ViewAllJobPost = () => {
 
     return (
         <>
-        {allJobPostForm.map((jobPost, index) => (
+        {allCV.map((cv, index) => (
             <Card  sx={{ minWidth: 275 }}>
                 <CardContent>
                     <Typography variant="h4" component="div">
-                        your dream job here
+                        {cv.employeeCV?.title}
                     </Typography>
                     <Typography variant="body2">
-                        <strong>Job title</strong>: {jobPost.title}
+                        <strong>cv description</strong>: {cv.employeeCV?.description}
                     </Typography>
                     <Typography variant="body2">
-                        <strong>Job location</strong>: {jobPost.locations}
+                        <strong>skill</strong>: {cv.skills[0]?.skillName}
                     </Typography>
                     <Typography variant="body2">
-                        <strong>Job salary</strong>: {jobPost.salary ? jobPost.salary : "thương lượng"}
+                        <strong>education</strong>: {cv.educations[0]?.schoolName}
+                    </Typography>
+                    <Typography variant="body2">
+                        <strong>experience</strong>: {cv.experiences[0]?.experience}
                     </Typography>
                     <CardActions>
-                        <Button size="small" onClick={() => goToUrl(`/view-job-post/${jobPost.id}`)}>More Detail</Button>
+                        <Button size="small" onClick={() => goToUrl(`/view-job-post`)}>More Detail</Button>
                     </CardActions>
                 </CardContent>
             </Card>
@@ -66,4 +63,4 @@ const ViewAllJobPost = () => {
     )
 }
 
-export default ViewAllJobPost;
+export default ViewAllCV;
