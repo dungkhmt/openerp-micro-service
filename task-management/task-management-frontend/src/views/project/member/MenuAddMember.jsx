@@ -15,12 +15,12 @@ import {
 import PropTypes from "prop-types";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useSelector, useDispatch } from "react-redux";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
 import { LoadingButton } from "../../../components/mui/button/LoadingButton";
 import { useDebounce } from "../../../hooks/useDebounce";
-import { useProjectContext } from "../../../hooks/useProjectContext";
-import { ProjectService } from "../../../services/api/project.service";
 import { UserService } from "../../../services/api/user.service";
+import { addMember } from "../../../store/project";
 
 function renderUserItem(user) {
   const { firstName, lastName, id } = user;
@@ -68,7 +68,9 @@ function renderUserItem(user) {
 }
 
 const MenuAddMember = ({ anchorEl, onClose }) => {
-  const { members, project, setIsUpdate } = useProjectContext();
+  const { members, project } = useSelector((state) => state.project);
+  const dispatch = useDispatch();
+
   const [addLoading, setAddLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [users, setUsers] = useState([]);
@@ -101,12 +103,13 @@ const MenuAddMember = ({ anchorEl, onClose }) => {
     if (!selectedUser) return;
     try {
       setAddLoading(true);
-      await ProjectService.addMember({
-        projectId: project.id,
-        userId: selectedUser.id,
-      });
+      await dispatch(
+        addMember({
+          projectId: project.id,
+          userId: selectedUser.id,
+        })
+      );
       toast.success("Thêm thành viên thành công");
-      setIsUpdate((prev) => !prev);
       handleClose();
     } catch (e) {
       console.log(e);

@@ -1,13 +1,16 @@
-import { Box, CircularProgress, Tab, Typography, styled } from "@mui/material";
-import MuiTabList from "@mui/lab/TabList";
-import { TabContext, TabPanel } from "@mui/lab";
 import { Icon } from "@iconify/react";
-import { useState } from "react";
+import { TabContext, TabPanel } from "@mui/lab";
+import PerfectScrollbar from "react-perfect-scrollbar";
+import MuiTabList from "@mui/lab/TabList";
+import { Box, Tab, styled } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useEffect } from "react";
-import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
-import { useProjectContext } from "../../hooks/useProjectContext";
+import { ProjectViewCalendar } from "./calendar/ProjectViewCalendar";
 import { ProjectViewMembers } from "./member/ProjectViewMembers";
+import { ProjectViewOverview } from "./overview/ProjectViewOverview";
+import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
+import { ProjectViewGanttChart } from "./gantt-chart/ProjectViewGanttChart";
+import { usePreventOverflow } from "../../hooks/usePreventOverflow";
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   "& .MuiTabs-indicator": {
@@ -40,19 +43,23 @@ const TabList = styled(MuiTabList)(({ theme }) => ({
 
 const ProjectViewRight = () => {
   const { id, tab } = useParams();
-  const { isLoading: projectLoading } = useProjectContext();
   const [activeTab, setActiveTab] = useState(tab);
 
+  const { ref, updateMaxHeight } = usePreventOverflow();
+
   const navigate = useNavigate();
+
+  const handleChange = (event, value) => {
+    navigate(`/project/${id}/${value}`);
+  };
 
   useEffect(() => {
     setActiveTab(tab);
   }, [tab]);
 
-  const handleChange = (event, value) => {
-    setActiveTab(value);
-    navigate(`/project/${id}/${value}`);
-  };
+  useEffect(() => {
+    updateMaxHeight();
+  }, [window?.innerHeight, ref]);
 
   return (
     <TabContext value={activeTab}>
@@ -60,6 +67,12 @@ const ProjectViewRight = () => {
         variant="scrollable"
         scrollButtons="auto"
         onChange={handleChange}
+        sx={{
+          position: "sticky",
+          top: "46px",
+          backgroundColor: "background.default",
+          zIndex: 10,
+        }}
       >
         <Tab
           value="overview"
@@ -90,18 +103,18 @@ const ProjectViewRight = () => {
               sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
             >
               <Icon fontSize={20} icon="mdi:calendar" />
-              Timeline
+              Lịch
             </Box>
           }
         />
         <Tab
-          value="activity"
+          value="gantt-chart"
           label={
             <Box
               sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
             >
-              <Icon fontSize={20} icon="ic:baseline-history" />
-              Hoạt động
+              <Icon fontSize={20} icon="fluent:gantt-chart-16-filled" />
+              Gantt Chart
             </Box>
           }
         />
@@ -122,47 +135,42 @@ const ProjectViewRight = () => {
             <Box
               sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
             >
-              <Icon fontSize={20} icon="mdi:application-edit-outline" />
+              <Icon fontSize={20} icon="uiw:setting" />
               Quản lý
             </Box>
           }
         />
       </TabList>
-      <Box>
-        {projectLoading ? (
-          <Box
-            sx={{
-              mt: 6,
-              display: "flex",
-              alignItems: "center",
-              flexDirection: "column",
-            }}
-          >
-            <CircularProgress sx={{ mb: 4 }} />
-            <Typography>Loading...</Typography>
-          </Box>
-        ) : (
-          <>
-            <TabPanel sx={{ p: 0 }} value="overview">
-              Overview
-            </TabPanel>
-            <TabPanel sx={{ p: 0 }} value="tasks">
-              <ProjectViewTasks />
-            </TabPanel>
-            <TabPanel sx={{ p: 0 }} value="timeline">
-              Timeline
-            </TabPanel>
-            <TabPanel sx={{ p: 0 }} value="activity">
-              History
-            </TabPanel>
-            <TabPanel sx={{ p: 0 }} value="members">
-              <ProjectViewMembers />
-            </TabPanel>
-            <TabPanel sx={{ p: 0 }} value="setting">
-              Quản lý
-            </TabPanel>
-          </>
-        )}
+      <Box
+        ref={ref}
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          overflowY: "auto",
+          mt: 1.5,
+        }}
+      >
+        <PerfectScrollbar style={{ flex: 1 }}>
+          <TabPanel sx={{ p: 0 }} value="overview">
+            <ProjectViewOverview />
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="tasks">
+            <ProjectViewTasks />
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="timeline">
+            <ProjectViewCalendar />
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="gantt-chart">
+            <ProjectViewGanttChart />
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="members">
+            <ProjectViewMembers />
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="setting">
+            Quản lý
+          </TabPanel>
+        </PerfectScrollbar>
       </Box>
     </TabContext>
   );

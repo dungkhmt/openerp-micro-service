@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hust.openerp.taskmanagement.dto.PaginationDTO;
 import com.hust.openerp.taskmanagement.dto.ProjectDTO;
 import com.hust.openerp.taskmanagement.dto.dao.HistoryDao;
+import com.hust.openerp.taskmanagement.dto.form.ProjectForm;
 import com.hust.openerp.taskmanagement.entity.Project;
 import com.hust.openerp.taskmanagement.entity.ProjectMember;
 import com.hust.openerp.taskmanagement.exception.ProjectNotFoundException;
@@ -94,10 +95,10 @@ public class ProjectController {
   }
 
   @PutMapping("{projectId}")
-  public ProjectDTO updateProject(@PathVariable("projectId") UUID projectId, @RequestBody Project entity) {
+  public ProjectDTO updateProject(@PathVariable("projectId") UUID projectId, @RequestBody ProjectForm entity) {
     var project = projectService.updateProject(projectId, entity);
     var projectDto = modelMapper.map(project, ProjectDTO.class);
-    projectDto.setTaskCount(taskService.countTasksByProjectId(projectId));
+    // projectDto.setTaskCount(taskService.countTasksByProjectId(projectId));
     return projectDto;
   }
 

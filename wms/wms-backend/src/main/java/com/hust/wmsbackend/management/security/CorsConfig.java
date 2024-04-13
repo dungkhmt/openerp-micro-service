@@ -17,8 +17,8 @@ public class CorsConfig {
     @Bean
     @SuppressWarnings("unchecked")
     public FilterRegistrationBean<CorsFilter> corsFilterRegistrationBean(
-            @Value("${app.cors.allowed-origins}")
-            List<String> allowedOrigins
+//            @Value("${app.cors.allowed-origins}")
+//            List<String> allowedOrigins
     ) {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);

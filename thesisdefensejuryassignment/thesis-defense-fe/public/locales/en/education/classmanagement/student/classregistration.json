@@ -1,0 +1,15 @@
+{
+  "title": "Registration - Semester ",
+  "columns": {
+    "classCode": "Class Code",
+    "courseId": "Course Code",
+    "name": "Course Name",
+    "classType": "Course Type",
+    "departmentId": "Faculty",
+    "join": "Join"
+  },
+  "registerNoti": {
+    "success": "Register success. Please wait for the teacher's approval.",
+    "error": "An error occurred while registering the class. Retry"
+  }
+}

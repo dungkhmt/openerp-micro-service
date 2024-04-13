@@ -1,3 +1,4 @@
+import { Icon } from "@iconify/react";
 import {
   Box,
   Card,
@@ -9,22 +10,18 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import PropTypes from "prop-types";
-import CustomChip from "../../../components/mui/chip";
-import { useProjectContext } from "../../../hooks/useProjectContext";
-import {
-  getCategoryColor,
-  getPriorityColor,
-  getStatusColor,
-} from "../../../utils/color.util";
-import { parseLogItemDetail } from "../../../utils/text-parse.util";
-import { Icon } from "@iconify/react";
 import MDEditor from "@uiw/react-md-editor";
+import PropTypes from "prop-types";
 import { useState } from "react";
-import { FileService } from "../../../services/api/file.service";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { TaskCategory } from "../../../components/task/category";
+import { TaskPriority } from "../../../components/task/priority";
+import { TaskStatus } from "../../../components/task/status";
 import { useTaskContext } from "../../../hooks/useTaskContext";
+import { FileService } from "../../../services/api/file.service";
+import { parseLogItemDetail } from "../../../utils/text-parse.util";
 
 const TextHighlight = styled(Typography)(({ theme }) => ({
   color: theme.palette.secondary.dark,
@@ -44,8 +41,12 @@ const TextState = styled(Typography)({
 });
 
 const FieldComponent = ({ field, value, isOld = false }) => {
-  const { statuses, categories, priorities, members, project } =
-    useProjectContext();
+  const { members, project } = useSelector((state) => state.project);
+  const {
+    category: categoryStore,
+    priority: priorityStore,
+    status: statusStore,
+  } = useSelector((state) => state);
   const { task } = useTaskContext();
 
   let category, status, priority, assignee, fileName, fileId, subTask;
@@ -106,44 +107,14 @@ const FieldComponent = ({ field, value, isOld = false }) => {
         </TextHighlight>
       );
     case "categoryId":
-      category = categories.find((c) => c.categoryId === value);
-      return (
-        category && (
-          <CustomChip
-            size="small"
-            skin="light"
-            label={category.categoryName}
-            color={getCategoryColor(category.categoryId)}
-            sx={{ textDecoration: isOld ? "line-through" : "none" }}
-          />
-        )
-      );
+      category = categoryStore.categories.find((c) => c.categoryId === value);
+      return category && <TaskCategory category={category} />;
     case "priorityId":
-      priority = priorities.find((p) => p.priorityId === value);
-      return (
-        priority && (
-          <CustomChip
-            size="small"
-            skin="light"
-            label={priority.priorityName}
-            color={getPriorityColor(priority.priorityId)}
-            sx={{ textDecoration: isOld ? "line-through" : "none" }}
-          />
-        )
-      );
+      priority = priorityStore.priorities.find((p) => p.priorityId === value);
+      return priority && <TaskPriority priority={priority} />;
     case "statusId":
-      status = statuses.find((s) => s.statusId === value);
-      return (
-        status && (
-          <CustomChip
-            size="small"
-            skin="light"
-            label={status.description}
-            color={getStatusColor(status.statusId)}
-            sx={{ textDecoration: isOld ? "line-through" : "none" }}
-          />
-        )
-      );
+      status = statusStore.statuses.find((s) => s.statusId === value);
+      return status && <TaskStatus status={status} />;
     case "assigneeId":
       assignee = members.find((m) => m.member.id === value);
 

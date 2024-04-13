@@ -3,19 +3,32 @@ import { useEffect, useState } from "react";
 import { request } from "api";
 import { DataGrid } from "@mui/x-data-grid";
 
+const DEFAULT_PAGINATION_MODEL = {
+  page: 0,
+  pageSize: 5,
+};
+
 const ApplicatorDialog = ({ open, handleClose, classId }) => {
   const [applicators, setApplicators] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
+
+  const [paginationModel, setPaginationModel] = useState(
+    DEFAULT_PAGINATION_MODEL
+  );
 
   useEffect(() => {
+    setIsLoading(true);
     request(
       "get",
-      `/application/get-application-by-class/${classId}`,
+      `/application/get-application-by-class/${classId}?page=${paginationModel.page}&limit=${paginationModel.pageSize}`,
       (res) => {
-        setApplicators(res.data);
-        console.log(res.data);
+        setApplicators(res.data.data);
+        setTotalElements(res.data.totalElement);
+        setIsLoading(false);
       }
     );
-  }, [classId]);
+  }, [classId, paginationModel]);
 
   const dataGridColumns = [
     {
@@ -75,18 +88,17 @@ const ApplicatorDialog = ({ open, handleClose, classId }) => {
         </DialogTitle>
         <DialogContent>
           <DataGrid
+            loading={isLoading}
             rowHeight={60}
             sx={{ fontSize: 16 }}
             rows={dataGridRows}
             columns={dataGridColumns}
             autoHeight
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 5,
-                },
-              },
-            }}
+            rowCount={totalElements}
+            pagination
+            paginationMode="server"
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
             pageSizeOptions={[5]}
             checkboxSelection={false}
             disableRowSelectionOnClick

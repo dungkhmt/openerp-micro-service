@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import springfox.documentation.spring.web.json.Json;
 
 import java.util.Objects;
 
@@ -38,6 +39,7 @@ public class ClassOpened {
     private String secondClassroom;
     private Boolean isSeparateClass = false;
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -53,5 +55,15 @@ public class ClassOpened {
     @Override
     public int hashCode() {
         return Objects.hash(moduleName, moduleCode, classCode);
+    }
+
+    public boolean getIsEnoughTimeTableInfo() {
+        if(classroom== null || startPeriod == null || weekday == null || weekday == null) {
+            return false;
+        }
+        if(isSeparateClass == true && (secondClassroom==null || secondWeekday == null || secondStartPeriod == null )) {
+            return false;
+        }
+        return true;
     }
 }

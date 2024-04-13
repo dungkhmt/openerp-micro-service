@@ -5,25 +5,20 @@ import {
   Card,
   Divider,
   LinearProgress,
-  Skeleton,
   Tooltip,
   Typography,
   styled,
 } from "@mui/material";
 import dayjs from "dayjs";
 import { memo } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { UserAvatar } from "../../components/common/avatar/UserAvatar";
-import CustomChip from "../../components/mui/chip";
-import { useProjectContext } from "../../hooks/useProjectContext";
+import { TaskCategory } from "../../components/task/category";
+import { TaskPriority } from "../../components/task/priority";
+import { TaskStatus } from "../../components/task/status";
 import { useTaskContext } from "../../hooks/useTaskContext";
-import {
-  getCategoryColor,
-  getDueDateColor,
-  getPriorityColor,
-  getProgressColor,
-  getStatusColor,
-} from "../../utils/color.util";
+import { getDueDateColor, getProgressColor } from "../../utils/color.util";
 
 const TitleWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -34,57 +29,25 @@ const TitleWrapper = styled(Box)(({ theme }) => ({
   },
 }));
 
-const Loading = () => (
-  <Card>
-    <Box sx={{ p: 6 }}>
-      <Skeleton variant="text" width={70} />
-      <Skeleton variant="text" width={100} />
-
-      <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
-      <Skeleton variant="text" width={80} />
-      <Skeleton variant="circular" width={35} height={35} />
-
-      <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
-      <Skeleton variant="text" width={70} />
-      <Skeleton variant="text" width={120} />
-
-      <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
-      <Skeleton variant="text" width={80} />
-      <Skeleton variant="text" width={120} />
-
-      <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
-      <Skeleton variant="text" width={70} />
-      <Skeleton variant="text" width={40} />
-
-      <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
-      <Skeleton variant="text" width={60} />
-      <Skeleton variant="text" width={35} />
-
-      <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
-      <Skeleton variant="text" width={65} />
-      <Skeleton variant="text" width={45} />
-    </Box>
-  </Card>
-);
-
 const TaskViewRight = () => {
-  const { isLoading: taskLoading, task } = useTaskContext();
+  const { task } = useTaskContext();
+  const { project } = useSelector((state) => state.project);
   const {
-    isLoading: projectLoading,
-    project,
-    statuses,
-    priorities,
-    categories,
-  } = useProjectContext();
+    category: categoryStore,
+    priority: priorityStore,
+    status: statusStore,
+  } = useSelector((state) => state);
 
-  if (taskLoading || projectLoading) return <Loading />;
-
-  const category = categories.find((c) => c.categoryId === task.categoryId);
-  const priority = priorities.find((p) => p.priorityId === task.priorityId);
-  const status = statuses.find((s) => s.statusId === task.statusId);
+  const category = categoryStore.categories.find(
+    (c) => c.categoryId === task.categoryId
+  );
+  const priority = priorityStore.priorities.find(
+    (p) => p.priorityId === task.priorityId
+  );
+  const status = statusStore.statuses.find((s) => s.statusId === task.statusId);
 
   return (
-    <Card>
+    <Card sx={{ position: "sticky", top: 0, mr: 2 }}>
       <Box sx={{ p: 6 }}>
         <Typography>Chi tiết</Typography>
 
@@ -246,14 +209,7 @@ const TaskViewRight = () => {
               Trạng thái
             </Typography>
           </TitleWrapper>
-          {status && (
-            <CustomChip
-              size="small"
-              skin="light"
-              label={status.description}
-              color={getStatusColor(status.statusId)}
-            />
-          )}
+          {status && <TaskStatus status={status} />}
         </Box>
 
         {/* priority */}
@@ -265,14 +221,7 @@ const TaskViewRight = () => {
               Ưu tiên
             </Typography>
           </TitleWrapper>
-          {priority && (
-            <CustomChip
-              size="small"
-              skin="light"
-              label={priority.priorityName}
-              color={getPriorityColor(priority.priorityId)}
-            />
-          )}
+          {priority && <TaskPriority priority={priority} showText />}
         </Box>
 
         {/* category */}
@@ -284,14 +233,7 @@ const TaskViewRight = () => {
               Danh mục
             </Typography>
           </TitleWrapper>
-          {category && (
-            <CustomChip
-              size="small"
-              skin="light"
-              label={category.categoryName}
-              color={getCategoryColor(category.categoryId)}
-            />
-          )}
+          {category && <TaskCategory category={category} />}
         </Box>
       </Box>
     </Card>

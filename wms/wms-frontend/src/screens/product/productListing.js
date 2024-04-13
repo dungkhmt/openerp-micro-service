@@ -36,6 +36,7 @@ const ProductListing =  () => {
     fetchData();
   }, []);
 
+  const history = useHistory();
   return (
     isLoading ? <LoadingScreen /> :
     <Fragment>
@@ -51,7 +52,7 @@ const ProductListing =  () => {
           sorting: true,
         }}
         onRowClick={ (event, rowData) => {
-          window.location.href = `${path}/update/${rowData.productId}`;
+          history.push(`${path}/update/${rowData.productId}`);
         } } 
         actions={[
           {

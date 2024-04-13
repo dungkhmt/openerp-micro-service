@@ -1,6 +1,7 @@
 package com.hust.wmsbackend.management.controller;
 
 import com.hust.wmsbackend.management.service.EntityAuthorizationService;
+import com.hust.wmsbackend.management.service.impl.EntityAuthorizationServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class EntityAuthorizationController {
 
-    private EntityAuthorizationService entityAuthorizationService;
+    private EntityAuthorizationServiceImpl entityAuthorizationService;
 
     /**
      * > Get all the entity ids that the user has access to

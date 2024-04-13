@@ -19,7 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class ClassOpenedServiceImpl implements ClassOpenedService {
@@ -123,7 +125,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
             return;
         }
 
-        //main class
+        //Get the main class detail information
         String startPeriod = requestDto.getStartPeriod();
         String weekday = requestDto.getWeekday();
         String classroom = requestDto.getClassroom();
@@ -131,7 +133,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         String subClassroom = classroom != null ? classroom : classOpened.getClassroom();
         String subWeekday = weekday != null ? weekday : classOpened.getWeekday();
 
-        //second class
+        //Get the second class detail information
         String secondStartPeriod = requestDto.getSecondStartPeriod();
         String secondWeekday = requestDto.getSecondWeekday();
         String secondClassroom = requestDto.getSecondClassroom();
@@ -139,6 +141,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         String secondSubClassroom = secondClassroom != null ? secondClassroom : classOpened.getSecondClassroom();
         String secondSubWeekday = secondWeekday != null ? secondWeekday : classOpened.getSecondWeekday();
 
+        // Check conflict for this class
         if (subStartPeriod != null && subClassroom != null && subWeekday != null) {
             this.checkConflictSchedule(classOpened, requestDto);
         }
@@ -248,7 +251,15 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
     }
 
     private Long calculateTotalPeriod(String mass) {
+        String pattern = "a\\((\\d+(-\\d+)*)\\)";
+        if (Pattern.compile(pattern).matcher(mass).matches()) {
+            System.out.println("Pattern matched!");
+        } else {
+            System.out.println("Pattern not matched!");
+        }
+        mass.replaceAll("\\s+","");
         //a(b-c-d-e) => b-c-d-e => b,c,d,e => b+c
+        //Need validation for pattern.
         String numbersString = mass.trim().substring(2, mass.indexOf(')'));
         String[] numbersArray = numbersString.split("-");
         return Long.parseLong(numbersArray[0]) + Long.parseLong(numbersArray[1]);
@@ -275,7 +286,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         int outOfDay = 0;
         int countClass4Period = 0;
 
-        //Tự động sắp xếp lịch học
+        // Tự động sắp xếp lịch học
         for (ClassOpened elClass : listClassMakeSchedule) {
             long totalPeriodOfClass = this.calculateTotalPeriod(elClass.getMass());
             if (totalPeriodOfClass == CLASS_ENABLE_SEPARATE) {
@@ -295,9 +306,9 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
                         .filter(obj -> elWeekday.equals(obj.getSecondWeekday()))
                         .toList();
                 if (existedClasses.isEmpty() && existedSecondClasses.isEmpty()) {
-                    //ngày hôm elWeekday chưa được gán lớp học nào
+                    // ngày hôm elWeekday chưa được gán lớp học nào
                     countClassForSeparate = this.setTimeStudyForElClass(elClass, elWeekday, DEFAULT_START_PERIOD, countClassForSeparate);
-                    //check thoát khỏi vòng lặp từng ngày trong tuần
+                    // check thoát khỏi vòng lặp từng ngày trong tuần
                     if (!elClass.getIsSeparateClass() || countClassForSeparate == MAX_CLASS_FOR_CLASS_OPENED) break;
                 } else {
                     //Đã có lớp học vào ngày hôm đó
@@ -315,7 +326,7 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
             }
 
             //kiểm tra lớp học đã được gán thời gian học chưa
-            //Sảy ra khi tất cả các ngày trong tuần đều đã được gán lớp học
+            //Xảy ra khi tất cả các ngày trong tuần đều đã được gán lớp học
             if (elClass.getStartPeriod() == null) {
                 elClass.setStartPeriod(DEFAULT_START_PERIOD);
                 elClass.setWeekday(weekdayArray[outOfDay]);
@@ -330,6 +341,13 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         }
     }
 
+    /**
+     * @param listClassMakeSchedule Danh sách các lớp học được gán.
+     * @param priorityBuilding Tòa nhà ưu tiên.
+     * @implNote
+     * Hàm này được sử dụng để tự động gán tòa nhà ưu tiên cho danh sách các lóp
+     * 
+     */
     private void autoSetClassroom(List<ClassOpened> listClassMakeSchedule, String priorityBuilding) {
         for (ClassOpened elClass : listClassMakeSchedule) {
             Boolean isSeparateClass = elClass.getIsSeparateClass();
@@ -476,7 +494,15 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
         return countClassForSeparate;
     }
 
+    /**
+     * @param existedClasses .Các lớp không tách và lớp tách
+     * @param existedSecondClasses .Các lớp tách kíp sau
+     * @return 
+     * Hàm trả về tiết đầu tiên thỏa mãn trong danh sách lịch học giữa các lớp trong 1 ngày.
+     */
     private Long calculateStartPeriod(List<ClassOpened> existedClasses, List<ClassOpened> existedSecondClasses) {
+        //minStartPeriod: Tiết học sớm nhất.
+        //sumTotalPeriod: Tổng cộng số tiết học        
         long minStartPeriod = 1;
         long sumTotalPeriod = 0;
 
@@ -519,5 +545,108 @@ public class ClassOpenedServiceImpl implements ClassOpenedService {
             el.setSecondStartPeriod(null);
             classOpenedRepo.save(el);
         });
+    }
+
+    public void autoMakeGeneralSchedule(AutoMakeScheduleDto autoMakeScheduleDto) {
+        int maxPeriod = 12;
+
+        String semester = autoMakeScheduleDto.getSemester();
+        String groupName = autoMakeScheduleDto.getGroupName();
+        String weekdayPriority = autoMakeScheduleDto.getWeekdayPriority();
+        Boolean isClassroomArranged = autoMakeScheduleDto.getIsClassroomArranged();
+        String priorityBuilding = this.getPriorityBuilding(groupName);
+
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        List<ClassOpened> classOpenedList = classOpenedRepo.getAllBySemesterAndGroupName(semester, groupName, sort);
+        if (classOpenedList.isEmpty()) {
+            return;
+        }
+        int[] weekDays = Arrays
+                .stream(weekdayPriority.split(","))
+                .mapToInt(Integer::parseInt)
+                .toArray();
+        for(ClassOpened classOpened : classOpenedList) {
+            long courseLength = calculateTotalPeriod(classOpened.getMass());
+            String crew = classOpened.getCrew();
+            List<Classroom> classroomList = classroomRepo
+                    .findClassroomByBuildingAndQuantityMaxAfter(
+                            priorityBuilding, Long.valueOf(classOpened.getQuantityMax()));
+            for (int day : weekDays) {
+                for (int curPeriod = 1; curPeriod<= 12; curPeriod++) {
+                    /*Check if the course is separable*/
+                    if(courseLength == 4 && curPeriod % 6 == 2 && !classOpened.getIsSeparateClass()) {
+                        long startPeriod = curPeriod;
+                        long endPeriod = calculateFinishPeriod(classOpened.getMass(), startPeriod, true);
+                        /*Check if classList doesnt have any class at that time*/
+                        if(!checkTimeConflict(classOpenedList, startPeriod, endPeriod, day, crew)) {
+                            for (Classroom classroom : classroomList) {
+                                /*Check if at that time, the room is empty*/
+                                if (!checkRoomConflict(classOpenedList, classroom, startPeriod, endPeriod, day, crew)) {
+                                    classOpened.setStartPeriod(String.valueOf(startPeriod));
+                                    classOpened.setWeekday(String.valueOf(day));
+                                    classOpened.setClassroom(classroom.getClassroom());
+                                    classOpened.setIsSeparateClass(true);
+
+                                    break;
+                                }
+                            }
+                        }
+                    } else if(classOpened.getIsSeparateClass()
+                            && classOpened.getSecondClassroom() == null
+                            && classOpened.getSecondStartPeriod() == null
+                            && classOpened.getSecondWeekday() == null
+                    ) {
+                        if(Integer.parseInt(classOpened.getWeekday()) != day) {
+                            long seperateStartPeriod = curPeriod;
+                            long seperateEndPeriod = calculateFinishPeriod(classOpened.getMass(), seperateStartPeriod, true);
+                            for (Classroom classroom : classroomList) {
+                                /*Check if at that time, the room is empty*/
+                                if(!checkRoomConflict(classOpenedList, classroom, seperateStartPeriod, seperateEndPeriod, day, crew)) {
+                                    classOpened.setStartPeriod(String.valueOf(seperateStartPeriod));
+                                    classOpened.setWeekday(String.valueOf(day));
+                                    classOpened.setClassroom(classroom.getClassroom());
+                                    classOpened.setIsSeparateClass(true);
+
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+
+                    } else {
+                        long startPeriod = curPeriod;
+                        long endPeriod = calculateFinishPeriod(classOpened.getMass(), startPeriod, false);
+                        /*Check if classList doesnt have any class at that time*/
+                        if(!checkTimeConflict(classOpenedList, startPeriod, endPeriod, day, crew)) {
+                            for (Classroom classroom : classroomList) {
+                                /*Check if at that time, the room is empty*/
+                                if (!checkRoomConflict(classOpenedList, classroom, startPeriod, endPeriod, day, crew)) {
+                                    classOpened.setStartPeriod(String.valueOf(startPeriod));
+                                    classOpened.setWeekday(String.valueOf(day));
+                                    classOpened.setClassroom(classroom.getClassroom());
+                                    classOpened.setIsSeparateClass(true);
+
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            /*If the classOpened info is enough
+            then save to database*/
+            if(classOpened.getIsEnoughTimeTableInfo()) {
+                classOpenedRepo.save(classOpened);
+            }
+        }
+    }
+
+    private boolean checkTimeConflict(List<ClassOpened> classOpenedList, long startPeriod, long endPeriod, int day, String crew) {
+        
+        return false;
+    }
+
+    private boolean checkRoomConflict(List<ClassOpened> classOpenedList, Classroom classroom, long startPeriod, long endPeriod, int day, String crew) {
+        return false;
     }
 }

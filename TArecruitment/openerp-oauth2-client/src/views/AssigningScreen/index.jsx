@@ -1,5 +1,5 @@
 import { request } from "api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { SEMESTER } from "config/localize";
 import {
   Button,
@@ -8,29 +8,86 @@ import {
   MenuItem,
   Select,
   Tooltip,
+  TextField,
+  Paper,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
+import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { errorNoti } from "utils/notification";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
+
+const DEFAULT_PAGINATION_MODEL = {
+  page: 0,
+  pageSize: 5,
+};
 
 const AssigningScreen = () => {
   const [applications, setApplications] = useState([]);
   const [originalApplications, setOriginalApplications] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
+
+  const [paginationModel, setPaginationModel] = useState(
+    DEFAULT_PAGINATION_MODEL
+  );
+
+  const [isFilter, setIsFilter] = useState(false);
+
+  const [statusFilter, setStatusFilter] = useState("ALL");
+
+  const [search, setSearch] = useState("");
+
+  const debouncedSearch = useCallback(
+    (search, statusFilter) => {
+      const timer = setTimeout(() => {
+        console.log({ search, statusFilter });
+        console.log(
+          "Test stringify " + JSON.stringify({ statusFilter, search })
+        );
+        setPaginationModel({
+          ...DEFAULT_PAGINATION_MODEL,
+          page: 0,
+        });
+        handleFetchData();
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [search, statusFilter]
+  );
+
+  useEffect(() => {
+    return debouncedSearch(search, statusFilter);
+  }, [search, statusFilter, debouncedSearch]);
+
   useEffect(() => {
     handleFetchData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paginationModel]);
 
   const handleFetchData = () => {
+    const searchParam =
+      search !== "" ? `&search=${encodeURIComponent(search)}` : "";
+    const assignStatusParam =
+      statusFilter !== "" ? `&assignStatus=${statusFilter}` : "";
+
+    console.log({ searchParam, assignStatusParam });
+
+    setIsLoading(true);
     request(
       "get",
-      `/application/get-application-by-status-and-semester/${SEMESTER}/APPROVED`,
+      `/application/get-application-by-status-and-semester/${SEMESTER}/APPROVED?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}${assignStatusParam}`,
       (res) => {
-        setApplications(res.data);
-        setOriginalApplications(res.data);
-        console.log(res.data);
+        setApplications(res.data.data);
+        setOriginalApplications(res.data.data);
+        setTotalElements(res.data.totalElement);
+        setIsLoading(false);
       }
     );
   };
@@ -83,9 +140,19 @@ const AssigningScreen = () => {
   };
 
   const handleAutoAssign = () => {
+    setIsLoading(true);
     request("get", `/application/auto-assign-class/${SEMESTER}`, (res) => {
       handleFetchData();
+      setIsLoading(false);
     });
+  };
+
+  const handleChangeStatusFilter = (e) => {
+    setStatusFilter(e.target.value);
+  };
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
   };
 
   const assignStatusCell = (params) => {
@@ -99,18 +166,7 @@ const AssigningScreen = () => {
         }}
         id="application-status"
         name="application-status"
-        sx={{
-          boxShadow: "none",
-          ".MuiOutlinedInput-notchedOutline": { border: 0 },
-          "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-            border: 0,
-          },
-          "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-            {
-              border: 0,
-            },
-          width: 145,
-        }}
+        sx={styles.selection}
       >
         <MenuItem value="APPROVED">
           <Chip label="APPROVED" color="success" variant="outlined" />
@@ -204,7 +260,7 @@ const AssigningScreen = () => {
     {
       field: "assignStatus",
       headerName: "Trạng thái",
-      flex: 1,
+      flex: 1.2,
       renderCell: assignStatusCell,
       align: "center",
       headerAlign: "center",
@@ -231,34 +287,103 @@ const AssigningScreen = () => {
     note: application.note,
   }));
 
+  const FilterComponent = () => {
+    return (
+      <div style={{ display: "flex" }}>
+        <h3>Trạng thái: </h3>
+        <Select
+          value={statusFilter}
+          id="application-status"
+          name="application-status"
+          sx={styles.selection}
+          onChange={(e) => {
+            handleChangeStatusFilter(e);
+          }}
+        >
+          <MenuItem value="ALL">
+            <Chip label="ALL" color="primary" variant="outlined" />
+          </MenuItem>
+          <MenuItem value="APPROVED">
+            <Chip label="APPROVED" color="success" variant="outlined" />
+          </MenuItem>
+          <MenuItem value="PENDING">
+            <Chip label="PENDING" color="warning" variant="outlined" />
+          </MenuItem>
+          <MenuItem value="CANCELED">
+            <Chip label="CANCELED" color="error" variant="outlined" />
+          </MenuItem>
+        </Select>
+      </div>
+    );
+  };
+
   return (
-    <div>
-      <h1>Phân công trợ giảng</h1>
-      <Button
-        style={styles.autoButton}
-        variant="contained"
-        onClick={handleAutoAssign}
-      >
-        Sắp xếp tự động
-      </Button>
+    <Paper elevation={3} style={{ paddingTop: "1em" }}>
+      <div style={styles.tableToolBar}>
+        <h1>Phân công trợ giảng</h1>
+        <div style={styles.toolLine}>
+          <div style={styles.leftTool}>
+            <Tooltip title="Phân loại">
+              <IconButton>
+                {isFilter ? (
+                  <FilterAltIcon
+                    color="primary"
+                    fontSize="large"
+                    onClick={() => setIsFilter(false)}
+                  />
+                ) : (
+                  <FilterAltOffIcon
+                    fontSize="large"
+                    onClick={() => setIsFilter(true)}
+                  />
+                )}
+              </IconButton>
+            </Tooltip>
+
+            <Button
+              style={styles.autoButton}
+              variant="contained"
+              onClick={handleAutoAssign}
+            >
+              Sắp xếp tự động
+            </Button>
+
+            <Tooltip title="Xuất file">
+              <IconButton color="primary">
+                <FileDownloadIcon fontSize="large" />
+              </IconButton>
+            </Tooltip>
+          </div>
+
+          <TextField
+            style={styles.searchBox}
+            variant="outlined"
+            name="search"
+            value={search}
+            onChange={handleSearch}
+            placeholder="Tìm kiếm"
+          />
+        </div>
+        {isFilter && <FilterComponent />}
+      </div>
+
       <DataGrid
+        loading={isLoading}
         rowHeight={60}
         sx={{ fontSize: 16 }}
         rows={dataGridRows}
         columns={dataGridColumns}
         autoHeight
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 5,
-            },
-          },
-        }}
+        rowCount={totalElements}
+        pagination
+        paginationMode="server"
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[5, 10, 20]}
         checkboxSelection={false}
         disableRowSelectionOnClick
       />
-    </div>
+    </Paper>
   );
 };
 

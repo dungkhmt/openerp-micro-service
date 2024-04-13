@@ -26,13 +26,13 @@ import AnalyticsIcon from '@mui/icons-material/Analytics';
 import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
 import { buildMapPathMenu } from "utils/MenuUtils";
-import { general } from "./menuconfig/general";
 import { teacher } from "./menuconfig/teacher";
 import { user } from "./menuconfig/user";
 // import {schedule} from "./menuconfig/schedule"
 import {scheduleInformation} from "./menuconfig/scheduleInformation"
 // import {schedulePerformance} from "./menuconfig/schedulePerformance"
 import {courseTimeTabling} from "./menuconfig/courseTimeTabling"
+import { generalTimeTabling } from "./menuconfig/generalTimeTabling";
 
 export const MENUS = [];
 
@@ -43,6 +43,7 @@ MENUS.push(teacher);
 MENUS.push(scheduleInformation);
 // MENUS.push(schedulePerformance);
 MENUS.push(courseTimeTabling);
+MENUS.push(generalTimeTabling);
 
 export const menuIconMap = new Map();
 

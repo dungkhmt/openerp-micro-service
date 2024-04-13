@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.controller;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.PaginationDTO;
 import openerp.openerpresourceserver.entity.ClassCall;
 import openerp.openerpresourceserver.service.ClassCallService;
 import org.apache.coyote.Response;
@@ -26,9 +27,10 @@ public class ClassCallController {
     }
 
     @GetMapping("/get-all-class")
-    public ResponseEntity<?> getAllClass() {
-        List<ClassCall> classCalls = classCallService.getAllClass();
-        return ResponseEntity.ok().body(classCalls);
+    public ResponseEntity<?> getAllClass(@RequestParam(defaultValue = "0") int page,
+                                         @RequestParam(defaultValue = "5") int limit) {
+        PaginationDTO<ClassCall> paginationDTO = classCallService.getAllClass(page, limit);
+        return ResponseEntity.ok().body(paginationDTO);
     }
 
     @GetMapping("/get-class/{id}")
@@ -62,10 +64,14 @@ public class ClassCallController {
     }
 
     @GetMapping("/get-class-by-semester/{semester}")
-    public ResponseEntity<?> getClassBySemester(@PathVariable String semester) {
+    public ResponseEntity<?> getClassBySemester(
+            @PathVariable String semester,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int limit,
+            @RequestParam(defaultValue = "") String search) {
         try {
-            List<ClassCall> classCalls = classCallService.getClassBySemester(semester);
-            return ResponseEntity.ok().body(classCalls);
+            PaginationDTO<ClassCall> paginationDTO = classCallService.getClassBySemester(semester, search, page, limit);
+            return ResponseEntity.ok().body(paginationDTO);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
