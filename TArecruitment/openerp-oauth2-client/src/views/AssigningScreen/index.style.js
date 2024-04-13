@@ -1,6 +1,7 @@
 const styles = {
   autoButton: {
-    marginBottom: "2em",
+    marginLeft: "1em",
+    marginRight: "1em",
   },
   selection: {
     boxShadow: "none",
@@ -12,6 +13,22 @@ const styles = {
       border: 0,
     },
     width: 145,
+  },
+  searchBox: {
+    width: "20%",
+  },
+  tableToolBar: {
+    marginLeft: "2em",
+    marginBottom: "1em",
+  },
+  toolLine: {
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: "1em",
+  },
+  leftTool: {
+    display: "flex",
+    alignItems: "center",
   },
 };
 

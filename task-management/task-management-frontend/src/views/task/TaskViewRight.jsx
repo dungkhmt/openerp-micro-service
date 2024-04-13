@@ -14,15 +14,11 @@ import { memo } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { UserAvatar } from "../../components/common/avatar/UserAvatar";
-import CustomChip from "../../components/mui/chip";
+import { TaskCategory } from "../../components/task/category";
+import { TaskPriority } from "../../components/task/priority";
+import { TaskStatus } from "../../components/task/status";
 import { useTaskContext } from "../../hooks/useTaskContext";
-import {
-  getCategoryColor,
-  getDueDateColor,
-  getPriorityColor,
-  getProgressColor,
-  getStatusColor,
-} from "../../utils/color.util";
+import { getDueDateColor, getProgressColor } from "../../utils/color.util";
 
 const TitleWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -213,14 +209,7 @@ const TaskViewRight = () => {
               Trạng thái
             </Typography>
           </TitleWrapper>
-          {status && (
-            <CustomChip
-              size="small"
-              skin="light"
-              label={status.description}
-              color={getStatusColor(status.statusId)}
-            />
-          )}
+          {status && <TaskStatus status={status} />}
         </Box>
 
         {/* priority */}
@@ -232,14 +221,7 @@ const TaskViewRight = () => {
               Ưu tiên
             </Typography>
           </TitleWrapper>
-          {priority && (
-            <CustomChip
-              size="small"
-              skin="light"
-              label={priority.priorityName}
-              color={getPriorityColor(priority.priorityId)}
-            />
-          )}
+          {priority && <TaskPriority priority={priority} showText />}
         </Box>
 
         {/* category */}
@@ -251,14 +233,7 @@ const TaskViewRight = () => {
               Danh mục
             </Typography>
           </TitleWrapper>
-          {category && (
-            <CustomChip
-              size="small"
-              skin="light"
-              label={category.categoryName}
-              color={getCategoryColor(category.categoryId)}
-            />
-          )}
+          {category && <TaskCategory category={category} />}
         </Box>
       </Box>
     </Card>

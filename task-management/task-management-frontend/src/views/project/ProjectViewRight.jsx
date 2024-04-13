@@ -9,6 +9,7 @@ import { ProjectViewCalendar } from "./calendar/ProjectViewCalendar";
 import { ProjectViewMembers } from "./member/ProjectViewMembers";
 import { ProjectViewOverview } from "./overview/ProjectViewOverview";
 import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
+import { ProjectViewGanttChart } from "./gantt-chart/ProjectViewGanttChart";
 import { usePreventOverflow } from "../../hooks/usePreventOverflow";
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
@@ -107,13 +108,13 @@ const ProjectViewRight = () => {
           }
         />
         <Tab
-          value="activity"
+          value="gantt-chart"
           label={
             <Box
               sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
             >
-              <Icon fontSize={20} icon="ic:baseline-history" />
-              Hoạt động
+              <Icon fontSize={20} icon="fluent:gantt-chart-16-filled" />
+              Gantt Chart
             </Box>
           }
         />
@@ -134,7 +135,7 @@ const ProjectViewRight = () => {
             <Box
               sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
             >
-              <Icon fontSize={20} icon="mdi:application-edit-outline" />
+              <Icon fontSize={20} icon="uiw:setting" />
               Quản lý
             </Box>
           }
@@ -160,8 +161,8 @@ const ProjectViewRight = () => {
           <TabPanel sx={{ p: 0, pr: 2 }} value="timeline">
             <ProjectViewCalendar />
           </TabPanel>
-          <TabPanel sx={{ p: 0, pr: 2 }} value="activity">
-            History
+          <TabPanel sx={{ p: 0, pr: 2 }} value="gantt-chart">
+            <ProjectViewGanttChart />
           </TabPanel>
           <TabPanel sx={{ p: 0, pr: 2 }} value="members">
             <ProjectViewMembers />

@@ -316,8 +316,8 @@ INSERT INTO public.entity_authorization
 VALUES('MENU_WMSv2_APPROVER.REPORT', 'ADMIN', null, now(), null);
 
 -- xem màn hình phiếu nhập hàng chi tiết
-insert into entity_authorization (id, role_id, last_updated, created, description)
-values ('SCR_WMSv2_RECEIPT_BILL_DETAIL.VIEW', 'ADMIN', null, now(), null) ;
+    insert into entity_authorization (id, role_id, last_updated, created, description)
+    values ('SCR_WMSv2_RECEIPT_BILL_DETAIL.VIEW', 'ADMIN', null, now(), null) ;
 
 -- xem màn hình phiếu xuất hàng chi tiết
 insert into entity_authorization (id, role_id, last_updated, created, description)

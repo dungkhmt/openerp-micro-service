@@ -22,21 +22,18 @@ import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import { forwardRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 import { UserAvatar } from "../../components/common/avatar/UserAvatar";
 import { CustomMDEditor } from "../../components/editor/md-editor/CustomMDEditor";
 import { FileUploader } from "../../components/file-uploader";
 import { LoadingButton } from "../../components/mui/button/LoadingButton";
-import CustomChip from "../../components/mui/chip";
+import { TaskCategory } from "../../components/task/category";
+import { TaskPriority } from "../../components/task/priority";
+import { TaskStatus } from "../../components/task/status";
 import { useTaskContext } from "../../hooks/useTaskContext";
 import { FileService } from "../../services/api/file.service";
 import { TaskService } from "../../services/api/task.service";
-import {
-  getCategoryColor,
-  getPriorityColor,
-  getStatusColor,
-} from "../../utils/color.util";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />;
@@ -174,14 +171,12 @@ const DialogEditTask = ({ open, setOpen }) => {
                     labelId="role-category"
                     inputProps={{ placeholder: "Danh mục" }}
                   >
-                    {category.categories.map(({ categoryId, categoryName }) => (
-                      <MenuItem key={categoryId} value={categoryId}>
-                        <CustomChip
-                          size="small"
-                          skin="light"
-                          label={categoryName}
-                          color={getCategoryColor(categoryId)}
-                        />
+                    {category.categories.map((category) => (
+                      <MenuItem
+                        key={category.categoryId}
+                        value={category.categoryId}
+                      >
+                        <TaskCategory category={category} />
                       </MenuItem>
                     ))}
                   </Select>
@@ -208,14 +203,9 @@ const DialogEditTask = ({ open, setOpen }) => {
                     labelId="status-select"
                     inputProps={{ placeholder: "Trạng thái" }}
                   >
-                    {status.statuses.map(({ statusId, description }) => (
-                      <MenuItem key={statusId} value={statusId}>
-                        <CustomChip
-                          size="small"
-                          skin="light"
-                          label={description}
-                          color={getStatusColor(statusId)}
-                        />
+                    {status.statuses.map((status) => (
+                      <MenuItem key={status.statusId} value={status.statusId}>
+                        <TaskStatus status={status} />
                       </MenuItem>
                     ))}
                   </Select>
@@ -242,14 +232,12 @@ const DialogEditTask = ({ open, setOpen }) => {
                     labelId="priority-select"
                     inputProps={{ placeholder: "Ưu tiên" }}
                   >
-                    {priority.priorities.map(({ priorityId, priorityName }) => (
-                      <MenuItem key={priorityId} value={priorityId}>
-                        <CustomChip
-                          size="small"
-                          skin="light"
-                          label={priorityName}
-                          color={getPriorityColor(priorityId)}
-                        />
+                    {priority.priorities.map((priority) => (
+                      <MenuItem
+                        key={priority.priorityId}
+                        value={priority.priorityId}
+                      >
+                        <TaskPriority priority={priority} showText />
                       </MenuItem>
                     ))}
                   </Select>

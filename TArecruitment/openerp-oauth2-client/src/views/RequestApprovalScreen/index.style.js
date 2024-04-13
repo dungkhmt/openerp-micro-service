@@ -10,6 +10,22 @@ const styles = {
     },
     width: 145,
   },
+  searchBox: {
+    width: "20%",
+  },
+  tableToolBar: {
+    marginLeft: "2em",
+    marginBottom: "1em",
+  },
+  toolLine: {
+    display: "flex",
+    justifyContent: "space-between",
+    paddingRight: "1em",
+  },
+  leftTool: {
+    display: "flex",
+    alignItems: "center",
+  },
 };
 
 export default styles;
