@@ -218,11 +218,6 @@ const EnhancedTableToolbar = (props) => {
             </IconButton>
           </Tooltip>
         ) : (
-          // <Tooltip title="Thêm mới">
-          //   <IconButton onClick={openNewRow}> 
-          //     <AddIcon />
-          //   </IconButton>
-          // </Tooltip>
           <div></div>
         )
         }
@@ -298,25 +293,6 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
   };
 
   const handleClick = (event, row) => {
-    // const selectedIndex = selected.indexOf(name);
-    // let newSelected = [];
-
-    // if (selectedIndex === -1) {
-    //   newSelected = newSelected.concat(selected, name);
-    // } else if (selectedIndex === 0) {
-    //   newSelected = newSelected.concat(selected.slice(1));
-    // } else if (selectedIndex === selected.length - 1) {
-    //   newSelected = newSelected.concat(selected.slice(0, -1));
-    // } else if (selectedIndex > 0) {
-    //   newSelected = newSelected.concat(
-    //     selected.slice(0, selectedIndex),
-    //     selected.slice(selectedIndex + 1),
-    //   );
-    // }
-
-    // setSelected(newSelected);
-    // console.log("handleClick: Event => ", event);
-    // console.log("handleClick: Row => ", row);
     if (typeof onRowClick === 'function') {
       onRowClick(event, row);
     }
@@ -409,7 +385,6 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
           <Tooltip title="Lưu">
             <IconButton onClick={() => {
                 editable?.onRowAdd();
-                // successNoti("Lưu thành công");
                 setShowAddModal(false);
               }}>
               <SaveIcon />
@@ -443,9 +418,9 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
                 <TableRow>
                   {
                     columns != undefined &&
-                    columns.map(column => {
+                    columns.map((column, index) => {
                       if (column.editComponent == undefined) {
-                        return <TableCell>
+                        return <TableCell key={`xyz` + index}>
                           <TextField />
                         </TableCell>
                       } else {
@@ -534,9 +509,10 @@ const StandardTable = ({ columns, data, title, options, editable, onRowClick,
                       }
                       {
                         columns != undefined &&
-                        columns.map(column => {
+                        columns.map((column, index) => {
                           if (column.buttonOnclickHandle != undefined) {
                             return <TableCell 
+                              key={`xxx-${index}`}
                               children={<Button variant="contained"
                                 onClick={() => column.buttonOnclickHandle(row)}
                               >{column.buttonOnclickText != null ? column.buttonOnclickText : "Xử lý"}</Button>}

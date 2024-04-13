@@ -45,11 +45,6 @@ export function setCanvasSize(size, scale) {
 }
 
 const convertToVNDFormat = ( valueInt ) => {
-  // const formatter = new Intl.NumberFormat('vn-VN', {
-  //   style: 'currency',
-  //   currency: 'VND',
-  // });
-  // return formatter.format(valueInt).substring(1);
   var result;
   try {
     return result = valueInt.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})
