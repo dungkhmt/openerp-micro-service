@@ -5,9 +5,11 @@ import { useClasses } from "../../hooks/useClasses";
 import { Box } from "@mui/material";
 import { toast } from "react-toastify";
 
-const GeneralScheduleTable = ({ group, semester }) => {
-  console.log(semester);
-  const { loading, error, classes, setClasses, setLoading } = useClasses(group, semester);
+const GeneralScheduleTable = ({ semester, selectedGroup }) => {
+  const { loading, error, classes, setClasses, setLoading } = useClasses(
+    selectedGroup,
+    semester
+  );
 
   return (
     <Box style={{ height: 600, width: "100%" }}>

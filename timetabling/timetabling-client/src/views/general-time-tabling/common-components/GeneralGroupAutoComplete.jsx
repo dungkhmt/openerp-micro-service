@@ -4,13 +4,14 @@ import { useGroups } from "../hooks/useGroups";
 
 const GeneralGroupAutoComplete = ({ selectedGroup, setSelectedGroup }) => {
   const { loading: groupsLoading, error: groupsError, groups } = useGroups();
-
+  
   return (
     <Autocomplete
       disablePortal
       loadingText="Loading..."
       getOptionLabel={(option) => option && option.groupName}
       onChange={(e, group) => {
+        console.log(group);
         setSelectedGroup(group);
       }}
       value={selectedGroup}
