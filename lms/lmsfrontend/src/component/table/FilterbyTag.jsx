@@ -14,22 +14,22 @@ const FilterbyTag = (props) => {
 
   const getTags = useCallback((path, setData) => {
     request("get", path, (res) => {
-      // let sortedTag = res.data 
-      // sortedTag.sort((a, b) => {
-      //   const nameA = a.name.toUpperCase(); 
-      //   const nameB = b.name.toUpperCase(); 
-      //   if (nameA < nameB) {
-      //     return -1;
-      //   }
-      //   if (nameA > nameB) {
-      //     return 1;
-      //   }
+      let sortedTag = res.data 
+      sortedTag.sort((a, b) => {
+        const nameA = a.name.toUpperCase(); 
+        const nameB = b.name.toUpperCase(); 
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
       
-      //   // names must be equal
-      //   return 0;
-      // })
+        // names must be equal
+        return 0;
+      })
       
-      // // list to object
+      // list to object
       
       // console.log("Tags", sortedTag)
 
@@ -67,7 +67,7 @@ const FilterbyTag = (props) => {
         <TextField {...params} label="Tags" placeholder="" />
       )}
       onChange={(event, newValue) => {
-        console.log(event, newValue, definedTags)
+        // console.log(event, newValue, definedTags)
         props.onFilterChanged(props.columnDef.tableData.id, newValue);
       }}
       limitTags={3}
