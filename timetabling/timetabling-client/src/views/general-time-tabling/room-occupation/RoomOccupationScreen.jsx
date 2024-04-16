@@ -1,20 +1,58 @@
 import React, { useState } from "react";
 import RoomUsageChart from "./components/RoomUsageChart";
-import RoomSelectBox from "./components/RoomSelectBox";
-import { useSemesters } from "../hooks/useSemester";
 import FilterSelectBox from "./components/FilterSelectBox";
+import GeneralSemesterAutoComplete from "../common-components/GeneralSemesterAutoComplete";
+import { Button } from "@mui/material";
+import { request } from "api";
 
 const RoomOccupationScreen = () => {
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedSemester, setSelectedSemester] = useState(null);
   const [selectedWeek, setSelectedWeek] = useState(0);
-  const { loading, error, semesters } = useSemesters();
+  const [startDate, setStartDate] = useState(null);
+  const handleExportExcel = () => {
+
+    request(
+      "post",
+      `room-occupation/export?semester=20221&weeks=${selectedWeek+1}-${selectedWeek+1}`,
+      (res) => {
+        const blob = new Blob([res.data], {
+          type: res.headers["content-type"],
+        });
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = "Room_Conflict_List.xlsx";
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      },
+      (error) => {
+        console.error("Error exporting Excel:", error);
+      },
+      null,
+      { responseType: "arraybuffer" }
+    ).then();
+  }
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-row gap-2">
-        <RoomSelectBox  data={semesters} setSelectedItem={setSelectedItem} />
-        <FilterSelectBox selectedWeek={selectedWeek} setSelectedWeek={setSelectedWeek}/>
+        <GeneralSemesterAutoComplete
+          setSelectedSemester={setSelectedSemester}
+          selectedSemester={selectedSemester}
+        />
+        <FilterSelectBox
+          selectedSemester={selectedSemester}
+          selectedWeek={selectedWeek}
+          setSelectedWeek={setSelectedWeek}
+          setStartDate={setStartDate}
+        />
+        <Button variant="contained" onClick={handleExportExcel}>Xuất File Excel</Button>
       </div>
-      <RoomUsageChart selectedWeek = {selectedWeek} semester={selectedItem?.semester} />
+      <RoomUsageChart
+        startDate={startDate}
+        selectedWeek={selectedWeek}
+        semester={selectedSemester?.semester}
+      />
     </div>
   );
 };

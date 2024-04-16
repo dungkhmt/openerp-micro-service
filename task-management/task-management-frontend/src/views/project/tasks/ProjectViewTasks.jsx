@@ -19,30 +19,26 @@ import {
 import AvatarGroup from "@mui/material/AvatarGroup";
 import { DataGrid } from "@mui/x-data-grid";
 import dayjs from "dayjs";
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
-import CustomChip from "../../../components/mui/chip";
+import { TaskCategory } from "../../../components/task/category";
+import { TaskPriority } from "../../../components/task/priority";
+import { TaskStatus } from "../../../components/task/status";
 import { useDebounce } from "../../../hooks/useDebounce";
 import {
-  fetchTasks,
   clearCache,
+  fetchTasks,
+  resetFilters,
+  resetPagination,
   resetSort,
   setFilters,
   setPagination,
   setSort,
-  resetPagination,
-  resetFilters,
 } from "../../../store/project/tasks";
-import {
-  getCategoryColor,
-  getDueDateColor,
-  getPriorityColor,
-  getProgressColor,
-  getStatusColor,
-} from "../../../utils/color.util";
+import { getDueDateColor, getProgressColor } from "../../../utils/color.util";
 import { DialogAddTask } from "./DialogAddTask";
 
 const ProjectViewTasks = () => {
@@ -105,23 +101,8 @@ const ProjectViewTasks = () => {
               </Typography>
             </Tooltip>
             <Box sx={{ display: "flex", gap: 1 }}>
-              {category && (
-                <CustomChip
-                  size="small"
-                  skin="light"
-                  sx={{ width: "fit-content" }}
-                  label={category.categoryName}
-                  color={getCategoryColor(category.categoryId)}
-                />
-              )}
-              {priority && (
-                <CustomChip
-                  size="small"
-                  skin="light"
-                  label={priority.priorityName}
-                  color={getPriorityColor(priority.priorityId)}
-                />
-              )}
+              {priority && <TaskPriority priority={priority} />}
+              {category && <TaskCategory category={category} />}
             </Box>
           </Box>
         );
@@ -141,15 +122,10 @@ const ProjectViewTasks = () => {
           (status) => status.statusId === row.statusId
         );
         return status ? (
-          <CustomChip
-            size="small"
-            skin="light"
-            label={status.description}
-            color={getStatusColor(status.statusId)}
-          />
+          <TaskStatus status={status} />
         ) : (
           <Typography variant="body2" sx={{ color: "text.primary" }}>
-            Không xác định
+            -
           </Typography>
         );
       },
@@ -399,18 +375,14 @@ const ProjectViewTasks = () => {
                 inputProps={{ placeholder: "Thể loại" }}
               >
                 <MenuItem value="">Tất cả</MenuItem>
-                {categoryStore.categories.map(
-                  ({ categoryId, categoryName }) => (
-                    <MenuItem key={categoryId} value={categoryId}>
-                      <CustomChip
-                        size="medium"
-                        skin="light"
-                        label={categoryName}
-                        color={getCategoryColor(categoryId)}
-                      />
-                    </MenuItem>
-                  )
-                )}
+                {categoryStore.categories.map((category) => (
+                  <MenuItem
+                    key={category.categoryId}
+                    value={category.categoryId}
+                  >
+                    <TaskCategory category={category} />
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>
@@ -429,14 +401,9 @@ const ProjectViewTasks = () => {
                 inputProps={{ placeholder: "Trạng thái" }}
               >
                 <MenuItem value="">Tất cả</MenuItem>
-                {statusStore.statuses.map(({ statusId, description }) => (
-                  <MenuItem key={statusId} value={statusId}>
-                    <CustomChip
-                      size="medium"
-                      skin="light"
-                      label={description}
-                      color={getStatusColor(statusId)}
-                    />
+                {statusStore.statuses.map((status) => (
+                  <MenuItem key={status.statusId} value={status.statusId}>
+                    <TaskStatus status={status} />
                   </MenuItem>
                 ))}
               </Select>
@@ -457,18 +424,14 @@ const ProjectViewTasks = () => {
                 inputProps={{ placeholder: "Ưu tiên" }}
               >
                 <MenuItem value="">Tất cả</MenuItem>
-                {priorityStore.priorities.map(
-                  ({ priorityId, priorityName }) => (
-                    <MenuItem key={priorityId} value={priorityId}>
-                      <CustomChip
-                        size="medium"
-                        skin="light"
-                        label={priorityName}
-                        color={getPriorityColor(priorityId)}
-                      />
-                    </MenuItem>
-                  )
-                )}
+                {priorityStore.priorities.map((priority) => (
+                  <MenuItem
+                    key={priority.priorityId}
+                    value={priority.priorityId}
+                  >
+                    <TaskPriority priority={priority} showText />
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>

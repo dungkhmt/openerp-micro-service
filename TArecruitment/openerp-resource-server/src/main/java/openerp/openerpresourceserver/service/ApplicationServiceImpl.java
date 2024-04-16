@@ -10,12 +10,18 @@ import openerp.openerpresourceserver.entity.User;
 import openerp.openerpresourceserver.repo.ApplicationRepo;
 import openerp.openerpresourceserver.repo.ClassCallRepo;
 import openerp.openerpresourceserver.repo.UserRepo;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,10 +83,11 @@ public class ApplicationServiceImpl implements ApplicationService{
     }
 
     @Override
-    public PaginationDTO<Application> getApplicationBySemester(String semester, int page, int limit) {
+    public PaginationDTO<Application> getApplicationBySemester(String semester, String search, String applicationStatus, int page, int limit) {
 
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Application> applicationPage = applicationRepo.findApplicationsByClassSemester(semester, pageable);
+        if(applicationStatus.equals("ALL")) applicationStatus = "";
+        Page<Application> applicationPage = applicationRepo.findApplicationsByClassSemester(semester, search, applicationStatus, pageable);
 
         PaginationDTO<Application> paginationDTO = new PaginationDTO<>();
 
@@ -93,9 +100,11 @@ public class ApplicationServiceImpl implements ApplicationService{
 
     @Override
     public PaginationDTO<Application> getApplicationByApplicationStatusAndSemester(String applicationStatus,
-                                                                                   String semester, int page, int limit) {
+                                                                                   String semester, String search, String assignStatus, int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Application> applicationPage = applicationRepo.findByApplicationStatusAndSemester(applicationStatus, semester, pageable);
+        if(assignStatus.equals("ALL")) assignStatus = "";
+        log.info(search + " + " + assignStatus);
+        Page<Application> applicationPage = applicationRepo.findByApplicationStatusAndSemester(applicationStatus, semester, search, assignStatus, pageable);
 
         PaginationDTO<Application> paginationDTO = new PaginationDTO<>();
 
@@ -190,5 +199,57 @@ public class ApplicationServiceImpl implements ApplicationService{
             applicationRepo.save(app);
         }
         return maxMatching.getGraph();
+    }
+
+    @Override
+    public byte[] generateExcelFile(String semester) throws IOException {
+        try(Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Danh sách sinh viên trợ giảng");
+
+            List<Application> applications = applicationRepo.findApplicationToAutoAssign("APPROVED", "APPROVED", semester);
+
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("STT");
+            headerRow.createCell(1).setCellValue("Tên sinh viên");
+            headerRow.createCell(2).setCellValue("MSSV");
+            headerRow.createCell(3).setCellValue("Email");
+            headerRow.createCell(4).setCellValue("Số điện thoại");
+            headerRow.createCell(5).setCellValue("CPA");
+            headerRow.createCell(6).setCellValue("Điểm tiếng anh");
+            headerRow.createCell(7).setCellValue("Môn học");
+            headerRow.createCell(8).setCellValue("Mã môn học");
+            headerRow.createCell(9).setCellValue("Mã lớp");
+            headerRow.createCell(10).setCellValue("Phòng học");
+            headerRow.createCell(11).setCellValue("Ngày");
+            headerRow.createCell(12).setCellValue("Tiết bắt đầu");
+            headerRow.createCell(13).setCellValue("Tiết kết thúc");
+            headerRow.createCell(14).setCellValue("Ghi chú");
+
+            int rowNums = 1;
+            for(Application app : applications) {
+                Row row = sheet.createRow(rowNums);
+                row.createCell(0).setCellValue(rowNums);
+                row.createCell(1).setCellValue(app.getName());
+                row.createCell(2).setCellValue(app.getMssv());
+                row.createCell(3).setCellValue(app.getEmail());
+                row.createCell(4).setCellValue(app.getPhoneNumber());
+                row.createCell(5).setCellValue(app.getCPA());
+                row.createCell(6).setCellValue(app.getEnglishScore());
+                row.createCell(7).setCellValue(app.getClassCall().getSubjectName());
+                row.createCell(8).setCellValue(app.getClassCall().getSubjectId());
+                row.createCell(9).setCellValue(app.getClassCall().getId());
+                row.createCell(10).setCellValue(app.getClassCall().getClassRoom());
+                row.createCell(11).setCellValue(app.getClassCall().getDay());
+                row.createCell(12).setCellValue(app.getClassCall().getStartPeriod());
+                row.createCell(13).setCellValue(app.getClassCall().getEndPeriod());
+                row.createCell(14).setCellValue(app.getNote());
+                rowNums++;
+            }
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+
+            return outputStream.toByteArray();
+        }
     }
 }

@@ -5,7 +5,9 @@ import openerp.openerpresourceserver.dto.PaginationDTO;
 import openerp.openerpresourceserver.entity.Application;
 import openerp.openerpresourceserver.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,8 +64,10 @@ public class ApplicationController {
     public ResponseEntity<?> getApplicationBySemester(
             @PathVariable String semester,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int limit) {
-        PaginationDTO<Application> applications = applicationService.getApplicationBySemester(semester, page, limit);
+            @RequestParam(defaultValue = "5") int limit,
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "") String appStatus) {
+        PaginationDTO<Application> applications = applicationService.getApplicationBySemester(semester, search, appStatus, page, limit);
         return ResponseEntity.ok().body(applications);
     }
 
@@ -96,9 +100,11 @@ public class ApplicationController {
             @PathVariable String semester,
             @PathVariable String applicationStatus,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int limit) {
+            @RequestParam(defaultValue = "5") int limit,
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "") String assignStatus) {
         PaginationDTO<Application> applications =
-                applicationService.getApplicationByApplicationStatusAndSemester(applicationStatus, semester, page, limit);
+                applicationService.getApplicationByApplicationStatusAndSemester(applicationStatus, semester, search, assignStatus, page, limit);
         return ResponseEntity.ok().body(applications);
     }
 
@@ -106,6 +112,19 @@ public class ApplicationController {
     public ResponseEntity<?> autoAssignClass(@PathVariable String semester) {
         int[][] graph = applicationService.autoAssignApplication(semester);
         return ResponseEntity.ok().body(graph);
+    }
+
+    @GetMapping("/get-assign-list-file/{semester}")
+    public ResponseEntity<?> getAssignListFile(@PathVariable String semester) {
+        try {
+            byte[] excelBytes = applicationService.generateExcelFile(semester);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", semester + "list.xlsx");
+            return new ResponseEntity<>(excelBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("BAD REQUEST");
+        }
     }
 
 }

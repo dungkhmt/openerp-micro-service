@@ -23,4 +23,8 @@ public interface GeneralClassOpenedRepository extends JpaRepository<GeneralClass
     @Modifying
     @Query(nativeQuery = true, value = "UPDATE timetabling_general_classes SET time_slots = ?2\\:\\:json WHERE id = ?1")
     void saveTimeSlot(long id, String newTimeSlotString);
+
+    void deleteBySemester(String semester);
+
+    List<GeneralClassOpened> findAllBySemester(String semester);
 }

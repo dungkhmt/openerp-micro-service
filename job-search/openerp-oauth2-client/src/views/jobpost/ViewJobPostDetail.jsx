@@ -12,6 +12,7 @@ import {
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
 import { useParams } from 'react-router-dom';
+import { ApplyJobPost } from './ApplyJobPost'
 
 const ViewJobPostDetail = () => {
 
@@ -19,7 +20,12 @@ const ViewJobPostDetail = () => {
     const [JobPostForm, setJobPostForm] = useState({
 
     })
-
+    const [user, setUser] = useState({})
+    useEffect(() => {
+        request("get", "/user/get-user-data", (res) => {
+            setUser(res.data)
+          }).then();
+    }, [])
     useEffect(() => {
         request("get", `/job-post/${id}`, (res) => {
             setJobPostForm(res.data)
@@ -29,11 +35,20 @@ const ViewJobPostDetail = () => {
 
     function goToUrl(url) {
         window.location.href = url;
-      }
+    }
 
+    const [open, setOpen] = useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
     return (
         <>
-            <Card  sx={{ minWidth: 275 }}>
+            <Card sx={{ minWidth: 275 }}>
                 <CardContent>
                     <Typography variant="h4" component="div">
                         Job Detail
@@ -52,9 +67,12 @@ const ViewJobPostDetail = () => {
                     </Typography>
                 </CardContent>
                 <CardActions>
-                        <Button size="small" onClick={() => goToUrl(`/view-job-post`)}>Apply this Job</Button>
+                    <Button variant="outlined" onClick={handleClickOpen}>
+                        apply this job
+                    </Button>
+                    <ApplyJobPost open={open} onClose={handleClose} jobId={id} jobName={JobPostForm.jobPost?.title} />
                 </CardActions>
-            </Card>  
+            </Card>
         </>
 
     )

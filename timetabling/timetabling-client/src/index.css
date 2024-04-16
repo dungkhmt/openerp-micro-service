@@ -66,3 +66,7 @@ code {
   color: rgba(0, 0, 0, 0.87);
   margin-top: -2px !important;
 }
+
+.css-1t1j96h-MuiPaper-root-MuiDialog-paper{
+  position: unset !important;
+}

@@ -1,24 +1,26 @@
 package openerp.openerpresourceserver.service.impl;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.helper.GeneralExcelHelper;
+import openerp.openerpresourceserver.repo.AcademicWeekRepo;
 import org.springframework.stereotype.Service;
 
-import io.micrometer.common.lang.NonNull;
 import openerp.openerpresourceserver.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.repo.RoomOccupationRepo;
 import openerp.openerpresourceserver.service.RoomOccupationService;
 
 @Service
+@AllArgsConstructor
 public class RoomOccupationSeriviceImp implements RoomOccupationService {
 
-    @Autowired
     private RoomOccupationRepo roomOccupationRepo;
-
+    private AcademicWeekRepo academicWeekRepo;
+    private GeneralExcelHelper excelHelper;
     @Override
     public List<RoomOccupation> getRoomOccupationsBySemester(String semester) {
-        System.out.println("\n\n\n\n" + roomOccupationRepo.findAllBySemester(semester).get(0).getClassCode());
         return roomOccupationRepo.findAllBySemester(semester);
     }
 
@@ -31,5 +33,16 @@ public class RoomOccupationSeriviceImp implements RoomOccupationService {
     public void saveAll(List<RoomOccupation> roomOccupations) {
         roomOccupationRepo.saveAll(roomOccupations);
     }
-    
+
+    @Override
+    public ByteArrayInputStream exportExcel(String semester, List<Integer> weeks) {
+        int maxWeek = 1;
+        for(int week : weeks) {
+            if(week >= maxWeek) {
+                maxWeek = week;
+            }
+        }
+        return excelHelper.convertToExcel(roomOccupationRepo.findAllBySemesterAndWeekIndex(semester, maxWeek), maxWeek);
+    }
+
 }

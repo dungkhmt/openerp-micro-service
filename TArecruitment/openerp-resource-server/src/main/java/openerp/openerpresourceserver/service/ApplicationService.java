@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.service;
 import openerp.openerpresourceserver.dto.PaginationDTO;
 import openerp.openerpresourceserver.entity.Application;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ApplicationService {
@@ -15,14 +16,16 @@ public interface ApplicationService {
 
     List<Application> getUniqueApplicator();
 
-    PaginationDTO<Application> getApplicationBySemester(String semester, int page, int limit);
+    PaginationDTO<Application> getApplicationBySemester(String semester, String search, String applicationStatus, int page, int limit);
 
     PaginationDTO<Application> getApplicationByApplicationStatusAndSemester(String applicationStatus,
-                                                                            String semester, int page, int limit);
+                                                                            String semester, String search, String assignStatus, int page, int limit);
 
     Application updateApplicationStatus(int id, String status);
 
     Application updateAssignStatus(int id, String status);
 
     int[][] autoAssignApplication(String semester);
+
+    byte[] generateExcelFile(String semester) throws IOException;
 }

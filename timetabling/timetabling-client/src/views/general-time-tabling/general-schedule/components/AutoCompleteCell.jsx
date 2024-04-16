@@ -1,6 +1,7 @@
 import { Autocomplete, TextField } from "@mui/material";
 import { request } from "api";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const AutocompleteCell = ({
   id,
@@ -10,11 +11,13 @@ const AutocompleteCell = ({
   options,
   width,
   setClasses,
+  setLoading
 }) => {
   const handleAutocompleteChange = (event, newValue) => {
-    console.log(id, field, value);
+    
     // Call the api that update the general class with id = ?
     const generalClassId = String(id).split("-")?.[0];
+    setLoading(true);
     switch (String(field)) {
       case "startTime":
       case "room":
@@ -24,8 +27,7 @@ const AutocompleteCell = ({
           "post",
           `/general-classes/update-class-schedule`,
           (res) => {
-            console.log(res.data);
-            console.log(generalClassId);
+            setLoading(false);
             setClasses((prevClasses) => {
               return prevClasses.map((gc) => {
                 console.log(gc);
@@ -37,7 +39,11 @@ const AutocompleteCell = ({
               });
             });
           },
-          (error) => console.error(error),
+          (error) => {
+            toast.error(error.response.data);
+            console.error(error);
+            setLoading(false);
+          },
           { field, value: newValue?.label, scheduleIndex, generalClassId }
         );
         break;

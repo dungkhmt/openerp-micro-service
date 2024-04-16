@@ -4,6 +4,7 @@ import GroupScreen from "views/courseTimeTabling/group/ClassGroupList";
 import SemesterScreen from "views/courseTimeTabling/semester/SemesterScreen";
 import WeekDayScreen from "views/scheduleInformation/WeekDayScreen";
 import { Route, Switch, useRouteMatch } from "react-router";
+import WeekAcademicScreen from "views/courseTimeTabling/week-academic/WeekAcademicScreen";
 
 export default function TeacherRouter() {
   let { path } = useRouteMatch();
@@ -34,6 +35,11 @@ export default function TeacherRouter() {
           component={WeekDayScreen}
           exact
           path={`${path}/week-day`}
+        ></Route>
+        <Route
+          component={WeekAcademicScreen}
+          exact
+          path={`${path}/academic-week`}
         ></Route>
       </Switch>
     </div>

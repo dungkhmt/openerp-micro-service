@@ -9,11 +9,13 @@ import { TaskCompletedStatistic } from "./statistics/TaskCompletedStatistic";
 import { TaskCreatedStatistic } from "./statistics/TaskCreatedStatistic";
 import { TaskInprogressStatistic } from "./statistics/TaskInprogressStatistic";
 import { WorkloadByStatus } from "./statistics/WorkloadByStatus";
+import { ProjectInfo } from "./info/ProjectInfo";
 
 const WIDTH_TASK_MD = 2;
-const WIDTH_TASK_LG = 3;
+const WIDTH_TASK_LG = 2;
 const HEIGHT_DOC_MD = 5;
 const HEIGHT_DOC_LG = 6;
+const HEIGHT_INFO = 3;
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -29,10 +31,26 @@ const ProjectViewOverview = () => {
 
   const position = useMemo(
     () => ({
-      doc: {
+      info: {
         x: 0,
         y: 0,
-        w: 12,
+        w: getByBreakpoint({ lg: 3, md: 3, sm: 6, xs: 4 }),
+        h: getByBreakpoint({
+          lg: HEIGHT_DOC_LG,
+          md: HEIGHT_DOC_MD,
+          sm: HEIGHT_INFO,
+          xs: HEIGHT_INFO,
+        }),
+      },
+      doc: {
+        x: getByBreakpoint({ lg: 3, md: 3, sm: 0, xs: 0 }),
+        y: getByBreakpoint({
+          lg: 0,
+          md: 0,
+          sm: HEIGHT_INFO,
+          xs: HEIGHT_INFO,
+        }),
+        w: getByBreakpoint({ lg: 9, md: 7, sm: 6, xs: 4 }),
         h: breakpoint === "lg" ? HEIGHT_DOC_LG : HEIGHT_DOC_MD,
         minH: 3,
         minW: breakpoint === "xs" ? 4 : 6,
@@ -87,7 +105,7 @@ const ProjectViewOverview = () => {
           sm: HEIGHT_DOC_MD + 2,
           xs: HEIGHT_DOC_MD + 2,
         }),
-        w: getByBreakpoint({ lg: 3, md: 4, sm: 3, xs: 4 }),
+        w: getByBreakpoint({ lg: 6, md: 4, sm: 3, xs: 4 }),
         h: getByBreakpoint({ lg: 6, md: 6, sm: 4, xs: 4 }),
       },
       chart: {
@@ -136,6 +154,13 @@ const ProjectViewOverview = () => {
             setBreakpoint(newBreakpoint);
           }}
         >
+          <ProjectInfo
+            key="info"
+            data-grid={{
+              ...position.info,
+              static: true,
+            }}
+          />
           <ProjectViewDocument
             key="doc"
             data-grid={{

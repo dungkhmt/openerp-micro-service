@@ -3,17 +3,14 @@ package openerp.openerpresourceserver.controller.general;
 import java.util.ArrayList;
 import java.util.List;
 
+import openerp.openerpresourceserver.exception.ConflictScheduleException;
+import openerp.openerpresourceserver.model.dto.request.general.UpdateClassesToNewGroupRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import openerp.openerpresourceserver.model.dto.request.UpdateGeneralClassRequest;
-import openerp.openerpresourceserver.model.dto.request.UpdateGeneralClassScheduleRequest;
+import openerp.openerpresourceserver.model.dto.request.general.UpdateGeneralClassRequest;
+import openerp.openerpresourceserver.model.dto.request.general.UpdateGeneralClassScheduleRequest;
 import openerp.openerpresourceserver.model.entity.general.GeneralClassOpened;
 import openerp.openerpresourceserver.service.GeneralClassOpenedService;
 
@@ -22,13 +19,15 @@ import openerp.openerpresourceserver.service.GeneralClassOpenedService;
 public class GeneralClassOpenedController {
     @Autowired
     private GeneralClassOpenedService gService;
-
+    @ExceptionHandler(ConflictScheduleException.class)
+    public ResponseEntity scheduleConflict(ConflictScheduleException e) {
+        return ResponseEntity.status(400).body(e.getCustomMessage());
+    }
 
     @GetMapping("/")
     public ResponseEntity<List<GeneralClassOpened>> getClasses(@RequestParam String semester) {
         try {
             List<GeneralClassOpened> generalClassOpenedList = gService.getGeneralClasses(semester);
-            System.out.println(generalClassOpenedList);
             return ResponseEntity.ok(generalClassOpenedList);
         } catch(Exception e) {
             System.err.println(e);
@@ -51,5 +50,24 @@ public class GeneralClassOpenedController {
         return ResponseEntity.ok().body(updatedGeneralClass);
     }
 
+    @PostMapping("/update-classes-group")
+    public ResponseEntity updateClassesGroup(@RequestBody UpdateClassesToNewGroupRequest request) {
+        try{
+            if(request.getPriorityBuilding() == null) return ResponseEntity.ok(gService.addClassesToCreatedGroup(request.getIds(), request.getGroupName()));
+            return ResponseEntity.ok(gService.addClassesToNewGroup(request.getIds(),request.getGroupName(),request.getPriorityBuilding()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
+    @DeleteMapping("/")
+    public ResponseEntity deleteClassesBySemester(@RequestParam("semester") String semester) {
+        gService.deleteClassesBySemester(semester);
+        return ResponseEntity.ok("ok");
+    }
+
+    @PostMapping("/export-excel")
+    public ResponseEntity exportExcel(@RequestParam("semester") String semester) {
+        return ResponseEntity.ok("ok");
+    }
 }

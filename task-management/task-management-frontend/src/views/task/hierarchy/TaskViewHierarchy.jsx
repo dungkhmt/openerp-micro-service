@@ -1,12 +1,12 @@
 import { Icon } from "@iconify/react";
 import { Box, Grid, LinearProgress, Tooltip, Typography } from "@mui/material";
 import dayjs from "dayjs";
-import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
-import CustomChip from "../../../components/mui/chip";
+import { TaskStatus } from "../../../components/task/status";
 import { useTaskContext } from "../../../hooks/useTaskContext";
-import { getProgressColor, getStatusColor } from "../../../utils/color.util";
+import { getProgressColor } from "../../../utils/color.util";
 
 const TaskViewHierarchy = () => {
   const { task } = useTaskContext();
@@ -95,12 +95,7 @@ const TaskViewHierarchy = () => {
               sm={2}
               sx={{ display: "flex", justifyContent: "center" }}
             >
-              <CustomChip
-                size="small"
-                skin="light"
-                label={status.description}
-                color={getStatusColor(status.statusId)}
-              />
+              <TaskStatus status={status} />
             </Grid>
             <Grid
               item
@@ -147,3 +142,4 @@ const TaskViewHierarchy = () => {
 };
 
 export { TaskViewHierarchy };
+

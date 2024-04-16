@@ -7,10 +7,8 @@ import GeneralSemesterAutoComplete from "../common-components/GeneralSemesterAut
 import { request } from "api";
 
 const GeneralScheduleScreen = () => {
-  const [group, setGroup] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState(null);
-
-  
+  const [selectedGroup, setSelectedGroup] = useState(null);
 
   return (
     <div className="flex flex-col gap-4 w-full h-[700px]">
@@ -18,17 +16,21 @@ const GeneralScheduleScreen = () => {
         Xếp thời khóa biểu cho chương trình đại trà
       </p>
       <div className="">
-        <GeneralSemesterAutoComplete selectedSemester={selectedSemester} setSelectedSemester={setSelectedSemester}/>
+        <GeneralSemesterAutoComplete
+          selectedSemester={selectedSemester}
+          setSelectedSemester={setSelectedSemester}
+        />
       </div>
       <div className="flex flex-row justify-between">
-        <div className="flex flex-row justify-start items-center gap-2">
-          <GeneralGroupAutoComplete />
-          <Button>
-            <Search />
-          </Button>
-        </div>
+        <GeneralGroupAutoComplete
+          selectedGroup={selectedGroup}
+          setSelectedGroup={setSelectedGroup}
+        />
       </div>
-      <GeneralScheduleTable group={group} semester={selectedSemester} />
+      <GeneralScheduleTable
+        selectedGroup={selectedGroup}
+        semester={selectedSemester}
+      />
     </div>
   );
 };

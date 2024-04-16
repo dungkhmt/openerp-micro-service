@@ -10,18 +10,24 @@ import {
     FormControl,
     Row,
 } from "react-bootstrap";
-
+import {request} from "../../api"
 const CreateNewCvForm = () => {
 
     const [showCVDemo, setShowCVDemo] = useState(false)
     const [resumeTitle, setResumeTitle] = useState("")
     // experiences
     const [experiences, setExperiences] = useState([
-        { position: '', companyName: '', startingDate: '', endingDate: '', description: '' },
+        { workingPosition: '', companyName: '', startingTime: '', endingTime: '', responsibility: '' },
     ]);
+    const [user, setUser] = useState({})
+    useEffect(() => {
+        request("get", "/user/get-user-data", (res) => {
+            setUser(res.data)
+          }).then();
+    }, [])
 
     const handleAddExperience = () => {
-        setExperiences([...experiences, { position: '', companyName: '', startingDate: '', endingDate: '', description: '' }]);
+        setExperiences([...experiences, { workingPosition: '', companyName: '', startingTime: '', endingTime: '', responsibility: '' }]);
     };
 
     const handleExperienceChange = (index, event) => {
@@ -37,11 +43,11 @@ const CreateNewCvForm = () => {
     };
     // education
     const [educations, setEducations] = useState([
-        { major: '', schoolName: '', startingDate: '', grade: 0, endingDate: '', description: '' },
+        { major: '', schoolName: '', startingTime: '', grade: 0, endingTime: '', description: '' },
     ]);
 
     const handleAddEducation = () => {
-        setEducations([...educations, { major: '', schoolName: '', startingDate: '', endingDate: '', description: '' }]);
+        setEducations([...educations, { major: '', schoolName: '', startingTime: '', endingTime: '', description: '' }]);
     };
 
     const handleEducationChange = (index, event) => {
@@ -57,16 +63,17 @@ const CreateNewCvForm = () => {
     };
     // skill
     const [skills, setSkills] = useState([
-        { skill: '', linkCert: '' },
+        { skillName: '', certLink: '', score : 0},
     ]);
 
     const handleAddSkill = () => {
-        setSkills([...skills, { skill: '', linkCert: '' }]);
+        setSkills([...skills, { skillName: '', certLink: '', score : 0 }]);
     };
 
     const handleSkillChange = (index, event) => {
         const newSkills = [...skills];
         newSkills[index][event.target.name] = event.target.value;
+        newSkills[index].score = parseFloat(newSkills[index].score)
         setSkills(newSkills);
     };
 
@@ -77,37 +84,39 @@ const CreateNewCvForm = () => {
     };
     // all user info
     const [userInfoForm, setUserInfoForm] = useState({
-        name: "Lê Minh Thiện",
+        userName: "Lê Minh Thiện",
         gender: "Nam",
         profession: "Cloud engineer",
-        location: "Ha Noi",
+        userLocation: "Ha Noi",
         mobilePhone: "01647997611",
         email: "xxx@gmail.com",
-        profileDescription: "tôi yêu  gái đẹp",
+        description: "tôi yêu  gái đẹp",
         linkedInLink: "https://www.linkedin.com/checkpoint/login-submit?_l=en_US",
         githubLink: "javhd.pro",
-        experiences: experiences,
-        educations: educations,
-        skills: skills
+        title: "hacker"
     })
 
     const handleInputChange = (event) => {
         setUserInfoForm({
             ...userInfoForm,
             [event.target.name]: event.target.value,
+            
         });
+        setSubmitForm({
+            employeeCV: userInfoForm, experiences, educations, skills
+        })
     };
-
+    const [submitForm, setSubmitForm] = useState({})
     const handleSubmit = (e) => {
         e.preventDefault()
-        setUserInfoForm({
-            ...userInfoForm, experiences, educations, skills
-        })
         setShowCVDemo(true)
-        const newJsonData = { ...userInfoForm, experiences, educations, skills };
-        console.log(newJsonData)
-        // Do something with newJsonData (e.g., send to server, store locally)
-    };
+        console.log(submitForm)
+        request("post", `/employee-cv`, (res)=> {
+            console.log(res);
+          }, (err)=>{
+            console.log(err);
+          }, submitForm).then();
+    }
 
     // const createNewCv = async () => {
     //     const element = document.getElementById("fileToPrint");
@@ -135,7 +144,7 @@ const CreateNewCvForm = () => {
     //           location: userInfoForm.location,
     //           mobilePhone: userInfoForm.mobilePhone,
     //           email: userInfoForm.email,
-    //           profileDescription: userInfoForm.profileDescription,
+    //           description: userInfoForm.description,
     //           facebookLink: userInfoForm.facebookLink,
     //           linkedInLink: userInfoForm.linkedInLink,
     //           gitHubLink: userInfoForm.gitHubLink,
@@ -168,7 +177,7 @@ const CreateNewCvForm = () => {
                         <Typography variant="h4">Personal Information</Typography>
                     </Grid>
                     <Grid item xs={4}>
-                        <TextField fullWidth label="Full Name" value={userInfoForm.name} variant="outlined" name="name" onChange={handleInputChange} />
+                        <TextField fullWidth label="Full Name" value={userInfoForm.userName} variant="outlined" name="userName" onChange={handleInputChange} />
                     </Grid>
                     <Grid item xs={4}>
                         <TextField fullWidth label="Gender" value={userInfoForm.gender} variant="outlined" name="gender" onChange={handleInputChange} />
@@ -183,10 +192,10 @@ const CreateNewCvForm = () => {
                         <TextField fullWidth label="Profession" value={userInfoForm.profession} variant="outlined" name="profession" onChange={handleInputChange} />
                     </Grid>
                     <Grid item xs={4}>
-                        <TextField fullWidth label="Location" value={userInfoForm.location} variant="outlined" name="location" onChange={handleInputChange} />
+                        <TextField fullWidth label="User Location" value={userInfoForm.userLocation} variant="outlined" name="userLocation" onChange={handleInputChange} />
                     </Grid>
                     <Grid item xs={12}>
-                        <TextField fullWidth label="Describe Yourself" value={userInfoForm.profileDescription} variant="outlined" multiline rows={4} name="profileDescription" onChange={handleInputChange} />
+                        <TextField fullWidth label="Describe Yourself" value={userInfoForm.description} variant="outlined" multiline rows={4} name="description" onChange={handleInputChange} />
                     </Grid>
 
                     <Grid item xs={12}>
@@ -208,8 +217,8 @@ const CreateNewCvForm = () => {
                                         <TextField
                                             fullWidth variant="outlined"
                                             label="Position"
-                                            name="position"
-                                            value={experience.position}
+                                            name="workingPosition"
+                                            value={experience.workingPosition}
                                             onChange={(event) => handleExperienceChange(index, event)}
 
                                         />
@@ -228,10 +237,10 @@ const CreateNewCvForm = () => {
                                         <TextField
                                             fullWidth variant="outlined"
                                             label="Starting Date"
-                                            name="startingDate"
+                                            name="startingTime"
                                             type="date"
                                             InputLabelProps={{ shrink: true }}
-                                            value={experience.startingDate}
+                                            value={experience.startingTime}
                                             onChange={(event) => handleExperienceChange(index, event)}
                                             sx={{ mb: 1 }}
                                         />
@@ -240,10 +249,10 @@ const CreateNewCvForm = () => {
                                         <TextField
                                             fullWidth variant="outlined"
                                             label="Ending Date"
-                                            name="endingDate"
+                                            name="endingTime"
                                             type="date"
                                             InputLabelProps={{ shrink: true }}
-                                            value={experience.endingDate}
+                                            value={experience.endingTime}
                                             onChange={(event) => handleExperienceChange(index, event)}
                                             sx={{ mb: 1 }}
                                         />
@@ -252,10 +261,10 @@ const CreateNewCvForm = () => {
                                         <TextField
                                             fullWidth variant="outlined"
                                             label="Describe your responsibility"
-                                            name="description"
+                                            name="responsibility"
                                             multiline
                                             rows={4}
-                                            value={experience.description}
+                                            value={experience.responsibility}
                                             onChange={(event) => handleExperienceChange(index, event)}
                                         />
                                     </Grid>
@@ -317,10 +326,10 @@ const CreateNewCvForm = () => {
                                         <TextField
                                             fullWidth variant="outlined"
                                             label="Starting Date"
-                                            name="startingDate"
+                                            name="startingTime"
                                             type="date"
                                             InputLabelProps={{ shrink: true }}
-                                            value={education.startingDate}
+                                            value={education.startingTime}
                                             onChange={(event) => handleEducationChange(index, event)}
                                             sx={{ mb: 1 }}
                                         />
@@ -329,10 +338,10 @@ const CreateNewCvForm = () => {
                                         <TextField
                                             fullWidth variant="outlined"
                                             label="Ending Date"
-                                            name="endingDate"
+                                            name="endingTime"
                                             type="date"
                                             InputLabelProps={{ shrink: true }}
-                                            value={education.endingDate}
+                                            value={education.endingTime}
                                             onChange={(event) => handleEducationChange(index, event)}
                                             sx={{ mb: 1 }}
                                         />
@@ -373,18 +382,25 @@ const CreateNewCvForm = () => {
                             <Box key={index} xs={12} sx={{ display: 'flex', flexDirection: 'column', mb: 2 }}>
                                 <TextField
                                     fullWidth variant="outlined"
-                                    label="skill"
-                                    name="skill"
-                                    value={skill.position}
+                                    label="score"
+                                    name="score"
+                                    value={skill.score}
                                     onChange={(event) => handleSkillChange(index, event)}
                                     sx={{ mb: 1 }}
                                 />
-
+                                <TextField
+                                    fullWidth variant="outlined"
+                                    label="skillName"
+                                    name="skillName"
+                                    value={skill.skillName}
+                                    onChange={(event) => handleSkillChange(index, event)}
+                                    sx={{ mb: 1 }}
+                                />
                                 <TextField
                                     fullWidth variant="outlined"
                                     label="link to cert"
-                                    name="linkCert"
-                                    value={skill.companyName}
+                                    name="certLink"
+                                    value={skill.certLink}
                                     onChange={(event) => handleSkillChange(index, event)}
                                     sx={{ mb: 1 }}
                                 />
@@ -409,7 +425,7 @@ const CreateNewCvForm = () => {
                         <Typography variant="h4">Resume Title</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        <TextField fullWidth label="enter your job title" variant="outlined" />
+                        <TextField fullWidth label="enter your job title" value={userInfoForm.title} variant="outlined"  name="title" onChange={handleInputChange} />
                     </Grid>
                     {/* spacing */}
                     <Grid item xs={24} />
@@ -428,18 +444,18 @@ const CreateNewCvForm = () => {
             {showCVDemo && (
                 <div className="w-100">
                     <CvTemplate1
-                        name={userInfoForm.name}
+                        name={userInfoForm.userName}
                         gender={userInfoForm.gender}
                         profession={userInfoForm.profession}
-                        location={userInfoForm.location}
+                        location={userInfoForm.userLocation}
                         mobilePhone={userInfoForm.mobilePhone}
                         email={userInfoForm.email}
-                        profileDescription={userInfoForm.profileDescription}
+                        description={userInfoForm.responsibility}
                         linkedInLink={userInfoForm.linkedInLink}
                         gitHubLink={userInfoForm.githubLink}
-                        education={userInfoForm.educations}
-                        skill={userInfoForm.skills}
-                        workingExperience={userInfoForm.experiences}
+                        education={educations}
+                        skill={skills}
+                        workingExperience={experiences}
                         handleBackToEditButton={() => setShowCVDemo(false)}
                     // handleSaveCVButton={() => createNewCv()}
                     />

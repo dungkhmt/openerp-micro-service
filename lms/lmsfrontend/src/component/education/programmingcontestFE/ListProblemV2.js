@@ -22,15 +22,23 @@ import HustContainerCard from "../../common/HustContainerCard";
 import StandardTable from "../../table/StandardTable";
 import { TabPanelVertical } from "./TabPanel";
 import { getColorLevel } from "./lib";
+import FilterbyTag from "component/table/FilterbyTag";
+
+
 
 function ListProblemV2() {
   const { keycloak } = useKeycloak();
   const [value, setValue] = useState(0);
-  const [myProblems, setMyProblems] = useState([]);
 
+  const [myProblems, setMyProblems] = useState([]);
   const [sharedProblems, setSharedProblems] = useState([]);
   const [allProblems, setAllProblems] = useState([]);
+  
+
   const [loading, setLoading] = useState(false);
+  
+
+
 
   const { t } = useTranslation("education/programmingcontest/problem");
 
@@ -53,6 +61,7 @@ function ListProblemV2() {
     {
       title: "ID",
       field: "problemId",
+      filtering: false,
       render: (rowData) => (
         <Link
           to={{
@@ -79,28 +88,49 @@ function ListProblemV2() {
         </Link>
       ),
     },
-    { title: t("problemName"), field: "problemName" },
-    { title: t("problemList.createdBy"), field: "userId" },
-    { title: t("problemList.createdAt"), field: "createdAt" },
+    { title: t("problemName"), field: "problemName", filtering: false},
+    { title: t("problemList.createdBy"), field: "userId", filtering: false },
+    { title: t("problemList.createdAt"), field: "createdAt", filtering: false },
     {
       title: t("problemList.level"),
       field: "levelId",
+      filtering: true,
+      lookup: { 'easy': 'easy', 'medium': 'medium', 'hard': 'hard' },
+      
       render: (rowData) => (
         <span style={{ color: getColorLevel(`${rowData.levelId}`) }}>
           {`${rowData.levelId}`}
         </span>
       ),
     },
-    { title: t("problemList.status"), field: "statusId" },
+    { title: t("problemList.status"), field: "statusId", filtering: false },
+    
     {
       title: "Tags",
+      fields: "tags",
+      
+      // Using standard MUI Table filtering function
+      filtering: true,
+      filterComponent: (props) => <FilterbyTag {...props}/>,
+      customFilterAndSearch: (term, rowData) => {
+        let currentTags = rowData.tags.map(x => x.name)
+        console.log(term, currentTags)
+        return term.some(t=> currentTags.includes(t.name)) || term.length == 0
+        // Hiển thị hàng nếu tags của hàng đó contain một tags trong filter hoặc filter rỗng 
+      }
+
+      // Customize filter component 
+      // filterComponent: (props) => <FilterbyTag {...props} />
+    ,
       render: (rowData) => (
-        <Box>
+         <Box>
           {rowData?.tags.length > 0 &&
             rowData.tags.map((tag) => (
+              
               <Chip
                 size="small"
                 label={tag.name}
+                key = {tag.tagId}
                 sx={{
                   marginRight: "6px",
                   marginBottom: "6px",
@@ -109,12 +139,13 @@ function ListProblemV2() {
                 }}
               />
             ))}
-        </Box>
+         </Box>
       ),
     },
     {
       title: t("problemList.appearances"),
       field: "appearances",
+      filtering: false,
       render: (rowData) => {
         return (
           <span style={{ marginLeft: "24px" }}>{rowData.appearances}</span>
@@ -169,6 +200,10 @@ function ListProblemV2() {
     }).then();
   }, []);
 
+
+
+
+  
   useEffect(() => {
     setLoading(true);
     getProblems("/teacher/owned-problems", (data) => {
@@ -184,6 +219,8 @@ function ListProblemV2() {
       setLoading(false);
     });
   }, [getProblems]);
+
+
 
   /*
   useEffect(() => {
@@ -224,6 +261,7 @@ function ListProblemV2() {
             pageSize: 10,
             search: true,
             sorting: true,
+            filtering: true,
           }}
           actions={[
             {
@@ -253,6 +291,7 @@ function ListProblemV2() {
             pageSize: 10,
             search: true,
             sorting: true,
+            filtering: true,
           }}
           sx={{ marginTop: "8px" }}
         />

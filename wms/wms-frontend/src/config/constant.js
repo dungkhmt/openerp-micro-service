@@ -8,7 +8,7 @@ const prod = {
 const dev = {
   url: {
     KEYCLOAK_BASE_URL: "https://erp3.soict.ai/iam",
-    API_URL: "http://localhost/api",
+    API_URL: "http://localhost:8080/api",
   },
 };
 

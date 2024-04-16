@@ -145,7 +145,9 @@ const Projects = () => {
   }, [fetchProjects, searchDebounce, sort, sortColumn]);
 
   return (
-    <Card sx={{ height: "85vh", boxShadow: (theme) => theme.shadows[1] }}>
+    <Card
+      sx={{ height: "88vh", boxShadow: (theme) => theme.shadows[1], mr: 2 }}
+    >
       <CardHeader title="Danh sách dự án" />
       <DataGrid
         pagination

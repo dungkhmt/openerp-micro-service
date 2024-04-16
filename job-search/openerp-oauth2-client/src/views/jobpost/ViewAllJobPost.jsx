@@ -21,7 +21,12 @@ const ViewAllJobPost = () => {
     const [salary, setSalary] = useState(0)
 
     const [allJobPostForm, setAllJobPostForm] = useState([])
-
+    const [user, setUser] = useState({})
+    useEffect(() => {
+        request("get", "/user/get-user-data", (res) => {
+            setUser(res.data)
+          }).then();
+    }, [])
     useEffect(() => {
         request("get", "/job-post", (res) => {
             setAllJobPostForm(res.data)

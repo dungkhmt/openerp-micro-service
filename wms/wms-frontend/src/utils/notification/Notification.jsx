@@ -115,21 +115,26 @@ export const errorNoti = (message, autoClose) => {
     </ContentContainer>
   );
 
-  return toast[toast.TYPE.ERROR](content, {
+  const toastId = toast.error(content, {
     position: "bottom-right",
     autoClose: autoClose === undefined ? false : autoClose,
     pauseOnHover: true,
     draggable: true,
     progress: undefined,
   });
+
+  if (autoClose === undefined || autoClose) {
+    setTimeout(() => {
+      toast.dismiss(toastId);
+    }, 1500);
+  }
+
+  return toastId;
 };
 
-export const successNoti = (message, autoClose) =>
-  toast.success(
+export const successNoti = (message, autoClose) => {
+  const toastId = toast.success(
     <Box display="flex" alignItems="center">
-      {/* <IconContext.Provider>
-        <FiCheckCircle size={20} style={{marginRight: "5px" }} />
-      </IconContext.Provider> */}
       <CheckCircleRoundedIcon style={{ marginRight: "5px" }} />
       {message}
     </Box>,
@@ -142,6 +147,12 @@ export const successNoti = (message, autoClose) =>
     }
   );
 
+  if (autoClose === undefined || autoClose) {
+    setTimeout(() => {
+      toast.dismiss(toastId);
+    }, 2000); // Đợi 2 giây trước khi tự động tắt
+  }
+};
 export const warningNoti = (message, autoClose) =>
   toast.warning(
     <Box display="flex" alignItems="center">

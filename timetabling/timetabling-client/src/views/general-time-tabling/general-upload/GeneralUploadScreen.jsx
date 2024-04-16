@@ -5,11 +5,36 @@ import Button from "@mui/material/Button";
 import InputFileUpload from "./components/InputFileUpload";
 import { LoadingProvider } from "./contexts/LoadingContext";
 import { useClasses } from "../hooks/useClasses";
+import { toast } from "react-toastify";
+import { request } from "api";
+import { FacebookCircularProgress } from "components/common/progressBar/CustomizedCircularProgress";
 
 const GeneralUploadScreen = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedSemester, setSelectedSemester] = useState(null);
-  const { loading, error, classes } = useClasses(null, selectedSemester);
+  const { loading, error, classes, setClasses } = useClasses(
+    null,
+    selectedSemester
+  );
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const handleDelete = () => {
+    if (selectedSemester === null) return;
+    setDeleteLoading(true);
+    request(
+      "delete",
+      `/general-classes/?semester=${selectedSemester?.semester}`,
+      (res) => {
+        setDeleteLoading(false);
+        setClasses([]);
+        toast.info("Xóa danh sách lớp thành công");
+      },
+      (error) => {
+        console.log(error);
+        setDeleteLoading(false);
+        toast.error("Xóa danh sách lớp thất bại!");
+      }
+    );
+  };
 
   return (
     <LoadingProvider>
@@ -20,23 +45,27 @@ const GeneralUploadScreen = () => {
             setSelectedSemester={setSelectedSemester}
           />
           <div className="flex flex-col gap-2 items-end">
-            <Button
-              disabled={selectedSemester === null}
-              onClick={() => {}}
-              sx={{ width: "200px" }}
-              variant="contained"
-              color="error"
-            >
-              Xóa danh sách
-            </Button>
             <InputFileUpload
               selectedSemester={selectedSemester}
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
+              setClasses={setClasses}
             />
+            <div className="flex">
+              {deleteLoading && <FacebookCircularProgress />}
+              <Button
+                sx={{ width: 290 }}
+                disabled={deleteLoading || selectedSemester === null}
+                onClick={handleDelete}
+                variant="contained"
+                color="error"
+              >
+                Xóa danh sách theo kỳ
+              </Button>
+            </div>
           </div>
         </div>
-        <GeneralUploadTable classes={classes} dataLoading={loading}/>
+        <GeneralUploadTable classes={classes} dataLoading={loading} />
       </div>
     </LoadingProvider>
   );
