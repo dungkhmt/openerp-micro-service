@@ -1,24 +1,36 @@
 import DateFnsUtils from "@date-io/date-fns";
-import {Card, CardActions, CardContent, MenuItem, TextField, Typography,} from "@material-ui/core/";
+import {
+  Card,
+  CardActions,
+  CardContent,
+  MenuItem,
+  TextField,
+  Typography,
+} from "@material-ui/core/";
 import Button from "@material-ui/core/Button";
-import {makeStyles} from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import {MuiPickersUtilsProvider} from "@material-ui/pickers";
-import {ContentState, convertToRaw, EditorState} from "draft-js";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import { ContentState, convertToRaw, EditorState } from "draft-js";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
-import {DropzoneArea} from "material-ui-dropzone";
-import {useEffect, useState} from "react";
-import {Editor} from "react-draft-wysiwyg";
-import {useParams} from "react-router";
-import {useHistory} from "react-router-dom";
-import {request} from "../../../api";
-import {dataUrlToFile, randomImageName,} from "../../../utils/FileUpload/covert";
+import { DropzoneArea } from "material-ui-dropzone";
+import { useEffect, useState } from "react";
+import { Editor } from "react-draft-wysiwyg";
+import { useParams } from "react-router";
+import { useHistory } from "react-router-dom";
+import { request } from "../../../api";
+import {
+  dataUrlToFile,
+  randomImageName,
+} from "../../../utils/FileUpload/covert";
 import AlertDialog from "../../common/AlertDialog";
 import RichTextEditor from "../../common/editor/RichTextEditor";
 import FilePreview from "../../common/uploader/FilePreview";
 import FileUploader from "../../common/uploader/FileUploader";
 import getFileByStorageId from "../quiztest/quizdoingexplanation/content-utils";
+import { Box, Chip, InputLabel, OutlinedInput, Select } from "@mui/material";
+import { errorNoti } from "utils/notification";
 
 let reDirect = null;
 const useStyles = makeStyles((theme) => ({
@@ -54,6 +66,20 @@ const useStyles = makeStyles((theme) => ({
     height: 32,
     cursor: "pointer",
   },
+  selectBox: {
+    padding: 20,
+    minWidth: 150,
+    marginRight: 40,
+    height: 60,
+  },
+  wrapper: {
+    padding: 32,
+  },
+  subTitle: {
+    fontSize: 20,
+    fontWeight: 600,
+    marginBottom: 16,
+  },
 }));
 
 const editorStyle = {
@@ -65,6 +91,26 @@ const editorStyle = {
     minHeight: "300px",
   },
 };
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+function getStyles(tag, tags, theme) {
+  return {
+    fontWeight:
+      tags.indexOf(tag) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
 
 function CreateQuizOfCourse() {
   const params = useParams();
@@ -89,6 +135,11 @@ function CreateQuizOfCourse() {
   const [solutionAttachments, setSolutionAttachments] = useState([]);
   const [deletedAttachmentIds, setDeletedAttachmentIds] = useState([]);
   const [addedSolutionAttachments, setAddedSolutionAttachments] = useState([]);
+
+  const theme = useTheme();
+  const [tags, setTags] = useState([]);
+  const [chooseTags, setChooseTags] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(getSolutionAttachments, [solutionAttachmentIds]);
 
@@ -153,6 +204,12 @@ function CreateQuizOfCourse() {
     });
   }
 
+  async function getListTagOfCourse(courseId) {
+    request("GET", `/get-tags-of-course/${courseId}`, (res) =>
+      setTags(res.data.map((item) => item.tagName))
+    );
+  }
+
   async function getQuizContent() {
     request("get", "/edu/teacher/course/quiz/detail/" + questionId, (res) => {
       res = res.data;
@@ -181,6 +238,7 @@ function CreateQuizOfCourse() {
         setCourseId(quizQuestion.quizCourseTopic.eduCourse.id);
 
         const courseId = quizQuestion.quizCourseTopic.eduCourse.id;
+        getListTagOfCourse(courseId);
         getTopicList(courseId);
         getLevelList();
         setInitSate(true);
@@ -219,6 +277,8 @@ function CreateQuizOfCourse() {
       fileId,
       solutionContent,
       deletedAttachmentIds,
+      chooseTags,
+      courseId,
     };
 
     let formData = new FormData();
@@ -262,14 +322,47 @@ function CreateQuizOfCourse() {
     //let chapter = await authPost(dispatch, token, '/create-quiz-question', body);
     //console.log('Create chapter success, chapter = ',chapter);
   }
+
+  function getListTagOfQuiz() {
+    // setLoading(true);
+    let successHandler = (res) => {
+      setChooseTags(res.data.map((item) => item.tagName));
+      setLoading(false);
+    };
+    let errorHandlers = {
+      onError: () => {
+        errorNoti("Đã xảy ra lỗi khi tải dữ liệu", true);
+        setLoading(false);
+      },
+    };
+    request(
+      "GET",
+      `/get-tags-of-quiz/${questionId}`,
+      successHandler,
+      errorHandlers
+    );
+  }
+
   useEffect(() => {
     getQuizContent();
+    // getListTagOfCourse();
+    getListTagOfQuiz();
     // console.log('Create chapter of course ' + courseId);
   }, []);
 
   const handleDeleteImageAttachment = async (fileId) => {
     const newFileArray = fetchedImageArray.filter((file) => file.id !== fileId);
     setFetchedImageArray(newFileArray);
+  };
+
+  const handleChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setChooseTags(
+      // On autofill we get a stringified value.
+      typeof value === "string" ? value.split(",") : value
+    );
   };
 
   return (
@@ -323,6 +416,39 @@ function CreateQuizOfCourse() {
                     </MenuItem>
                   ))}
                 </TextField>
+
+                <InputLabel id="demo-multiple-name-label">Tags</InputLabel>
+                <Select
+                  labelId="demo-multiple-chip-label"
+                  id="demo-multiple-chip"
+                  multiple
+                  required
+                  value={chooseTags}
+                  onChange={handleChange}
+                  className={classes.selectBox}
+                  input={
+                    <OutlinedInput id="select-multiple-chip" label="Chip" />
+                  }
+                  placeholder="Tags"
+                  renderValue={(selected) => (
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                      {selected.map((value) => (
+                        <Chip key={value} label={value} />
+                      ))}
+                    </Box>
+                  )}
+                  MenuProps={MenuProps}
+                >
+                  {tags.map((tag) => (
+                    <MenuItem
+                      key={tag}
+                      value={tag}
+                      style={getStyles(tag, tags, theme)}
+                    >
+                      {tag}
+                    </MenuItem>
+                  ))}
+                </Select>
 
                 <Editor
                   editorState={editorState}

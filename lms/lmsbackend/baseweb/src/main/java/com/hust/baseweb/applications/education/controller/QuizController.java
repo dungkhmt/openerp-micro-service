@@ -1,14 +1,19 @@
 package com.hust.baseweb.applications.education.controller;
 
+import com.google.gson.Gson;
 import com.hust.baseweb.applications.education.classmanagement.service.ClassService;
 import com.hust.baseweb.applications.education.entity.*;
 import com.hust.baseweb.applications.education.model.GetClassDetailOM;
 import com.hust.baseweb.applications.education.model.quiz.*;
+import com.hust.baseweb.applications.education.repo.QuizQuestionTagRepo;
 import com.hust.baseweb.applications.education.repo.QuizQuestionUserRoleRepo;
+import com.hust.baseweb.applications.education.repo.QuizTagRepo;
 import com.hust.baseweb.applications.education.service.CommentOnQuizQuestionService;
 import com.hust.baseweb.applications.education.service.QuizChoiceAnswerService;
 import com.hust.baseweb.applications.education.service.QuizCourseTopicService;
 import com.hust.baseweb.applications.education.service.QuizQuestionService;
+import com.hust.baseweb.applications.education.service.QuizQuestionTagService;
+import com.hust.baseweb.applications.education.service.QuizTagService;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;
 import lombok.AllArgsConstructor;
@@ -46,6 +51,11 @@ public class QuizController {
     private CommentOnQuizQuestionService commentOnQuizQuestionService;
 
     private QuizQuestionUserRoleRepo quizQuestionUserRoleRepo;
+
+    private QuizTagRepo quizTagRepo;
+    private QuizTagService quizTagService;
+    private QuizQuestionTagRepo quizQuestionTagRepo;
+    private QuizQuestionTagService quizQuestionTagService;
 
     @PostMapping("/post-comment-on-quiz")
     public ResponseEntity<?> postCommentOnQuizQuestion(
@@ -108,6 +118,67 @@ public class QuizController {
     }
 
     @Secured({"ROLE_TEACHER"})
+    @PostMapping("/create-quiz-tag")
+    public ResponseEntity<?> createQuizTag(Principal principal, @RequestBody QuizTagCreateModel input) {
+        QuizTag quizTag = quizTagService.createQuizTag(input.getCourseId(), input.getTagName());
+        return ResponseEntity.ok().body(quizTag);
+    }
+
+    @Secured({"ROLE_TEACHER"})
+    @PostMapping("/create-quiz-question-tag")
+    public ResponseEntity<?> createQuizQuestionTag(Principal principal, @RequestBody QuizQuestionTagCreateModel input) {
+        QuizQuestionTag quizQuestionTag = quizQuestionTagService.createQuizQuestionTag(input.getQuestionId(), input.getTagId());
+        return ResponseEntity.ok().body(quizQuestionTag);
+    }
+
+    @GetMapping("/get-tags-of-course/{courseId}")
+    public ResponseEntity<?> getListTagOfCourse(Principal principal, @PathVariable String courseId) {
+        
+        return ResponseEntity.ok().body(quizTagRepo.findAllByCourseId(courseId));
+    }
+
+    @GetMapping("/get-tags-of-quiz/{questionId}")
+    public ResponseEntity<?> getListTagOfQuiz(Principal principal, @PathVariable UUID questionId) {
+        List<QuizQuestionTag> quizQuestionTags = quizQuestionTagRepo.findAllByQuestionId(questionId);
+        List<UUID> tagIds = new ArrayList<>();
+        for (QuizQuestionTag quizQuestionTag : quizQuestionTags) {
+            tagIds.add(quizQuestionTag.getTagId());
+        }
+        List<QuizTag> quizTags = quizTagRepo.findAllByTagIdsIn(tagIds);
+        return ResponseEntity.ok().body(quizTags);
+    }
+
+    @GetMapping("/get-questions-of-course-by-tags")
+    public ResponseEntity<?> getListQuestionByTags(Principal principal, @RequestParam("tags") List<String> tags, @RequestParam("courseId") String courseId) {
+        List<UUID> tagIds = quizTagRepo.findAllTagIdByCourseIdAndTagName(courseId, tags);
+        List<UUID> questionIds = quizQuestionTagService.getListQuizQuestionByTagIds(tagIds);
+        
+        List<QuizQuestion> quizQuestions = quizQuestionService.findAllQuizQuestionsByQuestionIdsIn(questionIds);
+        //List<QuizQuestion> quizQuestions = quizQuestionService.findAll();
+        List<QuizQuestionDetailModel> quizQuestionDetailModels = new ArrayList<>();
+        for (QuizQuestion quizQuestion : quizQuestions) {
+            QuizQuestionDetailModel quizQuestionDetailModel = quizQuestionService.findQuizDetail(quizQuestion.getQuestionId());
+            quizQuestionDetailModels.add(quizQuestionDetailModel);
+        }
+        Collections.sort(quizQuestionDetailModels, new Comparator<QuizQuestionDetailModel>() {
+            @Override
+            public int compare(QuizQuestionDetailModel o1, QuizQuestionDetailModel o2) {
+                String topic1 = o1.getQuizCourseTopic().getQuizCourseTopicId();
+                String topic2 = o2.getQuizCourseTopic().getQuizCourseTopicId();
+                String level1 = o1.getLevelId();
+                String level2 = o2.getLevelId();
+                int c1 = topic1.compareTo(topic2);
+                if (c1 == 0) {
+                    return level1.compareTo(level2);
+                } else {
+                    return c1;
+                }
+            }
+        });
+        return ResponseEntity.ok().body(quizQuestionDetailModels);
+    }
+
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/get-all-quiz-course-topics")
     public ResponseEntity<?> getAllQuizCourseTopics(Principal principal) {
         //log.info("getAllQuizCourseTopics");
@@ -158,6 +229,14 @@ public class QuizController {
             json,
             files,
             addedSolutionAttachments);
+        
+        quizQuestionTagRepo.deleteByQuestionId(questionId);
+        Gson gson = new Gson();
+        QuizQuestionUpdateInputModel quizQuestionUpdateInputModel = gson.fromJson(json, QuizQuestionUpdateInputModel.class);
+        List<UUID> tagIds = quizTagRepo.findAllTagIdByCourseIdAndTagName(quizQuestionUpdateInputModel.getCourseId(), quizQuestionUpdateInputModel.getChooseTags());
+        for (UUID tag : tagIds) {
+            quizQuestionTagService.createQuizQuestionTag(questionId, tag);
+        }
         return ResponseEntity.ok().body(quizQuestion);
     }
 
@@ -227,6 +306,14 @@ public class QuizController {
         //System.out.println("hehehehehehehe");
 //        log.info("createQuizQuestion, topicId = " + input.getQuizCourseTopicId());
         QuizQuestion quizQuestion = quizQuestionService.save(u, json, files, solutionAttachments);
+
+        // Can add them tag vao service
+        Gson gson = new Gson();
+        QuizQuestionCreateInputModel questionCreateInputModel = gson.fromJson(json, QuizQuestionCreateInputModel.class);
+        List<UUID> tagIds = quizTagRepo.findAllTagIdByCourseIdAndTagName(questionCreateInputModel.getCourseId(), questionCreateInputModel.getChooseTags());
+        for (UUID tag : tagIds) {
+            quizQuestionTagService.createQuizQuestionTag(quizQuestion.getQuestionId(), tag);
+        }
         return ResponseEntity.ok().body(quizQuestion);
     }
 
