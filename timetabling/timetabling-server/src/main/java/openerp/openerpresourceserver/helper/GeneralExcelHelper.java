@@ -8,10 +8,7 @@ import java.util.*;
 
 import openerp.openerpresourceserver.model.entity.occupation.OccupationClassPeriod;
 import openerp.openerpresourceserver.model.entity.occupation.RoomOccupation;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
@@ -223,12 +220,15 @@ public class GeneralExcelHelper {
             /*Header*/
             Row headerRow = sheet.createRow(0);
             /*Header Cell*/
-            for (int i = 1; i <= weekLength*84; i++) {
-                Cell c = headerRow.createCell(i);
-                String periodIndexString = "W" + (i/84 + 1) + "-D" + ((i%84)/12 +2) + "-P" + ((i%84)%12);
+            for (int i = 0; i < weekLength*84; i++) {
+                Cell c = headerRow.createCell(i+1);
+                String periodIndexString = ((i%84)%12+1) + "/" + ((i%84)/12 +2) + "/W" + (i/84 + 1) ;
                 c.setCellValue(periodIndexString);
             }
-
+            CellStyle boldStyle = workbook.createCellStyle();
+            Font boldFont = workbook.createFont();
+            boldFont.setBold(true);
+            boldStyle.setFont(boldFont);
             int rowIndex = 1;
             for (String room : periodMap.keySet()) {
                 if(!room.equals("")) {
@@ -237,6 +237,7 @@ public class GeneralExcelHelper {
                     roomNameCell.setCellValue(room);
                     for (int cellIndex = 1; cellIndex <= weekLength*7*12; cellIndex++) {
                         Cell c = roomRow.createCell(cellIndex);
+                        c.setCellStyle(boldStyle);
                         for (OccupationClassPeriod roomPeriod : periodMap.get(room)) {
                             if(cellIndex >=  roomPeriod.getStartPeriodIndex() && cellIndex <= roomPeriod.getEndPeriodIndex()) {
                                 // If cell value is not empty, append class code with comma
