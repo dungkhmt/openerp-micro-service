@@ -1,14 +1,12 @@
+import { forwardRef } from "react";
 import PropTypes from "prop-types";
 import CustomAvatar from "../../mui/avatar/CustomAvatar";
 import { getRandomColorSkin } from "../../../utils/color.util";
 
-const UserAvatar = ({
-  user,
-  width = 30,
-  height = 30,
-  fontSize = "0.875rem",
-  ...props
-}) => {
+const UserAvatar = forwardRef(function UserAvatar(
+  { user, width = 30, height = 30, fontSize = "0.875rem", ...props },
+  ref
+) {
   return (
     <CustomAvatar
       skin="light"
@@ -21,11 +19,12 @@ const UserAvatar = ({
         ...props.sx,
       }}
       src={user.avatarUrl}
+      ref={ref}
     >
       {`${user.firstName?.charAt(0) ?? ""}${user.lastName?.charAt(0) ?? ""}`}
     </CustomAvatar>
   );
-};
+});
 
 UserAvatar.propTypes = {
   user: PropTypes.object.isRequired,

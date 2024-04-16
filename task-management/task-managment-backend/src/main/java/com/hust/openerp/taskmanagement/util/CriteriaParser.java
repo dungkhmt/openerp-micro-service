@@ -16,7 +16,8 @@ public class CriteriaParser {
   private static Map<String, Operator> ops;
 
   private static Pattern criteriaRegex = Pattern.compile("^(\\w+?)(" + Joiner.on("|")
-      .join(SearchOperation.SIMPLE_OPERATION_SET) + ")(\\p{Punct}?)(.*?)(\\p{Punct}?)?$");
+      .join(SearchOperation.SIMPLE_OPERATION_SET).replace("[", "\\[").replace("]", "\\]")
+      + ")(\\p{Punct}?)(.*?)(\\p{Punct}?)?$");
 
   private enum Operator {
     OR(1), AND(2);

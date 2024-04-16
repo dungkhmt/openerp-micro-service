@@ -195,11 +195,12 @@ const ProjectViewMembers = () => {
   useEffect(() => {
     setFilterMembers(
       members.filter((member) => {
-        const fullName = `${member.member.firstName ?? ""} ${
-          member.member.lastName ?? ""
-        }`.toLowerCase();
+        const fullName =
+          `${member.member.firstName ?? ""} ${
+            member.member.lastName ?? ""
+          }`?.toLowerCase() ?? "";
         const id = member.member.id.toLowerCase();
-        const email = member.member.email.toLowerCase();
+        const email = member.member.email?.toLowerCase() ?? "";
         return (
           fullName.includes(searchDebounce.toLowerCase()) ||
           id.includes(searchDebounce.toLowerCase()) ||
