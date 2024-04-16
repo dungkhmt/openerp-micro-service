@@ -1,9 +1,10 @@
 package com.hust.openerp.taskmanagement.util;
 
 public enum SearchOperation {
-  EQUALITY, NEGATION, GREATER_THAN, LESS_THAN, LIKE, STARTS_WITH, ENDS_WITH, CONTAINS;
+  EQUALITY, NEGATION, GREATER_THAN, LESS_THAN, LIKE, STARTS_WITH, ENDS_WITH, CONTAINS, IN, GREATER_THAN_OR_EQUAL,
+  LESS_THAN_OR_EQUAL;
 
-  public static final String[] SIMPLE_OPERATION_SET = { "!", ":", ">", "<", "~" };
+  public static final String[] SIMPLE_OPERATION_SET = { "!", ":", ">", "<", "~", "]", "[" };
 
   public static final String DATETIME_PREFIX = "t";
 
@@ -31,6 +32,10 @@ public enum SearchOperation {
         return LESS_THAN;
       case '~':
         return LIKE;
+      case ']':
+        return GREATER_THAN_OR_EQUAL;
+      case '[':
+        return LESS_THAN_OR_EQUAL;
       default:
         return null;
     }

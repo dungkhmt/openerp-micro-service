@@ -52,8 +52,10 @@ for (let i = 0; i < 3; i++) {
  * @return {import('gantt-schedule-timeline-calendar/dist/gstc').Config}
  */
 export const buildConfig = ({ listRows, chartItems }) => ({
+  // ! The license key is for testing purposes only, will expire in 2 months
+  // ! Please get your own license key from https://gstc.neuronet.io/free-key/
   licenseKey:
-    "====BEGIN LICENSE KEY====\nXOfH/lnVASM6et4Co473t9jPIvhmQ/l0X3Ewog30VudX6GVkOB0n3oDx42NtADJ8HjYrhfXKSNu5EMRb5KzCLvMt/pu7xugjbvpyI1glE7Ha6E5VZwRpb4AC8T1KBF67FKAgaI7YFeOtPFROSCKrW5la38jbE5fo+q2N6wAfEti8la2ie6/7U2V+SdJPqkm/mLY/JBHdvDHoUduwe4zgqBUYLTNUgX6aKdlhpZPuHfj2SMeB/tcTJfH48rN1mgGkNkAT9ovROwI7ReLrdlHrHmJ1UwZZnAfxAC3ftIjgTEHsd/f+JrjW6t+kL6Ef1tT1eQ2DPFLJlhluTD91AsZMUg==||U2FsdGVkX1/SWWqU9YmxtM0T6Nm5mClKwqTaoF9wgZd9rNw2xs4hnY8Ilv8DZtFyNt92xym3eB6WA605N5llLm0D68EQtU9ci1rTEDopZ1ODzcqtTVSoFEloNPFSfW6LTIC9+2LSVBeeHXoLEQiLYHWihHu10Xll3KsH9iBObDACDm1PT7IV4uWvNpNeuKJc\npY3C5SG+3sHRX1aeMnHlKLhaIsOdw2IexjvMqocVpfRpX4wnsabNA0VJ3k95zUPS3vTtSegeDhwbl6j+/FZcGk9i+gAy6LuetlKuARjPYn2LH5Be3Ah+ggSBPlxf3JW9rtWNdUoFByHTcFlhzlU9HnpnBUrgcVMhCQ7SAjN9h2NMGmCr10Rn4OE0WtelNqYVig7KmENaPvFT+k2I0cYZ4KWwxxsQNKbjEAxJxrzK4HkaczCvyQbzj4Ppxx/0q+Cns44OeyWcwYD/vSaJm4Kptwpr+L4y5BoSO/WeqhSUQQ85nvOhtE0pSH/ZXYo3pqjPdQRfNm6NFeBl2lwTmZUEuw==\n====END LICENSE KEY====",
+    "====BEGIN LICENSE KEY====\nLJ8TI6WxbTVIwld0JHpE7OC9TtrXzTEiwgFkflylqkeWP+QA4o0KZzphP5YQPryO8fqzmn0e7n8FV0+QDPwaLq6P7J+HPRTFvoJ8D9eZx5EHD/Dc3SZMxoxIXhzB4X9F3gQbM86mxwknEjfQOhGlWEwzhvbWoILB7cLWijtj0tnPqdRD0T4WTYukkfbWI3FHxjDZiYzlUbn+hOFWRHIJrVf0CbHepQARqO0P6o9wMYOWf1hn6RyymxuqHpYPcScfDm+me0DZHrjeGqhxIigOKXe25PDNEZhC1Wn2BEkFVB9IR6tmmfsF1bep8wQj7TFWu8A0BeZOWYeL4MomKFxteQ==||U2FsdGVkX1+dWz07FoUMIQpSGcvjOnzRN8YHhb4ZvDBI2qEEgV/FFvHo14YrP8Dza/yyY6+mSD+w3vViNNgllV5Pe3qHoOF6YNHYxI7PT7g=\nCpUN0koRph7sdZqZNafj74c6CqY0+qwHEjRy1T8VU/m8XWR9+KwLskpJEUykyqJuzgj3F6cyJ8a391Z9Sy8BqjIz8aMN8Ub72QSk0tM5gfnB60S3e0J+VpZUlt2ldsI+zBg2w1qzq77C2ObSggLelqJnYX9GR1V5b/RnffVnTXAWbVKB2ODC9QiyfvPJABFdq8u+vMV9E75oKT8WxkcSBGQ3vbQYN+Gxe+x7RMb1C62Y+r9vGzCXRUjWazBtvM+i7E3uO0fF0ISqZW/LJDx46Dt/q/8pxJuOAa2FbrHLcxxbG4Vue0mrl0RJXi/qZ2zMa/hLjvmh9pu16zYaDGr+7Q==\n====END LICENSE KEY====",
   // innerHeight: 900,
   autoInnerHeight: true,
   plugins: [

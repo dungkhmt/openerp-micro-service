@@ -4,14 +4,8 @@ import {
   Button,
   Card,
   CardContent,
-  Collapse,
-  FormControl,
-  Grid,
-  IconButton,
-  InputLabel,
+  InputAdornment,
   LinearProgress,
-  MenuItem,
-  Select,
   TextField,
   Tooltip,
   Typography,
@@ -31,31 +25,35 @@ import { useDebounce } from "../../../hooks/useDebounce";
 import {
   clearCache,
   fetchTasks,
-  resetFilters,
   resetPagination,
   resetSort,
-  setFilters,
   setPagination,
   setSort,
+  setSearch as setSearchAction,
 } from "../../../store/project/tasks";
 import { getDueDateColor, getProgressColor } from "../../../utils/color.util";
 import { DialogAddTask } from "./DialogAddTask";
+import { Filter } from "./Filter";
 
 const ProjectViewTasks = () => {
   const dispatch = useDispatch();
-  const { members, project } = useSelector((state) => state.project);
-  const { filters, sort, pagination, fetchLoading, totalCount, tasksCache } =
-    useSelector((state) => state.tasks);
+  const { project } = useSelector((state) => state.project);
+  const {
+    filters,
+    sort,
+    pagination,
+    fetchLoading,
+    totalCount,
+    tasksCache,
+    search: searchStore,
+  } = useSelector((state) => state.tasks);
   const {
     category: categoryStore,
     priority: priorityStore,
     status: statusStore,
   } = useSelector((state) => state);
 
-  const [toggleFilter, setToggleFilter] = useState(false);
-  const [filter, setFilter] = useState(filters);
-
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchStore);
   const searchDebounce = useDebounce(search, 1000);
 
   const [rows, setRows] = useState([]);
@@ -234,9 +232,40 @@ const ProjectViewTasks = () => {
     );
   };
 
+  const buildFilterString = (filter) => {
+    const expressions = filter.items
+      .map((f) => {
+        const subExpressions = f.items
+          .map((i) => {
+            if (
+              i.field === "" ||
+              i.operator === "" ||
+              (typeof i.operator === "object" &&
+                !i.operator.isUnary &&
+                i.value.length === 0)
+            ) {
+              return null;
+            }
+            return `${i.field.id}${i.operator.id}${i.value.join(",")}`;
+          })
+          .filter((i) => i !== null);
+
+        if (subExpressions.length === 0) {
+          return null;
+        }
+        const subQueryString = subExpressions.join(` ${f.condition} `);
+        return `( ${subQueryString} )`;
+      })
+      .filter((f) => f !== null);
+
+    return expressions.length > 0
+      ? expressions.join(` ${filter.condition} `)
+      : "";
+  };
+
   const buildQueryString = () => {
     const builder = [];
-    const encodedSearch = encodeURIComponent(searchDebounce).replace(
+    const encodedSearch = encodeURIComponent(searchStore).replace(
       /%20/g,
       "%1F"
     );
@@ -245,11 +274,8 @@ const ProjectViewTasks = () => {
         ? `( name:*${encodedSearch}* OR description:*${encodedSearch}* )`
         : ""
     );
-    Object.entries(filter).forEach(([key, value]) => {
-      if (value) {
-        builder.push(`${key}:${value}`);
-      }
-    });
+
+    builder.push(buildFilterString(filters));
 
     return builder.filter((s) => s !== "").join(" AND ");
   };
@@ -261,8 +287,8 @@ const ProjectViewTasks = () => {
           fetchTasks({
             projectId: project.id,
             filters: {
-              ...filters,
               ...pagination,
+              q: buildQueryString(),
               sort: `${sort.field},${sort.sort}`,
             },
           })
@@ -272,17 +298,12 @@ const ProjectViewTasks = () => {
         toast.error("Có lỗi khi lấy danh sách nhiệm vụ");
       }
     }
-  }, [dispatch, filters, pagination, project.id, sort]);
+  }, [dispatch, filters, pagination, project.id, sort, searchStore]);
 
-  const onFilter = async () => {
+  const onSearch = async () => {
     dispatch(resetPagination());
     dispatch(clearCache());
-    dispatch(
-      setFilters({
-        ...filter,
-        q: buildQueryString(),
-      })
-    );
+    dispatch(setSearchAction(searchDebounce));
   };
 
   useEffect(() => {
@@ -297,7 +318,7 @@ const ProjectViewTasks = () => {
 
   useEffect(() => {
     if (isInitialized) {
-      onFilter();
+      onSearch();
     } else {
       setIsInitialized(true);
     }
@@ -314,19 +335,9 @@ const ProjectViewTasks = () => {
         }}
       >
         <Box sx={{ display: "flex", gap: 4, alignItems: "center" }}>
-          <Typography variant="h5">Danh sách nhiệm vụ</Typography>
+          <Typography variant="h5">{totalCount ?? 0} nhiệm vụ</Typography>
           <Tooltip title="Lọc">
-            <IconButton
-              color="secondary"
-              size="medium"
-              onClick={() => setToggleFilter(!toggleFilter)}
-            >
-              {toggleFilter ? (
-                <Icon icon="ic:baseline-filter-alt" fontSize="inherit" />
-              ) : (
-                <Icon icon="ic:baseline-filter-alt-off" fontSize="inherit" />
-              )}
-            </IconButton>
+            <Filter />
           </Tooltip>
         </Box>
         <Box
@@ -336,15 +347,19 @@ const ProjectViewTasks = () => {
             justifyContent: "flex-end",
           }}
         >
-          <Typography variant="body2" sx={{ mr: 2 }}>
-            Tìm kiếm:
-          </Typography>
           <TextField
             size="small"
             placeholder="Tìm kiếm nhiệm vụ"
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Icon icon="material-symbols:search" />
+                </InputAdornment>
+              ),
             }}
           />
           <Button
@@ -356,137 +371,6 @@ const ProjectViewTasks = () => {
           </Button>
         </Box>
       </CardContent>
-
-      {/* Filter */}
-      <Collapse in={toggleFilter}>
-        <Grid container spacing={6} sx={{ px: 4, pb: 2 }}>
-          <Grid item sm={1.5} xs={12} xl={1.5} md={1.5}>
-            <FormControl fullWidth>
-              <InputLabel id="role-category">Thể loại</InputLabel>
-              <Select
-                fullWidth
-                value={filter.categoryId}
-                id="select-category"
-                label="Thể loại"
-                labelId="role-category"
-                onChange={(e) =>
-                  setFilter({ ...filter, categoryId: e.target.value })
-                }
-                inputProps={{ placeholder: "Thể loại" }}
-              >
-                <MenuItem value="">Tất cả</MenuItem>
-                {categoryStore.categories.map((category) => (
-                  <MenuItem
-                    key={category.categoryId}
-                    value={category.categoryId}
-                  >
-                    <TaskCategory category={category} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item sm={2} xs={12}>
-            <FormControl fullWidth>
-              <InputLabel id="status-select">Trạng thái</InputLabel>
-              <Select
-                fullWidth
-                value={filter.statusId}
-                id="select-status"
-                label="Trạng thái"
-                labelId="status-select"
-                onChange={(e) =>
-                  setFilter({ ...filter, statusId: e.target.value })
-                }
-                inputProps={{ placeholder: "Trạng thái" }}
-              >
-                <MenuItem value="">Tất cả</MenuItem>
-                {statusStore.statuses.map((status) => (
-                  <MenuItem key={status.statusId} value={status.statusId}>
-                    <TaskStatus status={status} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item sm={2} xs={12}>
-            <FormControl fullWidth>
-              <InputLabel id="priority-select">Ưu tiên</InputLabel>
-              <Select
-                fullWidth
-                value={filter.priorityId}
-                id="select-priority"
-                label="Ưu tiên"
-                labelId="priority-select"
-                onChange={(e) =>
-                  setFilter({ ...filter, priorityId: e.target.value })
-                }
-                inputProps={{ placeholder: "Ưu tiên" }}
-              >
-                <MenuItem value="">Tất cả</MenuItem>
-                {priorityStore.priorities.map((priority) => (
-                  <MenuItem
-                    key={priority.priorityId}
-                    value={priority.priorityId}
-                  >
-                    <TaskPriority priority={priority} showText />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item sm={6} xs={12}>
-            <FormControl fullWidth>
-              <InputLabel id="asignee-select">Phân công cho</InputLabel>
-              <Select
-                fullWidth
-                value={filter.assigneeId}
-                id="select-assignee"
-                label="Phân công cho"
-                labelId="assignee-select"
-                onChange={(e) =>
-                  setFilter({ ...filter, assigneeId: e.target.value })
-                }
-                inputProps={{ placeholder: "Phân công cho" }}
-              >
-                <MenuItem value="">Tất cả</MenuItem>
-                {members.map(({ member }) => (
-                  <MenuItem key={member.id} value={member.id}>
-                    <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-                      <UserAvatar user={member} />
-                      <Typography variant="subtitle2">{`${
-                        member.firstName ?? ""
-                      } ${member.lastName ?? ""}`}</Typography>
-                    </Box>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item sm={2} xs={12}>
-            <Box sx={{ display: "flex", gap: 4 }}>
-              <Button
-                variant="contained"
-                sx={{ height: "32px" }}
-                onClick={onFilter}
-              >
-                Apply
-              </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                sx={{ height: "32px" }}
-                onClick={() => {
-                  dispatch(resetFilters());
-                  setFilter(filters);
-                }}
-              >
-                Clear
-              </Button>
-            </Box>
-          </Grid>
-        </Grid>
-      </Collapse>
 
       {/* Table */}
       <DataGrid

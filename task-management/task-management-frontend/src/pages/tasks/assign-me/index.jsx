@@ -221,7 +221,7 @@ const TaskAssigned = () => {
         page: paginationModel.page,
         size: paginationModel.pageSize,
         search: encodedSearch
-          ? `name:*${encodedSearch}* OR creatorId:*${encodedSearch}* OR projectName:*${encodedSearch}*`
+          ? `name:*${encodedSearch}* OR projectName:*${encodedSearch}*`
           : "",
         sort: `${sortModel.field},${sortModel.sort}`,
       });

@@ -12,12 +12,10 @@ export const fetchTasks = createAsyncThunk(
 const initialState = {
   tasksCache: {},
   totalCount: 0,
+  search: "",
   filters: {
-    categoryId: "",
-    statusId: "",
-    priorityId: "",
-    assigneeId: "",
-    q: "",
+    condition: "AND",
+    items: [],
   },
   pagination: {
     page: 0,
@@ -32,6 +30,12 @@ export const tasksSlice = createSlice({
   name: "tasks",
   initialState,
   reducers: {
+    setSearch: (state, action) => {
+      state.search = action.payload;
+    },
+    resetSearch: (state) => {
+      state.search = initialState.search;
+    },
     setFilters: (state, action) => {
       state.filters = action.payload;
     },
@@ -89,6 +93,8 @@ export const {
   resetPagination,
   resetSort,
   clearCache,
+  setSearch,
+  resetSearch,
 } = tasksSlice.actions;
 
 export default tasksSlice.reducer;
