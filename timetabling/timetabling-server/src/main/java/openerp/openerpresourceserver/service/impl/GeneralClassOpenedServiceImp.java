@@ -2,7 +2,6 @@ package openerp.openerpresourceserver.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.helper.ClassTimeComparator;
@@ -36,10 +35,7 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
 
     @Override
     public List<GeneralClassOpened> getGeneralClasses(String semester) {
-        List<GeneralClassOpened> generalClassOpenedList = gcoRepo.findAll();
-        return generalClassOpenedList.stream()
-                .filter(gClass -> gClass.getSemester().equals(semester))
-                .collect(Collectors.toList());
+        return gcoRepo.findAllBySemester(semester);
     }
 
     @Override
@@ -66,7 +62,7 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
                         gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getStartTime();
                 gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).setStartTime(Integer.parseInt(request.getValue()));
                 gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).setEndTime(Integer.parseInt(request.getValue())+duration);
-                if (!ClassTimeComparator.isConflict(Integer.parseInt(request.getScheduleIndex())-1,gClassOpened, generalClassOpenedList)) {
+                if (!ClassTimeComparator.isClassConflict(Integer.parseInt(request.getScheduleIndex())-1,gClassOpened, generalClassOpenedList)) {
                     roomOccupationList.forEach(ro->{
                         ro.setStartPeriod(gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getStartTime());
                         ro.setEndPeriod(gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getEndTime());
@@ -76,7 +72,7 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
                 }
                 break;
             case "room":
-                if (!ClassTimeComparator.isConflict(Integer.parseInt(request.getScheduleIndex())-1,gClassOpened, generalClassOpenedList)) {
+                if (!ClassTimeComparator.isClassConflict(Integer.parseInt(request.getScheduleIndex())-1,gClassOpened, generalClassOpenedList)) {
                     gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).setRoom(request.getValue());
                     roomOccupationList.forEach(ro->{
                         ro.setClassRoom(gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getRoom());
@@ -87,7 +83,7 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
                 break;
             case "weekday":
                 gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).setWeekday(Integer.parseInt(request.getValue()));
-                if (!ClassTimeComparator.isConflict(Integer.parseInt(request.getScheduleIndex())-1,gClassOpened, generalClassOpenedList)) {
+                if (!ClassTimeComparator.isClassConflict(Integer.parseInt(request.getScheduleIndex())-1,gClassOpened, generalClassOpenedList)) {
                     roomOccupationList.forEach(ro->{
                         ro.setDayIndex(gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getWeekday());
                     });

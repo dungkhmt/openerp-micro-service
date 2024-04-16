@@ -1,24 +1,26 @@
 package openerp.openerpresourceserver.helper;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-import org.apache.poi.hssf.util.HSSFColor;
+import openerp.openerpresourceserver.model.entity.occupation.OccupationClassPeriod;
+import openerp.openerpresourceserver.model.entity.occupation.RoomOccupation;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Color;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import openerp.openerpresourceserver.model.entity.general.GeneralClassOpened;
 import openerp.openerpresourceserver.model.entity.general.RoomReservation;
 
+@Component
 public class GeneralExcelHelper {
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static String[] HEADERs = { "ID", "Kỳ", "Nhóm", "SL thực", "Loại lớp", "Mã HP", "Tên HP", "Thời lượng", "SL Max",
@@ -186,4 +188,75 @@ public class GeneralExcelHelper {
         }
     }
 
+
+    public ByteArrayInputStream convertToExcel(List<RoomOccupation> rooms, int weekLength) {
+        /**Init the data to map*/
+        HashMap<String, List<OccupationClassPeriod>> periodMap = new HashMap<>();
+        HashMap<String, List<OccupationClassPeriod>> conflictMap = new HashMap<>();
+        for(RoomOccupation room : rooms) {
+            String classRoom = room.getClassRoom();
+            long crewPeriod = room.getCrew().equals("S") ? 0 : 6;
+            long startPeriodIndex = room.getStartPeriod() + 12*(room.getDayIndex()-2) + 7*12*(room.getWeekIndex()-1) + crewPeriod;
+            long endPeriodIndex = room.getEndPeriod() + 12*(room.getDayIndex()-2) + 7*12*(room.getWeekIndex()-1) + crewPeriod;
+            OccupationClassPeriod period = new OccupationClassPeriod(startPeriodIndex, endPeriodIndex, room.getClassCode());
+            if(periodMap.get(classRoom) == null) {
+                List<OccupationClassPeriod> initList = new ArrayList<>();
+                initList.add(period);
+                periodMap.put(classRoom, initList);
+            } else {
+                periodMap.get(classRoom).add(period);
+            }
+            if(/**Check conflict at here*/!ClassTimeComparator.isPeriodConflict(period, periodMap)) {
+                if(conflictMap.get(classRoom) == null) {
+                    List<OccupationClassPeriod> initList = new ArrayList<>();
+                    initList.add(period);
+                    conflictMap.put(classRoom, initList);
+                } else {
+                    conflictMap.get(classRoom).add(period);
+                }
+            }
+        }
+
+        /**Handle Excel write*/
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
+            Sheet sheet = workbook.createSheet(SHEET);
+            /*Header*/
+            Row headerRow = sheet.createRow(0);
+            /*Header Cell*/
+            for (int i = 1; i <= weekLength*84; i++) {
+                Cell c = headerRow.createCell(i);
+                String periodIndexString = "W" + (i/84 + 1) + "-D" + ((i%84)/12 +2) + "-P" + ((i%84)%12);
+                c.setCellValue(periodIndexString);
+            }
+
+            int rowIndex = 1;
+            for (String room : periodMap.keySet()) {
+                if(!room.equals("")) {
+                    Row roomRow = sheet.createRow(rowIndex);
+                    Cell roomNameCell = roomRow.createCell(0);
+                    roomNameCell.setCellValue(room);
+                    for (int cellIndex = 1; cellIndex <= weekLength*7*12; cellIndex++) {
+                        Cell c = roomRow.createCell(cellIndex);
+                        for (OccupationClassPeriod roomPeriod : periodMap.get(room)) {
+                            if(cellIndex >=  roomPeriod.getStartPeriodIndex() && cellIndex <= roomPeriod.getEndPeriodIndex()) {
+                                // If cell value is not empty, append class code with comma
+                                if (c.getStringCellValue() != null && !c.getStringCellValue().isEmpty()) {
+                                    Set<String> classCodeSet = new HashSet<>(Arrays.stream(c.getStringCellValue().split(",")).toList());
+                                    classCodeSet.add(roomPeriod.getClassCode());
+                                    c.setCellValue(String.join(",", classCodeSet));
+                                } else {
+                                    c.setCellValue(roomPeriod.getClassCode());
+                                }
+                            }
+                        }
+                    }
+                    rowIndex++;
+                }
+            }
+            workbook.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+        } catch (IOException e) {
+            throw new RuntimeException("fail to import data to Excel file: " + e.getMessage());
+        }
+    }
 }

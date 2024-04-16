@@ -65,4 +65,9 @@ public class GeneralClassOpenedController {
         gService.deleteClassesBySemester(semester);
         return ResponseEntity.ok("ok");
     }
+
+    @PostMapping("/export-excel")
+    public ResponseEntity exportExcel(@RequestParam("semester") String semester) {
+        return ResponseEntity.ok("ok");
+    }
 }

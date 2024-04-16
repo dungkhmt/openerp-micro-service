@@ -1,14 +1,16 @@
 package openerp.openerpresourceserver.helper;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import openerp.openerpresourceserver.exception.ConflictScheduleException;
 import openerp.openerpresourceserver.model.entity.general.GeneralClassOpened;
 import openerp.openerpresourceserver.model.entity.general.RoomReservation;
+import openerp.openerpresourceserver.model.entity.occupation.OccupationClassPeriod;
 
 public class ClassTimeComparator {
-    public static boolean isConflict(int scheduleIndex, GeneralClassOpened gClass, List<GeneralClassOpened> classList) {
+    public static boolean isClassConflict(int scheduleIndex, GeneralClassOpened gClass, List<GeneralClassOpened> classList) {
         boolean isConflict = false;
         /*Filter the class which is different with current class*/
         List<GeneralClassOpened> compareClassList = classList.stream().filter(nonUpdateClass-> !nonUpdateClass.getId().equals(gClass.getId())).collect(Collectors.toList());
@@ -84,6 +86,26 @@ public class ClassTimeComparator {
         for (Integer item : weekList1) {
             if (weekList2.contains(item)) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isPeriodConflict(OccupationClassPeriod comparePeriod, HashMap<String, List<OccupationClassPeriod>> periodMap) {
+        for (List<OccupationClassPeriod> periodList : periodMap.values()) {
+            for (OccupationClassPeriod storedPeriod  :periodList) {
+                /*Check A_start < B_start < A_end*/
+                if(comparePeriod.getStartPeriodIndex() < storedPeriod.getStartPeriodIndex() && storedPeriod.getStartPeriodIndex() < comparePeriod.getEndPeriodIndex()) {
+                    return true;
+                }
+                /*Check B_start < A_start < A_end < B_end*/
+                else if (comparePeriod.getStartPeriodIndex() > storedPeriod.getStartPeriodIndex() && comparePeriod.getEndPeriodIndex() < storedPeriod.getStartPeriodIndex()) {
+                    return true;
+                }
+                /*Check A_start < B_end < A_end*/
+                else if (comparePeriod.getStartPeriodIndex() < storedPeriod.getEndPeriodIndex() &&  comparePeriod.getEndPeriodIndex() > storedPeriod.getEndPeriodIndex()) {
+                    return true;
+                }
             }
         }
         return false;
