@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.service;
 import openerp.openerpresourceserver.dto.PaginationDTO;
 import openerp.openerpresourceserver.entity.Application;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ApplicationService {
@@ -25,4 +26,6 @@ public interface ApplicationService {
     Application updateAssignStatus(int id, String status);
 
     int[][] autoAssignApplication(String semester);
+
+    byte[] generateExcelFile(String semester) throws IOException;
 }
