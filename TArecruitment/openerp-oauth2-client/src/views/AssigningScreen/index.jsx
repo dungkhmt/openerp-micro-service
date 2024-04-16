@@ -155,6 +155,24 @@ const AssigningScreen = () => {
     setSearch(e.target.value);
   };
 
+  const handleDownloadFile = () => {
+    request(
+      "get",
+      `/application/get-assign-list-file/${SEMESTER}`,
+      (res) => {
+        const url = window.URL.createObjectURL(new Blob([res.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "assign_list.xlsx");
+        document.body.appendChild(link);
+        link.click();
+      },
+      {},
+      {},
+      { responseType: "arraybuffer" }
+    );
+  };
+
   const assignStatusCell = (params) => {
     const rowData = params.row;
 
@@ -349,7 +367,7 @@ const AssigningScreen = () => {
             </Button>
 
             <Tooltip title="Xuất file">
-              <IconButton color="primary">
+              <IconButton onClick={handleDownloadFile} color="primary">
                 <FileDownloadIcon fontSize="large" />
               </IconButton>
             </Tooltip>

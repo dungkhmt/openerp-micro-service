@@ -5,7 +5,9 @@ import openerp.openerpresourceserver.dto.PaginationDTO;
 import openerp.openerpresourceserver.entity.Application;
 import openerp.openerpresourceserver.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -110,6 +112,19 @@ public class ApplicationController {
     public ResponseEntity<?> autoAssignClass(@PathVariable String semester) {
         int[][] graph = applicationService.autoAssignApplication(semester);
         return ResponseEntity.ok().body(graph);
+    }
+
+    @GetMapping("/get-assign-list-file/{semester}")
+    public ResponseEntity<?> getAssignListFile(@PathVariable String semester) {
+        try {
+            byte[] excelBytes = applicationService.generateExcelFile(semester);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", semester + "list.xlsx");
+            return new ResponseEntity<>(excelBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("BAD REQUEST");
+        }
     }
 
 }
