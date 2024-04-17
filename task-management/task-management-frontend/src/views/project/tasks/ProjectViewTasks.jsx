@@ -30,10 +30,13 @@ import {
   setPagination,
   setSort,
   setSearch as setSearchAction,
+  setFilters,
 } from "../../../store/project/tasks";
 import { getDueDateColor, getProgressColor } from "../../../utils/color.util";
 import { DialogAddTask } from "./DialogAddTask";
 import { Filter } from "./Filter";
+import { buildFilterString } from "../../../utils/task-filter";
+import { usePreventOverflow } from "../../../hooks/usePreventOverflow";
 
 const ProjectViewTasks = () => {
   const dispatch = useDispatch();
@@ -52,6 +55,7 @@ const ProjectViewTasks = () => {
     priority: priorityStore,
     status: statusStore,
   } = useSelector((state) => state);
+  const { members } = useSelector((state) => state.project);
 
   const [search, setSearch] = useState(searchStore);
   const searchDebounce = useDebounce(search, 1000);
@@ -60,6 +64,8 @@ const ProjectViewTasks = () => {
   const [openAddTask, setOpenAddTask] = useState(false);
 
   const [isInitialized, setIsInitialized] = useState(false);
+
+  const { ref, updateHeight } = usePreventOverflow();
 
   const columns = [
     {
@@ -232,38 +238,7 @@ const ProjectViewTasks = () => {
     );
   };
 
-  const buildFilterString = (filter) => {
-    const expressions = filter.items
-      .map((f) => {
-        const subExpressions = f.items
-          .map((i) => {
-            if (
-              i.field === "" ||
-              i.operator === "" ||
-              (typeof i.operator === "object" &&
-                !i.operator.isUnary &&
-                i.value.length === 0)
-            ) {
-              return null;
-            }
-            return `${i.field.id}${i.operator.id}${i.value.join(",")}`;
-          })
-          .filter((i) => i !== null);
-
-        if (subExpressions.length === 0) {
-          return null;
-        }
-        const subQueryString = subExpressions.join(` ${f.condition} `);
-        return `( ${subQueryString} )`;
-      })
-      .filter((f) => f !== null);
-
-    return expressions.length > 0
-      ? expressions.join(` ${filter.condition} `)
-      : "";
-  };
-
-  const buildQueryString = () => {
+  const buildQueryString = useCallback(() => {
     const builder = [];
     const encodedSearch = encodeURIComponent(searchStore).replace(
       /%20/g,
@@ -278,7 +253,7 @@ const ProjectViewTasks = () => {
     builder.push(buildFilterString(filters));
 
     return builder.filter((s) => s !== "").join(" AND ");
-  };
+  }, [searchStore, filters]);
 
   const fetchTasksPagination = useCallback(async () => {
     if (!tasksCache[pagination.page]) {
@@ -298,12 +273,18 @@ const ProjectViewTasks = () => {
         toast.error("Có lỗi khi lấy danh sách nhiệm vụ");
       }
     }
-  }, [dispatch, filters, pagination, project.id, sort, searchStore]);
+  }, [dispatch, pagination, project.id, sort, buildQueryString]);
 
   const onSearch = async () => {
     dispatch(resetPagination());
     dispatch(clearCache());
     dispatch(setSearchAction(searchDebounce));
+  };
+
+  const onFilter = async (filters) => {
+    dispatch(resetPagination());
+    dispatch(clearCache());
+    dispatch(setFilters(filters));
   };
 
   useEffect(() => {
@@ -324,6 +305,10 @@ const ProjectViewTasks = () => {
     }
   }, [searchDebounce]);
 
+  useEffect(() => {
+    updateHeight(10);
+  }, [window.innerHeight]);
+
   return (
     <Card>
       {/* Header */}
@@ -337,7 +322,12 @@ const ProjectViewTasks = () => {
         <Box sx={{ display: "flex", gap: 4, alignItems: "center" }}>
           <Typography variant="h5">{totalCount ?? 0} nhiệm vụ</Typography>
           <Tooltip title="Lọc">
-            <Filter />
+            <Filter
+              text="Filters"
+              onFilter={onFilter}
+              filters={filters}
+              members={members.map((m) => m.member)}
+            />
           </Tooltip>
         </Box>
         <Box
@@ -373,30 +363,28 @@ const ProjectViewTasks = () => {
       </CardContent>
 
       {/* Table */}
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        disableRowSelectionOnClick
-        pageSizeOptions={[10, 20, 50]}
-        paginationModel={{
-          page: pagination.page,
-          pageSize: pagination.size,
-        }}
-        onPaginationModelChange={handlePaginationModel}
-        pagination
-        paginationMode="server"
-        rowCount={totalCount}
-        loading={fetchLoading}
-        rowHeight={68}
-        onSortModelChange={handleSortModel}
-        sx={{
-          height: "70vh",
-        }}
-        localeText={{
-          noRowsLabel: "Không có dữ liệu",
-        }}
-      />
-
+      <Box ref={ref}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          disableRowSelectionOnClick
+          pageSizeOptions={[10, 20, 50]}
+          paginationModel={{
+            page: pagination.page,
+            pageSize: pagination.size,
+          }}
+          onPaginationModelChange={handlePaginationModel}
+          pagination
+          paginationMode="server"
+          rowCount={totalCount}
+          loading={fetchLoading}
+          rowHeight={68}
+          onSortModelChange={handleSortModel}
+          localeText={{
+            noRowsLabel: "Không có dữ liệu",
+          }}
+        />
+      </Box>
       <DialogAddTask open={openAddTask} setOpen={setOpenAddTask} />
     </Card>
   );

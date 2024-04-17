@@ -13,4 +13,6 @@ public interface UserService {
     void synchronizeUser(String userId, String email, String firstName, String lastName);
 
     List<User> searchUser(String q);
+
+    List<User> getUserCreateTaskAssignMe(String userId);
 }

@@ -15,35 +15,48 @@ import dayjs from "dayjs";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setSort,
+  resetSort,
+  fetchAssignedTasks,
+  fetchAllAssignedTaskCreator,
+  clearCache,
+  setPagination,
+  resetPagination,
+  setSearch as setSearchAction,
+  setFilters,
+} from "../../../store/assigned-tasks";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
 import { TaskCategory } from "../../../components/task/category";
 import { TaskStatus } from "../../../components/task/status";
+import { Filter } from "../../../views/project/tasks/Filter";
 import { useDebounce } from "../../../hooks/useDebounce";
-import { StatusService } from "../../../services/api/task-status.service";
-import { TaskService } from "../../../services/api/task.service";
+import { usePreventOverflow } from "../../../hooks/usePreventOverflow";
 import { getDueDateColor, getProgressColor } from "../../../utils/color.util";
-
-const DEFAULT_PAGINATION_MODEL = {
-  page: 0,
-  pageSize: 10,
-};
-
-const DEFAULT_SORT_MODEL = {
-  field: "createdStamp",
-  sort: "desc",
-};
+import { buildFilterString } from "../../../utils/task-filter";
 
 const TaskAssigned = () => {
+  const {
+    tasksCache,
+    totalCount,
+    search: searchStore,
+    filters,
+    pagination,
+    sort,
+    fetchLoading,
+    creators,
+  } = useSelector((state) => state.assignedTasks);
+  const { statuses } = useSelector((state) => state.status);
+  const dispatch = useDispatch();
+
   const [rows, setRows] = useState([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [paginationModel, setPaginationModel] = useState(
-    DEFAULT_PAGINATION_MODEL
-  );
-  const [sortModel, setSortModel] = useState(DEFAULT_SORT_MODEL);
-  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [statuses, setStatuses] = useState([]);
   const searchDebounce = useDebounce(search, 1000);
+
+  const { ref, updateHeight } = usePreventOverflow();
+
+  const [isFirstFetch, setIsFirstFetch] = useState(true);
 
   const columns = [
     {
@@ -195,66 +208,142 @@ const TaskAssigned = () => {
 
   const handleSortModel = (newModel) => {
     if (newModel.length > 0) {
-      setSortModel(newModel[0]);
+      dispatch(setSort({ field: newModel[0].field, sort: newModel[0].sort }));
     } else {
-      setSortModel(DEFAULT_SORT_MODEL);
+      dispatch(resetSort());
     }
   };
 
-  const getStatuses = useCallback(async () => {
-    try {
-      const res = await StatusService.getStatuses();
-      setStatuses(res);
-    } catch (error) {
-      toast.error("Lỗi khi lấy dữ liệu");
+  const handlePaginationModel = (newModel) => {
+    if (
+      newModel.page === pagination.page &&
+      newModel.pageSize !== pagination.size
+    ) {
+      dispatch(clearCache());
     }
-  }, []);
+
+    dispatch(
+      setPagination({
+        page: newModel.page,
+        size: newModel.pageSize,
+      })
+    );
+  };
+
+  const buildQueryString = useCallback(() => {
+    const builder = [];
+    const encodedSearch = encodeURIComponent(searchStore).replace(
+      /%20/g,
+      "%1F"
+    );
+    builder.push(
+      encodedSearch
+        ? `( name:*${encodedSearch}* OR projectName:*${encodedSearch}* OR description:*${encodedSearch}* )`
+        : ""
+    );
+
+    builder.push(buildFilterString(filters));
+
+    return builder.filter((s) => s !== "").join(" AND ");
+  }, [searchStore, filters]);
 
   const getTasks = useCallback(async () => {
+    if (tasksCache[pagination.page]) return;
     try {
-      setIsLoading(true);
-      const encodedSearch = encodeURIComponent(searchDebounce).replace(
-        /%20/g,
-        "%1F"
+      await dispatch(
+        fetchAssignedTasks({
+          ...pagination,
+          search: buildQueryString(),
+          sort: `${sort.field},${sort.sort}`,
+        })
       );
-      const response = await TaskService.getAssignedTasks({
-        page: paginationModel.page,
-        size: paginationModel.pageSize,
-        search: encodedSearch
-          ? `name:*${encodedSearch}* OR projectName:*${encodedSearch}*`
-          : "",
-        sort: `${sortModel.field},${sortModel.sort}`,
-      });
-      setRows(response.data);
-      setTotalCount(response.totalElements);
     } catch (error) {
       toast.error("Lỗi khi lấy dữ liệu");
       console.log(error);
-    } finally {
-      setIsLoading(false);
     }
-  }, [paginationModel, searchDebounce, sortModel]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination, sort, buildQueryString, dispatch]);
+
+  const getCreators = useCallback(async () => {
+    try {
+      if (creators.length <= 0) await dispatch(fetchAllAssignedTaskCreator());
+    } catch (error) {
+      toast.error("Lỗi khi lấy dữ liệu");
+      console.log(error);
+    }
+  }, [dispatch]);
+
+  const onSearch = async () => {
+    dispatch(resetPagination());
+    dispatch(clearCache());
+    dispatch(setSearchAction(searchDebounce));
+  };
+
+  const onFilter = async (filter) => {
+    dispatch(resetPagination());
+    dispatch(clearCache());
+    dispatch(setFilters(filter));
+  };
 
   useEffect(() => {
     getTasks();
   }, [getTasks]);
 
   useEffect(() => {
-    getStatuses();
-  }, [getStatuses]);
+    getCreators();
+  }, [getCreators]);
+
+  useEffect(() => {
+    if (tasksCache[pagination.page]) {
+      setRows(tasksCache[pagination.page]);
+    }
+  }, [tasksCache, pagination.page]);
+
+  useEffect(() => {
+    if (isFirstFetch) {
+      setIsFirstFetch(false);
+    } else {
+      onSearch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchDebounce]);
+
+  useEffect(() => {
+    updateHeight(10);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [window.innerHeight]);
 
   return (
-    <Card>
+    <Card sx={{ mr: 2 }}>
       <CardContent sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography variant="h6" component="div">
-          Danh sách các nhiệm vụ được giao
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Typography variant="h6" component="div">
+            Danh sách các nhiệm vụ được giao
+          </Typography>
+          <Tooltip title="Lọc">
+            <Filter
+              onFilter={onFilter}
+              filters={filters}
+              text="Filters"
+              sx={{
+                minWidth: 0,
+                borderRadius: "11px",
+                padding: (theme) => theme.spacing(0, 2),
+                "& svg": {
+                  fontSize: "1rem !important",
+                },
+              }}
+              excludeFields={["assigneeId"]}
+              members={creators}
+            />
+          </Tooltip>
+        </Box>
         <Box>
           <TextField
             size="small"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search…"
+            placeholder="Tìm kiếm..."
             InputProps={{
               startAdornment: (
                 <Box sx={{ mr: 2, display: "flex" }}>
@@ -284,20 +373,24 @@ const TaskAssigned = () => {
           />
         </Box>
       </CardContent>
-      <DataGrid
-        rows={rows}
-        loading={isLoading}
-        rowCount={totalCount}
-        columns={columns}
-        pageSizeOptions={[10, 25, 50]}
-        pagination
-        paginationMode="server"
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        onSortModelChange={handleSortModel}
-        sx={{ height: "75vh" }}
-        rowHeight={70}
-      />
+      <Box ref={ref}>
+        <DataGrid
+          rows={rows}
+          loading={fetchLoading}
+          rowCount={totalCount}
+          columns={columns}
+          pageSizeOptions={[10, 25, 50]}
+          pagination
+          paginationMode="server"
+          paginationModel={{
+            page: pagination.page,
+            pageSize: pagination.size,
+          }}
+          onPaginationModelChange={handlePaginationModel}
+          onSortModelChange={handleSortModel}
+          rowHeight={70}
+        />
+      </Box>
     </Card>
   );
 };

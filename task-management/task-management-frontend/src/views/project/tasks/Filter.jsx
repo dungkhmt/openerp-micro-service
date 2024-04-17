@@ -1,14 +1,10 @@
 import { Icon } from "@iconify/react";
 import { Box, Button, styled } from "@mui/material";
-import { useMemo, useState, useCallback } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import PropTypes from "prop-types";
+import { useCallback, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { TaskFilter } from "../../../components/task/filter";
 import { buildTaskFilter } from "../../../components/task/filter/task-filter";
-import {
-  clearCache,
-  resetPagination,
-  setFilters,
-} from "../../../store/project/tasks";
 
 const FilterButton = styled(Button)(({ theme }) => ({
   blockSize: "26px",
@@ -35,11 +31,17 @@ const FilterButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const Filter = () => {
-  const { status, priority, category, project, tasks } = useSelector(
-    (state) => state
-  );
-  const dispatch = useDispatch();
+const Filter = (props) => {
+  const {
+    text,
+    showIcon = true,
+    onFilter,
+    excludeFields,
+    sx,
+    filters,
+    members = [],
+  } = props;
+  const { status, priority, category } = useSelector((state) => state);
   const [anchorEl, setAnchorEl] = useState(null);
 
   const getStatusOptions = useCallback(() => {
@@ -64,7 +66,7 @@ const Filter = () => {
   }, [category.categories]);
 
   const getMemberOptions = useCallback(() => {
-    return project.members.map(({ member }) => ({
+    return members.map((member) => ({
       label:
         member.firstName || member.lastName
           ? `${member.firstName} ${member.lastName}`
@@ -74,7 +76,7 @@ const Filter = () => {
       lastName: member.lastName,
       email: member.email,
     }));
-  }, [project.members]);
+  }, [members]);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -91,14 +93,19 @@ const Filter = () => {
         priorityOptions: getPriorityOptions(),
         categoryOptions: getCategoryOptions(),
         memberOptions: getMemberOptions(),
+        excludeFields,
       }),
-    [getStatusOptions, getPriorityOptions, getCategoryOptions, getMemberOptions]
+    [
+      getStatusOptions,
+      getPriorityOptions,
+      getCategoryOptions,
+      getMemberOptions,
+      excludeFields,
+    ]
   );
 
   const handleFilter = (filter) => {
-    dispatch(resetPagination());
-    dispatch(clearCache());
-    dispatch(setFilters(filter));
+    onFilter?.(filter);
   };
 
   return (
@@ -108,9 +115,10 @@ const Filter = () => {
         aria-haspopup="true"
         onClick={handleClick}
         aria-controls="customized-menu"
-        startIcon={<Icon icon="fluent:filter-16-regular" />}
+        startIcon={showIcon && <Icon icon="fluent:filter-16-regular" />}
         sx={{
-          ...(tasks.filters.items.length > 0 && {
+          ...sx,
+          ...(filters.items.length > 0 && {
             color: "primary.main",
             borderColor: "primary.main",
 
@@ -124,13 +132,13 @@ const Filter = () => {
           }),
         }}
       >
-        {tasks.filters.items.length > 0 && (
+        {filters.items.length > 0 && (
           <>
-            <span>{tasks.filters.items.length}</span>
+            <span>{filters.items.length}</span>
             &nbsp;
           </>
         )}
-        <span>Filters</span>
+        {text && <span>{text}</span>}
         <Box
           title="Clear filter"
           className="clear-filter"
@@ -164,11 +172,21 @@ const Filter = () => {
         anchorEl={anchorEl}
         onClose={handleClose}
         filterList={filterList}
-        initFilter={tasks.filters}
+        initFilter={filters}
         onFilter={handleFilter}
       />
     </>
   );
+};
+
+Filter.propTypes = {
+  text: PropTypes.string,
+  showIcon: PropTypes.bool,
+  onFilter: PropTypes.func,
+  excludeFields: PropTypes.array,
+  sx: PropTypes.object,
+  filters: PropTypes.object,
+  members: PropTypes.array,
 };
 
 export { Filter };

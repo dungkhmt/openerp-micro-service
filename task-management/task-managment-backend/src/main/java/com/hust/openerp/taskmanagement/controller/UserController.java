@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.lang.Nullable;
@@ -40,4 +41,8 @@ public class UserController {
         return userService.searchUser(q);
     }
 
+    @GetMapping("/users/assigned-task-creator")
+    public List<User> getUserCreateTaskAssignMe(Principal principal) {
+        return userService.getUserCreateTaskAssignMe(principal.getName());
+    }
 }
