@@ -30,6 +30,10 @@ public class Request {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    private Integer status;
+
+    private String approval_flow;
+
     @Column(columnDefinition = "TEXT")
     private String approvers_id;
 

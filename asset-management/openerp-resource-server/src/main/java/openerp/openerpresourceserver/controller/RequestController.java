@@ -6,9 +6,7 @@ import openerp.openerpresourceserver.service.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,4 +23,16 @@ public class RequestController {
             .status(HttpStatus.OK)
             .body(requests);
     }
+
+    @PostMapping("/add-new")
+    public ResponseEntity<?> createNewRequest(@RequestBody Request request){
+        Request savedRequest = requestService.createNewRequest(request);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(savedRequest);
+    }
+
+//    public ResponseEntity<?> approveRequest(@PathVariable Integer Id){
+//
+//    }
 }

@@ -18,7 +18,6 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { errorNoti, successNoti } from "utils/notification";
-import { render } from "@testing-library/react";
 
 const AssetsScreen = () => {    
     const [assetName, setAssetName] = useState("");
@@ -330,6 +329,9 @@ const AssetsScreen = () => {
                             onChange={(e) => setDescription(e.target.value)}
                             value={description}
                         />
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker label="Basic date picker" />
+                        </LocalizationProvider>
                         <FormControl sx={{ minWidth: 255, marginTop: "20px" }}>
                             <InputLabel id="demo-simple-select-label">Type</InputLabel>
                             <Select

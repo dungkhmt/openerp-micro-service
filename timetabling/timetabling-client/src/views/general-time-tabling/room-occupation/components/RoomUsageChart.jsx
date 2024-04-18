@@ -42,7 +42,7 @@ const RoomUsageChart = ({ semester, selectedWeek, startDate }) => {
     }
   }, [selectedWeek]);
   
-  return !isEmptyRooms ? <div>Chưa chọn tuần học hoặc tuần này không có phòng nào được sử dụng</div> : data ? (
+  return data ? (
     <Chart
       width={"100%"}
       height={"600px"}
