@@ -114,9 +114,30 @@ function ListProblemV2() {
       filterComponent: (props) => <FilterbyTag {...props}/>,
       customFilterAndSearch: (term, rowData) => {
         let currentTags = rowData.tags.map(x => x.name)
-        console.log(term, currentTags)
-        return term.some(t=> currentTags.includes(t.name)) || term.length == 0
-        // Hiển thị hàng nếu tags của hàng đó contain một tags trong filter hoặc filter rỗng 
+
+        // There are two case now
+        // User using global table search => term will be string
+        // User using Filter by Tag function => term will be array  (coz we using Autocomplete
+        // multiple checkbox as input). In either case, rowData.tags always be array
+        // Solution here is to check type and handle each case seperately 
+
+        // Using filter by tags search 
+        if(Array.isArray(term)){
+          //console.log(term,  currentTags)
+          return term.some(t=> currentTags.includes(t.name)) || term.length === 0
+        }
+        // using global table search
+        else if(typeof term === 'string'){
+          //console.log(term,  currentTags)
+          return currentTags.some(tg => {
+            return tg.toLowerCase().includes(term.toLowerCase())
+          }) 
+        }
+        // other case 
+        else{ 
+          return false 
+        }
+        
       }
 
       // Customize filter component 
