@@ -8,7 +8,7 @@
     "@hookstate/core": "^3.0.8",
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.0.3",
-    "@mui/styles": "^5.12.0",
+    "@mui/styles": "^5.15.14",
     "@react-keycloak/web": "^3.4.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",

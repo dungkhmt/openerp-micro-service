@@ -18,7 +18,6 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { errorNoti, successNoti } from "utils/notification";
-import { render } from "@testing-library/react";
 
 const AssetsScreen = () => {    
     const [assetName, setAssetName] = useState("");
