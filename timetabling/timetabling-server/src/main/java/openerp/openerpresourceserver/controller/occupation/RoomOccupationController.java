@@ -40,7 +40,6 @@ public class RoomOccupationController {
     @PostMapping("/export")
     public ResponseEntity exportExcel (@RequestParam("semester") String semester, @RequestParam("weeks") String weeks) {
         List<Integer> learningWeeks  = LearningWeekExtractor.extract(weeks);
-        System.out.println(learningWeeks);
         String filename = "Room_Conflict.xlsx";
         InputStreamResource file = new InputStreamResource(roomService.exportExcel(semester, learningWeeks));
         return ResponseEntity.ok()
