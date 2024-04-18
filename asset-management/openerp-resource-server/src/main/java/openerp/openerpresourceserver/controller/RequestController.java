@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -17,7 +18,8 @@ public class RequestController {
     private RequestService requestService;
 
     @GetMapping("/get-all")
-    public ResponseEntity<?> getAllRequests(){
+    public ResponseEntity<?> getAllRequests(Principal principal){
+        System.out.println("pripri " + principal.getName());
         List<Request> requests = requestService.getAllRequests();
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -25,11 +27,14 @@ public class RequestController {
     }
 
     @PostMapping("/add-new")
-    public ResponseEntity<?> createNewRequest(@RequestBody Request request){
-        Request savedRequest = requestService.createNewRequest(request);
+    public ResponseEntity<?> createNewRequest(@RequestBody Request request, Principal principal){
+
+        System.out.println("request: " + request.toString());
+        System.out.println("principal " + principal.getName());
+//        Request savedRequest = requestService.createNewRequest(request);
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(savedRequest);
+            .body("");
     }
 
 //    public ResponseEntity<?> approveRequest(@PathVariable Integer Id){
