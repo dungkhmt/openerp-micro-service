@@ -1,7 +1,7 @@
 export const courseTimeTabling = {
   id: "MENU_COURSE_TIME_TABLING",
   icon: "AnalyticsIcon",
-  text: "Quản lý lịch học",
+  text: "Quản lý lịch học (TT)",
   child: [
     {
       id: "MENU_COURSE_TIME_TABLING.CLASS_LIST_OPENED",

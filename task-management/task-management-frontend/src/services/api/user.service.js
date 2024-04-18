@@ -3,11 +3,14 @@ import privateClient from "../client/private.client";
 const endPoints = {
   getAll: "/users",
   sync: "/",
+  getAssignedTaskCreator: "/users/assigned-task-creator",
 };
 
 export const UserService = {
-  async getAll() {
-    const res = await privateClient.get(endPoints.getAll);
+  async getAll(params) {
+    const res = await privateClient.get(endPoints.getAll, {
+      params,
+    });
     return res.data;
   },
   async sync() {
@@ -17,5 +20,9 @@ export const UserService = {
     } catch (e) {
       console.error("Sync user error");
     }
+  },
+  async getAllAssignedTaskCreator() {
+    const res = await privateClient.get(endPoints.getAssignedTaskCreator);
+    return res.data;
   },
 };

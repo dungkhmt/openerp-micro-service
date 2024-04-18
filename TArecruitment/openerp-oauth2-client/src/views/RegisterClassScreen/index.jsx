@@ -64,8 +64,10 @@ const RegisterClassScreen = () => {
   };
 
   return (
-    <div>
-      <h1>Tạo lớp học</h1>
+    <Paper elevation={1} style={{ padding: "1em" }}>
+      <div style={styles.tableToolBar}>
+        <h1>Tạo lớp học</h1>
+      </div>
 
       <Paper elevation={3}>
         <div style={styles.content}>
@@ -74,7 +76,6 @@ const RegisterClassScreen = () => {
               <h3>Mã lớp</h3>
               <TextField
                 style={styles.textField}
-                label="Mã lớp"
                 variant="outlined"
                 name="subjectId"
                 value={formData.subjectId}
@@ -86,7 +87,6 @@ const RegisterClassScreen = () => {
               <h3>Tên lớp</h3>
               <TextField
                 style={styles.rightTextField}
-                label="Tên lớp"
                 variant="outlined"
                 name="subjectName"
                 value={formData.subjectName}
@@ -100,7 +100,6 @@ const RegisterClassScreen = () => {
               <h3>Phòng học</h3>
               <TextField
                 style={styles.textField}
-                label="Phòng học"
                 variant="outlined"
                 name="classRoom"
                 value={formData.classRoom}
@@ -112,7 +111,6 @@ const RegisterClassScreen = () => {
               <h3>Học kì</h3>
               <TextField
                 style={styles.textField}
-                label="Học kì"
                 variant="outlined"
                 name="semester"
                 value={formData.semester}
@@ -203,7 +201,7 @@ const RegisterClassScreen = () => {
           </div>
         </div>
       </Paper>
-    </div>
+    </Paper>
   );
 };
 

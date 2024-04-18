@@ -1,47 +1,72 @@
 import { Dialog, DialogContent, DialogTitle, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { request } from "api";
-import { StandardTable } from "erp-hust/lib/StandardTable";
+import { DataGrid } from "@mui/x-data-grid";
+
+const DEFAULT_PAGINATION_MODEL = {
+  page: 0,
+  pageSize: 5,
+};
 
 const ApplicatorDialog = ({ open, handleClose, classId }) => {
   const [applicators, setApplicators] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
+
+  const [paginationModel, setPaginationModel] = useState(
+    DEFAULT_PAGINATION_MODEL
+  );
 
   useEffect(() => {
+    setIsLoading(true);
     request(
       "get",
-      `/application/get-application-by-class/${classId}`,
+      `/application/get-application-by-class/${classId}?page=${paginationModel.page}&limit=${paginationModel.pageSize}`,
       (res) => {
-        setApplicators(res.data);
+        setApplicators(res.data.data);
+        setTotalElements(res.data.totalElement);
+        setIsLoading(false);
       }
     );
-  }, [classId]);
+  }, [classId, paginationModel]);
 
-  const columns = [
+  const dataGridColumns = [
     {
-      title: "Mã số sinh viên",
       field: "mssv",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
+      headerName: "MSSV",
+      align: "center",
+      headerAlign: "center",
     },
     {
-      title: "Tên sinh viên",
       field: "name",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
+      headerName: "Tên sinh viên",
+      align: "center",
+      headerAlign: "center",
+      flex: 1,
     },
     {
-      title: "Số điện thoại",
       field: "phoneNumber",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
+      headerName: "Số điện thoại",
+      align: "center",
+      headerAlign: "center",
+      flex: 1,
     },
     {
-      title: "Email",
       field: "email",
-      headerStyle: { fontWeight: "bold" },
-      cellStyle: { fontWeight: "bold" },
+      headerName: "Email",
+      align: "center",
+      headerAlign: "center",
+      flex: 1,
     },
   ];
+
+  const dataGridRows = applicators.map((applicator, index) => ({
+    id: index,
+    mssv: applicator.mssv,
+    name: applicator.name,
+    phoneNumber: applicator.phoneNumber,
+    email: applicator.email,
+  }));
 
   return (
     <div>
@@ -61,21 +86,22 @@ const ApplicatorDialog = ({ open, handleClose, classId }) => {
             Danh sách sinh viên đăng ký mã lớp {classId}
           </Typography>
         </DialogTitle>
-        {/**
-         * @TODO Change the table library, this shit is shit
-         */}
         <DialogContent>
-          <StandardTable
-            title=""
-            columns={columns}
-            data={applicators}
-            hideCommandBar
-            options={{
-              selection: false,
-              pageSize: 5,
-              search: false,
-              sorting: true,
-            }}
+          <DataGrid
+            loading={isLoading}
+            rowHeight={60}
+            sx={{ fontSize: 16 }}
+            rows={dataGridRows}
+            columns={dataGridColumns}
+            autoHeight
+            rowCount={totalElements}
+            pagination
+            paginationMode="server"
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            pageSizeOptions={[5]}
+            checkboxSelection={false}
+            disableRowSelectionOnClick
           />
         </DialogContent>
       </Dialog>

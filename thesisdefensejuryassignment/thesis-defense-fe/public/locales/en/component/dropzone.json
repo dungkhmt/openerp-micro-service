@@ -1,0 +1,8 @@
+{
+  "title": "Attachment files",
+  "dropzoneText": "Drop file here or click to upload",
+  "previewText": "Files:",
+  "getFileAddedMessage": "File {{fileName}} uploaded successfully",
+  "getFileRemovedMessage": "File {{fileName}} remove",
+  "getFileLimitExceedMessage": "Maximum number of files exceeded. You can upload up to {{filesLimit}} files"
+}

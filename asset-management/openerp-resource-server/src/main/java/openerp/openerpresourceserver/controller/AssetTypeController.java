@@ -40,4 +40,18 @@ public class AssetTypeController {
             .status(HttpStatus.CREATED)
             .body(newType);
     }
+
+    @PutMapping("/edit/{Id}")
+    public ResponseEntity<?> editType(@PathVariable Integer Id, @RequestBody AssetType assetType){
+        AssetType type = assetTypeService.editType(Id, assetType);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(type);
+    }
+
+    @DeleteMapping("/delete/{Id}")
+    public ResponseEntity<?> deleteType(@PathVariable Integer Id){
+        assetTypeService.deleteType(Id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

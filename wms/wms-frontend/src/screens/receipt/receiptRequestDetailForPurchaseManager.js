@@ -6,7 +6,7 @@ import useStyles from "screens/styles";
 import { useForm } from "react-hook-form";
 import StandardTable from "components/StandardTable";
 import { request } from "api";
-import { API_PATH } from "../apiPaths";
+import { API_PATH, API_PATH_2 } from "../apiPaths";
 import { getProductNameFromProductId, getWarehouseNameByWarehouseId } from "../utils/utils";
 import { errorNoti, successNoti } from "utils/notification";
 import { useHistory } from "react-router";
@@ -91,7 +91,7 @@ const ReceiptRequestDetailForPurchaseManager = ( props ) => {
     async function fetchData() {
       await request(
         "get",
-        API_PATH.PRODUCT,
+        API_PATH_2.PRODUCT_WITHOUT_IMAGE,
         (res) => {
           setProductList(res.data);
         }
@@ -108,7 +108,7 @@ const ReceiptRequestDetailForPurchaseManager = ( props ) => {
       if (!isCreateForm) {
         await request(
           "get",
-          API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "/" + receiptId,
+          API_PATH_2.SALE_MANAGEMENT_RECEIPT_REQUEST + "/" + receiptId,
           (res) => {
             setReceiptInfo(res.data);
             setProductTableData(res.data?.items);
@@ -191,9 +191,6 @@ const ReceiptRequestDetailForPurchaseManager = ( props ) => {
               </Box>
 
               <Box className={classes.boxInfor}>
-                {/* <Typography className={classes.inforTitle} variant="h6">
-                  Danh sách hàng hóa
-                </Typography> */}
                 <StandardTable 
                   rowKey="productName"
                   title="Danh sách hàng hóa"
@@ -229,7 +226,6 @@ const ReceiptRequestDetailForPurchaseManager = ( props ) => {
                           || newQuantity == null 
                           || newQuantity < 1) {
                           errorNoti("Vui lòng kiểm tra lại thông tin đơn hàng vừa nhập.");
-                          reject();
                         } else {
                           const newRow = {
                             "productId": selectedProductId,

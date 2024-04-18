@@ -21,6 +21,23 @@ public class ClassroomController {
     @Autowired
     private ClassroomService service;
 
+    @PostMapping("/clear-all")
+    public ResponseEntity<List<Classroom>> clearAllClassRoom() {
+        service.clearAllClassRoom();
+        List<Classroom> classroomList = service.getClassroom();
+        if (!classroomList.isEmpty()) {
+            return new ResponseEntity<>(classroomList, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/clear-all-timetable")
+    public ResponseEntity<List<Classroom>> clearAllClassRoomTimetable() {
+        service.clearAllClassRoomTimetable();
+        List<Classroom> classroomList = service.getClassroom();
+        return new ResponseEntity<>(null, HttpStatus.OK);
+    }
+
     @GetMapping("/get-all")
     public ResponseEntity<List<Classroom>> getAllClassroom() {
         try {

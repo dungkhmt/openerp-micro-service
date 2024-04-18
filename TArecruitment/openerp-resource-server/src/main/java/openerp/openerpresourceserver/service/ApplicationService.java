@@ -1,20 +1,31 @@
 package openerp.openerpresourceserver.service;
 
+import openerp.openerpresourceserver.dto.PaginationDTO;
 import openerp.openerpresourceserver.entity.Application;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ApplicationService {
 
     Application createApplication(Application application);
 
-    List<Application> getMyApplications(String userId);
+    PaginationDTO<Application> getMyApplications(String userId, int page, int limit);
 
-    List<Application> getApplicationByClassId(int classCallId);
+    PaginationDTO<Application> getApplicationByClassId(int classCallId, int page, int limit);
 
     List<Application> getUniqueApplicator();
 
-    List<Application> getApplicationBySemester(String semester);
+    PaginationDTO<Application> getApplicationBySemester(String semester, String search, String applicationStatus, int page, int limit);
+
+    PaginationDTO<Application> getApplicationByApplicationStatusAndSemester(String applicationStatus,
+                                                                            String semester, String search, String assignStatus, int page, int limit);
 
     Application updateApplicationStatus(int id, String status);
+
+    Application updateAssignStatus(int id, String status);
+
+    int[][] autoAssignApplication(String semester);
+
+    byte[] generateExcelFile(String semester) throws IOException;
 }

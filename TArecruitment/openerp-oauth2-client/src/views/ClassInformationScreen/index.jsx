@@ -11,7 +11,7 @@ import { useState, useEffect } from "react";
 import styles from "./index.style";
 import { useParams, useHistory } from "react-router-dom";
 import { request } from "api";
-import { successNoti } from "utils/notification";
+import { successNoti, warningNoti } from "utils/notification";
 
 const ClassInformationScreen = () => {
   const history = useHistory();
@@ -34,6 +34,7 @@ const ClassInformationScreen = () => {
       setFormData(res.data);
       setOldFormData(res.data);
     }).then();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChange = (event) => {
@@ -49,13 +50,32 @@ const ClassInformationScreen = () => {
   };
 
   const handleUpdate = () => {
-    /**
-     * @todo: Checking data before updating if it's empty or not
-     */
-    setOldFormData({ ...formData });
-    request("put", `/class-call/update-class/${id}`, (res) => {}, {}, formData);
-    successNoti("Cập nhật thông tin lớp học thành công!");
-    setIsEdited(false);
+    if (
+      !formData.day ||
+      !formData.startPeriod ||
+      !formData.endPeriod ||
+      !formData.subjectId ||
+      !formData.subjectName ||
+      !formData.classRoom ||
+      !formData.semester
+    ) {
+      warningNoti("Vui lòng điền đầy đủ thông tin");
+      return;
+    } else if (formData.startPeriod >= formData.endPeriod) {
+      warningNoti("Tiết bắt đầu phải nhỏ hơn tiết kết thúc");
+      return;
+    } else {
+      setOldFormData({ ...formData });
+      request(
+        "put",
+        `/class-call/update-class/${id}`,
+        (res) => {},
+        {},
+        formData
+      );
+      successNoti("Cập nhật thông tin lớp học thành công!");
+      setIsEdited(false);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -77,7 +97,6 @@ const ClassInformationScreen = () => {
               <h3>Mã lớp</h3>
               <TextField
                 style={styles.textField}
-                label="Mã lớp"
                 variant="outlined"
                 name="subjectId"
                 value={formData.subjectId}
@@ -90,7 +109,6 @@ const ClassInformationScreen = () => {
               <h3>Tên lớp</h3>
               <TextField
                 style={styles.rightTextField}
-                label="Tên lớp"
                 variant="outlined"
                 name="subjectName"
                 value={formData.subjectName}
@@ -105,7 +123,6 @@ const ClassInformationScreen = () => {
               <h3>Phòng học</h3>
               <TextField
                 style={styles.textField}
-                label="Phòng học"
                 variant="outlined"
                 name="classRoom"
                 value={formData.classRoom}
@@ -118,7 +135,6 @@ const ClassInformationScreen = () => {
               <h3>Học kì</h3>
               <TextField
                 style={styles.textField}
-                label="Học kì"
                 variant="outlined"
                 name="semester"
                 value={formData.semester}

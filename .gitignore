@@ -37,3 +37,7 @@ HELP.md
 ./passbook/openerp-resource-server/*.yml
 ./passbook/openerp-resource-server/.idea/
 **/node_modules/
+lms/.idea/lms.iml
+lms/.idea/misc.xml
+lms/.idea/vcs.xml
+lms/.idea/modules.xml

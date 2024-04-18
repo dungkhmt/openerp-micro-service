@@ -1,4 +1,4 @@
-import { withStyles } from "@mui/material/styles";
+import { withStyles } from "@mui/styles";
 import Tabs from "@mui/material/Tabs";
 import React from "react";
 import { AntScrollButton } from "./AntScrollButton";

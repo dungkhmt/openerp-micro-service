@@ -11,4 +11,8 @@ public interface AssetTypeService {
     Optional<AssetType> getTypeById(Integer Id);
 
     AssetType addNewType(AssetType assetType);
+
+    AssetType editType(Integer Id, AssetType assetType);
+
+    void deleteType(Integer Id);
 }

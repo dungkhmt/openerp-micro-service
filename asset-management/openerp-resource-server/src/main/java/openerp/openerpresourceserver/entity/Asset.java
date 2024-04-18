@@ -19,17 +19,22 @@ import java.util.Date;
 @Table(name = "asset_management_asset")
 public class Asset {
     @Id
-    @Column(name = "asset_id", updatable = false, nullable = false)
+    @Column(name = "asset_id", updatable = false, nullable = false, unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String name;
 
+    @Column(name = "code", nullable = false, unique = true)
     private String code;
 
-    private Integer assignee_id;
+    private String assignee_id;
 
     private BigDecimal price;
+
+    private String image;
+
+    private Boolean is_deprecated;
 
     private Integer type_id;
 

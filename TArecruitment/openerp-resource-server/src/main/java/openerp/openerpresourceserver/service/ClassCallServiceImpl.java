@@ -2,9 +2,13 @@ package openerp.openerpresourceserver.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import openerp.openerpresourceserver.dto.PaginationDTO;
 import openerp.openerpresourceserver.entity.ClassCall;
 import openerp.openerpresourceserver.repo.ClassCallRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +28,16 @@ public class ClassCallServiceImpl implements ClassCallService {
     }
 
     @Override
-    public List<ClassCall> getAllClass() {
-        List<ClassCall> classCalls = classCallRepo.findAll();
-        return classCalls;
+    public PaginationDTO<ClassCall> getAllClass(int page, int limit) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<ClassCall> classCallsPage = classCallRepo.findAll(pageable);
+
+        PaginationDTO<ClassCall> paginationDTO = new PaginationDTO<>();
+        paginationDTO.setPage(classCallsPage.getNumber());
+        paginationDTO.setTotalElement((int) classCallsPage.getTotalElements());
+        paginationDTO.setData(classCallsPage.getContent());
+
+        return paginationDTO;
     }
 
     @Override
@@ -37,10 +48,20 @@ public class ClassCallServiceImpl implements ClassCallService {
     }
 
     @Override
-    public List<ClassCall> getClassBySemester(String semester) {
-        List<ClassCall> classCall = classCallRepo.findBySemester(semester, Sort.by(Sort.Direction.ASC, "id"));
-        if(classCall.isEmpty()) throw new IllegalArgumentException("No class in semester " + semester);
-        return classCall;
+    public PaginationDTO<ClassCall> getClassBySemester(String semester, String search, int page, int limit) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<ClassCall> classCallsPage = classCallRepo.findBySemester(semester, search, pageable);
+
+        if (classCallsPage.isEmpty()) {
+            throw new IllegalArgumentException("No classes found for semester " + semester);
+        }
+
+        PaginationDTO<ClassCall> paginationDTO = new PaginationDTO<>();
+        paginationDTO.setPage(classCallsPage.getNumber());
+        paginationDTO.setTotalElement((int) classCallsPage.getTotalElements());
+        paginationDTO.setData(classCallsPage.getContent());
+
+        return paginationDTO;
     }
 
     @Override
@@ -75,5 +96,10 @@ public class ClassCallServiceImpl implements ClassCallService {
 
         classCallRepo.deleteById(id);
         return true;
+    }
+
+    @Override
+    public List<ClassCall> getAllMyRegisteredClass(String userId, String semester) {
+        return classCallRepo.getAllMyRegisteredClass(userId, semester);
     }
 }

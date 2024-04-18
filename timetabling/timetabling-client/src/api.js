@@ -83,6 +83,7 @@ export async function request(
           break;
         default:
           if (isFunction(errorHandlers[e.response.status])) {
+            console.error(e);
             errorHandlers[e.response.status](e);
           } else if (isFunction(errorHandlers["rest"])) {
             errorHandlers["rest"](e);

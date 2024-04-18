@@ -9,7 +9,11 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.util.Date;
-
+// reuqets muon, request tra
+// tu ngay nao den ngay nao
+// Principal principal
+// qua han thi co thong bao
+//
 @Data
 @Builder
 @AllArgsConstructor
@@ -29,7 +33,7 @@ public class AssetType {
     private String description;
 
     @Column(nullable = false, unique = true)
-    private String codePrefix;
+    private String code_prefix;
 
     @CreatedDate
     private Date since;

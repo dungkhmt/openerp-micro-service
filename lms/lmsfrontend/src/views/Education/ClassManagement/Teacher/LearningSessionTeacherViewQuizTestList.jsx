@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from "react";
-import {request} from "../../../../api";
+import React, { useEffect, useState } from "react";
+import { request } from "../../../../api";
 import MaterialTable from "material-table";
-import {Button, Tooltip} from "@material-ui/core/";
+import { Button, Tooltip } from "@material-ui/core/";
 
 import AddIcon from "@material-ui/icons/Add";
-import {Link,} from "react-router-dom";
+import { Link } from "react-router-dom";
 import LearningSessionFormAddQuizTest from "./LearningSessionFormAddQuizTest";
 import LearningSessionFormAddQuizInClassTests from "./LearningSessionFormAddQuizInClassTests";
 
@@ -23,12 +23,12 @@ export default function LearningSessionTeacherViewQuizTestList(props) {
 
   const columns = [
     {
-      title: "TestId",
-      field: "testId",
+      title: "Interactive Quiz Id",
+      field: "interactive_quiz_id",
       render: (rowData) => (
         <Link
           to={{
-            pathname: `/edu/class/quiztest/detail/${rowData.testId}`,
+            pathname: `/edu/teacher/class/detail/interactive-quiz/${rowData.interactive_quiz_id}`,
           }}
           style={{
             textDecoration: "none",
@@ -39,17 +39,17 @@ export default function LearningSessionTeacherViewQuizTestList(props) {
             wordWrap: "break-word" /* Internet Explorer 5.5+ */,
           }}
         >
-          {rowData.testId}
+          {rowData.interactive_quiz_id}
         </Link>
       ),
     },
-    { title: "TestName", field: "testName" },
+    { title: "Interactive Quiz Name", field: "interactive_quiz_name" },
     { title: "Status", field: "statusId" },
   ];
   function getQuizTestOfSession() {
     request(
       "get",
-      "/edu/class/get-quiz-test-list-of-session/" + sessionId,
+      "/get-list-interactive-quiz-by-session/" + sessionId,
       (res) => {
         console.log(res);
         setQuizTests(res.data);

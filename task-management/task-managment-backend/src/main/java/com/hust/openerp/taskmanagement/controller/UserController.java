@@ -1,10 +1,13 @@
 package com.hust.openerp.taskmanagement.controller;
 
+import java.security.Principal;
 import java.util.List;
 
+import org.springframework.lang.Nullable;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hust.openerp.taskmanagement.config.OpenApiConfig;
@@ -34,8 +37,12 @@ public class UserController {
 
     // FIXME: add role to @Secured annotation when role is defined
     @GetMapping("/users")
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public List<User> getAllUsers(@Nullable @RequestParam("q") String q) {
+        return userService.searchUser(q);
     }
 
+    @GetMapping("/users/assigned-task-creator")
+    public List<User> getUserCreateTaskAssignMe(Principal principal) {
+        return userService.getUserCreateTaskAssignMe(principal.getName());
+    }
 }

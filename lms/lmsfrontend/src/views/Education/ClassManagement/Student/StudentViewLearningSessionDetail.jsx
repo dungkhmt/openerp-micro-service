@@ -1,11 +1,17 @@
-import React, {useEffect, useState} from "react";
-import {useParams,} from "react-router";
-import {a11yProps, StyledTab, StyledTabs, TabPanel,} from "../../../../component/tab";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router";
+import {
+  a11yProps,
+  StyledTab,
+  StyledTabs,
+  TabPanel,
+} from "../../../../component/tab";
 import LearningSessionStudentViewQuizTestList from "./LearningSessionStudentViewQuizTestList";
-import {request} from "../../../../api";
-import {makeStyles} from "@material-ui/core/styles";
+import { request } from "../../../../api";
+import { makeStyles } from "@material-ui/core/styles";
 import ListWhiteBoardStudentView from "../../../../component/education/whiteboard/ListWhiteboardStudentView";
-import {Typography} from "@material-ui/core";
+import { Typography } from "@material-ui/core";
+import StudentViewInteractiveQuizList from "./StudentViewInteractiveQuizList";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -73,7 +79,8 @@ export default function StudentViewLearningSessionDetail() {
       </div>
       <h1>{sessionDetail ? sessionDetail.sessionName : ""}</h1>
       <TabPanel value={activeTab} index={0}>
-        <LearningSessionStudentViewQuizTestList sessionId={sessionId} />
+        {/* <LearningSessionStudentViewQuizTestList sessionId={sessionId} /> */}
+        <StudentViewInteractiveQuizList sessionId={sessionId} />
       </TabPanel>
       <TabPanel value={activeTab} index={1}>
         <ListWhiteBoardStudentView />

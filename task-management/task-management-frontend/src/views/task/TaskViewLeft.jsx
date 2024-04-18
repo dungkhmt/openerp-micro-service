@@ -6,7 +6,6 @@ import {
   Divider,
   Grid,
   IconButton,
-  Skeleton,
   Tooltip,
   Typography,
   styled,
@@ -15,17 +14,15 @@ import MDEditor from "@uiw/react-md-editor";
 import dayjs from "dayjs";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import CustomAvatar from "../../components/mui/avatar/CustomAvatar";
+import { UserAvatar } from "../../components/common/avatar/UserAvatar";
 import { useTaskContext } from "../../hooks/useTaskContext";
 import { FileService } from "../../services/api/file.service";
-import { getRandomColorSkin } from "../../utils/color.util";
 import { getDiffDateWithCurrent } from "../../utils/date.util";
-import CommentSection from "./CommentSection";
 import { DialogEditTask } from "./DialogEditTask";
-import TaskViewLog from "./TaskViewLog";
-import { TaskViewHierarchy } from "./TaskViewHierarchy";
-import { DialogAddSubTask } from "./DialogAddSubTask";
-import { useProjectContext } from "../../hooks/useProjectContext";
+import CommentSection from "./comment/CommentSection";
+import { DialogAddSubTask } from "./hierarchy/DialogAddSubTask";
+import { TaskViewHierarchy } from "./hierarchy/TaskViewHierarchy";
+import TaskViewLog from "./log/TaskViewLog";
 
 const TextHighlight = styled(Typography)(({ theme }) => ({
   color: theme.palette.primary.main,
@@ -43,36 +40,10 @@ export const TitleWrapper = styled(Box)(({ theme }) => ({
   },
 }));
 
-const Loading = () => (
-  <Card sx={{ p: 6 }}>
-    <Box sx={{ display: "flex", gap: 4, mb: 6 }}>
-      <Skeleton variant="circular" width={80} height={80} />
-      <Box>
-        <Skeleton variant="text" width={350} />
-        <Skeleton variant="text" width={160} />
-      </Box>
-    </Box>
-    <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
-    <Box sx={{ display: "flex", gap: 4, flexDirection: "column" }}>
-      <Skeleton variant="text" width={50} />
-      <Skeleton variant="text" width={200} />
-      <Skeleton variant="text" width={70} />
-      <Skeleton variant="rectangular" width={300} height={120} />
-      <Skeleton variant="text" width={200} />
-      <Skeleton variant="text" width={100} />
-    </Box>
-  </Card>
-);
-
 const TaskViewLeft = () => {
-  const { isLoading: taskLoading, task } = useTaskContext();
-  const {isLoading: projectLoading} = useProjectContext();
+  const { task } = useTaskContext();
   const [openEdit, setOpenEdit] = useState(false);
   const [openAddSubTask, setOpenAddSubTask] = useState(false);
-
-  if (taskLoading || projectLoading) {
-    return <Loading />;
-  }
 
   const [fileName, fileId] = task.attachmentPaths?.split(",") ?? [];
 
@@ -108,19 +79,12 @@ const TaskViewLeft = () => {
           <CardContent>
             <Grid container spacing={6}>
               <Grid item xs={12} md={1} sm={0.75} xl={0.75}>
-                <CustomAvatar
-                  skin="light"
-                  color={getRandomColorSkin(task.creator?.id)}
-                  sx={{
-                    width: 70,
-                    height: 70,
-                    fontSize: "2rem",
-                  }}
-                >
-                  {`${task.creator?.firstName?.charAt(
-                    0
-                  )}${task.creator?.lastName?.charAt(0)}`}
-                </CustomAvatar>
+                <UserAvatar
+                  user={task.creator}
+                  width={70}
+                  height={70}
+                  fontSize="2rem"
+                />
               </Grid>
 
               <Grid item xs={12} md={10} xl={10.5}>

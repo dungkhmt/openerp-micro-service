@@ -1,5 +1,7 @@
 package com.hust.baseweb.applications.education.model.quiz;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,4 +20,8 @@ public class QuizQuestionUpdateInputModel {
     private String solutionContent;
 
     private String[] deletedAttachmentIds;
+
+    private List<String> chooseTags;
+
+    private String courseId;
 }

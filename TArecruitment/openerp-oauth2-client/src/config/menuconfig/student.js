@@ -13,14 +13,14 @@ export const student = {
     {
       id: "MENU_STUDENT.MENU_ITEM_1",
       path: "/student/classregister-list",
-      isPublic: false,
+      isPublic: true,
       text: "Đăng ký lớp trợ giảng",
       child: [],
     },
     {
       id: "MENU_STUDENT.MENU_ITEM_2",
       path: "/student/result",
-      isPublic: false,
+      isPublic: true,
       text: "Kết quả tuyển dụng",
       child: [],
     },

@@ -25,6 +25,8 @@ export default function CreateNewGroupScreen({ open, handleClose, existingData, 
       groupName: newGroup
     };
 
+    console.log(requestUpdateClassOpened);
+
     request("post", "/group/create", (res) => {
 
       //if success, do request update class opened

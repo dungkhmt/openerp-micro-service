@@ -2,7 +2,6 @@ import { Icon } from "@iconify/react";
 import {
   Box,
   Button,
-  CircularProgress,
   Collapse,
   Dialog,
   DialogActions,
@@ -24,20 +23,17 @@ import PropTypes from "prop-types";
 import { forwardRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { CustomEditor } from "../../components/editor/CustomEditor";
+import { useSelector } from "react-redux";
+import { UserAvatar } from "../../components/common/avatar/UserAvatar";
+import { CustomMDEditor } from "../../components/editor/md-editor/CustomMDEditor";
 import { FileUploader } from "../../components/file-uploader";
-import CustomAvatar from "../../components/mui/avatar/CustomAvatar";
-import CustomChip from "../../components/mui/chip";
-import { useProjectContext } from "../../hooks/useProjectContext";
+import { LoadingButton } from "../../components/mui/button/LoadingButton";
+import { TaskCategory } from "../../components/task/category";
+import { TaskPriority } from "../../components/task/priority";
+import { TaskStatus } from "../../components/task/status";
 import { useTaskContext } from "../../hooks/useTaskContext";
 import { FileService } from "../../services/api/file.service";
 import { TaskService } from "../../services/api/task.service";
-import {
-  getCategoryColor,
-  getPriorityColor,
-  getRandomColorSkin,
-  getStatusColor,
-} from "../../utils/color.util";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />;
@@ -45,7 +41,9 @@ const Transition = forwardRef(function Transition(props, ref) {
 
 const DialogEditTask = ({ open, setOpen }) => {
   const { task, isUpdate, setIsUpdate } = useTaskContext();
-  const { statuses, priorities, categories, members } = useProjectContext();
+  const { members } = useSelector((state) => state.project);
+  const { category, priority, status } = useSelector((state) => state);
+
   const [toggleEditDesc, setToggleEditDesc] = useState(false);
   const [files, setFiles] = useState(null);
   const [updateLoading, setUpdateLoading] = useState(false);
@@ -149,7 +147,7 @@ const DialogEditTask = ({ open, setOpen }) => {
                 control={control}
                 defaultValue={task.description}
                 render={(field) => (
-                  <CustomEditor
+                  <CustomMDEditor
                     {...field}
                     setValue={(value) => setValue("description", value)}
                   />
@@ -173,14 +171,12 @@ const DialogEditTask = ({ open, setOpen }) => {
                     labelId="role-category"
                     inputProps={{ placeholder: "Danh mục" }}
                   >
-                    {categories.map(({ categoryId, categoryName }) => (
-                      <MenuItem key={categoryId} value={categoryId}>
-                        <CustomChip
-                          size="small"
-                          skin="light"
-                          label={categoryName}
-                          color={getCategoryColor(categoryId)}
-                        />
+                    {category.categories.map((category) => (
+                      <MenuItem
+                        key={category.categoryId}
+                        value={category.categoryId}
+                      >
+                        <TaskCategory category={category} />
                       </MenuItem>
                     ))}
                   </Select>
@@ -207,14 +203,9 @@ const DialogEditTask = ({ open, setOpen }) => {
                     labelId="status-select"
                     inputProps={{ placeholder: "Trạng thái" }}
                   >
-                    {statuses.map(({ statusId, description }) => (
-                      <MenuItem key={statusId} value={statusId}>
-                        <CustomChip
-                          size="small"
-                          skin="light"
-                          label={description}
-                          color={getStatusColor(statusId)}
-                        />
+                    {status.statuses.map((status) => (
+                      <MenuItem key={status.statusId} value={status.statusId}>
+                        <TaskStatus status={status} />
                       </MenuItem>
                     ))}
                   </Select>
@@ -241,14 +232,12 @@ const DialogEditTask = ({ open, setOpen }) => {
                     labelId="priority-select"
                     inputProps={{ placeholder: "Ưu tiên" }}
                   >
-                    {priorities.map(({ priorityId, priorityName }) => (
-                      <MenuItem key={priorityId} value={priorityId}>
-                        <CustomChip
-                          size="small"
-                          skin="light"
-                          label={priorityName}
-                          color={getPriorityColor(priorityId)}
-                        />
+                    {priority.priorities.map((priority) => (
+                      <MenuItem
+                        key={priority.priorityId}
+                        value={priority.priorityId}
+                      >
+                        <TaskPriority priority={priority} showText />
                       </MenuItem>
                     ))}
                   </Select>
@@ -357,19 +346,7 @@ const DialogEditTask = ({ open, setOpen }) => {
                         <Box
                           sx={{ display: "flex", gap: 2, alignItems: "center" }}
                         >
-                          <CustomAvatar
-                            skin="light"
-                            color={getRandomColorSkin(member.id)}
-                            sx={{
-                              width: 30,
-                              height: 30,
-                              fontSize: ".875rem",
-                            }}
-                          >
-                            {`${member.firstName?.charAt(0) ?? ""}${
-                              member.lastName?.charAt(0) ?? ""
-                            }`}
-                          </CustomAvatar>
+                          <UserAvatar user={member} />
                           <Typography variant="subtitle2">{`${
                             member.firstName ?? ""
                           } ${member.lastName ?? ""}`}</Typography>
@@ -389,7 +366,7 @@ const DialogEditTask = ({ open, setOpen }) => {
                 control={control}
                 defaultValue=""
                 render={(field) => (
-                  <CustomEditor
+                  <CustomMDEditor
                     {...field}
                     setValue={(value) => setValue("note", value)}
                   />
@@ -415,32 +392,14 @@ const DialogEditTask = ({ open, setOpen }) => {
           ],
         }}
       >
-        <Button
+        <LoadingButton
           variant="contained"
           sx={{ mr: 1, position: "relative" }}
           onClick={handleSubmit(onUpdated)}
-          disabled={updateLoading}
+          loading={updateLoading}
         >
           Cập nhật
-          {updateLoading && (
-            <Box
-              component="span"
-              sx={{
-                position: "absolute",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                bgcolor: "rgba(255, 255, 255, 0.7)",
-              }}
-            >
-              <CircularProgress size={24} />
-            </Box>
-          )}
-        </Button>
+        </LoadingButton>
         <Button
           variant="outlined"
           color="secondary"

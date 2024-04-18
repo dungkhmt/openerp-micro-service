@@ -22,7 +22,6 @@ public class EntityAuthorization {
     @Id
     private String id;
 
-    // User's role
     private String roleId;
 
     private String description;
