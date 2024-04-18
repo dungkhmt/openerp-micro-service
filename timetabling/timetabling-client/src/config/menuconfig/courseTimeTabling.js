@@ -25,9 +25,9 @@ export const courseTimeTabling = {
       child: [],
     },
     {
-      id: "MENU_COURSE_TIME_TABLING.CLASS_LIST_OPENED",
+      id: "MENU_COURSE_TIME_TABLING.CLASS_1_YEAR_STD_LIST_OPENED",
       path: "/course-time-tabling/class-list-opened-first-year-standard",
-      isPublic: true,
+      isPublic: false,
       text: "Tải lên DS lớp năm 1",
       child: [],
     },
