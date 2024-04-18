@@ -329,6 +329,9 @@ const AssetsScreen = () => {
                             onChange={(e) => setDescription(e.target.value)}
                             value={description}
                         />
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker label="Basic date picker" />
+                        </LocalizationProvider>
                         <FormControl sx={{ minWidth: 255, marginTop: "20px" }}>
                             <InputLabel id="demo-simple-select-label">Type</InputLabel>
                             <Select
