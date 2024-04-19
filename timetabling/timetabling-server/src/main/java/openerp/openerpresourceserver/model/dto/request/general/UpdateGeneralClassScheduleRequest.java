@@ -18,10 +18,9 @@ public class UpdateGeneralClassScheduleRequest {
     private String value;
     @NotNull
     private String generalClassId;
-    @NotNull
-    private String scheduleIndex;
+    private Long roomReservationId;
     @Override
     public String toString() {
-        return field + " " + value + " " + generalClassId + " " + scheduleIndex;
+        return field + " " + value + " " + generalClassId + roomReservationId;
     }
 }

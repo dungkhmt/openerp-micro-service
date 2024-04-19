@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.controller;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.helper.ExcelHelper;
 import openerp.openerpresourceserver.message.ResponseMessage;
 import openerp.openerpresourceserver.model.dto.request.FilterClassOpenedDto;
@@ -22,10 +23,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @Controller
+@AllArgsConstructor
 @RequestMapping("/excel")
 public class ExcelController {
-    @Autowired
-    ExcelService fileService;
+
+    private ExcelService fileService;
 
     // @GetMapping(value = "/download-template")
     // public ResponseEntity<Resource> getFile() {

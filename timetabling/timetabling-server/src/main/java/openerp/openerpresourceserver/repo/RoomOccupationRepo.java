@@ -17,4 +17,6 @@ public interface RoomOccupationRepo extends JpaRepository<RoomOccupation, String
     void deleteBySemester(String semester);
 
     List<RoomOccupation> findAllBySemesterAndWeekIndex(String semester, int i);
+
+    void deleteAllByClassCodeAndStartPeriodAndEndPeriodAndDayIndexAndClassRoom(String classCode, int startPeriod, int endPeriod, int weekDay, String classRoom);
 }

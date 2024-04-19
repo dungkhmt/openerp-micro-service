@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 const AutocompleteCell = ({
+  roomReservationId,
   id,
   field,
   value,
@@ -11,30 +12,43 @@ const AutocompleteCell = ({
   options,
   width,
   setClasses,
-  setLoading
+  setLoading,
+  semester,
 }) => {
   const handleAutocompleteChange = (event, newValue) => {
-    
     // Call the api that update the general class with id = ?
     const generalClassId = String(id).split("-")?.[0];
     setLoading(true);
     switch (String(field)) {
       case "startTime":
+      case "endTime":
       case "room":
       case "weekday":
         const scheduleIndex = String(id).split("-")?.[1];
         request(
           "post",
-          `/general-classes/update-class-schedule`,
+          `/general-classes/update-class-schedule?semester=${semester?.semester}`,
           (res) => {
             setLoading(false);
+            const newClass = res.data;
+            const newTimeSlot = res.data.timeSlots.filter(
+              (timeSlot) => timeSlot.id === roomReservationId
+            )?.[0];
+            delete newClass.timeSlots;
+
+            const a = {
+              ...newClass,
+              ...newTimeSlot,
+              roomReservationId: newTimeSlot.id,
+              id: `${newClass.id}-${scheduleIndex}`,
+            };
+
             setClasses((prevClasses) => {
-              return prevClasses.map((gc) => {
-                console.log(gc);
-                if (id == gc.id) {
-                  return { ...gc, [field]: newValue?.label };
+              return prevClasses.map((prevClass) => {
+                if (prevClass.roomReservationId === roomReservationId) {
+                  return a;
                 } else {
-                  return gc;
+                  return prevClass;
                 }
               });
             });
@@ -44,13 +58,19 @@ const AutocompleteCell = ({
             console.error(error);
             setLoading(false);
           },
-          { field, value: newValue?.label, scheduleIndex, generalClassId }
+          {
+            field,
+            value: newValue?.label,
+            scheduleIndex,
+            generalClassId,
+            roomReservationId,
+          }
         );
         break;
       default:
         request(
           "post",
-          `/general-class/${generalClassId}/update-class-schedule`,
+          `/general-class/${generalClassId}/update-class-schedule?semester=${semester?.semester}`,
           (res) => {
             console.log(res.data);
             setClasses((prevClasses) => {
@@ -72,7 +92,7 @@ const AutocompleteCell = ({
   return (
     <Autocomplete
       disablePortal
-      value={value !== undefined ? { label: value.toString() } : null}
+      value={value !== undefined ? { label: value?.toString() || "" } : null}
       isOptionEqualToValue={(option, value) =>
         option.label.toString() === value.label
       }

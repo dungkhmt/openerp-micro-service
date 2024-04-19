@@ -87,7 +87,7 @@ export default function InputFileUpload({
         }
       >
         {selectedFile === null
-          ? "Chọn danh sách lớp"
+          ? "Chọn file TKB"
           : `TKB-${selectedSemester.semester}`}
         <VisuallyHiddenInput
           ref={inputRef}
