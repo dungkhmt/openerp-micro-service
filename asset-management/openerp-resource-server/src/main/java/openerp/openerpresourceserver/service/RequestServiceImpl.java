@@ -15,6 +15,10 @@ import java.util.List;
 public class RequestServiceImpl implements RequestService{
     private RequestRepo requestRepo;
 
+    private final Integer PENDING = 0;
+    private final Integer APPROVED = 1;
+    private final Integer REJECTED = 2;
+
     @Override
     public List<Request> getAllRequests() {
         List<Request> requests = requestRepo.findAll();
@@ -26,9 +30,9 @@ public class RequestServiceImpl implements RequestService{
         Request newRequest = new Request();
         newRequest.setName(request.getName());
         newRequest.setDescription(request.getDescription());
-        newRequest.setApproval_flow(request.getApproval_flow());
-        newRequest.setStatus(0);
-        newRequest.setApprovers_id(request.getApprovers_id());
+        newRequest.setStatus(PENDING);
+//        String assetId = request.get
+//        newRequest.setApprovers_id(request.getApprovers_id());
 
         Date currentDate = new Date();
         newRequest.setSince(currentDate);
@@ -48,9 +52,9 @@ public class RequestServiceImpl implements RequestService{
         }
 
         // check quyen xem co dc approve ko
-        if(!request.getApprovers_id().contains(userId)){
-            return false;
-        }
+//        if(!request.getApprovers_id().contains(userId)){
+//            return false;
+//        }
 //        List<String> approvals = request.getApprovals_id();
 //        approvals.add(userId);
 //        request.setApprovals_id(approvals.toString());

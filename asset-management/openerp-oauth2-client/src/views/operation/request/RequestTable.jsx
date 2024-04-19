@@ -5,14 +5,6 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Checkbox from "@mui/material/Checkbox";
-import ListItemText from "@mui/material/ListItemText";
-import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -20,27 +12,38 @@ import Select from '@mui/material/Select';
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import dayjs from 'dayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { errorNoti, successNoti } from 'utils/notification';
+import "./requestTable.css";
 
 const RequestTable = () => {
-    const INITIAL_DATA = {
-        name: "",
-        description: ""
-    };
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
 
-    const [data, setData] = useState(INITIAL_DATA);
-    const [users, setUsers] = useState([]);
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+
+    const [assets, setAssets] = useState([]);
     const [requests, setRequests] = useState([]);
-    const [approvers, setApprovers] = useState([]);
+    const [assetName, setAssetName] = useState("");
 
     const [open, setOpen] = useState(false);
     const [currentId, setCurrentId] = useState(null);
     const [title, setTitle] = useState("");
 
+    const getAllAvailableAssets = async() => {
+        request("get", "/asset/get-all", (res) => {
+            setAssets(res.data);
+        }).then();
+    };
 
-    const getAllUsers = async() => {
-        request("get", "/user/get-all", (res) => {
-            setUsers(res.data);
+    const getAllRequests = async() => {
+        request("get", "/request/get-all", (res) => {
+            setRequests(res.data);
         }).then();
     };
    
@@ -57,17 +60,6 @@ const RequestTable = () => {
         gap: "30px"
 	};
 
-    const ITEM_HEIGHT = 48;
-    const ITEM_PADDING_TOP = 8;
-    const MenuProps = {
-        PaperProps: {
-            style: {
-            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-            width: 250,
-            },
-        },
-    };
-    
     const errorHandlers = {
         onError: (e) => {
             console.log(e);
@@ -75,7 +67,7 @@ const RequestTable = () => {
         },
     };
 
-        const successHandler = (res) => {
+    const successHandler = (res) => {
         const msg = title === "CREATE NEW ASSET" ? "CREATE SUCCESSFULLY" : "EDIT SUCCESSFULLY";
         successNoti(msg, 3000);
         setRequests(prevAsset => [...prevAsset, res.data]);
@@ -86,45 +78,45 @@ const RequestTable = () => {
         setOpen(true);
     };
 
+    const resetData = () => {
+        setName("");
+        setDescription("");
+        setAssetName("");
+        setStartDate(null);
+        setEndDate(null);
+    }
+
 
     const handleClose = () => {
         setOpen(false);
-        setData(INITIAL_DATA);
-        setApprovers([]);
-    };
-
-    const handleChangeApprovers = (event) => {
-        const {
-            target: {value},
-        } = event;
-
-        setApprovers(
-            typeof value === "string" ? value.split(",") : value
-        );
+        resetData();
     };
 
     const handleSubmit = (e) => {
     	e.preventDefault();
-        console.log("dataaa", data);
-        console.log("appro", approvers);
-        const arr = ["aa", "bb", "cc"];
-        console.log("mix mix", {...data, approvers: approvers});
-        request("post", "/request/add-new", successHandler, errorHandlers, {...data, ...approvers});
-    };
+        const foundAsset = assets.find(a => a.name === assetName);
+        console.log("dataaa", name);
+        const asset_id = foundAsset ? foundAsset.id : 0;
 
-    const handleInputChange = (e) => {
-        e.preventDefault();
-        setData({...data, [e.target.name]: e.target.value});
+        const body = {
+            name: name,
+            description: description,
+            start_date: startDate.format(),
+            end_date: endDate.format(),
+            asset_id: asset_id
+        };
+
+        console.log("body", body);
+
+        request("post", "/request/add-new", successHandler, errorHandlers, body);
+
+        resetData();
+        setOpen(false);
     };
 
     useEffect(() => {
-        getAllUsers();
-    });
-
-    useEffect(() => {
-        request("get", "/request/get-all", (res) => {
-            setRequests(res.data);
-        }).then();
+        getAllAvailableAssets();
+        getAllRequests();
     }, []);
 
     const columns = [
@@ -145,8 +137,12 @@ const RequestTable = () => {
             field: "email",
         },
         {
-            title: "Approvers",
-            field: "approvers",
+            title: "StartDate",
+            field: "startDate",
+        },
+        {
+            title: "EndDate",
+            field: "endDate",
         },
         {
             title: "Edit",
@@ -215,22 +211,44 @@ const RequestTable = () => {
                             fullWidth
                             margin="normal"
                             required
-                            value={data.name}
+                            value={name}
                             name='name'
-                            placeholder='Asset name'
-                            onChange={handleInputChange}
+                            placeholder='Request name'
+                            onChange={(e) => setName(e.target.value)}
                         />
                         <TextField
                             label="Description"
                             variant="outlined"
                             fullWidth
-                            value={data.description}
-                            onChange={handleInputChange}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
                             margin="normal"
                             name='description'
-                            placeholder='Asset description'
-                        />  
-                        <FormControl sx={{ width: "100%", marginTop: "20px" }}>
+                            placeholder='Request description'
+                        /> 
+                        <FormControl sx={{ minWidth: 730, marginTop: "20px" }}>
+                            <InputLabel id="demo-simple-select-label">Asset</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={assetName}
+                                label="Asset"
+                                onChange={(e) => setAssetName(e.target.value)}
+                            >
+                                {assets.map((asset) => (
+                                    <MenuItem id={asset.id} value={asset.name}>{asset.name}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>    
+                        <div style={{marginTop: "20px"}}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs} className='date-adapter'>
+                            <DemoContainer components={['DatePicker', 'DatePicker']}>
+                                <DatePicker className='date-picker-request' label="Start Date" value={startDate} onChange={(newValue) => setStartDate(newValue)} />
+                                <DatePicker className='date-picker-request' label="End Date" value={endDate} onChange={(newValue) => setEndDate(newValue)} />
+                            </DemoContainer>
+                            </LocalizationProvider>
+                        </div>
+                        {/* <FormControl sx={{ width: "100%", marginTop: "20px" }}>
                             <InputLabel id="demo-multiple-checkbox-label">Approval</InputLabel>
                             <Select
                                 labelId="demo-multiple-checkbox-label"
@@ -249,7 +267,7 @@ const RequestTable = () => {
                                     </MenuItem>
                                 ))}
                             </Select>
-                        </FormControl>                         
+                        </FormControl>                          */}
                         <div style={{display: "flex", justifyContent: "space-between", marginTop: "20px"}}>
                             <Button
                                 variant="outlined"

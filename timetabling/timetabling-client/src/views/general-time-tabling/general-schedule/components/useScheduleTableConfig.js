@@ -3,7 +3,7 @@ import AutocompleteCell from "./AutoCompleteCell";
 import { request } from "api";
 import { useEffect, useState } from "react";
 
-export const useGeneralTableColumns = (setClasses, setLoading) => {
+export const useGeneralTableColumns = (setClasses, setLoading, semester) => {
   const [classRooms, setClassRooms] = useState([]);
   useEffect(() => {
     request("get", "/classroom/get-all", (res) => {
@@ -24,36 +24,36 @@ export const useGeneralTableColumns = (setClasses, setLoading) => {
       editable: true,
       width: 150,
     },
-    {
-      headerName: "Nhóm",
-      field: "groupName",
-      editable: true,
-      width: 120,
-    },
+    // {
+    //   headerName: "Nhóm",
+    //   field: "groupName",
+    //   editable: true,
+    //   width: 120,
+    // },
     {
       headerName: "Tuần học",
       field: "learningWeeks",
       editable: true,
       width: 120,
     },
-    {
-      headerName: "Mã học phần",
-      field: "moduleCode",
-      editable: true,
-      width: 100,
-    },
-    {
-      headerName: "Tên học phần",
-      field: "moduleName",
-      editable: true,
-      width: 100,
-    },
-    {
-      headerName: "SL thực",
-      field: "quantity",
-      editable: true,
-      width: 100,
-    },
+    // {
+    //   headerName: "Mã học phần",
+    //   field: "moduleCode",
+    //   editable: true,
+    //   width: 100,
+    // },
+    // {
+    //   headerName: "Tên học phần",
+    //   field: "moduleName",
+    //   editable: true,
+    //   width: 100,
+    // },
+    // {
+    //   headerName: "SL thực",
+    //   field: "quantity",
+    //   editable: true,
+    //   width: 100,
+    // },
     {
       headerName: "SL MAX",
       field: "quantityMax",
@@ -66,7 +66,6 @@ export const useGeneralTableColumns = (setClasses, setLoading) => {
       editable: true,
       width: 100,
     },
-
     {
       headerName: "Thời lượng",
       field: "mass",
@@ -85,12 +84,12 @@ export const useGeneralTableColumns = (setClasses, setLoading) => {
       editable: true,
       width: 100,
     },
-    {
-      headerName: "Đợt",
-      field: "openBatch",
-      editable: true,
-      width: 100,
-    },
+    // {
+    //   headerName: "Đợt",
+    //   field: "openBatch",
+    //   editable: true,
+    //   width: 100,
+    // },
     {
       headerName: "Khóa",
       field: "course",
@@ -102,12 +101,32 @@ export const useGeneralTableColumns = (setClasses, setLoading) => {
       field: "startTime",
       width: 80,
       editable: true,
-      renderCell: (params) => (
-        <AutocompleteCell
+      renderCell: (params) => {
+        return <AutocompleteCell
+          roomReservationId={params.row.roomReservationId}
+          semester={semester}
           setLoading={setLoading}
           setClasses={setClasses}
           options={Array.from({ length: 5 }).map((_, index) => ({
             label: (index + 1)?.toString(),
+          }))}
+          {...params}
+        />
+      },
+    },
+    {
+      headerName: "Tiết KT",
+      field: "endTime",
+      width: 80,
+      editable: true,
+      renderCell: (params) => (
+        <AutocompleteCell
+          roomReservationId={params.row.roomReservationId}
+          semester={semester}
+          setLoading={setLoading}
+          setClasses={setClasses}
+          options={Array.from({ length: 5 }).map((_, index) => ({
+            label: (index + 2)?.toString(),
           }))}
           {...params}
         />
@@ -119,6 +138,8 @@ export const useGeneralTableColumns = (setClasses, setLoading) => {
       width: 80,
       renderCell: (params) => (
         <AutocompleteCell
+          roomReservationId={params.row.roomReservationId}
+          semester={semester}
           setLoading={setLoading}
           setClasses={setClasses}
           options={Array.from({ length: 7 }).map((_, index) => ({
@@ -134,6 +155,8 @@ export const useGeneralTableColumns = (setClasses, setLoading) => {
       width: 120,
       renderCell: (params) => (
         <AutocompleteCell
+          roomReservationId={params.row.roomReservationId}
+          semester={semester}
           setLoading={setLoading}
           setClasses={setClasses}
           options={classRooms?.map((classRoom, index) => ({

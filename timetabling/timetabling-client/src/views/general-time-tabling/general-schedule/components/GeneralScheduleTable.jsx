@@ -5,18 +5,25 @@ import { useClasses } from "../../hooks/useClasses";
 import { Box } from "@mui/material";
 import { toast } from "react-toastify";
 
-const GeneralScheduleTable = ({ semester, selectedGroup }) => {
-  const { loading, error, classes, setClasses, setLoading } = useClasses(
-    selectedGroup,
-    semester
-  );
+const GeneralScheduleTable = ({
+  isLoading,
+  setSelectedRows,
+  isDataLoading,
+  setClasses,
+  setLoading,
+  classes,
+  semester
+}) => {
+  
 
   return (
-    <Box style={{ height: 600, width: "100%" }}>
+    <Box style={{ height: 550, width: "100%" }}>
       <DataGrid
+        onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
+        checkboxSelection
         className="text-xs"
-        loading={loading}
-        columns={useGeneralTableColumns(setClasses, setLoading)}
+        loading={isDataLoading || isLoading}
+        columns={useGeneralTableColumns(setClasses, setLoading, semester)}
         rows={classes}
         pageSize={10}
       />

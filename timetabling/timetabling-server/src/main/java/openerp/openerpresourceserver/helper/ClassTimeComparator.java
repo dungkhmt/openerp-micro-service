@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.helper;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import openerp.openerpresourceserver.exception.ConflictScheduleException;
@@ -10,19 +11,17 @@ import openerp.openerpresourceserver.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.model.entity.occupation.OccupationClassPeriod;
 
 public class ClassTimeComparator {
-    public static boolean isClassConflict(int scheduleIndex, GeneralClassOpened gClass, List<GeneralClassOpened> classList) {
+    public static boolean isClassConflict(RoomReservation rr, GeneralClassOpened gClass, List<GeneralClassOpened> classList) {
         boolean isConflict = false;
         /*Filter the class which is different with current class*/
-        List<GeneralClassOpened> compareClassList = classList.stream().filter(nonUpdateClass-> !nonUpdateClass.getId().equals(gClass.getId())).collect(Collectors.toList());
+        List<GeneralClassOpened> compareClassList = classList.stream().filter(nonUpdateClass-> !nonUpdateClass.getId().equals(gClass.getId())).toList();
         /*Check conflict with current class*/
         for(int i = 0; i < gClass.getTimeSlots().size(); i++) {
-            if(i != scheduleIndex) {
-                RoomReservation gTimeSlot = gClass.getTimeSlots().get(scheduleIndex);
+            if(!Objects.equals(gClass.getTimeSlots().get(i).getId(), rr.getId())) {
+                RoomReservation gTimeSlot = rr;
                 RoomReservation cTimeSlot = gClass.getTimeSlots().get(i);
-                if(gTimeSlot.getRoom().equals(cTimeSlot.getRoom()) && gTimeSlot.getWeekday() == cTimeSlot.getWeekday()) {
-                    /*Get the duration of current time slot*/
-                    int duration = gTimeSlot.getEndTime() - gTimeSlot.getStartTime();
-                    if(gTimeSlot.getStartTime()+duration < 6 ) {
+                if(gTimeSlot.getRoom().equals(cTimeSlot.getRoom()) && Objects.equals(gTimeSlot.getWeekday(), cTimeSlot.getWeekday())) {
+                    if(gTimeSlot.getEndTime() <= 6 ) {
                         /*Check A_start < B_start < A_end*/
                         if(gTimeSlot.getStartTime() < cTimeSlot.getStartTime() && cTimeSlot.getStartTime() < gTimeSlot.getEndTime() ) {
                             throw new ConflictScheduleException("Trùng lich với ca " +  (i + 1) + "của lớp " + gClass.getClassCode() + "/" + gClass.getModuleName());
@@ -33,6 +32,10 @@ public class ClassTimeComparator {
                         }
                         /*Check A_start < B_end < A_end*/
                         else if (gTimeSlot.getStartTime() < cTimeSlot.getEndTime() &&  cTimeSlot.getStartTime()< gTimeSlot.getEndTime() ) {
+                            throw new ConflictScheduleException("Trùng lich với ca " +  (i + 1) + "của lớp " + gClass.getClassCode() + "/" + gClass.getModuleName());
+                        }
+                        /*Check if A_end equal B_start*/
+                        else if (gTimeSlot.getEndTime().equals(cTimeSlot.getStartTime())) {
                             throw new ConflictScheduleException("Trùng lich với ca " +  (i + 1) + "của lớp " + gClass.getClassCode() + "/" + gClass.getModuleName());
                         }
                     }
@@ -53,13 +56,11 @@ public class ClassTimeComparator {
                     List<RoomReservation> cTimeSlots = cClass.getTimeSlots();
                     List<RoomReservation> gTimeSlots = gClass.getTimeSlots();
                     /*Get time slot which is need to be updated of the current class*/
-                    RoomReservation gTimeSlot = gTimeSlots.get(scheduleIndex);
+                    RoomReservation gTimeSlot = rr;
                     for(RoomReservation cTimeSlot : cTimeSlots ){
                         /*Check 2 time slot is the same room and same day*/
-                        if(gTimeSlot.getRoom().equals(cTimeSlot.getRoom()) && gTimeSlot.getWeekday() == cTimeSlot.getWeekday()) {
-                            /*Get the duration of current time slot*/
-                            int duration = gTimeSlot.getEndTime() - gTimeSlot.getStartTime();
-                            if(gTimeSlot.getStartTime()+duration < 6 ) {
+                        if(gTimeSlot.getRoom().equals(cTimeSlot.getRoom()) && Objects.equals(gTimeSlot.getWeekday(), cTimeSlot.getWeekday())) {
+                            if(gTimeSlot.getEndTime() <= 6 ) {
                                 /*Check A_start < B_start < A_end*/
                                 if(gTimeSlot.getStartTime() < cTimeSlot.getStartTime() && cTimeSlot.getStartTime() < gTimeSlot.getEndTime() ) {
                                     throw new ConflictScheduleException("Trùng lich với lớp " + cClass.getClassCode() + "/" + cClass.getModuleName());
@@ -70,6 +71,10 @@ public class ClassTimeComparator {
                                 }
                                 /*Check A_start < B_end < A_end*/
                                 else if (gTimeSlot.getStartTime() < cTimeSlot.getEndTime() &&  cTimeSlot.getStartTime()< gTimeSlot.getEndTime() ) {
+                                    throw new ConflictScheduleException("Trùng lich với lớp " + cClass.getClassCode() + "/" + cClass.getModuleName());
+                                }
+                                /*Check if A_end equal B_start*/
+                                else if (gTimeSlot.getEndTime().equals(cTimeSlot.getStartTime())) {
                                     throw new ConflictScheduleException("Trùng lich với lớp " + cClass.getClassCode() + "/" + cClass.getModuleName());
                                 }
                             }

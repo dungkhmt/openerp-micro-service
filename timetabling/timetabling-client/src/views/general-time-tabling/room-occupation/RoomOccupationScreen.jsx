@@ -12,7 +12,7 @@ const RoomOccupationScreen = () => {
   const handleExportExcel = () => {
     request(
       "post",
-      `room-occupation/export?semester=20221&weeks=${selectedWeek}-${selectedWeek}`,
+      `room-occupation/export?semester=${selectedSemester?.semester}&weeks=${selectedWeek}-${selectedWeek}`,
       (res) => {
         const blob = new Blob([res.data], {
           type: res.headers["content-type"],

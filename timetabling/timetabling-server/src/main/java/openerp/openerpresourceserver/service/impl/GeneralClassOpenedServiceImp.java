@@ -4,12 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.exception.ConflictScheduleException;
+import openerp.openerpresourceserver.exception.NotFoundException;
 import openerp.openerpresourceserver.helper.ClassTimeComparator;
+import openerp.openerpresourceserver.helper.LearningWeekExtractor;
 import openerp.openerpresourceserver.model.entity.Group;
 import openerp.openerpresourceserver.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.repo.GroupRepo;
 import openerp.openerpresourceserver.repo.RoomOccupationRepo;
+import openerp.openerpresourceserver.repo.RoomReservationRepo;
 import org.springframework.stereotype.Service;
 
 import openerp.openerpresourceserver.model.dto.request.general.UpdateGeneralClassRequest;
@@ -22,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * GeneralClassOpenedServiceImp
  */
-@Service
 @AllArgsConstructor
+@Service
 public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
 
     private GeneralClassOpenedRepository gcoRepo;
@@ -32,6 +36,7 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
 
     private RoomOccupationRepo roomOccupationRepo;
 
+    private RoomReservationRepo roomReservationRepo;
 
     @Override
     public List<GeneralClassOpened> getGeneralClasses(String semester) {
@@ -46,53 +51,100 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
 
     @Transactional
     @Override
-    public GeneralClassOpened updateGeneralClassSchedule(UpdateGeneralClassScheduleRequest request) {
+    public GeneralClassOpened updateGeneralClassSchedule(String semester, UpdateGeneralClassScheduleRequest request) {
         GeneralClassOpened gClassOpened = gcoRepo.findById(Long.parseLong(request.getGeneralClassId())).orElse(null);
-        List<GeneralClassOpened> generalClassOpenedList = gcoRepo.findAll();
-        RoomReservation rr = gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1);
-        int startPeriod = rr.getStartTime();
-        int endPeriod = rr.getEndTime();
-        int weekDay = rr.getWeekday();
-        String classRoom = rr.getRoom();
-        List<RoomOccupation> roomOccupationList = roomOccupationRepo.findAllBySemesterAndClassCodeAndDayIndexAndStartPeriodAndEndPeriodAndClassRoom(gClassOpened.getSemester(), gClassOpened.getClassCode(), weekDay, startPeriod, endPeriod, classRoom);
-
-        switch (request.getField()) {
-            case "startTime":
-                int duration = gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getEndTime() -
-                        gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getStartTime();
-                gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).setStartTime(Integer.parseInt(request.getValue()));
-                gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).setEndTime(Integer.parseInt(request.getValue())+duration);
-                if (!ClassTimeComparator.isClassConflict(Integer.parseInt(request.getScheduleIndex())-1,gClassOpened, generalClassOpenedList)) {
-                    roomOccupationList.forEach(ro->{
-                        ro.setStartPeriod(gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getStartTime());
-                        ro.setEndPeriod(gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getEndTime());
-                    });
-                    gcoRepo.save(gClassOpened);
+        List<GeneralClassOpened> generalClassOpenedList = gcoRepo.findAllBySemester(semester);
+        RoomReservation rr = roomReservationRepo.findById(request.getRoomReservationId()).orElse(null);
+        if (gClassOpened == null || rr == null) throw new NotFoundException("Không tìm thấy lớp hoặc lịch học!");
+        if (rr.getStartTime() == null || rr.getEndTime() == null || rr.getWeekday() == null || rr.getRoom() == null) {
+            switch (request.getField()) {
+                case "startTime":
+                    rr.setStartTime(Integer.parseInt(request.getValue()));
+                    if (rr.getEndTime() != null && rr.getStartTime() >= rr.getEndTime()) throw new ConflictScheduleException("Thời gian bắt đầu không thể lớn hơn hoặc bằng với thời gian kết thúc!");
+                    break;
+                case "room":
+                    rr.setRoom(request.getValue());
+                    break;
+                case "weekday":
+                    rr.setWeekday(request.getValue().equals("Chủ nhật") ? 8 : Integer.parseInt(request.getValue()));
+                    break;
+                case "endTime":
+                    rr.setEndTime(Integer.parseInt(request.getValue()));
+                    if (rr.getStartTime() != null && rr.getStartTime() >= rr.getEndTime()) throw new ConflictScheduleException("Thời gian bắt đầu không thể lớn hơn hoặc bằng với thời gian kết thúc!");
+                    break;
+                default:
+                    break;
+            }
+            if (rr.getStartTime() != null && rr.getEndTime() != null && rr.getWeekday() != null && rr.getRoom() != null) {
+                if (!ClassTimeComparator.isClassConflict(rr, gClassOpened, generalClassOpenedList)) {
+                    List<Integer> weeks = LearningWeekExtractor.extractArray(gClassOpened.getLearningWeeks());
+                    List<RoomOccupation> roomOccupationList = new ArrayList<>();
+                    for (Integer week : weeks) {
+                        roomOccupationList.add(new RoomOccupation(
+                                rr.getRoom(),
+                                gClassOpened.getClassCode(),
+                                rr.getStartTime(),
+                                rr.getEndTime(),
+                                gClassOpened.getCrew(),
+                                rr.getWeekday(),
+                                week,
+                                "study",
+                                gClassOpened.getSemester()));
+                    }
                     roomOccupationRepo.saveAll(roomOccupationList);
                 }
-                break;
-            case "room":
-                if (!ClassTimeComparator.isClassConflict(Integer.parseInt(request.getScheduleIndex())-1,gClassOpened, generalClassOpenedList)) {
-                    gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).setRoom(request.getValue());
-                    roomOccupationList.forEach(ro->{
-                        ro.setClassRoom(gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getRoom());
-                    });
+            }
+            gcoRepo.save(gClassOpened);
+        } else {
+            System.out.println(rr);
+            List<RoomOccupation> roomOccupationList = roomOccupationRepo.findAllBySemesterAndClassCodeAndDayIndexAndStartPeriodAndEndPeriodAndClassRoom(
+                    gClassOpened.getSemester(),
+                    gClassOpened.getClassCode(),
+                    rr.getWeekday(),
+                    rr.getStartTime(),
+                    rr.getEndTime(),
+                    rr.getRoom());
+            switch (request.getField()) {
+                case "startTime":
+                    rr.setStartTime(Integer.parseInt(request.getValue()));
+                    if (rr.getEndTime() != null && rr.getStartTime() >= rr.getEndTime()) throw new ConflictScheduleException("Thời gian bắt đầu không thể lớn hơn hoặc bằng với thời gian kết thúc!");
+                    if (!ClassTimeComparator.isClassConflict(rr, gClassOpened, generalClassOpenedList)) {
+                        roomOccupationList.forEach(ro -> {
+                            ro.setStartPeriod(rr.getStartTime());
+                        });
+                    }
+                    break;
+                case "room":
+                    rr.setRoom(request.getValue());
+                    if (!ClassTimeComparator.isClassConflict(rr, gClassOpened, generalClassOpenedList)) {
+                        rr.setRoom(request.getValue());
+                        roomOccupationList.forEach(ro -> {
+                            ro.setClassRoom(rr.getRoom());
+                        });
+                    }
+                    break;
+                case "weekday":
+                    rr.setWeekday(request.getValue().equals("Chủ nhật") ? 8 : Integer.parseInt(request.getValue()));
+                    if (!ClassTimeComparator.isClassConflict(rr, gClassOpened, generalClassOpenedList)) {
+                        roomOccupationList.forEach(ro -> {
+                            ro.setDayIndex(rr.getWeekday());
+                        });
+                    }
+                    break;
+                case "endTime":
+                    rr.setEndTime(Integer.parseInt(request.getValue()));
+                    if (rr.getStartTime() != null && rr.getStartTime() >= rr.getEndTime()) throw new ConflictScheduleException("Thời gian bắt đầu không thể lớn hơn hoặc bằng với thời gian kết thúc!");
+                    if (!ClassTimeComparator.isClassConflict(rr, gClassOpened, generalClassOpenedList)) {
+                        roomOccupationList.forEach(ro -> {
+                            ro.setEndPeriod(rr.getEndTime());
+                        });
+                    }
+                    break;
+                default:
                     gcoRepo.save(gClassOpened);
                     roomOccupationRepo.saveAll(roomOccupationList);
-                }
-                break;
-            case "weekday":
-                gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).setWeekday(Integer.parseInt(request.getValue()));
-                if (!ClassTimeComparator.isClassConflict(Integer.parseInt(request.getScheduleIndex())-1,gClassOpened, generalClassOpenedList)) {
-                    roomOccupationList.forEach(ro->{
-                        ro.setDayIndex(gClassOpened.getTimeSlots().get(Integer.parseInt(request.getScheduleIndex())-1).getWeekday());
-                    });
-                    gcoRepo.save(gClassOpened);
-                    roomOccupationRepo.saveAll(roomOccupationList);
-                }
-                break;
-            default:
-                break;
+                    break;
+            }
         }
         return gClassOpened;
     }
@@ -152,5 +204,35 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
     public void deleteClassesBySemester(String semester) {
         gcoRepo.deleteBySemester(semester);
         roomOccupationRepo.deleteBySemester(semester);
+    }
+
+    @Transactional
+    @Override
+    public List<GeneralClassOpened> resetSchedule(List<String> ids, String semester) {
+        List<GeneralClassOpened> generalClassOpenedList = gcoRepo.findAllBySemester(semester);
+        if(generalClassOpenedList.size() == 0) {
+            throw new NotFoundException("Không tìm thấy lớp, hãy kiểm tra lại danh sách lớp!");
+        } else {
+            List<GeneralClassOpened>filteredGeneralClassList = new ArrayList<>();
+            for (GeneralClassOpened gClass : generalClassOpenedList) {
+                for (String idString : ids) {
+                    int gId = Integer.parseInt(idString.split("-")[0]);
+                    int timeSlotIndex = Integer.parseInt(idString.split("-")[1])-1;
+                    if(gId == gClass.getId()) {
+                        RoomReservation timeSlot = gClass.getTimeSlots().get(timeSlotIndex);
+                        if (timeSlot.getStartTime() != null && timeSlot.getEndTime() != null && timeSlot.getRoom() != null && !timeSlot.getRoom().equals("")) {
+                            roomOccupationRepo.deleteAllByClassCodeAndStartPeriodAndEndPeriodAndDayIndexAndClassRoom(gClass.getClassCode(), timeSlot.getStartTime(), timeSlot.getEndTime(), timeSlot.getWeekday(), timeSlot.getRoom());
+                        }
+                        timeSlot.setWeekday(null);
+                        timeSlot.setStartTime(null);
+                        timeSlot.setEndTime(null);
+                        timeSlot.setRoom(null);
+                        filteredGeneralClassList.add(gClass);
+                    }
+                }
+            }
+            gcoRepo.saveAll(filteredGeneralClassList);
+        }
+        return generalClassOpenedList;
     }
 }

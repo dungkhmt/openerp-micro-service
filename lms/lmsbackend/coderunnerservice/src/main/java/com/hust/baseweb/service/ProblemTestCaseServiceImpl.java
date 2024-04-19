@@ -142,16 +142,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
         tempDir.removeDir(tempName);
 
-        if (Objects.equals(submission.getSourceCodeLanguage(),
-            ContestSubmissionEntity.LANGUAGE_JAVA)) {
-            submissionResponseHandler.processSubmissionResponse(
-                testCaseEntityList,
-                listSubmissionResponse,
-                submission,
-                problem.getScoreEvaluationType());
-            return;
-        }
-
         submissionResponseHandler.processSubmissionResponseV2(
             testCaseEntityList,
             listSubmissionResponse,

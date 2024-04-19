@@ -22,11 +22,11 @@ public class RoomReservation {
     @JsonIgnore
     private GeneralClassOpened generalClassOpened;
     @JsonProperty("startTime")
-    private int startTime;
+    private Integer startTime;
     @JsonProperty("endTime")
-    private int endTime;
+    private Integer endTime;
 
-    private int weekday;
+    private Integer weekday;
     private String room;
 
     @Id
