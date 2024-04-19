@@ -6,6 +6,8 @@ import openerp.openerpresourceserver.repo.RequestRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -13,9 +15,52 @@ import java.util.List;
 public class RequestServiceImpl implements RequestService{
     private RequestRepo requestRepo;
 
+    private final Integer PENDING = 0;
+    private final Integer APPROVED = 1;
+    private final Integer REJECTED = 2;
+
     @Override
     public List<Request> getAllRequests() {
         List<Request> requests = requestRepo.findAll();
         return requests;
+    }
+
+    @Override
+    public Request createNewRequest(Request request) {
+        Request newRequest = new Request();
+        newRequest.setName(request.getName());
+        newRequest.setDescription(request.getDescription());
+        newRequest.setStatus(PENDING);
+//        String assetId = request.get
+//        newRequest.setApprovers_id(request.getApprovers_id());
+
+        Date currentDate = new Date();
+        newRequest.setSince(currentDate);
+        newRequest.setLast_updated(currentDate);
+
+        return requestRepo.save(newRequest);
+    }
+
+    public boolean approveRequest(Integer requestId, String userId){
+        Request request = requestRepo.findById(requestId).get();
+        if(request.getStatus() == -10){ // rejected
+            return false;
+        }
+
+        if(request.getStatus() == 10){ // request done
+            return false;
+        }
+
+        // check quyen xem co dc approve ko
+//        if(!request.getApprovers_id().contains(userId)){
+//            return false;
+//        }
+//        List<String> approvals = request.getApprovals_id();
+//        approvals.add(userId);
+//        request.setApprovals_id(approvals.toString());
+//        if(approvals.length() == request.getApprovers_id().length()){
+//            request.setStatus(10); // mark done
+//        }
+        return true;
     }
 }

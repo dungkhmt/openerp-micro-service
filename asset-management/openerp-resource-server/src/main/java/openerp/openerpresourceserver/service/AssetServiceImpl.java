@@ -9,6 +9,7 @@ import openerp.openerpresourceserver.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -19,10 +20,14 @@ public class AssetServiceImpl implements AssetService{
     private AssetRepo assetRepo;
     private AssetTypeRepo assetTypeRepo;
 
+    private final Integer AVAILABLE = 1;
+    private final Integer INUSE = 2;
+    private final Integer REPAIR = 3;
+    private final Integer DEPRECATED = 4;
+
     @Override
     public List<Asset> getAllAssets() {
-        List<Asset> assets = assetRepo.findAll();
-        return assets;
+        return assetRepo.findAll();
     }
 
     @Override
@@ -35,6 +40,8 @@ public class AssetServiceImpl implements AssetService{
         String prefix = assetType.getCode_prefix();
         Utils utils = new Utils();
         newAsset.setCode(prefix + "-" + utils.generateRandomHash(8));
+        newAsset.setAdmin_id(asset.getAdmin_id());
+        newAsset.setStatus_id(AVAILABLE);
         newAsset.setAssignee_id(asset.getAssignee_id());
         newAsset.setLocation_id(asset.getLocation_id());
         newAsset.setVendor_id(asset.getVendor_id());
@@ -52,11 +59,19 @@ public class AssetServiceImpl implements AssetService{
         Asset foundAsset = assetRepo.findById(Id).get();
         foundAsset.setName(asset.getName());
         foundAsset.setDescription(asset.getDescription());
-        foundAsset.setType_id(asset.getType_id());
+
         foundAsset.setVendor_id(asset.getVendor_id());
         foundAsset.setLocation_id(asset.getLocation_id());
         foundAsset.setImage(asset.getImage());
         foundAsset.setAssignee_id(asset.getAssignee_id());
+
+        Integer typeId = asset.getType_id();
+        AssetType type = assetTypeRepo.findById(typeId).get();
+        String typePrefix = type.getCode_prefix();
+        foundAsset.setType_id(typeId);
+        String code = foundAsset.getCode();
+        String prefix = code.split("-")[1];
+        foundAsset.setCode(typePrefix + "-" + prefix);
 
         Date currentDate = new Date();
         foundAsset.setLast_updated(currentDate);
