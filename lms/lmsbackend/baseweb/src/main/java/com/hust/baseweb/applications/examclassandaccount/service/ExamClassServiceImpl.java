@@ -26,6 +26,7 @@ public class ExamClassServiceImpl implements ExamClassService{
 
     private ExamClassRepo examClassRepo;
     private ExamClassUserloginMapRepo examClassUserloginMapRepo;
+    private ExamClassUserloginMapService examClassUserloginMapService;
     @Override
     public List<ExamClass> getAllExamClass() {
         List<ExamClass> res = examClassRepo.findAll();
@@ -74,6 +75,8 @@ public class ExamClassServiceImpl implements ExamClassService{
         m.setExecuteDate(ec.getExecuteDate());
         m.setStatus(ec.getStatus());
         m.setStatusList(ExamClass.getStatusList());
+        List<ExamClassUserloginMap> accounts = examClassUserloginMapService.getExamClassUserloginMap(examClassId);
+        m.setAccounts(accounts);
         return m;
     }
 }

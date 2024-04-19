@@ -10,4 +10,6 @@ public interface ExamClassUserloginMapService {
     List<ExamClassUserloginMap> getExamClassUserloginMap(UUID examClassId);
 
     List<ExamClassUserloginMap> createExamClassAccount(UUID examClassId, List<UserLoginModel> users);
+
+
 }

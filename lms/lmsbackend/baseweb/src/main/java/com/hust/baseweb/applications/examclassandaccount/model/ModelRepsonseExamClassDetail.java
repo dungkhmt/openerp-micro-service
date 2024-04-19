@@ -1,5 +1,6 @@
 package com.hust.baseweb.applications.examclassandaccount.model;
 
+import com.hust.baseweb.applications.examclassandaccount.entity.ExamClassUserloginMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,4 +20,5 @@ public class ModelRepsonseExamClassDetail {
     private String executeDate;
     private String status;
     private List<String> statusList;
+    private List<ExamClassUserloginMap> accounts;
 }

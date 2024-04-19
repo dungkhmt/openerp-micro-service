@@ -4,11 +4,12 @@ import {useHistory} from "react-router-dom";
 import {request} from "../../api";
 import {errorNoti, successNoti} from "../../utils/notification";
 import {LoadingButton} from "@mui/lab";
-import {Button, Card, CardContent, TextField,Chip} from "@mui/material";
+import {Button, Card, CardContent, TextField,Chip,MenuItem ,Select,SelectChangeEvent} from "@mui/material";
 import PublishIcon from '@mui/icons-material/Publish';
 import SendIcon from '@mui/icons-material/Send';
 import StandardTable from "../table/StandardTable";
 import SelectItem from "../common/form/SelectItem";
+import XLSX from "xlsx";
 function ExamClassDetail(){
     const params = useParams();
     const examClassId = params.id;
@@ -25,9 +26,9 @@ function ExamClassDetail(){
       { title: "UserName", field: "realUserLoginId" },
       { title: "StudentCode", field: "studentCode" },
       { title: "FullName", field: "fullname" },
-      { title: "random username", field: "randomUserLoginId" },
-      { title: "password", field: "password" }
-
+      { title: "Random username", field: "randomUserLoginId" },
+      { title: "Password", field: "password" },
+      { title: "Status", field: "status" }
     ];
     function importStudentsFromExcel(event) {
         event.preventDefault();
@@ -62,9 +63,45 @@ function ExamClassDetail(){
           setExecuteDate(res.data.executeDate);
           setStatusList(res.data.statusList);
           setStatus(res.data.status);
+          setMapUserLogins(res.data.accounts);
         });
       }
-
+      const downloadHandler = (event) => {
+        if (mapUserLogins.length === 0) {
+          return;
+        }
+    
+        var wbcols = [];
+    
+        wbcols.push({ wpx: 80 });
+        wbcols.push({ wpx: 120 });
+        let rows = mapUserLogins.length;
+        for (let i = 0; i < rows; i++) {
+          wbcols.push({ wpx: 50 });
+        }
+        wbcols.push({ wpx: 50 });
+    
+        let datas = [];
+    
+        for (let i = 0; i < mapUserLogins.length; i++) {
+          let data = {};
+          data["Original"] = mapUserLogins[i].realUserLoginId;
+          data["Fullname"] = mapUserLogins[i].fullname;
+          data["MSSV"] = mapUserLogins[i].studentCode;
+          data["UserName"] = mapUserLogins[i].randomUserLoginId;
+          data["Password"] = mapUserLogins[i].password;
+          
+          datas[i] = data;
+        }
+    
+        var sheet = XLSX.utils.json_to_sheet(datas);
+        var wb = XLSX.utils.book_new();
+        sheet["!cols"] = wbcols;
+    
+        XLSX.utils.book_append_sheet(wb, sheet, "students");
+        XLSX.writeFile(wb, examClassId + ".xlsx");
+      };
+    
       function handleUpdateStatus(){
         let body = {
           examClassId: examClassId,
@@ -82,12 +119,17 @@ function ExamClassDetail(){
           body
         );
       }
+
+      const handleChangeStatus = (event) => {
+        setStatus(event.target.value);
+      };
+
       useEffect(() =>{
         getExamClassDetail();
       },[])
     return(
         <>
-        Exam Class Detail {examClassId}
+        <div>
         <TextField
                 required
                 id="name"
@@ -98,6 +140,8 @@ function ExamClassDetail(){
                     setName(event.target.value);
                 }}
               />
+             </div>
+             <div> 
               <TextField
                 required
                 id="description"
@@ -108,6 +152,8 @@ function ExamClassDetail(){
                     setDescription(event.target.value);
                 }}
               />
+              </div>
+              <div>
               <TextField
               required
               id="execute_date"
@@ -118,13 +164,24 @@ function ExamClassDetail(){
                   setExecuteDate(event.target.value);
               }}
             />
-            <SelectItem
-                label="Status"
-                style={{ width: "100%" }}
-                value={status}
-                options={statusList}
-                onChange={(value) => setStatus(value)}
-              />
+            </div>
+
+            <div>
+            <Select
+          labelId="status-select-label"
+          id="status-select"
+          value={status}
+          label="status"
+          onChange={handleChangeStatus}
+        >
+          { statusList.map(option => (
+          <MenuItem value={option} key={option}>
+            { option}
+          </MenuItem>
+        ))}
+       
+        </Select>       
+           
              <Button
             variant="contained"
             color="primary"
@@ -133,7 +190,16 @@ function ExamClassDetail(){
           >
             Update Status 
           </Button> 
+          </div>
         <div>
+        <div><Button
+            variant="contained"
+            color="primary"
+            style={{ marginLeft: "45px" }}
+            onClick={downloadHandler}
+          >
+            EXPORT EXCEL 
+          </Button> </div>
         <Button color="primary" variant="contained" component="label">
           <PublishIcon/> Select excel file to import
           <input type="file" hidden
