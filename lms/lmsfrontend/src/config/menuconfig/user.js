@@ -49,6 +49,20 @@ export const user = {
       child: [],
     },
     {
+      id: "MENU_USER.MENU_EXAM_USER_MANAGEMENT",
+      path: "/exam-class/list",
+      isPublic: false,
+      text: "Exam Class Users",
+      child: [],
+    },
+    {
+      id: "MENU_USER.MENU_USER_ADD",
+      path: "/generated-user/upload",
+      isPublic: false,
+      text: "Upload generated list",
+      child: [],
+    },
+    {
       id: "MENU_USER.MENU_USER_SEND_MAIL_TO_USERS",
       path: "/user-group/user/send-mail",
       isPublic: false,
