@@ -5,13 +5,18 @@ import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.dto.PaginationDTO;
 import openerp.openerpresourceserver.entity.ClassCall;
 import openerp.openerpresourceserver.repo.ClassCallRepo;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,6 +77,7 @@ public class ClassCallServiceImpl implements ClassCallService {
         }
 
         ClassCall existingClassCall = existingClassCallOptional.get();
+        existingClassCall.setId(classCall.getId());
         existingClassCall.setDay(classCall.getDay());
         existingClassCall.setStartPeriod(classCall.getStartPeriod());
         existingClassCall.setEndPeriod(classCall.getEndPeriod());
@@ -101,5 +107,98 @@ public class ClassCallServiceImpl implements ClassCallService {
     @Override
     public List<ClassCall> getAllMyRegisteredClass(String userId, String semester) {
         return classCallRepo.getAllMyRegisteredClass(userId, semester);
+    }
+
+    @Override
+    public int importClass(MultipartFile file) {
+        try (InputStream inputStream = file.getInputStream()) {
+            int numberOfData = 0;
+            Workbook workbook = new XSSFWorkbook(inputStream);
+            Sheet sheet = workbook.getSheetAt(0);
+
+            Row firstRow = sheet.getRow(0);
+            log.info(firstRow);
+            log.info("Did it get at here");
+            if(firstRow != null) {
+                Cell idCell = firstRow.getCell(0);
+                Cell classIdCell = firstRow.getCell(1);
+                Cell subjectCell = firstRow.getCell(2);
+                Cell room = firstRow.getCell(3);
+                Cell semester = firstRow.getCell(4);
+                Cell day = firstRow.getCell(5);
+                Cell startPeriod = firstRow.getCell(6);
+                Cell endPeriod = firstRow.getCell(7);
+                Cell note = firstRow.getCell(8);
+
+
+                // Check if excel is valid
+                if("Mã lớp".equals(idCell.getStringCellValue()) &&
+                "Mã môn học".equals(classIdCell.getStringCellValue()) &&
+                "Tên môn học".equals(subjectCell.getStringCellValue()) &&
+                "Phòng học".equals(room.getStringCellValue()) &&
+                "Học kì".equals(semester.getStringCellValue()) &&
+                "Ngày".equals(day.getStringCellValue()) &&
+                "Tiết bắt đầu".equals(startPeriod.getStringCellValue()) &&
+                "Tiết kết thúc".equals(endPeriod.getStringCellValue()) &&
+                "Ghi chú".equals(note.getStringCellValue())) {
+                    log.info("The excel file is valid");
+                    int dataRowNums = 1;
+                    Row dataRow = sheet.getRow(dataRowNums);
+                    while(dataRow != null) {
+
+                        int classId = (int) dataRow.getCell(0).getNumericCellValue();
+                        log.info("Class Id " + classId);
+                        String subjectId = dataRow.getCell(1).getStringCellValue();
+                        log.info("Subject Id " + subjectId);
+                        String subjectName = dataRow.getCell(2).getStringCellValue();
+                        log.info("Subject Name " + subjectName);
+                        String subjectRoom = dataRow.getCell(3).getStringCellValue();
+                        log.info("Subject Room " + subjectRoom);
+                        String classSemester = dataRow.getCell(4).getStringCellValue();
+                        log.info("Subject Semester " + classSemester);
+                        int classDay = (int) dataRow.getCell(5).getNumericCellValue();
+                        log.info("Day " + classDay);
+                        int classStartPeriod = (int) dataRow.getCell(6).getNumericCellValue();
+                        log.info("Start period " + classStartPeriod);
+                        int classEndPeriod = (int) dataRow.getCell(7).getNumericCellValue();
+                        log.info("End period " + classEndPeriod);
+                        Cell classNote = dataRow.getCell(8);
+                        String classNoteData = "";
+                        if(!(classNote == null || classNote.getCellType() == CellType.BLANK)) {
+                            classNoteData = classNote.getStringCellValue();
+                        }
+                        log.info("Note " + classNoteData);
+
+                        Optional<ClassCall> existClassCall = classCallRepo.findById(classId);
+
+                        if(existClassCall.isEmpty()) {
+                            ClassCall newClass = new ClassCall();
+                            newClass.setId(classId);
+                            newClass.setSubjectId(subjectId);
+                            newClass.setSubjectName(subjectName);
+                            newClass.setClassRoom(subjectRoom);
+                            newClass.setSemester(classSemester);
+                            newClass.setDay(classDay);
+                            newClass.setStartPeriod(classStartPeriod);
+                            newClass.setEndPeriod(classEndPeriod);
+                            newClass.setNote(classNoteData);
+
+                            classCallRepo.save(newClass);
+                            numberOfData++;
+                        }
+
+                        dataRowNums++;
+                        dataRow = sheet.getRow(dataRowNums);
+                    }
+                    return numberOfData;
+                }
+                else {
+                    throw new IllegalArgumentException("Excel file is invalid");
+                }
+            }
+        } catch(IOException e) {
+            throw new IllegalArgumentException("Something is wrong");
+        }
+        return 0;
     }
 }

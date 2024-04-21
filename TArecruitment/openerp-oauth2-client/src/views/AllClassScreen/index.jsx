@@ -11,12 +11,15 @@ import {
   Select,
   TextField,
   Paper,
+  Tooltip,
 } from "@mui/material";
 import { styles } from "./index.style";
 import { SEMESTER, SEMESTER_LIST } from "config/localize";
 import DeleteDialog from "components/dialog/DeleteDialog";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 import ApplicatorDialog from "./ApplicatorDialog";
 import { DataGrid } from "@mui/x-data-grid";
+import { errorNoti, successNoti } from "utils/notification";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -96,6 +99,33 @@ const AllClassScreen = () => {
   const handleOpenDialog = (klass) => {
     setOpenDeleteDialog(true);
     setDeleteId(klass.id);
+  };
+
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    const formData = new FormData();
+    formData.append("excelFile", selectedFile);
+    request(
+      "post",
+      "/class-call/import-class",
+      (res) => {
+        successNoti(res.data);
+        handleFetchData();
+        event.target.value = null;
+      },
+      {
+        onError: (e) => {
+          errorNoti(e.response.data);
+        },
+      },
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    handleFetchData();
   };
 
   const handleCloseDialog = () => {
@@ -203,6 +233,18 @@ const AllClassScreen = () => {
               ))}
             </Select>
           </FormControl>
+
+          <Tooltip style={styles.importIcon} title="Import danh sách lớp học">
+            <IconButton component="label">
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleFileChange}
+                style={{ display: "none" }}
+              />
+              <FileUploadIcon color="primary" fontSize="large" />
+            </IconButton>
+          </Tooltip>
 
           <TextField
             style={styles.searchBox}
