@@ -13,6 +13,11 @@ import ProgrammingContestRoutes from "./ProgrammingContestRoutes";
 import ThesisRoutes from "./ThesisRoutes";
 import WhiteBoardRoute from "./WhiteBoardRoute";
 import UploadUser from "../component/userlogin/UploadUser";
+import ExamClassList from "../component/examclassaccount/ExamClassList";
+import ExamClassCreate from "../component/examclassaccount/ExamClassCreate";
+import ExamClassDetail from "../component/examclassaccount/ExamClassDetail";
+import UploadGeneratedUser from "../component/examclassaccount/UploadGeneratedUser";
+
 import ContestManagerRankingPublicV2 from "../component/education/programmingcontestFE/ContestManagerRankingPublicV2";
 
 const EduRoute = lazy(() => import("./EduRoute"));
@@ -72,6 +77,26 @@ function MainAppRoute(props) {
             component={UploadUser}
             exact
             path={`/user/upload`}
+          />
+           <PrivateRoute
+            component={ExamClassList}
+            exact
+            path={`/exam-class/list`}
+          />
+          <PrivateRoute
+            component={ExamClassCreate}
+            exact
+            path={`/exam-class/create`}
+          />
+          <PrivateRoute
+            component={ExamClassDetail}
+            exact
+            path={`/exam-class/detail/:id`}
+          />
+          <PrivateRoute
+            component={UploadGeneratedUser}
+            exact
+            path={`/generated-user/upload`}
           />
 
           {/* <Route component={error} path="*" /> */}

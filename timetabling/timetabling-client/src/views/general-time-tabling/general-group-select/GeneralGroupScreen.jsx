@@ -17,10 +17,8 @@ const GeneralGroupScreen = () => {
     useState(false);
   const [openNewGroupDialouge, setOpenNewGroupDialouge] = useState(false);
 
-  console.log(selectedClasses);
   const handleSelectionModelChange = (selectionModel) => {
     setSelectedClasses(selectionModel);
-    console.log(selectedClasses);
   };
 
   return (

@@ -229,7 +229,6 @@ const MenuAddMember = ({ anchorEl, onClose }) => {
           ) : (
             <MenuList
               id="list-user-select"
-              autoFocus={true}
               sx={{
                 minHeight: "10rem",
                 maxHeight: "15rem",

@@ -1,5 +1,7 @@
 package com.hust.baseweb.applications.education.model.quiz;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,4 +18,8 @@ public class QuizQuestionCreateInputModel {
     private String solutionContent;
 
     private String[] fileId;
+
+    private List<String> chooseTags;
+
+    private String courseId;
 }

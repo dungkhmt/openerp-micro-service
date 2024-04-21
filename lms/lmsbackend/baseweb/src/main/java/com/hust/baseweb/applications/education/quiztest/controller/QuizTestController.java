@@ -8,7 +8,9 @@ import com.hust.baseweb.applications.education.classmanagement.service.ClassServ
 import com.hust.baseweb.applications.education.classmanagement.service.EduClassSessionService;
 import com.hust.baseweb.applications.education.entity.EduClass;
 import com.hust.baseweb.applications.education.entity.QuizQuestion;
+import com.hust.baseweb.applications.education.entity.QuizTag;
 import com.hust.baseweb.applications.education.model.quiz.QuizQuestionDetailModel;
+import com.hust.baseweb.applications.education.model.quiz.QuizTagCreateModel;
 import com.hust.baseweb.applications.education.quiztest.UserQuestionQuizExecutionOM;
 import com.hust.baseweb.applications.education.quiztest.entity.EduQuizTest;
 import com.hust.baseweb.applications.education.quiztest.entity.EduQuizTestQuizQuestion;
@@ -33,6 +35,7 @@ import com.hust.baseweb.applications.education.quiztest.repo.QuizGroupQuestionAs
 import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizRepo.StudentResult;
 import com.hust.baseweb.applications.education.quiztest.service.*;
 import com.hust.baseweb.applications.education.service.QuizQuestionService;
+import com.hust.baseweb.applications.education.service.QuizTagService;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;
 import lombok.AllArgsConstructor;

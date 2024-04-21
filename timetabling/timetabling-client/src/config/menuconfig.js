@@ -37,9 +37,9 @@ import { generalTimeTabling } from "./menuconfig/generalTimeTabling";
 export const MENUS = [];
 
 // MENUS.push(general);
-MENUS.push(user);
-MENUS.push(teacher);
-// MENUS.push(schedule);
+//MENUS.push(user);
+//MENUS.push(teacher);
+//MENUS.push(schedule);
 MENUS.push(scheduleInformation);
 // MENUS.push(schedulePerformance);
 MENUS.push(courseTimeTabling);

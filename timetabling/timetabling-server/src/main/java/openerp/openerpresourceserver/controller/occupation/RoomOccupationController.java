@@ -1,8 +1,13 @@
 package openerp.openerpresourceserver.controller.occupation;
 
+import java.util.Arrays;
 import java.util.List;
 
+import openerp.openerpresourceserver.helper.LearningWeekExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +35,18 @@ public class RoomOccupationController {
             System.err.println(e);
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    @PostMapping("/export")
+    public ResponseEntity exportExcel (@RequestParam("semester") String semester, @RequestParam("weeks") String weeks) {
+        List<Integer> learningWeeks  = LearningWeekExtractor.extract(weeks);
+        String filename = "Room_Conflict.xlsx";
+        InputStreamResource file = new InputStreamResource(roomService.exportExcel(semester, learningWeeks));
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(
+                        MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(file);
     }
 
 }

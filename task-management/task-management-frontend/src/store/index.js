@@ -4,6 +4,7 @@ import tasks from "./project/tasks";
 import category from "./category";
 import status from "./status";
 import priority from "./priority";
+import assignedTasks from "./assigned-tasks";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     category,
     status,
     priority,
+    assignedTasks,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

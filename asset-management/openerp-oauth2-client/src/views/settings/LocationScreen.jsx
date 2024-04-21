@@ -15,12 +15,22 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 export const LocationScreen = () => {
     const INITIAL_STATE = {
         name: "",
         description: "",
         address: ""
+    };
+
+    const [age, setAge] = React.useState('');
+
+    const handleChange = (event) => {
+        setAge(event.target.value);
     };
 
     const [locations, setLocations] = useState([]);
@@ -40,7 +50,6 @@ export const LocationScreen = () => {
     const successHandler = (res) => {
         const msg = title === "CREATE NEW LOCATION" ? "CREATE SUCCESSFULLY" : "EDIT SUCCESSFULLY";
         successNoti(msg, 3000);
-        console.log("res", res);
         const locationIndex = locations.findIndex(location => location.id === res.data.id);
 
         if (locationIndex !== -1) {
@@ -127,6 +136,7 @@ export const LocationScreen = () => {
 		border: '2px solid #000',
 		boxShadow: 24,
 		p: 4,
+        gap: "30px"
 	};
 
     const columns = [
@@ -259,7 +269,21 @@ export const LocationScreen = () => {
                             placeholder='Location address'
                             onChange={handleInputChange}
                             value={data.address}
-                        />            
+                        />     
+                        <FormControl fullWidth>
+                            <InputLabel id="demo-simple-select-label">Age</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={age}
+                                label="Age"
+                                onChange={handleChange}
+                            >
+                                <MenuItem value={10}>Ten</MenuItem>
+                                <MenuItem value={20}>Twenty</MenuItem>
+                                <MenuItem value={30}>Thirty</MenuItem>
+                            </Select>
+                        </FormControl>       
                         <div style={{display: "flex", justifyContent: "space-between", marginTop: "20px"}}>
                             <Button
                                 variant="outlined"

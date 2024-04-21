@@ -3,8 +3,10 @@ package openerp.openerpresourceserver.controller.general;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.exception.ConflictScheduleException;
 import openerp.openerpresourceserver.model.dto.request.general.UpdateClassesToNewGroupRequest;
+import openerp.openerpresourceserver.model.entity.general.ResetScheduleRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +18,8 @@ import openerp.openerpresourceserver.service.GeneralClassOpenedService;
 
 @RestController
 @RequestMapping("/general-classes")
+@AllArgsConstructor
 public class GeneralClassOpenedController {
-    @Autowired
     private GeneralClassOpenedService gService;
     @ExceptionHandler(ConflictScheduleException.class)
     public ResponseEntity scheduleConflict(ConflictScheduleException e) {
@@ -44,8 +46,8 @@ public class GeneralClassOpenedController {
     }
 
     @PostMapping("/update-class-schedule")
-    public ResponseEntity<GeneralClassOpened> updateClassSchedule(@RequestBody UpdateGeneralClassScheduleRequest request ) {
-        GeneralClassOpened updatedGeneralClass= gService.updateGeneralClassSchedule(request);
+    public ResponseEntity<GeneralClassOpened> updateClassSchedule(@RequestParam("semester")String semester, @RequestBody UpdateGeneralClassScheduleRequest request ) {
+        GeneralClassOpened updatedGeneralClass= gService.updateGeneralClassSchedule(semester, request);
         if(updatedGeneralClass == null) throw new RuntimeException("General Class was null");
         return ResponseEntity.ok().body(updatedGeneralClass);
     }
@@ -64,5 +66,16 @@ public class GeneralClassOpenedController {
     public ResponseEntity deleteClassesBySemester(@RequestParam("semester") String semester) {
         gService.deleteClassesBySemester(semester);
         return ResponseEntity.ok("ok");
+    }
+
+    @PostMapping("/export-excel")
+    public ResponseEntity exportExcel(@RequestParam("semester") String semester) {
+        return ResponseEntity.ok("ok");
+    }
+
+    @PostMapping("/reset-schedule")
+    public ResponseEntity<List<GeneralClassOpened>> requestResetSchedule(@RequestParam("semester") String semester, @RequestBody ResetScheduleRequest request) {
+        System.out.println(123);
+        return ResponseEntity.ok(gService.resetSchedule(request.getIds(), semester));
     }
 }

@@ -1,17 +1,19 @@
-import React, {useState} from 'react';
-import {a11yProps, AntTab, AntTabs, TabPanel} from "../../../tab";
+import React, { useState } from "react";
+import { a11yProps, AntTab, AntTabs, TabPanel } from "../../../tab";
 import TeacherViewChapterListOfCourse from "./TeacherViewChapterListOfCourse";
 import TeacherViewTopicListOfCourse from "./TeacherViewTopicListOfCourse";
 import TeacherViewQuizListOfCourse from "./TeacherViewQuizListOfCourse";
 import TeacherViewQuizListDetailOfCourse from "./TeacherViewQuizListDetailOfCourse";
 import PropTypes from "prop-types";
+import TeacherViewQuizLibrary from "./TeacherViewQuizLibrary";
 
 const tabsLabel = [
   "Danh sách chương",
   "Danh sách chủ đề",
   "Danh sách quiz",
-  "Chi tiết các quiz"
-]
+  "Chi tiết các quiz",
+  "Quiz library",
+];
 
 export default function TeacherViewCourseDetail(props) {
   const courseId = props.courseId;
@@ -32,21 +34,24 @@ export default function TeacherViewCourseDetail(props) {
       </AntTabs>
 
       <TabPanel value={activeTab} index={0}>
-        <TeacherViewChapterListOfCourse courseId={courseId}/>
+        <TeacherViewChapterListOfCourse courseId={courseId} />
       </TabPanel>
       <TabPanel value={activeTab} index={1}>
-        <TeacherViewTopicListOfCourse courseId={courseId}/>
+        <TeacherViewTopicListOfCourse courseId={courseId} />
       </TabPanel>
       <TabPanel value={activeTab} index={2}>
-        <TeacherViewQuizListOfCourse courseId={courseId}/>
+        <TeacherViewQuizListOfCourse courseId={courseId} />
       </TabPanel>
       <TabPanel value={activeTab} index={3}>
-        <TeacherViewQuizListDetailOfCourse courseId={courseId}/>
+        <TeacherViewQuizListDetailOfCourse courseId={courseId} />
+      </TabPanel>
+      <TabPanel value={activeTab} index={4}>
+        <TeacherViewQuizLibrary courseId={courseId} />
       </TabPanel>
     </div>
   );
 }
 
 TeacherViewCourseDetail.propTypes = {
-  courseId: PropTypes.string.isRequired
-}
+  courseId: PropTypes.string.isRequired,
+};

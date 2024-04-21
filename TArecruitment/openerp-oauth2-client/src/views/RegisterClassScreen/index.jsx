@@ -15,6 +15,7 @@ import styles from "./index.style";
 
 const RegisterClassScreen = () => {
   const [formData, setFormData] = useState({
+    id: "",
     day: "",
     startPeriod: "",
     endPeriod: "",
@@ -42,7 +43,8 @@ const RegisterClassScreen = () => {
       !formData.subjectId ||
       !formData.subjectName ||
       !formData.classRoom ||
-      !formData.semester
+      !formData.semester ||
+      !formData.id
     ) {
       warningNoti("Vui lòng điền đầy đủ thông tin");
       return;
@@ -77,6 +79,19 @@ const RegisterClassScreen = () => {
               <TextField
                 style={styles.textField}
                 variant="outlined"
+                name="id"
+                value={formData.id}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div style={styles.firstRow}>
+            <div style={styles.textFieldContainer}>
+              <h3>Mã môn học</h3>
+              <TextField
+                style={styles.textField}
+                variant="outlined"
                 name="subjectId"
                 value={formData.subjectId}
                 onChange={handleChange}
@@ -84,7 +99,7 @@ const RegisterClassScreen = () => {
             </div>
 
             <div style={styles.textFieldContainer}>
-              <h3>Tên lớp</h3>
+              <h3>Tên môn học</h3>
               <TextField
                 style={styles.rightTextField}
                 variant="outlined"

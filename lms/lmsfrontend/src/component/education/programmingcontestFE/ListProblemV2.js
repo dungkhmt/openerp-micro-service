@@ -22,6 +22,9 @@ import HustContainerCard from "../../common/HustContainerCard";
 import StandardTable from "../../table/StandardTable";
 import { TabPanelVertical } from "./TabPanel";
 import { getColorLevel } from "./lib";
+import FilterbyTag from "component/table/FilterbyTag";
+
+
 
 function ListProblemV2() {
   const { keycloak } = useKeycloak();
@@ -30,7 +33,7 @@ function ListProblemV2() {
   const [myProblems, setMyProblems] = useState([]);
   const [sharedProblems, setSharedProblems] = useState([]);
   const [allProblems, setAllProblems] = useState([]);
-  const [definedTags, setdefinedTags] = useState([])
+  
 
   const [loading, setLoading] = useState(false);
   
@@ -93,6 +96,7 @@ function ListProblemV2() {
       field: "levelId",
       filtering: true,
       lookup: { 'easy': 'easy', 'medium': 'medium', 'hard': 'hard' },
+      
       render: (rowData) => (
         <span style={{ color: getColorLevel(`${rowData.levelId}`) }}>
           {`${rowData.levelId}`}
@@ -104,15 +108,41 @@ function ListProblemV2() {
     {
       title: "Tags",
       fields: "tags",
+      
+      // Using standard MUI Table filtering function
       filtering: true,
-      lookup:  definedTags,
+      filterComponent: (props) => <FilterbyTag {...props}/>,
       customFilterAndSearch: (term, rowData) => {
         let currentTags = rowData.tags.map(x => x.name)
-        console.log(term, currentTags)
-        return term.some(t=> currentTags.includes(t)) || term.length == 0
-        // Hiển thị hàng nếu tags của hàng đó contain một tags trong filter hoặc filter rỗng 
+
+        // There are two case now
+        // User using global table search => term will be string
+        // User using Filter by Tag function => term will be array  (coz we using Autocomplete
+        // multiple checkbox as input). In either case, rowData.tags always be array
+        // Solution here is to check type and handle each case seperately 
+
+        // Using filter by tags search 
+        if(Array.isArray(term)){
+          //console.log(term,  currentTags)
+          return term.some(t=> currentTags.includes(t.name)) || term.length === 0
+        }
+        // using global table search
+        else if(typeof term === 'string'){
+          //console.log(term,  currentTags)
+          return currentTags.some(tg => {
+            return tg.toLowerCase().includes(term.toLowerCase())
+          }) 
+        }
+        // other case 
+        else{ 
+          return false 
+        }
+        
       }
-      ,
+
+      // Customize filter component 
+      // filterComponent: (props) => <FilterbyTag {...props} />
+    ,
       render: (rowData) => (
          <Box>
           {rowData?.tags.length > 0 &&
@@ -191,14 +221,7 @@ function ListProblemV2() {
     }).then();
   }, []);
 
-  const getTags = useCallback((path, setData) => {
-    request("get", path, (res) => {
-      const data = res.data.reduce((obj, cur) => ({...obj, [cur.name]: cur.name}), {})
-      console.log("Tags", data)
 
-      setData(data);
-    }).then();
-  }, []);
 
 
   
@@ -219,13 +242,6 @@ function ListProblemV2() {
   }, [getProblems]);
 
 
-  useEffect(() => {
-    setLoading(true);
-    getTags("/tags/", (data) => {
-      setdefinedTags(data);
-      setLoading(false);
-    });
-  }, [getTags]);
 
   /*
   useEffect(() => {

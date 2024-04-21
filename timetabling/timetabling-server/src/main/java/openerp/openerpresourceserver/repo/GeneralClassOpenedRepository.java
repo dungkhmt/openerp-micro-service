@@ -25,4 +25,6 @@ public interface GeneralClassOpenedRepository extends JpaRepository<GeneralClass
     void saveTimeSlot(long id, String newTimeSlotString);
 
     void deleteBySemester(String semester);
+
+    List<GeneralClassOpened> findAllBySemester(String semester);
 }
