@@ -15,8 +15,7 @@ import lombok.NoArgsConstructor;
 public class ClassCall {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(name = "id", nullable = false)
     private int id;
 
     @Column(name = "subject_id")
