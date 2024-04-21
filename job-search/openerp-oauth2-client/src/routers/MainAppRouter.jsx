@@ -63,7 +63,7 @@ function MainAppRouter(props) {
           <PrivateRoute component={CreateJobPost} path = "/create-job-post" />
           <PrivateRoute component={ViewAllApplicant} path = "/view-job-post/user/dungpq" />
           <PrivateRoute component={ViewJobPostDetail} path = "/view-job-post/:id" />          
-          <PrivateRoute component={ViewAllJobPost} path = "/view-job-post" />
+          <PrivateRoute component={ViewAllJobPost} path = "/view-job-post" />          
           <PrivateRoute component={ViewAllJobPostApplicant} path = "/view-job-post-applicant/:id" />
           <PrivateRoute component={ViewAllApplicantStatus} path = "/view-all-applicant" />
           <PrivateRoute component={ViewAllCV} path = "/view-all-cv" />

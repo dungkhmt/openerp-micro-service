@@ -19,7 +19,7 @@ export const createJobPost = {
       },
       {
         id: "MENU_CREATE_jOBPOST.View_JOB_POST",
-        path: "/view-all-applicant",
+        path: "/view-job-post",
         isPublic: true,
         text: "View all job post",
         child: [],
