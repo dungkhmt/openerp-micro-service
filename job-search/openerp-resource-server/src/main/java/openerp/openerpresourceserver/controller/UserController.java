@@ -37,6 +37,12 @@ public class UserController {
                 principal.getClaim("family_name"));
     }
 
+    @GetMapping("/get-user-data")
+    public ResponseEntity<?> getData(JwtAuthenticationToken token) {
+        Jwt principal = (Jwt) token.getPrincipal();
+        return ResponseEntity.ok().body(userService.getUserInfoFromToken(token));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id) {
         User user = userService.getUserById(id);

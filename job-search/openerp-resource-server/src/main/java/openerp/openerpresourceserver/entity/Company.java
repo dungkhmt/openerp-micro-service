@@ -31,4 +31,5 @@ public class Company {
     private String workingDays;
     private String overtimePolicy;
     private String companyLocation;
+    private String companyName;
 }
