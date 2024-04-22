@@ -11,7 +11,7 @@ import {
     Row,
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
-
+import CVCard from "components/CVCard";
 const ViewAllCV = () => {
 
     const [allCV, setAllCV] = useState([])
@@ -19,7 +19,7 @@ const ViewAllCV = () => {
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
-          }).then();
+        }).then();
     }, [])
     useEffect(() => {
         request("get", "/employee-cv/user/dungpq", (res) => {
@@ -29,11 +29,41 @@ const ViewAllCV = () => {
 
     function goToUrl(url) {
         window.location.href = url;
-      }
+    }
 
     return (
         <>
-        {allCV.map((cv, index) => (
+            <Typography variant="h4" component="div">
+               Your CV List: 
+            </Typography>
+            <Grid container spacing={4} style={{ backgroundColor: "#F7F7FF" }} display="flex" justifyContent="center" paddingTop={"50px"}>
+                {allCV.map((cv, index) => (
+                    <Grid item xs={6} style={{ boxShadow: '1px 1px 1px 1px rgba(0.5,0.5,0.5,0.5)', margin: '20px', borderRadius: '20px', backgroundColor: "white", display: 'flex', alignItems: 'stretch' }} >
+                        <CVCard cvData={cv}></CVCard>
+                    </Grid>
+                    // <Card  sx={{ minWidth: 275 }}>
+                    //     <CardContent>
+                    //         <Typography variant="h4" component="div">
+                    //             your dream job here
+                    //         </Typography>
+                    //         <Typography variant="body2">
+                    //             <strong>Job title</strong>: {jobPost.title}
+                    //         </Typography>
+                    //         <Typography variant="body2">
+                    //             <strong>Job location</strong>: {jobPost.locations}
+                    //         </Typography>
+                    //         <Typography variant="body2">
+                    //             <strong>Job salary</strong>: {jobPost.salary ? jobPost.salary : "thương lượng"}
+                    //         </Typography>
+                    //         <CardActions>
+                    //             <Button size="small" onClick={() => goToUrl(`/view-job-post-applicant/${jobPost.id}`)}>View All CV Applicant</Button>
+                    //         </CardActions>
+                    //     </CardContent>
+                    // </Card>
+                ))
+                }
+            </Grid>
+            {/* {allCV.map((cv, index) => (
             <Card  sx={{ minWidth: 275 }}>
                 <CardContent>
                     <Typography variant="h4" component="div">
@@ -57,7 +87,7 @@ const ViewAllCV = () => {
                 </CardContent>
             </Card>
         ))
-        }    
+        }     */}
         </>
 
     )

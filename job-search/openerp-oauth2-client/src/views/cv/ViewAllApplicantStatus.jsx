@@ -11,7 +11,7 @@ import {
     Row,
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
-
+import UserApplicantCard from "components/UserApplicantCard";
 const ViewAllApplicantStatus = () => {
     let id = "4"
     const [title, setTitle] = useState("Thực tập sinh dot net")
@@ -27,7 +27,7 @@ const ViewAllApplicantStatus = () => {
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
-          }).then();
+        }).then();
     }, [])
     useEffect(() => {
         request("get", `/cv-application/${id}`, (res) => {
@@ -43,7 +43,7 @@ const ViewAllApplicantStatus = () => {
 
     function goToUrl(url) {
         window.location.href = url;
-      }
+    }
 
     const handleSubmit = (status, index) => {
         let cv = cvApplication[index]
@@ -51,19 +51,30 @@ const ViewAllApplicantStatus = () => {
         let submitToServerForm = {
             ...cv,
             "status": status,
-            
+
         };
         console.log(submitToServerForm)
-        request("put", `/cv-application/user/dungpq/${id}`, (res)=> {
+        request("put", `/cv-application/user/dungpq/${id}`, (res) => {
             console.log(res);
-          }, (err)=>{
+        }, (err) => {
             console.log(err);
-          }, submitToServerForm).then();
+        }, submitToServerForm).then();
     }
 
     return (
         <>
-        {cvApplication.map((cv, index) => (
+            <Typography variant="h4" component="div">
+                Your Applicant
+            </Typography>
+            <Grid container spacing={4} style={{ backgroundColor: "#F7F7FF" }} display="flex" justifyContent="center" paddingTop={"50px"}>
+                {cvApplication.map((cv, index) => (
+                    <Grid item xs={5} style={{ boxShadow: '1px 1px 1px 1px rgba(0.5,0.5,0.5,0.5)', margin: '20px', borderRadius: '20px', backgroundColor: "white", display: 'flex', alignItems: 'stretch' }} >
+                        <UserApplicantCard applicant={cv}></UserApplicantCard>
+                    </Grid>
+                ))
+                }
+            </Grid>
+            {/* {cvApplication.map((cv, index) => (
             <Card  sx={{ minWidth: 275 }}>
                 <CardContent>
                     <Typography variant="h4" component="div">
@@ -87,7 +98,7 @@ const ViewAllApplicantStatus = () => {
                 </CardContent>
             </Card>
         ))
-        }    
+        }     */}
         </>
 
     )

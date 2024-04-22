@@ -23,11 +23,6 @@ const CreateJobPost = () => {
     const [location, setLocation] = useState("")
     const [salary, setSalary] = useState(0)
     const [jobPostForm, setJobPostForm] = useState({
-        title: "title",
-        description: "description",
-        requirements: "requirements",
-        locations: "location",
-        salary: 4.0
     })
     const [user, setUser] = useState({})
     useEffect(() => {
