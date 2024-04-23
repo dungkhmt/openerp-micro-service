@@ -1,25 +1,31 @@
-import logo from './logo.svg';
 import './App.css';
+import {BrowserRouter, Route, Routes} from 'react-router-dom'
+import Layout from "./components/Layout/Layout";
+import React from "react";
+import Home from "./pages/Home";
+import PostSell from "./pages/PostSell/PostSell";
+import PostBuy from "./pages/PostBuy/PostBuy";
+import PostSellDetail from "./pages/PostSellDetail/PostSellDetail";
+import ListPageSell from "./pages/ListPageSell/ListPageSell";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <div>
+            <BrowserRouter>
+                <Routes>
+                    <Route element={<Layout/>}>
+                        <Route path={"/*"} element={<Home/>}/>
+                        <Route path={"/postSell"} element={<PostSell/>}/>
+                        <Route path={"/postBuy"} element={<PostBuy/>}/>
+                        <Route path="/sell/properties">
+                            <Route index element={<ListPageSell/>}/>
+                            <Route path=":propertyId" element={<PostSellDetail/>}/>
+                        </Route>
+                    </Route>
+                </Routes>
+            </BrowserRouter>
+        </div>
+    );
 }
 
 export default App;
