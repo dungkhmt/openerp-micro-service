@@ -73,4 +73,6 @@ public class GeneralClassOpened {
     public String toString() {
         return classCode + " " + moduleCode + " " + moduleName + " " + timeSlots.toString();
     }
+
+
 }

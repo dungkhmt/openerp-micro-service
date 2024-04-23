@@ -18,6 +18,7 @@ const ClassInformationScreen = () => {
   const { id } = useParams();
   const [isEdited, setIsEdited] = useState(false);
   const [formData, setFormData] = useState({
+    id: "",
     day: "",
     startPeriod: "",
     endPeriod: "",
@@ -57,7 +58,8 @@ const ClassInformationScreen = () => {
       !formData.subjectId ||
       !formData.subjectName ||
       !formData.classRoom ||
-      !formData.semester
+      !formData.semester ||
+      !formData.id
     ) {
       warningNoti("Vui lòng điền đầy đủ thông tin");
       return;
@@ -98,6 +100,20 @@ const ClassInformationScreen = () => {
               <TextField
                 style={styles.textField}
                 variant="outlined"
+                name="id"
+                value={formData.id}
+                onChange={handleChange}
+                disabled={!isEdited}
+              />
+            </div>
+          </div>
+
+          <div style={styles.firstRow}>
+            <div style={styles.textFieldContainer}>
+              <h3>Mã môn học</h3>
+              <TextField
+                style={styles.textField}
+                variant="outlined"
                 name="subjectId"
                 value={formData.subjectId}
                 onChange={handleChange}
@@ -106,7 +122,7 @@ const ClassInformationScreen = () => {
             </div>
 
             <div style={styles.textFieldContainer}>
-              <h3>Tên lớp</h3>
+              <h3>Tên môn học</h3>
               <TextField
                 style={styles.rightTextField}
                 variant="outlined"

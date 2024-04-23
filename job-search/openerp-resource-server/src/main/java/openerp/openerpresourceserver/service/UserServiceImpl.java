@@ -6,6 +6,8 @@ import openerp.openerpresourceserver.entity.User;
 import openerp.openerpresourceserver.repo.UserRepo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +26,8 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepo.findAll();
         return users;
     }
+
+
 
     @Override
     public User getUserById(String id) {
@@ -57,6 +61,13 @@ public class UserServiceImpl implements UserService {
 
             userRepo.save(user);
         }
+    }
+
+    @Override
+    public User getUserInfoFromToken(JwtAuthenticationToken token) {
+        Jwt principal = (Jwt) token.getPrincipal();
+        String userName = principal.getClaim("preferred_username");
+        return getUserById(userName);
     }
 
 

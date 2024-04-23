@@ -3,6 +3,8 @@ package openerp.openerpresourceserver.controller;
 import jakarta.validation.Valid;
 import openerp.openerpresourceserver.exception.ClassroomNotFoundException;
 import openerp.openerpresourceserver.exception.ClassroomUsedException;
+import openerp.openerpresourceserver.exception.NotFoundException;
+import openerp.openerpresourceserver.model.dto.GetClassRoomByBuildingsRequest;
 import openerp.openerpresourceserver.model.dto.request.ClassroomDto;
 import openerp.openerpresourceserver.model.entity.Classroom;
 import openerp.openerpresourceserver.service.ClassroomService;
@@ -112,5 +114,15 @@ public class ClassroomController {
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/")
+    public ResponseEntity<List<Classroom>> requestGetClassroomByBuildings(@RequestBody GetClassRoomByBuildingsRequest request) {
+        return  ResponseEntity.ok(service.getMaxQuantityClassRoomByBuildings(request.getGroupName(), request.getMaxAmount()));
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> notFoundException(NotFoundException e) {
+        return ResponseEntity.badRequest().body(e.getCustomMessage());
     }
 }

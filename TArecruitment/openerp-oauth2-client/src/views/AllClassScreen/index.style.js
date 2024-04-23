@@ -26,4 +26,8 @@ export const styles = {
     marginLeft: "2em",
     marginBottom: "1em",
   },
+  importIcon: {
+    marginLeft: "1em",
+    marginTop: "0.7em",
+  },
 };

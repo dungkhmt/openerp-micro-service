@@ -18,7 +18,6 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { errorNoti, successNoti } from "utils/notification";
-import { render } from "@testing-library/react";
 
 const AssetsScreen = () => {    
     const [assetName, setAssetName] = useState("");
@@ -26,7 +25,8 @@ const AssetsScreen = () => {
     const [locationName, setLocationName] = useState("");
     const [vendorName, setVendorName] = useState("");
     const [type, setType] = useState("");
-    const [assignee, setAssignee] = useState("");
+    // const [assignee, setAssignee] = useState("");
+    const [admin, setAdmin] = useState("");
 
     const [title, setTitle] = useState("");
     const [assets, setAssets] = useState([]);
@@ -65,7 +65,13 @@ const AssetsScreen = () => {
         }).then();
     };
 
-    const  errorHandlers = {
+    const getAllAssets = async() => {
+        request("get", "/asset/get-all", (res) => {
+            setAssets(res.data);
+        }).then();
+    }
+
+    const errorHandlers = {
         onError: (e) => {
             console.log(e);
             errorNoti("FAILED", 3000);
@@ -96,10 +102,10 @@ const AssetsScreen = () => {
     const resetData = () => {
         setAssetName("");
         setDescription("");
-        setAssignee("");
         setLocationName("");
         setVendorName("");
         setType("");
+        setAdmin("");
     }
 
     const handleCreate = () => {
@@ -113,7 +119,7 @@ const AssetsScreen = () => {
         const foundLocation = locations.find(location => location.name === locationName);
         const foundVendor = vendors.find(vendor => vendor.name === vendorName);
         const foundType = types.find(typ => typ.name === type);
-        const foundAssignee = users.find(user => user.id === assignee);
+        const foundAdmin = users.find(user => user.id === admin);
 
         const body = {
             name: assetName,
@@ -121,7 +127,7 @@ const AssetsScreen = () => {
             location_id: foundLocation ? foundLocation.id : 0,
             vendor_id: foundVendor ? foundVendor.id : 0,
             type_id: foundType ? foundType.id : 0,
-            assignee_id: foundAssignee ? foundAssignee.id : 0
+            admin_id: foundAdmin.id
         };
 
         console.log("body shy", body);
@@ -142,12 +148,12 @@ const AssetsScreen = () => {
         const foundLocation = locations.find(location => location.id === asset.location_id);
         const foundVendor = vendors.find(vendor => vendor.id === asset.vendor_id);
         const foundType = types.find(typ => typ.id === asset.type_id);
-        const foundAssignee = asset.assignee_id;
+        const foundAdmin = asset.admin_id;
 
         foundLocation ? setLocationName(foundLocation.name) : setLocationName("");
         foundVendor ? setVendorName(foundVendor.name) : setVendorName("");
         foundType ? setType(foundType.name) : setType("");
-        foundAssignee ? setAssignee(foundAssignee) : setAssignee("");
+        foundAdmin ? setAdmin(foundAdmin) : setAdmin("");
         setCurrentId(asset.id);
         setTitle("EDIT ASSET");
         handleOpen();
@@ -172,16 +178,9 @@ const AssetsScreen = () => {
         getAllVendors();
         getAllUsers();
         getAllTypes();
-    }, []);
-
-    useEffect(() => {
-        request("get", "/asset/get-all", (res) => {
-            setAssets(res.data);
-        }).then();
+        getAllAssets();
     }, []);
     
-    console.log("asset", assets);
-
     const style = {
 		position: 'absolute',
 		top: '50%',
@@ -199,6 +198,10 @@ const AssetsScreen = () => {
         {
             title: "Name",
             field: "name",
+        },
+        {
+            title: "Admin",
+            field: "admin_id",
         },
         {
             title: "Assignee",
@@ -220,9 +223,17 @@ const AssetsScreen = () => {
         {
             title: "Status",
             field: "status",
-            render: (rowData) => (
-            	<div>In use</div>
-            )
+            render: (rowData) => {
+                if(rowData.status_id === 1){
+                    return <div>AVAILABLE</div>;
+                } else if(rowData.status_id === 2){
+                    return <div>IN USE</div>;
+                } else if(rowData.status_id === 3){
+                    return <div>REPAIRING</div>;
+                } else if(rowData.status_id === 4){
+                    return <div>DEPRECATED</div>;
+                }
+            }
         },
         {
             title: "Location",
@@ -346,14 +357,14 @@ const AssetsScreen = () => {
                             </Select>
                         </FormControl>    
                         <FormControl sx={{ marginLeft: "20px", minWidth: 255, marginTop: "20px" }}>
-                            <InputLabel id="demo-simple-select-label">Assignee</InputLabel>
+                            <InputLabel id="demo-simple-select-label">Admin</InputLabel>
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
-                                value={assignee}
-                                label="Assignee"
-                                onChange={(e) => setAssignee(e.target.value)}
-                                renderValue={() => assignee}
+                                value={admin}
+                                label="Admin"
+                                onChange={(e) => setAdmin(e.target.value)}
+                                renderValue={() => admin}
                             >
                                 {users.map((user) => (
                                     <MenuItem key={user.id} value={user.id}>{user.id}</MenuItem>
@@ -368,7 +379,6 @@ const AssetsScreen = () => {
                                 value={locationName}
                                 label="Location"
                                 onChange={(e) => setLocationName(e.target.value)}
-                                //renderValue={() => data.location_name}
                             >
                                 {locations.map((location) => (
                                     <MenuItem key={location.id} value={location.name}>{location.name}</MenuItem>

@@ -14,7 +14,8 @@ public class StringHandler {
             String response,
             String testCaseAns,
             int point,
-            String problemEvaluationType
+            String problemEvaluationType,
+            int problemTimeLimit
     ) {
         String status = "";
 
@@ -26,7 +27,7 @@ public class StringHandler {
         int lastNewlineIndex = response.lastIndexOf('\n');
         int secondLastNewlineIndex = response.lastIndexOf('\n', lastNewlineIndex - 1);
 
-        String runtime = response.substring(secondLastNewlineIndex + 1, lastNewlineIndex).trim();
+        int runtime = Integer.parseInt(response.substring(secondLastNewlineIndex + 1, lastNewlineIndex).trim());
 
         // get testcase answer of participant
         String participantAns = response.substring(0, response.indexOf(Constants.SPLIT_TEST_CASE));
@@ -42,6 +43,7 @@ public class StringHandler {
         if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.TIME_LIMIT.getValue())) {
             status = ContestSubmissionEntity.SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED;
             participantAns = status;
+            runtime = problemTimeLimit * 1000;
         } else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.FILE_LIMIT.getValue())) {
             status = ContestSubmissionEntity.SUBMISSION_STATUS_OUTPUT_LIMIT_EXCEEDED;
             participantAns = status;
@@ -67,7 +69,7 @@ public class StringHandler {
         }
 
         return ProblemSubmission.builder()
-                .runtime(Long.parseLong(runtime))
+                .runtime((long) runtime)
                 .score(score)
                 .status(status)
                 .message(response)

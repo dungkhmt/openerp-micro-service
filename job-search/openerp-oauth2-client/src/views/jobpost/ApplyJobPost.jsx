@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { TextField, Button, Grid, Typography, IconButton, Box,InputLabel,Select } from '@mui/material';
+import { TextField, Button, Grid, Typography, IconButton, Box, InputLabel, Select } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { request } from "../../api"
 import {
@@ -16,8 +16,12 @@ import Autocomplete from '@mui/material/Autocomplete';
 import Dialog from '@mui/material/Dialog';
 import { useHookstate } from '@hookstate/core';
 import fetchUserState from "state/userState";
+import { CircularProgress, Snackbar } from '@mui/material';
+import Backdrop from '@mui/material/Backdrop';
 
-const ApplyJobPost = ({open, onClose, jobId, jobName}) => {
+const ApplyJobPost = ({ open, onClose, jobId, jobName }) => {
+    const [loading, setLoading] = useState(false);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
 
     const [allCV, setAllCV] = useState([])
     const [selectedCVName, setSelectedCVName] = useState()
@@ -26,23 +30,29 @@ const ApplyJobPost = ({open, onClose, jobId, jobName}) => {
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
-          }).then();
+        }).then();
     }, [])
 
     const handleClose = () => {
-      onClose();
+        onClose();
     };
 
     const [submitForm, setSubmitForm] = useState({})
-  
+
     useEffect(() => {
         request("get", "/employee-cv/user/dungpq", (res) => {
             setAllCV(res.data)
         }).then();
     }, [])
 
-    const handleSubmit =  (e) => {
+    const sleep = (milliseconds) => {
+        return new Promise(resolve => setTimeout(resolve, milliseconds));
+      }
+
+    const handleSubmit = async  (e) => {
         e.preventDefault()
+        setLoading(true);
+        await sleep(2000);
         let submitToServerForm = {
             "status": "pending",
             "cvId": selectedCV.employeeCV?.id
@@ -51,29 +61,32 @@ const ApplyJobPost = ({open, onClose, jobId, jobName}) => {
 
         console.log(submitToServerForm)
         console.log(user)
-        request("post", `/cv-application/user/dungpq/${jobId}`, (res)=> {
+        request("post", `/cv-application/user/dungpq/${jobId}`, (res) => {
             console.log(res);
-          }, (err)=>{
+        }, (err) => {
             console.log(err);
-          }, submitToServerForm).then();
-
+        }, submitToServerForm).then();
+        setLoading(false);
+        setOpenSnackbar(true);
+        await sleep(1500);
+        handleClose()
     }
 
     function goToUrl(url) {
         window.location.href = url;
     }
-    let allCVArray = allCV.map(e => {return {title: e.employeeCV.title, id: e.employeeCV.id}})
+    let allCVArray = allCV.map(e => { return { title: e.employeeCV.title, id: e.employeeCV.id } })
     return (<>
         <div>
-        <Dialog onClose={handleClose} open={open}>
-            <h1>Apply for {jobName}</h1>
-            <form noValidate autoComplete="off">
-                <InputLabel id="cv-label">Attach your CV</InputLabel>
+            <Dialog onClose={handleClose} open={open} maxWidth="md" fullWidth={true} sx={{ maxHeight: 'lg' }} fullHeight={true}>
+                <h1>Apply for:  {jobName}</h1>
+                <form noValidate autoComplete="off">
+                    <InputLabel id="cv-label" sx={{ marginBottom: '16px' }}><strong>Attach your CV</strong></InputLabel>
                     <Autocomplete
                         disablePortal
                         id="combo-box-demo"
-                        options={allCV.map(e => {return "name: " + e.employeeCV?.title + " id: " + e.employeeCV?.id})}
-                        sx={{ width: 300 }}
+                        options={allCV.map(e => { return "name: " + e.employeeCV?.title + " id: " + e.employeeCV?.id })}
+                        sx={{ width: 300, margin: '16px' }}
                         renderInput={(params) => <TextField {...params} label="select your cv" />}
                         value={selectedCVName}
                         onChange={(event, value) => {
@@ -82,31 +95,43 @@ const ApplyJobPost = ({open, onClose, jobId, jobName}) => {
                             let cvExtracted = extractValuesFromString(value.toString())
                             let cvName = cvExtracted.name
                             let index = cvExtracted.id
-                            let idx = allCVArray.findIndex(e =>{ return e.title == cvName  && e.id == index })
+                            let idx = allCVArray.findIndex(e => { return e.title == cvName && e.id == index })
                             setSelectedCV(allCV[idx])
                         }}
                     />
                     {/* Add more MenuItems here */}
 
-                {/* This button should trigger a file picker dialog */}
-                <Button variant="contained" color="primary">
-                    ...Or create new CV?
-                </Button>
+                    {/* This button should trigger a file picker dialog */}
+                    <Snackbar
+                        open={openSnackbar}
+                        autoHideDuration={3000} // Duration in milliseconds
+                        onClose={() => setOpenSnackbar(false)}
+                        message="Form submitted successfully!"
+                    />
+                    <InputLabel id="create-cv-label" sx={{ padding: '16px' }}><a href="https://xnxx.com">or create new one</a></InputLabel>
+                    <TextField
+                        id="message"
+                        label="Message to employer"
+                        multiline
+                        rows={5}
+                        variant="outlined"
+                        fullWidth
+                        sx={{ margin: '16px', maxWidth: '865px' }}
+                    />
 
-                <TextField
-                    id="message"
-                    label="Message to employer"
-                    multiline
-                    rows={4}
-                    variant="outlined"
-                    fullWidth
-                />
-
-                {/* This button should submit the form */}
-                <Button type="submit" variant="contained" color="primary" onClick={handleSubmit}>
-                    Send my CV
-                </Button>
-            </form>
+                    {/* This button should submit the form */}
+                    <Box display="flex" justifyContent="center">
+                        <Button type="submit" variant="contained" color="primary" onClick={handleSubmit} disabled={loading}  sx={{ marginBottom: '16px' }}>
+                            {'Submit'}
+                        </Button>
+                    </Box>
+                    <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                        <CircularProgress color="inherit" />
+                        <div>
+                            Please wait a few seconds...
+                        </div>
+                    </Backdrop>
+                </form>
             </Dialog>
         </div>
     </>

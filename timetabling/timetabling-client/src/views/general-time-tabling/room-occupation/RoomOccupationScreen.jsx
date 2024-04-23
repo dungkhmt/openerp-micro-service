@@ -7,13 +7,12 @@ import { request } from "api";
 
 const RoomOccupationScreen = () => {
   const [selectedSemester, setSelectedSemester] = useState(null);
-  const [selectedWeek, setSelectedWeek] = useState(0);
+  const [selectedWeek, setSelectedWeek] = useState(1);
   const [startDate, setStartDate] = useState(null);
   const handleExportExcel = () => {
-
     request(
       "post",
-      `room-occupation/export?semester=20221&weeks=${selectedWeek+1}-${selectedWeek+1}`,
+      `room-occupation/export?semester=${selectedSemester?.semester}&weeks=${selectedWeek}-${selectedWeek}`,
       (res) => {
         const blob = new Blob([res.data], {
           type: res.headers["content-type"],
@@ -32,7 +31,7 @@ const RoomOccupationScreen = () => {
       null,
       { responseType: "arraybuffer" }
     ).then();
-  }
+  };
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-row gap-2">
@@ -46,7 +45,13 @@ const RoomOccupationScreen = () => {
           setSelectedWeek={setSelectedWeek}
           setStartDate={setStartDate}
         />
-        <Button variant="contained" onClick={handleExportExcel}>Xuất File Excel</Button>
+        <Button
+          disabled={selectedSemester === null}
+          variant="contained"
+          onClick={handleExportExcel}
+        >
+          Xuất File Excel
+        </Button>
       </div>
       <RoomUsageChart
         startDate={startDate}

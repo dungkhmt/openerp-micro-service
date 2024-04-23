@@ -32,7 +32,8 @@
     "web-vitals": "^2.1.4",
     "html-react-parser": "^3.0.16",
     "react-bootstrap": "^2.5.0",
-    "bootstrap": "^5.2.1"
+    "bootstrap": "^5.2.1",
+    "styled-components": "^6.1.0"
   },
   "scripts": {
     "start": "react-scripts start",

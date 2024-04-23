@@ -4,13 +4,15 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import openerp.openerpresourceserver.model.entity.occupation.RoomOccupation;
+import org.springframework.stereotype.Service;
+
 
 public interface RoomOccupationService {
-    public List<RoomOccupation> getRoomOccupationsBySemester(String semester);
+     List<RoomOccupation> getRoomOccupationsBySemester(String semester);
     
-    public void saveRoomOccupation(RoomOccupation r);
+     void saveRoomOccupation(RoomOccupation r);
 
-    public void saveAll(List<RoomOccupation> roomOccupations);
+     void saveAll(List<RoomOccupation> roomOccupations);
 
-    public ByteArrayInputStream exportExcel(String semester, List<Integer> weeks);
+     ByteArrayInputStream exportExcel(String semester, List<Integer> weeks);
 }

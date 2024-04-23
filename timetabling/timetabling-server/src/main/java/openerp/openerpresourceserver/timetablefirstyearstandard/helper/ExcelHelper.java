@@ -222,7 +222,6 @@ public class ExcelHelper {
 
     public static List<ClassFirstYearStandardOpened> excelToClassOpened(InputStream is) {
         try {
-            System.out.println("excelToClassOpened");
             Workbook workbook = new XSSFWorkbook(is);
             Sheet sheet = workbook.getSheet(SHEET);
             if (sheet == null) {

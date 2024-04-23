@@ -1,5 +1,5 @@
 import { Tab } from "@mui/material";
-import { withStyles } from "@mui/material/styles";
+import { withStyles } from "@mui/styles";
 import React from "react";
 
 export const StyledTab = withStyles((theme) => ({

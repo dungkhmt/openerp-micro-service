@@ -20,6 +20,7 @@ import ViewAllCV from "views/cv/viewAllCV";
 import ViewAllApplicant from "views/jobpost/ViewAllApplicant";
 import ViewAllJobPostApplicant from "views/jobpost/ViewAllJobPostApplicant";
 import ViewAllApplicantStatus from "views/cv/ViewAllApplicantStatus";
+import FindJob from "views/FindJob";
 
 const styles = {
   loadingProgress: {
@@ -63,11 +64,11 @@ function MainAppRouter(props) {
           <PrivateRoute component={CreateJobPost} path = "/create-job-post" />
           <PrivateRoute component={ViewAllApplicant} path = "/view-job-post/user/dungpq" />
           <PrivateRoute component={ViewJobPostDetail} path = "/view-job-post/:id" />          
-          <PrivateRoute component={ViewAllJobPost} path = "/view-job-post" />
+          <PrivateRoute component={ViewAllJobPost} path = "/view-job-posts" />          
           <PrivateRoute component={ViewAllJobPostApplicant} path = "/view-job-post-applicant/:id" />
           <PrivateRoute component={ViewAllApplicantStatus} path = "/view-all-applicant" />
           <PrivateRoute component={ViewAllCV} path = "/view-all-cv" />
-    
+          <PrivateRoute component={FindJob} path = "/find-job" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>

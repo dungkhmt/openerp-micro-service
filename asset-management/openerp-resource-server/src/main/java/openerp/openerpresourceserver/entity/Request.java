@@ -22,25 +22,25 @@ public class Request {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
-    private Integer user_id;
+    private String user_id;
 
     private String name;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(columnDefinition = "TEXT")
-    private String approvers_id;
+    private Integer status;
 
-    @Column(columnDefinition = "TEXT")
-    private String approvals_id;
+    private Integer asset_id;
 
-    @Column(columnDefinition = "TEXT")
-    private String rejections_id;
+    private String admin_id;
 
     @Column(columnDefinition = "TEXT")
     private String data;
+
+    private Date start_date;
+
+    private Date end_date;
 
     @CreatedDate
     private Date since;

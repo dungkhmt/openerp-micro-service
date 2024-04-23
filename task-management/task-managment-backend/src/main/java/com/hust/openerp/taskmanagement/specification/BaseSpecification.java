@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.specification;
 
+import java.util.Date;
 import java.util.UUID;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -41,11 +42,15 @@ public abstract class BaseSpecification<T> implements Specification<T> {
 
   @Nullable
   protected <X> Predicate parseDateField(final Path<X> path, final CriteriaBuilder builder) {
+    long unixTime = Long.parseLong(criteria.getValue().toString());
+    Date date = new Date(unixTime * 1000L); // Unix time is in seconds, Date constructor expects milliseconds
+
     return switch (criteria.getOperation()) {
-      case EQUALITY -> builder.equal(path.get(criteria.getKey()), criteria.getValue());
-      case NEGATION -> builder.notEqual(path.get(criteria.getKey()), criteria.getValue());
-      case GREATER_THAN -> builder.greaterThan(path.get(criteria.getKey()), criteria.getValue().toString());
-      case LESS_THAN -> builder.lessThan(path.get(criteria.getKey()), criteria.getValue().toString());
+      case GREATER_THAN -> builder.greaterThan(path.<Date>get(criteria.getKey()), date);
+      case LESS_THAN -> builder.lessThan(path.<Date>get(criteria.getKey()), date);
+      case GREATER_THAN_OR_EQUAL ->
+        builder.greaterThanOrEqualTo(path.<Date>get(criteria.getKey()), date);
+      case LESS_THAN_OR_EQUAL -> builder.lessThanOrEqualTo(path.<Date>get(criteria.getKey()), date);
       default -> null;
     };
   }
@@ -58,6 +63,10 @@ public abstract class BaseSpecification<T> implements Specification<T> {
       case NEGATION -> builder.notEqual(path.get(criteria.getKey()), criteria.getValue());
       case GREATER_THAN -> builder.greaterThan(path.get(criteria.getKey()), criteria.getValue().toString());
       case LESS_THAN -> builder.lessThan(path.get(criteria.getKey()), criteria.getValue().toString());
+      case GREATER_THAN_OR_EQUAL ->
+        builder.greaterThanOrEqualTo(path.get(criteria.getKey()), criteria.getValue().toString());
+      case LESS_THAN_OR_EQUAL ->
+        builder.lessThanOrEqualTo(path.get(criteria.getKey()), criteria.getValue().toString());
       default -> null;
     };
   }

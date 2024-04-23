@@ -1,10 +1,8 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
-import com.hust.openerp.taskmanagement.entity.Project;
 import com.hust.openerp.taskmanagement.entity.User;
 import com.hust.openerp.taskmanagement.repository.UserRepository;
 import com.hust.openerp.taskmanagement.service.UserService;
-import com.hust.openerp.taskmanagement.specification.ProjectSpecification;
 import com.hust.openerp.taskmanagement.specification.UserSpecification;
 import com.hust.openerp.taskmanagement.specification.builder.GenericSpecificationsBuilder;
 import com.hust.openerp.taskmanagement.util.CriteriaParser;
@@ -72,5 +70,10 @@ public class UserServiceImplement implements UserService {
         var spec = builder.build(parser.parse(q), UserSpecification::new);
 
         return userLoginRepo.findAll(spec);
+    }
+
+    @Override
+    public List<User> getUserCreateTaskAssignMe(String userId) {
+        return userLoginRepo.getAllUserCreateTaskAssignMe(userId);
     }
 }

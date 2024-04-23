@@ -12,9 +12,9 @@ import openerp.openerpresourceserver.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.repo.RoomOccupationRepo;
 import openerp.openerpresourceserver.service.RoomOccupationService;
 
-@Service
 @AllArgsConstructor
-public class RoomOccupationSeriviceImp implements RoomOccupationService {
+@Service
+public class RoomOccupationServiceImp implements RoomOccupationService {
 
     private RoomOccupationRepo roomOccupationRepo;
     private AcademicWeekRepo academicWeekRepo;
@@ -46,3 +46,4 @@ public class RoomOccupationSeriviceImp implements RoomOccupationService {
     }
 
 }
+

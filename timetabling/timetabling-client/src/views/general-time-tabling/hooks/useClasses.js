@@ -23,6 +23,7 @@ export const useClasses = (group, semester) => {
                     ...classObj,
                     ...timeSlot,
                     classCode: classObj.classCode,
+                    roomReservationId: timeSlot.id,
                     id: classObj.id + `-${index + 1}`,
                   })
                 );

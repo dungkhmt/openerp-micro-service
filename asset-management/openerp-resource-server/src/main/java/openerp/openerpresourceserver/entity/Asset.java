@@ -28,6 +28,9 @@ public class Asset {
     @Column(name = "code", nullable = false, unique = true)
     private String code;
 
+    @Column(nullable = false)
+    private String admin_id;
+
     private String assignee_id;
 
     private BigDecimal price;

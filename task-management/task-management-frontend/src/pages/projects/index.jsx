@@ -1,4 +1,4 @@
-import { Card, CardHeader, Tooltip, Typography } from "@mui/material";
+import { Box, Card, Tooltip, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { UserAvatar } from "../../components/common/avatar/UserAvatar";
 import TableToolbar from "../../components/mui/table/Toolbar";
 import { useDebounce } from "../../hooks/useDebounce";
+import { usePreventOverflow } from "../../hooks/usePreventOverflow";
 import { ProjectService } from "../../services/api/project.service";
 
 const columns = [
@@ -104,6 +105,8 @@ const Projects = () => {
   const [loading, setLoading] = useState(true);
   const searchDebounce = useDebounce(searchValue, 1000);
 
+  const { ref, updateHeight } = usePreventOverflow();
+
   const handleSortModel = (newModel) => {
     if (newModel.length) {
       setSort(newModel[0].sort);
@@ -144,36 +147,41 @@ const Projects = () => {
     fetchProjects(sort, searchDebounce, sortColumn);
   }, [fetchProjects, searchDebounce, sort, sortColumn]);
 
+  useEffect(() => {
+    updateHeight(10);
+  }, [window.innerHeight]);
+
   return (
-    <Card
-      sx={{ height: "88vh", boxShadow: (theme) => theme.shadows[1], mr: 2 }}
-    >
-      <CardHeader title="Danh sách dự án" />
-      <DataGrid
-        pagination
-        rows={rows}
-        rowCount={total}
-        columns={columns}
-        sortingMode="server"
-        paginationMode="server"
-        pageSizeOptions={[10, 20, 50]}
-        onSortModelChange={handleSortModel}
-        onPaginationModelChange={setPaginationModel}
-        paginationModel={paginationModel}
-        slots={{ toolbar: TableToolbar }}
-        loading={loading}
-        sx={{ height: "88%" }}
-        slotProps={{
-          baseButton: {
-            variant: "outlined",
-          },
-          toolbar: {
-            value: searchValue,
-            clearSearch: () => setSearchValue(""),
-            onChange: (event) => setSearchValue(event.target.value),
-          },
-        }}
-      />
+    <Card sx={{ boxShadow: (theme) => theme.shadows[1], mr: 2 }}>
+      <Typography variant="h5" sx={{ m: 2 }}>
+        Danh sách dự án
+      </Typography>
+      <Box ref={ref}>
+        <DataGrid
+          pagination
+          rows={rows}
+          rowCount={total}
+          columns={columns}
+          sortingMode="server"
+          paginationMode="server"
+          pageSizeOptions={[10, 20, 50]}
+          onSortModelChange={handleSortModel}
+          onPaginationModelChange={setPaginationModel}
+          paginationModel={paginationModel}
+          slots={{ toolbar: TableToolbar }}
+          loading={loading}
+          slotProps={{
+            baseButton: {
+              variant: "outlined",
+            },
+            toolbar: {
+              value: searchValue,
+              clearSearch: () => setSearchValue(""),
+              onChange: (event) => setSearchValue(event.target.value),
+            },
+          }}
+        />
+      </Box>
     </Card>
   );
 };

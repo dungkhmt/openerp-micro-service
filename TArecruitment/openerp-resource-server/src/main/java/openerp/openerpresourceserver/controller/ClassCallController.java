@@ -1,20 +1,22 @@
 package openerp.openerpresourceserver.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.dto.PaginationDTO;
 import openerp.openerpresourceserver.entity.ClassCall;
 import openerp.openerpresourceserver.service.ClassCallService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
+@Log4j2
 @AllArgsConstructor(onConstructor_ = @Autowired)
 @RequestMapping("/class-call")
 public class ClassCallController {
@@ -82,6 +84,21 @@ public class ClassCallController {
         String userId = principal.getName();
         List<ClassCall> myClassCall = classCallService.getAllMyRegisteredClass(userId, semester);
         return ResponseEntity.ok().body(myClassCall);
+    }
+
+    @PostMapping("/import-class")
+    public ResponseEntity<?> importClassCall(@RequestParam("excelFile") MultipartFile file) {
+        if(file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Need to upload a file");
+        }
+        try {
+            int numberOfData = classCallService.importClass(file);
+            return ResponseEntity.ok().body("Nhập thành công " + numberOfData + " lớp học");
+
+
+        } catch(Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }

@@ -11,12 +11,15 @@ import {
   Select,
   TextField,
   Paper,
+  Tooltip,
 } from "@mui/material";
 import { styles } from "./index.style";
 import { SEMESTER, SEMESTER_LIST } from "config/localize";
 import DeleteDialog from "components/dialog/DeleteDialog";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 import ApplicatorDialog from "./ApplicatorDialog";
 import { DataGrid } from "@mui/x-data-grid";
+import ImportDialog from "./ImportDialog";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -30,6 +33,7 @@ const AllClassScreen = () => {
   const [deleteId, setDeleteId] = useState("");
   const [openApplicatorDialog, setOpenApplicatorDialog] = useState(false);
   const [infoClassId, setInfoClassId] = useState("");
+  const [openImportDialog, setOpenImportDialog] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
@@ -96,6 +100,14 @@ const AllClassScreen = () => {
   const handleOpenDialog = (klass) => {
     setOpenDeleteDialog(true);
     setDeleteId(klass.id);
+  };
+
+  const handleFileChange = (event) => {
+    setOpenImportDialog(true);
+  };
+
+  const handleCloseImportDialog = () => {
+    setOpenImportDialog(false);
   };
 
   const handleCloseDialog = () => {
@@ -204,6 +216,18 @@ const AllClassScreen = () => {
             </Select>
           </FormControl>
 
+          <Tooltip style={styles.importIcon} title="Import danh sách lớp học">
+            <IconButton component="label" onClick={handleFileChange}>
+              {/* <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleFileChange}
+                style={{ display: "none" }}
+              /> */}
+              <FileUploadIcon color="primary" fontSize="large" />
+            </IconButton>
+          </Tooltip>
+
           <TextField
             style={styles.searchBox}
             variant="outlined"
@@ -225,6 +249,12 @@ const AllClassScreen = () => {
         open={openApplicatorDialog}
         handleClose={handleCloseApplicatorDialog}
         classId={infoClassId}
+      />
+
+      <ImportDialog
+        open={openImportDialog}
+        handleClose={handleCloseImportDialog}
+        fetchData={handleFetchData}
       />
 
       <DataGrid

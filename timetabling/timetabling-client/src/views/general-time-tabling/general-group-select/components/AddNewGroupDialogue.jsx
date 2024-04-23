@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 const AddNewGroupDialogue = ({ open, setOpen, selectedClasses, setClasses }) => {
   const [groupName, setGroupName] = useState("");
   const [buildings, setBuildings] = useState([]);
-  const [selectedBuildingName, setSelectedBuildingName] = useState("");
+  const [selectedBuildingName, setSelectedBuildingName] = useState([]);
   const [isLoading, setLoading] = useState(false);
 
 
@@ -29,6 +29,7 @@ const AddNewGroupDialogue = ({ open, setOpen, selectedClasses, setClasses }) => 
   }, []);
 
   const handleBuildingpriorityChange = (event, newValue) => {
+    console.log(newValue.join(","))
     setSelectedBuildingName(newValue);
   };
 
@@ -69,7 +70,7 @@ const AddNewGroupDialogue = ({ open, setOpen, selectedClasses, setClasses }) => 
         handleClose();
         toast.error("Thêm nhóm lỗi, nhóm đã có hoặc mã lớp không tồn tại!");
       },
-      { ids, groupName, priorityBuilding: selectedBuildingName }
+      { ids, groupName, priorityBuilding: selectedBuildingName.join(",") }
     );
   };
 
@@ -86,6 +87,7 @@ const AddNewGroupDialogue = ({ open, setOpen, selectedClasses, setClasses }) => 
             }}
           />
           <Autocomplete
+            multiple
             options={buildings}
             getOptionLabel={(option) => option}
             style={{ width: 250, marginTop: "8px" }}

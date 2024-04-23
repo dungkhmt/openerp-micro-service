@@ -12,7 +12,6 @@ const GeneralSemesterAutoComplete = ({selectedSemester, setSelectedSemester}) =>
           loadingText="Loading..."
           getOptionLabel={(option) => option && option.semester}
           onChange={(e, semester) => {
-            console.log(semester);
             setSelectedSemester(semester);
           }}
           value={selectedSemester}

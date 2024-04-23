@@ -25,6 +25,7 @@ public class Education {
     private Integer id;
     private String schoolName;
     private String major;
+    private String description;
     private Double grade;
     private Timestamp startingTime;
     private Timestamp endingTime;

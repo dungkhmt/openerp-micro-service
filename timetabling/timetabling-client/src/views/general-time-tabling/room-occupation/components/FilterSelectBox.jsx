@@ -34,6 +34,7 @@ const FilterSelectBox = ({
         console.log(res.data);
         setWeeks(res.data);
         setStartDate(convertToDate(res.data.at(0).startDayOfWeek));
+        setSelectedWeek(res?.data[0]?.weekIndex);
         toast.success("Truy vấn tuần học thành công với " + res.data?.length);
       },
       (error) => {
@@ -46,6 +47,7 @@ const FilterSelectBox = ({
     <div>
       <Autocomplete
         disabled={selectedSemester === null}
+        defaultValue={selectedWeek?.weekIndex}
         loadingText="Loading..."
         getOptionLabel={(option) => "Tuần " + option?.weekIndex?.toString()}
         onChange={(e, week) => {
