@@ -1,29 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Autocomplete } from '@mui/material';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Autocomplete,
+} from "@mui/material";
 import { request } from "../../../api";
 
-export default function CreateNewSemester({ open, handleClose, handleUpdate, handleRefreshData, selectedGroup }) {
-  const [newGroup, setNewGroup] = useState('');
-  const [buildings, setBuildings] = useState('');
-  const [newPriorityBuilding, setNewPriorityBuilding] = useState('');
-  const [id, setId] = useState('');
+export default function CreateNewSemester({
+  open,
+  handleClose,
+  handleUpdate,
+  handleRefreshData,
+  selectedGroup,
+}) {
+  const [newGroup, setNewGroup] = useState("");
+  const [buildings, setBuildings] = useState("");
+  const [newPriorityBuilding, setNewPriorityBuilding] = useState("");
+  const [id, setId] = useState("");
   const [isUpdate, setIsUpdate] = useState(false);
 
   useEffect(() => {
     request("get", "/classroom/get-all-building", (res) => {
       setBuildings(res.data);
     });
-    console.log()
+    console.log();
     if (selectedGroup) {
       setNewGroup(selectedGroup.groupName);
       setNewPriorityBuilding(selectedGroup.priorityBuilding);
       setId(selectedGroup.id);
       setIsUpdate(true);
     } else {
-      setNewGroup('');
-      setNewPriorityBuilding('');
-      setId('');
+      setNewGroup("");
+      setNewPriorityBuilding("");
+      setId("");
       setIsUpdate(false);
     }
   }, [selectedGroup]);
@@ -36,11 +50,14 @@ export default function CreateNewSemester({ open, handleClose, handleUpdate, han
     };
 
     const apiEndpoint = isUpdate ? `/group/update` : "/group/create";
-    request("post", apiEndpoint, (res) => {
-      handleUpdate(res.data);
-      handleRefreshData();
-      handleClose();
-    },
+    request(
+      "post",
+      apiEndpoint,
+      (res) => {
+        handleUpdate(res.data);
+        handleRefreshData();
+        handleClose();
+      },
       (error) => {
         toast.error(error.response.data);
       },
@@ -51,13 +68,18 @@ export default function CreateNewSemester({ open, handleClose, handleUpdate, han
   };
 
   const handleBuildingpriorityChange = (event, newValue) => {
+    console.log(newValue)
     setNewPriorityBuilding(newValue);
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} aria-labelledby="create-new-semester-dialog">
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="create-new-semester-dialog"
+    >
       <DialogTitle id="create-new-group-dialog-title">
-        {isUpdate ? 'Chỉnh sửa thông tin' : 'Thêm nhóm mới'}
+        {isUpdate ? "Chỉnh sửa thông tin" : "Thêm nhóm mới"}
       </DialogTitle>
       <DialogContent>
         <TextField
@@ -68,14 +90,15 @@ export default function CreateNewSemester({ open, handleClose, handleUpdate, han
           value={newGroup}
           onChange={(event) => setNewGroup(event.target.value)}
         />
-        <div style={{ margin: '16px' }} />
+        <div style={{ margin: "16px" }} />
         <Autocomplete
-          multiple
           options={buildings}
           getOptionLabel={(option) => option}
-          style={{ width: 250, marginTop: '8px' }}
+          style={{ width: 250, marginTop: "8px" }}
           value={newPriorityBuilding}
-          renderInput={(params) => <TextField {...params} label="Tòa nhà ưu tiên" />}
+          renderInput={(params) => (
+            <TextField {...params} label="Tòa nhà ưu tiên" />
+          )}
           onChange={handleBuildingpriorityChange}
         />
       </DialogContent>
@@ -88,7 +111,7 @@ export default function CreateNewSemester({ open, handleClose, handleUpdate, han
           color="primary"
           disabled={!newGroup || !newPriorityBuilding}
         >
-          {isUpdate ? 'Cập nhật' : 'Tạo mới'}
+          {isUpdate ? "Cập nhật" : "Tạo mới"}
         </Button>
       </DialogActions>
     </Dialog>

@@ -1,5 +1,13 @@
 import React from 'react'
-
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
+import { toast } from "react-toastify";
 const ClassDetailDialog = ({open, setOpen, row}) => {
   return (
     <Dialog

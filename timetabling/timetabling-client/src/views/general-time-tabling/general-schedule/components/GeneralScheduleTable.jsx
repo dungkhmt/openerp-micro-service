@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { toast } from "react-toastify";
+import ClassDetailDialog from "./ClassDetailDialog";
 
 const GeneralScheduleTable = ({
   isLoading,
