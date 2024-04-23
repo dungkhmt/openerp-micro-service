@@ -137,7 +137,7 @@ export default function ClassroomAutoCompleteCell({
         value !== undefined ? { classroom: value?.toString() || "" } : null
       }
       isOptionEqualToValue={(option, value) => {
-        option.classroom.toString() === value.classroom;
+        return option.classroom.toString() === value.classroom;
       }}
       renderOption={(props, option) => (
         <Box
