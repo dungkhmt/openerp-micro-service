@@ -64,11 +64,11 @@ public class PostSellImpl implements PostSellDao {
         Root<PostSellPostgresEntity> post = query.from(PostSellPostgresEntity.class);
         List<Predicate> predicates = new ArrayList<>();
 
-        if (province != null) {
+        if (province != null && province != "") {
             predicates.add(cb.equal(post.get("province"), province));
         }
 
-        if (district != null) {
+        if (district != null && district != "") {
             predicates.add(cb.equal(post.get("district"), district));
         }
 
@@ -139,11 +139,11 @@ public class PostSellImpl implements PostSellDao {
 
         Expression<Long> countId = cb.count(post.get("postSellId"));
 
-        if (province != null) {
+        if (province != null && province != "") {
             predicates.add(cb.equal(post.get("province"), province));
         }
 
-        if (district != null) {
+        if (district != null && district != "") {
             predicates.add(cb.equal(post.get("district"), district));
         }
 

@@ -30,7 +30,7 @@ public class PublicPostSellController {
             @RequestParam(value = "size", defaultValue = "10") Integer size,
             @RequestParam(value = "province", required = false) String province,
             @RequestParam(value = "district", required = false) String district,
-            @RequestParam(value = "minAcreage", required = false) Long minAcreage,
+            @RequestParam(value = "minAcreage", defaultValue = "0") Long minAcreage,
             @RequestParam(value = "fromPrice", required = false) Long fromPrice,
             @RequestParam(value = "toPrice", required = false) Long toPrice,
             @RequestParam(value = "sortPrice", required = false) String sortPrice,
@@ -42,8 +42,6 @@ public class PublicPostSellController {
             @RequestParam(value = "minBedroom", defaultValue = "0", required = false) Long minBedroom,
             @RequestParam(value = "minParking", defaultValue = "0", required = false) Long minParking
     ) {
-        System.out.println("xem minAcreage" + minAcreage + minAcreage.getClass());
-        System.out.println("xem typeProperty" + legalDocuments);
         List<String> typePropertiesString = typeProperties.stream().map((item) -> {
             return item.toString();
         }).collect(Collectors.toList());
