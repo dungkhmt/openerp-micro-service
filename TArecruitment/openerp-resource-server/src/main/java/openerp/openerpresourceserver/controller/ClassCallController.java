@@ -93,7 +93,7 @@ public class ClassCallController {
         }
         try {
             int numberOfData = classCallService.importClass(file);
-            return ResponseEntity.ok().body("Successfully import " + numberOfData + " classes");
+            return ResponseEntity.ok().body("Nhập thành công " + numberOfData + " lớp học");
 
 
         } catch(Exception e) {
