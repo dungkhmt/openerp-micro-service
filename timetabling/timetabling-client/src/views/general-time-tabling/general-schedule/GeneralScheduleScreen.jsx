@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import GeneralScheduleTable from "./components/GeneralScheduleTable";
 import { Autocomplete, Button, Input, TextField } from "@mui/material";
 import { Search } from "@mui/icons-material";
@@ -18,7 +18,8 @@ const GeneralScheduleScreen = () => {
     selectedGroup,
     selectedSemester
   );
-  console.log(classes);
+
+  
 
   const handleResetTimeTabling = () => {
     setResetLoading(true);

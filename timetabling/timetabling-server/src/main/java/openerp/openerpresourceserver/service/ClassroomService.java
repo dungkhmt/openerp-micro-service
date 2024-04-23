@@ -1,9 +1,7 @@
 package openerp.openerpresourceserver.service;
 
 import openerp.openerpresourceserver.model.dto.request.ClassroomDto;
-import openerp.openerpresourceserver.model.dto.request.SemesterDto;
 import openerp.openerpresourceserver.model.entity.Classroom;
-import openerp.openerpresourceserver.model.entity.Semester;
 
 import java.util.List;
 
@@ -24,4 +22,6 @@ public interface ClassroomService {
     void clearAllClassRoom();
 
     void clearAllClassRoomTimetable();
+
+    List<Classroom> getMaxQuantityClassRoomByBuildings(String groupName, int maxAmount);
 }

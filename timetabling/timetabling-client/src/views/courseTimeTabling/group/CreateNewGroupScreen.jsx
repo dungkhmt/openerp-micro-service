@@ -70,6 +70,7 @@ export default function CreateNewSemester({ open, handleClose, handleUpdate, han
         />
         <div style={{ margin: '16px' }} />
         <Autocomplete
+          multiple
           options={buildings}
           getOptionLabel={(option) => option}
           style={{ width: 250, marginTop: '8px' }}
