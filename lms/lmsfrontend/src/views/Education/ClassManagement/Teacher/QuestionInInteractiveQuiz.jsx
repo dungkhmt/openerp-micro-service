@@ -33,7 +33,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function QuestionInInteractiveQuiz({ testId }) {
+function QuestionInInteractiveQuiz({ testId, isCourse }) {
   const classes = useStyles();
 
   const [quizList, setQuizList] = useState([]);
@@ -45,7 +45,9 @@ function QuestionInInteractiveQuiz({ testId }) {
       // token,
       // history,
       "get",
-      `/get-questions-of-interactive-quiz/${testId}`,
+      isCourse
+        ? `/get-questions-of-course-interactive-quiz/${testId}`
+        : `/get-questions-of-interactive-quiz/${testId}`,
       (res) => {
         // console.log("getQuizListOfClass, res.data = ", res.data);
         setQuizList(res.data);
@@ -104,10 +106,7 @@ function QuestionInInteractiveQuiz({ testId }) {
 
   useEffect(() => {
     getQuizListOfClass();
-  }, []);
-
-  useEffect(() => {
-    getInteractiveQuizStatus();
+    if (!isCourse) getInteractiveQuizStatus();
   }, []);
 
   return (
@@ -126,29 +125,33 @@ function QuestionInInteractiveQuiz({ testId }) {
       </div>
       <div className={classes.body}>
         <div className={classes.quizzList}>
-          <FormControl>
-            <InputLabel htmlFor="status">Trạng thái</InputLabel>
-            <Select
-              labelId="status"
-              value={status}
-              onChange={handleStatusChange}
-              displayEmpty
-              style={{ width: "150px", marginRight: "24px" }}
-              renderValue={() => status}
-              name="status"
-            >
-              <MenuItem value={"OPEN"}>OPEN</MenuItem>
-              <MenuItem value={"HIDDEN"}>HIDDEN</MenuItem>
-              <MenuItem value={"CREATED"}>CREATED</MenuItem>
-            </Select>
-          </FormControl>
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={updateInteractiveQuizStatus}
-          >
-            Update
-          </Button>
+          {!isCourse && (
+            <div>
+              <FormControl>
+                <InputLabel htmlFor="status">Trạng thái</InputLabel>
+                <Select
+                  labelId="status"
+                  value={status}
+                  onChange={handleStatusChange}
+                  displayEmpty
+                  style={{ width: "150px", marginRight: "24px" }}
+                  renderValue={() => status}
+                  name="status"
+                >
+                  <MenuItem value={"OPEN"}>OPEN</MenuItem>
+                  <MenuItem value={"HIDDEN"}>HIDDEN</MenuItem>
+                  <MenuItem value={"CREATED"}>CREATED</MenuItem>
+                </Select>
+              </FormControl>
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={updateInteractiveQuizStatus}
+              >
+                Update
+              </Button>
+            </div>
+          )}
           {loading ? (
             <Fragment>
               <Skeleton
@@ -189,6 +192,7 @@ function QuestionInInteractiveQuiz({ testId }) {
           ) : (
             quizList.map((quiz, index) => (
               <TeacherViewQuizDetailInQuizTest
+                isCourse={isCourse}
                 key={quiz.questionId}
                 quiz={quiz}
                 index={index}

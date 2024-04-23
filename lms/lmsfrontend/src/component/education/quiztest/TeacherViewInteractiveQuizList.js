@@ -26,7 +26,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function TeacherViewInteractiveQuizList({ testId }) {
+function TeacherViewInteractiveQuizList({ testId, isCourse }) {
   const classes = useStyles();
 
   const [quizList, setQuizList] = useState([]);
@@ -39,7 +39,9 @@ function TeacherViewInteractiveQuizList({ testId }) {
       // token,
       // history,
       "get",
-      `/get-list-interactive-quiz-questions/${testId}`,
+      isCourse
+        ? `/get-list-quiz-questions-of-course-by-testId/${testId}`
+        : `/get-list-interactive-quiz-questions/${testId}`,
       (res) => {
         // console.log("getQuizListOfClass, res.data = ", res.data);
         setQuizList(res.data);
@@ -130,6 +132,7 @@ function TeacherViewInteractiveQuizList({ testId }) {
                 quiz={quiz}
                 index={index}
                 testId={testId}
+                isCourse={isCourse}
                 // quizGroups={quizGroups}
               />
             ))

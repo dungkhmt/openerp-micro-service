@@ -16,6 +16,14 @@ public interface InteractiveQuizRepo extends JpaRepository<InteractiveQuiz, UUID
         String getUserId();
         Integer getScore();
     }
+
+    public interface StudentSubmission {
+        String getQuestionId();
+        String getUserId();
+        String getAnswerList();
+        Boolean getIsCorrect();
+        Date getCreatedStamp();
+    }
     @Query(
         nativeQuery = true,
         value =
@@ -65,4 +73,30 @@ public interface InteractiveQuizRepo extends JpaRepository<InteractiveQuiz, UUID
     )
 
     public List<StudentResult> getResultOfInteractiveQuiz(UUID interactiveQuizId);
+
+    @Query(
+        nativeQuery = true, 
+        value = "SELECT\r\n" + //
+            "    Cast(qq.question_id as varchar) AS questionId,\r\n" + //
+            "    iqa.user_id AS userId,\r\n" + //
+            "    array_to_string(array_agg(qca.choice_answer_content),',') AS answerList,\r\n" + //
+            "    CASE\r\n" + //
+            "        WHEN SUM(CASE WHEN qca.is_correct_answer = 'Y' THEN 1 ELSE 0 END) = COUNT(*) THEN 'true'\r\n" + //
+            "        ELSE 'false'\r\n" + //
+            "    END AS isCorrect,\r\n" + //
+            "    MAX(iqa.created_stamp) AS createdStamp\r\n" + //
+            "FROM\r\n" + //
+            "    interactive_quiz_answer iqa\r\n" + //
+            "JOIN\r\n" + //
+            "    quiz_choice_answer qca ON iqa.choice_answer_id = qca.choice_answer_id\r\n" + //
+            "JOIN\r\n" + //
+            "    quiz_question qq ON iqa.quiz_question_id = qq.question_id\r\n" + //
+            "WHERE\r\n" + //
+            "    iqa.interactive_quiz_id = ?1\r\n" + //
+            "GROUP BY\r\n" + //
+            "    qq.question_name, qq.question_id, iqa.user_id\r\n" + //
+            "ORDER BY\r\n" + //
+            "    qq.question_name, iqa.user_id")
+    public List<StudentSubmission> getStudentSubmission(UUID interactiveQuizId);
+
 }

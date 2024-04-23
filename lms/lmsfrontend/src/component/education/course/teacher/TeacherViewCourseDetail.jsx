@@ -6,6 +6,7 @@ import TeacherViewQuizListOfCourse from "./TeacherViewQuizListOfCourse";
 import TeacherViewQuizListDetailOfCourse from "./TeacherViewQuizListDetailOfCourse";
 import PropTypes from "prop-types";
 import TeacherViewQuizLibrary from "./TeacherViewQuizLibrary";
+import TeacherCourseViewLearningSessionList from "views/Education/ClassManagement/Teacher/TeacherCourseViewLearningSessionList";
 
 const tabsLabel = [
   "Danh sách chương",
@@ -13,6 +14,7 @@ const tabsLabel = [
   "Danh sách quiz",
   "Chi tiết các quiz",
   "Quiz library",
+  "Course sessions",
 ];
 
 export default function TeacherViewCourseDetail(props) {
@@ -47,6 +49,9 @@ export default function TeacherViewCourseDetail(props) {
       </TabPanel>
       <TabPanel value={activeTab} index={4}>
         <TeacherViewQuizLibrary courseId={courseId} />
+      </TabPanel>
+      <TabPanel value={activeTab} index={5}>
+        <TeacherCourseViewLearningSessionList courseId={courseId} />
       </TabPanel>
     </div>
   );

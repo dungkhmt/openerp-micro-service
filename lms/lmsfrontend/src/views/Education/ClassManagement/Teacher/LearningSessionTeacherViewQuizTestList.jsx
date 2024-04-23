@@ -10,6 +10,7 @@ import LearningSessionFormAddQuizInClassTests from "./LearningSessionFormAddQuiz
 
 export default function LearningSessionTeacherViewQuizTestList(props) {
   const sessionId = props.sessionId;
+  const isCourse = props.isCourse;
   const [quizTests, setQuizTests] = useState([]);
   const [open, setOpen] = useState(false);
 
@@ -24,11 +25,13 @@ export default function LearningSessionTeacherViewQuizTestList(props) {
   const columns = [
     {
       title: "Interactive Quiz Id",
-      field: "interactive_quiz_id",
+      field: isCourse ? "id" : "interactive_quiz_id",
       render: (rowData) => (
         <Link
           to={{
-            pathname: `/edu/teacher/class/detail/interactive-quiz/${rowData.interactive_quiz_id}`,
+            pathname: isCourse
+              ? `/edu/teacher/course/detail/interactive-quiz/${rowData.id}`
+              : `/edu/teacher/class/detail/interactive-quiz/${rowData.interactive_quiz_id}`,
           }}
           style={{
             textDecoration: "none",
@@ -39,17 +42,22 @@ export default function LearningSessionTeacherViewQuizTestList(props) {
             wordWrap: "break-word" /* Internet Explorer 5.5+ */,
           }}
         >
-          {rowData.interactive_quiz_id}
+          {isCourse ? rowData.id : rowData.interactive_quiz_id}
         </Link>
       ),
     },
-    { title: "Interactive Quiz Name", field: "interactive_quiz_name" },
+    {
+      title: "Interactive Quiz Name",
+      field: isCourse ? "interactiveQuizName" : "interactive_quiz_name",
+    },
     { title: "Status", field: "statusId" },
   ];
   function getQuizTestOfSession() {
     request(
       "get",
-      "/get-list-interactive-quiz-by-session/" + sessionId,
+      isCourse
+        ? "/edu/course/get-interactive-quiz-of-course-session/" + sessionId
+        : "/get-list-interactive-quiz-by-session/" + sessionId,
       (res) => {
         console.log(res);
         setQuizTests(res.data);
@@ -118,6 +126,7 @@ export default function LearningSessionTeacherViewQuizTestList(props) {
         ]}
       />
       <LearningSessionFormAddQuizInClassTests
+        isCourse={isCourse}
         open={open}
         setOpen={setOpen}
         sessionId={sessionId}
