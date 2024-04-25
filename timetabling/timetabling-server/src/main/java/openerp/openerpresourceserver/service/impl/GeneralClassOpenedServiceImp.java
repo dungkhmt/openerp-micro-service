@@ -220,7 +220,7 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
                     int timeSlotIndex = Integer.parseInt(idString.split("-")[1])-1;
                     if(gId == gClass.getId()) {
                         RoomReservation timeSlot = gClass.getTimeSlots().get(timeSlotIndex);
-                        if (timeSlot.getStartTime() != null && timeSlot.getEndTime() != null && timeSlot.getRoom() != null && !timeSlot.getRoom().equals("")) {
+                        if (timeSlot.getStartTime() != null && timeSlot.getEndTime() != null && timeSlot.getRoom() != null && timeSlot.getWeekday() != null && !timeSlot.getRoom().equals("")) {
                             roomOccupationRepo.deleteAllByClassCodeAndStartPeriodAndEndPeriodAndDayIndexAndClassRoom(gClass.getClassCode(), timeSlot.getStartTime(), timeSlot.getEndTime(), timeSlot.getWeekday(), timeSlot.getRoom());
                         }
                         timeSlot.setWeekday(null);
