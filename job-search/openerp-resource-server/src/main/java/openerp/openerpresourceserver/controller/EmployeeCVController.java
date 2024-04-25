@@ -16,7 +16,7 @@ import java.util.*;
 @RestController
 @AllArgsConstructor(onConstructor_ = @Autowired)
 @RequestMapping("/employee-cv")
-public class EmployeeCVController {
+public class GIT EmployeeCVController {
     private EmployeeCVService employeeCVService;
     private EducationService educationService;
     private ExperienceService experienceService;

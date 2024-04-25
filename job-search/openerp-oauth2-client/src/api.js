@@ -40,17 +40,17 @@ export async function request(
   config
 ) {
   try {
-    if(method == "post") {
-      data.user = {
-        "id": "thienxd2002",
-        "email": "lethien7902@gmail.com",
-        "firstName": "le",
-        "lastName": "thien",
-        "enabled": true,
-        "createdDate": null,
-        "lastModifiedDate": null
-      }
-  }
+  //   if(method == "post") {
+  //     data.user = {
+  //       "id": "thienxd2002",
+  //       "email": "lethien7902@gmail.com",
+  //       "firstName": "le",
+  //       "lastName": "thien",
+  //       "enabled": true,
+  //       "createdDate": null,
+  //       "lastModifiedDate": null
+  //     }
+  // }
 
     const res = await axiosInstance.request({
       method: method.toLowerCase(),
