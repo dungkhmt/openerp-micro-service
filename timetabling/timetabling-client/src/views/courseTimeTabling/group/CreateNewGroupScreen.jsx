@@ -19,24 +19,25 @@ export default function CreateNewSemester({
   selectedGroup,
 }) {
   const [newGroup, setNewGroup] = useState("");
-  const [buildings, setBuildings] = useState("");
-  const [newPriorityBuilding, setNewPriorityBuilding] = useState("");
+  const [buildings, setBuildings] = useState([]);
+  const [newPriorityBuilding, setNewPriorityBuilding] = useState([]);
   const [id, setId] = useState("");
   const [isUpdate, setIsUpdate] = useState(false);
 
   useEffect(() => {
     request("get", "/classroom/get-all-building", (res) => {
+      console.log(res.data);
       setBuildings(res.data);
     });
-    console.log();
+    console.log(selectedGroup?.priorityBuilding);
     if (selectedGroup) {
       setNewGroup(selectedGroup.groupName);
-      setNewPriorityBuilding(selectedGroup.priorityBuilding);
+      setNewPriorityBuilding(selectedGroup.priorityBuilding?.split(","));
       setId(selectedGroup.id);
       setIsUpdate(true);
     } else {
       setNewGroup("");
-      setNewPriorityBuilding("");
+      setNewPriorityBuilding([]);
       setId("");
       setIsUpdate(false);
     }
@@ -46,7 +47,7 @@ export default function CreateNewSemester({
     const requestData = {
       id: id,
       groupName: newGroup,
-      priorityBuilding: newPriorityBuilding,
+      priorityBuilding: newPriorityBuilding.join(","),
     };
 
     const apiEndpoint = isUpdate ? `/group/update` : "/group/create";
@@ -68,7 +69,7 @@ export default function CreateNewSemester({
   };
 
   const handleBuildingpriorityChange = (event, newValue) => {
-    console.log(newValue)
+    console.log(newValue);
     setNewPriorityBuilding(newValue);
   };
 
@@ -92,6 +93,7 @@ export default function CreateNewSemester({
         />
         <div style={{ margin: "16px" }} />
         <Autocomplete
+          multiple={true}
           options={buildings}
           getOptionLabel={(option) => option}
           style={{ width: 250, marginTop: "8px" }}
@@ -109,7 +111,7 @@ export default function CreateNewSemester({
         <Button
           onClick={handleCreate}
           color="primary"
-          disabled={!newGroup || !newPriorityBuilding}
+          disabled={!newGroup || newPriorityBuilding.length === 0}
         >
           {isUpdate ? "Cập nhật" : "Tạo mới"}
         </Button>
