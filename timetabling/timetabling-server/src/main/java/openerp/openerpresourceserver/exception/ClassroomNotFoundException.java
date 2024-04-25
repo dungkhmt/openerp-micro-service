@@ -10,5 +10,6 @@ public class ClassroomNotFoundException extends RuntimeException {
     public ClassroomNotFoundException(String customMessage) {
         super();
         this.customMessage = customMessage;
-    }}
+    }
+}
 

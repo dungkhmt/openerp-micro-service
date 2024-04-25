@@ -7,6 +7,9 @@ import com.hust.baseweb.applications.education.classmanagement.repo.EduClassSess
 import com.hust.baseweb.applications.education.classmanagement.service.ClassService;
 import com.hust.baseweb.applications.education.classmanagement.service.EduClassSessionService;
 import com.hust.baseweb.applications.education.entity.EduClass;
+import com.hust.baseweb.applications.education.entity.EduCourseSession;
+import com.hust.baseweb.applications.education.entity.EduCourseSessionInteractiveQuiz;
+import com.hust.baseweb.applications.education.entity.EduCourseSessionInteractiveQuizQuestion;
 import com.hust.baseweb.applications.education.entity.QuizQuestion;
 import com.hust.baseweb.applications.education.entity.QuizTag;
 import com.hust.baseweb.applications.education.model.quiz.QuizQuestionDetailModel;
@@ -33,7 +36,12 @@ import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizQues
 import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizRepo;
 import com.hust.baseweb.applications.education.quiztest.repo.QuizGroupQuestionAssignmentRepo;
 import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizRepo.StudentResult;
+import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizRepo.StudentSubmission;
 import com.hust.baseweb.applications.education.quiztest.service.*;
+import com.hust.baseweb.applications.education.repo.EduCourseSessionInteractiveQuizQuestionRepo;
+import com.hust.baseweb.applications.education.repo.EduCourseSessionInteractiveQuizRepo;
+import com.hust.baseweb.applications.education.repo.EduCourseSessionRepo;
+import com.hust.baseweb.applications.education.service.EduCourseSessionInteractiveQuizQuestionService;
 import com.hust.baseweb.applications.education.service.QuizQuestionService;
 import com.hust.baseweb.applications.education.service.QuizTagService;
 import com.hust.baseweb.entity.UserLogin;
@@ -83,6 +91,10 @@ public class QuizTestController {
     private InteractiveQuizRepo interactiveQuizRepo;
     private InteractiveQuizQuestionRepo interactiveQuizQuestionRepo;
     private EduClassSessionRepo eduClassSessionRepo;
+    private EduCourseSessionRepo eduCourseSessionRepo;
+    private EduCourseSessionInteractiveQuizRepo eduCourseSessionInteractiveQuizRepo;
+    private EduCourseSessionInteractiveQuizQuestionRepo eduCourseSessionInteractiveQuizQuestionRepo;
+    private EduCourseSessionInteractiveQuizQuestionService eduCourseSessionInteractiveQuizQuestionService;
 
     @Secured({"ROLE_TEACHER"})
     @PostMapping("/create-quiz-test")
@@ -120,11 +132,31 @@ public class QuizTestController {
         interactiveQuizQuestion.setLastUpdated(new Date());
         return ResponseEntity.ok().body(interactiveQuizQuestionRepo.save(interactiveQuizQuestion));
     }
+
+    @Secured({"ROLE_TEACHER"})
+    @PostMapping("/add-question-to-course-interactive-quiz")
+    public ResponseEntity<?> addQuestionToCourseInteractiveQuiz(
+        Principal principal,
+        @RequestBody InteractiveQuizQuestionInputModel input
+    ) {
+        EduCourseSessionInteractiveQuizQuestion eduCourseSessionInteractiveQuizQuestion = new EduCourseSessionInteractiveQuizQuestion();
+        eduCourseSessionInteractiveQuizQuestion.setInteractiveQuizId(input.getInteractiveQuizId());
+        eduCourseSessionInteractiveQuizQuestion.setQuestionId(input.getQuestionId());
+        eduCourseSessionInteractiveQuizQuestion.setCreatedStamp(new Date());
+        eduCourseSessionInteractiveQuizQuestion.setLastUpdated(new Date());
+        return ResponseEntity.ok().body(eduCourseSessionInteractiveQuizQuestionRepo.save(eduCourseSessionInteractiveQuizQuestion));
+    }
     
     @GetMapping("/get-questions-of-interactive-quiz/{interactiveQuizId}")
     public ResponseEntity<?> getQuestionsOfInteractiveQuiz(Principal principal, @PathVariable UUID interactiveQuizId) {
         List<QuizQuestionDetailModel> quizQuestionList =
             interactiveQuizQuestionService.findAllByInteractiveQuizId(interactiveQuizId);
+        return ResponseEntity.ok().body(quizQuestionList);
+    }
+
+    @GetMapping("/get-questions-of-course-interactive-quiz/{interactiveQuizId}")
+    public ResponseEntity<?> getQuestionsOfCourseInteractiveQuiz(Principal principal, @PathVariable UUID interactiveQuizId) {
+        List<QuizQuestionDetailModel> quizQuestionList = eduCourseSessionInteractiveQuizQuestionService.findAllByInteractiveQuizId(interactiveQuizId);
         return ResponseEntity.ok().body(quizQuestionList);
     }
     
@@ -479,6 +511,51 @@ public class QuizTestController {
 
     }
 
+    @GetMapping("/get-list-course-interactive-quiz-by-session/{sessionId}")
+    public ResponseEntity<?> getListCourseInteractiveQuizBySession(Principal principal, @PathVariable UUID sessionId) {
+        List<InteractiveQuiz> interactiveQuizs = interactiveQuizRepo.findAllBySessionId(sessionId);
+        return ResponseEntity.ok().body(interactiveQuizs);
+
+    }
+
+    @Secured({"ROLE_TEACHER"})
+    @GetMapping("/get-list-quiz-questions-of-course-by-testId/{testId}")
+    public ResponseEntity<?> getQuizQuestionsOfCourse(Principal principal, @PathVariable UUID testId) {
+        EduCourseSessionInteractiveQuiz eduCourseSessionInteractiveQuiz = eduCourseSessionInteractiveQuizRepo.findById(testId).orElse(null);
+        if (eduCourseSessionInteractiveQuiz == null) {
+            return ResponseEntity.status(404).build();
+        }
+        EduCourseSession eduCourseSession = eduCourseSessionRepo.findById(eduCourseSessionInteractiveQuiz.getSessionId()).orElse(null);
+        if (eduCourseSession == null) {
+            return ResponseEntity.status(404).build();
+        }
+        List<QuizQuestion> quizQuestions = quizQuestionService.findQuizOfCourse(eduCourseSession.getCourseId());
+        List<QuizQuestionDetailModel> quizQuestionDetailModels = new ArrayList<>();
+        for (QuizQuestion q : quizQuestions) {
+            if (q.getStatusId().equals(QuizQuestion.STATUS_PUBLIC)) {
+                continue;
+            }
+            QuizQuestionDetailModel quizQuestionDetailModel = quizQuestionService.findQuizDetail(q.getQuestionId());
+            quizQuestionDetailModels.add(quizQuestionDetailModel);
+        }
+        Collections.sort(quizQuestionDetailModels, new Comparator<QuizQuestionDetailModel>() {
+            @Override
+            public int compare(QuizQuestionDetailModel o1, QuizQuestionDetailModel o2) {
+                String topic1 = o1.getQuizCourseTopic().getQuizCourseTopicId();
+                String topic2 = o2.getQuizCourseTopic().getQuizCourseTopicId();
+                String level1 = o1.getLevelId();
+                String level2 = o2.getLevelId();
+                int c1 = topic1.compareTo(topic2);
+                if (c1 == 0) {
+                    return level1.compareTo(level2);
+                } else {
+                    return c1;
+                }
+            }
+        });
+
+        return ResponseEntity.ok().body(quizQuestionDetailModels);
+    }
 
     @GetMapping("/get-list-interactive-quiz-questions/{testId}")
     public ResponseEntity<?> getListQuestionsOfInteractiveQuiz(Principal principal, @PathVariable String testId) {
@@ -543,6 +620,13 @@ public class QuizTestController {
         List<StudentResult> results = interactiveQuizRepo.getResultOfInteractiveQuiz(interactiveQuizId);
         return ResponseEntity.ok().body(results);
 
+    }
+
+    @Secured({"ROLE_TEACHER"})
+    @GetMapping("/get-interactive-quiz-submission/{interactiveQuizId}")
+    public ResponseEntity<?> getInteractiveQuizSubmission(Principal principal, @PathVariable UUID interactiveQuizId) {
+        List<StudentSubmission> results = interactiveQuizRepo.getStudentSubmission(interactiveQuizId);
+        return ResponseEntity.ok().body(results);
     }
 
     @Secured({"ROLE_TEACHER"})

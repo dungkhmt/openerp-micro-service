@@ -157,6 +157,12 @@ export default function EduRoute() {
 
         <Route
           component={TeacherViewLearningSessionDetail}
+          path={`${path}/teacher/course/session/detail/:sessionId`}
+          exact
+        />
+
+        <Route
+          component={TeacherViewLearningSessionDetail}
           path={`${path}/teacher/class/session/detail/:sessionId`}
           exact
         />
@@ -308,6 +314,11 @@ export default function EduRoute() {
         <Route
           component={TeacherViewInteractiveQuiz}
           path={`${path}/teacher/class/detail/interactive-quiz/:testId`}
+          exact
+        />
+        <Route
+          component={TeacherViewInteractiveQuiz}
+          path={`${path}/teacher/course/detail/interactive-quiz/:testId`}
           exact
         />
         <Route

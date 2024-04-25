@@ -1,25 +1,27 @@
 package openerp.openerpresourceserver.service.impl;
 
-import openerp.openerpresourceserver.exception.ClassroomNotFoundException;
-import openerp.openerpresourceserver.exception.ClassroomUsedException;
-import openerp.openerpresourceserver.exception.SemesterNotFoundException;
-import openerp.openerpresourceserver.exception.SemesterUsedException;
+import openerp.openerpresourceserver.exception.*;
 import openerp.openerpresourceserver.mapper.ClassroomMapper;
 import openerp.openerpresourceserver.model.dto.request.ClassroomDto;
 import openerp.openerpresourceserver.model.entity.ClassOpened;
 import openerp.openerpresourceserver.model.entity.Classroom;
+import openerp.openerpresourceserver.model.entity.Group;
 import openerp.openerpresourceserver.model.entity.Semester;
 import openerp.openerpresourceserver.repo.ClassOpenedRepo;
 import openerp.openerpresourceserver.repo.ClassroomRepo;
+import openerp.openerpresourceserver.repo.GroupRepo;
 import openerp.openerpresourceserver.service.ClassroomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
+
 
 @Service
 public class ClassroomServiceImpl implements ClassroomService {
-
+    @Autowired
+    private GroupRepo groupRepo;
     @Autowired
     private ClassroomRepo classroomRepo;
 
@@ -119,5 +121,27 @@ public class ClassroomServiceImpl implements ClassroomService {
 
         // Save the modified entities
         classOpenedRepo.saveAll(classOpenedList);
+    }
+
+    @Override
+    public List<Classroom> getMaxQuantityClassRoomByBuildings(String groupName, int maxAmount) {
+        List<Classroom> fetchedClasses = classroomRepo.findAll();
+        if (fetchedClasses.isEmpty()) {
+            throw new NotFoundException("Không tìm thấy lớp học!");
+        } else if (groupName == null) {
+            return fetchedClasses.stream()
+                    .filter(classRoom -> classRoom.getQuantityMax() >= maxAmount)
+                    .toList();
+        } else {
+            Group groupByBuilding =groupRepo.findByGroupName(groupName).orElse(null);
+            if (groupByBuilding == null) throw new NotFoundException("Không tìm thấy nhóm!");
+            String buildingListString = groupByBuilding.getPriorityBuilding();
+            List<String> buildingList = Arrays.stream(buildingListString.split(",")).toList();
+            if (buildingList.isEmpty()) throw new NotFoundException("Không tìm thấy phòng học!");
+            return fetchedClasses.stream()
+                    .filter(classRoom -> classRoom.getQuantityMax() >= maxAmount)
+                    .filter(classroom -> buildingList.contains(classroom.getBuilding()))
+                    .toList();
+        }
     }
 }

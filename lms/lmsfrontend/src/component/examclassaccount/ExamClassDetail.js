@@ -1,5 +1,5 @@
 import {useParams} from "react-router";
-import {useEffect, useState} from "react";
+import {useEffect, useState, useRef} from "react";
 import {useHistory} from "react-router-dom";
 import {request} from "../../api";
 import {errorNoti, successNoti} from "../../utils/notification";
@@ -10,6 +10,8 @@ import SendIcon from '@mui/icons-material/Send';
 import StandardTable from "../table/StandardTable";
 import SelectItem from "../common/form/SelectItem";
 import XLSX from "xlsx";
+import {config} from "../../config/config";
+import {KC_REALM} from "../../config/keycloak";
 function ExamClassDetail(){
     const params = useParams();
     const examClassId = params.id;
@@ -21,6 +23,8 @@ function ExamClassDetail(){
     const [importedExcelFile, setImportedExcelFile] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [mapUserLogins, setMapUserLogins] = useState([]);
+    const intervalIdRef = useRef(null);
+    const [continueOnError, setContinueOnError] = useState(true);
 
     const columns = [
       { title: "UserName", field: "realUserLoginId" },
@@ -57,7 +61,7 @@ function ExamClassDetail(){
       function getExamClassDetail(){
         request("get", "/get-exam-class-detail/" + examClassId, (res) => {
           //setLoading(false);
-          console.log('get-exam-class-detail res = ',res.data);
+          console.log('get-exam-class-detail res = ',res.data,' len = ',res.data.accounts.length);
           setName(res.data.name);
           setDescription(res.data.description);
           setExecuteDate(res.data.executeDate);
@@ -124,6 +128,64 @@ function ExamClassDetail(){
         setStatus(event.target.value);
       };
 
+      function resetPassword(){
+         //for(i = 0; i < mapUserLogins.length; i++){
+         // resetPasswordOfUser(mapUserLogins[i].randomUserLoginId,mapUserLogins[i].password);
+         //} 
+
+         let idx = 0;
+         intervalIdRef.current = setInterval(() => {
+            if (idx < mapUserLogins.length) {
+              resetPasswordOfUser(mapUserLogins[idx].randomUserLoginId,mapUserLogins[idx].password);
+              console.log('reset password ', idx, ' : ', mapUserLogins[idx].randomUserLoginId,':',mapUserLogins[idx].password);
+               idx++;
+            }
+         }, 500);
+
+      }
+      function resetPasswordOfUser(userId, password){
+        let data = {
+          "type": "password", 
+          "temporary": false, 
+          "value": password
+        };
+        const headerConfig = {
+          headers: {
+            "content-Type": "application/json",
+          },
+        };
+        //  API: /auth/admin/realms/{realm}/users/{id}/reset-password
+        request(
+          "post",
+          //`${config.url.KEYCLOAK_BASE_URL}/auth/admin/realms/${KC_REALM}/users/${userId}/reset-password`,
+          `${config.url.KEYCLOAK_BASE_URL}/admin/realms/${KC_REALM}/users/${userId}/reset-password`,
+          (res) => {
+            //data.status = "SUCCESS";
+            //data.message = "";
+            //data.password = password;
+            //data.doneAt = defaultDatetimeFormat(new Date());
+            //setResult(result => [...result, data]);
+          },
+          {
+            409: (err) => {
+              //data.status = "FAIL";
+              //data.message = err?.response.data.errorMessage || "";
+              //data.password = password;
+              //data.doneAt = defaultDatetimeFormat(new Date());
+              //setResult(result => [...result, data]);
+    
+              if (!continueOnError) {
+                clearInterval(intervalIdRef.current);
+                //setLoading(false);
+              }
+            }
+          },
+          data,
+          headerConfig
+        )
+    
+
+      }
       useEffect(() =>{
         getExamClassDetail();
       },[])
@@ -192,14 +254,26 @@ function ExamClassDetail(){
           </Button> 
           </div>
         <div>
-        <div><Button
+        <div>
+          <Button
             variant="contained"
             color="primary"
             style={{ marginLeft: "45px" }}
             onClick={downloadHandler}
           >
             EXPORT EXCEL 
-          </Button> </div>
+          </Button> 
+          <Button
+            variant="contained"
+            color="primary"
+            style={{ marginLeft: "45px" }}
+            onClick={resetPassword}
+          >
+            RESET PASSWORD KEY CLOAK 
+          </Button> 
+          
+        </div>
+
         <Button color="primary" variant="contained" component="label">
           <PublishIcon/> Select excel file to import
           <input type="file" hidden

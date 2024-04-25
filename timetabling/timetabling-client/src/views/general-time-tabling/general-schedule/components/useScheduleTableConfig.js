@@ -2,14 +2,12 @@ import { Autocomplete, Grid, TextField } from "@mui/material";
 import AutocompleteCell from "./AutoCompleteCell";
 import { request } from "api";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import ClassroomAutoCompleteCell from "./ClassRoomAutoCompleteCell";
 
 export const useGeneralTableColumns = (setClasses, setLoading, semester) => {
   const [classRooms, setClassRooms] = useState([]);
-  useEffect(() => {
-    request("get", "/classroom/get-all", (res) => {
-      setClassRooms(res.data);
-    });
-  }, []);
+  
 
   return [
     {
@@ -102,16 +100,18 @@ export const useGeneralTableColumns = (setClasses, setLoading, semester) => {
       width: 80,
       editable: true,
       renderCell: (params) => {
-        return <AutocompleteCell
-          roomReservationId={params.row.roomReservationId}
-          semester={semester}
-          setLoading={setLoading}
-          setClasses={setClasses}
-          options={Array.from({ length: 5 }).map((_, index) => ({
-            label: (index + 1)?.toString(),
-          }))}
-          {...params}
-        />
+        return (
+          <AutocompleteCell
+            roomReservationId={params.row.roomReservationId}
+            semester={semester}
+            setLoading={setLoading}
+            setClasses={setClasses}
+            options={Array.from({ length: 5 }).map((_, index) => ({
+              label: (index + 1)?.toString(),
+            }))}
+            {...params}
+          />
+        );
       },
     },
     {
@@ -153,18 +153,22 @@ export const useGeneralTableColumns = (setClasses, setLoading, semester) => {
       headerName: "Phòng học",
       field: "room",
       width: 120,
-      renderCell: (params) => (
-        <AutocompleteCell
-          roomReservationId={params.row.roomReservationId}
-          semester={semester}
-          setLoading={setLoading}
-          setClasses={setClasses}
-          options={classRooms?.map((classRoom, index) => ({
-            label: classRoom?.classroom,
-          }))}
-          {...params}
-        />
-      ),
+      renderCell: (params) => {
+        return (
+          <ClassroomAutoCompleteCell
+            groupName={params.row?.groupName}
+            maxQuantity={params.row?.quantityMax}
+            roomReservationId={params.row.roomReservationId}
+            semester={semester}
+            setLoading={setLoading}
+            setClasses={setClasses}
+            options={classRooms?.map((classRoom, index) => ({
+              label: classRoom?.classroom,
+            }))}
+            {...params}
+          />
+        );
+      },
     },
   ];
 };

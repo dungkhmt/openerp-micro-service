@@ -10,6 +10,7 @@ import {
   Tooltip,
   TextField,
   Paper,
+  Collapse,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
@@ -382,7 +383,9 @@ const AssigningScreen = () => {
             placeholder="Tìm kiếm"
           />
         </div>
-        {isFilter && <FilterComponent />}
+        <Collapse in={isFilter}>
+          <FilterComponent />
+        </Collapse>
       </div>
 
       <DataGrid

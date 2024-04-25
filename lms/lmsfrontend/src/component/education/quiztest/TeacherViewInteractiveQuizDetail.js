@@ -106,6 +106,7 @@ export default function TeacherViewInteractiveQuizDetail({
   quiz,
   index,
   testId,
+  isCourse,
   // quizGroups,
 }) {
   const classes = useStyles();
@@ -147,7 +148,9 @@ export default function TeacherViewInteractiveQuizDetail({
       // token,
       // history,
       "post",
-      "/add-question-to-interactive-quiz",
+      isCourse
+        ? "/add-question-to-course-interactive-quiz"
+        : "/add-question-to-interactive-quiz",
       (res) => {},
       { rest: () => setError(true) },
       { interactiveQuizId: testId, questionId: quiz.questionId }

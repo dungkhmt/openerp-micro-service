@@ -1,18 +1,33 @@
-import React, {useState} from "react";
-import {Button, Dialog, DialogContent, DialogTitle, TextField} from "@material-ui/core";
-import {request} from "../../../../api";
+import React, { useState } from "react";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  TextField,
+} from "@mui/material";
+import { makeStyles } from "@material-ui/core/styles";
+import { request } from "../../../../api";
+
+const useStyles = makeStyles((theme) => ({
+  formInput: {
+    width: "100%",
+    marginTop: "10px !important",
+  },
+}));
 
 export default function LearningSessionFormAddQuizInClassTests(props) {
-  const { open, setOpen, sessionId } = props;
+  const classes = useStyles();
+  const { open, setOpen, sessionId, isCourse } = props;
   const [testId, setTestId] = useState(null);
   const [testName, setTestName] = useState(null);
-  const [duration, setDuration] = useState(60);
+  const [description, setDescription] = useState("");
   const [numberOfQuizTests, setNumberOfQuizTests] = useState(1);
 
   function handleChangeTestId(e) {
     //setTestId(e.target.value);
     setNumberOfQuizTests(e.target.value);
-}
+  }
   function handleChangeTestName(e) {
     setTestName(e.target.value);
   }
@@ -22,13 +37,16 @@ export default function LearningSessionFormAddQuizInClassTests(props) {
       sessionId: sessionId,
       //testId: testId,
       //testName: testName,
-      numberTests: numberOfQuizTests,
-      duration: 60,
+      interactiveQuizName: testName,
+      status: "OPENED",
+      description,
     };
     request(
       "POST",
       //"edu/class/add-a-quiz-test-of-class-session",
-      "edu/class/add-some-quiz-tests-of-class-session",
+      isCourse
+        ? "edu/course/create-course-session-interactive-quiz"
+        : "edu/class/create-interactive-quiz",
       (res) => {
         //alert("assign teacher to class " + res.data);
         //setIsProcessing(false);
@@ -42,22 +60,33 @@ export default function LearningSessionFormAddQuizInClassTests(props) {
     <Dialog open={open}>
       <DialogTitle>Thêm quiz test</DialogTitle>
       <DialogContent>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-around",
-            minWidth: "500px",
-            border: "1px solid black",
-          }}
-        >
-          <TextField label="Number of Tests" onChange={handleChangeTestId}></TextField>
+        <div>
           <TextField
             label="TestName"
             onChange={handleChangeTestName}
           ></TextField>
+          <TextField
+            label="Mô tả"
+            multiline
+            rows={4}
+            maxRows={8}
+            className={classes.formInput}
+            onChange={(e) => setDescription(e.target.value)}
+          />
         </div>
-        <div>
-          <Button onClick={perfromAddNewQuizTest}>Lưu</Button>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: "20px",
+          }}
+        >
+          <Button variant="outlined" onClick={perfromAddNewQuizTest}>
+            Lưu
+          </Button>
+          <Button variant="outlined" onClick={() => setOpen(false)}>
+            Đóng
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

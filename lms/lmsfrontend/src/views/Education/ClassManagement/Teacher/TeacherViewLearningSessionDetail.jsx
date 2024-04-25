@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useHistory } from "react-router";
 import {
   a11yProps,
   StyledTab,
@@ -32,6 +32,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function TeacherViewLearningSessionDetail() {
+  const history = useHistory();
+  const isCourse = history.location.pathname.includes("course");
   const params = useParams();
   const classes = useStyles();
   const sessionId = params.sessionId;
@@ -58,7 +60,10 @@ export default function TeacherViewLearningSessionDetail() {
         <Typography className={classes.padding} />
       </div>
       <TabPanel value={activeTab} index={0}>
-        <LearningSessionTeacherViewQuizTestList sessionId={sessionId} />
+        <LearningSessionTeacherViewQuizTestList
+          isCourse={isCourse}
+          sessionId={sessionId}
+        />
       </TabPanel>
       <TabPanel value={activeTab} index={1}>
         <ListWhiteBoard />

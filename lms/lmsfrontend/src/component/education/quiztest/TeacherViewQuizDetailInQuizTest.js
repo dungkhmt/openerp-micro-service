@@ -1,11 +1,19 @@
-import {Box, Button, List, ListItem, ListItemIcon, ListItemText, Typography,} from "@material-ui/core";
-import {blue, grey} from "@material-ui/core/colors";
-import {makeStyles} from "@material-ui/core/styles";
+import {
+  Box,
+  Button,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from "@material-ui/core";
+import { blue, grey } from "@material-ui/core/colors";
+import { makeStyles } from "@material-ui/core/styles";
 import parse from "html-react-parser";
-import React, {useState} from "react";
-import {FcDocument} from "react-icons/fc";
+import React, { useState } from "react";
+import { FcDocument } from "react-icons/fc";
 import SimpleBar from "simplebar-react";
-import {request} from "../../../api";
+import { request } from "../../../api";
 import PrimaryButton from "../../button/PrimaryButton";
 import TertiaryButton from "../../button/TertiaryButton";
 import CustomizedDialogs from "../../dialog/CustomizedDialogs";
@@ -70,6 +78,7 @@ export default function TeacherViewQuizDetailInQuizTest({
   index,
   testId,
   quizGroups,
+  isCourse,
 }) {
   const classes = useStyles();
 
@@ -145,14 +154,16 @@ export default function TeacherViewQuizDetailInQuizTest({
         {quiz.statusId})&nbsp;&nbsp;
         {parse(quiz.statement)}
       </Box>
-      <Button
-        color="primary"
-        variant="contained"
-        onClick={onOpenDialog}
-        className={classes.btn}
-      >
-        Thêm vào đề
-      </Button>
+      {!isCourse && (
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={onOpenDialog}
+          className={classes.btn}
+        >
+          Thêm vào đề
+        </Button>
+      )}
 
       <Button
         color="primary"
