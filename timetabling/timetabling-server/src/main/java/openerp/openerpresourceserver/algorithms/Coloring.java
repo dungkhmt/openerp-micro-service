@@ -2,10 +2,7 @@ package openerp.openerpresourceserver.algorithms;
 
 
 import com.google.ortools.Loader;
-import com.google.ortools.sat.CpModel;
-import com.google.ortools.sat.CpSolver;
-import com.google.ortools.sat.CpSolverSolutionCallback;
-import com.google.ortools.sat.IntVar;
+import com.google.ortools.sat.*;
 
 public class Coloring {
     static class VarArraySolutionPrinter extends CpSolverSolutionCallback {
@@ -42,9 +39,10 @@ public class Coloring {
                 {0,1,1,0,1},
                 {1,0,0,1,0}
         };
+        int[] sotiet = {2,3,2,4,2};
         int n = 5;
         // Create the variables.
-        long numVals = 3;
+        long numVals = 6;
         IntVar[] xc = new IntVar[n];
         for(int i = 0; i < n; i++)
             xc[i] = model.newIntVar(0,numVals-1,"c[" + i + "]");
@@ -57,7 +55,13 @@ public class Coloring {
         for(int i = 0; i < n; i++){
             for(int j = i+1; j < n; j++){
                 if(conflict[i][j] == 1){
-                    model.addDifferent(xc[i],xc[j]);
+                    //model.addDifferent(xc[i],xc[j]);
+                    BoolVar b = model.newBoolVar("b");
+                    LinearExpr ei = LinearExpr.newBuilder().add(xc[i]).add(sotiet[i]).build();
+                    LinearExpr ej = LinearExpr.newBuilder().add(xc[j]).add(sotiet[j]).build();
+                    model.addLessOrEqual(ei,xc[j]).onlyEnforceIf(b);
+                    model.addGreaterThan(ei,xc[i]).onlyEnforceIf(b.not());
+                    model.addLessOrEqual(ej,xc[i]).onlyEnforceIf(b.not());
                 }
             }
         }
@@ -71,7 +75,7 @@ public class Coloring {
         VarArraySolutionPrinter cb = new VarArraySolutionPrinter(xc);
 
         // Tell the solver to enumerate all solutions.
-        solver.getParameters().setEnumerateAllSolutions(true);
+        //solver.getParameters().setEnumerateAllSolutions(true);
         //solver.getParameters().setEnumerateAllSolutions(false);
 
 
