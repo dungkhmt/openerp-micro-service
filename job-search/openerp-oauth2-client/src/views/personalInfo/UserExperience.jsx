@@ -13,7 +13,7 @@ import {
 import { Card, CardContent, CardActions } from '@mui/material';
 import ExperienceCard from "components/ExperienceCard";
 
-const ViewAllEperience = () => {
+const UserExperience = () => {
 
     const [allExperience, setAllExperience] = useState([])
     const [user, setUser] = useState({})
@@ -23,8 +23,8 @@ const ViewAllEperience = () => {
         }).then();
     }, [])
     useEffect(() => {
-        request("get", "/employee-cv/user/dungpq", (res) => {
-            setAllCV(res.data)
+        request("get", "/experience/user/dungpq", (res) => {
+            setAllExperience(res.data)
         }).then();
     }, [])
 
@@ -50,4 +50,4 @@ const ViewAllEperience = () => {
     )
 }
 
-export default ViewAllEperience;
+export default UserExperience;

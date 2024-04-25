@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
 import SkillCard from "components/SkillCard";
-const ViewAllEperience = () => {
+const UserSkills = () => {
 
     const [allSkill, setAllSkill] = useState([])
     const [user, setUser] = useState({})
@@ -21,9 +21,10 @@ const ViewAllEperience = () => {
             setUser(res.data)
         }).then();
     }, [])
+
     useEffect(() => {
-        request("get", "/employee-cv/user/dungpq", (res) => {
-            setAllCV(res.data)
+        request("get", "/skill/user/dungpq", (res) => {
+            setAllSkill(res.data)
         }).then();
     }, [])
 
@@ -49,4 +50,4 @@ const ViewAllEperience = () => {
     )
 }
 
-export default ViewAllEperience;
+export default UserSkills;

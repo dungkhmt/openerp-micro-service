@@ -13,7 +13,7 @@ import {
 import { Card, CardContent, CardActions } from '@mui/material';
 import EducationCard from "components/EducationCard";
 
-const ViewAllEducation = () => {
+const UserEducation = () => {
 
     const [allEducation, setAllEducation] = useState([])
     const [user, setUser] = useState({})
@@ -23,8 +23,8 @@ const ViewAllEducation = () => {
         }).then();
     }, [])
     useEffect(() => {
-        request("get", "/employee-cv/user/dungpq", (res) => {
-            setAllCV(res.data)
+        request("get", "/education/user/dungpq", (res) => {
+            setAllEducation(res.data)
         }).then();
     }, [])
 
@@ -50,4 +50,4 @@ const ViewAllEducation = () => {
     )
 }
 
-export default ViewAllEducation;
+export default UserEducation;

@@ -42,10 +42,10 @@ function EducationCard({education}) {
         Grade: {education.grade}
         </Typography>        
         <Typography variant="body2" className={classes.subTitle}>
-        From: {experience.startingTime}
+        From: {education.startingTime}
         </Typography>
         <Typography variant="body2" className={classes.subTitle}>
-        To: {experience.endingTime}
+        To: {education.endingTime}
         </Typography>
         <Button>
             <Typography>more details</Typography>

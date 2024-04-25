@@ -39,10 +39,10 @@ function SkillCard({skill}) {
         Score: {skill.score}
         </Typography>
         <Typography>
-        Grade: {education.grade}
+        Grade: {skill.grade}
         </Typography>        
         <Typography variant="body2" className={classes.subTitle}>
-        Created At: {experience.createdTime}
+        Created At: {skill.createdTime}
         </Typography>
         <Button>
             <Typography>more details</Typography>
