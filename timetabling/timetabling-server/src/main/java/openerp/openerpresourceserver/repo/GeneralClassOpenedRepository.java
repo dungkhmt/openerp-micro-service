@@ -27,4 +27,6 @@ public interface GeneralClassOpenedRepository extends JpaRepository<GeneralClass
     void deleteBySemester(String semester);
 
     List<GeneralClassOpened> findAllBySemester(String semester);
+
+    List<GeneralClassOpened> findAllBySemesterAndGroupName(String semester, String groupName);
 }

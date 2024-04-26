@@ -1,31 +1,25 @@
-package openerp.openerpresourceserver;
+package openerp.openerpresourceserver.algorithms;
 
 import com.google.ortools.Loader;
 import com.google.ortools.sat.*;
 import com.google.ortools.util.Domain;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import openerp.openerpresourceserver.helper.MassExtractor;
 import openerp.openerpresourceserver.model.entity.general.GeneralClassOpened;
-import openerp.openerpresourceserver.repo.GeneralClassOpenedRepository;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import openerp.openerpresourceserver.model.entity.general.RoomReservation;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@SpringBootTest
-class OpenerpResourceServerApplicationTests {
+@AllArgsConstructor
+@Getter
+@Setter
+public class ClassTimeScheduleSolver {
 
-    private final GeneralClassOpenedRepository gcoRepo;
-    private final int minPeriod = 2;
-    private final int maxPeriod = 4;
-
-    @Autowired
-    OpenerpResourceServerApplicationTests(GeneralClassOpenedRepository gcoRepo) {
-        this.gcoRepo = gcoRepo;
-    }
-
-    static class VarArraySolutionPrinter extends CpSolverSolutionCallback {
+    private List<GeneralClassOpened> classes;
+    private class VarArraySolutionPrinter extends CpSolverSolutionCallback {
         public VarArraySolutionPrinter(IntVar[] variables) {
             variableArray = variables;
         }
@@ -34,24 +28,23 @@ class OpenerpResourceServerApplicationTests {
         public void onSolutionCallback() {
             System.out.printf("Solution #%d: time = %.02f s%n", solutionCount, wallTime());
             for (IntVar v : variableArray) {
+                GeneralClassOpened gClass = classes.get(v.getIndex());
+                gClass.getTimeSlots().clear();
+                gClass.getTimeSlots().add(new RoomReservation(
+                        (int)value(v)%6,
+                        (int)value(v)%6 + MassExtractor.extract(gClass.getMass())-1,
+                        (int)value(v)/6 +1,
+                        null));
                 System.out.printf("  %s = %d%n", v.getName(), value(v));
             }
             solutionCount++;
         }
 
-        public int getSolutionCount() {
-            return solutionCount;
-        }
-
+        @Getter
         private int solutionCount;
         private final IntVar[] variableArray;
     }
-
-    @Test
-    void initData() {
-        List<GeneralClassOpened> classes = gcoRepo.findAllBySemester("20221")
-                .stream().filter(c -> (c.getGroupName() != null && c.getGroupName()
-                        .startsWith("TAKHMT"))).toList();
+    public List<GeneralClassOpened> solve() {
 
         Loader.loadNativeLibraries();
         CpModel model = new CpModel();
@@ -91,14 +84,11 @@ class OpenerpResourceServerApplicationTests {
             }
             xc[i] = model.newIntVarFromDomain(
                     Domain.fromValues(
-                    allowedValues.stream().mapToLong(z -> z + 1).toArray()
+                            allowedValues.stream().mapToLong(z -> z + 1).toArray()
                     ),
                     "c[" + i + "]");
         }
 
-        for (int i = 0 ; i < n; i++) {
-            System.out.println( classes.get(i) + ", Duration: " + durations[i] + ", Domain: " + xc[i].getDomain());
-        }
 
         // Create the constraints.
         for (int i = 0; i < n; i++) {
@@ -127,5 +117,6 @@ class OpenerpResourceServerApplicationTests {
         solver.solve(model, cb);
         System.out.println(cb.getSolutionCount() + " solutions found.");
 
+        return classes;
     }
 }

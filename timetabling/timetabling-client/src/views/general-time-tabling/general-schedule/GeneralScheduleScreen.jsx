@@ -13,13 +13,12 @@ const GeneralScheduleScreen = () => {
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [isResetLoading, setResetLoading] = useState(false);
+  const [isTimeScheduleLoading, setTimeScheduleLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const { loading, error, classes, setClasses, setLoading } = useClasses(
     selectedGroup,
     selectedSemester
   );
-
-  
 
   const handleResetTimeTabling = () => {
     setResetLoading(true);
@@ -59,6 +58,42 @@ const GeneralScheduleScreen = () => {
     );
   };
 
+  const handleAutoScheduleTimeTabling = () => {
+    request(
+      "post",
+      `/general-classes/auto-schedule-time?semester=${selectedSemester?.semester}&groupName=${selectedGroup?.groupName}`,
+      (res) => {
+        let generalClasses = [];
+        res.data?.forEach((classObj) => {
+          if (classObj?.classCode !== null && classObj?.timeSlots) {
+            classObj.timeSlots.forEach((timeSlot, index) => {
+              const cloneObj = JSON.parse(
+                JSON.stringify({
+                  ...classObj,
+                  ...timeSlot,
+                  classCode: classObj.classCode,
+                  id: classObj.id + `-${index + 1}`,
+                  roomReservationId: timeSlot.id,
+                })
+              );
+              delete cloneObj.timeSlots;
+              generalClasses.push(cloneObj);
+            });
+          }
+        });
+        setClasses(generalClasses);
+        setSelectedRows([]);
+        setResetLoading(false);
+        toast.success("Tự động thời khóa biểu thành công!");
+      },
+      (error) => {
+        console.log(error);
+        toast.error("Có lỗi khi tự động thời khóa biểu!");
+        setResetLoading(false);
+      }
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4 w-full h-[700px]">
       <div className="flex flex-row justify-between">
@@ -72,15 +107,26 @@ const GeneralScheduleScreen = () => {
             setSelectedGroup={setSelectedGroup}
           />
         </div>
-        <Button
-          disabled={selectedRows.length === 0}
-          startIcon={FacebookCircularProgress}
-          variant="contained"
-          color="error"
-          onClick={handleResetTimeTabling}
-        >
-          Xóa lịch học TKB
-        </Button>
+        <div className="flex flex-row gap-4">
+          <Button
+            disabled={selectedRows.length === 0}
+            startIcon={FacebookCircularProgress}
+            variant="contained"
+            color="error"
+            onClick={handleResetTimeTabling}
+          >
+            Xóa lịch học TKB
+          </Button>
+          <Button
+            disabled={!(selectedSemester !== null && selectedGroup !== null)}
+            startIcon={isTimeScheduleLoading ? FacebookCircularProgress : null}
+            variant="contained"
+            color="primary"
+            onClick={handleAutoScheduleTimeTabling}
+          >
+            Tự động xếp TKB
+          </Button>
+        </div>
       </div>
       <GeneralScheduleTable
         isLoading={isResetLoading}

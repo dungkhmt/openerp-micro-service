@@ -23,4 +23,6 @@ public interface GeneralClassOpenedService {
     public void deleteClassesBySemester(String semester);
 
     List<GeneralClassOpened> resetSchedule(List<String> ids, String semester);
+
+    List<GeneralClassOpened> autoSchedule(String semester, String groupName);
 }

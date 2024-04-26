@@ -42,7 +42,7 @@ public class GeneralClassOpened {
     private String openBatch;
     private String course;
     private String groupName;
-    @OneToMany(mappedBy = "generalClassOpened", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "generalClassOpened", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<RoomReservation> timeSlots = new ArrayList<RoomReservation>();
     @Column(name = "is_seperate_class")
     private Boolean isSeparateClass = false;
