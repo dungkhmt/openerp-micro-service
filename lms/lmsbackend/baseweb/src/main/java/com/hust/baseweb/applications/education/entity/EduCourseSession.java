@@ -28,6 +28,9 @@ public class EduCourseSession {
     @Column(name = "created_by_user_login_id")
     private String createdByUserLoginId;
 
+    @Column(name = "status_id")
+    private String statusId;
+
     @Column(name = "description")
     private String description;
 

@@ -8,6 +8,7 @@ import com.hust.baseweb.applications.education.classmanagement.model.ModelAddUse
 import com.hust.baseweb.applications.education.classmanagement.model.ModelInputAddStudentToClassViaExcelUpload;
 import com.hust.baseweb.applications.education.classmanagement.model.ModelResponseEduClassDetail;
 import com.hust.baseweb.applications.education.classmanagement.service.ClassServiceImpl;
+import com.hust.baseweb.applications.education.classmanagement.service.EduClassSessionService;
 import com.hust.baseweb.applications.education.content.Video;
 import com.hust.baseweb.applications.education.content.VideoService;
 import com.hust.baseweb.applications.education.entity.*;
@@ -75,6 +76,7 @@ public class ClassController {
     private ClassRepo classRepo;
     private FileSystemStorageProperties properties;
     private ClassRegistrationRepo classRegistrationRepo;
+    private EduClassSessionService eduClassSessionService;
 
     @Autowired
     private MongoContentService mongoContentService;
@@ -272,6 +274,7 @@ public class ClassController {
         log.info("addEduClass, start....");
         UserLogin userLogin = userService.findById(principal.getName());
         EduClass aClass = classService.save(userLogin, addClassModel);
+        eduClassSessionService.addCourseSessionToClass(aClass);
         return ResponseEntity.ok().body(aClass);
     }
 
