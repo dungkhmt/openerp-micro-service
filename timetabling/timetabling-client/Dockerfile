@@ -3,7 +3,7 @@ FROM node:18 as react-build
 WORKDIR /app
 
 COPY package.json .
-RUN npm i
+RUN npm i -f
 COPY . ./
 RUN npm run build
 
