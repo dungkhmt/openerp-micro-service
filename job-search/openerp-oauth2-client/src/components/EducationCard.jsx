@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { makeStyles } from '@mui/styles';
-import { Card, CardContent, Typography, Button } from '@mui/material';
+import { Card, CardContent, Typography, Button, CardActions, Grid } from '@mui/material';
+import { EducatonDetail } from './userinfoDetails/EducationDetails';
+import { useState, useEffect } from "react"
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -25,7 +27,15 @@ const useStyles = makeStyles((theme) => ({
 
 function EducationCard({education}) {
   const classes = useStyles();
+  const [open, setOpen] = useState(false);
 
+  const handleClickOpen = () => {
+      setOpen(true);
+  };
+
+  const handleClose = () => {
+      setOpen(false);
+  };
   return (
     <Card className={classes.card} style={{ width: "100%" }}>
       <CardContent className={classes.cardContent}>
@@ -47,9 +57,14 @@ function EducationCard({education}) {
         <Typography variant="body2" className={classes.subTitle}>
         To: {education.endingTime}
         </Typography>
-        <Button>
-            <Typography>more details</Typography>
-        </Button>
+        <CardActions>
+        <Grid display='flex' justifyContent={'center'} item xs={12}>
+          <Button variant="contained" color="secondary"  onClick={handleClickOpen}>
+            More details
+          </Button>
+        <EducatonDetail open={open} onClose={handleClose} Education={education} />
+        </Grid>
+        </CardActions>
       </CardContent>
     </Card>
   );
