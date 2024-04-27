@@ -33,6 +33,7 @@ import {scheduleInformation} from "./menuconfig/scheduleInformation"
 // import {schedulePerformance} from "./menuconfig/schedulePerformance"
 import {courseTimeTabling} from "./menuconfig/courseTimeTabling"
 import { generalTimeTabling } from "./menuconfig/generalTimeTabling";
+import { computerLabTimeTabling } from "./menuconfig/computerLabTimeTabling";
 
 export const MENUS = [];
 
@@ -44,6 +45,7 @@ MENUS.push(scheduleInformation);
 // MENUS.push(schedulePerformance);
 MENUS.push(courseTimeTabling);
 MENUS.push(generalTimeTabling);
+MENUS.push(computerLabTimeTabling)
 
 export const menuIconMap = new Map();
 
