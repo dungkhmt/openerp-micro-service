@@ -8,4 +8,8 @@ public interface RequestService {
     List<Request> getAllRequests();
 
     Request createNewRequest(Request request);
+
+    Request editRequest(Integer Id, Request request);
+
+    void deleteRequest(Integer id);
 }

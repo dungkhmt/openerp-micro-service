@@ -28,16 +28,29 @@ public class RequestController {
 
     @PostMapping("/add-new")
     public ResponseEntity<?> createNewRequest(@RequestBody Request request, Principal principal){
-
-        System.out.println("request: " + request.toString());
-        System.out.println("principal " + principal.getName());
-//        Request savedRequest = requestService.createNewRequest(request);
+        request.setUser_id(principal.getName());
+        Request savedRequest = requestService.createNewRequest(request);
+        System.out.println(savedRequest.toString());
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body("");
     }
 
+    @PutMapping("/edit/{Id}")
+    public ResponseEntity<?> editRequest(@PathVariable Integer Id, @RequestBody Request request){
+        Request savedRequest = requestService.editRequest(Id, request);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(savedRequest);
+    }
+
 //    public ResponseEntity<?> approveRequest(@PathVariable Integer Id){
 //
 //    }
+
+    @DeleteMapping("/delete/{Id}")
+    public ResponseEntity<?> deleteRequest(@PathVariable Integer Id){
+        requestService.deleteRequest(Id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

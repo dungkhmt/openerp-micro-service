@@ -1,19 +1,22 @@
 package openerp.openerpresourceserver.service;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.entity.Asset;
 import openerp.openerpresourceserver.entity.Request;
+import openerp.openerpresourceserver.repo.AssetRepo;
 import openerp.openerpresourceserver.repo.RequestRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class RequestServiceImpl implements RequestService{
     private RequestRepo requestRepo;
+    private AssetRepo assetRepo;
 
     private final Integer PENDING = 0;
     private final Integer APPROVED = 1;
@@ -31,14 +34,36 @@ public class RequestServiceImpl implements RequestService{
         newRequest.setName(request.getName());
         newRequest.setDescription(request.getDescription());
         newRequest.setStatus(PENDING);
-//        String assetId = request.get
-//        newRequest.setApprovers_id(request.getApprovers_id());
+        newRequest.setUser_id(request.getUser_id());
+        newRequest.setAsset_id(request.getAsset_id());
+        Integer asset_id = request.getAsset_id();
+        Asset asset = assetRepo.findById(asset_id).get();
+        newRequest.setAdmin_id(asset.getAdmin_id());
 
         Date currentDate = new Date();
         newRequest.setSince(currentDate);
         newRequest.setLast_updated(currentDate);
-
         return requestRepo.save(newRequest);
+    }
+
+    @Override
+    public Request editRequest(Integer Id, Request request) {
+        Request foundRequest = requestRepo.findById(Id).get();
+        foundRequest.setName(request.getName());
+        foundRequest.setDescription(request.getDescription());
+        foundRequest.setStart_date(request.getStart_date());
+        foundRequest.setEnd_date(request.getEnd_date());
+        Date currentDate = new Date();
+        foundRequest.setLast_updated(currentDate);
+        return requestRepo.save(foundRequest);
+    }
+
+    @Override
+    public void deleteRequest(Integer Id) {
+        Optional<Request> request = requestRepo.findById(Id);
+        if(request.isPresent()) {
+            requestRepo.deleteById(Id);
+        }
     }
 
     public boolean approveRequest(Integer requestId, String userId){
@@ -63,4 +88,6 @@ public class RequestServiceImpl implements RequestService{
 //        }
         return true;
     }
+
+
 }
