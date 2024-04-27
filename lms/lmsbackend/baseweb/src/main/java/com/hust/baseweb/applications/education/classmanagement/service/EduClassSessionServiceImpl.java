@@ -6,16 +6,27 @@ import com.hust.baseweb.applications.education.classmanagement.model.EduClassSes
 import com.hust.baseweb.applications.education.classmanagement.repo.EduClassSessionRepo;
 import com.hust.baseweb.applications.education.entity.EduClass;
 import com.hust.baseweb.applications.education.entity.EduCourse;
+import com.hust.baseweb.applications.education.entity.EduCourseSession;
+import com.hust.baseweb.applications.education.entity.EduCourseSessionInteractiveQuiz;
+import com.hust.baseweb.applications.education.entity.EduCourseSessionInteractiveQuizQuestion;
 import com.hust.baseweb.applications.education.model.GetStudentsOfClassOM;
 import com.hust.baseweb.applications.education.quiztest.entity.EduQuizTest;
 import com.hust.baseweb.applications.education.quiztest.entity.EduTestQuizGroup;
 import com.hust.baseweb.applications.education.quiztest.entity.EduTestQuizParticipant;
+import com.hust.baseweb.applications.education.quiztest.entity.InteractiveQuiz;
+import com.hust.baseweb.applications.education.quiztest.entity.InteractiveQuizQuestion;
 import com.hust.baseweb.applications.education.quiztest.model.quiztestgroup.GenerateQuizTestGroupInputModel;
 import com.hust.baseweb.applications.education.quiztest.repo.EduQuizTestRepo;
 import com.hust.baseweb.applications.education.quiztest.repo.EduTestQuizParticipantRepo;
+import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizQuestionRepo;
+import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizRepo;
 import com.hust.baseweb.applications.education.quiztest.service.EduQuizTestGroupService;
 import com.hust.baseweb.applications.education.quiztest.utils.Utils;
 import com.hust.baseweb.applications.education.repo.ClassRepo;
+import com.hust.baseweb.applications.education.repo.EduCourseSessionInteractiveQuizQuestionRepo;
+import com.hust.baseweb.applications.education.repo.EduCourseSessionInteractiveQuizRepo;
+import com.hust.baseweb.applications.education.repo.EduCourseSessionRepo;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +46,11 @@ public class EduClassSessionServiceImpl implements EduClassSessionService {
     private ClassRepo classRepo;
     private EduTestQuizParticipantRepo eduTestQuizParticipationRepo;
     private EduQuizTestGroupService eduQuizTestGroupService;
+    private EduCourseSessionRepo eduCourseSessionRepo;
+    private EduCourseSessionInteractiveQuizRepo eduCourseSessionInteractiveQuizRepo;
+    private EduCourseSessionInteractiveQuizQuestionRepo eduCourseSessionInteractiveQuizQuestionRepo;
+    private InteractiveQuizRepo interactiveQuizRepo;
+    private InteractiveQuizQuestionRepo interactiveQuizQuestionRepo;
 
     @Override
     public EduClassSession save(UUID classId, String sessionName, String description, String userLoginId) {
@@ -200,5 +216,53 @@ public class EduClassSessionServiceImpl implements EduClassSessionService {
         return m;
 
 
+    }
+
+    @Override
+    public List<EduClassSession> addCourseSessionToClass(EduClass eduClass){
+        List<EduCourseSession> eduCourseSessions = eduCourseSessionRepo.findByCourseId(eduClass.getEduCourse().getId());
+        List<EduCourseSessionInteractiveQuiz> eduCourseSessionInteractiveQuizs = new ArrayList<>();
+        List<EduClassSession> eduClassSessions = new ArrayList<>();
+        List<InteractiveQuiz> interactiveQuizList = new ArrayList<>();
+
+        for (EduCourseSession eduCourseSession : eduCourseSessions) {
+
+            EduClassSession eduClassSession = new EduClassSession();
+            eduClassSession.setClassId(eduClass.getId());
+            eduClassSession.setSessionName(eduCourseSession.getSessionName());
+            eduClassSession.setCreatedByUserLoginId(eduCourseSession.getCreatedByUserLoginId());
+            eduClassSession.setStatusId(eduCourseSession.getStatusId());
+            eduClassSession.setDescription(eduCourseSession.getDescription());
+            eduClassSession.setCreatedStamp(eduCourseSession.getCreatedStamp());
+            EduClassSession addedEduClassSession = eduClassSessionRepo.save(eduClassSession);
+            eduClassSessions.add(addedEduClassSession); 
+
+            List<EduCourseSessionInteractiveQuiz> courseInteractiveQuizs = eduCourseSessionInteractiveQuizRepo.findBySessionId(eduCourseSession.getId());
+            for (EduCourseSessionInteractiveQuiz eduCourseSessionInteractiveQuiz : courseInteractiveQuizs) {
+                eduCourseSessionInteractiveQuizs.add(eduCourseSessionInteractiveQuiz);
+
+                InteractiveQuiz interactiveQuiz = new InteractiveQuiz();
+                interactiveQuiz.setInteractive_quiz_name(eduCourseSessionInteractiveQuiz.getInteractiveQuizName());
+                interactiveQuiz.setCreatedStamp(new Date());
+                interactiveQuiz.setSessionId(addedEduClassSession.getSessionId());
+                interactiveQuiz.setStatusId(InteractiveQuiz.STATUS_CREATED);
+                InteractiveQuiz addedInteractiveQuiz = interactiveQuizRepo.save(interactiveQuiz);
+                interactiveQuizList.add(addedInteractiveQuiz);
+
+                List<EduCourseSessionInteractiveQuizQuestion> courseSessionInteractiveQuizQuestions = eduCourseSessionInteractiveQuizQuestionRepo.findByInteractiveQuizId(eduCourseSessionInteractiveQuiz.getId());
+
+                for (EduCourseSessionInteractiveQuizQuestion courseSessionInteractiveQuizQuestion : courseSessionInteractiveQuizQuestions) {
+                    InteractiveQuizQuestion interactiveQuizQuestion = new InteractiveQuizQuestion();
+                    interactiveQuizQuestion.setInteractiveQuizId(addedInteractiveQuiz.getInteractive_quiz_id());
+                    interactiveQuizQuestion.setQuestionId(courseSessionInteractiveQuizQuestion.getQuestionId());
+                    interactiveQuizQuestion.setCreatedStamp(new Date());
+                    interactiveQuizQuestion.setLastUpdated(new Date());
+                    interactiveQuizQuestionRepo.save(interactiveQuizQuestion);
+                }
+            //eduCourseSessionInteractiveQuizs.add();
+            }
+
+        }
+        return eduClassSessions;
     }
 }

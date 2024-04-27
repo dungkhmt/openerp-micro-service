@@ -2,6 +2,8 @@ package com.hust.baseweb.applications.education.classmanagement.service;
 
 import com.hust.baseweb.applications.education.classmanagement.entity.EduClassSession;
 import com.hust.baseweb.applications.education.classmanagement.model.EduClassSessionDetailOM;
+import com.hust.baseweb.applications.education.entity.EduClass;
+import com.hust.baseweb.applications.education.entity.EduCourseSession;
 import com.hust.baseweb.applications.education.quiztest.entity.EduQuizTest;
 
 import java.util.List;
@@ -20,4 +22,6 @@ public interface EduClassSessionService {
     List<EduQuizTest> findAllBySession(UUID sessionId);
 
     EduClassSessionDetailOM getSessionDetail(UUID sessionId);
+
+    public List<EduClassSession> addCourseSessionToClass(EduClass eduClass);
 }

@@ -75,7 +75,12 @@ public class GeneralClassOpenedController {
 
     @PostMapping("/reset-schedule")
     public ResponseEntity<List<GeneralClassOpened>> requestResetSchedule(@RequestParam("semester") String semester, @RequestBody ResetScheduleRequest request) {
-        System.out.println(123);
         return ResponseEntity.ok(gService.resetSchedule(request.getIds(), semester));
     }
+
+    @PostMapping("/auto-schedule-time")
+    public ResponseEntity<List<GeneralClassOpened>> requestAutoScheduleTime(@RequestParam("semester") String semester, @RequestParam("groupName") String groupName) {
+        return ResponseEntity.ok(gService.autoSchedule(semester, groupName));
+    }
+
 }

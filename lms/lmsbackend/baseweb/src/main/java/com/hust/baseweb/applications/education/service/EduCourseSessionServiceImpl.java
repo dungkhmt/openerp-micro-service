@@ -7,6 +7,9 @@ import lombok.extern.log4j.Log4j2;
 
 import org.springframework.stereotype.Service;
 
+import com.hust.baseweb.applications.education.classmanagement.entity.EduClassSession;
+import com.hust.baseweb.applications.education.classmanagement.repo.EduClassSessionRepo;
+import com.hust.baseweb.applications.education.entity.EduClass;
 import com.hust.baseweb.applications.education.entity.EduCourseSession;
 import com.hust.baseweb.applications.education.repo.EduCourseSessionRepo;
 
@@ -20,6 +23,7 @@ import java.util.UUID;
 @Service
 public class EduCourseSessionServiceImpl implements EduCourseSessionService{
     private EduCourseSessionRepo eduCourseSessionRepo;
+    private EduClassSessionRepo eduClassSessionRepo;
     @Override
     public EduCourseSession createCourseSession(String courseId, String sessionName, String createdByUserLoginId, String description){
         EduCourseSession eduCourseSession = new EduCourseSession();
@@ -31,4 +35,5 @@ public class EduCourseSessionServiceImpl implements EduCourseSessionService{
         eduCourseSession.setLastUpdated(new Date());
         return eduCourseSessionRepo.save(eduCourseSession);
     }
+
 }

@@ -71,6 +71,7 @@ public class ExamClassAccountController {
         @RequestParam("inputJson") String inputJson,
         @RequestParam("file") MultipartFile file
     ) {
+        log.info("createExamAccountsMap, start...");
         Gson gson = new Gson();
         ModelCreateExamAccountMap modelUpload = gson.fromJson(
             inputJson,
@@ -81,19 +82,33 @@ public class ExamClassAccountController {
             XSSFWorkbook wb = new XSSFWorkbook(is);
             XSSFSheet sheet = wb.getSheetAt(0);
             int lastRowNum = sheet.getLastRowNum();
-            System.out.println("createExamAccountsMap, lastRowNum = " + lastRowNum);
+            log.info("createExamAccountsMap, lastRowNum = " + lastRowNum);
             List<UserLoginModel> users = new ArrayList<UserLoginModel>();
             for (int i = 1; i <= lastRowNum; i++) {
                 Row row = sheet.getRow(i);
-                Cell c = row.getCell(0);
-                String userLoginId = c.getStringCellValue();
-                c = row.getCell(1);
-                String studentCode =  c.getStringCellValue();
-                c = row.getCell(2);
-                String fullName =  c.getStringCellValue();
+                int columns = row.getLastCellNum();
+                log.info("row " + i + " has columns = " + columns);
+                String userLoginId = "";
+                String studentCode = "";
+                if(columns > 0) {
+                    Cell c = row.getCell(0);
+                    userLoginId = c.getStringCellValue();
+                    log.info("userId = " + c.getStringCellValue());
+                }
+                if(columns > 1) {
+                    Cell c = row.getCell(1);
+                    studentCode = c.getStringCellValue();
+                    log.info("Student Code = " + c.getStringCellValue());
+                }
+                String fullName = "";
+                if(columns > 2) {
+                    Cell c = row.getCell(2);
+                    fullName = c.getStringCellValue();
+                    log.info("fullName = " + c.getStringCellValue());
+                }
                 UserLoginModel u = new UserLoginModel(userLoginId,studentCode,fullName);
                 users.add(u);
-                System.out.println("userId = " + c.getStringCellValue());
+
             }
             List<ExamClassUserloginMap> res = examClassUserloginMapService.createExamClassAccount(examClassId,users);
             return ResponseEntity.ok().body(res);

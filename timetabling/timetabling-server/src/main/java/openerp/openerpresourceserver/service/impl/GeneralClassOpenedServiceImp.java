@@ -3,11 +3,16 @@ package openerp.openerpresourceserver.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.ortools.Loader;
+import com.google.ortools.sat.*;
+import com.google.ortools.util.Domain;
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.algorithms.ClassTimeScheduleSolver;
 import openerp.openerpresourceserver.exception.ConflictScheduleException;
 import openerp.openerpresourceserver.exception.NotFoundException;
 import openerp.openerpresourceserver.helper.ClassTimeComparator;
 import openerp.openerpresourceserver.helper.LearningWeekExtractor;
+import openerp.openerpresourceserver.helper.MassExtractor;
 import openerp.openerpresourceserver.model.entity.Group;
 import openerp.openerpresourceserver.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.model.entity.occupation.RoomOccupation;
@@ -210,7 +215,7 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
     @Override
     public List<GeneralClassOpened> resetSchedule(List<String> ids, String semester) {
         List<GeneralClassOpened> generalClassOpenedList = gcoRepo.findAllBySemester(semester);
-        if(generalClassOpenedList.size() == 0) {
+        if(generalClassOpenedList.isEmpty()) {
             throw new NotFoundException("Không tìm thấy lớp, hãy kiểm tra lại danh sách lớp!");
         } else {
             List<GeneralClassOpened>filteredGeneralClassList = new ArrayList<>();
@@ -220,7 +225,7 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
                     int timeSlotIndex = Integer.parseInt(idString.split("-")[1])-1;
                     if(gId == gClass.getId()) {
                         RoomReservation timeSlot = gClass.getTimeSlots().get(timeSlotIndex);
-                        if (timeSlot.getStartTime() != null && timeSlot.getEndTime() != null && timeSlot.getRoom() != null && !timeSlot.getRoom().equals("")) {
+                        if (timeSlot.getStartTime() != null && timeSlot.getEndTime() != null && timeSlot.getRoom() != null && timeSlot.getWeekday() != null && !timeSlot.getRoom().isEmpty()) {
                             roomOccupationRepo.deleteAllByClassCodeAndStartPeriodAndEndPeriodAndDayIndexAndClassRoom(gClass.getClassCode(), timeSlot.getStartTime(), timeSlot.getEndTime(), timeSlot.getWeekday(), timeSlot.getRoom());
                         }
                         timeSlot.setWeekday(null);
@@ -234,5 +239,13 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
             gcoRepo.saveAll(filteredGeneralClassList);
         }
         return generalClassOpenedList;
+    }
+
+    @Override
+    public List<GeneralClassOpened> autoSchedule(String semester, String groupName) {
+        List<GeneralClassOpened> foundClasses = gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
+        List<GeneralClassOpened> autoScheduleClasses = new ClassTimeScheduleSolver(foundClasses).solve();
+        gcoRepo.saveAll(autoScheduleClasses);
+        return autoScheduleClasses;
     }
 }
