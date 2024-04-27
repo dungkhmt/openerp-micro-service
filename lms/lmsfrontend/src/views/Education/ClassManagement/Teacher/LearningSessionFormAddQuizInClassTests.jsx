@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function LearningSessionFormAddQuizInClassTests(props) {
   const classes = useStyles();
-  const { open, setOpen, sessionId, isCourse } = props;
+  const { open, setOpen, sessionId, isCourse, onCreateSuccess } = props;
   const [testId, setTestId] = useState(null);
   const [testName, setTestName] = useState(null);
   const [description, setDescription] = useState("");
@@ -38,7 +38,8 @@ export default function LearningSessionFormAddQuizInClassTests(props) {
       //testId: testId,
       //testName: testName,
       interactiveQuizName: testName,
-      status: "OPENED",
+      status: "CREATED",
+      statusId: "CREATED",
       description,
     };
     request(
@@ -46,10 +47,11 @@ export default function LearningSessionFormAddQuizInClassTests(props) {
       //"edu/class/add-a-quiz-test-of-class-session",
       isCourse
         ? "edu/course/create-course-session-interactive-quiz"
-        : "edu/class/create-interactive-quiz",
+        : "create-interactive-quiz",
       (res) => {
         //alert("assign teacher to class " + res.data);
         //setIsProcessing(false);
+        onCreateSuccess(res);
       },
       { 401: () => {} },
       body

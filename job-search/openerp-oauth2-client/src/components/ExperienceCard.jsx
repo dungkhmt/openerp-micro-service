@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { makeStyles } from '@mui/styles';
-import { Card, CardContent, Typography, Button } from '@mui/material';
+import { Card, CardContent, Typography, Button, CardActions, Grid } from '@mui/material';
+import { ExperienceDetail } from './userinfoDetails/ExperienceDetals';
+import { useState, useEffect } from "react"
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -25,7 +27,15 @@ const useStyles = makeStyles((theme) => ({
 
 function ExperienceCard({experience}) {
   const classes = useStyles();
+  const [open, setOpen] = useState(false);
 
+  const handleClickOpen = () => {
+      setOpen(true);
+  };
+
+  const handleClose = () => {
+      setOpen(false);
+  };
   return (
     <Card className={classes.card} style={{ width: "100%" }}>
       <CardContent className={classes.cardContent}>
@@ -44,9 +54,14 @@ function ExperienceCard({experience}) {
         <Typography variant="body2" className={classes.subTitle}>
         To: {experience.endingTime}
         </Typography>
-        <Button>
-            <Typography>more details</Typography>
-        </Button>
+        <CardActions>
+        <Grid display='flex' justifyContent={'center'} item xs={12}>
+          <Button variant="contained" color="secondary"  onClick={handleClickOpen}>
+            More details
+          </Button>
+        <ExperienceDetail open={open} onClose={handleClose} Experience={experience} />
+        </Grid>
+        </CardActions>
       </CardContent>
     </Card>
   );

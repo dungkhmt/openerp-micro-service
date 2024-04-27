@@ -70,6 +70,10 @@ export default function LearningSessionTeacherViewQuizTestList(props) {
     setOpen(true);
   }
 
+  function updateQuizListWhenCreateSuccess(res) {
+    setQuizTests([...quizTests, res.data]);
+  }
+
   useEffect(() => {
     getQuizTestOfSession();
   }, []);
@@ -130,6 +134,7 @@ export default function LearningSessionTeacherViewQuizTestList(props) {
         open={open}
         setOpen={setOpen}
         sessionId={sessionId}
+        onCreateSuccess={updateQuizListWhenCreateSuccess}
       />
     </div>
   );

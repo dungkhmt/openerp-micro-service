@@ -136,13 +136,53 @@ function ExamClassDetail(){
          let idx = 0;
          intervalIdRef.current = setInterval(() => {
             if (idx < mapUserLogins.length) {
-              resetPasswordOfUser(mapUserLogins[idx].randomUserLoginId,mapUserLogins[idx].password);
-              console.log('reset password ', idx, ' : ', mapUserLogins[idx].randomUserLoginId,':',mapUserLogins[idx].password);
+              //if (idx < 3) {  
+              var userName = mapUserLogins[idx].randomUserLoginId;
+              //let userId = getUserId(userName);
+              //console.log('found id = ',userId,' of username ',userName);
+              //resetPasswordOfUser(mapUserLogins[idx].randomUserLoginId,mapUserLogins[idx].password);
+              resetPasswordOfUserName(mapUserLogins[idx].randomUserLoginId,mapUserLogins[idx].password);
+              //console.log('reset password ', idx, ' : ', mapUserLogins[idx].randomUserLoginId,':',mapUserLogins[idx].password);
                idx++;
+               
             }
          }, 500);
 
       }
+      function resetPasswordOfUserName(userName,password){
+
+        const headerConfig = {
+          headers: {
+            "content-Type": "application/json",
+          },
+        };
+
+        // get user_id (based on userName)
+        let userId = "";
+        request(
+          "GET",
+          //`${config.url.KEYCLOAK_BASE_URL}/auth/admin/realms/${KC_REALM}/users/${userId}/reset-password`,
+          `${config.url.KEYCLOAK_BASE_URL}/admin/realms/${KC_REALM}/ui-ext/brute-force-user?briefRepresentation=true&first=0&max=11&q=&search=${userName}`,
+          (res) => {
+            console.log('res = ',res);
+            console.log('GOT userId = ',res.data[0].id);
+            //return res.data[0].id;
+            resetPasswordOfUser(res.data[0].id,password);
+          },
+          {
+            409: (err) => {
+              //data.status = "FAIL";
+              if (!continueOnError) {
+                clearInterval(intervalIdRef.current);
+                //setLoading(false);
+              }
+            }
+          },          
+          headerConfig
+        )
+        
+      }
+      
       function resetPasswordOfUser(userId, password){
         let data = {
           "type": "password", 
@@ -154,9 +194,11 @@ function ExamClassDetail(){
             "content-Type": "application/json",
           },
         };
+
+        
         //  API: /auth/admin/realms/{realm}/users/{id}/reset-password
         request(
-          "post",
+          "PUT",
           //`${config.url.KEYCLOAK_BASE_URL}/auth/admin/realms/${KC_REALM}/users/${userId}/reset-password`,
           `${config.url.KEYCLOAK_BASE_URL}/admin/realms/${KC_REALM}/users/${userId}/reset-password`,
           (res) => {
