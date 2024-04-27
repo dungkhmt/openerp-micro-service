@@ -24,23 +24,21 @@ public class RoomOccupation {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @NotNull
     private String classRoom;
-    @NotNull
     private String classCode;
 
     private String semester;
 
-    private int startPeriod;
-    private int endPeriod;
+    private Integer startPeriod;
+    private Integer endPeriod;
     private String crew;
-    private int dayIndex;
-    private int weekIndex;
+    private Integer dayIndex;
+    private Integer weekIndex;
 
     private String status;
 
-    public RoomOccupation(@NotNull String classRoom, @NotNull String classCode, int startPeriod, int endPeriod,
-            String crew, int dayIndex, int weekIndex, String status, String semester) {
+    public RoomOccupation( String classRoom,  String classCode, Integer startPeriod, Integer endPeriod,
+            String crew, Integer dayIndex, Integer weekIndex, String status, String semester) {
         this.classRoom = classRoom;
         this.classCode = classCode;
         this.startPeriod = startPeriod;

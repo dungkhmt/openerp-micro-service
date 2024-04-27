@@ -2,17 +2,17 @@ package openerp.openerpresourceserver.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
-import com.google.ortools.Loader;
-import com.google.ortools.sat.*;
-import com.google.ortools.util.Domain;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.algorithms.ClassTimeScheduleSolver;
 import openerp.openerpresourceserver.exception.ConflictScheduleException;
 import openerp.openerpresourceserver.exception.NotFoundException;
 import openerp.openerpresourceserver.helper.ClassTimeComparator;
 import openerp.openerpresourceserver.helper.LearningWeekExtractor;
-import openerp.openerpresourceserver.helper.MassExtractor;
+import openerp.openerpresourceserver.mapper.RoomOccupationMapper;
 import openerp.openerpresourceserver.model.entity.Group;
 import openerp.openerpresourceserver.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.model.entity.occupation.RoomOccupation;
@@ -241,11 +241,18 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
         return generalClassOpenedList;
     }
 
+    @Transactional
     @Override
     public List<GeneralClassOpened> autoSchedule(String semester, String groupName) {
         List<GeneralClassOpened> foundClasses = gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
-        List<GeneralClassOpened> autoScheduleClasses = new ClassTimeScheduleSolver(foundClasses).solve();
+        List<GeneralClassOpened> autoScheduleClasses = ClassTimeScheduleSolver.solve(foundClasses);
+        autoScheduleClasses.forEach(System.out::println);
+        /*Get id from each room reservation of class and delete*/
         gcoRepo.saveAll(autoScheduleClasses);
+        roomOccupationRepo.deleteAllByClassCodeIn(foundClasses.stream().map(GeneralClassOpened::getClassCode).toList());
+        /*Get the roomOccupations from generalClass*/
+        List<RoomOccupation> newRoomOccupationList = autoScheduleClasses.stream().map(RoomOccupationMapper::mapFromGeneralClass).flatMap(List::stream).toList();
+        roomOccupationRepo.saveAll(newRoomOccupationList);
         return autoScheduleClasses;
     }
 }

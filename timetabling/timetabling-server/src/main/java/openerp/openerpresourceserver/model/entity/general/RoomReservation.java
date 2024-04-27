@@ -39,7 +39,15 @@ public class RoomReservation {
         this.weekday = weekday;
         this.room = room;
     }
-    
+
+    public RoomReservation(GeneralClassOpened gClass, int startTime, int endTime, int weekday, String room) {
+        this.generalClassOpened = gClass;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.weekday = weekday;
+        this.room = room;
+    }
+
     @Override
     public String toString() {
         return startTime + "-" + endTime + "/" + "D" + weekday+ "/" + room;

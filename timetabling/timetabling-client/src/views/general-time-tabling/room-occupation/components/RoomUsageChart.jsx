@@ -29,19 +29,23 @@ const RoomUsageChart = ({ semester, selectedWeek, startDate }) => {
     if (data?.length > 1) {
       let weekendDate = new Date(startDate);
       weekendDate.setDate(startDate.getDate() + 7);
-      setRoomData((prevRoomData) =>{
-        if(data?.length === 0) setEmptyRoom(true);
+      setRoomData((prevRoomData) => {
+        if (data?.length === 0) setEmptyRoom(true);
         setEmptyRoom(false);
+        const newRoomData = data?.filter(
+          (room, index) =>
+            room?.at(2) > startDate &&
+            room?.at(3) < weekendDate &&
+            room?.at(0) !== null
+        );
+        console.log(newRoomData);
         return initRoomData.concat(
-          data?.filter(
-            (room, index) =>
-              room?.at(2) > startDate && room?.at(3) < weekendDate
-          )
-        )}
-      );
+          newRoomData?.length !== 0 ? newRoomData : []
+        );
+      });
     }
   }, [selectedWeek]);
-  
+
   return data ? (
     <Chart
       width={"100%"}
