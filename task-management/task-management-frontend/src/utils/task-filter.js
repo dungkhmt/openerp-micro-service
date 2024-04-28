@@ -24,7 +24,7 @@ export function buildFilterString(filter) {
     })
     .filter((f) => f !== null);
 
-  return expressions.length > 0
-    ? expressions.join(` ${filter.condition} `)
-    : "";
+  return encodeURIComponent(
+    expressions.length > 0 ? expressions.join(` ${filter.condition} `) : ""
+  );
 }

@@ -183,12 +183,7 @@ const TaskAssigned = () => {
       renderCell: ({ row }) =>
         row.creator && (
           <AvatarGroup max={3} className="pull-up">
-            <Tooltip
-              title={`${row.creator.firstName} ${row.creator.lastName}`}
-              key={row.creator.id}
-            >
-              <UserAvatar user={row.creator} />
-            </Tooltip>
+            <UserAvatar user={row.creator} key={row.creator.id} />
           </AvatarGroup>
         ),
     },

@@ -1,196 +1,148 @@
-import { Box } from "@mui/material";
-import GSTC from "gantt-schedule-timeline-calendar/dist/gstc.wasm.esm.min.js";
-import "gantt-schedule-timeline-calendar/dist/style.css";
-import { useCallback, useEffect, useState } from "react";
-import { buildConfig } from "./config";
-import {
-  GSTCID,
-  addDays,
-  endDate,
-  iterations,
-  startDate,
-  startTime,
-} from "./config/lib";
-import { colors, getRandomColor } from "./config/color";
-import { usePreventOverflow } from "../../../hooks/usePreventOverflow";
-
-function getRandomFaceImage() {
-  return "https://cdn.vectorstock.com/i/1000v/31/95/user-sign-icon-person-symbol-human-avatar-vector-12693195.jpg";
-}
-
-function getInitialRows() {
-  /**
-   * @type {import("gantt-schedule-timeline-calendar/dist/gstc").Rows}
-   */
-  const rows = {};
-  for (let i = 0; i < iterations; i++) {
-    const withParent = i > 0 && i % 2 === 0;
-    const id = GSTCID(String(i));
-    rows[id] = {
-      id,
-      label: `John Doe ${i}`,
-      parentId: withParent ? GSTCID(String(i - 1)) : undefined,
-      expanded: false,
-      vacations: [],
-      img: getRandomFaceImage(),
-      progress: Math.floor(Math.random() * 100),
-      visible: true,
-    };
-  }
-
-  rows[GSTCID("11")].label = "NESTED TREE HERE";
-  rows[GSTCID("12")].parentId = GSTCID("11");
-  rows[GSTCID("13")].parentId = GSTCID("12");
-  rows[GSTCID("14")].parentId = GSTCID("13");
-  rows[GSTCID("3")].vacations = [
-    {
-      from: startDate.add(5, "days").startOf("day").valueOf(),
-      to: startDate.add(5, "days").endOf("day").valueOf(),
-    },
-    {
-      from: startDate.add(6, "days").startOf("day").valueOf(),
-      to: startDate.add(6, "days").endOf("day").valueOf(),
-    },
-  ];
-  rows[GSTCID("7")].birthday = [
-    {
-      from: startDate.add(3, "day").startOf("day").valueOf(),
-      to: startDate.add(3, "day").endOf("day").valueOf(),
-    },
-  ];
-  return rows;
-}
-
-function generateItemsForDaysView() {
-  /**
-   * @type {import("gantt-schedule-timeline-calendar/dist/gstc").Items}
-   */
-  const items = {};
-  for (let i = 0; i < iterations; i++) {
-    let rowId = GSTCID(i.toString());
-    let id = GSTCID(i.toString());
-    let startDayjs = GSTC.api
-      .date(startTime)
-      .startOf("day")
-      .add(Math.floor(Math.random() * addDays), "day");
-    let end = startDayjs
-      .clone()
-      .add(Math.floor(Math.random() * 20) + 4, "day")
-      .endOf("day")
-      .valueOf();
-    if (end > endDate.valueOf()) end = endDate.valueOf();
-    items[id] = {
-      id,
-      label: `John Doe ${i}`,
-      progress: Math.round(Math.random() * 100),
-      style: { background: getRandomColor() },
-      time: {
-        start: startDayjs.startOf("day").valueOf(),
-        end,
-      },
-      rowId,
-      img: getRandomFaceImage(),
-      classNames: ["additional-custom-class"],
-      description: "Lorem ipsum dolor sit amet",
-    };
-  }
-
-  items[GSTCID("0")].linkedWith = [GSTCID("1")];
-  items[GSTCID("0")].label = "Task 0 linked with 1";
-  items[GSTCID("0")].type = "task";
-  items[GSTCID("1")].label = "Task 1 linked with 0";
-  items[GSTCID("1")].type = "task";
-  items[GSTCID("1")].time = { ...items[GSTCID("0")].time };
-
-  items[GSTCID("0")].style = { background: colors[3] };
-  items[GSTCID("1")].style = { background: colors[3] };
-
-  items[GSTCID("3")].dependant = [GSTCID("5")];
-  items[GSTCID("3")].label = "Grab and move me into vacation area";
-  items[GSTCID("3")].time.start = GSTC.api
-    .date(startTime)
-    .add(4, "day")
-    .startOf("day")
-    .add(5, "day")
-    .valueOf();
-  items[GSTCID("3")].time.end = GSTC.api
-    .date(items[GSTCID("3")].time.start)
-    .endOf("day")
-    .add(5, "day")
-    .valueOf();
-
-  items[GSTCID("5")].time.start = GSTC.api
-    .date(items[GSTCID("3")].time.end)
-    .startOf("day")
-    .add(5, "day")
-    .valueOf();
-  items[GSTCID("5")].time.end = GSTC.api
-    .date(items[GSTCID("5")].time.start)
-    .endOf("day")
-    .add(2, "day")
-    .valueOf();
-  items[GSTCID("5")].dependant = [GSTCID("7"), GSTCID("9")];
-
-  items[GSTCID("7")].time.start = GSTC.api
-    .date(items[GSTCID("5")].time.end)
-    .startOf("day")
-    .add(3, "day")
-    .valueOf();
-  items[GSTCID("7")].time.end = GSTC.api
-    .date(items[GSTCID("7")].time.start)
-    .endOf("day")
-    .add(2, "day")
-    .valueOf();
-  items[GSTCID("9")].time.start = GSTC.api
-    .date(items[GSTCID("5")].time.end)
-    .startOf("day")
-    .add(2, "day")
-    .valueOf();
-  items[GSTCID("9")].time.end = GSTC.api
-    .date(items[GSTCID("9")].time.start)
-    .endOf("day")
-    .add(3, "day")
-    .valueOf();
-  return items;
-}
+import { Box, CircularProgress } from "@mui/material";
+import { Gantt, ViewMode } from "gantt-task-react";
+import "gantt-task-react/dist/index.css";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams, useNavigate } from "react-router";
+import { fetchGanttChartTasks } from "../../../store/project/gantt-chart";
+import { GanttControl } from "./GanttControl";
+import { TaskListHeader } from "./TaskListHeader";
+import { TaskListTable } from "./TaskListTable";
+import { TaskPreview } from "./TaskPreview";
+import { convertTasks, defaultTasks } from "./helper";
 
 const ProjectViewGanttChart = () => {
-  const { ref, updateHeight } = usePreventOverflow();
-  const [gstc, setGstc] = useState(null);
+  const ref = useRef(null);
+  const { id: projectId } = useParams();
+  const navigate = useNavigate();
 
-  const callback = useCallback((element) => {
-    if (element) {
-      const config = buildConfig({
-        listRows: getInitialRows(),
-        chartItems: generateItemsForDaysView(),
-      });
+  const {
+    view,
+    tasks: tasksStore,
+    fetchLoading,
+  } = useSelector((state) => state.gantt);
+  const dispatch = useDispatch();
 
-      const state = GSTC.api.stateFromConfig(config);
+  const [tasks, setTasks] = useState(defaultTasks);
+  const [height, setHeight] = useState(300);
+  const [isInitiated, setIsInitiated] = useState(false);
 
-      const gstc_ = GSTC({
-        element,
-        state,
-      });
-
-      setGstc(gstc_);
+  const columnWidth = useMemo(() => {
+    if (view === ViewMode.Year) {
+      return 350;
+    } else if (view === ViewMode.Month) {
+      return 300;
+    } else if (view === ViewMode.Week) {
+      return 250;
     }
-  }, []);
+    return 65;
+  }, [view]);
+
+  const handleTaskChange = (task) => {
+    console.log("On date change Id:" + task.id);
+    let newTasks = tasks.map((t) => (t.id === task.id ? task : t));
+    setTasks(newTasks);
+  };
+
+  // const handleTaskDelete = (task: Task) => {
+  //   const conf = window.confirm("Are you sure about " + task.name + " ?");
+  //   if (conf) {
+  //     setTasks(tasks.filter((t) => t.id !== task.id));
+  //   }
+  //   return conf;
+  // };
+
+  const handleProgressChange = async (task) => {
+    setTasks(tasks.map((t) => (t.id === task.id ? task : t)));
+    console.log("On progress change Id:" + task.id);
+  };
+
+  const handleClick = (task) => {
+    console.log("On Click event Id:" + task.id);
+    navigate(`/project/${projectId}/task/${task.id}`);
+  };
+
+  // const handleDblClick = (task: Task) => {
+  //   alert("On Double Click event Id:" + task.id);
+  // };
+
+  const handleSelect = (task, isSelected) => {
+    console.log(task.name + " has " + (isSelected ? "selected" : "unselected"));
+  };
+
+  const handleExpanderClick = (task) => {
+    setTasks(tasks.map((t) => (t.id === task.id ? task : t)));
+  };
+
+  const getTasks = useCallback(async () => {
+    if (!isInitiated && tasksStore.length > 0) return;
+    // TODO: handle filters and search, fetch from startDate
+    await dispatch(fetchGanttChartTasks({ projectId }));
+    setIsInitiated(true);
+  }, [projectId]);
 
   useEffect(() => {
-    return () => {
-      if (gstc) {
-        gstc.destroy();
+    const timer = setTimeout(() => {
+      if (!ref.current) {
+        return;
       }
-    };
-  });
+
+      if (ref.current) {
+        // Get the menu DOM rect
+        const domRect = ref.current.getBoundingClientRect();
+        setHeight(window.innerHeight - domRect.top - 80);
+      }
+    }, 10);
+
+    return () => clearTimeout(timer);
+  }, [ref]);
 
   useEffect(() => {
-    updateHeight(10);
-  }, []);
+    getTasks();
+  }, [getTasks]);
+
+  useEffect(() => {
+    setTasks(convertTasks(tasksStore));
+  }, [tasksStore]);
 
   return (
-    <Box ref={ref} sx={{ "& .gstc-wrapper": { height: "100%" } }}>
-      <div className="gstc-wrapper" ref={callback}></div>
+    <Box>
+      <GanttControl />
+      <Box ref={ref} sx={{ mt: 2, position: "relative" }}>
+        <Gantt
+          tasks={tasks}
+          viewMode={view}
+          onDateChange={handleTaskChange}
+          // onDelete={handleTaskDelete}
+          onProgressChange={handleProgressChange}
+          // onDoubleClick={handleDblClick}
+          onClick={handleClick}
+          onSelect={handleSelect}
+          onExpanderClick={handleExpanderClick}
+          ganttHeight={height}
+          columnWidth={columnWidth}
+          TaskListTable={TaskListTable}
+          TaskListHeader={TaskListHeader}
+          TooltipContent={TaskPreview}
+        />
+        {fetchLoading && (
+          <Box
+            sx={{
+              position: "absolute",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+              height: "100%",
+              top: 0,
+              left: 0,
+              background: (theme) => theme.palette.action.hover,
+            }}
+          >
+            <CircularProgress size={30} />
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };

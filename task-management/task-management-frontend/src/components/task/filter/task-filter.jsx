@@ -2,7 +2,7 @@ import { TaskStatus } from "../status";
 import { TaskPriority } from "../priority";
 import { TaskCategory } from "../category";
 import { UserAvatar } from "../../common/avatar/UserAvatar";
-import { Box, Tooltip, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 export const operators = {
   equal: {
@@ -45,9 +45,7 @@ export const operators = {
 const renderUserItem = (value, showText) =>
   value && (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-      <Tooltip title={value.label}>
-        <UserAvatar user={value} width={24} height={24} fontSize={"0.7rem"} />
-      </Tooltip>
+      <UserAvatar user={value} width={24} height={24} fontSize={"0.7rem"} />
       {showText && <Typography variant="body2">{value.label}</Typography>}
     </Box>
   );
