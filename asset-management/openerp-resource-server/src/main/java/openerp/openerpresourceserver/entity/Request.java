@@ -32,6 +32,8 @@ public class Request {
 
     private Integer status;
 
+    private Integer type;
+
     private Integer asset_id;
 
     private String admin_id;
