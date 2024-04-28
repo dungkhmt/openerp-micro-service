@@ -1,93 +1,95 @@
 import React, {useEffect, useState} from "react";
 import {request} from "../api";
 import {StandardTable} from "erp-hust/lib/StandardTable";
-import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Switch from '@mui/material/Switch';
 
 export const UsersScreen = () => {
 
-    const [users, setUsers] = useState([]);
     const [assets, setAssets] = useState([]);
+    const [locations, setLocations] = useState([]);
+    const [vendors, setVendors] = useState([]);
+    const [types, setTypes] = useState([]);
+
+    const getMyAssets = async() => {
+        request("get", "/asset/get-by-user", (res) => {
+            setAssets(res.data);
+        }).then();
+    };
+
+    const getAllLocations = async() => {
+        request("get", "/location/get-all", (res) => {
+            setLocations(res.data);
+        }).then();
+    };
+    
+    const getAllVendors = async() => {
+        request("get", "/vendor/get-all", (res) => {
+            setVendors(res.data);
+        }).then();
+    };
+
+    const getAllTypes = async() => {
+        request("get", "/asset-type/get-all", (res) => {
+            setTypes(res.data);
+        }).then();
+    };
 
     useEffect(() => {
-        request("get", "/user/get-all", (res) => {
-            setUsers(res.data);
-        }).then();
+        getAllLocations();
+        getAllVendors();
+        getAllTypes();
+        getMyAssets();
     }, []);
     
-    console.log("assets", assets);
-
-    const label = { inputProps: { 'aria-label': 'Size switch demo' } };
-
     const columns = [
         {
-            title: "User",
-            field: "id",
+            title: "Name",
+            field: "name",
         },
         {
-            title: "First name",
-            field: "firstName",
+            title: "Admin Id",
+            field: "admin_id",
         },
         {
-            title: "Last name",
-            field: "lastName",
+            title: "Code",
+            field: "code",
         },
         {
-            title: "Email",
-            field: "email",
+            title: "Type",
+            render: (rowData) => {
+                let found = types.find(typ => typ.id === rowData.type_id);
+                if(found){
+                    return <div>{found.name}</div>
+                } else return ``;
+            }
         },
         {
-            title: "Status",
-            sorting: true,
-            render: (rowData) => (
-                <Switch {...label} checked={rowData.enabled} />
-            )
-        },
+            title: "Location",
+            field: "location",
+            render: (rowData) => {
+                let found = locations.find(loc => loc.id === rowData.location_id);
+                if(found){
+                    return <div>{found.name}</div>
+                } else return ``;
+            }
+        }, 
         {
-            title: "Edit",
-            sorting: false,
-            render: (rowData) => (
-                <IconButton
-                    onClick={() => {
-                        demoFunction(rowData)
-                    }}
-                    variant="contained"
-                    color="success"
-                >
-                    <EditIcon/>
-                </IconButton>
-            ),
-        },
-        {
-            title: "Delete",
-            sorting: false,
-            render: (rowData) => (
-                <IconButton
-                    onClick={() => {
-                        demoFunction(rowData)
-                    }}
-                    variant="contained"
-                    color="error"
-                >
-                    <DeleteIcon/>
-                </IconButton>
-            ),
-        },
+            title: "Vendor",
+            field: "vendor",
+            render: (rowData) => {
+                let found = vendors.find(v => v.id === rowData.vendor_id);
+                if(found){
+                    return <div>{found.name}</div>
+                } else return ``;
+            }
+        }
     ];
-
-    const demoFunction = (user) => {
-        alert("You clicked on User: " + user.id)
-    }
 
     return (
         <div>
             <StandardTable
-                title="User List"
+                title="My Assets"
                 columns={columns}
-                data={users}
-                // hideCommandBar
+                data={assets}
                 options={{
                     selection: false,
                     pageSize: 20,

@@ -25,7 +25,6 @@ const AssetsScreen = () => {
     const [locationName, setLocationName] = useState("");
     const [vendorName, setVendorName] = useState("");
     const [type, setType] = useState("");
-    // const [assignee, setAssignee] = useState("");
     const [admin, setAdmin] = useState("");
 
     const [title, setTitle] = useState("");
@@ -129,8 +128,6 @@ const AssetsScreen = () => {
             type_id: foundType ? foundType.id : 0,
             admin_id: foundAdmin.id
         };
-
-        console.log("body shy", body);
 
         if(title === "CREATE NEW ASSET"){
             request("post", "/asset/add-new", successHandler, errorHandlers, body);
@@ -302,7 +299,6 @@ const AssetsScreen = () => {
                 title="Assets"
                 columns={columns}
                 data={assets}
-                // hideCommandBar
                 options={{
                     selection: false,
                     pageSize: 20,
@@ -427,11 +423,11 @@ const AssetsScreen = () => {
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">
-                    {"DELETE THIS LOCATION"}
+                    {"DELETE THIS ASSET"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        DO you want to delete this location. It cannot be undone?
+                        Do you want to delete this asset. It cannot be undone?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
