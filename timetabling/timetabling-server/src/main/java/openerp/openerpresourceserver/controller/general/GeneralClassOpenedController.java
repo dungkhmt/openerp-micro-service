@@ -77,6 +77,8 @@ public class GeneralClassOpenedController {
 
     @PostMapping("/reset-schedule")
     public ResponseEntity<List<GeneralClassOpened>> requestResetSchedule(@RequestParam("semester") String semester, @RequestBody ResetScheduleRequest request) {
+        log.info("Controler API -> requestResetSchedule start...");
+
         return ResponseEntity.ok(gService.resetSchedule(request.getIds(), semester));
     }
 

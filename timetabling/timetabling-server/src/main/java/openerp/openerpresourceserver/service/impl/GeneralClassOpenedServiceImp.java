@@ -226,6 +226,7 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
             List<GeneralClassOpened>filteredGeneralClassList = new ArrayList<>();
             for (GeneralClassOpened gClass : generalClassOpenedList) {
                 for (String idString : ids) {
+                    log.info("resetSchedule, consider id " + idString);
                     int gId = Integer.parseInt(idString.split("-")[0]);
                     int timeSlotIndex = Integer.parseInt(idString.split("-")[1])-1;
                     if(gId == gClass.getId()) {
