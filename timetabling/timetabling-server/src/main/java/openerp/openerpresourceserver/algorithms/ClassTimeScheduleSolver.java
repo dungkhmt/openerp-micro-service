@@ -32,6 +32,7 @@ public class ClassTimeScheduleSolver {
             for (IntVar v : variableArray) {
                 GeneralClassOpened gClass = classes.get(v.getIndex());
                 gClass.getTimeSlots().forEach(rr -> rr.setGeneralClassOpened(null));
+                gClass.getTimeSlots().clear();
                 RoomReservation newRoomReservation = new RoomReservation(
                         (int)value(v)%6,
                         (int)value(v)%6 + MassExtractor.extract(gClass.getMass())-1,
