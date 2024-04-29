@@ -52,7 +52,7 @@ public class ClassTimeScheduleSolver {
         private final IntVar[] variableArray;
     }
     public static List<GeneralClassOpened> solve(List<GeneralClassOpened> classes) {
-        log.info("solve... by or-tools");
+        log.info("solve... by or-tools, start to loadNativeLibraries");
         Loader.loadNativeLibraries();
         log.info("solve... by or-tools, loadNativeLibraries -> OK ");
 
