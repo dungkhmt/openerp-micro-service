@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.algorithms.ClassTimeScheduleSolver;
 import openerp.openerpresourceserver.exception.ConflictScheduleException;
 import openerp.openerpresourceserver.exception.NotFoundException;
@@ -33,6 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @AllArgsConstructor
 @Service
+@Log4j2
+@Slf4j
 public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
 
     private GeneralClassOpenedRepository gcoRepo;
@@ -244,6 +249,9 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
     @Transactional
     @Override
     public List<GeneralClassOpened> autoSchedule(String semester, String groupName) {
+        log.info("autoSchedule START....");
+        //log.info("abc");
+
         List<GeneralClassOpened> foundClasses = gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
         List<GeneralClassOpened> autoScheduleClasses = ClassTimeScheduleSolver.solve(foundClasses);
         autoScheduleClasses.forEach(System.out::println);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.exception.ConflictScheduleException;
 import openerp.openerpresourceserver.model.dto.request.general.UpdateClassesToNewGroupRequest;
 import openerp.openerpresourceserver.model.entity.general.ResetScheduleRequest;
@@ -19,6 +20,7 @@ import openerp.openerpresourceserver.service.GeneralClassOpenedService;
 @RestController
 @RequestMapping("/general-classes")
 @AllArgsConstructor
+@Log4j2
 public class GeneralClassOpenedController {
     private GeneralClassOpenedService gService;
     @ExceptionHandler(ConflictScheduleException.class)
@@ -80,6 +82,7 @@ public class GeneralClassOpenedController {
 
     @PostMapping("/auto-schedule-time")
     public ResponseEntity<List<GeneralClassOpened>> requestAutoScheduleTime(@RequestParam("semester") String semester, @RequestParam("groupName") String groupName) {
+        log.info("Controler API -> requestAutoScheduleTime...");
         return ResponseEntity.ok(gService.autoSchedule(semester, groupName));
     }
 

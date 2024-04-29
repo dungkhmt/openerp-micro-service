@@ -6,6 +6,7 @@ import com.google.ortools.util.Domain;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.helper.MassExtractor;
 import openerp.openerpresourceserver.model.entity.general.GeneralClassOpened;
 import openerp.openerpresourceserver.model.entity.general.RoomReservation;
@@ -16,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@Log4j2
 public class ClassTimeScheduleSolver {
 
     private static class VarArraySolutionPrinter extends CpSolverSolutionCallback {
@@ -50,7 +52,7 @@ public class ClassTimeScheduleSolver {
         private final IntVar[] variableArray;
     }
     public static List<GeneralClassOpened> solve(List<GeneralClassOpened> classes) {
-
+        log.info("solve... by or-tools");
         Loader.loadNativeLibraries();
         CpModel model = new CpModel();
 
@@ -110,6 +112,8 @@ public class ClassTimeScheduleSolver {
         // Create a solver and solve the model.
         CpSolver solver = new CpSolver();
         VarArraySolutionPrinter cb = new VarArraySolutionPrinter(xc, classes);
+
+        log.info("solve... by or-tools created model OK, start to search...");
 
         // Tell the solver to enumerate all solutions.
 //        solver.getParameters().setEnumerateAllSolutions(true);
