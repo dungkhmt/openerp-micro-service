@@ -1,8 +1,8 @@
-import {Box, Typography} from "@material-ui/core/";
-import {useTheme} from "@material-ui/core/styles";
-import {a11yProps, AntTab, AntTabs, TabPanel} from "component/tab";
-import {useState} from "react";
-import {useParams} from "react-router";
+import { Box, Typography } from "@material-ui/core/";
+import { useTheme } from "@material-ui/core/styles";
+import { a11yProps, AntTab, AntTabs, TabPanel } from "component/tab";
+import { useState } from "react";
+import { useParams } from "react-router";
 import withScreenSecurity from "../../../withScreenSecurity";
 import ParticipantRolesOfQuizTest from "./ParticipantRolesOfQuizTest";
 import QuizListForAssignment from "../QuizListForAssignment";
@@ -30,7 +30,7 @@ const tabsLabel = [
   "User Vai trò",
 ];
 
-function TeacherViewQuizTestDetail() {
+function TeacherViewQuizTestDetail({ courseInfo }) {
   let params = useParams();
   const testId = params.id;
   const [activeTab, setActiveTab] = useState(0);
@@ -42,7 +42,7 @@ function TeacherViewQuizTestDetail() {
 
   return (
     <>
-      <QuizTestGeneralInfo testId={testId}/>
+      <QuizTestGeneralInfo testId={testId} />
 
       <AntTabs
         value={activeTab}
@@ -57,31 +57,31 @@ function TeacherViewQuizTestDetail() {
       </AntTabs>
 
       <TabPanel value={activeTab} index={0} dir={theme.direction}>
-        <StudentsApprovedToQuizTest testId={testId}/>
+        <StudentsApprovedToQuizTest testId={testId} />
       </TabPanel>
       <TabPanel value={activeTab} index={1} dir={theme.direction}>
-        <JoinQuizTestRequestList testId={testId}/>
+        <JoinQuizTestRequestList testId={testId} />
       </TabPanel>
       <TabPanel value={activeTab} index={2} dir={theme.direction}>
-        <QuizGroupList testId={testId}/>
+        <QuizGroupList testId={testId} />
       </TabPanel>
       <TabPanel value={activeTab} index={3} dir={theme.direction}>
-        <StudentAssignedToQuizGroups testId={testId}/>
+        <StudentAssignedToQuizGroups testId={testId} />
       </TabPanel>
       <TabPanel value={activeTab} index={4} dir={theme.direction}>
-        <QuizListForAssignment testId={testId} />
+        <QuizListForAssignment courseInfo={courseInfo} testId={testId} />
       </TabPanel>
       <TabPanel value={activeTab} index={5} dir={theme.direction}>
         <QuizQuestionsInQuizTest testId={testId} />
       </TabPanel>
       <TabPanel value={activeTab} index={6} dir={theme.direction}>
-        <ResultListOfQuizTest testId={testId} isGeneral={false}/>
+        <ResultListOfQuizTest testId={testId} isGeneral={false} />
       </TabPanel>
       <TabPanel value={activeTab} index={7} dir={theme.direction}>
-        <ResultListOfQuizTest testId={testId} isGeneral={true}/>
+        <ResultListOfQuizTest testId={testId} isGeneral={true} />
       </TabPanel>
       <TabPanel index={8} value={activeTab} dir={theme.direction}>
-        <ViewDoingQuizTestQuestionLogs testId={testId}/>
+        <ViewDoingQuizTestQuestionLogs testId={testId} />
       </TabPanel>
       <TabPanel value={activeTab} index={9} dir={theme.direction}>
         <QuizTestResultChart testId={testId} />
