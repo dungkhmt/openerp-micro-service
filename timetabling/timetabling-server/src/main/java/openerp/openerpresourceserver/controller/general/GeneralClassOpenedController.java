@@ -88,4 +88,9 @@ public class GeneralClassOpenedController {
         return ResponseEntity.ok(gService.autoSchedule(semester, groupName));
     }
 
+    @PostMapping("/auto-schedule-room")
+    public ResponseEntity<?> requestAutoScheduleRoom(@RequestParam("semester") String semester, @RequestParam("groupName") String groupName) {
+        log.info("Controler API -> requestAutoScheduleRoom...");
+        return ResponseEntity.ok(gService.autoScheduleRoom(semester, groupName));
+    }
 }

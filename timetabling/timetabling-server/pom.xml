@@ -83,6 +83,11 @@
             <version>9.3.10497</version>
         </dependency>
         <dependency>
+            <groupId>com.google.ortools</groupId>
+            <artifactId>ortools-linux-x86-64</artifactId>
+            <version>9.9.3963</version>
+        </dependency>
+        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.2</version>

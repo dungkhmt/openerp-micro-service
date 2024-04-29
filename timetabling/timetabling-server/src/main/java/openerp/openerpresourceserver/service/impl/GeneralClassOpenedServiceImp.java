@@ -264,4 +264,11 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
         roomOccupationRepo.saveAll(newRoomOccupationList);
         return autoScheduleClasses;
     }
+
+    @Override
+    public List<GeneralClassOpened> autoScheduleRoom(String semester, String groupName) {
+        log.info("autoScheduleRoom start...");
+        
+        return null;
+    }
 }

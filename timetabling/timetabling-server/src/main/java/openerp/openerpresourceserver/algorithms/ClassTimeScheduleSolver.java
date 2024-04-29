@@ -126,4 +126,17 @@ public class ClassTimeScheduleSolver {
 
         return classes;
     }
+
+    public void autoScheduleRoom(){
+        log.info("autoScheduleRoom... by or-tools");
+        Loader.loadNativeLibraries();
+        CpModel model = new CpModel();
+        CpSolver solver = new CpSolver();
+        solver.getParameters().setEnumerateAllSolutions(false);
+        //VarArraySolutionPrinter cb = new VarArraySolutionPrinter(xc, classes);
+
+
+        // And solve.
+        //solver.solve(model, cb);
+    }
 }
