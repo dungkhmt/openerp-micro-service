@@ -1,15 +1,19 @@
-import { Box, CircularProgress } from "@mui/material";
+import { Icon } from "@iconify/react";
+import { Box, CircularProgress, useTheme } from "@mui/material";
+import dayjs from "dayjs";
 import { Gantt, ViewMode } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams, useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { fetchGanttChartTasks } from "../../../store/project/gantt-chart";
+import { buildFilterString } from "../../../utils/task-filter";
 import { GanttControl } from "./GanttControl";
 import { TaskListHeader } from "./TaskListHeader";
 import { TaskListTable } from "./TaskListTable";
 import { TaskPreview } from "./TaskPreview";
-import { convertTasks, defaultTasks } from "./helper";
+import { useConvertTasks } from "./helper";
 
 const ProjectViewGanttChart = () => {
   const ref = useRef(null);
@@ -20,10 +24,15 @@ const ProjectViewGanttChart = () => {
     view,
     tasks: tasksStore,
     fetchLoading,
+    range,
+    search: searchStore,
+    filters,
   } = useSelector((state) => state.gantt);
   const dispatch = useDispatch();
 
-  const [tasks, setTasks] = useState(defaultTasks);
+  const theme = useTheme();
+
+  const [tasks, setTasks] = useConvertTasks(tasksStore, range.startDate);
   const [height, setHeight] = useState(300);
   const [isInitiated, setIsInitiated] = useState(false);
 
@@ -39,9 +48,20 @@ const ProjectViewGanttChart = () => {
   }, [view]);
 
   const handleTaskChange = (task) => {
-    console.log("On date change Id:" + task.id);
+    // TODO: handler change task
     let newTasks = tasks.map((t) => (t.id === task.id ? task : t));
     setTasks(newTasks);
+    toast("The feature is not available yet", {
+      icon: <Icon icon="ic:round-warning" />,
+      style: {
+        color: theme.palette.warning.main,
+        border: `1px solid ${theme.palette.warning.main}`,
+      },
+      iconTheme: {
+        primary: theme.palette.warning.main,
+        secondary: theme.palette.warning.contrastText,
+      },
+    });
   };
 
   // const handleTaskDelete = (task: Task) => {
@@ -53,18 +73,28 @@ const ProjectViewGanttChart = () => {
   // };
 
   const handleProgressChange = async (task) => {
+    // TODO: handler change task
     setTasks(tasks.map((t) => (t.id === task.id ? task : t)));
-    console.log("On progress change Id:" + task.id);
+    toast("The feature is not available yet", {
+      icon: <Icon icon="ic:round-warning" />,
+      style: {
+        color: theme.palette.warning.main,
+        border: `1px solid ${theme.palette.warning.main}`,
+      },
+      iconTheme: {
+        primary: theme.palette.warning.main,
+        secondary: theme.palette.warning.contrastText,
+      },
+    });
   };
 
   const handleClick = (task) => {
     console.log("On Click event Id:" + task.id);
-    navigate(`/project/${projectId}/task/${task.id}`);
   };
 
-  // const handleDblClick = (task: Task) => {
-  //   alert("On Double Click event Id:" + task.id);
-  // };
+  const handleDblClick = (task) => {
+    navigate(`/project/${projectId}/task/${task.id}`);
+  };
 
   const handleSelect = (task, isSelected) => {
     console.log(task.name + " has " + (isSelected ? "selected" : "unselected"));
@@ -74,12 +104,39 @@ const ProjectViewGanttChart = () => {
     setTasks(tasks.map((t) => (t.id === task.id ? task : t)));
   };
 
+  const buildQueryString = useCallback(() => {
+    const builder = [];
+    const encodedSearch = encodeURIComponent(searchStore).replace(
+      /%20/g,
+      "%1F"
+    );
+    builder.push(
+      encodedSearch
+        ? `( name:*${encodedSearch}* OR description:*${encodedSearch}* )`
+        : ""
+    );
+
+    builder.push(buildFilterString(filters));
+
+    return builder.filter((s) => s !== "").join(" AND ");
+  }, [searchStore, filters]);
+
   const getTasks = useCallback(async () => {
     if (!isInitiated && tasksStore.length > 0) return;
     // TODO: handle filters and search, fetch from startDate
-    await dispatch(fetchGanttChartTasks({ projectId }));
+    await dispatch(
+      fetchGanttChartTasks({
+        projectId,
+        from: dayjs(range.startDate).startOf("day").unix(),
+        to: dayjs(range.startDate)
+          .add(range.duration, "month")
+          .endOf("day")
+          .unix(),
+        q: buildQueryString(),
+      })
+    );
     setIsInitiated(true);
-  }, [projectId]);
+  }, [projectId, range, dispatch, buildQueryString]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -101,10 +158,6 @@ const ProjectViewGanttChart = () => {
     getTasks();
   }, [getTasks]);
 
-  useEffect(() => {
-    setTasks(convertTasks(tasksStore));
-  }, [tasksStore]);
-
   return (
     <Box>
       <GanttControl />
@@ -112,10 +165,12 @@ const ProjectViewGanttChart = () => {
         <Gantt
           tasks={tasks}
           viewMode={view}
+          viewDate={range.startDate}
+          locale="vi-VN"
           onDateChange={handleTaskChange}
           // onDelete={handleTaskDelete}
           onProgressChange={handleProgressChange}
-          // onDoubleClick={handleDblClick}
+          onDoubleClick={handleDblClick}
           onClick={handleClick}
           onSelect={handleSelect}
           onExpanderClick={handleExpanderClick}
@@ -146,5 +201,4 @@ const ProjectViewGanttChart = () => {
     </Box>
   );
 };
-
 export { ProjectViewGanttChart };

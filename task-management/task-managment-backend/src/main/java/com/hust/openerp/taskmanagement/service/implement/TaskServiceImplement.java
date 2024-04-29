@@ -15,9 +15,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Joiner;
+import com.hust.openerp.taskmanagement.dto.TaskGanttDTO;
 import com.hust.openerp.taskmanagement.dto.TaskHierarchyDTO;
 import com.hust.openerp.taskmanagement.dto.form.TaskForm;
 import com.hust.openerp.taskmanagement.entity.ProjectMember;
@@ -37,8 +40,13 @@ import com.hust.openerp.taskmanagement.service.TaskService;
 import com.hust.openerp.taskmanagement.specification.TaskSpecification;
 import com.hust.openerp.taskmanagement.specification.builder.GenericSpecificationsBuilder;
 import com.hust.openerp.taskmanagement.util.CriteriaParser;
+import com.hust.openerp.taskmanagement.util.SearchOperation;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -428,6 +436,66 @@ public class TaskServiceImplement implements TaskService {
             }
         }
         return taskLevel;
+    }
+
+    public List<TaskGanttDTO> getTaskGantt(UUID projectId, String from, String to, String q) {
+        var unixTime = Long.parseLong(from);
+        var fromDate = new Date(unixTime * 1000L);
+        unixTime = Long.parseLong(to);
+        var toDate = new Date(unixTime * 1000L);
+
+        if (q != null && !q.isEmpty()) {
+            // exclude fields
+            if (q.contains(Task_.CREATED_DATE)) {
+                // remove created_date field
+                q = q.replaceAll(Task_.CREATED_DATE + "(" + Joiner.on("|")
+                        .join(SearchOperation.SIMPLE_OPERATION_SET).replace("[", "\\[").replace("]", "\\]") + ")[^ ]+",
+                        "");
+            }
+
+            if (q.contains(Task_.DUE_DATE)) {
+                // remove due_date field
+                q = q.replaceAll(Task_.DUE_DATE + "(" + Joiner.on("|")
+                        .join(SearchOperation.SIMPLE_OPERATION_SET).replace("[", "\\[").replace("]", "\\]") + ")[^ ]+",
+                        "");
+            }
+
+            if (q.contains(Task_.FROM_DATE)) {
+                // remove progress field
+                q = q.replaceAll(Task_.PROGRESS + "(" + Joiner.on("|")
+                        .join(SearchOperation.SIMPLE_OPERATION_SET).replace("[", "\\[").replace("]", "\\]") + ")[^ ]+",
+                        "");
+            }
+        } else {
+            q = "";
+        }
+
+        GenericSpecificationsBuilder<Task> builder = new GenericSpecificationsBuilder<>();
+        var specs = builder.build(new CriteriaParser().parse(q), TaskSpecification::new);
+        // WHERE ... AND (projectId = )
+        // AND (fromDate between fromDate and toDate
+        // OR (fromDate is NULL AND createdStamp between fromDate and toDate)
+        // OR (dueDate between fromDate and toDate)
+        // )
+        specs = Specification.where(specs)
+                .and((Root<Task> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> criteriaBuilder
+                        .equal(root.get(Task_.PROJECT_ID), projectId))
+                .and(Specification.where(
+                        (Root<Task> root, CriteriaQuery<?> query,
+                                CriteriaBuilder criteriaBuilder) -> criteriaBuilder
+                                        .between(root.get(Task_.FROM_DATE), fromDate, toDate))
+                        .or(
+                                (Root<Task> root, CriteriaQuery<?> query,
+                                        CriteriaBuilder criteriaBuilder) -> criteriaBuilder
+                                                .and(criteriaBuilder.isNull(root.get(Task_.FROM_DATE)),
+                                                        criteriaBuilder.between(
+                                                                root.get(Task_.CREATED_STAMP), fromDate, toDate)))
+                        .or(
+                                (Root<Task> root, CriteriaQuery<?> query,
+                                        CriteriaBuilder criteriaBuilder) -> criteriaBuilder
+                                                .between(root.get(Task_.DUE_DATE), fromDate, toDate)));
+        return taskRepository.findAll(specs, Sort.by(Task_.CREATED_STAMP).ascending()).stream()
+                .map(task -> modelMapper.map(task, TaskGanttDTO.class)).toList();
     }
 
 }
