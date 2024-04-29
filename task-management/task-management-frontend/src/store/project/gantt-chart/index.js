@@ -5,16 +5,16 @@ import { ViewMode } from "gantt-task-react";
 
 export const fetchGanttChartTasks = createAsyncThunk(
   "project/fetchGanttChartTasks",
-  async ({ projectId, filters }) => {
+  async ({ projectId, from, to, q }) => {
     // TODO: separate the logic to get tasks from the service
-    const tasks = await TaskService.getTasks(projectId, filters);
+    const tasks = await TaskService.getTasksGantt(projectId, from, to, q);
     return tasks;
   }
 );
 
 const initialState = {
   tasks: [],
-  view: ViewMode.Day,
+  view: ViewMode.Week,
   search: "",
   filters: {
     condition: "AND",
@@ -72,7 +72,7 @@ export const ganttChartTasks = createSlice({
         state.fetchLoading = true;
       })
       .addCase(fetchGanttChartTasks.fulfilled, (state, action) => {
-        state.tasks = action.payload.data;
+        state.tasks = action.payload;
         state.fetchLoading = false;
       })
       .addCase(fetchGanttChartTasks.rejected, (state, action) => {

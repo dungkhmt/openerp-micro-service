@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.hust.openerp.taskmanagement.dto.TaskGanttDTO;
 import com.hust.openerp.taskmanagement.dto.TaskHierarchyDTO;
 import com.hust.openerp.taskmanagement.dto.form.TaskForm;
 import com.hust.openerp.taskmanagement.entity.Task;
@@ -39,4 +40,6 @@ public interface TaskService {
     long countTasksByProjectId(UUID projectId);
 
     List<TaskHierarchyDTO> getTaskHierarchyByRoot(UUID ancestorId);
+
+    List<TaskGanttDTO> getTaskGantt(UUID projectId, String from, String to, String q);
 }
