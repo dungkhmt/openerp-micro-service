@@ -20,20 +20,21 @@ import PersonIcon from "@mui/icons-material/Person";
 import StarBorder from "@mui/icons-material/StarBorder";
 import StoreMallDirectorySharpIcon from "@mui/icons-material/StoreMallDirectorySharp";
 import TeachingIcon from "assets/icons/mathematics.svg";
-import InfoIcon from '@mui/icons-material/Info';
-import BusinessIcon from '@mui/icons-material/Business';
-import AnalyticsIcon from '@mui/icons-material/Analytics';
+import InfoIcon from "@mui/icons-material/Info";
+import BusinessIcon from "@mui/icons-material/Business";
+import AnalyticsIcon from "@mui/icons-material/Analytics";
 import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
 import { buildMapPathMenu } from "utils/MenuUtils";
 import { teacher } from "./menuconfig/teacher";
 import { user } from "./menuconfig/user";
 // import {schedule} from "./menuconfig/schedule"
-import {scheduleInformation} from "./menuconfig/scheduleInformation"
+import { scheduleInformation } from "./menuconfig/scheduleInformation";
 // import {schedulePerformance} from "./menuconfig/schedulePerformance"
-import {courseTimeTabling} from "./menuconfig/courseTimeTabling"
+import { courseTimeTabling } from "./menuconfig/courseTimeTabling";
 import { generalTimeTabling } from "./menuconfig/generalTimeTabling";
 import { computerLabTimeTabling } from "./menuconfig/computerLabTimeTabling";
+import { taRecruitment } from "./menuconfig/taRecruitment";
 
 export const MENUS = [];
 
@@ -45,12 +46,13 @@ MENUS.push(scheduleInformation);
 // MENUS.push(schedulePerformance);
 MENUS.push(courseTimeTabling);
 MENUS.push(generalTimeTabling);
-MENUS.push(computerLabTimeTabling)
+MENUS.push(computerLabTimeTabling);
+MENUS.push(taRecruitment);
 
 export const menuIconMap = new Map();
 
-menuIconMap.set("ScheduleIcon",<EventNoteIcon />);
-menuIconMap.set("AnalyticsIcon",<AnalyticsIcon />);
+menuIconMap.set("ScheduleIcon", <EventNoteIcon />);
+menuIconMap.set("AnalyticsIcon", <AnalyticsIcon />);
 menuIconMap.set(
   "Teaching",
   <img alt="Teaching icon" src={TeachingIcon} height={24} width={24} />
