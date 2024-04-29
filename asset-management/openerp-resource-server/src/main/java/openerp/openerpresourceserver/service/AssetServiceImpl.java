@@ -9,7 +9,6 @@ import openerp.openerpresourceserver.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +27,21 @@ public class AssetServiceImpl implements AssetService{
     @Override
     public List<Asset> getAllAssets() {
         return assetRepo.findAll();
+    }
+
+    @Override
+    public List<Asset> getAllAvailableAssets() {
+        return assetRepo.findByStatusId(AVAILABLE);
+    }
+
+    @Override
+    public List<Asset> getAllInuseAssets() {
+        return assetRepo.findByStatusId(INUSE);
+    }
+
+    @Override
+    public List<Asset> getAllUserAssets(String user_id) {
+        return assetRepo.findByAssigneeId(user_id);
     }
 
     @Override
@@ -73,8 +87,7 @@ public class AssetServiceImpl implements AssetService{
         String prefix = code.split("-")[1];
         foundAsset.setCode(typePrefix + "-" + prefix);
 
-        Date currentDate = new Date();
-        foundAsset.setLast_updated(currentDate);
+        foundAsset.setLast_updated(new Date());
         return assetRepo.save(foundAsset);
     }
 
@@ -84,5 +97,35 @@ public class AssetServiceImpl implements AssetService{
         if(asset.isPresent()){
             assetRepo.deleteById(Id);
         }
+    }
+
+    @Override
+    public Asset assignAsset(Integer Id, String user_id, String admin_id) {
+        Asset foundAsset = assetRepo.findById(Id).get();
+        if(!foundAsset.getAssignee_id().equals(admin_id)){
+            return null;
+        }
+        if(!foundAsset.getStatus_id().equals(AVAILABLE)){
+            return null;
+        }
+        foundAsset.setStatus_id(INUSE);
+        foundAsset.setAssignee_id(user_id);
+        foundAsset.setLast_updated(new Date());
+        return assetRepo.save(foundAsset);
+    }
+
+    @Override
+    public Asset revokeAsset(Integer Id, String user_id, String admin_id) {
+        Asset foundAsset = assetRepo.findById(Id).get();
+        if(!foundAsset.getAssignee_id().equals(admin_id)){
+            return null;
+        }
+        if(!foundAsset.getStatus_id().equals(INUSE)){
+            return null;
+        }
+        foundAsset.setStatus_id(AVAILABLE);
+        foundAsset.setAssignee_id(null);
+        foundAsset.setLast_updated(new Date());
+        return assetRepo.save(foundAsset);
     }
 }

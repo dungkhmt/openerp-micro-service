@@ -19,7 +19,6 @@ public class RequestController {
 
     @GetMapping("/get-all")
     public ResponseEntity<?> getAllRequests(Principal principal){
-        System.out.println("pripri " + principal.getName());
         List<Request> requests = requestService.getAllRequests();
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -28,16 +27,53 @@ public class RequestController {
 
     @PostMapping("/add-new")
     public ResponseEntity<?> createNewRequest(@RequestBody Request request, Principal principal){
-
-        System.out.println("request: " + request.toString());
-        System.out.println("principal " + principal.getName());
-//        Request savedRequest = requestService.createNewRequest(request);
+        request.setUser_id(principal.getName());
+        Request savedRequest = requestService.createNewRequest(request);
+        System.out.println(savedRequest.toString());
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body("");
     }
 
-//    public ResponseEntity<?> approveRequest(@PathVariable Integer Id){
-//
-//    }
+    @PutMapping("/edit/{Id}")
+    public ResponseEntity<?> editRequest(@PathVariable Integer Id, @RequestBody Request request){
+        Request savedRequest = requestService.editRequest(Id, request);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(savedRequest);
+    }
+
+    @DeleteMapping("/delete/{Id}")
+    public ResponseEntity<?> deleteRequest(@PathVariable Integer Id){
+        requestService.deleteRequest(Id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/approve/{Id}")
+    public ResponseEntity<?> approveRequest(@PathVariable Integer Id, Principal principal){
+        String approval_id = principal.getName();
+        Request savedRequest = requestService.approveRequest(Id, approval_id);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(savedRequest);
+
+    }
+
+    @PutMapping("/reject/{Id}")
+    public ResponseEntity<?> rejectRequest(@PathVariable Integer Id, Principal principal){
+        String rejection_id = principal.getName();
+        Request savedRequest = requestService.rejectRequest(Id, rejection_id);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(savedRequest);
+    }
+
+    @GetMapping("/get-by-user")
+    public ResponseEntity<?> getUserRequests(Principal principal){
+        String user_id = principal.getName();
+        List<Request> requests = requestService.getUserRequests(user_id);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(requests);
+    }
 }

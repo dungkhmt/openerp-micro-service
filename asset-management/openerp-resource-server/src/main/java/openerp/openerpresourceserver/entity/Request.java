@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Data
@@ -31,6 +32,8 @@ public class Request {
 
     private Integer status;
 
+    private Integer type;
+
     private Integer asset_id;
 
     private String admin_id;
@@ -38,9 +41,9 @@ public class Request {
     @Column(columnDefinition = "TEXT")
     private String data;
 
-    private Date start_date;
+    private Instant start_date;
 
-    private Date end_date;
+    private Instant end_date;
 
     @CreatedDate
     private Date since;

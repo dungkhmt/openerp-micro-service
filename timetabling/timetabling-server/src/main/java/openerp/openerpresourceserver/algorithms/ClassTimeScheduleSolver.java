@@ -18,23 +18,28 @@ import java.util.List;
 @Setter
 public class ClassTimeScheduleSolver {
 
-    private List<GeneralClassOpened> classes;
-    private class VarArraySolutionPrinter extends CpSolverSolutionCallback {
-        public VarArraySolutionPrinter(IntVar[] variables) {
+    private static class VarArraySolutionPrinter extends CpSolverSolutionCallback {
+        private static List<GeneralClassOpened> classes;
+        public VarArraySolutionPrinter(IntVar[] variables, List<GeneralClassOpened> classes) {
             variableArray = variables;
+            VarArraySolutionPrinter.classes = classes;
         }
 
         @Override
         public void onSolutionCallback() {
+            if (solutionCount > 0) return;
             System.out.printf("Solution #%d: time = %.02f s%n", solutionCount, wallTime());
             for (IntVar v : variableArray) {
                 GeneralClassOpened gClass = classes.get(v.getIndex());
+                gClass.getTimeSlots().forEach(rr -> rr.setGeneralClassOpened(null));
                 gClass.getTimeSlots().clear();
-                gClass.getTimeSlots().add(new RoomReservation(
+                RoomReservation newRoomReservation = new RoomReservation(
                         (int)value(v)%6,
                         (int)value(v)%6 + MassExtractor.extract(gClass.getMass())-1,
                         (int)value(v)/6 +1,
-                        null));
+                        null) ;
+                newRoomReservation.setGeneralClassOpened(gClass);
+                gClass.getTimeSlots().add(newRoomReservation);
                 System.out.printf("  %s = %d%n", v.getName(), value(v));
             }
             solutionCount++;
@@ -44,7 +49,7 @@ public class ClassTimeScheduleSolver {
         private int solutionCount;
         private final IntVar[] variableArray;
     }
-    public List<GeneralClassOpened> solve() {
+    public static List<GeneralClassOpened> solve(List<GeneralClassOpened> classes) {
 
         Loader.loadNativeLibraries();
         CpModel model = new CpModel();
@@ -79,9 +84,7 @@ public class ClassTimeScheduleSolver {
             for (int startPeriod = 0; startPeriod < 42 - durations[i] ; startPeriod++) {
                 if ((startPeriod / 6) == ((startPeriod + durations[i]) / 6)) allowedValues.add(startPeriod);
             }
-            if (durations[i] == 1) {
-                allowedValues.forEach(System.out::println);
-            }
+
             xc[i] = model.newIntVarFromDomain(
                     Domain.fromValues(
                             allowedValues.stream().mapToLong(z -> z + 1).toArray()
@@ -106,7 +109,7 @@ public class ClassTimeScheduleSolver {
 
         // Create a solver and solve the model.
         CpSolver solver = new CpSolver();
-        VarArraySolutionPrinter cb = new VarArraySolutionPrinter(xc);
+        VarArraySolutionPrinter cb = new VarArraySolutionPrinter(xc, classes);
 
         // Tell the solver to enumerate all solutions.
 //        solver.getParameters().setEnumerateAllSolutions(true);

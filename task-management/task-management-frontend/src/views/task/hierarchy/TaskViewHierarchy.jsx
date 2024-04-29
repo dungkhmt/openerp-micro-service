@@ -25,7 +25,6 @@ const TaskViewHierarchy = () => {
     const assignee = members.find(
       (member) => member.member.id === hierarchy.assigneeId
     )?.member;
-    const fullName = `${assignee?.firstName ?? ""} ${assignee?.lastName ?? ""}`;
 
     return (
       <Grid
@@ -107,9 +106,7 @@ const TaskViewHierarchy = () => {
               }}
             >
               {assignee && (
-                <Tooltip title={fullName}>
-                  <UserAvatar user={assignee} sx={{ cursor: "pointer" }} />
-                </Tooltip>
+                <UserAvatar user={assignee} sx={{ cursor: "pointer" }} />
               )}
             </Grid>
             <Grid
@@ -142,4 +139,3 @@ const TaskViewHierarchy = () => {
 };
 
 export { TaskViewHierarchy };
-

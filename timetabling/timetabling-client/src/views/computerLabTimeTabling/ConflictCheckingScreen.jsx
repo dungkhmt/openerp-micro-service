@@ -250,13 +250,12 @@ const ConflictCheckingScreen = () => {
 
   return (
     <div>
-      <h1>Conflict Checking</h1>
       <div
         style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
       >
         <BasicSelect
             items={semesters}
-            label={"Semester"}
+            label={"Hoc kì"}
             value={currentSemester}
             onChange={semester_on_change}
           />
@@ -272,40 +271,14 @@ const ConflictCheckingScreen = () => {
         })}
       </ul>
       <div style={{ display: "flex", flexDirection: "row" }}>
-        <Box sx={{ position: "relative" }}>
-          <Button
-            variant="outlined"
-            color="success"
-            disabled={loading}
-            onClick={checking_btn_onclick}
-          >
-            Check conflicts
-          </Button>
-          {loading && (
-            <CircularProgress
-              size={24}
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                marginTop: "-12px",
-                marginLeft: "-12px",
-              }}
-            />
-          )}
-        </Box>
-        <div
-          style={{ display: "flex", alignItems: "center", padding: "0 12px" }}
-        >
           <Button
             onClick={(e)=>download_viz_schedule_onclick(assignsBySemester)}
             variant="outlined"
-            disabled={assignsBySemester.length === 0 || conflicts == null}
+            disabled={assignsBySemester.length === 0}
           >
             visual schedule
             <FileDownloadIcon />
           </Button>
-        </div>
       </div>
       {id}
       <ul>

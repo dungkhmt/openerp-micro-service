@@ -1,7 +1,6 @@
 import { a11yProps, AntTab, AntTabs, TabPanel } from 'components/tab';
 import React, { useState } from 'react'
 import { LocationScreen } from 'views/settings/LocationScreen';
-import { UsersScreen } from 'views/UsersScreen';
 import RequestTable from './request/RequestTable';
 
 const RequestsScreen = () => {

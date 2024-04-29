@@ -3,14 +3,14 @@ package openerp.openerpresourceserver.helper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class LearningWeekExtractor {
     public static List<Integer> extract(String weekString) {
-        List<Integer> weekIntList = Arrays.asList(weekString.split("-"))
-                .stream().map(Integer::parseInt).collect(Collectors.toList());
-        if (weekIntList.get(0) != null && weekIntList.get(0) == weekIntList.get(1)) {
+        List<Integer> weekIntList = Arrays.stream(weekString.split("-")).map(Integer::parseInt).toList();
+        if (weekIntList.get(0) != null && Objects.equals(weekIntList.get(0), weekIntList.get(1))) {
             return List.of(weekIntList.get(0));
         } else {
             return IntStream.rangeClosed(weekIntList.get(0), weekIntList.get(1))
@@ -29,7 +29,7 @@ public class LearningWeekExtractor {
             } else {
                 weeksArray.addAll(IntStream.rangeClosed(weekIntList.get(0), weekIntList.get(1))
                         .boxed()
-                        .collect(Collectors.toList()));
+                        .toList());
             }
         }
         return weeksArray;

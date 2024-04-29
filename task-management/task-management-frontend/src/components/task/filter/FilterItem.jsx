@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react";
 import { Box, Grid, IconButton, Typography, styled } from "@mui/material";
 import PropTypes from "prop-types";
 import { hexToRGBA } from "../../utils/hex-to-rgba";
-import { MenuSingleSelect } from "./menu/MenuSingleSelect";
+import { MenuSingleSelect } from "../../menu/MenuSingleSelect";
 import { useState } from "react";
 import { FilterWrapperBox } from "./FilterWrapperBox";
 import { FilterValueText } from "./value/FilterValueText";

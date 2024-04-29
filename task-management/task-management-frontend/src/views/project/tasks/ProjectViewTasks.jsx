@@ -172,12 +172,7 @@ const ProjectViewTasks = () => {
       renderCell: ({ row }) =>
         row.assignee ? (
           <AvatarGroup max={3} className="pull-up">
-            <Tooltip
-              title={`${row.assignee?.firstName} ${row.assignee?.lastName}`}
-              key={row.assignee?.id}
-            >
-              <UserAvatar user={row.assignee} />
-            </Tooltip>
+            <UserAvatar user={row.assignee} key={row.assignee?.id} />
           </AvatarGroup>
         ) : (
           <Typography> - </Typography>

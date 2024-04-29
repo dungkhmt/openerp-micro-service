@@ -22,6 +22,7 @@ import { useSelector } from "react-redux";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
 import { useDebounce } from "../../../hooks/useDebounce";
 import { MenuAddMember } from "./MenuAddMember";
+import { usePreventOverflow } from "../../../hooks/usePreventOverflow";
 
 const columns = [
   {
@@ -177,6 +178,7 @@ const RowOptions = ({ id }) => {
 
 const ProjectViewMembers = () => {
   const { members } = useSelector((state) => state.project);
+  const { ref, updateHeight } = usePreventOverflow();
 
   const [filterMembers, setFilterMembers] = useState(members);
 
@@ -210,6 +212,10 @@ const ProjectViewMembers = () => {
     );
   }, [searchDebounce, members]);
 
+  useEffect(() => {
+    updateHeight(10);
+  }, []);
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
@@ -240,17 +246,18 @@ const ProjectViewMembers = () => {
             </Box>
           </CardContent>
           <Divider />
-          <DataGrid
-            rows={filterMembers.map((member) => ({
-              ...member,
-              id: member.member.id,
-            }))}
-            columns={columns}
-            // checkboxSelection
-            disableRowSelectionOnClick
-            pageSizeOptions={[10, 25, 50]}
-            sx={{ height: "65vh" }}
-          />
+          <div ref={ref}>
+            <DataGrid
+              rows={filterMembers.map((member) => ({
+                ...member,
+                id: member.member.id,
+              }))}
+              columns={columns}
+              // checkboxSelection
+              disableRowSelectionOnClick
+              pageSizeOptions={[10, 25, 50]}
+            />
+          </div>
         </Card>
       </Grid>
     </Grid>

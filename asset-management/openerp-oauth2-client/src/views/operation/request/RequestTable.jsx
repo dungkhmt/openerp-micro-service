@@ -12,6 +12,8 @@ import Select from '@mui/material/Select';
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DoneIcon from '@mui/icons-material/Done';
+import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -19,6 +21,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { errorNoti, successNoti } from 'utils/notification';
 import "./requestTable.css";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 
 const RequestTable = () => {
     const [name, setName] = useState("");
@@ -35,8 +38,12 @@ const RequestTable = () => {
     const [currentId, setCurrentId] = useState(null);
     const [title, setTitle] = useState("");
 
+    const [openDelete, setOpenDelete] = useState(false);
+    const [openApprove, setOpenApprove] = useState(false);
+    const [openReject, setOpenReject] = useState(false);
+
     const getAllAvailableAssets = async() => {
-        request("get", "/asset/get-all", (res) => {
+        request("get", "/asset/get-all-available", (res) => {
             setAssets(res.data);
         }).then();
     };
@@ -68,9 +75,25 @@ const RequestTable = () => {
     };
 
     const successHandler = (res) => {
-        const msg = title === "CREATE NEW ASSET" ? "CREATE SUCCESSFULLY" : "EDIT SUCCESSFULLY";
+        const msg = title === "CREATE NEW REQUEST" ? "CREATE SUCCESSFULLY" : "EDIT SUCCESSFULLY";
         successNoti(msg, 3000);
-        setRequests(prevAsset => [...prevAsset, res.data]);
+        window.location.reload();
+        // setRequests(prevAsset => [...prevAsset, res.data]);
+    };
+
+    const successHandlerDelete = () => {
+        successNoti("DELETE SUCCESSFULLY", 3000);
+        window.location.reload();
+    };
+
+    const successHandlerApprove = () => {
+        successNoti("APPROVE REQUEST SUCCESSFULLY", 3000);
+        window.location.reload();
+    };
+
+    const successHandlerReject = () => {
+        successNoti("REJECT REQUEST SUCCESSFULLY", 3000);
+        window.location.reload();
     };
 
     const handleCreate = () => {
@@ -84,18 +107,28 @@ const RequestTable = () => {
         setAssetName("");
         setStartDate(null);
         setEndDate(null);
-    }
-
+    };
 
     const handleClose = () => {
         setOpen(false);
         resetData();
     };
 
+    const handleCloseDelete = () => {
+        setOpenDelete(false)
+    };
+
+    const handleCloseApprove = () => {
+        setOpenApprove(false);
+    };
+
+    const handleCloseReject = () => {
+        setOpenReject(false);
+    };
+
     const handleSubmit = (e) => {
     	e.preventDefault();
         const foundAsset = assets.find(a => a.name === assetName);
-        console.log("dataaa", name);
         const asset_id = foundAsset ? foundAsset.id : 0;
 
         const body = {
@@ -106,12 +139,40 @@ const RequestTable = () => {
             asset_id: asset_id
         };
 
-        console.log("body", body);
-
         request("post", "/request/add-new", successHandler, errorHandlers, body);
-
         resetData();
         setOpen(false);
+    };
+
+
+    const handleDelete = (request) => {
+        setOpenDelete(true);
+        setCurrentId(request.id);
+    };
+
+    const deleteApi = () => {
+        request("delete", `/request/delete/${currentId}`, successHandlerDelete, errorHandlers, {});
+        setOpenDelete(false);
+    };
+
+    const handleApprove = (request) => {
+        setOpenApprove(true);
+        setCurrentId(request.id);
+    };
+
+    const approveApi = () => {
+        request("put", `/request/approve/${currentId}`, successHandlerApprove, errorHandlers, {});
+        setOpenApprove(false);
+    };
+
+    const handleReject = (request) => {
+        setOpenReject(true);
+        setCurrentId(request.id);
+    };
+
+    const rejectApi = () => {
+        request("put", `/request/reject/${currentId}`, successHandlerReject, errorHandlers, {});
+        setOpenReject(false);
     };
 
     useEffect(() => {
@@ -122,19 +183,32 @@ const RequestTable = () => {
     const columns = [
         {
             title: "Request",
-            field: "id",
+            field: "name",
         },
         {
             title: "Creator",
-            field: "firstName",
+            field: "user_id",
         },
         {
             title: "Description",
-            field: "lastName",
+            field: "description",
         },
         {
             title: "Status",
-            field: "email",
+            sorting: true,
+            render: (rowData) => {
+                if(rowData.status === 0){
+                    return <div>PENDING</div>;
+                } else if(rowData.status === 1){
+                    return <div>APPROVED</div>;
+                } else {
+                    return <div>REJECTED</div>;
+                }
+            }
+        },
+        {
+            title: "Approver",
+            field: "admin_id"
         },
         {
             title: "StartDate",
@@ -143,6 +217,35 @@ const RequestTable = () => {
         {
             title: "EndDate",
             field: "endDate",
+        },
+        {
+            title: "Approve",
+            sorting: false,
+            render: (rowData) => (
+                <IconButton
+                    onClick={() => {
+                        handleApprove(rowData)
+                    }}
+                    variant="contained"
+                    color="success"
+                >
+                    <DoneIcon/>
+                </IconButton>
+            )
+        },
+        {
+            title: "Reject",
+            render: (rowData) => (
+                <IconButton
+                    onClick={() => {
+                        handleReject(rowData)
+                    }}
+                    variant="contained"
+                    color="error"
+                >
+                    <CloseIcon/>
+                </IconButton>
+            )
         },
         {
             title: "Edit",
@@ -165,7 +268,7 @@ const RequestTable = () => {
             render: (rowData) => (
                 <IconButton
                     onClick={() => {
-                        demoFunction(rowData)
+                        handleDelete(rowData)
                     }}
                     variant="contained"
                     color="error"
@@ -187,7 +290,6 @@ const RequestTable = () => {
                 title="Requests List"
                 columns={columns}
                 data={requests}
-                // hideCommandBar
                 options={{
                     selection: false,
                     pageSize: 10,
@@ -248,26 +350,6 @@ const RequestTable = () => {
                             </DemoContainer>
                             </LocalizationProvider>
                         </div>
-                        {/* <FormControl sx={{ width: "100%", marginTop: "20px" }}>
-                            <InputLabel id="demo-multiple-checkbox-label">Approval</InputLabel>
-                            <Select
-                                labelId="demo-multiple-checkbox-label"
-                                id="demo-multiple-checkbox"
-                                multiple
-                                value={approvers}
-                                onChange={handleChangeApprovers}
-                                input={<OutlinedInput label="Tag"/>}
-                                renderValue={(selected) => selected.join(', ')}
-                                MenuProps={MenuProps}
-                            >
-                                {users.map((ele, index) => (
-                                    <MenuItem key={ele.id} value={ele.id}>
-                                    <Checkbox checked={approvers.indexOf(ele.id) > -1}/>
-                                    <ListItemText primary={ele.id}/>
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>                          */}
                         <div style={{display: "flex", justifyContent: "space-between", marginTop: "20px"}}>
                             <Button
                                 variant="outlined"
@@ -287,7 +369,70 @@ const RequestTable = () => {
                         </div>
                     </form>
 				</Box>
-      		</Modal>               
+      		</Modal>     
+              <Dialog
+                open={openDelete}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"DELETE THIS REQUEST"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Do you want to delete this request. It cannot be undone?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" onClick={handleCloseDelete}>CANCEL</Button>
+                    <Button variant="outlined" color="error" onClick={deleteApi} autoFocus>
+                        DELETE
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={openApprove}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"APPROVE THIS REQUEST"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Do you want to approve this request. Asset in request will be assign for user
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" onClick={handleCloseApprove}>CANCEL</Button>
+                    <Button variant="outlined" color="error" onClick={approveApi} autoFocus>
+                        APPROVE
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={openReject}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"REJECT THIS REQUEST"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Do you want to reject this request. Asset in request will not be assign for user
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" onClick={handleCloseReject}>CANCEL</Button>
+                    <Button variant="outlined" color="error" onClick={rejectApi} autoFocus>
+                        REJECT
+                    </Button>
+                </DialogActions>
+            </Dialog>      
         </div>
     );
 };
