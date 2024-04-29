@@ -12,6 +12,7 @@ import {
   TextField,
   Paper,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import { styles } from "./index.style";
 import { SEMESTER, SEMESTER_LIST } from "../config/localize";
@@ -196,7 +197,9 @@ const AllClassScreen = () => {
   return (
     <Paper elevation={3} style={{ paddingTop: "1em" }}>
       <div style={styles.tableToolBar}>
-        <h1>Danh sách lớp học</h1>
+        <Typography variant="h4" style={{ fontWeight: "bold" }}>
+          Danh sách lớp học
+        </Typography>
         <div style={styles.searchArea}>
           <FormControl variant="standard" style={styles.dropdown}>
             <InputLabel id="semester-label">Học kì</InputLabel>

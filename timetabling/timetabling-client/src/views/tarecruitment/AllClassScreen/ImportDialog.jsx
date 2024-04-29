@@ -172,7 +172,12 @@ const ImportDialog = ({ open, handleClose, fetchData }) => {
             timeout={{ enter: 300, exit: 200 }}
           >
             <div style={{ width: "90%" }}>
-              <h1 style={{ textAlign: "center" }}>Yêu cầu dữ liệu Excel</h1>
+              <Typography
+                variant="h4"
+                style={{ textAlign: "center", fontWeight: "bold" }}
+              >
+                Yêu cầu dữ liệu Excel
+              </Typography>
               <TableDemoData />
             </div>
           </Slide>
@@ -250,7 +255,12 @@ const ImportDialog = ({ open, handleClose, fetchData }) => {
             >
               {isImportSuccess ? (
                 <div>
-                  <h1 style={{ textAlign: "center" }}>Đang xử lý dữ liệu</h1>
+                  <Typography
+                    variant="h4"
+                    style={{ textAlign: "center", fontWeight: "bold" }}
+                  >
+                    Đang xử lý dữ liệu
+                  </Typography>
                   <CircularProgress size={80} thickness={3} />
                 </div>
               ) : (
@@ -263,7 +273,12 @@ const ImportDialog = ({ open, handleClose, fetchData }) => {
                     justifyContent: "center",
                   }}
                 >
-                  <h1 style={{ textAlign: "center" }}>{response}</h1>
+                  <Typography
+                    variant="h4"
+                    style={{ textAlign: "center", fontWeight: "bold" }}
+                  >
+                    {response}
+                  </Typography>
                   <Button onClick={handleClose} variant="contained">
                     Thoát
                   </Button>
@@ -288,7 +303,12 @@ const ImportDialog = ({ open, handleClose, fetchData }) => {
                 justifyContent: "center",
               }}
             >
-              <h1 style={{ textAlign: "center" }}>Nhập dữ liệu thành công</h1>
+              <Typography
+                variant="h4"
+                style={{ textAlign: "center", fontWeight: "bold" }}
+              >
+                Nhập dữ liệu thành công
+              </Typography>
               <Typography style={{ textAlign: "center" }} variant="body1">
                 {response}
               </Typography>

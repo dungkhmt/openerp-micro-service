@@ -1,4 +1,4 @@
-import { Chip } from "@mui/material";
+import { Chip, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { request } from "api";
 import { useEffect, useState } from "react";
@@ -113,7 +113,9 @@ const ApplicationResultScreen = () => {
 
   return (
     <div>
-      <h1>Kết quả tuyển dụng</h1>
+      <Typography variant="h4" style={{ fontWeight: "bold" }}>
+        Kết quả tuyển dụng
+      </Typography>
       <DataGrid
         loading={isLoading}
         rowHeight={60}

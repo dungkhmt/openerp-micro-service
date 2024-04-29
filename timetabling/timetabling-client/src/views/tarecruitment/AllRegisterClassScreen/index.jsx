@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { request } from "api";
-import { Button, TextField, Paper } from "@mui/material";
+import { Button, TextField, Paper, Typography } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { SEMESTER } from "../config/localize";
 import { DataGrid } from "@mui/x-data-grid";
@@ -138,7 +138,9 @@ const AllRegisterClassScreen = () => {
   return (
     <Paper elevation={3} style={{ paddingTop: "1em" }}>
       <div style={styles.tableToolBar}>
-        <h1>Danh sách lớp học</h1>
+        <Typography variant="h4" style={{ fontWeight: "bold" }}>
+          Danh sách lớp học
+        </Typography>
 
         <TextField
           style={styles.searchBox}

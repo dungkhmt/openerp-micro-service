@@ -6,6 +6,7 @@ import {
   Select,
   InputLabel,
   Button,
+  Typography,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import styles from "./index.style";
@@ -91,12 +92,14 @@ const ClassInformationScreen = () => {
 
   return (
     <div>
-      <h1>Thông tin lớp học</h1>
+      <Typography variant="h4" style={{ fontWeight: "bold" }}>
+        Thông tin lớp học
+      </Typography>
       <Paper elevation={3}>
         <div style={styles.content}>
           <div style={styles.firstRow}>
             <div style={styles.textFieldContainer}>
-              <h3>Mã lớp</h3>
+              <Typography variant="h6">Mã lớp</Typography>
               <TextField
                 style={styles.textField}
                 variant="outlined"
@@ -110,7 +113,7 @@ const ClassInformationScreen = () => {
 
           <div style={styles.firstRow}>
             <div style={styles.textFieldContainer}>
-              <h3>Mã môn học</h3>
+              <Typography variant="h6">Mã môn học</Typography>
               <TextField
                 style={styles.textField}
                 variant="outlined"
@@ -122,7 +125,7 @@ const ClassInformationScreen = () => {
             </div>
 
             <div style={styles.textFieldContainer}>
-              <h3>Tên môn học</h3>
+              <Typography variant="h6">Tên môn học</Typography>
               <TextField
                 style={styles.rightTextField}
                 variant="outlined"
@@ -136,7 +139,7 @@ const ClassInformationScreen = () => {
 
           <div style={styles.firstRow}>
             <div style={styles.textFieldContainer}>
-              <h3>Phòng học</h3>
+              <Typography variant="h6">Phòng học</Typography>
               <TextField
                 style={styles.textField}
                 variant="outlined"
@@ -148,7 +151,7 @@ const ClassInformationScreen = () => {
             </div>
 
             <div style={styles.textFieldContainer}>
-              <h3>Học kì</h3>
+              <Typography variant="h6">Học kì</Typography>
               <TextField
                 style={styles.textField}
                 variant="outlined"
@@ -161,7 +164,7 @@ const ClassInformationScreen = () => {
           </div>
 
           <div style={styles.textFieldContainer}>
-            <h3>Thời gian</h3>
+            <Typography variant="h6">Thời gian</Typography>
 
             <div style={styles.row}>
               <FormControl variant="standard" style={styles.dropdown}>
@@ -227,7 +230,7 @@ const ClassInformationScreen = () => {
           </div>
 
           <div style={styles.textFieldContainer}>
-            <h3>Ghi chú</h3>
+            <Typography variant="h6">Ghi chú</Typography>
             <TextField
               style={styles.textArea}
               multiline

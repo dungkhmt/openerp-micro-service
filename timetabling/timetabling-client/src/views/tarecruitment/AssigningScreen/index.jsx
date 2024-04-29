@@ -11,6 +11,7 @@ import {
   TextField,
   Paper,
   Collapse,
+  Typography,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
@@ -306,8 +307,8 @@ const AssigningScreen = () => {
 
   const FilterComponent = () => {
     return (
-      <div style={{ display: "flex" }}>
-        <h3>Trạng thái: </h3>
+      <div style={{ display: "flex", height: "40px" }}>
+        <Typography variant="h6">Trạng thái: </Typography>
         <Select
           value={statusFilter}
           id="application-status"
@@ -337,7 +338,9 @@ const AssigningScreen = () => {
   return (
     <Paper elevation={3} style={{ paddingTop: "1em" }}>
       <div style={styles.tableToolBar}>
-        <h1>Phân công trợ giảng</h1>
+        <Typography variant="h4" style={{ fontWeight: "bold" }}>
+          Phân công trợ giảng
+        </Typography>
         <div style={styles.toolLine}>
           <div style={styles.leftTool}>
             <Tooltip title="Phân loại">
