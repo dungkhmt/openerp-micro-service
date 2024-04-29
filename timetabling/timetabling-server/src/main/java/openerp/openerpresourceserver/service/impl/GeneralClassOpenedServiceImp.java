@@ -268,7 +268,7 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
     @Override
     public List<GeneralClassOpened> autoScheduleRoom(String semester, String groupName) {
         log.info("autoScheduleRoom start...");
-        
+
         return null;
     }
 }

@@ -54,6 +54,8 @@ public class ClassTimeScheduleSolver {
     public static List<GeneralClassOpened> solve(List<GeneralClassOpened> classes) {
         log.info("solve... by or-tools");
         Loader.loadNativeLibraries();
+        log.info("solve... by or-tools, loadNativeLibraries -> OK ");
+
         CpModel model = new CpModel();
 
         /*Init the constraint*/
