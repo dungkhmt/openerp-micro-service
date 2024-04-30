@@ -30,7 +30,7 @@ RUN apk update && apk add --no-cache \
     && apk add \
     --update ttf-dejavu \
     && rm -rf /var/cache/apk/*
-    
+
 ENV JAVA_OPTS=""
 
 ARG DEPENDENCY=/workspace/app/target/dependency

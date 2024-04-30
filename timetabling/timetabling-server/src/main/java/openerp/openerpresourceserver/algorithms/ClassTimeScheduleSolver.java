@@ -123,7 +123,9 @@ public class ClassTimeScheduleSolver {
 
 
         // And solve.
+        log.info("solve, start to call solver.solve...");
         solver.solve(model, cb);
+        log.info("solve, finished to call solver.solve...");
         System.out.println(cb.getSolutionCount() + " solutions found.");
 
         return classes;
