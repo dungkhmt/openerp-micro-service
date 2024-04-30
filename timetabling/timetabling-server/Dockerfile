@@ -21,6 +21,16 @@ RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
 FROM eclipse-temurin:20-jre-alpine
 
+# Install ortools and Apache POI dependencies
+RUN apk update && apk add --no-cache \
+    gcompat \
+    ncurses-libs \
+    libgcc \
+    libstdc++ \
+    && apk add \
+    --update ttf-dejavu \
+    && rm -rf /var/cache/apk/*
+    
 ENV JAVA_OPTS=""
 
 ARG DEPENDENCY=/workspace/app/target/dependency
