@@ -22,12 +22,18 @@ public class ClassRoomScheduleBacktrackingSolver {
 
     int f;
     int f_best;
+    double timeLimit; // in milli seconds
+    double t0;// start time-point
     public ClassRoomScheduleBacktrackingSolver(int n, int m, boolean[][] conflict, int[] c, List[] D) {
         this.n = n;
         this.m = m;
         this.conflict = conflict;
         this.c = c;
         this.D = D;
+    }
+
+    public void setTimeLimit(double timeLimit){
+        this.timeLimit = timeLimit;
     }
 
     private boolean check(int v, int k){
@@ -44,6 +50,8 @@ public class ClassRoomScheduleBacktrackingSolver {
         }
     }
     private void Try(int k){// try values of x[k]
+        double t = System.currentTimeMillis() - t0;
+        if(t > timeLimit) return;
         for(int v: D[k]){
             if(check(v,k)){
                 x[k] = v;
@@ -64,6 +72,7 @@ public class ClassRoomScheduleBacktrackingSolver {
         sol = new int[n];
         load = 0;
         f_best = 10000000;
+        t0 = System.currentTimeMillis();
         Try(0);
     }
     public int[] getSolution(){
@@ -104,6 +113,7 @@ public class ClassRoomScheduleBacktrackingSolver {
         }
         ClassRoomScheduleBacktrackingSolver app =
                 new ClassRoomScheduleBacktrackingSolver(n,m,conflict,c,D);
+        app.setTimeLimit(2000);// time limit 2 seconds
         app.solve();
         app.printSolution();
     }
