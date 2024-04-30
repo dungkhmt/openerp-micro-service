@@ -13,6 +13,7 @@ import ScheduleInformationRouter from "./ScheduleInformationRouter";
 import CourseTimeTablingRouter from "./CourseTimeTablingRouter";
 import GeneralTimeTablingRouter from "./GeneralTimeTablingRouter";
 import ComputerLabTimeTabling from "./ComputerLabTimeTablingRouter";
+import TaRecruitmentRouter from "./TaRecruitmentRouter"
 
 const styles = {
   loadingProgress: {
@@ -48,6 +49,7 @@ function MainAppRouter(props) {
           <PrivateRoute component={GeneralTimeTablingRouter} path="/general-time-tabling" />
 
           <PrivateRoute component={ComputerLabTimeTabling} path="/lab-time-tabling" />
+          <PrivateRoute component={TaRecruitmentRouter} path="/ta-recruitment" />
           <Route component={NotFound} />
         </Switch>
       </Suspense>
