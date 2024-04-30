@@ -29,6 +29,7 @@ public class ClassTimeScheduleSolver {
 
         @Override
         public void onSolutionCallback() {
+            log.info("onSolutionCallback -> found a solution");
             if (solutionCount > 0) return;
             System.out.printf("Solution #%d: time = %.02f s%n", solutionCount, wallTime());
             for (IntVar v : variableArray) {
@@ -51,6 +52,8 @@ public class ClassTimeScheduleSolver {
         private int solutionCount;
         private final IntVar[] variableArray;
     }
+
+
     public static List<GeneralClassOpened> solve(List<GeneralClassOpened> classes) {
         log.info("solve... by or-tools, start to loadNativeLibraries");
         Loader.loadNativeLibraries();
@@ -89,6 +92,9 @@ public class ClassTimeScheduleSolver {
                 if ((startPeriod / 6) == ((startPeriod + durations[i]) / 6)) allowedValues.add(startPeriod);
             }
 
+            log.info("solve, domain x[" + i + "] = ");
+            log.info(allowedValues);
+
             xc[i] = model.newIntVarFromDomain(
                     Domain.fromValues(
                             allowedValues.stream().mapToLong(z -> z + 1).toArray()
@@ -101,11 +107,12 @@ public class ClassTimeScheduleSolver {
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
                 if (conflict[i][j] == 1) {
+                    log.info("conflict " + i + " " + j);
                     BoolVar b = model.newBoolVar("b");
                     LinearExpr ei = LinearExpr.newBuilder().add(xc[i]).add(durations[i]).build();
                     LinearExpr ej = LinearExpr.newBuilder().add(xc[j]).add(durations[j]).build();
                     model.addLessOrEqual(ei, xc[j]).onlyEnforceIf(b);
-                    model.addGreaterThan(ei, xc[i]).onlyEnforceIf(b.not());
+                    model.addGreaterThan(ei, xc[j]).onlyEnforceIf(b.not());
                     model.addLessOrEqual(ej, xc[i]).onlyEnforceIf(b.not());
                 }
             }
@@ -142,5 +149,10 @@ public class ClassTimeScheduleSolver {
 
         // And solve.
         //solver.solve(model, cb);
+    }
+    public static void main(String[] args){
+        List<Integer> L = new ArrayList<>();
+        L.add(3); L.add(1); L.add(2); L.add(7); L.add(2);
+        log.info(L);
     }
 }
