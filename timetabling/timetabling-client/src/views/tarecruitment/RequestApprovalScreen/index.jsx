@@ -177,7 +177,9 @@ const RequestApprovalScreen = () => {
 
   const actionCell = (params) => {
     const rowData = params.row;
-    console.log(rowData);
+    const originalApplication = originalApplications.find(
+      (application) => application.id === rowData.id
+    );
     return (
       <span>
         <IconButton
@@ -190,9 +192,8 @@ const RequestApprovalScreen = () => {
            * @disabled If the application status is the same as the original application status, the button is disabled
            */
           disabled={
-            originalApplications &&
-            rowData?.applicationStatus ===
-              originalApplications.applicationStatus
+            originalApplication &&
+            rowData?.applicationStatus === originalApplication.applicationStatus
           }
         >
           <SaveIcon />
