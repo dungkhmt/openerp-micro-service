@@ -13,8 +13,6 @@ import openerp.openerpresourceserver.generaltimetabling.repo.ClassroomRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.ScheduleRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.SemesterRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.TimePerformanceRepo;
-import openerp.openerpresourceserver.model.entity.*;
-import openerp.openerpresourceserver.repo.*;
 import openerp.openerpresourceserver.generaltimetabling.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

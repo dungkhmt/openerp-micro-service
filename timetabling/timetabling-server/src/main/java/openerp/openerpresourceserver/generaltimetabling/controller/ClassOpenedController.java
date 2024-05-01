@@ -1,7 +1,6 @@
 package openerp.openerpresourceserver.generaltimetabling.controller;
 
 import jakarta.validation.Valid;
-import openerp.openerpresourceserver.exception.*;
 import openerp.openerpresourceserver.generaltimetabling.exception.*;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.AutoMakeScheduleDto;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.FilterClassOpenedDto;

@@ -3,7 +3,6 @@ package openerp.openerpresourceserver.generaltimetabling.service;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.FilterScheduleDto;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.RequestPerformanceDto;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Schedule;
-import openerp.openerpresourceserver.model.entity.*;
 
 import java.util.List;
 

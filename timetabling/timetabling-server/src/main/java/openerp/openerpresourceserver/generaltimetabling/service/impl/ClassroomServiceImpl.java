@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.generaltimetabling.service.impl;
 
-import openerp.openerpresourceserver.exception.*;
 import openerp.openerpresourceserver.generaltimetabling.exception.ClassroomNotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.exception.ClassroomUsedException;
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;

@@ -3,7 +3,6 @@ package openerp.openerpresourceserver.generaltimetabling.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import openerp.openerpresourceserver.generaltimetabling.common.CommonUtil;
-import openerp.openerpresourceserver.exception.*;
 import openerp.openerpresourceserver.generaltimetabling.exception.*;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.AutoMakeScheduleDto;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.FilterClassOpenedDto;
