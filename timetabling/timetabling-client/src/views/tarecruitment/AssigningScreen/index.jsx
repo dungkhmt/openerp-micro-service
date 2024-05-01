@@ -204,6 +204,10 @@ const AssigningScreen = () => {
   const actionCell = (params) => {
     const rowData = params.row;
 
+    const originalApplication = originalApplications.find(
+      (application) => application.id === rowData.id
+    );
+
     return (
       <span>
         <IconButton
@@ -216,8 +220,8 @@ const AssigningScreen = () => {
            * @disabled If the application status is the same as the original application status, the button is disabled
            */
           disabled={
-            originalApplications &&
-            rowData?.assignStatus === originalApplications.assignStatus
+            originalApplication &&
+            rowData?.assignStatus === originalApplication.assignStatus
           }
         >
           <SaveIcon />
