@@ -1,9 +1,9 @@
 package openerp.openerpresourceserver;
 
-import openerp.openerpresourceserver.model.entity.ClassPeriod;
-import openerp.openerpresourceserver.model.entity.WeekDay;
-import openerp.openerpresourceserver.repo.ClassPeriodRepo;
-import openerp.openerpresourceserver.repo.WeekDayRepo;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.ClassPeriod;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.WeekDay;
+import openerp.openerpresourceserver.generaltimetabling.repo.ClassPeriodRepo;
+import openerp.openerpresourceserver.generaltimetabling.repo.WeekDayRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;

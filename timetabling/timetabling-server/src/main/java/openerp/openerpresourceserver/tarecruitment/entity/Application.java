@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import openerp.openerpresourceserver.model.entity.User;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.User;
 
 @Data
 @Builder

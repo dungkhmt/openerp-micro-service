@@ -3,7 +3,6 @@ package openerp.openerpresourceserver.labtimetabling.controller;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.labtimetabling.service.SemesterService;
-import openerp.openerpresourceserver.repo.SemesterRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
