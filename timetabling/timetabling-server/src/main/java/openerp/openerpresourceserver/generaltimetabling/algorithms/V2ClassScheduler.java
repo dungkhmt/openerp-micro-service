@@ -7,9 +7,12 @@ import openerp.openerpresourceserver.generaltimetabling.helper.MassExtractor;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
+import org.hibernate.mapping.Collection;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Log4j2
 public class V2ClassScheduler {
@@ -95,6 +98,16 @@ public class V2ClassScheduler {
                 return null;
             }
         }
+        for (int i = 0 ; i < roomCapacities.length; i++) {
+            log.info("ROOM CAP " + i + " : " + roomCapacities[i]);
+        }
+        for (int i=0;i< studentQuantities.length; i++) {
+            log.info("STUDENT QUANTITY " + i + " : " + studentQuantities[i]);
+        }
+        for (int i=0;i< assignRoomsArray.length; i++) {
+            log.info("STUDENT QUANTITY " + i + " : " + assignRoomsArray[i]);
+        }
+
         List<int[]> C = new ArrayList();
         boolean[][] conflict = new boolean[numClasses][numClasses];
         /*Check the conflict*/
@@ -112,6 +125,12 @@ public class V2ClassScheduler {
         for(int[] p: C){
             conflict[p[0]][p[1]] = true;
         }
+
+        for(int[] p: C){
+            log.info("CONFLICT " + p[0]+ "-" + p[1] + " : " + conflict[p[0]][p[1]]);
+        }
+
+
 
         /*Call the classroom solver*/
         ClassRoomScheduleBacktrackingSolver solver =
