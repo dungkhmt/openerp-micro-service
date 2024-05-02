@@ -138,7 +138,7 @@ function QuestionInInteractiveQuiz({ testId, isCourse }) {
                   renderValue={() => status}
                   name="status"
                 >
-                  <MenuItem value={"OPEN"}>OPEN</MenuItem>
+                  <MenuItem value={"OPENED"}>OPENED</MenuItem>
                   <MenuItem value={"HIDDEN"}>HIDDEN</MenuItem>
                   <MenuItem value={"CREATED"}>CREATED</MenuItem>
                 </Select>

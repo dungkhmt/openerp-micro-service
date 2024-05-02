@@ -67,7 +67,7 @@ export default function LearningSessionStudentViewQuizTestList(props) {
       // token,
       // history,
       "get",
-      "/get-questions-of-interactive-quiz/" + testId,
+      "/get-questions-of-interactive-quiz-student/" + testId,
       (res) => {
         setListQuestions(res.data);
         // setquizGroupTestDetail(res.data);
@@ -97,6 +97,10 @@ export default function LearningSessionStudentViewQuizTestList(props) {
         401: () => {},
         406: () => {
           setMessageRequest("Time Out!");
+          setErrorRequest(true);
+        },
+        403: () => {
+          setMessageRequest("The test has not started!");
           setErrorRequest(true);
         },
       }
