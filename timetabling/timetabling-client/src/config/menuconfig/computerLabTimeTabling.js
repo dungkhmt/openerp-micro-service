@@ -41,9 +41,9 @@ export const computerLabTimeTabling = {
       },
       {
         id: "MENU_SCHEDULER",
-        path: "/scheduler",
+        path: `${prefix}/auto-assign`,
         isPublic: true,
-        text: "Xếp lịch tự động (chưa hoàn thiện)",
+        text: "Xếp lịch tự động",
         child: [],
       },
     ],

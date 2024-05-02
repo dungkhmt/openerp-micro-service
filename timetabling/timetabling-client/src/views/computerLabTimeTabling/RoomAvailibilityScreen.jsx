@@ -30,7 +30,7 @@ function RoomAvailibilityScreen() {
   const fetch_heat_data = async (semester, week) => {
     if (semester == null) semester = 0;
     if (week == null) week = 0;
-    console.log(`/heatmap?semesterId=${semester}&week=${week}`);
+    console.log(`/lab-timetabling/heatmap?semesterId=${semester}&week=${week}`);
     const result = await request(
       "get",
       `/lab-timetabling/heatmap?semesterId=${semester}&week=${week}`,
