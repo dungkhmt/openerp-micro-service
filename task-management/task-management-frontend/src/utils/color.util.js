@@ -22,11 +22,11 @@ export const getStatusColor = (status) => {
     case "ASSIGNMENT_INACTIVE":
       return "secondary";
     case "TASK_INPROGRESS":
-      return "info";
+      return "primary";
     case "TASK_OPEN":
       return "success";
     case "TASK_RESOLVED":
-      return "primary";
+      return "info";
     case "TASK_CLOSED":
       return "error";
     default:

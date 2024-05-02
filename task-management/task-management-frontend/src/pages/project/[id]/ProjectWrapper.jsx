@@ -4,6 +4,7 @@ import { Outlet, useParams } from "react-router-dom";
 import { fetchMembers, fetchProject, setLoading } from "../../../store/project";
 import { resetTasksData } from "../../../store/project/tasks";
 import { resetGanttData } from "../../../store/project/gantt-chart";
+import { resetCalendarData } from "../../../store/project/calendar";
 
 const ProjectWrapper = () => {
   const { id } = useParams();
@@ -15,6 +16,7 @@ const ProjectWrapper = () => {
     dispatch(resetTasksData());
     // reset gantt data
     dispatch(resetGanttData());
+    dispatch(resetCalendarData());
     // fetch project data
     await Promise.all([dispatch(fetchProject(id)), dispatch(fetchMembers(id))]);
     dispatch(setLoading(false));

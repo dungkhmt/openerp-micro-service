@@ -147,12 +147,24 @@ public class QuizTestController {
         return ResponseEntity.ok().body(eduCourseSessionInteractiveQuizQuestionRepo.save(eduCourseSessionInteractiveQuizQuestion));
     }
     
+    @Secured({"ROLE_TEACHER"})
     @GetMapping("/get-questions-of-interactive-quiz/{interactiveQuizId}")
     public ResponseEntity<?> getQuestionsOfInteractiveQuiz(Principal principal, @PathVariable UUID interactiveQuizId) {
         List<QuizQuestionDetailModel> quizQuestionList =
             interactiveQuizQuestionService.findAllByInteractiveQuizId(interactiveQuizId);
         return ResponseEntity.ok().body(quizQuestionList);
     }
+
+    @GetMapping("/get-questions-of-interactive-quiz-student/{interactiveQuizId}")
+    public ResponseEntity<?> getStudentQuestionsOfInteractiveQuiz(Principal principal, @PathVariable UUID interactiveQuizId) {
+        InteractiveQuiz interactiveQuiz = interactiveQuizRepo.findById(interactiveQuizId).orElse(null);
+        if (interactiveQuiz == null || !interactiveQuiz.getStatusId().equals("OPENED")) {
+            return ResponseEntity.status(403).build();
+        }
+        List<QuizQuestionDetailModel> quizQuestionList =
+            interactiveQuizQuestionService.findAllByInteractiveQuizId(interactiveQuizId);
+        return ResponseEntity.ok().body(quizQuestionList);
+    }    
 
     @GetMapping("/get-questions-of-course-interactive-quiz/{interactiveQuizId}")
     public ResponseEntity<?> getQuestionsOfCourseInteractiveQuiz(Principal principal, @PathVariable UUID interactiveQuizId) {

@@ -6,6 +6,7 @@ import status from "./status";
 import priority from "./priority";
 import assignedTasks from "./assigned-tasks";
 import gantt from "./project/gantt-chart";
+import calendar from "./project/calendar";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     priority,
     assignedTasks,
     gantt,
+    calendar,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

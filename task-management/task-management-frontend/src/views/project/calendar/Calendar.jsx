@@ -1,18 +1,47 @@
-import FullCalendar from "@fullcalendar/react";
-import listPlugin from "@fullcalendar/list";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
 import bootstrap5Plugin from "@fullcalendar/bootstrap5";
+import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { useRef } from "react";
+import listPlugin from "@fullcalendar/list";
+import FullCalendar from "@fullcalendar/react";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import dayjs from "dayjs";
 import PropTypes from "prop-types";
+import { useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setRange, setView } from "../../../store/project/calendar";
+import { getStatusColor } from "../../../utils/color.util";
 
 const Calendar = (props) => {
   const { handleAddEventSidebarToggle } = props;
+  const { id: projectId } = useParams();
+  const navigate = useNavigate();
   const calendarRef = useRef();
+  const { view, tasks, range } = useSelector((state) => state.calendar);
+  const dispatch = useDispatch();
 
+  const buildEventFromTask = (tasks) =>
+    tasks.map((task) => ({
+      ...tasks,
+      title: task.name,
+      start: dayjs(task.fromDate ?? task.createdStamp).toDate(),
+      end: task.dueDate
+        ? dayjs(task.dueDate).toDate()
+        : dayjs(task.fromDate ?? task.createdStamp)
+            .add(1, "minute")
+            .toDate(),
+      allDay: false,
+      extendedProps: {
+        bg: getStatusColor(task.statusId),
+        url: `/project/${projectId}/task/${task.id}`,
+      },
+    }));
+
+  /**
+   * @type import("@fullcalendar/core").CalendarOptions
+   */
   const calendarOptions = {
-    events: [],
+    events: buildEventFromTask(tasks),
     plugins: [
       interactionPlugin,
       dayGridPlugin,
@@ -20,7 +49,9 @@ const Calendar = (props) => {
       listPlugin,
       bootstrap5Plugin,
     ],
-    initialView: "dayGridMonth",
+    locale: "vi",
+    initialView: view,
+    initialDate: dayjs(range.startDate).endOf("week").toDate(),
     headerToolbar: {
       start: "addTask, prev, next, title",
       end: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
@@ -41,6 +72,8 @@ const Calendar = (props) => {
     },
     datesSet: (event) => {
       console.log(event);
+      dispatch(setRange({ startDate: event.start, endDate: event.end }));
+      dispatch(setView(event.view.type));
     },
     /*
       Enable dragging and resizing event
@@ -73,8 +106,7 @@ const Calendar = (props) => {
     navLinks: true,
 
     eventClassNames({ event: calendarEvent }) {
-      const colorName =
-        calendarsColor[calendarEvent._def.extendedProps.calendar];
+      const colorName = calendarEvent._def.extendedProps.bg;
 
       return [
         // Background Color
@@ -87,7 +119,8 @@ const Calendar = (props) => {
 
       console.log(clickedEvent);
 
-      handleAddEventSidebarToggle();
+      // handleAddEventSidebarToggle();
+      navigate(clickedEvent._def.extendedProps.url);
 
       // * Only grab required field otherwise it goes in infinity loop
       // ! Always grab all fields rendered by form (even if it get `undefined`) otherwise due to Vue3/Composition API you might get: "object is not extensible"
