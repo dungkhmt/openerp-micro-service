@@ -18,7 +18,6 @@ public class AssignDTO {
     private Long start_slot;
     private Long semester_id;
     private Long period;
-
     private Room room;
     private Class lesson;
 }

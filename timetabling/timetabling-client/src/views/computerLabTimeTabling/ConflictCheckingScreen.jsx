@@ -1,12 +1,10 @@
-import { Button, Box } from "@mui/material";
-import { request } from "api";
-import React, { useEffect, useState } from "react";
-import writeXlsxFile from "write-excel-file";
-import { datetimeForFN, days_Of_Week } from "utils/formatter";
-import io from "socket.io-client";
-import CircularProgress from "@mui/material/CircularProgress";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import Cookies from 'js-cookie'
+import { Button } from "@mui/material";
+import { request } from "api";
+import Cookies from 'js-cookie';
+import { useEffect, useState } from "react";
+import { datetimeForFN, days_Of_Week } from "utils/formatter";
+import writeXlsxFile from "write-excel-file";
 import BasicSelect from "./components/SelectBox";
 
 const ConflictCheckingScreen = () => {
@@ -18,20 +16,6 @@ const ConflictCheckingScreen = () => {
   const [id, alert] = useState("");
   const [socket, setSocket] = useState(null); 
   useEffect(() => {
-    const socketInstance = io("http://localhost:8878", {
-      withCredentials: false,
-    });
-    socketInstance.on("connect", () => {
-      console.log(socketInstance.id);
-      console.log("connected");
-      setSocket(socketInstance);
-
-      socketInstance.on("response", (data) => {
-        setConflicts(data);
-        setLoading(false);
-      })
-    });
-
     
     request(
       "get",
@@ -43,17 +27,7 @@ const ConflictCheckingScreen = () => {
         console.log(err);
       }
     ).then();
-
-    return () => {
-      socketInstance.disconnect();
-      Cookies.remove('io')
-    };
   }, []);
-  const checking_btn_onclick = () => {
-    setLoading(true);
-    setConflicts(null);
-    socket.emit("conflict-checking", { sendId: socket.id });
-  };
 
   const semester_on_change = (value) => {
     var sem = value.target.value;

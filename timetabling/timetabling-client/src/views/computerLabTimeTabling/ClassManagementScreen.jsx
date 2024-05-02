@@ -1,3 +1,4 @@
+import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import {
@@ -32,7 +33,6 @@ import { v4 as uuidv4 } from "uuid";
 import DownloadButton from "./components/DownloadButton";
 import BasicSelect from "./components/SelectBox";
 import SelectFileButton from "./components/SelectFileButton";
-import AddIcon from '@mui/icons-material/Add';
 
 function ClassManagementScreen() {
   const [classes, setClasses] = useState([]);
@@ -438,8 +438,8 @@ function ClassManagementScreen() {
       department_id: departmentInput,
     };
 
-    submit_handler("patch", `/class/${selectedItem.id}`, update_class);
-    submit_handler("post", `/assign`, {
+    submit_handler("patch", `/lab-timetabling/class/${selectedItem.id}`, update_class);
+    submit_handler("post", `/lab-timetabling/assign`, {
       update: assigned,
       remove: redundant_assigned,
     });
@@ -651,7 +651,7 @@ function ClassManagementScreen() {
         isLoading={loading}
         textOk="Create"
         onOk={() => {
-          submit_handler("post", `/class`, {
+          submit_handler("post", `/lab-timetabling/class`, {
             semester_id: semesterInput,
             class_code: idInput,
             quantity: quantityInput,
@@ -720,7 +720,7 @@ function ClassManagementScreen() {
         isLoading={loading}
         textOk="Delete"
         onOk={() => {
-          submit_handler("delete", `/class/${selectedItem.id}`, null);
+          submit_handler("delete", `/lab-timetabling/class/${selectedItem.id}`, null);
         }}
       ></HustModal>
 
