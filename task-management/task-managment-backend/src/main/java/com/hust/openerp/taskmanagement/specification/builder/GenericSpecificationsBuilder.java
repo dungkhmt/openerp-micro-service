@@ -101,7 +101,7 @@ public class GenericSpecificationsBuilder<E> {
       }
 
     }
-    return specStack.pop();
+    return specStack.isEmpty() ? null : specStack.pop();
 
   }
 }

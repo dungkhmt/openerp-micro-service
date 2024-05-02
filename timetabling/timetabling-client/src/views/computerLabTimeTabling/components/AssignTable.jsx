@@ -233,8 +233,8 @@ const checkTimeAssignedConstraint = (object, assignedSetArray) => {
       department_id: departmentInput,
     };
 
-    submit_handler("patch", `/class/${selectedItem.id}`, update_class);
-    submit_handler("post", `/assign`, {
+    submit_handler("patch", `/lab-timetabling/class/${selectedItem.id}`, update_class);
+    submit_handler("post", `/lab-timetabling/assign`, {
       update: assigned,
       remove: redundant_assigned,
     });

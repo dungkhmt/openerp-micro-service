@@ -14,12 +14,22 @@ COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
 
-RUN ./mvnw install -DskipTests
+RUN --mount=type=cache,target=/root/.m2 ./mvnw install -DskipTests
 
 # Unpack Spring Boot fat JAR
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
 FROM eclipse-temurin:20-jre-alpine
+
+# Install ortools and Apache POI dependencies
+RUN apk update && apk add --no-cache \
+    gcompat \
+    ncurses-libs \
+    libgcc \
+    libstdc++ \
+    && apk add \
+    --update ttf-dejavu \
+    && rm -rf /var/cache/apk/*
 
 ENV JAVA_OPTS=""
 
@@ -28,3 +38,4 @@ COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 ENTRYPOINT java ${JAVA_OPTS} -cp app:app/lib/* openerp.openerpresourceserver.OpenerpResourceServerApplication
+

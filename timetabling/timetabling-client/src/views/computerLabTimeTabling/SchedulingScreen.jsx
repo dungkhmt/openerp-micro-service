@@ -18,11 +18,11 @@ function SchedulingScreen(){
     const [classes, setClasses] = useState([])
 
     useEffect(() => {
-        request("get", "/room/get-all", (res) => {
+        request("get", "/lab-timetabling/room/get-all", (res) => {
             setRooms(res.data);
         }).then();
 
-        request("get", "/class/get-all", (res) => {
+        request("get", "/lab-timetabling/class/get-all", (res) => {
             setClasses(res.data);
         }).then();
     }, [])
@@ -81,7 +81,7 @@ function SchedulingScreen(){
             roomList: selectedRooms
         }
         console.log(data)
-        request("post", "/submit", (res)=>{
+        request("post", "/lab-timetabling/submit", (res)=>{
             update_callback("success",  `post successful`)
         }, (err)=>{
             update_callback("error", "Failed on post")

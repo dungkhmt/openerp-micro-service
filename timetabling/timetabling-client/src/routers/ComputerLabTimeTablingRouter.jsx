@@ -4,6 +4,7 @@ import RoomManagementScreen from "views/computerLabTimeTabling/RoomManagementScr
 import RoomAvailibilityScreen from "views/computerLabTimeTabling/RoomAvailibilityScreen";
 import TimetableScreen from "views/computerLabTimeTabling/TimetableScreen";
 import ConflictCheckingScreen from "views/computerLabTimeTabling/ConflictCheckingScreen";
+import AutoAssignScreen from "views/computerLabTimeTabling/AutoAssignScreen";
 
 export default function ComputerLabTimeTabling() {
   let { path } = useRouteMatch();
@@ -34,6 +35,11 @@ export default function ComputerLabTimeTabling() {
           component={ConflictCheckingScreen}
           exact
           path={`${path}/conflict-checking`}
+        ></Route>
+        <Route
+          component={AutoAssignScreen}
+          exact
+          path={`${path}/auto-assign`}
         ></Route>
       </Switch>
     </div>

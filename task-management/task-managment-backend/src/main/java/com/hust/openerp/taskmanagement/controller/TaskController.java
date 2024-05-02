@@ -20,6 +20,7 @@ import com.hust.openerp.taskmanagement.config.OpenApiConfig;
 import com.hust.openerp.taskmanagement.dto.PaginationDTO;
 import com.hust.openerp.taskmanagement.dto.ProjectDTO;
 import com.hust.openerp.taskmanagement.dto.TaskDTO;
+import com.hust.openerp.taskmanagement.dto.TaskGanttDTO;
 import com.hust.openerp.taskmanagement.dto.form.SuggestForm;
 import com.hust.openerp.taskmanagement.dto.form.TaskForm;
 import com.hust.openerp.taskmanagement.entity.Task;
@@ -48,6 +49,13 @@ public class TaskController {
         var pageResult = taskService.getTasksOfProject(pageable, projectId, q)
                 .map(this::convertToDto);
         return new PaginationDTO<>(pageResult);
+    }
+
+    @GetMapping("/gantt")
+    public List<TaskGanttDTO> getTasksForGanttChart(@RequestParam("projectId") UUID projectId,
+            @RequestParam("from") String from, @RequestParam("to") String to,
+            @RequestParam(name = "q", required = false) String q) {
+        return taskService.getTaskGantt(projectId, from, to, q);
     }
 
     @PostMapping

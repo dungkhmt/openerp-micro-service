@@ -3,9 +3,15 @@ package openerp.openerpresourceserver;
 import com.google.ortools.Loader;
 import com.google.ortools.sat.*;
 import com.google.ortools.util.Domain;
-import openerp.openerpresourceserver.helper.MassExtractor;
-import openerp.openerpresourceserver.model.entity.general.GeneralClassOpened;
-import openerp.openerpresourceserver.repo.GeneralClassOpenedRepository;
+import lombok.extern.log4j.Log4j2;
+import openerp.openerpresourceserver.generaltimetabling.algorithms.V2ClassScheduler;
+import openerp.openerpresourceserver.generaltimetabling.helper.MassExtractor;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
+import openerp.openerpresourceserver.generaltimetabling.repo.ClassroomRepo;
+import openerp.openerpresourceserver.generaltimetabling.repo.GeneralClassOpenedRepository;
+import openerp.openerpresourceserver.generaltimetabling.repo.GroupRepo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,16 +19,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
 
+@Log4j2
 @SpringBootTest
 class OpenerpResourceServerApplicationTests {
 
     private final GeneralClassOpenedRepository gcoRepo;
+    private final ClassroomRepo classroomRepo;
+    private final GroupRepo groupRepo;
     private final int minPeriod = 2;
     private final int maxPeriod = 4;
 
     @Autowired
-    OpenerpResourceServerApplicationTests(GeneralClassOpenedRepository gcoRepo) {
+    OpenerpResourceServerApplicationTests(GeneralClassOpenedRepository gcoRepo, ClassroomRepo classroomRepo, GroupRepo groupRepo) {
         this.gcoRepo = gcoRepo;
+        this.classroomRepo = classroomRepo;
+        this.groupRepo = groupRepo;
     }
 
     static class VarArraySolutionPrinter extends CpSolverSolutionCallback {
@@ -48,7 +59,7 @@ class OpenerpResourceServerApplicationTests {
     }
 
     @Test
-    void initData() {
+    void v1SchedulerTest() {
         List<GeneralClassOpened> classes = gcoRepo.findAllBySemester("20221")
                 .stream().filter(c -> (c.getGroupName() != null && c.getGroupName()
                         .startsWith("TAKHMT"))).toList();
@@ -128,4 +139,28 @@ class OpenerpResourceServerApplicationTests {
         System.out.println(cb.getSolutionCount() + " solutions found.");
 
     }
+
+
+    @Test
+    void v2SchedulerTimeSlotTest() {
+        List<GeneralClassOpened> classes = gcoRepo.findAllBySemester("20232")
+                .stream().filter(c -> (c.getGroupName() != null && c.getGroupName()
+                        .startsWith("TA KHKT"))).toList();
+        List<Classroom> rooms = classroomRepo.findAll().stream().filter(classroom -> !classroom.equals("")).toList();
+        V2ClassScheduler.autoScheduleTimeSlot(classes);
+    }
+    @Test
+    void v2SchedulerRoomTest() {
+        List<GeneralClassOpened> classes = gcoRepo.findAllBySemester("20232")
+                .stream().filter(c -> (
+                        c.getGroupName() != null
+                        && c.getGroupName().startsWith("TA KHKT"))
+                        && !c.getQuantity().isEmpty()
+                ).toList();
+        Group group = groupRepo.findByGroupName("TA KHKT").orElse(null);
+        List<Classroom> rooms = classroomRepo.findAll().stream().filter(classroom -> classroom.getQuantityMax() != 0).toList();
+        V2ClassScheduler.autoScheduleRoom(classes, rooms);
+    }
+
+
 }
