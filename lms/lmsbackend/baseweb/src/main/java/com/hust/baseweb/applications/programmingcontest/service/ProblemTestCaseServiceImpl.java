@@ -12,6 +12,7 @@ import com.hust.baseweb.applications.programmingcontest.entity.*;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
 import com.hust.baseweb.applications.programmingcontest.model.*;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.ContestProblemModelResponse;
+import com.hust.baseweb.applications.programmingcontest.model.externalapi.SubmissionModelResponse;
 import com.hust.baseweb.applications.programmingcontest.repo.*;
 import com.hust.baseweb.applications.programmingcontest.service.helper.cache.ProblemTestCaseServiceCache;
 import com.hust.baseweb.applications.programmingcontest.utils.ComputerLanguage;
@@ -3690,6 +3691,17 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         for(ProblemEntity pe: problems){
             ContestProblemModelResponse p = new ContestProblemModelResponse(
                 pe.getProblemId(),pe.getProblemName(),pe.getLevelId());
+        }
+        return res;
+    }
+
+    @Override
+    public List<SubmissionModelResponse> extApiGetSubmissions(String participantId) {
+        List<ContestSubmissionEntity> sub = contestSubmissionPagingAndSortingRepo.findAllByUserId(participantId);
+        List<SubmissionModelResponse> res = new ArrayList<SubmissionModelResponse>();
+        for(ContestSubmissionEntity s: sub){
+            SubmissionModelResponse r = new SubmissionModelResponse(s.getUserId(),s.getProblemId(),s.getContestId(),s.getPoint(),s.getCreatedAt());
+            res.add(r);
         }
         return res;
     }
