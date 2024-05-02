@@ -1,21 +1,18 @@
-package openerp.openerpresourceserver.generaltimetabling.model.entity;
+package openerp.openerpresourceserver.model.entity.general;
 
-import jakarta.persistence.*;
-import lombok.*;
-import springfox.documentation.spring.web.json.Json;
-
+import java.util.List;
 import java.util.Objects;
 
-@Entity
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "timetabling_class_opened")
-public class ClassOpened {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "class_opened_id", updatable = false, nullable = false)
+public class GeneralClassOpened {
     private Long id;
     private String semester;
     private String quantity;
@@ -33,10 +30,7 @@ public class ClassOpened {
     private String groupName;
     private String startPeriod;
     private String weekday;
-    private String classroom;
-    private String secondStartPeriod;
-    private String secondWeekday;
-    private String secondClassroom;
+    private List<RoomReservation> timeSlots;
     private Boolean isSeparateClass = false;
 
 
@@ -45,7 +39,7 @@ public class ClassOpened {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ClassOpened that = (ClassOpened) o;
+        GeneralClassOpened that = (GeneralClassOpened) o;
 
         return Objects.equals(moduleName, that.moduleName) &&
                 Objects.equals(moduleCode, that.moduleCode) &&
@@ -57,13 +51,7 @@ public class ClassOpened {
         return Objects.hash(moduleName, moduleCode, classCode);
     }
 
-    public boolean getIsEnoughTimeTableInfo() {
-        if(classroom== null || startPeriod == null || weekday == null || weekday == null) {
-            return false;
-        }
-        if(isSeparateClass == true && (secondClassroom==null || secondWeekday == null || secondStartPeriod == null )) {
-            return false;
-        }
-        return true;
+    public void addTimeSlot(RoomReservation roomReservation) {
+        timeSlots.add(roomReservation);
     }
 }
