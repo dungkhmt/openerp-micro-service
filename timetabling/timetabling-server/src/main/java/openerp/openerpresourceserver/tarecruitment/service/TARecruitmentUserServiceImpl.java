@@ -23,7 +23,7 @@ public class TARecruitmentUserServiceImpl implements TARecruitment_UserService {
         }
         UserInfoDTO userInfoDTO = new UserInfoDTO();
         userInfoDTO.setEmail(user.get().getEmail());
-        String userName = user.get().getFirstName() + user.get().getLastName();
+        String userName = user.get().getFirstName() + " " + user.get().getLastName();
         userInfoDTO.setName(userName);
         return userInfoDTO;
     }

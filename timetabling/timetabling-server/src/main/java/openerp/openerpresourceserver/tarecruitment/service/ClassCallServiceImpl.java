@@ -56,11 +56,8 @@ public class ClassCallServiceImpl implements ClassCallService {
         Pageable pageable = PageRequest.of(page, limit);
         Page<ClassCall> classCallsPage = classCallRepo.findBySemester(semester, search, pageable);
 
-        if (classCallsPage.isEmpty()) {
-            throw new IllegalArgumentException("No classes found for semester " + semester);
-        }
-
         PaginationDTO<ClassCall> paginationDTO = new PaginationDTO<>();
+
         paginationDTO.setPage(classCallsPage.getNumber());
         paginationDTO.setTotalElement((int) classCallsPage.getTotalElements());
         paginationDTO.setData(classCallsPage.getContent());
@@ -100,6 +97,14 @@ public class ClassCallServiceImpl implements ClassCallService {
         }
 
         classCallRepo.deleteById(id);
+        return true;
+    }
+
+    @Override
+    public boolean deleteMultipleClass(List<Integer> idList) {
+        for(int id : idList) {
+            classCallRepo.deleteById(id);
+        }
         return true;
     }
 
