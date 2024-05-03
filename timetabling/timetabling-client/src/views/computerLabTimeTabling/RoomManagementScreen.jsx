@@ -175,7 +175,7 @@ function RoomManagementScreen() {
             department_id: departmentInput,
           };
           console.log(data);
-          submit_handler("patch", `/room/${selectedItem.id}`, data);
+          submit_handler("patch", `/lab-timetabling/room/${selectedItem.id}`, data);
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -217,7 +217,7 @@ function RoomManagementScreen() {
             department_id: departmentInput,
           };
           console.log(data);
-          submit_handler("post", `/room`, data);
+          submit_handler("post", `/lab-timetabling/room`, data);
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -254,7 +254,7 @@ function RoomManagementScreen() {
         isLoading={loading}
         textOk="Delete"
         onOk={() => {
-          submit_handler("delete", `/room/${selectedItem.id}`, null);
+          submit_handler("delete", `/lab-timetabling/room/${selectedItem.id}`, null);
         }}
       ></HustModal>
     </div>

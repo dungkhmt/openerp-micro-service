@@ -3,7 +3,7 @@ import { Typography } from "@mui/material";
 import { useState } from "react";
 import PropTypes from "prop-types";
 import { FilterWrapperBox } from "../FilterWrapperBox";
-import { MenuMultiSelect } from "../menu/MenuMultiSelect";
+import { MenuMultiSelect } from "../../../menu/MenuMultiSelect";
 
 const FilterValueMultiSelect = (props) => {
   const { filter, item, onAddItem, onDeleteItem, onSelectAll, onDeselectAll } =

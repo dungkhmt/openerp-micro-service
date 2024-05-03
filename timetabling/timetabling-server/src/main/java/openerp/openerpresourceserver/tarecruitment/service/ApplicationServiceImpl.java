@@ -2,8 +2,8 @@ package openerp.openerpresourceserver.tarecruitment.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import openerp.openerpresourceserver.model.entity.User;
-import openerp.openerpresourceserver.repo.UserRepo;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.User;
+import openerp.openerpresourceserver.generaltimetabling.repo.UserRepo;
 import openerp.openerpresourceserver.tarecruitment.algorithm.MaxMatching;
 import openerp.openerpresourceserver.tarecruitment.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.Application;

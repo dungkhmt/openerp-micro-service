@@ -57,8 +57,7 @@ const GeneralScheduleScreen = () => {
       { ids: selectedRows }
     );
   };
-
-  const handleAutoScheduleTimeTabling = () => {
+  const handleAutoScheduleTimeSlotTimeTabling = () => {
     request(
       "post",
       `/general-classes/auto-schedule-time?semester=${selectedSemester?.semester}&groupName=${selectedGroup?.groupName}`,
@@ -87,17 +86,64 @@ const GeneralScheduleScreen = () => {
         toast.success("Tự động thời khóa biểu thành công!");
       },
       (error) => {
-        console.log(error);
-        toast.error("Có lỗi khi tự động thời khóa biểu!");
-        setResetLoading(false);
+        if(error.response.status == 410){
+          toast.error(error.response.data);
+          setResetLoading(false);
+        } else {
+          console.log(error);
+          toast.error("Có lỗi khi tự động thời khóa biểu!");
+          setResetLoading(false);
+        }
       }
     );
-  }
+  };
+  const handleAutoScheduleClassroomTimeTabling = () => {
+    request(
+      "post",
+      `/general-classes/auto-schedule-room?semester=${selectedSemester?.semester}&groupName=${selectedGroup?.groupName}`,
+      (res) => {
+        let generalClasses = [];
+        res.data?.forEach((classObj) => {
+          
+          if (classObj?.classCode !== null && classObj?.timeSlots) {
+            classObj.timeSlots.forEach((timeSlot, index) => {
+              const cloneObj = JSON.parse(
+                JSON.stringify({
+                  ...classObj,
+                  ...timeSlot,
+                  classCode: classObj.classCode,
+                  id: classObj.id + `-${index + 1}`,
+                  roomReservationId: timeSlot.id,
+                })
+              );
+              delete cloneObj.timeSlots;
+              generalClasses.push(cloneObj);
+            });
+            console.log(generalClasses);
+          }
+        });
+        setClasses(generalClasses);
+        setSelectedRows([]);
+        setResetLoading(false);
+        toast.success("Tự động phòng thành công!");
+      },
+      (error) => {
+        if(error.response.status == 410){
+          toast.error(error.response.data);
+          setResetLoading(false);
+        } else {
+          console.log(error);
+          toast.error("Có lỗi khi tự động xếp phòng");
+          setResetLoading(false);
+        }
+      }
+    );
+  };
 
   return (
     <div className="flex flex-col gap-4 w-full h-[700px]">
       <div className="flex flex-row justify-between">
-        <div className="flex flex-row gap-2">
+        <div className="flex flex-col gap-4">
           <GeneralSemesterAutoComplete
             selectedSemester={selectedSemester}
             setSelectedSemester={setSelectedSemester}
@@ -107,25 +153,42 @@ const GeneralScheduleScreen = () => {
             setSelectedGroup={setSelectedGroup}
           />
         </div>
-        <div className="flex flex-row gap-4">
-          <Button
-            disabled={selectedRows.length === 0}
-            startIcon={FacebookCircularProgress}
-            variant="contained"
-            color="error"
-            onClick={handleResetTimeTabling}
-          >
-            Xóa lịch học TKB
-          </Button>
-          <Button
-            disabled={!(selectedSemester !== null && selectedGroup !== null)}
-            startIcon={isTimeScheduleLoading ? FacebookCircularProgress : null}
-            variant="contained"
-            color="primary"
-            onClick={handleAutoScheduleTimeTabling}
-          >
-            Tự động xếp TKB
-          </Button>
+        <div className="flex flex-col justify-end gap-2">
+          <div className="flex flex-row gap-2 justify-end">
+            <Button
+              disabled={selectedRows.length === 0}
+              startIcon={FacebookCircularProgress}
+              variant="contained"
+              color="error"
+              onClick={handleResetTimeTabling}
+            >
+              Xóa lịch học TKB
+            </Button>
+          </div>
+          <div className="flex flex-row gap-2">
+            <Button
+              disabled={!(selectedSemester !== null && selectedGroup !== null)}
+              startIcon={
+                isTimeScheduleLoading ? FacebookCircularProgress : null
+              }
+              variant="contained"
+              color="primary"
+              onClick={handleAutoScheduleTimeSlotTimeTabling}
+            >
+              Tự động xếp TKB
+            </Button>
+            <Button
+              disabled={!(selectedSemester !== null && selectedGroup !== null)}
+              startIcon={
+                isTimeScheduleLoading ? FacebookCircularProgress : null
+              }
+              variant="contained"
+              color="primary"
+              onClick={handleAutoScheduleClassroomTimeTabling}
+            >
+              Tự động xếp phòng học
+            </Button>
+          </div>
         </div>
       </div>
       <GeneralScheduleTable

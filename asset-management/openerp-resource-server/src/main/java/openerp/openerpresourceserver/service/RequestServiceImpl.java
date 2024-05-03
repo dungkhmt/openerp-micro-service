@@ -18,14 +18,18 @@ public class RequestServiceImpl implements RequestService{
     private RequestRepo requestRepo;
     private AssetRepo assetRepo;
 
+    // status
     private final Integer PENDING = 0;
     private final Integer APPROVED = 1;
     private final Integer REJECTED = 2;
 
+    // type
+    private final Integer BORROW = 1;
+    private final Integer PAY = 2;
+
     @Override
     public List<Request> getAllRequests() {
-        List<Request> requests = requestRepo.findAll();
-        return requests;
+        return requestRepo.findAll();
     }
 
     @Override
@@ -59,6 +63,43 @@ public class RequestServiceImpl implements RequestService{
     }
 
     @Override
+    public Request approveRequest(Integer Id, String admin_id) {
+        Request foundRequest = requestRepo.findById(Id).get();
+        if(!foundRequest.getStatus().equals(PENDING)){
+            return foundRequest;
+        }
+        Integer asset_id = foundRequest.getAsset_id();
+        Asset asset = assetRepo.findById(asset_id).get();
+        if(asset.getStatus_id() != 1){
+            return foundRequest;
+        }
+        if (admin_id.equals(foundRequest.getAdmin_id())) {
+            foundRequest.setStatus(APPROVED);
+        }
+        foundRequest.setLast_updated(new Date());
+        if(foundRequest.getType().equals(BORROW)){
+            asset.setStatus_id(2); // inuse
+        } else if(foundRequest.getType().equals(PAY)){
+            asset.setStatus_id(1); // available
+        }
+        assetRepo.save(asset);
+        return requestRepo.save(foundRequest);
+    }
+
+    @Override
+    public Request rejectRequest(Integer Id, String admin_id) {
+        Request foundRequest = requestRepo.findById(Id).orElse(null);
+        if(!foundRequest.getStatus().equals(PENDING)){
+            return foundRequest;
+        }
+        if (admin_id.equals(foundRequest.getAdmin_id())) {
+            foundRequest.setStatus(REJECTED);
+        }
+        foundRequest.setLast_updated(new Date());
+        return requestRepo.save(foundRequest);
+    }
+
+    @Override
     public void deleteRequest(Integer Id) {
         Optional<Request> request = requestRepo.findById(Id);
         if(request.isPresent()) {
@@ -66,28 +107,8 @@ public class RequestServiceImpl implements RequestService{
         }
     }
 
-    public boolean approveRequest(Integer requestId, String userId){
-        Request request = requestRepo.findById(requestId).get();
-        if(request.getStatus() == -10){ // rejected
-            return false;
-        }
-
-        if(request.getStatus() == 10){ // request done
-            return false;
-        }
-
-        // check quyen xem co dc approve ko
-//        if(!request.getApprovers_id().contains(userId)){
-//            return false;
-//        }
-//        List<String> approvals = request.getApprovals_id();
-//        approvals.add(userId);
-//        request.setApprovals_id(approvals.toString());
-//        if(approvals.length() == request.getApprovers_id().length()){
-//            request.setStatus(10); // mark done
-//        }
-        return true;
+    @Override
+    public List<Request> getUserRequests(String userId) {
+        return requestRepo.findByUserId(userId);
     }
-
-
 }

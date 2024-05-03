@@ -21,7 +21,7 @@ import PropTypes from "prop-types";
 import { forwardRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
 import { CustomMDEditor } from "../../../components/editor/md-editor/CustomMDEditor";
@@ -33,6 +33,7 @@ import { TaskStatus } from "../../../components/task/status";
 import { useTaskContext } from "../../../hooks/useTaskContext";
 import { FileService } from "../../../services/api/file.service";
 import { TaskService } from "../../../services/api/task.service";
+import { clearCache } from "../../../store/project/tasks";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />;
@@ -40,6 +41,7 @@ const Transition = forwardRef(function Transition(props, ref) {
 
 const DialogAddSubTask = ({ open, setOpen }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { members, project } = useSelector((state) => state.project);
   const { category, priority, status } = useSelector((state) => state);
 
@@ -67,6 +69,7 @@ const DialogAddSubTask = ({ open, setOpen }) => {
         fromDate: data.fromDate.toISOString(),
         parentId: task.id,
       });
+      dispatch(clearCache());
       toast.success("Thêm nhiệm vụ con thành công");
       navigate(`/project/${project.id}/task/${res.id}`);
     } catch (e) {

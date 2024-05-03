@@ -63,11 +63,7 @@ const columns = [
     fiterable: false,
     renderCell: ({ row }) =>
       row.creator ? (
-        <Tooltip
-          title={`${row.creator.firstName ?? ""} ${row.creator.lastName ?? ""}`}
-        >
-          <UserAvatar user={row.creator} />
-        </Tooltip>
+        <UserAvatar user={row.creator} />
       ) : (
         <Typography variant="body2" sx={{ color: "text.primary" }}>
           Không xác định

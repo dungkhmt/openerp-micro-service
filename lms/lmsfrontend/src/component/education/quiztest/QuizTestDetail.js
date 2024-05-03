@@ -111,7 +111,7 @@ function QuizTestDetail() {
 
   return courseInfo ? (
     <>
-      <TeacherViewQuizTestDetail />
+      <TeacherViewQuizTestDetail courseInfo={courseInfo} />
       <br />
 
       {/* <Card>

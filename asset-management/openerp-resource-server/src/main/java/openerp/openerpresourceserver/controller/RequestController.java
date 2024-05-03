@@ -19,7 +19,6 @@ public class RequestController {
 
     @GetMapping("/get-all")
     public ResponseEntity<?> getAllRequests(Principal principal){
-        System.out.println("pripri " + principal.getName());
         List<Request> requests = requestService.getAllRequests();
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -44,13 +43,37 @@ public class RequestController {
             .body(savedRequest);
     }
 
-//    public ResponseEntity<?> approveRequest(@PathVariable Integer Id){
-//
-//    }
-
     @DeleteMapping("/delete/{Id}")
     public ResponseEntity<?> deleteRequest(@PathVariable Integer Id){
         requestService.deleteRequest(Id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/approve/{Id}")
+    public ResponseEntity<?> approveRequest(@PathVariable Integer Id, Principal principal){
+        String approval_id = principal.getName();
+        Request savedRequest = requestService.approveRequest(Id, approval_id);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(savedRequest);
+
+    }
+
+    @PutMapping("/reject/{Id}")
+    public ResponseEntity<?> rejectRequest(@PathVariable Integer Id, Principal principal){
+        String rejection_id = principal.getName();
+        Request savedRequest = requestService.rejectRequest(Id, rejection_id);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(savedRequest);
+    }
+
+    @GetMapping("/get-by-user")
+    public ResponseEntity<?> getUserRequests(Principal principal){
+        String user_id = principal.getName();
+        List<Request> requests = requestService.getUserRequests(user_id);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(requests);
     }
 }
