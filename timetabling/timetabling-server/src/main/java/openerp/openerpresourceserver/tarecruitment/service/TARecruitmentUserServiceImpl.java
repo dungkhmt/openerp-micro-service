@@ -1,8 +1,6 @@
 package openerp.openerpresourceserver.tarecruitment.service;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.model.entity.User;
-import openerp.openerpresourceserver.repo.UserRepo;
 import openerp.openerpresourceserver.tarecruitment.dto.UserInfoDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.TARecruitmentUser;
 import openerp.openerpresourceserver.tarecruitment.repo.TARecruitmentUserRepo;
