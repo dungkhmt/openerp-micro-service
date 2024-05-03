@@ -5,6 +5,8 @@ import lombok.extern.log4j.Log4j2;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.DefenseJury;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.ThesisDefensePlan;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.TrainingProgram;
+import thesisdefensejuryassignment.thesisdefenseserver.models.AssignTeacherAndThesisToDefenseJuryIM;
+import thesisdefensejuryassignment.thesisdefenseserver.or_tools.AssignTeacherAndThesisToDefenseJury;
 import thesisdefensejuryassignment.thesisdefenseserver.repo.ThesisDefensePlanRepo;
 import org.springframework.stereotype.Service;
 
@@ -116,6 +118,5 @@ public class ThesisDefensePlanServiceImpl implements ThesisDefensePlanService {
                 .toList();
 
     }
-
 
 }

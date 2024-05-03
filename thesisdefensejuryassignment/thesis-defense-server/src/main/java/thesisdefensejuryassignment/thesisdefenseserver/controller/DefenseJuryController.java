@@ -11,6 +11,7 @@ import thesisdefensejuryassignment.thesisdefenseserver.entity.Teacher;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.Thesis;
 import thesisdefensejuryassignment.thesisdefenseserver.models.AssignReviewerToThesisIM;
 import thesisdefensejuryassignment.thesisdefenseserver.models.AssignTeacherAndThesisToDefenseJuryIM;
+import thesisdefensejuryassignment.thesisdefenseserver.models.AssignTeacherToDefenseJuryAutomaticallyIM;
 import thesisdefensejuryassignment.thesisdefenseserver.models.DefenseJuryIM;
 import thesisdefensejuryassignment.thesisdefenseserver.service.DefenseJuryServiceImpl;
 
@@ -81,4 +82,13 @@ public class DefenseJuryController {
         }
         return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);
     }
+
+    @PostMapping("/assign-automatically")
+    public ResponseEntity<String> assignTeacherAndThesisAutomatically(
+            @RequestBody AssignTeacherToDefenseJuryAutomaticallyIM teacherListAndDefensePlan
+    ) {
+        String message = juryService.assignTeacherAndThesisAutomatically(teacherListAndDefensePlan);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
 }

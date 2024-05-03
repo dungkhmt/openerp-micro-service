@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.*;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.embedded.DefenseJuryTeacherRole;
 import thesisdefensejuryassignment.thesisdefenseserver.models.*;
+import thesisdefensejuryassignment.thesisdefenseserver.or_tools.AssignTeacherAndThesisToDefenseJury;
 import thesisdefensejuryassignment.thesisdefenseserver.repo.*;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Log4j2
 @AllArgsConstructor
@@ -141,6 +141,31 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         }
         defenseJury.setAssigned(true);
         return defenseJuryRepo.save(defenseJury);
+    }
+
+    @Override
+    public String assignTeacherAndThesisAutomatically(AssignTeacherToDefenseJuryAutomaticallyIM teacherIdList) {
+        String id = teacherIdList.getThesisDefensePlanId();
+        System.out.println(id);
+        List<Thesis> thesisList = getAllAvailableThesiss(id);
+        List<Teacher> teacherList = new ArrayList<>();
+        for (DefenseJuryTeacherRoleIM teacher: teacherIdList.getDefenseJuryTeacherRole()){
+            teacherList.add(teacherRepo.findById(teacher.getTeacherName()).orElse(null));
+        }
+
+        ThesisDefensePlan thesisDefensePlan = thesisDefensePlanRepo.findById(id).orElse(null);
+        long dateStart = thesisDefensePlan.getStartDate().getTime();
+        long dateEnd = thesisDefensePlan.getEndDate().getTime();
+        long timeDiff = Math.abs(dateEnd - dateStart);
+        int sessionNumber = (int) TimeUnit.DAYS.convert(timeDiff, TimeUnit.MILLISECONDS) * 2;
+        AssignTeacherAndThesisToDefenseJury assignTeacherAndThesisToDefenseJury = new AssignTeacherAndThesisToDefenseJury(
+                thesisList,
+                teacherList,
+                14,
+                5
+        );
+        assignTeacherAndThesisToDefenseJury.assignThesisAndTeacherToDefenseJury();
+        return "Check the console";
     }
 
 

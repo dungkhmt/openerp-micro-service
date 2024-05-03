@@ -5,6 +5,7 @@ import thesisdefensejuryassignment.thesisdefenseserver.entity.Teacher;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.Thesis;
 import thesisdefensejuryassignment.thesisdefenseserver.models.AssignReviewerToThesisIM;
 import thesisdefensejuryassignment.thesisdefenseserver.models.AssignTeacherAndThesisToDefenseJuryIM;
+import thesisdefensejuryassignment.thesisdefenseserver.models.AssignTeacherToDefenseJuryAutomaticallyIM;
 import thesisdefensejuryassignment.thesisdefenseserver.models.DefenseJuryIM;
 
 import java.util.List;
@@ -23,5 +24,5 @@ public interface DefenseJuryService {
     public DefenseJury assignTeacherAndThesis(AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList);
 
     public DefenseJury assignReviewerToThesis(AssignReviewerToThesisIM teacherAndThesisList);
-
+    public String assignTeacherAndThesisAutomatically(AssignTeacherToDefenseJuryAutomaticallyIM teacherIdList);
 }

@@ -1,6 +1,7 @@
 package thesisdefensejuryassignment.thesisdefenseserver.service;
 
 import thesisdefensejuryassignment.thesisdefenseserver.entity.ThesisDefensePlan;
+import thesisdefensejuryassignment.thesisdefenseserver.models.AssignTeacherAndThesisToDefenseJuryIM;
 
 import java.util.List;
 
