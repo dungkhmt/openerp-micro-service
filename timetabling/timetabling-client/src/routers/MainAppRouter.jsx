@@ -13,7 +13,8 @@ import ScheduleInformationRouter from "./ScheduleInformationRouter";
 import CourseTimeTablingRouter from "./CourseTimeTablingRouter";
 import GeneralTimeTablingRouter from "./GeneralTimeTablingRouter";
 import ComputerLabTimeTabling from "./ComputerLabTimeTablingRouter";
-import TaRecruitmentRouter from "./TaRecruitmentRouter"
+import TaRecruitmentRouter from "./TaRecruitmentRouter";
+import MainPage from "views/mainPage";
 
 const styles = {
   loadingProgress: {
@@ -40,16 +41,32 @@ function MainAppRouter(props) {
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
+          <Route component={MainPage} exact path="/" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
           {/* <PrivateRoute component={ScheduleScreen} path="/schedule" /> */}
-          <PrivateRoute component={ScheduleInformationRouter} path="/schedule-information" />
+          <PrivateRoute
+            component={ScheduleInformationRouter}
+            path="/schedule-information"
+          />
           {/* <PrivateRoute component={SchedulePerformanceRouter} path="/schedule-performance" /> */}
-          <PrivateRoute component={CourseTimeTablingRouter} path="/course-time-tabling" />
+          <PrivateRoute
+            component={CourseTimeTablingRouter}
+            path="/course-time-tabling"
+          />
           {/* <Route component={error} path="*" /> */}
-          <PrivateRoute component={GeneralTimeTablingRouter} path="/general-time-tabling" />
+          <PrivateRoute
+            component={GeneralTimeTablingRouter}
+            path="/general-time-tabling"
+          />
 
-          <PrivateRoute component={ComputerLabTimeTabling} path="/lab-time-tabling" />
-          <PrivateRoute component={TaRecruitmentRouter} path="/ta-recruitment" />
+          <PrivateRoute
+            component={ComputerLabTimeTabling}
+            path="/lab-time-tabling"
+          />
+          <PrivateRoute
+            component={TaRecruitmentRouter}
+            path="/ta-recruitment"
+          />
           <Route component={NotFound} />
         </Switch>
       </Suspense>

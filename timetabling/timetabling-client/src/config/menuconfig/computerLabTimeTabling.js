@@ -1,4 +1,4 @@
-const prefix = '/lab-time-tabling';
+const prefix = "/lab-time-tabling";
 export const computerLabTimeTabling = {
     id: "MENU_SCHEDULER",
     icon: "AnalyticsIcon",
@@ -7,45 +7,44 @@ export const computerLabTimeTabling = {
       {
         id: "MENU_SCHEDULER",
         path: `${prefix}/class-management`,
-        isPublic: true,
+        isPublic: false,
         text: "Quản lý lớp học",
         child: [],
       },
       {
         id: "MENU_SCHEDULER",
         path: `${prefix}/room-management`,
-        isPublic: true,
+        isPublic: false,
         text: "Quản lý phòng học",
         child: [],
       },
       {
         id: "MENU_SCHEDULER",
         path: `${prefix}/room-availibility`,
-        isPublic: true,
+        isPublic: false,
         text: "Phòng học sẵn sàng",
         child: [],
       },
       {
         id: "MENU_SCHEDULER",
         path: `${prefix}/timetable`,
-        isPublic: true,
+        isPublic: false,
         text: "Thời khóa biểu",
         child: [],
       },
       {
         id: "MENU_SCHEDULER",
         path: `${prefix}/conflict-checking`,
-        isPublic: true,
+        isPublic: false,
         text: "Lịch màu",
         child: [],
       },
       {
         id: "MENU_SCHEDULER",
         path: `${prefix}/auto-assign`,
-        isPublic: true,
+        isPublic: false,
         text: "Xếp lịch tự động",
         child: [],
       },
     ],
   };
-  

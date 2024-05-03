@@ -13,6 +13,7 @@ import {
   Paper,
   Tooltip,
   Typography,
+  Button,
 } from "@mui/material";
 import { styles } from "./index.style";
 import { SEMESTER, SEMESTER_LIST } from "../config/localize";
@@ -24,7 +25,7 @@ import ImportDialog from "./ImportDialog";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
-  pageSize: 5,
+  pageSize: 10,
 };
 
 const AllClassScreen = () => {
@@ -44,6 +45,8 @@ const AllClassScreen = () => {
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
   );
+
+  const [rowSelect, setRowSelect] = useState([]);
 
   const history = useHistory();
 
@@ -91,11 +94,34 @@ const AllClassScreen = () => {
     history.push(`/ta-recruitment/teacher/class-information/${klass.id}`);
   };
 
+  const handleNavigateCreateClass = () => {
+    history.push(`/ta-recruitment/teacher/create-class/${semester}`);
+  };
+
   const handleDeleteClass = () => {
-    request("delete", `/class-call/delete-class/${deleteId}`, (res) => {
-      handleFetchData();
-      setOpenDeleteDialog(false);
-    });
+    if (rowSelect.length === 0) {
+      request("delete", `/class-call/delete-class/${deleteId}`, (res) => {
+        handleFetchData();
+        setOpenDeleteDialog(false);
+      });
+    } else if (rowSelect.length === 1) {
+      request("delete", `/class-call/delete-class/${rowSelect[0]}`, (res) => {
+        handleFetchData();
+        setOpenDeleteDialog(false);
+      });
+    } else {
+      let idList = rowSelect;
+      request(
+        "delete",
+        "/class-call/delete-multiple-class",
+        (res) => {
+          handleFetchData();
+          setOpenDeleteDialog(false);
+        },
+        {},
+        idList
+      );
+    }
   };
 
   const handleOpenDialog = (klass) => {
@@ -186,7 +212,7 @@ const AllClassScreen = () => {
     },
   ];
 
-  const dataGridRows = classes.map((klass) => ({
+  const dataGridRows = classes?.map((klass) => ({
     id: klass.id,
     subjectId: klass.subjectId,
     subjectName: klass.subjectName,
@@ -195,19 +221,27 @@ const AllClassScreen = () => {
   }));
 
   return (
-    <Paper elevation={3} style={{ paddingTop: "1em" }}>
+    <Paper elevation={3}>
       <div style={styles.tableToolBar}>
-        <Typography variant="h4" style={{ fontWeight: "bold" }}>
+        <Typography
+          variant="h4"
+          style={{
+            fontWeight: "bold",
+            marginBottom: "0.5em",
+            paddingTop: "1em",
+          }}
+        >
           Danh sách lớp học
         </Typography>
         <div style={styles.searchArea}>
-          <FormControl variant="standard" style={styles.dropdown}>
+          <FormControl style={styles.dropdown} fullWidth>
             <InputLabel id="semester-label">Học kì</InputLabel>
             <Select
               labelId="semester-label"
               id="semester-select"
               value={semester}
               name="day"
+              label="Học kì"
               onChange={handleChangeSemester}
               MenuProps={{ PaperProps: { sx: styles.selection } }}
             >
@@ -219,17 +253,37 @@ const AllClassScreen = () => {
             </Select>
           </FormControl>
 
-          <Tooltip style={styles.importIcon} title="Import danh sách lớp học">
+          {/* <Tooltip style={styles.importIcon} title="Import danh sách lớp học">
             <IconButton component="label" onClick={handleFileChange}>
-              {/* <input
-                type="file"
-                accept=".xlsx,.xls"
-                onChange={handleFileChange}
-                style={{ display: "none" }}
-              /> */}
               <FileUploadIcon color="primary" fontSize="large" />
             </IconButton>
-          </Tooltip>
+          </Tooltip> */}
+
+          <Button
+            style={{ height: "40px", marginTop: "1em", marginLeft: "1em" }}
+            variant="outlined"
+            onClick={handleNavigateCreateClass}
+          >
+            Thêm lớp học
+          </Button>
+
+          <Button
+            style={{ height: "40px", marginTop: "1em", marginLeft: "1em" }}
+            variant="outlined"
+            onClick={handleFileChange}
+          >
+            Import danh sách lớp học
+          </Button>
+
+          <Button
+            style={{ height: "40px", marginTop: "1em", marginLeft: "1em" }}
+            variant="outlined"
+            color="error"
+            disabled={rowSelect.length === 0}
+            onClick={() => setOpenDeleteDialog(true)}
+          >
+            Xóa
+          </Button>
 
           <TextField
             style={styles.searchBox}
@@ -263,17 +317,21 @@ const AllClassScreen = () => {
       <DataGrid
         loading={isLoading}
         rowHeight={60}
-        sx={{ fontSize: 16 }}
+        sx={{ fontSize: 16, height: "65vh" }}
         rows={dataGridRows}
         columns={dataGridColumns}
-        autoHeight
         rowCount={totalElements}
         pagination
         paginationMode="server"
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[5, 10, 20]}
-        checkboxSelection={false}
+        pageSizeOptions={[10, 20, 50]}
+        checkboxSelection
+        onRowSelectionModelChange={(newRowSelectionModel) => {
+          setRowSelect(newRowSelectionModel);
+          console.log(newRowSelectionModel);
+        }}
+        rowSelectionModel={rowSelect}
         disableRowSelectionOnClick
       />
     </Paper>
