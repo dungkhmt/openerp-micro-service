@@ -195,19 +195,20 @@ const AllClassScreen = () => {
   }));
 
   return (
-    <Paper elevation={3} style={{ paddingTop: "1em" }}>
+    <Paper elevation={3}>
       <div style={styles.tableToolBar}>
         <Typography variant="h4" style={{ fontWeight: "bold" }}>
           Danh sách lớp học
         </Typography>
         <div style={styles.searchArea}>
-          <FormControl variant="standard" style={styles.dropdown}>
+          <FormControl style={styles.dropdown} fullWidth>
             <InputLabel id="semester-label">Học kì</InputLabel>
             <Select
               labelId="semester-label"
               id="semester-select"
               value={semester}
               name="day"
+              label="Học kì"
               onChange={handleChangeSemester}
               MenuProps={{ PaperProps: { sx: styles.selection } }}
             >
@@ -263,17 +264,16 @@ const AllClassScreen = () => {
       <DataGrid
         loading={isLoading}
         rowHeight={60}
-        sx={{ fontSize: 16 }}
+        sx={{ fontSize: 16, height: "72vh" }}
         rows={dataGridRows}
         columns={dataGridColumns}
-        autoHeight
         rowCount={totalElements}
         pagination
         paginationMode="server"
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[5, 10, 20]}
-        checkboxSelection={false}
+        checkboxSelection={true}
         disableRowSelectionOnClick
       />
     </Paper>
