@@ -8,7 +8,7 @@ import openerp.openerpresourceserver.generaltimetabling.model.entity.general.Gen
 
 
 public interface GeneralClassOpenedService {
-    public List<GeneralClassOpened> getGeneralClasses(String semester);
+    public List<GeneralClassOpened> getGeneralClasses(String semester, String groupName);
     
     public void deleteAllGeneralClasses();
 

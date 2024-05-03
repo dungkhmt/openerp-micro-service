@@ -45,8 +45,9 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
     private ClassroomRepo classroomRepo;
 
     @Override
-    public List<GeneralClassOpened> getGeneralClasses(String semester) {
-        return gcoRepo.findAllBySemester(semester);
+    public List<GeneralClassOpened> getGeneralClasses(String semester, String groupName) {
+        if (groupName == null || groupName.isEmpty()) return gcoRepo.findAllBySemester(semester);
+        return gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
     }
 
     @Override

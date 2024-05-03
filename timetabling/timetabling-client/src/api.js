@@ -22,6 +22,8 @@ export function bearerAuth(token) {
   return `Bearer ${token}`;
 }
 
+let cancelTokenSource;
+
 /**
  * url, method, and data properties don't need to be specified in config.
  * @param {*} method
@@ -37,8 +39,12 @@ export async function request(
   successHandler,
   errorHandlers,
   data,
-  config
+  config,
+  token
 ) {
+  if (token) {
+    token.cancel("Request cancelled due to new request");
+  }
   if (config !== undefined  ) {
     axiosInstance.defaults.headers.common["Content-Type"] = "multipart/form-data";
   }
@@ -47,6 +53,7 @@ export async function request(
       method: method.toLowerCase(),
       url: url,
       data: data,
+      cancelToken: token,
       ...config,
       headers: {
         authorization: bearerAuth(keycloak.token),
@@ -63,8 +70,9 @@ export async function request(
     if (isFunction(errorHandlers)) {
       errorHandlers(e);
     }
-
-    if (e.response) {
+    if (axios.isCancel(e)) {
+      console.log('Request cancelled:', e.message);
+    } else if (e.response) {
       // The request was made and the server responded with a status code that falls out of the range of 2xx.
       switch (e.response.status) {
         // case 401:
