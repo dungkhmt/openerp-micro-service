@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.model.entity.User;
 import openerp.openerpresourceserver.repo.UserRepo;
 import openerp.openerpresourceserver.tarecruitment.dto.UserInfoDTO;
+import openerp.openerpresourceserver.tarecruitment.repo.TARecruitmentUserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +14,7 @@ import java.util.Optional;
 @Service
 public class TARecruitmentUserServiceImpl implements TARecruitment_UserService {
 
-    private UserRepo userRepo;
+    private TARecruitmentUserRepo userRepo;
 
     @Override
     public UserInfoDTO getUserInfo(String userId) {
