@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.model.entity.User;
 import openerp.openerpresourceserver.repo.UserRepo;
 import openerp.openerpresourceserver.tarecruitment.dto.UserInfoDTO;
+import openerp.openerpresourceserver.tarecruitment.entity.TARecruitmentUser;
 import openerp.openerpresourceserver.tarecruitment.repo.TARecruitmentUserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class TARecruitmentUserServiceImpl implements TARecruitment_UserService {
 
     @Override
     public UserInfoDTO getUserInfo(String userId) {
-        Optional<User> user = userRepo.findById(userId);
+        Optional<TARecruitmentUser> user = userRepo.findById(userId);
         if(user.isEmpty()) {
             throw new IllegalArgumentException("User did not exist");
         }
