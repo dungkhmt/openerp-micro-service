@@ -13,7 +13,7 @@ target/
 .springBeans
 .sts4-cache
 ./datn-firebase.json
-./datn-firebase-2.json
+./datn-firebase-3json
 application.yml
 ### IntelliJ IDEA ###
 .idea
