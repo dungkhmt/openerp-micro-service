@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.generaltimetabling.service.impl;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import openerp.openerpresourceserver.generaltimetabling.algorithms.V2ClassSchedu
 import openerp.openerpresourceserver.generaltimetabling.exception.ConflictScheduleException;
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.helper.ClassTimeComparator;
+import openerp.openerpresourceserver.generaltimetabling.helper.GeneralExcelHelper;
 import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekExtractor;
 import openerp.openerpresourceserver.generaltimetabling.mapper.RoomOccupationMapper;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGeneralClassRequest;
@@ -43,6 +45,9 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
     private RoomReservationRepo roomReservationRepo;
 
     private ClassroomRepo classroomRepo;
+
+    private GeneralExcelHelper excelHelper;
+
 
     @Override
     public List<GeneralClassOpened> getGeneralClasses(String semester, String groupName) {
@@ -268,5 +273,12 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
         List<GeneralClassOpened> updatedClasses = V2ClassScheduler.autoScheduleRoom(classes, rooms);
         gcoRepo.saveAll(updatedClasses);
         return updatedClasses;
+    }
+
+    @Override
+    public InputStream exportExcel(String semester) {
+        List<GeneralClassOpened> classes = gcoRepo.findAllBySemester(semester).stream().filter(c -> c.getClassCode() != null && !c.getClassCode().isEmpty()).toList();
+        if (classes.isEmpty()) throw new NotFoundException("Kỳ học không có bất kỳ lớp học nào!");
+        return excelHelper.convertGeneralClassToExcel(classes);
     }
 }

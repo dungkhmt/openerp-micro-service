@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.generaltimetabling.service;
 
+import java.io.InputStream;
 import java.util.List;
 
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGeneralClassRequest;
@@ -27,4 +28,5 @@ public interface GeneralClassOpenedService {
     List<GeneralClassOpened> autoSchedule(String semester, String groupName);
     List<GeneralClassOpened> autoScheduleRoom(String semester, String groupName);
 
+    InputStream exportExcel(String semester);
 }

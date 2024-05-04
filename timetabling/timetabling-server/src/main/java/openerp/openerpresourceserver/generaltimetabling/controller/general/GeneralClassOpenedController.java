@@ -10,6 +10,10 @@ import openerp.openerpresourceserver.generaltimetabling.exception.InvalidClassSt
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateClassesToNewGroupRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.ResetScheduleRequest;
+import openerp.openerpresourceserver.generaltimetabling.service.ExcelService;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +28,7 @@ import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassOpen
 @Log4j2
 public class GeneralClassOpenedController {
     private GeneralClassOpenedService gService;
+
     @ExceptionHandler(ConflictScheduleException.class)
     public ResponseEntity scheduleConflict(ConflictScheduleException e) {
         return ResponseEntity.status(410).body(e.getCustomMessage());
@@ -81,8 +86,15 @@ public class GeneralClassOpenedController {
     }
 
     @PostMapping("/export-excel")
-    public ResponseEntity exportExcel(@RequestParam("semester") String semester) {
-        return ResponseEntity.ok("ok");
+    public ResponseEntity requestExportExcel(@RequestParam("semester") String semester) {
+        log.info("Controler API -> requestExportExcel start...");
+        String filename = String.format("TKB_{}.xlsx", semester);
+        InputStreamResource file = new InputStreamResource(gService.exportExcel(semester));
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(
+                        MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(file);
     }
 
     @PostMapping("/reset-schedule")

@@ -53,4 +53,7 @@ public class RoomReservation {
     }
 
 
+    public boolean isNotNull() {
+        return this.getStartTime() != null && this.getEndTime() != null && this.getWeekday() != null && this.getRoom()!= null && !this.getRoom().isEmpty();
+    }
 }

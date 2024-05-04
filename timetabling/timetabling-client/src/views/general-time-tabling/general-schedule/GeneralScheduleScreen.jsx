@@ -140,6 +140,30 @@ const GeneralScheduleScreen = () => {
     );
   };
 
+  const handleExportTimeTabling = () => {
+    request(
+      "post",
+      `general-classes/export-excel?semester=${selectedSemester?.semester}`,
+      (res) => {
+        const blob = new Blob([res.data], {
+          type: res.headers["content-type"],
+        });
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = `TKB_${selectedSemester?.semester}.xlsx`;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      },
+      (error) => {
+        console.error("Error exporting Excel:", error);
+      },
+      null,
+      { responseType: "arraybuffer" }
+    ).then();
+  }
+
   return (
     <div className="flex flex-col gap-4 w-full h-[700px]">
       <div className="flex flex-row justify-between">
@@ -155,6 +179,15 @@ const GeneralScheduleScreen = () => {
         </div>
         <div className="flex flex-col justify-end gap-2">
           <div className="flex flex-row gap-2 justify-end">
+          <Button
+              disabled={selectedSemester === null}
+              startIcon={FacebookCircularProgress}
+              variant="contained"
+              color="success"
+              onClick={handleExportTimeTabling}
+            >
+              Tải xuống File Excel
+            </Button>
             <Button
               disabled={selectedRows.length === 0}
               startIcon={FacebookCircularProgress}

@@ -78,7 +78,7 @@ public class V2ClassScheduler {
         /*Initial data*/
         int[] roomCapacities = rooms.stream().mapToInt(room -> Math.toIntExact(room.getQuantityMax())).toArray();
         int[] studentQuantities = classes.stream().mapToInt(gClass -> {
-            if (gClass.getQuantity() == null || gClass.getQuantity().isEmpty()) throw new InvalidClassStudentQuantityException(gClass.getClassCode() + " đang không có học sinh");
+            if (gClass.getQuantity() == null || gClass.getQuantityMax().isEmpty()) throw new InvalidClassStudentQuantityException(gClass.getClassCode() + " đang không có số học sinh tối đa!");
             return Integer.parseInt(gClass.getQuantity());
         }).toArray();
         int numClasses = classes.size();
