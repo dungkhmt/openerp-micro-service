@@ -14,7 +14,7 @@ target/
 .sts4-cache
 ./application.yml
 ./datn-firebase.json
-
+./datn.json
 ### IntelliJ IDEA ###
 .idea
 *.iws
