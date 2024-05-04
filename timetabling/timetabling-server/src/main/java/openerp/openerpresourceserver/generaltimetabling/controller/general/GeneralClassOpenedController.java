@@ -39,7 +39,7 @@ public class GeneralClassOpenedController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<GeneralClassOpened>> getClasses(@RequestParam String semester, @RequestParam("groupName") String groupName) {
+    public ResponseEntity<List<GeneralClassOpened>> getClasses(@RequestParam("semester") String semester, @RequestParam("groupName") String groupName) {
         try {
             List<GeneralClassOpened> generalClassOpenedList = gService.getGeneralClasses(semester, groupName);
             return ResponseEntity.ok(generalClassOpenedList);

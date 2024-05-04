@@ -1,9 +1,12 @@
 package openerp.openerpresourceserver.generaltimetabling.service.impl;
 
 import java.io.ByteArrayInputStream;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.RoomOccupationDto;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.generaltimetabling.repo.AcademicWeekRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.RoomOccupationRepo;
@@ -34,14 +37,13 @@ public class RoomOccupationServiceImp implements RoomOccupationService {
     }
 
     @Override
-    public ByteArrayInputStream exportExcel(String semester, List<Integer> weeks) {
-        int maxWeek = 1;
-        for(int week : weeks) {
-            if(week >= maxWeek) {
-                maxWeek = week;
-            }
-        }
-        return excelHelper.convertToExcel(roomOccupationRepo.findAllBySemesterAndWeekIndex(semester, maxWeek), maxWeek);
+    public ByteArrayInputStream exportExcel(String semester, int week) {
+        return excelHelper.convertToExcel(roomOccupationRepo.findAllBySemesterAndWeekIndex(semester, week));
+    }
+
+    @Override
+    public List<RoomOccupation> getRoomOccupationsBySemesterAndWeekIndex(String semester, int weekIndex) {
+        return roomOccupationRepo.findAllBySemesterAndWeekIndex(semester,weekIndex);
     }
 
 }

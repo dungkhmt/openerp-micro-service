@@ -11,6 +11,8 @@ import openerp.openerpresourceserver.generaltimetabling.model.entity.general.Roo
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.OccupationClassPeriod;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
@@ -185,15 +187,15 @@ public class GeneralExcelHelper {
     }
 
 
-    public ByteArrayInputStream convertToExcel(List<RoomOccupation> rooms, int weekLength) {
+    public ByteArrayInputStream convertToExcel(List<RoomOccupation> rooms) {
         /**Init the data to map*/
         HashMap<String, List<OccupationClassPeriod>> periodMap = new HashMap<>();
         HashMap<String, List<OccupationClassPeriod>> conflictMap = new HashMap<>();
         for(RoomOccupation room : rooms) {
             String classRoom = room.getClassRoom();
             long crewPeriod = room.getCrew().equals("S") ? 0 : 6;
-            long startPeriodIndex = room.getStartPeriod() + 12*(room.getDayIndex()-2) + 7*12*(room.getWeekIndex()-1) + crewPeriod;
-            long endPeriodIndex = room.getEndPeriod() + 12*(room.getDayIndex()-2) + 7*12*(room.getWeekIndex()-1) + crewPeriod;
+            long startPeriodIndex = room.getStartPeriod() + 12*(room.getDayIndex()-2) + crewPeriod;
+            long endPeriodIndex = room.getEndPeriod() + 12*(room.getDayIndex()-2) + crewPeriod;
             OccupationClassPeriod period = new OccupationClassPeriod(startPeriodIndex, endPeriodIndex, room.getClassCode());
             if(periodMap.get(classRoom) == null) {
                 List<OccupationClassPeriod> initList = new ArrayList<>();
@@ -213,28 +215,64 @@ public class GeneralExcelHelper {
             }
         }
 
+
         /**Handle Excel write*/
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
-            Sheet sheet = workbook.createSheet(SHEET);
-            /*Header*/
-            Row headerRow = sheet.createRow(0);
-            /*Header Cell*/
-            for (int i = 0; i < weekLength*84; i++) {
-                Cell c = headerRow.createCell(i+1);
-                String periodIndexString = ((i%84)%12+1) + "/" + ((i%84)/12 +2) + "/W" + (i/84 + 1) ;
-                c.setCellValue(periodIndexString);
-            }
+            /** Init the cell style*/
+            /*Bold style*/
             CellStyle boldStyle = workbook.createCellStyle();
             Font boldFont = workbook.createFont();
             boldFont.setBold(true);
             boldStyle.setFont(boldFont);
-            int rowIndex = 1;
+            /*Error style*/
+            CellStyle errorStyle=  workbook.createCellStyle();
+            errorStyle.setFillForegroundColor(IndexedColors.RED.getIndex());
+            errorStyle.setFillPattern((short) 1);
+            errorStyle.setFont(boldFont);
+            /*Room style*/
+            CellStyle roomStyle=  workbook.createCellStyle();
+            roomStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+            roomStyle.setFillPattern((short) 1);
+            /*Week index style*/
+            CellStyle headerStyle = workbook.createCellStyle();
+            headerStyle.setAlignment(CellStyle.ALIGN_CENTER);
+            headerStyle.setBorderBottom((short) 1);
+            headerStyle.setBorderLeft((short) 1);
+            headerStyle.setBorderRight((short) 1);
+            headerStyle.setBorderTop((short) 1);
+            Sheet sheet = workbook.createSheet(SHEET);
+            int rowIndex = 0;
+
+            /**Header*/
+            /*Week index row*/
+            Row dayIndexRow = sheet.createRow(rowIndex);
+            for (int i = 0; i < 84; i+=12) {
+                sheet.addMergedRegion(new CellRangeAddress(rowIndex,rowIndex,i+1,i+12));
+                Cell c = dayIndexRow.createCell(i+1);
+                String weekIndexString = "" + ((i%84)/12 +2);
+                c.setCellValue(weekIndexString);
+                c.setCellStyle(headerStyle);
+            }
+            rowIndex++;
+            /*Period row*/
+            Row periodRow = sheet.createRow(rowIndex);
+            for (int i = 0; i < 84; i++) {
+                Cell c = periodRow.createCell(i+1);
+                String periodIndexString = "" + ((i%84)%12+1);
+                c.setCellValue(periodIndexString);
+                c.setCellStyle(headerStyle);
+            }
+            rowIndex++;
+
+
+            /*Start write data*/
             for (String room : periodMap.keySet()) {
                 if(!room.equals("")) {
                     Row roomRow = sheet.createRow(rowIndex);
                     Cell roomNameCell = roomRow.createCell(0);
                     roomNameCell.setCellValue(room);
-                    for (int cellIndex = 1; cellIndex <= weekLength*7*12; cellIndex++) {
+                    roomNameCell.setCellStyle(roomStyle);
+                    for (int cellIndex = 1; cellIndex <= 84; cellIndex++) {
                         Cell c = roomRow.createCell(cellIndex);
                         c.setCellStyle(boldStyle);
                         for (OccupationClassPeriod roomPeriod : periodMap.get(room)) {
@@ -244,6 +282,7 @@ public class GeneralExcelHelper {
                                     Set<String> classCodeSet = new HashSet<>(Arrays.stream(c.getStringCellValue().split(",")).toList());
                                     classCodeSet.add(roomPeriod.getClassCode());
                                     c.setCellValue(String.join(",", classCodeSet));
+                                    c.setCellStyle(errorStyle);
                                 } else {
                                     c.setCellValue(roomPeriod.getClassCode());
                                 }

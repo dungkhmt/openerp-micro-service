@@ -63,7 +63,7 @@ const GeneralScheduleScreen = () => {
       `/general-classes/auto-schedule-time?semester=${selectedSemester?.semester}&groupName=${selectedGroup?.groupName}`,
       (res) => {
         let generalClasses = [];
-        res.data?.forEach((classObj) => {
+        res?.data?.forEach((classObj) => {
           if (classObj?.classCode !== null && classObj?.timeSlots) {
             classObj.timeSlots.forEach((timeSlot, index) => {
               const cloneObj = JSON.parse(
