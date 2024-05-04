@@ -20,9 +20,11 @@ public class TestCallApiController {
     private TestCallApi testCallApi;
 
     @GetMapping
-    public ResponseEntity<?> testCallApi(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<?> testCallApi() {
         try {
-            int responseCode = testCallApi.testCallApi(authorizationHeader);
+            String access_token = testCallApi.getAccessToken();
+            String token = "Bearer " + access_token;
+            int responseCode = testCallApi.testCallApi(token);
             return ResponseEntity.ok().body("Successfully call API with response code is " + responseCode);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
