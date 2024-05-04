@@ -7,6 +7,7 @@ import com.hust.baseweb.applications.programmingcontest.entity.UserContestProble
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
 import com.hust.baseweb.applications.programmingcontest.model.*;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.ContestProblemModelResponse;
+import com.hust.baseweb.applications.programmingcontest.model.externalapi.GetSubmissionsOfParticipantModelInput;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.SubmissionModelResponse;
 import com.hust.baseweb.applications.programmingcontest.repo.UserContestProblemRoleRepo;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
@@ -244,8 +245,9 @@ public class ProblemController {
         List<ContestProblemModelResponse> problems = problemTestCaseService.extApiGetAllProblems(principal.getName());
         return ResponseEntity.ok().body(problems);
     }
-    @GetMapping("extapi/get-submissions-of/{participantId}")
-    public ResponseEntity<?> getSubmissionOf(Principal principal, @PathVariable String participantId){
+    @PostMapping("extapi/get-submissions-of-participant")
+    public ResponseEntity<?> getSubmissionOf(Principal principal, @RequestBody GetSubmissionsOfParticipantModelInput I){
+        String participantId = I.getParticipantId();
         List<SubmissionModelResponse> res = problemTestCaseService.extApiGetSubmissions(participantId);
         return ResponseEntity.ok().body(res);
     }
