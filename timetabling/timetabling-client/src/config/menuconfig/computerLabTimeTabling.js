@@ -1,4 +1,4 @@
-const prefix = '/lab-time-tabling';
+const prefix = "/lab-time-tabling";
 export const computerLabTimeTabling = {
     id: "MENU_SCHEDULER",
     icon: "AnalyticsIcon",
@@ -48,4 +48,3 @@ export const computerLabTimeTabling = {
       },
     ],
   };
-  

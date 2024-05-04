@@ -39,8 +39,8 @@ import { taRecruitment } from "./menuconfig/taRecruitment";
 export const MENUS = [];
 
 // MENUS.push(general);
-//MENUS.push(user);
-//MENUS.push(teacher);
+// MENUS.push(user);
+// MENUS.push(teacher);
 //MENUS.push(schedule);
 MENUS.push(scheduleInformation);
 // MENUS.push(schedulePerformance);

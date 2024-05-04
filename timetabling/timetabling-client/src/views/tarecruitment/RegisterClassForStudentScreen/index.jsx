@@ -1,10 +1,12 @@
 import { Paper, TextField, Button, Typography } from "@mui/material";
 import styles from "./index.style";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { successNoti } from "utils/notification";
 import { request } from "api";
+import { useHistory } from "react-router-dom";
 
 const RegisterClassForStudentScreen = (props) => {
+  const history = useHistory();
   const { classId } = props.location.state ? props.location.state : "";
 
   const [formData, setFormData] = useState({
@@ -22,6 +24,17 @@ const RegisterClassForStudentScreen = (props) => {
     englishScore: "",
     note: "",
   });
+
+  useEffect(() => {
+    request("get", "/user/get-user-info", (res) => {
+      console.log(res.data);
+      setFormData((prevData) => ({
+        ...prevData,
+        name: res.data.name,
+        email: res.data.email,
+      }));
+    });
+  }, []);
 
   const setDataEmpty = () => {
     setFormData({
@@ -63,13 +76,13 @@ const RegisterClassForStudentScreen = (props) => {
       "post",
       "/application/create-application",
       (res) => {
-        console.log(res.data);
+        successNoti("Đăng ký lớp trợ giảng thành công");
+        setDataEmpty();
+        history.push("/ta-recruitment/student/result");
       },
       {},
       formData
     );
-    successNoti("Đăng ký lớp trợ giảng thành công");
-    setDataEmpty();
   };
 
   return (

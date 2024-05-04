@@ -65,6 +65,16 @@ public class ClassCallController {
         }
     }
 
+    @DeleteMapping("/delete-multiple-class")
+    public ResponseEntity<?> deleteMultipleClass(@RequestBody List<Integer> idList) {
+        try {
+            classCallService.deleteMultipleClass(idList);
+            return ResponseEntity.ok().body("Delete successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/get-class-by-semester/{semester}")
     public ResponseEntity<?> getClassBySemester(
             @PathVariable String semester,

@@ -21,6 +21,8 @@ public interface ClassCallService {
 
     boolean deleteClass(int id);
 
+    boolean deleteMultipleClass(List<Integer> idList);
+
     List<ClassCall> getAllMyRegisteredClass(String userId, String semester);
 
     int importClass(MultipartFile file);
