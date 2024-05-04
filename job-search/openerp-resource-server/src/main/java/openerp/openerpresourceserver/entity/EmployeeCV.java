@@ -27,6 +27,7 @@ public class EmployeeCV {
     private String githubLink;
     private String userName;
     private String gender;
+    private String cvLink;
     private String profession;
     private String mobilePhone;
     private String email;
