@@ -267,7 +267,7 @@ public class GeneralExcelHelper {
 
             /*Start write data*/
             for (String room : periodMap.keySet()) {
-                if(!room.equals("")) {
+                if(room != null && !room.equals("")) {
                     Row roomRow = sheet.createRow(rowIndex);
                     Cell roomNameCell = roomRow.createCell(0);
                     roomNameCell.setCellValue(room);
