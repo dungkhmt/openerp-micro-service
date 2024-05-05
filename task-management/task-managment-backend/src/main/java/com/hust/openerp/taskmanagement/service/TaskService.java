@@ -7,39 +7,26 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.hust.openerp.taskmanagement.dto.TaskDTO;
 import com.hust.openerp.taskmanagement.dto.TaskGanttDTO;
-import com.hust.openerp.taskmanagement.dto.TaskHierarchyDTO;
-import com.hust.openerp.taskmanagement.dto.form.TaskForm;
-import com.hust.openerp.taskmanagement.entity.Task;
-import com.hust.openerp.taskmanagement.entity.User;
+import com.hust.openerp.taskmanagement.dto.form.CreateTaskForm;
+import com.hust.openerp.taskmanagement.dto.form.UpdateTaskForm;
 
 import jakarta.annotation.Nullable;
 
 @Service
 public interface TaskService {
-    Task createTask(TaskForm taskForm, String creatorId);
+    TaskDTO createTask(CreateTaskForm taskForm, String creatorId);
 
-    List<Task> getAllTaskInProject(UUID projectId);
+    TaskDTO getTask(UUID taskId, String getterId);
 
-    List<Object[]> getTaskStaticsCategoryInProject(UUID projectId);
-
-    List<Object[]> getTaskStaticsStatusInProject(UUID projectId);
-
-    Task getTask(UUID taskId);
-
-    Task updateTask(UUID taskId, TaskForm taskForm, String updateBy);
+    TaskDTO updateTask(UUID taskId, UpdateTaskForm taskForm, String updateBy);
 
     void addTaskSkill(UUID taskId, String skillId);
 
-    List<User> suggestAssignTask(UUID projectId, List<String> skillIds);
+    Page<TaskDTO> getTasksAssignedToUser(Pageable pageable, String assignee, @Nullable String search);
 
-    Page<Task> getTasksAssignedToUser(Pageable pageable, String assignee, @Nullable String search);
-
-    Page<Task> getTasksOfProject(Pageable pageable, UUID projectId, @Nullable String search);
-
-    long countTasksByProjectId(UUID projectId);
-
-    List<TaskHierarchyDTO> getTaskHierarchyByRoot(UUID ancestorId);
+    Page<TaskDTO> getTasksOfProject(Pageable pageable, UUID projectId, @Nullable String search, String getterId);
 
     List<TaskGanttDTO> getTaskGantt(UUID projectId, String from, String to, String q);
 }

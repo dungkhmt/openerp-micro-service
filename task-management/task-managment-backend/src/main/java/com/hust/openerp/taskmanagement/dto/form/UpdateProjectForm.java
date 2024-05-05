@@ -10,11 +10,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProjectForm {
+public class UpdateProjectForm {
     @Nullable
     private String name;
-    @Nullable
-    private String code;
     @Nullable
     private String description;
 }

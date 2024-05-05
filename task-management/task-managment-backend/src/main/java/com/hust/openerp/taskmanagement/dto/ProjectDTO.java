@@ -26,7 +26,5 @@ public class ProjectDTO {
 
   private User creator;
 
-  private long taskCount;
-
   private String role;
 }

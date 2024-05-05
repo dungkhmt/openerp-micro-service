@@ -9,25 +9,9 @@ import com.hust.openerp.taskmanagement.entity.ProjectMember;
 
 @Service
 public interface ProjectMemberService {
-    List<ProjectMember> getMembersOfProject(UUID projectId);
+    List<ProjectMember> getMembersOfProject(UUID projectId, String getterId);
 
-    /**
-     * @deprecated use {@link #addMemberToProject(ProjectMember)} instead
-     * @param projectMember
-     * @return
-     */
-    @Deprecated
-    ProjectMember setProjectMember(ProjectMember projectMember);
-
-    ProjectMember addMemberToProject(ProjectMember projectMemberForm);
-
-    /**
-     * @deprecated use {@link #addMemberToProject(ProjectMember)} instead
-     * @param projectMember
-     * @return
-     */
-    @Deprecated
-    ProjectMember create(ProjectMember projectMember);
+    ProjectMember addMemberToProject(ProjectMember projectMemberForm, String adderId);
 
     boolean checkAddedMemberInProject(String memberId, UUID projectId);
 }
