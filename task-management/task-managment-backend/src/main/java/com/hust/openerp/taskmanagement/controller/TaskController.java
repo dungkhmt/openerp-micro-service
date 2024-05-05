@@ -4,7 +4,6 @@ import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,19 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hust.openerp.taskmanagement.config.OpenApiConfig;
 import com.hust.openerp.taskmanagement.dto.PaginationDTO;
-import com.hust.openerp.taskmanagement.dto.ProjectDTO;
 import com.hust.openerp.taskmanagement.dto.TaskDTO;
 import com.hust.openerp.taskmanagement.dto.TaskGanttDTO;
-import com.hust.openerp.taskmanagement.dto.form.SuggestForm;
-import com.hust.openerp.taskmanagement.dto.form.TaskForm;
-import com.hust.openerp.taskmanagement.entity.Task;
+import com.hust.openerp.taskmanagement.dto.form.CreateTaskForm;
+import com.hust.openerp.taskmanagement.dto.form.UpdateTaskForm;
 import com.hust.openerp.taskmanagement.entity.TaskLog;
-import com.hust.openerp.taskmanagement.entity.User;
 import com.hust.openerp.taskmanagement.service.TaskLogService;
 import com.hust.openerp.taskmanagement.service.TaskService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -39,15 +36,14 @@ import lombok.RequiredArgsConstructor;
 @SecurityRequirement(name = OpenApiConfig.SECURITY_SCHEME_NAME)
 @RequiredArgsConstructor
 public class TaskController {
-    private final ModelMapper modelMapper;
     private final TaskService taskService;
     private final TaskLogService taskLogService;
 
     @GetMapping
-    public PaginationDTO<TaskDTO> getPaginatedTasks(Pageable pageable, @RequestParam("projectId") UUID projectId,
+    public PaginationDTO<TaskDTO> getPaginatedTasks(Principal principal, Pageable pageable,
+            @RequestParam("projectId") UUID projectId,
             @Nullable @RequestParam(name = "q", required = false) String q) {
-        var pageResult = taskService.getTasksOfProject(pageable, projectId, q)
-                .map(this::convertToDto);
+        var pageResult = taskService.getTasksOfProject(pageable, projectId, q, principal.getName());
         return new PaginationDTO<>(pageResult);
     }
 
@@ -61,10 +57,9 @@ public class TaskController {
     @PostMapping
     public TaskDTO createNewTask(
             Principal principal,
-            @RequestBody TaskForm taskForm) {
+            @RequestBody @Valid CreateTaskForm taskForm) {
         String userId = principal.getName();
-        var task = taskService.createTask(taskForm, userId);
-        return modelMapper.map(task, TaskDTO.class);
+        return taskService.createTask(taskForm, userId);
     }
 
     @GetMapping("/assigned-me")
@@ -72,22 +67,13 @@ public class TaskController {
             Principal principal,
             Pageable pageable, @RequestParam(value = "search", required = false) String search) {
         String assignee = principal.getName();
-        var tasks = taskService.getTasksAssignedToUser(pageable, assignee, search);
-        var result = tasks.map(entity -> {
-            var dto = modelMapper.map(entity, TaskDTO.class);
-            dto.setProject(modelMapper.map(entity.getProject(), ProjectDTO.class));
-            return dto;
-        });
-        return new PaginationDTO<>(result);
+        var tasksDto = taskService.getTasksAssignedToUser(pageable, assignee, search);
+        return new PaginationDTO<>(tasksDto);
     }
 
     @GetMapping("{id}")
-    public TaskDTO getTaskById(@PathVariable("id") UUID id) {
-        // TODO: check if user has permission to get this task
-        var task = taskService.getTask(id);
-        var dto = convertToDto(task);
-        dto.setHierarchies(taskService.getTaskHierarchyByRoot(task.getAncestorId()));
-        return dto;
+    public TaskDTO getTaskById(Principal principal, @PathVariable("id") UUID id) {
+        return taskService.getTask(id, principal.getName());
     }
 
     @GetMapping("{id}/logs")
@@ -96,22 +82,8 @@ public class TaskController {
     }
 
     @PutMapping("{id}")
-    public TaskDTO updateTask(Principal principal, @PathVariable("id") UUID id, @RequestBody TaskForm taskForm) {
-        // TODO: check if user has permission to update this task
-        var task = taskService.updateTask(id, taskForm, principal.getName());
-        if (task == null) {
-            throw new RuntimeException("Task not found");
-        }
-        return convertToDto(task);
-    }
-
-    @PostMapping("/suggest-assign-task")
-    public List<User> suggestAssignTask(@RequestBody SuggestForm suggestForm) {
-        return taskService.suggestAssignTask(suggestForm.getProjectId(), suggestForm.getSkillIds());
-    }
-
-    private TaskDTO convertToDto(Task task) {
-        var dto = modelMapper.map(task, TaskDTO.class);
-        return dto;
+    public TaskDTO updateTask(Principal principal, @PathVariable("id") UUID id,
+            @RequestBody @Valid UpdateTaskForm taskForm) {
+        return taskService.updateTask(id, taskForm, principal.getName());
     }
 }
