@@ -50,4 +50,8 @@ public class RoomOccupation {
         this.semester = semester;
     }
 
+    @Override
+    public String toString() {
+        return classCode + " " + classRoom + " " + dayIndex + " " + weekIndex + " " + startPeriod + "/" + endPeriod + " " + semester;
+    }
 }

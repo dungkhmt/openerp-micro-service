@@ -2,7 +2,9 @@ package openerp.openerpresourceserver.generaltimetabling.service.impl;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,6 +24,7 @@ import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassOpen
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
@@ -251,6 +254,22 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
 
     @Transactional
     @Override
+    public List<GeneralClassOpened> autoScheduleRoom(String semester, String groupName) {
+        log.info("autoScheduleRoom start...");
+        List<GeneralClassOpened> classes = gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
+        if (classes == null) throw new NotFoundException("Không tìm thấy lớp");
+        List<Classroom> rooms = classroomRepo.findAll();
+        List<GeneralClassOpened> updatedClasses = V2ClassScheduler.autoScheduleRoom(classes, rooms);
+        List<String> classCodes = updatedClasses.stream().map(GeneralClassOpened::getClassCode).toList();
+        List<RoomOccupation> newRoomOccupations = updatedClasses.stream().map(RoomOccupationMapper::mapFromGeneralClass).flatMap(Collection::stream).toList();
+        roomOccupationRepo.deleteAllByClassCodeIn(classCodes);
+        roomOccupationRepo.saveAll(newRoomOccupations);
+        gcoRepo.saveAll(updatedClasses);
+        return updatedClasses;
+    }
+
+    @Transactional
+    @Override
     public List<GeneralClassOpened> autoSchedule(String semester, String groupName) {
         log.info("autoSchedule START....");
         List<GeneralClassOpened> foundClasses = gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
@@ -265,19 +284,16 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
     }
 
     @Override
-    public List<GeneralClassOpened> autoScheduleRoom(String semester, String groupName) {
-        log.info("autoScheduleRoom start...");
-        List<GeneralClassOpened> classes = gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
-        if (classes == null) throw new NotFoundException("Không tìm thấy lớp");
-        List<Classroom> rooms = classroomRepo.findAll();
-        List<GeneralClassOpened> updatedClasses = V2ClassScheduler.autoScheduleRoom(classes, rooms);
-        gcoRepo.saveAll(updatedClasses);
-        return updatedClasses;
-    }
-
-    @Override
     public InputStream exportExcel(String semester) {
-        List<GeneralClassOpened> classes = gcoRepo.findAllBySemester(semester).stream().filter(c -> c.getClassCode() != null && !c.getClassCode().isEmpty()).toList();
+        List<GeneralClassOpened> classes = gcoRepo.findAllBySemester(semester)
+                .stream()
+                .filter(c -> c.getClassCode() != null && !c.getClassCode().isEmpty())
+                .collect(Collectors.toCollection(ArrayList::new));
+        classes.sort((a, b) -> {
+            Comparable fieldValueA = a.getClassCode();
+            Comparable fieldValueB = b.getClassCode();
+            return fieldValueA.compareTo(fieldValueB);
+        });
         if (classes.isEmpty()) throw new NotFoundException("Kỳ học không có bất kỳ lớp học nào!");
         return excelHelper.convertGeneralClassToExcel(classes);
     }

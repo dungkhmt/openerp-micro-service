@@ -160,7 +160,8 @@ const GeneralScheduleScreen = () => {
         console.error("Error exporting Excel:", error);
       },
       null,
-      { responseType: "arraybuffer" }
+      { responseType: "arraybuffer" },
+      null
     ).then();
   }
 

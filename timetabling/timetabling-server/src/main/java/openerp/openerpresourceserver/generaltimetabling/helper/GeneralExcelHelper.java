@@ -328,15 +328,15 @@ public class GeneralExcelHelper {
 
             Row periodIndexRow = sheet.createRow(rowIndex+1);
             for (int i = START_COL_TO_READ_CLASS_SCHEDULE; i < START_COL_TO_READ_CLASS_SCHEDULE+42; i += 6) {
-                sheet.addMergedRegion(new CellRangeAddress(rowIndex,rowIndex,i,i+6));
+                sheet.addMergedRegion(new CellRangeAddress(rowIndex,rowIndex,i,i+5));
                 Cell c = weekIndexRow.createCell(i);
-                String weekString = "Thứ " + (i-START_COL_TO_READ_CLASS_SCHEDULE)/6;
+                String weekString = "Thứ " + ((i-START_COL_TO_READ_CLASS_SCHEDULE)/6 + 2);
                 c.setCellValue(weekString);
             }
 
             for (int i = START_COL_TO_READ_CLASS_SCHEDULE; i < START_COL_TO_READ_CLASS_SCHEDULE+42; i++) {
                 Cell c = periodIndexRow.createCell(i);
-                String periodString = "" + (i-START_COL_TO_READ_CLASS_SCHEDULE)%6;
+                String periodString = "" + ((i-START_COL_TO_READ_CLASS_SCHEDULE)%6 + 1);
                 c.setCellValue(periodString);
             }
 
@@ -395,7 +395,7 @@ public class GeneralExcelHelper {
                 for (int j = START_COL_TO_READ_CLASS_SCHEDULE; j < START_COL_TO_READ_CLASS_SCHEDULE + 42; j++) {
                     Cell c = classRow.createCell(j);
                     for (RoomReservation rr : generalClassOpened.getTimeSlots().stream().filter(RoomReservation::isNotNull).toList()) {
-                        if (j - START_COL_TO_READ_CLASS_SCHEDULE > (rr.getWeekday()-2)*6 + rr.getStartTime() && j-START_COL_TO_READ_CLASS_SCHEDULE < (rr.getWeekday()-2)*6 + rr.getEndTime()) {
+                        if (j - START_COL_TO_READ_CLASS_SCHEDULE >= (rr.getWeekday()-2)*6 + rr.getStartTime() -1 && j-START_COL_TO_READ_CLASS_SCHEDULE <= (rr.getWeekday()-2)*6 + rr.getEndTime() -1) {
                             c.setCellValue(rr.getRoom());
                             c.setCellStyle(roomStyle);
                         }

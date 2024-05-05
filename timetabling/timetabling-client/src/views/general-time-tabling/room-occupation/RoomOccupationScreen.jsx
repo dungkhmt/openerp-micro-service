@@ -9,7 +9,6 @@ const RoomOccupationScreen = () => {
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [selectedWeek, setSelectedWeek] = useState(1);
   const [startDate, setStartDate] = useState(null);
-  const [semesterStartDate, setSemesterStartDate] = useState(null);
   const handleExportExcel = () => {
     request(
       "post",
@@ -56,7 +55,6 @@ const RoomOccupationScreen = () => {
         </Button>
       </div>
       <RoomUsageChart
-        semesterStartDate = {semesterStartDate}
         startDate={startDate}
         selectedWeek={selectedWeek}
         semester={selectedSemester?.semester}

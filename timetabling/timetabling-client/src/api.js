@@ -41,8 +41,11 @@ export async function request(
   config,
   controller
 ) {
+  console.log(config)
   if (config !== undefined && config !== null) {
     axiosInstance.defaults.headers.common["Content-Type"] = "multipart/form-data";
+  } else {
+    axiosInstance.defaults.headers.common["Content-Type"] = "application/json";
   }
   try {
     let options = {}
