@@ -7,23 +7,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.hust.openerp.taskmanagement.dto.form.ProjectForm;
+import com.hust.openerp.taskmanagement.dto.ProjectDTO;
+import com.hust.openerp.taskmanagement.dto.form.UpdateProjectForm;
 import com.hust.openerp.taskmanagement.entity.Project;
 
 @Service
 public interface ProjectService {
-    Project getProjectById(UUID id);
+    ProjectDTO getProjectById(UUID id, String userId);
 
-    Project createProject(Project project);
+    ProjectDTO createProject(Project project, String creatorId);
 
-    Project updateProject(UUID id, ProjectForm project);
+    ProjectDTO updateProject(UUID id, UpdateProjectForm project, String updaterId);
 
-    void deleteProjectById(UUID id);
+    void deleteProjectById(UUID id, String deleterId);
 
-    Page<Project> findPaginated(String memberId, Pageable pageable, String searchString);
-
-    // List<StatusTaskDao> getDataBoardWithFilters(BoardFilterInputForm
-    // boardFilterInputForm);
-
-    List<Project> getAllProjects();
+    Page<ProjectDTO> findPaginated(String memberId, Pageable pageable, String searchString);
 }

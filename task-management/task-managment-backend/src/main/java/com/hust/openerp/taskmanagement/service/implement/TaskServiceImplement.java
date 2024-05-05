@@ -2,7 +2,6 @@ package com.hust.openerp.taskmanagement.service.implement;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -20,20 +19,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Joiner;
+import com.hust.openerp.taskmanagement.dto.ProjectDTO;
+import com.hust.openerp.taskmanagement.dto.TaskDTO;
 import com.hust.openerp.taskmanagement.dto.TaskGanttDTO;
 import com.hust.openerp.taskmanagement.dto.TaskHierarchyDTO;
-import com.hust.openerp.taskmanagement.dto.form.TaskForm;
-import com.hust.openerp.taskmanagement.entity.ProjectMember;
+import com.hust.openerp.taskmanagement.dto.form.CreateTaskForm;
+import com.hust.openerp.taskmanagement.dto.form.UpdateTaskForm;
 import com.hust.openerp.taskmanagement.entity.Task;
 import com.hust.openerp.taskmanagement.entity.TaskLog;
 import com.hust.openerp.taskmanagement.entity.TaskLogDetail;
 import com.hust.openerp.taskmanagement.entity.TaskSkill;
 import com.hust.openerp.taskmanagement.entity.Task_;
-import com.hust.openerp.taskmanagement.entity.User;
-import com.hust.openerp.taskmanagement.entity.UserSkill;
+import com.hust.openerp.taskmanagement.exception.ApiException;
+import com.hust.openerp.taskmanagement.exception.ErrorCode;
 import com.hust.openerp.taskmanagement.repository.TaskRepository;
 import com.hust.openerp.taskmanagement.repository.TaskSkillRepository;
-import com.hust.openerp.taskmanagement.repository.UserSkillRepository;
 import com.hust.openerp.taskmanagement.service.ProjectMemberService;
 import com.hust.openerp.taskmanagement.service.TaskLogService;
 import com.hust.openerp.taskmanagement.service.TaskService;
@@ -45,7 +45,6 @@ import com.hust.openerp.taskmanagement.util.SearchOperation;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.AllArgsConstructor;
 
@@ -60,13 +59,11 @@ public class TaskServiceImplement implements TaskService {
 
     private TaskSkillRepository taskSkillRepository;
 
-    private UserSkillRepository userLoginSkillRepository;
-
     private TaskLogService taskLogService;
 
     @Override
     @Transactional
-    public Task createTask(TaskForm taskForm, String creatorId) {
+    public TaskDTO createTask(CreateTaskForm taskForm, String creatorId) {
         List<TaskLogDetail> taskLogDetails = new ArrayList<>();
         var task = modelMapper.map(taskForm, Task.class);
         var createdTime = new Date();
@@ -160,27 +157,22 @@ public class TaskServiceImplement implements TaskService {
 
         taskLogService.addLog(taskLog);
 
-        return savedTask;
+        return convertToDto(savedTask);
     }
 
     @Override
-    public List<Task> getAllTaskInProject(UUID projectId) {
-        return taskRepository.findAllTasksByProjectId(projectId);
-    }
+    public TaskDTO getTask(UUID taskId, String getterId) {
+        var task = taskRepository.findById(taskId).orElseThrow(
+                () -> new ApiException(ErrorCode.TASK_NOT_EXIST));
 
-    @Override
-    public List<Object[]> getTaskStaticsCategoryInProject(UUID projectId) {
-        return taskRepository.getTaskStaticsCategoryInProject(projectId);
-    }
+        if (!projectMemberService.checkAddedMemberInProject(getterId, task.getProjectId())) {
+            throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
+        }
 
-    @Override
-    public List<Object[]> getTaskStaticsStatusInProject(UUID projectId) {
-        return taskRepository.getTaskStaticsStatusInProject(projectId);
-    }
+        var dto = convertToDto(task);
+        dto.setHierarchies(this.getTaskHierarchyByRoot(task.getAncestorId()));
 
-    @Override
-    public Task getTask(UUID taskId) {
-        return taskRepository.findById(taskId).orElse(null);
+        return dto;
     }
 
     @Override
@@ -191,66 +183,7 @@ public class TaskServiceImplement implements TaskService {
         taskSkillRepository.save(taskSkill);
     }
 
-    @Override
-    public List<User> suggestAssignTask(UUID projectId, List<String> skillIds) {
-        List<User> userList = projectMemberService.getMembersOfProject(projectId).stream().map(ProjectMember::getMember)
-                .toList();
-        List<User> personRs = new ArrayList<>();
-        List<String> userLoginRs = new ArrayList<>();
-        List<String> userIds = new ArrayList<>();
-        HashMap<String, Integer> rs = new HashMap<>();
-        HashMap<String, List<String>> collection = new HashMap<>();
-        for (int i = 0; i < userList.size(); i++) {
-            userIds
-                    .add(userList.get(i).getId());
-            rs.put(userIds.get(i), 0);
-        }
-
-        for (int i = 0; i < userIds.size(); i++) {
-            List<UserSkill> userLoginSkills = userLoginSkillRepository.getListUserLoginSkill(userIds.get(i));
-            List<String> tmp = new ArrayList<>();
-            for (UserSkill userloginSkill : userLoginSkills) {
-                tmp.add(userloginSkill.getSkillId());
-            }
-            collection.put(userIds.get(i), tmp);
-        }
-
-        for (int i = 0; i < skillIds.size(); i++) {
-            for (int j = 0; j < userIds.size(); j++) {
-                int dem = rs.get(userIds.get(j));
-                List<String> arrTmp = collection.get(userIds.get(j));
-                for (int k = 0; k < arrTmp.size(); k++) {
-                    if (skillIds.get(i).equals(arrTmp.get(k))) {
-                        dem++;
-                    }
-                }
-                rs.put(userIds.get(j), dem);
-            }
-        }
-
-        Collection<Integer> rsArr = rs.values();
-        int max = 0;
-        for (Integer i : rsArr) {
-            if (max < i) {
-                max = i;
-            }
-        }
-
-        if (max == 0) {
-            return personRs;
-        }
-
-        for (Map.Entry<String, Integer> entry : rs.entrySet()) {
-            if (entry.getValue() == max) {
-                userLoginRs.add(entry.getKey());
-            }
-        }
-
-        userList.stream().filter(user -> userLoginRs.contains(user.getId())).forEach(personRs::add);
-        return personRs;
-    }
-
-    public Page<Task> getTasksAssignedToUser(Pageable pageable, String assignee, @Nullable String search) {
+    public Page<TaskDTO> getTasksAssignedToUser(Pageable pageable, String assignee, @Nullable String search) {
         // replace "assignee:value" if exist in search by "assignee:`assignee`"
         if (search != null && !search.equals("")) {
             if (search.contains("assigneeId:"))
@@ -269,17 +202,20 @@ public class TaskServiceImplement implements TaskService {
 
         GenericSpecificationsBuilder<Task> builder = new GenericSpecificationsBuilder<>();
         var specs = builder.build(new CriteriaParser().parse(search), TaskSpecification::new);
-        return taskRepository.findAll(specs, pageable);
+        return taskRepository.findAll(specs, pageable).map(entity -> {
+            var dto = modelMapper.map(entity, TaskDTO.class);
+            dto.setProject(modelMapper.map(entity.getProject(), ProjectDTO.class));
+            return dto;
+        });
     }
 
     @Override
-    public long countTasksByProjectId(UUID projectId) {
-        return taskRepository
-                .count((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("projectId"), projectId));
-    }
+    public Page<TaskDTO> getTasksOfProject(Pageable pageable, UUID projectId, @Nullable String search,
+            String getterId) {
+        if (!projectMemberService.checkAddedMemberInProject(getterId, projectId)) {
+            throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
+        }
 
-    @Override
-    public Page<Task> getTasksOfProject(Pageable pageable, UUID projectId, @Nullable String search) {
         // default sort by created date
         if (pageable.getSort().isUnsorted()) {
             pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
@@ -294,12 +230,12 @@ public class TaskServiceImplement implements TaskService {
 
         GenericSpecificationsBuilder<Task> builder = new GenericSpecificationsBuilder<>();
         var specs = builder.build(new CriteriaParser().parse(search), TaskSpecification::new);
-        return taskRepository.findAll(specs, pageable);
+        return taskRepository.findAll(specs, pageable).map(this::convertToDto);
     }
 
     @Override
     @Transactional
-    public Task updateTask(UUID taskId, TaskForm taskForm, String updateBy) {
+    public TaskDTO updateTask(UUID taskId, UpdateTaskForm taskForm, String updateBy) {
         List<TaskLogDetail> taskLogDetails = new ArrayList<>();
         Task task = taskRepository.findById(taskId).orElse(null);
         if (task == null) {
@@ -400,20 +336,20 @@ public class TaskServiceImplement implements TaskService {
 
         taskLog.setDetails(taskLogDetails);
 
-        if (taskLogDetails.size() > 0 || taskLog.getComment() != null) {
+        if (taskLogDetails.isEmpty() || taskLog.getComment() != null) {
             taskLogService.addLog(taskLog);
 
             task.setLastUpdatedStamp(updatedTime);
-            return taskRepository.save(task);
+            return convertToDto(taskRepository.save(task));
         } else {
             return null;
         }
     }
 
-    public List<TaskHierarchyDTO> getTaskHierarchyByRoot(UUID ancestorId) {
+    private List<TaskHierarchyDTO> getTaskHierarchyByRoot(UUID ancestorId) {
         var ancestor = taskRepository.findById(ancestorId).orElse(null);
         if (ancestor == null) {
-            return null;
+            return List.of();
         }
         var tasks = taskRepository.getTaskByAncestorIdAndLftAndRgt(ancestorId, ancestor.getLft(), ancestor.getRgt());
         var taskLevel = findTaskLevel(tasks);
@@ -498,4 +434,7 @@ public class TaskServiceImplement implements TaskService {
                 .map(task -> modelMapper.map(task, TaskGanttDTO.class)).toList();
     }
 
+    private TaskDTO convertToDto(Task task) {
+        return modelMapper.map(task, TaskDTO.class);
+    }
 }

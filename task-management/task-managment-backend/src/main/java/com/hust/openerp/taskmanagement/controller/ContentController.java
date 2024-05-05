@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.hust.openerp.taskmanagement.exception.ApiException;
+import com.hust.openerp.taskmanagement.exception.ErrorCode;
 import com.hust.openerp.taskmanagement.model.ContentHeaderModel;
 import com.hust.openerp.taskmanagement.model.ContentModel;
 import com.hust.openerp.taskmanagement.service.MongoContentService;
@@ -31,57 +33,48 @@ public class ContentController {
     @PostMapping("/content/create")
     public ResponseEntity<?> create(
             @RequestParam("inputJson") String inputJson,
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam("file") MultipartFile file) throws IOException {
         Gson gson = new Gson();
         ContentHeaderModel modelHeader = gson.fromJson(inputJson, ContentHeaderModel.class);
         ContentModel model = new ContentModel(modelHeader.getId(), file);
 
         ObjectId id;
-        try {
-            id = mongoContentService.storeFileToGridFs(model);
-            ContentHeaderModel rs = new ContentHeaderModel(id.toHexString());
-            return ResponseEntity.ok().body(rs);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.ok().body(null);
-        }
+        id = mongoContentService.storeFileToGridFs(model);
+        ContentHeaderModel rs = new ContentHeaderModel(id.toHexString());
+        return ResponseEntity.ok().body(rs);
     }
 
     @GetMapping("/content/get/{id}")
-    public ResponseEntity<byte[]> get(@PathVariable String id) {
-        try {
-            GridFsResource content = mongoContentService.getById(id);
-            if (content != null) {
-                InputStream inputStream = content.getInputStream();
-                HttpHeaders headers = new HttpHeaders();
-                headers.add("Content-Type", content.getContentType());
-                headers.add("Content-Disposition", "attachment");
-                headers.add("Access-Control-Expose-Headers", "Content-Disposition");
-                return new ResponseEntity<>(IOUtils.toByteArray(inputStream), headers, HttpStatus.OK);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<byte[]> get(@PathVariable String id) throws IOException {
+        GridFsResource content = mongoContentService.getById(id);
+        if (content == null) {
+            throw new ApiException(ErrorCode.FILE_NOT_EXIST);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        InputStream inputStream = content.getInputStream();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", content.getContentType());
+        headers.add("Content-Disposition", "attachment");
+        headers.add("Access-Control-Expose-Headers", "Content-Disposition");
+        return new ResponseEntity<>(IOUtils.toByteArray(inputStream), headers, HttpStatus.OK);
     }
 
+    // NOT SECURE
     @GetMapping("/content/img/{id}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String id) {
-        try {
-            GridFsResource content = mongoContentService.getById(id);
-            if (content != null && content.getContentType().startsWith("image")) {
-                InputStream inputStream = content.getInputStream();
-                HttpHeaders headers = new HttpHeaders();
-                headers.add("Content-Type", content.getContentType());
-                headers.add("Content-Disposition", "inline");
+    public ResponseEntity<byte[]> getImage(@PathVariable String id) throws IOException {
+        GridFsResource content = mongoContentService.getById(id);
 
-                return new ResponseEntity<>(IOUtils.toByteArray(inputStream), headers, HttpStatus.OK);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (content == null)
+            throw new ApiException(ErrorCode.FILE_NOT_EXIST);
+
+        if (!content.getContentType().startsWith("image"))
+            throw new ApiException(ErrorCode.UNSUPPORTED_MEDIA_TYPE);
+
+        InputStream inputStream = content.getInputStream();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", content.getContentType());
+        headers.add("Content-Disposition", "inline");
+
+        return new ResponseEntity<>(IOUtils.toByteArray(inputStream), headers, HttpStatus.OK);
     }
 }
