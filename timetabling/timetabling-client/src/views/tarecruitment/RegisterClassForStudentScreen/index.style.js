@@ -1,6 +1,6 @@
 const styles = {
   content: {
-    padding: "3%",
+    padding: "3em",
   },
   textFieldContainer: {
     width: "50%",

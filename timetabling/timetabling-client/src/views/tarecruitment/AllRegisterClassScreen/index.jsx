@@ -136,9 +136,16 @@ const AllRegisterClassScreen = () => {
   }));
 
   return (
-    <Paper elevation={3} style={{ paddingTop: "1em" }}>
+    <Paper elevation={3}>
       <div style={styles.tableToolBar}>
-        <Typography variant="h4" style={{ fontWeight: "bold" }}>
+        <Typography
+          variant="h4"
+          style={{
+            fontWeight: "bold",
+            marginBottom: "0.5em",
+            paddingTop: "1em",
+          }}
+        >
           Danh sách lớp học
         </Typography>
 
@@ -155,16 +162,15 @@ const AllRegisterClassScreen = () => {
       <DataGrid
         loading={isLoading}
         rowHeight={60}
-        sx={{ fontSize: 16 }}
+        sx={{ fontSize: 16, height: "65vh" }}
         rows={dataGridRows}
         columns={dataGridColumns}
-        autoHeight
         rowCount={totalElements}
         pagination
         paginationMode="server"
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[5, 10, 20]}
+        pageSizeOptions={[10, 20, 50]}
         checkboxSelection={false}
         disableRowSelectionOnClick
       />
