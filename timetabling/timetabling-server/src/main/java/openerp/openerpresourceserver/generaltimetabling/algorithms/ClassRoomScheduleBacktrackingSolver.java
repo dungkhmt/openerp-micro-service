@@ -1,11 +1,12 @@
 package openerp.openerpresourceserver.generaltimetabling.algorithms;
 
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
 import java.util.List;
 @Log4j2
-
+@Getter
 public class ClassRoomScheduleBacktrackingSolver {
     int n;// number of classes
     int m;// number of rooms

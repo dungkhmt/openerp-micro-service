@@ -11,6 +11,9 @@ import {
     Row,
 } from "react-bootstrap";
 import {request} from "../../api"
+import { convertHtmlElementToPdfFile } from "../../utils/ConvertHTMLToFile/convertHtmlElementToPdfFile";
+import Swal from "sweetalert2";
+
 const CreateNewCvForm = () => {
 
     const [showCVDemo, setShowCVDemo] = useState(false)
@@ -88,6 +91,7 @@ const CreateNewCvForm = () => {
         gender: "Nam",
         profession: "Cloud engineer",
         userLocation: "Ha Noi",
+        cvLink: "fuck",
         mobilePhone: "01647997611",
         email: "xxx@gmail.com",
         description: "tôi yêu  gái đẹp",
@@ -106,68 +110,71 @@ const CreateNewCvForm = () => {
             employeeCV: userInfoForm, experiences, educations, skills
         })
     };
-    const [submitForm, setSubmitForm] = useState({})
+    let [submitForm, setSubmitForm] = useState({})
     const handleSubmit = (e) => {
         e.preventDefault()
         setShowCVDemo(true)
         console.log(submitForm)
-        request("post", `/employee-cv`, (res)=> {
-            console.log(res);
-          }, (err)=>{
-            console.log(err);
-          }, submitForm).then();
+        // request("post", `/employee-cv`, (res)=> {
+        //     console.log(res);
+        //   }, (err)=>{
+        //     console.log(err);
+        //   }, submitForm).then();
     }
 
-    // const createNewCv = async () => {
-    //     const element = document.getElementById("fileToPrint");
-    //     if (element) {
-    //       // Convert the HTML element to canvas
-    //       const file = await convertHtmlElementToPdfFile(element, cvTitle);
-    //       const uploadFileData = await uploadFile(file);
-    //       console.log(uploadFileData);
-    //       if (isErrorHttpResponse(uploadFileData)) {
-    //         return Swal.fire(
-    //           "Oops...",
-    //           `There is some thing wrong when upload your CV ${uploadFileData.message.join(
-    //             ", "
-    //           )}`,
-    //           "error"
-    //         );
-    //       } else {
-    //         const createResumeData = uploadResume({
-    //           title: resumeTitle,
-    //           link: uploadFileData.data,
-    //           employeeId: employee?.id || "",
-    //           name: userInfoForm.name,
-    //           gender: userInfoForm.gender,
-    //           profession: userInfoForm.profession,
-    //           location: userInfoForm.location,
-    //           mobilePhone: userInfoForm.mobilePhone,
-    //           email: userInfoForm.email,
-    //           description: userInfoForm.description,
-    //           facebookLink: userInfoForm.facebookLink,
-    //           linkedInLink: userInfoForm.linkedInLink,
-    //           gitHubLink: userInfoForm.gitHubLink,
-    //           education: userEducations,
-    //           skill: userSkills,
-    //           workingExperience: userWorkingExperiences,
-    //           skillDescription: userInfoForm.skillDescription,
-    //           method: EResumeMethod.CREATE,
-    //         });
-    //         if (isErrorHttpResponse(createResumeData)) {
-    //           return Swal.fire(
-    //             "Oops...",
-    //             "There is some thing wrong when upload your CV",
-    //             "error"
-    //           );
-    //         } else {
-    //           notify("Create CV successfully", () =>
-    //             navigate(`/employee/profile/${employee?.userId}`)
-    //           );
-    //         }
-    //       }
-    //     }
+    // const handleGenerateResume = async (e) => {
+    //     e.preventDefault();
+    //     setUserCVInfo({
+    //       name: userInfoForm.name,
+    //       gender: userInfoForm.gender,
+    //       profession: userInfoForm.profession,
+    //       location: userInfoForm.location,
+    //       mobilePhone: userInfoForm.mobilePhone,
+    //       email: userInfoForm.email,
+    //       profileDescription: userInfoForm.profileDescription,
+    //       facebookLink: userInfoForm.facebookLink,
+    //       linkedInLink: userInfoForm.linkedInLink,
+    //       gitHubLink: userInfoForm.gitHubLink,
+    //       education: userEducations,
+    //       skill: userSkills,
+    //       workingExperience: userWorkingExperiences,
+    //       skillDescription: userInfoForm.skillDescription,
+    //     });
+    //     setShowCVDemo(true);
     //   };
+    const uploadFile = async (file) => {
+        const formData = new FormData()
+        formData.append("file", file);
+        await request("post", `/employee-cv/file-upload`, (res)=> {
+            console.log(res);
+            console.log("xnxx: ", submitForm)           
+            submitForm.employeeCV.cvLink = res.data
+            console.log("xnxx: ", submitForm)
+            request("post", `/employee-cv`, (res)=> {
+                console.log(res);
+              }, (err)=>{
+                console.log(err);
+              }, submitForm).then();
+          }, (err)=>{
+            console.log(err);
+          }, formData).then();
+    }
+
+    const createNewCv = async () => {
+        const element = document.getElementById("fileToPrint");
+        if (element) {
+          // Convert the HTML element to canvas
+          const file = await convertHtmlElementToPdfFile(element, userInfoForm.title);
+          const uploadFileData = await uploadFile(file);
+          if (uploadFileData == null) {
+            return Swal.fire(
+                      "Oops...",
+                      `There is some thing wrong when upload your CV`,
+                      "error"
+                    );
+                  } 
+        }
+      };
     return (
         <div>
             {!showCVDemo && (
@@ -457,7 +464,7 @@ const CreateNewCvForm = () => {
                         skill={skills}
                         workingExperience={experiences}
                         handleBackToEditButton={() => setShowCVDemo(false)}
-                    // handleSaveCVButton={() => createNewCv()}
+                        handleSaveCVButton={() => createNewCv()}
                     />
                 </div>
             )}

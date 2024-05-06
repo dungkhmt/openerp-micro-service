@@ -9,9 +9,11 @@ import openerp.openerpresourceserver.generaltimetabling.helper.MassExtractor;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.generaltimetabling.repo.ClassroomRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.GeneralClassOpenedRepository;
 import openerp.openerpresourceserver.generaltimetabling.repo.GroupRepo;
+import openerp.openerpresourceserver.generaltimetabling.repo.RoomOccupationRepo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,14 +27,16 @@ class OpenerpResourceServerApplicationTests {
 
     private final GeneralClassOpenedRepository gcoRepo;
     private final ClassroomRepo classroomRepo;
+    private final RoomOccupationRepo roomOccupationRepo;
     private final GroupRepo groupRepo;
     private final int minPeriod = 2;
     private final int maxPeriod = 4;
 
     @Autowired
-    OpenerpResourceServerApplicationTests(GeneralClassOpenedRepository gcoRepo, ClassroomRepo classroomRepo, GroupRepo groupRepo) {
+    OpenerpResourceServerApplicationTests(GeneralClassOpenedRepository gcoRepo, ClassroomRepo classroomRepo, RoomOccupationRepo roomOccupationRepo, GroupRepo groupRepo) {
         this.gcoRepo = gcoRepo;
         this.classroomRepo = classroomRepo;
+        this.roomOccupationRepo = roomOccupationRepo;
         this.groupRepo = groupRepo;
     }
 
@@ -162,5 +166,11 @@ class OpenerpResourceServerApplicationTests {
         V2ClassScheduler.autoScheduleRoom(classes, rooms);
     }
 
+    @Test
+    void testFetchRoomOccuptionByClassCodes() {
+        List<String> classCodes = List.of(new String[]{"136649","136650","136651"});
+        List<RoomOccupation> fetchRoomOccupations =  roomOccupationRepo.findAllByClassCodeIn(classCodes);
+        fetchRoomOccupations.forEach(System.out::println);
+    }
 
 }

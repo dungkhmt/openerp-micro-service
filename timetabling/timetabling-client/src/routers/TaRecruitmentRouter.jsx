@@ -32,7 +32,7 @@ export default function StudentRouter() {
         <Route
           component={RegisterClassScreen}
           exact
-          path={`${path}/teacher/create-class`}
+          path={`${path}/teacher/create-class/:semester`}
         ></Route>
         <Route
           component={AllClassScreen}

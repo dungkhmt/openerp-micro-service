@@ -12,7 +12,7 @@ const RoomOccupationScreen = () => {
   const handleExportExcel = () => {
     request(
       "post",
-      `room-occupation/export?semester=${selectedSemester?.semester}&weeks=${selectedWeek}-${selectedWeek}`,
+      `room-occupation/export?semester=${selectedSemester?.semester}&week=${selectedWeek}`,
       (res) => {
         const blob = new Blob([res.data], {
           type: res.headers["content-type"],
@@ -32,6 +32,7 @@ const RoomOccupationScreen = () => {
       { responseType: "arraybuffer" }
     ).then();
   };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-row gap-2">

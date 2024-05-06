@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.controller;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,13 +31,13 @@ public class ProjectMemberController {
     private final ProjectMemberService projectMemberService;
 
     @GetMapping("{projectId}")
-    public List<MemberUserDto> getAllMembers(@PathVariable("projectId") UUID projectId) {
-        var entities = projectMemberService.getMembersOfProject(projectId);
+    public List<MemberUserDto> getAllMembers(Principal principal, @PathVariable("projectId") UUID projectId) {
+        var entities = projectMemberService.getMembersOfProject(projectId, principal.getName());
         return entities.stream().map(entity -> modelMapper.map(entity, MemberUserDto.class)).toList();
     }
 
     @PostMapping
-    public void addMember(@RequestBody ProjectMember projectMember) {
-        projectMemberService.addMemberToProject(projectMember);
+    public void addMember(Principal principal, @RequestBody ProjectMember projectMember) {
+        projectMemberService.addMemberToProject(projectMember, principal.getName());
     }
 }

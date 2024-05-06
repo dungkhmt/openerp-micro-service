@@ -25,6 +25,7 @@ import UserCompany from "views/Company";
 import UserSkills from "views/personalInfo/UserSkill";
 import UserEducation from "views/personalInfo/UserEducation";
 import UserExperience from "views/personalInfo/UserExperience";
+import AnalyseCV from "views/AnalyseCV";
 
 const styles = {
   loadingProgress: {
@@ -77,6 +78,7 @@ function MainAppRouter(props) {
           <PrivateRoute component={UserSkills} path = "/skill" />
           <PrivateRoute component={UserExperience} path = "/experience" />
           <PrivateRoute component={UserEducation} path = "/education" />
+          <PrivateRoute component={AnalyseCV} path = "/analyse" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>

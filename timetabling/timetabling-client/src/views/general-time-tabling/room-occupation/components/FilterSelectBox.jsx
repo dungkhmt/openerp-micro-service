@@ -14,7 +14,7 @@ function convertToDate(dateString) {
 
   // Construct the Date object
   var date = new Date(year, month, day);
-
+  console.log(date);
   return date;
 }
 
@@ -25,16 +25,17 @@ const FilterSelectBox = ({
   setStartDate,
 }) => {
   const [weeks, setWeeks] = useState([]);
+
   useEffect(() => {
-    if (selectedSemester === null) return;
+    if (selectedSemester === null || selectedWeek === null) return;
     request(
       "get",
       `/academic-weeks/?semester=${selectedSemester?.semester}`,
       (res) => {
         console.log(res.data);
         setWeeks(res.data);
-        setStartDate(convertToDate(res.data.at(0).startDayOfWeek));
         setSelectedWeek(res?.data[0]?.weekIndex);
+        setStartDate(convertToDate(res?.data[0]?.startDayOfWeek))
         toast.success("Truy vấn tuần học thành công với " + res.data?.length);
       },
       (error) => {
@@ -43,6 +44,7 @@ const FilterSelectBox = ({
       }
     );
   }, [selectedSemester]);
+
   return (
     <div>
       <Autocomplete
@@ -51,9 +53,9 @@ const FilterSelectBox = ({
         loadingText="Loading..."
         getOptionLabel={(option) => "Tuần " + option?.weekIndex?.toString()}
         onChange={(e, week) => {
+          console.log(week);
+          if (!week) return;
           setSelectedWeek(week?.weekIndex);
-          console.log(week?.startDayOfWeek);
-          setStartDate(convertToDate(week?.startDayOfWeek));
         }}
         value={selectedWeek?.weekIndex}
         options={weeks}

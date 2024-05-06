@@ -11,10 +11,12 @@ import {
 import { useState } from "react";
 import { request } from "api";
 import { warningNoti, successNoti } from "utils/notification";
-import { SEMESTER } from "../config/localize";
 import styles from "./index.style";
+import { useParams, useHistory } from "react-router-dom";
 
 const RegisterClassScreen = () => {
+  const history = useHistory();
+  const { semester } = useParams();
   const [formData, setFormData] = useState({
     id: "",
     day: "",
@@ -24,7 +26,7 @@ const RegisterClassScreen = () => {
     subjectName: "",
     classRoom: "",
     note: "",
-    semester: SEMESTER,
+    semester: semester,
   });
 
   const handleChange = (event) => {
@@ -57,12 +59,12 @@ const RegisterClassScreen = () => {
         "post",
         "/class-call/create-class",
         (res) => {
-          console.log(res.data);
+          successNoti("Tạo lớp học thành công");
+          history.push("/ta-recruitment/teacher/class-list");
         },
         {},
         formData
       );
-      successNoti("Tạo lớp học thành công");
     }
   };
 
@@ -132,7 +134,7 @@ const RegisterClassScreen = () => {
                 variant="outlined"
                 name="semester"
                 value={formData.semester}
-                onChange={handleChange}
+                disabled
               />
             </div>
           </div>

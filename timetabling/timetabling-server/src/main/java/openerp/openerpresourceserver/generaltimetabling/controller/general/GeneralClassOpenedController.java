@@ -6,8 +6,14 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.exception.ConflictScheduleException;
+import openerp.openerpresourceserver.generaltimetabling.exception.InvalidClassStudentQuantityException;
+import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateClassesToNewGroupRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.ResetScheduleRequest;
+import openerp.openerpresourceserver.generaltimetabling.service.ExcelService;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,15 +28,25 @@ import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassOpen
 @Log4j2
 public class GeneralClassOpenedController {
     private GeneralClassOpenedService gService;
+
     @ExceptionHandler(ConflictScheduleException.class)
     public ResponseEntity scheduleConflict(ConflictScheduleException e) {
-        return ResponseEntity.status(400).body(e.getCustomMessage());
+        return ResponseEntity.status(410).body(e.getCustomMessage());
+    }
+    @ExceptionHandler(InvalidClassStudentQuantityException.class)
+    public ResponseEntity scheduleConflict(InvalidClassStudentQuantityException e) {
+        return ResponseEntity.status(410).body(e.getCustomMessage());
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity notFoundSolution(NotFoundException e) {
+        return ResponseEntity.status(410).body(e.getCustomMessage());
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<GeneralClassOpened>> getClasses(@RequestParam String semester) {
+    public ResponseEntity<List<GeneralClassOpened>> getClasses(@RequestParam("semester") String semester, @RequestParam("groupName") String groupName) {
         try {
-            List<GeneralClassOpened> generalClassOpenedList = gService.getGeneralClasses(semester);
+            List<GeneralClassOpened> generalClassOpenedList = gService.getGeneralClasses(semester, groupName);
             return ResponseEntity.ok(generalClassOpenedList);
         } catch(Exception e) {
             System.err.println(e);
@@ -70,8 +86,15 @@ public class GeneralClassOpenedController {
     }
 
     @PostMapping("/export-excel")
-    public ResponseEntity exportExcel(@RequestParam("semester") String semester) {
-        return ResponseEntity.ok("ok");
+    public ResponseEntity requestExportExcel(@RequestParam("semester") String semester) {
+        log.info("Controler API -> requestExportExcel start...");
+        String filename = String.format("TKB_{}.xlsx", semester);
+        InputStreamResource file = new InputStreamResource(gService.exportExcel(semester));
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(
+                        MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(file);
     }
 
     @PostMapping("/reset-schedule")

@@ -34,14 +34,13 @@ public class RoomOccupationServiceImp implements RoomOccupationService {
     }
 
     @Override
-    public ByteArrayInputStream exportExcel(String semester, List<Integer> weeks) {
-        int maxWeek = 1;
-        for(int week : weeks) {
-            if(week >= maxWeek) {
-                maxWeek = week;
-            }
-        }
-        return excelHelper.convertToExcel(roomOccupationRepo.findAllBySemesterAndWeekIndex(semester, maxWeek), maxWeek);
+    public ByteArrayInputStream exportExcel(String semester, int week) {
+        return excelHelper.convertRoomOccupationToExcel(roomOccupationRepo.findAllBySemesterAndWeekIndex(semester, week));
+    }
+
+    @Override
+    public List<RoomOccupation> getRoomOccupationsBySemesterAndWeekIndex(String semester, int weekIndex) {
+        return roomOccupationRepo.findAllBySemesterAndWeekIndex(semester,weekIndex);
     }
 
 }

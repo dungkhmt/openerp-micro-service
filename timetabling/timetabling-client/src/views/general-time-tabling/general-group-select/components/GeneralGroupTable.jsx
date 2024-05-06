@@ -1,8 +1,7 @@
 import React from "react";
 import { useGroupTableConfig } from "../hooks/useGeneralGroupTableConfig";
 import Box from "@mui/material/Box";
-import { Button } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
 const GeneralGroupTable = ({
   classes,
@@ -20,6 +19,24 @@ const GeneralGroupTable = ({
         columns={useGroupTableConfig()}
         rows={classes}
         pageSize={10}
+        initialState={{
+          filter: {
+            filterModel: {
+              items: [],
+              quickFilterValues: [''],
+            },
+          },
+        }}
+        slots={{ toolbar: GridToolbar }}
+        slotProps={{
+          toolbar: { 
+            printOptions: { disableToolbarButton: true },
+            csvOptions: { disableToolbarButton: true },
+            showQuickFilter: true,
+          },
+        }}
+        disableColumnSelector
+        disableDensitySelector
       />
     </Box>
   );

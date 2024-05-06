@@ -10,7 +10,9 @@ import openerp.openerpresourceserver.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -25,7 +27,7 @@ public class EmployeeCVController {
     private UserService userService;
     private CVSkillService cvSkillService;
     private CVWorkingExperienceService cvWorkingExperienceService;
-
+    private FirebaseService firebaseService;
     @GetMapping("user/{userId}")
     ResponseEntity<?> getAllUserCV(@PathVariable String userId) {
         List<EmployeeCV> employeeCVList = employeeCVService.getAllByUserId(userId);
@@ -179,6 +181,15 @@ public class EmployeeCVController {
         return ResponseEntity.ok(cvDetails);
 
     }
+
+    @PostMapping("/file-upload")
+    ResponseEntity<?> saveFile(@RequestParam("file") MultipartFile multipartFile) throws IOException {
+        System.out.println("xxxxxxxx" + multipartFile);
+        String fileUrl = firebaseService.uploadFile(multipartFile);
+
+        return ResponseEntity.ok(fileUrl);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id) {
         employeeCVService.deleteById(id);

@@ -1,7 +1,7 @@
 import { request } from "api";
 import { useEffect, useState } from "react";
 
-export const useRoomOccupations = (semester, startDate) => {
+export const useRoomOccupations = (semester, startDate, weekIndex) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
@@ -13,14 +13,22 @@ export const useRoomOccupations = (semester, startDate) => {
       try {
         request(
           "get",
-          `/room-occupation/get-all?semester=${semester}`,
+          `/room-occupation/?semester=${semester}&weekIndex=${weekIndex}`,
           (res) => {
             console.log(res.data);
-            const formattedData = res.data?.map((timeSlot) =>
-              formatTimeSlot(timeSlot, startDate)
-            );
+            const formattedData = res.data?.map((timeSlot) => {
+              if (
+                timeSlot?.startTime !== null &&
+                timeSlot?.endTime !== null &&
+                timeSlot?.weekIndex !== null &&
+                timeSlot?.dayIndex !== null
+              ) {
+                return formatTimeSlot(timeSlot, startDate);
+              }
+              return null;
+            });
+            setData(formattedData?.filter((x) => x !== null));
             console.log(formattedData);
-            setData(formattedData);
           },
           (error) => {
             console.log(error);
@@ -34,7 +42,7 @@ export const useRoomOccupations = (semester, startDate) => {
     };
 
     fetchRoomOccupations();
-  }, [semester, startDate]);
+  }, [weekIndex]);
 
   const getTimeByPeriod = (period) => {
     switch (period) {
@@ -70,6 +78,8 @@ export const useRoomOccupations = (semester, startDate) => {
   const formatTimeSlot = (timeSlot, startDate) => {
     const offset = timeSlot.crew === "C" ? 6 : 0;
     const start = new Date(startDate);
+    console.log(timeSlot?.weekIndex);
+
     const { hours: startHours, minutes: startMinutes } = getTimeByPeriod(
       timeSlot.startPeriod + offset
     );
@@ -78,17 +88,22 @@ export const useRoomOccupations = (semester, startDate) => {
     );
     start.setHours(startHours);
     start.setDate(
-      start.getDate() + (Number(timeSlot.weekIndex) - 1) * 7 + Number(timeSlot.dayIndex) - 2
+      start.getDate() +
+        (Number(timeSlot.weekIndex) - 1) * 7 +
+        Number(timeSlot.dayIndex) -
+        2
     );
     start.setMinutes(startMinutes);
     const end = new Date(startDate);
     end.setHours(endHours);
     end.setDate(
-      end.getDate() + (Number(timeSlot.weekIndex) - 1) * 7 + Number(timeSlot.dayIndex) - 2
+      end.getDate() +
+        (Number(timeSlot.weekIndex) - 1) * 7 +
+        Number(timeSlot.dayIndex) -
+        2
     );
     end.setMinutes(endMinutes);
     return [timeSlot.classRoom, timeSlot.classCode, start, end];
   };
-
   return { loading, error, data };
 };
