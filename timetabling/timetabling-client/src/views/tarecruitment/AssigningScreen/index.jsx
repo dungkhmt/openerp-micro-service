@@ -16,7 +16,6 @@ import {
 import SaveIcon from "@mui/icons-material/Save";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { errorNoti } from "utils/notification";
 import { DataGrid } from "@mui/x-data-grid";
@@ -340,9 +339,16 @@ const AssigningScreen = () => {
   };
 
   return (
-    <Paper elevation={3} style={{ paddingTop: "1em" }}>
+    <Paper elevation={3}>
       <div style={styles.tableToolBar}>
-        <Typography variant="h4" style={{ fontWeight: "bold" }}>
+        <Typography
+          variant="h4"
+          style={{
+            fontWeight: "bold",
+            marginBottom: "0.5em",
+            paddingTop: "1em",
+          }}
+        >
           Phân công trợ giảng
         </Typography>
         <div style={styles.toolLine}>
@@ -366,17 +372,15 @@ const AssigningScreen = () => {
 
             <Button
               style={styles.autoButton}
-              variant="contained"
+              variant="outlined"
               onClick={handleAutoAssign}
             >
               Sắp xếp tự động
             </Button>
 
-            <Tooltip title="Xuất file">
-              <IconButton onClick={handleDownloadFile} color="primary">
-                <FileDownloadIcon fontSize="large" />
-              </IconButton>
-            </Tooltip>
+            <Button variant="outlined" onClick={handleDownloadFile}>
+              Xuất file
+            </Button>
           </div>
 
           <TextField
@@ -396,16 +400,15 @@ const AssigningScreen = () => {
       <DataGrid
         loading={isLoading}
         rowHeight={60}
-        sx={{ fontSize: 16 }}
+        sx={{ fontSize: 16, height: "65vh" }}
         rows={dataGridRows}
         columns={dataGridColumns}
-        autoHeight
         rowCount={totalElements}
         pagination
         paginationMode="server"
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[5, 10, 20]}
+        pageSizeOptions={[10, 20, 50]}
         checkboxSelection={false}
         disableRowSelectionOnClick
       />

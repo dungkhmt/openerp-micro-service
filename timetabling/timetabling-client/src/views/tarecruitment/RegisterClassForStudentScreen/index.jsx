@@ -86,12 +86,20 @@ const RegisterClassForStudentScreen = (props) => {
   };
 
   return (
-    <div>
-      <Typography variant="h4" style={{ fontWeight: "bold" }}>
-        Đăng ký lớp trợ giảng
-      </Typography>
+    <Paper elevation={3}>
+      <div>
+        <Typography
+          variant="h4"
+          style={{
+            fontWeight: "bold",
+            marginBottom: "0.5em",
+            paddingTop: "1em",
+            marginLeft: "1em",
+          }}
+        >
+          Đăng ký lớp trợ giảng
+        </Typography>
 
-      <Paper elevation={3}>
         <div style={styles.content}>
           <div style={styles.row}>
             <div style={styles.textFieldContainer}>
@@ -198,8 +206,8 @@ const RegisterClassForStudentScreen = (props) => {
             </Button>
           </div>
         </div>
-      </Paper>
-    </div>
+      </div>
+    </Paper>
   );
 };
 

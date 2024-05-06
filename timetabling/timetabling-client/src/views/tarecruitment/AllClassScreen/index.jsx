@@ -11,14 +11,12 @@ import {
   Select,
   TextField,
   Paper,
-  Tooltip,
   Typography,
   Button,
 } from "@mui/material";
 import { styles } from "./index.style";
 import { SEMESTER, SEMESTER_LIST } from "../config/localize";
 import DeleteDialog from "../components/DeleteDialog";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
 import ApplicatorDialog from "./ApplicatorDialog";
 import { DataGrid } from "@mui/x-data-grid";
 import ImportDialog from "./ImportDialog";
@@ -204,6 +202,11 @@ const AllClassScreen = () => {
     },
     { field: "classRoom", headerName: "Lớp học", flex: 1 },
     {
+      field: "day",
+      headerName: "Thời gian",
+      flex: 1,
+    },
+    {
       headerName: "Hành động",
       renderCell: actionCell,
       align: "center",
@@ -216,6 +219,7 @@ const AllClassScreen = () => {
     id: klass.id,
     subjectId: klass.subjectId,
     subjectName: klass.subjectName,
+    day: `Thứ ${klass.day}, tiết ${klass.startPeriod} - ${klass.endPeriod}`,
     classRoom: klass.classRoom,
     actions: { rowData: klass },
   }));
@@ -329,7 +333,6 @@ const AllClassScreen = () => {
         checkboxSelection
         onRowSelectionModelChange={(newRowSelectionModel) => {
           setRowSelect(newRowSelectionModel);
-          console.log(newRowSelectionModel);
         }}
         rowSelectionModel={rowSelect}
         disableRowSelectionOnClick
