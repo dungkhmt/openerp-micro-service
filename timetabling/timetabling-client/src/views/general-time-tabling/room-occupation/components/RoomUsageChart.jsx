@@ -26,6 +26,7 @@ const RoomUsageChart = ({ semester, selectedWeek, startDate }) => {
     [
       { type: "string", id: "Room" },
       { type: "string", id: "Name" },
+      { type: 'string', role: 'tooltip' },
       { type: "date", id: "Start" },
       { type: "date", id: "End" },
     ],
@@ -33,11 +34,32 @@ const RoomUsageChart = ({ semester, selectedWeek, startDate }) => {
 
   useEffect(() => {
     if (selectedWeek === null) return;
+    const startWeekDate = new Date(startDate).setDate(
+      startDate?.getDate() + (selectedWeek - 1) * 7
+    );
+    const endWeekDate = new Date(startDate).setDate(
+      startDate?.getDate() + selectedWeek * 7
+    );
+    console.log(new Date(startWeekDate), new Date(endWeekDate));
+    data?.push([
+      "End",
+      "End",
+      "",
+      new Date(endWeekDate),
+      new Date(endWeekDate),
+    ]);
+    data?.unshift([
+      "Start",
+      "Start",
+      "",
+      new Date(startWeekDate),
+      new Date(startWeekDate),
+    ])
     setRoomData(roomHeader.concat(data));
   }, [data]);
 
   return semester ? (
-    (data && data?.length > 0)  ? (
+    data && data?.length > 0 ? (
       <Chart
         width={"100%"}
         height={"600px"}
@@ -49,11 +71,9 @@ const RoomUsageChart = ({ semester, selectedWeek, startDate }) => {
           </div>
         }
         data={roomData}
-        options={{
-          timeline: {
-            colorByRowLabel: true,
-          },
-          allowHtml: true,
+        options = {{
+          tooltip: { isHtml: true, className: 'custom-tooltip' }, // Enable HTML tooltips
+          legend: 'none',
         }}
       />
     ) : (

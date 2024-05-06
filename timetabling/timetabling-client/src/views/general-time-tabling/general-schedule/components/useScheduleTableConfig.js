@@ -1,13 +1,15 @@
-import { Autocomplete, Grid, TextField } from "@mui/material";
 import AutocompleteCell from "./AutoCompleteCell";
-import { request } from "api";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { useState } from "react";
 import ClassroomAutoCompleteCell from "./ClassRoomAutoCompleteCell";
 
-export const useGeneralTableColumns = (setClasses, setLoading, semester) => {
+export const useGeneralTableColumns = (
+  setClasses,
+  setLoading,
+  semester,
+  saveRequests,
+  setSaveRequests
+) => {
   const [classRooms, setClassRooms] = useState([]);
-  
 
   return [
     {
@@ -102,11 +104,14 @@ export const useGeneralTableColumns = (setClasses, setLoading, semester) => {
       renderCell: (params) => {
         return (
           <AutocompleteCell
+            row={params.row}
+            saveRequests={saveRequests}
+            setSaveRequests={setSaveRequests}
             roomReservationId={params.row.roomReservationId}
             semester={semester}
             setLoading={setLoading}
             setClasses={setClasses}
-            options={Array.from({ length: 5 }).map((_, index) => ({
+            options={Array.from({ length: 6 }).map((_, index) => ({
               label: (index + 1)?.toString(),
             }))}
             {...params}
@@ -121,12 +126,15 @@ export const useGeneralTableColumns = (setClasses, setLoading, semester) => {
       editable: true,
       renderCell: (params) => (
         <AutocompleteCell
+          row={params.row}
+          saveRequests={saveRequests}
+          setSaveRequests={setSaveRequests}
           roomReservationId={params.row.roomReservationId}
           semester={semester}
           setLoading={setLoading}
           setClasses={setClasses}
-          options={Array.from({ length: 5 }).map((_, index) => ({
-            label: (index + 2)?.toString(),
+          options={Array.from({ length: 6 }).map((_, index) => ({
+            label: (index + 1)?.toString(),
           }))}
           {...params}
         />
@@ -138,12 +146,15 @@ export const useGeneralTableColumns = (setClasses, setLoading, semester) => {
       width: 80,
       renderCell: (params) => (
         <AutocompleteCell
+          row={params.row}
+          saveRequests={saveRequests}
+          setSaveRequests={setSaveRequests}
           roomReservationId={params.row.roomReservationId}
           semester={semester}
           setLoading={setLoading}
           setClasses={setClasses}
           options={Array.from({ length: 7 }).map((_, index) => ({
-            label: index + 2 == 8 ? "Chủ nhật" : (index + 2).toString(),
+            label: index + 2 === 8 ? "Chủ nhật" : (index + 2).toString(),
           }))}
           {...params}
         />
@@ -156,6 +167,8 @@ export const useGeneralTableColumns = (setClasses, setLoading, semester) => {
       renderCell: (params) => {
         return (
           <ClassroomAutoCompleteCell
+            saveRequests={saveRequests}
+            setSaveRequests={setSaveRequests}
             groupName={params.row?.groupName}
             maxQuantity={params.row?.quantityMax}
             roomReservationId={params.row.roomReservationId}

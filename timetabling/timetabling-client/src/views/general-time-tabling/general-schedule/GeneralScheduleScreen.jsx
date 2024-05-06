@@ -13,12 +13,14 @@ const GeneralScheduleScreen = () => {
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [isResetLoading, setResetLoading] = useState(false);
+  const [isSaveLoading, setSaveLoading] = useState(false);
   const [isTimeScheduleLoading, setTimeScheduleLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const { loading, error, classes, setClasses, setLoading } = useClasses(
     selectedGroup,
     selectedSemester
   );
+  const [saveRequests, setSaveRequests] = useState([]);
 
   const handleResetTimeTabling = () => {
     setResetLoading(true);
@@ -86,7 +88,7 @@ const GeneralScheduleScreen = () => {
         toast.success("Tự động thời khóa biểu thành công!");
       },
       (error) => {
-        if(error.response.status == 410){
+        if (error.response.status == 410) {
           toast.error(error.response.data);
           setResetLoading(false);
         } else {
@@ -104,7 +106,6 @@ const GeneralScheduleScreen = () => {
       (res) => {
         let generalClasses = [];
         res.data?.forEach((classObj) => {
-          
           if (classObj?.classCode !== null && classObj?.timeSlots) {
             classObj.timeSlots.forEach((timeSlot, index) => {
               const cloneObj = JSON.parse(
@@ -128,7 +129,7 @@ const GeneralScheduleScreen = () => {
         toast.success("Tự động phòng thành công!");
       },
       (error) => {
-        if(error.response.status == 410){
+        if (error.response.status == 410) {
           toast.error(error.response.data);
           setResetLoading(false);
         } else {
@@ -163,7 +164,31 @@ const GeneralScheduleScreen = () => {
       { responseType: "arraybuffer" },
       null
     ).then();
-  }
+  };
+
+  const handleSaveTimeTabling = () => {
+    setSaveLoading(true);
+    request(
+      "post",
+      `/general-classes/update-class-schedule-v2?semester=${selectedSemester?.semester}`,
+      (res) => {
+        setSaveLoading(false);
+        toast.success("Lưu TKB thành công!");
+        console.log(res.data);
+        setSaveRequests([]);
+      },
+      (error) => {
+        if (error.response.status === 410) {
+          toast.error(error.response.data);
+        } else {
+          toast.error("Có lỗi khi lưu TKB!");
+        }
+        setSaveLoading(false);
+        console.log(error);
+      },
+      { saveRequests: saveRequests }
+    );
+  };
 
   return (
     <div className="flex flex-col gap-4 w-full h-[700px]">
@@ -179,15 +204,27 @@ const GeneralScheduleScreen = () => {
           />
         </div>
         <div className="flex flex-col justify-end gap-2">
-          <div className="flex flex-row gap-2 justify-end">
-          <Button
+          <div className="flex flex-row justify-end">
+            <Button
               disabled={selectedSemester === null}
               startIcon={FacebookCircularProgress}
               variant="contained"
               color="success"
               onClick={handleExportTimeTabling}
+              sx={{ width: 200 }}
             >
               Tải xuống File Excel
+            </Button>
+          </div>
+          <div className="flex flex-row gap-2 justify-end">
+            <Button
+              disabled={saveRequests.length === 0 || isSaveLoading}
+              startIcon={isSaveLoading ? <FacebookCircularProgress /> : null}
+              variant="contained"
+              color="primary"
+              onClick={handleSaveTimeTabling}
+            >
+              Lưu TKB
             </Button>
             <Button
               disabled={selectedRows.length === 0}
@@ -226,6 +263,8 @@ const GeneralScheduleScreen = () => {
         </div>
       </div>
       <GeneralScheduleTable
+        saveRequests={saveRequests}
+        setSaveRequests={setSaveRequests}
         isLoading={isResetLoading}
         isDataLoading={loading}
         classes={classes}

@@ -5,15 +5,20 @@ import com.google.ortools.sat.*;
 import com.google.ortools.util.Domain;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.algorithms.V2ClassScheduler;
+import openerp.openerpresourceserver.generaltimetabling.helper.ClassTimeComparator;
 import openerp.openerpresourceserver.generaltimetabling.helper.MassExtractor;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.V2UpdateClassScheduleRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.generaltimetabling.repo.ClassroomRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.GeneralClassOpenedRepository;
 import openerp.openerpresourceserver.generaltimetabling.repo.GroupRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.RoomOccupationRepo;
+import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassOpenedService;
+import openerp.openerpresourceserver.generaltimetabling.service.impl.GeneralClassOpenedServiceImp;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,15 +34,18 @@ class OpenerpResourceServerApplicationTests {
     private final ClassroomRepo classroomRepo;
     private final RoomOccupationRepo roomOccupationRepo;
     private final GroupRepo groupRepo;
+
+    private final GeneralClassOpenedService gService;
     private final int minPeriod = 2;
     private final int maxPeriod = 4;
 
     @Autowired
-    OpenerpResourceServerApplicationTests(GeneralClassOpenedRepository gcoRepo, ClassroomRepo classroomRepo, RoomOccupationRepo roomOccupationRepo, GroupRepo groupRepo) {
+    OpenerpResourceServerApplicationTests(GeneralClassOpenedRepository gcoRepo, ClassroomRepo classroomRepo, RoomOccupationRepo roomOccupationRepo, GroupRepo groupRepo, GeneralClassOpenedService gService) {
         this.gcoRepo = gcoRepo;
         this.classroomRepo = classroomRepo;
         this.roomOccupationRepo = roomOccupationRepo;
         this.groupRepo = groupRepo;
+        this.gService = gService;
     }
 
     static class VarArraySolutionPrinter extends CpSolverSolutionCallback {
@@ -171,6 +179,21 @@ class OpenerpResourceServerApplicationTests {
         List<String> classCodes = List.of(new String[]{"136649","136650","136651"});
         List<RoomOccupation> fetchRoomOccupations =  roomOccupationRepo.findAllByClassCodeIn(classCodes);
         fetchRoomOccupations.forEach(System.out::println);
+    }
+
+    @Test
+    void testRoomConflict() {
+        List<GeneralClassOpened> classes = gcoRepo.findAllBySemester("20232");
+        GeneralClassOpened conflictClass = gcoRepo.findById(Long.valueOf(31838)).orElse(null);
+        RoomReservation rr = conflictClass.getTimeSlots().get(0);
+        System.out.println(ClassTimeComparator.isClassConflict(rr, conflictClass, classes));
+    }
+
+    @Test
+    void testV2ScheduleTime() {
+        V2UpdateClassScheduleRequest request1 = new V2UpdateClassScheduleRequest(33208L, 1, 2, 4, "D3-101");
+        V2UpdateClassScheduleRequest request2 = new V2UpdateClassScheduleRequest(30878L, 1, 2, 5, "D3-101");
+        gService.v2UpdateClassSchedule("20232", List.of(request1, request2)).forEach(System.out::println);
     }
 
 }

@@ -394,7 +394,7 @@ public class GeneralExcelHelper {
                 /*Write the class schedule*/
                 for (int j = START_COL_TO_READ_CLASS_SCHEDULE; j < START_COL_TO_READ_CLASS_SCHEDULE + 42; j++) {
                     Cell c = classRow.createCell(j);
-                    for (RoomReservation rr : generalClassOpened.getTimeSlots().stream().filter(RoomReservation::isNotNull).toList()) {
+                    for (RoomReservation rr : generalClassOpened.getTimeSlots().stream().filter(RoomReservation::isScheduleNotNull).toList()) {
                         if (j - START_COL_TO_READ_CLASS_SCHEDULE >= (rr.getWeekday()-2)*6 + rr.getStartTime() -1 && j-START_COL_TO_READ_CLASS_SCHEDULE <= (rr.getWeekday()-2)*6 + rr.getEndTime() -1) {
                             c.setCellValue(rr.getRoom());
                             c.setCellStyle(roomStyle);

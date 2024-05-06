@@ -7,6 +7,8 @@ import {
 import ClassDetailDialog from "./ClassDetailDialog";
 
 const GeneralScheduleTable = ({
+  saveRequests,
+  setSaveRequests,
   isLoading,
   setSelectedRows,
   isDataLoading,
@@ -34,7 +36,7 @@ const GeneralScheduleTable = ({
         onRowDoubleClick={handleOpenDialog}
         className="text-xs"
         loading={isDataLoading || isLoading}
-        columns={useGeneralTableColumns(setClasses, setLoading, semester)}
+        columns={useGeneralTableColumns(setClasses, setLoading, semester, saveRequests, setSaveRequests)}
         rows={classes}
         pageSize={10}
         initialState={{

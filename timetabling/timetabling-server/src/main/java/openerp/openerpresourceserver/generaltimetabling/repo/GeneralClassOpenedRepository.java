@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.generaltimetabling.repo;
 
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,4 +29,6 @@ public interface GeneralClassOpenedRepository extends JpaRepository<GeneralClass
     List<GeneralClassOpened> findAllBySemester(String semester);
 
     List<GeneralClassOpened> findAllBySemesterAndGroupName(String semester, String groupName);
+
+    List<GeneralClassOpened> findAllByIdIn(List<Long> l);
 }

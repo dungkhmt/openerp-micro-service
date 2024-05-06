@@ -8,17 +8,15 @@ import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.exception.ConflictScheduleException;
 import openerp.openerpresourceserver.generaltimetabling.exception.InvalidClassStudentQuantityException;
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
-import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateClassesToNewGroupRequest;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.*;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.ResetScheduleRequest;
-import openerp.openerpresourceserver.generaltimetabling.service.ExcelService;
+import org.hibernate.sql.Update;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGeneralClassRequest;
-import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGeneralClassScheduleRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
 import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassOpenedService;
 
@@ -63,9 +61,16 @@ public class GeneralClassOpenedController {
     }
 
     @PostMapping("/update-class-schedule")
-    public ResponseEntity<GeneralClassOpened> updateClassSchedule(@RequestParam("semester")String semester, @RequestBody UpdateGeneralClassScheduleRequest request ) {
+    public ResponseEntity<GeneralClassOpened> requestUpdateClassSchedule(@RequestParam("semester")String semester, @RequestBody UpdateGeneralClassScheduleRequest request ) {
         GeneralClassOpened updatedGeneralClass= gService.updateGeneralClassSchedule(semester, request);
         if(updatedGeneralClass == null) throw new RuntimeException("General Class was null");
+        return ResponseEntity.ok().body(updatedGeneralClass);
+    }
+
+    @PostMapping("/update-class-schedule-v2")
+    public ResponseEntity<List<GeneralClassOpened>> requestUpdateClassScheduleV2(@RequestParam("semester")String semester, @RequestBody UpdateClassScheduleRequest request ) {
+        List<GeneralClassOpened> updatedGeneralClass = gService.v2UpdateClassSchedule(semester, request.getSaveRequests());
+        if(updatedGeneralClass.isEmpty()) throw new RuntimeException("General Class was null");
         return ResponseEntity.ok().body(updatedGeneralClass);
     }
 

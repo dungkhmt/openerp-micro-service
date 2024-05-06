@@ -1,10 +1,29 @@
 import { request } from "api";
 import { useEffect, useState } from "react";
+import ReactDOMServer from "react-dom/server";
 
 export const useRoomOccupations = (semester, startDate, weekIndex) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
+
+  function convertToToolTip(classCode, startTime, endTime) {
+    return (
+      <div class="custom-tooltip">
+        <div class="header-title">Mã lớp: {classCode}</div>
+        <div class="divider"></div>
+        <div class="body-content">
+          <div>Thời gian bắt đầu: {formatDate(startTime)}</div>
+          <div>Thời gian kết thúc: {formatDate(endTime)}</div>
+          <div>
+            Thời gian kéo dài:{" "}
+            {Math.floor(Math.abs(endTime - startTime) / (1000 * 60))} phút
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   useEffect(() => {
     if (!semester || !startDate) return;
 
@@ -75,6 +94,16 @@ export const useRoomOccupations = (semester, startDate, weekIndex) => {
     }
   };
 
+  function formatDate(date) {
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is zero-based, so add 1
+    const year = date.getFullYear();
+
+    return `${hours}:${minutes}, ngày ${day}/${month}/${year}`;
+  }
+
   const formatTimeSlot = (timeSlot, startDate) => {
     const offset = timeSlot.crew === "C" ? 6 : 0;
     const start = new Date(startDate);
@@ -103,7 +132,15 @@ export const useRoomOccupations = (semester, startDate, weekIndex) => {
         2
     );
     end.setMinutes(endMinutes);
-    return [timeSlot.classRoom, timeSlot.classCode, start, end];
+    return [
+      timeSlot.classRoom,
+      timeSlot.classCode,
+      ReactDOMServer.renderToStaticMarkup(
+        convertToToolTip(timeSlot.classCode, start, end)
+      ),
+      start,
+      end,
+    ];
   };
   return { loading, error, data };
 };
