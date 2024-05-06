@@ -1,8 +1,8 @@
 package com.real_estate.post.controllers;
 
 
-import com.real_estate.common.dtos.response.ResponseDto;
 import com.real_estate.post.dtos.request.CreatePostSellRequestDto;
+import com.real_estate.post.dtos.response.ResponseDto;
 import com.real_estate.post.services.PostSellService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;

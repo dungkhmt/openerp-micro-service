@@ -1,9 +1,9 @@
 package com.real_estate.post.services;
 
-import com.real_estate.common.models.PostBuyEntity;
-import com.real_estate.common.utils.PostStatus;
 import com.real_estate.post.daos.interfaces.PostBuyDao;
 import com.real_estate.post.dtos.request.CreatePostBuyRequestDto;
+import com.real_estate.post.models.PostBuyEntity;
+import com.real_estate.post.utils.PostStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

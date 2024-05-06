@@ -1,10 +1,9 @@
 package com.real_estate.post.daos.impls;
 
-
-import com.real_estate.common.models.DistrictEntity;
-import com.real_estate.common.models.postgres.DistrictPostgresEntity;
 import com.real_estate.post.daos.interfaces.DistrictDao;
 import com.real_estate.post.dtos.ProvinceEntity;
+import com.real_estate.post.models.DistrictEntity;
+import com.real_estate.post.models.postgresql.DistrictPostgresEntity;
 import com.real_estate.post.repositories.DistrictRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

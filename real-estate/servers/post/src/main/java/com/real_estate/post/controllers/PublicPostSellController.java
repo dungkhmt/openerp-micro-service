@@ -1,12 +1,12 @@
 package com.real_estate.post.controllers;
 
-import com.real_estate.common.dtos.response.PageResponseDto;
-import com.real_estate.common.dtos.response.ResponseDto;
-import com.real_estate.common.models.PostSellEntity;
-import com.real_estate.common.utils.DirectionsStatus;
-import com.real_estate.common.utils.LegalDocuments;
-import com.real_estate.common.utils.TypeProperty;
+import com.real_estate.post.dtos.response.PageResponseDto;
+import com.real_estate.post.dtos.response.ResponseDto;
+import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.services.PostSellService;
+import com.real_estate.post.utils.DirectionsStatus;
+import com.real_estate.post.utils.LegalDocuments;
+import com.real_estate.post.utils.TypeProperty;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

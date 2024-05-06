@@ -1,12 +1,8 @@
 package com.real_estate.post.daos.impls;
 
-
-import com.real_estate.common.models.PostSellEntity;
-import com.real_estate.common.models.postgres.PostSellPostgresEntity;
-import com.real_estate.common.utils.DirectionsStatus;
-import com.real_estate.common.utils.LegalDocuments;
-import com.real_estate.common.utils.TypeProperty;
 import com.real_estate.post.daos.interfaces.PostSellDao;
+import com.real_estate.post.models.PostSellEntity;
+import com.real_estate.post.models.postgresql.PostSellPostgresEntity;
 import com.real_estate.post.repositories.PostSellRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

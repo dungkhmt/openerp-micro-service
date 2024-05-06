@@ -1,10 +1,9 @@
 package com.real_estate.post.services;
 
-
-import com.real_estate.common.models.DistrictEntity;
 import com.real_estate.post.daos.interfaces.DistrictDao;
 import com.real_estate.post.dtos.Location;
 import com.real_estate.post.dtos.ProvinceEntity;
+import com.real_estate.post.models.DistrictEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

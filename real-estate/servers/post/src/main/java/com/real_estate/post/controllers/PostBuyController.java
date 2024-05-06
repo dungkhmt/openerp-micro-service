@@ -1,7 +1,7 @@
 package com.real_estate.post.controllers;
 
-import com.real_estate.common.dtos.response.ResponseDto;
 import com.real_estate.post.dtos.request.CreatePostBuyRequestDto;
+import com.real_estate.post.dtos.response.ResponseDto;
 import com.real_estate.post.services.PostBuyService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;

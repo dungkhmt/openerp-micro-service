@@ -1,6 +1,8 @@
 package com.real_estate.post.config;
 
-import com.real_estate.common.filter.JwtAuthenticationFilter;
+import com.real_estate.post.security.TokenAuthenticationFilter;
+import com.real_estate.post.security.TokenProvider;
+import com.real_estate.post.security.oauth2.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -22,7 +25,13 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class WebSecurityConfig {
 	@Autowired
-	JwtAuthenticationFilter jwtAuthenticationFilter;
+	TokenAuthenticationFilter tokenAuthenticationFilter;
+
+	@Autowired
+	TokenProvider tokenProvider;
+
+	@Autowired
+	CustomOAuth2UserService customOAuth2UserService;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,16 +41,38 @@ public class WebSecurityConfig {
 				auth.requestMatchers(("/**")).permitAll();
 				auth.requestMatchers("/public/**").permitAll();
 				auth.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll();
+				auth.requestMatchers("/auth/**", "/oauth2/**").permitAll();
+				auth.requestMatchers("/",
+									 "/error",
+									 "/favicon.ico",
+									 "/**/*.png",
+									 "/**/*.gif",
+									 "/**/*.svg",
+									 "/**/*.jpg",
+									 "/**/*.html",
+									 "/**/*.css",
+									 "/**/*.js").permitAll();
 				auth.anyRequest().authenticated();
 			});
+		http.oauth2Login(oauth2 -> oauth2
+				.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService))
+				.successHandler(authenticationSuccessHandler()));
 		http.csrf(AbstractHttpConfigurer::disable);
 		http.cors(Customizer.withDefaults());
 		/** This is solely required to support H2 console viewing in Spring MVC with Spring Security */
 		http.headers(httpSecurityHeadersConfigurer -> httpSecurityHeadersConfigurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
 			.authorizeHttpRequests(Customizer.withDefaults());
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-		http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
+	}
+
+	@Bean
+	public AuthenticationSuccessHandler authenticationSuccessHandler() {
+		return ((request, response, authentication) -> {
+			String token = tokenProvider.createToken(authentication);
+			response.sendRedirect("http://localhost:2804/oauth/redirect?token=" + token);
+		});
 	}
 
 	@Bean

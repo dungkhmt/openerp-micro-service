@@ -1,7 +1,7 @@
 package com.real_estate.post.controllers;
 
-import com.real_estate.common.dtos.response.ResponseDto;
-import com.real_estate.common.models.PostBuyEntity;
+import com.real_estate.post.dtos.response.ResponseDto;
+import com.real_estate.post.models.PostBuyEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

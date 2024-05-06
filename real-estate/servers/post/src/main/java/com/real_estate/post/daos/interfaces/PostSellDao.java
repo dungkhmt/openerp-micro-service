@@ -1,10 +1,8 @@
 package com.real_estate.post.daos.interfaces;
 
 
-import com.real_estate.common.models.PostSellEntity;
-import com.real_estate.common.utils.DirectionsStatus;
-import com.real_estate.common.utils.LegalDocuments;
-import com.real_estate.common.utils.TypeProperty;
+
+import com.real_estate.post.models.PostSellEntity;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
