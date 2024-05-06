@@ -1,9 +1,7 @@
 package com.real_estate.post.daos.interfaces;
 
-
-
-import com.real_estate.common.models.DistrictEntity;
 import com.real_estate.post.dtos.ProvinceEntity;
+import com.real_estate.post.models.DistrictEntity;
 
 import java.util.List;
 

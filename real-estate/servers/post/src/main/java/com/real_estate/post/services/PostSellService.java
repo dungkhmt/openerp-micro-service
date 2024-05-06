@@ -1,12 +1,9 @@
 package com.real_estate.post.services;
 
-import com.real_estate.common.models.PostSellEntity;
-import com.real_estate.common.utils.DirectionsStatus;
-import com.real_estate.common.utils.LegalDocuments;
-import com.real_estate.common.utils.PostStatus;
-import com.real_estate.common.utils.TypeProperty;
 import com.real_estate.post.daos.interfaces.PostSellDao;
 import com.real_estate.post.dtos.request.CreatePostSellRequestDto;
+import com.real_estate.post.models.PostSellEntity;
+import com.real_estate.post.utils.PostStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.*;

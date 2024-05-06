@@ -1,8 +1,9 @@
 package com.real_estate.post.daos.impls;
 
-import com.real_estate.common.models.PostBuyEntity;
-import com.real_estate.common.models.postgres.PostBuyPostgresEntity;
+
 import com.real_estate.post.daos.interfaces.PostBuyDao;
+import com.real_estate.post.models.PostBuyEntity;
+import com.real_estate.post.models.postgresql.PostBuyPostgresEntity;
 import com.real_estate.post.repositories.PostBuyRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

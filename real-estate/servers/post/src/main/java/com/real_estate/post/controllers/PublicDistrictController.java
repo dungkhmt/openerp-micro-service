@@ -1,8 +1,8 @@
 package com.real_estate.post.controllers;
 
-import com.real_estate.common.dtos.response.ResponseDto;
-import com.real_estate.common.models.DistrictEntity;
 import com.real_estate.post.dtos.ProvinceEntity;
+import com.real_estate.post.dtos.response.ResponseDto;
+import com.real_estate.post.models.DistrictEntity;
 import com.real_estate.post.services.DistrictService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;

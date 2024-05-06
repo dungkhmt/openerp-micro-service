@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @Profile({"postgresql"})
-@EntityScan(basePackages = {"com.real_estate.common.models.postgres"})
+@EntityScan(basePackages = {"com.real_estate.post.models.postgresql"})
 public class PostgresConfig {
 	@Value("#{'${postgres.url}'}")
 	private String url;
