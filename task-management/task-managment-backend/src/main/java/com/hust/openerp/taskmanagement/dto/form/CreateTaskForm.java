@@ -11,8 +11,8 @@ import java.util.UUID;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -23,6 +23,8 @@ public class CreateTaskForm {
     private String name;
     @Nullable
     private String description;
+    @NotNull
+    private UUID projectId;
     @Nullable
     private Date fromDate;
     @Nullable
