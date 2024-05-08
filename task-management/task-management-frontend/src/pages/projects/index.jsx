@@ -9,6 +9,9 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { usePreventOverflow } from "../../hooks/usePreventOverflow";
 import { ProjectService } from "../../services/api/project.service";
 
+/**
+ * @type {import("@mui/x-data-grid").GridColDef[]}
+ */
 const columns = [
   {
     flex: 0.2,
@@ -19,6 +22,8 @@ const columns = [
         {params.row.code}
       </Typography>
     ),
+    description: "Mã dự án là duy nhất và không thể thay đổi",
+    display: "flex",
   },
   {
     flex: 0.4,
@@ -40,6 +45,7 @@ const columns = [
         </Tooltip>
       </Typography>
     ),
+    display: "flex",
   },
   {
     flex: 0.1,
@@ -52,6 +58,7 @@ const columns = [
         {params.row.role}
       </Typography>
     ),
+    display: "flex",
   },
   {
     flex: 0.15,
@@ -69,6 +76,7 @@ const columns = [
           Không xác định
         </Typography>
       ),
+    display: "flex",
   },
   {
     flex: 0.2,
@@ -82,6 +90,7 @@ const columns = [
         {new Date(params.row.createdStamp).toLocaleDateString()}
       </Typography>
     ),
+    display: "flex",
   },
 ];
 

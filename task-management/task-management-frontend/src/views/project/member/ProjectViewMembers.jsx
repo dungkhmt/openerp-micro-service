@@ -24,6 +24,9 @@ import { useDebounce } from "../../../hooks/useDebounce";
 import { MenuAddMember } from "./MenuAddMember";
 import { usePreventOverflow } from "../../../hooks/usePreventOverflow";
 
+/**
+ * @type {import("@mui/x-data-grid").GridColDef[]}
+ */
 const columns = [
   {
     flex: 0.3,
@@ -66,6 +69,7 @@ const columns = [
         </Box>
       );
     },
+    display: "flex",
   },
   {
     flex: 0.3,
@@ -87,6 +91,7 @@ const columns = [
         </Tooltip>
       );
     },
+    display: "flex",
   },
   {
     flex: 0.15,
@@ -112,6 +117,7 @@ const columns = [
         </Box>
       );
     },
+    display: "flex",
   },
   {
     flex: 0.1,

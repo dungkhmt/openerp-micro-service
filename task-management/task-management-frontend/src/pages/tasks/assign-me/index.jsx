@@ -58,6 +58,9 @@ const TaskAssigned = () => {
 
   const [isFirstFetch, setIsFirstFetch] = useState(true);
 
+  /**
+   * @type {import("@mui/x-data-grid").GridColDef[]}
+   */
   const columns = [
     {
       flex: 0.25,
@@ -91,6 +94,7 @@ const TaskAssigned = () => {
           {row.category && <TaskCategory category={row.category} />}
         </Box>
       ),
+      display: "flex",
     },
     {
       flex: 0.15,
@@ -120,6 +124,7 @@ const TaskAssigned = () => {
             </Typography>
           </Tooltip>
         ),
+      display: "flex",
     },
     {
       flex: 0.1,
@@ -132,6 +137,7 @@ const TaskAssigned = () => {
         const status = statuses?.find((s) => s.statusId === row.statusId);
         return status && <TaskStatus status={status} />;
       },
+      display: "flex",
     },
     {
       flex: 0.1,
@@ -157,6 +163,7 @@ const TaskAssigned = () => {
           </Box>
         );
       },
+      display: "flex",
     },
     {
       flex: 0.1,
@@ -171,6 +178,7 @@ const TaskAssigned = () => {
           </Typography>
         </Box>
       ),
+      display: "flex",
     },
     {
       flex: 0.1,
@@ -186,6 +194,7 @@ const TaskAssigned = () => {
             <UserAvatar user={row.creator} key={row.creator.id} />
           </AvatarGroup>
         ),
+      display: "flex",
     },
     {
       flex: 0.1,
@@ -198,6 +207,7 @@ const TaskAssigned = () => {
           {dayjs(row.createdStamp).format("DD/MM/YYYY") ?? ""}
         </Typography>
       ),
+      display: "flex",
     },
   ];
 
