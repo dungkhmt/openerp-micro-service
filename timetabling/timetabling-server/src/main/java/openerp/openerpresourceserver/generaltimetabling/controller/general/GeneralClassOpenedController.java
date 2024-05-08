@@ -110,14 +110,20 @@ public class GeneralClassOpenedController {
     }
 
     @PostMapping("/auto-schedule-time")
-    public ResponseEntity<List<GeneralClassOpened>> requestAutoScheduleTime(@RequestParam("semester") String semester, @RequestParam("groupName") String groupName) {
+    public ResponseEntity<List<GeneralClassOpened>> requestAutoScheduleTime(
+            @RequestParam("semester") String semester,
+            @RequestParam("groupName") String groupName,
+            @RequestParam("timeLimit") int timeLimit) {
         log.info("Controler API -> requestAutoScheduleTime...");
-        return ResponseEntity.ok(gService.autoSchedule(semester, groupName));
+        return ResponseEntity.ok(gService.autoSchedule(semester, groupName, timeLimit));
     }
 
     @PostMapping("/auto-schedule-room")
-    public ResponseEntity<?> requestAutoScheduleRoom(@RequestParam("semester") String semester, @RequestParam("groupName") String groupName) {
+    public ResponseEntity<?> requestAutoScheduleRoom(
+            @RequestParam("semester") String semester,
+            @RequestParam("groupName") String groupName,
+            @RequestParam("timeLimit") int timeLimit) {
         log.info("Controler API -> requestAutoScheduleRoom...");
-        return ResponseEntity.ok(gService.autoScheduleRoom(semester, groupName));
+        return ResponseEntity.ok(gService.autoScheduleRoom(semester, groupName, timeLimit));
     }
 }

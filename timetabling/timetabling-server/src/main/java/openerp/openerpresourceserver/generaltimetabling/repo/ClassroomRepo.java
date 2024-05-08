@@ -28,4 +28,6 @@ public interface ClassroomRepo extends JpaRepository<Classroom, Long> {
     List<Classroom> findClassroomByBuildingAndQuantityMaxAfter(String building, Long amountStudent);
 
     List<Classroom> getClassRoomByBuilding(String priorityBuilding);
+
+    List<Classroom> getClassRoomByBuildingIn(List<String> split);
 }

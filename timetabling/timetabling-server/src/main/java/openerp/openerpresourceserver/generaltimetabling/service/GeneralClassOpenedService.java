@@ -26,8 +26,8 @@ public interface GeneralClassOpenedService {
 
     List<GeneralClassOpened> resetSchedule(List<String> ids, String semester);
 
-    List<GeneralClassOpened> autoSchedule(String semester, String groupName);
-    List<GeneralClassOpened> autoScheduleRoom(String semester, String groupName);
+    List<GeneralClassOpened> autoSchedule(String semester, String groupName, int timeLimit);
+    List<GeneralClassOpened> autoScheduleRoom(String semester, String groupName, int timeLimit);
 
     InputStream exportExcel(String semester);
 

@@ -25,12 +25,13 @@ public class ClassRoomScheduleBacktrackingSolver {
     int f_best;
     double timeLimit; // in milli seconds
     double t0;// start time-point
-    public ClassRoomScheduleBacktrackingSolver(int n, int m, boolean[][] conflict, int[] c, List[] D) {
+    public ClassRoomScheduleBacktrackingSolver(int n, int m, boolean[][] conflict, int[] c, List[] D, int timeLimit) {
         this.n = n;
         this.m = m;
         this.conflict = conflict;
         this.c = c;
         this.D = D;
+        this.timeLimit = timeLimit;
     }
 
     public void setTimeLimit(double timeLimit){
@@ -113,7 +114,7 @@ public class ClassRoomScheduleBacktrackingSolver {
             conflict[p[0]][p[1]] = true;
         }
         ClassRoomScheduleBacktrackingSolver app =
-                new ClassRoomScheduleBacktrackingSolver(n,m,conflict,c,D);
+                new ClassRoomScheduleBacktrackingSolver(n,m,conflict,c,D, 2000);
         app.setTimeLimit(2000);// time limit 2 seconds
         app.solve();
         app.printSolution();

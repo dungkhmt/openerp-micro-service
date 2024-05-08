@@ -9,13 +9,14 @@ import openerp.openerpresourceserver.generaltimetabling.helper.MassExtractor;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Log4j2
 public class V2ClassScheduler {
-    public static List<GeneralClassOpened> autoScheduleTimeSlot(List<GeneralClassOpened> classes) {
+    public static List<GeneralClassOpened> autoScheduleTimeSlot(List<GeneralClassOpened> classes, int timeLimit) {
         int n = classes.size();
         if (n == 0) {
             log.info("Chưa chọn lớp!");
@@ -40,7 +41,7 @@ public class V2ClassScheduler {
                 conflict.add(new int[]{i, j});
         }
 
-        ClassTimeScheduleBacktrackingSolver solver = new ClassTimeScheduleBacktrackingSolver(n, durations, domains, conflict);
+        ClassTimeScheduleBacktrackingSolver solver = new ClassTimeScheduleBacktrackingSolver(n, durations, domains, conflict, timeLimit);
         solver.solve();
         if (!solver.hasSolution()) {
             log.error("NO SOLUTION");
@@ -66,7 +67,7 @@ public class V2ClassScheduler {
     }
 
 
-    public static List<GeneralClassOpened> autoScheduleRoom(List<GeneralClassOpened> classes, List<Classroom> rooms) {
+    public static List<GeneralClassOpened> autoScheduleRoom(List<GeneralClassOpened> classes, List<Classroom> rooms, int timeLimit, List<RoomOccupation> roomOccupations) {
         /*Validate the timeslot assigned*/
         for (GeneralClassOpened gClass : classes) {
             if (gClass.getTimeSlots().isEmpty()) {
@@ -78,13 +79,16 @@ public class V2ClassScheduler {
         /*Initial data*/
         int[] roomCapacities = rooms.stream().mapToInt(room -> Math.toIntExact(room.getQuantityMax())).toArray();
         int[] studentQuantities = classes.stream().mapToInt(gClass -> {
-            if (gClass.getQuantityMax() == null || gClass.getQuantityMax().isEmpty()) throw new InvalidClassStudentQuantityException(gClass.getClassCode() + " đang không có số học sinh tối đa!");
+            if (gClass.getQuantityMax() == null || gClass.getQuantityMax().isEmpty())
+                throw new InvalidClassStudentQuantityException(gClass.getClassCode() + " đang không có số học sinh tối đa!");
             return Integer.parseInt(gClass.getQuantityMax());
         }).toArray();
         int numClasses = classes.size();
         int numRooms = rooms.size();
-        List[] assignRoomsArray = new List[numClasses];
+        List<Integer>[] assignRoomsArray = new List[numClasses];
         for (int i = 0; i < numClasses; i++) {
+            GeneralClassOpened gClass = classes.get(i);
+
             assignRoomsArray[i] = new ArrayList<Integer>();
             for (int r = 0; r < numRooms; r++)
                 if (roomCapacities[r] >= studentQuantities[i]) assignRoomsArray[i].add(r);
@@ -93,22 +97,35 @@ public class V2ClassScheduler {
                 return null;
             }
         }
-        for (int i = 0; i < roomCapacities.length; i++) {
-            log.info("ROOM CAP " + i + " : " + roomCapacities[i]);
-        }
-        for (int i = 0; i < studentQuantities.length; i++) {
-            log.info("STUDENT QUANTITY " + i + " : " + studentQuantities[i]);
-        }
-        for (int i = 0; i < assignRoomsArray.length; i++) {
-            log.info("CLASSROOM ASSIGN FOR CLASS " + i + " : " + assignRoomsArray[i]);
-        }
-
         List<int[]> C = new ArrayList();
         boolean[][] conflict = new boolean[numClasses][numClasses];
         /*Check the conflict*/
         for (GeneralClassOpened gClass : classes) {
             List<RoomReservation> timeSlots = gClass.getTimeSlots();
             for (RoomReservation rr : timeSlots) {
+                /*Remove all the room of assign rooms to a class if that time have been taken */
+                if (rr.isTimeSlotNotNull()) {
+
+                    for (RoomOccupation roomOccupation : roomOccupations) {
+                        if (
+                                rr.getWeekday().equals(roomOccupation.getDayIndex()) &&
+                                rr.getStartTime().equals(roomOccupation.getStartPeriod()) &&
+                                rr.getEndTime().equals(roomOccupation.getEndPeriod()) &&
+                                !rr.getGeneralClassOpened().getClassCode().equals(roomOccupation.getClassCode())
+                        ) {
+                            log.info("START REMOVE FOR: " + rr.getGeneralClassOpened().getClassCode());
+                            Integer roomIndex = rooms
+                                    .stream().filter(room -> room.getClassroom().equals(roomOccupation.getClassRoom()))
+                                    .map(rooms::indexOf).toList().get(0);
+
+                            assignRoomsArray[classes.indexOf(gClass)].remove(roomIndex);
+                            log.info(assignRoomsArray[classes.indexOf(gClass)].stream().map(j->rooms.get(j).getClassroom()).toList());
+                            break;
+                        }
+                    }
+
+
+                }
                 if (rr.getEndTime() != null && rr.getStartTime() > rr.getEndTime())
                     throw new ConflictScheduleException("Thời gian bắt đầu không thể lớn hơn thời gian kết thúc! " + gClass);
                 GeneralClassOpened conflictClass = ClassTimeComparator.findClassConflict(rr, gClass, classes);
@@ -116,6 +133,19 @@ public class V2ClassScheduler {
                     C.add(new int[]{classes.indexOf(gClass), classes.indexOf(conflictClass)});
                 }
             }
+        }
+
+
+        System.out.println("NUMBER OF CLASSES:" + classes.size());
+
+        for (int i = 0; i < roomCapacities.length; i++) {
+            log.info("ROOM CAP OF " + rooms.get(i).getClassroom() + " : " + roomCapacities[i]);
+        }
+        for (int i = 0; i < studentQuantities.length; i++) {
+            log.info("STUDENT QUANTITY " + classes.get(i).getClassCode() + " : " + studentQuantities[i]);
+        }
+        for (int i = 0; i < assignRoomsArray.length; i++) {
+            log.info("CLASSROOM ASSIGN FOR CLASS " + classes.get(i).getClassCode() + " : " + assignRoomsArray[i].stream().map(j->rooms.get(j).getClassroom()).toList());
         }
 
         for (int[] p : C) {
@@ -129,8 +159,7 @@ public class V2ClassScheduler {
 
 
         /*Call the classroom solver*/
-        ClassRoomScheduleBacktrackingSolver solver = new ClassRoomScheduleBacktrackingSolver(numClasses, numRooms, conflict, roomCapacities, assignRoomsArray);
-        solver.setTimeLimit(2000);// time limit 2 seconds
+        ClassRoomScheduleBacktrackingSolver solver = new ClassRoomScheduleBacktrackingSolver(numClasses, numRooms, conflict, roomCapacities, assignRoomsArray, timeLimit * 1000);
         solver.solve();
         solver.printSolution();
         classes.forEach(gClass -> {

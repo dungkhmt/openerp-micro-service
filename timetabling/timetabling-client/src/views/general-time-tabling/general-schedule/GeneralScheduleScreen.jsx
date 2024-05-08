@@ -8,6 +8,7 @@ import { request } from "api";
 import { FacebookCircularProgress } from "components/common/progressBar/CustomizedCircularProgress";
 import { toast } from "react-toastify";
 import { useClasses } from "../hooks/useClasses";
+import AutoScheduleDialog from "./components/AutoScheduleDialog";
 
 const GeneralScheduleScreen = () => {
   const [selectedSemester, setSelectedSemester] = useState(null);
@@ -21,6 +22,11 @@ const GeneralScheduleScreen = () => {
     selectedSemester
   );
   const [saveRequests, setSaveRequests] = useState([]);
+  const [isAutoSaveLoading, setAutoSaveLoading] = useState(false);
+  const [isOpenClassroomDialog, setOpenClassroomDialog] = useState(false);
+  const [isOpenTimeslotDialog, setOpenTimeslotDialog] = useState(false);
+  const [classroomTimeLimit, setClassroomTimeLimit] = useState(5);
+  const [timeSlotTimeLimit, setTimeSlotTimeLimit] = useState(5);
 
   const handleResetTimeTabling = () => {
     setResetLoading(true);
@@ -60,10 +66,12 @@ const GeneralScheduleScreen = () => {
     );
   };
   const handleAutoScheduleTimeSlotTimeTabling = () => {
+    setAutoSaveLoading(true);
     request(
       "post",
-      `/general-classes/auto-schedule-time?semester=${selectedSemester?.semester}&groupName=${selectedGroup?.groupName}`,
+      `/general-classes/auto-schedule-time?semester=${selectedSemester?.semester}&groupName=${selectedGroup?.groupName}&timeLimit=${timeSlotTimeLimit}`,
       (res) => {
+        setAutoSaveLoading(true);
         let generalClasses = [];
         res?.data?.forEach((classObj) => {
           if (classObj?.classCode !== null && classObj?.timeSlots) {
@@ -84,25 +92,27 @@ const GeneralScheduleScreen = () => {
         });
         setClasses(generalClasses);
         setSelectedRows([]);
-        setResetLoading(false);
+        setOpenTimeslotDialog(false);
+        setAutoSaveLoading(false);
         toast.success("Tự động thời khóa biểu thành công!");
       },
       (error) => {
         if (error.response.status == 410) {
           toast.error(error.response.data);
-          setResetLoading(false);
+          setAutoSaveLoading(false);
         } else {
           console.log(error);
           toast.error("Có lỗi khi tự động thời khóa biểu!");
-          setResetLoading(false);
+          setAutoSaveLoading(false);
         }
       }
     );
   };
   const handleAutoScheduleClassroomTimeTabling = () => {
+    setAutoSaveLoading(true);
     request(
       "post",
-      `/general-classes/auto-schedule-room?semester=${selectedSemester?.semester}&groupName=${selectedGroup?.groupName}`,
+      `/general-classes/auto-schedule-room?semester=${selectedSemester?.semester}&groupName=${selectedGroup?.groupName}&timeLimit=${classroomTimeLimit}`,
       (res) => {
         let generalClasses = [];
         res.data?.forEach((classObj) => {
@@ -124,18 +134,20 @@ const GeneralScheduleScreen = () => {
           }
         });
         setClasses(generalClasses);
+        setOpenClassroomDialog(false);
         setSelectedRows([]);
-        setResetLoading(false);
+        setAutoSaveLoading(false);
+
         toast.success("Tự động phòng thành công!");
       },
       (error) => {
         if (error.response.status == 410) {
           toast.error(error.response.data);
-          setResetLoading(false);
+          setAutoSaveLoading(false);
         } else {
           console.log(error);
           toast.error("Có lỗi khi tự động xếp phòng");
-          setResetLoading(false);
+          setAutoSaveLoading(false);
         }
       }
     );
@@ -192,6 +204,22 @@ const GeneralScheduleScreen = () => {
 
   return (
     <div className="flex flex-col gap-4 w-full h-[700px]">
+      <AutoScheduleDialog
+        title={"Tự động xếp lịch học"}
+        open={isOpenTimeslotDialog}
+        closeDialog={() => setOpenTimeslotDialog(false)}
+        timeLimit={timeSlotTimeLimit}
+        setTimeLimit={setTimeSlotTimeLimit}
+        submit={handleAutoScheduleTimeSlotTimeTabling}
+      />
+      <AutoScheduleDialog
+        title={"Tự động xếp phòng học"}
+        open={isOpenClassroomDialog}
+        closeDialog={() => setOpenClassroomDialog(false)}
+        setTimeLimit={setClassroomTimeLimit}
+        timeLimit={classroomTimeLimit}
+        submit={handleAutoScheduleClassroomTimeTabling}
+      />
       <div className="flex flex-row justify-between">
         <div className="flex flex-col gap-4">
           <GeneralSemesterAutoComplete
@@ -238,24 +266,32 @@ const GeneralScheduleScreen = () => {
           </div>
           <div className="flex flex-row gap-2">
             <Button
-              disabled={!(selectedSemester !== null && selectedGroup !== null)}
+              loading={isAutoSaveLoading}
+              disabled={
+                !(selectedSemester !== null && selectedGroup !== null) ||
+                isAutoSaveLoading
+              }
               startIcon={
                 isTimeScheduleLoading ? FacebookCircularProgress : null
               }
               variant="contained"
               color="primary"
-              onClick={handleAutoScheduleTimeSlotTimeTabling}
+              onClick={() => setOpenTimeslotDialog(true)}
             >
               Tự động xếp TKB
             </Button>
             <Button
-              disabled={!(selectedSemester !== null && selectedGroup !== null)}
+              loading={isAutoSaveLoading}
+              disabled={
+                !(selectedSemester !== null && selectedGroup !== null) ||
+                isAutoSaveLoading
+              }
               startIcon={
                 isTimeScheduleLoading ? FacebookCircularProgress : null
               }
               variant="contained"
               color="primary"
-              onClick={handleAutoScheduleClassroomTimeTabling}
+              onClick={() => setOpenClassroomDialog(true)}
             >
               Tự động xếp phòng học
             </Button>

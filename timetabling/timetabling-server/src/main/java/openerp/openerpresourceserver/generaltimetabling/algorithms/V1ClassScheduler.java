@@ -19,7 +19,7 @@ import java.util.Scanner;
 @Getter
 @Setter
 @Log4j2
-public class ClassTimeScheduleSolver {
+public class V1ClassScheduler {
 
     private static class VarArraySolutionPrinter extends CpSolverSolutionCallback {
         private static List<GeneralClassOpened> classes;

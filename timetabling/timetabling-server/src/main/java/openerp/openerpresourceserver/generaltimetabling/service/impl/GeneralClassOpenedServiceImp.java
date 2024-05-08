@@ -24,10 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -260,12 +257,16 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
 
     @Transactional
     @Override
-    public List<GeneralClassOpened> autoScheduleRoom(String semester, String groupName) {
+    public List<GeneralClassOpened> autoScheduleRoom(String semester, String groupName, int timeLimit) {
         log.info("autoScheduleRoom start...");
         List<GeneralClassOpened> classes = gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
         if (classes == null) throw new NotFoundException("Không tìm thấy lớp");
-        List<Classroom> rooms = classroomRepo.findAll();
-        List<GeneralClassOpened> updatedClasses = V2ClassScheduler.autoScheduleRoom(classes, rooms);
+        Group group = groupRepo.findByGroupName(groupName).orElse(null);
+        if(group == null) throw new NotFoundException("Nhóm không tồn tại!");
+        List<Classroom> rooms = classroomRepo
+                .getClassRoomByBuildingIn(Arrays.stream(group.getPriorityBuilding().split(",")).toList());
+        List<RoomOccupation> roomOccupations = roomOccupationRepo.findAllBySemester(semester);
+        List<GeneralClassOpened> updatedClasses = V2ClassScheduler.autoScheduleRoom(classes, rooms, timeLimit, roomOccupations);
         List<String> classCodes = updatedClasses.stream().map(GeneralClassOpened::getClassCode).toList();
         List<RoomOccupation> newRoomOccupations = updatedClasses.stream().map(RoomOccupationMapper::mapFromGeneralClass).flatMap(Collection::stream).toList();
         roomOccupationRepo.deleteAllByClassCodeIn(classCodes);
@@ -276,10 +277,10 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
 
     @Transactional
     @Override
-    public List<GeneralClassOpened> autoSchedule(String semester, String groupName) {
+    public List<GeneralClassOpened> autoSchedule(String semester, String groupName, int timeLimit) {
         log.info("autoSchedule START....");
         List<GeneralClassOpened> foundClasses = gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
-        List<GeneralClassOpened> autoScheduleClasses = V2ClassScheduler.autoScheduleTimeSlot(foundClasses);
+        List<GeneralClassOpened> autoScheduleClasses = V2ClassScheduler.autoScheduleTimeSlot(foundClasses, timeLimit);
         /*Save the scheduled timeslot of the classes*/
         gcoRepo.saveAll(autoScheduleClasses);
         roomOccupationRepo.deleteAllByClassCodeIn(foundClasses.stream().map(GeneralClassOpened::getClassCode).toList());
