@@ -1,6 +1,5 @@
 package com.hust.openerp.taskmanagement.config.security;
 
-import com.hust.openerp.taskmanagement.exception.CustomAccessDeniedHandler;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.savedrequest.NullRequestCache;
+
+import com.hust.openerp.taskmanagement.exception.handler.CustomAccessDeniedHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -42,32 +43,44 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .oauth2ResourceServer(
                         cfg -> cfg.jwt(jwtConfigurer -> jwtConfigurer
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                                .jwtAuthenticationConverter(
+                                        jwtAuthenticationConverter())))
                 .sessionManagement(
-                        sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/roles").permitAll())
+                        sessionManagement -> sessionManagement
+                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/roles")
+                        .permitAll())
                 .authorizeHttpRequests(
-                        authorizeRequests -> authorizeRequests.requestMatchers("/actuator/prometheus/**").permitAll())
+                        authorizeRequests -> authorizeRequests
+                                .requestMatchers("/actuator/prometheus/**").permitAll())
                 .authorizeHttpRequests(
-                        authorizeRequests -> authorizeRequests.requestMatchers("/videos/videos/*").permitAll())
+                        authorizeRequests -> authorizeRequests.requestMatchers("/resources/**")
+                                .permitAll())
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/css/**")
+                        .permitAll())
                 .authorizeHttpRequests(
-                        authorizeRequests -> authorizeRequests.requestMatchers("/resources/**").permitAll())
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/css/**").permitAll())
+                        authorizeRequests -> authorizeRequests
+                                .requestMatchers("/content/img/**").permitAll())
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/js/**")
+                        .permitAll())
                 .authorizeHttpRequests(
-                        authorizeRequests -> authorizeRequests.requestMatchers("/content/img/**").permitAll())
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/js/**").permitAll())
+                        authorizeRequests -> authorizeRequests
+                                .requestMatchers("/export-problem/*").permitAll())
                 .authorizeHttpRequests(
-                        authorizeRequests -> authorizeRequests.requestMatchers("/export-problem/*").permitAll())
+                        authorizeRequests -> authorizeRequests
+                                .requestMatchers("/v3/api-docs/**")
+                                .permitAll())
                 .authorizeHttpRequests(
-                        authorizeRequests -> authorizeRequests.requestMatchers("/v2/api-docs").permitAll())
+                        authorizeRequests -> authorizeRequests.requestMatchers("/swagger-ui/**")
+                                .permitAll())
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers("/public/**").permitAll())
                 .authorizeHttpRequests(
-                        authorizeRequests -> authorizeRequests.requestMatchers("/swagger-ui").permitAll())
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/public/**").permitAll())
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/nghialm").permitAll())
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+                        authorizeRequests -> authorizeRequests.anyRequest().authenticated())
                 .requestCache(requestCache -> requestCache.requestCache(new NullRequestCache()))
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exceptionHandling -> exceptionHandling.accessDeniedHandler(accessDeniedHandler()))
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .accessDeniedHandler(accessDeniedHandler()))
                 .headers(headers -> headers.frameOptions(option -> option.disable()));
 
         return http.build();
@@ -77,5 +90,4 @@ public class SecurityConfig {
     CustomAccessDeniedHandler accessDeniedHandler() {
         return new CustomAccessDeniedHandler();
     }
-
 }

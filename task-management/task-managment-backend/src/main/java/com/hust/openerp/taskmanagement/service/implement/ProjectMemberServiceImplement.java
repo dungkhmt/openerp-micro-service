@@ -3,6 +3,8 @@ package com.hust.openerp.taskmanagement.service.implement;
 import com.hust.openerp.taskmanagement.entity.Project;
 import com.hust.openerp.taskmanagement.entity.ProjectMember;
 import com.hust.openerp.taskmanagement.entity.User;
+import com.hust.openerp.taskmanagement.exception.ApiException;
+import com.hust.openerp.taskmanagement.exception.ErrorCode;
 import com.hust.openerp.taskmanagement.repository.ProjectMemberRepository;
 import com.hust.openerp.taskmanagement.repository.ProjectRepository;
 import com.hust.openerp.taskmanagement.service.MailService;
@@ -31,23 +33,29 @@ public class ProjectMemberServiceImplement implements ProjectMemberService {
     private final NotificationService notificationsService;
 
     @Override
-    public List<ProjectMember> getMembersOfProject(UUID projectId) {
+    public List<ProjectMember> getMembersOfProject(UUID projectId, String userId) {
+        if (!this.checkAddedMemberInProject(userId, projectId)) {
+            throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
+        }
         return projectMemberRepository.findAllProjectMemberByProjectId(projectId);
     }
 
     @Override
-    public ProjectMember setProjectMember(ProjectMember projectMember) {
-        return projectMemberRepository.save(projectMember);
-    }
+    public ProjectMember addMemberToProject(ProjectMember projectMemberForm, String adderId) {
 
-    @Override
-    public ProjectMember addMemberToProject(ProjectMember projectMemberForm) {
         UUID projectId = projectMemberForm.getProjectId();
         String memberId = projectMemberForm.getUserId();
-        Project project = projectRepository.findById(projectId).orElseThrow();
+
+        projectRepository.findById(projectId).orElseThrow(
+                () -> new ApiException(ErrorCode.PROJECT_NOT_EXIST));
+
+        if (!this.checkAddedMemberInProject(adderId, projectId)) {
+            throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
+        }
+
         User member = userService.findById(memberId);
         if (member == null) {
-            throw new RuntimeException("User not found");
+            throw new ApiException(ErrorCode.USER_NOT_EXIST);
         }
 
         // FIX: hard code
@@ -57,7 +65,7 @@ public class ProjectMemberServiceImplement implements ProjectMemberService {
 
         ProjectMember projectMember = ProjectMember.builder().projectId(projectId)
                 .userId(memberId).roleId(projectMemberForm.getRoleId()).build();
-        ProjectMember projectMemberRes = projectMemberRepository.save(projectMember);
+        return projectMemberRepository.save(projectMember);
 
         // try {
         // notificationsService.sendNotification(
@@ -81,17 +89,12 @@ public class ProjectMemberServiceImplement implements ProjectMemberService {
         // // TODO: handle exception
         // }
 
-        return projectMemberRes;
-    }
-
-    @Override
-    public ProjectMember create(ProjectMember projectMember) {
-        return projectMemberRepository.save(projectMember);
+        // return projectMemberRes;
     }
 
     @Override
     public boolean checkAddedMemberInProject(String memberId, UUID projectId) {
-        return projectMemberRepository.isAddedMemberInProject(memberId, projectId) > 0 ? true : false;
+        return projectMemberRepository.isAddedMemberInProject(memberId, projectId) > 0;
     }
 
 }

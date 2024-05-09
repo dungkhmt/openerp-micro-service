@@ -1,11 +1,8 @@
 import React from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
-import { useClasses } from "views/general-time-tabling/hooks/useClasses";
 import { useUploadTableConfig } from "./useUploadTableConfig";
 import { useLoadingContext } from "../contexts/LoadingContext";
-import { FacebookCircularProgress } from "components/common/progressBar/CustomizedCircularProgress";
-import { Error } from "@mui/icons-material";
 
 const GeneralUploadTable = ({ classes, dataLoading }) => {
   const { loading: uploadLoading, setLoading } = useLoadingContext();
@@ -18,6 +15,24 @@ const GeneralUploadTable = ({ classes, dataLoading }) => {
         columns={useUploadTableConfig()}
         rows={classes}
         pageSize={10}
+        initialState={{
+          filter: {
+            filterModel: {
+              items: [],
+              quickFilterValues: [''],
+            },
+          },
+        }}
+        slots={{ toolbar: GridToolbar }}
+        slotProps={{
+          toolbar: { 
+            printOptions: { disableToolbarButton: true },
+            csvOptions: { disableToolbarButton: true },
+            showQuickFilter: true,
+          },
+        }}
+        disableColumnSelector
+        disableDensitySelector
       />
     </Box>
   );

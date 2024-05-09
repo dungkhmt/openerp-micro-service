@@ -1,8 +1,5 @@
 package openerp.openerpresourceserver.generaltimetabling.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
@@ -10,20 +7,25 @@ import openerp.openerpresourceserver.generaltimetabling.algorithms.V2ClassSchedu
 import openerp.openerpresourceserver.generaltimetabling.exception.ConflictScheduleException;
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.helper.ClassTimeComparator;
+import openerp.openerpresourceserver.generaltimetabling.helper.GeneralExcelHelper;
 import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekExtractor;
 import openerp.openerpresourceserver.generaltimetabling.mapper.RoomOccupationMapper;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGeneralClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGeneralClassScheduleRequest;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.V2UpdateClassScheduleRequest;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.generaltimetabling.repo.*;
 import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassOpenedService;
-import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
-import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
-import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import org.springframework.stereotype.Service;
-
-import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * GeneralClassOpenedServiceImp
@@ -43,6 +45,9 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
     private RoomReservationRepo roomReservationRepo;
 
     private ClassroomRepo classroomRepo;
+
+    private GeneralExcelHelper excelHelper;
+
 
     @Override
     public List<GeneralClassOpened> getGeneralClasses(String semester, String groupName) {
@@ -67,7 +72,8 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
             switch (request.getField()) {
                 case "startTime":
                     rr.setStartTime(Integer.parseInt(request.getValue()));
-                    if (rr.getEndTime() != null && rr.getStartTime() > rr.getEndTime()) throw new ConflictScheduleException("Thời gian bắt đầu không thể lớn hơn thời gian kết thúc!");
+                    if (rr.getEndTime() != null && rr.getStartTime() > rr.getEndTime())
+                        throw new ConflictScheduleException("Thời gian bắt đầu không thể lớn hơn thời gian kết thúc!");
                     break;
                 case "room":
                     rr.setRoom(request.getValue());
@@ -77,7 +83,8 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
                     break;
                 case "endTime":
                     rr.setEndTime(Integer.parseInt(request.getValue()));
-                    if (rr.getStartTime() != null && rr.getStartTime() > rr.getEndTime()) throw new ConflictScheduleException("Thời gian bắt đầu không thể lớn hơn thời gian kết thúc!");
+                    if (rr.getStartTime() != null && rr.getStartTime() > rr.getEndTime())
+                        throw new ConflictScheduleException("Thời gian bắt đầu không thể lớn hơn thời gian kết thúc!");
                     break;
                 default:
                     break;
@@ -114,7 +121,8 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
             switch (request.getField()) {
                 case "startTime":
                     rr.setStartTime(Integer.parseInt(request.getValue()));
-                    if (rr.getEndTime() != null && rr.getStartTime() > rr.getEndTime()) throw new ConflictScheduleException("Thời gian bắt đầu không thể lớn hơn thời gian kết thúc!");
+                    if (rr.getEndTime() != null && rr.getStartTime() > rr.getEndTime())
+                        throw new ConflictScheduleException("Thời gian bắt đầu không thể lớn hơn thời gian kết thúc!");
                     if (!ClassTimeComparator.isClassConflict(rr, gClassOpened, generalClassOpenedList)) {
                         roomOccupationList.forEach(ro -> {
                             ro.setStartPeriod(rr.getStartTime());
@@ -140,7 +148,8 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
                     break;
                 case "endTime":
                     rr.setEndTime(Integer.parseInt(request.getValue()));
-                    if (rr.getStartTime() != null && rr.getStartTime() > rr.getEndTime()) throw new ConflictScheduleException("Thời gian bắt đầu không thể lớn hơn thời gian kết thúc!");
+                    if (rr.getStartTime() != null && rr.getStartTime() > rr.getEndTime())
+                        throw new ConflictScheduleException("Thời gian bắt đầu không thể lớn hơn thời gian kết thúc!");
                     if (!ClassTimeComparator.isClassConflict(rr, gClassOpened, generalClassOpenedList)) {
                         roomOccupationList.forEach(ro -> {
                             ro.setEndPeriod(rr.getEndTime());
@@ -170,9 +179,10 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
         }
         return gClassOpened;
     }
+
     @Override
     public List<GeneralClassOpened> addClassesToNewGroup(List<String> ids, String groupName, String priorityBuilding) throws Exception {
-        if(!groupRepo.getAllByGroupName(groupName).isEmpty()) {
+        if (!groupRepo.getAllByGroupName(groupName).isEmpty()) {
             throw new Exception("Group name has existed!");
         } else {
             groupRepo.save(new Group(null, groupName, priorityBuilding));
@@ -206,6 +216,7 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
         gcoRepo.saveAll(generalClassOpenedList);
         return gcoRepo.findAll();
     }
+
     @Transactional
     @Override
     public void deleteClassesBySemester(String semester) {
@@ -217,16 +228,16 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
     @Override
     public List<GeneralClassOpened> resetSchedule(List<String> ids, String semester) {
         List<GeneralClassOpened> generalClassOpenedList = gcoRepo.findAllBySemester(semester);
-        if(generalClassOpenedList.isEmpty()) {
+        if (generalClassOpenedList.isEmpty()) {
             throw new NotFoundException("Không tìm thấy lớp, hãy kiểm tra lại danh sách lớp!");
         } else {
-            List<GeneralClassOpened>filteredGeneralClassList = new ArrayList<>();
+            List<GeneralClassOpened> filteredGeneralClassList = new ArrayList<>();
             for (GeneralClassOpened gClass : generalClassOpenedList) {
                 for (String idString : ids) {
                     log.info("resetSchedule, consider id " + idString);
                     int gId = Integer.parseInt(idString.split("-")[0]);
-                    int timeSlotIndex = Integer.parseInt(idString.split("-")[1])-1;
-                    if(gId == gClass.getId()) {
+                    int timeSlotIndex = Integer.parseInt(idString.split("-")[1]) - 1;
+                    if (gId == gClass.getId()) {
                         RoomReservation timeSlot = gClass.getTimeSlots().get(timeSlotIndex);
                         if (timeSlot.getStartTime() != null && timeSlot.getEndTime() != null && timeSlot.getRoom() != null && timeSlot.getWeekday() != null && !timeSlot.getRoom().isEmpty()) {
                             roomOccupationRepo.deleteAllByClassCodeAndStartPeriodAndEndPeriodAndDayIndexAndClassRoom(gClass.getClassCode(), timeSlot.getStartTime(), timeSlot.getEndTime(), timeSlot.getWeekday(), timeSlot.getRoom());
@@ -246,10 +257,30 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
 
     @Transactional
     @Override
-    public List<GeneralClassOpened> autoSchedule(String semester, String groupName) {
+    public List<GeneralClassOpened> autoScheduleRoom(String semester, String groupName, int timeLimit) {
+        log.info("autoScheduleRoom start...");
+        List<GeneralClassOpened> classes = gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
+        if (classes == null) throw new NotFoundException("Không tìm thấy lớp");
+        Group group = groupRepo.findByGroupName(groupName).orElse(null);
+        if(group == null) throw new NotFoundException("Nhóm không tồn tại!");
+        List<Classroom> rooms = classroomRepo
+                .getClassRoomByBuildingIn(Arrays.stream(group.getPriorityBuilding().split(",")).toList());
+        List<RoomOccupation> roomOccupations = roomOccupationRepo.findAllBySemester(semester);
+        List<GeneralClassOpened> updatedClasses = V2ClassScheduler.autoScheduleRoom(classes, rooms, timeLimit, roomOccupations);
+        List<String> classCodes = updatedClasses.stream().map(GeneralClassOpened::getClassCode).toList();
+        List<RoomOccupation> newRoomOccupations = updatedClasses.stream().map(RoomOccupationMapper::mapFromGeneralClass).flatMap(Collection::stream).toList();
+        roomOccupationRepo.deleteAllByClassCodeIn(classCodes);
+        roomOccupationRepo.saveAll(newRoomOccupations);
+        gcoRepo.saveAll(updatedClasses);
+        return updatedClasses;
+    }
+
+    @Transactional
+    @Override
+    public List<GeneralClassOpened> autoSchedule(String semester, String groupName, int timeLimit) {
         log.info("autoSchedule START....");
         List<GeneralClassOpened> foundClasses = gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
-        List<GeneralClassOpened> autoScheduleClasses = V2ClassScheduler.autoScheduleTimeSlot(foundClasses);
+        List<GeneralClassOpened> autoScheduleClasses = V2ClassScheduler.autoScheduleTimeSlot(foundClasses, timeLimit);
         /*Save the scheduled timeslot of the classes*/
         gcoRepo.saveAll(autoScheduleClasses);
         roomOccupationRepo.deleteAllByClassCodeIn(foundClasses.stream().map(GeneralClassOpened::getClassCode).toList());
@@ -260,13 +291,98 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
     }
 
     @Override
-    public List<GeneralClassOpened> autoScheduleRoom(String semester, String groupName) {
-        log.info("autoScheduleRoom start...");
-        List<GeneralClassOpened> classes = gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
-        if (classes == null) throw new NotFoundException("Không tìm thấy lớp");
-        List<Classroom> rooms = classroomRepo.findAll();
-        List<GeneralClassOpened> updatedClasses = V2ClassScheduler.autoScheduleRoom(classes, rooms);
-        gcoRepo.saveAll(updatedClasses);
-        return updatedClasses;
+    public InputStream exportExcel(String semester) {
+        List<GeneralClassOpened> classes = gcoRepo.findAllBySemester(semester)
+                .stream()
+                .filter(c -> c.getClassCode() != null && !c.getClassCode().isEmpty())
+                .collect(Collectors.toCollection(ArrayList::new));
+        classes.sort((a, b) -> {
+            Comparable fieldValueA = a.getClassCode();
+            Comparable fieldValueB = b.getClassCode();
+            return fieldValueA.compareTo(fieldValueB);
+        });
+        if (classes.isEmpty()) throw new NotFoundException("Kỳ học không có bất kỳ lớp học nào!");
+        return excelHelper.convertGeneralClassToExcel(classes);
+    }
+
+    @Transactional
+    @Override
+    public List<GeneralClassOpened> v2UpdateClassSchedule(String semester, List<V2UpdateClassScheduleRequest> request) {
+        /*Find reference*/
+        List<GeneralClassOpened> classes = gcoRepo.findAllBySemester(semester);
+        List<RoomReservation> roomReservations = classes.stream().map(GeneralClassOpened::getTimeSlots).flatMap(Collection::stream).toList();
+
+        HashMap<Long, RoomReservation> roomReservationMap = new HashMap<>();
+        List<Long> requestIds = request.stream().map(V2UpdateClassScheduleRequest::getRoomReservationId).toList();
+        List<RoomOccupation> roomOccupations = new ArrayList<>();
+
+        roomReservations.forEach(roomReservation -> {
+            if (requestIds.contains(roomReservation.getId())) {
+                roomReservationMap.put(roomReservation.getId(), roomReservation);
+            }
+        });
+        /*Set info*/
+        request.forEach(updateRequest -> {
+            RoomReservation updateRoomReservation = roomReservationMap.get(updateRequest.getRoomReservationId());
+
+            List<RoomOccupation> foundRoomOccupations = roomOccupationRepo.findAllBySemesterAndClassCodeAndDayIndexAndStartPeriodAndEndPeriodAndClassRoom(semester,
+                    updateRoomReservation.getGeneralClassOpened().getClassCode(),
+                    updateRoomReservation.getWeekday(),
+                    updateRoomReservation.getStartTime(),
+                    updateRoomReservation.getEndTime(),
+                    updateRoomReservation.getRoom());
+
+
+            updateRoomReservation.setStartTime(updateRequest.getStartTime());
+            updateRoomReservation.setEndTime(updateRequest.getEndTime());
+            updateRoomReservation.setWeekday(updateRequest.getWeekday());
+            updateRoomReservation.setRoom(updateRequest.getRoom());
+
+
+            if (
+                /*After schedule is complete*/
+                updateRoomReservation.isScheduleNotNull() &&
+                /*Before schedule is not complete*/
+                foundRoomOccupations.isEmpty()
+            ) {
+                List<Integer> weeks = LearningWeekExtractor.extractArray(updateRoomReservation.getGeneralClassOpened().getLearningWeeks());
+                List<RoomOccupation> roomOccupationList = new ArrayList<>();
+                for (Integer week : weeks) {
+                    roomOccupationList.add(new RoomOccupation(
+                            updateRoomReservation.getRoom(),
+                            updateRoomReservation.getGeneralClassOpened().getClassCode(),
+                            updateRoomReservation.getStartTime(),
+                            updateRoomReservation.getEndTime(),
+                            updateRoomReservation.getGeneralClassOpened().getCrew(),
+                            updateRoomReservation.getWeekday(),
+                            week,
+                            "study",
+                            semester));
+                }
+                roomOccupations.addAll(roomOccupationList);
+            } else if (
+                /*After schedule is complete*/
+                updateRoomReservation.isScheduleNotNull() &&
+                /*Before schedule is complete*/
+                !foundRoomOccupations.isEmpty()
+            ) {
+                foundRoomOccupations.forEach(roomOccupation -> {
+                    roomOccupation.setClassRoom(updateRequest.getRoom());
+                    roomOccupation.setStartPeriod(updateRequest.getStartTime());
+                    roomOccupation.setEndPeriod(updateRequest.getEndTime());
+                    roomOccupation.setDayIndex(updateRequest.getWeekday());
+                });
+            }
+            roomOccupations.addAll(foundRoomOccupations);
+        });
+        /*Check conflict*/
+        for (RoomReservation roomReservation : roomReservationMap.values()) {
+            ClassTimeComparator.isClassConflict(roomReservation, roomReservation.getGeneralClassOpened(), classes);
+        }
+        /* Persist room reservation and room occupation */
+        roomReservationRepo.saveAll(roomReservationMap.values());
+        roomOccupationRepo.saveAll(roomOccupations);
+        return roomReservationMap.values().stream().map(RoomReservation::getGeneralClassOpened).toList();
+
     }
 }

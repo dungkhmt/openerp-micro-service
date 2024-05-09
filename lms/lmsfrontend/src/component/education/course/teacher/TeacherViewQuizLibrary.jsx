@@ -6,12 +6,14 @@ import TeacherViewQuizDetail from "../TeacherViewQuizDetail";
 import { request } from "../../../../api";
 import { errorNoti } from "../../../../utils/notification";
 import {
+  Autocomplete,
   Button,
   Chip,
   InputLabel,
   MenuItem,
   OutlinedInput,
   Select,
+  TextField,
 } from "@mui/material";
 
 const useStyles = makeStyles(() => ({
@@ -74,11 +76,16 @@ export default function TeacherViewQuizLibrary({ courseId }) {
   const [chooseTags, setChooseTags] = useState([]);
 
   const [quizzList, setQuizzList] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [coursePool, setCoursePool] = useState([]);
+  const [chooseCourse, setChooseCourse] = useState(null);
 
-  useEffect(getListTagOfCourse, []);
+  useEffect(() => {
+    getAllCourses();
+  }, []);
 
-  function getListTagOfCourse() {
+  function getListTagOfCourse(courseId) {
+    setLoading(true);
     let successHandler = (res) => {
       setTags(res.data.map((item) => item.tagName));
       setLoading(false);
@@ -97,6 +104,27 @@ export default function TeacherViewQuizLibrary({ courseId }) {
     );
   }
 
+  const getAllCourses = () => {
+    request(
+      "get",
+      "/edu/class/get-all-courses",
+      (response) => {
+        response = response.data;
+        setCoursePool(
+          response.map((item) => ({
+            label: `${item.id} - ${item.name}`,
+            id: item.id,
+          }))
+        );
+      },
+      {
+        onError: (error) => {
+          setCoursePool([]);
+        },
+      }
+    );
+  };
+
   const handleFilterQuiz = () => {
     setLoading(true);
     let successHandler = (res) => {
@@ -111,12 +139,22 @@ export default function TeacherViewQuizLibrary({ courseId }) {
     };
     request(
       "GET",
-      `/get-questions-of-course-by-tags?courseId=${courseId}&tags=${chooseTags.join(
+      `/get-questions-of-course-by-tags?courseId=${chooseCourse}&tags=${chooseTags.join(
         ","
       )}`,
       successHandler,
       errorHandlers
     );
+  };
+
+  const onCourseChange = (event, value) => {
+    setChooseTags([]);
+    setTags([]);
+    if (value && value.id) {
+      setChooseCourse(value.id);
+      getListTagOfCourse(value.id);
+    }
+    console.log(value);
   };
 
   const handleChange = (event) => {
@@ -146,11 +184,24 @@ export default function TeacherViewQuizLibrary({ courseId }) {
 
       <Box className={classes.wrapper}>
         <Typography component="span" className={classes.subTitle}>
+          Chọn course
+        </Typography>
+        <InputLabel id="demo-multiple-name-label">Courses</InputLabel>
+        <Autocomplete
+          sx={{ width: 300 }}
+          options={coursePool}
+          renderInput={(params) => <TextField {...params} label="Course" />}
+          onChange={onCourseChange}
+        />
+      </Box>
+
+      <Box className={classes.wrapper}>
+        <Typography component="span" className={classes.subTitle}>
           Lọc câu hỏi theo các tags
         </Typography>
         <InputLabel id="demo-multiple-name-label">Tags</InputLabel>
         <Select
-          labelId="demo-multiple-chip-label"
+          label="tags"
           id="demo-multiple-chip"
           multiple
           value={chooseTags}

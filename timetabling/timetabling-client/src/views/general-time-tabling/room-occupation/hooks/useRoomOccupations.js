@@ -1,10 +1,29 @@
 import { request } from "api";
 import { useEffect, useState } from "react";
+import ReactDOMServer from "react-dom/server";
 
-export const useRoomOccupations = (semester, startDate) => {
+export const useRoomOccupations = (semester, startDate, weekIndex) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
+
+  function convertToToolTip(classCode, startTime, endTime) {
+    return (
+      <div class="custom-tooltip">
+        <div class="header-title">Mã lớp: {classCode}</div>
+        <div class="divider"></div>
+        <div class="body-content">
+          <div>Thời gian bắt đầu: {formatDate(startTime)}</div>
+          <div>Thời gian kết thúc: {formatDate(endTime)}</div>
+          <div>
+            Thời gian kéo dài:{" "}
+            {Math.floor(Math.abs(endTime - startTime) / (1000 * 60))} phút
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   useEffect(() => {
     if (!semester || !startDate) return;
 
@@ -13,14 +32,22 @@ export const useRoomOccupations = (semester, startDate) => {
       try {
         request(
           "get",
-          `/room-occupation/get-all?semester=${semester}`,
+          `/room-occupation/?semester=${semester}&weekIndex=${weekIndex}`,
           (res) => {
             console.log(res.data);
-            const formattedData = res.data?.map((timeSlot) =>
-              formatTimeSlot(timeSlot, startDate)
-            );
+            const formattedData = res.data?.map((timeSlot) => {
+              if (
+                timeSlot?.startTime !== null &&
+                timeSlot?.endTime !== null &&
+                timeSlot?.weekIndex !== null &&
+                timeSlot?.dayIndex !== null
+              ) {
+                return formatTimeSlot(timeSlot, startDate);
+              }
+              return null;
+            });
+            setData(formattedData?.filter((x) => x !== null));
             console.log(formattedData);
-            setData(formattedData);
           },
           (error) => {
             console.log(error);
@@ -34,7 +61,7 @@ export const useRoomOccupations = (semester, startDate) => {
     };
 
     fetchRoomOccupations();
-  }, [semester, startDate]);
+  }, [weekIndex]);
 
   const getTimeByPeriod = (period) => {
     switch (period) {
@@ -67,9 +94,21 @@ export const useRoomOccupations = (semester, startDate) => {
     }
   };
 
+  function formatDate(date) {
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is zero-based, so add 1
+    const year = date.getFullYear();
+
+    return `${hours}:${minutes}, ngày ${day}/${month}/${year}`;
+  }
+
   const formatTimeSlot = (timeSlot, startDate) => {
     const offset = timeSlot.crew === "C" ? 6 : 0;
     const start = new Date(startDate);
+    console.log(timeSlot?.weekIndex);
+
     const { hours: startHours, minutes: startMinutes } = getTimeByPeriod(
       timeSlot.startPeriod + offset
     );
@@ -78,17 +117,30 @@ export const useRoomOccupations = (semester, startDate) => {
     );
     start.setHours(startHours);
     start.setDate(
-      start.getDate() + (Number(timeSlot.weekIndex) - 1) * 7 + Number(timeSlot.dayIndex) - 2
+      start.getDate() +
+        (Number(timeSlot.weekIndex) - 1) * 7 +
+        Number(timeSlot.dayIndex) -
+        2
     );
     start.setMinutes(startMinutes);
     const end = new Date(startDate);
     end.setHours(endHours);
     end.setDate(
-      end.getDate() + (Number(timeSlot.weekIndex) - 1) * 7 + Number(timeSlot.dayIndex) - 2
+      end.getDate() +
+        (Number(timeSlot.weekIndex) - 1) * 7 +
+        Number(timeSlot.dayIndex) -
+        2
     );
     end.setMinutes(endMinutes);
-    return [timeSlot.classRoom, timeSlot.classCode, start, end];
+    return [
+      timeSlot.classRoom,
+      timeSlot.classCode,
+      ReactDOMServer.renderToStaticMarkup(
+        convertToToolTip(timeSlot.classCode, start, end)
+      ),
+      start,
+      end,
+    ];
   };
-
   return { loading, error, data };
 };

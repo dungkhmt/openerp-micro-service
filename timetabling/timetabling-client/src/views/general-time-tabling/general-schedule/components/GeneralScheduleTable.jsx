@@ -1,19 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useGeneralTableColumns } from "./useScheduleTableConfig";
-import { DataGrid } from "@mui/x-data-grid";
-import { useClasses } from "../../hooks/useClasses";
+import { DataGrid, GridToolbar  } from "@mui/x-data-grid";
 import {
   Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
 } from "@mui/material";
-import { toast } from "react-toastify";
 import ClassDetailDialog from "./ClassDetailDialog";
 
 const GeneralScheduleTable = ({
+  saveRequests,
+  setSaveRequests,
   isLoading,
   setSelectedRows,
   isDataLoading,
@@ -41,9 +36,27 @@ const GeneralScheduleTable = ({
         onRowDoubleClick={handleOpenDialog}
         className="text-xs"
         loading={isDataLoading || isLoading}
-        columns={useGeneralTableColumns(setClasses, setLoading, semester)}
+        columns={useGeneralTableColumns(setClasses, setLoading, semester, saveRequests, setSaveRequests)}
         rows={classes}
         pageSize={10}
+        initialState={{
+          filter: {
+            filterModel: {
+              items: [],
+              quickFilterValues: [''],
+            },
+          },
+        }}
+        slots={{ toolbar: GridToolbar }}
+        slotProps={{
+          toolbar: { 
+            printOptions: { disableToolbarButton: true },
+            csvOptions: { disableToolbarButton: true },
+            showQuickFilter: true,
+          },
+        }}
+        disableColumnSelector
+        disableDensitySelector
       />
     </Box>
   );

@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -15,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "room_reservation")
 @Entity
+@Builder
 public class RoomReservation {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "general_class_opened_id")
@@ -49,8 +47,15 @@ public class RoomReservation {
 
     @Override
     public String toString() {
-        return startTime + "-" + endTime + "/" + "D" + weekday+ "/" + room;
+        return generalClassOpened.getClassCode() + ":" + startTime + "-" + endTime + "/" + "D" + weekday+ "/" + room;
     }
 
 
+    public boolean isScheduleNotNull() {
+        return this.getStartTime() != null && this.getEndTime() != null && this.getWeekday() != null && this.getRoom()!= null && !this.getRoom().isEmpty();
+    }
+
+    public boolean isTimeSlotNotNull() {
+        return this.getStartTime() != null && this.getEndTime() != null && this.getWeekday() != null;
+    }
 }

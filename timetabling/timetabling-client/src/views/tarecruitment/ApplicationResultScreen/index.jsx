@@ -1,7 +1,8 @@
-import { Chip, Typography } from "@mui/material";
+import { Chip, Paper, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { request } from "api";
 import { useEffect, useState } from "react";
+import styles from "./index.style";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -112,27 +113,37 @@ const ApplicationResultScreen = () => {
   }));
 
   return (
-    <div>
-      <Typography variant="h4" style={{ fontWeight: "bold" }}>
-        Kết quả tuyển dụng
-      </Typography>
-      <DataGrid
-        loading={isLoading}
-        rowHeight={60}
-        sx={{ fontSize: 16 }}
-        rows={dataGridRows}
-        columns={dataGridColumns}
-        autoHeight
-        rowCount={totalElements}
-        pagination
-        paginationMode="server"
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[5, 10, 20]}
-        checkboxSelection={false}
-        disableRowSelectionOnClick
-      />
-    </div>
+    <Paper elevation={3}>
+      <div>
+        <div style={styles.tableToolBar}>
+          <Typography
+            variant="h4"
+            style={{
+              fontWeight: "bold",
+              marginBottom: "0.5em",
+              paddingTop: "1em",
+            }}
+          >
+            Kết quả tuyển dụng
+          </Typography>
+        </div>
+        <DataGrid
+          loading={isLoading}
+          rowHeight={60}
+          sx={{ fontSize: 16, height: "65vh" }}
+          rows={dataGridRows}
+          columns={dataGridColumns}
+          rowCount={totalElements}
+          pagination
+          paginationMode="server"
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          pageSizeOptions={[10, 20, 50]}
+          checkboxSelection={false}
+          disableRowSelectionOnClick
+        />
+      </div>
+    </Paper>
   );
 };
 

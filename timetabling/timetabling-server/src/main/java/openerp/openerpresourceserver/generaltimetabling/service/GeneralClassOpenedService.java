@@ -1,9 +1,11 @@
 package openerp.openerpresourceserver.generaltimetabling.service;
 
+import java.io.InputStream;
 import java.util.List;
 
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGeneralClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGeneralClassScheduleRequest;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.V2UpdateClassScheduleRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
 
 
@@ -24,7 +26,10 @@ public interface GeneralClassOpenedService {
 
     List<GeneralClassOpened> resetSchedule(List<String> ids, String semester);
 
-    List<GeneralClassOpened> autoSchedule(String semester, String groupName);
-    List<GeneralClassOpened> autoScheduleRoom(String semester, String groupName);
+    List<GeneralClassOpened> autoSchedule(String semester, String groupName, int timeLimit);
+    List<GeneralClassOpened> autoScheduleRoom(String semester, String groupName, int timeLimit);
 
+    InputStream exportExcel(String semester);
+
+    List<GeneralClassOpened> v2UpdateClassSchedule(String semester, List<V2UpdateClassScheduleRequest> request);
 }

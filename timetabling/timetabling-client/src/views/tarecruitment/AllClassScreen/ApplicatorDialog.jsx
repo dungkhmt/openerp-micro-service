@@ -92,10 +92,9 @@ const ApplicatorDialog = ({ open, handleClose, classId }) => {
           <DataGrid
             loading={isLoading}
             rowHeight={60}
-            sx={{ fontSize: 16 }}
+            sx={{ fontSize: 16, height: "45vh" }}
             rows={dataGridRows}
             columns={dataGridColumns}
-            autoHeight
             rowCount={totalElements}
             pagination
             paginationMode="server"
