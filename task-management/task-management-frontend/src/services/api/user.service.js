@@ -4,6 +4,7 @@ const endPoints = {
   getAll: "/users",
   sync: "/",
   getAssignedTaskCreator: "/users/assigned-task-creator",
+  getMeCreatedAssignee: "/users/assigned-task-assignee",
 };
 
 export const UserService = {
@@ -23,6 +24,10 @@ export const UserService = {
   },
   async getAllAssignedTaskCreator() {
     const res = await privateClient.get(endPoints.getAssignedTaskCreator);
+    return res.data;
+  },
+  async getAllMeCreatedAssignee() {
+    const res = await privateClient.get(endPoints.getMeCreatedAssignee);
     return res.data;
   },
 };

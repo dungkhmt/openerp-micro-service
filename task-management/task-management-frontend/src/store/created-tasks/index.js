@@ -2,18 +2,18 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { TaskService } from "../../services/api/task.service";
 import { UserService } from "../../services/api/user.service";
 
-export const fetchAssignedTasks = createAsyncThunk(
-  "fetchAssignedTasks",
+export const fetchCreatedTasks = createAsyncThunk(
+  "fetchCreatedTasks",
   async (filters) => {
-    const paginationTasks = await TaskService.getAssignedTasks(filters);
+    const paginationTasks = await TaskService.getCreatedTasks(filters);
     return paginationTasks;
   }
 );
 
-export const fetchAllAssignedTaskCreator = createAsyncThunk(
-  "fetchAllAssignedTaskCreator",
+export const fetchAllAssignees = createAsyncThunk(
+  "fetchAllAssignees",
   async () => {
-    const taskCreators = await UserService.getAllAssignedTaskCreator();
+    const taskCreators = await UserService.getAllMeCreatedAssignee();
     return taskCreators;
   }
 );
@@ -33,11 +33,11 @@ const initialState = {
   sort: { sort: "desc", field: "createdStamp" },
   fetchLoading: false,
   errors: [],
-  creators: [],
+  assignees: [],
 };
 
-export const assignedTasksSlice = createSlice({
-  name: "assignedTasks",
+export const createdTasksSlice = createSlice({
+  name: "createdTasks",
   initialState,
   reducers: {
     setSearch: (state, action) => {
@@ -75,25 +75,26 @@ export const assignedTasksSlice = createSlice({
       state.sort = initialState.sort;
       state.fetchLoading = initialState.fetchLoading;
       state.errors = initialState.errors;
+      state.assignees = initialState.assignees;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchAssignedTasks.pending, (state) => {
+      .addCase(fetchCreatedTasks.pending, (state) => {
         state.fetchLoading = true;
       })
-      .addCase(fetchAssignedTasks.fulfilled, (state, action) => {
+      .addCase(fetchCreatedTasks.fulfilled, (state, action) => {
         state.tasksCache[state.pagination.page] = action.payload.data;
         state.totalCount = action.payload.totalElements;
         state.fetchLoading = false;
       })
-      .addCase(fetchAssignedTasks.rejected, (state, action) => {
+      .addCase(fetchCreatedTasks.rejected, (state, action) => {
         state.errors.push(action.error);
         state.fetchLoading = false;
         throw action.error;
       })
-      .addCase(fetchAllAssignedTaskCreator.fulfilled, (state, action) => {
-        state.creators = action.payload;
+      .addCase(fetchAllAssignees.fulfilled, (state, action) => {
+        state.assignees = action.payload;
       });
   },
 });
@@ -109,6 +110,6 @@ export const {
   clearCache,
   setSearch,
   resetSearch,
-} = assignedTasksSlice.actions;
+} = createdTasksSlice.actions;
 
-export default assignedTasksSlice.reducer;
+export default createdTasksSlice.reducer;

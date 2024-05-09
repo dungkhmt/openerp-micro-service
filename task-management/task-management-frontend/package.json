@@ -66,6 +66,7 @@
     "react-draggable": "^4.4.6",
     "react-dropzone": "^14.2.3",
     "react-grid-layout": "^1.4.4",
+    "react-helmet": "^6.1.0",
     "react-hook-form": "6.15.2",
     "react-hot-toast": "^2.4.1",
     "react-html-table-to-excel": "^2.0.0",

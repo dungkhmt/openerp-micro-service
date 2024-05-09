@@ -60,7 +60,7 @@ const ProjectViewTasks = () => {
   const [search, setSearch] = useState(searchStore);
   const searchDebounce = useDebounce(search, 1000);
 
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState(tasksCache[pagination.page] ?? []);
   const [openAddTask, setOpenAddTask] = useState(false);
 
   const [isInitialized, setIsInitialized] = useState(false);

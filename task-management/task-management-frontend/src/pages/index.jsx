@@ -1,9 +1,12 @@
-import { Box, Typography, Button } from "@mui/material";
+import { Icon } from "@iconify/react";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import { useKeycloak } from "@react-keycloak/web";
 import Redirect from "../routers/Redirect";
 
 const Home = () => {
   const { keycloak, initialized } = useKeycloak();
+
+  const theme = useTheme();
 
   if (initialized && keycloak.authenticated) {
     return <Redirect to="/dashboard" />;
@@ -40,13 +43,64 @@ const Home = () => {
       </Typography>
       <Button
         sx={{
-          backgroundImage: (theme) =>
-            `linear-gradient(98deg, ${theme.palette.customColors.primaryGradient}, ${theme.palette.primary.main} 94%)`,
-          color: (theme) => theme.palette.common.white,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          mt: 6,
+          backgroundImage:
+            "linear-gradient(56deg, #45c4f9, #7d09ff 50.33%, #ff0be5)",
+          color: theme.palette.common.white,
+          borderRadius: "12px",
+          inlineSize: "220px",
+          blockSize: "48px",
+          boxShadow: "0 4px 4px 0 rgba(87,75,172,.15)",
+          position: "relative",
+          transform: "translateY(0)",
+          transition: "0.25s cubic-bezier(.5,0,.5,1)",
+          fontSize: "18px",
+          fontWeight: 700,
+          textTransform: "capitalize",
+
+          "& svg": {
+            fontSize: "14px",
+            marginInlineStart: "9px",
+
+            [theme.breakpoints.up("md")]: {
+              fontSize: "18px",
+              marginInlineStart: "12px",
+            },
+          },
+
+          [theme.breakpoints.up("md")]: {
+            inlineSize: "300px",
+            blockSize: "66px",
+            fontSize: "24px",
+          },
+
+          "&:hover": {
+            transform: "translateY(1px)",
+
+            "& svg": {
+              transform: "scale(1.2)",
+            },
+          },
+
+          "&::before,&::after": {
+            content: '""',
+            position: "absolute",
+            insetInlineStart: 0,
+            insetBlockStart: 0,
+            inlineSize: "100%",
+            blockSize: "100%",
+            transition: "opacity 0.25s cubic-bezier(.5,0,.5,1)",
+            borderRadius: "12px",
+            border: "1px solid rgba(0,0,0,.1)",
+          },
         }}
         onClick={() => keycloak.login()}
       >
-        Đăng nhập
+        <div>Đăng nhập</div>
+        <Icon icon="grommet-icons:link-next" />
       </Button>
     </Box>
   );

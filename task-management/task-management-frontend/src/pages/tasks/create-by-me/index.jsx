@@ -13,31 +13,31 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import dayjs from "dayjs";
 import { useCallback, useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { Helmet } from "react-helmet";
-import {
-  setSort,
-  resetSort,
-  fetchAssignedTasks,
-  fetchAllAssignedTaskCreator,
-  clearCache,
-  setPagination,
-  resetPagination,
-  setSearch as setSearchAction,
-  setFilters,
-} from "../../../store/assigned-tasks";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
 import { TaskCategory } from "../../../components/task/category";
 import { TaskStatus } from "../../../components/task/status";
-import { Filter } from "../../../views/project/tasks/Filter";
 import { useDebounce } from "../../../hooks/useDebounce";
 import { usePreventOverflow } from "../../../hooks/usePreventOverflow";
+import {
+  clearCache,
+  fetchAllAssignees,
+  fetchCreatedTasks,
+  resetPagination,
+  resetSort,
+  setFilters,
+  setPagination,
+  setSearch as setSearchAction,
+  setSort,
+} from "../../../store/created-tasks";
 import { getDueDateColor, getProgressColor } from "../../../utils/color.util";
 import { buildFilterString } from "../../../utils/task-filter";
+import { Filter } from "../../../views/project/tasks/Filter";
 
-const TaskAssigned = () => {
+const TaskCreated = () => {
   const {
     tasksCache,
     totalCount,
@@ -46,8 +46,8 @@ const TaskAssigned = () => {
     pagination,
     sort,
     fetchLoading,
-    creators,
-  } = useSelector((state) => state.assignedTasks);
+    assignees,
+  } = useSelector((state) => state.createdTasks);
   const { statuses } = useSelector((state) => state.status);
   const dispatch = useDispatch();
 
@@ -183,16 +183,16 @@ const TaskAssigned = () => {
     },
     {
       flex: 0.1,
-      field: "creator",
-      headerName: "Người tạo",
+      field: "assignee",
+      headerName: "Gán cho",
       align: "center",
       headerAlign: "center",
       sortable: false,
       filterable: false,
       renderCell: ({ row }) =>
-        row.creator && (
+        row.assignee && (
           <AvatarGroup max={3} className="pull-up">
-            <UserAvatar user={row.creator} key={row.creator.id} />
+            <UserAvatar user={row.assignee} key={row.assignee.id} />
           </AvatarGroup>
         ),
       display: "flex",
@@ -257,7 +257,7 @@ const TaskAssigned = () => {
     if (tasksCache[pagination.page]) return;
     try {
       await dispatch(
-        fetchAssignedTasks({
+        fetchCreatedTasks({
           ...pagination,
           search: buildQueryString(),
           sort: `${sort.field},${sort.sort}`,
@@ -270,9 +270,9 @@ const TaskAssigned = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination, sort, buildQueryString, dispatch]);
 
-  const getCreators = useCallback(async () => {
+  const getAssignees = useCallback(async () => {
     try {
-      if (creators.length <= 0) await dispatch(fetchAllAssignedTaskCreator());
+      if (assignees.length <= 0) await dispatch(fetchAllAssignees());
     } catch (error) {
       toast.error("Lỗi khi lấy dữ liệu");
       console.log(error);
@@ -296,8 +296,8 @@ const TaskAssigned = () => {
   }, [getTasks]);
 
   useEffect(() => {
-    getCreators();
-  }, [getCreators]);
+    getAssignees();
+  }, [getAssignees]);
 
   useEffect(() => {
     if (tasksCache[pagination.page]) {
@@ -322,13 +322,13 @@ const TaskAssigned = () => {
   return (
     <>
       <Helmet>
-        <title>Danh sách công việc được giao | Task management</title>
+        <title>Danh sách công việc đã tạo | Task management</title>
       </Helmet>
       <Card sx={{ mr: 2 }}>
         <CardContent sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography variant="h6" component="div">
-              {totalCount} nhiệm vụ được giao
+              {totalCount} nhiệm vụ đã tạo
             </Typography>
             <Tooltip title="Lọc">
               <Filter
@@ -343,8 +343,8 @@ const TaskAssigned = () => {
                     fontSize: "1rem !important",
                   },
                 }}
-                excludeFields={["assigneeId"]}
-                members={creators}
+                excludeFields={["creatorId"]}
+                members={assignees}
               />
             </Tooltip>
           </Box>
@@ -409,4 +409,4 @@ const TaskAssigned = () => {
   );
 };
 
-export default TaskAssigned;
+export default TaskCreated;
