@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, Typography, Button } from "@material-ui/core/";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { boxChildComponent, boxComponentStyle } from "./constant";
 import ElementAddTeacher from "./ElementAddTeacher";
 import ElementAddThesis from "./ElementAddThesis";
@@ -9,8 +9,13 @@ import KeywordChip from "component/common/KeywordChip";
 import AssignTeacherThesisButton from "component/common/AssignTeacherThesisButton";
 import { a11yProps, AntTab, AntTabs, TabPanel } from "component/tab";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useAssignTeacherRole, useAssignThesis } from "action";
+import { request } from "api";
+import { successNoti, errorNoti } from "utils/notification";
+
 function AssignTeacherAndThesisToDefenseJury() {
   const { id, juryId } = useParams();
+  const navigate = useNavigate();
   const defenseJury = useFetchData(`/defense-jury/${juryId}`);
   const teacherList = useFetchData("/defense-jury/teachers");
   const availableThesisList = useFetchData(
@@ -24,6 +29,52 @@ function AssignTeacherAndThesisToDefenseJury() {
     "Danh sách giáo viên",
     "Danh sách đồ án",
   ];
+
+  const assignedTeacher = useAssignTeacherRole(
+    (state) => state.assignedTeacher
+  );
+  const assignedThesis = useAssignThesis((state) => state.assignedThesis);
+  const clearAssignedTeacher = useAssignTeacherRole(
+    (state) => state.clearAssignedTeacher
+  );
+
+  const clearAssignedThesis = useAssignThesis(
+    (state) => state.clearAssignedThesis
+  );
+
+  const onAssignTeacherAndThesis = () => {
+    if (assignedTeacher?.length === 0) {
+      return errorNoti("Bạn hãy lựa chọn giáo viên", true);
+    }
+    if (assignedThesis?.length === 0) {
+      return errorNoti("Bạn hãy lựa chọn đồ án vào hội đồng", true);
+    }
+    request(
+      "post",
+      "/defense-jury/assign",
+      (res) => {
+        successNoti("Phân chia hội đồng thành công", true);
+        clearAssignedTeacher();
+        clearAssignedThesis();
+        return navigate(-1);
+      },
+      {
+        onError: (e) => {
+          const errorMessage = e?.message;
+          console.log(e?.message, true);
+          errorNoti(errorMessage, true);
+        },
+      },
+      {
+        defenseJuryId: juryId,
+        defenseJuryTeacherRole: assignedTeacher?.map((item) => ({
+          teacherName: item?.id,
+          roleId: item?.role,
+        })),
+        thesisIdList: assignedThesis,
+      }
+    ).then();
+  };
 
   return (
     <>
@@ -62,7 +113,7 @@ function AssignTeacherAndThesisToDefenseJury() {
             {availableThesisList && (
               <ElementAddThesis availableThesisList={availableThesisList} />
             )}
-            <AssignTeacherThesisButton juryId={juryId} />
+            <AssignTeacherThesisButton onClick={onAssignTeacherAndThesis} />
           </TabPanel>
         </form>
       </Box>

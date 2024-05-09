@@ -172,13 +172,13 @@ function CreateThesis(props) {
 
   const displayedTeacherOptions = useMemo(
     () =>
-      listTeacher?.filter((option) =>
+      searchTeacherText !== "" ? listTeacher?.filter((option) =>
         containsText(option.teacherName, searchTeacherText)
-      ),
+      ) : listTeacher,
     [searchTeacherText]
   );
   const displayedPlanOptions = useMemo(
-    () => listPlan?.filter((option) => containsText(option.name, searchThesisPlanText)),
+    () => searchThesisPlanText !== "" ? listPlan?.filter((option) => containsText(option.name, searchThesisPlanText)) : listPlan,
     [searchThesisPlanText]
   );
 

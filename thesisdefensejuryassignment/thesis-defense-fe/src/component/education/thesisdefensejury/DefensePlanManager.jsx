@@ -89,6 +89,10 @@ export default function DefensePlanManager() {
         >
           Tạo hội đồng mới
         </PrimaryButton>
+        <PrimaryButton onClick={() => { navigate('assign-automatically') }} sx={{ float: "right", marginRight: "16px" }}>
+          Phân chia hội đồng tự động
+        </PrimaryButton>
+
       </Box>
       <StandardTable
         title={"Danh sách hội đồng bảo vệ"}
