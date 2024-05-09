@@ -2,16 +2,13 @@ package thesisdefensejuryassignment.thesisdefenseserver.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.DefenseJury;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.ThesisDefensePlan;
-import thesisdefensejuryassignment.thesisdefenseserver.entity.TrainingProgram;
-import thesisdefensejuryassignment.thesisdefenseserver.models.AssignTeacherAndThesisToDefenseJuryIM;
-import thesisdefensejuryassignment.thesisdefenseserver.or_tools.AssignTeacherAndThesisToDefenseJury;
+import thesisdefensejuryassignment.thesisdefenseserver.models.UpdateThesisDefensePlanIM;
 import thesisdefensejuryassignment.thesisdefenseserver.repo.ThesisDefensePlanRepo;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Log4j2
 @AllArgsConstructor
@@ -21,6 +18,7 @@ public class ThesisDefensePlanServiceImpl implements ThesisDefensePlanService {
 
 
     private ThesisDefensePlanRepo graduationTermRepo;
+
     @Override
     public List<ThesisDefensePlan> getAllThesisDefensePlan() {
 
@@ -31,6 +29,7 @@ public class ThesisDefensePlanServiceImpl implements ThesisDefensePlanService {
     public ThesisDefensePlan createThesisDefensePlan(ThesisDefensePlan graduationTerm) {
         return graduationTermRepo.save(graduationTerm);
     }
+
     @Override
     public ThesisDefensePlan getThesisDefensePlanById(String id) {
         ThesisDefensePlan foundDefensePlan = graduationTermRepo.findById(id).orElse(null);
@@ -46,17 +45,17 @@ public class ThesisDefensePlanServiceImpl implements ThesisDefensePlanService {
 //                .collect(Collectors.toList());
 
         return thesisDefensePlanList.stream().filter(
-                thesisDefensePlan -> thesisDefensePlan
-                        .getDefenseJuries()
-                        .stream()
-                        .anyMatch(
-                        defenseJury -> defenseJury
-                                .getDefenseJuryTeacherRoles()
+                        thesisDefensePlan -> thesisDefensePlan
+                                .getDefenseJuries()
                                 .stream()
-                                .anyMatch(defenseJuryTeacherRole -> defenseJuryTeacherRole
-                                        .getTeacher()
-                                        .getId()
-                                        .equals(teacherId))))
+                                .anyMatch(
+                                        defenseJury -> defenseJury
+                                                .getDefenseJuryTeacherRoles()
+                                                .stream()
+                                                .anyMatch(defenseJuryTeacherRole -> defenseJuryTeacherRole
+                                                        .getTeacher()
+                                                        .getId()
+                                                        .equals(teacherId))))
                 .toList();
     }
 
@@ -117,6 +116,19 @@ public class ThesisDefensePlanServiceImpl implements ThesisDefensePlanService {
                                                         .equals(teacherId) && defenseJuryTeacherRole.getRole().getId() == PRESIDENT_ROLE)))
                 .toList();
 
+    }
+
+    @Override
+    public ThesisDefensePlan updateThesisDefensePlan(String id, UpdateThesisDefensePlanIM graduationTerm) {
+        ThesisDefensePlan thesisDefensePlan = graduationTermRepo.findById(id).orElse(null);
+        if (thesisDefensePlan == null) return null;
+        thesisDefensePlan.setId(graduationTerm.getId());
+        thesisDefensePlan.setDescription(graduationTerm.getDescription());
+        thesisDefensePlan.setName(graduationTerm.getName());
+        thesisDefensePlan.setEndDate(graduationTerm.getEndDate());
+        thesisDefensePlan.setStartDate(graduationTerm.getStartDate());
+        thesisDefensePlan.setSemester(graduationTerm.getSemester());
+        return graduationTermRepo.save(thesisDefensePlan);
     }
 
 }

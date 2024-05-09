@@ -17,6 +17,7 @@ import React, { useState } from "react";
 import { request } from "../../../api";
 import { SubmitSuccess } from "../programmingcontestFE/SubmitSuccess";
 import { useForm } from "react-hook-form";
+import { errorNoti, successNoti } from "utils/notification";
 const useStyles = makeStyles((theme) => ({
   modal: {
     display: "flex",
@@ -42,8 +43,6 @@ export default function ModalCreateThesisDefensePlan({
   handleToggle,
 }) {
   const classes = useStyles();
-  const [showSubmitSuccess, setShowSubmitSuccess] = useState(false);
-  const [openAlert, setOpenAlert] = useState(false);
   const {
     register,
     handleSubmit,
@@ -65,16 +64,18 @@ export default function ModalCreateThesisDefensePlan({
       (res) => {
         console.log(res.data);
         if (res.data === "Create successfully") {
-          setShowSubmitSuccess(true);
-          setOpenAlert(true);
+          // setShowSubmitSuccess(true);
+          // setOpenAlert(true);
+          successNoti('Bạn vừa tạo đợt bảo vệ mới thành công', true)
+          setTimeout(() => {
+            handleClose();
+            handleToggle();
+          }, 3000);
         } else {
-          setShowSubmitSuccess(false);
-          setOpenAlert(true);
+          errorNoti('Thêm mới thất bại', true)
+          // setShowSubmitSuccess(false);
+          // setOpenAlert(true);
         }
-        setTimeout(() => {
-          handleClose();
-          handleToggle();
-        }, 3000);
       },
       {
         onError: (e) => {
@@ -85,9 +86,7 @@ export default function ModalCreateThesisDefensePlan({
     ).then();
   }
   const onSubmit = (data) => {
-    console.log(data);
     createThesisDefensePlan(data);
-
     // history.push({
     //     pathname: `/thesis`,
     //   });
@@ -195,20 +194,6 @@ export default function ModalCreateThesisDefensePlan({
               </Button>
               {/* {alert ? <Alert severity="error">{alertContent}</Alert> : <></>} */}
             </CardActions>
-            {openAlert === true ? (
-              <div>
-                {showSubmitSuccess === true ? (
-                  <SubmitSuccess
-                    showSubmitSuccess={showSubmitSuccess}
-                    content={"Bạn vừa tạo đợt bảo vệ mới thành công"}
-                  />
-                ) : (
-                  <Alert severity="error">Thêm mới thất bại</Alert>
-                )}
-              </div>
-            ) : (
-              <></>
-            )}
           </Card>
         </form>
       </Fade>

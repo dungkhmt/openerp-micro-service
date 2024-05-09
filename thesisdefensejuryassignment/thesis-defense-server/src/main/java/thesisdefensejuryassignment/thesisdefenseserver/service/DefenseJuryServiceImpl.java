@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import thesisdefensejuryassignment.thesisdefenseserver.dto.UpdateDefenseJuryDTO;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.*;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.embedded.DefenseJuryTeacherRole;
 import thesisdefensejuryassignment.thesisdefenseserver.models.*;
@@ -166,6 +167,31 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         );
         assignTeacherAndThesisToDefenseJury.assignThesisAndTeacherToDefenseJury();
         return "Check the console";
+    }
+
+    @Override
+    public int updateDefenseJury(UpdateDefenseJuryIM updateDefenseJuryIM) {
+        DefenseJury defenseJury = defenseJuryRepo.findById(UUID.fromString(updateDefenseJuryIM.getId())).orElse(null);
+        if (defenseJury== null) return -1;
+        DefenseRoom defenseRoom = defenseRoomRepo.findById(updateDefenseJuryIM.getDefenseRoomId()).orElse(null);
+        if (defenseRoom == null) return -1;
+        DefenseSession defenseSession = defenseSessionRepo.findById(updateDefenseJuryIM.getDefenseSessionId()).orElse(null);
+
+        if (defenseSession == null) return -1;
+        List<AcademicKeyword> academicKeywordList = new ArrayList<>();
+        for (String keyword: updateDefenseJuryIM.getAcademicKeywordList()){
+            AcademicKeyword academicKeyword = academicKeywordRepo.findById(keyword).orElse(null);
+            if (academicKeyword == null) return -1;
+            academicKeywordList.add(academicKeyword);
+        }
+        defenseJury.setName(updateDefenseJuryIM.getName());
+        defenseJury.setMaxThesis(updateDefenseJuryIM.getMaxThesis());
+        defenseJury.setDefenseSession(defenseSession);
+        defenseJury.setDefenseRoom(defenseRoom);
+        defenseJury.setAcademicKeywordList(academicKeywordList);
+        defenseJury.setDefenseDate(updateDefenseJuryIM.getDefenseDate());
+        DefenseJury updatedDefenseJury = defenseJuryRepo.save(defenseJury);
+        return 1;
     }
 
 
