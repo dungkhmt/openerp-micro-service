@@ -17,14 +17,13 @@ const UserEducation = () => {
 
     const [allEducation, setAllEducation] = useState([])
     const [user, setUser] = useState({})
+
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
-        }).then();
-    }, [])
-    useEffect(() => {
-        request("get", "/education/user/dungpq", (res) => {
-            setAllEducation(res.data)
+            request("get", `/education/user/${res.data.id}`, (res) => {
+                setAllEducation(res.data)
+            }).then();
         }).then();
     }, [])
 

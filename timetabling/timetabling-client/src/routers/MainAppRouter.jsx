@@ -14,6 +14,7 @@ import CourseTimeTablingRouter from "./CourseTimeTablingRouter";
 import GeneralTimeTablingRouter from "./GeneralTimeTablingRouter";
 import ComputerLabTimeTabling from "./ComputerLabTimeTablingRouter";
 import TaRecruitmentRouter from "./TaRecruitmentRouter";
+import ThesisDefensePlanAssignmentRouter from "./ThesisDefensePlanAssignmentRouter";
 import MainPage from "views/mainPage";
 
 const styles = {
@@ -66,6 +67,10 @@ function MainAppRouter(props) {
           <PrivateRoute
             component={TaRecruitmentRouter}
             path="/ta-recruitment"
+          />
+          <PrivateRoute
+            component={ThesisDefensePlanAssignmentRouter}
+            path="/thesis"
           />
           <Route component={NotFound} />
         </Switch>
