@@ -36,6 +36,8 @@ function EducationCard({education}) {
   const handleClose = () => {
       setOpen(false);
   };
+
+
   return (
     <Card className={classes.card} style={{ width: "100%" }}>
       <CardContent className={classes.cardContent}>
