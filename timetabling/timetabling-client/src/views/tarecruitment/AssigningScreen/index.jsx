@@ -23,7 +23,7 @@ import styles from "./index.style";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
-  pageSize: 5,
+  pageSize: 10,
 };
 
 const AssigningScreen = () => {
