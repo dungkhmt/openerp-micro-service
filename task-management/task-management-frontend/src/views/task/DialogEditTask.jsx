@@ -67,11 +67,11 @@ const DialogEditTask = ({ open, setOpen }) => {
       });
       toast.success("Cập nhật nhiệm vụ thành công");
       setIsUpdate(!isUpdate);
+      setOpen(false);
     } catch (e) {
       console.error(e);
       toast.error("Cập nhật nhiệm vụ thất bại. Vui lòng thử lại sau.");
     } finally {
-      setOpen(false);
       setUpdateLoading(false);
     }
   };
