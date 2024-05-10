@@ -13,12 +13,21 @@
 .h-menu {
   gap: 2rem;
 }
+
+.h-menu button {
+  color: var(--secondary);
+  background-color: var(--black);
+  border: none;
+  margin: 0 10px;
+}
 .h-menu > *:hover {
   cursor: pointer;
 }
 .menu-icon {
   display: none;
 }
+
+
 
 @media (max-width: 768px) {
   .menu-icon {

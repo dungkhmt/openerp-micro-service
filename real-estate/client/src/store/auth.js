@@ -12,14 +12,21 @@ const authSlice = createSlice ({
     initialState,
     reducers: {
         login_success: (state,action) => {
-            state.token = action.data;
+            state.token = action.payload;
             state.isLoggedIn = true;
+            localStorage.setItem('token', action.payload);
+        },
+
+        logout_success: (state, action) => {
+            state.isLoggedIn = false;
+            state.token = null;
         }
     }
 })
 
 export const {
-    login_success
+    login_success,
+    logout_success
 } = authSlice.actions;
 
 export default authSlice.reducer;

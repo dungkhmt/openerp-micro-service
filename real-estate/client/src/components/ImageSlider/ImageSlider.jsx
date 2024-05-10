@@ -84,7 +84,6 @@ const ImageSlider = ({ images }) => {
                     </button>
                 ))}
             </div>
-            {/*<div id="after-image-slider-controls" />*/}
         </section>
     )
 }

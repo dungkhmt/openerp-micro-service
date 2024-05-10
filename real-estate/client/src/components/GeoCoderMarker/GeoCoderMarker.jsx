@@ -1,17 +1,13 @@
 import React, {useEffect, useState} from 'react'
 import {Marker, Popup, useMap} from 'react-leaflet'
-import L from 'leaflet'
+import L, {Icon} from 'leaflet'
 import "leaflet/dist/leaflet.css"
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import {apiGetPosition} from "../../services/AppRequest";
 
-const DefaulIcon = L.icon({
-    iconUrl: icon,
-    iconSize: [20, 20], // Kích thước của biểu tượng
-    // shadowUrl: iconShadow
+const customIcon = new Icon({
+    iconUrl: require('../../images/placeholder.png'),
+    iconSize: [20, 20]
 })
-L.Marker.prototype.options.icon = DefaulIcon
 
 const GeoCoderMarker = ({address, setPosition}) => {
     const map = useMap()
@@ -34,7 +30,7 @@ const GeoCoderMarker = ({address, setPosition}) => {
     }, [address])
     return (
         <Marker position={positionMarker}
-                icon={DefaulIcon}
+                icon={customIcon}
         >
             <Popup/>
         </Marker>

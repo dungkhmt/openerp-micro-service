@@ -5,9 +5,10 @@ import PostRequest from "../../services/PostRequest";
 import {toast} from "react-toastify";
 import "./ListPageSell.css"
 import FilterSell from "../../components/FilterSell/FilterSell";
-import {Button, Pagination} from "@mantine/core";
+import {Pagination, ScrollArea} from "@mantine/core";
 
 const ListPageSell = ({}) => {
+
     const [listPost, setListPost] = useState([]);
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(10);
@@ -42,7 +43,6 @@ const ListPageSell = ({}) => {
         const postRequest = new PostRequest();
         postRequest.getPageSell(params)
             .then((response) => {
-                console.log(response)
                 if (response.code === 200) {
                     setListPost(response.data);
                     setTotalPages(response.metadata.totalPages);
@@ -54,25 +54,34 @@ const ListPageSell = ({}) => {
     }
 
     useEffect(() => {
-        console.log("gia tri truyen di", params)
         getListPostSell(params);
     }, [page, params]);
 
     return (
         <div className="listPage">
-            <div className="flexColCenter filter" style={{flex: 1}}>
+            <div className="flexCenter filter">
                 <FilterSell setParams={setParams}/>
             </div>
-            <div className="postContainer" style={{flex: 3}}>
-                {listPost.map(item => (
-                    <div className="cardContainer" style={{margin: "20px 0"}}>
-                        <CardSell key={item.postSellId} item={item}/>
-                    </div>
-                ))}
-                <Pagination total={totalPages} value={params.page} onChange={handleChangePage} />            </div>
 
-            <div className="flexColCenter mapContainer" style={{flex: 2}}>
-                <MarkerMap posts={listPost}/>
+            <div className="flexCenter post_map_container"
+            >
+                <div className="postContainer"
+                     style={{flex: 3}}
+                >
+                    <Pagination total={totalPages} value={params.page} onChange={handleChangePage}/>
+
+                    <ScrollArea h={"100%"}>
+                        {listPost.map(item => (
+                            <div className="cardContainer" style={{margin: "20px 0"}}>
+                                <CardSell key={item.postSellId} item={item}/>
+                            </div>
+                        ))}
+                    </ScrollArea>
+                </div>
+
+                <div className="mapContainer">
+                    <MarkerMap posts={listPost}/>
+                </div>
             </div>
         </div>
     )

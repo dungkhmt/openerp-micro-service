@@ -1,75 +1,114 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import "./Header.css";
-import { BiMenuAltRight } from "react-icons/bi";
-import { getMenuStyles } from "../../utils/common";
+import {BiMenuAltRight} from "react-icons/bi";
+import {getMenuStyles} from "../../utils/common";
 import useHeaderColor from "../../hooks/useHeaderColor";
 import OutsideClickHandler from "react-outside-click-handler";
-import { Link, NavLink } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
+import {Link, NavLink, useNavigate} from "react-router-dom";
+import {useDispatch, useSelector} from 'react-redux'
+import {logout_success} from "../../store/auth";
 import ProfileMenu from "../ProfileMenu/ProfileMenu";
+import {Button, Menu} from '@mantine/core'
 // import useAuthCheck from "../../hooks/useAuthCheck.jsx";
 
 const Header = () => {
-  const [menuOpened, setMenuOpened] = useState(false);
-  const headerColor = useHeaderColor();
-  const [modalOpened, setModalOpened] = useState(false);
-  const { loginWithRedirect, isAuthenticated, user, logout } = useAuth0();
-  // const { validateLogin } = useAuthCheck();
+    const navigate = useNavigate();
+    const [menuOpened, setMenuOpened] = useState(false);
+    const headerColor = useHeaderColor();
+    const [modalOpened, setModalOpened] = useState(false);
+
+    const token = useSelector((state) => state.auth.token);
+    const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+    const current_account = useSelector((state) => state.account.currentData)
+    const dispatch = useDispatch()
+
+    const logout = () => {
+        dispatch(logout_success());
+    }
+    // const { validateLogin } = useAuthCheck();
 
 
-  // const handleAddPropertyClick = () => {
-  //   if (validateLogin()) {
-  //     setModalOpened(true);
-  //   }
-  // };
-  return (
-    <section className="h-wrapper" style={{ background: headerColor }}>
-      <div className="flexCenter innerWidth paddings h-container">
-        {/* logo */}
-        <Link to="/">
-          <img src="./logo192.png" alt="logo" width={100} />
-        </Link>
+    // const handleAddPropertyClick = () => {
+    //   if (validateLogin()) {
+    //     setModalOpened(true);
+    //   }
+    // };
+    return (
+        <section className="h-wrapper" style={{background: headerColor}}>
+            <div className="flexCenter innerWidth paddings h-container">
+                {/* logo */}
+                <Link to="/">
+                    <img src="./logo192.png" alt="logo" width={100}/>
+                </Link>
 
-        {/* menu */}
-        <OutsideClickHandler
-          onOutsideClick={() => {
-            setMenuOpened(false);
-          }}
-        >
-          <div
-            // ref={menuRef}
-            className="flexCenter h-menu"
-            style={getMenuStyles(menuOpened)}
-          >
-            <NavLink to="/properties">Properties</NavLink>
+                {/* menu */}
+                <OutsideClickHandler
+                    onOutsideClick={() => {
+                        setMenuOpened(false);
+                    }}
+                >
+                    <div
+                        // ref={menuRef}
+                        className="flexCenter h-menu"
+                        style={getMenuStyles(menuOpened)}
+                    >
+                        <Menu>
+                            <Menu.Target>
+                                <button>Danh Sách Tin</button>
+                            </Menu.Target>
+                            <Menu.Dropdown>
+                                <Menu.Item onClick={()=> navigate("/buy/properties", {replace: true})}>
+                                    Tin Mua
+                                </Menu.Item>
+                                <Menu.Item onClick={()=> navigate("/sell/properties", {replace: true})}>
+                                    Tin Bán
+                                </Menu.Item>
+                            </Menu.Dropdown>
+                        </Menu>
+                        {/*<NavLink to="/sell/properties"></NavLink>*/}
 
-            <a href="mailto:zainkeepscode@gmail.com">Contact</a>
+                        {/* add property */}
 
-            {/* add property */}
-            <Link to="/postSell">Add property</Link>
-            <Link to="/postBuy">Buy</Link>
-            {/*<AddPropertyModal opened={modalOpened} setOpened={setModalOpened} />*/}
-            {/*/!* login button *!/*/}
-            {/*{!isAuthenticated ? (*/}
-            {/*  <button className="button" onClick={loginWithRedirect}>*/}
-            {/*    Login*/}
-            {/*  </button>*/}
-            {/*) : (*/}
-            {/*  <ProfileMenu user={user} logout={logout} />*/}
-            {/*)}*/}
-          </div>
-        </OutsideClickHandler>
+                        {isLoggedIn && (
+                            <Menu>
+                                <Menu.Target>
+                                    <button>Đăng Tin</button>
+                                </Menu.Target>
+                                <Menu.Dropdown>
+                                    <Menu.Item onClick={()=> navigate("/postBuy", {replace: true})}>
+                                        Tin Mua
+                                    </Menu.Item>
+                                    <Menu.Item onClick={()=> navigate("/postSell", {replace: true})}>
+                                        Tin Bán
+                                    </Menu.Item>
+                                </Menu.Dropdown>
+                            </Menu>
+                        )}
 
-        {/* for medium and small screens */}
-        <div
-          className="menu-icon"
-          onClick={() => setMenuOpened((prev) => !prev)}
-        >
-          <BiMenuAltRight size={30} />
-        </div>
-      </div>
-    </section>
-  );
+                        {/*<AddPropertyModal opened={modalOpened} setOpened={setModalOpened} />*/}
+                        {/* login button */}
+                        {!isLoggedIn ? (
+                            <Button>
+                                <NavLink to={"/login"}>Đăng Nhập</NavLink>
+                            </Button>
+                        ) : (
+                            <div>
+                                <ProfileMenu user={current_account} logout={logout}/>
+                            </div>
+                        )}
+                    </div>
+                </OutsideClickHandler>
+
+                {/* for medium and small screens */}
+                <div
+                    className="menu-icon"
+                    onClick={() => setMenuOpened((prev) => !prev)}
+                >
+                    <BiMenuAltRight size={30}/>
+                </div>
+            </div>
+        </section>
+    );
 };
 
 export default Header;
