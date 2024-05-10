@@ -2,6 +2,7 @@ import {Box, Button, MultiSelect, NumberInput, Select, Textarea, TextInput} from
 import React, {useEffect, useState} from "react";
 import {apiGetPublicDistrict, apiGetPublicProvinces} from "../../services/AppRequest";
 import PostRequest from "../../services/PostRequest";
+import {toast} from "react-toastify";
 
 const PostBuy = () => {
 
@@ -119,7 +120,16 @@ const PostBuy = () => {
     useEffect(() => {
         const request = new PostRequest();
         console.log("goi api", propertyDetails);
-        request.addPostBuy(propertyDetails);
+        request.addPostBuy(propertyDetails)
+            .then((response) => {
+                const status = response.code;
+                if (status === 200) {
+                    toast.success("Đăng bài thành công")
+                } else {
+                    toast.error(response.data.message)
+                }
+            })
+        // request.addPostBuy(propertyDetails);
     }, [propertyDetails]);
 
 

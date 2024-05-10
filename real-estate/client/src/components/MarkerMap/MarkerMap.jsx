@@ -1,5 +1,7 @@
 import {MapContainer, TileLayer} from "react-leaflet";
 import React, {useEffect, useState} from "react";
+import "./MarkerMap.css"
+
 import Pin from "../Pin/Pin";
 import 'leaflet/dist/leaflet.css';
 import { v4 as uuidv4 } from 'uuid';
@@ -47,12 +49,13 @@ const MarkerMap = ({posts}) => {
                     // center={[10 , 105]}
                     zoom={7}
                     scrollWheelZoom={false}
-                    style={{
-                        height: "100%",
-                        width: "100%",
-                        // marginTop: "20px",
-                        zIndex: 999,
-                    }}
+                              className='map'
+                    // style={{
+                    //     height: "100%",
+                    //     width: "100%",
+                    //     marginTop: "20px",
+                    //     zIndex: 999,
+                    // }}
                 >
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

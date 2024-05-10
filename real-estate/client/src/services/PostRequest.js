@@ -2,12 +2,12 @@ import BaseRequest from "./BaseRequest";
 
 export default class PostRequest extends BaseRequest {
     addPostSell = async (data) => {
-        const url = "/public/post/sell";
+        const url = "/post/sell";
         return await this.post(url, data);
     }
 
     addPostBuy(data) {
-        const url = "/public/post/buy";
+        const url = "/post/buy";
         return this.post(url, data);
     }
 

@@ -18,7 +18,7 @@ const PostSellDetail = () => {
                 const status = response.code;
                 if (status === 200) {
                     setPost(response.data)
-                    console.log("o post",response.data);
+                    // console.log("o post",response.data);
                 } else {
                     toast.error(response.data.message)
                     navigate("/", {replace: true});

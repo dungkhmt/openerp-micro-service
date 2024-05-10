@@ -1,8 +1,18 @@
 import axios from "axios";
 import qs from 'qs';
+import {setAuthorizationToRequest} from "../utils/authenticate";
+import {useSelector} from "react-redux";
 const urlPrefix = 'http://localhost:2805';
 
 export default class BaseRequest {
+    constructor() {
+        const token = localStorage.getItem('token');
+        console.log('token', token);
+        if (token !== "") {
+            setAuthorizationToRequest(token);
+        }
+    }
+
     async get(url, params) {
         try {
             const config = {
@@ -32,6 +42,7 @@ export default class BaseRequest {
     }
 
     async _errorHandler(error) {
-        console.log(error);
+        // console.log(error);
+        return error.response.data;
     }
 }

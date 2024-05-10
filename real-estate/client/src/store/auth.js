@@ -12,14 +12,25 @@ const authSlice = createSlice ({
     initialState,
     reducers: {
         login_success: (state,action) => {
-            state.token = action.data;
+            // console.log('token duoc save', action)
+            state.token = action.payload;
             state.isLoggedIn = true;
+            localStorage.setItem('token', action.payload);
+            // localStorage.setItem('isLoggedIn', "true")
+        },
+
+        logout_success: (state, action) => {
+            state.isLoggedIn = false;
+            state.token = null;
+            // localStorage.setItem('token', "");
+            // localStorage.setItem('isLoggedIn', "false")
         }
     }
 })
 
 export const {
-    login_success
+    login_success,
+    logout_success
 } = authSlice.actions;
 
 export default authSlice.reducer;

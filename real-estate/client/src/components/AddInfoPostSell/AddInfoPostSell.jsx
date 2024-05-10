@@ -97,8 +97,6 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
     const handleNext = (e) => {
         e.preventDefault();
 
-        console.log("anh duoc save", imageUrls)
-
         setPropertyDetails({
             province: province,
             district: district,
@@ -179,6 +177,7 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
     }, [typeProperty]);
     // xu ly upload va xoa anh
 
+    console.log("vi tri", position)
 
     return (
         <div>
