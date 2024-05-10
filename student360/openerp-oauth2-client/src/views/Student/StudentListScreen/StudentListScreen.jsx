@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import StandardTable from "../../../components/table/StandardTable";
 import { request } from "api";
 import { formatDecimal } from "../../../utils/number";
+import withScreenSecurity from "../../../components/common/withScreenSecurity";
 // import { Tooltip } from "@mui/material";
 import { Link } from "react-router-dom";
 
@@ -100,4 +101,5 @@ function StudentListScreen() {
   );
 }
 
-export default StudentListScreen;
+const screenName = "MENU_STUDENT.STUDENT_LIST_STATISTICS";
+export default withScreenSecurity(StudentListScreen, screenName, true);

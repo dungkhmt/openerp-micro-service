@@ -25,17 +25,15 @@ import { GiTeacher } from "react-icons/gi";
 import { buildMapPathMenu } from "utils/MenuUtils";
 import { general } from "./menuconfig/general";
 import { student } from "./menuconfig/student";
-import { teacher } from "./menuconfig/teacher";
 import { user } from "./menuconfig/user";
-import { demo } from "./menuconfig/demo";
+import { result } from "./menuconfig/result";
 
 export const MENUS = [];
 
 MENUS.push(general);
 MENUS.push(student);
+MENUS.push(result);
 MENUS.push(user);
-MENUS.push(teacher);
-MENUS.push(demo);
 
 export const menuIconMap = new Map();
 
