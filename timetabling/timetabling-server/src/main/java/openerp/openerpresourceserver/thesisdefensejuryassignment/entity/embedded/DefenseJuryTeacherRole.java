@@ -8,11 +8,13 @@ import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.DefenseJ
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.Role;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.Teacher;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "defense_jury_teacher")
 @AllArgsConstructor
 @NoArgsConstructor
-public class DefenseJuryTeacherRole {
+public class DefenseJuryTeacherRole implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "serial")

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
 
 @NoArgsConstructor
 @Table(name = "thesis_defense_plan")
-public class ThesisDefensePlan {
+public class ThesisDefensePlan implements Serializable {
     @Id
     @Column(updatable = false, nullable = false, name = "id")
     private String id;
