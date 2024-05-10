@@ -34,6 +34,7 @@ import { findJob } from "./menuconfig/FindingJob";
 import { company } from "./menuconfig/company";
 import { userInfomation } from "./menuconfig/userInfomation";
 import { analyseCV } from "./menuconfig/analyseCV";
+
 export const MENUS = [];
 
 MENUS.push(general);

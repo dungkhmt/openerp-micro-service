@@ -20,13 +20,12 @@ import { CircularProgress, Snackbar } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 
 const ExperienceDetail = ({ Experience,  open, onClose }) => {
+
     const [loading, setLoading] = useState(false);
     const [openSnackbar, setOpenSnackbar] = useState(false);
-
-    const [allCV, setAllCV] = useState([])
-    const [selectedCVName, setSelectedCVName] = useState()
-    const [experience, setExperience] = useState({})
+    const [experience, setExperience] = useState(Experience)
     const [user, setUser] = useState({})
+
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
@@ -37,14 +36,6 @@ const ExperienceDetail = ({ Experience,  open, onClose }) => {
         onClose();
     };
 
-    const [submitForm, setSubmitForm] = useState({})
-
-    useEffect(() => {
-        request("get", "/employee-cv/user/dungpq", (res) => {
-            setAllCV(res.data)
-        }).then();
-    }, [])
-
     const sleep = (milliseconds) => {
         return new Promise(resolve => setTimeout(resolve, milliseconds));
     }
@@ -53,12 +44,11 @@ const ExperienceDetail = ({ Experience,  open, onClose }) => {
         e.preventDefault()
         setLoading(true);
         await sleep(2000);
-        let submitToServerForm = experience
-        let data = fetchUserState()
-
+        let submitToServerForm = {...Experience, ...experience}
+        submitToServerForm.user = user
         console.log(submitToServerForm)
         console.log(user)
-        request("post", `/cv-application/user/dungpq}`, (res) => {
+        request("post", `/experience`, (res) => {
             console.log(res);
         }, (err) => {
             console.log(err);
@@ -78,7 +68,7 @@ const ExperienceDetail = ({ Experience,  open, onClose }) => {
     function goToUrl(url) {
         window.location.href = url;
     }
-    let allCVArray = allCV.map(e => { return { title: e.employeeCV.title, id: e.employeeCV.id } })
+
     return (<>
         <div>
             <Dialog onClose={handleClose} open={open} maxWidth="md" fullWidth={true} sx={{ maxHeight: 'lg' }} fullHeight={true}>
@@ -89,31 +79,31 @@ const ExperienceDetail = ({ Experience,  open, onClose }) => {
                             <Typography>Company name</Typography>
                         </Grid>
                         <Grid item xs={11}>
-                            <TextField fullWidth label="Company name" value={Experience.schoolName} variant="outlined" name="companyName" onChange={handleInputChange} />
+                            <TextField fullWidth label="Company name" value={experience.companyName} variant="outlined" name="companyName" onChange={handleInputChange} />
                         </Grid>
                         <Grid item xs={11} container  style={{ backgroundColor: "white" }}  paddingLeft={"50px"}>
                             <Typography >Working position</Typography>
                         </Grid>
                         <Grid item xs={11}>
-                            <TextField fullWidth label="Working position" value={Experience.major} variant="outlined" name="workingPosition" onChange={handleInputChange} />
+                            <TextField fullWidth label="Working position" value={experience.workingPosition} variant="outlined" name="workingPosition" onChange={handleInputChange} />
                         </Grid>
                         <Grid item xs={11} container  style={{ backgroundColor: "white" }} display="flex" paddingTop={"50px"}>
                             <Typography >Responsibility</Typography>
                         </Grid>
                         <Grid item xs={11}>
-                            <TextField fullWidth label="Responsibility" value={Experience.responsibility} variant="outlined" name="responsibility" onChange={handleInputChange} />
+                            <TextField fullWidth label="Responsibility" value={experience.responsibility} variant="outlined" name="responsibility" onChange={handleInputChange} />
                         </Grid>                        
                         <Grid item xs={11} container  style={{ backgroundColor: "white" }} display="flex" paddingTop={"50px"}>
                             <Typography >Starting time</Typography>
                         </Grid>
                         <Grid item xs={11}>
-                            <TextField fullWidth label="Starting time" value={Experience.startingTime} variant="outlined" name="startingTime" onChange={handleInputChange} />
+                            <TextField fullWidth label="Starting time" value={experience.startingTime} variant="outlined" name="startingTime" onChange={handleInputChange} />
                         </Grid>
                         <Grid item xs={11} container  style={{ backgroundColor: "white" }} display="flex" paddingTop={"50px"}>
                             <Typography >Ending time</Typography>
                         </Grid>
                         <Grid item xs={11}>
-                            <TextField fullWidth label="Ending time" value={Experience.endingTime} variant="outlined" name="endingTime" onChange={handleInputChange} />
+                            <TextField fullWidth label="Ending time" value={experience.endingTime} variant="outlined" name="endingTime" onChange={handleInputChange} />
                         </Grid>
 
                         <Snackbar

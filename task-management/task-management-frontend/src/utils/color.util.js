@@ -114,5 +114,5 @@ export const getProgressColor = (progress) => {
   if (progress < 30) return "error";
   if (progress < 70) return "warning";
   if (progress < 90) return "success";
-  return "primary";
+  return "info";
 };

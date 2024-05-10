@@ -3,12 +3,16 @@ import { DataGrid } from "@mui/x-data-grid";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { UserAvatar } from "../../components/common/avatar/UserAvatar";
 import TableToolbar from "../../components/mui/table/Toolbar";
 import { useDebounce } from "../../hooks/useDebounce";
 import { usePreventOverflow } from "../../hooks/usePreventOverflow";
 import { ProjectService } from "../../services/api/project.service";
 
+/**
+ * @type {import("@mui/x-data-grid").GridColDef[]}
+ */
 const columns = [
   {
     flex: 0.2,
@@ -19,6 +23,8 @@ const columns = [
         {params.row.code}
       </Typography>
     ),
+    description: "Mã dự án là duy nhất và không thể thay đổi",
+    display: "flex",
   },
   {
     flex: 0.4,
@@ -40,6 +46,7 @@ const columns = [
         </Tooltip>
       </Typography>
     ),
+    display: "flex",
   },
   {
     flex: 0.1,
@@ -52,6 +59,7 @@ const columns = [
         {params.row.role}
       </Typography>
     ),
+    display: "flex",
   },
   {
     flex: 0.15,
@@ -69,6 +77,7 @@ const columns = [
           Không xác định
         </Typography>
       ),
+    display: "flex",
   },
   {
     flex: 0.2,
@@ -82,6 +91,7 @@ const columns = [
         {new Date(params.row.createdStamp).toLocaleDateString()}
       </Typography>
     ),
+    display: "flex",
   },
 ];
 
@@ -148,37 +158,42 @@ const Projects = () => {
   }, [window.innerHeight]);
 
   return (
-    <Card sx={{ boxShadow: (theme) => theme.shadows[1], mr: 2 }}>
-      <Typography variant="h5" sx={{ m: 2 }}>
-        Danh sách dự án
-      </Typography>
-      <Box ref={ref}>
-        <DataGrid
-          pagination
-          rows={rows}
-          rowCount={total}
-          columns={columns}
-          sortingMode="server"
-          paginationMode="server"
-          pageSizeOptions={[10, 20, 50]}
-          onSortModelChange={handleSortModel}
-          onPaginationModelChange={setPaginationModel}
-          paginationModel={paginationModel}
-          slots={{ toolbar: TableToolbar }}
-          loading={loading}
-          slotProps={{
-            baseButton: {
-              variant: "outlined",
-            },
-            toolbar: {
-              value: searchValue,
-              clearSearch: () => setSearchValue(""),
-              onChange: (event) => setSearchValue(event.target.value),
-            },
-          }}
-        />
-      </Box>
-    </Card>
+    <>
+      <Helmet>
+        <title>Danh sách dự án | Task management</title>
+      </Helmet>
+      <Card sx={{ boxShadow: (theme) => theme.shadows[1], mr: 2 }}>
+        <Typography variant="h5" sx={{ m: 2 }}>
+          Danh sách dự án
+        </Typography>
+        <Box ref={ref}>
+          <DataGrid
+            pagination
+            rows={rows}
+            rowCount={total}
+            columns={columns}
+            sortingMode="server"
+            paginationMode="server"
+            pageSizeOptions={[10, 20, 50]}
+            onSortModelChange={handleSortModel}
+            onPaginationModelChange={setPaginationModel}
+            paginationModel={paginationModel}
+            slots={{ toolbar: TableToolbar }}
+            loading={loading}
+            slotProps={{
+              baseButton: {
+                variant: "outlined",
+              },
+              toolbar: {
+                value: searchValue,
+                clearSearch: () => setSearchValue(""),
+                onChange: (event) => setSearchValue(event.target.value),
+              },
+            }}
+          />
+        </Box>
+      </Card>
+    </>
   );
 };
 

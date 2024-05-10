@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { Helmet } from "react-helmet";
 import {
   setSort,
   resetSort,
@@ -50,7 +51,7 @@ const TaskAssigned = () => {
   const { statuses } = useSelector((state) => state.status);
   const dispatch = useDispatch();
 
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState(tasksCache[pagination.page] ?? []);
   const [search, setSearch] = useState("");
   const searchDebounce = useDebounce(search, 1000);
 
@@ -58,6 +59,9 @@ const TaskAssigned = () => {
 
   const [isFirstFetch, setIsFirstFetch] = useState(true);
 
+  /**
+   * @type {import("@mui/x-data-grid").GridColDef[]}
+   */
   const columns = [
     {
       flex: 0.25,
@@ -91,6 +95,7 @@ const TaskAssigned = () => {
           {row.category && <TaskCategory category={row.category} />}
         </Box>
       ),
+      display: "flex",
     },
     {
       flex: 0.15,
@@ -120,6 +125,7 @@ const TaskAssigned = () => {
             </Typography>
           </Tooltip>
         ),
+      display: "flex",
     },
     {
       flex: 0.1,
@@ -132,6 +138,7 @@ const TaskAssigned = () => {
         const status = statuses?.find((s) => s.statusId === row.statusId);
         return status && <TaskStatus status={status} />;
       },
+      display: "flex",
     },
     {
       flex: 0.1,
@@ -157,6 +164,7 @@ const TaskAssigned = () => {
           </Box>
         );
       },
+      display: "flex",
     },
     {
       flex: 0.1,
@@ -171,6 +179,7 @@ const TaskAssigned = () => {
           </Typography>
         </Box>
       ),
+      display: "flex",
     },
     {
       flex: 0.1,
@@ -186,6 +195,7 @@ const TaskAssigned = () => {
             <UserAvatar user={row.creator} key={row.creator.id} />
           </AvatarGroup>
         ),
+      display: "flex",
     },
     {
       flex: 0.1,
@@ -198,6 +208,7 @@ const TaskAssigned = () => {
           {dayjs(row.createdStamp).format("DD/MM/YYYY") ?? ""}
         </Typography>
       ),
+      display: "flex",
     },
   ];
 
@@ -309,84 +320,92 @@ const TaskAssigned = () => {
   }, [window.innerHeight]);
 
   return (
-    <Card sx={{ mr: 2 }}>
-      <CardContent sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Typography variant="h6" component="div">
-            Danh sách các nhiệm vụ được giao
-          </Typography>
-          <Tooltip title="Lọc">
-            <Filter
-              onFilter={onFilter}
-              filters={filters}
-              text="Filters"
+    <>
+      <Helmet>
+        <title>Danh sách công việc được giao | Task management</title>
+      </Helmet>
+      <Card sx={{ mr: 2 }}>
+        <CardContent sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography variant="h6" component="div">
+              {totalCount} nhiệm vụ được giao
+            </Typography>
+            <Tooltip title="Lọc">
+              <Filter
+                onFilter={onFilter}
+                filters={filters}
+                text="Filters"
+                sx={{
+                  minWidth: 0,
+                  borderRadius: "11px",
+                  padding: (theme) => theme.spacing(0, 2),
+                  "& svg": {
+                    fontSize: "1rem !important",
+                  },
+                }}
+                excludeFields={["assigneeId"]}
+                members={creators}
+              />
+            </Tooltip>
+          </Box>
+          <Box>
+            <TextField
+              size="small"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Tìm kiếm..."
+              InputProps={{
+                startAdornment: (
+                  <Box sx={{ mr: 2, display: "flex" }}>
+                    <Icon icon="mdi:magnify" fontSize={20} />
+                  </Box>
+                ),
+                endAdornment: (
+                  <IconButton
+                    size="small"
+                    title="Clear"
+                    aria-label="Clear"
+                    onClick={() => setSearch("")}
+                  >
+                    <Icon icon="mdi:close" fontSize={20} />
+                  </IconButton>
+                ),
+              }}
               sx={{
-                minWidth: 0,
-                borderRadius: "11px",
-                padding: (theme) => theme.spacing(0, 2),
-                "& svg": {
-                  fontSize: "1rem !important",
+                width: {
+                  xs: 1,
+                  sm: "auto",
+                },
+                "& .MuiInputBase-root > svg": {
+                  mr: 2,
                 },
               }}
-              excludeFields={["assigneeId"]}
-              members={creators}
             />
-          </Tooltip>
-        </Box>
-        <Box>
-          <TextField
-            size="small"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Tìm kiếm..."
-            InputProps={{
-              startAdornment: (
-                <Box sx={{ mr: 2, display: "flex" }}>
-                  <Icon icon="mdi:magnify" fontSize={20} />
-                </Box>
-              ),
-              endAdornment: (
-                <IconButton
-                  size="small"
-                  title="Clear"
-                  aria-label="Clear"
-                  onClick={() => setSearch("")}
-                >
-                  <Icon icon="mdi:close" fontSize={20} />
-                </IconButton>
-              ),
+          </Box>
+        </CardContent>
+        <Box ref={ref}>
+          <DataGrid
+            rows={rows}
+            loading={fetchLoading}
+            rowCount={totalCount}
+            columns={columns}
+            pageSizeOptions={[10, 25, 50]}
+            pagination
+            paginationMode="server"
+            paginationModel={{
+              page: pagination.page,
+              pageSize: pagination.size,
             }}
-            sx={{
-              width: {
-                xs: 1,
-                sm: "auto",
-              },
-              "& .MuiInputBase-root > svg": {
-                mr: 2,
-              },
+            onPaginationModelChange={handlePaginationModel}
+            onSortModelChange={handleSortModel}
+            rowHeight={70}
+            localeText={{
+              noRowsLabel: "Không có dữ liệu",
             }}
           />
         </Box>
-      </CardContent>
-      <Box ref={ref}>
-        <DataGrid
-          rows={rows}
-          loading={fetchLoading}
-          rowCount={totalCount}
-          columns={columns}
-          pageSizeOptions={[10, 25, 50]}
-          pagination
-          paginationMode="server"
-          paginationModel={{
-            page: pagination.page,
-            pageSize: pagination.size,
-          }}
-          onPaginationModelChange={handlePaginationModel}
-          onSortModelChange={handleSortModel}
-          rowHeight={70}
-        />
-      </Box>
-    </Card>
+      </Card>
+    </>
   );
 };
 

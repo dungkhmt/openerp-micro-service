@@ -67,10 +67,11 @@ public class SecurityConfig {
                         authorizeRequests -> authorizeRequests
                                 .requestMatchers("/export-problem/*").permitAll())
                 .authorizeHttpRequests(
-                        authorizeRequests -> authorizeRequests.requestMatchers("/v2/api-docs")
+                        authorizeRequests -> authorizeRequests
+                                .requestMatchers("/v3/api-docs/**")
                                 .permitAll())
                 .authorizeHttpRequests(
-                        authorizeRequests -> authorizeRequests.requestMatchers("/swagger-ui")
+                        authorizeRequests -> authorizeRequests.requestMatchers("/swagger-ui/**")
                                 .permitAll())
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/public/**").permitAll())

@@ -2,6 +2,7 @@ import { Grid, Card, Box, Skeleton, Divider } from "@mui/material";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import PerfectScrollbar from "react-perfect-scrollbar";
+import { Helmet } from "react-helmet";
 import { useTaskContext } from "../../../../../hooks/useTaskContext";
 import { TaskViewLeft } from "../../../../../views/task/TaskViewLeft";
 import TaskViewRight from "../../../../../views/task/TaskViewRight";
@@ -63,8 +64,8 @@ const RightLoading = () => (
 );
 
 const Task = () => {
-  const { error, isLoading: taskLoading } = useTaskContext();
-  const { fetchLoading: projectLoading } = useSelector(
+  const { task, error, isLoading: taskLoading } = useTaskContext();
+  const { project, fetchLoading: projectLoading } = useSelector(
     (state) => state.project
   );
   const { ref, updateMaxHeight } = usePreventOverflow();
@@ -85,27 +86,38 @@ const Task = () => {
   const loading = taskLoading || projectLoading;
 
   return (
-    <Box
-      ref={ref}
-      sx={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        overflowY: "auto",
-        mt: 1.5,
-      }}
-    >
-      <PerfectScrollbar style={{ flex: 1 }}>
-        <Grid container spacing={5}>
-          <Grid item lg={9} xs={12}>
-            {loading ? <LeftLoading /> : <TaskViewLeft />}
+    <>
+      <Helmet>
+        <title>
+          {`${
+            task?.name?.length > 50
+              ? `${task.name.slice(0, 50)}...`
+              : task?.name ?? ""
+          } | ${project?.name ?? ""} | Task management`}
+        </title>
+      </Helmet>
+      <Box
+        ref={ref}
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          overflowY: "auto",
+          mt: 1.5,
+        }}
+      >
+        <PerfectScrollbar style={{ flex: 1 }}>
+          <Grid container spacing={5}>
+            <Grid item lg={9} xs={12}>
+              {loading ? <LeftLoading /> : <TaskViewLeft />}
+            </Grid>
+            <Grid item lg={3} xs={12}>
+              {loading ? <RightLoading /> : <TaskViewRight />}
+            </Grid>
           </Grid>
-          <Grid item lg={3} xs={12}>
-            {loading ? <RightLoading /> : <TaskViewRight />}
-          </Grid>
-        </Grid>
-      </PerfectScrollbar>
-    </Box>
+        </PerfectScrollbar>
+      </Box>
+    </>
   );
 };
 

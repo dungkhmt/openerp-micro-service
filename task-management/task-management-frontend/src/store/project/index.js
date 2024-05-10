@@ -8,7 +8,8 @@ export const handleRejected = (state, action) => {
 
 export const fetchProject = createAsyncThunk(
   "project/fetchProject",
-  async (projectId) => {
+  async (projectId, { dispatch }) => {
+    dispatch(setLoading(true));
     const project = await ProjectService.getProject(projectId);
     return project;
   }
@@ -46,7 +47,7 @@ export const addMember = createAsyncThunk(
 const initialState = {
   project: null,
   members: [],
-  fetchLoading: true,
+  fetchLoading: false,
   errors: [],
 };
 
@@ -56,6 +57,12 @@ export const projectSlice = createSlice({
   reducers: {
     setLoading: (state, action) => {
       state.fetchLoading = action.payload;
+    },
+    resetProject: (state) => {
+      state.project = initialState.project;
+      state.members = initialState.members;
+      state.fetchLoading = true;
+      state.errors = [];
     },
   },
   extraReducers: (builder) => {
@@ -73,6 +80,6 @@ export const projectSlice = createSlice({
   },
 });
 
-export const { setLoading } = projectSlice.actions;
+export const { setLoading, resetProject } = projectSlice.actions;
 
 export default projectSlice.reducer;

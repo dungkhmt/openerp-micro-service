@@ -60,13 +60,16 @@ const ProjectViewTasks = () => {
   const [search, setSearch] = useState(searchStore);
   const searchDebounce = useDebounce(search, 1000);
 
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState(tasksCache[pagination.page] ?? []);
   const [openAddTask, setOpenAddTask] = useState(false);
 
   const [isInitialized, setIsInitialized] = useState(false);
 
   const { ref, updateHeight } = usePreventOverflow();
 
+  /**
+   * @type {import("@mui/x-data-grid").GridColDef[]}
+   */
   const columns = [
     {
       flex: 0.3,
@@ -111,6 +114,7 @@ const ProjectViewTasks = () => {
           </Box>
         );
       },
+      display: "flex",
     },
     {
       flex: 0.2,
@@ -133,6 +137,7 @@ const ProjectViewTasks = () => {
           </Typography>
         );
       },
+      display: "flex",
     },
     {
       flex: 0.2,
@@ -159,6 +164,7 @@ const ProjectViewTasks = () => {
           </Box>
         );
       },
+      display: "flex",
     },
     {
       flex: 0.15,
@@ -177,6 +183,7 @@ const ProjectViewTasks = () => {
         ) : (
           <Typography> - </Typography>
         ),
+      display: "flex",
     },
     {
       flex: 0.1,
@@ -189,6 +196,7 @@ const ProjectViewTasks = () => {
           {dayjs(row.createdStamp).format("DD/MM/YYYY") ?? ""}
         </Typography>
       ),
+      display: "flex",
     },
     {
       flex: 0.1,
@@ -206,6 +214,7 @@ const ProjectViewTasks = () => {
           {row.dueDate ? dayjs(row.dueDate).format("DD/MM/YYYY") : " - "}
         </Typography>
       ),
+      display: "flex",
     },
   ];
 

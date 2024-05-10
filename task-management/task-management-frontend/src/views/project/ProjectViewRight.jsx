@@ -11,6 +11,7 @@ import { ProjectViewOverview } from "./overview/ProjectViewOverview";
 import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
 import { ProjectViewGanttChart } from "./gantt-chart/ProjectViewGanttChart";
 import { usePreventOverflow } from "../../hooks/usePreventOverflow";
+import { ProjectViewSetting } from "./setting/ProjectViewSetting";
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   "& .MuiTabs-indicator": {
@@ -168,7 +169,7 @@ const ProjectViewRight = () => {
             <ProjectViewMembers />
           </TabPanel>
           <TabPanel sx={{ p: 0, pr: 2 }} value="setting">
-            Quản lý
+            <ProjectViewSetting />
           </TabPanel>
         </PerfectScrollbar>
       </Box>

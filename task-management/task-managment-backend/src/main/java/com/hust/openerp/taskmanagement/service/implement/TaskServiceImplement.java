@@ -1,6 +1,7 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -67,6 +68,9 @@ public class TaskServiceImplement implements TaskService {
         List<TaskLogDetail> taskLogDetails = new ArrayList<>();
         var task = modelMapper.map(taskForm, Task.class);
         var createdTime = new Date();
+        var dateFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        dateFormatter.setTimeZone(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
+
         task.setCreatorId(creatorId);
         task.setCreatedStamp(createdTime);
         task.setLastUpdatedStamp(createdTime);
@@ -116,13 +120,13 @@ public class TaskServiceImplement implements TaskService {
 
         if (task.getFromDate() != null) {
             taskLogDetails.add(TaskLogDetail.builder().event("set").field("fromDate").oldValue("")
-                    .newValue(new SimpleDateFormat("dd-MM-yyyy").format(task.getFromDate()))
+                    .newValue(dateFormatter.format(task.getFromDate()))
                     .build());
         }
 
         if (task.getDueDate() != null) {
             taskLogDetails.add(TaskLogDetail.builder().event("set").field("dueDate").oldValue("")
-                    .newValue(new SimpleDateFormat("dd-MM-yyyy").format(task.getDueDate()))
+                    .newValue(dateFormatter.format(task.getDueDate()))
                     .build());
         }
 
@@ -186,12 +190,12 @@ public class TaskServiceImplement implements TaskService {
     public Page<TaskDTO> getTasksAssignedToUser(Pageable pageable, String assignee, @Nullable String search) {
         // replace "assignee:value" if exist in search by "assignee:`assignee`"
         if (search != null && !search.equals("")) {
-            if (search.contains("assigneeId:"))
-                search = search.replaceAll("assigneeId:[^ ]+", "assigneeId:" + assignee);
+            if (search.contains(Task_.ASSIGNEE_ID + ":"))
+                search = search.replaceAll(Task_.ASSIGNEE_ID + ":[^ ]+", Task_.ASSIGNEE_ID + ":" + assignee);
             else
-                search = "( " + search + " ) AND assigneeId:" + assignee;
+                search = "( " + search + " ) AND " + Task_.ASSIGNEE_ID + ":" + assignee;
         } else {
-            search = "assigneeId:" + assignee;
+            search = Task_.ASSIGNEE_ID + ":" + assignee;
         }
 
         // default sort by due date
@@ -243,6 +247,9 @@ public class TaskServiceImplement implements TaskService {
         }
         Date updatedTime = new Date();
 
+        var dateFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        dateFormatter.setTimeZone(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
+
         TaskLog taskLog = TaskLog.builder().taskId(taskId).creatorId(updateBy).createdAt(updatedTime)
                 .comment(taskForm.getNote()).build();
 
@@ -264,17 +271,17 @@ public class TaskServiceImplement implements TaskService {
         if (taskForm.getFromDate() != null && !taskForm.getFromDate().equals(task.getFromDate())) {
             taskLogDetails.add(TaskLogDetail.builder().event(task.getFromDate() == null ? "set" : "update")
                     .field("fromDate")
-                    .oldValue(task.getFromDate() != null ? new SimpleDateFormat("dd-MM-yyyy").format(task.getFromDate())
+                    .oldValue(task.getFromDate() != null ? dateFormatter.format(task.getFromDate())
                             : "")
-                    .newValue(new SimpleDateFormat("dd-MM-yyyy").format(taskForm.getFromDate())).build());
+                    .newValue(dateFormatter.format(taskForm.getFromDate())).build());
             task.setFromDate(taskForm.getFromDate());
         }
 
         if (taskForm.getDueDate() != null && !taskForm.getDueDate().equals(task.getDueDate())) {
             taskLogDetails
                     .add(TaskLogDetail.builder().event(task.getDueDate() == null ? "set" : "update").field("dueDate")
-                            .oldValue(new SimpleDateFormat("dd-MM-yyyy").format(task.getDueDate()))
-                            .newValue(new SimpleDateFormat("dd-MM-yyyy").format(taskForm.getDueDate())).build());
+                            .oldValue(task.getDueDate() != null ? dateFormatter.format(task.getDueDate()) : "")
+                            .newValue(dateFormatter.format(taskForm.getDueDate())).build());
             task.setDueDate(taskForm.getDueDate());
         }
 
@@ -432,6 +439,32 @@ public class TaskServiceImplement implements TaskService {
                                                 .between(root.get(Task_.DUE_DATE), fromDate, toDate)));
         return taskRepository.findAll(specs, Sort.by(Task_.CREATED_STAMP).ascending()).stream()
                 .map(task -> modelMapper.map(task, TaskGanttDTO.class)).toList();
+    }
+
+    public Page<TaskDTO> getTasksCreatedByUser(Pageable pageable, String creator, @Nullable String search) {
+        // replace "creatorId:value" if exist in search by "creatorId:`creator`"
+        if (search != null && !search.equals("")) {
+            if (search.contains(Task_.CREATOR_ID))
+                search = search.replaceAll(Task_.CREATOR_ID + ":[^ ]+", Task_.CREATOR_ID + ":" + creator);
+            else
+                search = "( " + search + " ) AND " + Task_.CREATOR_ID + ":" + creator;
+        } else {
+            search = Task_.CREATOR_ID + ":" + creator;
+        }
+
+        // default sort by due date
+        if (pageable.getSort().isUnsorted()) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                    Sort.by(Task_.DUE_DATE).ascending());
+        }
+
+        GenericSpecificationsBuilder<Task> builder = new GenericSpecificationsBuilder<>();
+        var specs = builder.build(new CriteriaParser().parse(search), TaskSpecification::new);
+        return taskRepository.findAll(specs, pageable).map(entity -> {
+            var dto = modelMapper.map(entity, TaskDTO.class);
+            dto.setProject(modelMapper.map(entity.getProject(), ProjectDTO.class));
+            return dto;
+        });
     }
 
     private TaskDTO convertToDto(Task task) {
