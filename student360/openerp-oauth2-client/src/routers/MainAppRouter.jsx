@@ -2,12 +2,12 @@ import { LinearProgress } from "@mui/material";
 import { Layout } from "layout";
 import { drawerWidth } from "layout/sidebar/SideBar";
 import { Suspense, useEffect } from "react";
+import { useKeycloak } from "@react-keycloak/web";
 import { Route, Switch, useLocation } from "react-router-dom";
 import { useNotificationState } from "state/NotificationState";
 import NotFound from "views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import TeacherRouter from "./TeacherRouter";
-import DemoScreen from "views/DemoScreen";
 import StudentListScreen from "views/Student/StudentListScreen/StudentListScreen";
 import StudentDetailStatistics from "views/Student/StudentDetailStatistics/StudentDetailStatistics";
 import Dashboard from "views/Dashboard";
@@ -28,6 +28,7 @@ const styles = {
 function MainAppRouter(props) {
   const location = useLocation();
   const notificationState = useNotificationState();
+  const { keycloak } = useKeycloak();
 
   useEffect(() => {
     notificationState.open.set(false);
@@ -38,13 +39,16 @@ function MainAppRouter(props) {
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
           <Route component={Dashboard} exact path="/" />
-          <Route component={DemoScreen} exact path="/demo" />
-          <Route component={TeacherRouter} path="/teacher" />
-          <Route component={StudentListScreen} exact path="/students" />
-          <Route
+          <TeacherRouter component={StudentListScreen} exact path="/students" />
+          <PrivateRoute
             component={StudentDetailStatistics}
             exact
             path="/students/statistics-detail/:id"
+          />
+          <PrivateRoute
+            component={StudentDetailStatistics}
+            exact
+            path={"/student_result"}
           />
 
           <Route component={NotFound} />
