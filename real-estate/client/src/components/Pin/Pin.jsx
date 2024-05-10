@@ -6,7 +6,6 @@ import {Icon} from "leaflet";
 import {Link} from "react-router-dom";
 
 const Pin = ({post}) => {
-    // console.log("gia tri ow pin", post)
     const uniqueId = uuidv4();
 
     const customIcon = new Icon({

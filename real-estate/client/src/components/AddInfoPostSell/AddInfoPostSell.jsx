@@ -10,6 +10,7 @@ import {v4} from "uuid";
 import {apiGetPublicDistrict, apiGetPublicProvinces} from "../../services/AppRequest";
 import {CKEditor} from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import {toast, ToastContainer} from "react-toastify";
 
 const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => {
 
@@ -89,7 +90,7 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                 })
                 .catch(error => console.log(error));
         } else {
-            alert("Chỉ được phép tải lên tối đa 4 ảnh");
+            toast.error("Đăng tối đa 4 ảnh")
             e.target.value = null;
         }
     };
@@ -158,7 +159,6 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
     }, [province])
 
     useEffect(() => {
-        console.log(acreage, price)
         if (acreage > 0) {
             setPricePerM2(price / acreage);
         }
@@ -175,9 +175,6 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
             setIsLand(false)
         }
     }, [typeProperty]);
-    // xu ly upload va xoa anh
-
-    console.log("vi tri", position)
 
     return (
         <div>
@@ -429,6 +426,17 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                 Xem Trước
             </Button>
 
+            <ToastContainer
+                position="top-left"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
         </div>
     )
 }

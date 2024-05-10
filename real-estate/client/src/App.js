@@ -2,7 +2,6 @@ import './App.css';
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import Layout from "./components/Layout/Layout";
 import React, {useEffect} from "react";
-import Home from "./pages/Home";
 import PostSell from "./pages/PostSell/PostSell";
 import PostBuy from "./pages/PostBuy/PostBuy";
 import PostSellDetail from "./pages/PostSellDetail/PostSellDetail";
@@ -11,7 +10,7 @@ import Oauth2Redirect from "./pages/Oauth2Redirect/Oauth2Redirect";
 import Login from "./pages/Login/Login";
 import {useDispatch, useSelector} from "react-redux";
 import AuthRequest from "./services/AuthRequest";
-import account, {get_current_account} from "./store/account";
+import account, {set_current_account} from "./store/account";
 
 function App() {
     const isLoggedIn = useSelector(state => state.auth.isLoggedIn)
@@ -24,7 +23,7 @@ function App() {
                 .then((response) => {
                     const status = response.code;
                     if (status === 200) {
-                        dispatch(get_current_account(response.data));
+                        dispatch(set_current_account(response.data));
                     }
                 })
         }

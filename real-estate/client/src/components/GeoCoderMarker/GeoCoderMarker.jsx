@@ -2,15 +2,12 @@ import React, {useEffect, useState} from 'react'
 import {Marker, Popup, useMap} from 'react-leaflet'
 import L, {Icon} from 'leaflet'
 import "leaflet/dist/leaflet.css"
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import {apiGetPosition} from "../../services/AppRequest";
 
 const customIcon = new Icon({
     iconUrl: require('../../images/placeholder.png'),
     iconSize: [20, 20]
 })
-// L.Marker.prototype.options.icon = DefaulIcon
 
 const GeoCoderMarker = ({address, setPosition}) => {
     const map = useMap()
