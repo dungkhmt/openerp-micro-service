@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
 @Table(name = "academic_keyword") // Entity map voi bang academic_keyword
 @NoArgsConstructor
 @AllArgsConstructor
-public class AcademicKeyword {
+public class AcademicKeyword implements Serializable {
     @Id
     @Column(name = "keyword")
     private String keyword;

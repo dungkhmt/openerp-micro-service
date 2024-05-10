@@ -2,6 +2,8 @@ package openerp.openerpresourceserver.thesisdefensejuryassignment.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.UpdateDefenseJuryDTO;
@@ -11,7 +13,6 @@ import openerp.openerpresourceserver.thesisdefensejuryassignment.models.*;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.or_tools.AssignTeacherAndThesisToDefenseJury;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.repo.*;
 
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 
 public class DefenseJuryServiceImpl implements DefenseJuryService {
+
+    private static Logger logger = LogManager.getLogger(DefenseJuryServiceImpl.class);
 
     @Autowired
     private DefenseJuryRepo defenseJuryRepo;
@@ -93,7 +96,11 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
 
     @Override
     public DefenseJury getDefenseJuryByID(UUID id) {
-        return defenseJuryRepo.findById(id).orElse(null);
+
+        DefenseJury defenseJury = defenseJuryRepo.findById(id).orElse(null);
+        assert defenseJury != null;
+        logger.info(defenseJury.getName());
+        return  defenseJury;
     }
 
     @Override

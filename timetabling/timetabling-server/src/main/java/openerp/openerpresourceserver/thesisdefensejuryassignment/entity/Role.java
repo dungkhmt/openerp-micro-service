@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.embedded.DefenseJuryTeacherRole;
+
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
@@ -14,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "defense_jury_teacher_role") // Entity map voi bang defense_jury
 
-public class Role {
+public class Role implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
