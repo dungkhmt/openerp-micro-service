@@ -20,10 +20,10 @@ public class PostSellService {
 	@Qualifier("postSellImpl")
 	private PostSellDao postSellDao;
 
-	public void createPostSell(CreatePostSellRequestDto requestDto) {
+	public void createPostSell(CreatePostSellRequestDto requestDto, Long accountId) {
 		Long now = System.currentTimeMillis();
 		PostSellEntity post = new PostSellEntity();
-		post.setAuthorId(1L);
+		post.setAuthorId(accountId);
 
 		post.setProvince(requestDto.getProvince());
 		post.setDistrict(requestDto.getDistrict());
