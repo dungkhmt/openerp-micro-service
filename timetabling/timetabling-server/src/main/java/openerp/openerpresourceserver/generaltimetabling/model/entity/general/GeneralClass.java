@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import jakarta.persistence.*;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +22,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "timetabling_general_classes")
-public class GeneralClassOpened {
+public class GeneralClass {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -38,20 +39,22 @@ public class GeneralClassOpened {
     private String crew;
     private String openBatch;
     private String course;
+    private Long refClassId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long tempClassId;
+    private Long parentClassId;
     private String groupName;
-    @OneToMany(mappedBy = "generalClassOpened", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "generalClass", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<RoomReservation> timeSlots = new ArrayList<RoomReservation>();
-    @Column(name = "is_seperate_class")
-    private Boolean isSeparateClass = false;
     private String learningWeeks;
-
+    private String foreignLecturer;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        GeneralClassOpened that = (GeneralClassOpened) o;
+        GeneralClass that = (GeneralClass) o;
 
         return Objects.equals(moduleName, that.moduleName) &&
                 Objects.equals(moduleCode, that.moduleCode) &&

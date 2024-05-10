@@ -10,14 +10,14 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "room_reservation")
+@Table(name = "timetabling_room_reservations")
 @Entity
 @Builder
 public class RoomReservation {
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "general_class_opened_id")
+    @JoinColumn(name = "general_class_id")
     @JsonIgnore
-    private GeneralClassOpened generalClassOpened;
+    private GeneralClass generalClass;
     @JsonProperty("startTime")
     private Integer startTime;
     @JsonProperty("endTime")
@@ -37,8 +37,8 @@ public class RoomReservation {
         this.room = room;
     }
 
-    public RoomReservation(GeneralClassOpened gClass, int startTime, int endTime, int weekday, String room) {
-        this.generalClassOpened = gClass;
+    public RoomReservation(GeneralClass gClass, int startTime, int endTime, int weekday, String room) {
+        this.generalClass = gClass;
         this.startTime = startTime;
         this.endTime = endTime;
         this.weekday = weekday;
@@ -47,7 +47,7 @@ public class RoomReservation {
 
     @Override
     public String toString() {
-        return generalClassOpened.getClassCode() + ":" + startTime + "-" + endTime + "/" + "D" + weekday+ "/" + room;
+        return generalClass.getClassCode() + ":" + startTime + "-" + endTime + "/" + "D" + weekday+ "/" + room;
     }
 
 
