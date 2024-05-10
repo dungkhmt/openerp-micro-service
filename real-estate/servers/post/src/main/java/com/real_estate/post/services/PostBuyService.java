@@ -14,10 +14,10 @@ public class PostBuyService {
 	@Qualifier("postBuyImpl")
 	PostBuyDao postBuyDao;
 
-	public void createPostBuy(CreatePostBuyRequestDto requestDto) {
+	public void createPostBuy(CreatePostBuyRequestDto requestDto, Long accountId) {
 		Long now = System.currentTimeMillis(); //
 		PostBuyEntity entity = new PostBuyEntity();
-		entity.setAuthorId(1L);
+		entity.setAuthorId(accountId);
 		entity.setTitle(requestDto.getTitle());
 		entity.setDescription(requestDto.getDescription());
 

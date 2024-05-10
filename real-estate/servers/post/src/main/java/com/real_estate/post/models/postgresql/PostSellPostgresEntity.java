@@ -60,7 +60,7 @@ public class PostSellPostgresEntity {
 	@Column(name = "position")
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "post_sell_postgres_entity_position", joinColumns = @JoinColumn(name = "post_sell_id"))
-	List<Long> position;
+	List<Float> position;
 
 	@Column(name = "province")
 	String province;

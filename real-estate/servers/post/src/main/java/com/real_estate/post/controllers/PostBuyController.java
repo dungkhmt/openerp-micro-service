@@ -2,6 +2,7 @@ package com.real_estate.post.controllers;
 
 import com.real_estate.post.dtos.request.CreatePostBuyRequestDto;
 import com.real_estate.post.dtos.response.ResponseDto;
+import com.real_estate.post.services.AuthenticationService;
 import com.real_estate.post.services.PostBuyService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -11,16 +12,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/public/post/buy")
+@RequestMapping("/post/buy")
 public class PostBuyController {
 	@Autowired
 	PostBuyService buyService;
 
+	@Autowired
+	AuthenticationService authenticationService;
+
 	@PostMapping()
 	@Operation(summary = "create a new post buy", operationId = "buy.createPost")
 	public ResponseEntity<ResponseDto<String>> createPostBuy(@Valid @RequestBody CreatePostBuyRequestDto requestDto) {
-		buyService.createPostBuy(requestDto);
-		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, "ok"));
+		Long accountId = authenticationService.getAccountIdFromContext();
+		buyService.createPostBuy(requestDto, accountId);
+		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, "Đăng tin mua thành công"));
 	}
 
 //	@GetMapping()

@@ -102,6 +102,12 @@
 			<scope>runtime</scope>
 		</dependency>
 
+
+		<!--		send verify gmail-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

@@ -40,8 +40,7 @@ public class TokenProvider {
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
 //        String roles = getRolesOfUser(authentication);
         Map<String, Object> claims = new HashMap<>();
-//        this.generateSecretKey();
-        claims.put("userId", userPrincipal.getId());
+        claims.put("accountId", userPrincipal.getId());
 //        claims.put("scope", roles);
         return Jwts.builder()
                 .setSubject(Long.toString(userPrincipal.getId()))
@@ -52,13 +51,14 @@ public class TokenProvider {
                 .compact();
     }
 
-    public Long getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser()
+    public String getAccountIdFromJwt(String token) {
+        Claims claims = Jwts
+                .parser()
                 .setSigningKey(JWT_SECRET)
                 .parseClaimsJws(token)
                 .getBody();
-
-        return Long.parseLong(claims.getSubject());
+        System.out.println("claims: " + claims);
+        return String.valueOf(claims.get("accountId"));
     }
 
     public boolean validateToken(String authToken) {
