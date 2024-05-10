@@ -3,7 +3,6 @@ package com.hust.openerp.taskmanagement.dto.form;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +16,6 @@ import java.util.Date;
 @NoArgsConstructor
 public class UpdateTaskForm {
     @Nullable
-    @NotBlank
     private String name;
     @Nullable
     private String description;
