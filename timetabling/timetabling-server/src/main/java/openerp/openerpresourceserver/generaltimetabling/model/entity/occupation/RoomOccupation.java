@@ -18,7 +18,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "room_occupation")
+@Table(name = "timetabling_room_occupations")
 public class RoomOccupation {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -19,7 +19,7 @@ import openerp.openerpresourceserver.generaltimetabling.model.entity.general.Gen
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.generaltimetabling.repo.*;
-import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassOpenedService;
+import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +34,9 @@ import java.util.stream.Collectors;
 @Service
 @Log4j2
 @Slf4j
-public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
+public class GeneralClassServiceImp implements GeneralClassService {
 
-    private GeneralClassOpenedRepository gcoRepo;
+    private GeneralClassRepository gcoRepo;
 
     private GroupRepo groupRepo;
 
@@ -239,7 +239,7 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
                     int timeSlotIndex = Integer.parseInt(idString.split("-")[1]) - 1;
                     if (gId == gClass.getId()) {
                         RoomReservation timeSlot = gClass.getTimeSlots().get(timeSlotIndex);
-                        if (timeSlot.getStartTime() != null && timeSlot.getEndTime() != null && timeSlot.getRoom() != null && timeSlot.getWeekday() != null && !timeSlot.getRoom().isEmpty()) {
+                        if (timeSlot.isScheduleNotNull()) {
                             roomOccupationRepo.deleteAllByClassCodeAndStartPeriodAndEndPeriodAndDayIndexAndClassRoom(gClass.getClassCode(), timeSlot.getStartTime(), timeSlot.getEndTime(), timeSlot.getWeekday(), timeSlot.getRoom());
                         }
                         timeSlot.setWeekday(null);
@@ -250,9 +250,8 @@ public class GeneralClassOpenedServiceImp implements GeneralClassOpenedService {
                     }
                 }
             }
-            gcoRepo.saveAll(filteredGeneralClassList);
+            return gcoRepo.saveAll(filteredGeneralClassList);
         }
-        return generalClassList;
     }
 
     @Transactional

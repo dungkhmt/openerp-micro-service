@@ -90,6 +90,7 @@ export const useRoomOccupations = (semester, startDate, weekIndex) => {
       case 12:
         return { hours: 16, minutes: 30 };
       default:
+        console.log("Wrong period: " + period);
         return null;
     }
   };

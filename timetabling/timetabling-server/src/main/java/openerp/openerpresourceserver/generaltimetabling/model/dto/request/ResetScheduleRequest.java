@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.generaltimetabling.model.entity.general;
+package openerp.openerpresourceserver.generaltimetabling.model.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -9,7 +9,7 @@ import openerp.openerpresourceserver.generaltimetabling.model.dto.request.genera
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 
 
-public interface GeneralClassOpenedService {
+public interface GeneralClassService {
     public List<GeneralClass> getGeneralClasses(String semester, String groupName);
     
     public void deleteAllGeneralClasses();
