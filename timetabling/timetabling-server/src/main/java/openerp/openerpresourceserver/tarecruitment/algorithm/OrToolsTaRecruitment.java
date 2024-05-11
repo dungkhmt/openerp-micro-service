@@ -6,57 +6,33 @@ import com.google.ortools.linearsolver.MPObjective;
 import com.google.ortools.linearsolver.MPSolver;
 import com.google.ortools.linearsolver.MPVariable;
 
-public class OptimizeTest {
+public class OrToolsTaRecruitment {
 
-    public static void main(String[] args) {
+    int numClasses;
+    int numStudents;
+    final int maxClassesPerStudent = 4;
+    int maxClassesGotAssign = 0;
+    int[][] request;
+    int[][] conflictBetweenClasses;
+    int[][] result;
 
+
+    public OrToolsTaRecruitment(int numClasses, int numStudents, int[][] request, int[][] conflictBetweenClasses) {
+        this.numClasses = numClasses;
+        this.numStudents = numStudents;
+        this.request = request;
+        this.conflictBetweenClasses = conflictBetweenClasses;
+        result = new int[numStudents][numClasses];
+    }
+
+    public int[][] solving() {
         Loader.loadNativeLibraries();
-
-        int numClasses = 3;
-
-        int numStudents = 3;
-
-        int maxClassesPerStudent = 4;
-
-        int maxClassesGotAssign = 0;
-
-        // Sinh viên yêu cầu vào lớp nào
-//        final int[][] request = {
-//                {0, 1, 1, 0, 0, 0},
-//                {0, 0, 0, 0, 1, 0},
-//                {1, 0, 0, 1, 0, 0},
-//                {0, 0, 1, 0, 0, 0},
-//                {0, 0, 1, 1, 0, 0},
-//                {0, 0, 0, 0, 0, 1}
-//        };
-
-        final int[][] request = {
-                {1, 0, 0},
-                {1, 1, 1},
-                {1, 1, 1}
-        };
-
-        // Các lớp conflict về mặt thời gian với nhau
-//        final int[][] conflictBetweenClasses = new int[][] {
-//                {0, 1, 0, 0, 0, 0},
-//                {1, 0, 0, 0, 0, 0},
-//                {0, 0, 0, 1, 0, 0},
-//                {0, 0, 1, 0, 0, 0},
-//                {0, 0, 0, 0, 0, 1},
-//                {0, 0, 0, 0, 1, 0}
-//        };
-
-        final int[][] conflictBetweenClasses = new int[][] {
-                {0, 0, 0},
-                {0, 0, 0},
-                {0, 0, 0},
-        };
 
         // Create the linear solver with the SCIP backend.
         MPSolver solver = MPSolver.createSolver("SCIP");
         if (solver == null) {
             System.out.println("Could not create solver SCIP");
-            return;
+            throw new RuntimeException("Cant create solver");
         }
 
         // Khởi tạo biến
@@ -66,7 +42,6 @@ public class OptimizeTest {
                 x[i][j] = solver.makeIntVar(0, 1, "");
             }
         }
-        System.out.println("Number of variables = " + solver.numVariables());
 
         // Mỗi lớp chỉ được có 1 sinh viên
         for(int j = 0; j < numClasses; j++) {
@@ -84,7 +59,6 @@ public class OptimizeTest {
             }
         }
 
-
         // Conflict về mặt thời gian các lớp
         for(int i = 0; i < numClasses; i++) {
             for(int j = i + 1; j < numClasses; j++) {
@@ -98,8 +72,6 @@ public class OptimizeTest {
             }
         }
 
-        System.out.println("Number of constraints = " + solver.numConstraints());
-
         // Hàm max
         MPObjective objective = solver.objective();
         for(int i = 0; i < numStudents; i++) {
@@ -112,21 +84,11 @@ public class OptimizeTest {
         final MPSolver.ResultStatus resultStatus = solver.solve();
 
         if (resultStatus == MPSolver.ResultStatus.OPTIMAL) {
-            System.out.println("Objective value = " + objective.value());
+
+            // Gán số lớp tối đa có thể được assign
             maxClassesGotAssign = (int) objective.value();
-            System.out.println("maxClassesGotAssign: " + maxClassesGotAssign);
-            for(int i = 0; i < numStudents; i++) {
-                for(int j = 0; j < numClasses; j++) {
-                    System.out.println("x[" + i + "][" + j + "] = " + x[i][j].solutionValue());
-                }
-            }
-            System.out.println();
-            System.out.println("Problem solved in " + solver.wallTime() + " milliseconds");
-            System.out.println("Problem solved in " + solver.iterations() + " iterations");
-            System.out.println("Problem solved in " + solver.nodes() + " branch-and-bound nodes");
 
-            // PHASE 2
-
+            //////////////////////////////////////////// PHASE 2 ///////////////////////////////////////
             solver.objective().delete();
 
             // Số lớp có sinh viên phải bằng với phase 1
@@ -166,26 +128,23 @@ public class OptimizeTest {
             final MPSolver.ResultStatus resultStatus2 = solver.solve();
 
             if (resultStatus2 == MPSolver.ResultStatus.OPTIMAL) {
-                System.out.println();
-                System.out.println("PHASE 2");
-                System.out.println("Objective2 value = " + classPerStudent.solutionValue());
                 for(int i = 0; i < numStudents; i++) {
                     for(int j = 0; j < numClasses; j++) {
-                        System.out.println("x[" + i + "][" + j + "] = " + x[i][j].solutionValue());
+                        result[i][j] = (int) x[i][j].solutionValue();
                     }
                 }
-                System.out.println();
-                System.out.println("Problem solved in " + solver.wallTime() + " milliseconds");
-                System.out.println("Problem solved in " + solver.iterations() + " iterations");
-                System.out.println("Problem solved in " + solver.nodes() + " branch-and-bound nodes");
-            } else {
-                System.err.println("The problem 2 does not have an optimal solution.");
             }
 
+            else {
+                throw new RuntimeException("Phase 2 don't have solution");
+            }
 
-        } else {
-            System.err.println("The problem does not have an optimal solution.");
         }
 
+        else {
+            throw new RuntimeException("Phase 1 don't have solution");
+        }
+
+        return result;
     }
 }

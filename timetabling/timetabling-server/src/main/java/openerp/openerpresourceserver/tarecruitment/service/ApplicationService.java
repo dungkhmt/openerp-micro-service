@@ -25,7 +25,7 @@ public interface ApplicationService {
 
     Application updateAssignStatus(int id, String status);
 
-    int[][] autoAssignApplication(String semester);
+    void autoAssignApplication(String semester);
 
     byte[] generateExcelFile(String semester) throws IOException;
 }
