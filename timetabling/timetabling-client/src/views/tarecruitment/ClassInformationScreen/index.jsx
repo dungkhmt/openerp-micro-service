@@ -62,10 +62,10 @@ const ClassInformationScreen = () => {
       !formData.semester ||
       !formData.id
     ) {
-      warningNoti("Vui lòng điền đầy đủ thông tin");
+      warningNoti("Vui lòng điền đầy đủ thông tin", 5000);
       return;
     } else if (formData.startPeriod >= formData.endPeriod) {
-      warningNoti("Tiết bắt đầu phải nhỏ hơn tiết kết thúc");
+      warningNoti("Tiết bắt đầu phải nhỏ hơn tiết kết thúc", 5000);
       return;
     } else {
       setOldFormData({ ...formData });
@@ -76,7 +76,7 @@ const ClassInformationScreen = () => {
         {},
         formData
       );
-      successNoti("Cập nhật thông tin lớp học thành công!");
+      successNoti("Cập nhật thông tin lớp học thành công!", 5000);
       setIsEdited(false);
     }
   };
@@ -91,10 +91,12 @@ const ClassInformationScreen = () => {
   };
 
   return (
-    <div>
-      <Typography variant="h4" style={{ fontWeight: "bold" }}>
-        Thông tin lớp học
-      </Typography>
+    <Paper elevation={1} style={{ padding: "1em" }}>
+      <div style={styles.tableToolBar}>
+        <Typography variant="h4" style={{ fontWeight: "bold" }}>
+          Thông tin lớp học
+        </Typography>
+      </div>
       <Paper elevation={3}>
         <div style={styles.content}>
           <div style={styles.firstRow}>
@@ -264,7 +266,7 @@ const ClassInformationScreen = () => {
           </div>
         </div>
       </Paper>
-    </div>
+    </Paper>
   );
 };
 

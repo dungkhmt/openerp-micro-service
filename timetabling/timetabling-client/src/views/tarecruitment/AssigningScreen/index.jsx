@@ -133,7 +133,7 @@ const AssigningScreen = () => {
       },
       {
         onError: (e) => {
-          errorNoti(e.response.data);
+          errorNoti(e.response.data, 5000);
         },
       },
       updatedApplication
@@ -164,7 +164,10 @@ const AssigningScreen = () => {
         const url = window.URL.createObjectURL(new Blob([res.data]));
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", "assign_list.xlsx");
+        link.setAttribute(
+          "download",
+          `Danh-sách-trợ-giảng-học-kì-${SEMESTER}.xlsx`
+        );
         document.body.appendChild(link);
         link.click();
       },
@@ -261,7 +264,7 @@ const AssigningScreen = () => {
     {
       field: "name",
       headerName: "Tên sinh viên",
-      flex: 1,
+      flex: 1.5,
     },
     {
       field: "mssv",
@@ -271,7 +274,7 @@ const AssigningScreen = () => {
     {
       field: "cpa",
       headerName: "CPA",
-      flex: 1,
+      flex: 0.5,
     },
     {
       field: "englishScore",

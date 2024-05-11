@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.tarecruitment.service;
 
+import io.swagger.models.auth.In;
 import openerp.openerpresourceserver.tarecruitment.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.Application;
 
@@ -9,6 +10,14 @@ import java.util.List;
 public interface ApplicationService {
 
     Application createApplication(Application application);
+
+    Application updateApplication(int id, Application application);
+
+    boolean deleteApplication(int id);
+
+    boolean deleteMultiApplication(List<Integer> idList);
+
+    Application getApplicationById(int id);
 
     PaginationDTO<Application> getMyApplications(String userId, int page, int limit);
 
