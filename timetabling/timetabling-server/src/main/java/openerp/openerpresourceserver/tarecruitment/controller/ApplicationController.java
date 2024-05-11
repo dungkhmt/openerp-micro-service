@@ -110,8 +110,8 @@ public class ApplicationController {
 
     @GetMapping("/auto-assign-class/{semester}")
     public ResponseEntity<?> autoAssignClass(@PathVariable String semester) {
-        int[][] graph = applicationService.autoAssignApplication(semester);
-        return ResponseEntity.ok().body(graph);
+        applicationService.autoAssignApplication(semester);
+        return ResponseEntity.ok().body("Success");
     }
 
     @GetMapping("/get-assign-list-file/{semester}")
