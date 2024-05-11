@@ -26,6 +26,7 @@ import UserSkills from "views/personalInfo/UserSkill";
 import UserEducation from "views/personalInfo/UserEducation";
 import UserExperience from "views/personalInfo/UserExperience";
 import AnalyseCV from "views/AnalyseCV";
+import TestPage from "views/mbti-page/test/TestPage";
 
 const styles = {
   loadingProgress: {
@@ -79,6 +80,7 @@ function MainAppRouter(props) {
           <PrivateRoute component={UserExperience} path = "/experience" />
           <PrivateRoute component={UserEducation} path = "/education" />
           <PrivateRoute component={AnalyseCV} path = "/analyse" />
+          <PrivateRoute component={TestPage} path = "/test-page" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>
