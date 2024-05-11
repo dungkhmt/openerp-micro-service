@@ -23,6 +23,7 @@ import java.util.List;
 public class ThesisDefensePlan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     @Column(updatable = false, nullable = false, name = "id")
     private String id;
 

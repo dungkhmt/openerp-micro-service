@@ -90,6 +90,7 @@ export const assignedTasksSlice = createSlice({
       .addCase(fetchAssignedTasks.rejected, (state, action) => {
         state.errors.push(action.error);
         state.fetchLoading = false;
+        throw action.error;
       })
       .addCase(fetchAllAssignedTaskCreator.fulfilled, (state, action) => {
         state.creators = action.payload;

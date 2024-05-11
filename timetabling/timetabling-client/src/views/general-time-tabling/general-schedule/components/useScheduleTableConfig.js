@@ -15,13 +15,11 @@ export const useGeneralTableColumns = (
     {
       headerName: "Mã lớp",
       field: "classCode",
-      editable: true,
       width: 100,
     },
     {
       headerName: "Lớp học",
       field: "studyClass",
-      editable: true,
       width: 150,
     },
     // {
@@ -33,7 +31,6 @@ export const useGeneralTableColumns = (
     {
       headerName: "Tuần học",
       field: "learningWeeks",
-      editable: true,
       width: 120,
     },
     // {
@@ -57,50 +54,52 @@ export const useGeneralTableColumns = (
     {
       headerName: "SL MAX",
       field: "quantityMax",
-      editable: true,
       width: 100,
     },
     {
       headerName: "Loại lớp",
       field: "classType",
-      editable: true,
       width: 100,
     },
     {
       headerName: "Thời lượng",
       field: "mass",
-      editable: true,
       width: 100,
     },
     {
       headerName: "Trạng thái",
       field: "state",
-      editable: true,
       width: 100,
     },
     {
       headerName: "Kíp",
       field: "crew",
-      editable: true,
       width: 100,
     },
-    // {
-    //   headerName: "Đợt",
-    //   field: "openBatch",
-    //   editable: true,
-    //   width: 100,
-    // },
+    {
+      headerName: "Mã lớp cha",
+      field: "parentClassId",
+      width: 100,
+    },
+    {
+      headerName: "Mã lớp tạm thời",
+      field: "tempClassId",
+      width: 100,
+    },
+    {
+      headerName: "Mã lớp tạm thời",
+      field: "refClassId",
+      width: 100,
+    },
     {
       headerName: "Khóa",
       field: "course",
-      editable: true,
       width: 100,
     },
     {
       headerName: "Tiết BĐ",
       field: "startTime",
       width: 80,
-      editable: true,
       renderCell: (params) => {
         return (
           <AutocompleteCell
@@ -123,7 +122,6 @@ export const useGeneralTableColumns = (
       headerName: "Tiết KT",
       field: "endTime",
       width: 80,
-      editable: true,
       renderCell: (params) => (
         <AutocompleteCell
           row={params.row}

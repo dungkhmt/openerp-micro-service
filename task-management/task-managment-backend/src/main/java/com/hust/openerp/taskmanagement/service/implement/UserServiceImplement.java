@@ -76,4 +76,9 @@ public class UserServiceImplement implements UserService {
     public List<User> getUserCreateTaskAssignMe(String userId) {
         return userLoginRepo.getAllUserCreateTaskAssignMe(userId);
     }
+
+    @Override
+    public List<User> getUserAssignTaskAssignMe(String userId) {
+        return userLoginRepo.getAllUserAssignTaskAssignMe(userId);
+    }
 }

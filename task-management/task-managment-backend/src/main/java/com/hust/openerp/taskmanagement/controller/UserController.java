@@ -45,4 +45,9 @@ public class UserController {
     public List<User> getUserCreateTaskAssignMe(Principal principal) {
         return userService.getUserCreateTaskAssignMe(principal.getName());
     }
+
+    @GetMapping("/users/assigned-task-assignee")
+    public List<User> getUserAssignTaskAssignMe(Principal principal) {
+        return userService.getUserAssignTaskAssignMe(principal.getName());
+    }
 }

@@ -20,8 +20,9 @@ import {
 import { useState, useRef, useEffect } from "react";
 import xlsxIcon from "../../../assets/img/xlsx_icon.svg";
 import { request } from "api";
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 
-const ImportDialog = ({ open, handleClose, fetchData }) => {
+const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [file, setFile] = useState(null);
   const [isImportSuccess, setIsImportSuccess] = useState(true);
@@ -32,7 +33,7 @@ const ImportDialog = ({ open, handleClose, fetchData }) => {
     setIsImportSuccess(true);
     setFile(null);
     setActiveStep(0);
-  }, [open]);
+  }, [open, semester]);
 
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -57,7 +58,7 @@ const ImportDialog = ({ open, handleClose, fetchData }) => {
     formData.append("excelFile", file);
     request(
       "post",
-      "/class-call/import-class",
+      `/class-call/import-class/${semester}`,
       (res) => {
         setActiveStep(3);
         setResponse(res.data);
@@ -83,15 +84,14 @@ const ImportDialog = ({ open, handleClose, fetchData }) => {
       <TableContainer component={Paper}>
         <TableHead>
           <TableRow>
-            <TableCell>Mã lớp</TableCell>
-            <TableCell>Mã môn học</TableCell>
-            <TableCell>Tên môn học</TableCell>
-            <TableCell>Phòng học</TableCell>
-            <TableCell>Học kì</TableCell>
-            <TableCell>Ngày</TableCell>
-            <TableCell>Tiết bắt đầu</TableCell>
-            <TableCell>Tiết kết thúc</TableCell>
-            <TableCell>Ghi chú</TableCell>
+            <TableCell width={100}>Mã lớp</TableCell>
+            <TableCell width={150}>Mã môn học</TableCell>
+            <TableCell width={200}>Tên môn học</TableCell>
+            <TableCell width={150}>Phòng học</TableCell>
+            <TableCell width={50}>Ngày</TableCell>
+            <TableCell width={150}>Tiết bắt đầu</TableCell>
+            <TableCell width={150}>Tiết kết thúc</TableCell>
+            <TableCell width={200}>Ghi chú</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -100,10 +100,9 @@ const ImportDialog = ({ open, handleClose, fetchData }) => {
             <TableCell>IT1001</TableCell>
             <TableCell>Tin học đại cương</TableCell>
             <TableCell>B1-301</TableCell>
-            <TableCell>2023-2</TableCell>
-            <TableCell>4</TableCell>
-            <TableCell>1</TableCell>
-            <TableCell>6</TableCell>
+            <TableCell style={{ textAlign: "center" }}>4</TableCell>
+            <TableCell style={{ textAlign: "center" }}>1</TableCell>
+            <TableCell style={{ textAlign: "center" }}>6</TableCell>
             <TableCell>Ghi chú của lớp học 1</TableCell>
           </TableRow>
           <TableRow key="2">
@@ -111,10 +110,9 @@ const ImportDialog = ({ open, handleClose, fetchData }) => {
             <TableCell>IT1002</TableCell>
             <TableCell>Cơ sở dữ liệu</TableCell>
             <TableCell>B1-302</TableCell>
-            <TableCell>2023-2</TableCell>
-            <TableCell>5</TableCell>
-            <TableCell>1</TableCell>
-            <TableCell>6</TableCell>
+            <TableCell style={{ textAlign: "center" }}>5</TableCell>
+            <TableCell style={{ textAlign: "center" }}>1</TableCell>
+            <TableCell style={{ textAlign: "center" }}>6</TableCell>
             <TableCell>Ghi chú của lớp học 2</TableCell>
           </TableRow>
         </TableBody>
@@ -136,7 +134,7 @@ const ImportDialog = ({ open, handleClose, fetchData }) => {
     >
       <DialogTitle sx={{ textAlign: "center", marginTop: "1%" }}>
         <Typography variant="h5" fontWeight="bold">
-          Import danh sách lớp học
+          Import danh sách lớp học cho học kì {semester}
         </Typography>
       </DialogTitle>
       <DialogContent sx={{ padding: "2em" }}>
@@ -261,7 +259,9 @@ const ImportDialog = ({ open, handleClose, fetchData }) => {
                   >
                     Đang xử lý dữ liệu
                   </Typography>
-                  <CircularProgress size={80} thickness={3} />
+                  <div style={{ textAlign: "center", marginTop: "2em" }}>
+                    <CircularProgress size={80} thickness={3} />
+                  </div>
                 </div>
               ) : (
                 <div
@@ -273,15 +273,17 @@ const ImportDialog = ({ open, handleClose, fetchData }) => {
                     justifyContent: "center",
                   }}
                 >
+                  <ReportProblemIcon style={{ fontSize: 200 }} color="error" />
                   <Typography
-                    variant="h4"
-                    style={{ textAlign: "center", fontWeight: "bold" }}
+                    variant="h5"
+                    style={{
+                      textAlign: "center",
+                      fontWeight: "bold",
+                      marginBottom: "2em",
+                    }}
                   >
-                    {response}
+                    {response ? response : "Lỗi không xác định"}
                   </Typography>
-                  <Button onClick={handleClose} variant="contained">
-                    Thoát
-                  </Button>
                 </div>
               )}
             </div>
@@ -341,6 +343,11 @@ const ImportDialog = ({ open, handleClose, fetchData }) => {
               Nhập dữ liệu
             </Button>
           </div>
+        )}
+        {activeStep === 2 && (
+          <Button onClick={handleClose} variant="contained">
+            Thoát
+          </Button>
         )}
         {activeStep === 3 && (
           <Button onClick={handleClose} variant="contained">

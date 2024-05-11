@@ -1,5 +1,6 @@
 import { Route, Switch, useRouteMatch } from "react-router";
 import GeneralGroupScreen from "views/general-time-tabling/general-group-select/GeneralGroupScreen";
+import GeneralPlanClassOpenScreen from "views/general-time-tabling/general-plan-class-open/GeneralPlanClassOpenScreen";
 import GeneralScheduleScreen from "views/general-time-tabling/general-schedule/GeneralScheduleScreen";
 import GeneralUploadScreen from "views/general-time-tabling/general-upload/GeneralUploadScreen";
 import RoomOccupationScreen from "views/general-time-tabling/room-occupation/RoomOccupationScreen";
@@ -9,6 +10,11 @@ export default function GeneralTimeTablingRouter() {
   return (
     <div>
       <Switch>
+        <Route
+          component={GeneralPlanClassOpenScreen}
+          exact
+          path={`${path}/plan-class-open`}
+        ></Route>
         <Route
           component={GeneralUploadScreen}
           exact

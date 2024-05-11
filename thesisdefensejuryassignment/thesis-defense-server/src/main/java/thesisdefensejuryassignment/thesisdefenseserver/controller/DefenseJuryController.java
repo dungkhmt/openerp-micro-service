@@ -6,12 +6,11 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import thesisdefensejuryassignment.thesisdefenseserver.dto.UpdateDefenseJuryDTO;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.DefenseJury;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.Teacher;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.Thesis;
-import thesisdefensejuryassignment.thesisdefenseserver.models.AssignReviewerToThesisIM;
-import thesisdefensejuryassignment.thesisdefenseserver.models.AssignTeacherAndThesisToDefenseJuryIM;
-import thesisdefensejuryassignment.thesisdefenseserver.models.DefenseJuryIM;
+import thesisdefensejuryassignment.thesisdefenseserver.models.*;
 import thesisdefensejuryassignment.thesisdefenseserver.service.DefenseJuryServiceImpl;
 
 import java.security.Principal;
@@ -40,6 +39,18 @@ public class DefenseJuryController {
         return new ResponseEntity<>(createdJury, HttpStatus.OK);
     }
 
+    @PostMapping("/update")
+    public ResponseEntity<UpdateDefenseJuryDTO> updateDefenseJury(
+            @RequestBody UpdateDefenseJuryIM request
+    ){
+        System.out.println("session: " + request.getDefenseSessionId());
+        int isUpdate = juryService.updateDefenseJury(request);
+        if (isUpdate < 1){
+            return new ResponseEntity<>(new UpdateDefenseJuryDTO("Không thể cập nhật hội đồng", 500), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        UpdateDefenseJuryDTO updateDefenseJuryDTO = new UpdateDefenseJuryDTO("cập nhật hội đồng thành công", 201);
+        return new ResponseEntity<>(updateDefenseJuryDTO , HttpStatus.CREATED);
+    }
     @GetMapping("/teachers")
 
     public ResponseEntity<List<Teacher>> getAllTeachers() {
@@ -71,6 +82,7 @@ public class DefenseJuryController {
         return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);
     }
 
+
     @PostMapping("/assign-defense-teacher")
     public ResponseEntity<DefenseJury> assignReviewerToThesis(
             @RequestBody AssignReviewerToThesisIM teacherAndThesisList
@@ -81,4 +93,13 @@ public class DefenseJuryController {
         }
         return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);
     }
+
+    @PostMapping("/assign-automatically")
+    public ResponseEntity<String> assignTeacherAndThesisAutomatically(
+            @RequestBody AssignTeacherToDefenseJuryAutomaticallyIM teacherListAndDefensePlan
+    ) {
+        String message = juryService.assignTeacherAndThesisAutomatically(teacherListAndDefensePlan);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
 }

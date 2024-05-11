@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.helper.MassExtractor;
-import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 
 import java.util.ArrayList;
@@ -22,8 +22,8 @@ import java.util.Scanner;
 public class V1ClassScheduler {
 
     private static class VarArraySolutionPrinter extends CpSolverSolutionCallback {
-        private static List<GeneralClassOpened> classes;
-        public VarArraySolutionPrinter(IntVar[] variables, List<GeneralClassOpened> classes) {
+        private static List<GeneralClass> classes;
+        public VarArraySolutionPrinter(IntVar[] variables, List<GeneralClass> classes) {
             variableArray = variables;
             VarArraySolutionPrinter.classes = classes;
         }
@@ -34,15 +34,15 @@ public class V1ClassScheduler {
             if (solutionCount > 0) return;
             System.out.printf("Solution #%d: time = %.02f s%n", solutionCount, wallTime());
             for (IntVar v : variableArray) {
-                GeneralClassOpened gClass = classes.get(v.getIndex());
-                gClass.getTimeSlots().forEach(rr -> rr.setGeneralClassOpened(null));
+                GeneralClass gClass = classes.get(v.getIndex());
+                gClass.getTimeSlots().forEach(rr -> rr.setGeneralClass(null));
                 gClass.getTimeSlots().clear();
                 RoomReservation newRoomReservation = new RoomReservation(
                         (int)value(v)%6,
                         (int)value(v)%6 + MassExtractor.extract(gClass.getMass())-1,
                         (int)value(v)/6 +1,
                         null) ;
-                newRoomReservation.setGeneralClassOpened(gClass);
+                newRoomReservation.setGeneralClass(gClass);
                 gClass.getTimeSlots().add(newRoomReservation);
                 System.out.printf("  %s = %d%n", v.getName(), value(v));
             }
@@ -76,7 +76,7 @@ public class V1ClassScheduler {
         private final IntVar[] variableArray;
     }
 
-    public static List<GeneralClassOpened> solve(List<GeneralClassOpened> classes) {
+    public static List<GeneralClass> solve(List<GeneralClass> classes) {
         log.info("solve... by or-tools, start to loadNativeLibraries");
         Loader.loadNativeLibraries();
         log.info("solve... by or-tools, loadNativeLibraries -> OK ");
@@ -96,8 +96,8 @@ public class V1ClassScheduler {
 
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
-                GeneralClassOpened classA = classes.get(i);
-                GeneralClassOpened classB = classes.get(j);
+                GeneralClass classA = classes.get(i);
+                GeneralClass classB = classes.get(j);
                 if (!classA.getModuleCode().equals(classB.getModuleCode())) {
                     conflict[i][j] = 1;
                 } else {

@@ -7,6 +7,7 @@ const endPoints = {
   createTask: `/tasks`,
   updateTask: (id) => `/tasks/${id}`,
   getAssignedTasks: `/tasks/assigned-me`,
+  getCreatedTasks: `/tasks/created-by-me`,
   getLogs: (id) => `/tasks/${id}/logs`,
   tasksGantt: "/tasks/gantt",
 };
@@ -85,6 +86,18 @@ const TaskService = {
           to,
           q,
         },
+      });
+      if (response?.data && isFunction(cb)) cb(null, response.data);
+      return response?.data;
+    } catch (e) {
+      if (isFunction(cb)) cb(e);
+      else throw e;
+    }
+  },
+  getCreatedTasks: async (filter, cb) => {
+    try {
+      const response = await privateClient.get(endPoints.getCreatedTasks, {
+        params: filter,
       });
       if (response?.data && isFunction(cb)) cb(null, response.data);
       return response?.data;

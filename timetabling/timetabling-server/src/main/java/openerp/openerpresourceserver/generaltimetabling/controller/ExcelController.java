@@ -7,7 +7,7 @@ import openerp.openerpresourceserver.generaltimetabling.message.ResponseMessage;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.ClassOpened;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Schedule;
-import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.service.ExcelService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -64,7 +64,7 @@ public class ExcelController {
             @RequestParam("semester") String semester) {
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
-                List<GeneralClassOpened> classOpenedConflict = fileService.saveGeneralClassOpeneds(file, semester);
+                List<GeneralClass> classOpenedConflict = fileService.saveGeneralClassOpeneds(file, semester);
                 return ResponseEntity.status(HttpStatus.OK).body(classOpenedConflict);
             } catch (Exception e) {
                 System.err.println("\n\n\nERRROR: " + e + "\n\n\n");

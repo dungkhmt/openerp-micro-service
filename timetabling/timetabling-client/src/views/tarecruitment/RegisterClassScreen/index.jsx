@@ -49,17 +49,17 @@ const RegisterClassScreen = () => {
       !formData.semester ||
       !formData.id
     ) {
-      warningNoti("Vui lòng điền đầy đủ thông tin");
+      warningNoti("Vui lòng điền đầy đủ thông tin", 5000);
       return;
     } else if (formData.startPeriod >= formData.endPeriod) {
-      warningNoti("Tiết bắt đầu phải nhỏ hơn tiết kết thúc");
+      warningNoti("Tiết bắt đầu phải nhỏ hơn tiết kết thúc", 5000);
       return;
     } else {
       request(
         "post",
         "/class-call/create-class",
         (res) => {
-          successNoti("Tạo lớp học thành công");
+          successNoti("Tạo lớp học thành công", 5000);
           history.push("/ta-recruitment/teacher/class-list");
         },
         {},

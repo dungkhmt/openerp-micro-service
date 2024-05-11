@@ -1,4 +1,4 @@
-import ProtectedScreen from "components/ProtectedScreen";
+import StudentListScreen from "views/Student/StudentListScreen/StudentListScreen";
 import { Route, Switch, useRouteMatch } from "react-router";
 
 export default function TeacherRouter() {
@@ -6,11 +6,7 @@ export default function TeacherRouter() {
   return (
     <div>
       <Switch>
-        <Route
-          component={ProtectedScreen}
-          exact
-          path={`${path}/screen-1`}
-        ></Route>
+        <Route component={StudentListScreen} exact path={`${path}`}></Route>
       </Switch>
     </div>
   );

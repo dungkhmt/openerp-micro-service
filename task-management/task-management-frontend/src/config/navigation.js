@@ -39,6 +39,10 @@ const navigation = [
         title: "Công việc được giao",
         path: "/tasks/assign-me",
       },
+      {
+        title: "Công việc đã tạo",
+        path: "/tasks/created-by-me",
+      },
     ],
   },
 ];

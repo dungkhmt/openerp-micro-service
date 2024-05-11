@@ -190,12 +190,12 @@ public class TaskServiceImplement implements TaskService {
     public Page<TaskDTO> getTasksAssignedToUser(Pageable pageable, String assignee, @Nullable String search) {
         // replace "assignee:value" if exist in search by "assignee:`assignee`"
         if (search != null && !search.equals("")) {
-            if (search.contains("assigneeId:"))
-                search = search.replaceAll("assigneeId:[^ ]+", "assigneeId:" + assignee);
+            if (search.contains(Task_.ASSIGNEE_ID + ":"))
+                search = search.replaceAll(Task_.ASSIGNEE_ID + ":[^ ]+", Task_.ASSIGNEE_ID + ":" + assignee);
             else
-                search = "( " + search + " ) AND assigneeId:" + assignee;
+                search = "( " + search + " ) AND " + Task_.ASSIGNEE_ID + ":" + assignee;
         } else {
-            search = "assigneeId:" + assignee;
+            search = Task_.ASSIGNEE_ID + ":" + assignee;
         }
 
         // default sort by due date
@@ -439,6 +439,32 @@ public class TaskServiceImplement implements TaskService {
                                                 .between(root.get(Task_.DUE_DATE), fromDate, toDate)));
         return taskRepository.findAll(specs, Sort.by(Task_.CREATED_STAMP).ascending()).stream()
                 .map(task -> modelMapper.map(task, TaskGanttDTO.class)).toList();
+    }
+
+    public Page<TaskDTO> getTasksCreatedByUser(Pageable pageable, String creator, @Nullable String search) {
+        // replace "creatorId:value" if exist in search by "creatorId:`creator`"
+        if (search != null && !search.equals("")) {
+            if (search.contains(Task_.CREATOR_ID))
+                search = search.replaceAll(Task_.CREATOR_ID + ":[^ ]+", Task_.CREATOR_ID + ":" + creator);
+            else
+                search = "( " + search + " ) AND " + Task_.CREATOR_ID + ":" + creator;
+        } else {
+            search = Task_.CREATOR_ID + ":" + creator;
+        }
+
+        // default sort by due date
+        if (pageable.getSort().isUnsorted()) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                    Sort.by(Task_.DUE_DATE).ascending());
+        }
+
+        GenericSpecificationsBuilder<Task> builder = new GenericSpecificationsBuilder<>();
+        var specs = builder.build(new CriteriaParser().parse(search), TaskSpecification::new);
+        return taskRepository.findAll(specs, pageable).map(entity -> {
+            var dto = modelMapper.map(entity, TaskDTO.class);
+            dto.setProject(modelMapper.map(entity.getProject(), ProjectDTO.class));
+            return dto;
+        });
     }
 
     private TaskDTO convertToDto(Task task) {

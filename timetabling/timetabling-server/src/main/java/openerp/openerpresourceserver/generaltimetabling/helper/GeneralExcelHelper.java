@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.*;
 
 import lombok.extern.log4j.Log4j2;
-import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.OccupationClassPeriod;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class GeneralExcelHelper {
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static String[] HEADERS = { "SL thực", "Loại lớp", "Mã HP", "Tuần học", "Thời lượng", "SL max",
-            "Lớp học", "Thời lượng", "Trạng thái", "Mã lớp", "Kíp", "Đợt", "Khóa", "Giáo viên nước ngoài"};
+            "Lớp học", "Thời lượng", "Trạng thái", "Mã lớp", "Mã lớp tham chiếu", "Mã lớp tạm thời", "Mã lớp cha", "Kíp", "Đợt", "Khóa", "Giáo viên nước ngoài"};
     static String SHEET = "Sheet1";
     static String DEFAULT_SHEET = "Sheet1";
 
@@ -36,17 +36,17 @@ public class GeneralExcelHelper {
      */
     private final static int START_COL_TO_READ_CLASS_INFO = 0;
     /**
-     * End column in excel to read class information (End with column P)
+     * End column in excel to read class information (End with column Q)
      */
-    private final static int END_COL_TO_READ_CLASS_INFO = 13;
+    private final static int END_COL_TO_READ_CLASS_INFO = 16;
     /**
-     * Start column in excel to read class schedule (Start with column Q)
+     * Start column in excel to read class schedule (Start with column R)
      */
-    private final static int START_COL_TO_READ_CLASS_SCHEDULE = 14;
+    private final static int START_COL_TO_READ_CLASS_SCHEDULE = 17;
     /**
-     * End column in excel to read class information (End with column AZ)
+     * End column in excel to read class information (End with column BA)
      */
-    private final static int END_COL_TO_READ_CLASS_SCHEDULE = 48;
+    private final static int END_COL_TO_READ_CLASS_SCHEDULE = 53;
 
     public static final Integer NUMBER_PERIODS_PER_DAY = 6;
 
@@ -59,10 +59,7 @@ public class GeneralExcelHelper {
      * @example example.xlsx return true, example.docx return false
      */
     public static boolean hasExcelFormat(MultipartFile file) {
-        if (!TYPE.equals(file.getContentType())) {
-            return false;
-        }
-        return true;
+        return TYPE.equals(file.getContentType());
     }
 
     /**
@@ -71,12 +68,12 @@ public class GeneralExcelHelper {
      *                to GCO.
      * @return
      */
-    public static List<GeneralClassOpened> convertFromExcelToGeneralClassOpened(InputStream inputStream,
-                                                                                String semester) {
+    public static List<GeneralClass> convertFromExcelToGeneralClassOpened(InputStream inputStream,
+                                                                          String semester) {
         try {
             Workbook workbook = new XSSFWorkbook(inputStream);
             Sheet sheet = workbook.getSheet(SHEET);
-            List<GeneralClassOpened> convertedList = new ArrayList<GeneralClassOpened>();
+            List<GeneralClass> convertedList = new ArrayList<GeneralClass>();
             if (sheet == null) {
                 sheet = workbook.getSheet(DEFAULT_SHEET);
             }
@@ -84,9 +81,15 @@ public class GeneralExcelHelper {
             for (int i = START_ROW_TO_READ_CLASS; i < totalRowsNum; i++) {
                 Row classRow = sheet.getRow(i);
                 // skip if not exist classs code
-                if (classRow.getCell(8) == null)
-                    continue;
-                GeneralClassOpened generalClassOpened = new GeneralClassOpened();
+                if (classRow.getCell(9) != null) {
+                    Cell classCodeCell = classRow.getCell(9);
+                    switch (classCodeCell.getCellType()) {
+                        case Cell.CELL_TYPE_BLANK:
+                            System.out.println("Cell blank, skip!");
+                            continue;
+                    }
+                }
+                GeneralClass generalClass = new GeneralClass();
                 RoomReservation timeSlot = null;
                 int duration = 0;
                 for (int j = START_COL_TO_READ_CLASS_INFO; j <= END_COL_TO_READ_CLASS_SCHEDULE; j++) {
@@ -107,9 +110,9 @@ public class GeneralExcelHelper {
                                 && classInfoCell.getCellStyle() != null) {
                             XSSFColor bgColor = (XSSFColor) classInfoCell.getCellStyle().getFillBackgroundColorColor();
                             if (bgColor != null && "FFFFC000".equals(bgColor.getARGBHex())) {
-                                if (cellValue != null && !cellValue.equals("")) {
+                                if (cellValue != null && !cellValue.isEmpty()) {
                                     timeSlot = new RoomReservation();
-                                    timeSlot.setGeneralClassOpened(generalClassOpened);
+                                    timeSlot.setGeneralClass(generalClass);
                                     timeSlot.setStartTime(
                                             (classInfoCell.getColumnIndex() - END_COL_TO_READ_CLASS_INFO) % 6);
                                     timeSlot.setWeekday(
@@ -121,7 +124,7 @@ public class GeneralExcelHelper {
                             } else {
                                 if (timeSlot != null) {
                                     timeSlot.setEndTime(timeSlot.getStartTime() + duration - 1);
-                                    generalClassOpened.addTimeSlot(timeSlot);
+                                    generalClass.addTimeSlot(timeSlot);
                                     timeSlot = null;
                                     duration = 0;
                                 }
@@ -129,45 +132,67 @@ public class GeneralExcelHelper {
                         } else {
                             switch (classInfoCell.getColumnIndex()) {
                                 case 0:
-                                    generalClassOpened.setQuantity(cellValue);
+                                    generalClass.setQuantity(cellValue);
                                     break;
                                 case 1:
-                                    generalClassOpened.setClassType(cellValue);
+                                    generalClass.setClassType(cellValue);
                                     break;
                                 case 2:
-                                    generalClassOpened.setModuleCode(cellValue);
+                                    generalClass.setModuleCode(cellValue);
                                     break;
                                 case 3:
-                                    generalClassOpened.setModuleName(cellValue);
+                                    generalClass.setModuleName(cellValue);
                                     break;
                                 case 4:
-                                    generalClassOpened.setLearningWeeks(cellValue);
+                                    generalClass.setLearningWeeks(cellValue);
                                     break;
                                 case 5:
-                                    generalClassOpened.setMass(cellValue);
+                                    generalClass.setMass(cellValue);
                                     break;
                                 case 6:
-                                    generalClassOpened.setQuantityMax(cellValue);
+                                    generalClass.setQuantityMax(cellValue);
                                     break;
                                 case 7:
-                                    generalClassOpened.setStudyClass(cellValue);
+                                    generalClass.setStudyClass(cellValue);
                                     break;
                                 case 8:
-                                    generalClassOpened.setState(cellValue);
+                                    generalClass.setState(cellValue);
                                     break;
                                 case 9:
-                                    if (cellValue.equals(""))
-                                        continue;
-                                    generalClassOpened.setClassCode(cellValue);
+                                    generalClass.setClassCode(cellValue);
                                     break;
                                 case 10:
-                                    generalClassOpened.setCrew(cellValue);
+                                    if (cellValue.isEmpty()) {
+                                        generalClass.setRefClassId(null);
+                                    } else {
+                                        generalClass.setRefClassId(Long.valueOf(cellValue));
+                                    }
                                     break;
                                 case 11:
-                                    generalClassOpened.setOpenBatch(cellValue);
+                                    if (cellValue.isEmpty()) {
+                                        generalClass.setTempClassId(null);
+                                    } else {
+                                        generalClass.setTempClassId(Long.valueOf(cellValue));
+                                    }
                                     break;
                                 case 12:
-                                    generalClassOpened.setCourse(cellValue);
+                                    if (cellValue.isEmpty()) {
+                                        generalClass.setParentClassId(null);
+                                    } else {
+                                        generalClass.setParentClassId(Long.valueOf(cellValue));
+                                    }
+                                    break;
+                                case 13:
+                                    generalClass.setCrew(cellValue);
+                                    break;
+                                case 14:
+                                    generalClass.setOpenBatch(cellValue);
+                                    break;
+                                case 15:
+                                    generalClass.setCourse(cellValue);
+                                    break;
+                                case 16:
+                                    generalClass.setForeignLecturer(cellValue);
                                     break;
                                 default:
                                     break;
@@ -175,8 +200,8 @@ public class GeneralExcelHelper {
                         }
                     }
                 }
-                generalClassOpened.setSemester(semester);
-                convertedList.add(generalClassOpened);
+                generalClass.setSemester(semester);
+                convertedList.add(generalClass);
             }
             workbook.close();
             return convertedList;
@@ -188,14 +213,14 @@ public class GeneralExcelHelper {
 
 
     public ByteArrayInputStream convertRoomOccupationToExcel(List<RoomOccupation> rooms) {
-        /**Init the data to map*/
+        /*Init the data to map*/
         HashMap<String, List<OccupationClassPeriod>> periodMap = new HashMap<>();
         HashMap<String, List<OccupationClassPeriod>> conflictMap = new HashMap<>();
         for(RoomOccupation room : rooms) {
             String classRoom = room.getClassRoom();
             long crewPeriod = room.getCrew().equals("S") ? 0 : 6;
-            long startPeriodIndex = room.getStartPeriod() + 12*(room.getDayIndex()-2) + crewPeriod;
-            long endPeriodIndex = room.getEndPeriod() + 12*(room.getDayIndex()-2) + crewPeriod;
+            long startPeriodIndex = room.getStartPeriod() + 12L *(room.getDayIndex()-2) + crewPeriod;
+            long endPeriodIndex = room.getEndPeriod() + 12L *(room.getDayIndex()-2) + crewPeriod;
             OccupationClassPeriod period = new OccupationClassPeriod(startPeriodIndex, endPeriodIndex, room.getClassCode());
             if(periodMap.get(classRoom) == null) {
                 List<OccupationClassPeriod> initList = new ArrayList<>();
@@ -204,7 +229,7 @@ public class GeneralExcelHelper {
             } else {
                 periodMap.get(classRoom).add(period);
             }
-            if(/**Check conflict at here*/!ClassTimeComparator.isPeriodConflict(period, periodMap)) {
+            if(/*Check conflict at here*/!ClassTimeComparator.isPeriodConflict(period, periodMap)) {
                 if(conflictMap.get(classRoom) == null) {
                     List<OccupationClassPeriod> initList = new ArrayList<>();
                     initList.add(period);
@@ -216,9 +241,9 @@ public class GeneralExcelHelper {
         }
 
 
-        /**Handle Excel write*/
-        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
-            /** Init the cell style*/
+        /*Handle Excel write*/
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            /* Init the cell style*/
             /*Bold style*/
             CellStyle boldStyle = workbook.createCellStyle();
             Font boldFont = workbook.createFont();
@@ -243,7 +268,7 @@ public class GeneralExcelHelper {
             Sheet sheet = workbook.createSheet(SHEET);
             int rowIndex = 0;
 
-            /**Header*/
+            /*Header*/
             /*Week index row*/
             Row dayIndexRow = sheet.createRow(rowIndex);
             for (int i = 0; i < 84; i+=12) {
@@ -267,7 +292,7 @@ public class GeneralExcelHelper {
 
             /*Start write data*/
             for (String room : periodMap.keySet()) {
-                if(room != null && !room.equals("")) {
+                if(room != null && !room.isEmpty()) {
                     Row roomRow = sheet.createRow(rowIndex);
                     Cell roomNameCell = roomRow.createCell(0);
                     roomNameCell.setCellValue(room);
@@ -299,10 +324,10 @@ public class GeneralExcelHelper {
         }
     }
 
-    public ByteArrayInputStream convertGeneralClassToExcel(List<GeneralClassOpened> classes) {
-        /**Handle Excel write*/
-        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
-            /** Init the cell style*/
+    public ByteArrayInputStream convertGeneralClassToExcel(List<GeneralClass> classes) {
+        /*Handle Excel write*/
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            /* Init the cell style*/
             /*Bold style*/
             CellStyle boldStyle = workbook.createCellStyle();
             Font boldFont = workbook.createFont();
@@ -315,7 +340,7 @@ public class GeneralExcelHelper {
             roomStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
             roomStyle.setFillPattern((short) 1);
 
-            /**Header*/
+            /*Header*/
             /*Handle create header info*/
             Row weekIndexRow = sheet.createRow(rowIndex);
             for (int i = 0; i < HEADERS.length; i += 1) {
@@ -324,7 +349,7 @@ public class GeneralExcelHelper {
                 String classInfoString = HEADERS[i];
                 c.setCellValue(classInfoString);
             }
-            /**Handle create header schedule info */
+            /*Handle create header schedule info */
 
             Row periodIndexRow = sheet.createRow(rowIndex+1);
             for (int i = START_COL_TO_READ_CLASS_SCHEDULE; i < START_COL_TO_READ_CLASS_SCHEDULE+42; i += 6) {
@@ -341,51 +366,63 @@ public class GeneralExcelHelper {
             }
 
             rowIndex+=2;
-            /**Handle write class info and schedule*/
-            for (GeneralClassOpened generalClassOpened : classes) {
+            /*Handle write class info and schedule*/
+            for (GeneralClass generalClass : classes) {
                 Row classRow = sheet.createRow(rowIndex);
                 /*Write the class info*/
-                for (int i = 0 ; i < END_COL_TO_READ_CLASS_INFO; i++ ) {
+                for (int i = 0 ; i <= END_COL_TO_READ_CLASS_INFO; i++ ) {
                     Cell c = classRow.createCell(i);
                     switch (i) {
                         case 0:
-                            c.setCellValue(generalClassOpened.getQuantity());
+                            c.setCellValue(generalClass.getQuantity());
                             break;
                         case 1:
-                            c.setCellValue(generalClassOpened.getClassType());
+                            c.setCellValue(generalClass.getClassType());
                             break;
                         case 2:
-                            c.setCellValue(generalClassOpened.getModuleCode());
+                            c.setCellValue(generalClass.getModuleCode());
                             break;
                         case 3:
-                            c.setCellValue(generalClassOpened.getModuleName());
+                            c.setCellValue(generalClass.getModuleName());
                             break;
                         case 4:
-                            c.setCellValue(generalClassOpened.getLearningWeeks());
+                            c.setCellValue(generalClass.getLearningWeeks());
                             break;
                         case 5:
-                            c.setCellValue(generalClassOpened.getMass());
+                            c.setCellValue(generalClass.getMass());
                             break;
                         case 6:
-                            c.setCellValue(generalClassOpened.getQuantityMax());
+                            c.setCellValue(generalClass.getQuantityMax());
                             break;
                         case 7:
-                            c.setCellValue(generalClassOpened.getStudyClass());
+                            c.setCellValue(generalClass.getStudyClass());
                             break;
                         case 8:
-                            c.setCellValue(generalClassOpened.getState());
+                            c.setCellValue(generalClass.getState());
                             break;
                         case 9:
-                            c.setCellValue(generalClassOpened.getClassCode());
+                            c.setCellValue(generalClass.getClassCode());
                             break;
                         case 10:
-                            c.setCellValue(generalClassOpened.getCrew());
+                            c.setCellValue(generalClass.getRefClassId());
                             break;
                         case 11:
-                            c.setCellValue(generalClassOpened.getOpenBatch());
+                            c.setCellValue(generalClass.getTempClassId());
                             break;
                         case 12:
-                            c.setCellValue(generalClassOpened.getCourse());
+                            c.setCellValue(generalClass.getParentClassId());
+                            break;
+                        case 13:
+                            c.setCellValue(generalClass.getCrew());
+                            break;
+                        case 14:
+                            c.setCellValue(generalClass.getOpenBatch());
+                            break;
+                        case 15:
+                            c.setCellValue(generalClass.getCourse());
+                            break;
+                        case 16:
+                            c.setCellValue(generalClass.getForeignLecturer());
                             break;
                         default:
                             break;
@@ -394,7 +431,7 @@ public class GeneralExcelHelper {
                 /*Write the class schedule*/
                 for (int j = START_COL_TO_READ_CLASS_SCHEDULE; j < START_COL_TO_READ_CLASS_SCHEDULE + 42; j++) {
                     Cell c = classRow.createCell(j);
-                    for (RoomReservation rr : generalClassOpened.getTimeSlots().stream().filter(RoomReservation::isScheduleNotNull).toList()) {
+                    for (RoomReservation rr : generalClass.getTimeSlots().stream().filter(RoomReservation::isScheduleNotNull).toList()) {
                         if (j - START_COL_TO_READ_CLASS_SCHEDULE >= (rr.getWeekday()-2)*6 + rr.getStartTime() -1 && j-START_COL_TO_READ_CLASS_SCHEDULE <= (rr.getWeekday()-2)*6 + rr.getEndTime() -1) {
                             c.setCellValue(rr.getRoom());
                             c.setCellStyle(roomStyle);

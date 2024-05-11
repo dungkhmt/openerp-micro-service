@@ -8,7 +8,7 @@ import styles from "./index.style";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
-  pageSize: 5,
+  pageSize: 10,
 };
 
 const AllRegisterClassScreen = () => {
@@ -89,14 +89,16 @@ const AllRegisterClassScreen = () => {
     const rowData = params.row;
     const isRegistered = registeredClass.some((item) => item.id === rowData.id);
     return (
-      <Button
-        variant="contained"
-        disabled={isRegistered}
-        onClick={() => handleRegister(rowData)}
-        style={styles.registeredButton}
-      >
-        {isRegistered ? "ĐÃ ĐĂNG KÝ" : "Đăng ký"}
-      </Button>
+      <div>
+        <Button
+          variant="outlined"
+          disabled={isRegistered}
+          onClick={() => handleRegister(rowData)}
+          style={styles.registeredButton}
+        >
+          {isRegistered ? "ĐÃ ĐĂNG KÝ" : "Đăng ký"}
+        </Button>
+      </div>
     );
   };
 

@@ -52,8 +52,8 @@ const GeneralUploadScreen = () => {
               setClasses={setClasses}
             />
             <div className="flex">
-              {deleteLoading && <FacebookCircularProgress />}
               <Button
+                startIcon={deleteLoading ? <FacebookCircularProgress /> : null}
                 sx={{ width: 290 }}
                 disabled={deleteLoading || selectedSemester === null}
                 onClick={handleDelete}
