@@ -76,7 +76,7 @@ const RegisterClassForStudentScreen = (props) => {
       "post",
       "/application/create-application",
       (res) => {
-        successNoti("Đăng ký lớp trợ giảng thành công");
+        successNoti("Đăng ký lớp trợ giảng thành công", 5000);
         setDataEmpty();
         history.push("/ta-recruitment/student/result");
       },

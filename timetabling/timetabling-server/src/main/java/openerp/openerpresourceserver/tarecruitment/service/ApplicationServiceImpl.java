@@ -51,6 +51,57 @@ public class ApplicationServiceImpl implements ApplicationService{
     }
 
     @Override
+    public Application updateApplication(int id, Application application) {
+        Optional<Application> existingApplicationOptional = applicationRepo.findById(id);
+        if (existingApplicationOptional.isEmpty()) {
+            throw new IllegalArgumentException("Application with ID " + id + " not found");
+        }
+
+        Application existingApplication = existingApplicationOptional.get();
+
+        existingApplication.setName(application.getName());
+        existingApplication.setEmail(application.getEmail());
+        existingApplication.setCPA(application.getCPA());
+        existingApplication.setEnglishScore(application.getEnglishScore());
+        existingApplication.setNote(application.getNote());
+        existingApplication.setMssv(application.getMssv());
+
+        Application newApplication = applicationRepo.save(existingApplication);
+
+        return newApplication;
+    }
+
+    @Override
+    public boolean deleteApplication(int id) {
+        Optional<Application> existingApplicationOptional = applicationRepo.findById(id);
+        if (existingApplicationOptional.isEmpty()) {
+            throw new IllegalArgumentException("Application with ID " + id + " not found");
+        }
+
+        applicationRepo.deleteById(id);
+        return true;
+    }
+
+    @Override
+    public boolean deleteMultiApplication(List<Integer> idList) {
+        for(int id : idList) {
+            applicationRepo.deleteById(id);
+        }
+        return true;
+    }
+
+    @Override
+    public Application getApplicationById(int id) {
+        Optional<Application> existingApplicationOptional = applicationRepo.findById(id);
+        if (existingApplicationOptional.isEmpty()) {
+            throw new IllegalArgumentException("Application with ID " + id + " not found");
+        }
+
+        Application existingApplication = existingApplicationOptional.get();
+        return existingApplication;
+    }
+
+    @Override
     public PaginationDTO<Application> getMyApplications(String userId, int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Application> applicationPage = applicationRepo.findByUserId(userId, pageable);

@@ -2,7 +2,7 @@ const prefix = "/ta-recruitment";
 export const taRecruitment = {
   id: "MENU_TA_RECRUITMENT",
   icon: "DashboardIcon",
-  text: "Quản lý và phân công trợ giảng",
+  text: "Quản lý trợ giảng",
   child: [
     {
       id: "MENU_TA_RECRUITMENT.ASSIGN_CLASS",

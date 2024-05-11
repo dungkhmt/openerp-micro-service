@@ -1,8 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { request } from "api";
-import IconButton from "@mui/material/IconButton";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { useHistory } from "react-router-dom";
 import {
   FormControl,
@@ -161,20 +158,20 @@ const AllClassScreen = () => {
 
     return (
       <div>
-        <IconButton variant="contained" color="primary">
-          <FormatListBulletedIcon
-            onClick={() => handleOpenApplicatorDialog(rowData)}
-          />
-        </IconButton>
-        <IconButton
-          onClick={() => {
-            handleOpenDialog(rowData);
-          }}
-          variant="contained"
-          color="error"
+        <Button
+          variant="outlined"
+          onClick={() => handleOpenApplicatorDialog(rowData)}
         >
-          <DeleteOutlineIcon />
-        </IconButton>
+          DS Đăng ký
+        </Button>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={() => handleOpenDialog(rowData)}
+          style={{ marginLeft: "1em" }}
+        >
+          Xóa
+        </Button>
       </div>
     );
   };
@@ -238,7 +235,7 @@ const AllClassScreen = () => {
           Danh sách lớp học
         </Typography>
         <div style={styles.searchArea}>
-          <FormControl style={styles.dropdown} fullWidth>
+          <FormControl style={styles.dropdown} fullWidth size="small">
             <InputLabel id="semester-label">Học kì</InputLabel>
             <Select
               labelId="semester-label"
@@ -264,7 +261,7 @@ const AllClassScreen = () => {
           </Tooltip> */}
 
           <Button
-            style={{ height: "40px", marginTop: "1em", marginLeft: "1em" }}
+            style={{ height: "40px", marginTop: "0.6em", marginLeft: "0.6em" }}
             variant="outlined"
             onClick={handleNavigateCreateClass}
           >
@@ -272,7 +269,7 @@ const AllClassScreen = () => {
           </Button>
 
           <Button
-            style={{ height: "40px", marginTop: "1em", marginLeft: "1em" }}
+            style={{ height: "40px", marginTop: "0.6em", marginLeft: "1em" }}
             variant="outlined"
             onClick={handleFileChange}
           >
@@ -280,7 +277,7 @@ const AllClassScreen = () => {
           </Button>
 
           <Button
-            style={{ height: "40px", marginTop: "1em", marginLeft: "1em" }}
+            style={{ height: "40px", marginTop: "0.6em", marginLeft: "1em" }}
             variant="outlined"
             color="error"
             disabled={rowSelect.length === 0}
@@ -316,6 +313,7 @@ const AllClassScreen = () => {
         open={openImportDialog}
         handleClose={handleCloseImportDialog}
         fetchData={handleFetchData}
+        semester={semester}
       />
 
       <DataGrid

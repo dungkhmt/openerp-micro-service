@@ -259,7 +259,7 @@ const RequestApprovalScreen = () => {
     {
       field: "name",
       headerName: "Tên sinh viên",
-      flex: 1,
+      flex: 1.5,
     },
     {
       field: "mssv",
@@ -269,7 +269,7 @@ const RequestApprovalScreen = () => {
     {
       field: "cpa",
       headerName: "CPA",
-      flex: 1,
+      flex: 0.5,
     },
     {
       field: "englishScore",

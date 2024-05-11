@@ -96,13 +96,13 @@ public class ClassCallController {
         return ResponseEntity.ok().body(myClassCall);
     }
 
-    @PostMapping("/import-class")
-    public ResponseEntity<?> importClassCall(@RequestParam("excelFile") MultipartFile file) {
+    @PostMapping("/import-class/{semester}")
+    public ResponseEntity<?> importClassCall(@RequestParam("excelFile") MultipartFile file, @PathVariable String semester) {
         if(file.isEmpty()) {
             return ResponseEntity.badRequest().body("Need to upload a file");
         }
         try {
-            int numberOfData = classCallService.importClass(file);
+            int numberOfData = classCallService.importClass(file, semester);
             return ResponseEntity.ok().body("Nhập thành công " + numberOfData + " lớp học");
 
 
