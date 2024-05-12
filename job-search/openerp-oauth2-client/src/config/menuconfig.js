@@ -34,6 +34,7 @@ import { findJob } from "./menuconfig/FindingJob";
 import { company } from "./menuconfig/company";
 import { userInfomation } from "./menuconfig/userInfomation";
 import { analyseCV } from "./menuconfig/analyseCV";
+import { mbti } from "./menuconfig/mbtiTest";
 
 export const MENUS = [];
 
@@ -48,7 +49,7 @@ MENUS.push(findJob)
 MENUS.push(company)
 MENUS.push(userInfomation)
 MENUS.push(analyseCV)
-
+MENUS.push(mbti)
 export const menuIconMap = new Map();
 
 menuIconMap.set(

@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { MouseEvent, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Flex, Text, UnorderedList, ListItem } from "@chakra-ui/react";
 
 import useHeadingsObserver from "../../hooks/use-headings-observer";
@@ -8,7 +7,7 @@ export default function TestResultTableOfContent() {
   const { activeId, setActiveId } = useHeadingsObserver();
 
   const [headings, setHeadings] = useState([]);
-  
+
   useEffect(() => {
     const elements = Array.from(document.querySelectorAll("h2")).map(
       (element) => ({
@@ -16,13 +15,17 @@ export default function TestResultTableOfContent() {
         text: element.textContent,
       })
     );
-  
+
     setHeadings(elements);
   }, []);
-  
+
   function handleTableOfContentLinkClick(event, id) {
     event.preventDefault();
     setActiveId(id);
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   return (
@@ -41,10 +44,7 @@ export default function TestResultTableOfContent() {
       alignSelf="flex-start"
     >
       <Text fontWeight="bold">Table Of Content</Text>
-      <UnorderedList
-        spacing={2}
-        listStyleType="none"
-      >
+      <UnorderedList spacing={2} listStyleType="none">
         {headings.map((heading, index) => (
           <ListItem
             key={index}
@@ -58,11 +58,9 @@ export default function TestResultTableOfContent() {
               color: "primary.500",
               fontWeight: "bold",
             })}
-            onClick={(event) =>
-              handleTableOfContentLinkClick(event, heading.id)
-            }
+            onClick={(event) => handleTableOfContentLinkClick(event, heading.id)}
           >
-            <Link href={`#${heading.id}`}>{heading.text}</Link>
+            <a href={`#${heading.id}`}>{heading.text}</a>
           </ListItem>
         ))}
       </UnorderedList>

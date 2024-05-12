@@ -1,4 +1,4 @@
-import Image from "next/image";
+// import Image from "next/image";
 import {
   Flex,
   Heading,
@@ -18,11 +18,49 @@ import {
   getPersonalityClassGroupByTestScores,
 } from "../../lib/personality-test";
 
+import enfj from '../../../src/public/images/mbti/enfj.png';
+import enfp from '../../../src/public/images/mbti/enfp.png';
+import entj from '../../../src/public/images/mbti/entj.png';
+import entp from '../../../src/public/images/mbti/entp.png';
+import esfj from '../../../src/public/images/mbti/esfj.png';
+import esfp from '../../../src/public/images/mbti/esfp.png';
+import estj from '../../../src/public/images/mbti/estj.png';
+import estp from '../../../src/public/images/mbti/estp.png';
+import infp from '../../../src/public/images/mbti/infp.png';
+import infj from '../../../src/public/images/mbti/infj.png';
+import intp from '../../../src/public/images/mbti/intp.png';
+import intj from '../../../src/public/images/mbti/intj.png';
+import isfj from '../../../src/public/images/mbti/isfj.png';
+import isfp from '../../../src/public/images/mbti/isfp.png';
+import istj from '../../../src/public/images/mbti/istj.png';
+import istp from '../../../src/public/images/mbti/istp.png';
+
+
 
 export default function TestResult(props) {
   const personalityClassGroup = getPersonalityClassGroupByTestScores(
     props.testResult.testScores
   );
+
+  const mapImg = {
+    'enfj':enfj,
+    'enfp':enfp,
+    'entj':entj,
+    'entp':entp,
+    'esfj':esfj,
+    'esfp':esfp,
+    'estj':estj,
+    'estp':estp,
+    'infp':infp,
+    'infj':infj,
+    'intp':intp,
+    'intj':intj,
+    'isfj':isfj,
+    'isfp':isfp,
+    'istj':istj,
+    'istp':istp
+    
+  }
 
   return (
     <Flex
@@ -56,9 +94,9 @@ export default function TestResult(props) {
       >
         {personalityClassGroup.nameDescription}
       </Text>
-      <Image
+      <img
         alt="illustration"
-        src={`/images/mbti/${personalityClassGroup.type.toLowerCase()}.png`}
+        src={mapImg[personalityClassGroup.type.toLowerCase()]}
         width={200}
         height={200}
       />

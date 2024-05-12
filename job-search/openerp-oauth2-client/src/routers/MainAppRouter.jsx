@@ -27,7 +27,10 @@ import UserEducation from "views/personalInfo/UserEducation";
 import UserExperience from "views/personalInfo/UserExperience";
 import AnalyseCV from "views/AnalyseCV";
 import TestPage from "views/mbti-page/test/TestPage";
-
+import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import theme from '../theme'
+import TestResult from "components/test/test-result";
+import TestResultPage from "views/mbti-page/test/result/testResultId";
 const styles = {
   loadingProgress: {
     position: "fixed",
@@ -80,7 +83,10 @@ function MainAppRouter(props) {
           <PrivateRoute component={UserExperience} path = "/experience" />
           <PrivateRoute component={UserEducation} path = "/education" />
           <PrivateRoute component={AnalyseCV} path = "/analyse" />
+          <ChakraProvider theme={theme}>
           <PrivateRoute component={TestPage} path = "/test-page" />
+          <PrivateRoute component={TestResultPage} path = "/test/result/:id" />
+          </ChakraProvider>
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>

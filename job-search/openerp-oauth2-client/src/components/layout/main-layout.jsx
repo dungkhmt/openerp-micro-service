@@ -29,7 +29,6 @@ export default function MainLayout(props) {
       >
         {props.children}
       </Flex>
-      <div />
     </>
   );
 }
