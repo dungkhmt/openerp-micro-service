@@ -96,11 +96,11 @@ const Main = () => {
   const [data, setData] = useState([]);
   const [inputs, setInputs] = useState({});
   const [city, setCity] = useState([]);
-  const [hide,setHide] = useState(false)
+  const [hide, setHide] = useState(false)
 
-  const handleClick = (e)=>{
+  const handleClick = (e) => {
     e.preventDefault()
-    setHide(()=>!hide)
+    setHide(() => !hide)
   }
 
 
@@ -156,6 +156,7 @@ const Main = () => {
         salary: inputs.salary,
         experience: inputs.experience,
         level: inputs.level,
+        skills: inputs.skills.split(", "),
         refreshedTime: currentDateTimeString,
       };
 
@@ -187,20 +188,75 @@ const Main = () => {
     getJobs();
   };
 
+  const jobTitles = [
+    ".NET Developer",
+    "Android App Developer",
+    "Android Developer",
+    "Backend Developer",
+    "Backend Web Developer",
+    "Bridge Engineer",
+    "Business Analyst",
+    "C++ Developer",
+    "Embedded Engineer",
+    "Front End Developer",
+    "Front End Web Developer",
+    "Full Stack Developer",
+    "Full Stack Web Developer",
+    "Java Developer",
+    "Java Web Developer",
+    "Mobile Apps Developer",
+    "NodeJS Developer",
+    "PHP Developer",
+    "Product Manager",
+    "Product Owner",
+    "Project Manager",
+    "Python Developer",
+    "Python Web Developer",
+    "Senior Back End Developer",
+    "Senior Front End Developer",
+    "Senior Full Stack Developer",
+    "Senior Java Developer",
+    "Senior Product Owner",
+    "Software Architect",
+    "Solution Architect",
+    "System Administrator",
+    "System Engineer",
+    "Team Leader",
+    "Tester",
+    "UX UI Designer",
+    "iOS Developer"
+  ];
+
+  const jobLevel = [
+    "intern",
+    "fresher",
+    "junior",
+    "middle",
+    "senior",
+    "manager"
+  ]
+
   return (
     <Container>
       <>
         <Info>
           <Title>Enter your information here :</Title>
           <GroupField>
-            <InputField
+            <LaybelField for="title">Title</LaybelField>
+            <SelectField
               id="title"
               name="title"
-              placeholder="VD: Backend developer"
               onChange={handleChange}
-            />
-            <LaybelField for="title">Title</LaybelField>
+            >
+              <option value="">Select a title</option>
+              {jobTitles.map((title, index) => (
+                <option key={index} value={title}>
+                  {title}
+                </option>
+              ))}
+            </SelectField>
           </GroupField>
+
           <GroupField>
             <SelectField
               id="address"
@@ -237,16 +293,25 @@ const Main = () => {
               placeholder="VD: Thương lượng"
               onChange={handleChange}
             />
-            <LaybelField for="salary">Salary</LaybelField>
+            <LaybelField for="salary">Salary - vnd</LaybelField>
           </GroupField>
           <GroupField>
             <InputField
               id="experience"
               name="experience"
-              placeholder="VD: đại học, 2 năm kinh nghiệm"
+              placeholder="VD: 2 năm kinh nghiệm"
               onChange={handleChange}
             />
             <LaybelField for="experience">Experience</LaybelField>
+          </GroupField>
+          <GroupField>
+            <InputField
+              id="skills"
+              name="skills"
+              placeholder="VD: java, springboot"
+              onChange={handleChange}
+            />
+            <LaybelField for="skills">Skill list - separate by ","</LaybelField>
           </GroupField>
           <GroupField>
             <SelectField
@@ -270,16 +335,21 @@ const Main = () => {
             </LaybelField>
           </GroupField>
           <GroupField>
-            <InputField
+            <LaybelField for="level">Level</LaybelField>
+            <SelectField
               id="level"
               name="level"
-              placeholder="VD: senior"
               onChange={handleChange}
-            />
-            <LaybelField screenWidth={screenWidth} for="level">
-              Level
-            </LaybelField>
+            >
+              <option value="">Select a level</option>
+              {jobLevel.map((level, index) => (
+                <option key={index} value={level}>
+                  {level}
+                </option>
+              ))}
+            </SelectField>
           </GroupField>
+
           <GroupField>
             <SelectField
               id="TvA"

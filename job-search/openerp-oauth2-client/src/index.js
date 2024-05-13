@@ -4,7 +4,7 @@ import App from "./App";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import "@fontsource/poppins/400.css";
+// import "@fontsource/poppins/400.css";
 import theme from './theme/index'
 // Import necessary packages for Chakra UI and MUI
 import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material/styles';

@@ -10,7 +10,7 @@ import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import SportsScoreIcon from "@mui/icons-material/SportsScore";
 const Container = styled.div`
-  height: 28rem;
+  height: 36rem;
   width: 87rem;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   border-radius: 2%;
@@ -81,13 +81,13 @@ const Item = ({job}) => {
             <ShowInfoIcon>
               <FmdGoodIcon />
             </ShowInfoIcon>
-            <ShowInfoTitle>Address : {job.address}</ShowInfoTitle>
+            <ShowInfoTitle style={{height: "60px"}}>Address : {job.address}</ShowInfoTitle>
           </ShowInfo>
           <ShowInfo>
             <ShowInfoIcon>
               <SchoolIcon />
             </ShowInfoIcon>
-            <ShowInfoTitle>Bằng cấp : {job.experience}</ShowInfoTitle>
+            <ShowInfoTitle  style={{height: "120px"}} >Yêu cầu : {job.experience}</ShowInfoTitle>
           </ShowInfo>
           <ShowInfo>
             <ShowInfoIcon>
@@ -111,7 +111,7 @@ const Item = ({job}) => {
             <ShowInfoIcon>
               <ManageAccountsIcon />
             </ShowInfoIcon>
-            <ShowInfoTitle>Làm Về : {job.major}</ShowInfoTitle>
+            <ShowInfoTitle>Skill keyword : {job.major}</ShowInfoTitle>
           </ShowInfo>
           <ShowInfo>
             <ShowInfoIcon>
@@ -120,7 +120,7 @@ const Item = ({job}) => {
             <ShowInfoTitle>Score : {job.score}</ShowInfoTitle>
           </ShowInfo>
           <ShowInfo>
-            <ShowInfoLink href={job.detailURL}>Link Job Here.</ShowInfoLink>
+            <ShowInfoLink target='_blank' href={job.detailURL}>Link Job Here.</ShowInfoLink>
           </ShowInfo>
         </Show>
       </Container>
