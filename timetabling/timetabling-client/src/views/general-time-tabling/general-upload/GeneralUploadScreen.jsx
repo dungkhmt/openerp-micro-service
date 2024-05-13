@@ -36,6 +36,46 @@ const GeneralUploadScreen = () => {
     );
   };
 
+  const handleSubmitFile = () => {
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      request(
+        "post",
+        `/excel/upload-general?semester=${selectedSemester?.semester}`,
+        (res) => {
+          console.log(res?.data);
+          let generalClasses = [];
+          res.data?.forEach((classObj) => {
+            if (classObj?.classCode !== null && classObj?.timeSlots) {
+              classObj.timeSlots.forEach((timeSlot, index) => {
+                const cloneObj = JSON.parse(
+                  JSON.stringify({
+                    ...classObj,
+                    ...timeSlot,
+                    classCode: classObj.classCode,
+                    id: classObj.id + `-${index + 1}`,
+                  })
+                );
+                delete cloneObj.timeSlots;
+                generalClasses.push(cloneObj);
+              });
+            }
+          });
+          console.log(generalClasses);
+          setClasses(generalClasses);
+        },
+        (err) => {
+          console.log(err);
+        },
+        formData,
+        {
+          "Content-Type": "multipart/form-data",
+        }
+      );
+    }
+  };
+
   return (
     <LoadingProvider>
       <div className="flex flex-col gap-2">
@@ -50,6 +90,7 @@ const GeneralUploadScreen = () => {
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
               setClasses={setClasses}
+              submitHandler={handleSubmitFile}
             />
             <div className="flex">
               <Button

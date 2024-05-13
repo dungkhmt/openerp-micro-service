@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import GeneralScheduleTable from "./components/GeneralScheduleTable";
-import { Autocomplete, Button, Input, TextField } from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Button} from "@mui/material";
 import GeneralGroupAutoComplete from "../common-components/GeneralGroupAutoComplete";
 import GeneralSemesterAutoComplete from "../common-components/GeneralSemesterAutoComplete";
 import { request } from "api";
@@ -25,6 +24,7 @@ const GeneralScheduleScreen = () => {
   const [isAutoSaveLoading, setAutoSaveLoading] = useState(false);
   const [isOpenClassroomDialog, setOpenClassroomDialog] = useState(false);
   const [isOpenTimeslotDialog, setOpenTimeslotDialog] = useState(false);
+  const [isExportExecelLoading, setExportExcelLoading] = useState(false);
   const [classroomTimeLimit, setClassroomTimeLimit] = useState(5);
   const [timeSlotTimeLimit, setTimeSlotTimeLimit] = useState(5);
 
@@ -154,6 +154,7 @@ const GeneralScheduleScreen = () => {
   };
 
   const handleExportTimeTabling = () => {
+    setExportExcelLoading(true);
     request(
       "post",
       `general-classes/export-excel?semester=${selectedSemester?.semester}`,
@@ -163,13 +164,15 @@ const GeneralScheduleScreen = () => {
         });
         const link = document.createElement("a");
         link.href = window.URL.createObjectURL(blob);
-        link.download = `TKB_${selectedSemester?.semester}.xlsx`;
+        link.download = `Danh_sach_lop_TKB_${selectedSemester?.semester}.xlsx`;
 
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        setExportExcelLoading(false);
       },
       (error) => {
+        setExportExcelLoading(false);
         console.error("Error exporting Excel:", error);
       },
       null,
@@ -234,11 +237,12 @@ const GeneralScheduleScreen = () => {
         <div className="flex flex-col justify-end gap-2">
           <div className="flex flex-row justify-end">
             <Button
-              disabled={selectedSemester === null}
-              startIcon={FacebookCircularProgress}
+              disabled={selectedSemester === null || isExportExecelLoading}
+              startIcon={isExportExecelLoading ? <FacebookCircularProgress/> : null}
               variant="contained"
               color="success"
               onClick={handleExportTimeTabling}
+              loading = {isExportExecelLoading}
               sx={{ width: 200 }}
             >
               Tải xuống File Excel
@@ -250,13 +254,15 @@ const GeneralScheduleScreen = () => {
               startIcon={isSaveLoading ? <FacebookCircularProgress /> : null}
               variant="contained"
               color="primary"
+              loading={isSaveLoading}
               onClick={handleSaveTimeTabling}
             >
               Lưu TKB
             </Button>
             <Button
-              disabled={selectedRows.length === 0}
-              startIcon={FacebookCircularProgress}
+              disabled={selectedRows.length === 0 || isResetLoading}
+              loading= {isResetLoading}
+              startIcon={isResetLoading ? <FacebookCircularProgress /> : null}
               variant="contained"
               color="error"
               onClick={handleResetTimeTabling}
@@ -272,7 +278,8 @@ const GeneralScheduleScreen = () => {
                 isAutoSaveLoading
               }
               startIcon={
-                isTimeScheduleLoading ? FacebookCircularProgress : null
+                isAutoSaveLoading ?
+                <FacebookCircularProgress/> : null
               }
               variant="contained"
               color="primary"
@@ -287,7 +294,7 @@ const GeneralScheduleScreen = () => {
                 isAutoSaveLoading
               }
               startIcon={
-                isTimeScheduleLoading ? FacebookCircularProgress : null
+                isTimeScheduleLoading ? <FacebookCircularProgress/> : null
               }
               variant="contained"
               color="primary"

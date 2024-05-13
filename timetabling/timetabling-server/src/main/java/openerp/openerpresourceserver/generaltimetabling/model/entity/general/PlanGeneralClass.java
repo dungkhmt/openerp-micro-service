@@ -16,4 +16,8 @@ public class PlanGeneralClass {
     private String classType;
     private String mass;
     private String programName;
+    private String moduleCode;
+    private String moduleName;
+    private String semester;
+
 }

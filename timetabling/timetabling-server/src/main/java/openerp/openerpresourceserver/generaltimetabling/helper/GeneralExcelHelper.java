@@ -8,6 +8,7 @@ import java.util.*;
 
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.OccupationClassPeriod;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
@@ -170,9 +171,9 @@ public class GeneralExcelHelper {
                                     break;
                                 case 11:
                                     if (cellValue.isEmpty()) {
-                                        generalClass.setTempClassId(null);
+                                        generalClass.setId(null);
                                     } else {
-                                        generalClass.setTempClassId(Long.valueOf(cellValue));
+                                        generalClass.setId(Long.valueOf(cellValue));
                                     }
                                     break;
                                 case 12:
@@ -324,6 +325,8 @@ public class GeneralExcelHelper {
         }
     }
 
+
+
     public ByteArrayInputStream convertGeneralClassToExcel(List<GeneralClass> classes) {
         /*Handle Excel write*/
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -404,13 +407,19 @@ public class GeneralExcelHelper {
                             c.setCellValue(generalClass.getClassCode());
                             break;
                         case 10:
-                            c.setCellValue(generalClass.getRefClassId());
+                            if (generalClass.getRefClassId() != null) {
+                                c.setCellValue(generalClass.getRefClassId());
+                            }
                             break;
                         case 11:
-                            c.setCellValue(generalClass.getTempClassId());
+                            if (generalClass.getId()!= null) {
+                                c.setCellValue(generalClass.getId());
+                            }
                             break;
                         case 12:
-                            c.setCellValue(generalClass.getParentClassId());
+                            if (generalClass.getParentClassId() != null) {
+                                c.setCellValue(generalClass.getParentClassId());
+                            }
                             break;
                         case 13:
                             c.setCellValue(generalClass.getCrew());

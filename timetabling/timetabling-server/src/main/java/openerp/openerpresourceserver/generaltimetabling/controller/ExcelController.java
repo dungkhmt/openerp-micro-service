@@ -8,6 +8,7 @@ import openerp.openerpresourceserver.generaltimetabling.model.dto.request.Filter
 import openerp.openerpresourceserver.generaltimetabling.model.entity.ClassOpened;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Schedule;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.service.ExcelService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -60,11 +61,11 @@ public class ExcelController {
     // }
 
     @PostMapping(value = "/upload-general")
-    public ResponseEntity uploadFileGeneralCLassOpened(@RequestParam("file") MultipartFile file,
+    public ResponseEntity uploadFileGeneralCLass(@RequestParam("file") MultipartFile file,
             @RequestParam("semester") String semester) {
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
-                List<GeneralClass> classOpenedConflict = fileService.saveGeneralClassOpeneds(file, semester);
+                List<GeneralClass> classOpenedConflict = fileService.saveGeneralClasses(file, semester);
                 return ResponseEntity.status(HttpStatus.OK).body(classOpenedConflict);
             } catch (Exception e) {
                 System.err.println("\n\n\nERRROR: " + e + "\n\n\n");
@@ -73,6 +74,23 @@ public class ExcelController {
         }
         // message = "Please upload an excel file!";
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
+    @PostMapping(value = "/upload-plan")
+    public ResponseEntity uploadFilePlanCLass(@RequestParam("file") MultipartFile file,
+                                                       @RequestParam("semester") String semester) {
+        System.out.println(123123);
+        if (ExcelHelper.hasExcelFormat(file)) {
+            try {
+                List<PlanGeneralClass> classOpenedConflict = fileService.savePlanClasses(file, semester);
+                return ResponseEntity.status(HttpStatus.OK).body(classOpenedConflict);
+            } catch (Exception e) {
+                System.err.println("\n\n\nERRROR: " + e + "\n\n\n");
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage().toString());
+            }
+        }
+        // message = "Please upload an excel file!";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, file is not type of excel");
     }
 
     @PostMapping(value = "/upload-class-opened")

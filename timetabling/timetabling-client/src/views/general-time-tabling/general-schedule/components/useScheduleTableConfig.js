@@ -83,11 +83,11 @@ export const useGeneralTableColumns = (
     },
     {
       headerName: "Mã lớp tạm thời",
-      field: "tempClassId",
+      field: "id",
       width: 100,
     },
     {
-      headerName: "Mã lớp tạm thời",
+      headerName: "Mã lớp tham chiếu",
       field: "refClassId",
       width: 100,
     },

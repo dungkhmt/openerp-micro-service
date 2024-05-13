@@ -3,8 +3,6 @@ import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { FacebookCircularProgress } from "components/common/progressBar/CustomizedCircularProgress";
-import { request } from "api";
-import { width } from "@mui/system";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -21,58 +19,17 @@ const VisuallyHiddenInput = styled("input")({
 export default function InputFileUpload({
   selectedFile,
   setSelectedFile,
-  setClasses,
   selectedSemester,
+  submitHandler
 }) {
   const inputRef = React.useRef();
   console.log(selectedSemester);
   const [isLoading, setIsLoading] = React.useState(false);
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
-    console.log(selectedFile);
+    console.log(event.target.files[0]);
   };
-  const handleSubmitFile = () => {
-    if (selectedFile) {
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-      setIsLoading(true);
-      request(
-        "post",
-        `/excel/upload-general?semester=${selectedSemester?.semester}`,
-        (res) => {
-          console.log(res?.data);
-          let generalClasses = [];
-          res.data?.forEach((classObj) => {
-            if (classObj?.classCode !== null && classObj?.timeSlots) {
-              classObj.timeSlots.forEach((timeSlot, index) => {
-                const cloneObj = JSON.parse(
-                  JSON.stringify({
-                    ...classObj,
-                    ...timeSlot,
-                    classCode: classObj.classCode,
-                    id: classObj.id + `-${index + 1}`,
-                  })
-                );
-                delete cloneObj.timeSlots;
-                generalClasses.push(cloneObj);
-              });
-            }
-          });
-          console.log(generalClasses);
-          setClasses(generalClasses);
-          setIsLoading(false);
-        },
-        (err) => {
-          setIsLoading(false);
-          console.log(err);
-        },
-        formData,
-        {
-          "Content-Type": "multipart/form-data",
-        }
-      );
-    }
-  };
+  
 
   return (
     <div className="flex flex-row gap-2">
@@ -87,8 +44,8 @@ export default function InputFileUpload({
         }
       >
         {selectedFile === null
-          ? "Chọn file TKB"
-          : `TKB-${selectedSemester.semester}`}
+          ? "Nhập Excel"
+          : `${selectedFile?.name}`}
         <VisuallyHiddenInput
           ref={inputRef}
           type="file"
@@ -96,9 +53,10 @@ export default function InputFileUpload({
         />
       </Button>
       <Button
+        
         disabled={selectedFile === null}
         variant="outlined"
-        onClick={handleSubmitFile}
+        onClick={submitHandler}
       >
         Submit
       </Button>
