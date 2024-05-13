@@ -17,6 +17,7 @@ import DeleteDialog from "../components/DeleteDialog";
 import ApplicatorDialog from "./ApplicatorDialog";
 import { DataGrid } from "@mui/x-data-grid";
 import ImportDialog from "./ImportDialog";
+import { classCallUrl } from "../apiURL";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -76,7 +77,7 @@ const AllClassScreen = () => {
     setIsLoading(true);
     request(
       "get",
-      `/class-call/get-class-by-semester/${semester}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}`,
+      `${classCallUrl.getClassBySemesterL}/${semester}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}`,
       (res) => {
         setClasses(res.data.data);
         setTotalElements(res.data.totalElement);
@@ -95,20 +96,24 @@ const AllClassScreen = () => {
 
   const handleDeleteClass = () => {
     if (rowSelect.length === 0) {
-      request("delete", `/class-call/delete-class/${deleteId}`, (res) => {
+      request("delete", `${classCallUrl.deleteClass}/${deleteId}`, (res) => {
         handleFetchData();
         setOpenDeleteDialog(false);
       });
     } else if (rowSelect.length === 1) {
-      request("delete", `/class-call/delete-class/${rowSelect[0]}`, (res) => {
-        handleFetchData();
-        setOpenDeleteDialog(false);
-      });
+      request(
+        "delete",
+        `${classCallUrl.deleteClass}/${rowSelect[0]}`,
+        (res) => {
+          handleFetchData();
+          setOpenDeleteDialog(false);
+        }
+      );
     } else {
       let idList = rowSelect;
       request(
         "delete",
-        "/class-call/delete-multiple-class",
+        `${classCallUrl.deleteMultipleClass}`,
         (res) => {
           handleFetchData();
           setOpenDeleteDialog(false);
@@ -168,7 +173,7 @@ const AllClassScreen = () => {
           variant="outlined"
           color="error"
           onClick={() => handleOpenDialog(rowData)}
-          style={{ marginLeft: "1em" }}
+          style={styles.rightActionButton}
         >
           Xóa
         </Button>
@@ -224,14 +229,7 @@ const AllClassScreen = () => {
   return (
     <Paper elevation={3}>
       <div style={styles.tableToolBar}>
-        <Typography
-          variant="h4"
-          style={{
-            fontWeight: "bold",
-            marginBottom: "0.5em",
-            paddingTop: "1em",
-          }}
-        >
+        <Typography variant="h4" style={styles.title}>
           Danh sách lớp học
         </Typography>
         <div style={styles.searchArea}>
@@ -254,14 +252,8 @@ const AllClassScreen = () => {
             </Select>
           </FormControl>
 
-          {/* <Tooltip style={styles.importIcon} title="Import danh sách lớp học">
-            <IconButton component="label" onClick={handleFileChange}>
-              <FileUploadIcon color="primary" fontSize="large" />
-            </IconButton>
-          </Tooltip> */}
-
           <Button
-            style={{ height: "40px", marginTop: "0.6em", marginLeft: "0.6em" }}
+            style={styles.firstButton}
             variant="outlined"
             onClick={handleNavigateCreateClass}
           >
@@ -269,7 +261,7 @@ const AllClassScreen = () => {
           </Button>
 
           <Button
-            style={{ height: "40px", marginTop: "0.6em", marginLeft: "1em" }}
+            style={styles.actionButton}
             variant="outlined"
             onClick={handleFileChange}
           >
@@ -277,7 +269,7 @@ const AllClassScreen = () => {
           </Button>
 
           <Button
-            style={{ height: "40px", marginTop: "0.6em", marginLeft: "1em" }}
+            style={styles.actionButton}
             variant="outlined"
             color="error"
             disabled={rowSelect.length === 0}
@@ -319,7 +311,7 @@ const AllClassScreen = () => {
       <DataGrid
         loading={isLoading}
         rowHeight={60}
-        sx={{ fontSize: 16, height: "65vh" }}
+        sx={styles.table}
         rows={dataGridRows}
         columns={dataGridColumns}
         rowCount={totalElements}

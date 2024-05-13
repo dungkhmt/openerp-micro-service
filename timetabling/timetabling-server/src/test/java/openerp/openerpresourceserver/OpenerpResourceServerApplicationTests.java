@@ -18,6 +18,7 @@ import openerp.openerpresourceserver.generaltimetabling.repo.GeneralClassReposit
 import openerp.openerpresourceserver.generaltimetabling.repo.GroupRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.RoomOccupationRepo;
 import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassService;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -208,5 +209,8 @@ class OpenerpResourceServerApplicationTests {
         List<Classroom> rooms = classroomRepo.getClassRoomByBuildingIn(Arrays.stream(group.getPriorityBuilding().split(",")).toList());
         rooms.forEach(System.out::println);
     }
-
+    @Test
+    void testStringUtil() {
+        System.out.println(StringUtils.isNumeric("40.0"));
+    }
 }

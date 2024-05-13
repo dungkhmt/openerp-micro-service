@@ -234,7 +234,7 @@ public class GeneralClassServiceImp implements GeneralClassService {
             List<GeneralClass> filteredGeneralClassList = new ArrayList<>();
             for (GeneralClass gClass : generalClassList) {
                 for (String idString : ids) {
-                    log.info("resetSchedule, consider id " + idString);
+
                     int gId = Integer.parseInt(idString.split("-")[0]);
                     int timeSlotIndex = Integer.parseInt(idString.split("-")[1]) - 1;
                     if (gId == gClass.getId()) {
@@ -246,11 +246,16 @@ public class GeneralClassServiceImp implements GeneralClassService {
                         timeSlot.setStartTime(null);
                         timeSlot.setEndTime(null);
                         timeSlot.setRoom(null);
-                        filteredGeneralClassList.add(gClass);
+                        if (!filteredGeneralClassList.contains(gClass)) {
+                            filteredGeneralClassList.add(gClass);
+                        }
                     }
                 }
             }
-            return gcoRepo.saveAll(filteredGeneralClassList);
+            gcoRepo.saveAll(filteredGeneralClassList);
+            ids.forEach(System.out::println);
+            filteredGeneralClassList.forEach(System.out::println);
+            return filteredGeneralClassList;
         }
     }
 

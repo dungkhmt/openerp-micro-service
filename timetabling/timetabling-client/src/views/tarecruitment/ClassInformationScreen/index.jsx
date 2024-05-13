@@ -13,6 +13,7 @@ import styles from "./index.style";
 import { useParams, useHistory } from "react-router-dom";
 import { request } from "api";
 import { successNoti, warningNoti } from "utils/notification";
+import { classCallUrl } from "../apiURL";
 
 const ClassInformationScreen = () => {
   const history = useHistory();
@@ -32,7 +33,7 @@ const ClassInformationScreen = () => {
   const [oldFormData, setOldFormData] = useState({ ...formData });
 
   useEffect(() => {
-    request("get", `/class-call/get-class/${id}`, (res) => {
+    request("get", `${classCallUrl.getClassById}/${id}`, (res) => {
       setFormData(res.data);
       setOldFormData(res.data);
     }).then();
@@ -71,7 +72,7 @@ const ClassInformationScreen = () => {
       setOldFormData({ ...formData });
       request(
         "put",
-        `/class-call/update-class/${id}`,
+        `${classCallUrl.updateClass}/${id}`,
         (res) => {},
         {},
         formData
@@ -91,9 +92,9 @@ const ClassInformationScreen = () => {
   };
 
   return (
-    <Paper elevation={1} style={{ padding: "1em" }}>
+    <Paper elevation={1} style={styles.paper}>
       <div style={styles.tableToolBar}>
-        <Typography variant="h4" style={{ fontWeight: "bold" }}>
+        <Typography variant="h4" style={styles.title}>
           Thông tin lớp học
         </Typography>
       </div>

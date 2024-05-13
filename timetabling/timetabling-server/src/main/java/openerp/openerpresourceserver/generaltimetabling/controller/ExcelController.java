@@ -2,12 +2,14 @@ package openerp.openerpresourceserver.generaltimetabling.controller;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFileInputException;
 import openerp.openerpresourceserver.generaltimetabling.helper.ExcelHelper;
 import openerp.openerpresourceserver.generaltimetabling.message.ResponseMessage;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.ClassOpened;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Schedule;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.service.ExcelService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -60,11 +62,11 @@ public class ExcelController {
     // }
 
     @PostMapping(value = "/upload-general")
-    public ResponseEntity uploadFileGeneralCLassOpened(@RequestParam("file") MultipartFile file,
+    public ResponseEntity uploadFileGeneralCLass(@RequestParam("file") MultipartFile file,
             @RequestParam("semester") String semester) {
         if (ExcelHelper.hasExcelFormat(file)) {
             try {
-                List<GeneralClass> classOpenedConflict = fileService.saveGeneralClassOpeneds(file, semester);
+                List<GeneralClass> classOpenedConflict = fileService.saveGeneralClasses(file, semester);
                 return ResponseEntity.status(HttpStatus.OK).body(classOpenedConflict);
             } catch (Exception e) {
                 System.err.println("\n\n\nERRROR: " + e + "\n\n\n");
@@ -73,6 +75,22 @@ public class ExcelController {
         }
         // message = "Please upload an excel file!";
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
+    @ExceptionHandler(InvalidFileInputException.class)
+    public ResponseEntity resolveInvalidFileException(InvalidFileInputException e) {
+        return ResponseEntity.status(410).body(e.getErrorMessage());
+    }
+
+    @PostMapping(value = "/upload-plan")
+    public ResponseEntity requestUploadFilePlanCLass(@RequestParam("file") MultipartFile file,
+                                                       @RequestParam("semester") String semester) {
+        if (ExcelHelper.hasExcelFormat(file)) {
+            List<PlanGeneralClass> classOpenedConflict = fileService.savePlanClasses(file, semester);
+            return ResponseEntity.status(HttpStatus.OK).body(classOpenedConflict);
+        } else {
+            throw new InvalidFileInputException("File không đúng định dạng! (Yêu cầu: .xlsx)");
+        }
     }
 
     @PostMapping(value = "/upload-class-opened")

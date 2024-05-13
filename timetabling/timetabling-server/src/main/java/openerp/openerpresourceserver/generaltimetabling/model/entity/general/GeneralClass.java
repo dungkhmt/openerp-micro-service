@@ -40,8 +40,6 @@ public class GeneralClass {
     private String openBatch;
     private String course;
     private Long refClassId;
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long tempClassId;
     private Long parentClassId;
     private String groupName;
     @OneToMany(mappedBy = "generalClass", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
@@ -56,9 +54,7 @@ public class GeneralClass {
 
         GeneralClass that = (GeneralClass) o;
 
-        return Objects.equals(moduleName, that.moduleName) &&
-                Objects.equals(moduleCode, that.moduleCode) &&
-                Objects.equals(classCode, that.classCode);
+        return Objects.equals(id, that.id);
     }
 
     @Override
@@ -71,7 +67,7 @@ public class GeneralClass {
     }
     @Override
     public String toString() {
-        return classCode + " " + moduleCode + " " + moduleName + " " + timeSlots.toString();
+        return refClassId +"/"+ parentClassId +"/"+ classCode + " " + moduleCode + " " + moduleName + " " + timeSlots.toString();
     }
 
 
