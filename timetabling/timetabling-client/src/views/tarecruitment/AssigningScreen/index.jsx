@@ -20,6 +20,7 @@ import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { errorNoti } from "utils/notification";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
+import { applicationUrl } from "../apiURL";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -46,10 +47,6 @@ const AssigningScreen = () => {
   const debouncedSearch = useCallback(
     (search, statusFilter) => {
       const timer = setTimeout(() => {
-        console.log({ search, statusFilter });
-        console.log(
-          "Test stringify " + JSON.stringify({ statusFilter, search })
-        );
         setPaginationModel({
           ...DEFAULT_PAGINATION_MODEL,
           page: 0,
@@ -83,7 +80,7 @@ const AssigningScreen = () => {
     setIsLoading(true);
     request(
       "get",
-      `/application/get-application-by-status-and-semester/${SEMESTER}/APPROVED?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}${assignStatusParam}`,
+      `${applicationUrl.getApplicationByStatusAndSemester}/${SEMESTER}/APPROVED?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}${assignStatusParam}`,
       (res) => {
         setApplications(res.data.data);
         setOriginalApplications(res.data.data);
@@ -124,7 +121,7 @@ const AssigningScreen = () => {
 
     request(
       "put",
-      `/application/update-assign-status/${id}`,
+      `${applicationUrl.updateAssignStatus}/${id}`,
       (res) => {
         const updatedOriginalApplications = originalApplications.map((app) =>
           app.id === id ? { ...app, assignStatus: value } : app
@@ -142,7 +139,7 @@ const AssigningScreen = () => {
 
   const handleAutoAssign = () => {
     setIsLoading(true);
-    request("get", `/application/auto-assign-class/${SEMESTER}`, (res) => {
+    request("get", `${applicationUrl.autoAssignClass}/${SEMESTER}`, (res) => {
       handleFetchData();
       setIsLoading(false);
     });
@@ -159,7 +156,7 @@ const AssigningScreen = () => {
   const handleDownloadFile = () => {
     request(
       "get",
-      `/application/get-assign-list-file/${SEMESTER}`,
+      `${applicationUrl.getAssignListFile}/${SEMESTER}`,
       (res) => {
         const url = window.URL.createObjectURL(new Blob([res.data]));
         const link = document.createElement("a");
@@ -313,7 +310,7 @@ const AssigningScreen = () => {
 
   const FilterComponent = () => {
     return (
-      <div style={{ display: "flex", height: "40px" }}>
+      <div style={styles.filterContent}>
         <Typography variant="h6">Trạng thái: </Typography>
         <Select
           value={statusFilter}
@@ -344,14 +341,7 @@ const AssigningScreen = () => {
   return (
     <Paper elevation={3}>
       <div style={styles.tableToolBar}>
-        <Typography
-          variant="h4"
-          style={{
-            fontWeight: "bold",
-            marginBottom: "0.5em",
-            paddingTop: "1em",
-          }}
-        >
+        <Typography variant="h4" style={styles.title}>
           Phân công trợ giảng
         </Typography>
         <div style={styles.toolLine}>
@@ -403,7 +393,7 @@ const AssigningScreen = () => {
       <DataGrid
         loading={isLoading}
         rowHeight={60}
-        sx={{ fontSize: 16, height: "65vh" }}
+        sx={styles.table}
         rows={dataGridRows}
         columns={dataGridColumns}
         rowCount={totalElements}

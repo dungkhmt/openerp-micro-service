@@ -1,4 +1,7 @@
 const styles = {
+  paper: {
+    padding: "1em",
+  },
   content: {
     padding: "3%",
   },
@@ -48,6 +51,9 @@ const styles = {
   tableToolBar: {
     marginLeft: "2em",
     marginBottom: "1em",
+  },
+  title: {
+    fontWeight: "bold",
   },
 };
 

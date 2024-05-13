@@ -13,6 +13,7 @@ import { request } from "api";
 import { warningNoti, successNoti } from "utils/notification";
 import styles from "./index.style";
 import { useParams, useHistory } from "react-router-dom";
+import { classCallUrl } from "../apiURL";
 
 const RegisterClassScreen = () => {
   const history = useHistory();
@@ -57,7 +58,7 @@ const RegisterClassScreen = () => {
     } else {
       request(
         "post",
-        "/class-call/create-class",
+        `${classCallUrl.createClass}`,
         (res) => {
           successNoti("Tạo lớp học thành công", 5000);
           history.push("/ta-recruitment/teacher/class-list");
@@ -69,9 +70,9 @@ const RegisterClassScreen = () => {
   };
 
   return (
-    <Paper elevation={1} style={{ padding: "1em" }}>
+    <Paper elevation={1} style={styles.paper}>
       <div style={styles.tableToolBar}>
-        <Typography variant="h4" style={{ fontWeight: "bold" }}>
+        <Typography variant="h4" style={styles.title}>
           Tạo lớp học
         </Typography>
       </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { successNoti, warningNoti } from "utils/notification";
 import { request } from "api";
 import { useHistory } from "react-router-dom";
+import { userUrl, applicationUrl } from "../apiURL";
 
 const RegisterClassForStudentScreen = (props) => {
   const history = useHistory();
@@ -26,7 +27,7 @@ const RegisterClassForStudentScreen = (props) => {
   });
 
   useEffect(() => {
-    request("get", "/user/get-user-info", (res) => {
+    request("get", `${userUrl.getUserInfo}`, (res) => {
       console.log(res.data);
       setFormData((prevData) => ({
         ...prevData,
@@ -84,7 +85,7 @@ const RegisterClassForStudentScreen = (props) => {
     } else {
       request(
         "post",
-        "/application/create-application",
+        `${applicationUrl.createApplication}`,
         (res) => {
           successNoti("Đăng ký lớp trợ giảng thành công", 5000);
           setDataEmpty();
@@ -99,15 +100,7 @@ const RegisterClassForStudentScreen = (props) => {
   return (
     <Paper elevation={3}>
       <div>
-        <Typography
-          variant="h4"
-          style={{
-            fontWeight: "bold",
-            marginBottom: "0.5em",
-            paddingTop: "1em",
-            marginLeft: "1em",
-          }}
-        >
+        <Typography variant="h4" style={styles.title}>
           Đăng ký lớp trợ giảng
         </Typography>
 
