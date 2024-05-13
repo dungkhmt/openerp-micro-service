@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Table(name = "thesis") // Entity map voi bang defense_jury
 
-public class Thesis {
+public class Thesis implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(updatable = false, nullable = false)

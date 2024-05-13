@@ -23,14 +23,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ApplicantCard() {
+function ApplicantCard({applicant}) {
   const classes = useStyles();
 
   return (
     <Card className={classes.card} style={{ width: "100%" }}>
       <CardContent className={classes.cardContent}>
+      <Typography variant="h4">
+          Job name: {applicant.jobId.title}
+        </Typography>
         <Typography variant="h6" component="div" className={classes.title}>
-          Applicant name: LE HAI THANH
+          Candidate name: {applicant.user.id}
         </Typography>
         <Typography variant="body2" className={classes.subTitle}>
           <Button variant="text" href="#">
@@ -38,7 +41,7 @@ function ApplicantCard() {
           </Button>
         </Typography>
         <Typography>
-          status: shortListed
+          status: {applicant.status}
         </Typography>
         <Typography variant="body2" className={classes.subTitle}>
           Applicant CV: <a href="#">Click here to download</a>
@@ -47,8 +50,14 @@ function ApplicantCard() {
           Applicant message:
         </Typography>
         <Typography variant="body2" className={classes.subTitle}>
-          Created At: 19:12 06/07/2023
+          Created At: {applicant.createdTime}
         </Typography>
+        <Button variant="text" href="#">
+            Accept
+          </Button>
+          <Button variant="text" href="#">
+            Reject
+          </Button>
       </CardContent>
     </Card>
   );

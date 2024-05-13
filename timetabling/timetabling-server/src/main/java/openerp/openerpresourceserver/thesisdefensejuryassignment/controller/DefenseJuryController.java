@@ -60,6 +60,7 @@ public class DefenseJuryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DefenseJury> getDefenseJuryById(@PathVariable String id) {
+        logger.info("Jury id: " + id);
         System.out.println(id);
         DefenseJury res = juryService.getDefenseJuryByID(UUID.fromString(id));
         return new ResponseEntity<>(res, HttpStatus.OK);

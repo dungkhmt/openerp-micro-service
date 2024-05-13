@@ -25,5 +25,5 @@ public interface ClassCallService {
 
     List<ClassCall> getAllMyRegisteredClass(String userId, String semester);
 
-    int importClass(MultipartFile file);
+    int importClass(MultipartFile file, String semester);
 }

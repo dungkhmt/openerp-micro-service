@@ -16,6 +16,7 @@ const styles = {
   textFieldContainer: {
     width: "50%",
     padding: "0 1%",
+    marginBottom: "1em",
   },
   textField: {
     width: "100%",

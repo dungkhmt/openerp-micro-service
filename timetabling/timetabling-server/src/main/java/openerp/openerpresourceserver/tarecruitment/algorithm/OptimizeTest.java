@@ -12,32 +12,44 @@ public class OptimizeTest {
 
         Loader.loadNativeLibraries();
 
-        int numClasses = 6;
+        int numClasses = 3;
 
-        int numStudents = 6;
+        int numStudents = 3;
 
         int maxClassesPerStudent = 4;
 
         int maxClassesGotAssign = 0;
 
         // Sinh viên yêu cầu vào lớp nào
+//        final int[][] request = {
+//                {0, 1, 1, 0, 0, 0},
+//                {0, 0, 0, 0, 1, 0},
+//                {1, 0, 0, 1, 0, 0},
+//                {0, 0, 1, 0, 0, 0},
+//                {0, 0, 1, 1, 0, 0},
+//                {0, 0, 0, 0, 0, 1}
+//        };
+
         final int[][] request = {
-                {0, 1, 1, 0, 0, 0},
-                {0, 0, 0, 0, 1, 0},
-                {1, 0, 0, 1, 0, 0},
-                {0, 0, 1, 0, 0, 0},
-                {0, 0, 1, 1, 0, 0},
-                {0, 0, 0, 0, 0, 1}
+                {1, 0, 0},
+                {1, 1, 1},
+                {1, 1, 1}
         };
 
         // Các lớp conflict về mặt thời gian với nhau
+//        final int[][] conflictBetweenClasses = new int[][] {
+//                {0, 1, 0, 0, 0, 0},
+//                {1, 0, 0, 0, 0, 0},
+//                {0, 0, 0, 1, 0, 0},
+//                {0, 0, 1, 0, 0, 0},
+//                {0, 0, 0, 0, 0, 1},
+//                {0, 0, 0, 0, 1, 0}
+//        };
+
         final int[][] conflictBetweenClasses = new int[][] {
-                {0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0}
+                {0, 0, 0},
+                {0, 0, 0},
+                {0, 0, 0},
         };
 
         // Create the linear solver with the SCIP backend.

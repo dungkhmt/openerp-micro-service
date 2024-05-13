@@ -50,7 +50,7 @@ function withScreenSecurity(SecuredComponent, id, viewError) {
           }}
         />
       );
-    else if (screenAuthorization.has(`${id}.VIEW`))
+    else if (screenAuthorization.has(`${id}`))
       return (
         <SecuredComponent
           {...props}

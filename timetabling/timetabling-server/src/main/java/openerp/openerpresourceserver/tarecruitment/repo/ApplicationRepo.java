@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.tarecruitment.repo;
 
 import openerp.openerpresourceserver.tarecruitment.entity.Application;
+import openerp.openerpresourceserver.tarecruitment.entity.ClassCall;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -49,11 +50,12 @@ public interface ApplicationRepo extends JpaRepository<Application, Integer> {
             "AND a.classCall.semester = :semester ORDER BY a.classCall.id ASC")
     List<Application> findApplicationByUserIdAndAssignStatus(String id, String status, String semester);
 
-    @Query("SELECT DISTINCT a.user.id FROM Application a WHERE a.classCall.semester = :semester")
-    List<String> findDistinctUserIdsBySemester(String semester);
+    @Query("SELECT DISTINCT a.user.id FROM Application a WHERE a.classCall.semester = :semester AND a.assignStatus = :status " +
+            "AND a.applicationStatus = :applicationStatus")
+    List<String> findDistinctUserIdsBySemester(String semester, String applicationStatus, String status);
 
-    @Query("SELECT DISTINCT a.classCall.id FROM Application a WHERE a.classCall.semester = :semester")
-    List<Integer> findDistinctClassCallIdsBySemester(String semester);
+    @Query("SELECT DISTINCT a.classCall FROM Application a WHERE a.classCall.semester = :semester")
+    List<ClassCall> findDistinctClassCallBySemester(String semester);
 
     @Query("SELECT a FROM Application a WHERE a.classCall.semester = :semester " +
             "AND a.applicationStatus = :applicationStatus AND a.assignStatus = :assignStatus ORDER BY a.classCall.id ASC")
