@@ -53,6 +53,10 @@ public class PlanGeneralClassService {
     }
 
     public GeneralClass updateGeneralClass(GeneralClass generalClass) {
-        return generalClassRepository.save(generalClass);
+        GeneralClass updateGeneralClass = generalClassRepository.findById(generalClass.getId()).orElse(null);
+        updateGeneralClass.setParentClassId(generalClass.getParentClassId());
+        updateGeneralClass.setQuantityMax(generalClass.getQuantityMax());
+        updateGeneralClass.setClassType(generalClass.getClassType());
+        return generalClassRepository.save(updateGeneralClass);
     }
 }

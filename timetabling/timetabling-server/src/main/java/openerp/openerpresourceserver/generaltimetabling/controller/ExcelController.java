@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.generaltimetabling.controller;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFileInputException;
 import openerp.openerpresourceserver.generaltimetabling.helper.ExcelHelper;
 import openerp.openerpresourceserver.generaltimetabling.message.ResponseMessage;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.FilterClassOpenedDto;
@@ -76,21 +77,20 @@ public class ExcelController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
+    @ExceptionHandler(InvalidFileInputException.class)
+    public ResponseEntity resolveInvalidFileException(InvalidFileInputException e) {
+        return ResponseEntity.status(410).body(e.getErrorMessage());
+    }
+
     @PostMapping(value = "/upload-plan")
-    public ResponseEntity uploadFilePlanCLass(@RequestParam("file") MultipartFile file,
+    public ResponseEntity requestUploadFilePlanCLass(@RequestParam("file") MultipartFile file,
                                                        @RequestParam("semester") String semester) {
-        System.out.println(123123);
         if (ExcelHelper.hasExcelFormat(file)) {
-            try {
-                List<PlanGeneralClass> classOpenedConflict = fileService.savePlanClasses(file, semester);
-                return ResponseEntity.status(HttpStatus.OK).body(classOpenedConflict);
-            } catch (Exception e) {
-                System.err.println("\n\n\nERRROR: " + e + "\n\n\n");
-                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage().toString());
-            }
+            List<PlanGeneralClass> classOpenedConflict = fileService.savePlanClasses(file, semester);
+            return ResponseEntity.status(HttpStatus.OK).body(classOpenedConflict);
+        } else {
+            throw new InvalidFileInputException("File không đúng định dạng! (Yêu cầu: .xlsx)");
         }
-        // message = "Please upload an excel file!";
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, file is not type of excel");
     }
 
     @PostMapping(value = "/upload-class-opened")

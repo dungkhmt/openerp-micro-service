@@ -108,7 +108,6 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
         />
       ),
     },
-    
     {
       headerName: "Thời lượng",
       field: "mass",

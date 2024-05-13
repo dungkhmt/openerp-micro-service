@@ -66,9 +66,6 @@ const ViewClassPlanDialog = ({
           <Button onClick={handleMakeGeneralClass} variant="contained">
             Thêm lớp
           </Button>
-          <Button onClick={() => {}} variant="contained">
-            Lưu thay đổi
-          </Button>
         </div>
         <DataGrid
           sx={{ height: 550 }}
