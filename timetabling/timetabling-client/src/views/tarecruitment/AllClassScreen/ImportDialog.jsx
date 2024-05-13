@@ -21,6 +21,8 @@ import { useState, useRef, useEffect } from "react";
 import xlsxIcon from "../../../assets/img/xlsx_icon.svg";
 import { request } from "api";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
+import { importDialogStyles } from "./index.style";
+import { classCallUrl } from "../apiURL";
 
 const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
   const [activeStep, setActiveStep] = useState(0);
@@ -58,7 +60,7 @@ const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
     formData.append("excelFile", file);
     request(
       "post",
-      `/class-call/import-class/${semester}`,
+      `${classCallUrl.importClass}/${semester}`,
       (res) => {
         setActiveStep(3);
         setResponse(res.data);
@@ -100,9 +102,9 @@ const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
             <TableCell>IT1001</TableCell>
             <TableCell>Tin học đại cương</TableCell>
             <TableCell>B1-301</TableCell>
-            <TableCell style={{ textAlign: "center" }}>4</TableCell>
-            <TableCell style={{ textAlign: "center" }}>1</TableCell>
-            <TableCell style={{ textAlign: "center" }}>6</TableCell>
+            <TableCell style={importDialogStyles.cellCeneter}>4</TableCell>
+            <TableCell style={importDialogStyles.cellCeneter}>1</TableCell>
+            <TableCell style={importDialogStyles.cellCeneter}>6</TableCell>
             <TableCell>Ghi chú của lớp học 1</TableCell>
           </TableRow>
           <TableRow key="2">
@@ -110,9 +112,9 @@ const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
             <TableCell>IT1002</TableCell>
             <TableCell>Cơ sở dữ liệu</TableCell>
             <TableCell>B1-302</TableCell>
-            <TableCell style={{ textAlign: "center" }}>5</TableCell>
-            <TableCell style={{ textAlign: "center" }}>1</TableCell>
-            <TableCell style={{ textAlign: "center" }}>6</TableCell>
+            <TableCell style={importDialogStyles.cellCeneter}>5</TableCell>
+            <TableCell style={importDialogStyles.cellCeneter}>1</TableCell>
+            <TableCell style={importDialogStyles.cellCeneter}>6</TableCell>
             <TableCell>Ghi chú của lớp học 2</TableCell>
           </TableRow>
         </TableBody>
@@ -132,12 +134,13 @@ const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
         },
       }}
     >
-      <DialogTitle sx={{ textAlign: "center", marginTop: "1%" }}>
+      <DialogTitle style={importDialogStyles.dialogTitle}>
         <Typography variant="h5" fontWeight="bold">
           Import danh sách lớp học cho học kì {semester}
         </Typography>
       </DialogTitle>
-      <DialogContent sx={{ padding: "2em" }}>
+
+      <DialogContent style={importDialogStyles.dialogContent}>
         <Stepper nonLinear activeStep={activeStep}>
           <Step key={0} completed={activeStep > 0}>
             <StepLabel>Yêu cầu dữ liệu</StepLabel>
@@ -153,15 +156,7 @@ const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
           </Step>
         </Stepper>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-around",
-            alignItems: "center",
-            height: "90%",
-            overflowX: "hidden",
-          }}
-        >
+        <div style={importDialogStyles.content}>
           <Slide
             direction={activeStep === 0 ? "left" : "right"}
             in={activeStep === 0}
@@ -169,11 +164,8 @@ const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
             mountOnEnter
             timeout={{ enter: 300, exit: 200 }}
           >
-            <div style={{ width: "90%" }}>
-              <Typography
-                variant="h4"
-                style={{ textAlign: "center", fontWeight: "bold" }}
-              >
+            <div style={importDialogStyles.slide1.content}>
+              <Typography variant="h4" style={importDialogStyles.slide1.title}>
                 Yêu cầu dữ liệu Excel
               </Typography>
               <TableDemoData />
@@ -191,20 +183,13 @@ const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
               <div
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "1rem",
-                  border: "2px dashed #aaaaaa",
-                  padding: "8rem",
-                  borderRadius: "8px",
-                  marginTop: "2em",
-                }}
+                style={importDialogStyles.slide2.content}
               >
                 <Typography variant="h5">Kéo thả file vào đây</Typography>
-                <Typography style={{ textAlign: "center" }} variant="body1">
+                <Typography
+                  style={importDialogStyles.slide2.title}
+                  variant="body1"
+                >
                   Hoặc
                 </Typography>
                 <input
@@ -217,7 +202,7 @@ const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
                 <Button
                   variant="contained"
                   onClick={() => inputRef.current.click()}
-                  style={{ alignSelf: "center" }}
+                  style={importDialogStyles.slide2.button}
                 >
                   Chọn file
                 </Button>
@@ -226,7 +211,7 @@ const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
                     <img
                       src={xlsxIcon}
                       alt="xlsx icon"
-                      style={{ width: "50px", height: "50px" }}
+                      style={importDialogStyles.slide2.image}
                     />
                   </div>
                 )}
@@ -242,45 +227,28 @@ const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
             mountOnEnter
             timeout={{ enter: 300, exit: 200 }}
           >
-            <div
-              style={{
-                width: "90%",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
+            <div style={importDialogStyles.slide3.content}>
               {isImportSuccess ? (
                 <div>
                   <Typography
                     variant="h4"
-                    style={{ textAlign: "center", fontWeight: "bold" }}
+                    style={importDialogStyles.slide3.title}
                   >
                     Đang xử lý dữ liệu
                   </Typography>
-                  <div style={{ textAlign: "center", marginTop: "2em" }}>
+                  <div style={importDialogStyles.slide3.loadingIcon}>
                     <CircularProgress size={80} thickness={3} />
                   </div>
                 </div>
               ) : (
-                <div
-                  style={{
-                    width: "90%",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <ReportProblemIcon style={{ fontSize: 200 }} color="error" />
+                <div style={importDialogStyles.slide3.content}>
+                  <ReportProblemIcon
+                    style={importDialogStyles.slide3.errorIcon}
+                    color="error"
+                  />
                   <Typography
                     variant="h5"
-                    style={{
-                      textAlign: "center",
-                      fontWeight: "bold",
-                      marginBottom: "2em",
-                    }}
+                    style={importDialogStyles.slide3.errorText}
                   >
                     {response ? response : "Lỗi không xác định"}
                   </Typography>
@@ -296,28 +264,21 @@ const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
             mountOnEnter
             timeout={{ enter: 300, exit: 200 }}
           >
-            <div
-              style={{
-                width: "90%",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Typography
-                variant="h4"
-                style={{ textAlign: "center", fontWeight: "bold" }}
-              >
+            <div style={importDialogStyles.slide4.content}>
+              <Typography variant="h4" style={importDialogStyles.slide4.title}>
                 Nhập dữ liệu thành công
               </Typography>
-              <Typography style={{ textAlign: "center" }} variant="body1">
+              <Typography
+                style={importDialogStyles.slide4.response}
+                variant="body1"
+              >
                 {response}
               </Typography>
             </div>
           </Slide>
         </div>
       </DialogContent>
+
       <DialogActions>
         {activeStep === 0 && (
           <Button variant="contained" onClick={handleDemoDataStep}>
@@ -325,13 +286,7 @@ const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
           </Button>
         )}
         {activeStep === 1 && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
+          <div style={importDialogStyles.slide2.actionButton}>
             <Button onClick={handleBackStep} variant="contained">
               Quay lại
             </Button>

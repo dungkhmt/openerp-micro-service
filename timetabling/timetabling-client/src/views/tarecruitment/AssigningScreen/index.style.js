@@ -30,6 +30,19 @@ const styles = {
     display: "flex",
     alignItems: "center",
   },
+  filterContent: {
+    display: "flex",
+    height: "40px",
+  },
+  title: {
+    fontWeight: "bold",
+    marginBottom: "0.5em",
+    paddingTop: "1em",
+  },
+  table: {
+    fontSize: 16,
+    height: "65vh",
+  },
 };
 
 export default styles;

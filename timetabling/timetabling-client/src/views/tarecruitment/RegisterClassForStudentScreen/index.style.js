@@ -21,6 +21,12 @@ const styles = {
   textArea: {
     width: "205%",
   },
+  title: {
+    fontWeight: "bold",
+    marginBottom: "0.5em",
+    paddingTop: "1em",
+    marginLeft: "1em",
+  },
 };
 
 export default styles;

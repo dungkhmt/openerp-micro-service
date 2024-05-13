@@ -2,7 +2,7 @@ import { request } from "api";
 import { useEffect, useState } from "react";
 import { successNoti } from "utils/notification";
 
-const {
+import {
   Dialog,
   DialogTitle,
   DialogContent,
@@ -10,25 +10,10 @@ const {
   Button,
   Typography,
   TextField,
-} = require("@mui/material");
+} from "@mui/material";
 
-const styles = {
-  textFieldContainer: {
-    width: "50%",
-    padding: "0 1%",
-    marginBottom: "1em",
-  },
-  textField: {
-    width: "100%",
-  },
-  row: {
-    display: "flex",
-    flexDirection: "row",
-  },
-  textArea: {
-    width: "205%",
-  },
-};
+import { updateStyles } from "./index.style";
+import { applicationUrl } from "../apiURL";
 
 const UpdateApplicationDialog = ({
   open,
@@ -50,7 +35,7 @@ const UpdateApplicationDialog = ({
     if (open && applicationId !== "") {
       request(
         "get",
-        `/application/get-application-by-id/${applicationId}`,
+        `${applicationUrl.getApplicationById}/${applicationId}`,
         (res) => {
           const { name, mssv, phoneNumber, email, cpa, englishScore, note } =
             res.data;
@@ -80,7 +65,7 @@ const UpdateApplicationDialog = ({
   const handleUpdateApplication = () => [
     request(
       "put",
-      `/application/update-application/${applicationId}`,
+      `${applicationUrl.updateApplication}/${applicationId}`,
       (res) => {
         successNoti("Cập nhật ứng tuyển thành công!", 5000);
         fetchData();
@@ -103,26 +88,30 @@ const UpdateApplicationDialog = ({
         },
       }}
     >
-      <DialogTitle>Chỉnh sửa trạng thái ứng tuyển</DialogTitle>
+      <DialogTitle style={updateStyles.dialogTitle}>
+        <Typography variant="h5" fontWeight="bold">
+          Chỉnh sửa trạng thái ứng tuyển
+        </Typography>
+      </DialogTitle>
       <DialogContent>
-        <div style={styles.row}>
-          <div style={styles.textFieldContainer}>
+        <div style={updateStyles.row}>
+          <div style={updateStyles.textFieldContainer}>
             <Typography variant="h6">Họ tên</Typography>
             <TextField
               name="name"
               variant="outlined"
-              style={styles.textField}
+              style={updateStyles.textField}
               value={formData.name}
               onChange={handleChange}
               placeholder="Nguyễn Văn A"
             />
           </div>
-          <div style={styles.textFieldContainer}>
+          <div style={updateStyles.textFieldContainer}>
             <Typography variant="h6">Mã số sinh viên</Typography>
             <TextField
               name="mssv"
               variant="outlined"
-              style={styles.textField}
+              style={updateStyles.textField}
               value={formData.mssv}
               onChange={handleChange}
               placeholder="20200000"
@@ -130,62 +119,62 @@ const UpdateApplicationDialog = ({
           </div>
         </div>
 
-        <div style={styles.row}>
-          <div style={styles.textFieldContainer}>
+        <div style={updateStyles.row}>
+          <div style={updateStyles.textFieldContainer}>
             <Typography variant="h6">Email</Typography>
             <TextField
               name="email"
               variant="outlined"
-              style={styles.textField}
+              style={updateStyles.textField}
               value={formData.email}
               onChange={handleChange}
               placeholder="email@gmail.com"
             />
           </div>
-          <div style={styles.textFieldContainer}>
+          <div style={updateStyles.textFieldContainer}>
             <Typography variant="h6">Số điện thoại</Typography>
             <TextField
               name="phoneNumber"
               variant="outlined"
-              style={styles.textField}
+              style={updateStyles.textField}
               value={formData.phoneNumber}
               onChange={handleChange}
               placeholder="0912345678"
             />
           </div>
         </div>
-        <div style={styles.row}>
-          <div style={styles.textFieldContainer}>
+        <div style={updateStyles.row}>
+          <div style={updateStyles.textFieldContainer}>
             <Typography variant="h6">CPA</Typography>
             <TextField
               name="cpa"
               variant="outlined"
-              style={styles.textField}
+              style={updateStyles.textField}
               value={formData.cpa}
               onChange={handleChange}
               placeholder="4.0"
             />
           </div>
-          <div style={styles.textFieldContainer}>
+          <div style={updateStyles.textFieldContainer}>
             <Typography variant="h6">Chứng chỉ tiếng Anh</Typography>
             <TextField
               name="englishScore"
               variant="outlined"
-              style={styles.textField}
+              style={updateStyles.textField}
               value={formData.englishScore}
               onChange={handleChange}
               placeholder="990 TOEIC"
             />
           </div>
         </div>
-        <div style={styles.textFieldContainer}>
+        <div style={updateStyles.textFieldContainer}>
           <Typography variant="h6">Ghi chú</Typography>
           <TextField
             name="note"
             variant="outlined"
             value={formData.note}
             onChange={handleChange}
-            style={styles.textArea}
+            style={updateStyles.textArea}
             multiline
             rows={4}
           />
@@ -199,7 +188,7 @@ const UpdateApplicationDialog = ({
         >
           Sửa
         </Button>
-        <Button variant="contained" onClick={handleClose}>
+        <Button color="error" variant="contained" onClick={handleClose}>
           Quay lại
         </Button>
       </DialogActions>

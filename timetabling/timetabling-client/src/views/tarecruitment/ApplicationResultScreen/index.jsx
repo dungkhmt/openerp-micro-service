@@ -2,9 +2,10 @@ import { Button, Chip, Paper, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { request } from "api";
 import { useEffect, useState } from "react";
-import styles from "./index.style";
+import { styles } from "./index.style";
 import DeleteDialog from "../components/DeleteDialog";
 import UpdateApplicationDialog from "./UpdateApplicationDialog";
+import { applicationUrl } from "../apiURL";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -36,7 +37,7 @@ const ApplicationResultScreen = () => {
     setIsLoading(true);
     request(
       "get",
-      `/application/my-applications?page=${paginationModel.page}&limit=${paginationModel.pageSize}`,
+      `${applicationUrl.getMyApplication}?page=${paginationModel.page}&limit=${paginationModel.pageSize}`,
       (res) => {
         setApplications(res.data.data);
         setTotalElements(res.data.totalElement);
@@ -62,7 +63,7 @@ const ApplicationResultScreen = () => {
     if (rowSelect.length === 0) {
       request(
         "delete",
-        `/application/delete-application/${deleteId}`,
+        `${applicationUrl.deleteApplication}/${deleteId}`,
         (res) => {
           handleFetchData();
           setOpenDeleteDialog(false);
@@ -71,7 +72,7 @@ const ApplicationResultScreen = () => {
     } else if (rowSelect.length === 1) {
       request(
         "delete",
-        `/application/delete-application/${rowSelect[0]}`,
+        `${applicationUrl.deleteApplication}/${rowSelect[0]}`,
         (res) => {
           handleFetchData();
           setOpenDeleteDialog(false);
@@ -81,7 +82,7 @@ const ApplicationResultScreen = () => {
       let idList = rowSelect;
       request(
         "delete",
-        "/application/delete-multiple-application",
+        `${applicationUrl.deleteMultipleApplication}`,
         (res) => {
           handleFetchData();
           setOpenDeleteDialog(false);
@@ -145,7 +146,7 @@ const ApplicationResultScreen = () => {
         <Button
           variant="outlined"
           color="error"
-          style={{ marginLeft: "1em" }}
+          style={styles.rightButton}
           onClick={() => handleOpenDialog(rowData)}
         >
           Xóa
@@ -217,14 +218,7 @@ const ApplicationResultScreen = () => {
     <Paper elevation={3}>
       <div>
         <div style={styles.tableToolBar}>
-          <Typography
-            variant="h4"
-            style={{
-              fontWeight: "bold",
-              marginBottom: "0.5em",
-              paddingTop: "1em",
-            }}
-          >
+          <Typography variant="h4" style={styles.title}>
             Kết quả tuyển dụng
           </Typography>
           <Button
@@ -239,7 +233,7 @@ const ApplicationResultScreen = () => {
         <DataGrid
           loading={isLoading}
           rowHeight={60}
-          sx={{ fontSize: 16, height: "65vh" }}
+          sx={styles.table}
           rows={dataGridRows}
           columns={dataGridColumns}
           rowCount={totalElements}

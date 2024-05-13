@@ -37,6 +37,12 @@ const styles = {
     marginLeft: "2em",
     marginBottom: "1em",
   },
+  paper: {
+    padding: "1em",
+  },
+  title: {
+    fontWeight: "bold",
+  },
 };
 
 export default styles;
