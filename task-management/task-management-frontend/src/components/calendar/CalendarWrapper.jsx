@@ -22,7 +22,7 @@ const CalendarWrapper = styled(Box)(({ theme }) => {
         flexWrap: "wrap",
         flexDirection: "row !important",
         "&.fc-header-toolbar": {
-          marginBottom: theme.spacing(6),
+          marginBottom: theme.spacing(3),
         },
         ".fc-prev-button, & .fc-next-button": {
           display: "inline-block",
