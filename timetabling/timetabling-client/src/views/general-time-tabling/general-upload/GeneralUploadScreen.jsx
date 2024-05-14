@@ -17,6 +17,7 @@ const GeneralUploadScreen = () => {
     selectedSemester
   );
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [isUploading, setUploading] = useState(false);
   const handleDelete = () => {
     if (selectedSemester === null) return;
     setDeleteLoading(true);
@@ -38,12 +39,14 @@ const GeneralUploadScreen = () => {
 
   const handleSubmitFile = () => {
     if (selectedFile) {
+      setUploading(true);
       const formData = new FormData();
       formData.append("file", selectedFile);
       request(
         "post",
         `/excel/upload-general?semester=${selectedSemester?.semester}`,
         (res) => {
+          setUploading(false);
           console.log(res?.data);
           let generalClasses = [];
           res.data?.forEach((classObj) => {
@@ -64,9 +67,11 @@ const GeneralUploadScreen = () => {
           });
           console.log(generalClasses);
           setClasses(generalClasses);
+          toast.success("Upload file thành công!");
         },
         (err) => {
-          console.log(err);
+          setUploading(false);
+          toast.error("Có lỗi khi upload file!");
         },
         formData,
         {
@@ -86,6 +91,7 @@ const GeneralUploadScreen = () => {
           />
           <div className="flex flex-col gap-2 items-end">
             <InputFileUpload
+              isUploading={isUploading}
               selectedSemester={selectedSemester}
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}

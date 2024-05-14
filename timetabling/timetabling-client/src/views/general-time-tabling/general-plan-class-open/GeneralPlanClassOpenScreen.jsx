@@ -11,6 +11,7 @@ const GeneralPlanClassOpenScreen = () => {
   const [planClasses, setPlanClasses] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isOpenDialog, setOpenDialog] = useState(false);
+  const [isImportLoading, setImportLoading] = useState(false);
 
   useEffect(() => {
     if (selectedSemester) {
@@ -19,6 +20,7 @@ const GeneralPlanClassOpenScreen = () => {
         `/plan-general-classes/?semester=${selectedSemester.semester}`,
         (res) => {
           setPlanClasses(res.data);
+          toast.success("Truy vấn kế hoạch học tập thành công!");
         },
         (err) => {
           toast.error("Có lỗi khi truy vấn kế hoạch học tập");
@@ -32,16 +34,21 @@ const GeneralPlanClassOpenScreen = () => {
 
   const handleImportExcel = () => {
     if (selectedFile) {
+      setImportLoading(true);
       const formData = new FormData();
       formData.append("file", selectedFile);
       request(
         "post",
         `/excel/upload-plan?semester=${selectedSemester?.semester}`,
         (res) => {
+          setImportLoading(false);
+          toast.success("Upload file thành công!");
           console.log(res?.data);
           setPlanClasses(res?.data);
         },
         (err) => {
+          setImportLoading(false);
+          toast.success("Có lỗi khi upload file!");
           console.log(err);
         },
         formData,
@@ -74,6 +81,7 @@ const GeneralPlanClassOpenScreen = () => {
           </div> */}
           <div className="flex flex-row gap-2 justify-end">
             <InputFileUpload
+              isUploading={isImportLoading}
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
               selectedSemester={selectedSemester}

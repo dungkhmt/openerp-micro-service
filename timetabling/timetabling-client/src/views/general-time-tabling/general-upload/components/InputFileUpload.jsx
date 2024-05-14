@@ -20,11 +20,11 @@ export default function InputFileUpload({
   selectedFile,
   setSelectedFile,
   selectedSemester,
-  submitHandler
+  submitHandler,
+  isUploading
 }) {
   const inputRef = React.useRef();
   console.log(selectedSemester);
-  const [isLoading, setIsLoading] = React.useState(false);
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
     console.log(event.target.files[0]);
@@ -35,13 +35,11 @@ export default function InputFileUpload({
     <div className="flex flex-row gap-2">
       <Button
         sx={{ width: "200px" }}
-        disabled={selectedSemester === null || isLoading === true}
+        disabled={selectedSemester === null}
         component="label"
         color={selectedFile ? "success" : "primary"}
         variant="contained"
-        startIcon={
-          !isLoading ? <CloudUploadIcon /> : <FacebookCircularProgress />
-        }
+        
       >
         {selectedFile === null
           ? "Nhập Excel"
@@ -53,8 +51,8 @@ export default function InputFileUpload({
         />
       </Button>
       <Button
-        
-        disabled={selectedFile === null}
+        startIcon = {isUploading ? <FacebookCircularProgress/> : null}
+        disabled={selectedFile === null || isUploading}
         variant="outlined"
         onClick={submitHandler}
       >
