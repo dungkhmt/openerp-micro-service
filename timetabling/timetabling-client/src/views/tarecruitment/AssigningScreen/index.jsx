@@ -127,11 +127,11 @@ const AssigningScreen = () => {
           app.id === id ? { ...app, assignStatus: value } : app
         );
         setOriginalApplications(updatedOriginalApplications);
+        handleFetchData();
       },
-      {
-        onError: (e) => {
-          errorNoti(e.response.data, 5000);
-        },
+      (res) => {
+        console.log(res);
+        errorNoti(res.response.data, 5000);
       },
       updatedApplication
     );

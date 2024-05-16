@@ -19,11 +19,11 @@ public class Application {
     @Column(name = "id", updatable = false, nullable = false)
     private int id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "class_call_id", referencedColumnName = "id")
     private ClassCall classCall;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_login_id")
     private User user;
 
