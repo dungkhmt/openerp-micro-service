@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Log4j2
@@ -221,9 +222,24 @@ public class ApplicationServiceImpl implements ApplicationService{
                         }
                     }
                 }
+
+                List<Application> remainApplication = applicationRepo.getAllRemainingApplication(semester, updateApplication.getUser().getId(), updateApplication.getClassCall().getId());
+                for(Application app : remainApplication) {
+                    if(Objects.equals(app.getAssignStatus(), "APPROVED")) {
+                        throw new IllegalArgumentException("Lớp này đã có trợ giảng");
+                    }
+                }
+
+                for(Application app : remainApplication) {
+                    app.setAssignStatus("CANCELED");
+                    applicationRepo.save(app);
+                }
+
+                updateApplication.setAssignStatus(status);
+
             }
 
-            updateApplication.setAssignStatus(status);
+            else updateApplication.setAssignStatus(status);
             applicationRepo.save(updateApplication);
             return updateApplication;
         }
