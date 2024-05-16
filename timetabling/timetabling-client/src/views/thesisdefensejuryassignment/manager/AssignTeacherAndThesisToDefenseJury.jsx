@@ -19,6 +19,7 @@ function AssignTeacherAndThesisToDefenseJury() {
   const { data: availableThesisList } = useFetch(
     `/defense-jury/thesis/get-all-available/${id}`
   );
+  const { loading, data: teacherList } = useFetch("/defense-jury/teachers");
   const [activeTab, setActiveTab] = useState(0);
   const handleChangeTab = (event, tabIndex) => {
     setActiveTab(tabIndex);
@@ -88,7 +89,7 @@ function AssignTeacherAndThesisToDefenseJury() {
           </AntTabs>
           <TabPanel value={activeTab} index={0}>
             <Box sx={{ ...boxChildComponent, margin: "8px 0px 8px 0px" }}>
-              <ElementAddTeacher assignedTeacher={assignedTeacher} handleAssignRole={handleAssignRole} handleSelectTeacher={handleSelectTeacher} />
+              <ElementAddTeacher loading={loading} teacherList={teacherList} assignedTeacher={assignedTeacher} handleAssignRole={handleAssignRole} handleSelectTeacher={handleSelectTeacher} />
             </Box>
             <Box display={"flex"} flexDirection={"row-reverse"} sx={{ width: "100%" }}>
               <Button type="text" sx={{ color: 'blue' }} endIcon={<ArrowForwardIcon />} onClick={(e) => { setActiveTab((prevActiveTab) => prevActiveTab + 1) }}>
@@ -98,7 +99,7 @@ function AssignTeacherAndThesisToDefenseJury() {
           </TabPanel>
           <TabPanel value={activeTab} index={1}>
             <ElementAddThesis availableThesisList={availableThesisList} handleSelectThesis={handleSelectThesis} assignedThesis={assignedThesis} />
-            <AssignTeacherThesisButton onClick={onAssignTeacherAndThesis} />
+            <AssignTeacherThesisButton onClick={onAssignTeacherAndThesis} >Tạo hội đồng</AssignTeacherThesisButton>
           </TabPanel>
         </form>
       </Box>

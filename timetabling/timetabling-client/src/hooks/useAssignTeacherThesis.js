@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-const useAssignTeacherThesis = () => {
-  const [assignedTeacher, setAssignedTeacher] = useState([]);
-  const [assignedThesis, setAssignedThesis] = useState([]);
+const useAssignTeacherThesis = (teacherList = [], thesisList = []) => {
+  const [assignedTeacher, setAssignedTeacher] = useState(teacherList);
+  const [assignedThesis, setAssignedThesis] = useState(thesisList);
   const handleSelectThesis = (thesis) => {
     const currentIndex = assignedThesis?.find((item) => item === thesis?.id);
     if (!currentIndex) {
@@ -51,6 +51,8 @@ const useAssignTeacherThesis = () => {
     handleAssignRole,
     handleSelectTeacher,
     handleSelectThesis,
+    setAssignedTeacher,
+    setAssignedThesis,
     clearAssignedTeacher,
     clearAssignedThesis,
   };

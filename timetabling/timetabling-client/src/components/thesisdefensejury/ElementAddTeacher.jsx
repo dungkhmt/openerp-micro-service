@@ -3,11 +3,9 @@ import { Grid, List, ListSubheader, TextField, InputAdornment } from "@mui/mater
 import TeacherListItem from "./TeacherListItem";
 import AssignedTeacherListItem from './AssignedTeacherListItem'
 import SearchIcon from "@mui/icons-material/Search";
-import { useFetch } from "hooks/useFetch";
 import ModalLoading from "components/common/ModalLoading";
 
-export default function ElementAddTeacher({ assignedTeacher, handleSelectTeacher, handleAssignRole }) {
-    const { loading, data: teacherList } = useFetch("/defense-jury/teachers");
+export default function ElementAddTeacher({ loading, teacherList, assignedTeacher, handleSelectTeacher, handleAssignRole }) {
     const containsText = (text, searchText) =>
         text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
     const [searchTeacher, setSearchTeacher] = useState("");
