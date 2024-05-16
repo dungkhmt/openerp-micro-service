@@ -39,5 +39,12 @@ export const taRecruitment = {
       text: "Phân công trợ giảng",
       child: [],
     },
+    {
+      id: "MENU_TA_RECRUITMENT.ASSIGN",
+      path: `${prefix}/teacher/ta-assist-list`,
+      isPublic: false,
+      text: "Danh sách trợ giảng",
+      child: [],
+    },
   ],
 };

@@ -17,7 +17,6 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
-import { useDebounce } from "../../../hooks/useDebounce";
 import { usePreventOverflow } from "../../../hooks/usePreventOverflow";
 import { MenuAddMember } from "./MenuAddMember";
 
@@ -187,7 +186,6 @@ const ProjectViewMembers = () => {
 
   const [addMemberAnchorEl, setAddMemberAnchorEl] = useState(null);
   const [search, setSearch] = useState("");
-  const searchDebounce = useDebounce(search, 500);
 
   const handleAddMenuClick = (event) => {
     setAddMemberAnchorEl(event.currentTarget);
@@ -207,16 +205,16 @@ const ProjectViewMembers = () => {
         const id = member.member.id.toLowerCase();
         const email = member.member.email?.toLowerCase() ?? "";
         return (
-          fullName.includes(searchDebounce.toLowerCase()) ||
-          id.includes(searchDebounce.toLowerCase()) ||
-          email.includes(searchDebounce.toLowerCase())
+          fullName.includes(search.toLowerCase()) ||
+          id.includes(search.toLowerCase()) ||
+          email.includes(search.toLowerCase())
         );
       })
     );
-  }, [searchDebounce, members]);
+  }, [search, members]);
 
   useEffect(() => {
-    updateHeight(10);
+    updateHeight(20);
   }, []);
 
   return (

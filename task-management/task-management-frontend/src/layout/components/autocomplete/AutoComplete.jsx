@@ -1,22 +1,27 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useCallback, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import MuiAutocomplete from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import List from "@mui/material/List";
 import MuiDialog from "@mui/material/Dialog";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import { styled, useTheme } from "@mui/material/styles";
-import ListItemButton from "@mui/material/ListItemButton";
-import InputAdornment from "@mui/material/InputAdornment";
-import MuiAutocomplete from "@mui/material/Autocomplete";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-import { searchData } from "./searchData";
 import { Icon } from "@iconify/react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchRecentActivity } from "../../../store/search";
+import { searchData } from "./searchData";
+import { useDebounce } from "../../../hooks/useDebounce";
+import { SearchService } from "../../../services/api/search.service";
+import { CircularProgress } from "@mui/material";
 
 const defaultSuggestionsData = [
   {
@@ -80,6 +85,8 @@ const categoryTitle = {
   projects: "Quản lý dự án",
   tasks: "Quản lý công việc",
   dashboard: "Dashboard",
+  task: "Công việc",
+  project: "Dự án",
 };
 
 const Autocomplete = styled(MuiAutocomplete)(({ theme }) => ({
@@ -159,7 +166,10 @@ const Dialog = styled(MuiDialog)({
   },
 });
 
-const NoResult = ({ value, setOpenDialog }) => {
+const NoResult = ({ value, setOpenDialog, loading }) => {
+  if (loading) {
+    return <CircularProgress size={24} />;
+  }
   return (
     <Box
       sx={{
@@ -239,9 +249,41 @@ const NoResult = ({ value, setOpenDialog }) => {
 };
 
 const DefaultSuggestions = ({ setOpenDialog }) => {
+  const [suggestions, setSuggestions] = useState(defaultSuggestionsData);
+  const { recent } = useSelector((state) => state.search);
+
+  useEffect(() => {
+    const suggestions = [];
+    if (recent.tasks.length) {
+      recent.tasks.forEach((task) => {
+        suggestions.push({
+          icon: "carbon:task-asset-view",
+          suggestion: task.name,
+          link: `project/${task.projectId}/task/${task.id}`,
+        });
+      });
+    }
+    if (recent.projects.length) {
+      recent.projects.forEach((project) => {
+        suggestions.push({
+          icon: "ic:baseline-folder",
+          suggestion: project.name,
+          link: `project/${project.id}`,
+        });
+      });
+    }
+    const newSuggestions = [];
+    newSuggestions.push({
+      category: "Gần đây",
+      suggestions,
+    });
+    newSuggestions.push(...defaultSuggestionsData);
+    setSuggestions(newSuggestions);
+  }, [recent]);
+
   return (
     <Grid container spacing={6} sx={{ ml: 0 }}>
-      {defaultSuggestionsData.map((item, index) => (
+      {suggestions.map((item, index) => (
         <Grid item xs={12} sm={6} key={index}>
           <Typography
             component="p"
@@ -283,13 +325,16 @@ const DefaultSuggestions = ({ setOpenDialog }) => {
 const AutocompleteComponent = ({ hidden }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const searchDebounce = useDebounce(searchValue, 500);
   const [openDialog, setOpenDialog] = useState(false);
-  const [options] = useState(searchData);
+  const [options, setOptions] = useState(searchData);
+  const [loading, setLoading] = useState(false);
 
   const theme = useTheme();
   const navigate = useNavigate();
   const wrapper = useRef(null);
   const fullScreenDialog = useMediaQuery(theme.breakpoints.down("sm"));
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!openDialog) {
@@ -299,9 +344,51 @@ const AutocompleteComponent = ({ hidden }) => {
 
   useEffect(() => {
     setIsMounted(true);
+    dispatch(fetchRecentActivity());
 
     return () => setIsMounted(false);
-  }, []);
+  }, [dispatch]);
+
+  useEffect(() => {
+    const fetchSearchData = async () => {
+      if (!isMounted) return;
+      try {
+        // ** Fetch search data
+        setLoading(true);
+        const response = await SearchService.search(searchDebounce);
+        const newOptions = [];
+        if (response) {
+          if (response.tasks.length > 0) {
+            response.tasks.forEach((task) => {
+              newOptions.push({
+                icon: "carbon:task-asset-view",
+                title: task.name,
+                url: `project/${task.projectId}/task/${task.id}`,
+                category: "task",
+              });
+            });
+          }
+          if (response.projects.length > 0) {
+            response.projects.forEach((project) => {
+              newOptions.push({
+                icon: "ic:baseline-folder",
+                title: project.name,
+                url: `project/${project.id}`,
+                category: "project",
+              });
+            });
+          }
+        }
+        setOptions([...newOptions, ...searchData]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (searchDebounce.length) {
+      fetchSearchData();
+    }
+  }, [searchDebounce]);
 
   // Handle click event on a list item in search result
   const handleOptionClick = (obj) => {
@@ -399,7 +486,15 @@ const AutocompleteComponent = ({ hidden }) => {
                 onInputChange={(event, value) => setSearchValue(value)}
                 onChange={(event, obj) => handleOptionClick(obj)}
                 noOptionsText={
-                  <NoResult value={searchValue} setOpenDialog={setOpenDialog} />
+                  <NoResult
+                    value={searchValue}
+                    setOpenDialog={setOpenDialog}
+                    loading={loading}
+                  />
+                }
+                loading={loading}
+                loadingText={
+                  <CircularProgress size={24} sx={{ color: "primary.main" }} />
                 }
                 getOptionLabel={(option) => option.title || ""}
                 groupBy={(option) =>

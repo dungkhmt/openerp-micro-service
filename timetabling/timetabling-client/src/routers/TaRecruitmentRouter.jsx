@@ -7,6 +7,7 @@ import ClassInformationScreen from "views/tarecruitment/ClassInformationScreen";
 import RegisterClassForStudentScreen from "views/tarecruitment/RegisterClassForStudentScreen";
 import RegisterClassScreen from "views/tarecruitment/RegisterClassScreen";
 import RequestApprovalScreen from "views/tarecruitment/RequestApprovalScreen";
+import TAAssistListScreen from "views/tarecruitment/TAAssistListScreen";
 
 export default function StudentRouter() {
   let { path } = useRouteMatch();
@@ -53,6 +54,11 @@ export default function StudentRouter() {
           component={AssigningScreen}
           exact
           path={`${path}/teacher/ta-assignment`}
+        ></Route>
+        <Route
+          component={TAAssistListScreen}
+          exact
+          path={`${path}/teacher/ta-assist-list`}
         ></Route>
       </Switch>
     </div>
