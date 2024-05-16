@@ -71,6 +71,15 @@ public class TaskController {
         return new PaginationDTO<>(tasksDto);
     }
 
+    @GetMapping("/created-by-me")
+    public PaginationDTO<TaskDTO> getPaginatedTasksCreatedByMe(
+            Principal principal,
+            Pageable pageable, @RequestParam(value = "search", required = false) @Nullable String search) {
+        String creator = principal.getName();
+        var tasksDto = taskService.getTasksCreatedByUser(pageable, creator, search);
+        return new PaginationDTO<>(tasksDto);
+    }
+
     @GetMapping("{id}")
     public TaskDTO getTaskById(Principal principal, @PathVariable("id") UUID id) {
         return taskService.getTask(id, principal.getName());

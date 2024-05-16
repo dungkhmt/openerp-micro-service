@@ -46,7 +46,7 @@ const AddCreatedGroupDialogue = ({ open, setOpen, setClasses, selectedClasses })
         });
         setClasses(generalClasses);
         setLoading(false);
-        toast.info("Thêm nhóm thành công!")
+        toast.success("Thêm nhóm thành công!")
         handleClose();
       },
       (error) => {

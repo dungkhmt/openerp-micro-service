@@ -19,11 +19,9 @@ const ViewAllCV = () => {
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
-        }).then();
-    }, [])
-    useEffect(() => {
-        request("get", "/employee-cv/user/dungpq", (res) => {
-            setAllCV(res.data)
+            request("get", `/employee-cv/user/${res.data.id}`, (res) => {
+                setAllCV(res.data)
+            }).then();
         }).then();
     }, [])
 

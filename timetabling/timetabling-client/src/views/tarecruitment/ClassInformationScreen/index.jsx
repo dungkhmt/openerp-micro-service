@@ -13,6 +13,7 @@ import styles from "./index.style";
 import { useParams, useHistory } from "react-router-dom";
 import { request } from "api";
 import { successNoti, warningNoti } from "utils/notification";
+import { classCallUrl } from "../apiURL";
 
 const ClassInformationScreen = () => {
   const history = useHistory();
@@ -32,7 +33,7 @@ const ClassInformationScreen = () => {
   const [oldFormData, setOldFormData] = useState({ ...formData });
 
   useEffect(() => {
-    request("get", `/class-call/get-class/${id}`, (res) => {
+    request("get", `${classCallUrl.getClassById}/${id}`, (res) => {
       setFormData(res.data);
       setOldFormData(res.data);
     }).then();
@@ -62,21 +63,21 @@ const ClassInformationScreen = () => {
       !formData.semester ||
       !formData.id
     ) {
-      warningNoti("Vui lòng điền đầy đủ thông tin");
+      warningNoti("Vui lòng điền đầy đủ thông tin", 5000);
       return;
     } else if (formData.startPeriod >= formData.endPeriod) {
-      warningNoti("Tiết bắt đầu phải nhỏ hơn tiết kết thúc");
+      warningNoti("Tiết bắt đầu phải nhỏ hơn tiết kết thúc", 5000);
       return;
     } else {
       setOldFormData({ ...formData });
       request(
         "put",
-        `/class-call/update-class/${id}`,
+        `${classCallUrl.updateClass}/${id}`,
         (res) => {},
         {},
         formData
       );
-      successNoti("Cập nhật thông tin lớp học thành công!");
+      successNoti("Cập nhật thông tin lớp học thành công!", 5000);
       setIsEdited(false);
     }
   };
@@ -91,10 +92,12 @@ const ClassInformationScreen = () => {
   };
 
   return (
-    <div>
-      <Typography variant="h4" style={{ fontWeight: "bold" }}>
-        Thông tin lớp học
-      </Typography>
+    <Paper elevation={1} style={styles.paper}>
+      <div style={styles.tableToolBar}>
+        <Typography variant="h4" style={styles.title}>
+          Thông tin lớp học
+        </Typography>
+      </div>
       <Paper elevation={3}>
         <div style={styles.content}>
           <div style={styles.firstRow}>
@@ -264,7 +267,7 @@ const ClassInformationScreen = () => {
           </div>
         </div>
       </Paper>
-    </div>
+    </Paper>
   );
 };
 

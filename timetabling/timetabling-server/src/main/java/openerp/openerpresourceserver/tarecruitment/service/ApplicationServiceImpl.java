@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.User;
 import openerp.openerpresourceserver.generaltimetabling.repo.UserRepo;
+import openerp.openerpresourceserver.tarecruitment.algorithm.ConvertDataV2;
 import openerp.openerpresourceserver.tarecruitment.algorithm.MaxMatching;
 import openerp.openerpresourceserver.tarecruitment.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.Application;
@@ -47,6 +48,57 @@ public class ApplicationServiceImpl implements ApplicationService{
         application.setAssignStatus("PENDING");
         applicationRepo.save(application);
         return application;
+    }
+
+    @Override
+    public Application updateApplication(int id, Application application) {
+        Optional<Application> existingApplicationOptional = applicationRepo.findById(id);
+        if (existingApplicationOptional.isEmpty()) {
+            throw new IllegalArgumentException("Application with ID " + id + " not found");
+        }
+
+        Application existingApplication = existingApplicationOptional.get();
+
+        existingApplication.setName(application.getName());
+        existingApplication.setEmail(application.getEmail());
+        existingApplication.setCPA(application.getCPA());
+        existingApplication.setEnglishScore(application.getEnglishScore());
+        existingApplication.setNote(application.getNote());
+        existingApplication.setMssv(application.getMssv());
+
+        Application newApplication = applicationRepo.save(existingApplication);
+
+        return newApplication;
+    }
+
+    @Override
+    public boolean deleteApplication(int id) {
+        Optional<Application> existingApplicationOptional = applicationRepo.findById(id);
+        if (existingApplicationOptional.isEmpty()) {
+            throw new IllegalArgumentException("Application with ID " + id + " not found");
+        }
+
+        applicationRepo.deleteById(id);
+        return true;
+    }
+
+    @Override
+    public boolean deleteMultiApplication(List<Integer> idList) {
+        for(int id : idList) {
+            applicationRepo.deleteById(id);
+        }
+        return true;
+    }
+
+    @Override
+    public Application getApplicationById(int id) {
+        Optional<Application> existingApplicationOptional = applicationRepo.findById(id);
+        if (existingApplicationOptional.isEmpty()) {
+            throw new IllegalArgumentException("Application with ID " + id + " not found");
+        }
+
+        Application existingApplication = existingApplicationOptional.get();
+        return existingApplication;
     }
 
     @Override
@@ -178,27 +230,36 @@ public class ApplicationServiceImpl implements ApplicationService{
     }
 
     @Override
-    public int[][] autoAssignApplication(String semester) {
-        List<String> userApplies = applicationRepo.findDistinctUserIdsBySemester(semester);
+    public void autoAssignApplication(String semester) {
+        List<String> userApplies = applicationRepo.findDistinctUserIdsBySemester(semester, "APPROVED", "PENDING");
         log.info("Found " + userApplies.size() + " user");
+        for(String userInfo : userApplies) {
+            log.info("There is user " + userInfo);
+        }
         List<Application> applications = applicationRepo.findApplicationToAutoAssign("APPROVED", "PENDING", semester);
         log.info("Found " + applications.size() + " applications");
-        List<Integer> classCalls = applicationRepo.findDistinctClassCallIdsBySemester(semester);
+        List<ClassCall> classCalls = applicationRepo.findDistinctClassCallBySemester(semester);
         log.info("Found " + classCalls.size() + " class");
-        // could improve this
-        MaxMatching maxMatching = new MaxMatching(applications, userApplies, classCalls);
-        List<Application> assignApplications = maxMatching.getAssignApplications();
+
+//        MaxMatching maxMatching = new MaxMatching(applications, userApplies, classCalls);
+//        List<Application> assignApplications = maxMatching.getAssignApplications();
+
+        ConvertDataV2 convertDataV2 = new ConvertDataV2(applications, userApplies, classCalls);
+        List<Application> assignApplication = convertDataV2.solvingProblem();
+
+        for(Application application : assignApplication) {
+            log.info("User " + application.getUser().getId() + " got assign to class id: " + application.getClassCall().getId());
+        }
 
         for(Application app : applications) {
             app.setAssignStatus("CANCELED");
             applicationRepo.save(app);
         }
 
-        for(Application app : assignApplications) {
+        for(Application app : assignApplication) {
             app.setAssignStatus("APPROVED");
             applicationRepo.save(app);
         }
-        return maxMatching.getGraph();
     }
 
     @Override

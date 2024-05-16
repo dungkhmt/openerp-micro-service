@@ -19,12 +19,9 @@ const UserSkills = () => {
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
-        }).then();
-    }, [])
-
-    useEffect(() => {
-        request("get", "/skill/user/dungpq", (res) => {
-            setAllSkill(res.data)
+            request("get", `/skill/user/${res.data.id}`, (res) => {
+                setAllSkill(res.data)
+            }).then();
         }).then();
     }, [])
 

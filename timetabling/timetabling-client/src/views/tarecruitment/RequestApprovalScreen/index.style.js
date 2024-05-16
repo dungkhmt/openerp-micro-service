@@ -26,6 +26,15 @@ const styles = {
     display: "flex",
     alignItems: "center",
   },
+  title: {
+    fontWeight: "bold",
+    marginBottom: "0.5em",
+    paddingTop: "1em",
+  },
+  table: {
+    fontSize: 16,
+    height: "65vh",
+  },
 };
 
 export default styles;

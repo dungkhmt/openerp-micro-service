@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "../layout/Layout";
+import Home from "../pages";
 import DashBoard from "../pages/dashboard";
 import { ProjectWrapper } from "../pages/project/[id]/ProjectWrapper";
 import Project from "../pages/project/[id]/[tab]";
@@ -8,10 +9,10 @@ import { TaskContextProvider } from "../pages/project/[id]/task/[id]/TaskContext
 import Projects from "../pages/projects";
 import NewProject from "../pages/projects/new";
 import TaskAssigned from "../pages/tasks/assign-me";
+import TaskCreated from "../pages/tasks/create-by-me";
 import NotFound from "../views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import Redirect from "./Redirect";
-import Home from "../pages";
 
 export const router = createBrowserRouter([
   {
@@ -74,6 +75,10 @@ export const router = createBrowserRouter([
               {
                 path: "assign-me",
                 element: <TaskAssigned />,
+              },
+              {
+                path: "created-by-me",
+                element: <TaskCreated />,
               },
             ],
           },

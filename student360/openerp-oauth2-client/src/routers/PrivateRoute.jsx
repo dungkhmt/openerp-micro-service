@@ -15,16 +15,7 @@ function PrivateRoute({ component: Component, ...rest }) {
     <Route
       {...rest}
       render={(props) =>
-        keycloak.authenticated ? (
-          <Component {...props} />
-        ) : (
-          // (
-          //   <Redirect
-          //     to={{ pathname: "/", state: { from: history.location } }}
-          //   />
-          // )
-          keycloak.login()
-        )
+        keycloak.authenticated ? <Component {...props} /> : keycloak.login()
       }
     />
   );

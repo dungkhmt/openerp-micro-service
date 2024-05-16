@@ -14,6 +14,7 @@ import { useNotificationState } from "../state/NotificationState";
 import AccountButton from "./components/account/AccountButton";
 import NotificationButton from "./components/notification/NotificationButton";
 import SideBar, { collapsedNavWidth, navWidth } from "./SideBar";
+import AutocompleteComponent from "./components/autocomplete/AutoComplete";
 
 const Offset = styled("div")(({ theme }) => ({
   display: "flex",
@@ -145,7 +146,16 @@ function Layout() {
             </Typography>
 
             {/* Use this div tag to push the icons to the right */}
-            <div style={{ flexGrow: 1 }} />
+            <div
+              style={{
+                flexGrow: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {!hidden && <AutocompleteComponent hidden={hidden} />}
+            </div>
             <Box sx={styles.sectionDesktop}>
               {keycloak.authenticated && (
                 <>

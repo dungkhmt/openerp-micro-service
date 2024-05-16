@@ -13,13 +13,14 @@ public class ClassTimeScheduleBacktrackingSolver {
     private int[] x;// x[i] is the time-slot for class i
     private int[] sol;
     private boolean found;
-    private int timeLimit;// time limit in seconds
+    private double timeLimit;// time limit in seconds
     private double t_start;
-    public ClassTimeScheduleBacktrackingSolver(int n, int[] durations, List<Integer>[] domains, List<int[]> C) {
+    public ClassTimeScheduleBacktrackingSolver(int n, int[] durations, List<Integer>[] domains, List<int[]> C, double timeLimit) {
         this.n = n;
         this.durations = durations;
         this.domains = domains;
-
+        this.timeLimit = timeLimit;
+        t_start = System.currentTimeMillis();
         this.conflicts = new boolean[n][n];
         for(int i = 0;i < n; i++)
             for(int j = 0; j < n; j++)
@@ -47,9 +48,10 @@ public class ClassTimeScheduleBacktrackingSolver {
 
     }
     private void Try(int k){
-        log.info("Try(" + k + "/" + n + ") domain = " + domains[k].size());
+        //log.info("Try(" + k + "/" + n + ") domain = " + domains[k].size());
         double t= System.currentTimeMillis() - t_start;
         if(t > timeLimit) return;
+        //if (System.currentTimeMillis() - t0 > timeLimit) return;
         if(found) return;
         for(int v : domains[k]){
             if(check(v,k)){
@@ -61,8 +63,8 @@ public class ClassTimeScheduleBacktrackingSolver {
             }
         }
     }
-    public void solve(int timeLimit){
-        this.timeLimit = timeLimit;
+    public void solve(){
+        //this.timeLimit = timeLimit;
         log.info("solve...");
         found = false;
         x = new int[n];
@@ -107,8 +109,8 @@ public class ClassTimeScheduleBacktrackingSolver {
                 }
             }
         }
-        ClassTimeScheduleBacktrackingSolver app = new ClassTimeScheduleBacktrackingSolver(n,durations,domains,C);
-        app.solve(1000);
+        ClassTimeScheduleBacktrackingSolver app = new ClassTimeScheduleBacktrackingSolver(n,durations,domains,C, 2);
+        app.solve();
         if(!app.hasSolution()){
             log.info("NO SOLUTION");
         }else {

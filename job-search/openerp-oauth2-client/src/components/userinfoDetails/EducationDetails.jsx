@@ -22,11 +22,9 @@ import Backdrop from '@mui/material/Backdrop';
 const EducatonDetail = ({ Education,  open, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [openSnackbar, setOpenSnackbar] = useState(false);
-
-    const [allCV, setAllCV] = useState([])
-    const [selectedCVName, setSelectedCVName] = useState()
-    const [education, setEducation] = useState({})
+    const [education, setEducation] = useState(Education)
     const [user, setUser] = useState({})
+
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
@@ -37,14 +35,6 @@ const EducatonDetail = ({ Education,  open, onClose }) => {
         onClose();
     };
 
-    const [submitForm, setSubmitForm] = useState({})
-
-    useEffect(() => {
-        request("get", "/employee-cv/user/dungpq", (res) => {
-            setAllCV(res.data)
-        }).then();
-    }, [])
-
     const sleep = (milliseconds) => {
         return new Promise(resolve => setTimeout(resolve, milliseconds));
     }
@@ -53,13 +43,13 @@ const EducatonDetail = ({ Education,  open, onClose }) => {
         e.preventDefault()
         setLoading(true);
         await sleep(2000);
-        let submitToServerForm = education
-        let data = fetchUserState()
+        let submitToServerForm = {...Education, ...education}
+        submitToServerForm.user = user
 
         console.log(submitToServerForm)
         console.log(user)
-        request("post", `/cv-application/user/dungpq}`, (res) => {
-            console.log(res);
+        request("post", `/education`, (res) => {
+            console.log(res.data);
         }, (err) => {
             console.log(err);
         }, submitToServerForm).then();
@@ -78,7 +68,7 @@ const EducatonDetail = ({ Education,  open, onClose }) => {
     function goToUrl(url) {
         window.location.href = url;
     }
-    let allCVArray = allCV.map(e => { return { title: e.employeeCV.title, id: e.employeeCV.id } })
+
     return (<>
         <div>
             <Dialog onClose={handleClose} open={open} maxWidth="md" fullWidth={true} sx={{ maxHeight: 'lg' }} fullHeight={true}>
@@ -89,37 +79,37 @@ const EducatonDetail = ({ Education,  open, onClose }) => {
                             <Typography>School name</Typography>
                         </Grid>
                         <Grid item xs={11}>
-                            <TextField fullWidth label="School name" value={Education.schoolName} variant="outlined" name="schoolName" onChange={handleInputChange} />
+                            <TextField fullWidth label="School name" value={education.schoolName} variant="outlined" name="schoolName" onChange={handleInputChange} />
                         </Grid>
                         <Grid item xs={11} container  style={{ backgroundColor: "white" }}  paddingLeft={"50px"}>
                             <Typography >Major</Typography>
                         </Grid>
                         <Grid item xs={11}>
-                            <TextField fullWidth label="Major" value={Education.major} variant="outlined" name="major" onChange={handleInputChange} />
+                            <TextField fullWidth label="Major" value={education.major} variant="outlined" name="major" onChange={handleInputChange} />
                         </Grid>
                         <Grid item xs={11} container  style={{ backgroundColor: "white" }} display="flex" paddingTop={"50px"}>
                             <Typography >Description</Typography>
                         </Grid>
                         <Grid item xs={11}>
-                            <TextField fullWidth label="Description" value={Education.description} variant="outlined" name="description" onChange={handleInputChange} />
+                            <TextField fullWidth label="Description" value={education.description} variant="outlined" name="description" onChange={handleInputChange} />
                         </Grid>
                         <Grid item xs={11} container  style={{ backgroundColor: "white" }} display="flex" paddingTop={"50px"}>
                             <Typography>Grade</Typography>
                         </Grid>
                         <Grid item xs={11}>
-                            <TextField fullWidth label="Grade" value={Education.grade} variant="outlined" name="grade" onChange={handleInputChange} />
+                            <TextField fullWidth label="Grade" value={education.grade} variant="outlined" name="grade" onChange={handleInputChange} />
                         </Grid>
                         <Grid item xs={11} container  style={{ backgroundColor: "white" }} display="flex" paddingTop={"50px"}>
                             <Typography >Starting time</Typography>
                         </Grid>
                         <Grid item xs={11}>
-                            <TextField fullWidth label="Starting time" value={Education.startingTime} variant="outlined" name="startingTime" onChange={handleInputChange} />
+                            <TextField fullWidth label="Starting time" value={education.startingTime} variant="outlined" name="startingTime" onChange={handleInputChange} />
                         </Grid>
                         <Grid item xs={11} container  style={{ backgroundColor: "white" }} display="flex" paddingTop={"50px"}>
                             <Typography >Ending time</Typography>
                         </Grid>
                         <Grid item xs={11}>
-                            <TextField fullWidth label="Ending time" value={Education.endingTime} variant="outlined" name="endingTime" onChange={handleInputChange} />
+                            <TextField fullWidth label="Ending time" value={education.endingTime} variant="outlined" name="endingTime" onChange={handleInputChange} />
                         </Grid>
 
                         <Snackbar

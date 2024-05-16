@@ -17,6 +17,7 @@ const GeneralUploadScreen = () => {
     selectedSemester
   );
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [isUploading, setUploading] = useState(false);
   const handleDelete = () => {
     if (selectedSemester === null) return;
     setDeleteLoading(true);
@@ -36,6 +37,50 @@ const GeneralUploadScreen = () => {
     );
   };
 
+  const handleSubmitFile = () => {
+    if (selectedFile) {
+      setUploading(true);
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      request(
+        "post",
+        `/excel/upload-general?semester=${selectedSemester?.semester}`,
+        (res) => {
+          setUploading(false);
+          console.log(res?.data);
+          let generalClasses = [];
+          res.data?.forEach((classObj) => {
+            if (classObj?.classCode !== null && classObj?.timeSlots) {
+              classObj.timeSlots.forEach((timeSlot, index) => {
+                const cloneObj = JSON.parse(
+                  JSON.stringify({
+                    ...classObj,
+                    ...timeSlot,
+                    classCode: classObj.classCode,
+                    id: classObj.id + `-${index + 1}`,
+                  })
+                );
+                delete cloneObj.timeSlots;
+                generalClasses.push(cloneObj);
+              });
+            }
+          });
+          console.log(generalClasses);
+          setClasses(generalClasses);
+          toast.success("Upload file thành công!");
+        },
+        (err) => {
+          setUploading(false);
+          toast.error("Có lỗi khi upload file!");
+        },
+        formData,
+        {
+          "Content-Type": "multipart/form-data",
+        }
+      );
+    }
+  };
+
   return (
     <LoadingProvider>
       <div className="flex flex-col gap-2">
@@ -46,14 +91,16 @@ const GeneralUploadScreen = () => {
           />
           <div className="flex flex-col gap-2 items-end">
             <InputFileUpload
+              isUploading={isUploading}
               selectedSemester={selectedSemester}
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
               setClasses={setClasses}
+              submitHandler={handleSubmitFile}
             />
             <div className="flex">
-              {deleteLoading && <FacebookCircularProgress />}
               <Button
+                startIcon={deleteLoading ? <FacebookCircularProgress /> : null}
                 sx={{ width: 290 }}
                 disabled={deleteLoading || selectedSemester === null}
                 onClick={handleDelete}

@@ -1,20 +1,25 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
+import { useKeycloak } from "@react-keycloak/web";
 import Breadcrumb from "./Breadcrumb";
 import { a11yProps, AntTab, AntTabs, TabPanel } from "../../../components/tab";
 import StudentProfile from "./StudentProfile/StudentProfile";
 import StudentStatisticsContest from "./StudentStatisticContest/StudentStatisticContest";
 import StudentPerformance from "./StudentPerformance/StudentPerformance";
 import StudentCourseRecommend from "./StudentCourseRecommend/StudentCourseRecommend";
+import withScreenSecurity from "../../../components/common/withScreenSecurity";
 
 function StudentDetailStatistics() {
-  const { id } = useParams();
+  let { id } = useParams();
+  const { keycloak } = useKeycloak();
 
   const [activeTab, setActiveTab] = useState(0);
 
   function handleChangeTab(event, tabIndex) {
     setActiveTab(tabIndex);
   }
+
+  if (id == null) id = keycloak.tokenParsed.preferred_username;
 
   const tabsLabel = [
     "Thông tin sinh viên",
@@ -54,4 +59,5 @@ function StudentDetailStatistics() {
   );
 }
 
-export default StudentDetailStatistics;
+const screenName = "MENU_STUDENT_RESULT.STUDENT_RESULT";
+export default withScreenSecurity(StudentDetailStatistics, screenName, true);

@@ -1,9 +1,10 @@
 import { Paper, TextField, Button, Typography } from "@mui/material";
 import styles from "./index.style";
 import { useEffect, useState } from "react";
-import { successNoti } from "utils/notification";
+import { successNoti, warningNoti } from "utils/notification";
 import { request } from "api";
 import { useHistory } from "react-router-dom";
+import { userUrl, applicationUrl } from "../apiURL";
 
 const RegisterClassForStudentScreen = (props) => {
   const history = useHistory();
@@ -26,7 +27,7 @@ const RegisterClassForStudentScreen = (props) => {
   });
 
   useEffect(() => {
-    request("get", "/user/get-user-info", (res) => {
+    request("get", `${userUrl.getUserInfo}`, (res) => {
       console.log(res.data);
       setFormData((prevData) => ({
         ...prevData,
@@ -72,31 +73,34 @@ const RegisterClassForStudentScreen = (props) => {
   };
 
   const handleSubmit = () => {
-    request(
-      "post",
-      "/application/create-application",
-      (res) => {
-        successNoti("Đăng ký lớp trợ giảng thành công");
-        setDataEmpty();
-        history.push("/ta-recruitment/student/result");
-      },
-      {},
-      formData
-    );
+    if (
+      formData.name === "" ||
+      formData.mssv === "" ||
+      formData.phoneNumber === "" ||
+      formData.email === "" ||
+      formData.cpa === "" ||
+      formData.englishScore === ""
+    ) {
+      warningNoti("Vui lòng điền đầy đủ thông tin", 5000);
+    } else {
+      request(
+        "post",
+        `${applicationUrl.createApplication}`,
+        (res) => {
+          successNoti("Đăng ký lớp trợ giảng thành công", 5000);
+          setDataEmpty();
+          history.push("/ta-recruitment/student/result");
+        },
+        {},
+        formData
+      );
+    }
   };
 
   return (
     <Paper elevation={3}>
       <div>
-        <Typography
-          variant="h4"
-          style={{
-            fontWeight: "bold",
-            marginBottom: "0.5em",
-            paddingTop: "1em",
-            marginLeft: "1em",
-          }}
-        >
+        <Typography variant="h4" style={styles.title}>
           Đăng ký lớp trợ giảng
         </Typography>
 

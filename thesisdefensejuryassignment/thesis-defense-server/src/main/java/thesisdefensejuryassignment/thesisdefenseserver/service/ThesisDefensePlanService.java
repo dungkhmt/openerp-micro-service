@@ -1,6 +1,8 @@
 package thesisdefensejuryassignment.thesisdefenseserver.service;
 
 import thesisdefensejuryassignment.thesisdefenseserver.entity.ThesisDefensePlan;
+import thesisdefensejuryassignment.thesisdefenseserver.models.AssignTeacherAndThesisToDefenseJuryIM;
+import thesisdefensejuryassignment.thesisdefenseserver.models.UpdateThesisDefensePlanIM;
 
 import java.util.List;
 
@@ -19,4 +21,5 @@ public interface ThesisDefensePlanService {
 
     List<ThesisDefensePlan> getAllThesisDefensePlanAssignedForTeacherAsPresidentWithId(String teacherId);
 
+    ThesisDefensePlan updateThesisDefensePlan(String id, UpdateThesisDefensePlanIM graduationTerm);
 }

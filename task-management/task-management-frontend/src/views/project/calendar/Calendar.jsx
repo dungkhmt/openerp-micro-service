@@ -53,7 +53,7 @@ const Calendar = (props) => {
     initialView: view,
     initialDate: dayjs(range.startDate).endOf("week").toDate(),
     headerToolbar: {
-      start: "addTask, prev, next, title",
+      start: "prev, next, title",
       end: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
     },
     views: {

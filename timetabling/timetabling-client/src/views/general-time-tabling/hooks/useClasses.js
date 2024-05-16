@@ -18,21 +18,19 @@ export const useClasses = (group, semester) => {
       (res) => {
         let generalClasses = [];
         res?.data?.forEach((classObj) => {
-          if (classObj?.classCode !== null && classObj?.timeSlots) {
-            classObj.timeSlots.forEach((timeSlot, index) => {
-              const cloneObj = JSON.parse(
-                JSON.stringify({
-                  ...classObj,
-                  ...timeSlot,
-                  classCode: classObj.classCode,
-                  roomReservationId: timeSlot.id,
-                  id: classObj.id + `-${index + 1}`,
-                })
-              );
-              delete cloneObj.timeSlots;
-              generalClasses.push(cloneObj);
-            });
-          }
+          classObj.timeSlots.forEach((timeSlot, index) => {
+            const cloneObj = JSON.parse(
+              JSON.stringify({
+                ...classObj,
+                ...timeSlot,
+                classCode: classObj.classCode,
+                roomReservationId: timeSlot.id,
+                id: classObj.id + `-${index + 1}`,
+              })
+            );
+            delete cloneObj.timeSlots;
+            generalClasses.push(cloneObj);
+          });
         });
         setClasses(generalClasses);
         setLoading(false);

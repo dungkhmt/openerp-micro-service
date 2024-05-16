@@ -19,6 +19,7 @@ import StudentAssignedDefenseJury from "views/thesis-defense-jury-assignment/stu
 import PresidentAssignedThesisDefensePlan from "views/thesis-defense-jury-assignment/assigned/PresidentAssignedThesisDefensePlan";
 import PresidentAssignedDefenseJury from "views/thesis-defense-jury-assignment/assigned/PresidentAssignedDefenseJury";
 import PresidentAssignJuryDefense from "views/thesis-defense-jury-assignment/assigned/PresidentAssignJuryDefense";
+import AssignTeacherAndThesisAutomatically from "views/thesis-defense-jury-assignment/manager/AssignTeacherAndThesisAutomatically";
 const EduRoute = lazy(() => import("./EduRoute"));
 // const UserLoginRoute = lazy(() => import("./UserLoginRoute"));
 
@@ -65,6 +66,11 @@ function MainAppRoute(props) {
                 <Route
                   path="/thesis/thesis_defense_plan/:id/defense_jury/:juryId/create"
                   element={<AssignTeacherAndThesisToDefenseJury />}
+                  exact
+                />
+                <Route
+                  path="assign-automatically"
+                  element={<AssignTeacherAndThesisAutomatically />}
                   exact
                 />
               </Route>

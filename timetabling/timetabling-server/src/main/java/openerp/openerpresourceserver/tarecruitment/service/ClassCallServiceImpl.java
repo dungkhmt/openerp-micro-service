@@ -114,7 +114,7 @@ public class ClassCallServiceImpl implements ClassCallService {
     }
 
     @Override
-    public int importClass(MultipartFile file) {
+    public int importClass(MultipartFile file, String semester) {
         try (InputStream inputStream = file.getInputStream()) {
             int numberOfData = 0;
             Workbook workbook = new XSSFWorkbook(inputStream);
@@ -128,11 +128,10 @@ public class ClassCallServiceImpl implements ClassCallService {
                 Cell classIdCell = firstRow.getCell(1);
                 Cell subjectCell = firstRow.getCell(2);
                 Cell room = firstRow.getCell(3);
-                Cell semester = firstRow.getCell(4);
-                Cell day = firstRow.getCell(5);
-                Cell startPeriod = firstRow.getCell(6);
-                Cell endPeriod = firstRow.getCell(7);
-                Cell note = firstRow.getCell(8);
+                Cell day = firstRow.getCell(4);
+                Cell startPeriod = firstRow.getCell(5);
+                Cell endPeriod = firstRow.getCell(6);
+                Cell note = firstRow.getCell(7);
 
 
                 // Check if excel is valid
@@ -140,7 +139,6 @@ public class ClassCallServiceImpl implements ClassCallService {
                         "Mã môn học".equals(classIdCell.getStringCellValue()) &&
                         "Tên môn học".equals(subjectCell.getStringCellValue()) &&
                         "Phòng học".equals(room.getStringCellValue()) &&
-                        "Học kì".equals(semester.getStringCellValue()) &&
                         "Ngày".equals(day.getStringCellValue()) &&
                         "Tiết bắt đầu".equals(startPeriod.getStringCellValue()) &&
                         "Tiết kết thúc".equals(endPeriod.getStringCellValue()) &&
@@ -158,15 +156,13 @@ public class ClassCallServiceImpl implements ClassCallService {
                         log.info("Subject Name " + subjectName);
                         String subjectRoom = dataRow.getCell(3).getStringCellValue();
                         log.info("Subject Room " + subjectRoom);
-                        String classSemester = dataRow.getCell(4).getStringCellValue();
-                        log.info("Subject Semester " + classSemester);
-                        int classDay = (int) dataRow.getCell(5).getNumericCellValue();
+                        int classDay = (int) dataRow.getCell(4).getNumericCellValue();
                         log.info("Day " + classDay);
-                        int classStartPeriod = (int) dataRow.getCell(6).getNumericCellValue();
+                        int classStartPeriod = (int) dataRow.getCell(5).getNumericCellValue();
                         log.info("Start period " + classStartPeriod);
-                        int classEndPeriod = (int) dataRow.getCell(7).getNumericCellValue();
+                        int classEndPeriod = (int) dataRow.getCell(6).getNumericCellValue();
                         log.info("End period " + classEndPeriod);
-                        Cell classNote = dataRow.getCell(8);
+                        Cell classNote = dataRow.getCell(7);
                         String classNoteData = "";
                         if(!(classNote == null || classNote.getCellType() == Cell.CELL_TYPE_BLANK)) {
                             classNoteData = classNote.getStringCellValue();
@@ -181,7 +177,7 @@ public class ClassCallServiceImpl implements ClassCallService {
                             newClass.setSubjectId(subjectId);
                             newClass.setSubjectName(subjectName);
                             newClass.setClassRoom(subjectRoom);
-                            newClass.setSemester(classSemester);
+                            newClass.setSemester(semester);
                             newClass.setDay(classDay);
                             newClass.setStartPeriod(classStartPeriod);
                             newClass.setEndPeriod(classEndPeriod);

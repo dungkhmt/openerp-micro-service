@@ -5,10 +5,11 @@ import { useHistory } from "react-router-dom";
 import { SEMESTER } from "../config/localize";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
+import { classCallUrl } from "../apiURL";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
-  pageSize: 5,
+  pageSize: 10,
 };
 
 const AllRegisterClassScreen = () => {
@@ -60,7 +61,7 @@ const AllRegisterClassScreen = () => {
     setIsLoading(true);
     request(
       "get",
-      `/class-call/get-class-by-semester/${SEMESTER}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}`,
+      `${classCallUrl.getClassBySemesterL}/${SEMESTER}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}`,
       (res) => {
         setClasses(res.data.data);
         setTotalElements(res.data.totalElement);
@@ -70,7 +71,7 @@ const AllRegisterClassScreen = () => {
   };
 
   const fetchRegisteredData = () => {
-    request("get", `/class-call/get-my-registered-class/${SEMESTER}`, (res) => {
+    request("get", `${classCallUrl.getMyRegisterClass}/${SEMESTER}`, (res) => {
       setRegisteredClass(res.data);
     });
   };
@@ -89,14 +90,16 @@ const AllRegisterClassScreen = () => {
     const rowData = params.row;
     const isRegistered = registeredClass.some((item) => item.id === rowData.id);
     return (
-      <Button
-        variant="contained"
-        disabled={isRegistered}
-        onClick={() => handleRegister(rowData)}
-        style={styles.registeredButton}
-      >
-        {isRegistered ? "ĐÃ ĐĂNG KÝ" : "Đăng ký"}
-      </Button>
+      <div>
+        <Button
+          variant="outlined"
+          disabled={isRegistered}
+          onClick={() => handleRegister(rowData)}
+          style={styles.registeredButton}
+        >
+          {isRegistered ? "ĐÃ ĐĂNG KÝ" : "Đăng ký"}
+        </Button>
+      </div>
     );
   };
 
@@ -138,14 +141,7 @@ const AllRegisterClassScreen = () => {
   return (
     <Paper elevation={3}>
       <div style={styles.tableToolBar}>
-        <Typography
-          variant="h4"
-          style={{
-            fontWeight: "bold",
-            marginBottom: "0.5em",
-            paddingTop: "1em",
-          }}
-        >
+        <Typography variant="h4" style={styles.title}>
           Danh sách lớp học
         </Typography>
 
@@ -162,7 +158,7 @@ const AllRegisterClassScreen = () => {
       <DataGrid
         loading={isLoading}
         rowHeight={60}
-        sx={{ fontSize: 16, height: "65vh" }}
+        sx={styles.table}
         rows={dataGridRows}
         columns={dataGridColumns}
         rowCount={totalElements}

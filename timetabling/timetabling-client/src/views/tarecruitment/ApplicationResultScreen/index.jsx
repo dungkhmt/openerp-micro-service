@@ -1,12 +1,15 @@
-import { Chip, Paper, Typography } from "@mui/material";
+import { Button, Chip, Paper, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { request } from "api";
 import { useEffect, useState } from "react";
-import styles from "./index.style";
+import { styles } from "./index.style";
+import DeleteDialog from "../components/DeleteDialog";
+import UpdateApplicationDialog from "./UpdateApplicationDialog";
+import { applicationUrl } from "../apiURL";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
-  pageSize: 5,
+  pageSize: 10,
 };
 
 const ApplicationResultScreen = () => {
@@ -14,23 +17,86 @@ const ApplicationResultScreen = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [deleteId, setDeleteId] = useState("");
+  const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
+  const [updateId, setUpdateId] = useState("");
 
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
   );
 
+  const [rowSelect, setRowSelect] = useState([]);
+
   useEffect(() => {
+    handleFetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paginationModel]);
+
+  const handleFetchData = () => {
     setIsLoading(true);
     request(
       "get",
-      `/application/my-applications?page=${paginationModel.page}&limit=${paginationModel.pageSize}`,
+      `${applicationUrl.getMyApplication}?page=${paginationModel.page}&limit=${paginationModel.pageSize}`,
       (res) => {
         setApplications(res.data.data);
         setTotalElements(res.data.totalElement);
         setIsLoading(false);
       }
     );
-  }, [paginationModel]);
+  };
+
+  const handleCloseUpdateDialog = () => {
+    setOpenUpdateDialog(false);
+  };
+
+  const handleOpenUpdateDialog = (application) => {
+    setUpdateId(application.id);
+    setOpenUpdateDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDeleteDialog(false);
+  };
+
+  const handleDeleteApplication = () => {
+    if (rowSelect.length === 0) {
+      request(
+        "delete",
+        `${applicationUrl.deleteApplication}/${deleteId}`,
+        (res) => {
+          handleFetchData();
+          setOpenDeleteDialog(false);
+        }
+      );
+    } else if (rowSelect.length === 1) {
+      request(
+        "delete",
+        `${applicationUrl.deleteApplication}/${rowSelect[0]}`,
+        (res) => {
+          handleFetchData();
+          setOpenDeleteDialog(false);
+        }
+      );
+    } else {
+      let idList = rowSelect;
+      request(
+        "delete",
+        `${applicationUrl.deleteMultipleApplication}`,
+        (res) => {
+          handleFetchData();
+          setOpenDeleteDialog(false);
+        },
+        {},
+        idList
+      );
+    }
+  };
+
+  const handleOpenDialog = (application) => {
+    setOpenDeleteDialog(true);
+    setDeleteId(application.id);
+  };
 
   const applicationStatusCell = (params) => {
     const rowData = params.row;
@@ -64,6 +130,31 @@ const ApplicationResultScreen = () => {
     );
   };
 
+  const actionCell = (params) => {
+    const rowData = params.row;
+
+    return (
+      <div>
+        <Button
+          variant="outlined"
+          color="success"
+          onClick={() => handleOpenUpdateDialog(rowData)}
+          disabled={rowData.applicationStatus !== "PENDING"}
+        >
+          Sửa
+        </Button>
+        <Button
+          variant="outlined"
+          color="error"
+          style={styles.rightButton}
+          onClick={() => handleOpenDialog(rowData)}
+        >
+          Xóa
+        </Button>
+      </div>
+    );
+  };
+
   const dataGridColumns = [
     {
       field: "classId",
@@ -90,6 +181,7 @@ const ApplicationResultScreen = () => {
       headerName: "Trạng thái đăng ký",
       flex: 1,
       renderCell: applicationStatusCell,
+      field: "applicationStatus",
       align: "center",
       headerAlign: "center",
     },
@@ -97,6 +189,15 @@ const ApplicationResultScreen = () => {
       headerName: "Trạng thái phân công",
       flex: 1,
       renderCell: assignStatusCell,
+      field: "assignStatus",
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      headerName: "Hành động",
+      field: "actions",
+      flex: 1,
+      renderCell: actionCell,
       align: "center",
       headerAlign: "center",
     },
@@ -110,27 +211,29 @@ const ApplicationResultScreen = () => {
     day: `Thứ ${application.classCall.day}, tiết ${application.classCall.startPeriod} - ${application.classCall.endPeriod}`,
     applicationStatus: application.applicationStatus,
     assignStatus: application.assignStatus,
+    actions: { rowData: application },
   }));
 
   return (
     <Paper elevation={3}>
       <div>
         <div style={styles.tableToolBar}>
-          <Typography
-            variant="h4"
-            style={{
-              fontWeight: "bold",
-              marginBottom: "0.5em",
-              paddingTop: "1em",
-            }}
-          >
+          <Typography variant="h4" style={styles.title}>
             Kết quả tuyển dụng
           </Typography>
+          <Button
+            color="error"
+            variant="outlined"
+            disabled={rowSelect.length === 0}
+            onClick={() => setOpenDeleteDialog(true)}
+          >
+            Xóa
+          </Button>
         </div>
         <DataGrid
           loading={isLoading}
           rowHeight={60}
-          sx={{ fontSize: 16, height: "65vh" }}
+          sx={styles.table}
           rows={dataGridRows}
           columns={dataGridColumns}
           rowCount={totalElements}
@@ -139,10 +242,27 @@ const ApplicationResultScreen = () => {
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
           pageSizeOptions={[10, 20, 50]}
-          checkboxSelection={false}
+          checkboxSelection={true}
+          onRowSelectionModelChange={(newRowSelectionModel) => {
+            setRowSelect(newRowSelectionModel);
+            console.log(newRowSelectionModel);
+          }}
           disableRowSelectionOnClick
         />
       </div>
+
+      <DeleteDialog
+        open={openDeleteDialog}
+        handleDelete={handleDeleteApplication}
+        handleClose={handleCloseDialog}
+      />
+
+      <UpdateApplicationDialog
+        open={openUpdateDialog}
+        handleClose={handleCloseUpdateDialog}
+        applicationId={updateId}
+        fetchData={handleFetchData}
+      />
     </Paper>
   );
 };
