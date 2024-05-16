@@ -33,6 +33,7 @@ import { scheduleInformation } from "./menuconfig/scheduleInformation";
 // import {schedulePerformance} from "./menuconfig/schedulePerformance"
 import { courseTimeTabling } from "./menuconfig/courseTimeTabling";
 import { generalTimeTabling } from "./menuconfig/generalTimeTabling";
+import { firstYearTimeTabling } from "./menuconfig/firstYearTimeTabling";
 import { computerLabTimeTabling } from "./menuconfig/computerLabTimeTabling";
 import { taRecruitment } from "./menuconfig/taRecruitment";
 import {
@@ -51,6 +52,7 @@ MENUS.push(scheduleInformation);
 // MENUS.push(schedulePerformance);
 MENUS.push(courseTimeTabling);
 MENUS.push(generalTimeTabling);
+MENUS.push(firstYearTimeTabling);
 MENUS.push(computerLabTimeTabling);
 MENUS.push(taRecruitment);
 MENUS.push(ThesisDefensePlanManagement);
