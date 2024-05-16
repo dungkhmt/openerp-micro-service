@@ -16,6 +16,7 @@ import java.util.List;
 @Log4j2
 public class V2ClassScheduler {
     public static List<GeneralClassOpened> autoScheduleTimeSlot(List<GeneralClassOpened> classes) {
+        log.info("autoScheduleTimeSlot start...");
         int n = classes.size();
         if (n == 0) {
             log.info("Chưa chọn lớp!");
@@ -41,7 +42,7 @@ public class V2ClassScheduler {
         }
 
         ClassTimeScheduleBacktrackingSolver solver = new ClassTimeScheduleBacktrackingSolver(n, durations, domains, conflict);
-        solver.solve();
+        solver.solve(5000);// hard code with 5 seconds
         if (!solver.hasSolution()) {
             log.error("NO SOLUTION");
             throw new NotFoundException("Không tìm thấy cách xếp các lớp học!");
@@ -130,7 +131,7 @@ public class V2ClassScheduler {
 
         /*Call the classroom solver*/
         ClassRoomScheduleBacktrackingSolver solver = new ClassRoomScheduleBacktrackingSolver(numClasses, numRooms, conflict, roomCapacities, assignRoomsArray);
-        solver.setTimeLimit(2000);// time limit 2 seconds
+        solver.setTimeLimit(5000);// time limit 2 seconds
         solver.solve();
         solver.printSolution();
         classes.forEach(gClass -> {
