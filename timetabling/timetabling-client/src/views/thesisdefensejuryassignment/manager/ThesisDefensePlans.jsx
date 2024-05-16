@@ -61,7 +61,6 @@ function ThesisDefensePlans() {
       "GET",
       `/thesis-defense-plan/get-all`,
       (res) => {
-        console.log(res.data);
         setPlans(res.data);
         setLoading(false)
       }

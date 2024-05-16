@@ -58,12 +58,10 @@ export default function ModalCreateThesisDefensePlan({
         },
     });
     async function createThesisDefensePlan(body) {
-        // console.log(body);
         request(
             "post",
             "/thesis-defense-plan/save",
             (res) => {
-                console.log(res.data);
                 if (res.data === "Create successfully") {
                     // setShowSubmitSuccess(true);
                     // setOpenAlert(true);
