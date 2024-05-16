@@ -39,6 +39,7 @@ const TimetableScreen = () => {
     setSelectedSemester(semesterValue);
     request("get", `/lab-timetabling/class/semester/${semesterValue}`, (res) => {
       setClassesBySemester(res.data);
+      console.log(res.data);
       setChartData(transform_data(res.data));
     }).then();
   };

@@ -1,11 +1,14 @@
 package openerp.openerpresourceserver.labtimetabling.controller;
 
+import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.labtimetabling.algorithm.LabTimetablingSolver;
-import openerp.openerpresourceserver.labtimetabling.entity.AutoSchedulingResult;
+import openerp.openerpresourceserver.labtimetabling.entity.autoscheduling.*;
 import openerp.openerpresourceserver.labtimetabling.entity.Class;
 import openerp.openerpresourceserver.labtimetabling.entity.Room;
 import openerp.openerpresourceserver.labtimetabling.repo.AutoSchedulingResultRepo;
+import openerp.openerpresourceserver.labtimetabling.repo.AutoSchedulingSubmissionRepo;
+import openerp.openerpresourceserver.labtimetabling.service.AutoSchedulingSubmissionService;
 import openerp.openerpresourceserver.labtimetabling.service.ClassService;
 import openerp.openerpresourceserver.labtimetabling.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -23,28 +24,59 @@ import java.util.UUID;
 public class SolvingController {
     private ClassService classService;
     private RoomService roomService;
-
+    private AutoSchedulingSubmissionService autoSchedulingSubmissionService;
     private AutoSchedulingResultRepo autoSchedulingResultRepo;
+
+    private AutoSchedulingSubmissionRepo autoSchedulingSubmissionRepo;
     @PostMapping("/{semester_id}")
-    public ResponseEntity<?> autoAssign(@PathVariable Long semester_id){
-        UUID reqId = UUID.randomUUID();
-        AutoSchedulingResult result = new AutoSchedulingResult();
-        result.setSemester_id(semester_id);
-        result.setId(reqId);
-        result.setCreated_time(new Date());
-
-        autoSchedulingResultRepo.save(result);
-
+    public ResponseEntity<?> solve(@PathVariable Long semester_id, @RequestBody AutoSchedulingRequest request){
         List<Class> classList = classService.getClassesBySemester(semester_id);
         List<Room> roomList = roomService.getAllRooms();
 
+        List<Long> oddWeekClassesId = new ArrayList<>();
+        List<Long> evenWeekClassesId = new ArrayList<>();
+        List<Long> allClassesId = classList.stream().map(Class::getId).toList();
+
+        for(Map.Entry<Long, Integer> row: request.getWeekConstraintMap().entrySet()){
+            if(row.getValue() == 1) oddWeekClassesId.add(row.getKey());
+            else if (row.getValue() == 2) evenWeekClassesId.add(row.getKey());
+        }
+
+        List<Long> classesId = new ArrayList<>();
+        List<Integer> avoidWeeks = new ArrayList<>();
+        for(Map.Entry<Long, Integer> row: request.getAvoidWeekMap().entrySet()){
+            classesId.add(row.getKey());
+            avoidWeeks.add(row.getValue()-1);
+        }
+
+        System.out.println(classesId);
+        System.out.println(avoidWeeks);
+
+        UUID id = UUID.randomUUID();
+        AutoSchedulingSubmission submission = new AutoSchedulingSubmission.Builder().setId(id).setStatus(SubmissionStatus.WAITING).setSemesterId(semester_id).build();
+        AutoSchedulingSubmission newSubmission = autoSchedulingSubmissionService.create(submission);
         Thread solver = new Thread(new Runnable() {
             @Override
             public void run() {
                 LabTimetablingSolver problem = new LabTimetablingSolver(classList, roomList);
-                String res = problem.solve();
-                result.setResult(res);
-                autoSchedulingResultRepo.save(result);
+
+                List<LabTimetablingSolver.OptionalConstraint> optionalConstraints = new ArrayList<>();
+                optionalConstraints.add(new LabTimetablingSolver.ConsistentWeeklyScheduleConstraint(allClassesId));
+                optionalConstraints.add(new LabTimetablingSolver.OddWeekScheduleConstraint(oddWeekClassesId));
+                optionalConstraints.add(new LabTimetablingSolver.EvenWeekScheduleConstraint(evenWeekClassesId));
+                optionalConstraints.add(new LabTimetablingSolver.AvoidWeekScheduleConstraint(classesId, avoidWeeks));
+
+                List<List<AutoSchedulingVar>> vars = problem.solve(optionalConstraints);
+                newSubmission.setStatus(SubmissionStatus.FINISHED);
+                autoSchedulingSubmissionRepo.save(newSubmission);
+                for(List<AutoSchedulingVar> autoSchedulingVarList: vars){
+                    for(AutoSchedulingVar var: autoSchedulingVarList){
+                        AutoSchedulingResult result = new AutoSchedulingResult(var);
+                        result.setSubmission_id(id);
+                        result.setId(UUID.randomUUID());
+                        autoSchedulingResultRepo.save(result);
+                    }
+                }
             }
         });
         solver.start();
@@ -52,12 +84,17 @@ public class SolvingController {
     }
     @GetMapping("/{semester_id}")
     public ResponseEntity<?> getResultsBySemester(@PathVariable Long semester_id){
-        List<AutoSchedulingResult> results = autoSchedulingResultRepo.findAllBySemester_id(semester_id);
+        List<AutoSchedulingSubmission> results = autoSchedulingSubmissionService.getAllBySemesterId(semester_id);
         return ResponseEntity.status(HttpStatus.OK).body(results);
     }
     @GetMapping("/get-all")
     public ResponseEntity<?> getAll(){
-        List<AutoSchedulingResult> results = autoSchedulingResultRepo.findAll();
+        List<AutoSchedulingSubmission> results = autoSchedulingSubmissionService.findAll();
         return ResponseEntity.status(HttpStatus.OK).body(results);
+    }
+    @GetMapping("/result/{submission_id}")
+    public ResponseEntity<?> getResultsBySubmissionId(@PathVariable UUID submission_id) {
+        List<AutoSchedulingResult> resultList = autoSchedulingResultRepo.findAllBySubmission_id(submission_id);
+        return ResponseEntity.status(HttpStatus.OK).body(resultList);
     }
 }
