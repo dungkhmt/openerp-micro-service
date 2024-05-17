@@ -329,4 +329,18 @@ public class ApplicationServiceImpl implements ApplicationService{
             return outputStream.toByteArray();
         }
     }
+
+    @Override
+    public PaginationDTO<Application> getTABySemester(String semester, String search, int page, int limit) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Application> applications = applicationRepo.getTABySemester("APPROVED", "APPROVED", semester, search, pageable);
+
+        PaginationDTO<Application> paginationDTO = new PaginationDTO<>();
+
+        paginationDTO.setPage(applications.getNumber());
+        paginationDTO.setTotalElement((int) applications.getTotalElements());
+        paginationDTO.setData(applications.getContent());
+
+        return paginationDTO;
+    }
 }

@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.tarecruitment.service;
 
-import io.swagger.models.auth.In;
 import openerp.openerpresourceserver.tarecruitment.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.Application;
 
@@ -37,4 +36,6 @@ public interface ApplicationService {
     void autoAssignApplication(String semester);
 
     byte[] generateExcelFile(String semester) throws IOException;
+
+    PaginationDTO<Application> getTABySemester(String semester, String search, int page, int limit);
 }
