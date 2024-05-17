@@ -20,11 +20,11 @@ public interface ProductService {
 
         List<ProductGeneralResponse> getAllProductGeneralWithoutImage();
 
-//        List<ProductGeneralResponse> getAllProductForSale();
+        List<ProductGeneralResponse> getAllProductForSale();
 
         boolean deleteProducts(List<String> productIds);
 
-        ProductDetailResponse getById(String id);
+        ProductDetailResponse getDetailByProductId(String id);
 
         boolean createProductPrice(ProductPriceRequest request);
 
@@ -35,5 +35,7 @@ public interface ProductService {
         BigDecimal getCurrPriceByProductId(UUID id);
 
         Map<UUID, String> getProductNameMap();
+
+        Map<UUID, String> getProductNameMapNotInCache();
 
 }

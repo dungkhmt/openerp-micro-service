@@ -69,8 +69,8 @@ public class ProductController2 {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDetailResponse> getByProductId(@PathVariable String id) {
-        return ResponseEntity.ok(productService.getById(id));
+    public ResponseEntity<ProductDetailResponse> getDetailByProductId(@PathVariable String id) {
+        return ResponseEntity.ok(productService.getDetailByProductId(id));
     }
 
     @GetMapping(path = "/category")
@@ -96,4 +96,10 @@ public class ProductController2 {
                 ResponseEntity.ok("OK") :
                 new ResponseEntity<>("FAIL", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @GetMapping(path="/sale")
+    public ResponseEntity<List<ProductGeneralResponse>> getProductGeneralForSale() {
+        return ResponseEntity.ok(productService.getAllProductForSale());
+    }
+
 }

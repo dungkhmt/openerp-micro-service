@@ -11,7 +11,7 @@ import com.hust.wmsbackend.management.model.response.ProductPriceResponse;
 import com.hust.wmsbackend.management.repository.*;
 import com.hust.wmsbackend.v2.repo.*;
 import com.hust.wmsbackend.v2.service.ProductService;
-import com.hust.wmsbackend.management.service.WarehouseService;
+import com.hust.wmsbackend.v2.service.WarehouseService;
 import com.hust.wmsbackend.management.utils.DateTimeFormat;
 import com.hust.wmsbackend.management.utils.DateUtils;
 import lombok.AllArgsConstructor;
@@ -34,364 +34,388 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ProductServiceImplVD implements ProductService {
 
-        private ProductPriceRepository2 productPriceRepository;
-        private ProductV2Repository productRepository;
-        private ProductWarehouseRepository productWarehouseRepository;
-        private InventoryItemRepository inventoryItemRepository;
-        private ReceiptItemRequestRepository receiptItemRequestRepository;
-        private ReceiptItemRepository receiptItemRepository;
-        private SaleOrderItemRepository saleOrderItemRepository;
-        private AssignedOrderItemRepository assignedOrderItemRepository;
-        private RedisCacheService redisCacheService;
+    private ProductPriceRepository2 productPriceRepository;
+    private ProductV2Repository2 productRepository;
+    private ProductWarehouseRepository productWarehouseRepository;
+    private InventoryItemRepository inventoryItemRepository;
+    private ReceiptItemRequestRepository receiptItemRequestRepository;
+    private ReceiptItemRepository receiptItemRepository;
+    private SaleOrderItemRepository saleOrderItemRepository;
+    private AssignedOrderItemRepository assignedOrderItemRepository;
+    private RedisCacheService redisCacheService;
 
-        private WarehouseService warehouseService;
+    private WarehouseService warehouseService;
 
-        @Override
-        @Transactional
-        public Product createProduct(ProductRequest request) {
-            log.info("Start create product " + request);
-            Product product;
-            String productId;
-            boolean isCreateRequest = request.getProductId() == null;
-            if (!isCreateRequest) {
-                productId = request.getProductId();
-                log.info("Start update product with id " + productId);
-                Optional<Product> productOpt = productRepository.findById(UUID.fromString(productId));
-                if (productOpt.isPresent()) {
-                    product = productOpt.get();
-                } else {
-                    log.warn("Not found product with id " + productId);
-                    return null;
-                }
+    @Override
+    @Transactional
+    public Product createProduct(ProductRequest request) {
+        log.info("Start create product " + request);
+        Product product;
+        String productId;
+        boolean isCreateRequest = request.getProductId() == null;
+        if (!isCreateRequest) {
+            productId = request.getProductId();
+            log.info("Start update product with id " + productId);
+            Optional<Product> productOpt = productRepository.findById(UUID.fromString(productId));
+            if (productOpt.isPresent()) {
+                product = productOpt.get();
             } else {
-                product = Product.builder()
-                        .productId(UUID.randomUUID())
-                        .build();
+                log.warn("Not found product with id " + productId);
+                return null;
             }
-            product.setName(request.getName());
-            product.setCode(request.getCode());
-            product.setDescription(request.getDescription());
-            product.setHeight(request.getHeight());
-            product.setWeight(request.getWeight());
-            product.setArea(request.getArea());
-            product.setUom(request.getUom());
-            product.setCategoryId(request.getCategoryId() == null
-                    ? null
-                    : UUID.fromString(request.getCategoryId()));
-            if (request.getImage() != null) {
-                try {
-                    MultipartFile image = request.getImage();
-                    product.setImageData(image.getBytes());
-                    product.setImageContentType(image.getContentType());
-                    product.setImageSize(image.getSize());
-                } catch (IOException ioe) {
-                    log.error("Error when get image");
-                    return null;
+        } else {
+            product = Product.builder()
+                    .productId(UUID.randomUUID())
+                    .build();
+        }
+        product.setName(request.getName());
+        product.setCode(request.getCode());
+        product.setDescription(request.getDescription());
+        product.setHeight(request.getHeight());
+        product.setWeight(request.getWeight());
+        product.setArea(request.getArea());
+        product.setUom(request.getUom());
+        product.setCategoryId(request.getCategoryId() == null
+                ? null
+                : UUID.fromString(request.getCategoryId()));
+        if (request.getImage() != null) {
+            try {
+                MultipartFile image = request.getImage();
+                product.setImageData(image.getBytes());
+                product.setImageContentType(image.getContentType());
+                product.setImageSize(image.getSize());
+            } catch (IOException ioe) {
+                log.error("Error when get image");
+                return null;
+            }
+        }
+        Product savedProduct = productRepository.save(product);
+        productId = savedProduct.getProductId().toString();
+        log.info("Saved new product");
+
+        // update redis
+        List<Product> products = redisCacheService.getCachedListObject(RedisCacheService.ALL_PRODUCTS_KEY, Product.class);
+        if (products != null && !products.isEmpty()) {
+            int index = -1;
+            for (int i = 0; i < products.size(); i++) {
+                Product lProduct = products.get(i);
+                if (lProduct.getProductId().toString().equals(productId)) {
+                    index = i;
                 }
             }
-            Product savedProduct = productRepository.save(product);
-            productId = savedProduct.getProductId().toString();
-            log.info("Saved new product");
+            if (index != -1) {
+                products.remove(index);
+            }
+            products.add(product);
+            redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_PRODUCTS_KEY, products);
+        }
+        return product;
+    }
 
+    @Transactional
+    private List<Product> getAllProductInCacheElseDatabase() {
+        List<Product> products = redisCacheService.getCachedListObject(RedisCacheService.ALL_PRODUCTS_KEY, Product.class);
+        if (products == null) {
+            log.info("Get all products by repository");
+            products = productRepository.findAll();
+            redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_PRODUCTS_KEY, products);
+        }
+        return products;
+    }
+
+    @Override
+    @Transactional
+    public List<ProductGeneralResponse> getAllProductGeneral() {
+        List<Product> products = getAllProductInCacheElseDatabase();
+        Map<String, BigDecimal> productOnHandQuantityMap = new HashMap<>();
+        for (Product product : products) {
+            String productId = product.getProductId().toString();
+            productOnHandQuantityMap.put(productId,
+                    productWarehouseRepository.getTotalOnHandQuantityByProductId(UUID.fromString(productId)));
+        }
+        List<ProductGeneralResponse> response = products.stream()
+                .map(product -> ProductGeneralResponse.builder()
+                        .productId(product.getProductId().toString())
+                        .name(product.getName())
+                        .code(product.getCode())
+                        .retailPrice(getCurrPriceByProductId(product.getProductId()))
+                        .imageData(product.getImageData())
+                        .imageContentType(product.getImageContentType())
+                        .productCategoryId(product.getCategoryId().toString())
+                        .onHandQuantity(productOnHandQuantityMap.get(product.getProductId().toString()))
+                        .build())
+                .collect(Collectors.toList());
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public List<ProductGeneralResponse> getAllProductGeneralWithoutImage() {
+        List<Product> products = getAllProductInCacheElseDatabase();
+        Map<String, BigDecimal> productOnHandQuantityMap = new HashMap<>();
+        for (Product product : products) {
+            String productId = product.getProductId().toString();
+            productOnHandQuantityMap.put(productId,
+                    productWarehouseRepository.getTotalOnHandQuantityByProductId(UUID.fromString(productId)));
+        }
+        List<ProductGeneralResponse> response = new ArrayList<>(products.size());
+        for (Product product : products) {
+            String productId = product.getProductId().toString();
+            BigDecimal retailPrice = getCurrPriceByProductId(product.getProductId());
+            BigDecimal onHandQuantity = productOnHandQuantityMap.get(productId);
+            boolean canBeDelete = checkProductCanBeDelete(product.getProductId());
+
+            response.add(ProductGeneralResponse.builder()
+                    .productId(productId)
+                    .name(product.getName())
+                    .code(product.getCode())
+                    .retailPrice(retailPrice)
+                    .onHandQuantity(onHandQuantity)
+                    .canBeDelete(canBeDelete)
+                    .build());
+        }
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public List<ProductGeneralResponse> getAllProductForSale() {
+        return null;
+    }
+
+    private boolean checkProductCanBeDelete(UUID productId) {
+        List<InventoryItem> inventoryItemList = inventoryItemRepository.findAllByProductId(productId);
+        if (!inventoryItemList.isEmpty()) {
+            return false;
+        }
+        List<ProductWarehouse> productWarehouseList = productWarehouseRepository.findAllByProductId(productId);
+        if (!productWarehouseList.isEmpty()) {
+            return false;
+        }
+        List<ReceiptItemRequest> receiptItemRequestList = receiptItemRequestRepository.findAllByProductId(productId);
+        if (!receiptItemRequestList.isEmpty()) {
+            return false;
+        }
+        List<ReceiptItem> receiptItemList = receiptItemRepository.findAllByProductId(productId);
+        if (!receiptItemList.isEmpty()) {
+            return false;
+        }
+        List<SaleOrderItem> saleOrderItemList = saleOrderItemRepository.findAllByProductId(productId);
+        if (!saleOrderItemList.isEmpty()) {
+            return false;
+        }
+        List<AssignedOrderItem> assignedOrderItemList = assignedOrderItemRepository.findAllByProductId(productId);
+        if (!assignedOrderItemList.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteProducts(List<String> productIds) {
+        if (productIds.isEmpty()) {
+            log.info("Product ids list for deleting is empty");
+            return true;
+        }
+
+        try {
+            for (String productId : productIds) {
+                log.info("Start delete product with id " + productId);
+                productRepository.deleteById(UUID.fromString(productId));
+            }
             // update redis
             List<Product> products = redisCacheService.getCachedListObject(RedisCacheService.ALL_PRODUCTS_KEY, Product.class);
             if (products != null && !products.isEmpty()) {
-                int index = -1;
-                for (int i = 0; i < products.size(); i++) {
-                    Product lProduct = products.get(i);
-                    if (lProduct.getProductId().toString().equals(productId)) {
-                        index = i;
-                    }
-                }
-                if (index != -1) {
-                    products.remove(index);
-                }
-                products.add(product);
-                redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_PRODUCTS_KEY, products);
+                products.removeIf(product -> productIds.contains(product.getProductId().toString()));
             }
-            return product;
-        }
-
-        private List<Product> getAllProductInCacheElseDatabase() {
-            List<Product> products = redisCacheService.getCachedListObject(RedisCacheService.ALL_PRODUCTS_KEY, Product.class);
-            if (products == null) {
-                log.info("Get all products by repository");
-                products = productRepository.findAll();
-                redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_PRODUCTS_KEY, products);
-            }
-            return products;
-        }
-
-        @Override
-        public List<ProductGeneralResponse> getAllProductGeneral() {
-            List<Product> products = getAllProductInCacheElseDatabase();
-            Map<String, BigDecimal> productOnHandQuantityMap = new HashMap<>();
-            for (Product product : products) {
-                String productId = product.getProductId().toString();
-                productOnHandQuantityMap.put(productId,
-                        productWarehouseRepository.getTotalOnHandQuantityByProductId(UUID.fromString(productId)));
-            }
-            List<ProductGeneralResponse> response = products.stream()
-                    .map(product -> ProductGeneralResponse.builder()
-                            .productId(product.getProductId().toString())
-                            .name(product.getName())
-                            .code(product.getCode())
-                            .retailPrice(getCurrPriceByProductId(product.getProductId()))
-                            .imageData(product.getImageData())
-                            .imageContentType(product.getImageContentType())
-                            .productCategoryId(product.getCategoryId().toString())
-                            .onHandQuantity(productOnHandQuantityMap.get(product.getProductId().toString()))
-                            .build())
-                    .collect(Collectors.toList());
-            return response;
-        }
-
-        @Override
-        public List<ProductGeneralResponse> getAllProductGeneralWithoutImage() {
-            List<Product> products = getAllProductInCacheElseDatabase();
-            Map<String, BigDecimal> productOnHandQuantityMap = new HashMap<>();
-            for (Product product : products) {
-                String productId = product.getProductId().toString();
-                productOnHandQuantityMap.put(productId,
-                        productWarehouseRepository.getTotalOnHandQuantityByProductId(UUID.fromString(productId)));
-            }
-            List<ProductGeneralResponse> response = new ArrayList<>(products.size());
-            for (Product product : products) {
-                String productId = product.getProductId().toString();
-                BigDecimal retailPrice = getCurrPriceByProductId(product.getProductId());
-                BigDecimal onHandQuantity = productOnHandQuantityMap.get(productId);
-                boolean canBeDelete = checkProductCanBeDelete(product.getProductId());
-
-                response.add(ProductGeneralResponse.builder()
-                        .productId(productId)
-                        .name(product.getName())
-                        .code(product.getCode())
-                        .retailPrice(retailPrice)
-                        .onHandQuantity(onHandQuantity)
-                        .canBeDelete(canBeDelete)
-                        .build());
-            }
-            return response;
-        }
-
-        private boolean checkProductCanBeDelete(UUID productId) {
-            List<InventoryItem> inventoryItemList = inventoryItemRepository.findAllByProductId(productId);
-            if (!inventoryItemList.isEmpty()) {
-                return false;
-            }
-            List<ProductWarehouse> productWarehouseList = productWarehouseRepository.findAllByProductId(productId);
-            if (!productWarehouseList.isEmpty()) {
-                return false;
-            }
-            List<ReceiptItemRequest> receiptItemRequestList = receiptItemRequestRepository.findAllByProductId(productId);
-            if (!receiptItemRequestList.isEmpty()) {
-                return false;
-            }
-            List<ReceiptItem> receiptItemList = receiptItemRepository.findAllByProductId(productId);
-            if (!receiptItemList.isEmpty()) {
-                return false;
-            }
-            List<SaleOrderItem> saleOrderItemList = saleOrderItemRepository.findAllByProductId(productId);
-            if (!saleOrderItemList.isEmpty()) {
-                return false;
-            }
-            List<AssignedOrderItem> assignedOrderItemList = assignedOrderItemRepository.findAllByProductId(productId);
-            if (!assignedOrderItemList.isEmpty()) {
-                return false;
-            }
+            redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_PRODUCTS_KEY, products);
             return true;
+        } catch (Exception e) {
+            log.info("Error when deleting product ids list");
+            return false;
+        }
+    }
+
+    @Override
+    @Transactional
+    public ProductDetailResponse getDetailByProductId(String id) {
+        UUID productId = UUID.fromString(id);
+        Optional<Product> productInfo = productRepository.findById(productId);
+        if (!productInfo.isPresent()) {
+            log.warn(String.format("Product with id %s is not found", id));
+            return null;
         }
 
-        @Override
-        @Transactional
-        public boolean deleteProducts(List<String> productIds) {
-            if (productIds.isEmpty()) {
-                log.info("Product ids list for deleting is empty");
-                return true;
-            }
+        List<ProductDetailQuantityResponse> quantityList =
+                productRepository.getProductDetailQuantityResponseByProductId(productId);
+        List<ProductWarehouse> productWarehouses = productWarehouseRepository.findAllByProductId(productId);
+        Map<UUID, String> warehouseNameMap = warehouseService.getWarehouseNameMap();
+        List<ProductDetailResponse.ProductWarehouseQuantity> warehouseQuantities = productWarehouses.stream()
+                .filter(productWarehouse -> productWarehouse.getQuantityOnHand().compareTo(BigDecimal.ZERO) > 0)
+                .map(productWarehouse -> ProductDetailResponse.ProductWarehouseQuantity.
+                        builder().quantity(productWarehouse.getQuantityOnHand())
+                        .warehouseName(warehouseNameMap.get(productWarehouse.getWarehouseId()))
+                        .warehouseId(productWarehouse.getWarehouseId().toString())
+                        .build())
+                .collect(Collectors.toList());
+        return ProductDetailResponse.builder()
+                .productInfo(productInfo.get())
+                .quantityList(quantityList)
+                .warehouseQuantities(warehouseQuantities)
+                .build();
+    }
 
-            try {
-                for (String productId : productIds) {
-                    log.info("Start delete product with id " + productId);
-                    productRepository.deleteById(UUID.fromString(productId));
+    @Override
+    @Transactional
+    public boolean createProductPrice(ProductPriceRequest request) {
+        log.info(String.format("Create product price with request %s", request));
+        if (!productRepository.findById(UUID.fromString(request.getProductId())).isPresent()) {
+            log.warn(String.format("Product id %s is not exist", request.getProductId()));
+            return false;
+        }
+
+        if (request.getStartDate() == null) {
+            log.warn("Start date must not be null");
+            return false;
+        }
+
+        if (request.getEndDate() != null && request.getStartDate().after(request.getEndDate())) {
+            log.warn("Bad request. Start date is after end date");
+            return false;
+        }
+
+        UUID productId = UUID.fromString(request.getProductId());
+        // get previous price config
+        List<ProductPrice> prices = productPriceRepository.findAllByProductId(productId);
+
+        // get current product price entity
+        ProductPrice updatePrice = null;
+        Date now = new Date();
+        if (!prices.isEmpty()) {
+            for (ProductPrice price : prices) {
+                if (DateUtils.isNowBetween(now, price.getStartDate(), price.getEndDate())) {
+                    updatePrice = price;
+                    break;
                 }
-                // update redis
-                List<Product> products = redisCacheService.getCachedListObject(RedisCacheService.ALL_PRODUCTS_KEY, Product.class);
-                if (products != null && !products.isEmpty()) {
-                    products.removeIf(product -> productIds.contains(product.getProductId().toString()));
-                }
-                redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_PRODUCTS_KEY, products);
-                return true;
-            } catch (Exception e) {
-                log.info("Error when deleting product ids list");
-                return false;
             }
         }
 
-        @Override
-        public ProductDetailResponse getById(String id) {
-            UUID productId = UUID.fromString(id);
-            Optional<Product> productInfo = productRepository.findById(productId);
-            if (!productInfo.isPresent()) {
-                log.warn(String.format("Product with id %s is not found", id));
-                return null;
+        // set previous price config end date to request.getStartDate() - 1
+        if (updatePrice != null && updatePrice.getEndDate() == null) {
+            Date newEndDate = org.apache.commons.lang.time.DateUtils.addDays(request.getStartDate(), -1);
+            if (DateUtils.isBeforeOrEqual(updatePrice.getStartDate(), newEndDate)) {
+                updatePrice.setEndDate(newEndDate);
             }
+        }
 
-            List<ProductDetailQuantityResponse> quantityList =
-                    productRepository.getProductDetailQuantityResponseByProductId(productId);
-            List<ProductWarehouse> productWarehouses = productWarehouseRepository.findAllByProductId(productId);
-            Map<UUID, String> warehouseNameMap = warehouseService.getWarehouseNameMap();
-            List<ProductDetailResponse.ProductWarehouseQuantity> warehouseQuantities = productWarehouses.stream()
-                    .filter(productWarehouse -> productWarehouse.getQuantityOnHand().compareTo(BigDecimal.ZERO) > 0)
-                    .map(productWarehouse -> ProductDetailResponse.ProductWarehouseQuantity.
-                            builder().quantity(productWarehouse.getQuantityOnHand())
-                            .warehouseName(warehouseNameMap.get(productWarehouse.getWarehouseId()))
-                            .warehouseId(productWarehouse.getWarehouseId().toString())
+        if (!prices.isEmpty()) {
+            for (ProductPrice price : prices) {
+                if (DateUtils.isOverlap(request.getStartDate(), request.getEndDate(), price.getStartDate(), price.getEndDate())) {
+                    return false;
+                }
+                if (updatePrice != null && price.getProductPriceId().equals(updatePrice.getProductPriceId())) {
+                    price.setEndDate(updatePrice.getEndDate());
+                }
+                if (DateUtils.isOverlap(request.getStartDate(), request.getEndDate(), price.getStartDate(), price.getEndDate())) {
+                    return false;
+                }
+            }
+        }
+
+        ProductPrice productPrice = ProductPrice
+                .builder()
+                .productPriceId(UUID.randomUUID())
+                .price(request.getPrice())
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .description(request.getDescription())
+                .productId(UUID.fromString(request.getProductId()))
+                .build();
+        productPriceRepository.save(productPrice);
+        if (updatePrice != null) {
+            productPriceRepository.save(updatePrice);
+        }
+        log.info("Saved new product price");
+        return true;
+    }
+
+    @Override
+    public List<ProductPriceResponse> getAllProductPrices() {
+        List<ProductPriceResponse> response = new ArrayList<>();
+        List<Product> products = getAllProductInCacheElseDatabase();
+        for (Product product : products) {
+            List<ProductPrice> prices = productPriceRepository.findAllByProductId(product.getProductId());
+            BigDecimal currPrice = getCurrPriceByProductId(product.getProductId());
+            List<ProductPriceResponse.ProductHistoryPrices> historyPrices = prices.stream()
+                    .map(price -> ProductPriceResponse.ProductHistoryPrices.builder()
+                            .price(price.getPrice())
+                            .startDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, price.getStartDate()))
+                            .endDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, price.getEndDate()))
+                            .description(price.getDescription())
+                            .productPriceId(price.getProductPriceId())
                             .build())
                     .collect(Collectors.toList());
-            return ProductDetailResponse.builder()
-                    .productInfo(productInfo.get())
-                    .quantityList(quantityList)
-                    .warehouseQuantities(warehouseQuantities)
-                    .build();
-        }
-
-        @Override
-        @Transactional
-        public boolean createProductPrice(ProductPriceRequest request) {
-            log.info(String.format("Create product price with request %s", request));
-            if (!productRepository.findById(UUID.fromString(request.getProductId())).isPresent()) {
-                log.warn(String.format("Product id %s is not exist", request.getProductId()));
-                return false;
-            }
-
-            if (request.getStartDate() == null) {
-                log.warn("Start date must not be null");
-                return false;
-            }
-
-            if (request.getEndDate() != null && request.getStartDate().after(request.getEndDate())) {
-                log.warn("Bad request. Start date is after end date");
-                return false;
-            }
-
-            UUID productId = UUID.fromString(request.getProductId());
-            // get previous price config
-            List<ProductPrice> prices = productPriceRepository.findAllByProductId(productId);
-
-            // get current product price entity
-            ProductPrice updatePrice = null;
-            Date now = new Date();
-            if (!prices.isEmpty()) {
-                for (ProductPrice price : prices) {
-                    if (DateUtils.isNowBetween(now, price.getStartDate(), price.getEndDate())) {
-                        updatePrice = price;
-                        break;
-                    }
-                }
-            }
-
-            // set previous price config end date to request.getStartDate() - 1
-            if (updatePrice != null && updatePrice.getEndDate() == null) {
-                Date newEndDate = org.apache.commons.lang.time.DateUtils.addDays(request.getStartDate(), -1);
-                if (DateUtils.isBeforeOrEqual(updatePrice.getStartDate(), newEndDate)) {
-                    updatePrice.setEndDate(newEndDate);
-                }
-            }
-
-            if (!prices.isEmpty()) {
-                for (ProductPrice price : prices) {
-                    if (DateUtils.isOverlap(request.getStartDate(), request.getEndDate(), price.getStartDate(), price.getEndDate())) {
-                        return false;
-                    }
-                    if (updatePrice != null && price.getProductPriceId().equals(updatePrice.getProductPriceId())) {
-                        price.setEndDate(updatePrice.getEndDate());
-                    }
-                    if (DateUtils.isOverlap(request.getStartDate(), request.getEndDate(), price.getStartDate(), price.getEndDate())) {
-                        return false;
-                    }
-                }
-            }
-
-            ProductPrice productPrice = ProductPrice
+            response.add(ProductPriceResponse
                     .builder()
-                    .productPriceId(UUID.randomUUID())
-                    .price(request.getPrice())
-                    .startDate(request.getStartDate())
-                    .endDate(request.getEndDate())
-                    .description(request.getDescription())
-                    .productId(UUID.fromString(request.getProductId()))
-                    .build();
-            productPriceRepository.save(productPrice);
-            if (updatePrice != null) {
-                productPriceRepository.save(updatePrice);
+                    .currPrice(currPrice)
+                    .productName(product.getName())
+                    .productId(product.getProductId())
+                    .historyPrices(historyPrices)
+                    .build());
+        }
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteProductPriceById(String[] ids) {
+        try {
+            for (String id : ids) {
+                productPriceRepository.deleteById(UUID.fromString(id));
             }
-            log.info("Saved new product price");
             return true;
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            return false;
         }
+    }
 
-        @Override
-        public List<ProductPriceResponse> getAllProductPrices() {
-            List<ProductPriceResponse> response = new ArrayList<>();
-            List<Product> products = getAllProductInCacheElseDatabase();
-            for (Product product : products) {
-                List<ProductPrice> prices = productPriceRepository.findAllByProductId(product.getProductId());
-                BigDecimal currPrice = getCurrPriceByProductId(product.getProductId());
-                List<ProductPriceResponse.ProductHistoryPrices> historyPrices = prices.stream()
-                        .map(price -> ProductPriceResponse.ProductHistoryPrices.builder()
-                                .price(price.getPrice())
-                                .startDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, price.getStartDate()))
-                                .endDate(DateTimeFormat.convertDateToString(DateTimeFormat.DD_MM_YYYY, price.getEndDate()))
-                                .description(price.getDescription())
-                                .productPriceId(price.getProductPriceId())
-                                .build())
-                        .collect(Collectors.toList());
-                response.add(ProductPriceResponse
-                        .builder()
-                        .currPrice(currPrice)
-                        .productName(product.getName())
-                        .productId(product.getProductId())
-                        .historyPrices(historyPrices)
-                        .build());
-            }
-            return response;
+    @Override
+    public BigDecimal getCurrPriceByProductId(UUID productId) {
+        Date now = new Date();
+        List<ProductPrice> prices = productPriceRepository.findCurrentPriceByProductId(productId, now);
+        BigDecimal curPrice = null;
+        if  (prices.size() == 1) {
+            curPrice = prices.get(0).getPrice();
+        } else {
+            // ?? có ràng buộc date khi config Price không
+            curPrice = prices.get(0).getPrice();
         }
+        return curPrice;
+    }
 
-        @Override
-        @Transactional
-        public boolean deleteProductPriceById(String[] ids) {
-            try {
-                for (String id : ids) {
-                    productPriceRepository.deleteById(UUID.fromString(id));
-                }
-                return true;
-            } catch (Exception e) {
-                log.warn(e.getMessage());
-                return false;
-            }
+    @Override
+    @Transactional
+    public Map<UUID, String> getProductNameMap() {
+        List<Product> products = getAllProductInCacheElseDatabase();
+        Map<UUID, String> map = new HashMap<>();
+        for (Product product : products) {
+            map.put(product.getProductId(), product.getName());
         }
+        return map;
+    }
 
-        @Override
-        public BigDecimal getCurrPriceByProductId(UUID productId) {
-            Date now = new Date();
-            List<ProductPrice> prices = productPriceRepository.findCurrentPriceByProductId(productId, now);
-            BigDecimal curPrice = null;
-            if  (prices.size() == 1) {
-                curPrice = prices.get(0).getPrice();
-            } else {
-                // ?? có ràng buộc date khi config Price không
-                curPrice = prices.get(0).getPrice();
-            }
-            return curPrice;
+    @Override
+    @Transactional
+    public Map<UUID, String> getProductNameMapNotInCache() {
+        List<Object[]> results = productRepository.findProductIdAndName();
+        Map<UUID, String> map = new HashMap<>();
+        for (Object[] result : results) {
+            UUID productId = (UUID) result[0];
+            String name = (String) result[1];
+            map.put(productId, name);
         }
-
-        @Override
-        public Map<UUID, String> getProductNameMap() {
-            List<Product> products = getAllProductInCacheElseDatabase();
-            Map<UUID, String> map = new HashMap<>();
-            for (Product product : products) {
-                map.put(product.getProductId(), product.getName());
-            }
-            return map;
-        }
+        return map;
+    }
 }

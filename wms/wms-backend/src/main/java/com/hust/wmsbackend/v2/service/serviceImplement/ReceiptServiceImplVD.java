@@ -34,7 +34,7 @@ public class ReceiptServiceImplVD implements ReceiptService {
     private InventoryItemRepository inventoryItemRepository;
     private ProductWarehouseRepository productWarehouseRepository;
     private WarehouseRepository warehouseRepository;
-    private ProductV2Repository productRepository;
+    private ProductV2Repository2 productRepository;
     private ReceiptBillRepository receiptBillRepository;
 
     private ProductService productService;

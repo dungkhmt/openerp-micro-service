@@ -16,13 +16,27 @@ export const ProductDropDown = ({ productList, setSelectedProductId, setSelected
 
 export const WarehouseDropDown = ({ warehouseList, setSelectedWarehouseId, setSelectedWarehouseName }) => {
   return <Select onChange={(e, v) => {
+    console.log('chon wh: ', e.target.value, v?.props?.children);
         setSelectedWarehouseId(e.target.value);
         setSelectedWarehouseName(v?.props?.children);
       }} defaultValue={""}>
     {
-      warehouseList.length > 0 &&
+      warehouseList?.length > 0 &&
       warehouseList.map(warehouse => 
         <MenuItem key={warehouse.id} value={warehouse.id}>{warehouse.name}</MenuItem>)
+    }
+  </Select>
+}
+
+export const BayDropDownWithSelectedPrdAndWh = ({ bayList, setSelectedBayId, setSelectedBayCode}) => {
+  return <Select onChange={(e, v) => {
+      setSelectedBayId(e.target.value); 
+      setSelectedBayCode(v?.props?.children);
+      }} defaultValue={""}>
+    {
+      bayList?.length > 0 &&
+      bayList.map(bay => 
+        <MenuItem key={bay.id} value={bay.id}>{bay.code}</MenuItem>)
     }
   </Select>
 }
@@ -53,6 +67,7 @@ export const BayDropDownHavingProduct = ({ selectedWarehouseItems, setSelectedBa
     }
   </Select>
 }
+
 
 export const ShipmentDropDown = ({ shipmentList, setSelectedShipmentId }) => {
   return <Select onChange={(e, v) => setSelectedShipmentId(e.target.value)}>
