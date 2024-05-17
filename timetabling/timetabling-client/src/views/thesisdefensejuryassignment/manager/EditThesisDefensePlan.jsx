@@ -17,7 +17,6 @@ export const EditThesisDefensePlan = () => {
     const { id } = useParams();
     const history = useHistory();
     const { loading, data: thesisDefensePlan } = useFetch(`/thesis-defense-plan/${id}`);
-    console.log(thesisDefensePlan);
     const {
         register,
         handleSubmit,
@@ -35,15 +34,10 @@ export const EditThesisDefensePlan = () => {
     });
 
     const handleFormSubmit = data => {
-        console.log({
-            previousPlanId: id,
-            newThesisDefensePlan: { ...data, createdTime: thesisDefensePlan?.createdTime, lastModifiedDate: thesisDefensePlan?.lastModifiedDate }
-        });
         request(
             "POST",
             "/thesis-defense-plan/edit?id=" + id,
             (res) => {
-                console.log(res.data);
                 if (res.data) {
                     // setShowSubmitSuccess(true);
                     // setOpenAlert(true);

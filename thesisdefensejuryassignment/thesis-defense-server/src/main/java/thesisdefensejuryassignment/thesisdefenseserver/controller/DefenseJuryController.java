@@ -40,16 +40,15 @@ public class DefenseJuryController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<UpdateDefenseJuryDTO> updateDefenseJury(
+    public ResponseEntity<DefenseJury> updateDefenseJury(
             @RequestBody UpdateDefenseJuryIM request
     ){
         System.out.println("session: " + request.getDefenseSessionId());
-        int isUpdate = juryService.updateDefenseJury(request);
-        if (isUpdate < 1){
-            return new ResponseEntity<>(new UpdateDefenseJuryDTO("Không thể cập nhật hội đồng", 500), HttpStatus.INTERNAL_SERVER_ERROR);
+        DefenseJury updatedDefenseJury = juryService.updateDefenseJury(request);
+        if (updatedDefenseJury == null){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        UpdateDefenseJuryDTO updateDefenseJuryDTO = new UpdateDefenseJuryDTO("cập nhật hội đồng thành công", 201);
-        return new ResponseEntity<>(updateDefenseJuryDTO , HttpStatus.CREATED);
+        return new ResponseEntity<>(updatedDefenseJury , HttpStatus.CREATED);
     }
     @GetMapping("/teachers")
 
@@ -100,6 +99,16 @@ public class DefenseJuryController {
     ) {
         String message = juryService.assignTeacherAndThesisAutomatically(teacherListAndDefensePlan);
         return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+    @PostMapping("/reassign")
+    public ResponseEntity<DefenseJury> reassignTeacherAndThesis(
+            @RequestBody AssignTeacherAndThesisToDefenseJuryIM teacherListAndThesis
+    ) {
+        DefenseJury defenseJury = juryService.reassignTeacherAndThesis(teacherListAndThesis);
+        if (defenseJury == null){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);
     }
 
 }

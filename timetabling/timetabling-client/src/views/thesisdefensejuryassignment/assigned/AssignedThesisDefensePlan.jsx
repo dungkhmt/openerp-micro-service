@@ -39,7 +39,6 @@ export default function AssignedThesisDefensePlan() {
       ),
     },
   ];
-  console.log(keycloak?.tokenParsed?.email)
   const { loading, data: assignedThesisDefensePlanList } = useFetch(
     `/thesis-defense-plan/get-assigned-for-teacher/${keycloak?.tokenParsed?.email}`
   );

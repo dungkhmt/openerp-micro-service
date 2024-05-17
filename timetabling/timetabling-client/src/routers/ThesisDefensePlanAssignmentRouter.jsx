@@ -1,7 +1,7 @@
 import { Route, Switch, useRouteMatch } from "react-router";
 import ThesisDefensePlans from "views/thesisdefensejuryassignment/manager/ThesisDefensePlans";
 import DefensePlanManager from "views/thesisdefensejuryassignment/manager/DefensePlanManager";
-import DefenseJuryDetail from "views/thesisdefensejuryassignment/manager/DefenseJuryDetail";
+import DefenseJuryDetail from "components/thesisdefensejury/DefenseJuryDetail";
 import AssignTeacherAndThesisToDefenseJury from "views/thesisdefensejuryassignment/manager/AssignTeacherAndThesisToDefenseJury";
 import AssignTeacherAndThesisAutomatically from "views/thesisdefensejuryassignment/manager/AssignTeacherAndThesisAutomatically";
 import AssignedThesisDefensePlan from "views/thesisdefensejuryassignment/assigned/AssignedThesisDefensePlan";
@@ -13,6 +13,8 @@ import StudentAssignedDefenseJury from "views/thesisdefensejuryassignment/studen
 import StudentCreateThesis from "views/thesisdefensejuryassignment/student/StudentCreateThesis";
 import { EditThesisDefensePlan } from "views/thesisdefensejuryassignment/manager/EditThesisDefensePlan";
 import { EditDefenseJury } from "views/thesisdefensejuryassignment/manager/EditDefenseJury";
+import { EditTeacherAndThesisToDefenseJury } from "views/thesisdefensejuryassignment/manager/EditTeacherAndThesisToDefenseJury";
+import { ManagerDefenseJuryDetail } from "views/thesisdefensejuryassignment/manager/ManagerDefenseJuryDetail";
 const ThesisDefensePlanAssignmentRouter = () => {
     let { path } = useRouteMatch();
     return (
@@ -35,7 +37,7 @@ const ThesisDefensePlanAssignmentRouter = () => {
                 />
                 <Route
                     path={`${path}/thesis_defense_plan/:id/defense_jury/:juryId`}
-                    component={DefenseJuryDetail}
+                    component={ManagerDefenseJuryDetail}
                     exact
                 />
                 <Route
@@ -46,6 +48,11 @@ const ThesisDefensePlanAssignmentRouter = () => {
                 <Route
                     path={`${path}/thesis_defense_plan/:id/defense_jury/:juryId/create`}
                     component={AssignTeacherAndThesisToDefenseJury}
+                    exact
+                />
+                <Route
+                    path={`${path}/thesis_defense_plan/:id/defense_jury/:juryId/reassign`}
+                    component={EditTeacherAndThesisToDefenseJury}
                     exact
                 />
                 <Route
