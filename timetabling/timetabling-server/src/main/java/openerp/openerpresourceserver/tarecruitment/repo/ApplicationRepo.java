@@ -30,6 +30,19 @@ public interface ApplicationRepo extends JpaRepository<Application, Integer> {
             "ORDER BY a.classCall.id ASC, a.user.id ASC")
     Page<Application> findByApplicationStatusAndSemester(String status, String semester, String search, String assignStatus, Pageable pageable);
 
+    @Query("SELECT a FROM Application a WHERE a.classCall.semester = :semester " +
+            "AND a.applicationStatus = :applicationStatus " +
+            "AND a.assignStatus = :assignStatus " +
+            "AND (:search = '' " +
+            "OR a.name LIKE CONCAT('%', :search, '%') " +
+            "OR a.email LIKE CONCAT('%', :search, '%') " +
+            "OR a.mssv LIKE CONCAT('%', :search, '%') " +
+            "OR a.classCall.subjectName LIKE CONCAT('%', :search, '%') " +
+            "OR CAST(a.classCall.id AS string) LIKE CONCAT('%', :search, '%') " +
+            "OR a.classCall.subjectId LIKE CONCAT('%', :search, '%')) " +
+            "ORDER BY a.classCall.id ASC, a.user.id ASC")
+    Page<Application> getTABySemester(String applicationStatus, String assignStatus, String semester, String search, Pageable pageable);
+
     @Query("SELECT a FROM Application a WHERE a.id IN " +
             "(SELECT MAX(a2.id) FROM Application a2 GROUP BY a2.user.id) ORDER BY a.classCall.id ASC, a.user.id ASC")
     List<Application> findDistinctApplicationsByUser();

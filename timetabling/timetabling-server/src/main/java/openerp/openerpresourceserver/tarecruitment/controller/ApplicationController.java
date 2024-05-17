@@ -168,4 +168,13 @@ public class ApplicationController {
         }
     }
 
+    @GetMapping("/get-ta-by-semester/{semester}")
+    public ResponseEntity<?> getTABySemester(@PathVariable String semester,
+                                             @RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "10") int limit,
+                                             @RequestParam(defaultValue = "") String search) {
+        PaginationDTO<Application> applications = applicationService.getTABySemester(semester, search, page, limit);
+        return ResponseEntity.ok().body(applications);
+    }
+
 }

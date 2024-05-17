@@ -42,7 +42,7 @@ export const taRecruitment = {
     {
       id: "MENU_TA_RECRUITMENT.ASSIGN",
       path: `${prefix}/teacher/ta-assist-list`,
-      isPublic: false,
+      isPublic: true,
       text: "Danh sách trợ giảng",
       child: [],
     },

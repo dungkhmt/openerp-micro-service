@@ -153,27 +153,6 @@ const AssigningScreen = () => {
     setSearch(e.target.value);
   };
 
-  const handleDownloadFile = () => {
-    request(
-      "get",
-      `${applicationUrl.getAssignListFile}/${SEMESTER}`,
-      (res) => {
-        const url = window.URL.createObjectURL(new Blob([res.data]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute(
-          "download",
-          `Danh-sách-trợ-giảng-học-kì-${SEMESTER}.xlsx`
-        );
-        document.body.appendChild(link);
-        link.click();
-      },
-      {},
-      {},
-      { responseType: "arraybuffer" }
-    );
-  };
-
   const assignStatusCell = (params) => {
     const rowData = params.row;
 
@@ -369,10 +348,6 @@ const AssigningScreen = () => {
               onClick={handleAutoAssign}
             >
               Sắp xếp tự động
-            </Button>
-
-            <Button variant="outlined" onClick={handleDownloadFile}>
-              Xuất file
             </Button>
           </div>
 
