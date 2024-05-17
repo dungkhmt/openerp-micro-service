@@ -42,7 +42,7 @@ function SkillCard({skill}) {
         Skill name: {skill.skillName}
         </Typography>
         <Typography variant="body2" className={classes.subTitle}>
-        Cert link: <a href={skill.certLink}>click here</a>
+        Cert link: <a target='_blank' href={skill.certLink}>click here</a>
         </Typography>
         <Typography>
         Score: {skill.score}

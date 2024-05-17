@@ -13,6 +13,7 @@ import {
 import {request} from "../../api"
 import { convertHtmlElementToPdfFile } from "../../utils/ConvertHTMLToFile/convertHtmlElementToPdfFile";
 import Swal from "sweetalert2";
+import './styles.css';
 
 const CreateNewCvForm = () => {
 
@@ -87,17 +88,17 @@ const CreateNewCvForm = () => {
     };
     // all user info
     const [userInfoForm, setUserInfoForm] = useState({
-        userName: "Lê Minh Thiện",
-        gender: "Nam",
-        profession: "Cloud engineer",
-        userLocation: "Ha Noi",
-        cvLink: "fuck",
-        mobilePhone: "01647997611",
-        email: "xxx@gmail.com",
-        description: "tôi yêu  gái đẹp",
-        linkedInLink: "https://www.linkedin.com/checkpoint/login-submit?_l=en_US",
-        githubLink: "javhd.pro",
-        title: "hacker"
+        userName: "",
+        gender: "",
+        profession: "",
+        userLocation: "",
+        cvLink: "",
+        mobilePhone: "",
+        email: "",
+        description: "",
+        linkedInLink: "",
+        githubLink: "",
+        title: ""
     })
 
     const handleInputChange = (event) => {
@@ -142,37 +143,78 @@ const CreateNewCvForm = () => {
     //     });
     //     setShowCVDemo(true);
     //   };
-    const uploadFile = async (file) => {
-        const formData = new FormData()
-        formData.append("file", file);
-        await request("post", `/employee-cv/file-upload`, (res)=> {
-            console.log(res);
-            console.log("xnxx: ", submitForm)           
-            submitForm.employeeCV.cvLink = res.data
-            console.log("xnxx: ", submitForm)
-            request("post", `/employee-cv`, (res)=> {
-                console.log(res);
-              }, (err)=>{
-                console.log(err);
-              }, submitForm).then();
-          }, (err)=>{
-            console.log(err);
-          }, formData).then();
-    }
+    // const uploadFile = async (file) => {
+    //     const formData = new FormData()
+    //     formData.append("file", file);
+    //     await request("post", `/employee-cv/file-upload`, (res)=> {       
+    //         submitForm.employeeCV.cvLink = res.data
+    //         request("post", `/employee-cv`, (res)=> {
+    //             console.log(res);
+    //           }, (err)=>{
+    //             console.log(err);
+    //           }, submitForm).then();
+    //       }, (err)=>{
+    //         console.log(err);
+    //       }, formData).then();
+    // }
 
+    const uploadFile = async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+    
+        // Show a loading Swal while the file is being uploaded
+        Swal.fire({
+            title: 'Uploading...',
+            text: 'Please wait while the file is being uploaded.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        try {
+            const uploadResponse = await request("post", `/employee-cv/file-upload`, null, null, formData);
+            console.log(uploadResponse);
+            submitForm.employeeCV.cvLink = uploadResponse.data;
+            
+            // Show a success Swal if the file is uploaded
+            await Swal.fire({
+                title: 'Success!',
+                text: 'Your file has been uploaded.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+            const userInfo = await request("get", "/user/get-user-data", null, null, null)
+            console.log(userInfo.data);
+            // Proceed with the next request after the file is uploaded
+            submitForm.user = userInfo.data
+            const submitResponse = await request("post", `/employee-cv`, null, null, submitForm);
+            console.log(submitResponse);
+    
+            // Show a success Swal if the form is submitted
+            Swal.fire({
+                title: 'Submitted!',
+                text: 'Your information has been submitted.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+        } catch (error) {
+            console.error(error);
+            // Show an error Swal if there's an issue with the upload or form submission
+            Swal.fire({
+                title: 'Error!',
+                text: 'There was an issue with the upload or submission.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    };
+    
     const createNewCv = async () => {
         const element = document.getElementById("fileToPrint");
         if (element) {
           // Convert the HTML element to canvas
           const file = await convertHtmlElementToPdfFile(element, userInfoForm.title);
           const uploadFileData = await uploadFile(file);
-          if (uploadFileData == null) {
-            return Swal.fire(
-                      "Oops...",
-                      `There is some thing wrong when upload your CV`,
-                      "error"
-                    );
-                  } 
         }
       };
     return (
@@ -190,10 +232,10 @@ const CreateNewCvForm = () => {
                         <TextField fullWidth label="Gender" value={userInfoForm.gender} variant="outlined" name="gender" onChange={handleInputChange} />
                     </Grid>
                     <Grid item xs={4}>
-                        <TextField fullWidth label="Mobile Phone" value={userInfoForm.mobilePhone} variant="outlined" name="mobilephone" onChange={handleInputChange} />
+                        <TextField fullWidth label="Mobile Phone" value={userInfoForm.mobilePhone} variant="outlined" name="mobilePhone" onChange={handleInputChange} />
                     </Grid>
                     <Grid item xs={4}>
-                        <TextField fullWidth label="Email" value={userInfoForm.email} variant="outlined" name="mobile" onChange={handleInputChange} />
+                        <TextField fullWidth label="Email" value={userInfoForm.email} variant="outlined" name="email" onChange={handleInputChange} />
                     </Grid>
                     <Grid item xs={4}>
                         <TextField fullWidth label="Profession" value={userInfoForm.profession} variant="outlined" name="profession" onChange={handleInputChange} />
@@ -209,10 +251,10 @@ const CreateNewCvForm = () => {
                         <Typography variant="h4">Social Detail</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        <TextField fullWidth value={userInfoForm.githubLink} label="Github Link" variant="outlined" />
+                        <TextField fullWidth value={userInfoForm.githubLink} label="Github Link" variant="outlined" name="githubLink" onChange={handleInputChange} />
                     </Grid>
                     <Grid item xs={12}>
-                        <TextField fullWidth value={userInfoForm.linkedInLink} label="LinkedIn Link" variant="outlined" />
+                        <TextField fullWidth value={userInfoForm.linkedInLink} label="LinkedIn Link" variant="outlined" name="linkedInLink" onChange={handleInputChange} />
                     </Grid>
 
                     <Grid item xs={12}>
