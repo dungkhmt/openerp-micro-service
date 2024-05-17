@@ -2,6 +2,7 @@ package thesisdefensejuryassignment.thesisdefenseserver.controller;
 
 import lombok.AllArgsConstructor;
 import thesisdefensejuryassignment.thesisdefenseserver.entity.ThesisDefensePlan;
+import thesisdefensejuryassignment.thesisdefenseserver.models.UpdateThesisDefensePlanIM;
 import thesisdefensejuryassignment.thesisdefenseserver.service.ThesisDefensePlanService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -81,6 +82,13 @@ public class ThesisDefensePlanController {
         }
         return new ResponseEntity<>("Create failed", HttpStatus.BAD_REQUEST);
     }
-
-
+    @PostMapping("/edit")
+    public  ResponseEntity<String> updateGraduationTerm(@RequestParam String id, @RequestBody UpdateThesisDefensePlanIM graduationTerm){
+        System.out.println(id);
+        ThesisDefensePlan savedGraduationTerm = graduationTermService.updateThesisDefensePlan(id, graduationTerm);
+        if (savedGraduationTerm != null){
+            return new ResponseEntity<>("Update successfully", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Update failed", HttpStatus.BAD_REQUEST);
+    }
 }

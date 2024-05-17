@@ -33,8 +33,14 @@ import { scheduleInformation } from "./menuconfig/scheduleInformation";
 // import {schedulePerformance} from "./menuconfig/schedulePerformance"
 import { courseTimeTabling } from "./menuconfig/courseTimeTabling";
 import { generalTimeTabling } from "./menuconfig/generalTimeTabling";
+import { firstYearTimeTabling } from "./menuconfig/firstYearTimeTabling";
 import { computerLabTimeTabling } from "./menuconfig/computerLabTimeTabling";
 import { taRecruitment } from "./menuconfig/taRecruitment";
+import {
+  ThesisDefensePlanManagement,
+  ThesisDefensePlanStudent,
+} from "./menuconfig/Thesis_defense_plan_managenment";
+import { Schedule } from "@mui/icons-material/";
 
 export const MENUS = [];
 
@@ -46,8 +52,11 @@ MENUS.push(scheduleInformation);
 // MENUS.push(schedulePerformance);
 MENUS.push(courseTimeTabling);
 MENUS.push(generalTimeTabling);
+MENUS.push(firstYearTimeTabling);
 MENUS.push(computerLabTimeTabling);
 MENUS.push(taRecruitment);
+MENUS.push(ThesisDefensePlanManagement);
+MENUS.push(ThesisDefensePlanStudent);
 
 export const menuIconMap = new Map();
 
@@ -81,5 +90,5 @@ menuIconMap.set("LocalLibraryIcon", <LocalLibraryIcon />);
 menuIconMap.set("AssignmentOutlinedIcon", <AssignmentOutlinedIcon />);
 menuIconMap.set("ManageAccountsIcon", <ManageAccountsIcon />);
 menuIconMap.set("CiEdit", <CiEdit />);
-
+menuIconMap.set("Schedule", <Schedule />);
 export const mapPathMenu = buildMapPathMenu(MENUS);

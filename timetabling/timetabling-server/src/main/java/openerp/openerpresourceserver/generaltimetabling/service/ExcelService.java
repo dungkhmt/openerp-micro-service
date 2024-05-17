@@ -1,20 +1,19 @@
 package openerp.openerpresourceserver.generaltimetabling.service;
 
-import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekExtractor;
-import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekValidator;
+import lombok.extern.log4j.Log4j2;
+import openerp.openerpresourceserver.generaltimetabling.helper.*;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
-import openerp.openerpresourceserver.generaltimetabling.repo.GeneralClassOpenedRepository;
+import openerp.openerpresourceserver.generaltimetabling.repo.*;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.FilterClassOpenedDto;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.ClassOpened;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Schedule;
-import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
-import openerp.openerpresourceserver.generaltimetabling.repo.ClassOpenedRepo;
-import openerp.openerpresourceserver.generaltimetabling.repo.ClassroomRepo;
-import openerp.openerpresourceserver.generaltimetabling.repo.ScheduleRepo;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -23,9 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import openerp.openerpresourceserver.generaltimetabling.helper.ExcelHelper;
-import openerp.openerpresourceserver.generaltimetabling.helper.GeneralExcelHelper;
-
+@Log4j2
 @Service
 public class ExcelService {
 
@@ -38,13 +35,16 @@ public class ExcelService {
     private ClassOpenedRepo classOpenedRepo;
 
     @Autowired
-    private GeneralClassOpenedRepository gcoRepo;
+    private GeneralClassRepository gcoRepo;
 
     @Autowired
     private ClassroomRepo classroomRepo;
 
     @Autowired
     private RoomOccupationService roomOccupationService;
+
+    @Autowired
+    private PlanGeneralClassRepository planGeneralClassRepository;
 
     // public ByteArrayInputStream load() {
     // List<Schedule> schedules = this.getAllSchedules();
@@ -89,15 +89,17 @@ public class ExcelService {
     // throw new RuntimeException("fail to store excel data: " + e.getMessage());
     // }
     // }
-    public List<GeneralClassOpened> saveGeneralClassOpeneds(MultipartFile file, String semester) {
+    @Transactional
+    public List<GeneralClass> saveGeneralClasses(MultipartFile file, String semester) {
+        gcoRepo.deleteAllBySemester(semester);
         try {
-            List<GeneralClassOpened> generalClassOpenedList = GeneralExcelHelper
+            List<GeneralClass> generalClassList = GeneralExcelHelper
                     .convertFromExcelToGeneralClassOpened(file.getInputStream(), semester);
-            if (generalClassOpenedList == null) {
+            if (generalClassList == null) {
                 return new ArrayList<>();
             }
             List<RoomOccupation> roomOccupations = new ArrayList<>();
-            generalClassOpenedList.forEach(generalClass -> {
+            generalClassList.forEach(generalClass -> {
                 generalClass.getTimeSlots().forEach(timeSlot -> {
                     List<String> learningWeekStrings = Arrays.asList(generalClass.getLearningWeeks().trim().split(","));
                     learningWeekStrings.forEach(learningWeek -> {
@@ -121,12 +123,12 @@ public class ExcelService {
                     });
                 });
             });
-            gcoRepo.saveAll(generalClassOpenedList);
+            gcoRepo.saveAll(generalClassList);
             roomOccupationService.saveAll(roomOccupations);
-            return generalClassOpenedList;
+            return generalClassList;
         } catch (IOException e) {
             e.printStackTrace();
-            return new ArrayList<GeneralClassOpened>();
+            return new ArrayList<GeneralClass>();
         }
     }
 
@@ -301,5 +303,17 @@ public class ExcelService {
 
     public List<Schedule> getAllSchedules() {
         return scheduleRepo.findAll();
+    }
+    @Transactional
+    public List<PlanGeneralClass> savePlanClasses(MultipartFile file, String semester) {
+        try {
+            planGeneralClassRepository.deleteAllBySemester(semester);
+            List<PlanGeneralClass> planClasses = PlanGeneralClassExcelHelper
+                    .convertExcelToPlanGeneralClasses(file.getInputStream(), semester);
+            return planGeneralClassRepository.saveAll(planClasses);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return new ArrayList<>();
+        }
     }
 }

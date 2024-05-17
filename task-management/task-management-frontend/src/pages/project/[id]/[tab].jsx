@@ -1,4 +1,5 @@
 import { Box, CircularProgress, Typography } from "@mui/material";
+import { Helmet } from "react-helmet";
 import { useSelector } from "react-redux";
 import { ProjectViewRight } from "../../../views/project/ProjectViewRight";
 
@@ -17,39 +18,22 @@ const Loading = () => (
 );
 
 const Project = () => {
-  const { fetchLoading, errors, project } = useSelector(
-    (state) => state.project
-  );
+  const { fetchLoading, project } = useSelector((state) => state.project);
 
   if (fetchLoading) {
     <Loading />;
   }
 
-  if (!fetchLoading && errors?.length > 0) {
-    const is404 = errors[0].message.includes("404");
-
-    return (
-      <Box
-        sx={{
-          mt: 6,
-          display: "flex",
-          alignItems: "center",
-          flexDirection: "column",
-        }}
-      >
-        <Typography variant="h4" color="error">
-          {is404 ? "Không tìm thấy dự án" : "Lỗi"}
-        </Typography>
-        <Typography variant="body1" color="error">
-          {errors[0].message}
-        </Typography>
-      </Box>
-    );
-  }
-
   if (!project) return null;
 
-  return <ProjectViewRight />;
+  return (
+    <>
+      <Helmet>
+        <title>{project.name} | Task management</title>
+      </Helmet>
+      <ProjectViewRight />
+    </>
+  );
 };
 
 export default Project;

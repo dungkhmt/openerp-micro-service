@@ -61,4 +61,9 @@ const time_By_Slot = [
   {id: 11, time: "16h00"},
   {id: 12, time: "16h50"},
 ]
-export { time_By_Slot, convertToSchedule, datetimeForFN, weeks_Of_Semester, days_Of_Week, periods_Of_Day, slots_Of_Period};
+export { time_By_Slot, convertToSchedule, datetimeForFN, weeks_Of_Semester, days_Of_Week, periods_Of_Day, slots_Of_Period , submission_status};
+
+const submission_status = [
+  {id: 0, name: "Chờ xử lý"},
+  {id: 1, name: "Hoàn thành"},
+]

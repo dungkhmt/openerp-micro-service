@@ -5,15 +5,15 @@ import java.util.List;
 import java.util.Objects;
 
 import openerp.openerpresourceserver.generaltimetabling.exception.ConflictScheduleException;
-import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClassOpened;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.OccupationClassPeriod;
 
 public class ClassTimeComparator {
-    public static boolean isClassConflict(RoomReservation rr, GeneralClassOpened gClass, List<GeneralClassOpened> classList) {
+    public static boolean isClassConflict(RoomReservation rr, GeneralClass gClass, List<GeneralClass> classList) {
         boolean isConflict = false;
         /*Filter the class which is different with current class*/
-        List<GeneralClassOpened> compareClassList = classList.stream().filter(nonUpdateClass-> !nonUpdateClass.getId().equals(gClass.getId())).toList();
+        List<GeneralClass> compareClassList = classList.stream().filter(nonUpdateClass-> !nonUpdateClass.getId().equals(gClass.getId())).toList();
         /*Check conflict with current class*/
         for(int i = 0; i < gClass.getTimeSlots().size(); i++) {
             if(!Objects.equals(gClass.getTimeSlots().get(i).getId(), rr.getId())) {
@@ -36,7 +36,7 @@ public class ClassTimeComparator {
         System.out.println("start: " + gTimeSlot);
 
         /*Check conflict with different classes*/
-        for (GeneralClassOpened cClass : compareClassList) {
+        for (GeneralClass cClass : compareClassList) {
             /*Get learning weeks of 2 classes*/
             List<Integer> gWeekIndexs =  LearningWeekExtractor.extractArray(gClass.getLearningWeeks());
             List<Integer> cWeekIndexs =  LearningWeekExtractor.extractArray(gClass.getLearningWeeks());
@@ -65,9 +65,9 @@ public class ClassTimeComparator {
         return isConflict;
     }
 
-    public static GeneralClassOpened findClassConflict(RoomReservation rr, GeneralClassOpened gClass, List<GeneralClassOpened> classList) {
+    public static GeneralClass findClassConflict(RoomReservation rr, GeneralClass gClass, List<GeneralClass> classList) {
         /*Filter the class which is different with current class*/
-        List<GeneralClassOpened> compareClassList = classList.stream().filter(nonUpdateClass-> !nonUpdateClass.getId().equals(gClass.getId())).toList();
+        List<GeneralClass> compareClassList = classList.stream().filter(nonUpdateClass-> !nonUpdateClass.getId().equals(gClass.getId())).toList();
         /*Check conflict with current class*/
         for(int i = 0; i < gClass.getTimeSlots().size(); i++) {
             if(!Objects.equals(gClass.getTimeSlots().get(i).getId(), rr.getId())) {
@@ -98,7 +98,7 @@ public class ClassTimeComparator {
 
 
         /*Check conflict with different classes*/
-        for (GeneralClassOpened cClass : compareClassList) {
+        for (GeneralClass cClass : compareClassList) {
             /*Check if 2 class is the same crew*/
             if(cClass.getCrew().equals(gClass.getCrew())) {
                 /*Get learning weeks of 2 classes*/

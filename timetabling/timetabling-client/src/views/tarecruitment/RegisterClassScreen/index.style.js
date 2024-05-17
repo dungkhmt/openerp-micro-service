@@ -16,6 +16,7 @@ const styles = {
   textFieldContainer: {
     width: "50%",
     padding: "0 1%",
+    marginBottom: "1em",
   },
   textField: {
     width: "100%",
@@ -35,6 +36,12 @@ const styles = {
   tableToolBar: {
     marginLeft: "2em",
     marginBottom: "1em",
+  },
+  paper: {
+    padding: "1em",
+  },
+  title: {
+    fontWeight: "bold",
   },
 };
 

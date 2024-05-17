@@ -20,14 +20,12 @@ const UserExperience = () => {
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
+            request("get", `/experience/user/${res.data.id}`, (res) => {
+                setAllExperience(res.data)
+            }).then();
         }).then();
     }, [])
-    useEffect(() => {
-        request("get", "/experience/user/dungpq", (res) => {
-            setAllExperience(res.data)
-        }).then();
-    }, [])
-
+    
     function goToUrl(url) {
         window.location.href = url;
     }

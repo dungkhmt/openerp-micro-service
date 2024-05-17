@@ -1,4 +1,7 @@
 const styles = {
+  paper: {
+    padding: "1em",
+  },
   content: {
     padding: "3%",
   },
@@ -18,6 +21,7 @@ const styles = {
   textFieldContainer: {
     width: "50%",
     padding: "0 1%",
+    marginBottom: "1em",
   },
   textField: {
     width: "100%",
@@ -43,6 +47,13 @@ const styles = {
     marginTop: "20px",
     textAlign: "center",
     marginRight: "1%",
+  },
+  tableToolBar: {
+    marginLeft: "2em",
+    marginBottom: "1em",
+  },
+  title: {
+    fontWeight: "bold",
   },
 };
 

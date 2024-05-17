@@ -17,7 +17,7 @@ import ApplicantCard from "components/ApplicantCard";
 const ViewAllApplicant = () => {
 
     let { id } = useParams();
-    id = "dungpq"
+    id = "4"
     const [title, setTitle] = useState("Thực tập sinh dot net")
     const [description, setDescription] = useState("không có lương đâu")
     const [requirements, setRequirements] = useState("10 năm kinh nghiệm")
@@ -25,15 +25,20 @@ const ViewAllApplicant = () => {
     const [salary, setSalary] = useState(0)
 
     const [allJobPostForm, setAllJobPostForm] = useState([])
+    const [allApplicant, setAllApplicant] = useState([])
+    const [allJobPostForm2, setAllJobPostForm2] = useState([])
     const [user, setUser] = useState({})
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
+            request("get", `/cv-application/${res.data.id}`, (res) => {
+                setAllJobPostForm2(res.data)
+            }).then();
         }).then();
     }, [])
     useEffect(() => {
-        request("get", `/job-post/user/${id}`, (res) => {
-            setAllJobPostForm(res.data)
+        request("get", `/cv-application/${id}`, (res) => {
+            setAllApplicant(res.data)
         }).then();
     }, [])
 
@@ -47,9 +52,9 @@ const ViewAllApplicant = () => {
                 Candidate Applicant
             </Typography>
             <Grid container spacing={4} style={{ backgroundColor: "#F7F7FF" }} display="flex" justifyContent="center" paddingTop={"50px"}>
-                {allJobPostForm.map((jobPost, index) => (
-                    <Grid item xs={6} style={{ boxShadow: '1px 1px 1px 1px rgba(0.5,0.5,0.5,0.5)', margin: '20px', borderRadius: '20px', backgroundColor: "white", display: 'flex', alignItems: 'stretch' }} onClick={() => goToUrl(`/view-job-post/${jobPost.id}`)}>
-                        <ApplicantCard ></ApplicantCard>
+                {allApplicant.map((applicant, index) => (
+                    <Grid item xs={6} style={{ boxShadow: '1px 1px 1px 1px rgba(0.5,0.5,0.5,0.5)', margin: '20px', borderRadius: '20px', backgroundColor: "white", display: 'flex', alignItems: 'stretch' }} onClick={() => goToUrl(`/view-job-post/${applicant.id}`)}>
+                        <ApplicantCard applicant={applicant}></ApplicantCard>
                     </Grid>
                     // <Card  sx={{ minWidth: 275 }}>
                     //     <CardContent>

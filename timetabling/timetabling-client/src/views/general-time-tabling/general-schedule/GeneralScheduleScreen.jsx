@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import GeneralScheduleTable from "./components/GeneralScheduleTable";
-import { Autocomplete, Button, Input, TextField } from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Button} from "@mui/material";
 import GeneralGroupAutoComplete from "../common-components/GeneralGroupAutoComplete";
 import GeneralSemesterAutoComplete from "../common-components/GeneralSemesterAutoComplete";
 import { request } from "api";
 import { FacebookCircularProgress } from "components/common/progressBar/CustomizedCircularProgress";
 import { toast } from "react-toastify";
 import { useClasses } from "../hooks/useClasses";
+import AutoScheduleDialog from "./components/AutoScheduleDialog";
 
 const GeneralScheduleScreen = () => {
   const [selectedSemester, setSelectedSemester] = useState(null);
@@ -21,6 +21,12 @@ const GeneralScheduleScreen = () => {
     selectedSemester
   );
   const [saveRequests, setSaveRequests] = useState([]);
+  const [isAutoSaveLoading, setAutoSaveLoading] = useState(false);
+  const [isOpenClassroomDialog, setOpenClassroomDialog] = useState(false);
+  const [isOpenTimeslotDialog, setOpenTimeslotDialog] = useState(false);
+  const [isExportExecelLoading, setExportExcelLoading] = useState(false);
+  const [classroomTimeLimit, setClassroomTimeLimit] = useState(5);
+  const [timeSlotTimeLimit, setTimeSlotTimeLimit] = useState(5);
 
   const handleResetTimeTabling = () => {
     setResetLoading(true);
@@ -60,10 +66,12 @@ const GeneralScheduleScreen = () => {
     );
   };
   const handleAutoScheduleTimeSlotTimeTabling = () => {
+    setAutoSaveLoading(true);
     request(
       "post",
-      `/general-classes/auto-schedule-time?semester=${selectedSemester?.semester}&groupName=${selectedGroup?.groupName}`,
+      `/general-classes/auto-schedule-time?semester=${selectedSemester?.semester}&groupName=${selectedGroup?.groupName}&timeLimit=${timeSlotTimeLimit}`,
       (res) => {
+        setAutoSaveLoading(true);
         let generalClasses = [];
         res?.data?.forEach((classObj) => {
           if (classObj?.classCode !== null && classObj?.timeSlots) {
@@ -84,25 +92,27 @@ const GeneralScheduleScreen = () => {
         });
         setClasses(generalClasses);
         setSelectedRows([]);
-        setResetLoading(false);
+        setOpenTimeslotDialog(false);
+        setAutoSaveLoading(false);
         toast.success("Tự động thời khóa biểu thành công!");
       },
       (error) => {
         if (error.response.status == 410) {
           toast.error(error.response.data);
-          setResetLoading(false);
+          setAutoSaveLoading(false);
         } else {
           console.log(error);
           toast.error("Có lỗi khi tự động thời khóa biểu!");
-          setResetLoading(false);
+          setAutoSaveLoading(false);
         }
       }
     );
   };
   const handleAutoScheduleClassroomTimeTabling = () => {
+    setAutoSaveLoading(true);
     request(
       "post",
-      `/general-classes/auto-schedule-room?semester=${selectedSemester?.semester}&groupName=${selectedGroup?.groupName}`,
+      `/general-classes/auto-schedule-room?semester=${selectedSemester?.semester}&groupName=${selectedGroup?.groupName}&timeLimit=${classroomTimeLimit}`,
       (res) => {
         let generalClasses = [];
         res.data?.forEach((classObj) => {
@@ -124,24 +134,27 @@ const GeneralScheduleScreen = () => {
           }
         });
         setClasses(generalClasses);
+        setOpenClassroomDialog(false);
         setSelectedRows([]);
-        setResetLoading(false);
+        setAutoSaveLoading(false);
+
         toast.success("Tự động phòng thành công!");
       },
       (error) => {
         if (error.response.status == 410) {
           toast.error(error.response.data);
-          setResetLoading(false);
+          setAutoSaveLoading(false);
         } else {
           console.log(error);
           toast.error("Có lỗi khi tự động xếp phòng");
-          setResetLoading(false);
+          setAutoSaveLoading(false);
         }
       }
     );
   };
 
   const handleExportTimeTabling = () => {
+    setExportExcelLoading(true);
     request(
       "post",
       `general-classes/export-excel?semester=${selectedSemester?.semester}`,
@@ -151,13 +164,15 @@ const GeneralScheduleScreen = () => {
         });
         const link = document.createElement("a");
         link.href = window.URL.createObjectURL(blob);
-        link.download = `TKB_${selectedSemester?.semester}.xlsx`;
+        link.download = `Danh_sach_lop_TKB_${selectedSemester?.semester}.xlsx`;
 
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        setExportExcelLoading(false);
       },
       (error) => {
+        setExportExcelLoading(false);
         console.error("Error exporting Excel:", error);
       },
       null,
@@ -192,6 +207,22 @@ const GeneralScheduleScreen = () => {
 
   return (
     <div className="flex flex-col gap-4 w-full h-[700px]">
+      <AutoScheduleDialog
+        title={"Tự động xếp lịch học"}
+        open={isOpenTimeslotDialog}
+        closeDialog={() => setOpenTimeslotDialog(false)}
+        timeLimit={timeSlotTimeLimit}
+        setTimeLimit={setTimeSlotTimeLimit}
+        submit={handleAutoScheduleTimeSlotTimeTabling}
+      />
+      <AutoScheduleDialog
+        title={"Tự động xếp phòng học"}
+        open={isOpenClassroomDialog}
+        closeDialog={() => setOpenClassroomDialog(false)}
+        setTimeLimit={setClassroomTimeLimit}
+        timeLimit={classroomTimeLimit}
+        submit={handleAutoScheduleClassroomTimeTabling}
+      />
       <div className="flex flex-row justify-between">
         <div className="flex flex-col gap-4">
           <GeneralSemesterAutoComplete
@@ -206,11 +237,12 @@ const GeneralScheduleScreen = () => {
         <div className="flex flex-col justify-end gap-2">
           <div className="flex flex-row justify-end">
             <Button
-              disabled={selectedSemester === null}
-              startIcon={FacebookCircularProgress}
+              disabled={selectedSemester === null || isExportExecelLoading}
+              startIcon={isExportExecelLoading ? <FacebookCircularProgress/> : null}
               variant="contained"
               color="success"
               onClick={handleExportTimeTabling}
+              loading = {isExportExecelLoading}
               sx={{ width: 200 }}
             >
               Tải xuống File Excel
@@ -222,13 +254,15 @@ const GeneralScheduleScreen = () => {
               startIcon={isSaveLoading ? <FacebookCircularProgress /> : null}
               variant="contained"
               color="primary"
+              loading={isSaveLoading}
               onClick={handleSaveTimeTabling}
             >
               Lưu TKB
             </Button>
             <Button
-              disabled={selectedRows.length === 0}
-              startIcon={FacebookCircularProgress}
+              disabled={selectedRows.length === 0 || isResetLoading}
+              loading= {isResetLoading}
+              startIcon={isResetLoading ? <FacebookCircularProgress /> : null}
               variant="contained"
               color="error"
               onClick={handleResetTimeTabling}
@@ -238,24 +272,33 @@ const GeneralScheduleScreen = () => {
           </div>
           <div className="flex flex-row gap-2">
             <Button
-              disabled={!(selectedSemester !== null && selectedGroup !== null)}
+              loading={isAutoSaveLoading}
+              disabled={
+                !(selectedSemester !== null && selectedGroup !== null) ||
+                isAutoSaveLoading
+              }
               startIcon={
-                isTimeScheduleLoading ? FacebookCircularProgress : null
+                isAutoSaveLoading ?
+                <FacebookCircularProgress/> : null
               }
               variant="contained"
               color="primary"
-              onClick={handleAutoScheduleTimeSlotTimeTabling}
+              onClick={() => setOpenTimeslotDialog(true)}
             >
               Tự động xếp TKB
             </Button>
             <Button
-              disabled={!(selectedSemester !== null && selectedGroup !== null)}
+              loading={isAutoSaveLoading}
+              disabled={
+                !(selectedSemester !== null && selectedGroup !== null) ||
+                isAutoSaveLoading
+              }
               startIcon={
-                isTimeScheduleLoading ? FacebookCircularProgress : null
+                isTimeScheduleLoading ? <FacebookCircularProgress/> : null
               }
               variant="contained"
               color="primary"
-              onClick={handleAutoScheduleClassroomTimeTabling}
+              onClick={() => setOpenClassroomDialog(true)}
             >
               Tự động xếp phòng học
             </Button>

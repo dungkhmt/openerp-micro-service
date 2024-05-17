@@ -15,4 +15,6 @@ public interface UserService {
     List<User> searchUser(String q);
 
     List<User> getUserCreateTaskAssignMe(String userId);
+
+    List<User> getUserAssignTaskAssignMe(String userId);
 }

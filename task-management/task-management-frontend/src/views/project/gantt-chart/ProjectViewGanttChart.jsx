@@ -122,7 +122,7 @@ const ProjectViewGanttChart = () => {
   }, [searchStore, filters]);
 
   const getTasks = useCallback(async () => {
-    if (!isInitiated && tasksStore.length > 0) return;
+    if (!isInitiated && tasksStore.length > 0) setIsInitiated(true);
     // TODO: handle filters and search, fetch from startDate
     await dispatch(
       fetchGanttChartTasks({
@@ -135,7 +135,6 @@ const ProjectViewGanttChart = () => {
         q: buildQueryString(),
       })
     );
-    setIsInitiated(true);
   }, [projectId, range, dispatch, buildQueryString]);
 
   useEffect(() => {

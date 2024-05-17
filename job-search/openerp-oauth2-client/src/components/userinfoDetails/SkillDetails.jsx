@@ -20,13 +20,12 @@ import { CircularProgress, Snackbar } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 
 const SkillDetail = ({ Skill,  open, onClose }) => {
+
     const [loading, setLoading] = useState(false);
     const [openSnackbar, setOpenSnackbar] = useState(false);
-
-    const [allCV, setAllCV] = useState([])
-    const [selectedCVName, setSelectedCVName] = useState()
-    const [skill, setSkill] = useState({})
+    const [skill, setSkill] = useState(Skill)
     const [user, setUser] = useState({})
+
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
@@ -37,14 +36,6 @@ const SkillDetail = ({ Skill,  open, onClose }) => {
         onClose();
     };
 
-    const [submitForm, setSubmitForm] = useState({})
-
-    useEffect(() => {
-        request("get", "/employee-cv/user/dungpq", (res) => {
-            setAllCV(res.data)
-        }).then();
-    }, [])
-
     const sleep = (milliseconds) => {
         return new Promise(resolve => setTimeout(resolve, milliseconds));
     }
@@ -53,12 +44,11 @@ const SkillDetail = ({ Skill,  open, onClose }) => {
         e.preventDefault()
         setLoading(true);
         await sleep(2000);
-        let submitToServerForm = skill
-        let data = fetchUserState()
-
+        let submitToServerForm = {...Skill, ...skill}
+        submitToServerForm.user = user
         console.log(submitToServerForm)
         console.log(user)
-        request("post", `/cv-application/user/dungpq}`, (res) => {
+        request("post", `/skill`, (res) => {
             console.log(res);
         }, (err) => {
             console.log(err);
@@ -70,6 +60,7 @@ const SkillDetail = ({ Skill,  open, onClose }) => {
     }
 
     const handleInputChange = (event) => {
+        console.log(skill)
         setSkill({
             ...skill,
             [event.target.name]: event.target.value,
@@ -78,7 +69,7 @@ const SkillDetail = ({ Skill,  open, onClose }) => {
     function goToUrl(url) {
         window.location.href = url;
     }
-    let allCVArray = allCV.map(e => { return { title: e.employeeCV.title, id: e.employeeCV.id } })
+    
     return (<>
         <div>
             <Dialog onClose={handleClose} open={open} maxWidth="md" fullWidth={true} sx={{ maxHeight: 'lg' }} fullHeight={true}>
@@ -89,19 +80,19 @@ const SkillDetail = ({ Skill,  open, onClose }) => {
                             <Typography>Skill name</Typography>
                         </Grid>
                         <Grid item xs={11}>
-                            <TextField fullWidth label="Skill name" value={Skill.skillName} variant="outlined" name="skillName" onChange={handleInputChange} />
+                            <TextField fullWidth label="Skill name" value={skill.skillName} variant="outlined" name="skillName" onChange={handleInputChange} />
                         </Grid>
                         <Grid item xs={11} container  style={{ backgroundColor: "white" }}  paddingLeft={"50px"}>
                             <Typography >Cert link</Typography>
                         </Grid>
                         <Grid item xs={11}>
-                            <TextField fullWidth label="Cert link" value={Skill.certLink} variant="outlined" name="certLink" onChange={handleInputChange} />
+                            <TextField fullWidth label="Cert link" value={skill.certLink} variant="outlined" name="certLink" onChange={handleInputChange} />
                         </Grid>
                         <Grid item xs={11} container  style={{ backgroundColor: "white" }} display="flex" paddingTop={"50px"}>
                             <Typography >Score</Typography>
                         </Grid>
                         <Grid item xs={11}>
-                            <TextField fullWidth label="Skill score" value={Skill.score} variant="outlined" name="score" onChange={handleInputChange} />
+                            <TextField fullWidth label="Skill score" value={skill.score} variant="outlined" name="score" onChange={handleInputChange} />
                         </Grid>
                         <Snackbar
                             open={openSnackbar}

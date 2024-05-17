@@ -13,11 +13,14 @@ public class ClassTimeScheduleBacktrackingSolver {
     private int[] x;// x[i] is the time-slot for class i
     private int[] sol;
     private boolean found;
-    public ClassTimeScheduleBacktrackingSolver(int n, int[] durations, List<Integer>[] domains, List<int[]> C) {
+    double timeLimit; // in milli seconds
+    double t0;// start time-point
+    public ClassTimeScheduleBacktrackingSolver(int n, int[] durations, List<Integer>[] domains, List<int[]> C, double timeLimit) {
         this.n = n;
         this.durations = durations;
         this.domains = domains;
-
+        this.timeLimit = timeLimit;
+        t0 = System.currentTimeMillis();
         this.conflicts = new boolean[n][n];
         for(int i = 0;i < n; i++)
             for(int j = 0; j < n; j++)
@@ -45,6 +48,7 @@ public class ClassTimeScheduleBacktrackingSolver {
 
     }
     private void Try(int k){
+        if (System.currentTimeMillis() - t0 > timeLimit) return;
         if(found) return;
         for(int v : domains[k]){
             if(check(v,k)){
@@ -99,7 +103,7 @@ public class ClassTimeScheduleBacktrackingSolver {
                 }
             }
         }
-        ClassTimeScheduleBacktrackingSolver app = new ClassTimeScheduleBacktrackingSolver(n,durations,domains,C);
+        ClassTimeScheduleBacktrackingSolver app = new ClassTimeScheduleBacktrackingSolver(n,durations,domains,C, 2);
         app.solve();
         if(!app.hasSolution()){
             log.info("NO SOLUTION");

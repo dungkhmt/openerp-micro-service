@@ -12,8 +12,10 @@ import ScheduleInformationRouter from "./ScheduleInformationRouter";
 // import ScheduleScreen from "views/ScheduleScreen";
 import CourseTimeTablingRouter from "./CourseTimeTablingRouter";
 import GeneralTimeTablingRouter from "./GeneralTimeTablingRouter";
+import FirstYearTimeTablingRouter from "./FirstYearTimeTablingRouter";
 import ComputerLabTimeTabling from "./ComputerLabTimeTablingRouter";
 import TaRecruitmentRouter from "./TaRecruitmentRouter";
+import ThesisDefensePlanAssignmentRouter from "./ThesisDefensePlanAssignmentRouter";
 import MainPage from "views/mainPage";
 
 const styles = {
@@ -58,6 +60,10 @@ function MainAppRouter(props) {
             component={GeneralTimeTablingRouter}
             path="/general-time-tabling"
           />
+          <PrivateRoute
+            component={FirstYearTimeTablingRouter}
+            path="/first-year-time-tabling"
+          />
 
           <PrivateRoute
             component={ComputerLabTimeTabling}
@@ -66,6 +72,10 @@ function MainAppRouter(props) {
           <PrivateRoute
             component={TaRecruitmentRouter}
             path="/ta-recruitment"
+          />
+          <PrivateRoute
+            component={ThesisDefensePlanAssignmentRouter}
+            path="/thesis"
           />
           <Route component={NotFound} />
         </Switch>

@@ -2,6 +2,8 @@ import { Dialog, DialogContent, DialogTitle, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { request } from "api";
 import { DataGrid } from "@mui/x-data-grid";
+import { applicatorDialogStyles } from "./index.style";
+import { applicationUrl } from "../apiURL";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -22,7 +24,7 @@ const ApplicatorDialog = ({ open, handleClose, classId }) => {
     if (classId) {
       request(
         "get",
-        `/application/get-application-by-class/${classId}?page=${paginationModel.page}&limit=${paginationModel.pageSize}`,
+        `${applicationUrl.getApplicationByClass}/${classId}?page=${paginationModel.page}&limit=${paginationModel.pageSize}`,
         (res) => {
           setApplicators(res.data.data);
           setTotalElements(res.data.totalElement);
@@ -83,7 +85,7 @@ const ApplicatorDialog = ({ open, handleClose, classId }) => {
           },
         }}
       >
-        <DialogTitle sx={{ textAlign: "center", marginTop: "1%" }}>
+        <DialogTitle style={applicatorDialogStyles.dialogTitle}>
           <Typography variant="h5" fontWeight="bold">
             Danh sách sinh viên đăng ký mã lớp {classId}
           </Typography>

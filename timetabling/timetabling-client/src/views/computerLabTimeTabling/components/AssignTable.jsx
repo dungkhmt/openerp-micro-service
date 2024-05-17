@@ -47,7 +47,7 @@ function AssignTable({ data }) {
   const [departmentInput, setDepartmentInput] = useState("");
 
   const [invalidRows, setInvalidRows] = useState({});
-
+  const [renderKey, setRenderKey] = useState(0);
   const edit_btn_onclick = (e) => {
     const item_id = e.target.parentNode.parentNode.getAttribute("id")
     const item  = data.filter((item) => item.id == item_id)[0];
@@ -222,7 +222,6 @@ const checkTimeAssignedConstraint = (object, assignedSetArray) => {
         id: id,
       };
     });
-    console.log(assigned);
 
     const update_class = {
       class_code: idInput,
@@ -283,6 +282,7 @@ const checkTimeAssignedConstraint = (object, assignedSetArray) => {
     request("get", "/lab-timetabling/room/get-all", (res) => {
       setRooms(res.data);
     }).then();
+
   }, []);
   return (
     <div className="container">
@@ -293,7 +293,7 @@ const checkTimeAssignedConstraint = (object, assignedSetArray) => {
             <th>Assign</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody renderKey={renderKey}>
           {data?.map((obj, index) => (
             <tr style={{ height: "100px", maxHeight: "100px" }} id={obj.id} key={obj.id}>
               <td style={{ padding: "0 12px" }}>
@@ -320,10 +320,8 @@ const checkTimeAssignedConstraint = (object, assignedSetArray) => {
                           Tuần {child.week}
                         </span>
                         <span style={{ padding: "2px" }}>
-                          {
-                            days_Of_Week.filter(
-                              (day) => child.day_of_week === day.id
-                            )[0]?.name
+                          {"Thứ "}{
+                            child.day_of_week
                           }{" "}
                           -{" "}
                           {

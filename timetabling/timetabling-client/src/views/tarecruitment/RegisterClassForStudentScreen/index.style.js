@@ -5,6 +5,7 @@ const styles = {
   textFieldContainer: {
     width: "50%",
     padding: "0 1%",
+    marginBottom: "1em",
   },
   textField: {
     width: "100%",
@@ -19,6 +20,12 @@ const styles = {
   },
   textArea: {
     width: "205%",
+  },
+  title: {
+    fontWeight: "bold",
+    marginBottom: "0.5em",
+    paddingTop: "1em",
+    marginLeft: "1em",
   },
 };
 

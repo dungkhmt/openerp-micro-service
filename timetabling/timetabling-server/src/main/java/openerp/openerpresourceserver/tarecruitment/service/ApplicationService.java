@@ -10,6 +10,14 @@ public interface ApplicationService {
 
     Application createApplication(Application application);
 
+    Application updateApplication(int id, Application application);
+
+    boolean deleteApplication(int id);
+
+    boolean deleteMultiApplication(List<Integer> idList);
+
+    Application getApplicationById(int id);
+
     PaginationDTO<Application> getMyApplications(String userId, int page, int limit);
 
     PaginationDTO<Application> getApplicationByClassId(int classCallId, int page, int limit);
@@ -25,7 +33,9 @@ public interface ApplicationService {
 
     Application updateAssignStatus(int id, String status);
 
-    int[][] autoAssignApplication(String semester);
+    void autoAssignApplication(String semester);
 
     byte[] generateExcelFile(String semester) throws IOException;
+
+    PaginationDTO<Application> getTABySemester(String semester, String search, int page, int limit);
 }

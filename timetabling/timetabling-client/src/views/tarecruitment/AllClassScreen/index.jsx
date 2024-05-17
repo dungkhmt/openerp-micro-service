@@ -1,8 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { request } from "api";
-import IconButton from "@mui/material/IconButton";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { useHistory } from "react-router-dom";
 import {
   FormControl,
@@ -20,6 +17,7 @@ import DeleteDialog from "../components/DeleteDialog";
 import ApplicatorDialog from "./ApplicatorDialog";
 import { DataGrid } from "@mui/x-data-grid";
 import ImportDialog from "./ImportDialog";
+import { classCallUrl } from "../apiURL";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -79,7 +77,7 @@ const AllClassScreen = () => {
     setIsLoading(true);
     request(
       "get",
-      `/class-call/get-class-by-semester/${semester}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}`,
+      `${classCallUrl.getClassBySemesterL}/${semester}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}`,
       (res) => {
         setClasses(res.data.data);
         setTotalElements(res.data.totalElement);
@@ -98,20 +96,24 @@ const AllClassScreen = () => {
 
   const handleDeleteClass = () => {
     if (rowSelect.length === 0) {
-      request("delete", `/class-call/delete-class/${deleteId}`, (res) => {
+      request("delete", `${classCallUrl.deleteClass}/${deleteId}`, (res) => {
         handleFetchData();
         setOpenDeleteDialog(false);
       });
     } else if (rowSelect.length === 1) {
-      request("delete", `/class-call/delete-class/${rowSelect[0]}`, (res) => {
-        handleFetchData();
-        setOpenDeleteDialog(false);
-      });
+      request(
+        "delete",
+        `${classCallUrl.deleteClass}/${rowSelect[0]}`,
+        (res) => {
+          handleFetchData();
+          setOpenDeleteDialog(false);
+        }
+      );
     } else {
       let idList = rowSelect;
       request(
         "delete",
-        "/class-call/delete-multiple-class",
+        `${classCallUrl.deleteMultipleClass}`,
         (res) => {
           handleFetchData();
           setOpenDeleteDialog(false);
@@ -161,20 +163,20 @@ const AllClassScreen = () => {
 
     return (
       <div>
-        <IconButton variant="contained" color="primary">
-          <FormatListBulletedIcon
-            onClick={() => handleOpenApplicatorDialog(rowData)}
-          />
-        </IconButton>
-        <IconButton
-          onClick={() => {
-            handleOpenDialog(rowData);
-          }}
-          variant="contained"
-          color="error"
+        <Button
+          variant="outlined"
+          onClick={() => handleOpenApplicatorDialog(rowData)}
         >
-          <DeleteOutlineIcon />
-        </IconButton>
+          DS Đăng ký
+        </Button>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={() => handleOpenDialog(rowData)}
+          style={styles.rightActionButton}
+        >
+          Xóa
+        </Button>
       </div>
     );
   };
@@ -227,18 +229,11 @@ const AllClassScreen = () => {
   return (
     <Paper elevation={3}>
       <div style={styles.tableToolBar}>
-        <Typography
-          variant="h4"
-          style={{
-            fontWeight: "bold",
-            marginBottom: "0.5em",
-            paddingTop: "1em",
-          }}
-        >
+        <Typography variant="h4" style={styles.title}>
           Danh sách lớp học
         </Typography>
         <div style={styles.searchArea}>
-          <FormControl style={styles.dropdown} fullWidth>
+          <FormControl style={styles.dropdown} fullWidth size="small">
             <InputLabel id="semester-label">Học kì</InputLabel>
             <Select
               labelId="semester-label"
@@ -257,14 +252,8 @@ const AllClassScreen = () => {
             </Select>
           </FormControl>
 
-          {/* <Tooltip style={styles.importIcon} title="Import danh sách lớp học">
-            <IconButton component="label" onClick={handleFileChange}>
-              <FileUploadIcon color="primary" fontSize="large" />
-            </IconButton>
-          </Tooltip> */}
-
           <Button
-            style={{ height: "40px", marginTop: "1em", marginLeft: "1em" }}
+            style={styles.firstButton}
             variant="outlined"
             onClick={handleNavigateCreateClass}
           >
@@ -272,7 +261,7 @@ const AllClassScreen = () => {
           </Button>
 
           <Button
-            style={{ height: "40px", marginTop: "1em", marginLeft: "1em" }}
+            style={styles.actionButton}
             variant="outlined"
             onClick={handleFileChange}
           >
@@ -280,7 +269,7 @@ const AllClassScreen = () => {
           </Button>
 
           <Button
-            style={{ height: "40px", marginTop: "1em", marginLeft: "1em" }}
+            style={styles.actionButton}
             variant="outlined"
             color="error"
             disabled={rowSelect.length === 0}
@@ -316,12 +305,13 @@ const AllClassScreen = () => {
         open={openImportDialog}
         handleClose={handleCloseImportDialog}
         fetchData={handleFetchData}
+        semester={semester}
       />
 
       <DataGrid
         loading={isLoading}
         rowHeight={60}
-        sx={{ fontSize: 16, height: "65vh" }}
+        sx={styles.table}
         rows={dataGridRows}
         columns={dataGridColumns}
         rowCount={totalElements}

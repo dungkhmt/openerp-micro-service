@@ -197,9 +197,9 @@ const MenuAddMember = ({ anchorEl, onClose }) => {
                 }}
                 onChange={(e) => setSearch(e.target.value)}
                 sx={{
-                  "& .MuiSelect-select": {
-                    display: "flex",
-                    alignItems: "center",
+                  "& .MuiInputBase-root": {
+                    height: "40px",
+                    fontSize: "14px",
                   },
                 }}
               />

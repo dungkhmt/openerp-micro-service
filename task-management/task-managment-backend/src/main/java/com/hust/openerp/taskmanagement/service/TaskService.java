@@ -29,4 +29,6 @@ public interface TaskService {
     Page<TaskDTO> getTasksOfProject(Pageable pageable, UUID projectId, @Nullable String search, String getterId);
 
     List<TaskGanttDTO> getTaskGantt(UUID projectId, String from, String to, String q);
+
+    Page<TaskDTO> getTasksCreatedByUser(Pageable pageable, String creator, @Nullable String search);
 }

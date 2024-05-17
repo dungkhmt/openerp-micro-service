@@ -5,9 +5,16 @@ export const generalTimeTabling = {
   child: [
     {
       id: "MENU_GENERAL_TIME_TABLING.UPLOAD_SCREEN",
+      path: "/general-time-tabling/plan-class-open",
+      isPublic: true,
+      text: "Kế hoạch mở lớp",
+      child: [],
+    },
+    {
+      id: "MENU_GENERAL_TIME_TABLING.UPLOAD_SCREEN",
       path: "/general-time-tabling/upload-class",
       isPublic: true,
-      text: "Tải lên Danh sách lớp",
+      text: "Danh sách lớp",
       child: [],
     },
     {

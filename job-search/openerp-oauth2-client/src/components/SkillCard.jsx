@@ -39,17 +39,14 @@ function SkillCard({skill}) {
     <Card className={classes.card} style={{ width: "100%" }}>
       <CardContent className={classes.cardContent}>
         <Typography variant="h6" component="div" className={classes.title}>
-        Skill name: {skill.schoolName}
+        Skill name: {skill.skillName}
         </Typography>
         <Typography variant="body2" className={classes.subTitle}>
-        Cert link: <a href={skill.certLink}></a>
+        Cert link: <a href={skill.certLink}>click here</a>
         </Typography>
         <Typography>
         Score: {skill.score}
-        </Typography>
-        <Typography>
-        Grade: {skill.grade}
-        </Typography>        
+        </Typography>       
         <Typography variant="body2" className={classes.subTitle}>
         Created At: {skill.createdTime}
         </Typography>

@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.tarecruitment.controller;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.tarecruitment.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.Application;
+import openerp.openerpresourceserver.tarecruitment.entity.ClassCall;
 import openerp.openerpresourceserver.tarecruitment.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,46 @@ public class ApplicationController {
             Application newApplication = applicationService.createApplication(application);
             return ResponseEntity.ok().body(newApplication);
         } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/update-application/{id}")
+    public ResponseEntity<?> updateApplication(@PathVariable int id, @RequestBody Application application) {
+        try {
+            Application updateApplication = applicationService.updateApplication(id, application);
+            return ResponseEntity.ok().body(updateApplication);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/delete-application/{id}")
+    public ResponseEntity<?> deleteApplication(@PathVariable int id) {
+        try {
+            applicationService.deleteApplication(id);
+            return ResponseEntity.ok().body("Delete successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/delete-multiple-application")
+    public ResponseEntity<?> deleteMultipleApplication(@RequestBody List<Integer> idList) {
+        try {
+            applicationService.deleteMultiApplication(idList);
+            return ResponseEntity.ok().body("Delete successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/get-application-by-id/{id}")
+    public ResponseEntity<?> getApplicationById(@PathVariable int id) {
+        try {
+            Application application = applicationService.getApplicationById(id);
+            return ResponseEntity.ok().body(application);
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
@@ -110,8 +151,8 @@ public class ApplicationController {
 
     @GetMapping("/auto-assign-class/{semester}")
     public ResponseEntity<?> autoAssignClass(@PathVariable String semester) {
-        int[][] graph = applicationService.autoAssignApplication(semester);
-        return ResponseEntity.ok().body(graph);
+        applicationService.autoAssignApplication(semester);
+        return ResponseEntity.ok().body("Success");
     }
 
     @GetMapping("/get-assign-list-file/{semester}")
@@ -125,6 +166,15 @@ public class ApplicationController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("BAD REQUEST");
         }
+    }
+
+    @GetMapping("/get-ta-by-semester/{semester}")
+    public ResponseEntity<?> getTABySemester(@PathVariable String semester,
+                                             @RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "10") int limit,
+                                             @RequestParam(defaultValue = "") String search) {
+        PaginationDTO<Application> applications = applicationService.getTABySemester(semester, search, page, limit);
+        return ResponseEntity.ok().body(applications);
     }
 
 }

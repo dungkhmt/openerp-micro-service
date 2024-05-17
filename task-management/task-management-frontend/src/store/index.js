@@ -7,6 +7,8 @@ import priority from "./priority";
 import assignedTasks from "./assigned-tasks";
 import gantt from "./project/gantt-chart";
 import calendar from "./project/calendar";
+import createdTasks from "./created-tasks";
+import search from "./search";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +20,8 @@ export const store = configureStore({
     assignedTasks,
     gantt,
     calendar,
+    createdTasks,
+    search,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

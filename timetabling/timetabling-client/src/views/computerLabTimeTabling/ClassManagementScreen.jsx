@@ -290,7 +290,14 @@ function ClassManagementScreen() {
       });
     }
   };
-
+  const isDisabled = () => {
+    for (let key in invalidRows) {
+      if (invalidRows[key]) {
+        return true; // Nếu có ít nhất một giá trị true thì return true
+      }
+    }
+    return false; // Nếu không có giá trị true nào thì return false
+  };
   const submit_data_from_file = () => {
     var data = fileData.filter((_class) =>
       selectedClassIds.includes(_class.id)
@@ -639,7 +646,7 @@ function ClassManagementScreen() {
         </DialogContent>
         <DialogActions>
           <Button onClick={closeModal}>Cancel</Button>
-          <Button onClick={save_class_onclick}>Save</Button>
+          <Button onClick={save_class_onclick} disabled={isDisabled()}>Save</Button>
         </DialogActions>
       </Dialog>
 
