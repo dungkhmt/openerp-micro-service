@@ -1,50 +1,56 @@
 import { Icon } from "@iconify/react";
 import { TabContext, TabPanel } from "@mui/lab";
-import PerfectScrollbar from "react-perfect-scrollbar";
 import MuiTabList from "@mui/lab/TabList";
-import { Box, Tab, styled } from "@mui/material";
+import { Box, Button, Divider, Tab, styled } from "@mui/material";
 import { useEffect, useState } from "react";
+import PerfectScrollbar from "react-perfect-scrollbar";
 import { useNavigate, useParams } from "react-router";
+import { usePreventOverflow } from "../../hooks/usePreventOverflow";
+import { ProjectBreadcrumb } from "./ProjectBreadcrumb";
 import { ProjectViewCalendar } from "./calendar/ProjectViewCalendar";
+import { ProjectViewGanttChart } from "./gantt-chart/ProjectViewGanttChart";
 import { ProjectViewMembers } from "./member/ProjectViewMembers";
 import { ProjectViewOverview } from "./overview/ProjectViewOverview";
-import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
-import { ProjectViewGanttChart } from "./gantt-chart/ProjectViewGanttChart";
-import { usePreventOverflow } from "../../hooks/usePreventOverflow";
 import { ProjectViewSetting } from "./setting/ProjectViewSetting";
+import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
+import { DialogAddTask } from "./tasks/DialogAddTask";
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
+  minHeight: "34px",
+  marginTop: theme.spacing(1.5),
+  "& .MuiTabs-scroller": {
+    paddingBottom: theme.spacing(1.5),
+  },
   "& .MuiTabs-indicator": {
     backgroundColor: theme.palette.primary.main,
-    top: 0,
-    height: "40px",
-    zIndex: -2,
-    borderRadius: theme.shape.borderRadius,
+    height: "1.5px",
   },
   "& .Mui-selected": {
-    color: `${theme.palette.common.white} !important`,
+    color: `${theme.palette.text.primary} !important`,
+    fontWeight: 600,
     "&:hover": {
-      backgroundColor: `${theme.palette.primary.main} !important`,
+      borderRadius: theme.shape.borderRadius,
     },
   },
   "& .MuiTab-root": {
-    minWidth: 65,
-    minHeight: 40,
-    paddingTop: theme.spacing(2),
-    paddingBottom: theme.spacing(2),
+    minWidth: "auto",
+    minHeight: 30,
     borderRadius: theme.shape.borderRadius,
-    [theme.breakpoints.up("md")]: {
-      minWidth: 130,
-    },
     "&:hover": {
-      backgroundColor: theme.palette.grey[200],
+      backgroundColor: theme.palette.grey[300],
     },
+    textTransform: "none",
+    fontSize: 14,
+    fontWeight: 550,
+    padding: theme.spacing(1, 1.5),
+    margin: theme.spacing(0, 1),
   },
 }));
 
 const ProjectViewRight = () => {
   const { id, tab } = useParams();
   const [activeTab, setActiveTab] = useState(tab);
+  const [openAddTask, setOpenAddTask] = useState(false);
 
   const { ref, updateMaxHeight } = usePreventOverflow();
 
@@ -64,84 +70,134 @@ const ProjectViewRight = () => {
 
   return (
     <TabContext value={activeTab}>
-      <TabList
-        variant="scrollable"
-        scrollButtons="auto"
-        onChange={handleChange}
+      <ProjectBreadcrumb />
+      <Divider sx={{ mt: 1 }} />
+      <Box
         sx={{
-          position: "sticky",
-          top: "46px",
-          backgroundColor: "background.default",
-          zIndex: 10,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        <Tab
-          value="overview"
-          label={
-            <Box
-              sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
-            >
-              <Icon fontSize={20} icon="mdi:view-quilt-outline" />
-              Tổng quan
-            </Box>
-          }
-        />
-        <Tab
-          value="tasks"
-          label={
-            <Box
-              sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
-            >
-              <Icon fontSize={20} icon="ic:baseline-task" />
-              Nhiệm vụ
-            </Box>
-          }
-        />
-        <Tab
-          value="timeline"
-          label={
-            <Box
-              sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
-            >
-              <Icon fontSize={20} icon="mdi:calendar" />
-              Lịch
-            </Box>
-          }
-        />
-        <Tab
-          value="gantt-chart"
-          label={
-            <Box
-              sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
-            >
-              <Icon fontSize={20} icon="fluent:gantt-chart-16-filled" />
-              Gantt Chart
-            </Box>
-          }
-        />
-        <Tab
-          value="members"
-          label={
-            <Box
-              sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
-            >
-              <Icon fontSize={20} icon="mdi:account-group" />
-              Thành viên
-            </Box>
-          }
-        />
-        <Tab
-          value="setting"
-          label={
-            <Box
-              sx={{ display: "flex", alignItems: "center", "& svg": { mr: 2 } }}
-            >
-              <Icon fontSize={20} icon="uiw:setting" />
-              Quản lý
-            </Box>
-          }
-        />
-      </TabList>
+        <TabList
+          variant="scrollable"
+          scrollButtons="auto"
+          onChange={handleChange}
+          sx={{
+            position: "sticky",
+            top: "46px",
+            backgroundColor: "background.default",
+            zIndex: 10,
+          }}
+          size="small"
+        >
+          <Tab
+            value="overview"
+            label={
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  "& svg": { mr: 1, fontSize: "16px" },
+                }}
+              >
+                <Icon fontSize={20} icon="fluent:board-20-regular" />
+                Tổng quan
+              </Box>
+            }
+            size="small"
+          />
+          <Tab
+            value="tasks"
+            label={
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  "& svg": { mr: 1, fontSize: "16px" },
+                }}
+              >
+                <Icon fontSize={20} icon="ion:list-outline" />
+                Nhiệm vụ
+              </Box>
+            }
+          />
+          <Tab
+            value="timeline"
+            label={
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  "& svg": { mr: 1, fontSize: "16px" },
+                }}
+              >
+                <Icon fontSize={20} icon="ph:calendar" />
+                Lịch
+              </Box>
+            }
+          />
+          <Tab
+            value="gantt-chart"
+            label={
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  "& svg": { mr: 1, fontSize: "16px" },
+                }}
+              >
+                <Icon fontSize={20} icon="fluent:gantt-chart-16-regular" />
+                Gantt
+              </Box>
+            }
+          />
+          <Tab
+            value="members"
+            label={
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  "& svg": { mr: 1, fontSize: "16px" },
+                }}
+              >
+                <Icon fontSize={20} icon="tdesign:member" />
+                Thành viên
+              </Box>
+            }
+          />
+          <Tab
+            value="setting"
+            label={
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  "& svg": { mr: 1, fontSize: "16px" },
+                }}
+              >
+                <Icon fontSize={20} icon="uil:setting" />
+                Quản lý
+              </Box>
+            }
+          />
+        </TabList>
+        <Box sx={{ mr: 4 }}>
+          <Button
+            variant="contained"
+            size="small"
+            sx={{
+              textTransform: "capitalize",
+              padding: (theme) => theme.spacing(0.5, 2),
+            }}
+            onClick={() => setOpenAddTask(true)}
+          >
+            Thêm việc
+          </Button>
+        </Box>
+      </Box>
+      <Divider />
       <Box
         ref={ref}
         sx={{
@@ -173,6 +229,7 @@ const ProjectViewRight = () => {
           </TabPanel>
         </PerfectScrollbar>
       </Box>
+      <DialogAddTask open={openAddTask} setOpen={setOpenAddTask} />
     </TabContext>
   );
 };

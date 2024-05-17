@@ -23,5 +23,8 @@ public interface DefenseJuryService {
     public DefenseJury assignReviewerToThesis(AssignReviewerToThesisIM teacherAndThesisList);
     public String assignTeacherAndThesisAutomatically(AssignTeacherToDefenseJuryAutomaticallyIM teacherIdList);
 
-    public int updateDefenseJury(UpdateDefenseJuryIM updateDefenseJuryIM);
+    public DefenseJury updateDefenseJury(UpdateDefenseJuryIM updateDefenseJuryIM);
+
+    public DefenseJury reassignTeacherAndThesis(AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList);
+
 }

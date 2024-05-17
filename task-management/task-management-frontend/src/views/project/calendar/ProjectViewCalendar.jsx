@@ -43,8 +43,7 @@ const ProjectViewCalendar = () => {
     >
       <Box
         sx={{
-          p: 5,
-          pb: 0,
+          p: (theme) => theme.spacing(2, 5, 0),
           flexGrow: 1,
           borderRadius: 1,
           boxShadow: "none",

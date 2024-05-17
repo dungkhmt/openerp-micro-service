@@ -1,11 +1,8 @@
 import { Icon } from "@iconify/react";
 import {
   Box,
-  Button,
   Card,
-  CardContent,
   Divider,
-  Grid,
   IconButton,
   Link,
   Menu,
@@ -20,9 +17,8 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
-import { useDebounce } from "../../../hooks/useDebounce";
-import { MenuAddMember } from "./MenuAddMember";
 import { usePreventOverflow } from "../../../hooks/usePreventOverflow";
+import { MenuAddMember } from "./MenuAddMember";
 
 /**
  * @type {import("@mui/x-data-grid").GridColDef[]}
@@ -190,7 +186,6 @@ const ProjectViewMembers = () => {
 
   const [addMemberAnchorEl, setAddMemberAnchorEl] = useState(null);
   const [search, setSearch] = useState("");
-  const searchDebounce = useDebounce(search, 500);
 
   const handleAddMenuClick = (event) => {
     setAddMemberAnchorEl(event.currentTarget);
@@ -210,63 +205,76 @@ const ProjectViewMembers = () => {
         const id = member.member.id.toLowerCase();
         const email = member.member.email?.toLowerCase() ?? "";
         return (
-          fullName.includes(searchDebounce.toLowerCase()) ||
-          id.includes(searchDebounce.toLowerCase()) ||
-          email.includes(searchDebounce.toLowerCase())
+          fullName.includes(search.toLowerCase()) ||
+          id.includes(search.toLowerCase()) ||
+          email.includes(search.toLowerCase())
         );
       })
     );
-  }, [searchDebounce, members]);
+  }, [search, members]);
 
   useEffect(() => {
-    updateHeight(10);
+    updateHeight(20);
   }, []);
 
   return (
-    <Grid container spacing={6}>
-      <Grid item xs={12}>
-        <Card>
-          <CardContent
-            sx={{ display: "flex", justifyContent: "space-between" }}
+    <Box>
+      <Box
+        sx={{ display: "flex", justifyContent: "space-between", mb: 2, px: 2 }}
+      >
+        <Typography variant="h6">{members.length} thành viên</Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: 3,
+          }}
+        >
+          <IconButton
+            variant="outlined"
+            onClick={handleAddMenuClick}
+            sx={{
+              border: (theme) => `3px dashed ${theme.palette.divider}`,
+            }}
+            title="Add Member"
           >
-            <Typography variant="h5" sx={{ color: "text.secondary" }}>
-              {members.length} thành viên
-            </Typography>
-            <Box
-              sx={{ display: "flex", flexWrap: "wrap", alignItems: "center" }}
-            >
-              <TextField
-                size="small"
-                value={search}
-                sx={{ mr: 4 }}
-                placeholder="Search User"
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <Button variant="outlined" onClick={handleAddMenuClick}>
-                Thêm thành viên
-              </Button>
-              <MenuAddMember
-                anchorEl={addMemberAnchorEl}
-                onClose={handleAddMenuClose}
-              />
-            </Box>
-          </CardContent>
-          <Divider />
-          <div ref={ref}>
-            <DataGrid
-              rows={filterMembers.map((member) => ({
-                ...member,
-                id: member.member.id,
-              }))}
-              columns={columns}
-              // checkboxSelection
-              disableRowSelectionOnClick
-              pageSizeOptions={[10, 25, 50]}
-            />
-          </div>
-        </Card>
-      </Grid>
-    </Grid>
+            <Icon icon="mdi:account-plus" />
+          </IconButton>
+          <TextField
+            size="small"
+            value={search}
+            sx={{
+              "& .MuiInputBase-root": {
+                height: "34px",
+                fontSize: "14px",
+              },
+            }}
+            placeholder="Search User"
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <MenuAddMember
+            anchorEl={addMemberAnchorEl}
+            onClose={handleAddMenuClose}
+          />
+        </Box>
+      </Box>
+      <Card>
+        <Divider />
+        <div ref={ref}>
+          <DataGrid
+            rows={filterMembers.map((member) => ({
+              ...member,
+              id: member.member.id,
+            }))}
+            columns={columns}
+            // checkboxSelection
+            disableRowSelectionOnClick
+            pageSizeOptions={[10, 25, 50]}
+          />
+        </div>
+      </Card>
+    </Box>
   );
 };
 

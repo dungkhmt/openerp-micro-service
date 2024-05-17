@@ -2,7 +2,9 @@ package com.hust.wmsbackend.management.repository;
 
 import com.hust.wmsbackend.management.entity.SaleOrderHeader;
 import com.hust.wmsbackend.management.entity.enumentity.OrderStatus;
+import com.hust.wmsbackend.management.model.response.OrderDetailResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

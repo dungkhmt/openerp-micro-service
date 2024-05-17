@@ -18,6 +18,14 @@ export default function ElementAddThesis({ availableThesisList, assignedThesis, 
         },
         { title: "Tên đồ án", field: "thesisName" },
         {
+            title: "Keyword",
+            field: "academicKeywordList",
+            render: (rowData) =>
+                rowData?.academicKeywordList?.map(({ keyword, description }) => (
+                    <KeywordChip key={keyword} keyword={description} />
+                )),
+        },
+        {
             title: "Sinh viên",
             field: "studentName",
         },
@@ -25,14 +33,6 @@ export default function ElementAddThesis({ availableThesisList, assignedThesis, 
             title: "Giáo viên",
             field: "supervisor",
             render: (rowData) => rowData?.supervisor?.teacherName,
-        },
-        {
-            title: "Keyword",
-            field: "academicKeywordList",
-            render: (rowData) =>
-                rowData?.academicKeywordList?.map(({ keyword, description }) => (
-                    <KeywordChip key={keyword} keyword={description} />
-                )),
         },
     ];
     return (

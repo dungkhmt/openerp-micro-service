@@ -1,14 +1,12 @@
 import { Icon } from "@iconify/react";
 import {
   Box,
-  Button,
-  Card,
-  CardContent,
   InputAdornment,
   LinearProgress,
   TextField,
   Tooltip,
   Typography,
+  Card,
 } from "@mui/material";
 import AvatarGroup from "@mui/material/AvatarGroup";
 import { DataGrid } from "@mui/x-data-grid";
@@ -22,21 +20,21 @@ import { TaskCategory } from "../../../components/task/category";
 import { TaskPriority } from "../../../components/task/priority";
 import { TaskStatus } from "../../../components/task/status";
 import { useDebounce } from "../../../hooks/useDebounce";
+import { usePreventOverflow } from "../../../hooks/usePreventOverflow";
 import {
   clearCache,
   fetchTasks,
   resetPagination,
   resetSort,
-  setPagination,
-  setSort,
-  setSearch as setSearchAction,
   setFilters,
+  setPagination,
+  setSearch as setSearchAction,
+  setSort,
 } from "../../../store/project/tasks";
 import { getDueDateColor, getProgressColor } from "../../../utils/color.util";
-import { DialogAddTask } from "./DialogAddTask";
-import { Filter } from "./Filter";
 import { buildFilterString } from "../../../utils/task-filter";
-import { usePreventOverflow } from "../../../hooks/usePreventOverflow";
+import { Filter } from "./Filter";
+import { CustomPagination } from "../../../components/mui/table/CustomPagination";
 
 const ProjectViewTasks = () => {
   const dispatch = useDispatch();
@@ -61,7 +59,6 @@ const ProjectViewTasks = () => {
   const searchDebounce = useDebounce(search, 1000);
 
   const [rows, setRows] = useState(tasksCache[pagination.page] ?? []);
-  const [openAddTask, setOpenAddTask] = useState(false);
 
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -314,17 +311,18 @@ const ProjectViewTasks = () => {
   }, [window.innerHeight]);
 
   return (
-    <Card>
+    <Box>
       {/* Header */}
-      <CardContent
+      <Box
         sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          mb: 2,
         }}
       >
         <Box sx={{ display: "flex", gap: 4, alignItems: "center" }}>
-          <Typography variant="h5">{totalCount ?? 0} nhiệm vụ</Typography>
+          <Typography variant="h6">{totalCount ?? 0} nhiệm vụ</Typography>
           <Tooltip title="Lọc">
             <Filter
               text="Filters"
@@ -348,6 +346,12 @@ const ProjectViewTasks = () => {
             onChange={(e) => {
               setSearch(e.target.value);
             }}
+            sx={{
+              "& .MuiInputBase-root": {
+                height: "34px",
+                fontSize: "14px",
+              },
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -356,28 +360,14 @@ const ProjectViewTasks = () => {
               ),
             }}
           />
-          <Button
-            variant="outlined"
-            sx={{ textTransform: "normal", ml: 4 }}
-            onClick={() => setOpenAddTask(true)}
-          >
-            Thêm nhiệm vụ
-          </Button>
         </Box>
-      </CardContent>
-
+      </Box>
       {/* Table */}
-      <Box ref={ref}>
+      <Card ref={ref}>
         <DataGrid
           rows={rows}
           columns={columns}
           disableRowSelectionOnClick
-          pageSizeOptions={[10, 20, 50]}
-          paginationModel={{
-            page: pagination.page,
-            pageSize: pagination.size,
-          }}
-          onPaginationModelChange={handlePaginationModel}
           pagination
           paginationMode="server"
           rowCount={totalCount}
@@ -387,10 +377,34 @@ const ProjectViewTasks = () => {
           localeText={{
             noRowsLabel: "Không có dữ liệu",
           }}
+          slots={{
+            pagination: CustomPagination,
+          }}
+          slotProps={{
+            pagination: {
+              page: pagination.page + 1,
+              rowsPerPage: pagination.size,
+              count: Math.ceil(totalCount / pagination.size),
+              onPageChange: (e, page) => {
+                handlePaginationModel({
+                  page: page - 1,
+                  pageSize: pagination.size,
+                });
+              },
+              onRowsPerPageChange: (value) => {
+                handlePaginationModel({
+                  page: 0,
+                  pageSize: value,
+                });
+              },
+              pageSizeOptions: [10, 20, 50],
+              showFirstButton: true,
+              showLastButton: true,
+            },
+          }}
         />
-      </Box>
-      <DialogAddTask open={openAddTask} setOpen={setOpenAddTask} />
-    </Card>
+      </Card>
+    </Box>
   );
 };
 

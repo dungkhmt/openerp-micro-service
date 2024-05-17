@@ -13,6 +13,7 @@ export const applicationUrl = {
   deleteApplication: "/application/delete-application",
   deleteMultipleApplication: "/application/delete-multiple-application",
   autoAssignClass: "/application/auto-assign-class",
+  getTaBySemester: "/application/get-ta-by-semester",
 };
 
 export const classCallUrl = {
