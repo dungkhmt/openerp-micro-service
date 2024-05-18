@@ -18,6 +18,9 @@ public class RoomReservation {
     @JoinColumn(name = "general_class_id")
     @JsonIgnore
     private GeneralClass generalClass;
+    @JsonProperty("crew")
+    private String crew;
+
     @JsonProperty("startTime")
     private Integer startTime;
     @JsonProperty("endTime")
@@ -30,15 +33,17 @@ public class RoomReservation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    public RoomReservation(int startTime, int endTime, int weekday, String room) {
+    public RoomReservation(String crew, int startTime, int endTime, int weekday, String room) {
+        this.crew = crew;
         this.endTime = endTime;
         this.startTime = startTime;
         this.weekday = weekday;
         this.room = room;
     }
 
-    public RoomReservation(GeneralClass gClass, int startTime, int endTime, int weekday, String room) {
+    public RoomReservation(GeneralClass gClass,String crew,  int startTime, int endTime, int weekday, String room) {
         this.generalClass = gClass;
+        this.crew = crew;
         this.startTime = startTime;
         this.endTime = endTime;
         this.weekday = weekday;

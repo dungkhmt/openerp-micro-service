@@ -14,6 +14,13 @@ public interface RoomOccupationRepo extends JpaRepository<RoomOccupation, String
 
     List<RoomOccupation> findAllBySemesterAndClassCodeAndDayIndexAndStartPeriodAndEndPeriodAndClassRoom(
             String semester, String classCode, Integer dayIndex, Integer startPeriod, Integer endPeriod, String classRoom);
+
+    List<RoomOccupation> findAllBySemesterAndCrewAndWeekIndexAndDayIndexAndStartPeriodAndEndPeriod(
+            String semester, String crew, Integer weekIndex, Integer dayIndex, Integer startPeriod, Integer endPeriod);
+
+    List<RoomOccupation> findAllBySemesterAndCrewAndWeekIndexAndDayIndex(
+            String semester, String crew, Integer weekIndex, Integer dayIndex);
+
     void deleteBySemester(String semester);
 
     List<RoomOccupation> findAllBySemesterAndWeekIndex(String semester, int i);

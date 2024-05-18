@@ -1,12 +1,14 @@
 package openerp.openerpresourceserver.generaltimetabling.helper;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
+@Log4j2
 public class LearningWeekExtractor {
     public static List<Integer> extract(String weekString) {
         List<Integer> weekIntList = Arrays.stream(weekString.split("-")).map(Integer::parseInt).toList();
@@ -20,6 +22,7 @@ public class LearningWeekExtractor {
     }
 
     public static List<Integer> extractArray(String weekArrayString) {
+        log.info("extractArray, weekArrayString = " + weekArrayString);
         List<String> weekStrings = Arrays.stream(weekArrayString.split(",")).toList();
         List<Integer> weeksArray = new ArrayList<>();
         for(String weekString : weekStrings) {

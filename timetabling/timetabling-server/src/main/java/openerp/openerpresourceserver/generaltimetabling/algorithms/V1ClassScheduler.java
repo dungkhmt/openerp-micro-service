@@ -38,6 +38,7 @@ public class V1ClassScheduler {
                 gClass.getTimeSlots().forEach(rr -> rr.setGeneralClass(null));
                 gClass.getTimeSlots().clear();
                 RoomReservation newRoomReservation = new RoomReservation(
+                        gClass.getCrew(),
                         (int)value(v)%6,
                         (int)value(v)%6 + MassExtractor.extract(gClass.getMass())-1,
                         (int)value(v)/6 +1,
