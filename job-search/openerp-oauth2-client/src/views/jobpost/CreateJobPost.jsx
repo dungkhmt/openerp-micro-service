@@ -12,6 +12,8 @@ import {
 import { request } from "../../api"
 import { CircularProgress, Snackbar } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
+import Swal from "sweetalert2";
+import './styles.css';
 
 const CreateJobPost = () => {
     const [loading, setLoading] = useState(false);
@@ -20,7 +22,7 @@ const CreateJobPost = () => {
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
     const [requirements, setRequirements] = useState("")
-    const [location, setLocation] = useState("")
+    const [locations, setLocations] = useState("")
     const [salary, setSalary] = useState(0)
     const [jobPostForm, setJobPostForm] = useState({
     })
@@ -41,19 +43,61 @@ const CreateJobPost = () => {
     }
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
         setLoading(true);
-        await sleep(2000);
-        jobPostForm.salary = Number(jobPostForm.salary)
+    
+        // Simulate a delay with setTimeout
+    
+        jobPostForm.salary = Number(jobPostForm.salary);
+        jobPostForm.user = user
         console.log(jobPostForm)
-        request("post", "/job-post", (res) => {
-            return 0;
-        }, (res) => {
-            return 0;
-        }, jobPostForm).then();
-        setLoading(false);
-        setOpenSnackbar(true);
-        await sleep(1500);
+        // Use SweetAlert2 for confirmation before submitting
+        try {
+        Swal.fire({
+            title: 'Confirm Submission',
+            text: "Are you sure you want to submit this job post?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Submit',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                request("post", "/job-post", (res) => {
+                    // Handle success
+                    console.log("success: ", res)
+                    Swal.fire(
+                        'Submitted!',
+                        'The job post has been submitted.',
+                        'success'
+                    );
+                    setLoading(false);
+                }, (err) => {
+                    // Handle error
+                    console.log("error: ", err)
+                    Swal.fire(
+                        'Failed!',
+                        'There was a problem submitting the job post.',
+                        'error'
+                    );
+                    setLoading(false);
+                }, jobPostForm).then();
+            } else {
+                // If cancelled, reset loading
+                setLoading(false);
+            }
+        }); }
+        catch (error) {
+            console.error(error);
+            // Show an error Swal if there's an issue with the upload or form submission
+            Swal.fire({
+                title: 'Error!',
+                text: 'There was an issue with the upload or submission.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
     };
 
     return (
@@ -85,7 +129,7 @@ const CreateJobPost = () => {
                         <Typography variant="h4">Location</Typography>
                     </Grid>
                     <Grid item xs={11}>
-                        <TextField fullWidth label="location" value={jobPostForm.locations} variant="outlined" name="location" onChange={handleInputChange} />
+                        <TextField fullWidth label="locations" value={jobPostForm.locations} variant="outlined" name="locations" onChange={handleInputChange} />
                     </Grid>
                     <Grid item xs={12}>
                         <Typography variant="h4">Salary</Typography>
@@ -102,18 +146,18 @@ const CreateJobPost = () => {
                             </Button>
                         </Grid>
                     </Grid>
-                    <Snackbar
+                    {/* <Snackbar
                         open={openSnackbar}
                         autoHideDuration={3000} // Duration in milliseconds
                         onClose={() => setOpenSnackbar(false)}
                         message="Form submitted successfully!"
-                    />
-                    <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                    /> */}
+                    {/* <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                         <CircularProgress color="inherit" />
                         <div>
                             Please wait a few seconds...
                         </div>
-                    </Backdrop>
+                    </Backdrop> */}
                 </Grid>
             </Grid>
         </>

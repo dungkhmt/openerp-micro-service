@@ -18,8 +18,10 @@ import { useHookstate } from '@hookstate/core';
 import fetchUserState from "state/userState";
 import { CircularProgress, Snackbar } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
+import './styles.css';
+import Swal from "sweetalert2";
 
-const ExperienceDetail = ({ Experience,  open, onClose }) => {
+const ExperienceDetail = ({ Experience, open, onClose }) => {
 
     const [loading, setLoading] = useState(false);
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -43,20 +45,38 @@ const ExperienceDetail = ({ Experience,  open, onClose }) => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true);
-        await sleep(2000);
-        let submitToServerForm = {...Experience, ...experience}
+        let submitToServerForm = { ...Experience, ...experience }
         submitToServerForm.user = user
-        console.log(submitToServerForm)
-        console.log(user)
-        request("post", `/experience`, (res) => {
-            console.log(res);
-        }, (err) => {
-            console.log(err);
-        }, submitToServerForm).then();
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, submit it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                request("post", `/experience`, (res) => {
+                    Swal.fire(
+                        'Submitted!',
+                        'Your information has been submitted.',
+                        'success'
+                    );
+                    handleClose();
+                }
+                    , (err) => {
+                        Swal.fire(
+                            'Failed!',
+                            'There was a problem submitting your information.',
+                            'error'
+                        );
+                        handleClose();
+                    }, submitToServerForm).then();
+            }
+        })
         setLoading(false);
-        setOpenSnackbar(true);
-        await sleep(1500);
-        handleClose()
     }
 
     const handleInputChange = (event) => {
@@ -74,44 +94,44 @@ const ExperienceDetail = ({ Experience,  open, onClose }) => {
             <Dialog onClose={handleClose} open={open} maxWidth="md" fullWidth={true} sx={{ maxHeight: 'lg' }} fullHeight={true}>
                 <h1 fullHeight>Your Experience: </h1>
                 <form noValidate autoComplete="off">
-                    <Grid item xs={12} container spacing={2}  display="flex" justifyContent="center" paddingTop={"50px"}>
-                        <Grid item xs={11} container  style={{ backgroundColor: "white" }}  paddingLeft={"50px"}>
+                    <Grid item xs={12} container spacing={2} display="flex" justifyContent="center" paddingTop={"50px"}>
+                        <Grid item xs={11} container style={{ backgroundColor: "white" }} paddingLeft={"50px"}>
                             <Typography>Company name</Typography>
                         </Grid>
                         <Grid item xs={11}>
                             <TextField fullWidth label="Company name" value={experience.companyName} variant="outlined" name="companyName" onChange={handleInputChange} />
                         </Grid>
-                        <Grid item xs={11} container  style={{ backgroundColor: "white" }}  paddingLeft={"50px"}>
+                        <Grid item xs={11} container style={{ backgroundColor: "white" }} paddingLeft={"50px"}>
                             <Typography >Working position</Typography>
                         </Grid>
                         <Grid item xs={11}>
                             <TextField fullWidth label="Working position" value={experience.workingPosition} variant="outlined" name="workingPosition" onChange={handleInputChange} />
                         </Grid>
-                        <Grid item xs={11} container  style={{ backgroundColor: "white" }} display="flex" paddingTop={"50px"}>
+                        <Grid item xs={11} container style={{ backgroundColor: "white" }} display="flex" paddingTop={"50px"}>
                             <Typography >Responsibility</Typography>
                         </Grid>
                         <Grid item xs={11}>
                             <TextField fullWidth label="Responsibility" value={experience.responsibility} variant="outlined" name="responsibility" onChange={handleInputChange} />
-                        </Grid>                        
-                        <Grid item xs={11} container  style={{ backgroundColor: "white" }} display="flex" paddingTop={"50px"}>
+                        </Grid>
+                        <Grid item xs={11} container style={{ backgroundColor: "white" }} display="flex" paddingTop={"50px"}>
                             <Typography >Starting time</Typography>
                         </Grid>
                         <Grid item xs={11}>
                             <TextField fullWidth label="Starting time" value={experience.startingTime} variant="outlined" name="startingTime" onChange={handleInputChange} />
                         </Grid>
-                        <Grid item xs={11} container  style={{ backgroundColor: "white" }} display="flex" paddingTop={"50px"}>
+                        <Grid item xs={11} container style={{ backgroundColor: "white" }} display="flex" paddingTop={"50px"}>
                             <Typography >Ending time</Typography>
                         </Grid>
                         <Grid item xs={11}>
                             <TextField fullWidth label="Ending time" value={experience.endingTime} variant="outlined" name="endingTime" onChange={handleInputChange} />
                         </Grid>
 
-                        <Snackbar
+                        {/* <Snackbar
                             open={openSnackbar}
                             autoHideDuration={3000} // Duration in milliseconds
                             onClose={() => setOpenSnackbar(false)}
                             message="Form submitted successfully!"
-                        />
+                        /> */}
 
                         {/* This button should submit the form */}
                         <Box display="flex" justifyContent="center" paddingTop={'50px'}>
@@ -119,12 +139,12 @@ const ExperienceDetail = ({ Experience,  open, onClose }) => {
                                 {'Submit'}
                             </Button>
                         </Box>
-                        <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                        {/* <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                             <CircularProgress color="inherit" />
                             <div>
                                 Please wait a few seconds...
                             </div>
-                        </Backdrop>
+                        </Backdrop> */}
                     </Grid>
                 </form>
             </Dialog>

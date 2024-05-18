@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useParams, useHistory, useLocation } from "react-router-dom";
 import { boxChildComponent, boxComponentStyle } from "components/thesisdefensejury/constant";
 import { useFetch } from "hooks/useFetch";
@@ -16,11 +16,6 @@ function DefenseJuryDetail(props) {
   const columns = [
     { title: "Tên đồ án", field: "thesisName" },
     {
-      title: "Sinh viên",
-      field: "studentName",
-    },
-    { title: "Giáo viên", field: "supervisor" },
-    {
       title: "Keywords",
       field: "keywords",
       render: (rowData) =>
@@ -28,6 +23,11 @@ function DefenseJuryDetail(props) {
           <KeywordChip key={item} keyword={item} />
         )),
     },
+    {
+      title: "Sinh viên",
+      field: "studentName",
+    },
+    { title: "Giáo viên", field: "supervisor" },
     {
       title: "Giáo viên phản biện",
       field: "scheduledReviewer",
@@ -38,7 +38,7 @@ function DefenseJuryDetail(props) {
   const defenseJuryTeacherRoles = defenseJury?.defenseJuryTeacherRoles.map(
     (item) => ({
       id: item.id,
-      role: item?.role?.role,
+      role: item?.role?.name,
       teacher: item?.teacher.teacherName,
     })
   );

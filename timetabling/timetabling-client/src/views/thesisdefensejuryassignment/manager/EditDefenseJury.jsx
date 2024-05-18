@@ -73,12 +73,10 @@ export const EditDefenseJury = () => {
         data.defenseRoomId = defenseRoomId;
         data.defenseSessionId = defenseSessionId;
         data.maxThesis = parseInt(data.maxThesis);
-        console.log(data);
         request(
             "POST",
             "/defense-jury/update",
             (res) => {
-                console.log(res.data);
                 if (res.data) {
                     successNoti("cập nhật hội đồng thành công", true)
                     return history.goBack();
@@ -113,7 +111,7 @@ export const EditDefenseJury = () => {
         <form onSubmit={handleSubmit(handleFormSubmit)}>
             {loading ? <ModalLoading /> : <Box sx={boxComponentStyle}>
                 <Typography variant="h4" mb={4} component={"h4"}>
-                    Thêm mới Hội Đồng
+                    Cập nhật Hội Đồng
                 </Typography>
                 <Box mb={3}>
                     <TextField

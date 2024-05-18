@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     ListItem,
     ListItemText,
@@ -39,13 +39,16 @@ const ROLES = [
     },
 ];
 export default function AssignTeacherListItem({ assignedTeacher, handleSelectTeacher, handleAssignRole }) {
-    const [role, setRole] = useState(
-        assignedTeacher?.role ? assignedTeacher.role : ""
-    );
+    const [role, setRole] = useState("");
     const handleChange = (e) => {
         setRole(e.target.value);
         handleAssignRole(e);
     };
+    useEffect(() => {
+        if (assignedTeacher?.role) {
+            return setRole(assignedTeacher?.role)
+        }
+    }, [assignedTeacher])
     return (
         <React.Fragment>
             <ListItem

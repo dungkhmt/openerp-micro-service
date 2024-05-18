@@ -1,0 +1,15 @@
+.product-item {
+  position: relative;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 1%;
+}
+
+.product-item:hover {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  transform: translate(0px, -0.5px);
+}
+
+.price-text {
+    color: #1976D2; /* Màu văn bản */
+  }
