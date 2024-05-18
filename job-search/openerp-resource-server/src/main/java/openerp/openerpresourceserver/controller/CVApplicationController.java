@@ -31,20 +31,27 @@ public class CVApplicationController {
         List<CVApplication> cvApplicationList = cvApplicationService.getAll();
         return ResponseEntity.ok(cvApplicationList);
     }
-
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getCvApplicationByUserId(@PathVariable String id) {
+        List<CVApplication> cvApplication = cvApplicationService.getAllByUserId(id);
+        return ResponseEntity.ok(cvApplication);
+    }
     @GetMapping("/{id}")
     public ResponseEntity<?> getCvApplicationByJobId(@PathVariable Integer id) {
         List<CVApplication> cvApplication = cvApplicationService.getAllByJobId(jobPostService.getById(id));
         return ResponseEntity.ok(cvApplication);
     }
 
+
+
     @PostMapping("/user/{id}/{jobPostId}")
     public ResponseEntity<?> save(@RequestBody CVApplication cvApplication, @PathVariable String id, @PathVariable Integer jobPostId) {
-        CVApplication cvApplication1 = cvApplicationService.save(cvApplication);
+        CVApplication cvApplication1 = cvApplication;
         User user = userService.getUserById(id);
         JobPost jobPost = jobPostService.getById(jobPostId);
         cvApplication1.setUser(user);
         cvApplication1.setJobId(jobPost);
+        cvApplicationService.save(cvApplication1);
         return ResponseEntity.ok(cvApplication1);
     }
 
