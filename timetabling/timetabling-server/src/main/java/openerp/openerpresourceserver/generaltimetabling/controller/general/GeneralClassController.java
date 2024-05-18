@@ -120,7 +120,7 @@ public class GeneralClassController {
             @RequestParam("groupName") String groupName,
             @RequestParam("timeLimit") int timeLimit) {
         log.info("Controler API -> requestAutoScheduleTime...");
-        return ResponseEntity.ok(gService.autoSchedule(semester, groupName, timeLimit));
+        return ResponseEntity.ok(gService.autoSchedule(semester, groupName, timeLimit*1000));
     }
 
     @PostMapping("/auto-schedule-room")

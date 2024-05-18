@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import openerp.openerpresourceserver.generaltimetabling.model.dto.RoomOccupationDto;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 
 
@@ -17,4 +18,7 @@ public interface RoomOccupationService {
      ByteArrayInputStream exportExcel(String semester, int week);
 
     List<RoomOccupation> getRoomOccupationsBySemesterAndWeekIndex(String semester, int weekIndex);
+
+    List<Classroom> getRoomsNotOccupiedBySemesterAndWeekDayCrewStartAndEndSLot(String semester, String crew, int week, int day, int startSlot, int endSlot);
+
 }

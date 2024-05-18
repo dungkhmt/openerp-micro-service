@@ -48,8 +48,9 @@ public class ClassTimeScheduleBacktrackingSolver {
 
     }
     private void Try(int k){
-        //log.info("Try(" + k + "/" + n + ") domain = " + domains[k].size());
         double t= System.currentTimeMillis() - t_start;
+        log.info("time = " + t + " -> Try(" + k + "/" + n + ") domain = " + domains[k].size());
+
         if(t > timeLimit) return;
         //if (System.currentTimeMillis() - t0 > timeLimit) return;
         if(found) return;
@@ -65,7 +66,7 @@ public class ClassTimeScheduleBacktrackingSolver {
     }
     public void solve(){
         //this.timeLimit = timeLimit;
-        log.info("solve...");
+        log.info("solve...timeLimit = " + timeLimit);
         found = false;
         x = new int[n];
         sol = new int[n];
