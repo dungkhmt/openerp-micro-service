@@ -11,19 +11,20 @@ export const createJobPost = {
         child: [],
       },
       {
-        id: "MENU_CREATE_jOBPOST.View_YOUR_JOB_POST",
-        path: "/view-job-post/user/dungpq",
+        id: "",
+        path: "/view-job-posts/employer",
         isPublic: true,
-        text: "View all employee job post",
+        text: "View your all job post",
         child: [],
-      },
+      },      
       {
-        id: "MENU_CREATE_jOBPOST.View_JOB_POST",
-        path: "/view-job-posts",
+        id: "MENU_CREATE_jOBPOST.View_YOUR_JOB_POST",
+        path: "/view-job-post/user",
         isPublic: true,
-        text: "View all job post",
+        text: "View all employee applicant",
         child: [],
       }
+
     ],
   };
   

@@ -32,6 +32,8 @@ import theme from '../theme'
 import TestResult from "components/test/test-result";
 import TestResultPage from "views/mbti-page/test/result/testResultId";
 import CVScanner from "views/cvscanner/CVScanner";
+import ViewAllApplicant2 from "views/jobpost/ViewAllApplicant2";
+import ViewAllJobPost2 from "views/jobpost/ViewAllJobPost2";
 
 const styles = {
   loadingProgress: {
@@ -73,9 +75,11 @@ function MainAppRouter(props) {
           <PrivateRoute component={CreateNewCvForm} path="/create-cv" />
           <PrivateRoute component={UserSkill} path = "/user-skill" />
           <PrivateRoute component={CreateJobPost} path = "/create-job-post" />
-          <PrivateRoute component={ViewAllApplicant} path = "/view-job-post/user/dungpq" />
-          <PrivateRoute component={ViewJobPostDetail} path = "/view-job-post/:id" />          
-          <PrivateRoute component={ViewAllJobPost} path = "/view-job-posts" />          
+          <PrivateRoute component={ViewAllApplicant} path = "/view-job-post/user" />
+          <PrivateRoute component={ViewAllApplicant2} path = "/view-job-posts/user/:id" />
+          <PrivateRoute component={ViewJobPostDetail} path = "/view-job-post/:id" /> 
+          <PrivateRoute component={ViewAllJobPost2} path = "/view-jobs-posts" />          
+          <PrivateRoute component={ViewAllJobPost} path = "/view-job-posts/employer" />                    
           <PrivateRoute component={ViewAllJobPostApplicant} path = "/view-job-post-applicant/:id" />
           <PrivateRoute component={ViewAllApplicantStatus} path = "/view-all-applicant" />
           <PrivateRoute component={ViewAllCV} path = "/view-all-cv" />

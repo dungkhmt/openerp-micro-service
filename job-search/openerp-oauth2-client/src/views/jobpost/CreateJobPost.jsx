@@ -52,43 +52,24 @@ const CreateJobPost = () => {
         jobPostForm.user = user
         console.log(jobPostForm)
         // Use SweetAlert2 for confirmation before submitting
-        try {
         Swal.fire({
-            title: 'Confirm Submission',
-            text: "Are you sure you want to submit this job post?",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Submit',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                request("post", "/job-post", (res) => {
-                    // Handle success
-                    console.log("success: ", res)
-                    Swal.fire(
-                        'Submitted!',
-                        'The job post has been submitted.',
-                        'success'
-                    );
-                    setLoading(false);
-                }, (err) => {
-                    // Handle error
-                    console.log("error: ", err)
-                    Swal.fire(
-                        'Failed!',
-                        'There was a problem submitting the job post.',
-                        'error'
-                    );
-                    setLoading(false);
-                }, jobPostForm).then();
-            } else {
-                // If cancelled, reset loading
-                setLoading(false);
+            title: 'Uploading...',
+            text: 'Please wait while the file is being uploaded.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
             }
-        }); }
-        catch (error) {
+        });
+        try {
+            const res = await request("post", "/job-post", null, null, jobPostForm)
+            // Show a success Swal if the form is submitted
+            Swal.fire({
+                title: 'Submitted!',
+                text: 'Your information has been submitted.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+        } catch (error) {
             console.error(error);
             // Show an error Swal if there's an issue with the upload or form submission
             Swal.fire({

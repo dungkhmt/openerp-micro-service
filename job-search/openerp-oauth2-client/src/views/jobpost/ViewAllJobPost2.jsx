@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
 import JobCard from "components/JobCard";
-const ViewAllJobPost = () => {
+const ViewAllJobPost2 = () => {
 
     const [title, setTitle] = useState("Thực tập sinh dot net")
     const [description, setDescription] = useState("không có lương đâu")
@@ -41,7 +41,7 @@ const ViewAllJobPost = () => {
         <>
         <Grid container spacing={4} style={{backgroundColor:  "#F7F7FF"}} display="flex" justifyContent="center" paddingTop={"50px"}>
         {allJobPostForm.map((jobPost, index) => (
-            <Grid item xs={5} style={{ boxShadow: '1px 1px 1px 1px rgba(0.5,0.5,0.5,0.5)', margin: '20px', borderRadius: '20px', backgroundColor: "white"}} onClick={() => goToUrl(`/view-job-posts/user/${jobPost.id}`)}>
+            <Grid index={index} item xs={5} style={{ boxShadow: '1px 1px 1px 1px rgba(0.5,0.5,0.5,0.5)', margin: '20px', borderRadius: '20px', backgroundColor: "white"}} onClick={() => goToUrl(`/view-job-post/${jobPost.id}`)}>
             <JobCard job={jobPost}></JobCard>
             </Grid>
             // <Card  sx={{ minWidth: 275 }}>
@@ -71,4 +71,4 @@ const ViewAllJobPost = () => {
     )
 }
 
-export default ViewAllJobPost;
+export default ViewAllJobPost2;

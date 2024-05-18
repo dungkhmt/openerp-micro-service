@@ -14,10 +14,10 @@ import { Card, CardContent, CardActions } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import ApplicantCard from "components/ApplicantCard";
 
-const ViewAllApplicant = () => {
+const ViewAllApplicant2 = () => {
 
     let { id } = useParams();
-    id = "4"
+
     const [title, setTitle] = useState("Thực tập sinh dot net")
     const [description, setDescription] = useState("không có lương đâu")
     const [requirements, setRequirements] = useState("10 năm kinh nghiệm")
@@ -83,4 +83,4 @@ const ViewAllApplicant = () => {
     )
 }
 
-export default ViewAllApplicant;
+export default ViewAllApplicant2;
