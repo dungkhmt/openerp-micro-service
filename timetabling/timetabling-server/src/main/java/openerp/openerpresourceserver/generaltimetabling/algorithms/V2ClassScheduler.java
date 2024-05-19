@@ -36,7 +36,11 @@ public class V2ClassScheduler {
             return null;
         }
         List<int[]> conflict = new ArrayList<int[]>();
-        int[] durations = classes.stream().filter(c -> c.getMass() != null).mapToInt(c -> MassExtractor.extract(c.getMass())).toArray();
+        //int[] durations = classes.stream().filter(c -> c.getMass() != null).mapToInt(c -> MassExtractor.extract(c.getMass())).toArray();
+        int[] durations = new int[n];
+        for(int i = 0; i < classes.size(); i++){
+            durations[i] = classes.get(i).getDuration();
+        }
         ArrayList[] domains = new ArrayList[n];
 
         for (int i = 0; i < n; i++) {
@@ -56,7 +60,7 @@ public class V2ClassScheduler {
                     end = rr.getEndTime();
                 }
                 if(rr.getWeekday() != null && rr.getWeekday() > 0){
-                    day = rr.getWeekday();
+                    day = rr.getWeekday() - 2;// 0 means Monday, 1 means Tuesday...
                 }
                 if(rr.getCrew()!= null){
                     if(rr.getCrew().equals("S")) KIP = 0;
@@ -84,10 +88,15 @@ public class V2ClassScheduler {
                 GeneralClass ci = classes.get(i);
                 GeneralClass cj = classes.get(j);
                 if(ci.getRefClassId().equals(cj.getRefClassId())){
-                    if(ci.getParentClassId().equals(cj.getId()) ||
-                    cj.getParentClassId().equals(ci.getId())){
+                    if(ci.getClassCode().equals(cj.getClassCode())){// same classCode means 2 segments of the same class
                         conflict.add(new int[]{i, j});
+                    }else {// different classCode, then add conflict is parent-child classes
+                        if (ci.getParentClassId().equals(cj.getId()) ||
+                                cj.getParentClassId().equals(ci.getId())) {
+                            conflict.add(new int[]{i, j});
+                        }
                     }
+
                 }else{
                     conflict.add(new int[]{i, j});
                 }
@@ -109,9 +118,14 @@ public class V2ClassScheduler {
                 int K = t1 / 6; // kip
                 int tietBD = t1 - 6 * K;
                 GeneralClass gClass = classes.get(i);
+                gClass.setStartTime(tietBD);
+                gClass.setEndTime(tietBD + gClass.getDuration() - 1);
+                gClass.setWeekday(day + 2);
                 gClass.getTimeSlots().forEach(rr -> rr.setGeneralClass(null));
                 gClass.getTimeSlots().clear();
-                RoomReservation newRoomReservation = new RoomReservation(gClass.getCrew(),tietBD, tietBD + MassExtractor.extract(gClass.getMass()) - 1, day + 2, null);
+                //RoomReservation newRoomReservation = new RoomReservation(gClass.getCrew(),tietBD, tietBD + MassExtractor.extract(gClass.getMass()) - 1, day + 2, null);
+                RoomReservation newRoomReservation = new RoomReservation(gClass.getCrew(),tietBD, tietBD + gClass.getDuration() - 1, day + 2, null);
+
                 newRoomReservation.setGeneralClass(gClass);
                 gClass.getTimeSlots().add(newRoomReservation);
                 log.info("class[" + i + "] is assigned to slot " + solution[i] + "(" + day + "," + K + "," + tietBD + ")");
@@ -151,7 +165,8 @@ public class V2ClassScheduler {
             List<Integer> learningWeeks = gClass.extractLearningWeeks();
             HashSet<String> occupiedRooms = new HashSet();
             for(RoomOccupation ro: roomOccupations){
-                if(ro.getCrew().equals(rr.getCrew()) &&
+                if(ro.getCrew() != null && rr.getCrew() != null &&
+                        ro.getCrew().equals(rr.getCrew()) &&
                         ro.getDayIndex() == rr.getWeekday()){
                     //boolean occupied = false;
                     for(int w: learningWeeks)if(w == ro.getWeekIndex()){
@@ -190,6 +205,7 @@ public class V2ClassScheduler {
                 RoomReservation rr_i = ci.getTimeSlots().get(0);
                 RoomReservation rr_j = cj.getTimeSlots().get(0);
                 if(intersect(LW_i,LW_j) &&
+                        rr_i.getCrew() != null && rr_j.getCrew() != null &&
                         rr_i.getCrew().equals(rr_j.getCrew()) &&
                         rr_i.getWeekday() == rr_j.getWeekday()){
                     boolean notOverlap = rr_i.getStartTime() > rr_j.getEndTime() ||

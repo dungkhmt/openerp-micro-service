@@ -1,7 +1,7 @@
 export const generalTimeTabling = {
   id: "MENU_GENERAL_TIME_TABLING",
   icon: "AnalyticsIcon",
-  text: "Quản lý lịch học (Đại trà)",
+  text: "Thời khóa biểu",
   child: [
     {
       id: "MENU_GENERAL_TIME_TABLING.UPLOAD_SCREEN",
