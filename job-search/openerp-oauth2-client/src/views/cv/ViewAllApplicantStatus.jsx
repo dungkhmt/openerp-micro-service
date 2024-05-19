@@ -13,25 +13,18 @@ import {
 import { Card, CardContent, CardActions } from '@mui/material';
 import UserApplicantCard from "components/UserApplicantCard";
 const ViewAllApplicantStatus = () => {
-    let id = "4"
-    const [title, setTitle] = useState("Thực tập sinh dot net")
-    const [description, setDescription] = useState("không có lương đâu")
-    const [requirements, setRequirements] = useState("10 năm kinh nghiệm")
-    const [location, setLocation] = useState("Hà Nội")
-    const [salary, setSalary] = useState(0)
 
-    const [cv, selectedCV] = useState({})
+    let id = "4"
     const [cvApplication, setCVApplication] = useState([])
     const [allCV, setAllCV] = useState([])
     const [user, setUser] = useState({})
+    
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
-        }).then();
-    }, [])
-    useEffect(() => {
-        request("get", `/cv-application/${id}`, (res) => {
+            request("get", `/cv-application/user/${res.data.id}`, (res) => {
             setCVApplication(res.data)
+        }).then();
         }).then();
     }, [])
 
@@ -41,25 +34,6 @@ const ViewAllApplicantStatus = () => {
         }).then();
     }, [])
 
-    function goToUrl(url) {
-        window.location.href = url;
-    }
-
-    const handleSubmit = (status, index) => {
-        let cv = cvApplication[index]
-        console.log(cv)
-        let submitToServerForm = {
-            ...cv,
-            "status": status,
-
-        };
-        console.log(submitToServerForm)
-        request("put", `/cv-application/user/dungpq/${id}`, (res) => {
-            console.log(res);
-        }, (err) => {
-            console.log(err);
-        }, submitToServerForm).then();
-    }
 
     return (
         <>
