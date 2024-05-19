@@ -23,4 +23,6 @@ public class PlanGeneralClass {
     private Integer lectureMaxQuantity;
     private Integer exerciseMaxQuantity;
     private Integer lectureExerciseMaxQuantity;
+    private String learningWeeks;
+    private String crew;
 }

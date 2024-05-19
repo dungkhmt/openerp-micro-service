@@ -89,11 +89,6 @@ public class GeneralClassController {
         }
     }
 
-    @DeleteMapping("/")
-    public ResponseEntity deleteClassesBySemester(@RequestParam("semester") String semester) {
-        gService.deleteClassesBySemester(semester);
-        return ResponseEntity.ok("ok");
-    }
 
     @PostMapping("/export-excel")
     public ResponseEntity requestExportExcel(@RequestParam("semester") String semester) {
@@ -130,5 +125,10 @@ public class GeneralClassController {
             @RequestParam("timeLimit") int timeLimit) {
         log.info("Controler API -> requestAutoScheduleRoom...");
         return ResponseEntity.ok(gService.autoScheduleRoom(semester, groupName, timeLimit));
+    }
+
+    @DeleteMapping("/")
+    public ResponseEntity<GeneralClass> requestDeletePlanClass(@RequestParam("generalClassId") Long generalClassId) {
+        return ResponseEntity.ok(gService.deleteClassById(generalClassId));
     }
 }

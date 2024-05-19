@@ -46,11 +46,6 @@ public class GeneralClass {
     private List<RoomReservation> timeSlots = new ArrayList<RoomReservation>();
     private String learningWeeks;
     private String foreignLecturer;
-    private Integer duration;
-    private Integer startTime;
-    private Integer endTime;
-    private Integer weekday;
-    private String room;
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

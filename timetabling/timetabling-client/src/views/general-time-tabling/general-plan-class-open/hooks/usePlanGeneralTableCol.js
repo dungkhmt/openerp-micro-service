@@ -1,10 +1,9 @@
-import { SaveAlt } from "@mui/icons-material";
+import { Delete, SaveAlt } from "@mui/icons-material";
 import { Autocomplete, Button, TextField } from "@mui/material";
 import { request } from "api";
 import { toast } from "react-toastify";
 
 export const usePlanGeneralTableCol = (setGeneralClasses) => {
-
   const handleOnCellChange = (e, params) => {
     setGeneralClasses((prevClasses) => {
       const updatedClass = {
@@ -40,6 +39,25 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
     );
   };
 
+  const handleDeleteClass = (generalClass) => {
+    request(
+      "delete",
+      `/general-classes/?generalClassId=${generalClass?.id}`,
+      (res) => {
+        setGeneralClasses((prevClasses) => {
+          return prevClasses.filter(
+            (prevClass) => prevClass?.id !== res.data?.id
+          );
+        });
+        toast.success("Xóa lớp thành công!");
+      },
+      (err) => {
+        console.log(err);
+        toast.error("Xóa lớp thất bại");
+      }
+    );
+  };
+
   const handleOnCellSelect = (e, params, option) => {
     setGeneralClasses((prevClasses) => {
       const updatedClass = {
@@ -60,11 +78,11 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
   };
 
   return [
-    // {
-    //   headerName: "Mã lớp",
-    //   field: "classCode",
-    //   width: 100,
-    // },
+    {
+      headerName: "Mã lớp tạm thời",
+      field: "classCode",
+      width: 100,
+    },
     // {
     //   headerName: "Lớp học",
     //   field: "studyClass",
@@ -76,11 +94,17 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
     //   editable: true,
     //   width: 120,
     // },
-    // {
-    //   headerName: "Tuần học",
-    //   field: "learningWeeks",
-    //   width: 120,
-    // },
+    {
+      headerName: "Tuần học",
+      field: "learningWeeks",
+      width: 120,
+      renderCell: (params) => (
+        <TextField
+          value={params.value}
+          onChange={(e) => handleOnCellChange(e, params)}
+        />
+      ),
+    },
     {
       headerName: "Mã học phần",
       field: "moduleCode",
@@ -118,11 +142,22 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
     //   field: "state",
     //   width: 100,
     // },
-    // {
-    //   headerName: "Kíp",
-    //   field: "crew",
-    //   width: 100,
-    // },
+    {
+      headerName: "Kíp",
+      field: "crew",
+      width: 100,
+      renderCell: (params) => (
+        <Autocomplete
+          {...params}
+          options={["S", "C"]}
+          onChange={(e, option) => handleOnCellSelect(e, params, option)}
+          renderInput={(option) => {
+            console.log(option);
+            return <TextField disableUnderline={false} {...option} />;
+          }}
+        />
+      ),
+    },
     {
       headerName: "Mã lớp cha",
       field: "parentClassId",
@@ -134,15 +169,21 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
         />
       ),
     },
-    {
-      headerName: "Mã lớp tạm thời",
-      field: "id",
-      width: 100,
-    },
+    // {
+    //   headerName: "Mã lớp tạm thời",
+    //   field: "id",
+    //   width: 100,
+    // },
     {
       headerName: "Mã lớp tham chiếu",
       field: "refClassId",
       width: 100,
+      renderCell: (params) => (
+        <TextField
+          value={params.value}
+          onChange={(e) => handleOnCellChange(e, params)}
+        />
+      ),
     },
     {
       headerName: "Loại lớp",
@@ -166,9 +207,24 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
       field: "saveButton",
       with: 100,
       renderCell: (params) => (
-        <Button onClick={(e) => handleSaveClass(params.row)}>
-          <SaveAlt />
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={(e) => handleDeleteClass(params.row)}>
+            <Delete />
+          </Button>
+        </div>
+      ),
+    },
+
+    {
+      headerName: "Xóa",
+      field: "deleteButton",
+      with: 100,
+      renderCell: (params) => (
+        <div className="flex gap-2">
+          <Button onClick={(e) => handleSaveClass(params.row)}>
+            <SaveAlt />
+          </Button>
+        </div>
       ),
     },
     // {

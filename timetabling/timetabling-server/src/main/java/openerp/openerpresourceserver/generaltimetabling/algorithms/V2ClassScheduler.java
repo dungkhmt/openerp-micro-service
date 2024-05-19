@@ -36,11 +36,11 @@ public class V2ClassScheduler {
             return null;
         }
         List<int[]> conflict = new ArrayList<int[]>();
-        //int[] durations = classes.stream().filter(c -> c.getMass() != null).mapToInt(c -> MassExtractor.extract(c.getMass())).toArray();
-        int[] durations = new int[n];
-        for(int i = 0; i < classes.size(); i++){
-            durations[i] = classes.get(i).getDuration();
-        }
+        int[] durations = classes.stream().filter(c -> c.getMass() != null).mapToInt(c -> MassExtractor.extract(c.getMass())).toArray();
+//        int[] durations = new int[n];
+//        for(int i = 0; i < classes.size(); i++){
+//            durations[i] = classes.get(i).getDuration();
+//        }
         ArrayList[] domains = new ArrayList[n];
 
         for (int i = 0; i < n; i++) {
@@ -118,13 +118,13 @@ public class V2ClassScheduler {
                 int K = t1 / 6; // kip
                 int tietBD = t1 - 6 * K;
                 GeneralClass gClass = classes.get(i);
-                gClass.setStartTime(tietBD);
-                gClass.setEndTime(tietBD + gClass.getDuration() - 1);
-                gClass.setWeekday(day + 2);
+//                gClass.setStartTime(tietBD);
+//                gClass.setEndTime(tietBD + gClass.getDuration() - 1);
+//                gClass.setWeekday(day + 2);
                 gClass.getTimeSlots().forEach(rr -> rr.setGeneralClass(null));
                 gClass.getTimeSlots().clear();
-                //RoomReservation newRoomReservation = new RoomReservation(gClass.getCrew(),tietBD, tietBD + MassExtractor.extract(gClass.getMass()) - 1, day + 2, null);
-                RoomReservation newRoomReservation = new RoomReservation(gClass.getCrew(),tietBD, tietBD + gClass.getDuration() - 1, day + 2, null);
+                RoomReservation newRoomReservation = new RoomReservation(gClass.getCrew(),tietBD, tietBD + MassExtractor.extract(gClass.getMass()) - 1, day + 2, null);
+//                RoomReservation newRoomReservation = new RoomReservation(gClass.getCrew(),tietBD, tietBD + gClass.getDuration() - 1, day + 2, null);
 
                 newRoomReservation.setGeneralClass(gClass);
                 gClass.getTimeSlots().add(newRoomReservation);

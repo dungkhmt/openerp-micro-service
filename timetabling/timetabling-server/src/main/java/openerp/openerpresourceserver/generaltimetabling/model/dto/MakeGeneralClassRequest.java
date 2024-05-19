@@ -16,4 +16,6 @@ public class MakeGeneralClassRequest {
     private String moduleCode;
     private String moduleName;
     private String semester;
+    private String learningWeeks;
+    private String crew;
 }

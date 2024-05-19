@@ -16,6 +16,7 @@ import openerp.openerpresourceserver.generaltimetabling.model.dto.request.genera
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.generaltimetabling.repo.*;
@@ -395,5 +396,13 @@ public class GeneralClassServiceImp implements GeneralClassService {
         roomOccupationRepo.saveAll(roomOccupations);
         return roomReservationMap.values().stream().map(RoomReservation::getGeneralClass).toList();
 
+    }
+
+    @Override
+    public GeneralClass deleteClassById(Long generalClassId) {
+        GeneralClass foundClass = gcoRepo.findById(generalClassId).orElse(null);
+        if (foundClass == null) throw new NotFoundException("Không tìm thấy lớp kế hoạch!");
+        gcoRepo.deleteById(generalClassId);
+        return foundClass;
     }
 }

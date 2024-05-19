@@ -1,4 +1,4 @@
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import React, { useState } from "react";
 import { usePlanTableConfig } from "../hooks/usePlanTableConfig";
 import ViewClassPlanDialog from "./ViewClassPlanDialog";
@@ -8,10 +8,13 @@ const ClassOpenPlanTable = ({
   semester,
   classes,
   setOpenDialog,
+  setClasses
 }) => {
+
+
   const [selectedRow, setSelectedRow] = useState(null);
 
-  const handleRowClick = (rowModel) => {
+  const handleRowDoubleClick = (rowModel) => {
     if (rowModel.row) {
       console.log(rowModel.row);
       setSelectedRow(rowModel.row);
@@ -19,6 +22,7 @@ const ClassOpenPlanTable = ({
       console.log(isOpenDialog);
     }
   };
+
 
   return (
     <div className="">
@@ -30,9 +34,27 @@ const ClassOpenPlanTable = ({
         semester={semester}
       />
       <DataGrid
-        onRowClick={(row) => handleRowClick(row)}
+        initialState={{
+          filter: {
+            filterModel: {
+              items: [],
+              quickFilterValues: [""],
+            },
+          },
+        }}
+        slots={{ toolbar: GridToolbar }}
+        slotProps={{
+          toolbar: {
+            printOptions: { disableToolbarButton: true },
+            csvOptions: { disableToolbarButton: true },
+            showQuickFilter: true,
+          },
+        }}
+        disableColumnSelector
+        disableDensitySelector
+        onRowDoubleClick = {(row) => handleRowDoubleClick(row)}
         rowSelection={true}
-        columns={usePlanTableConfig()}
+        columns={usePlanTableConfig(setClasses)}
         rows={classes}
         sx={{ height: 550 }}
       />

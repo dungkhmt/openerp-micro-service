@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.generaltimetabling.controller.general;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.MakeGeneralClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.UpdateGeneralClassRequest;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.UpdatePlanClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.service.impl.PlanGeneralClassService;
@@ -27,11 +28,6 @@ public class PlanGeneralClassController {
         return ResponseEntity.ok(planClassService.getAllClasses(semester));
     }
 
-    @PostMapping("/delete-plan")
-    public ResponseEntity<String> requestDeletePlan(@RequestParam("semester") String semester) {
-        planClassService.deleteAllClasses(semester);
-        return ResponseEntity.ok("Đã xóa danh sách kế hoạch lớp!");
-    }
 
     @GetMapping("/view-class")
     public ResponseEntity requestViewPlanClass(@RequestParam("semester") String semester,
@@ -44,7 +40,15 @@ public class PlanGeneralClassController {
         return  ResponseEntity.ok(planClassService.updateGeneralClass(request.getGeneralClass()));
     }
 
+    @PostMapping("/update-plan-class")
+    public ResponseEntity requestUpdatePlanClass(@RequestBody UpdatePlanClassRequest request) {
+        return  ResponseEntity.ok(planClassService.updatePlanClass(request.getPlanClass()));
+    }
 
+    @DeleteMapping("/")
+    public ResponseEntity<PlanGeneralClass> requestDeletePlanClass(@RequestParam("planClassId") Long planClassId) {
+        return ResponseEntity.ok(planClassService.deleteClassById(planClassId));
+    }
 
 
 }

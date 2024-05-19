@@ -7,6 +7,7 @@ import openerp.openerpresourceserver.generaltimetabling.model.dto.request.genera
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGeneralClassScheduleRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.V2UpdateClassScheduleRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
 
 
 public interface GeneralClassService {
@@ -32,4 +33,6 @@ public interface GeneralClassService {
     InputStream exportExcel(String semester);
 
     List<GeneralClass> v2UpdateClassSchedule(String semester, List<V2UpdateClassScheduleRequest> request);
+
+    GeneralClass deleteClassById(Long generalClassId);
 }
