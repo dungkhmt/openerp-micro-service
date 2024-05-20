@@ -2,8 +2,10 @@ package com.real_estate.post.repositories;
 
 import com.real_estate.post.models.postgresql.AccountPostgresEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -14,4 +16,14 @@ public interface AccountRepository extends JpaRepository<AccountPostgresEntity, 
 
     @Query("SELECT a FROM AccountPostgresEntity a where a.email = :email")
     public Optional<AccountPostgresEntity> findByEmail(String email);
+
+    @Modifying
+    @Transactional
+    @Query("update AccountPostgresEntity a set a.avatar = :avatar, a.phone = :phone, a.name = :name, a.updatedAt = :now where a.accountId = :accountId")
+    public Integer updateAccount(String avatar, String phone,String name, Long now, Long accountId);
+
+    @Modifying
+    @Transactional
+    @Query("update AccountPostgresEntity a set a.password = :newPassword where a.accountId = :accountId")
+    public Integer updatePasswordBy(String newPassword, Long accountId);
 }

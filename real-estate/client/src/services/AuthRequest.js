@@ -15,4 +15,14 @@ export default class AuthRequest extends BaseRequest {
         const url = "/account";
         return await this.get(url);
     }
+
+    update_info = async (data) => {
+        const url = "/account";
+        return await this.put(url, data);
+    }
+
+    update_password = async (data) => {
+        const url = "/account/updatePassword";
+        return await this.post(url, data);
+    }
 }

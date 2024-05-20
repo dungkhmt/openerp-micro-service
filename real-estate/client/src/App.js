@@ -10,14 +10,14 @@ import Oauth2Redirect from "./pages/Oauth2Redirect/Oauth2Redirect";
 import Login from "./pages/Login/Login";
 import {useDispatch, useSelector} from "react-redux";
 import AuthRequest from "./services/AuthRequest";
-import account, {set_current_account} from "./store/account";
+import {set_current_account} from "./store/account";
+import Profile from "./pages/Profile/Profile";
 
 function App() {
     const isLoggedIn = useSelector(state => state.auth.isLoggedIn)
     const authRequest = new AuthRequest();
     const dispatch = useDispatch();
     useEffect(() => {
-        console.log("gia tri", isLoggedIn)
         if (isLoggedIn) {
             authRequest.get_current_account()
                 .then((response) => {
@@ -43,6 +43,7 @@ function App() {
                             <Route path=":propertyId" element={<PostSellDetail/>}/>
                         </Route>
                         <Route path={"/oauth/redirect"} element={<Oauth2Redirect/>}/>
+                        <Route path={"/profile"} element={<Profile/>}/>
                     </Route>
                 </Routes>
             </BrowserRouter>

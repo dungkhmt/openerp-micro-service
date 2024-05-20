@@ -1,16 +1,17 @@
 package com.real_estate.post.daos.impls;
 
 import com.real_estate.post.daos.interfaces.PostSellDao;
+import com.real_estate.post.dtos.response.PostSellResponseDto;
+import com.real_estate.post.models.AccountEntity;
 import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.models.postgresql.PostSellPostgresEntity;
 import com.real_estate.post.repositories.PostSellRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.Query;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -37,137 +38,89 @@ public class PostSellImpl implements PostSellDao {
     }
 
     @Override
-    public List<PostSellEntity> findPostSellBy(Pageable pageable,
+    public List<PostSellResponseDto> findPostSellBy(Pageable pageable,
                                                String province,
                                                String district,
-                                               Long minAcreage,
+                                               Long fromAcreage,
+                                               Long toAcreage,
                                                Long fromPrice,
                                                Long toPrice,
                                                List<String> typeProperties,
-                                               List<String> legalDocuments,
-                                               List<String> directions,
-                                               Long minFloor,
-                                               Long minBathroom,
-                                               Long minBedroom,
-                                               Long minParking
+                                               List<String> directions
     ) {
-
         int limit = pageable.getPageSize();
         int offset = (int) pageable.getOffset();
 
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<PostSellPostgresEntity> query = cb.createQuery(PostSellPostgresEntity.class);
-        Root<PostSellPostgresEntity> post = query.from(PostSellPostgresEntity.class);
-        List<Predicate> predicates = new ArrayList<>();
-
+        StringBuilder rawQuery = new StringBuilder();
+        rawQuery.append(
+                "select p, a " +
+                "from PostSellPostgresEntity p " +
+                "left join AccountPostgresEntity a on p.authorId = a.accountId " +
+                "where p.postStatus = 'OPENING' ");
         if (province != null && province != "") {
-            predicates.add(cb.equal(post.get("province"), province));
+            rawQuery.append("and p.province = '" + province + "' ");
         }
-
         if (district != null && district != "") {
-            predicates.add(cb.equal(post.get("district"), district));
+            rawQuery.append("and p.district = '" + district + "' ");
         }
 
-        predicates.add(cb.and(cb.between(post.get("price"), fromPrice, toPrice)));
+        rawQuery.append("and p.price >= " + fromPrice + " and p.price <= " + toPrice + " ");
+        rawQuery.append("and p.acreage >= " + fromAcreage + " and p.acreage <= " + toAcreage + " ");
+        rawQuery.append("and p.typeProperty in :typeProperties ");
+        rawQuery.append("and p.directionsProperty in :directions ");
+        rawQuery.append("order by p.createdAt desc ");
 
-        predicates.add(cb.greaterThanOrEqualTo(post.get("acreage"), minAcreage));
-        predicates.add(cb.greaterThanOrEqualTo(post.get("floor"), minFloor));
-        predicates.add(cb.greaterThanOrEqualTo(post.get("bathroom"), minBathroom));
-        predicates.add(cb.greaterThanOrEqualTo(post.get("bedroom"), minBedroom));
-        predicates.add(cb.greaterThanOrEqualTo(post.get("parking"), minParking));
-
-        if (typeProperties != null && typeProperties.size() > 0) {
-            predicates.add(post.get("typeProperty").in(typeProperties));
+        Query query = entityManager.createQuery(rawQuery.toString());
+        query.setParameter("typeProperties", typeProperties);
+        query.setParameter("directions", directions);
+        query.setFirstResult(offset);
+        query.setMaxResults(limit);
+        List<Object[]> resultList = query.getResultList();
+        List<PostSellResponseDto> dtos = new ArrayList<>();
+        for (Object[] row : resultList) {
+            PostSellEntity post = this.mapper.map(row[0], PostSellEntity.class);
+            AccountEntity account = this.mapper.map(row[1], AccountEntity.class);
+            PostSellResponseDto combined = new PostSellResponseDto(post, account);
+            dtos.add(combined);
         }
-
-        if (legalDocuments != null && legalDocuments.size() > 0) {
-            predicates.add(post.get("legalDocuments").in(legalDocuments));
-        }
-
-        if (directions != null && directions.size() > 0) {
-            predicates.add(post.get("directionsProperty").in(directions));
-        }
-
-        query.where(cb.and(predicates.toArray(new Predicate[0])));
-
-        Sort sort = pageable.getSort();
-        if (sort != Sort.unsorted()) {
-            List<Order> ordersSorted = new ArrayList<>();
-            for (Sort.Order orderCondition : sort) {
-                if (orderCondition.getDirection() == Sort.Direction.ASC) {
-                    ordersSorted.add(cb.asc(post.get(orderCondition.getProperty())));
-                } else {
-                    ordersSorted.add(cb.desc(post.get(orderCondition.getProperty())));
-                }
-            }
-            query.orderBy(ordersSorted);
-        }
-
-        List<PostSellPostgresEntity> result = entityManager.createQuery(query)
-                .setFirstResult((int) offset)
-                .setMaxResults(limit)
-                .getResultList();
-
-
-        return result.stream().map((postgresEntity) -> {
-            return this.mapper.map(postgresEntity, PostSellEntity.class);
-        }).collect(Collectors.toList());
+        return dtos;
     }
 
     @Override
-    public Long countBy(String province,
-                        String district,
-                        Long minAcreage,
-                        Long fromPrice,
-                        Long toPrice,
-                        List<String> typeProperties,
-                        List<String> legalDocuments,
-                        List<String> directions,
-                        Long minFloor,
-                        Long minBathroom,
-                        Long minBedroom,
-                        Long minParking
+    public Long countBy(
+            String province,
+            String district,
+            Long fromAcreage,
+            Long toAcreage,
+            Long fromPrice,
+            Long toPrice,
+            List<String> typeProperties,
+            List<String> directions
     ) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Long> query = cb.createQuery(Long.class);
-        Root<PostSellPostgresEntity> post = query.from(PostSellPostgresEntity.class);
-        List<Predicate> predicates = new ArrayList<>();
-
-        Expression<Long> countId = cb.count(post.get("postSellId"));
-
+        StringBuilder rawQuery = new StringBuilder();
+        rawQuery.append(
+                "select p, a " +
+                        "from PostSellPostgresEntity p " +
+                        "left join AccountPostgresEntity a on p.authorId = a.accountId " +
+                        "where p.postStatus = 'OPENING' ");
         if (province != null && province != "") {
-            predicates.add(cb.equal(post.get("province"), province));
+            rawQuery.append("and p.province = '" + province + "' ");
         }
-
         if (district != null && district != "") {
-            predicates.add(cb.equal(post.get("district"), district));
+            rawQuery.append("and p.district = '" + district + "' ");
         }
 
-        predicates.add(cb.and(cb.between(post.get("price"), fromPrice, toPrice)));
+        rawQuery.append("and p.price >= " + fromPrice + " and p.price <= " + toPrice + " ");
+        rawQuery.append("and p.acreage >= " + fromAcreage + " and p.acreage <= " + toAcreage + " ");
+        rawQuery.append("and p.typeProperty in :typeProperties ");
+        rawQuery.append("and p.directionsProperty in :directions ");
+        rawQuery.append("order by p.createdAt desc ");
 
-        predicates.add(cb.greaterThanOrEqualTo(post.get("acreage"), minAcreage));
-        predicates.add(cb.greaterThanOrEqualTo(post.get("floor"), minFloor));
-        predicates.add(cb.greaterThanOrEqualTo(post.get("bathroom"), minBathroom));
-        predicates.add(cb.greaterThanOrEqualTo(post.get("bedroom"), minBedroom));
-        predicates.add(cb.greaterThanOrEqualTo(post.get("parking"), minParking));
-
-        if (typeProperties != null && typeProperties.size() > 0) {
-            predicates.add(post.get("typeProperty").in(typeProperties));
-        }
-
-        if (legalDocuments != null && legalDocuments.size() > 0) {
-            predicates.add(post.get("legalDocuments").in(legalDocuments));
-        }
-
-        if (directions != null && directions.size() > 0) {
-            predicates.add(post.get("directionsProperty").in(directions));
-        }
-
-        query.select(countId).where(cb.and(predicates.toArray(new Predicate[0])));
-        List<Long> result = entityManager.createQuery(query).getResultList();
-
-        return result.isEmpty() || result.get(0) == null ? 0L : result.get(0);
-
+        Query query = entityManager.createQuery(rawQuery.toString());
+        query.setParameter("typeProperties", typeProperties);
+        query.setParameter("directions", directions);
+        List<Object[]> resultList = query.getResultList();
+        return (long) resultList.size();
     }
 
     @Override
@@ -178,5 +131,13 @@ public class PostSellImpl implements PostSellDao {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public List<PostSellEntity> findByAccountId(Long accountId) {
+        List<PostSellPostgresEntity> postgresEntities = repository.findByAccountId(accountId);
+        return postgresEntities.stream().map((postgresEntity) -> {
+            return this.mapper.map(postgresEntity, PostSellEntity.class);
+        }).collect(Collectors.toList());
     }
 }

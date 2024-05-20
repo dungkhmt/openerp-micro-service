@@ -2,6 +2,8 @@ package com.real_estate.post.services;
 
 import com.real_estate.post.daos.interfaces.PostSellDao;
 import com.real_estate.post.dtos.request.CreatePostSellRequestDto;
+import com.real_estate.post.dtos.request.UpdatePostSellRequestDto;
+import com.real_estate.post.dtos.response.PostSellResponseDto;
 import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.utils.PostStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -56,63 +57,42 @@ public class PostSellService {
 		postSellDao.save(post);
 	}
 
-	public Page<PostSellEntity> getPageSell(
+	public Page<PostSellResponseDto> getPageSell(
 			Integer page,
 			Integer size,
 			String province,
 			String district,
-			Long minAcreage,
+			Long fromAcreage,
+			Long toAcreage,
 			Long fromPrice,
 			Long toPrice,
-			String sortPrice,
 			List<String> typeProperties,
-			List<String> legalDocuments,
-			List<String> directions,
-			Long minFloor,
-			Long minBathroom,
-			Long minBedroom,
-			Long minParking
+			List<String> directions
 	) {
-		Pageable pageable = null;
-		if (sortPrice == "ASC") {
-			pageable = PageRequest.of(page - 1, size, Sort.by("price").ascending().and(Sort.by("updatedAt").descending()));
-		} else if (sortPrice == "DESC") {
-			pageable = PageRequest.of(page - 1, size, Sort.by("price").descending().and(Sort.by("updatedAt").descending()));
-		} else {
-			pageable = PageRequest.of(page - 1, size, Sort.by("updatedAt").descending());
-		}
-
+		Pageable pageable = PageRequest.of(page-1, size);
 		long totalRecords = postSellDao.countBy(province,
 												district,
-												minAcreage,
+												fromAcreage,
+												toAcreage,
 												fromPrice,
 												toPrice,
 												typeProperties,
-												legalDocuments,
-												directions,
-												minFloor,
-												minBathroom,
-												minBedroom,
-												minParking
+												directions
 		);
 		if (totalRecords == 0) {
-			return new PageImpl<>(new ArrayList<>(), pageable, totalRecords);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không có bài viết nào phù hợp");
 		} else {
-			List<PostSellEntity> entities = postSellDao.findPostSellBy(pageable,
-																	   province,
-																	   district,
-																	   minAcreage,
-																	   fromPrice,
-																	   toPrice,
-																	   typeProperties,
-																	   legalDocuments,
-																	   directions,
-																	   minFloor,
-																	   minBathroom,
-																	   minBedroom,
-																	   minParking
+			List<PostSellResponseDto> entities = postSellDao.findPostSellBy(
+					pageable,
+					province,
+					district,
+					fromAcreage,
+					toAcreage,
+					fromPrice,
+					toPrice,
+					typeProperties,
+					directions
 			);
-
 			return new PageImpl<>(entities, pageable, totalRecords);
 		}
 	}
@@ -123,5 +103,42 @@ public class PostSellService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy bài viết");
 		}
 		return entity;
+	}
+
+	public void updatePostSell(UpdatePostSellRequestDto requestDto) {
+		Long now = System.currentTimeMillis();
+		PostSellEntity entity = new PostSellEntity().builder()
+				.postSellId(requestDto.getPostSellId())
+				.authorId(requestDto.getAuthorId())
+				.title(requestDto.getTitle())
+				.description(requestDto.getDescription())
+				.typeProperty(requestDto.getTypeProperty().toString())
+				.price(requestDto.getPrice())
+				.pricePerM2(requestDto.getPricePerM2())
+				.acreage(requestDto.getAcreage())
+				.bathroom(requestDto.getBathroom())
+				.parking(requestDto.getParking())
+				.bedroom(requestDto.getBedroom())
+				.floor(requestDto.getFloor())
+				.legalDocuments(requestDto.getLegalDocuments().toString())
+				.directionsProperty(requestDto.getDirectionsProperty().toString())
+				.horizontal(requestDto.getHorizontal())
+				.vertical(requestDto.getVertical())
+				.position(requestDto.getPosition())
+				.province(requestDto.getProvince())
+				.district(requestDto.getDistrict())
+				.address(requestDto.getAddress())
+				.imageUrls(requestDto.getImageUrls())
+				.postStatus(requestDto.getPostStatus())
+				.isAvailable(true)
+				.createdAt(requestDto.getCreatedAt())
+				.updatedAt(now)
+				.build();
+
+		postSellDao.save(entity);
+	}
+
+	public List<PostSellEntity> getPostByAccountId(Long accountId) {
+		return postSellDao.findByAccountId(accountId);
 	}
 }

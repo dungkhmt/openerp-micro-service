@@ -12,12 +12,8 @@ const ProfileMenu = ({user, logout}) => {
                     alt='user image' radius={"xl"}/>
             </Menu.Target>
             <Menu.Dropdown>
-                <Menu.Item onClick={() => navigate("./favourites", {replace: true})}>
-                    Favourites
-                </Menu.Item>
-
-                <Menu.Item onClick={() => navigate("./bookings", {replace: true})}>
-                    Bookings
+                <Menu.Item onClick={() => navigate("/profile", {replace: true})}>
+                    Thông tin cá nhân
                 </Menu.Item>
 
                 <Menu.Item onClick={() => {

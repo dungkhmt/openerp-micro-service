@@ -1,7 +1,7 @@
 import axios from "axios";
 import qs from 'qs';
 import {setAuthorizationToRequest} from "../utils/authenticate";
-import {useSelector} from "react-redux";
+
 const urlPrefix = 'http://localhost:2805';
 
 export default class BaseRequest {
@@ -17,7 +17,7 @@ export default class BaseRequest {
         try {
             const config = {
                 params,
-                paramsSerializer: (params)=> {
+                paramsSerializer: (params) => {
                     return qs.stringify(params, {arrayFormat: 'repeat'})
                 },
             };
@@ -31,6 +31,24 @@ export default class BaseRequest {
     async post(url, data) {
         try {
             const response = await axios.post(urlPrefix + url, data);
+            return this._responseHandler(response);
+        } catch (error) {
+            return this._errorHandler(error);
+        }
+    }
+
+    async put(url, data) {
+        try {
+            const response = await axios.put(urlPrefix + url, data);
+            return this._responseHandler(response);
+        } catch (error) {
+            return this._errorHandler(error);
+        }
+    }
+
+    async patch(url, data) {
+        try {
+            const response = await axios.patch(this.getUrlPrefix() + url, data);
             return this._responseHandler(response);
         } catch (error) {
             return this._errorHandler(error);

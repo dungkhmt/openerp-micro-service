@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@auth0/auth0-react": "2.0.1",
     "@ckeditor/ckeditor5-build-classic": "^41.2.1",
     "@ckeditor/ckeditor5-react": "^6.2.0",
     "@emotion/react": "^11.11.1",
@@ -11,6 +10,7 @@
     "@fortawesome/free-brands-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@mantine/core": "^7.7.1",
+    "@mantine/form": "^7.9.2",
     "@mantine/hooks": "^7.7.1",
     "@reduxjs/toolkit": "^2.2.2",
     "@testing-library/jest-dom": "^5.17.0",
@@ -26,6 +26,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",
+    "react-imask": "^7.6.0",
     "react-leaflet": "^4.2.1",
     "react-loader-spinner": "^6.1.6",
     "react-number-format": "^5.3.4",

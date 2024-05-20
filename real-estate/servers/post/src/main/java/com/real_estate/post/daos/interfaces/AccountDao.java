@@ -12,4 +12,8 @@ public interface AccountDao {
     public Optional<AccountEntity> findByEmail(String email);
 
     public AccountEntity save(AccountEntity account);
+
+    public Integer updateAccount(String avatar, String phone, String name, Long accountId);
+
+    public Integer updatePassword(String newPassword, Long accountId);
 }
