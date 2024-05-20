@@ -33,6 +33,11 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
+	private static final String[] WHITE_LIST_URL = { "/api/v1/auth/**", "/v2/api-docs", "/v3/api-docs",
+			"/v3/api-docs/**", "/swagger-resources", "/swagger-resources/**", "/configuration/ui",
+			"/configuration/security", "/swagger-ui/**", "/webjars/**", "/swagger-ui.html", "/api/auth/**",
+			"/api/test/**", "/authenticate" };
+
 	@Autowired
 	TokenAuthenticationFilter tokenAuthenticationFilter;
 
@@ -52,6 +57,7 @@ public class WebSecurityConfig {
 			.authorizeHttpRequests(auth -> {
 				auth.requestMatchers(("/**")).permitAll();
 				auth.requestMatchers("/public/**").permitAll();
+				auth.requestMatchers(WHITE_LIST_URL).permitAll();
 				auth.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll();
 				auth.requestMatchers("/auth/**", "/oauth2/**").permitAll();
 				auth.requestMatchers("/",

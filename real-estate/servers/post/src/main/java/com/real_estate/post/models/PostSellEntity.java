@@ -1,14 +1,16 @@
 package com.real_estate.post.models;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-// test
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 public class PostSellEntity {
 	Long postSellId;
 	Long authorId;

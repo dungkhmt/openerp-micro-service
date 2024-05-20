@@ -2,7 +2,8 @@ package com.real_estate.post.services;
 
 import com.real_estate.post.daos.interfaces.AccountDao;
 import com.real_estate.post.dtos.request.CreateAccountRequestDto;
-import com.real_estate.post.dtos.request.LoginRequest;
+import com.real_estate.post.dtos.request.UpdateAccountRequestDto;
+import com.real_estate.post.dtos.request.UpdatePasswordRequestDto;
 import com.real_estate.post.dtos.response.AccountResponseDto;
 import com.real_estate.post.models.AccountEntity;
 import com.real_estate.post.security.TokenProvider;
@@ -69,5 +70,23 @@ public class AccountService {
                 .build();
 
         return dto;
+    }
+
+    public void updateInfo(UpdateAccountRequestDto requestDto, Long accountId) {
+        int countRecord = accountDao.updateAccount(requestDto.getAvatar(), requestDto.getPhone(), requestDto.getName(), accountId);
+        if (countRecord == 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Số điện thoại đã được sử dụng");
+        }
+    }
+
+    public void updatePassword(UpdatePasswordRequestDto requestDto, Long accountId) {
+        String newPassword = passwordEncoder.encode(requestDto.getNewPassword());
+        System.out.println(newPassword);
+        Optional<AccountEntity> entity = accountDao.findById(accountId);
+        if (passwordEncoder.matches(requestDto.getOldPassword(), entity.get().getPassword())) {
+            accountDao.updatePassword(newPassword, accountId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mật khẩu cũ không trùng khớp");
+        }
     }
 }

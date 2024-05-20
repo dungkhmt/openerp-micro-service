@@ -44,4 +44,15 @@ public class AccountImpl implements AccountDao {
         postgres = repository.save(postgres);
         return mapper.map(postgres, AccountEntity.class);
     }
+
+    @Override
+    public Integer updateAccount(String avatar, String phone, String name, Long accountId) {
+        Long now = System.currentTimeMillis();
+        return repository.updateAccount(avatar, phone, name, now, accountId);
+    }
+
+    @Override
+    public Integer updatePassword(String newPassword, Long accountId) {
+        return repository.updatePasswordBy(newPassword, accountId);
+    }
 }
