@@ -1,4 +1,4 @@
-import {Box, Button, NumberInput, Select, TextInput} from "@mantine/core";
+import {Box, Button, Grid, NumberInput, Select, TextInput} from "@mantine/core";
 import Map from "../Map/Map";
 import {AiOutlineCloudUpload} from "react-icons/ai";
 import {ImBin} from "react-icons/im";
@@ -11,6 +11,7 @@ import {apiGetPublicDistrict, apiGetPublicProvinces} from "../../services/AppReq
 import {CKEditor} from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import {toast, ToastContainer} from "react-toastify";
+import {transferPrice} from "../../utils/common";
 
 const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => {
 
@@ -20,15 +21,12 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
     const [district, setDistrict] = useState(propertyDetails?.district || null)
     const [address, setAddress] = useState(propertyDetails?.address || null)
     const [position, setPosition] = useState(propertyDetails?.position || [])
-
-
-    // them anh
     const [imageUrls, setImageUrls] = useState(propertyDetails?.imageUrls || [])
 
     // thong tin chi tiet
     const [title, setTitle] = useState(propertyDetails?.title || null);
     const [description, setDescription] = useState(propertyDetails?.description || null);
-    const [typeProperty, setTypeProperty] = useState(propertyDetails?.typeProperty || null);
+    const [typeProperty, setTypeProperty] = useState(propertyDetails?.typeProperty || 'APARTMENT');
     const [directionsProperty, setDirectionsProperty] = useState(propertyDetails?.directionsProperty || null);
     const [acreage, setAcreage] = useState(propertyDetails?.acreage || 0);
     const [bedroom, setBedroom] = useState(propertyDetails?.bedroom || 0);
@@ -40,7 +38,6 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
     const [vertical, setVertical] = useState(propertyDetails?.vertical || 0)
     const [price, setPrice] = useState(propertyDetails?.price || 0)
     const [pricePerM2, setPricePerM2] = useState(propertyDetails?.pricePerM2 || 0)
-    const [isLand, setIsLand] = useState(false)
 
     const optionsProvince = provinces?.map((item) => ({
         value: item.nameProvince,
@@ -97,7 +94,6 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
 
     const handleNext = (e) => {
         e.preventDefault();
-
         setPropertyDetails({
             province: province,
             district: district,
@@ -122,7 +118,6 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
         setShowPost(true);
     };
 
-
     const handleDeleteImage = async (image) => {
         try {
             const imageRef = ref(storage, image);
@@ -134,8 +129,7 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
             console.log("Lỗi khi xóa ảnh:", error);
         }
     }
-    // phan logic vitri
-    // lay danh sach cac tinh
+
     useEffect(() => {
         const fetchPublicProvince = async () => {
             const response = await apiGetPublicProvinces()
@@ -165,14 +159,15 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
     }, [price])
 
     useEffect(() => {
+        if (typeProperty === 'APARTMENT') {
+            setFloor(1)
+            setParking(1)
+        }
         if (typeProperty === 'LAND') {
             setFloor(0);
             setBathroom(0)
             setBedroom(0)
             setParking(0)
-            setIsLand(true);
-        } else {
-            setIsLand(false)
         }
     }, [typeProperty]);
 
@@ -190,7 +185,7 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
             >
                 <div className="flexColStart" style={{flex: 1, gap: "1rem"}}>
                     <Select
-                        w={"100%"}
+                        w={"60%"}
                         withAsterisk
                         label="Province"
                         clearable
@@ -201,7 +196,7 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                     />
 
                     <Select
-                        w={"100%"}
+                        w={"60%"}
                         withAsterisk
                         label="District"
                         clearable
@@ -211,7 +206,7 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                         value={district}
                     />
                     <TextInput
-                        w={"100%"}
+                        w={"60%"}
                         withAsterisk
                         clearable
                         label="Address"
@@ -269,13 +264,6 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                     style={{paddingBottom: "30px"}}
                     error={title?.length > 50 ? "Nhập tối đa 50 ký tự" : ""}
                 />
-                {/*<Textarea*/}
-                {/*    placeholder="Description"*/}
-                {/*    label="Mô tả"*/}
-                {/*    withAsterisk*/}
-                {/*    value={description}*/}
-                {/*    onChange={(event) => setDescription(event.currentTarget.value)}*/}
-                {/*/>*/}
 
                 <span>Mô tả</span>
                 <CKEditor
@@ -305,7 +293,7 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                     placeholder="1000"
                     min={0}
                     thousandSeparator=","
-                    suffix="m2"
+                    suffix="m²"
                     value={acreage}
                     onChange={(value) => setAcreage(value)}
                 />
@@ -315,11 +303,11 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                     placeholder="1000"
                     min={0}
                     thousandSeparator=","
-                    suffix="VND"
+                    suffix=" VND"
                     value={price}
                     onChange={(value) => setPrice(value)}
                 />
-                <small>Giá bán trên m<sup>2</sup> đất đang là: ${pricePerM2.toLocaleString('us-US')} VND</small>
+                <small>Giá bán là: {transferPrice(pricePerM2)}/m²</small>
 
                 <Select
                     withAsterisk
@@ -329,96 +317,152 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                         {value: 'HOUSE', label: 'Nhà ở'},
                         {value: 'APARTMENT', label: 'Chung cư'}
                     ]}
+                    defaultValue='APARTMENT'
                     onChange={(value) => setTypeProperty(value)}
                 />
 
-                <Select
-                    withAsterisk
-                    label="Hướng nhà"
-                    data={[
-                        {value: 'NORTH', label: 'Bắc'},
-                        {value: 'EAST_NORTH', label: 'Đông Bắc'},
-                        {value: 'EAST', label: 'Đông'},
-                        {value: 'EAST_SOUTH', label: 'Đông Nam'},
-                        {value: 'SOUTH', label: 'Nam'},
-                        {value: 'WEST_SOUTH', label: 'Tây Nam'},
-                        {value: 'WEST', label: 'Tây'},
-                        {value: 'WEST_NORTH', label: 'Tây Bắc'}
-                    ]}
-                    onChange={(value) => setDirectionsProperty(value)}
-                />
 
-                <Select
-                    withAsterisk
-                    label="Trạng thái sổ đỏ"
-                    data={[
-                        {value: 'HAVE', label: 'Đã có sổ'},
-                        {value: 'WAIT', label: 'Đang chờ'},
-                        {value: 'HAVE_NOT', label: 'Không có'},
-                    ]}
-                    value={legalDocuments}
-                    onChange={(value) => setLegalDocuments(value)}
-                />
+                <Grid>
+                    <Grid.Col span={6}>
+                        <Select
+                            withAsterisk
+                            label="Hướng nhà"
+                            data={[
+                                {value: 'NORTH', label: 'Bắc'},
+                                {value: 'EAST_NORTH', label: 'Đông Bắc'},
+                                {value: 'EAST', label: 'Đông'},
+                                {value: 'EAST_SOUTH', label: 'Đông Nam'},
+                                {value: 'SOUTH', label: 'Nam'},
+                                {value: 'WEST_SOUTH', label: 'Tây Nam'},
+                                {value: 'WEST', label: 'Tây'},
+                                {value: 'WEST_NORTH', label: 'Tây Bắc'}
+                            ]}
+                            onChange={(value) => setDirectionsProperty(value)}
+                        />
+                    </Grid.Col>
 
-                <NumberInput
-                    withAsterisk
-                    label="Chiều dài"
-                    min={0}
-                    suffix=" mét"
-                    value={horizontal}
-                    onChange={(value) => setHorizontal(value)}
-                    decimalScale={1}
-                />
+                    <Grid.Col span={6}>
+                        <Select
+                            withAsterisk
+                            label="Trạng thái sổ đỏ"
+                            data={[
+                                {value: 'HAVE', label: 'Đã có sổ'},
+                                {value: 'WAIT', label: 'Đang chờ'},
+                                {value: 'HAVE_NOT', label: 'Không có'},
+                            ]}
+                            value={legalDocuments}
+                            onChange={(value) => setLegalDocuments(value)}
+                        />
+                    </Grid.Col>
 
-                <NumberInput
-                    withAsterisk
-                    label="Chiều rộng"
-                    min={0}
-                    suffix=" mét"
-                    value={vertical}
-                    onChange={(value) => setVertical(value)}
-                    decimalScale={1}
-                />
+                    <Grid.Col span={6}>
+                        <NumberInput
+                            withAsterisk
+                            label="Chiều dài"
+                            min={0}
+                            suffix=" mét"
+                            value={horizontal}
+                            onChange={(value) => setHorizontal(value)}
+                            decimalScale={1}
+                        />
+                    </Grid.Col>
 
-                <NumberInput
-                    withAsterisk
-                    label="Số tầng"
-                    min={0}
-                    value={floor}
-                    onChange={(value) => setFloor(value)}
-                    allowDecimal={false}
-                    disabled={isLand}
-                />
+                    <Grid.Col span={6}>
+                        <NumberInput
+                            withAsterisk
+                            label="Chiều rộng"
+                            min={0}
+                            suffix=" mét"
+                            value={vertical}
+                            onChange={(value) => setVertical(value)}
+                            decimalScale={1}
+                        />
+                    </Grid.Col>
+                </Grid>
 
-                <NumberInput
-                    withAsterisk
-                    label="Số phòng ngủ"
-                    min={0}
-                    value={bedroom}
-                    onChange={(value) => setBedroom(value)}
-                    allowDecimal={false}
-                    disabled={isLand}
-                />
+                {typeProperty === 'APARTMENT' && (
+                    <Grid>
+                        <Grid.Col span={6}>
+                            <NumberInput
+                                withAsterisk
+                                label="Số phòng ngủ"
+                                min={0}
+                                value={bedroom}
+                                onChange={(value) => setBedroom(value)}
+                                allowDecimal={false}
+                                // disabled={isLand}
+                            />
+                        </Grid.Col>
 
-                <NumberInput
-                    withAsterisk
-                    label="Số phòng tắm"
-                    min={0}
-                    value={bathroom}
-                    onChange={(value) => setBathroom(value)}
-                    allowDecimal={false}
-                    disabled={isLand}
-                />
-                <NumberInput
-                    withAsterisk
-                    label="Có thể đậu bao nhiêu xe ô tô"
-                    min={0}
-                    value={parking}
-                    onChange={(value) => setParking(value)}
-                    allowDecimal={false}
-                    disabled={isLand}
-                />
+                        <Grid.Col span={6}>
+                            <NumberInput
+                                withAsterisk
+                                label="Số phòng tắm"
+                                min={0}
+                                value={bathroom}
+                                onChange={(value) => setBathroom(value)}
+                                allowDecimal={false}
+                                // disabled={isLand}
+                            />
+                        </Grid.Col>
 
+                    </Grid>
+                )}
+
+                {typeProperty === 'HOUSE' && (
+                    <Grid>
+                        <Grid.Col span={6}>
+                            <NumberInput
+                                withAsterisk
+                                label="Số tầng"
+                                min={0}
+                                value={floor}
+                                onChange={(value) => setFloor(value)}
+                                allowDecimal={false}
+                                // disabled={isLand}
+                            />
+                        </Grid.Col>
+
+
+                        <Grid.Col span={6}>
+                            <NumberInput
+                                withAsterisk
+                                label="Số phòng ngủ"
+                                min={0}
+                                value={bedroom}
+                                onChange={(value) => setBedroom(value)}
+                                allowDecimal={false}
+                                // disabled={isLand}
+                            />
+                        </Grid.Col>
+
+
+                        <Grid.Col span={6}>
+                            <NumberInput
+                                withAsterisk
+                                label="Số phòng tắm"
+                                min={0}
+                                value={bathroom}
+                                onChange={(value) => setBathroom(value)}
+                                allowDecimal={false}
+                                // disabled={isLand}
+                            />
+                        </Grid.Col>
+
+
+                        <Grid.Col span={6}>
+                            <NumberInput
+                                withAsterisk
+                                label="Có thể đậu bao nhiêu xe ô tô"
+                                min={0}
+                                value={parking}
+                                onChange={(value) => setParking(value)}
+                                allowDecimal={false}
+                                // disabled={isLand}
+                            />
+                        </Grid.Col>
+                    </Grid>
+                )}
 
             </Box>
 

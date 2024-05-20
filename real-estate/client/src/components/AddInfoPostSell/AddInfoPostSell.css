@@ -2,27 +2,19 @@
     height: 350px;
 }
 
-/*css phan up anh*/
-/*.uploadWrapper {*/
-/*    background-color: #ff922d;*/
-/*    height: 400px;*/
-/*    width: 100%;*/
-/*}*/
-
-
 .uploadWrapper {
     margin-top: 3rem;
     gap: 2rem;
     /*width: 60rem;*/
     /*height: 25rem;*/
-    background-color: #ff922d;
+    /*background-color: #ff922d;*/
     height: 400px;
     width: 100%;
     /*background-color: #ff922d;*/
 }
 
 .uploadZone {
-    background-color: #61dafb;
+    /*background-color: #61dafb;*/
     width: 25%;
     height: 12rem;
     border: 2px dashed grey;

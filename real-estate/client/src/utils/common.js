@@ -1,3 +1,7 @@
+import {storage} from "../components/UploadImage/FireBaseConfig";
+import {deleteObject, getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
+import {v4} from "uuid";
+
 export const getMenuStyles = (menuOpened) => {
   if (document.documentElement.clientWidth <= 800) {
     return { right: !menuOpened && "-100%" };
@@ -103,4 +107,75 @@ export const transferTypeProperties = (listValue) => {
     result = [...result, transferTypeProperty(value)];
   }
   return result;
+}
+
+export const transferPrice = (price) => {
+  if (price >= 1000000000) {
+    return (price / 1000000000).toFixed(1) + "tỷ";
+  }
+  if (price >= 1000000) {
+    return (price / 1000000).toFixed(1) + "triệu";
+  }
+}
+
+export const transferTime = (timestamp) => {
+  const now = Date.now();
+  const diff = now - timestamp; // khoảng cách thời gian tính bằng mili giây
+
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(weeks/4)
+  if (months > 0) {
+    return `Đăng ${months} tháng trước`;
+  } else if (weeks > 0) {
+    return `Đăng ${weeks} tuần trước`;
+  } else if (days > 0) {
+    return `Đăng ${days} ngày trước`;
+  } else if (hours > 0) {
+    return `Đăng ${hours} giờ trước`;
+  } else if (minutes > 0) {
+    return `Đăng ${minutes} phút trước`;
+  } else {
+    return `Đăng ${seconds} giây trước`;
+  }
+}
+
+export const uploadImage = (image) => {
+  return new Promise((resolve, reject) => {
+    const storageRef = ref(storage, `images/${v4()}`);
+    const uploadTask = uploadBytesResumable(storageRef, image);
+    uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          // Xử lý tiến trình tải lên
+        },
+        (error) => {
+          // Xử lý lỗi
+          console.log(error);
+          reject(error);
+        },
+        () => {
+          // Xử lý khi tải lên thành công
+          getDownloadURL(uploadTask.snapshot.ref)
+              .then((url) => {
+                console.log(url);
+                resolve(url);
+              })
+              .catch(error => reject(error));
+        }
+    );
+  });
+}
+
+export const handleDeleteImage = async (image) => {
+  try {
+    const imageRef = ref(storage, image);
+    await deleteObject(imageRef);
+    console.log("Ảnh đã được xóa thành công!");
+  } catch (error) {
+    console.log("Lỗi khi xóa ảnh:", error);
+  }
 }

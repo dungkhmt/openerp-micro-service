@@ -10,11 +10,9 @@ import {AiTwotoneCar} from "react-icons/ai";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import {CKEditor} from "@ckeditor/ckeditor5-react";
 import React from "react";
-import {transferDirection, transferLegalDocument, transferTypeProperty} from "../../utils/common";
+import {transferDirection, transferLegalDocument, transferPrice, transferTypeProperty} from "../../utils/common";
 
 const InfoPostSell = ({propertyDetails}) => {
-
-    console.log("gia tri o info",propertyDetails)
 
     return (
     <div className="singlePage">
@@ -30,17 +28,17 @@ const InfoPostSell = ({propertyDetails}) => {
                         <div className="flexStart row-event">Kiểu tài sản: {transferTypeProperty(propertyDetails?.typeProperty)}</div>
                         <div className="flexStart facilities">
                             <span className="">
-                                Giá: {propertyDetails?.price.toLocaleString('us-US')} VND
+                                Giá: {transferPrice(propertyDetails?.price)}
                             </span>
 
                             <span className="">
-                                {propertyDetails?.pricePerM2.toLocaleString('us-US')} VND/m<sup>2</sup>
+                                {transferPrice(propertyDetails.pricePerM2)}/m²
                             </span>
                         </div>
 
                         <div className="flexStart row-event facilities">
                             <span style={{}}>
-                                Diện tích: {propertyDetails?.acreage}m<sup>2</sup>
+                                Diện tích: {propertyDetails?.acreage}m²
                             </span>
                             <span style={{}}>
                                 Chiều dài: {propertyDetails?.horizontal}m
