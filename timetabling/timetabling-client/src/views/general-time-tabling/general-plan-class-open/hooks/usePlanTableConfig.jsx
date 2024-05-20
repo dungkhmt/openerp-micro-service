@@ -47,7 +47,9 @@ export const usePlanTableConfig = (setPlanClasses) => {
       `/plan-general-classes/?planClassId=${planClass?.id}`,
       (res) => {
         setPlanClasses((prevClasses) => {
-          return prevClasses.filter((prevClass) => prevClass?.id !== res.data?.id);
+          return prevClasses.filter(
+            (prevClass) => prevClass?.id !== res.data?.id
+          );
         });
         toast.success("Xóa lớp thành công!");
       },
@@ -92,27 +94,61 @@ export const usePlanTableConfig = (setPlanClasses) => {
       headerName: "Max SV/LT",
       field: "lectureMaxQuantity",
       width: 120,
+      renderCell: (params) => (
+        <TextField
+          value={params.value}
+          onChange={(e) => handleOnCellChange(e, params)}
+        />
+      ),
     },
     {
       headerName: "Max SV/BT",
       field: "exerciseMaxQuantity",
       width: 120,
+      renderCell: (params) => (
+        <TextField
+          value={params.value}
+          onChange={(e) => handleOnCellChange(e, params)}
+        />
+      ),
     },
     {
       headerName: "Max SV/LT+BT",
       field: "lectureExerciseMaxQuantity",
       width: 120,
+      renderCell: (params) => (
+        <TextField
+          value={params.value}
+          onChange={(e) => handleOnCellChange(e, params)}
+        />
+      ),
     },
 
     {
       headerName: "SL MAX",
       field: "quantityMax",
       width: 100,
+      renderCell: (params) => (
+        <TextField
+          value={params.value}
+          onChange={(e) => handleOnCellChange(e, params)}
+        />
+      ),
     },
     {
       headerName: "Loại lớp",
       field: "classType",
       width: 100,
+      renderCell: (params) => (
+        <Autocomplete
+          {...params}
+          options={["LT", "BT", "LT+BT"]}
+          onChange={(e, option) => handleOnCellSelect(e, params, option)}
+          renderInput={(option) => {
+            return <TextField disableUnderline={false} {...option} />;
+          }}
+        />
+      ),
     },
     {
       headerName: "Thời lượng",
@@ -133,17 +169,17 @@ export const usePlanTableConfig = (setPlanClasses) => {
     {
       headerName: "Kíp",
       field: "crew",
-      width: 100,
-      renderCell: (params) => (
-        <Autocomplete
-          {...params}
-          options={["S", "C"]}
-          onChange={(e, option) => handleOnCellSelect(e, params, option)}
-          renderInput={(option) => {
-            return <TextField disableUnderline={false} {...option} />;
-          }}
-        />
-      ),
+      width: 200,
+        renderCell: (params) => (
+          <Autocomplete
+            {...params}
+            options={["S", "C"]}
+            onChange={(e, option) => handleOnCellSelect(e, params, option)}
+            renderInput={(option) => {
+              return <TextField disableUnderline={false} {...option} />;
+            }}
+          />
+        ),
     },
     {
       headerName: "Mã HP",

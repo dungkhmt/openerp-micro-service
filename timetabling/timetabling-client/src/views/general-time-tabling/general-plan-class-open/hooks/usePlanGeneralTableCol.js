@@ -79,9 +79,15 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
 
   return [
     {
-      headerName: "Mã lớp tạm thời",
+      headerName: "Mã lớp",
       field: "classCode",
       width: 100,
+      renderCell: (params) => (
+        <TextField
+          value={params.value}
+          onChange={(e) => handleOnCellChange(e, params)}
+        />
+      ),
     },
     // {
     //   headerName: "Lớp học",
@@ -109,6 +115,18 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
       headerName: "Mã học phần",
       field: "moduleCode",
       width: 100,
+    },
+
+    {
+      headerName: "Số tiết",
+      field: "duration",
+      width: 100,
+      renderCell: (params) => (
+        <TextField
+          value={params.value}
+          onChange={(e) => handleOnCellChange(e, params)}
+        />
+      ),
     },
     {
       headerName: "Tên học phần",
@@ -145,7 +163,7 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
     {
       headerName: "Kíp",
       field: "crew",
-      width: 100,
+      width: 200,
       renderCell: (params) => (
         <Autocomplete
           {...params}
@@ -188,7 +206,7 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
     {
       headerName: "Loại lớp",
       field: "classType",
-      width: 120,
+      width: 200,
       editable: true,
       renderCell: (params) => (
         <Autocomplete
@@ -208,6 +226,18 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
       with: 100,
       renderCell: (params) => (
         <div className="flex gap-2">
+          <Button onClick={(e) => handleSaveClass(params.row)}>
+            <SaveAlt />
+          </Button>
+        </div>
+      ),
+    },
+    {
+      headerName: "Xóa",
+      field: "deleteButton",
+      with: 100,
+      renderCell: (params) => (
+        <div className="flex gap-2">
           <Button onClick={(e) => handleDeleteClass(params.row)}>
             <Delete />
           </Button>
@@ -215,18 +245,6 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
       ),
     },
 
-    {
-      headerName: "Xóa",
-      field: "deleteButton",
-      with: 100,
-      renderCell: (params) => (
-        <div className="flex gap-2">
-          <Button onClick={(e) => handleSaveClass(params.row)}>
-            <SaveAlt />
-          </Button>
-        </div>
-      ),
-    },
     // {
     //   headerName: "Khóa",
     //   field: "course",

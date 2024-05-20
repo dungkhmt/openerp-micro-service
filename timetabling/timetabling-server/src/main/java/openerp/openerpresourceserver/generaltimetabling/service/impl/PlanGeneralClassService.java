@@ -67,6 +67,8 @@ public class PlanGeneralClassService {
         updateGeneralClass.setParentClassId(generalClass.getParentClassId());
         updateGeneralClass.setQuantityMax(generalClass.getQuantityMax());
         updateGeneralClass.setClassType(generalClass.getClassType());
+        updateGeneralClass.setCrew(generalClass.getCrew());
+        updateGeneralClass.setDuration(generalClass.getDuration());
         return generalClassRepository.save(updateGeneralClass);
     }
 
@@ -76,6 +78,10 @@ public class PlanGeneralClassService {
         if (planGeneralClass == null) throw new NotFoundException("Không tìm thấy lớp kế hoạch!");
         planGeneralClass.setLearningWeeks(planClass.getLearningWeeks());
         planGeneralClass.setCrew(planClass.getCrew());
+        planGeneralClass.setLectureMaxQuantity(planClass.getLectureMaxQuantity());
+        planGeneralClass.setExerciseMaxQuantity(planClass.getExerciseMaxQuantity());
+        planGeneralClass.setQuantityMax(planClass.getQuantityMax());
+        planGeneralClass.setClassType(planClass.getClassType());
         return planGeneralClassRepository.save(planGeneralClass);
     }
 

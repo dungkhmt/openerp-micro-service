@@ -41,6 +41,7 @@ public class GeneralClass {
     private String course;
     private Long refClassId;
     private Long parentClassId;
+    private Integer duration;
     private String groupName;
     @OneToMany(mappedBy = "generalClass", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<RoomReservation> timeSlots = new ArrayList<RoomReservation>();
