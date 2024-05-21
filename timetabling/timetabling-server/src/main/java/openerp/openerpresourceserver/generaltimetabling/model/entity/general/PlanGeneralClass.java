@@ -6,6 +6,8 @@ import lombok.Setter;
 import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFieldException;
 import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekValidator;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -29,10 +31,14 @@ public class PlanGeneralClass {
     private String crew;
 
 
-
     public void setLearningWeeks(String learningWeeks) {
-        if (learningWeeks != null && !LearningWeekValidator.isCorrectFormat(learningWeeks))
-            throw new InvalidFieldException("Tuần học không đúng định dạng!");
+        if (learningWeeks != null) {
+            List<String> weekStringList = List.of(learningWeeks.split(","));
+            weekStringList.forEach(weekString -> {
+                if (!LearningWeekValidator.isCorrectFormat(weekString))
+                    throw new InvalidFieldException("Tuần học không đúng định dạng!");
+            });
+        }
         this.learningWeeks = learningWeeks;
     }
 
