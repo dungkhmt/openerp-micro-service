@@ -6,13 +6,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "contest_contest_problem_new")
-public class ContestProblem {
+public class ContestProblem implements Serializable {
     @Id
     @Column(name = "contest_contest_problem_id",updatable = false, nullable = false)
     private String id;

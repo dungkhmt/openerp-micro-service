@@ -13,4 +13,7 @@ public class DashBoard {
     private long totalUserActive;
     private long totalProblem;
     private long totalQuizQuestion;
+    private Object[] totalStudentPassBySemester;
+    private Object[] totalStudentPlagiarism;
+
 }

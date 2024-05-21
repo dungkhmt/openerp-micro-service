@@ -6,13 +6,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "code_plagiarism")
-public class CodePlagiarism {
+public class CodePlagiarism implements Serializable {
     @Id
     @Column(name = "plagiarism_id",updatable = false, nullable = false)
     private String id;

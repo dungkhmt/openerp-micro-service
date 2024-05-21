@@ -1,14 +1,14 @@
-package openerp.openerpresourceserver.entity;
+package openerp.openerpresourceserver.firstyeartimetabling.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -18,7 +18,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class EntityAuthorization implements Serializable {
+@Table(name = "first_year_entity_authorization")
+public class FirstYearEntityAuthorization {
 
     @Id
     private String id;
