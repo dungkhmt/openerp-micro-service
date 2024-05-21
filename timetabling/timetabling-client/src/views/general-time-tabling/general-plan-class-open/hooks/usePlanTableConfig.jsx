@@ -1,6 +1,6 @@
 import { SaveAlt } from "@mui/icons-material";
 import Delete from "@mui/icons-material/Delete";
-import { Autocomplete, Button, TextField } from "@mui/material";
+import { Autocomplete, Box, Button, Input, TextField } from "@mui/material";
 import { request } from "api";
 import { toast } from "react-toastify";
 
@@ -101,7 +101,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
       field: "lectureMaxQuantity",
       width: 120,
       renderCell: (params) => (
-        <TextField
+        <Input
           type="number"
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
@@ -113,7 +113,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
       field: "exerciseMaxQuantity",
       width: 120,
       renderCell: (params) => (
-        <TextField
+        <Input
           type="number"
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
@@ -125,7 +125,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
       field: "lectureExerciseMaxQuantity",
       width: 120,
       renderCell: (params) => (
-        <TextField
+        <Input
           type="number"
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
@@ -138,7 +138,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
       field: "quantityMax",
       width: 100,
       renderCell: (params) => (
-        <TextField
+        <Input
           type="number"
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
@@ -155,7 +155,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
           options={["LT", "BT", "LT+BT"]}
           onChange={(e, option) => handleOnCellSelect(e, params, option)}
           renderInput={(option) => {
-            return <TextField disableUnderline={false} {...option} />;
+            return <TextField variant='standard' {...option} sx={{width: 80}} />;
           }}
         />
       ),
@@ -170,7 +170,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
       field: "learningWeeks",
       width: 100,
       renderCell: (params) => (
-        <TextField
+        <Input
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
@@ -179,14 +179,14 @@ export const usePlanTableConfig = (setPlanClasses) => {
     {
       headerName: "Kíp",
       field: "crew",
-      width: 200,
+      width: 100,
       renderCell: (params) => (
         <Autocomplete
           {...params}
           options={["S", "C"]}
           onChange={(e, option) => handleOnCellSelect(e, params, option)}
           renderInput={(option) => {
-            return <TextField disableUnderline={false} {...option} />;
+            return <TextField variant='standard' {...option} sx={{width: 80}}/>;
           }}
         />
       ),
@@ -209,7 +209,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
     {
       headerName: "Lưu",
       field: "saveButton",
-      with: 100,
+      with: 80,
       renderCell: (params) => (
         <div className="flex gap-2">
           <Button onClick={(e) => handleSaveClass(params.row)}>
@@ -221,7 +221,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
     {
       headerName: "Xóa",
       field: "deleteButton",
-      with: 100,
+      with: 80,
       renderCell: (params) => (
         <div className="flex gap-2">
           <Button onClick={(e) => handleDeleteClass(params.row)}>

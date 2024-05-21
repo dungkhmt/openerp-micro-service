@@ -1,5 +1,5 @@
 import { Delete, SaveAlt } from "@mui/icons-material";
-import { Autocomplete, Button, TextField } from "@mui/material";
+import { Autocomplete, Button, Input, TextField } from "@mui/material";
 import { request } from "api";
 import { toast } from "react-toastify";
 
@@ -88,10 +88,10 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
     {
       headerName: "Mã lớp",
       field: "classCode",
-      width: 100,
+      width: 120,
       renderCell: (params) => (
-        <TextField
-          type='number'
+        <Input
+          type="number"
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
@@ -113,7 +113,7 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
       field: "learningWeeks",
       width: 120,
       renderCell: (params) => (
-        <TextField
+        <Input
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
@@ -130,8 +130,8 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
       field: "duration",
       width: 100,
       renderCell: (params) => (
-        <TextField
-          type='number'
+        <Input
+          type="number"
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
@@ -153,8 +153,8 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
       field: "quantityMax",
       width: 120,
       renderCell: (params) => (
-        <TextField
-        type='number'
+        <Input
+          type="number"
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
@@ -173,15 +173,14 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
     {
       headerName: "Kíp",
       field: "crew",
-      width: 200,
+      width: 100,
       renderCell: (params) => (
         <Autocomplete
           {...params}
           options={["S", "C"]}
           onChange={(e, option) => handleOnCellSelect(e, params, option)}
           renderInput={(option) => {
-            console.log(option);
-            return <TextField disableUnderline={false} {...option} />;
+            return <TextField variant='standard' disableUnderline={false} {...option} sx={{width: 80}}/>;
           }}
         />
       ),
@@ -191,7 +190,7 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
       field: "parentClassId",
       width: 120,
       renderCell: (params) => (
-        <TextField
+        <Input
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
@@ -207,8 +206,8 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
       field: "refClassId",
       width: 100,
       renderCell: (params) => (
-        <TextField
-        type='number'
+        <Input
+          type="number"
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
@@ -217,7 +216,7 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
     {
       headerName: "Loại lớp",
       field: "classType",
-      width: 200,
+      width: 100,
       editable: true,
       renderCell: (params) => (
         <Autocomplete
@@ -225,8 +224,7 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
           options={["LT", "BT", "LT+BT"]}
           onChange={(e, option) => handleOnCellSelect(e, params, option)}
           renderInput={(option) => {
-            console.log(option);
-            return <TextField disableUnderline={false} {...option} />;
+            return <TextField variant='standard' disableUnderline={false} {...option} sx={{width: 80}} />;
           }}
         />
       ),
@@ -234,7 +232,7 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
     {
       headerName: "Lưu",
       field: "saveButton",
-      with: 100,
+      with: 80,
       renderCell: (params) => (
         <div className="flex gap-2">
           <Button onClick={(e) => handleSaveClass(params.row)}>
@@ -246,7 +244,7 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
     {
       headerName: "Xóa",
       field: "deleteButton",
-      with: 100,
+      with: 80,
       renderCell: (params) => (
         <div className="flex gap-2">
           <Button onClick={(e) => handleDeleteClass(params.row)}>

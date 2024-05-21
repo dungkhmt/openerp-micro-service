@@ -67,6 +67,14 @@ public class PlanGeneralClassService {
     @Transactional
     public GeneralClass updateGeneralClass(GeneralClass generalClass) {
         GeneralClass updateGeneralClass = generalClassRepository.findById(generalClass.getId()).orElse(null);
+        if (updateGeneralClass == null) throw new NotFoundException("Không tìm thấy lớp kế hoạch!");
+        List<AcademicWeek> foundWeeks = academicWeekRepo.findAllBySemester(updateGeneralClass.getSemester());
+        if (foundWeeks.isEmpty()) {
+            throw new NotFoundException("Không tìm thấy tuần học trong học kỳ");
+        }
+        if (updateGeneralClass.getLearningWeeks() != null && !LearningWeekValidator.validate(updateGeneralClass.getLearningWeeks(), foundWeeks)){
+            throw new InvalidFieldException("Tuần học không phù hợp với danh sách tuần học");
+        }
         updateGeneralClass.setParentClassId(generalClass.getParentClassId());
         updateGeneralClass.setQuantityMax(generalClass.getQuantityMax());
         updateGeneralClass.setClassType(generalClass.getClassType());
