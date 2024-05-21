@@ -313,4 +313,43 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmission, 
                     "ORDER BY mfs.semester DESC ")
     List<StudentSemesterResult> findStudentSemesterResult(@Param("userId") String userId);
 
+    @Query(value =
+            "WITH midterm_point AS (\n" +
+                    "SELECT mfs.user_submission_id, mfs.contest_id, semester, CAST(SUM(mfs.point) * 10.0 / mpc.total_point AS DECIMAL(10, 1)) AS midterm_point \n" +
+                    "FROM midterm_final_submission_view mfs\n" +
+                    "INNER JOIN max_point_contest_view mpc ON mfs.contest_id = mpc.contest_id \n" +
+                    "WHERE semester IS NOT NULL AND UPPER(mfs.contest_id) LIKE UPPER('%midterm%')\n" +
+                    "GROUP BY mfs.user_submission_id, mfs.contest_id, semester, total_point\n" +
+                    "),\n" +
+                    "final_point AS (\n" +
+                    "SELECT mfs.user_submission_id, mfs.contest_id, semester, CAST(SUM(mfs.point) * 10.0 / mpc.total_point AS DECIMAL(10, 1)) AS final_point \n" +
+                    "FROM midterm_final_submission_view mfs\n" +
+                    "INNER JOIN max_point_contest_view mpc ON mfs.contest_id = mpc.contest_id \n" +
+                    "WHERE semester IS NOT NULL AND UPPER(mfs.contest_id) LIKE UPPER('%final%')\n" +
+                    "GROUP BY mfs.user_submission_id, mfs.contest_id, semester, total_point\n" +
+                    "),\n" +
+                    "state AS (\n" +
+                    "SELECT \n" +
+                    "    mp.user_submission_id,\n" +
+                    "    mp.semester,\n" +
+                    "    COALESCE(mp.midterm_point, 0) AS midterm_point,\n" +
+                    "    COALESCE(fp.final_point, 0) AS final_point,\n" +
+                    "    (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) AS final_grade,\n" +
+                    "    CASE \n" +
+                    "        WHEN midterm_point < 2.5 OR final_point < 2.5 OR (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) <= 3.5 THEN 'failed'\n" +
+                    "        ELSE 'pass'\n" +
+                    "    END AS evaluation_result\n" +
+                    "FROM \n" +
+                    "    midterm_point mp\n" +
+                    "FULL OUTER JOIN \n" +
+                    "    final_point fp ON mp.user_submission_id = fp.user_submission_id\n" +
+                    ")\n" +
+                    "SELECT s.semester, COALESCE(COUNT(user_submission_id), 0) AS total_student_pass\n" +
+                    "FROM (SELECT DISTINCT semester FROM state) s\n" +
+                    "LEFT JOIN state ON s.semester = state.semester AND state.evaluation_result = 'pass'\n" +
+                    "GROUP BY s.semester "
+            , nativeQuery = true
+    )
+    Object[] findResultAllSemester();
+
 }

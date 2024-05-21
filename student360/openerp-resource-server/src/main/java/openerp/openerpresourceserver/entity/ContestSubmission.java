@@ -9,6 +9,7 @@ import openerp.openerpresourceserver.model.SubmissionScoreHistory;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
@@ -18,7 +19,7 @@ import java.util.Date;
 @Entity
 @Table(name = "contest_submission_new")
 
-public class ContestSubmission {
+public class ContestSubmission implements Serializable {
 
     @Id
     @Column(name = "contest_submission_id", updatable = false, nullable = false)

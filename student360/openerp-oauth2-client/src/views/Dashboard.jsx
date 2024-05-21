@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { Grid, Stack } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import CodeBracket from "@heroicons/react/24/solid/CodeBracketIcon";
 import CommandLine from "@heroicons/react/24/solid/CommandLineIcon";
@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { Box } from "@material-ui/core";
 import TopicWordCloud from "../components/dashboard/TopicWordCloud";
 import { request } from "../api";
+import LineChartCoponent from "../components/chart/LineChart";
 
 export default function Home() {
   const [statistics, setStatistics] = useState([]);
@@ -21,8 +22,8 @@ export default function Home() {
     }).then();
   }, []);
   return (
-    <>
-      {/*<HustContainerCard>*/}
+    <Stack gap={2}>
+      {/* <HustContainerCard> */}
       <Grid container>
         <Grid item xs={12} sx={{ textAlign: "center" }}>
           <motion.div
@@ -141,8 +142,13 @@ export default function Home() {
           </Grid>
         </Grid>
       </Grid>
-
-      {/*</HustContainerCard>*/}
-    </>
+      <LineChartCoponent
+        data={statistics.totalStudentPassBySemester}
+        title="Summary of Student Passed By Semester"
+        xAxisName="Semester"
+        yAxisName="Total Student Passed"
+      />
+      {/* </HustContainerCard> */}
+    </Stack>
   );
 }
