@@ -9,29 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface SubmissionHourlySummaryRepo extends JpaRepository<SubmissionHourlySummary, String> {
 
-    @Modifying
-    @Transactional
-    @Query(value = "DELETE FROM submission_hourly_summary", nativeQuery = true)
-    void deleteAllData();
-    @Modifying
-    @Transactional
-    @Query(value =
-                    "INSERT INTO submission_hourly_summary (submission_date, hour_of_day, submission_count, submission_pass_count, user_submission_id) " +
-                    "SELECT " +
-                    "    date_trunc('day', created_stamp) AS submission_date, " +
-                    "    EXTRACT(hour FROM created_stamp) AS hour_of_day, " +
-                    "    COUNT(*) AS submission_count, " +
-                    "    SUM(CASE WHEN point > 0 THEN 1 ELSE 0 END) AS submission_pass_count," +
-                    "    user_submission_id " +
-                    "FROM " +
-                    "    contest_submission_new " +
-                    "GROUP BY " +
-                    "    submission_date, " +
-                    "    hour_of_day, " +
-                    "    user_submission_id", nativeQuery = true)
-
-    void updateSummaryData();
-
     @Query(value = "WITH subquery AS ( " +
             "    SELECT " +
             "        user_submission_id, " +

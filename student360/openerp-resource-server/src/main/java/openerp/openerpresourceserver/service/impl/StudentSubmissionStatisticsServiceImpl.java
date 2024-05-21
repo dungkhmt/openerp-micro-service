@@ -34,9 +34,6 @@ public class StudentSubmissionStatisticsServiceImpl implements StudentSubmission
 
         List<StudentSubmissionDetail> allStudentDetails = new ArrayList<>();
 
-        submissionHourlySummaryRepo.deleteAllData();
-        submissionHourlySummaryRepo.updateSummaryData();
-
         Set<String> uniqueStudentKey = new HashSet<>();
 
         List<ContestSubmission> contestSubmissionAll = contestSubmissionRepo.findAll();

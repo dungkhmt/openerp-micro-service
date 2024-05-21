@@ -30,8 +30,14 @@ const LineChartCoponent = ({ data, title, subtitle, xAxisName, yAxisName }) => {
   if (Array.isArray(data)) {
     chartData = data
       .map((item) => ({
-        [xAxisName]: "Tháng " + item.submissionMonth,
-        [yAxisName]: item.numberOfSubmissions,
+        [xAxisName]:
+          item.submissionMonth !== undefined
+            ? "Tháng " + item.submissionMonth
+            : item[0],
+        [yAxisName]:
+          item.numberOfSubmissions !== undefined
+            ? item.numberOfSubmissions
+            : item[1],
       }))
       .sort((a, b) => parseInt(a[xAxisName]) - parseInt(b[xAxisName]));
   } else {
