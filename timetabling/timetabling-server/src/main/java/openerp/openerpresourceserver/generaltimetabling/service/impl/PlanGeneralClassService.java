@@ -69,6 +69,8 @@ public class PlanGeneralClassService {
         updateGeneralClass.setClassType(generalClass.getClassType());
         updateGeneralClass.setCrew(generalClass.getCrew());
         updateGeneralClass.setDuration(generalClass.getDuration());
+        updateGeneralClass.setLearningWeeks(generalClass.getLearningWeeks());
+        updateGeneralClass.setClassCode(generalClass.getClassCode());
         return generalClassRepository.save(updateGeneralClass);
     }
 
