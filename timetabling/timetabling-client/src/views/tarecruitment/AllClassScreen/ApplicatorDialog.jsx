@@ -70,6 +70,8 @@ const ApplicatorDialog = ({ open, handleClose, classId }) => {
     name: applicator.name,
     phoneNumber: applicator.phoneNumber,
     email: applicator.email,
+    applicationStatus: applicator.applicationStatus,
+    assignStatus: applicator.assignStatus,
   }));
 
   return (
@@ -94,7 +96,6 @@ const ApplicatorDialog = ({ open, handleClose, classId }) => {
           <DataGrid
             loading={isLoading}
             rowHeight={60}
-            sx={{ fontSize: 16, height: "45vh" }}
             rows={dataGridRows}
             columns={dataGridColumns}
             rowCount={totalElements}
@@ -105,6 +106,19 @@ const ApplicatorDialog = ({ open, handleClose, classId }) => {
             pageSizeOptions={[5]}
             checkboxSelection={false}
             disableRowSelectionOnClick
+            getRowClassName={(params) =>
+              params.row.applicationStatus === "APPROVED" &&
+              params.row.assignStatus === "APPROVED"
+                ? "bold-row"
+                : ""
+            }
+            sx={{
+              "& .bold-row": {
+                fontWeight: "bold",
+              },
+              fontSize: 16,
+              height: "45vh",
+            }}
           />
         </DialogContent>
       </Dialog>
