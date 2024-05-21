@@ -82,6 +82,7 @@ public class PlanGeneralClassService {
         planGeneralClass.setCrew(planClass.getCrew());
         planGeneralClass.setLectureMaxQuantity(planClass.getLectureMaxQuantity());
         planGeneralClass.setExerciseMaxQuantity(planClass.getExerciseMaxQuantity());
+        planGeneralClass.setLectureExerciseMaxQuantity(planClass.getLectureExerciseMaxQuantity());
         planGeneralClass.setQuantityMax(planClass.getQuantityMax());
         planGeneralClass.setClassType(planClass.getClassType());
         return planGeneralClassRepository.save(planGeneralClass);
