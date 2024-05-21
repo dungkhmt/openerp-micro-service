@@ -104,7 +104,7 @@ public class ExcelService {
                     List<String> learningWeekStrings = Arrays.asList(generalClass.getLearningWeeks().trim().split(","));
                     learningWeekStrings.forEach(learningWeek -> {
                         if(
-                            LearningWeekValidator.validate(learningWeek)
+                            LearningWeekValidator.isCorrectFormat(learningWeek)
                         ) {
                             LearningWeekExtractor.extract(learningWeek).forEach(weekInt->{
                                 roomOccupations.add(new RoomOccupation(

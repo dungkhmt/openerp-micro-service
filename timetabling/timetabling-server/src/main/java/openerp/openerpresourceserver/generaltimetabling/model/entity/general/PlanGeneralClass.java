@@ -3,6 +3,8 @@ package openerp.openerpresourceserver.generaltimetabling.model.entity.general;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFieldException;
+import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekValidator;
 
 @Entity
 @Getter
@@ -25,4 +27,36 @@ public class PlanGeneralClass {
     private Integer lectureExerciseMaxQuantity;
     private String learningWeeks;
     private String crew;
+
+
+
+    public void setLearningWeeks(String learningWeeks) {
+        if (learningWeeks != null && !LearningWeekValidator.isCorrectFormat(learningWeeks))
+            throw new InvalidFieldException("Tuần học không đúng định dạng!");
+        this.learningWeeks = learningWeeks;
+    }
+
+    public void setLectureMaxQuantity(Integer lectureMaxQuantity) {
+        if ((lectureMaxQuantity != null || exerciseMaxQuantity != null) && lectureExerciseMaxQuantity != null) {
+            throw new InvalidFieldException("Số lượng tối đa của LT+BT phải trống!");
+        } else {
+            this.lectureMaxQuantity = lectureMaxQuantity;
+        }
+    }
+
+    public void setExerciseMaxQuantity(Integer exerciseMaxQuantity) {
+        if ((lectureMaxQuantity != null || exerciseMaxQuantity != null) && lectureExerciseMaxQuantity != null) {
+            throw new InvalidFieldException("Số lượng tối đa của LT+BT phải trống!");
+        } else {
+            this.exerciseMaxQuantity = exerciseMaxQuantity;
+        }
+    }
+
+    public void setLectureExerciseMaxQuantity(Integer lectureExerciseMaxQuantity) {
+        if ((lectureMaxQuantity != null || exerciseMaxQuantity != null) && lectureExerciseMaxQuantity != null) {
+            throw new InvalidFieldException("Số lượng tối đa của LT và BT cần phải trống!");
+        } else {
+            this.lectureExerciseMaxQuantity = lectureExerciseMaxQuantity;
+        }
+    }
 }

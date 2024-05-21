@@ -13,9 +13,12 @@ export const usePlanTableConfig = (setPlanClasses) => {
         toast.success("Cập nhật lớp thành công!");
         console.log(res);
       },
-      (err) => {
-        toast.error("Cập nhật lớp thất bại");
-        console.log(err);
+      (error) => {
+        if (error.response.status == 410) {
+          toast.error(error.response.data);
+        } else {
+          toast.error("Cập nhật lớp thất bại");
+        }
       },
       { planClass },
       null,
@@ -27,7 +30,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
     setPlanClasses((prevClasses) => {
       const updatedClass = {
         ...params.row,
-        [params.field]: e.target.value,
+        [params.field]: e.target.value !== "" ? e.target.value : null,
       };
       const newClasses = prevClasses?.map((prevClass) => {
         if (prevClass?.id === params?.id) {
@@ -53,9 +56,12 @@ export const usePlanTableConfig = (setPlanClasses) => {
         });
         toast.success("Xóa lớp thành công!");
       },
-      (err) => {
-        console.log(err);
-        toast.error("Xóa lớp thất bại");
+      (error) => {
+        if (error.response.status == 410) {
+          toast.error(error.response.data);
+        } else {
+          toast.error("Xóa lớp thất bại");
+        }
       }
     );
   };
@@ -96,6 +102,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
       width: 120,
       renderCell: (params) => (
         <TextField
+          type="number"
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
@@ -107,6 +114,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
       width: 120,
       renderCell: (params) => (
         <TextField
+          type="number"
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
@@ -118,6 +126,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
       width: 120,
       renderCell: (params) => (
         <TextField
+          type="number"
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
@@ -130,6 +139,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
       width: 100,
       renderCell: (params) => (
         <TextField
+          type="number"
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
@@ -170,16 +180,16 @@ export const usePlanTableConfig = (setPlanClasses) => {
       headerName: "Kíp",
       field: "crew",
       width: 200,
-        renderCell: (params) => (
-          <Autocomplete
-            {...params}
-            options={["S", "C"]}
-            onChange={(e, option) => handleOnCellSelect(e, params, option)}
-            renderInput={(option) => {
-              return <TextField disableUnderline={false} {...option} />;
-            }}
-          />
-        ),
+      renderCell: (params) => (
+        <Autocomplete
+          {...params}
+          options={["S", "C"]}
+          onChange={(e, option) => handleOnCellSelect(e, params, option)}
+          renderInput={(option) => {
+            return <TextField disableUnderline={false} {...option} />;
+          }}
+        />
+      ),
     },
     {
       headerName: "Mã HP",

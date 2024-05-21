@@ -13,6 +13,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFieldException;
+import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekValidator;
 
 @Data
 @Builder
@@ -70,6 +72,11 @@ public class GeneralClass {
         return refClassId +"/"+ parentClassId +"/"+ classCode + " " + moduleCode + " " + moduleName + " " + timeSlots.toString();
     }
 
+    public void setLearningWeeks(String learningWeeks) {
+        if (learningWeeks != null && !LearningWeekValidator.isCorrectFormat(learningWeeks))
+            throw new InvalidFieldException("Tuần học không đúng định dạng!");
+        this.learningWeeks = learningWeeks;
+    }
 
     public List<Integer> extractLearningWeeks(){
         String[] terms = learningWeeks.split(",");

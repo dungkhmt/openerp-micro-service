@@ -1,10 +1,13 @@
 package openerp.openerpresourceserver.generaltimetabling.helper;
 
+import openerp.openerpresourceserver.generaltimetabling.model.entity.AcademicWeek;
+
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LearningWeekValidator {
-    public static boolean validate(String week) {
+    public static boolean isCorrectFormat(String week) {
         String regex = "\\d+-\\d+";
 
         // Compile the regular expression
@@ -25,5 +28,16 @@ public class LearningWeekValidator {
             // If the pattern doesn't match, return false
             return false;
         }
+    }
+
+    public static boolean validate(String weekString, List<AcademicWeek> repoWeeks) {
+        List<Integer> updateWeeks = LearningWeekExtractor.extractArray(weekString);
+        List<Integer> existedWeeks = repoWeeks.stream().map(AcademicWeek::getWeekIndex).toList();
+        for (int i = 0; i < updateWeeks.size(); i++) {
+            if (!existedWeeks.contains(updateWeeks.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -2,12 +2,15 @@ package openerp.openerpresourceserver.generaltimetabling.service.impl;
 
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFieldException;
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
+import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekValidator;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.MakeGeneralClassRequest;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.AcademicWeek;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
-import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
+import openerp.openerpresourceserver.generaltimetabling.repo.AcademicWeekRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.GeneralClassRepository;
 import openerp.openerpresourceserver.generaltimetabling.repo.PlanGeneralClassRepository;
 import org.springframework.stereotype.Service;
@@ -15,13 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @AllArgsConstructor
 @Service
 public class PlanGeneralClassService {
     private GeneralClassRepository generalClassRepository;
     private PlanGeneralClassRepository planGeneralClassRepository;
+    private AcademicWeekRepo academicWeekRepo;
     public GeneralClass makeClass(MakeGeneralClassRequest request) {
         GeneralClass newClass = new GeneralClass();
 
@@ -78,6 +81,13 @@ public class PlanGeneralClassService {
     public PlanGeneralClass updatePlanClass(PlanGeneralClass planClass) {
         PlanGeneralClass planGeneralClass = planGeneralClassRepository.findById(planClass.getId()).orElse(null);
         if (planGeneralClass == null) throw new NotFoundException("Không tìm thấy lớp kế hoạch!");
+        List<AcademicWeek> foundWeeks = academicWeekRepo.findAllBySemester(planClass.getSemester());
+        if (foundWeeks.isEmpty()) {
+            throw new NotFoundException("Không tìm thấy tuần học trong học kỳ");
+        }
+        if (planGeneralClass.getLearningWeeks() != null && !LearningWeekValidator.validate(planClass.getLearningWeeks(), foundWeeks)){
+            throw new InvalidFieldException("Tuần học không phù hợp với danh sách tuần học");
+        }
         planGeneralClass.setLearningWeeks(planClass.getLearningWeeks());
         planGeneralClass.setCrew(planClass.getCrew());
         planGeneralClass.setLectureMaxQuantity(planClass.getLectureMaxQuantity());

@@ -46,8 +46,12 @@ const ViewClassPlanDialog = ({
         });
         toast.success("Thêm lớp thành công!");
       },
-      (err) => {
-        toast.error("Thêm lớp thất bại");
+      (error) => {
+        if (error.response.status == 410) {
+          toast.error(error.response.data);
+        } else {
+          toast.error("Thêm lớp thất bại");
+        }
       },
       {
         planClassId: planClassId,

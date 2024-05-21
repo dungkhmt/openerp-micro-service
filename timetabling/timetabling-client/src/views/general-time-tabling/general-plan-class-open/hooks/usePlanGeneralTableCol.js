@@ -30,8 +30,12 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
       (res) => {
         toast.success("Lưu lớp thành công");
       },
-      (err) => {
-        toast.error("Lưu lớp thất bại");
+      (error) => {
+        if (error.response.status == 410) {
+          toast.error(error.response.data);
+        } else {
+          toast.error("Cập nhật lớp thất bại");
+        }
       },
       { generalClass },
       null,
@@ -51,9 +55,12 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
         });
         toast.success("Xóa lớp thành công!");
       },
-      (err) => {
-        console.log(err);
-        toast.error("Xóa lớp thất bại");
+      (error) => {
+        if (error.response.status == 410) {
+          toast.error(error.response.data);
+        } else {
+          toast.error("Xóa lớp thất bại");
+        }
       }
     );
   };
@@ -84,6 +91,7 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
       width: 100,
       renderCell: (params) => (
         <TextField
+          type='number'
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
@@ -123,6 +131,7 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
       width: 100,
       renderCell: (params) => (
         <TextField
+          type='number'
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
@@ -145,6 +154,7 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
       width: 120,
       renderCell: (params) => (
         <TextField
+        type='number'
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
@@ -198,6 +208,7 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
       width: 100,
       renderCell: (params) => (
         <TextField
+        type='number'
           value={params.value}
           onChange={(e) => handleOnCellChange(e, params)}
         />
