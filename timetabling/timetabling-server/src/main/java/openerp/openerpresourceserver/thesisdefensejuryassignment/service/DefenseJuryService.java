@@ -27,5 +27,5 @@ public interface DefenseJuryService {
 
     public DefenseJury reassignTeacherAndThesis(AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList);
 
-
+    public DefenseJury deleteDefenseJuryByID(UUID id);
 }

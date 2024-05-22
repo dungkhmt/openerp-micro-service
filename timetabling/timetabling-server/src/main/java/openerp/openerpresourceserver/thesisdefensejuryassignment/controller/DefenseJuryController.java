@@ -65,9 +65,20 @@ public class DefenseJuryController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteDefenseJuryById(@PathVariable String id) {
+        logger.info("Deleted Jury id: " + id);
+        DefenseJury res = juryService.deleteDefenseJuryByID(UUID.fromString(id));
+        if (res == null){
+            return new ResponseEntity<>("Xóa hội đồng không thành công", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("Xóa hội đồng thành công", HttpStatus.OK);
+    }
+
 
     @GetMapping("/thesis/get-all-available/{thesisDefensePlanId}")
     public ResponseEntity<List<Thesis>> getAllAvailableThesis(@PathVariable String thesisDefensePlanId) {
+        System.out.println("Get available thesis: " + thesisDefensePlanId);
         return new ResponseEntity<>(juryService.getAllAvailableThesiss(thesisDefensePlanId), HttpStatus.OK);
     }
 
@@ -112,5 +123,6 @@ public class DefenseJuryController {
         }
         return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);
     }
+
 
 }
