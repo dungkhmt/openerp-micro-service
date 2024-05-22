@@ -36,6 +36,9 @@ function AssignTeacherAndThesisToDefenseJury() {
     if (assignedThesis?.length === 0) {
       return errorNoti("Bạn hãy lựa chọn đồ án vào hội đồng", true);
     }
+    if (assignedThesis?.length > defenseJury?.maxThesis) {
+      return errorNoti(`Hội đồng chỉ có tối đa ${defenseJury?.maxThesis} đồ án`, true);
+    }
 
     request(
       "post",
