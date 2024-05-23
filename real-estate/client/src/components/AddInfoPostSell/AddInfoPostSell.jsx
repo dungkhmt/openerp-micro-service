@@ -17,9 +17,12 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
 
     const [provinces, setProvinces] = useState([])
     const [districts, setDistricts] = useState([])
-    const [province, setProvince] = useState(propertyDetails?.province || null)
-    const [district, setDistrict] = useState(propertyDetails?.district || null)
-    const [address, setAddress] = useState(propertyDetails?.address || null)
+    const [provinceId, setProvinceId] = useState(propertyDetails?.provinceId)
+    const [nameProvince, setNameProvince] = useState(propertyDetails?.nameProvince)
+    const [districtId, setDistrictId] = useState(propertyDetails?.districtId)
+    const [nameDistrict, setNameDistrict] = useState(propertyDetails?.nameDistrict)
+    const [address, setAddress] = useState(propertyDetails.address)
+
     const [position, setPosition] = useState(propertyDetails?.position || [])
     const [imageUrls, setImageUrls] = useState(propertyDetails?.imageUrls || [])
 
@@ -33,20 +36,20 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
     const [bathroom, setBathroom] = useState(propertyDetails?.bathroom || 0);
     const [parking, setParking] = useState(propertyDetails?.parking) || 0;
     const [floor, setFloor] = useState(propertyDetails?.floor || 0)
-    const [legalDocuments, setLegalDocuments] = useState(propertyDetails?.legalDocuments || null)
+    const [legalDocument, setLegalDocument] = useState(propertyDetails?.legalDocument || null)
     const [horizontal, setHorizontal] = useState(propertyDetails?.horizontal || 0);
     const [vertical, setVertical] = useState(propertyDetails?.vertical || 0)
     const [price, setPrice] = useState(propertyDetails?.price || 0)
     const [pricePerM2, setPricePerM2] = useState(propertyDetails?.pricePerM2 || 0)
 
     const optionsProvince = provinces?.map((item) => ({
-        value: item.nameProvince,
+        value: item.provinceId,
         label: item.nameProvince,
         key: item.provinceId,
     }));
 
     const optionsDistrict = districts?.map((item) => ({
-        value: item.nameDistrict,
+        value: item.districtId,
         label: item.nameDistrict,
         key: item.districtId
     }));
@@ -93,29 +96,42 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
     };
 
     const handleNext = (e) => {
-        e.preventDefault();
-        setPropertyDetails({
-            province: province,
-            district: district,
-            address: address,
-            position: position,
-            imageUrls: imageUrls,
-            title: title,
-            description: description,
-            acreage: acreage,
-            price: price,
-            pricePerM2: pricePerM2,
-            typeProperty: typeProperty,
-            legalDocuments: legalDocuments,
-            directionsProperty: directionsProperty,
-            horizontal: horizontal,
-            vertical: vertical,
-            floor: floor,
-            bathroom: bathroom,
-            bedroom: bedroom,
-            parking: parking,
-        })
-        setShowPost(true);
+        if (provinceId === null || districtId === null
+            || address === null || imageUrls.length < 1
+            || title.length < 20 || title.length > 50
+            || acreage === 0 || price === 0
+            || typeProperty === null || legalDocument === null
+            || directionsProperty === null
+            || horizontal === 0 || vertical === 0
+        ) {
+            toast.error("Yêu cầu điền thông tin đầy đủ!")
+        } else {
+            setPropertyDetails({
+                provinceId: provinceId,
+                nameProvince: nameProvince,
+                districtId: districtId,
+                nameDistrict: nameDistrict,
+                address: address,
+
+                position: position,
+                imageUrls: imageUrls,
+                title: title,
+                description: description,
+                acreage: acreage,
+                price: price,
+                pricePerM2: pricePerM2,
+                typeProperty: typeProperty,
+                legalDocument: legalDocument,
+                directionsProperty: directionsProperty,
+                horizontal: horizontal,
+                vertical: vertical,
+                floor: floor,
+                bathroom: bathroom,
+                bedroom: bedroom,
+                parking: parking,
+            })
+            setShowPost(true);
+        }
     };
 
     const handleDeleteImage = async (image) => {
@@ -142,15 +158,26 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
 
     useEffect(() => {
         const fetchPublicDistrict = async () => {
-            const response = await apiGetPublicDistrict(province)
+            const response = await apiGetPublicDistrict(provinceId)
             if (response.status === 200) {
-                setDistricts(response.data?.data)
+                const districts = response.data?.data;
+                setDistricts(districts);
+                const districtExists = districts.some(districtItem => {
+                    if (districtItem.districtId === districtId) {
+                        return true;
+                    }
+                    return false;
+                });
+
+                if (!districtExists) {
+                    setDistrictId(null);
+                    setNameDistrict(null);
+                    setAddress('');
+                }
             }
         }
-        province && fetchPublicDistrict()
-        setDistrict(null);
-        setAddress("");
-    }, [province])
+        provinceId && fetchPublicDistrict()
+    }, [provinceId])
 
     useEffect(() => {
         if (acreage > 0) {
@@ -187,39 +214,44 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                     <Select
                         w={"60%"}
                         withAsterisk
-                        label="Province"
+                        label="Tỉnh"
                         clearable
                         searchable
                         data={optionsProvince}
-                        value={province}
-                        onChange={(value) => setProvince(value)}
+                        value={provinceId}
+                        onChange={(value, option) => {
+                            setProvinceId(option?.value)
+                            setNameProvince(option?.label)
+                        }}
                     />
 
                     <Select
                         w={"60%"}
                         withAsterisk
-                        label="District"
+                        label="Huyện"
                         clearable
                         searchable
                         data={optionsDistrict}
-                        onChange={(value) => setDistrict(value)}
-                        value={district}
+                        onChange={(value, option) => {
+                            setDistrictId(option?.value)
+                            setNameDistrict(option?.label)
+                        }}
+                        value={districtId}
                     />
                     <TextInput
                         w={"60%"}
                         withAsterisk
                         clearable
-                        label="Address"
-                        value={address}
+                        label="Địa Chỉ"
+                        value={address.toString()}
                         onChange={(event) => setAddress(event.currentTarget.value)}
                         error={address?.length > 30 ? "Nhập tối đa 30 ký tự" : ""}
                     />
 
                 </div>
 
-
                 <div style={{flex: 1}}>
-                    <Map address={address} district={district} province={province} position={position}
+                    <Map address={address} district={nameDistrict} province={nameProvince} position={position}
                          setPosition={setPosition}/>
                 </div>
             </div>
@@ -262,7 +294,7 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                     value={title}
                     onChange={(event) => setTitle(event.currentTarget.value)}
                     style={{paddingBottom: "30px"}}
-                    error={title?.length > 50 ? "Nhập tối đa 50 ký tự" : ""}
+                    error={(title?.length > 50 || title?.length < 20) ? "Nhập 20 đến 50 ký tự" : ""}
                 />
 
                 <span>Mô tả</span>
@@ -290,32 +322,30 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                 <NumberInput
                     withAsterisk
                     label="Diện tích"
-                    placeholder="1000"
                     min={0}
                     thousandSeparator=","
-                    suffix="m²"
+                    suffix=" m²"
                     value={acreage}
                     onChange={(value) => setAcreage(value)}
                 />
                 <NumberInput
                     withAsterisk
                     label="Giá"
-                    placeholder="1000"
                     min={0}
                     thousandSeparator=","
                     suffix=" VND"
                     value={price}
                     onChange={(value) => setPrice(value)}
                 />
-                <small>Giá bán là: {transferPrice(pricePerM2)}/m²</small>
+                <small style={{color: "red"}}>Giá bán là: {transferPrice(pricePerM2)}/m²</small>
 
                 <Select
                     withAsterisk
                     label="Kiểu bất sản muốn bán"
                     data={[
                         {value: 'LAND', label: 'Đất'},
-                        {value: 'HOUSE', label: 'Nhà ở'},
-                        {value: 'APARTMENT', label: 'Chung cư'}
+                        {value: 'HOUSE', label: 'Nhà Ở'},
+                        {value: 'APARTMENT', label: 'Chung Cư'}
                     ]}
                     defaultValue='APARTMENT'
                     onChange={(value) => setTypeProperty(value)}
@@ -350,8 +380,8 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                                 {value: 'WAIT', label: 'Đang chờ'},
                                 {value: 'HAVE_NOT', label: 'Không có'},
                             ]}
-                            value={legalDocuments}
-                            onChange={(value) => setLegalDocuments(value)}
+                            value={legalDocument}
+                            onChange={(value) => setLegalDocument(value)}
                         />
                     </Grid.Col>
 
@@ -390,7 +420,6 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                                 value={bedroom}
                                 onChange={(value) => setBedroom(value)}
                                 allowDecimal={false}
-                                // disabled={isLand}
                             />
                         </Grid.Col>
 
@@ -402,7 +431,6 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                                 value={bathroom}
                                 onChange={(value) => setBathroom(value)}
                                 allowDecimal={false}
-                                // disabled={isLand}
                             />
                         </Grid.Col>
 
@@ -419,7 +447,6 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                                 value={floor}
                                 onChange={(value) => setFloor(value)}
                                 allowDecimal={false}
-                                // disabled={isLand}
                             />
                         </Grid.Col>
 
@@ -432,7 +459,6 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                                 value={bedroom}
                                 onChange={(value) => setBedroom(value)}
                                 allowDecimal={false}
-                                // disabled={isLand}
                             />
                         </Grid.Col>
 
@@ -445,7 +471,6 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                                 value={bathroom}
                                 onChange={(value) => setBathroom(value)}
                                 allowDecimal={false}
-                                // disabled={isLand}
                             />
                         </Grid.Col>
 
@@ -458,7 +483,6 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                                 value={parking}
                                 onChange={(value) => setParking(value)}
                                 allowDecimal={false}
-                                // disabled={isLand}
                             />
                         </Grid.Col>
                     </Grid>

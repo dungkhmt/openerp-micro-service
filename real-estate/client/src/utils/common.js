@@ -47,7 +47,7 @@ export const validateString = (value) => {
 
 export const transferLegalDocument = (value) => {
   switch (value) {
-    case "Have": return "Đã có sổ đỏ";
+    case "HAVE": return "Đã có sổ đỏ";
     case "WAIT": return "Đang chờ sổ đỏ";
     default: return "Không có sổ đỏ"
   }
@@ -111,10 +111,13 @@ export const transferTypeProperties = (listValue) => {
 
 export const transferPrice = (price) => {
   if (price >= 1000000000) {
-    return (price / 1000000000).toFixed(1) + "tỷ";
+    return (price / 1000000000).toFixed(1) + " tỷ";
   }
   if (price >= 1000000) {
-    return (price / 1000000).toFixed(1) + "triệu";
+    return (price / 1000000).toFixed(1) + " triệu";
+  }
+  if (price === 0) {
+    return "0 VND"
   }
 }
 
@@ -177,5 +180,19 @@ export const handleDeleteImage = async (image) => {
     console.log("Ảnh đã được xóa thành công!");
   } catch (error) {
     console.log("Lỗi khi xóa ảnh:", error);
+  }
+}
+
+export const capitalizeFirstLetterOfEachWord = (string) => {
+  return string?.split(' ').map(word => {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  }).join(' ');
+}
+
+export const transferPostStatus = (status) => {
+  switch (status) {
+    case "OPENING": return "Đang Mở";
+    case "CLOSE": return "Đã Đóng";
+    default: return "Đã Chốt";
   }
 }

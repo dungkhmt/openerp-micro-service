@@ -7,17 +7,21 @@
 }
 
 .filter {
+    width: 100%;
     height: 100px;
 }
 
 .post_map_container {
-    height: 800px;
+    height: 700px;
+    width: 80%;
+    margin: 0 auto;
 }
 
-.postContainer {
+.postSellContainer {
     /*display: flex;*/
-    margin: 0 5px;
     height: 100%;
+    /*width: 90%;*/
+    margin: 0 10px;
     /*overflow-y: scroll;*/
     /*flex-direction: column;*/
 
@@ -42,5 +46,5 @@
 
 .mapContainer > div {
     width: 100%;
-    height: 100%;
+    height: 80%;
 }

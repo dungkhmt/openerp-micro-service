@@ -1,3 +1,10 @@
+.filterContainer{
+    width: 85%;
+    /*background-color: #ffb978;*/
+    margin: 0 auto;
+}
+
 .filterContainer > div {
-    margin-top: 5px;
+    /*width: 125px;*/
+    margin: 0 5px;
 }

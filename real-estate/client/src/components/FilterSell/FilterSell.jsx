@@ -1,41 +1,55 @@
-import React, {useEffect, useRef, useState} from "react";
-import {Button, Checkbox, Drawer, NumberInput, Select} from "@mantine/core";
+import React, {useEffect, useState} from "react";
+import {Button, Checkbox, Popover, RangeSlider, Select} from "@mantine/core";
 import {apiGetPublicDistrict, apiGetPublicProvinces} from "../../services/AppRequest";
 import "./FilterSell.css"
-import {useDisclosure} from "@mantine/hooks";
+import {LuChevronsUpDown} from "react-icons/lu";
+import {transferDirection, transferPrice, transferTypeProperty} from "../../utils/common";
+import MultiplySelect from "../MultiplySelect/MultiplySelect";
 
 const FilterSell = ({setParams}) => {
-    const [opened, {open, close}] = useDisclosure(false);
-
-    const typeProperties = useRef(["LAND", "HOUSE", "APARTMENT"]);
-    const directions = useRef(["NORTH", "SOUTH", "WEST", "EAST", "EAST_NORTH",
-        "EAST_SOUTH", "WEST_SOUTH", "WEST_NORTH"]);
-    const legalDocuments = useRef(["HAVE", "WAIT", "HAVE_NOT"]);
-    const [province, setProvince] = useState("")
-    const [district, setDistrict] = useState("")
+    const [provinceId, setProvinceId] = useState("")
+    const [districtId, setDistrictId] = useState("")
     const [provinces, setProvinces] = useState([])
     const [districts, setDistricts] = useState([])
 
-    const minAcreage = useRef(0)
-    const fromPrice = useRef(0)
-    const toPrice = useRef(99999999999)
+    const [filterAcreage, setFilterAcreage] = useState([0, 100])
+    const [fromAcreage, setFromAcreage] = useState(0)
+    const [toAcreage, setToAcreage] = useState(100)
+    const [checkMaxAcreage, setCheckMaxAcreage] = useState(false)
 
-    const minFloor = useRef(0);
-    const minBathroom = useRef(0)
-    const minBedroom = useRef(0)
-    const minParking = useRef(0)
+    const [filterPrice, setFilterPrice] = useState([0, 10000000000])
+    const [fromPrice, setFromPrice] = useState(0)
+    const [toPrice, setToPrice] = useState(10000000000)
+    const [checkMaxPrice, setCheckMaxPrice] = useState(false)
+
+    const [directions, setDirections] = useState(["NORTH", "SOUTH", "WEST", "EAST", "EAST_NORTH",
+        "EAST_SOUTH", "WEST_SOUTH", "WEST_NORTH"]);
+    const [typeProperties, setTypeProperties] = useState(["HOUSE", "APARTMENT", "LAND"]);
 
     const optionsProvince = provinces?.map((item) => ({
-        value: item.nameProvince,
+        value: item.provinceId,
         label: item.nameProvince,
         key: item.provinceId,
     }));
 
     const optionsDistrict = districts?.map((item) => ({
-        value: item.nameDistrict,
+        value: item.districtId,
         label: item.nameDistrict,
         key: item.districtId
     }));
+
+    const marksPrice = [
+        {value: 2500000000, label: '2,5 tỷ'},
+        {value: 5000000000, label: '5 tỷ'},
+        {value: 7500000000, label: '7,5 tỷ'},
+    ];
+
+    const marksAcreage = [
+        {value: 20, label: '20 m²'},
+        {value: 40, label: '40 m²'},
+        {value: 60, label: '60 m²'},
+        {value: 80, label: '80 m²'},
+    ];
 
     useEffect(() => {
         const fetchPublicProvince = async () => {
@@ -49,201 +63,211 @@ const FilterSell = ({setParams}) => {
 
     useEffect(() => {
         const fetchPublicDistrict = async () => {
-            const response = await apiGetPublicDistrict(province)
+            const response = await apiGetPublicDistrict(provinceId)
             if (response.status === 200) {
                 setDistricts(response.data?.data)
             }
         }
-        province && fetchPublicDistrict()
-        setDistrict(null);
-    }, [province])
+        provinceId && fetchPublicDistrict()
+        setDistrictId(null);
+    }, [provinceId])
 
-    const handleTypeProperties = (value) => {
-        typeProperties.current = value;
-    };
+    useEffect(() => {
+        if (checkMaxAcreage === false) {
+            setFromAcreage(filterAcreage[0])
+            setToAcreage(filterAcreage[1])
+        } else {
+            setFromAcreage(100)
+            setToAcreage(0)
+        }
+    }, [filterAcreage, checkMaxAcreage]);
 
-    const handleDirections = (value) => {
-        directions.current = value;
-    }
+    useEffect(() => {
+        if (checkMaxPrice === false) {
+            setFromPrice(filterPrice[0])
+            setToPrice(filterPrice[1])
+        } else {
+            setFromPrice(10000000000)
+            setToPrice(0)
+        }
+    }, [filterPrice, checkMaxPrice]);
 
-    const handleLegalDocuments = (value) => {
-        legalDocuments.current = value;
-    }
     const handleSearch = () => {
-        console.log(typeProperties.current)
-        setParams({
+        console.log(fromAcreage, toAcreage)
+        const params = {
             page: 1,
             size: 10,
-            province: province,
-            district: district,
-            minAcreage: minAcreage.current,
-            fromPrice: fromPrice.current,
-            toPrice: toPrice.current,
-            minFloor: minFloor.current,
-            minBedroom: minBedroom.current,
-            minBathroom: minBathroom.current,
-            minParking: minParking.current,
-            typeProperties: typeProperties.current,
-            legalDocuments: legalDocuments.current,
-            directions: directions.current,
-        })
+            fromAcreage: fromAcreage,
+            fromPrice: fromPrice,
+            typeProperties: typeProperties,
+            directions: directions,
+        };
+
+        if (provinceId !== null && provinceId !== "") {
+            params.provinceId = provinceId;
+        }
+
+        if (districtId !== null && districtId !== "") {
+            params.districtId = districtId;
+        }
+
+        if (toAcreage > 0 && toAcreage > fromAcreage) {
+            params.toAcreage = toAcreage;
+        }
+
+        if (toPrice > 0 && toPrice > fromPrice) {
+            params.toPrice = toPrice;
+        }
+
+        setParams(params);
     }
     return (
-        <div className="filterContainer">
-            <Button onClick={open}>Open drawer</Button>
+        <div className="filterContainer flexStart">
+            <Select
+                w={"120px"}
+                withAsterisk
+                placeholder="Tỉnh"
+                clearable
+                searchable
+                data={optionsProvince}
+                value={provinceId}
+                onChange={(value) => setProvinceId(value)}
+            />
 
-            <Drawer
-                opened={opened}
-                onClose={close}
-                overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
+            <Select
+                w={"125px"}
+                withAsterisk
+                placeholder="Huyện/Thành phố"
+                clearable
+                searchable
+                data={optionsDistrict}
+                onChange={(value) => setDistrictId(value)}
+                value={districtId}
+            />
+
+            <Popover
+                position="bottom-start"
+                withArrow shadow="md"
+                width={"400px"}
+                zIndex={1000}
             >
-                <Select
-                    w={"100%"}
-                    withAsterisk
-                    label="Province"
-                    clearable
-                    searchable
-                    data={optionsProvince}
-                    value={province}
-                    onChange={(value) => setProvince(value)}
-                />
+                <Popover.Target>
+                    <Button
+                        style={{
+                            backgroundColor: "white",
+                            color: "rgb(153, 153, 153)",
+                            fontSize: "16px",
+                            fontWeight: "50",
+                            margin: "0 5px",
+                            border: "1px solid #F2F2F2"
+                            // width: "150px"
+                        }}
+                    >
+                        Diện Tích
+                        <LuChevronsUpDown
+                            size={15}
+                            style={{
+                                color: "rgb(153, 153, 153)",
+                                marginLeft: "10px",
+                            }}
+                        />
+                    </Button>
+                </Popover.Target>
+                <Popover.Dropdown>
+                    <RangeSlider
+                        label={value => value + "m²"}
+                        marks={marksAcreage} min={0} max={100} minRange={10} step={10}
+                        value={filterAcreage}
+                        onChange={setFilterAcreage}
+                        disabled={checkMaxAcreage}
+                    />
+                    <Checkbox
+                        style={{
+                            margin: "25px auto 5px auto"
+                        }}
+                        label="Trên 100 m²"
+                        checked={checkMaxAcreage}
+                        onChange={(event) => setCheckMaxAcreage(event.currentTarget.checked)}
+                    />
+                </Popover.Dropdown>
+            </Popover>
+            <Popover
+                position="bottom-start"
+                withArrow shadow="md"
+                width={"400px"}
+                zIndex={1000}
+                styles={{}}
+            >
+                <Popover.Target>
+                    <Button
+                        style={{
+                            backgroundColor: "white",
+                            color: "rgb(153, 153, 153)",
+                            fontSize: "16px",
+                            fontWeight: "50",
+                            margin: "0 5px",
+                            border: "1px solid #F2F2F2"
+                        }}
+                    >
+                        Mức Giá
+                        <LuChevronsUpDown
+                            size={15}
+                            style={{
+                                color: "rgb(153, 153, 153)",
+                                marginLeft: "10px",
+                            }}
+                        />
+                    </Button>
+                </Popover.Target>
+                <Popover.Dropdown>
+                    <RangeSlider
+                        label={value => transferPrice(value)}
+                        marks={marksPrice} min={0} max={10000000000} minRange={500000000} step={500000000}
+                        value={filterPrice}
+                        onChange={setFilterPrice}
+                        disabled={checkMaxPrice}
+                    />
+                    <Checkbox
+                        style={{
+                            margin: "25px auto 5px auto"
+                        }}
+                        label="Trên 10 tỷ"
+                        checked={checkMaxPrice}
+                        onChange={(event) => setCheckMaxPrice(event.currentTarget.checked)}
+                    />
+                </Popover.Dropdown>
+            </Popover>
 
-                <Select
-                    w={"100%"}
-                    withAsterisk
-                    label="District"
-                    clearable
-                    searchable
-                    data={optionsDistrict}
-                    onChange={(value) => setDistrict(value)}
-                    value={district}
-                />
+            <MultiplySelect
+                data={[
+                    {value: "NORTH", label: "Bắc"},
+                    {value: "EAST_NORTH", label: "Đông Bắc"},
+                    {value: "EAST", label: "Đông"},
+                    {value: "EAST_SOUTH", label: "Đông Nam"},
+                    {value: "SOUTH", label: "Nam"},
+                    {value: "WEST_SOUTH", label: "Tây Nam"},
+                    {value: "WEST", label: "Tây"},
+                    {value: "WEST_NORTH", label: "Tây Bắc"}
+                ]}
+                value={directions}
+                setValue={setDirections}
+                transferContent={transferDirection}
+            />
 
-                <NumberInput
-                    defaultValue="0"
-                    withAsterisk
-                    label="Diện tích tối thiểu"
-                    min={0}
-                    thousandSeparator=","
-                    suffix=" mét vuông"
-                    onChange={(value) => minAcreage.current = value}
-                />
-                <NumberInput
-                    defaultValue="0"
-                    withAsterisk
-                    label="Giá tối thiểu"
-                    min={0}
-                    thousandSeparator=","
-                    suffix=" VND"
-                    // value={fromPrice}
-                    onChange={(value) => fromPrice.current = value}
-                    error={fromPrice > toPrice ? "Gía tối thiểu phải bé hơn giá tối đa" : ""}
-                />
+            <MultiplySelect
+                data={[
+                    {value: "HOUSE", label: "Nhà Ở"},
+                    {value: "APARTMENT", label: "Chung Cư"},
+                    {value: "LAND", label: "Đất"},
+                ]}
+                value={typeProperties}
+                setValue={setTypeProperties}
+                transferContent={transferTypeProperty}
+            />
 
-                <NumberInput
-                    defaultValue="99999999999"
-                    withAsterisk
-                    label="Giá tối đa"
-                    placeholder="1000"
-                    min={0}
-                    thousandSeparator=","
-                    suffix=" VND"
-                    // value={toPrice}
-                    onChange={(value) => toPrice.current = value}
-                />
-                {/*<small>Giá bán trên 1 m2 đất đang là: ${toPricePerM2.toLocaleString('us-US')} VND</small>*/}
-
-                <Checkbox.Group
-                    defaultValue={["LAND", "HOUSE", "APARTMENT"]}
-                    label="Chọn kiểu bất động sản"
-                    onChange={handleTypeProperties}
-                    withAsterisk
-                >
-                    <Checkbox value="LAND" label="Đất" style={{marginTop: "5px"}}/>
-                    <Checkbox value="HOUSE" label="Nhà ở" style={{marginTop: "5px"}}/>
-                    <Checkbox value="APARTMENT" label="Chung cư" style={{marginTop: "5px"}}/>
-                </Checkbox.Group>
-
-                <Checkbox.Group
-                    defaultValue={["NORTH", "EAST_NORTH", "EAST", "EAST_SOUTH",
-                        "SOUTH", "WEST_SOUTH", "WEST", "WEST_NORTH"]}
-                    label="Chọn hướng"
-                    onChange={handleDirections}
-                    withAsterisk
-                >
-                    <Checkbox value="NORTH" label="Phía Bắc" style={{marginTop: "5px"}}/>
-                    <Checkbox value="EAST_NORTH" label="Phía Đông Bắc" style={{marginTop: "5px"}}/>
-                    <Checkbox value="EAST" label="Phía Đông" style={{marginTop: "5px"}}/>
-                    <Checkbox value="EAST_SOUTH" label="Phía Đông Nam" style={{marginTop: "5px"}}/>
-                    <Checkbox value="SOUTH" label="Phía Nam" style={{marginTop: "5px"}}/>
-                    <Checkbox value="WEST_SOUTH" label="Phía Tây Nam" style={{marginTop: "5px"}}/>
-                    <Checkbox value="WEST" label="Phía Tây" style={{marginTop: "5px"}}/>
-                    <Checkbox value="WEST_NORTH" label="Phía Tây Bắc" style={{marginTop: "5px"}}/>
-                </Checkbox.Group>
-
-
-                <Checkbox.Group
-                    defaultValue={["HAVE", "WAIT", "HAVE_NOT"]}
-                    label="Chọn trạng thái sổ đỏ"
-                    onChange={handleLegalDocuments}
-                    withAsterisk
-                >
-                    <Checkbox value="HAVE" label="Đã có sổ đỏ" style={{marginTop: "5px"}}/>
-                    <Checkbox value="WAIT" label="Đang chờ sổ đỏ" style={{marginTop: "5px"}}/>
-                    <Checkbox value="HAVE_NOT" label="Không có sổ đỏ" style={{marginTop: "5px"}}/>
-                </Checkbox.Group>
-
-
-                <NumberInput
-                    withAsterisk
-                    label="Số tầng tối thiểu"
-                    min={0}
-                    defaultValue={0}
-                    // value={minFloor}
-                    onChange={(value) => minFloor.current = value}
-                    allowDecimal={false}
-                    // disabled={isLand}
-                />
-
-                <NumberInput
-                    withAsterisk
-                    label="Số phòng ngủ tối thiểu"
-                    min={0}
-                    defaultValue={0}
-                    // value={minBedroom}
-                    onChange={(value) => minBedroom.current = value}
-                    allowDecimal={false}
-                    // disabled={isLand}
-                />
-
-                <NumberInput
-                    withAsterisk
-                    label="Số phòng tắm tối thiểu"
-                    min={0}
-                    defaultValue={0}
-
-                    // value={minBathroom}
-                    onChange={(value) => minBathroom.current = value}
-                    allowDecimal={false}
-                    // disabled={isLand}
-                />
-                <NumberInput
-                    withAsterisk
-                    label="Có thể đậu ít nhất bao nhiêu xe ô tô"
-                    min={0}
-                    defaultValue={0}
-
-                    // value={minParking}
-                    onChange={(value) => minParking.current = value}
-                    allowDecimal={false}
-                    // disabled={isLand}
-                />
-
-                <Button onClick={handleSearch}>
-                    Áp Dụng
-                </Button>
-
-            </Drawer>
+            <Button onClick={handleSearch}>
+                Áp Dụng
+            </Button>
         </div>
     )
 }

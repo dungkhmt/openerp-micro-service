@@ -11,8 +11,11 @@ const PostSell = () => {
     const navigate = useNavigate();
     const [propertyDetails, setPropertyDetails] = useState({
         position: [21, 105],
-        province: "",
-        district: "",
+
+        provinceId: "",
+        nameProvince: "",
+        districtId: "",
+        nameDistrict: "",
         address: "",
 
         imageUrls: [],
@@ -29,19 +32,16 @@ const PostSell = () => {
         parking: 0,
         bathroom: 0,
         floor: 0,
-        legalDocuments: "",
+        legalDocument: "",
         horizontal: 0,
         vertical: 0,
 
     });
 
     const [showPost, setShowPost] = useState(false);
-    const [messageNotifi, setMessageNotifi] = useState("");
-
-    console.log("gia tri truyen", propertyDetails)
 
     const handleFix = () => {
-        toast.success("Theem thanh cong")
+        toast.success("Thêm thành công")
         setShowPost(false);
     }
 
@@ -51,8 +51,8 @@ const PostSell = () => {
             .then(response => {
                 const statusCode = response.code;
                 if (statusCode === 200) {
-                    toast.success("Đăng bán thành công")
-                    return response.data;
+                    toast.success(response.data)
+                    // return response.data;
                 } else {
                     toast.error(response.data.message)
                 }

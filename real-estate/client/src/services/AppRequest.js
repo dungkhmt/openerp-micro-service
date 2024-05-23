@@ -10,23 +10,13 @@ export const apiGetPublicProvinces = async () => {
 };
 
 
-export const apiGetPublicDistrict = async (nameProvince) => {
-    const encodedNameProvince = encodeURIComponent(nameProvince);
+export const apiGetPublicDistrict = async (provinceId) => {
+    const encodedProvinceId = encodeURIComponent(provinceId);
     const response = await axiosDefault({
         method: 'get',
-        url: `http://localhost:2805/public/address/district?nameProvince=${encodedNameProvince}`
+        url: `http://localhost:2805/public/address/district?provinceId=${encodedProvinceId}`
     })
-    return response
-}
-
-export const apiAddPostSell = async (data) => {
-    console.log("gui di", data)
-    const response = await axiosDefault({
-        method: 'post',
-        url: `http://localhost:2805/public/post/sell`,
-        data: data
-    })
-    return response
+    return response;
 }
 
 export const apiGetPosition = async (address) => {
