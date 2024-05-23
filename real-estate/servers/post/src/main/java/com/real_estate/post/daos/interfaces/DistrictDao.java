@@ -10,5 +10,5 @@ public interface DistrictDao {
 
 	public List<ProvinceEntity> findDistinctProvince();
 
-	public List<DistrictEntity> findDistrictsBy(String nameProvince);
+	public List<DistrictEntity> findDistrictsBy(String provinceId);
 }

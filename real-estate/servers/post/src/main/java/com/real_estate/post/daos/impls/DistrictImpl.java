@@ -39,8 +39,8 @@ public class DistrictImpl implements DistrictDao {
 	}
 
 	@Override
-	public List<DistrictEntity> findDistrictsBy(String nameProvince) {
-		List<DistrictPostgresEntity> postgresEntities = repository.findBy(nameProvince);
+	public List<DistrictEntity> findDistrictsBy(String provinceId) {
+		List<DistrictPostgresEntity> postgresEntities = repository.findBy(provinceId);
 		return postgresEntities.stream().map((postgresEntity) -> {
 			return this.mapper.map(postgresEntity, DistrictEntity.class);
 		}).collect(Collectors.toList());

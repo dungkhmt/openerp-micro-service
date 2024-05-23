@@ -1,7 +1,7 @@
 package com.real_estate.post.dtos.request;
 
 import com.real_estate.post.utils.DirectionsStatus;
-import com.real_estate.post.utils.LegalDocuments;
+import com.real_estate.post.utils.LegalDocument;
 import com.real_estate.post.utils.TypeProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,14 +29,17 @@ public class UpdatePostSellRequestDto {
     Integer parking;
     Integer bedroom;
     Integer floor;
-    LegalDocuments legalDocuments;
+    LegalDocument legalDocument;
     DirectionsStatus directionsProperty;
     Long horizontal;
     Long vertical;
 
     List<Float> position;
-    String province;
-    String district;
+
+    String provinceId;
+    String nameProvince;
+    String districtId;
+    String nameDistrict;
     String address;
 
     List<String> imageUrls;

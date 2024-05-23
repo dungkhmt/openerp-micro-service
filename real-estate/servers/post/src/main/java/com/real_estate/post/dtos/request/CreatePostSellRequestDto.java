@@ -11,8 +11,10 @@ import java.util.List;
 @AllArgsConstructor
 public class CreatePostSellRequestDto {
 	List<Float> position;
-	String province;
-	String district;
+	String provinceId;
+	String nameProvince;
+	String districtId;
+	String nameDistrict;
 	String address;
 
 	List<String> imageUrls;
@@ -24,7 +26,7 @@ public class CreatePostSellRequestDto {
 	Float pricePerM2;
 
 	String typeProperty;
-	String legalDocuments;
+	String legalDocument;
 	String directionsProperty;
 	Integer floor;
 	Integer bathroom;

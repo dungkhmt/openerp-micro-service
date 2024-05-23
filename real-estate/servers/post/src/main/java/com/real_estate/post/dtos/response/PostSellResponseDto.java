@@ -15,6 +15,7 @@ public class PostSellResponseDto {
     String nameAuthor;
     String avatarAuthor;
     String phoneAuthor;
+    String emailAuthor;
     String title;
     String description;
     String typeProperty;
@@ -25,13 +26,17 @@ public class PostSellResponseDto {
     Integer parking;
     Integer bedroom;
     Integer floor;
-    String legalDocuments;
+    String legalDocument;
     String directionsProperty;
     Long horizontal;
     Long vertical;
     List<Float> position;
-    String province;
-    String district;
+
+    String provinceId;
+    String nameProvince;
+    String districtId;
+    String nameDistrict;
+
     String address;
     List<String> imageUrls;
     String postStatus;
@@ -45,6 +50,7 @@ public class PostSellResponseDto {
         this.nameAuthor = a.getName();
         this.avatarAuthor = a.getAvatar();
         this.phoneAuthor = a.getPhone();
+        this.emailAuthor = a.getEmail();
         this.title = p.getTitle();
         this.description = p.getDescription();
         this.typeProperty = p.getTypeProperty();
@@ -55,13 +61,17 @@ public class PostSellResponseDto {
         this.parking = p.getParking();
         this.bedroom = p.getBedroom();
         this.floor = p.getFloor();
-        this.legalDocuments = p.getLegalDocuments();
+        this.legalDocument = p.getLegalDocument();
         this.directionsProperty = p.getDirectionsProperty();
         this.horizontal = p.getHorizontal();
         this.vertical = p.getVertical();
         this.position = p.getPosition();
-        this.province = p.getProvince();
-        this.district = p.getDistrict();
+
+        this.provinceId = p.getProvinceId();
+        this.nameProvince = p.getNameProvince();
+        this.districtId = p.getDistrictId();
+        this.nameDistrict = p.getNameDistrict();
+
         this.address = p.getAddress();
         this.imageUrls = p.getImageUrls();
         this.postStatus = p.getPostStatus();

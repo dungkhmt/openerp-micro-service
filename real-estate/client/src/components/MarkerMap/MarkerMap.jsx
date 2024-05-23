@@ -20,7 +20,7 @@ const MarkerMap = ({posts}) => {
 
 
     return (
-        <div>
+        <div className="map-wrapper">
             {mapLoaded ? (
                 <MapContainer id={uniqueId}
                     center={posts[0]?.position}

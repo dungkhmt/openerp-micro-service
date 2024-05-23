@@ -28,7 +28,6 @@ const PostSellDetail = () => {
     }, []);
     return (
         <div>
-            day la man hinh chi tiet
             <InfoPostSell propertyDetails={post} />
         </div>
     )

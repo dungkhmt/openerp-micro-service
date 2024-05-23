@@ -4,6 +4,7 @@ import com.real_estate.post.daos.interfaces.PostSellDao;
 import com.real_estate.post.dtos.request.CreatePostSellRequestDto;
 import com.real_estate.post.dtos.request.UpdatePostSellRequestDto;
 import com.real_estate.post.dtos.response.PostSellResponseDto;
+import com.real_estate.post.models.DashboardPriceEntity;
 import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.utils.PostStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,10 @@ public class PostSellService {
 		PostSellEntity post = new PostSellEntity();
 		post.setAuthorId(accountId);
 
-		post.setProvince(requestDto.getProvince());
-		post.setDistrict(requestDto.getDistrict());
+		post.setProvinceId(requestDto.getProvinceId());
+		post.setNameProvince(requestDto.getNameProvince());
+		post.setDistrictId(requestDto.getDistrictId());
+		post.setNameDistrict(requestDto.getNameDistrict());
 		post.setAddress(requestDto.getAddress());
 		post.setPosition(requestDto.getPosition());
 
@@ -44,7 +47,7 @@ public class PostSellService {
 		post.setBathroom(requestDto.getBathroom());
 		post.setBedroom(requestDto.getBedroom());
 		post.setParking(requestDto.getParking());
-		post.setLegalDocuments(requestDto.getLegalDocuments());
+		post.setLegalDocument(requestDto.getLegalDocument());
 		post.setDirectionsProperty(requestDto.getDirectionsProperty());
 		post.setHorizontal(requestDto.getHorizontal());
 		post.setVertical(requestDto.getVertical());
@@ -60,8 +63,8 @@ public class PostSellService {
 	public Page<PostSellResponseDto> getPageSell(
 			Integer page,
 			Integer size,
-			String province,
-			String district,
+			String provinceId,
+			String districtId,
 			Long fromAcreage,
 			Long toAcreage,
 			Long fromPrice,
@@ -70,8 +73,8 @@ public class PostSellService {
 			List<String> directions
 	) {
 		Pageable pageable = PageRequest.of(page-1, size);
-		long totalRecords = postSellDao.countBy(province,
-												district,
+		long totalRecords = postSellDao.countBy(provinceId,
+												districtId,
 												fromAcreage,
 												toAcreage,
 												fromPrice,
@@ -84,8 +87,8 @@ public class PostSellService {
 		} else {
 			List<PostSellResponseDto> entities = postSellDao.findPostSellBy(
 					pageable,
-					province,
-					district,
+					provinceId,
+					districtId,
 					fromAcreage,
 					toAcreage,
 					fromPrice,
@@ -120,13 +123,17 @@ public class PostSellService {
 				.parking(requestDto.getParking())
 				.bedroom(requestDto.getBedroom())
 				.floor(requestDto.getFloor())
-				.legalDocuments(requestDto.getLegalDocuments().toString())
+				.legalDocument(requestDto.getLegalDocument().toString())
 				.directionsProperty(requestDto.getDirectionsProperty().toString())
 				.horizontal(requestDto.getHorizontal())
 				.vertical(requestDto.getVertical())
 				.position(requestDto.getPosition())
-				.province(requestDto.getProvince())
-				.district(requestDto.getDistrict())
+
+				.provinceId(requestDto.getProvinceId())
+				.nameProvince(requestDto.getNameProvince())
+				.districtId(requestDto.getDistrictId())
+				.nameDistrict(requestDto.getNameDistrict())
+
 				.address(requestDto.getAddress())
 				.imageUrls(requestDto.getImageUrls())
 				.postStatus(requestDto.getPostStatus())
@@ -140,5 +147,9 @@ public class PostSellService {
 
 	public List<PostSellEntity> getPostByAccountId(Long accountId) {
 		return postSellDao.findByAccountId(accountId);
+	}
+
+	public List<DashboardPriceEntity> calculatePricePerM2(Long startTime, Long endTime) {
+		return postSellDao.calculatePricePerM2(startTime, endTime);
 	}
 }

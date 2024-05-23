@@ -62,17 +62,23 @@ public class PostSellPostgresEntity {
 	@CollectionTable(name = "post_sell_postgres_entity_position", joinColumns = @JoinColumn(name = "post_sell_id"))
 	List<Float> position;
 
-	@Column(name = "province")
-	String province;
+	@Column(name = "provinceId")
+	String provinceId;
 
-	@Column(name = "distric")
-	String district;
+	@Column(name = "name_province")
+	String nameProvince;
+
+	@Column(name = "districtId")
+	String districtId;
+
+	@Column(name = "name_district")
+	String nameDistrict;
 
 	@Column(name = "address")
 	String address;
 
-	@Column(name = "legal_documents")
-	String legalDocuments;
+	@Column(name = "legal_document")
+	String legalDocument;
 
 	@Column(name = "directions_property")
 	String directionsProperty;

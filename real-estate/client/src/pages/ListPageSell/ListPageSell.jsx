@@ -1,8 +1,8 @@
 import CardSell from "../../components/CardSell/CardSell";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import MarkerMap from "../../components/MarkerMap/MarkerMap";
 import PostRequest from "../../services/PostRequest";
-import {toast} from "react-toastify";
+import {toast, ToastContainer} from "react-toastify";
 import "./ListPageSell.css"
 import FilterSell from "../../components/FilterSell/FilterSell";
 import {Pagination, ScrollArea} from "@mantine/core";
@@ -16,17 +16,7 @@ const ListPageSell = ({}) => {
     const [params, setParams] = useState({
         page: 1,
         size: 10,
-        province: '',
-        district: '',
-        minAcreage: 0,
-        fromPrice: 0,
-        toPrice: 99999999999,
-        minFloor: 0,
-        minBedroom: 0,
-        minBathroom: 0,
-        minParking: 0,
         typeProperties: ["LAND", "HOUSE", "APARTMENT"],
-        legalDocuments: ["HAVE", "WAIT", "HAVE_NOT"],
         directions: ["NORTH", "SOUTH", "WEST", "EAST", "EAST_NORTH", "EAST_SOUTH", "WEST_SOUTH", "WEST_NORTH"],
     })
 
@@ -47,6 +37,8 @@ const ListPageSell = ({}) => {
                     setListPost(response.data);
                     setTotalPages(response.metadata.totalPages);
                 } else {
+                    setListPost([])
+                    setTotalPages(0)
                     toast.error(response.data.message)
                 }
             })
@@ -65,12 +57,12 @@ const ListPageSell = ({}) => {
 
             <div className="flexCenter post_map_container"
             >
-                <div className="postContainer"
+                <div className="postSellContainer"
                      style={{flex: 3}}
                 >
                     <Pagination total={totalPages} value={params.page} onChange={handleChangePage}/>
 
-                    <ScrollArea h={"100%"}>
+                    <ScrollArea h={"95%"}>
                         {listPost.map(item => (
                             <div className="cardContainer" style={{margin: "20px 0"}}>
                                 <CardSell key={item.postSellId} item={item}/>
@@ -83,6 +75,17 @@ const ListPageSell = ({}) => {
                     <MarkerMap posts={listPost}/>
                 </div>
             </div>
+            <ToastContainer
+                position="top-left"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
         </div>
     )
 }
