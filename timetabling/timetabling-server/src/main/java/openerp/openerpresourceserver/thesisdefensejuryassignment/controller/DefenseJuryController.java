@@ -83,14 +83,14 @@ public class DefenseJuryController {
     }
 
     @PostMapping("/assign")
-    public ResponseEntity<DefenseJury> assignTeacherAndThesisToDefenseJury(
+    public ResponseEntity<String> assignTeacherAndThesisToDefenseJury(
             @RequestBody AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList
     ) {
         DefenseJury defenseJury = juryService.assignTeacherAndThesis(teacherAndThesisList);
         if (defenseJury == null){
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Không thể phân công hội đồng", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);
+        return new ResponseEntity<>("Phân công hội đồng thành công", HttpStatus.CREATED);
     }
 
 
