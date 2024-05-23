@@ -54,6 +54,9 @@ public class ExamClassUserloginMapServiceImpl implements ExamClassUserloginMapSe
         List<ExamClassUserloginMap> res = new ArrayList<ExamClassUserloginMap>();
         Random R = new Random();
         for(UserLoginModel um: users){
+            if (sz <= 0) {
+                break;
+            }
             int i = R.nextInt(sz);
             String selectedUserLogin = availableUsers[i];
             availableUsers[i] = availableUsers[sz-1];
