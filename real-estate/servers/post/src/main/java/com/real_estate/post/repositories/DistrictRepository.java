@@ -18,7 +18,7 @@ public interface DistrictRepository extends JpaRepository<DistrictPostgresEntity
 	public List<ProvinceEntity> findProvince();
 
 	@Query("select entity from DistrictPostgresEntity entity " +
-		"where entity.nameProvince = :nameProvince " +
+		"where entity.provinceId = :provinceId " +
 		"order by entity.nameDistrict")
-	public List<DistrictPostgresEntity> findBy(String nameProvince);
+	public List<DistrictPostgresEntity> findBy(String provinceId);
 }

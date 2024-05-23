@@ -3,12 +3,14 @@ package com.real_estate.post.daos.impls;
 import com.real_estate.post.daos.interfaces.PostSellDao;
 import com.real_estate.post.dtos.response.PostSellResponseDto;
 import com.real_estate.post.models.AccountEntity;
+import com.real_estate.post.models.DashboardPriceEntity;
 import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.models.postgresql.PostSellPostgresEntity;
 import com.real_estate.post.repositories.PostSellRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -38,15 +40,16 @@ public class PostSellImpl implements PostSellDao {
     }
 
     @Override
-    public List<PostSellResponseDto> findPostSellBy(Pageable pageable,
-                                               String province,
-                                               String district,
-                                               Long fromAcreage,
-                                               Long toAcreage,
-                                               Long fromPrice,
-                                               Long toPrice,
-                                               List<String> typeProperties,
-                                               List<String> directions
+    public List<PostSellResponseDto> findPostSellBy(
+            Pageable pageable,
+            String provinceId,
+            String districtId,
+            Long fromAcreage,
+            Long toAcreage,
+            Long fromPrice,
+            Long toPrice,
+            List<String> typeProperties,
+            List<String> directions
     ) {
         int limit = pageable.getPageSize();
         int offset = (int) pageable.getOffset();
@@ -57,15 +60,25 @@ public class PostSellImpl implements PostSellDao {
                 "from PostSellPostgresEntity p " +
                 "left join AccountPostgresEntity a on p.authorId = a.accountId " +
                 "where p.postStatus = 'OPENING' ");
-        if (province != null && province != "") {
-            rawQuery.append("and p.province = '" + province + "' ");
+        if (provinceId != null && provinceId != "") {
+            rawQuery.append("and p.provinceId = '" + provinceId + "' ");
         }
-        if (district != null && district != "") {
-            rawQuery.append("and p.district = '" + district + "' ");
+        if (districtId != null && districtId != "") {
+            rawQuery.append("and p.districtId = '" + districtId + "' ");
         }
 
-        rawQuery.append("and p.price >= " + fromPrice + " and p.price <= " + toPrice + " ");
-        rawQuery.append("and p.acreage >= " + fromAcreage + " and p.acreage <= " + toAcreage + " ");
+        if (fromPrice != null) {
+            rawQuery.append("and p.price >= " + fromPrice + " ");
+        }
+        if (toPrice != null) {
+            rawQuery.append("and p.price <= " + toPrice + " ");
+        }
+        if (fromAcreage != null) {
+            rawQuery.append("and p.acreage >= " + fromAcreage + " ");
+        }        if (toAcreage != null) {
+            rawQuery.append("and p.acreage <= " + toAcreage + " ");
+        }
+
         rawQuery.append("and p.typeProperty in :typeProperties ");
         rawQuery.append("and p.directionsProperty in :directions ");
         rawQuery.append("order by p.createdAt desc ");
@@ -88,8 +101,8 @@ public class PostSellImpl implements PostSellDao {
 
     @Override
     public Long countBy(
-            String province,
-            String district,
+            String provinceId,
+            String districtId,
             Long fromAcreage,
             Long toAcreage,
             Long fromPrice,
@@ -103,15 +116,24 @@ public class PostSellImpl implements PostSellDao {
                         "from PostSellPostgresEntity p " +
                         "left join AccountPostgresEntity a on p.authorId = a.accountId " +
                         "where p.postStatus = 'OPENING' ");
-        if (province != null && province != "") {
-            rawQuery.append("and p.province = '" + province + "' ");
+        if (provinceId != null && provinceId != "") {
+            rawQuery.append("and p.provinceId = '" + provinceId + "' ");
         }
-        if (district != null && district != "") {
-            rawQuery.append("and p.district = '" + district + "' ");
+        if (districtId != null && districtId != "") {
+            rawQuery.append("and p.districtId = '" + districtId + "' ");
         }
 
-        rawQuery.append("and p.price >= " + fromPrice + " and p.price <= " + toPrice + " ");
-        rawQuery.append("and p.acreage >= " + fromAcreage + " and p.acreage <= " + toAcreage + " ");
+        if (fromPrice != null) {
+            rawQuery.append("and p.price >= " + fromPrice + " ");
+        }
+        if (toPrice != null) {
+            rawQuery.append("and p.price <= " + toPrice + " ");
+        }
+        if (fromAcreage != null) {
+            rawQuery.append("and p.acreage >= " + fromAcreage + " ");
+        }        if (toAcreage != null) {
+            rawQuery.append("and p.acreage <= " + toAcreage + " ");
+        }
         rawQuery.append("and p.typeProperty in :typeProperties ");
         rawQuery.append("and p.directionsProperty in :directions ");
         rawQuery.append("order by p.createdAt desc ");
@@ -139,5 +161,28 @@ public class PostSellImpl implements PostSellDao {
         return postgresEntities.stream().map((postgresEntity) -> {
             return this.mapper.map(postgresEntity, PostSellEntity.class);
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DashboardPriceEntity> calculatePricePerM2(Long startTime, Long endTime) {
+        TypedQuery<DashboardPriceEntity> query = entityManager.createQuery(
+                "select new com.real_estate.post.models.DashboardPriceEntity(" +
+                        "p.districtId," +
+                        "p.nameDistrict," +
+                        "p.typeProperty," +
+                        "max (p.pricePerM2)," +
+                        "min (p.pricePerM2)," +
+                        "avg (p.pricePerM2)," +
+                        ":startTime," +
+                        ":endTime" +
+                        ") " +
+                        "from PostSellPostgresEntity p " +
+                        "where p.createdAt > :startTime and p.createdAt < :endTime " +
+                        "group by p.districtId, p.nameDistrict, p.typeProperty"
+                , DashboardPriceEntity.class);
+        query.setParameter("startTime", startTime);
+        query.setParameter("endTime", endTime);
+        List<DashboardPriceEntity> entities = query.getResultList();
+        return entities;
     }
 }

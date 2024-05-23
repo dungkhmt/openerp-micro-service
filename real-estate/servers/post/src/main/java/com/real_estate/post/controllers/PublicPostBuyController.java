@@ -3,9 +3,6 @@ package com.real_estate.post.controllers;
 import com.real_estate.post.dtos.response.PageResponseDto;
 import com.real_estate.post.dtos.response.PostBuyResponseDto;
 import com.real_estate.post.services.PostBuyService;
-import com.real_estate.post.utils.DirectionsStatus;
-import com.real_estate.post.utils.LegalDocuments;
-import com.real_estate.post.utils.TypeProperty;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -14,8 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/public/post/buy")

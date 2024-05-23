@@ -29,11 +29,11 @@ public class PublicDistrictController {
 	}
 
 	@GetMapping("/district")
-	@Operation(operationId = "district.getDistrict", summary = "Get district of prvince")
+	@Operation(operationId = "district.getDistrict", summary = "Get district of province")
 	public ResponseEntity<ResponseDto<List<DistrictEntity>>> getDistricts(
-		@RequestParam("nameProvince") String nameProvince
+		@RequestParam("provinceId") String provinceId
 	) {
-		List<DistrictEntity> entities = districtService.getDistricts(nameProvince);
+		List<DistrictEntity> entities = districtService.getDistricts(provinceId);
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, entities));
 	}
 }

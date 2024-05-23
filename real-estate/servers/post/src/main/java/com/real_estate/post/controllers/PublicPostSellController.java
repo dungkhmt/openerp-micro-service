@@ -28,12 +28,12 @@ public class PublicPostSellController {
     public ResponseEntity<PageResponseDto<PostSellResponseDto>> getPageSell(
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size,
-            @RequestParam(value = "province", required = false) String province,
-            @RequestParam(value = "district", required = false) String district,
-            @RequestParam(value = "fromAcreage", defaultValue = "0") Long fromAcreage,
-            @RequestParam(value = "toAcreage", defaultValue = "500") Long toAcreage,
-            @RequestParam(value = "fromPrice", required = false, defaultValue = "0") Long fromPrice,
-            @RequestParam(value = "toPrice", required = false, defaultValue = "99999999999") Long toPrice,
+            @RequestParam(value = "provinceId", required = false) String provinceId,
+            @RequestParam(value = "districtId", required = false) String districtId,
+            @RequestParam(value = "fromAcreage", required = false) Long fromAcreage,
+            @RequestParam(value = "toAcreage", required = false) Long toAcreage,
+            @RequestParam(value = "fromPrice", required = false) Long fromPrice,
+            @RequestParam(value = "toPrice", required = false) Long toPrice,
             @RequestParam(value = "typeProperties", required = false) List<TypeProperty> typeProperties,
             @RequestParam(value = "directions", required = false) List<DirectionsStatus> directions
     ) {
@@ -45,8 +45,8 @@ public class PublicPostSellController {
         }).collect(Collectors.toList());
         Page<PostSellResponseDto> sells = postSellService.getPageSell(page,
                                                                       size,
-                                                                      province,
-                                                                      district,
+                                                                      provinceId,
+                                                                      districtId,
                                                                       fromAcreage,
                                                                       toAcreage,
                                                                       fromPrice,

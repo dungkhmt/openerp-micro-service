@@ -43,7 +43,7 @@ public class DistrictService {
 		return districtDao.findDistinctProvince();
 	}
 
-	public List<DistrictEntity> getDistricts(String nameProvince) {
-		return districtDao.findDistrictsBy(nameProvince);
+	public List<DistrictEntity> getDistricts(String provinceId) {
+		return districtDao.findDistrictsBy(provinceId);
 	}
 }

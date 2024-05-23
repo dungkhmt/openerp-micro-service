@@ -1,6 +1,5 @@
 package com.real_estate.post.runner;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.real_estate.post.dtos.DataPage;
 import com.real_estate.post.dtos.Location;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-
 
 @Component
 @Profile("start-crawl-district")

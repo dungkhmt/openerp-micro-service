@@ -26,14 +26,18 @@ public class PostSellEntity {
 	Integer parking;
 	Integer bedroom;
 	Integer floor;
-	String legalDocuments;
+	String legalDocument;
 	String directionsProperty;
 	Long horizontal;
 	Long vertical;
 
 	List<Float> position;
-	String province;
-	String district;
+
+	String provinceId;
+	String nameProvince;
+	String districtId;
+	String nameDistrict;
+
 	String address;
 
 	List<String> imageUrls;

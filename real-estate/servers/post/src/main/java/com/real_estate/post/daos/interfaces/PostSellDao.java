@@ -1,6 +1,7 @@
 package com.real_estate.post.daos.interfaces;
 
 import com.real_estate.post.dtos.response.PostSellResponseDto;
+import com.real_estate.post.models.DashboardPriceEntity;
 import com.real_estate.post.models.PostSellEntity;
 import org.springframework.data.domain.Pageable;
 
@@ -11,8 +12,8 @@ public interface PostSellDao {
 
     public List<PostSellResponseDto> findPostSellBy(
                Pageable pageable,
-               String province,
-               String district,
+               String provinceId,
+               String districtId,
                Long fromAcreage,
                Long toAcreage,
                Long fromPrice,
@@ -22,8 +23,8 @@ public interface PostSellDao {
     );
 
     public Long countBy(
-            String province,
-            String district,
+            String provinceId,
+            String districtId,
             Long fromAcreage,
             Long toAcreage,
             Long fromPrice,
@@ -35,4 +36,6 @@ public interface PostSellDao {
     public PostSellEntity findById(Long postSellId);
 
     public List<PostSellEntity> findByAccountId(Long accountId);
+
+    public List<DashboardPriceEntity> calculatePricePerM2(Long startTime, Long endTime);
 }
