@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ModelContestSubmission {
+public class ContestSubmissionByStudent {
 
     private String contestId;
 

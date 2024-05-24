@@ -7,7 +7,6 @@ import {
   Typography,
   Stack,
   Divider,
-  Chip,
   useTheme,
 } from "@mui/material";
 import { errorNoti } from "../../../../utils/notification";
@@ -104,12 +103,6 @@ function StudentPerformance(props) {
       );
 
       detail.mostLanguageUsed = detail.programmingLanguageSubmitCounts[0][0];
-      detail.midtermExamResult = detail.midtermExamResult
-        ? detail.midtermExamResult + "/10"
-        : "Chưa thi giữa kỳ";
-      detail.finalExamResult = detail.finalExamResult
-        ? detail.finalExamResult + "/10"
-        : "Chưa thi cuối kỳ";
 
       setStudentDetail(detail);
     };
@@ -119,7 +112,7 @@ function StudentPerformance(props) {
     };
     request(
       "GET",
-      `/student-statistics/details/${studentLoginId}`,
+      `/student-statistics/student-performance/${studentLoginId}`,
       successHandler,
       errorHandlers
     );
@@ -130,7 +123,7 @@ function StudentPerformance(props) {
     "totalProblemSubmitted",
     "numberProgramLanguage",
     "mostLanguageUsed",
-    "passingState",
+    "passState",
   ];
 
   const studentLearningInforAttrLabels = {
@@ -138,7 +131,7 @@ function StudentPerformance(props) {
     totalProblemSubmitted: "Tổng số bài đã nộp",
     numberProgramLanguage: "Số ngôn ngữ lập trình sử dụng",
     mostLanguageUsed: "Ngôn ngữ lập trình sử dụng nhiều nhất",
-    passingState: "Trạng thái",
+    passState: "Trạng thái",
   };
 
   const studentLearningRoutineAttrs = [
@@ -227,8 +220,8 @@ function StudentPerformance(props) {
                   />
                   <Typography variant="contentMBold" py={1} key={attr}>
                     <b>:</b>{" "}
-                    {attr === "passingState" ? (
-                      studentDetail.passingState !== 1 ? (
+                    {attr === "passState" ? (
+                      studentDetail.passState !== 1 ? (
                         <span style={{ color: theme.palette.error.main }}>
                           Chưa đạt
                         </span>
