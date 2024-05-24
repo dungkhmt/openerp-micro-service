@@ -1,5 +1,7 @@
 package openerp.openerpresourceserver.service;
 
+import openerp.openerpresourceserver.model.StudentPerformance;
+import openerp.openerpresourceserver.model.StudentStatisticContest;
 import org.springframework.cache.annotation.Cacheable;
 import openerp.openerpresourceserver.model.StudentSubmissionDetail;
 
@@ -11,4 +13,7 @@ public interface StudentSubmissionStatisticsService {
 
     @Cacheable(cacheNames = "studentStatisticsCache")
     StudentSubmissionDetail getStatisticsDetailStudentId(String id);
+
+    StudentStatisticContest getStaticsContestStudentId(String id);
+    StudentPerformance getPerformanceStudentId(String id);
 }

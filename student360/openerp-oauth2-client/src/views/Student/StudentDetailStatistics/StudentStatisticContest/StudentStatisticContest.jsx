@@ -31,7 +31,7 @@ function StudentStatisticsContest(props) {
     };
     request(
       "GET",
-      `/student-statistics/details/${studentLoginId}`,
+      `/student-statistics/student-contest-statistic/${studentLoginId}`,
       successHandler,
       errorHandlers
     );

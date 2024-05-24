@@ -1,7 +1,6 @@
 package openerp.openerpresourceserver.model;
 
 import lombok.*;
-import openerp.openerpresourceserver.entity.SubmissionHourlySummary;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -25,7 +24,6 @@ public class StudentSubmissionDetail {
     private String midtermExamResult;
 
     private String finalExamResult;
-
 //    So ngon ngu lap trinh co the su dung
     private int numberProgramLanguage;
 
@@ -81,7 +79,7 @@ public class StudentSubmissionDetail {
     private boolean submittedMultipleTimes ;
 
 //    cac contest da nop
-    private List<ModelContestSubmission> contestDetails;
+    private List<ContestSubmissionByStudent> contestDetails;
 
 //    so lan submission tren moi ngon ngu lap trinh
     private Object[] programmingLanguageSubmitCounts;

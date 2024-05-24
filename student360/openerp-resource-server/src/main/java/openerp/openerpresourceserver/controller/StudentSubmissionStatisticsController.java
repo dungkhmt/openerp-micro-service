@@ -1,6 +1,8 @@
 package openerp.openerpresourceserver.controller;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.model.StudentPerformance;
+import openerp.openerpresourceserver.model.StudentStatisticContest;
 import openerp.openerpresourceserver.model.StudentSubmissionDetail;
 import openerp.openerpresourceserver.service.StudentSubmissionStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,5 +31,17 @@ public class StudentSubmissionStatisticsController {
     public ResponseEntity<?> getStatisticsDetailStudentId(@PathVariable String id) {
         StudentSubmissionDetail studentSubmissionDetail = StudentSubmissionStatisticsService.getStatisticsDetailStudentId(id);
         return ResponseEntity.ok().body(studentSubmissionDetail);
+    }
+
+    @GetMapping("/student-contest-statistic/{id}")
+    public ResponseEntity<?> getStaticsContestStudentId(@PathVariable String id) {
+        StudentStatisticContest studentStatisticContest = StudentSubmissionStatisticsService.getStaticsContestStudentId(id);
+        return ResponseEntity.ok().body(studentStatisticContest);
+    }
+
+    @GetMapping("/student-performance/{id}")
+    public ResponseEntity<?> getPerformanceStudentId(@PathVariable String id) {
+        StudentPerformance studentPerformance = StudentSubmissionStatisticsService.getPerformanceStudentId(id);
+        return ResponseEntity.ok().body(studentPerformance);
     }
 }
