@@ -31,7 +31,7 @@ public class ContestSubmission implements Serializable {
 
     private String userSubmissionId;
 
-    private int point;
+    private long point;
 
     private String status;
 

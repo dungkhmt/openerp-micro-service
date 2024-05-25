@@ -32,29 +32,24 @@ function StudentProfile(props) {
       onError: (error) =>
         errorNoti("Đã xảy ra lỗi trong khi tải dữ liệu!", 3000),
     };
-    request(
-      "GET",
-      `/student-statistics/details/${studentLoginId}`,
-      successHandler,
-      errorHandlers
-    );
+    request("GET", `/user/${studentLoginId}`, successHandler, errorHandlers);
   }
 
   const studentInforAttrs = [
-    "studentId",
-    "fullname",
+    "id",
+    "fullName",
     "gender",
     "email",
     "class",
-    "affiliations",
+    "affiliation",
   ];
 
   const studentInforAttrLabels = {
-    studentId: "Mã số sinh viên",
-    fullname: "Họ và tên",
+    id: "Mã số sinh viên",
+    fullName: "Họ và tên",
     gender: "Giới tính",
     class: "Lớp",
-    affiliations: "Khóa",
+    affiliation: "Khóa",
     email: "Email",
   };
 

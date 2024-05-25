@@ -1,6 +1,6 @@
 package openerp.openerpresourceserver.recommend;
 
-import openerp.openerpresourceserver.model.StudentSubmissionDetail;
+import openerp.openerpresourceserver.model.StudentPerformance;
 import openerp.openerpresourceserver.service.StudentSubmissionStatisticsService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Log4j2
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -34,7 +33,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Override
     public List<Course> getRecommendCourses(String studentId, String price) {
         List<Course> courses = loadCoursesFromCSV("course.csv");
-        StudentSubmissionDetail student = studentSubmissionStatisticsService.getStatisticsDetailStudentId(studentId);
+        StudentPerformance student = studentSubmissionStatisticsService.getPerformanceStudentId(studentId);
         List<Course> recommendedCourses = new ArrayList<>();
 
         if (price.equalsIgnoreCase("free")) {

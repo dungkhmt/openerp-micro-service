@@ -47,3 +47,32 @@ GROUP BY
     submission_date,
     hour_of_day,
     user_submission_id;
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS public.student_submission_statistics AS
+SELECT
+    s.user_submission_id AS student_id,
+    COUNT(*) AS total_submitted,
+    COUNT(DISTINCT s.problem_id) AS total_problem_submitted,
+    COUNT(DISTINCT s.contest_id) AS total_contest_submitted,
+    COUNT(DISTINCT
+          CASE
+              WHEN s.source_code_language LIKE '%CPP%' THEN 'CPP'
+              WHEN s.source_code_language LIKE '%PYTHON%' THEN 'Python'
+              WHEN s.source_code_language LIKE '%JAVA%' THEN 'Java'
+              ELSE s.source_code_language
+              END
+    ) AS number_program_language,
+    COUNT(DISTINCT CASE WHEN s.status = 'Accept' THEN s.problem_id END) AS total_problem_submitted_accept,
+    AVG(CASE WHEN s.status = 'Accept' THEN 1 ELSE 0 END) AS average_minimum_submission_to_accept,
+    MIN(s.created_stamp) AS first_submission_date,
+    MAX(s.created_stamp) AS last_submission_date,
+    CASE
+        WHEN extract(DAY FROM MAX(s.created_stamp) - MIN(s.created_stamp)) + 1 = 0 THEN 0
+        ELSE COUNT(*) / (EXTRACT(DAY FROM MAX(s.created_stamp) - MIN(s.created_stamp)) + 1)
+        END AS average_submission_per_day
+FROM
+    contest_submission_new s
+GROUP BY
+    s.user_submission_id;
+
+
