@@ -2,6 +2,7 @@ package com.real_estate.post.controllers;
 
 import com.real_estate.post.dtos.request.CreateAccountRequestDto;
 import com.real_estate.post.dtos.request.LoginRequest;
+import com.real_estate.post.dtos.response.AccountResponseDto;
 import com.real_estate.post.dtos.response.ResponseDto;
 import com.real_estate.post.security.TokenProvider;
 import com.real_estate.post.services.AccountService;
@@ -13,10 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/public/account")
@@ -53,5 +51,14 @@ public class PublicAccountController {
         String token = tokenProvider.createToken(authentication);
 
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, token));
+    }
+
+    @GetMapping("")
+    @Operation(summary = "Get info account", operationId = "publicAccount.getInfo")
+    public ResponseEntity<ResponseDto<AccountResponseDto>> getInfoAccount(
+            @RequestParam("accountId") Long accountId
+    ) {
+        AccountResponseDto dto = accountService.getAccountBy(accountId);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, dto));
     }
 }

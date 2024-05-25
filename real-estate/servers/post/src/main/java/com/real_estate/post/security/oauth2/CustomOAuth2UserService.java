@@ -82,6 +82,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         account.setName(oAuth2UserInfo.getName());
         account.setEmail(oAuth2UserInfo.getEmail());
         account.setAvatar(oAuth2UserInfo.getImageUrl());
+        account.setTotalPostSell(0);
+        account.setTotalPostBuy(0);
         account.setIsActive(true);
         account.setRole(new HashSet<>(Collections.singleton("USER")));
         account.setCreatedAt(now);

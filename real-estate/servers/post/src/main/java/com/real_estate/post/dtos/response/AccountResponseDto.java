@@ -15,4 +15,6 @@ public class AccountResponseDto {
     String phone;
     String email;
     String avatar;
+    Integer totalPostSell;
+    Integer totalPostBuy;
 }

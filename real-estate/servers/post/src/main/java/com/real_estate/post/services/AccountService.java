@@ -41,6 +41,8 @@ public class AccountService {
         entity.setEmail(dto.getEmail());
         entity.setPassword(passwordEncoder.encode(dto.getPassword()));
         entity.setAvatar(avatar_default);
+        entity.setTotalPostSell(0);
+        entity.setTotalPostBuy(0);
         entity.setRole(new HashSet<>(Collections.singletonList("USER")));
         entity.setIsActive(true);
         entity.setProvider(AuthProvider.local);
@@ -67,6 +69,8 @@ public class AccountService {
                 .phone(entity.getPhone())
                 .email(entity.getEmail())
                 .avatar(entity.getAvatar())
+                .totalPostSell(entity.getTotalPostSell())
+                .totalPostBuy(entity.getTotalPostBuy())
                 .build();
 
         return dto;

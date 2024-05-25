@@ -10,4 +10,6 @@ public interface DashboardPriceDao {
     public List<DashboardPriceEntity> saveAll(List<DashboardPriceEntity> entities);
 
     public Long getLastTimeTrigger();
+
+    public List<DashboardPriceEntity> findBy(Long fromTime, Long toTime, String typeProperty, String districtId);
 }

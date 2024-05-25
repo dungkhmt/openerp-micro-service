@@ -26,10 +26,10 @@ public class PostSellPostgresEntity {
 	@Column(name = "author_id")
 	Long authorId;
 
-	@Column(name = "title", nullable = true)
+	@Column(name = "title")
 	String title;
 
-	@Column(name = "description", nullable = true)
+	@Column(name = "description", columnDefinition="TEXT")
 	String description;
 
 	@Column(name = "type_property")

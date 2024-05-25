@@ -1,5 +1,6 @@
 package com.real_estate.post.services;
 
+import com.real_estate.post.daos.interfaces.AccountDao;
 import com.real_estate.post.daos.interfaces.PostSellDao;
 import com.real_estate.post.dtos.request.CreatePostSellRequestDto;
 import com.real_estate.post.dtos.request.UpdatePostSellRequestDto;
@@ -7,11 +8,13 @@ import com.real_estate.post.dtos.response.PostSellResponseDto;
 import com.real_estate.post.models.DashboardPriceEntity;
 import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.utils.PostStatus;
+import org.hibernate.TransactionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -22,6 +25,11 @@ public class PostSellService {
 	@Qualifier("postSellImpl")
 	private PostSellDao postSellDao;
 
+	@Autowired
+	@Qualifier("accountImpl")
+	private AccountDao accountDao;
+
+	@Transactional
 	public void createPostSell(CreatePostSellRequestDto requestDto, Long accountId) {
 		Long now = System.currentTimeMillis();
 		PostSellEntity post = new PostSellEntity();
@@ -57,7 +65,16 @@ public class PostSellService {
 		post.setCreatedAt(now);
 		post.setUpdatedAt(now);
 
-		postSellDao.save(post);
+		try {
+			postSellDao.save(post);
+			accountDao.incOneTotalPostSellBy(accountId);
+		} catch (TransactionException transactionException) {
+			String message = "Tạo bài viết không thành công";
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+		} catch (Exception exception) {
+			String message = "Tạo bài viết không thành công";
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message);
+		}
 	}
 
 	public Page<PostSellResponseDto> getPageSell(
