@@ -56,15 +56,15 @@ function StudentListScreen() {
         minWidth: "128px",
       },
     },
-    {
-      title: "First Submission Score Rate",
-      field: "firstSubmissionAccuracyRate",
-      cellStyle: {
-        minWidth: "128px",
-      },
-      render: (rowData) =>
-        formatDecimal(rowData?.firstSubmissionAccuracyRate, 1) + "%",
-    },
+    // {
+    //   title: "First Submission Score Rate",
+    //   field: "firstSubmissionAccuracyRate",
+    //   cellStyle: {
+    //     minWidth: "128px",
+    //   },
+    //   render: (rowData) =>
+    //     formatDecimal(rowData?.firstSubmissionAccuracyRate, 1) + "%",
+    // },
     {
       title: "Average Submissions To Success",
       field: "averageMinimumSubmissionToAccept",
@@ -81,6 +81,22 @@ function StudentListScreen() {
         minWidth: "128px",
       },
       render: (rowData) => formatDecimal(rowData?.averageSubmissionPerDay, 2),
+    },
+    {
+      title: "First Submission Date",
+      field: "firstSubmissionDate",
+      cellStyle: {
+        minWidth: "128px",
+      },
+      render: (rowData) => rowData?.firstSubmissionDate,
+    },
+    {
+      title: "Last Submission Date",
+      field: "lastSubmissionDate",
+      cellStyle: {
+        minWidth: "128px",
+      },
+      render: (rowData) => rowData?.firstSubmissionDate,
     },
   ];
   return (

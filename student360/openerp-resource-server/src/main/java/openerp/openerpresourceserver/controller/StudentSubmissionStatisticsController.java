@@ -3,7 +3,7 @@ package openerp.openerpresourceserver.controller;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.model.StudentPerformance;
 import openerp.openerpresourceserver.model.StudentStatisticContest;
-import openerp.openerpresourceserver.model.StudentSubmissionDetail;
+import openerp.openerpresourceserver.entity.StudentSubmissionStatistics;
 import openerp.openerpresourceserver.service.StudentSubmissionStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,15 +25,8 @@ public class StudentSubmissionStatisticsController {
 
     @GetMapping("/get-all")
     public ResponseEntity<?> getAllStudentStatistics() {
-        List<StudentSubmissionDetail> StudentSubmissionDetails = StudentSubmissionStatisticsService.getAllStatisticsDetailStudent();
+        List<StudentSubmissionStatistics> StudentSubmissionDetails = StudentSubmissionStatisticsService.getAllStatisticsDetailStudent();
         return ResponseEntity.ok().body(StudentSubmissionDetails);
-    }
-
-    @PreAuthorize("hasRole('ROLE_TEACHER') or (hasRole('ROLE_STUDENT') and #id == principal.name)")
-    @GetMapping("/details/{id}")
-    public ResponseEntity<?> getStatisticsDetailStudentId(@PathVariable String id, Principal principal) {
-        StudentSubmissionDetail studentSubmissionDetail = StudentSubmissionStatisticsService.getStatisticsDetailStudentId(id);
-        return ResponseEntity.ok().body(studentSubmissionDetail);
     }
 
     @PreAuthorize("hasRole('ROLE_TEACHER') or (hasRole('ROLE_STUDENT') and #id == principal.name)")
