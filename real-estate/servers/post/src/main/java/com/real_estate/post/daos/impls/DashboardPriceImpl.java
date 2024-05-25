@@ -41,4 +41,12 @@ public class DashboardPriceImpl implements DashboardPriceDao {
     public Long getLastTimeTrigger() {
         return repository.findLastTimeTrigger().orElse(0L);
     }
+
+    @Override
+    public List<DashboardPriceEntity> findBy(Long fromTime, Long toTime, String typeProperty, String districtId) {
+        List<DashboardPricePostgresEntity> postgresEntities = repository.findBy(fromTime, toTime, typeProperty, districtId);
+        return postgresEntities.stream().map(postEntity -> {
+            return this.mapper.map(postEntity, DashboardPriceEntity.class);
+        }).collect(Collectors.toList());
+    }
 }

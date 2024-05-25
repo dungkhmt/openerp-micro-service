@@ -6,6 +6,7 @@ import com.real_estate.post.services.PostSellService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,9 @@ import java.util.List;
 @Component
 @Profile("start-calculate-pricePerM2")
 public class StartCalculatePricePerM2 implements CommandLineRunner {
-    Long DURATION = Long.valueOf(7 * 24 * 60 * 60 * 1000);
+    @Value("${dashboard.duration}")
+    Long DURATION;
+
     private final Logger logger = LoggerFactory.getLogger(StartCalculatePricePerM2.class);
 
     @Autowired

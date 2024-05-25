@@ -1,10 +1,12 @@
 package com.real_estate.post.services;
 
+import com.real_estate.post.daos.interfaces.AccountDao;
 import com.real_estate.post.daos.interfaces.PostBuyDao;
 import com.real_estate.post.dtos.request.CreatePostBuyRequestDto;
 import com.real_estate.post.dtos.response.PostBuyResponseDto;
 import com.real_estate.post.models.PostBuyEntity;
 import com.real_estate.post.utils.PostStatus;
+import org.hibernate.TransactionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -23,6 +26,11 @@ public class PostBuyService {
 	@Qualifier("postBuyImpl")
 	PostBuyDao postBuyDao;
 
+	@Autowired
+	@Qualifier("accountImpl")
+	private AccountDao accountDao;
+
+	@Transactional
 	public void createPostBuy(CreatePostBuyRequestDto requestDto, Long accountId) {
 		Long now = System.currentTimeMillis(); //
 		PostBuyEntity entity = new PostBuyEntity();
@@ -53,7 +61,16 @@ public class PostBuyService {
 		entity.setCreatedAt(now);
 		entity.setUpdatedAt(now);
 
-		postBuyDao.save(entity);
+		try {
+			postBuyDao.save(entity);
+			accountDao.incOneTotalPostBuyBy(accountId);
+		} catch (TransactionException transactionException) {
+			String message = "Tạo bài viết không thành công";
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+		} catch (Exception exception) {
+			String message = "Tạo bài viết không thành công";
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message);
+		}
 	}
 
 	public Page<PostBuyResponseDto> getPageBuy(

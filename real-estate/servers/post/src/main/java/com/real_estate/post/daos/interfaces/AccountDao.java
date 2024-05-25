@@ -16,4 +16,9 @@ public interface AccountDao {
     public Integer updateAccount(String avatar, String phone, String name, Long accountId);
 
     public Integer updatePassword(String newPassword, Long accountId);
+
+    void incOneTotalPostSellBy(Long accountId);
+
+    void incOneTotalPostBuyBy(Long accountId);
+
 }

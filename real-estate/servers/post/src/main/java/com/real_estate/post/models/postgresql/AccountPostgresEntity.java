@@ -41,6 +41,14 @@ public class AccountPostgresEntity {
 	@Column(name = "avatar")
 	String avatar;
 
+	@Column(name = "total_postSell")
+	@ColumnDefault(value = "0")
+	Integer totalPostSell = 0;
+
+	@Column(name = "total_postBuy")
+	@ColumnDefault(value = "0")
+	Integer totalPostBuy = 0;
+
 	@Column(name = "role")
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "account_postgres_entity_role", joinColumns = @JoinColumn(name = "account_id"))

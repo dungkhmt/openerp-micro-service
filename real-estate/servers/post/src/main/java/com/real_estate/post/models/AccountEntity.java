@@ -17,6 +17,8 @@ public class AccountEntity {
   String phone;
   String email;
   String avatar;
+  Integer totalPostSell;
+  Integer totalPostBuy;
   Set<String> role;
 //  Integer reputation;
   AuthProvider provider;

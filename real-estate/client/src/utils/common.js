@@ -196,3 +196,13 @@ export const transferPostStatus = (status) => {
     default: return "Đã Chốt";
   }
 }
+
+export const transferTimeToDate = (timestamp) => {
+  const date = new Date(timestamp);
+
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const day = String(date.getDate()).padStart(2, '0');
+
+  const formattedDate = `${month}/${day}`;
+  return formattedDate;
+}
