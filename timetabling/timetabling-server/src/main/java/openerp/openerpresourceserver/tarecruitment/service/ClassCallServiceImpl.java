@@ -27,6 +27,8 @@ public class ClassCallServiceImpl implements ClassCallService {
     private ClassCallRepo classCallRepo;
     @Override
     public ClassCall createNewClass(ClassCall classCall) {
+        Optional<ClassCall> existClassCall = classCallRepo.findById(classCall.getId());
+        if(!existClassCall.isEmpty()) throw new IllegalArgumentException("Mã lớp " + classCall.getId() + " đã tồn tại");
         classCallRepo.save(classCall);
         return classCall;
     }
