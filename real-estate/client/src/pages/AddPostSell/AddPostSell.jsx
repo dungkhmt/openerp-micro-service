@@ -1,13 +1,13 @@
 import React, {useState} from "react";
 import {Button, Notification} from "@mantine/core";
-import "./PostSell.css"
+import "./AddPostSell.css"
 import AddInfoPostSell from "../../components/AddInfoPostSell/AddInfoPostSell";
-import InfoPostSell from "../../components/PostBuyDetail/InfoPostSell";
+import InfoPostSell from "../../components/InfoPostSell/InfoPostSell";
 import PostRequest from "../../services/PostRequest";
 import {useNavigate} from "react-router-dom";
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-const PostSell = () => {
+const AddPostSell = () => {
     const navigate = useNavigate();
     const [propertyDetails, setPropertyDetails] = useState({
         position: [21, 105],
@@ -45,7 +45,7 @@ const PostSell = () => {
         setShowPost(false);
     }
 
-    const handleDonePose = () => {
+    const handleDonePost = () => {
         const postRequest = new PostRequest();
         postRequest.addPostSell(propertyDetails)
             .then(response => {
@@ -74,7 +74,7 @@ const PostSell = () => {
                             <Button onClick={handleFix}>
                                 Chỉnh sửa
                             </Button>
-                            <Button onClick={handleDonePose}>
+                            <Button onClick={handleDonePost}>
                                 Đăng bài
                             </Button>
                         </div>
@@ -101,4 +101,4 @@ const PostSell = () => {
     )
 }
 
-export default PostSell;
+export default AddPostSell;

@@ -1,7 +1,7 @@
 .card {
     display: block;
     position: relative;
-    height: 280px;
+    height: 100%;
     width: 95%;
     /*background-color: #777777;*/
     margin-bottom: 10px;
@@ -19,6 +19,7 @@
 .infoPost {
     display: flex;
     width: 100%;
+    max-height: 175px;
     height: 70%;
 }
 
@@ -34,14 +35,25 @@
     /*flex: 3;*/
     width: 60%;
     margin-left: 10px;
+    /*background-color: aquamarine;*/
 }
 
+.head {
+    width: 90%;
+}
 
 .titleCard {
-    font-size: 20px;
+    /*font-size: 20px;*/
     font-weight: 600;
     color: #444;
     transition: all 0.4s ease;
+
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    /*background-color: #ffb978;*/
 }
 
 .textCard > div {

@@ -4,7 +4,7 @@ import {apiGetPublicDistrict, apiGetPublicProvinces} from "../../services/AppReq
 import PostRequest from "../../services/PostRequest";
 import {toast} from "react-toastify";
 
-const PostBuy = () => {
+const AddPostBuy = () => {
 
     const [propertyDetails, setPropertyDetails] = useState({
         title: "",
@@ -297,4 +297,4 @@ const PostBuy = () => {
     )
 }
 
-export default PostBuy;
+export default AddPostBuy;

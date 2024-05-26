@@ -30,6 +30,7 @@
 
 .cardContainer {
     margin-top: 20px;
+    height: 280px;
     /*border: 2px solid #666666;*/
 }
 .cardContainer:hover {

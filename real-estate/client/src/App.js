@@ -2,8 +2,8 @@ import './App.css';
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import Layout from "./components/Layout/Layout";
 import React, {useEffect} from "react";
-import PostSell from "./pages/PostSell/PostSell";
-import PostBuy from "./pages/PostBuy/PostBuy";
+import AddPostSell from "./pages/AddPostSell/AddPostSell";
+import AddPostBuy from "./pages/AddPostBuy/AddPostBuy";
 import PostSellDetail from "./pages/PostSellDetail/PostSellDetail";
 import ListPageSell from "./pages/ListPageSell/ListPageSell";
 import Oauth2Redirect from "./pages/Oauth2Redirect/Oauth2Redirect";
@@ -12,6 +12,7 @@ import {useDispatch, useSelector} from "react-redux";
 import AuthRequest from "./services/AuthRequest";
 import {set_current_account} from "./store/account";
 import Profile from "./pages/Profile/Profile";
+import ManagerPost from "./pages/ManagerPost/ManagerPost";
 
 function App() {
     const isLoggedIn = useSelector(state => state.auth.isLoggedIn)
@@ -36,8 +37,9 @@ function App() {
 
                     <Route element={<Layout/>}>
                         <Route path={"/*"} element={<ListPageSell/>}/>
-                        <Route path={"/postSell"} element={<PostSell/>}/>
-                        <Route path={"/postBuy"} element={<PostBuy/>}/>
+                        <Route path={"/add-post-sell"} element={<AddPostSell/>}/>
+                        <Route path={"/add-post-buy"} element={<AddPostBuy/>}/>
+                        <Route path={"/manager-post"} element={<ManagerPost/>}/>
                         <Route path="/sell/properties">
                             <Route index element={<ListPageSell/>}/>
                             <Route path=":propertyId" element={<PostSellDetail/>}/>

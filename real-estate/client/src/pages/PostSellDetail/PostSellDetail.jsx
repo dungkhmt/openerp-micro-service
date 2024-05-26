@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import PostRequest from "../../services/PostRequest";
 import {useLocation, useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
-import InfoPostSell from "../../components/PostBuyDetail/InfoPostSell";
+import InfoPostSell from "../../components/InfoPostSell/InfoPostSell";
 import AuthRequest from "../../services/AuthRequest";
 import DashboardRequest from "../../services/DashboardRequest";
 import "./PostSellDetail.css"

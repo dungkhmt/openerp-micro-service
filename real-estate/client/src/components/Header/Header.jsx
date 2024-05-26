@@ -75,10 +75,10 @@ const Header = () => {
                                     <button>Đăng Tin</button>
                                 </Menu.Target>
                                 <Menu.Dropdown>
-                                    <Menu.Item onClick={()=> navigate("/postBuy", {replace: true})}>
+                                    <Menu.Item onClick={()=> navigate("/add-post-buy", {replace: true})}>
                                         Tin Mua
                                     </Menu.Item>
-                                    <Menu.Item onClick={()=> navigate("/postSell", {replace: true})}>
+                                    <Menu.Item onClick={()=> navigate("/add-post-sell", {replace: true})}>
                                         Tin Bán
                                     </Menu.Item>
                                 </Menu.Dropdown>

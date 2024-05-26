@@ -106,7 +106,8 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
         ) {
             toast.error("Yêu cầu điền thông tin đầy đủ!")
         } else {
-            setPropertyDetails({
+            const data = {
+                ...propertyDetails,
                 provinceId: provinceId,
                 nameProvince: nameProvince,
                 districtId: districtId,
@@ -129,7 +130,8 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                 bathroom: bathroom,
                 bedroom: bedroom,
                 parking: parking,
-            })
+            }
+            setPropertyDetails(data)
             setShowPost(true);
         }
     };
@@ -367,6 +369,7 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                                 {value: 'WEST', label: 'Tây'},
                                 {value: 'WEST_NORTH', label: 'Tây Bắc'}
                             ]}
+                            value={directionsProperty}
                             onChange={(value) => setDirectionsProperty(value)}
                         />
                     </Grid.Col>
