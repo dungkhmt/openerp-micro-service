@@ -1,0 +1,18 @@
+.list-post-sell-container {
+    /*background-color: #ffb978;*/
+    width: 80%;
+    margin: 10px auto;
+}
+
+.manager-post-sell-container {
+    position: relative;
+    width: 75%;
+}
+
+.feature-more {
+    align-items: center;
+    align-content: center;
+    position: absolute;
+    top: 0;
+    right: 38px;
+}

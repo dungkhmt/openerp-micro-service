@@ -197,6 +197,17 @@ export const transferPostStatus = (status) => {
   }
 }
 
+export const transferColorPostStatus = (status) => {
+  switch (status) {
+    case "OPENING":
+      return "rgb(227, 170, 73)";
+    case "CLOSE":
+      return "rgb(224, 60, 49)";
+    default:
+      return "rgb(0, 155, 161)";
+  }
+}
+
 export const transferTimeToDate = (timestamp) => {
   const date = new Date(timestamp);
 

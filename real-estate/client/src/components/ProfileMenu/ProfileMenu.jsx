@@ -16,6 +16,10 @@ const ProfileMenu = ({user, logout}) => {
                     Thông tin cá nhân
                 </Menu.Item>
 
+                <Menu.Item onClick={() => navigate("/manager-post", {replace: true})}>
+                    Quản lý bài viết
+                </Menu.Item>
+
                 <Menu.Item onClick={() => {
                     localStorage.clear();
                     logout()

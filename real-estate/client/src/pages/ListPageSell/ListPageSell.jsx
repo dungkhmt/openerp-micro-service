@@ -64,7 +64,7 @@ const ListPageSell = ({}) => {
 
                     <ScrollArea h={"95%"}>
                         {listPost.map(item => (
-                            <div className="cardContainer" style={{margin: "20px 0"}}>
+                            <div key={item.postSellId} className="cardContainer">
                                 <CardSell key={item.postSellId} item={item}/>
                             </div>
                         ))}

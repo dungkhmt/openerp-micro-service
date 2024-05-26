@@ -93,7 +93,6 @@ const FilterSell = ({setParams}) => {
     }, [filterPrice, checkMaxPrice]);
 
     const handleSearch = () => {
-        console.log(fromAcreage, toAcreage)
         const params = {
             page: 1,
             size: 10,
