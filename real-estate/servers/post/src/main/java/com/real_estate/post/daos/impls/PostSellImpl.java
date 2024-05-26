@@ -7,6 +7,7 @@ import com.real_estate.post.models.DashboardPriceEntity;
 import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.models.postgresql.PostSellPostgresEntity;
 import com.real_estate.post.repositories.PostSellRepository;
+import com.real_estate.post.utils.PostStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -184,5 +185,10 @@ public class PostSellImpl implements PostSellDao {
         query.setParameter("endTime", endTime);
         List<DashboardPriceEntity> entities = query.getResultList();
         return entities;
+    }
+
+    @Override
+    public Integer updateStatusBy(Long postSellId, Long accountId, PostStatus status) {
+        return repository.updateStatusBy(postSellId, accountId, status.toString());
     }
 }

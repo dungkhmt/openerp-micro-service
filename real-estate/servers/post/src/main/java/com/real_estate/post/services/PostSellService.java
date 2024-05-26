@@ -169,4 +169,11 @@ public class PostSellService {
 	public List<DashboardPriceEntity> calculatePricePerM2(Long startTime, Long endTime) {
 		return postSellDao.calculatePricePerM2(startTime, endTime);
 	}
+
+	public void updateStatus(Long postSellId, Long accountId, PostStatus status) {
+		int record = postSellDao.updateStatusBy(postSellId, accountId, status);
+		if (record == 0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cập nhập không thành công");
+		}
+	}
 }
