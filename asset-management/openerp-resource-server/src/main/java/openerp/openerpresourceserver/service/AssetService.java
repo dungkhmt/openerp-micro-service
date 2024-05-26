@@ -7,6 +7,8 @@ import java.util.List;
 public interface AssetService {
     List<Asset> getAllAssets();
 
+    Asset getById(Integer id);
+
     List<Asset> getAllAvailableAssets();
 
     List<Asset> getAllInuseAssets();

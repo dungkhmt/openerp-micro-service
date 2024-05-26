@@ -26,7 +26,12 @@ public class AssetServiceImpl implements AssetService{
 
     @Override
     public List<Asset> getAllAssets() {
-        return assetRepo.findAll();
+        return assetRepo.getAllByLastUpdate();
+    }
+
+    @Override
+    public Asset getById(Integer id) {
+        return assetRepo.findById(id).orElse(null);
     }
 
     @Override

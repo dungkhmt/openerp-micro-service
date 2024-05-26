@@ -9,6 +9,9 @@ import java.util.List;
 
 @Repository
 public interface AssetRepo extends JpaRepository<Asset, Integer> {
+    @Query(value = "SELECT * FROM asset_management_asset ORDER BY since DESC", nativeQuery = true)
+    List<Asset> getAllByLastUpdate();
+
     @Query(value = "SELECT * FROM asset_management_asset WHERE status_id = :status_id", nativeQuery = true)
     List<Asset> findByStatusId(Integer status_id);
 
