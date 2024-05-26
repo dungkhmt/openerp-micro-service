@@ -37,7 +37,7 @@ function CVCard({cvData}) {
             CV Description: {cvData.employeeCV?.description}
         </Typography>
         <Typography>
-          Skill: {cvData.employeeCV[0]?.skillName}...
+          Skill: {cvData.skills[0]?.skillName}...
         </Typography>
         <Typography variant="body2" className={classes.subTitle}>
           Education: {cvData.educations[0]?.schoolName}...
@@ -49,7 +49,8 @@ function CVCard({cvData}) {
           Created At: {cvData.employeeCV?.createdTime}
         </Typography>
         <Button>
-            <Typography>more details </Typography>
+            <Typography><a target='_blank' href={cvData.employeeCV?.cvLink + "?alt=media"}>more details</a></Typography>
+
         </Button>
       </CardContent>
     </Card>

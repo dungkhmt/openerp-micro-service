@@ -23,7 +23,7 @@ const ViewAllCV = () => {
                 setAllCV(res.data)
             }).then();
         }).then();
-    }, [])
+    }, []) 
 
     function goToUrl(url) {
         window.location.href = url;

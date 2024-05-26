@@ -52,9 +52,9 @@ const ViewAllApplicant2 = () => {
                 Candidate Applicant
             </Typography>
             <Grid container spacing={4} style={{ backgroundColor: "#F7F7FF" }} display="flex" justifyContent="center" paddingTop={"50px"}>
-                {allApplicant.map((applicant, index) => (
+                {allApplicant.reverse().map((applicant, index) => (
                     <Grid item xs={6} style={{ boxShadow: '1px 1px 1px 1px rgba(0.5,0.5,0.5,0.5)', margin: '20px', borderRadius: '20px', backgroundColor: "white", display: 'flex', alignItems: 'stretch' }} >
-                        <ApplicantCard applicant={applicant} index={index}></ApplicantCard>
+                        <ApplicantCard applicant={applicant} index={index} id={id}></ApplicantCard>
                     </Grid>
                     // <Card  sx={{ minWidth: 275 }}>
                     //     <CardContent>

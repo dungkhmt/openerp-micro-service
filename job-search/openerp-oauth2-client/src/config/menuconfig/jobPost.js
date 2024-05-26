@@ -21,7 +21,7 @@ export const createJobPost = {
         id: "MENU_CREATE_jOBPOST.View_YOUR_JOB_POST",
         path: "/view-job-post/user",
         isPublic: true,
-        text: "View all employee applicant",
+        text: "View application from hotest job",
         child: [],
       }
 

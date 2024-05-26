@@ -102,15 +102,22 @@ const CreateNewCvForm = () => {
     })
 
     const handleInputChange = (event) => {
+        console.log([event.target.name], event.target.value)
         setUserInfoForm({
             ...userInfoForm,
             [event.target.name]: event.target.value,
             
         });
-        setSubmitForm({
-            employeeCV: userInfoForm, experiences, educations, skills
-        })
     };
+
+    useEffect(() => {
+        if (userInfoForm !== null) {
+            setSubmitForm({
+                employeeCV: userInfoForm, experiences, educations, skills
+            })
+        }
+      }, [userInfoForm]); // 
+
     let [submitForm, setSubmitForm] = useState({})
     const handleSubmit = (e) => {
         e.preventDefault()
