@@ -124,7 +124,7 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmission, 
                     "   ORDER BY " +
                     "       ccpn.contest_id" +
                     ") " +
-                    "SELECT CAST(SUM(mps.point) * 10.0 / total_point AS DECIMAL(10, 1)) AS average_point " +
+                    "SELECT CAST(SUM(mps.point) * 10.0 / total_point AS DECIMAL(15, 2)) AS average_point " +
                     "FROM " +
                     "    maxp_point_student mps " +
                     "INNER JOIN " +
@@ -201,7 +201,7 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmission, 
                     "   ORDER BY " +
                     "       ccpn.contest_id" +
                     ") " +
-                    "SELECT CAST(SUM(mps.point) * 10.0 / total_point AS DECIMAL(10, 1)) AS average_point " +
+                    "SELECT CAST(SUM(mps.point) * 10.0 / total_point AS DECIMAL(15, 2)) AS average_point " +
                     "FROM " +
                     "    maxp_point_student mps " +
                     "INNER JOIN " +
@@ -315,14 +315,14 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmission, 
 
     @Query(value =
             "WITH midterm_point AS (\n" +
-                    "SELECT mfs.user_submission_id, mfs.contest_id, semester, CAST(SUM(mfs.point) * 10.0 / mpc.total_point AS DECIMAL(10, 1)) AS midterm_point \n" +
+                    "SELECT mfs.user_submission_id, mfs.contest_id, semester, CAST(SUM(mfs.point) * 10.0 / mpc.total_point AS DECIMAL(15, 2)) AS midterm_point \n" +
                     "FROM midterm_final_submission_view mfs\n" +
                     "INNER JOIN max_point_contest_view mpc ON mfs.contest_id = mpc.contest_id \n" +
                     "WHERE semester IS NOT NULL AND UPPER(mfs.contest_id) LIKE UPPER('%midterm%')\n" +
                     "GROUP BY mfs.user_submission_id, mfs.contest_id, semester, total_point\n" +
                     "),\n" +
                     "final_point AS (\n" +
-                    "SELECT mfs.user_submission_id, mfs.contest_id, semester, CAST(SUM(mfs.point) * 10.0 / mpc.total_point AS DECIMAL(10, 1)) AS final_point \n" +
+                    "SELECT mfs.user_submission_id, mfs.contest_id, semester, CAST(SUM(mfs.point) * 10.0 / mpc.total_point AS DECIMAL(15, 2)) AS final_point \n" +
                     "FROM midterm_final_submission_view mfs\n" +
                     "INNER JOIN max_point_contest_view mpc ON mfs.contest_id = mpc.contest_id \n" +
                     "WHERE semester IS NOT NULL AND UPPER(mfs.contest_id) LIKE UPPER('%final%')\n" +
