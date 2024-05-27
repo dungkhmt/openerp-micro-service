@@ -11,6 +11,7 @@ import {
 import { errorNoti } from "../../../../utils/notification";
 import { request } from "../../../../api";
 import SwitchText from "../../../../components/switch/SwitchText";
+import SkeletonCourse from "../../../../components/skeleton/Skeleton";
 
 function StudentCourseRecommend(props) {
   const theme = useTheme();
@@ -19,7 +20,7 @@ function StudentCourseRecommend(props) {
   const navigation = ["free", "Paid"];
   const [active, setActive] = useState(navigation[0]);
 
-  useEffect(getStudentDetail, [active]);
+  useEffect(getStudentDetail, [active, studentLoginId]);
 
   function getStudentDetail() {
     let successHandler = (res) => {
@@ -38,6 +39,8 @@ function StudentCourseRecommend(props) {
     );
   }
 
+  console.log(studentDetail);
+
   if (Array.isArray(studentDetail)) {
     return (
       <Stack gap={1.25}>
@@ -52,7 +55,7 @@ function StudentCourseRecommend(props) {
         </Stack>
         <Stack direction="column" gap={1}>
           {studentDetail.length > 0 &&
-            studentDetail.map((item) => (
+            studentDetail?.map((item) => (
               <>
                 <Divider
                   orientation="horizontal"
@@ -107,7 +110,7 @@ function StudentCourseRecommend(props) {
                       label={item.level}
                     />
                   </Stack>
-                  {item.currentPrice != 0 && item.originalPrice != 0 ? (
+                  {item.currentPrice !== 0 && item.originalPrice !== 0 ? (
                     <Stack>
                       <Typography variant="contentMBold">
                         đ {item.currentPrice}
@@ -130,7 +133,7 @@ function StudentCourseRecommend(props) {
         </Stack>
       </Stack>
     );
-  }
+  } else return <SkeletonCourse/>
 }
 
 export default StudentCourseRecommend;
