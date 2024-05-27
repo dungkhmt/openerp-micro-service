@@ -296,7 +296,7 @@ public class StudentSubmissionStatisticsServiceImpl implements StudentSubmission
         studentPerformance.setAverageSubmissionPerDay(averageSubmissionPerDay);
         studentPerformance.setAverageMinimumSubmissionToAccept(averageMinimumSubmissionToAccept);
         studentPerformance.setNumberProgramLanguage(contestSubmissionRepo.findNumberCountLanguagesDetailByUserId(studentId).length);
-        studentPerformance.setProgrammingLanguageSubmitCounts(contestSubmissionRepo.findNumberCountLanguagesDetailByUserId(studentId));
+        studentPerformance.setProgrammingLanguageSubmitCounts(contestSubmissionRepo.findNumberCountLanguagesDetailByUserId(studentId) != null ? contestSubmissionRepo.findNumberCountLanguagesDetailByUserId(studentId) : new List[]{Collections.emptyList()});
         studentPerformance.setMostSubmittedTime(hourRange);
         studentPerformance.setMostEffectiveSubmittedTime(hourRangePass);
         studentPerformance.setStartTimeActive((String) timeActive[1]);
