@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Setter
 @Getter
-public class StudentSubmissionBySemster {
+public class StudentSubmissionBySemester {
     private String userSubmissionId;
     private String semester;
     private int submissionMonth;

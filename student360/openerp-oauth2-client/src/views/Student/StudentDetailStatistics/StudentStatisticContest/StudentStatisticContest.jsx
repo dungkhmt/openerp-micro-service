@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Grid, Stack, useTheme } from "@mui/material";
+import { Grid, Stack } from "@mui/material";
 import CodeBracket from "@heroicons/react/24/solid/CodeBracketIcon";
 import CommandLine from "@heroicons/react/24/solid/CommandLineIcon";
 import AcademicCap from "@heroicons/react/24/solid/AcademicCapIcon";
@@ -14,11 +14,10 @@ import { request } from "../../../../api";
 import { errorNoti } from "../../../../utils/notification";
 
 function StudentStatisticsContest(props) {
-  const theme = useTheme();
   const TABLE_HEADERS_1 = ["Problem ID", "Count"];
   const [studentDetail, setStudentDetail] = useState({});
   const studentLoginId = props.studentLoginId;
-  useEffect(getStudentDetail, []);
+  useEffect(getStudentDetail, [studentLoginId]);
 
   function getStudentDetail() {
     let successHandler = (res) => {
@@ -139,7 +138,6 @@ function StudentStatisticsContest(props) {
       <DoubleLineChart
         data={studentDetail?.submissionHourlySummary}
         title="Submission Count per Hour"
-        // subtitle="Your Chart Subtitle"
         xAxisName="hour"
         yAxis1Name="Total Submissions"
         yAxis2Name="Total Passed Submissions"

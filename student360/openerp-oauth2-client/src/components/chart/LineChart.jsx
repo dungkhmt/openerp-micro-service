@@ -11,6 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import ChartTitle from "./ChartTitle";
+import ChartSkeleton from "./ChartSkeleton";
 
 const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.grey[100],
@@ -24,10 +25,20 @@ const LineChartCoponent = ({ data, title, subtitle, xAxisName, yAxisName }) => {
 
   let chartData = [];
 
+  const monthOrder = {
+    "Tháng 9": 0,
+    "Tháng 10": 1,
+    "Tháng 11": 2,
+    "Tháng 12": 3,
+    "Tháng 1": 4,
+    "Tháng 2": 5,
+    "Tháng 3": 6,
+  };
+
   if (!data) {
-    return <div>No data available</div>;
+    return <ChartSkeleton />;
   }
-  if (Array.isArray(data)) {
+  if (data && Array.isArray(data)) {
     chartData = data
       .map((item) => ({
         [xAxisName]:
@@ -39,12 +50,26 @@ const LineChartCoponent = ({ data, title, subtitle, xAxisName, yAxisName }) => {
             ? item.numberOfSubmissions
             : item[1],
       }))
-      .sort((a, b) => parseInt(a[xAxisName]) - parseInt(b[xAxisName]));
+      .sort((a, b) => {
+        const aMonth = a[xAxisName];
+        const bMonth = b[xAxisName];
+
+        if (
+          monthOrder[aMonth] === undefined ||
+          monthOrder[bMonth] === undefined
+        ) {
+          return aMonth.localeCompare(bMonth);
+        }
+
+        return monthOrder[aMonth] - monthOrder[bMonth];
+      });
   } else {
-    chartData = Object.entries(data).map(([key, value]) => ({
-      [xAxisName]: key,
-      [yAxisName]: value,
-    }));
+    chartData = Object.entries(data)
+      .map(([key, value]) => ({
+        [xAxisName]: key,
+        [yAxisName]: value,
+      }))
+      .sort((a, b) => new Date(a[xAxisName]) - new Date(b[xAxisName]));
   }
 
   // Tick Style
