@@ -21,12 +21,12 @@ public class StudentPerformance {
     private double firstSubmissionAccuracyRate;
     private String startTimeActive;
     private String endTimeActive;
-    private boolean hasProgress;
-    private boolean hasHighScore;
+//    private boolean hasProgress;
+//    private boolean hasHighScore;
     private String mostSubmittedTime;
     private String mostEffectiveSubmittedTime;
-    private boolean submittedMultipleTimes ;
+//    private boolean submittedMultipleTimes ;
     private Object[] programmingLanguageSubmitCounts;
-    private String learningBehavior;
-//    private List<StudentSemesterResult> studentSemesterResult;
+//    private String learningBehavior;
+    private List<StudentSemesterResult> studentSemesterResult;
 }

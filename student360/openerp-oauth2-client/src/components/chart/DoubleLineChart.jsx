@@ -1,5 +1,12 @@
 /* eslint-disable no-unused-vars */
-import { Stack, useTheme, styled, Box, Typography } from "@mui/material";
+import {
+  Stack,
+  useTheme,
+  styled,
+  Box,
+  Typography,
+  Skeleton,
+} from "@mui/material";
 import React from "react";
 import {
   CartesianGrid,
@@ -11,6 +18,7 @@ import {
   YAxis,
 } from "recharts";
 import ChartTitle from "./ChartTitle";
+import ChartSkeleton from "./ChartSkeleton";
 
 const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.grey[100],
@@ -32,7 +40,7 @@ const DoubleLineChart = ({
   let chartData = [];
 
   if (!data) {
-    return <div>No data available</div>;
+    return <ChartSkeleton />;
   }
 
   if (Array.isArray(data)) {

@@ -116,6 +116,19 @@ export default function Home() {
         <Grid
           container
           justifyContent="space-between"
+          sx={{ marginTop: "16px" }}
+        >
+          <LineChartCoponent
+            data={statistics.totalStudentPassBySemester}
+            title="Summary of Student Passed By Semester"
+            xAxisName="Semester"
+            yAxisName="Total Student Passed"
+          />
+        </Grid>
+
+        <Grid
+          container
+          justifyContent="space-between"
           sx={{ marginTop: "20px" }}
         >
           <Grid item xs={7}>
@@ -142,12 +155,7 @@ export default function Home() {
           </Grid>
         </Grid>
       </Grid>
-      <LineChartCoponent
-        data={statistics.totalStudentPassBySemester}
-        title="Summary of Student Passed By Semester"
-        xAxisName="Semester"
-        yAxisName="Total Student Passed"
-      />
+
       {/* </HustContainerCard> */}
     </Stack>
   );
