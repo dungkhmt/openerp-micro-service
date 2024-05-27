@@ -28,5 +28,5 @@ public class StudentPerformance {
     private boolean submittedMultipleTimes ;
     private Object[] programmingLanguageSubmitCounts;
     private String learningBehavior;
-    private List<StudentSemesterResult> studentSemesterResult;
+//    private List<StudentSemesterResult> studentSemesterResult;
 }

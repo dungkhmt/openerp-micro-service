@@ -8,6 +8,7 @@ import {
   Stack,
   Divider,
   useTheme,
+  Skeleton,
 } from "@mui/material";
 import { errorNoti } from "../../../../utils/notification";
 import { request } from "../../../../api";
@@ -21,7 +22,7 @@ function StudentPerformance(props) {
   function getStudentDetail() {
     let successHandler = (res) => {
       let detail = res.data;
-
+      console.log("huuson",detail)
       if (detail.firstSubmissionAccuracyRate > 80) {
         detail.carefulness = "Cao";
       } else if (detail.firstSubmissionAccuracyRate > 50) {
@@ -48,22 +49,22 @@ function StudentPerformance(props) {
         detail.attitude = "Cẩn cải thiện";
       }
 
-      if (
-        detail.averageMinimumSubmissionToAccept <= 3 &&
-        detail.averageMinimumSubmissionToAccept !== 0
-      )
-        detail.evaluation = "Tốt";
-      else if (
-        detail.averageMinimumSubmissionToAccept <= 5 &&
-        detail.averageMinimumSubmissionToAccept !== 0
-      )
-        detail.evaluation = "Khá";
-      else if (
-        detail.averageMinimumSubmissionToAccept <= 10 &&
-        detail.averageMinimumSubmissionToAccept !== 0
-      )
-        detail.evaluation = "Trung bình";
-      else detail.evaluation = "Kém";
+      // if (
+      //   detail.averageMinimumSubmissionToAccept <= 3 &&
+      //   detail.averageMinimumSubmissionToAccept !== 0
+      // )
+      //   detail.evaluation = "Tốt";
+      // else if (
+      //   detail.averageMinimumSubmissionToAccept <= 5 &&
+      //   detail.averageMinimumSubmissionToAccept !== 0
+      // )
+      //   detail.evaluation = "Khá";
+      // else if (
+      //   detail.averageMinimumSubmissionToAccept <= 10 &&
+      //   detail.averageMinimumSubmissionToAccept !== 0
+      // )
+      //   detail.evaluation = "Trung bình";
+      // else detail.evaluation = "Kém";
 
       if (detail.submittedMultipleTimes && detail.hasProgress)
         detail.learningStatus = "Tích cực, mong muốn hoàn thiện bài tập";
@@ -78,29 +79,29 @@ function StudentPerformance(props) {
       if (!detail.submittedMultipleTimes && !detail.hasHighScore)
         detail.learningStatus = "Thiếu quan tâm, không đầu tư bài tập";
 
-      detail.numberProgramLanguage =
-        detail.numberProgramLanguage +
-        `  (${detail.programmingLanguageSubmitCounts
-          .map((obj) => obj[0])
-          .join(", ")})`;
-      detail.studentSemesterResult = detail?.studentSemesterResult.map(
-        (semesterResult) => {
-          switch (semesterResult.appearedInPlagiarism) {
-            case 0:
-              semesterResult.appearedInPlagiarism = "Không";
-              break;
-            case 1:
-              semesterResult.appearedInPlagiarism = "Gian lận bài thi giữa kỳ";
-              break;
-            case 2:
-              semesterResult.appearedInPlagiarism = "Gian lận bài thi cuối kỳ";
-              break;
-            default:
-            // You can add a default action here
-          }
-          return semesterResult;
-        }
-      );
+      // detail.numberProgramLanguage =
+      //   detail.numberProgramLanguage +
+      //   `  (${detail.programmingLanguageSubmitCounts
+      //     .map((obj) => obj[0])
+      //     .join(", ")})`;
+      // detail.studentSemesterResult = detail?.studentSemesterResult.map(
+      //   (semesterResult) => {
+      //     switch (semesterResult.appearedInPlagiarism) {
+      //       case 0:
+      //         semesterResult.appearedInPlagiarism = "Không";
+      //         break;
+      //       case 1:
+      //         semesterResult.appearedInPlagiarism = "Gian lận bài thi giữa kỳ";
+      //         break;
+      //       case 2:
+      //         semesterResult.appearedInPlagiarism = "Gian lận bài thi cuối kỳ";
+      //         break;
+      //       default:
+      //       // You can add a default action here
+      //     }
+      //     return semesterResult;
+      //   }
+      // );
 
       detail.mostLanguageUsed = detail.programmingLanguageSubmitCounts[0][0];
 
@@ -117,6 +118,8 @@ function StudentPerformance(props) {
       errorHandlers
     );
   }
+
+  console.log("huuson1",studentDetail);
 
   const studentLearningInforAttrs = [
     "totalSubmitted",
@@ -184,6 +187,8 @@ function StudentPerformance(props) {
     passingState: "Trạng thái",
     passingRate: "Tỷ lệ qua môn",
   };
+  
+if (studentDetail !== null) {
   return (
     <Stack gap={2}>
       {/* Đặc tính sinh viên */}
@@ -240,7 +245,7 @@ function StudentPerformance(props) {
           </Grid>
         </CardContent>
       </Card>
-      <Grid container spacing={2}>
+      {/* <Grid container spacing={2}>
         {studentDetail.studentSemesterResult?.map((semesterResult, index) => (
           <Grid key={index} item xs={6}>
             <Card>
@@ -302,7 +307,7 @@ function StudentPerformance(props) {
             </Card>
           </Grid>
         ))}
-      </Grid>
+      </Grid> */}
       {/* Thói quen học tập  */}
       <Card>
         <CardHeader
@@ -385,7 +390,10 @@ function StudentPerformance(props) {
         </CardContent>
       </Card>
     </Stack>
-  );
+  )}
+  else {
+    <>Huuson</>
+  }
 }
 
 export default StudentPerformance;
