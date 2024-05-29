@@ -22,7 +22,6 @@ public class LearningWeekExtractor {
     }
 
     public static List<Integer> extractArray(String weekArrayString) {
-        log.info("extractArray, weekArrayString = " + weekArrayString);
         List<String> weekStrings = Arrays.stream(weekArrayString.split(",")).toList();
         List<Integer> weeksArray = new ArrayList<>();
         for(String weekString : weekStrings) {

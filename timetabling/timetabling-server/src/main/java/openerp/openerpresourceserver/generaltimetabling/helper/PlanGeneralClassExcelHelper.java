@@ -27,9 +27,9 @@ public class PlanGeneralClassExcelHelper {
      */
     private final static int START_COL_TO_READ_CLASS_INFO = 1;
     /**
-     * End column in excel to read class information (End with column Q)
+     * End column in excel to read class information (End with column J)
      */
-    private final static int END_COL_TO_READ_CLASS_INFO = 8;
+    private final static int END_COL_TO_READ_CLASS_INFO = 12;
     public static boolean isNumeric(String str) {
         try {
             Double.parseDouble(str);
@@ -57,27 +57,43 @@ public class PlanGeneralClassExcelHelper {
                 }
                 break;
             case 5:
+                planGeneralClass.setLearningWeeks(value);
+                break;
+            case 6:
+                planGeneralClass.setWeekType(value);
+                break;
+            case 7:
+                planGeneralClass.setCrew(value);
+                break;
+            case 8:
                 if (isNumeric(value)) {
                     double decimalNumber = Double.parseDouble(value);
                     Integer intValue = (int) decimalNumber;
                     planGeneralClass.setLectureMaxQuantity(intValue);
                 }
                 break;
-            case 6:
+            case 9:
                 if (isNumeric(value)) {
                     double decimalNumber = Double.parseDouble(value);
                     Integer intValue = (int) decimalNumber;
                     planGeneralClass.setExerciseMaxQuantity(intValue);
                 }
                 break;
-            case 7:
+            case 10:
                 if (isNumeric(value)) {
                     double decimalNumber = Double.parseDouble(value);
                     Integer intValue = (int) decimalNumber;
                     planGeneralClass.setLectureExerciseMaxQuantity(intValue);
                 }
                 break;
-            case 8:
+            case 11:
+                if (isNumeric(value)) {
+                    double decimalNumber = Double.parseDouble(value);
+                    Integer intValue = (int) decimalNumber;
+                    planGeneralClass.setQuantityMax(intValue);
+                }
+                break;
+            case 12:
                 planGeneralClass.setProgramName(value);
                 break;
         }

@@ -4,6 +4,7 @@ package openerp.openerpresourceserver.generaltimetabling.service.impl;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFieldException;
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
+import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekExtractor;
 import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekValidator;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.MakeGeneralClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.AcademicWeek;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -33,9 +35,28 @@ public class PlanGeneralClassService {
         newClass.setModuleCode(request.getModuleCode());
         newClass.setModuleName(request.getModuleName());
         newClass.setMass(request.getMass());
-        newClass.setLearningWeeks(request.getLearningWeeks());
         newClass.setCrew(request.getCrew());
+        newClass.setQuantityMax(request.getQuantityMax());
+        if (request.getClassType() != null && !request.getClassType().isEmpty()) {
+            newClass.setClassType(request.getClassType());
+        } else {
+            newClass.setClassType("LT+BT");
+        }
 
+
+        if(request.getWeekType().equals("Chẵn")) {
+            List<Integer> weekIntList = LearningWeekExtractor.extractArray(request.getLearningWeeks()).stream().filter(num->num%2==0).toList();
+            String weekListString = weekIntList.stream().map(num -> num + "-" + num)
+                    .collect(Collectors.joining(","));
+            newClass.setLearningWeeks(weekListString);
+        } else if(request.getWeekType().equals("Lẻ")) {
+            List<Integer> weekIntList = LearningWeekExtractor.extractArray(request.getLearningWeeks()).stream().filter(num->num%2!=0).toList();
+            String weekListString = weekIntList.stream().map(num -> num + "-" + num)
+                    .collect(Collectors.joining(","));
+            newClass.setLearningWeeks(weekListString);
+        } else if(request.getWeekType().equals("Chẵn+Lẻ")) {
+            newClass.setLearningWeeks(request.getLearningWeeks());
+        }
 
         Long nextId = planGeneralClassRepository.getNextReferenceValue();
         newClass.setParentClassId(nextId);

@@ -4,11 +4,14 @@ import FilterSelectBox from "./components/FilterSelectBox";
 import GeneralSemesterAutoComplete from "../common-components/GeneralSemesterAutoComplete";
 import { Button } from "@mui/material";
 import { request } from "api";
+import { Refresh } from "@mui/icons-material";
+import { useRoomOccupations } from "./hooks/useRoomOccupations";
 
 const RoomOccupationScreen = () => {
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [selectedWeek, setSelectedWeek] = useState(1);
   const [startDate, setStartDate] = useState(null);
+
   const handleExportExcel = () => {
     request(
       "post",
@@ -33,31 +36,52 @@ const RoomOccupationScreen = () => {
     ).then();
   };
 
+  
+
+
+  const { loading, error, data , refresh } = useRoomOccupations(
+    selectedSemester?.semester,
+    startDate,
+    selectedWeek
+  );
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-row gap-2">
-        <GeneralSemesterAutoComplete
-          setSelectedSemester={setSelectedSemester}
-          selectedSemester={selectedSemester}
-        />
-        <FilterSelectBox
-          selectedSemester={selectedSemester}
-          selectedWeek={selectedWeek}
-          setSelectedWeek={setSelectedWeek}
-          setStartDate={setStartDate}
-        />
-        <Button
-          disabled={selectedSemester === null}
-          variant="contained"
-          onClick={handleExportExcel}
-        >
-          Xuất File Excel
-        </Button>
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-row  gap-2 ">
+          <GeneralSemesterAutoComplete
+            setSelectedSemester={setSelectedSemester}
+            selectedSemester={selectedSemester}
+          />
+          <FilterSelectBox
+            selectedSemester={selectedSemester}
+            selectedWeek={selectedWeek}
+            setSelectedWeek={setSelectedWeek}
+            setStartDate={setStartDate}
+          />
+        </div>
+        <div className="flex flex-row gap-2 ">
+          <Button
+            disabled={selectedSemester === null}
+            variant="contained"
+            onClick={handleExportExcel}
+          >
+            Xuất File Excel
+          </Button>
+          <Button
+            disabled={selectedSemester === null || selectedWeek == null}
+            variant="contained"
+            onClick={refresh}
+          >
+            <Refresh/>
+          </Button>
+        </div>
       </div>
       <RoomUsageChart
         startDate={startDate}
         selectedWeek={selectedWeek}
         semester={selectedSemester?.semester}
+        data={data}
       />
     </div>
   );

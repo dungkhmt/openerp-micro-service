@@ -6,19 +6,15 @@ import { toast } from "react-toastify";
 export const usePlanGeneralTableCol = (setGeneralClasses) => {
   const handleOnCellChange = (e, params) => {
     setGeneralClasses((prevClasses) => {
-      const updatedClass = {
-        ...params.row,
-        [params.field]: e.target.value,
-      };
-      const newClasses = prevClasses?.map((prevClass) => {
-        if (prevClass?.id === params?.id) {
-          return updatedClass;
-        } else {
-          return prevClass;
-        }
-      });
-
-      return newClasses;
+      const index = prevClasses?.findIndex(
+        (prevClass) => prevClass?.id === params?.id
+      );
+      if (index === -1) return prevClasses;
+      return [
+        ...prevClasses.slice(0, index),
+        {...prevClasses[index], [params.field]: e.target.value},
+        ...prevClasses.slice(index + 1),
+      ]
     });
   };
 
@@ -67,20 +63,15 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
 
   const handleOnCellSelect = (e, params, option) => {
     setGeneralClasses((prevClasses) => {
-      const updatedClass = {
-        ...params.row,
-        [params.field]: option,
-      };
-      const newClasses = prevClasses?.map((prevClass) => {
-        console.log(prevClass?.id, params?.id);
-        if (prevClass?.id === params?.id) {
-          return updatedClass;
-        } else {
-          return prevClass;
-        }
-      });
-
-      return newClasses;
+      const index = prevClasses?.findIndex(
+        (prevClass) => prevClass?.id === params?.id
+      );
+      if (index === -1) return prevClasses;
+      return [
+        ...prevClasses.slice(0, index),
+        {...prevClasses[index], [params.field]: option},
+        ...prevClasses.slice(index + 1),
+      ]
     });
   };
 
@@ -180,7 +171,14 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
           options={["S", "C"]}
           onChange={(e, option) => handleOnCellSelect(e, params, option)}
           renderInput={(option) => {
-            return <TextField variant='standard' disableUnderline={false} {...option} sx={{width: 80}}/>;
+            return (
+              <TextField
+                variant="standard"
+                disableUnderline={false}
+                {...option}
+                sx={{ width: 80 }}
+              />
+            );
           }}
         />
       ),
@@ -224,7 +222,14 @@ export const usePlanGeneralTableCol = (setGeneralClasses) => {
           options={["LT", "BT", "LT+BT"]}
           onChange={(e, option) => handleOnCellSelect(e, params, option)}
           renderInput={(option) => {
-            return <TextField variant='standard' disableUnderline={false} {...option} sx={{width: 80}} />;
+            return (
+              <TextField
+                variant="standard"
+                disableUnderline={false}
+                {...option}
+                sx={{ width: 80 }}
+              />
+            );
           }}
         />
       ),

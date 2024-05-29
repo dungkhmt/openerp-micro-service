@@ -6,9 +6,7 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import openerp.openerpresourceserver.generaltimetabling.exception.ConflictScheduleException;
-import openerp.openerpresourceserver.generaltimetabling.exception.InvalidClassStudentQuantityException;
-import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
+import openerp.openerpresourceserver.generaltimetabling.exception.*;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.*;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.ResetScheduleRequest;
 import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassService;
@@ -31,6 +29,17 @@ public class GeneralClassController {
     public ResponseEntity resolveScheduleConflict(ConflictScheduleException e) {
         return ResponseEntity.status(410).body(e.getCustomMessage());
     }
+
+    @ExceptionHandler(InvalidFieldException.class)
+    public ResponseEntity resolveInvalidFieldException(InvalidFieldException e) {
+        return ResponseEntity.status(420).body(e.getErrorMessage());
+    }
+
+    @ExceptionHandler(MinimumTimeSlotPerClassException.class)
+    public ResponseEntity resolveMiniumTimeSlotException(MinimumTimeSlotPerClassException e) {
+        return ResponseEntity.status(410).body(e.getErrorMessage());
+    }
+
     @ExceptionHandler(InvalidClassStudentQuantityException.class)
     public ResponseEntity resolveScheduleConflict(InvalidClassStudentQuantityException e) {
         return ResponseEntity.status(410).body(e.getCustomMessage());
@@ -128,7 +137,23 @@ public class GeneralClassController {
     }
 
     @DeleteMapping("/")
-    public ResponseEntity<GeneralClass> requestDeletePlanClass(@RequestParam("generalClassId") Long generalClassId) {
+    public ResponseEntity<GeneralClass> requestDeleteClass(@RequestParam("generalClassId") Long generalClassId) {
         return ResponseEntity.ok(gService.deleteClassById(generalClassId));
     }
+
+    @PostMapping("/{generalClassId}/room-reservations/")
+    public ResponseEntity<GeneralClass> requestAddRoomReservation(@PathVariable("generalClassId")Long generalClassId) {
+        return ResponseEntity.ok(gService.addRoomReservation(generalClassId));
+    }
+
+    @DeleteMapping("/{generalClassId}/room-reservations/{roomReservationId}")
+    public ResponseEntity<String> requestDeleteRoomReservation(
+            @PathVariable("generalClassId") Long generalClassId,
+            @PathVariable("roomReservationId") Long roomReservationId
+    ) {
+        gService.deleteRoomReservation(generalClassId, roomReservationId);
+        return ResponseEntity.ok("Xóa lớp thành công");
+    }
+
+
 }

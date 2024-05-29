@@ -28,8 +28,8 @@ public class GeneralClass {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String quantity;
-    private String quantityMax;
+    private Integer quantity;
+    private Integer quantityMax;
     private String moduleCode;
     private String moduleName;
     private String classType;

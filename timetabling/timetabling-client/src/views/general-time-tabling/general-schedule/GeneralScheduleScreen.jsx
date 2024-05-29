@@ -94,7 +94,7 @@ const GeneralScheduleScreen = () => {
         setSelectedRows([]);
         setOpenTimeslotDialog(false);
         setAutoSaveLoading(false);
-        toast.success("Tự động thời khóa biểu thành công!");
+        toast.success("Tự động xếp thời khóa biểu thành công!");
       },
       (error) => {
         if (error.response.status == 410) {
@@ -194,6 +194,8 @@ const GeneralScheduleScreen = () => {
       },
       (error) => {
         if (error.response.status === 410) {
+          toast.warn(error.response.data);
+        } else if (error.response.status === 420) {
           toast.error(error.response.data);
         } else {
           toast.error("Có lỗi khi lưu TKB!");

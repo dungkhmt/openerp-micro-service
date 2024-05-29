@@ -29,6 +29,7 @@ public class PlanGeneralClass {
     private Integer lectureExerciseMaxQuantity;
     private String learningWeeks;
     private String crew;
+    private String weekType;
 
 
     public void setLearningWeeks(String learningWeeks) {

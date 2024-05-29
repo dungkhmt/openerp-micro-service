@@ -1,6 +1,7 @@
 import { request } from "api";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ReactDOMServer from "react-dom/server";
+import { toast } from "react-toastify";
 
 export const useRoomOccupations = (semester, startDate, weekIndex) => {
   const [loading, setLoading] = useState(false);
@@ -24,44 +25,44 @@ export const useRoomOccupations = (semester, startDate, weekIndex) => {
     );
   }
 
+  const fetchRoomOccupations = useCallback(() => {
+    setLoading(true);
+    try {
+      request(
+        "get",
+        `/room-occupation/?semester=${semester}&weekIndex=${weekIndex}`,
+        (res) => {
+          toast.success("Truy vấn thành công!");
+          console.log(res.data);
+          const formattedData = res.data?.map((timeSlot) => {
+            if (
+              timeSlot?.startTime !== null &&
+              timeSlot?.endTime !== null &&
+              timeSlot?.weekIndex !== null &&
+              timeSlot?.dayIndex !== null
+            ) {
+              return formatTimeSlot(timeSlot, startDate);
+            }
+            return null;
+          });
+          setData(formattedData?.filter((x) => x !== null));
+          console.log(formattedData);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [semester, weekIndex]);
+
   useEffect(() => {
     if (!semester || !startDate) return;
-
-    const fetchRoomOccupations = async () => {
-      setLoading(true);
-      try {
-        request(
-          "get",
-          `/room-occupation/?semester=${semester}&weekIndex=${weekIndex}`,
-          (res) => {
-            console.log(res.data);
-            const formattedData = res.data?.map((timeSlot) => {
-              if (
-                timeSlot?.startTime !== null &&
-                timeSlot?.endTime !== null &&
-                timeSlot?.weekIndex !== null &&
-                timeSlot?.dayIndex !== null
-              ) {
-                return formatTimeSlot(timeSlot, startDate);
-              }
-              return null;
-            });
-            setData(formattedData?.filter((x) => x !== null));
-            console.log(formattedData);
-          },
-          (error) => {
-            console.log(error);
-          }
-        );
-      } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchRoomOccupations();
-  }, [weekIndex]);
+  }, [semester, weekIndex]);
 
   const getTimeByPeriod = (period) => {
     switch (period) {
@@ -143,5 +144,5 @@ export const useRoomOccupations = (semester, startDate, weekIndex) => {
       end,
     ];
   };
-  return { loading, error, data };
+  return { loading, error, data, refresh: fetchRoomOccupations };
 };

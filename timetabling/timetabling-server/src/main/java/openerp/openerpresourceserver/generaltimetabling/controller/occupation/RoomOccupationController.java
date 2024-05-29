@@ -2,18 +2,13 @@ package openerp.openerpresourceserver.generaltimetabling.controller.occupation;
 
 import java.util.List;
 
-import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekExtractor;
-import openerp.openerpresourceserver.generaltimetabling.model.dto.RoomOccupationDto;
+import openerp.openerpresourceserver.generaltimetabling.model.GetEmptyRoomsRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.generaltimetabling.service.RoomOccupationService;
@@ -53,4 +48,18 @@ public class RoomOccupationController {
                 .body(file);
     }
 
+
+    @PostMapping("/empty-room")
+    public ResponseEntity requestGetEmptyRooms(
+            @RequestParam("semester") String semester,
+            @RequestBody GetEmptyRoomsRequest request) {
+        return ResponseEntity.ok(roomOccupationService.getRoomsNotOccupiedBySemesterAndWeekDayCrewStartAndEndSLot(
+                semester,
+                request.getCrew(),
+                request.getWeek(),
+                request.getWeekDay(),
+                request.getStartTime(),
+                request.getEndTime()
+        ));
+    }
 }
