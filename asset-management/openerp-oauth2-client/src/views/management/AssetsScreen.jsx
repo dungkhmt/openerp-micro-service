@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {request} from "../../api";
+import { request } from "../../api";
 import {StandardTable} from "erp-hust/lib/StandardTable";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
@@ -17,7 +17,9 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { Link as RouterLink } from "react-router-dom";
 import { errorNoti, successNoti } from "utils/notification";
+import { Link } from "@mui/material";
 
 const AssetsScreen = () => {    
     const [assetName, setAssetName] = useState("");
@@ -166,7 +168,8 @@ const AssetsScreen = () => {
     };
 
     const deleteApi = () => {
-        request("delete", `/location/delete/${currentId}`, successHandlerDelete, errorHandlers, {});
+        console.log("current id", currentId);
+        request("delete", `/asset/delete/${currentId}`, successHandlerDelete, errorHandlers, {});
         setOpenDelete(false);
     };    
 
@@ -193,8 +196,16 @@ const AssetsScreen = () => {
 
     const columns = [
         {
-            title: "Name",
+            title: "Asset",
             field: "name",
+            render: (rowData) => (
+                <Link
+                    component={RouterLink}
+                    to={`/asset/${rowData["id"]}`}
+                >
+                    {rowData["name"]}
+                </Link>
+            ),
         },
         {
             title: "Admin",

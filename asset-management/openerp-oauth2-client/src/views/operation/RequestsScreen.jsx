@@ -5,18 +5,17 @@ import RequestTable from './request/RequestTable';
 
 const RequestsScreen = () => {
     const tabsLabel = [
-        "Thông tin chung",
-        "Nội dung",
-        "Bài tập trắc nghiệm",
-        "DS sinh viên",
-        "Bài tập",
-        "Buổi học",
+        "All Request",
+        "Send To Me",
+        "Created By Me"
     ];
 
     const [activeTab, setActiveTab] = useState(0);
     const handleChangeTab = (event, tabIndex) => {
         setActiveTab(tabIndex);
     };
+
+    
 
     return (
         <div>
@@ -35,7 +34,10 @@ const RequestsScreen = () => {
                 <RequestTable/>
             </TabPanel>
             <TabPanel value={activeTab} index={1}>
-                <LocationScreen/>
+                <RequestTable/>
+            </TabPanel>
+            <TabPanel value={activeTab} index={2}>
+                <RequestTable/>
             </TabPanel>
         </div>
     );

@@ -14,6 +14,7 @@ import { CircularProgress, Snackbar } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import Swal from "sweetalert2";
 import './styles.css';
+import { Select, MenuItem, Checkbox, ListItemText, InputLabel } from '@mui/material';
 
 const CreateJobPost = () => {
     const [loading, setLoading] = useState(false);
@@ -45,11 +46,12 @@ const CreateJobPost = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-    
+        console.log(selectedrequirements)
         // Simulate a delay with setTimeout
-    
+
         jobPostForm.salary = Number(jobPostForm.salary);
         jobPostForm.user = user
+        jobPostForm.requirements = selectedrequirements.join(", ")
         console.log(jobPostForm)
         // Use SweetAlert2 for confirmation before submitting
         Swal.fire({
@@ -81,6 +83,105 @@ const CreateJobPost = () => {
         }
     };
 
+    const requirement = [
+        "Agile",
+        "Android",
+        "Angular",
+        "AngularJS",
+        "ASP.NET",
+        "Automation Test",
+        "AWS",
+        "Azure",
+        "Blockchain",
+        "Bridge Engineer",
+        "Business Analyst",
+        "Business Intelligence",
+        "C#",
+        "C++",
+        "C language",
+        "Cloud",
+        "Cocos",
+        "Crystal",
+        "CSS",
+        "Dart",
+        "Data Analyst",
+        "Database",
+        "Designer",
+        "DevOps",
+        "DevSecOps",
+        "Django",
+        "Embedded",
+        "Embedded C",
+        "English",
+        "ERP",
+        "Flutter",
+        "Games",
+        "Golang",
+        "HTML5",
+        "iOS",
+        "IT Support",
+        "J2EE",
+        "Japanese",
+        "Java",
+        "JavaScript",
+        "JQuery",
+        "JSON",
+        "Kotlin",
+        "Laravel",
+        "Linux",
+        "Magento",
+        "Manager",
+        "MongoDB",
+        "MVC",
+        "MySQL",
+        ".NET",
+        "Networking",
+        "NodeJS",
+        "NoSQL",
+        "Objective C",
+        "OOP",
+        "Oracle",
+        "PHP",
+        "PostgreSql",
+        "Presale",
+        "Product Designer",
+        "Product Manager",
+        "Product Owner",
+        "Project Manager",
+        "Python",
+        "QA QC",
+        "ReactJS",
+        "React Native",
+        "Ruby",
+        "Ruby on Rails",
+        "Salesforce",
+        "SAP",
+        "Scala",
+        "Scrum",
+        "Security",
+        "Sharepoint",
+        "Software Architect",
+        "Solidity",
+        "Solution Architect",
+        "Spring",
+        "SQL",
+        "Swift",
+        "System Admin",
+        "System Engineer",
+        "Team Leader",
+        "Tester",
+        "TypeScript",
+        "UI-UX",
+        "Unity",
+        "VueJS",
+        "Wordpress",
+        "Xamarin"
+    ];
+    const [selectedrequirements, setSelectedrequirements] = useState([]);
+    const handleRequirementsChange = (event) => {
+        setSelectedrequirements(event.target.value);
+    };
+
     return (
         <>
             <Grid item xs={12} container spacing={4} style={{ backgroundColor: "#F7F7FF" }} display="flex" justifyContent="center" paddingTop={"50px"}>
@@ -104,7 +205,22 @@ const CreateJobPost = () => {
                         <Typography variant="h4">Requirements</Typography>
                     </Grid>
                     <Grid item xs={11}>
-                        <TextField fullWidth label="requirements" value={jobPostForm.requirements} variant="outlined" name="requirements" multiline rows={4} onChange={handleInputChange} />
+                    <InputLabel id="multi-select-label">Select required skill</InputLabel>
+                        <Select
+                            labelId="multi-select-label"
+                            multiple
+                            value={selectedrequirements}
+                            onChange={handleRequirementsChange}
+                            renderValue={(selected) => selected.join(', ')}
+                            fullWidth
+                        >
+                            {requirement.map((option) => (
+                                <MenuItem key={option} value={option}>
+                                    <Checkbox checked={selectedrequirements.indexOf(option) > -1} />
+                                    <ListItemText primary={option} />
+                                </MenuItem>
+                            ))}
+                        </Select>
                     </Grid>
                     <Grid item xs={12}>
                         <Typography variant="h4">Location</Typography>

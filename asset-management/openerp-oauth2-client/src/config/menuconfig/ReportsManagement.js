@@ -4,17 +4,17 @@ export const ReportsManagement = {
     text: "Reports",
     child: [
         {
-            id: "MENU_DASHBOARD_MANAGEMENT.COMPANY_REPORT",
-            path: "/reports/company",
+            id: "MENU_DASHBOARD_MANAGEMENT.ASSET_REPORT",
+            path: "/reports/asset",
             isPublic: true,
-            text: "Company Report",
+            text: "Asset Report",
             child: []
         },
         {
-            id: "MENU_DASHBOARD_MANAGEMENT.LOCATION_REPORT",
-            path: "/reports/location",
+            id: "MENU_DASHBOARD_MANAGEMENT.REQUEST_REPORT",
+            path: "/reports/request",
             isPublic: true,
-            text: "Location Report",
+            text: "Request Report",
             child: []
         }
     ]

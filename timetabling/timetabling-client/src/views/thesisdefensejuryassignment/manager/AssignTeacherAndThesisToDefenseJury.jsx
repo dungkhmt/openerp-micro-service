@@ -36,15 +36,20 @@ function AssignTeacherAndThesisToDefenseJury() {
     if (assignedThesis?.length === 0) {
       return errorNoti("Bạn hãy lựa chọn đồ án vào hội đồng", true);
     }
+    if (assignedThesis?.length > defenseJury?.maxThesis) {
+      return errorNoti(`Hội đồng chỉ có tối đa ${defenseJury?.maxThesis} đồ án`, true);
+    }
 
     request(
       "post",
       "/defense-jury/assign",
       (res) => {
-        successNoti("Phân chia hội đồng thành công", true);
-        clearAssignedTeacher();
-        clearAssignedThesis();
-        return history.goBack();
+        if (res?.data) {
+          successNoti(res?.data, true);
+          clearAssignedTeacher();
+          clearAssignedThesis();
+          return history.goBack();
+        }
       },
       {
         onError: (e) => {

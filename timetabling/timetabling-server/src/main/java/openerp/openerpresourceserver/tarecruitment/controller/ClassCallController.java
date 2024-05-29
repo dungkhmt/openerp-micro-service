@@ -24,8 +24,12 @@ public class ClassCallController {
 
     @PostMapping("/create-class")
     public ResponseEntity<?> createClass(@RequestBody ClassCall classCall) {
-        ClassCall newClassCall = classCallService.createNewClass(classCall);
-        return ResponseEntity.ok().body(newClassCall);
+        try {
+            ClassCall newClassCall = classCallService.createNewClass(classCall);
+            return ResponseEntity.ok().body(newClassCall);
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping("/get-all-class")

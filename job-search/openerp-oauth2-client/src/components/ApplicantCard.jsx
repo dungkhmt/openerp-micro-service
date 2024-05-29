@@ -27,9 +27,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ApplicantCard({ applicant, index }) {
+function ApplicantCard({ applicant, index, id }) {
   const classes = useStyles();
-  let id = 4
+  // let id = 4
   const [allCV, setAllCV] = useState([])
   const [user, setUser] = useState({})
   const [CV, setCV] = useState([])

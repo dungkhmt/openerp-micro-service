@@ -116,7 +116,7 @@ public interface SubmissionHourlySummaryRepo extends JpaRepository<SubmissionHou
                     "FROM AllHours " +
                     "LEFT JOIN submission_hourly_summary shs " +
                     "       ON AllHours.hour_of_day = shs.hour_of_day " +
-                    "       AND shs.user_submission_id = 'admin' " +
+                    "       AND shs.user_submission_id = :userId " +
                     "GROUP BY AllHours.hour_of_day " +
                     "ORDER BY AllHours.hour_of_day ", nativeQuery = true)
     Object[] submissionHourlySummariesByHourByUserID(@Param("userId") String userId);

@@ -13,6 +13,11 @@ import { VendorScreen } from "views/settings/VendorScreen";
 import { TypeScreen } from "views/settings/TypeScreen";
 import AssetsScreen from "views/management/AssetsScreen";
 import RequestsScreen from "views/operation/RequestsScreen";
+import RequestDetail from "views/operation/request/RequestDetail";
+import RequestInfo from "views/operation/request/RequestDetail";
+import AssetReport from "views/reports/AssetReport";
+import RequestReport from "views/reports/RequestReport";
+import AssetDetail from "views/management/AssetDetail";
 
 const styles = {
   loadingProgress: {
@@ -50,7 +55,15 @@ function MainAppRouter(props) {
 
           <PrivateRoute component={AssetsScreen} exact path="/assets" />
 
-          <PrivateRoute component={RequestsScreen} path="/requests" />
+          <PrivateRoute component={AssetDetail} path="/asset/:id" />
+
+          <PrivateRoute component={RequestsScreen} exact path="/requests" />
+
+          <PrivateRoute component={RequestDetail} path="/request/:id" />
+
+          <PrivateRoute component={AssetReport} path="/reports/asset"/>
+
+          <PrivateRoute component={RequestReport} path="/reports/request"/>
 
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />

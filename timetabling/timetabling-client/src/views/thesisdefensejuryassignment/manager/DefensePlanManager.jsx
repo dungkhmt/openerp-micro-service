@@ -1,19 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { request } from "api";
 import PrimaryButton from "components/button/PrimaryButton";
 import { StandardTable } from "erp-hust/lib/StandardTable";
 import CreateDefenseJury from "components/thesisdefensejury/modal/ModalCreateDefenseJury";
 import { Box, IconButton } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Chip from "@mui/material/Chip";
 import ModalLoading from "components/common/ModalLoading";
+import ModalDeleteItem from "components/thesisdefensejury/modal/ModalDeleteItem";
+import { successNoti } from "utils/notification";
 export default function DefensePlanManager() {
+  const deletedJuryId = useRef("");
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const history = useHistory();
   const [defenseJuries, setDefenseJuries] = useState([]);
   const [open, setOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [toggle, setToggle] = useState(false);
   const columns = [
     { title: "Tên hội đồng", field: "name" },
@@ -39,6 +44,12 @@ export default function DefensePlanManager() {
           }}>
             <EditIcon />
           </IconButton>
+          <IconButton aria-label="Chỉnh sửa" sx={{ marginRight: 2 }} onClick={() => {
+            deletedJuryId.current = rowData.id;
+            setDeleteModalOpen((prevDeleteModalOpen) => !prevDeleteModalOpen)
+          }}>
+            <DeleteIcon />
+          </IconButton>
           <PrimaryButton
             onClick={() => {
               history.push(`/thesis/thesis_defense_plan/${id}/defense_jury/${rowData.id}`);
@@ -63,7 +74,19 @@ export default function DefensePlanManager() {
   const handleToggle = () => {
     setToggle(!toggle);
   };
-
+  const handleDelete = () => {
+    request("DELETE",
+      `/defense-jury/delete/${deletedJuryId.current}`, (res) => {
+        if (res?.data) {
+          successNoti(res?.data, true);
+          setDeleteModalOpen((prevDeleteModalOpen) => !prevDeleteModalOpen)
+          setToggle((prevToggle) => !prevToggle)
+          deletedJuryId.current = ""
+        }
+      }, (e) => {
+        console.log(e)
+      })
+  }
   async function getPlanById() {
     setLoading(true);
     request(
@@ -129,6 +152,14 @@ export default function DefensePlanManager() {
           </div>
         </div>
       )}
+      {deleteModalOpen &&
+        <ModalDeleteItem
+          handleClose={() => setDeleteModalOpen((prevDeleteModalOpen) => !prevDeleteModalOpen)}
+          open={deleteModalOpen}
+          title={"Xóa hội đồng"}
+          content={`Bạn có muốn xóa hội đồng này không ?`}
+          handleDelete={handleDelete}
+        />}
     </div>
   );
 }

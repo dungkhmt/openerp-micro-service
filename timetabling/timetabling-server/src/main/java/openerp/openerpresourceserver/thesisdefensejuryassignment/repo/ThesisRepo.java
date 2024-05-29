@@ -10,8 +10,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ThesisRepo extends JpaRepository<Thesis, UUID>{
-    @Query(value = "select * from thesis d where d.scheduled_jury_id is null and d.thesis_defense_plan_id = :thesisDefensePlanId", nativeQuery = true)
-    public List<Thesis> findAllAvailableThesis(String thesisDefensePlanId);
+//    @Query(value = "select * from thesis d where d.scheduled_jury_id is null and d.thesis_defense_plan_id = :thesisDefensePlanId", nativeQuery = true)
+    public Optional<List<Thesis>> findByThesisDefensePlanIdAndDefenseJury(String thesisDefensePlanId, UUID scheduledJuryId);
 
     @Override
     @Query(value = "select * from thesis d where d.id= :Id", nativeQuery = true)

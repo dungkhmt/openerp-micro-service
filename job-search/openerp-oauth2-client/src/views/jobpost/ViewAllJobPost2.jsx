@@ -37,6 +37,7 @@ const ViewAllJobPost2 = () => {
         window.location.href = url;
       }
 
+    allJobPostForm.reverse()
     return (
         <>
         <Grid container spacing={4} style={{backgroundColor:  "#F7F7FF"}} display="flex" justifyContent="center" paddingTop={"50px"}>

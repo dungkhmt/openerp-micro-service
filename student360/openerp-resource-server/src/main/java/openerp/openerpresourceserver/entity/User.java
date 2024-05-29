@@ -32,8 +32,6 @@ public class User implements Serializable {
 
     private String lastName;
 
-//    private String affiliations;
-
     @CreatedDate
     @Column(name = "created_stamp")
     private Date createdDate;
@@ -56,5 +54,4 @@ public class User implements Serializable {
         // Trả về chuỗi tên đầy đủ
         return fullNameBuilder.toString();
     }
-
 }

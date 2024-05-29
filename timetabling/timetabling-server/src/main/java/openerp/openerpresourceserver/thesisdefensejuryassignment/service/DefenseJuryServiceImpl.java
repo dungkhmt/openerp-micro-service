@@ -105,7 +105,7 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
 
     @Override
     public List<Thesis> getAllAvailableThesiss(String thesisDefensePlanId) {
-        return thesisRepo.findAllAvailableThesis(thesisDefensePlanId);
+        return thesisRepo.findByThesisDefensePlanIdAndDefenseJury(thesisDefensePlanId, null).orElse(null);
     }
 
     @Override
@@ -283,6 +283,21 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         }
         defenseJury.setThesisList(thesisList);
         return defenseJuryRepo.save(defenseJury);
+    }
+
+    @Override
+    public DefenseJury deleteDefenseJuryByID(UUID id) {
+        DefenseJury defenseJury = defenseJuryRepo.findById(id).orElse(null);
+        if (defenseJury == null) return null;
+        for (DefenseJuryTeacherRole role: defenseJury.getDefenseJuryTeacherRoles()){
+            defenseJuryTeacherRoleRepo.delete(role);
+        }
+        for (Thesis thesis: defenseJury.getThesisList()){
+            thesis.setDefenseJury(null);
+            thesisRepo.save(thesis);
+        }
+        defenseJuryRepo.delete(defenseJury);
+        return defenseJury;
     }
 
 

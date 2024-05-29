@@ -65,21 +65,32 @@ public class DefenseJuryController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteDefenseJuryById(@PathVariable String id) {
+        logger.info("Deleted Jury id: " + id);
+        DefenseJury res = juryService.deleteDefenseJuryByID(UUID.fromString(id));
+        if (res == null){
+            return new ResponseEntity<>("Xóa hội đồng không thành công", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("Xóa hội đồng thành công", HttpStatus.OK);
+    }
+
 
     @GetMapping("/thesis/get-all-available/{thesisDefensePlanId}")
     public ResponseEntity<List<Thesis>> getAllAvailableThesis(@PathVariable String thesisDefensePlanId) {
+        System.out.println("Get available thesis: " + thesisDefensePlanId);
         return new ResponseEntity<>(juryService.getAllAvailableThesiss(thesisDefensePlanId), HttpStatus.OK);
     }
 
     @PostMapping("/assign")
-    public ResponseEntity<DefenseJury> assignTeacherAndThesisToDefenseJury(
+    public ResponseEntity<String> assignTeacherAndThesisToDefenseJury(
             @RequestBody AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList
     ) {
         DefenseJury defenseJury = juryService.assignTeacherAndThesis(teacherAndThesisList);
         if (defenseJury == null){
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Không thể phân công hội đồng", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);
+        return new ResponseEntity<>("Phân công hội đồng thành công", HttpStatus.CREATED);
     }
 
 
@@ -112,5 +123,6 @@ public class DefenseJuryController {
         }
         return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);
     }
+
 
 }
