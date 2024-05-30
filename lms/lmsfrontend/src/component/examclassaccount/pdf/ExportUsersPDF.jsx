@@ -136,7 +136,6 @@ function ExportUsersPDF({ data }) {
               </View>
               <Footer pageNumber={idx + 1} totalPages={arr.length} />
             </Page>
-            <Page size="A4" />
           </>
         )
       )}
