@@ -37,20 +37,18 @@ public class SolvingController {
         List<Long> evenWeekClassesId = new ArrayList<>();
         List<Long> allClassesId = classList.stream().map(Class::getId).toList();
 
-        for(Map.Entry<Long, Integer> row: request.getWeekConstraintMap().entrySet()){
-            if(row.getValue() == 1) oddWeekClassesId.add(row.getKey());
-            else if (row.getValue() == 2) evenWeekClassesId.add(row.getKey());
+        for(Class c: classList){
+            if (c.getWeek_schedule_constraint() == 1) oddWeekClassesId.add(c.getId());
+            else if (c.getWeek_schedule_constraint() == 2) evenWeekClassesId.add(c.getId());
         }
 
         List<Long> classesId = new ArrayList<>();
-        List<Integer> avoidWeeks = new ArrayList<>();
-        for(Map.Entry<Long, Integer> row: request.getAvoidWeekMap().entrySet()){
-            classesId.add(row.getKey());
-            avoidWeeks.add(row.getValue()-1);
+        List<List<Integer>> avoidWeeks = new ArrayList<>();
+        for(Class c: classList){
+            classesId.add(c.getId());
+            avoidWeeks.add(new ArrayList<>(Arrays.asList(c.getAvoid_week_schedule_constraint())).stream().map(x->x-1).toList());
         }
 
-        System.out.println(classesId);
-        System.out.println(avoidWeeks);
 
         UUID id = UUID.randomUUID();
         AutoSchedulingSubmission submission = new AutoSchedulingSubmission.Builder().setId(id).setStatus(SubmissionStatus.WAITING).setSemesterId(semester_id).build();
@@ -58,8 +56,7 @@ public class SolvingController {
         Thread solver = new Thread(new Runnable() {
             @Override
             public void run() {
-                LabTimetablingSolver problem = new LabTimetablingSolver(classList, roomList);
-
+                LabTimetablingSolver problem = new LabTimetablingSolver(classList, roomList, request.getSolvingTimeLimit());
                 List<LabTimetablingSolver.OptionalConstraint> optionalConstraints = new ArrayList<>();
                 optionalConstraints.add(new LabTimetablingSolver.ConsistentWeeklyScheduleConstraint(allClassesId));
                 optionalConstraints.add(new LabTimetablingSolver.OddWeekScheduleConstraint(oddWeekClassesId));
@@ -67,6 +64,9 @@ public class SolvingController {
                 optionalConstraints.add(new LabTimetablingSolver.AvoidWeekScheduleConstraint(classesId, avoidWeeks));
 
                 List<List<AutoSchedulingVar>> vars = problem.solve(optionalConstraints);
+                if (vars == null) {
+                    return ;
+                }
                 newSubmission.setStatus(SubmissionStatus.FINISHED);
                 autoSchedulingSubmissionRepo.save(newSubmission);
                 for(List<AutoSchedulingVar> autoSchedulingVarList: vars){

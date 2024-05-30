@@ -32,11 +32,18 @@ export const computerLabTimeTabling = {
         text: "Thời khóa biểu",
         child: [],
       },
+      // {
+      //   id: "MENU_SCHEDULER",
+      //   path: `${prefix}/conflict-checking`,
+      //   isPublic: true,
+      //   text: "Lịch màu",
+      //   child: [],
+      // },
       {
         id: "MENU_SCHEDULER",
-        path: `${prefix}/conflict-checking`,
+        path: `${prefix}/manual-assign`,
         isPublic: true,
-        text: "Lịch màu",
+        text: "Xếp lịch thủ công",
         child: [],
       },
       {
