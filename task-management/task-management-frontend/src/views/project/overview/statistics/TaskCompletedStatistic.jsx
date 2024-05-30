@@ -1,7 +1,15 @@
-import { Box, CardContent, Grid, Typography, useTheme } from "@mui/material";
-import { forwardRef } from "react";
+import {
+  Box,
+  CardContent,
+  Grid,
+  Tooltip,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import PropTypes from "prop-types";
+import { forwardRef } from "react";
 import ReactApexcharts from "react-apexcharts";
+import { useSelector } from "react-redux";
 import { DashboardCard } from "../../../../components/card/DashboardCard";
 
 const TaskCompletedStatistic = forwardRef(function TaskCompletedStatistic(
@@ -9,6 +17,7 @@ const TaskCompletedStatistic = forwardRef(function TaskCompletedStatistic(
   ref
 ) {
   const theme = useTheme();
+  const { completed } = useSelector((state) => state.statistic);
 
   const chartOptions = {
     stroke: { lineCap: "round" },
@@ -88,34 +97,40 @@ const TaskCompletedStatistic = forwardRef(function TaskCompletedStatistic(
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Grid container spacing={0}>
             <Grid item sx={6} md={6} lg={5} xl={4}>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-start",
-                  flexDirection: "column",
-                  cursor: "pointer",
-                  borderRadius: "5px",
-                  padding: (theme) => theme.spacing(0),
-                  "&:hover": {
-                    backgroundColor: "#f7f7f7",
-                  },
-                  flex: 1,
-                }}
-              >
-                <Typography variant="h3">2</Typography>
-                <Typography variant="subtitle2" sx={{ fontSize: "0.7rem" }}>
-                  nhiệm vụ
-                </Typography>
-              </Box>
+              <Tooltip title="Chi tiết">
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                    flexDirection: "column",
+                    cursor: "pointer",
+                    borderRadius: "5px",
+                    padding: (theme) => theme.spacing(0),
+                    "&:hover": {
+                      backgroundColor: "#f7f7f7",
+                    },
+                    flex: 1,
+                  }}
+                >
+                  <Typography variant="h3">{completed.count}</Typography>
+                  <Typography variant="subtitle2" sx={{ fontSize: "0.7rem" }}>
+                    nhiệm vụ
+                  </Typography>
+                </Box>
+              </Tooltip>
             </Grid>
             <Grid item xs={6} md={6} lg={7} xl={8} sx={{ mt: 2 }}>
-              <ReactApexcharts
-                type="radialBar"
-                height={120}
-                options={chartOptions}
-                series={[20]}
-              />
+              <Tooltip title={`${completed.percentage}%`}>
+                <div>
+                  <ReactApexcharts
+                    type="radialBar"
+                    height={120}
+                    options={chartOptions}
+                    series={[completed.percentage]}
+                  />
+                </div>
+              </Tooltip>
             </Grid>
           </Grid>
         </Box>

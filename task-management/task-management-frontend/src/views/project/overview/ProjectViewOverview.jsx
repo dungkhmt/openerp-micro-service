@@ -1,15 +1,19 @@
 import { CardContent } from "@mui/material";
 import { TourProvider } from "@reactour/tour";
-import { useCallback, useMemo, useState } from "react";
+import dayjs from "dayjs";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
+import { useDispatch, useSelector } from "react-redux";
 import { DashboardCard } from "../../../components/card/DashboardCard";
 import { ApexChartWrapper } from "../../../components/chart/apex/ApexChartWrapper";
+import { fetchStatisticData } from "../../../store/project/statistic";
 import { ProjectViewDocument } from "./document/ProjectViewDocument";
+import { ProjectInfo } from "./info/ProjectInfo";
+import { Period } from "./statistics/Period";
 import { TaskCompletedStatistic } from "./statistics/TaskCompletedStatistic";
 import { TaskCreatedStatistic } from "./statistics/TaskCreatedStatistic";
 import { TaskInprogressStatistic } from "./statistics/TaskInprogressStatistic";
 import { WorkloadByStatus } from "./statistics/WorkloadByStatus";
-import { ProjectInfo } from "./info/ProjectInfo";
 
 const WIDTH_TASK_MD = 2;
 const WIDTH_TASK_LG = 2;
@@ -28,6 +32,11 @@ const ProjectViewOverview = () => {
     },
     [breakpoint]
   );
+
+  const [isMounted, setIsMounted] = useState(false);
+  const { period } = useSelector((state) => state.statistic);
+  const { project } = useSelector((state) => state.project);
+  const dispatch = useDispatch();
 
   const position = useMemo(
     () => ({
@@ -55,6 +64,24 @@ const ProjectViewOverview = () => {
         minH: 3,
         minW: breakpoint === "xs" ? 4 : 6,
         maxW: 12,
+        static: true,
+      },
+      period: {
+        x: 0,
+        y: getByBreakpoint({
+          lg: HEIGHT_DOC_LG,
+          md: HEIGHT_DOC_MD,
+          sm: HEIGHT_DOC_MD + HEIGHT_INFO,
+          xs: HEIGHT_DOC_MD + HEIGHT_INFO,
+        }),
+        w: getByBreakpoint({
+          lg: 12,
+          md: 10,
+          sm: 6,
+          xs: 4,
+        }),
+        h: 0.5,
+        static: true,
       },
       taskCreated: {
         x: 0,
@@ -106,7 +133,7 @@ const ProjectViewOverview = () => {
           xs: HEIGHT_DOC_MD + 2,
         }),
         w: getByBreakpoint({ lg: 6, md: 4, sm: 3, xs: 4 }),
-        h: getByBreakpoint({ lg: 6, md: 6, sm: 4, xs: 4 }),
+        h: getByBreakpoint({ lg: 7, md: 7, sm: 4, xs: 4 }),
       },
       chart: {
         x: 0,
@@ -122,7 +149,7 @@ const ProjectViewOverview = () => {
           sm: 3,
           xs: 4,
         }),
-        h: 4,
+        h: 5,
       },
     }),
     [breakpoint, getByBreakpoint]
@@ -134,6 +161,20 @@ const ProjectViewOverview = () => {
       content: "Xem và viết tài liệu dự án tại đây",
     },
   ];
+
+  useEffect(() => {
+    if (!isMounted) {
+      setIsMounted(true);
+    } else {
+      dispatch(
+        fetchStatisticData({
+          projectId: project.id,
+          startDate: dayjs(period.startDate).unix(),
+          endDate: dayjs(period.endDate).unix(),
+        })
+      );
+    }
+  }, [period, dispatch]);
 
   return (
     <ApexChartWrapper>
@@ -169,6 +210,9 @@ const ProjectViewOverview = () => {
             }}
             className="document-step"
           />
+          <div key="period" data-grid={position.period}>
+            <Period />
+          </div>
           <TaskCreatedStatistic
             key="task-created"
             data-grid={position.taskCreated}

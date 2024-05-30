@@ -12,8 +12,8 @@ import { ProjectViewGanttChart } from "./gantt-chart/ProjectViewGanttChart";
 import { ProjectViewMembers } from "./member/ProjectViewMembers";
 import { ProjectViewOverview } from "./overview/ProjectViewOverview";
 import { ProjectViewSetting } from "./setting/ProjectViewSetting";
-import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
 import { DialogAddTask } from "./tasks/DialogAddTask";
+import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   minHeight: "34px",
@@ -66,6 +66,7 @@ const ProjectViewRight = () => {
 
   useEffect(() => {
     updateMaxHeight();
+    ref.current?.click();
   }, [window?.innerHeight, ref]);
 
   return (
