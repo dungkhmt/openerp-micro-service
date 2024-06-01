@@ -49,6 +49,7 @@ public class RoomOccupationController {
     }
 
 
+
     @PostMapping("/empty-room")
     public ResponseEntity requestGetEmptyRooms(
             @RequestParam("semester") String semester,
