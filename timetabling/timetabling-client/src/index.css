@@ -103,7 +103,10 @@ code {
 
 /* CSS for room-occupation */
 
+.room-occupation-table {
+  table-layout: fixed;
 
+}
 
 .cell {
   padding: 0.5rem;

@@ -53,17 +53,6 @@ const RoomOccupationScreen = () => {
   //   </div>
   // );
 
-  const getCellMaxWidth = (colSpan) => {
-    switch (colSpan) {
-      case 2:
-        return "52px";
-      case 3:
-        return "76px";
-      case 4:
-        return "104px";
-    }
-  };
-
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-row justify-between">
@@ -95,7 +84,7 @@ const RoomOccupationScreen = () => {
           </Button>
         </div>
       </div>
-      <table className=" border-[1px] border-slate-600 overflow-auto">
+      <table className=" room-occupation-table border-[1px] border-slate-600 overflow-auto">
         {/* Header */}
         <thead>
           <th
@@ -103,16 +92,16 @@ const RoomOccupationScreen = () => {
             rowSpan="2"
             colSpan={2}
           >
-            Room
+            Phòng học/ Thời gian
           </th>
 
           {Array.from({ length: 7 }).map((v, index) => (
             <td
               key={index}
               colSpan="6"
-              className=" text-center border-[1px] border-slate-600"
+              className="cell text-center border-[1px] border-slate-600"
             >
-              {index + 2 === 8 ? "CN" : index + 2}
+              {index + 2 !== 8 ? "CN" : index + 2}
             </td>
           ))}
           <tr>
@@ -179,20 +168,98 @@ const RoomOccupationScreen = () => {
                       if (cell === null)
                         return (
                           <td
-                            className="w-full border-x-[0.5px] border-slate-600"
+                            className="cell w-full border-x-[0.5px] border-slate-600"
                             key={index}
                           ></td>
                         );
                       if (cell.hidden) return null;
-                      return (
-                        <td
-                          key={index}
-                          className={`bg-yellow-400 overflow-hidden text-xs border-x-[0.5px] border-slate-600`}
-                          colSpan={cell.colSpan}
-                        >
-                          {cell.classCode}
-                        </td>
-                      );
+                      switch (cell.colSpan) {
+                        case 2:
+                          return (
+                            <td
+                              title={`${cell.classCode}: ${
+                                Math.floor(index / 6) + 2 !== 8
+                                  ? `Thứ ${Math.floor(index / 6) + 2}`
+                                  : `CN`
+                              }/${(index % 6) + 1}-${
+                                ((index + cell.colSpan - 1) % 6) + 1
+                              }`}
+                              key={index}
+                              className={`cell max-w-[52px] bg-yellow-400 overflow-hidden text-xs border-x-[0.5px] border-slate-600 `}
+                              colSpan={cell.colSpan}
+                            >
+                              {cell.classCode}
+                            </td>
+                          );
+                        case 3:
+                          return (
+                            <td
+                              title={`${cell.classCode}: ${
+                                Math.floor(index / 6) + 2 !== 8
+                                  ? `Thứ ${Math.floor(index / 6) + 2}`
+                                  : `CN`
+                              }/${(index % 6) + 1}-${
+                                ((index + cell.colSpan - 1) % 6) + 1
+                              }`}
+                              key={index}
+                              className={`cell max-w-[78px] bg-yellow-400 overflow-hidden text-xs border-x-[0.5px] border-slate-600 `}
+                              colSpan={cell.colSpan}
+                            >
+                              {cell.classCode}
+                            </td>
+                          );
+                        case 4:
+                          return (
+                            <td
+                              title={`${cell.classCode}: ${
+                                Math.floor(index / 6) + 2 !== 8
+                                  ? `Thứ ${Math.floor(index / 6) + 2}`
+                                  : `CN`
+                              }/${(index % 6) + 1}-${
+                                ((index + cell.colSpan - 1) % 6) + 1
+                              }`}
+                              key={index}
+                              className={`cell max-w-[104px] bg-yellow-400 overflow-hidden text-xs border-x-[0.5px] border-slate-600 `}
+                              colSpan={cell.colSpan}
+                            >
+                              {cell.classCode}
+                            </td>
+                          );
+                        case 5:
+                          return (
+                            <td
+                              title={`${cell.classCode}: ${
+                                Math.floor(index / 6) + 2 !== 8
+                                  ? `Thứ ${Math.floor(index / 6) + 2}`
+                                  : `CN`
+                              }/${(index % 6) + 1}-${
+                                ((index + cell.colSpan - 1) % 6) + 1
+                              }`}
+                              key={index}
+                              className={`cell max-w-[130px] bg-yellow-400 overflow-hidden text-xs border-x-[0.5px] border-slate-600 `}
+                              colSpan={cell.colSpan}
+                            >
+                              {cell.classCode}
+                            </td>
+                          );
+                        case 6:
+                          return (
+                            <td
+                              title={`${cell.classCode}: ${
+                                Math.floor(index / 6) + 2 !== 8
+                                  ? `Thứ ${Math.floor(index / 6) + 2}`
+                                  : `CN`
+                              }/${(index % 6) + 1}-${
+                                ((index + cell.colSpan - 1) % 6) + 1
+                              }`}
+                              key={index}
+                              className={`cell max-w-[156px] bg-yellow-400 overflow-hidden text-xs border-x-[0.5px] border-slate-600 `}
+                              colSpan={cell.colSpan}
+                            >
+                              {cell.classCode}
+                            </td>
+                          );
+                      }
                     })}
                   </tr>
                   <tr className="">
@@ -200,20 +267,98 @@ const RoomOccupationScreen = () => {
                       if (cell === null)
                         return (
                           <td
-                            className="w-full border-x-[0.5px] border-slate-600"
+                            className="cell w-full border-x-[0.5px] border-slate-600"
                             key={index}
                           ></td>
                         );
                       if (cell.hidden) return null;
-                      return (
-                        <td
-                          key={index}
-                          className={`bg-yellow-400 overflow-hidden text-xs border-x-[0.5px] border-slate-600 `}
-                          colSpan={cell.colSpan}
-                        >
-                          {cell.classCode}
-                        </td>
-                      );
+                      switch (cell.colSpan) {
+                        case 2:
+                          return (
+                            <td
+                              title={`${cell.classCode}: ${
+                                Math.floor(index / 6) + 2 !== 8
+                                  ? `Thứ ${Math.floor(index / 6) + 2}`
+                                  : `CN`
+                              }/${(index % 6) + 1}-${
+                                ((index + cell.colSpan - 1) % 6) + 1
+                              }`}
+                              key={index}
+                              className={`cell max-w-[52px] bg-yellow-400 overflow-hidden text-xs border-x-[0.5px] border-slate-600 `}
+                              colSpan={cell.colSpan}
+                            >
+                              {cell.classCode}
+                            </td>
+                          );
+                        case 3:
+                          return (
+                            <td
+                              title={`${cell.classCode}: ${
+                                Math.floor(index / 6) + 2 !== 8
+                                  ? `Thứ ${Math.floor(index / 6) + 2}`
+                                  : `CN`
+                              }/${(index % 6) + 1}-${
+                                ((index + cell.colSpan - 1) % 6) + 1
+                              }`}
+                              key={index}
+                              className={`cell max-w-[78px] bg-yellow-400 overflow-hidden text-xs border-x-[0.5px] border-slate-600 `}
+                              colSpan={cell.colSpan}
+                            >
+                              {cell.classCode}
+                            </td>
+                          );
+                        case 4:
+                          return (
+                            <td
+                              title={`${cell.classCode}: ${
+                                Math.floor(index / 6) + 2 !== 8
+                                  ? `Thứ ${Math.floor(index / 6) + 2}`
+                                  : `CN`
+                              }/${(index % 6) + 1}-${
+                                ((index + cell.colSpan - 1) % 6) + 1
+                              }`}
+                              key={index}
+                              className={`cell max-w-[104px] bg-yellow-400 overflow-hidden text-xs border-x-[0.5px] border-slate-600 `}
+                              colSpan={cell.colSpan}
+                            >
+                              {cell.classCode}
+                            </td>
+                          );
+                        case 5:
+                          return (
+                            <td
+                              title={`${cell.classCode}: ${
+                                Math.floor(index / 6) + 2 !== 8
+                                  ? `Thứ ${Math.floor(index / 6) + 2}`
+                                  : `CN`
+                              }/${(index % 6) + 1}-${
+                                ((index + cell.colSpan - 1) % 6) + 1
+                              }`}
+                              key={index}
+                              className={`cell max-w-[130px] bg-yellow-400 overflow-hidden text-xs border-x-[0.5px] border-slate-600 `}
+                              colSpan={cell.colSpan}
+                            >
+                              {cell.classCode}
+                            </td>
+                          );
+                        case 6:
+                          return (
+                            <td
+                              title={`${cell.classCode}: ${
+                                Math.floor(index / 6) + 2 !== 8
+                                  ? `Thứ ${Math.floor(index / 6) + 2}`
+                                  : `CN`
+                              }/${(index % 6) + 1}-${
+                                ((index + cell.colSpan - 1) % 6) + 1
+                              }`}
+                              key={index}
+                              className={`cell max-w-[156px] bg-yellow-400 overflow-hidden text-xs border-x-[0.5px] border-slate-600 `}
+                              colSpan={cell.colSpan}
+                            >
+                              {cell.classCode}
+                            </td>
+                          );
+                      }
                     })}
                   </tr>
                 </th>
