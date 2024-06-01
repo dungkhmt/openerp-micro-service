@@ -7,6 +7,7 @@ import {
   Typography,
   Stack,
   Divider,
+  Tooltip,
   useTheme,
 } from "@mui/material";
 import { errorNoti } from "../../../../utils/notification";
@@ -150,6 +151,14 @@ function StudentPerformance(props) {
     // learningBehavior: "Xu hướng học tập trong học kỳ",
   };
 
+  const studentLearningRoutineAttrTooltip = {
+    startTimeActive: "Thời gian đầu tiên học trong ngày",
+    endTimeActive: "Thời gian kết thúc học trong học",
+    mostSubmittedTime: "Thời gian nộp bài tập nhiều nhất",
+    mostEffectiveSubmittedTime: "Thời gian nộp bài tập hiệu quả, được điểm cao",
+    // learningBehavior: "Xu hướng học tập trong học kỳ",
+  };
+
   const studentCharacterAttrs = [
     "carefulness",
     "languageVariety",
@@ -163,6 +172,14 @@ function StudentPerformance(props) {
     languageVariety: "Đa dạng ngôn ngữ",
     attitude: "Thái độ học tập",
     evaluation: "Khả năng tư duy thuật toán",
+    // learningStatus: "Tình trạng học tập",
+  };
+
+  const studentCharacterAttrTooltips = {
+    carefulness: "Tỷ lệ lần nộp bài đầu tiên được điểm",
+    languageVariety: "Số ngôn ngữ lập trình có thể sử dụng",
+    attitude: "Trung bình số lần nộp bài trong ngày",
+    evaluation: "Trung bình số lần tối thiểu nộp bài được điểm tối đa",
     // learningStatus: "Tình trạng học tập",
   };
 
@@ -336,9 +353,11 @@ function StudentPerformance(props) {
                     flexItem
                     sx={{ color: "grey.300" }}
                   />
-                  <Typography variant="contentMBold" py={1} key={attr}>
-                    <b>:</b> {studentDetail[attr]}
-                  </Typography>
+                  <Tooltip title={studentLearningRoutineAttrTooltip[attr]}>
+                    <Typography variant="contentMBold" py={1} key={attr}>
+                      <b>:</b> {studentDetail[attr]}
+                    </Typography>
+                  </Tooltip>
                 </>
               ))}
             </Grid>
@@ -376,10 +395,12 @@ function StudentPerformance(props) {
                     flexItem
                     sx={{ color: "grey.300" }}
                   />
-                  <Typography variant="contentMBold" py={1} key={attr}>
-                    <b>:</b>
-                    {studentDetail[attr]}
-                  </Typography>
+                  <Tooltip title={studentCharacterAttrTooltips[attr]}>
+                    <Typography variant="contentMBold" py={1} key={attr}>
+                      <b>: </b>
+                      {studentDetail[attr]}
+                    </Typography>
+                  </Tooltip>
                 </>
               ))}
             </Grid>

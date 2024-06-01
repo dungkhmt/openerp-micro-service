@@ -12,6 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import ChartTitle from "./ChartTitle";
+import ChartTooltip from "./ChartTooltip";
 import { useTheme } from "@emotion/react";
 
 const StyledBox = styled(Box)(({ theme }) => ({
@@ -59,7 +60,7 @@ const DoubleBarChart = ({ data, fieldX = "bucket", fieldY = "delta" }) => {
                 bottom: 30,
               }}
             >
-              <Tooltip />
+              <Tooltip content={<ChartTooltip />} />
 
               <XAxis
                 dataKey="contestId"
@@ -107,7 +108,7 @@ const DoubleBarChart = ({ data, fieldX = "bucket", fieldY = "delta" }) => {
                   />
                 ))}
               </Bar>
-              <Tooltip />
+              <Tooltip content={<ChartTooltip />} />
 
               <CartesianGrid
                 vertical={false}
