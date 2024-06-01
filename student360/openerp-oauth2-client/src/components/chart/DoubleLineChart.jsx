@@ -1,12 +1,5 @@
 /* eslint-disable no-unused-vars */
-import {
-  Stack,
-  useTheme,
-  styled,
-  Box,
-  Typography,
-  Skeleton,
-} from "@mui/material";
+import { Stack, useTheme, styled, Box, Typography } from "@mui/material";
 import React from "react";
 import {
   CartesianGrid,
@@ -18,6 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import ChartTitle from "./ChartTitle";
+import ChartTooltip from "./ChartTooltip";
 import ChartSkeleton from "./ChartSkeleton";
 
 const StyledBox = styled(Box)(({ theme }) => ({
@@ -82,7 +76,7 @@ const DoubleLineChart = ({
         <Stack width="100%" height="100%" mt={3}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ left: 0, right: 30 }}>
-              <Tooltip />
+              <Tooltip content={<ChartTooltip />} />
 
               <CartesianGrid
                 vertical={false}

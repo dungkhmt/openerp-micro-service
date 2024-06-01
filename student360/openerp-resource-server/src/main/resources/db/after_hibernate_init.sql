@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW public.max_point_contest_view
+CREATE MATERIALIZED VIEW IF NOT EXISTS public.max_point_contest_view
 AS SELECT ccpn.contest_id,
           sum(tsn.test_case_point) AS total_point
    FROM test_case_new tsn
@@ -8,7 +8,7 @@ AS SELECT ccpn.contest_id,
    ORDER BY ccpn.contest_id;
 
 
-CREATE OR REPLACE VIEW public.midterm_final_submission_view
+CREATE MATERIALIZED VIEW IF NOT EXISTS public.midterm_final_submission_view
 AS SELECT ranked.user_submission_id,
           ranked.contest_id,
           ranked.problem_id,
@@ -33,9 +33,9 @@ AS SELECT ranked.user_submission_id,
                 END) ORDER BY csn.point DESC) AS rn
           FROM contest_submission_new csn
           WHERE upper(csn.contest_id::text) ~~ upper('%midterm%'::text) OR upper(csn.contest_id::text) ~~ upper('%final%'::text)) ranked
-   WHERE ranked.rn = 1;
+   WHERE ranked.semester is not null and ranked.rn = 1;
 
-CREATE OR REPLACE VIEW submission_hourly_summary AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS submission_hourly_summary AS
 SELECT
     date_trunc('day', created_stamp) AS submission_date,
     EXTRACT(hour FROM created_stamp) AS hour_of_day,
