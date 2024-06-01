@@ -106,7 +106,8 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmission, 
             "ORDER BY r.submissionMonth " )
     List<StudentSubmissionBySemester> findSemesterSubmissionHaveMaxSubmission(@Param("userId") String userId, @Param("semesterMax") String semesterMax);
 
-    @Query(value = "WITH midterm_point AS ( "
+    @Query(value =
+            "WITH midterm_point AS ( "
             + "SELECT "
             + "mfs.user_submission_id, "
             + "mfs.contest_id, "
@@ -206,8 +207,69 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmission, 
                     "LEFT JOIN state ON s.semester = state.semester AND state.evaluation_result = 'pass'\n" +
                     "GROUP BY s.semester " +
                     "ORDER BY s.semester "
-            , nativeQuery = true
-    )
+            , nativeQuery = true)
     Object[] findResultAllSemester();
 
+    @Query(value =
+            "WITH midterm_point AS ( " +
+            "SELECT " +
+            "mfs.user_submission_id, " +
+            "mfs.contest_id, " +
+            "semester, " +
+            "CAST(SUM(mfs.point) * 10.0 / mpc.total_point AS DECIMAL(15, 2)) AS midterm_point " +
+            "FROM " +
+            "midterm_final_submission_view mfs " +
+            "INNER JOIN " +
+            "max_point_contest_view mpc ON mfs.contest_id = mpc.contest_id " +
+            "WHERE " +
+            "semester IS NOT NULL " +
+            "AND UPPER(mfs.contest_id) LIKE UPPER('%midterm%') " +
+            "GROUP BY " +
+            "mfs.user_submission_id, mfs.contest_id, semester, mpc.total_point " +
+            "), " +
+            "final_point AS ( " +
+            "SELECT " +
+            "mfs.user_submission_id, " +
+            "mfs.contest_id, " +
+            "semester, " +
+            "CAST(SUM(mfs.point) * 10.0 / mpc.total_point AS DECIMAL(15, 2)) AS final_point " +
+            "FROM " +
+            "midterm_final_submission_view mfs " +
+            "INNER JOIN " +
+            "max_point_contest_view mpc ON mfs.contest_id = mpc.contest_id " +
+            "WHERE " +
+            "semester IS NOT NULL " +
+            "AND UPPER(mfs.contest_id) LIKE UPPER('%final%') " +
+            "GROUP BY " +
+            "mfs.user_submission_id, mfs.contest_id, semester, mpc.total_point " +
+            ") " +
+            "SELECT " +
+            "mp.semester, " +
+            "CASE " +
+            "WHEN COALESCE(mp.midterm_point, 0) < 2.5 " +
+            "OR COALESCE(fp.final_point, 0) < 2.5 " +
+            "OR (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) <= 3.5 THEN 'F' " +
+            "WHEN (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) > 8.4 THEN 'A/A+' " +
+            "WHEN (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) > 6.9 THEN 'B/B+' " +
+            "WHEN (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) > 5.4 THEN 'C/C+' " +
+            "ELSE 'D/D+' " +
+            "END AS evaluation_result, " +
+            "COUNT(*) AS num_students " +
+            "FROM " +
+            "midterm_point mp " +
+            "FULL OUTER JOIN " +
+            "final_point fp ON mp.user_submission_id = fp.user_submission_id " +
+            "GROUP BY " +
+            "mp.semester, " +
+            "CASE " +
+            "WHEN COALESCE(mp.midterm_point, 0) < 2.5 " +
+            "OR COALESCE(fp.final_point, 0) < 2.5 " +
+            "OR (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) <= 3.5 THEN 'F' " +
+            "WHEN (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) > 8.4 THEN 'A/A+' " +
+            "WHEN (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) > 6.9 THEN 'B/B+' " +
+            "WHEN (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) > 5.4 THEN 'C/C+' " +
+            "ELSE 'D/D+' " +
+            "END " +
+            "ORDER BY mp.semester DESC ", nativeQuery = true)
+    Object[] numberScoreBySemester();
 }

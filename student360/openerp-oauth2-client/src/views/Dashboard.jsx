@@ -6,14 +6,16 @@ import CommandLine from "@heroicons/react/24/solid/CommandLineIcon";
 import AcademicCap from "@heroicons/react/24/solid/AcademicCapIcon";
 import Users from "@heroicons/react/24/solid/UsersIcon";
 import InfoCard from "../components/card/InfoCard";
-import DailyProgramming from "../components/dashboard/DailyProgramming";
-import DailyQuiz from "../components/dashboard/DailyQuiz";
-import { Box } from "@material-ui/core";
-import TopicWordCloud from "../components/dashboard/TopicWordCloud";
+// import DailyProgramming from "../components/dashboard/DailyProgramming";
+// import DailyQuiz from "../components/dashboard/DailyQuiz";
+// import { Box } from "@material-ui/core";
+// import TopicWordCloud from "../components/dashboard/TopicWordCloud";
 import { request } from "../api";
 import LineChartComponent from "../components/chart/LineChart";
+import ScoreTable from "../components/table/ScoreTable";
 
 export default function Home() {
+  const TABLE_HEADERS = ["Semester", "A/A+", "B/B+", "C/C+", "D/D+", "F"];
   const [statistics, setStatistics] = useState([]);
   useEffect(() => {
     request("get", "/dash-board", (res) => {
@@ -78,38 +80,44 @@ export default function Home() {
             />
           </Grid>
         </Grid>
-        <Grid
-          container
-          justifyContent="space-between"
-          sx={{ marginTop: "16px" }}
-        >
-          <LineChartComponent
-            data={statistics.totalStudentPassBySemester}
-            title="Summary of Student Passed By Semester"
-            xAxisName="Semester"
-            yAxisName="Total Student Passed"
-          />
-        </Grid>
 
-        <Grid
+        {/* <Grid
           container
           justifyContent="space-between"
           sx={{ marginTop: "20px" }}
-        >
-          {/* <Grid item xs={7}>
+        > */}
+        {/* <Grid item xs={7}>
             <Box>
               <DailyQuiz />
               <Box sx={{ height: "24px" }} />
               <DailyProgramming />
             </Box>
           </Grid> */}
-          <Grid item xs={4.75}>
+        {/* <Grid item xs={4.75}>
             <TopicWordCloud />
-          </Grid>
-        </Grid>
+          </Grid> */}
+        {/* </Grid> */}
       </Grid>
 
+      <LineChartComponent
+        data={statistics?.totalStudentPassBySemester}
+        title="Number of Students Passing by Semester"
+        xAxisName="Semester"
+        yAxisName="Total Student Passed"
+      />
+      <LineChartComponent
+        data={statistics?.totalStudentPlagiarismBySemester}
+        title="Number of Students Cheating by Semester"
+        xAxisName="Semester"
+        yAxisName="Total Student Plagiarism"
+      />
       {/* </HustContainerCard> */}
+      <ScoreTable
+        title="Semester Student Grades"
+        headTable={TABLE_HEADERS}
+        data={statistics?.semesterScores}
+        typeTable="seller"
+      />
     </Stack>
   );
 }
