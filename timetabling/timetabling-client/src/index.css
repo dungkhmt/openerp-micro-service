@@ -103,12 +103,9 @@ code {
 
 /* CSS for room-occupation */
 
-th,
-table {
-  border: 1px solid;
-}
 
-td {
+
+.cell {
   padding: 0.5rem;
   overflow: hidden;
   text-overflow: ellipsis;
