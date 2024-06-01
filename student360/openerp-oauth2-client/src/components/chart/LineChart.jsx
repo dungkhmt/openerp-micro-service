@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Stack, useTheme, styled, Box, Typography } from "@mui/material";
+
 import React from "react";
 import {
   CartesianGrid,
@@ -12,6 +13,7 @@ import {
 } from "recharts";
 import ChartTitle from "./ChartTitle";
 import ChartSkeleton from "./ChartSkeleton";
+import CustomTooltip from "./ChartTooltip";
 
 const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.grey[100],
@@ -102,7 +104,7 @@ const LineChartCoponent = ({ data, title, subtitle, xAxisName, yAxisName }) => {
         <Stack width="100%" height="100%" mt={3}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ left: 0, right: 30 }}>
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
 
               <CartesianGrid
                 vertical={false}
