@@ -345,6 +345,7 @@ function StudentPerformance(props) {
           </Grid>
         </CardContent>
       </Card>
+
       {/* Tính cách sinh viên */}
       <Card>
         <CardHeader

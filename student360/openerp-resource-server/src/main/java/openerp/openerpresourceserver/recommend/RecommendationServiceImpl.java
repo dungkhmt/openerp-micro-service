@@ -63,6 +63,18 @@ public class RecommendationServiceImpl implements RecommendationService {
         }
         else {
             recommendedCourses = courses.stream()
+                    .filter(course -> course.getRating() >= defaultRating)
+                    .filter(course -> {
+                        if (defaultHour == 0)
+                            return course.getHours() < 1 && course.getHours() >= 0;
+                        else if (defaultHour == 1)
+                            return course.getHours() > 1 && course.getHours() <= 3;
+                        if (defaultHour == 3)
+                            return course.getHours() > 3 && course.getHours() <= 6;
+                        else if (defaultHour == 6)
+                            return course.getHours() > 6 && course.getHours() <= 17;
+                        return course.getHours() > 17;
+                    })
                     .sorted(Comparator.comparingDouble(Course::getAdvanceTfIdfScore).reversed())
                     .limit(10)
                     .collect(Collectors.toList());
