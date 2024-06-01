@@ -1,4 +1,4 @@
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import {
@@ -9,7 +9,13 @@ import {
   FormControl,
   FormHelperText,
   IconButton,
-  TextField
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
 } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -23,16 +29,11 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "react-widgets/styles.css";
 import readXlsxFile from "read-excel-file";
-import {
-  days_Of_Week,
-  periods_Of_Day,
-  slots_Of_Period,
-  weeks_Of_Semester,
-} from "utils/formatter";
 import { v4 as uuidv4 } from "uuid";
 import DownloadButton from "./components/DownloadButton";
 import BasicSelect from "./components/SelectBox";
 import SelectFileButton from "./components/SelectFileButton";
+import TagInput from "./components/TagInput/TagInput";
 
 function ClassManagementScreen() {
   const [classes, setClasses] = useState([]);
@@ -68,9 +69,11 @@ function ClassManagementScreen() {
   const [periodInput, setPeriodInput] = useState("");
   const [semesterInput, setSemesterInput] = useState("");
   const [departmentInput, setDepartmentInput] = useState("");
+  const [avoidWeekInput, setAvoidWeekInput] = useState([]);
+  const [weekConstraintInput, setWeekConstraintInput] = useState(0);
 
   const [invalidRows, setInvalidRows] = useState({});
-  const [roomChartKey, setRoomChartKey] = useState(0); 
+  const [roomChartKey, setRoomChartKey] = useState(0);
   useEffect(() => {
     function fetch_initial_data() {
       request(
@@ -92,19 +95,19 @@ function ClassManagementScreen() {
 
   const columns = [
     {
-      title: "Class Code",
+      title: "Mã lớp",
       field: "class_code",
     },
     {
-      title: "Quantity",
+      title: "Số lượng SV",
       field: "quantity",
     },
     {
-      title: "Note",
+      title: "Tên lớp",
       field: "note",
     },
     {
-      title: "Edit",
+      title: "Chỉnh sửa",
       sorting: false,
       render: (rowData) => (
         <IconButton
@@ -119,7 +122,7 @@ function ClassManagementScreen() {
       ),
     },
     {
-      title: "Delete",
+      title: "Xóa",
       sorting: false,
       render: (rowData) => (
         <IconButton
@@ -144,10 +147,15 @@ function ClassManagementScreen() {
   };
 
   const edit_btn_onclick = (item) => {
-    request("get", `/lab-timetabling/room/department/${item.department_id}`, (res) => {
-      setRoomsByDepartment(res.data);
-    });
-    
+    console.log(item);
+    request(
+      "get",
+      `/lab-timetabling/room/department/${item.department_id}`,
+      (res) => {
+        setRoomsByDepartment(res.data);
+      }
+    );
+
     request(
       "get",
       `/lab-timetabling/assign/semester/${currentSemester}`,
@@ -174,8 +182,10 @@ function ClassManagementScreen() {
     setIdInput(item.class);
     setQuantityInput(item.quantity);
     setPeriodInput(item.period);
-    setNumberOfLessonsInput(item.number_of_lessons);
+    setNumberOfLessonsInput(item.lessons_per_semester);
     setNoteInput(item.note);
+    setAvoidWeekInput(item.avoid_week_schedule_constraint || []);
+    setWeekConstraintInput(item.week_schedule_constraint || 0);
 
     setUpdateModalVisible(true);
   };
@@ -212,7 +222,6 @@ function ClassManagementScreen() {
     setCreationModalVisible(true);
   };
   const submit_handler = (http_method, url, data) => {
-    console.log(data);
     setLoading(true);
     request(
       http_method,
@@ -270,8 +279,9 @@ function ClassManagementScreen() {
       for (var i = 1; i < rows.length; i++) {
         var object = {};
         console.log(columns_name);
-        for(let col_index in commonIndexes){
-          object[name_field_map[col_index].field] = rows[i][commonIndexes[col_index]];
+        for (let col_index in commonIndexes) {
+          object[name_field_map[col_index].field] =
+            rows[i][commonIndexes[col_index]];
         }
         object["id"] = i;
         console.log(object);
@@ -299,12 +309,12 @@ function ClassManagementScreen() {
     return false; // Nếu không có giá trị true nào thì return false
   };
   const submit_data_from_file = () => {
-    var data = fileData.filter((_class) =>
-      selectedClassIds.includes(_class.id)
-    ).map((_class) => {
-      const {id, ...rest} = _class;
-      return {...rest, semester_id: currentSemester};
-    })
+    var data = fileData
+      .filter((_class) => selectedClassIds.includes(_class.id))
+      .map((_class) => {
+        const { id, ...rest } = _class;
+        return { ...rest, semester_id: currentSemester };
+      });
 
     console.log(data);
 
@@ -323,7 +333,7 @@ function ClassManagementScreen() {
   };
 
   const add_row_btn_onclick = () => {
-    var updatedData = [...assignedData]
+    var updatedData = [...assignedData];
     if (assignedData.length < totalLessons) {
       const id = uuidv4();
       const newRow = {
@@ -335,7 +345,7 @@ function ClassManagementScreen() {
         period: null,
         start_slot: null,
         quantity: selectedItem.quantity,
-        duration: selectedItem.period
+        duration: selectedItem.period,
       };
       const updatedData = [...assignedData, newRow];
       setAssignedData(updatedData);
@@ -346,7 +356,9 @@ function ClassManagementScreen() {
   const remove_btn_onclick = (item) => {
     var tr_id = item.target.parentNode.parentNode.getAttribute("id");
     const updatedData = assignedData.filter((assign) => assign.id != tr_id);
-    const updatedAssignsBySemester = assignsBySemester.filter((assign)=>assign.id != tr_id)
+    const updatedAssignsBySemester = assignsBySemester.filter(
+      (assign) => assign.id != tr_id
+    );
 
     var r = redundantAssignedData.slice();
     staticAssigned.forEach((a) => {
@@ -359,26 +371,26 @@ function ClassManagementScreen() {
     });
     setRedundantAssignedData(r);
     update_invalid_rows(updatedData, updatedAssignsBySemester);
-    setAssignedData(prev=>prev.filter((assign)=>assign.id != tr_id));
-    setAssignsBySemester(prev=>prev.filter((assign)=>assign.id != tr_id));
+    setAssignedData((prev) => prev.filter((assign) => assign.id != tr_id));
+    setAssignsBySemester((prev) => prev.filter((assign) => assign.id != tr_id));
   };
 
-  const update_invalid_rows = (assignedData_var, assignsBySemester_var) => { 
+  const update_invalid_rows = (assignedData_var, assignsBySemester_var) => {
     var assigned_set_array = [];
     assignedData_var.forEach((assign) => {
-      if(assignsBySemester_var.filter((a)=>a.id == assign.id).length == 0){
+      if (assignsBySemester_var.filter((a) => a.id == assign.id).length == 0) {
         assigned_set_array.push(assign);
       }
-    })
+    });
     assignsBySemester_var.forEach((assign) => {
       assigned_set_array.push(assign);
-    })
+    });
     var invalid = {};
     assignedData_var.forEach((assign) => {
       invalid[assign.id] = is_invalid(assign, assigned_set_array);
     });
     setInvalidRows(invalid);
-  }
+  };
   const is_invalid = (object, assigned_set_array) => {
     // not null constraint
     for (let key in object) {
@@ -387,70 +399,96 @@ function ClassManagementScreen() {
       }
     }
     // room capacity constraint
-    const room_assigned = roomsByDepartment.filter((room) => (room.id == object.room_id))[0];
+    const room_assigned = roomsByDepartment.filter(
+      (room) => room.id == object.room_id
+    )[0];
     if (room_assigned.capacity < object.quantity) return true;
     // time assigned constraint
-    for(let i=0;i<assigned_set_array.length;i++){
-      if(assigned_set_array[i].id == object.id) continue;
+    for (let i = 0; i < assigned_set_array.length; i++) {
+      if (assigned_set_array[i].id == object.id) continue;
       const assign = assigned_set_array[i];
-      if (assign.week == object.week){
-          if(assign.room_id == object.room_id){
-          const time_slot = (day, period, start) => (day-2)*12 + (period-1)*6 + start
-          const first_time_slot = time_slot(assign.day_of_week, assign.period, assign.start_slot);
-          const second_time_slot = time_slot(object.day_of_week, object.period, object.start_slot);
-          console.log(first_time_slot, second_time_slot)
-          if (first_time_slot <= second_time_slot && second_time_slot <= first_time_slot + assign.duration - 1) return true
-          if (second_time_slot <= first_time_slot && first_time_slot <= second_time_slot + object.duration - 1) return true
+      if (assign.week == object.week) {
+        if (assign.room_id == object.room_id) {
+          const time_slot = (day, period, start) =>
+            (day - 2) * 12 + (period - 1) * 6 + start;
+          const first_time_slot = time_slot(
+            assign.day_of_week,
+            assign.period,
+            assign.start_slot
+          );
+          const second_time_slot = time_slot(
+            object.day_of_week,
+            object.period,
+            object.start_slot
+          );
+          console.log(first_time_slot, second_time_slot);
+          if (
+            first_time_slot <= second_time_slot &&
+            second_time_slot <= first_time_slot + assign.duration - 1
+          )
+            return true;
+          if (
+            second_time_slot <= first_time_slot &&
+            first_time_slot <= second_time_slot + object.duration - 1
+          )
+            return true;
         }
       }
     }
-    return false
-  }
+    return false;
+  };
 
   const handleInputChange = (item, tr_id, property) => {
     const copy = assignedData?.map((row) => {
-        if (row.id === tr_id) {
-          const new_row_obj = { ...row, [property]: item.target.value  }
-          return new_row_obj;
-        }
-        return row
+      if (row.id === tr_id) {
+        const new_row_obj = { ...row, [property]: item.target.value };
+        return new_row_obj;
+      }
+      return row;
     });
-    console.log(copy)
+    console.log(copy);
     update_invalid_rows(copy, assignsBySemester);
     setAssignedData(copy);
   };
   const save_class_onclick = () => {
-    const assigned = assignedData?.map((assign) => {
-      return {
-        ...assign,
-        lesson: { id: assign.class_id },
-        room: { id: assign.room_id },
-        semester_id: selectedItem.semester_id,
-      };
-    });
+    // const assigned = assignedData?.map((assign) => {
+    //   return {
+    //     ...assign,
+    //     lesson: { id: assign.class_id },
+    //     room: { id: assign.room_id },
+    //     semester_id: selectedItem.semester_id,
+    //   };
+    // });
 
-    const redundant_assigned = redundantAssignedData.map((id) => {
-      return {
-        id: id,
-      };
-    });
-    console.log(assigned);
+    // const redundant_assigned = redundantAssignedData.map((id) => {
+    //   return {
+    //     id: id,
+    //   };
+    // });
+    // console.log(assigned);
 
     const update_class = {
       class_code: idInput,
       quantity: quantityInput,
       note: noteInput,
       period: periodInput,
-      number_of_lessons: numberOfLessonsInput,
       department_id: departmentInput,
+      lessons_per_semester: numberOfLessonsInput,
+      week_schedule_constraint: weekConstraintInput,
+      avoid_week_schedule_constraint: avoidWeekInput
     };
 
-    submit_handler("patch", `/lab-timetabling/class/${selectedItem.id}`, update_class);
-    submit_handler("post", `/lab-timetabling/assign`, {
-      update: assigned,
-      remove: redundant_assigned,
-    });
-    console.log(assigned);
+    console.log(update_class);
+    submit_handler(
+      "patch",
+      `/lab-timetabling/class/${selectedItem.id}`,
+      update_class
+    );
+    // submit_handler("post", `/lab-timetabling/assign`, {
+    //   update: assigned,
+    //   remove: redundant_assigned,
+    // });
+    // console.log(assigned);
   };
   return (
     <div>
@@ -471,7 +509,7 @@ function ClassManagementScreen() {
         >
           <BasicSelect
             items={semesters}
-            label={"Semester"}
+            label={"Học kỳ"}
             value={currentSemester}
             onChange={semester_on_change}
           />
@@ -484,18 +522,29 @@ function ClassManagementScreen() {
           }}
         >
           {selectedFile?.name}
-          <DownloadButton label={"Template"} fileUrl="/static/xlsx/template.xlsx" fileName={selectedFile} />
+          <DownloadButton
+            label={"Tải xuống template"}
+            fileUrl="/static/xlsx/template.xlsx"
+            fileName={selectedFile}
+          />
           <div style={{ padding: "0 12px" }}>
-            <SelectFileButton disabled={currentSemester==null} onChange={file_on_change}/>
+            <SelectFileButton
+              disabled={currentSemester == null}
+              onChange={file_on_change}
+            />
           </div>
-          <Button disabled={currentSemester==null} variant="outlined" onClick={create_btn_onclick}>
-            <AddIcon/>
-            Create
+          <Button
+            disabled={currentSemester == null}
+            variant="outlined"
+            onClick={create_btn_onclick}
+          >
+            <AddIcon />
+            Tạo mới
           </Button>
         </div>
       </div>
       <StandardTable
-        title="Class List"
+        title="Danh sách lớp học"
         columns={columns}
         data={classes}
         hideCommandBar={true}
@@ -512,7 +561,7 @@ function ClassManagementScreen() {
         fullWidth={true}
         maxWidth={"md"}
       >
-        <DialogTitle>Update class</DialogTitle>
+        <DialogTitle>Cập nhật lớp học</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1 }}>
             <div
@@ -521,45 +570,102 @@ function ClassManagementScreen() {
               <div>
                 <BasicSelect
                   items={departments}
-                  label={"Department"}
+                  label={"Viện"}
                   value={departmentInput}
-                  onChange={e=>setDepartmentInput(e.target.target)}
+                  onChange={(e) => setDepartmentInput(e.target.target)}
                 />
               </div>
               <TextField
-                label="Note"
+                label="Tên lớp"
                 id="outlined-size-small"
                 defaultValue={noteInput}
-                onChange={(e) =>setNoteInput(e.target.value)}
+                onChange={(e) => setNoteInput(e.target.value)}
                 size="small"
                 style={inputTextStyle}
               />
               <TextField
-                label="Class ID"
+                label="Mã lớp"
                 id="outlined-size-small"
                 defaultValue={idInput}
-                onChange={e=>setIdInput(e.target.value)}
+                onChange={(e) => setIdInput(e.target.value)}
                 size="small"
                 style={inputTextStyle}
               />
               <TextField
-                label="Quantity"
+                label="Số lượng SV"
                 id="outlined-size-small"
                 defaultValue={quantityInput}
-                onChange={e=>setQuantityInput(e.target.value)}
+                onChange={(e) => setQuantityInput(e.target.value)}
                 size="small"
                 style={inputTextStyle}
               />
               <TextField
-                label="Period"
+                label="Số tiết một buổi"
                 id="outlined-size-small"
                 defaultValue={periodInput}
                 onChange={(e) => setPeriodInput(e.target.value)}
                 size="small"
                 style={inputTextStyle}
               />
+              <TextField
+                label="Số buổi một kỳ"
+                id="outlined-size-small"
+                defaultValue={numberOfLessonsInput}
+                onChange={(e) => setNumberOfLessonsInput(e.target.value)}
+                size="small"
+                style={inputTextStyle}
+              />
             </div>
-            <div>
+            Điều kiện xếp lịch
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Điều kiện</TableCell>
+                    <TableCell>Tránh tuần</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>
+                      <BasicSelect
+                        items={[
+                          { id: 1, name: "Tuần lẻ" },
+                          { id: 2, name: "Tuần chẵn" },
+                        ]}
+                        label={"Tuần"}
+                        value={weekConstraintInput}
+                        onChange={(e) => {
+                          setWeekConstraintInput(e.target.value);
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <TagInput
+                        placeholder={"Thêm tuần"}
+                        tags={avoidWeekInput || []}
+                        onTagsChange={(newTags) => {
+                          setAvoidWeekInput(newTags);
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => {
+                          setWeekConstraintInput(0)
+                          setAvoidWeekInput([])
+                        }}
+                      >
+                        Reset
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+            {/* <div>
               time table (assigned = {selectedItem.assigns?.length}, require ={" "}
               {totalLessons})
               <table sx={{ width: 1 }}>
@@ -641,12 +747,14 @@ function ClassManagementScreen() {
               >
                 Add row
               </Button>
-            </div>
+            </div> */}
           </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={closeModal}>Cancel</Button>
-          <Button onClick={save_class_onclick} disabled={isDisabled()}>Save</Button>
+          <Button onClick={save_class_onclick} disabled={isDisabled()}>
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -654,9 +762,9 @@ function ClassManagementScreen() {
         open={creationModalVisible}
         onClose={closeModal}
         // textClose="Update"
-        title="Create new class"
+        title="Tạo mới lớp học"
         isLoading={loading}
-        textOk="Create"
+        textOk="Tạo"
         onOk={() => {
           submit_handler("post", `/lab-timetabling/class`, {
             semester_id: semesterInput,
@@ -665,6 +773,7 @@ function ClassManagementScreen() {
             period: periodInput,
             note: noteInput,
             department_id: departmentInput,
+            lessons_per_semester: numberOfLessonsInput,
           });
         }}
       >
@@ -680,19 +789,19 @@ function ClassManagementScreen() {
               items={departments}
               label={"Department"}
               value={departmentInput}
-              onChange={e=>setDepartmentInput(e.target.value)}
+              onChange={(e) => setDepartmentInput(e.target.value)}
             />
           </div>
           <TextField
-            label="Class ID"
+            label="Mã lớp"
             id="outlined-size-small"
             defaultValue={idInput}
-            onChange={e=>setIdInput(e.target.value)}
+            onChange={(e) => setIdInput(e.target.value)}
             size="small"
             style={inputTextStyle}
           />
           <TextField
-            label="Note"
+            label="Tên lớp"
             id="outlined-size-small"
             defaultValue={noteInput}
             onChange={(e) => setNoteInput(e.target.value)}
@@ -700,18 +809,26 @@ function ClassManagementScreen() {
             style={inputTextStyle}
           />
           <TextField
-            label="Quantity"
+            label="Số lượng SV"
             id="outlined-size-small"
             defaultValue={quantityInput}
-            onChange={e=>setQuantityInput(e.target.value)}
+            onChange={(e) => setQuantityInput(e.target.value)}
             size="small"
             style={inputTextStyle}
           />
           <TextField
-            label="Period"
+            label="Số tiết một buổi"
             id="outlined-size-small"
             defaultValue={periodInput}
             onChange={(e) => setPeriodInput(e.target.value)}
+            size="small"
+            style={inputTextStyle}
+          />
+          <TextField
+            label="Số buổi một kỳ"
+            id="outlined-size-small"
+            defaultValue={periodInput}
+            onChange={(e) => setNumberOfLessonsInput(e.target.value)}
             size="small"
             style={inputTextStyle}
           />
@@ -727,7 +844,11 @@ function ClassManagementScreen() {
         isLoading={loading}
         textOk="Delete"
         onOk={() => {
-          submit_handler("delete", `/lab-timetabling/class/${selectedItem.id}`, null);
+          submit_handler(
+            "delete",
+            `/lab-timetabling/class/${selectedItem.id}`,
+            null
+          );
         }}
       ></HustModal>
 

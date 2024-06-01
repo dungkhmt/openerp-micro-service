@@ -4,10 +4,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 public class AutoSchedulingRequest {
-    HashMap<Long, Integer> weekConstraintMap;
-    HashMap<Long, Integer> avoidWeekMap;
+    Long solvingTimeLimit;
 }

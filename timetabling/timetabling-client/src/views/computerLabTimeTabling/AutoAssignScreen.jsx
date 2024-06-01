@@ -1,11 +1,14 @@
 import { FileDownload } from "@mui/icons-material";
 import {
   Button,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
-  Select,
+  LinearProgress,
   Table,
   TableBody,
   TableCell,
@@ -19,26 +22,31 @@ import { StandardTable } from "erp-hust/lib/StandardTable";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { submission_status, weeks_Of_Semester } from "utils/formatter";
+import { submission_status } from "utils/formatter";
 import BasicSelect from "./components/SelectBox";
-import { download_result_file } from "./service/extractAutoSchedulingResult";
+import {
+  download_result_file,
+  produce_result_data,
+} from "./service/extractAutoSchedulingResult";
+import FindInPageIcon from "@mui/icons-material/FindInPage";
+import {time_limit_input} from 'utils/formatter'
+
 const AutoAssignScreen = () => {
   const [semesters, setSemesters] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [results, setResults] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedSubmission, setSelectedSubmission] = useState({});
-
-  const [consistentWeeklyConstraint, setConsistentWeeklyConstraint] =
-    useState(null);
-  const [oddWeekSchedulingConstraint, setOddWeekSchedulingConstraint] =
-    useState(null);
-  const [evenWeekSchedulingConstraint, setEvenWeekSchedulingConstraint] =
-    useState(null);
+  const [selectedResult, setSelectedResult] = useState([]);
+  const [timeLimitInput, setTimeLimitInput] = useState(null);
 
   const [classes, setClasses] = useState([]);
   const [weekConstraintMap, setWeekConstraintMap] = useState({});
   const [avoidWeekMap, setAvoidWeekMap] = useState({});
+  const [tags, setTags] = useState([]);
+  const [viewResultModal, setViewResultModal] = useState(false);
+  const [resultProgressLoading, setResultProgressLoading] = useState(true);
+  const [autoSchedulingInProgress, setAutoSchedulingInProgress] = useState(false);
 
   const semester_on_change = (e) => {
     const semesterValue = e.target.value;
@@ -58,13 +66,32 @@ const AutoAssignScreen = () => {
       "get",
       `/lab-timetabling/auto-assign/result/${submission_id}`,
       (res) => {
-        download_result_file(item, res.data);
+        produce_result_data(item, res.data).then((res) => download_result_file(res));
       }
     ).then();
   };
 
+  const view_result = (item) => {
+    setResultProgressLoading(true);
+    const submission_id = item.id;
+    setSelectedSubmission(item);
+    request(
+      "get",
+      `/lab-timetabling/auto-assign/result/${submission_id}`,
+      (res) => {
+        produce_result_data(item, res.data).then((res) => {
+          setResultProgressLoading(false);
+          setSelectedResult(res.slice(2));
+        });
+      }
+    ).then();
+    setViewResultModal(true);
+  };
+
   const handleClose = () => {
-    setOpen(false);
+    setSelectedResult([]);
+    setViewResultModal(false);
+    setSelectedSubmission({});
   };
 
   const columns = [
@@ -84,6 +111,22 @@ const AutoAssignScreen = () => {
         const c = submission_status.find((item) => item.id === data.status);
         return c?.name;
       },
+    },
+    {
+      title: "Kết quả",
+      sorting: false,
+      render: (rowData) => (
+        <IconButton
+          disabled={rowData.status != 1}
+          onClick={() => {
+            view_result(rowData);
+          }}
+          variant="contained"
+          color="success"
+        >
+          <FindInPageIcon />
+        </IconButton>
+      ),
     },
     {
       title: "Kết quả",
@@ -120,20 +163,25 @@ const AutoAssignScreen = () => {
     ).then();
   }, []);
   const handleAutoAssign = () => {
+    toast("Đã tạo request", {
+      position: toast.POSITION.TOP_RIGHT,
+      hideProgressBar: false,
+      type: "success",
+      autoClose: false
+    });
+    setAutoSchedulingInProgress(true);
     const filteredWeekConstraintMap = Object.fromEntries(
       Object.entries(weekConstraintMap).filter(([key, value]) => value !== 0)
-  );
+    );
     const filteredAvoidWeekMap = Object.fromEntries(
-      Object.entries(avoidWeekMap).filter(([key, value]) => value !== 0)
-  );
-    console.log(filteredWeekConstraintMap);
-    console.log(filteredAvoidWeekMap);
+      Object.entries(avoidWeekMap).filter(([key, value]) => value.length !== 0)
+    );
     var url = `/lab-timetabling/auto-assign/${selectedSemester}`;
     request(
       "post",
       url,
       (res) => {
-        toast("Đã tạo request", {
+        toast(res.data.msg, {
           position: toast.POSITION.TOP_RIGHT,
           hideProgressBar: false,
           type: "success",
@@ -150,8 +198,9 @@ const AutoAssignScreen = () => {
       {
         weekConstraintMap: filteredWeekConstraintMap,
         avoidWeekMap: filteredAvoidWeekMap,
+        solvingTimeLimit: timeLimitInput
       }
-    ).then();
+    ).then(e=>setAutoSchedulingInProgress(false));
   };
   return (
     <Box sx={{ width: 1 }}>
@@ -163,36 +212,7 @@ const AutoAssignScreen = () => {
           onChange={semester_on_change}
         />
       </div>
-      <div>
-        {/* Điều kiện (tùy chọn) <br />
-        <FormGroup>
-          <FormControlLabel
-            disabled={selectedSemester ? false : true}
-            control={
-              <Checkbox
-                checked={oddWeekSchedulingConstraint}
-                onChange={(e) => {
-                  setOddWeekSchedulingConstraint(e.target.checked);
-                  console.log(e.target.checked);
-                }}
-              />
-            }
-            label="Xếp lịch vào các tuần lẻ"
-          />
-          <FormControlLabel
-            disabled={selectedSemester ? false : true}
-            control={
-              <Checkbox
-                checked={evenWeekSchedulingConstraint}
-                onChange={(e) => {
-                  setEvenWeekSchedulingConstraint(e.target.checked);
-                  console.log(e.target.checked);
-                }}
-              />
-            }
-            label="Xếp lịch vào các tuần chẵn"
-          />
-        </FormGroup> */}
+      {/* <div>
         {(classes.length == 0)?'Không có dữ liệu':
         <TableContainer>
           <Table>
@@ -225,17 +245,12 @@ const AutoAssignScreen = () => {
                       />
                     </TableCell>
                     <TableCell>
-                      <BasicSelect
-                        items={weeks_Of_Semester}
-                        label={"Tuần"}
-                        value={avoidWeekMap[item.id]}
-                        onChange={(e) => {
-                          setAvoidWeekMap({
-                            ...avoidWeekMap,
-                            [item.id]: e.target.value,
-                          });
-                        }}
-                      />
+                      <TagInput placeholder={"Thêm tuần"} tags={avoidWeekMap[item.id] || []} onTagsChange={(newTags)=>{
+                        setAvoidWeekMap({
+                          ...avoidWeekMap,
+                          [item.id]: newTags
+                        });
+                      }}/>
                     </TableCell>
                     <TableCell>
                       <Button
@@ -248,7 +263,7 @@ const AutoAssignScreen = () => {
                           });
                           setAvoidWeekMap({
                             ...avoidWeekMap,
-                            [item.id]: 0,
+                            [item.id]: [],
                           });
                         }}
                       >
@@ -261,15 +276,27 @@ const AutoAssignScreen = () => {
             </TableBody>
           </Table>
         </TableContainer>}
-      </div>
+      </div> */}
+      <div style={{display: 'flex', flexDirection: 'row', marginTop: "12px" }}>
       <Button
-        disabled={selectedSemester ? false : true}
+        disabled={(selectedSemester ? false : true) && !autoSchedulingInProgress}
         variant="outlined"
         color="primary"
         onClick={handleAutoAssign}
-      >
+        >
         Xếp lịch tự động
       </Button>
+      <BasicSelect
+          disabled={selectedSemester ? false : true}
+          items={time_limit_input}
+          label={"Thời gian giới hạn"}
+          value={timeLimitInput}
+          onChange={e=>{
+            setTimeLimitInput(e.target.value)
+          }}
+        />
+      {(autoSchedulingInProgress)?<CircularProgress/>:null}
+      </div>
       <div style={{ marginTop: "12px" }}>
         <StandardTable
           title="Kết quả xếp lịch tự động"
@@ -284,6 +311,53 @@ const AutoAssignScreen = () => {
           }}
         ></StandardTable>
       </div>
+      <Dialog
+        fullWidth={true}
+        maxWidth={"lg"}
+        open={viewResultModal}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {`Chi tiết kết quả xếp lịch tự động kì ${selectedSubmission?.semester?.semester}`}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {resultProgressLoading ? <LinearProgress /> : null}
+            <TableContainer>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>STT</TableCell>
+                    <TableCell>Tên lớp</TableCell>
+                    <TableCell>Tuần</TableCell>
+                    <TableCell>Thứ</TableCell>
+                    <TableCell>Buổi</TableCell>
+                    <TableCell>Tiết</TableCell>
+                    <TableCell>Phòng</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {selectedResult?.map((row, i) => (
+                    <TableRow
+                      key={i}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      {row.map((cell, j) => (
+                        <TableCell key={j}>{cell.value}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Đóng</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -234,16 +234,6 @@ const ConflictCheckingScreen = () => {
             onChange={semester_on_change}
           />
       </div>
-      <h2>Assigns</h2>
-      <ul>
-        {assignsBySemester?.map((assign, index) => {
-          return (
-            <li key={index}>
-              <span>{printAssign(assign)}</span>
-            </li>
-          );
-        })}
-      </ul>
       <div style={{ display: "flex", flexDirection: "row" }}>
           <Button
             onClick={(e)=>download_viz_schedule_onclick(assignsBySemester)}

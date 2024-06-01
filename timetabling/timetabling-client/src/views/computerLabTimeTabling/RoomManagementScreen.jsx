@@ -38,19 +38,15 @@ function RoomManagementScreen() {
 
   const columns = [
     {
-      title: "Room",
+      title: "Tên phòng",
       field: "name",
     },
     {
-      title: "Capacity",
+      title: "Số chỗ",
       field: "capacity",
     },
     {
-      title: "Department",
-      field: "department.name",
-    },
-    {
-      title: "Edit",
+      title: "Chỉnh sửa",
       sorting: false,
       render: (rowData) => (
         <IconButton
@@ -67,7 +63,7 @@ function RoomManagementScreen() {
       ),
     },
     {
-      title: "Delete",
+      title: "Xóa",
       sorting: false,
       render: (rowData) => (
         <IconButton
@@ -118,11 +114,11 @@ function RoomManagementScreen() {
       http_method,
       url,
       () => {
-        update_callback("success", `${http_method} successful`);
+        update_callback("success", `${http_method} thành công`);
       },
       {
         onError: () => {
-          update_callback("error", `Failed on ${http_method}`);
+          update_callback("error", `${http_method} thất bại`);
         },
       },
       data
@@ -146,11 +142,11 @@ function RoomManagementScreen() {
       >
         <Button variant="outlined" onClick={create_btn_onclick}>
             <AddIcon/>
-            Create
+            Tạo mới
           </Button>
       </div>
       <StandardTable
-        title="Room List"
+        title="Danh sách phòng học"
         columns={columns}
         data={rooms}
         hideCommandBar={true}
@@ -165,9 +161,9 @@ function RoomManagementScreen() {
         open={updateModalVisible}
         onClose={closeModal}
         // textClose="Update"
-        title="Update room"
+        title="Chỉnh sửa thông tin phòng"
         isLoading={loading}
-        textOk="Save"
+        textOk="Lưu"
         onOk={() => {
           var data = {
             name: nameInput,
@@ -188,14 +184,14 @@ function RoomManagementScreen() {
             />
           </div>
           <TextField
-            label="Room Name"
+            label="Tên phòng"
             defaultValue={nameInput}
             onChange={(e) => setNameInput(e.target.value)}
             size="small"
             style={inputTextStyle}
           />
           <TextField
-            label="Capacity"
+            label="Số chỗ"
             defaultValue={capInput}
             onChange={(e) => setCapInput(e.target.value)}
             size="small"
@@ -207,9 +203,9 @@ function RoomManagementScreen() {
         open={creationModalVisible}
         onClose={closeModal}
         // textClose="Update"
-        title="Create new room"
+        title="Tạo mới"
         isLoading={loading}
-        textOk="Create"
+        textOk="Tạo"
         onOk={() => {
           var data = {
             name: nameInput,
@@ -230,14 +226,14 @@ function RoomManagementScreen() {
             />
           </div>
           <TextField
-            label="Room Name"
+            label="Tên phòng"
             defaultValue={nameInput}
             onChange={(e) => setNameInput(e.target.value)}
             size="small"
             style={inputTextStyle}
           />
           <TextField
-            label="Capacity"
+            label="Số chỗ"
             defaultValue={capInput}
             onChange={(e) => setCapInput(e.target.value)}
             size="small"
@@ -250,9 +246,9 @@ function RoomManagementScreen() {
         open={deletionModalVisible}
         onClose={closeModal}
         // textClose="Update"
-        title="Delete room"
+        title="Xóa phòng"
         isLoading={loading}
-        textOk="Delete"
+        textOk="Xóa"
         onOk={() => {
           submit_handler("delete", `/lab-timetabling/room/${selectedItem.id}`, null);
         }}

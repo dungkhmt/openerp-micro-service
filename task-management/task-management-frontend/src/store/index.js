@@ -9,6 +9,7 @@ import gantt from "./project/gantt-chart";
 import calendar from "./project/calendar";
 import createdTasks from "./created-tasks";
 import search from "./search";
+import statistic from "./project/statistic";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     calendar,
     createdTasks,
     search,
+    statistic,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
