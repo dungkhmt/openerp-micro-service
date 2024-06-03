@@ -2,6 +2,7 @@ package com.real_estate.post.daos.interfaces;
 
 import com.real_estate.post.dtos.response.PostSellResponseDto;
 import com.real_estate.post.models.DashboardPriceEntity;
+import com.real_estate.post.models.PostBuyEntity;
 import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.utils.PostStatus;
 import org.springframework.data.domain.Pageable;
@@ -36,9 +37,11 @@ public interface PostSellDao {
 
     public PostSellEntity findById(Long postSellId);
 
-    public List<PostSellEntity> findByAccountId(Long accountId);
+    public List<PostSellResponseDto> findByAccountId(Long accountId);
 
     public List<DashboardPriceEntity> calculatePricePerM2(Long startTime, Long endTime);
 
     public Integer updateStatusBy(Long postSellId, Long accountId, PostStatus status);
+
+    public List<PostSellResponseDto> findBy(PostBuyEntity buyEntity);
 }

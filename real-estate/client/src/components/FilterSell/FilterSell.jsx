@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {Button, Checkbox, Popover, RangeSlider, Select} from "@mantine/core";
-import {apiGetPublicDistrict, apiGetPublicProvinces} from "../../services/AppRequest";
 import "./FilterSell.css"
 import {LuChevronsUpDown} from "react-icons/lu";
 import {transferDirection, transferPrice, transferTypeProperty} from "../../utils/common";
 import MultiplySelect from "../MultiplySelect/MultiplySelect";
+import DistrictRequest from "../../services/DistrictRequest";
 
 const FilterSell = ({setParams}) => {
     const [provinceId, setProvinceId] = useState("")
@@ -52,21 +52,28 @@ const FilterSell = ({setParams}) => {
     ];
 
     useEffect(() => {
-        const fetchPublicProvince = async () => {
-            const response = await apiGetPublicProvinces()
-            if (response.status === 200) {
-                setProvinces(response?.data.data)
-            }
+        const fetchPublicProvince = () => {
+            const districtRequest = new DistrictRequest();
+            districtRequest.get_province()
+                .then(response => {
+                    if (response.code === 200) {
+                        setProvinces(response.data);
+                    }
+                })
         }
         fetchPublicProvince()
     }, [])
 
     useEffect(() => {
-        const fetchPublicDistrict = async () => {
-            const response = await apiGetPublicDistrict(provinceId)
-            if (response.status === 200) {
-                setDistricts(response.data?.data)
-            }
+        const fetchPublicDistrict = () => {
+            const districtRequest = new DistrictRequest();
+            districtRequest.get_districts({
+                provinceId
+            }).then(response => {
+                if (response.code === 200) {
+                    setDistricts(response.data);
+                }
+            })
         }
         provinceId && fetchPublicDistrict()
         setDistrictId(null);

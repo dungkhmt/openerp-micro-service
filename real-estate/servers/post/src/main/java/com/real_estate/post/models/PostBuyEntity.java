@@ -1,6 +1,7 @@
 package com.real_estate.post.models;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 public class PostBuyEntity {
 	Long postBuyId;
 	Long authorId;
@@ -16,23 +18,26 @@ public class PostBuyEntity {
 	String title;
 	String description;
 
-	List<String> typeProperty;
+	String typeProperty;
 	Long minAcreage;
-	Long fromPrice;
-	Long toPrice;
-	Float fromPricePerM2;
-	Float toPricePerM2;
+	Long maxAcreage;
+	Long minPrice;
+	Long maxPrice;
+
 	Integer minBathroom;
 	Integer minParking;
 	Integer minBedroom;
 	Integer minFloor;
 	List<String> legalDocuments;
-	List<String> directionsProperty;
+	List<String> directionProperties;
 	Long minHorizontal;
 	Long minVertical;
 
-	String province;
-	List<String> district;
+	String provinceId;
+	String nameProvince;
+	List<String> nameDistricts;
+	List<String> districtIds;
+
 	String postStatus;
 
 	Boolean isAvailable;

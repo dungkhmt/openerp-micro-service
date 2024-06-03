@@ -1,5 +1,6 @@
 package com.real_estate.post.controllers;
 
+import com.real_estate.post.dtos.PriceDistrict;
 import com.real_estate.post.dtos.ProvinceEntity;
 import com.real_estate.post.dtos.response.ResponseDto;
 import com.real_estate.post.models.DistrictEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/public/address")
@@ -35,5 +37,16 @@ public class PublicDistrictController {
 	) {
 		List<DistrictEntity> entities = districtService.getDistricts(provinceId);
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, entities));
+	}
+
+	@GetMapping("/price-district")
+	@Operation(operationId = "district.getDistrict", summary = "Get district of province")
+	public ResponseEntity<ResponseDto<Map<String, List<PriceDistrict>>>> getPriceOfAllDistrict(
+			@RequestParam("provinceId") String provinceId,
+			@RequestParam("fromTime") Long fromTime,
+			@RequestParam(value = "toTime" ,required = false, defaultValue = "0") Long toTime
+	) {
+		Map<String, List<PriceDistrict>> result = districtService.getPriceDistricts(provinceId, fromTime, toTime);
+		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, result));
 	}
 }

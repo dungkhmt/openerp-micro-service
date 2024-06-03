@@ -56,7 +56,7 @@ public class PostSellService {
 		post.setBedroom(requestDto.getBedroom());
 		post.setParking(requestDto.getParking());
 		post.setLegalDocument(requestDto.getLegalDocument());
-		post.setDirectionsProperty(requestDto.getDirectionsProperty());
+		post.setDirectionProperty(requestDto.getDirectionProperty());
 		post.setHorizontal(requestDto.getHorizontal());
 		post.setVertical(requestDto.getVertical());
 		post.setPostStatus(PostStatus.OPENING.toString());
@@ -141,7 +141,7 @@ public class PostSellService {
 				.bedroom(requestDto.getBedroom())
 				.floor(requestDto.getFloor())
 				.legalDocument(requestDto.getLegalDocument().toString())
-				.directionsProperty(requestDto.getDirectionsProperty().toString())
+				.directionProperty(requestDto.getDirectionProperty().toString())
 				.horizontal(requestDto.getHorizontal())
 				.vertical(requestDto.getVertical())
 				.position(requestDto.getPosition())
@@ -162,7 +162,7 @@ public class PostSellService {
 		postSellDao.save(entity);
 	}
 
-	public List<PostSellEntity> getPostByAccountId(Long accountId) {
+	public List<PostSellResponseDto> getPostByAccountId(Long accountId) {
 		return postSellDao.findByAccountId(accountId);
 	}
 
@@ -172,6 +172,7 @@ public class PostSellService {
 
 	public void updateStatus(Long postSellId, Long accountId, PostStatus status) {
 		int record = postSellDao.updateStatusBy(postSellId, accountId, status);
+		System.out.println(" thong tin " + accountId + postSellId + status + record);
 		if (record == 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cập nhập không thành công");
 		}

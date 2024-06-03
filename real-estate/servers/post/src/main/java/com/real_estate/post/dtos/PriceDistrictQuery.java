@@ -1,6 +1,5 @@
-package com.real_estate.post.dtos.request;
+package com.real_estate.post.dtos;
 
-import com.real_estate.post.utils.PostStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpdateStatusPost {
-    Long postId;
-    PostStatus status;
+public class PriceDistrictQuery {
+    String districtId;
+    String nameDistrict;
+    Long startTime;
 }

@@ -4,6 +4,7 @@ import com.real_estate.post.daos.interfaces.PostSellDao;
 import com.real_estate.post.dtos.response.PostSellResponseDto;
 import com.real_estate.post.models.AccountEntity;
 import com.real_estate.post.models.DashboardPriceEntity;
+import com.real_estate.post.models.PostBuyEntity;
 import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.models.postgresql.PostSellPostgresEntity;
 import com.real_estate.post.repositories.PostSellRepository;
@@ -81,7 +82,7 @@ public class PostSellImpl implements PostSellDao {
         }
 
         rawQuery.append("and p.typeProperty in :typeProperties ");
-        rawQuery.append("and p.directionsProperty in :directions ");
+        rawQuery.append("and p.directionProperty in :directions ");
         rawQuery.append("order by p.createdAt desc ");
 
         Query query = entityManager.createQuery(rawQuery.toString());
@@ -136,7 +137,7 @@ public class PostSellImpl implements PostSellDao {
             rawQuery.append("and p.acreage <= " + toAcreage + " ");
         }
         rawQuery.append("and p.typeProperty in :typeProperties ");
-        rawQuery.append("and p.directionsProperty in :directions ");
+        rawQuery.append("and p.directionProperty in :directions ");
         rawQuery.append("order by p.createdAt desc ");
 
         Query query = entityManager.createQuery(rawQuery.toString());
@@ -157,11 +158,24 @@ public class PostSellImpl implements PostSellDao {
     }
 
     @Override
-    public List<PostSellEntity> findByAccountId(Long accountId) {
-        List<PostSellPostgresEntity> postgresEntities = repository.findByAccountId(accountId);
-        return postgresEntities.stream().map((postgresEntity) -> {
-            return this.mapper.map(postgresEntity, PostSellEntity.class);
-        }).collect(Collectors.toList());
+    public List<PostSellResponseDto> findByAccountId(Long accountId) {
+        Query query = entityManager.createQuery(
+                "select p, a " +
+                        "from PostSellPostgresEntity p " +
+                        "left join AccountPostgresEntity a " +
+                        "on p.authorId = a.accountId " +
+                        "where p.authorId = :accountId " +
+                        "order by p.createdAt desc");
+        query.setParameter("accountId", accountId);
+        List<Object[]> resultList = query.getResultList();
+        List<PostSellResponseDto> dtos = new ArrayList<>();
+        for (Object[] row : resultList) {
+            PostSellEntity post = this.mapper.map(row[0], PostSellEntity.class);
+            AccountEntity account = this.mapper.map(row[1], AccountEntity.class);
+            PostSellResponseDto combined = new PostSellResponseDto(post, account);
+            dtos.add(combined);
+        }
+        return dtos;
     }
 
     @Override
@@ -174,6 +188,7 @@ public class PostSellImpl implements PostSellDao {
                         "max (p.pricePerM2)," +
                         "min (p.pricePerM2)," +
                         "avg (p.pricePerM2)," +
+                        "count(p.districtId)," +
                         ":startTime," +
                         ":endTime" +
                         ") " +
@@ -190,5 +205,56 @@ public class PostSellImpl implements PostSellDao {
     @Override
     public Integer updateStatusBy(Long postSellId, Long accountId, PostStatus status) {
         return repository.updateStatusBy(postSellId, accountId, status.toString());
+    }
+
+    @Override
+    public List<PostSellResponseDto> findBy(PostBuyEntity buyEntity) {
+        StringBuilder rawQuery = new StringBuilder();
+        rawQuery.append(
+                "select p, a " +
+                        "from PostSellPostgresEntity p " +
+                        "left join AccountPostgresEntity a on p.authorId = a.accountId " +
+                        "where p.postStatus = 'OPENING' ");
+        rawQuery.append("and p.provinceId = '" + buyEntity.getProvinceId() + "' ");
+        rawQuery.append("and p.districtId in :districtIds ");
+        rawQuery.append("and p.typeProperty = '" + buyEntity.getTypeProperty() + "' ");
+        rawQuery.append("and p.authorId != " + buyEntity.getAuthorId() + " ");
+        rawQuery.append("and p.price >= " + buyEntity.getMinPrice() + " ");
+        if (buyEntity.getMaxPrice() != 0) {
+            rawQuery.append("and p.price <= " + buyEntity.getMaxPrice() + " ");
+        }
+        rawQuery.append("and p.acreage >= " + buyEntity.getMinAcreage() + " ");
+        if (buyEntity.getMaxAcreage() != 0) {
+            rawQuery.append("and p.acreage <= " + buyEntity.getMaxAcreage() + " ");
+        }
+
+        rawQuery.append("and p.bathroom >= " + buyEntity.getMinBathroom() + " ");
+        rawQuery.append("and p.parking >= " + buyEntity.getMinParking() + " ");
+        rawQuery.append("and p.bedroom >= " + buyEntity.getMinBedroom() + " ");
+        rawQuery.append("and p.floor >= " + buyEntity.getMinFloor() + " ");
+        rawQuery.append("and p.horizontal >= " + buyEntity.getMinHorizontal() + " ");
+        rawQuery.append("and p.vertical >= " + buyEntity.getMinVertical() + " ");
+
+
+        rawQuery.append("and p.legalDocument in :legalDocuments ");
+        rawQuery.append("and p.directionProperty in :directions ");
+        rawQuery.append("and p.postStatus = 'OPENING' ");
+        rawQuery.append("order by p.createdAt desc ");
+
+        Query query = entityManager.createQuery(rawQuery.toString());
+        query.setParameter("districtIds", buyEntity.getDistrictIds());
+        query.setParameter("legalDocuments", buyEntity.getLegalDocuments());
+        query.setParameter("directions", buyEntity.getDirectionProperties());
+        query.setFirstResult(0);
+        query.setMaxResults(10);
+        List<Object[]> resultList = query.getResultList();
+        List<PostSellResponseDto> dtos = new ArrayList<>();
+        for (Object[] row : resultList) {
+            PostSellEntity post = this.mapper.map(row[0], PostSellEntity.class);
+            AccountEntity account = this.mapper.map(row[1], AccountEntity.class);
+            PostSellResponseDto combined = new PostSellResponseDto(post, account);
+            dtos.add(combined);
+        }
+        return dtos;
     }
 }

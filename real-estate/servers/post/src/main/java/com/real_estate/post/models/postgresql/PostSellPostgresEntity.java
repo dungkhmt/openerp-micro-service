@@ -80,8 +80,8 @@ public class PostSellPostgresEntity {
 	@Column(name = "legal_document")
 	String legalDocument;
 
-	@Column(name = "directions_property")
-	String directionsProperty;
+	@Column(name = "direction_property")
+	String directionProperty;
 
 	@Column(name = "horizontal")
 	Long horizontal;

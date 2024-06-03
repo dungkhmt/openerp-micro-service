@@ -3,10 +3,11 @@ import {Button, Notification} from "@mantine/core";
 import "./AddPostSell.css"
 import AddInfoPostSell from "../../components/AddInfoPostSell/AddInfoPostSell";
 import InfoPostSell from "../../components/InfoPostSell/InfoPostSell";
-import PostRequest from "../../services/PostRequest";
+import PostRequest from "../../services/PostSellRequest";
 import {useNavigate} from "react-router-dom";
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import PostSellRequest from "../../services/PostSellRequest";
 const AddPostSell = () => {
     const navigate = useNavigate();
     const [propertyDetails, setPropertyDetails] = useState({
@@ -27,7 +28,7 @@ const AddPostSell = () => {
         price: 0,
         pricePerM2: 0,
         typeProperty: "",
-        directionsProperty: "",
+        directionProperty: "",
         bedroom: 0,
         parking: 0,
         bathroom: 0,
@@ -46,7 +47,7 @@ const AddPostSell = () => {
     }
 
     const handleDonePost = () => {
-        const postRequest = new PostRequest();
+        const postRequest = new PostSellRequest();
         postRequest.addPostSell(propertyDetails)
             .then(response => {
                 const statusCode = response.code;

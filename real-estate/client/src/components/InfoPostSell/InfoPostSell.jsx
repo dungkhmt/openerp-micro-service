@@ -21,7 +21,6 @@ import {PiArrowsHorizontal, PiBathtub} from "react-icons/pi";
 import {BsArrowsVertical} from "react-icons/bs";
 import {FaCarSide} from "react-icons/fa6";
 
-
 const InfoPostSell = ({propertyDetails}) => {
     console.log("ben show", propertyDetails)
 
@@ -119,7 +118,7 @@ const InfoPostSell = ({propertyDetails}) => {
                             //     )
                             // })
 
-                            console.log('Editor is ready to use!', editor);
+                            // console.log('Editor is ready to use!', editor);
                         }}
                         onChange={(event, editor) => {
                             // console.log( event );
@@ -179,13 +178,13 @@ const InfoPostSell = ({propertyDetails}) => {
                                         <span>Hướng</span>
                                     </div>
                                     <div>
-                                        {transferDirection(propertyDetails?.directionsProperty)}
+                                        {transferDirection(propertyDetails?.directionProperty)}
                                     </div>
                                 </SimpleGrid>
                                 <SimpleGrid cols={2} className="border-top-bottom flexStart">
                                     <div className="flexStart">
-                                        <PiArrowsHorizontal className="icon"/>
-                                        <span>Chiều rộng</span>
+                                        <BsArrowsVertical className="icon"/>
+                                        <span>Chiều dài</span>
                                     </div>
                                     <div>
                                         {propertyDetails?.horizontal} m
@@ -193,8 +192,8 @@ const InfoPostSell = ({propertyDetails}) => {
                                 </SimpleGrid>
                                 <SimpleGrid cols={2} className="border-top-bottom flexStart">
                                     <div className="flexStart">
-                                        <BsArrowsVertical className="icon"/>
-                                        <span>Chiều dài</span>
+                                        <PiArrowsHorizontal className="icon"/>
+                                        <span>Chiều rộng</span>
                                     </div>
                                     <div>
                                         {propertyDetails?.vertical} m

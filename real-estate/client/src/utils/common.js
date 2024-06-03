@@ -55,9 +55,9 @@ export const transferLegalDocument = (value) => {
 
 export const transferLegalDocuments = (listValue) => {
   let result = [];
-  for (const value in listValue) {
-    result = [...result, transferLegalDocument(value)];
-  }
+  listValue.forEach((item,index) => {
+    result = [...result, transferLegalDocument(item)]
+  })
   return result;
 }
 
@@ -87,9 +87,9 @@ export const transferDirection = (value) => {
 
 export const transferDirections = (listValue) => {
   let result = [];
-  for (const value in listValue) {
-    result = [...result, transferDirection(value)];
-  }
+  listValue.forEach((item,index) => {
+    result = [...result, transferDirection(item)]
+  })
   return result;
 }
 
@@ -192,7 +192,7 @@ export const capitalizeFirstLetterOfEachWord = (string) => {
 export const transferPostStatus = (status) => {
   switch (status) {
     case "OPENING": return "Đang Mở";
-    case "CLOSE": return "Đã Đóng";
+    case "CLOSED": return "Đã Đóng";
     default: return "Đã Chốt";
   }
 }
@@ -201,7 +201,7 @@ export const transferColorPostStatus = (status) => {
   switch (status) {
     case "OPENING":
       return "rgb(227, 170, 73)";
-    case "CLOSE":
+    case "CLOSED":
       return "rgb(224, 60, 49)";
     default:
       return "rgb(0, 155, 161)";

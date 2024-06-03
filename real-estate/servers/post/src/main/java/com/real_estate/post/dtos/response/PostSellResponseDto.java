@@ -27,7 +27,7 @@ public class PostSellResponseDto {
     Integer bedroom;
     Integer floor;
     String legalDocument;
-    String directionsProperty;
+    String directionProperty;
     Long horizontal;
     Long vertical;
     List<Float> position;
@@ -62,7 +62,7 @@ public class PostSellResponseDto {
         this.bedroom = p.getBedroom();
         this.floor = p.getFloor();
         this.legalDocument = p.getLegalDocument();
-        this.directionsProperty = p.getDirectionsProperty();
+        this.directionProperty = p.getDirectionProperty();
         this.horizontal = p.getHorizontal();
         this.vertical = p.getVertical();
         this.position = p.getPosition();

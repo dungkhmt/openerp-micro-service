@@ -7,11 +7,11 @@ import "./AddInfoPostSell.css";
 import {deleteObject, getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
 import {storage} from "../UploadImage/FireBaseConfig";
 import {v4} from "uuid";
-import {apiGetPublicDistrict, apiGetPublicProvinces} from "../../services/AppRequest";
 import {CKEditor} from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import {toast, ToastContainer} from "react-toastify";
 import {transferPrice} from "../../utils/common";
+import DistrictRequest from "../../services/DistrictRequest";
 
 const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => {
 
@@ -30,7 +30,7 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
     const [title, setTitle] = useState(propertyDetails?.title || null);
     const [description, setDescription] = useState(propertyDetails?.description || null);
     const [typeProperty, setTypeProperty] = useState(propertyDetails?.typeProperty || 'APARTMENT');
-    const [directionsProperty, setDirectionsProperty] = useState(propertyDetails?.directionsProperty || null);
+    const [directionProperty, setdirectionProperty] = useState(propertyDetails?.directionProperty || null);
     const [acreage, setAcreage] = useState(propertyDetails?.acreage || 0);
     const [bedroom, setBedroom] = useState(propertyDetails?.bedroom || 0);
     const [bathroom, setBathroom] = useState(propertyDetails?.bathroom || 0);
@@ -101,7 +101,7 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
             || title.length < 20 || title.length > 50
             || acreage === 0 || price === 0
             || typeProperty === null || legalDocument === null
-            || directionsProperty === null
+            || directionProperty === null
             || horizontal === 0 || vertical === 0
         ) {
             toast.error("Yêu cầu điền thông tin đầy đủ!")
@@ -123,7 +123,7 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                 pricePerM2: pricePerM2,
                 typeProperty: typeProperty,
                 legalDocument: legalDocument,
-                directionsProperty: directionsProperty,
+                directionProperty: directionProperty,
                 horizontal: horizontal,
                 vertical: vertical,
                 floor: floor,
@@ -149,34 +149,41 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
     }
 
     useEffect(() => {
-        const fetchPublicProvince = async () => {
-            const response = await apiGetPublicProvinces()
-            if (response.status === 200) {
-                setProvinces(response?.data.data)
-            }
+        const fetchPublicProvince = () => {
+            const districtRequest = new DistrictRequest();
+            districtRequest.get_province()
+                .then(response => {
+                    if (response.code === 200) {
+                        setProvinces(response.data);
+                    }
+                })
         }
         fetchPublicProvince()
     }, [])
 
     useEffect(() => {
-        const fetchPublicDistrict = async () => {
-            const response = await apiGetPublicDistrict(provinceId)
-            if (response.status === 200) {
-                const districts = response.data?.data;
-                setDistricts(districts);
-                const districtExists = districts.some(districtItem => {
-                    if (districtItem.districtId === districtId) {
-                        return true;
-                    }
-                    return false;
-                });
+        const fetchPublicDistrict = () => {
+            const districtRequest = new DistrictRequest();
+            districtRequest.get_districts({
+                provinceId
+            }).then(response => {
+                if (response.code === 200) {
+                    const districts = response.data;
+                    setDistricts(districts);
+                    const districtExists = districts.some(districtItem => {
+                        if (districtItem.districtId === districtId) {
+                            return true;
+                        }
+                        return false;
+                    });
 
-                if (!districtExists) {
-                    setDistrictId(null);
-                    setNameDistrict(null);
-                    setAddress('');
+                    if (!districtExists) {
+                        setDistrictId(null);
+                        setNameDistrict(null);
+                        setAddress('');
+                    }
                 }
-            }
+            })
         }
         provinceId && fetchPublicDistrict()
     }, [provinceId])
@@ -209,7 +216,7 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                     justifyContent: "space-between",
                     gap: "3rem",
                     marginTop: "3rem",
-                    flexdirectionsProperty: "row",
+                    flexdirectionProperty: "row",
                 }}
             >
                 <div className="flexColStart" style={{flex: 1, gap: "1rem"}}>
@@ -306,7 +313,7 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                     data={description}
                     onReady={editor => {
                         // You can store the "editor" and use when it is needed.
-                        console.log('Editor is ready to use!', editor);
+                        // console.log('Editor is ready to use!', editor);
                     }}
                     onChange={(event, editor) => {
                         // console.log( event );
@@ -369,8 +376,8 @@ const AddInfoPostSell = ({propertyDetails, setPropertyDetails, setShowPost}) => 
                                 {value: 'WEST', label: 'Tây'},
                                 {value: 'WEST_NORTH', label: 'Tây Bắc'}
                             ]}
-                            value={directionsProperty}
-                            onChange={(value) => setDirectionsProperty(value)}
+                            value={directionProperty}
+                            onChange={(value) => setdirectionProperty(value)}
                         />
                     </Grid.Col>
 

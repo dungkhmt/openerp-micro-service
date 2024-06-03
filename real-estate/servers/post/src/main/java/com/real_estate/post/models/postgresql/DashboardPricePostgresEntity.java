@@ -36,6 +36,9 @@ public class DashboardPricePostgresEntity {
     @Column(name = "medium_pricePerM2")
     Double mediumPricePerM2;
 
+    @Column(name = "total_post")
+    Long totalPost;
+
     @Column(name = "start_time")
     Long startTime;
 

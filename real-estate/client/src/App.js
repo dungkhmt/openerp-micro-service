@@ -13,6 +13,8 @@ import AuthRequest from "./services/AuthRequest";
 import {set_current_account} from "./store/account";
 import Profile from "./pages/Profile/Profile";
 import ManagerPost from "./pages/ManagerPost/ManagerPost";
+import PageBuy from "./pages/PageBuy/PageBuy";
+import Report from "./pages/Report/Report";
 
 function App() {
     const isLoggedIn = useSelector(state => state.auth.isLoggedIn)
@@ -39,11 +41,13 @@ function App() {
                         <Route path={"/*"} element={<ListPageSell/>}/>
                         <Route path={"/add-post-sell"} element={<AddPostSell/>}/>
                         <Route path={"/add-post-buy"} element={<AddPostBuy/>}/>
-                        <Route path={"/manager-post"} element={<ManagerPost/>}/>
+                        <Route path={"/manager-post/:accountId"} element={<ManagerPost/>}/>
                         <Route path="/sell/properties">
                             <Route index element={<ListPageSell/>}/>
                             <Route path=":propertyId" element={<PostSellDetail/>}/>
                         </Route>
+                        <Route path={"/report"} element={<Report />}/>
+                        <Route path={"/buy/properties"} element={<PageBuy />} />
                         <Route path={"/oauth/redirect"} element={<Oauth2Redirect/>}/>
                         <Route path={"/profile"} element={<Profile/>}/>
                     </Route>

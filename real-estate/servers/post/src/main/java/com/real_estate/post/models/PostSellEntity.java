@@ -27,7 +27,7 @@ public class PostSellEntity {
 	Integer bedroom;
 	Integer floor;
 	String legalDocument;
-	String directionsProperty;
+	String directionProperty;
 	Long horizontal;
 	Long vertical;
 
