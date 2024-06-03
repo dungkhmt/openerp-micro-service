@@ -14,35 +14,33 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpdatePostSellRequestDto {
-    Long postSellId;
+public class UpdatePostBuyRequestDto {
+    Long postBuyId;
     Long authorId;
 
     String title;
     String description;
 
     TypeProperty typeProperty;
-    Long price;
-    Float pricePerM2;
-    Long acreage;
-    Integer bathroom;
-    Integer parking;
-    Integer bedroom;
-    Integer floor;
-    LegalDocument legalDocument;
-    DirectionsStatus directionProperty;
-    Long horizontal;
-    Long vertical;
+    Long minAcreage;
+    Long maxAcreage;
+    Long minPrice;
+    Long maxPrice;
 
-    List<Float> position;
+    Integer minBathroom;
+    Integer minParking;
+    Integer minBedroom;
+    Integer minFloor;
+    List<LegalDocument> legalDocuments;
+    List<DirectionsStatus> directionProperties;
+    Long minHorizontal;
+    Long minVertical;
 
     String provinceId;
     String nameProvince;
-    String districtId;
-    String nameDistrict;
-    String address;
+    List<String> nameDistricts;
+    List<String> districtIds;
 
-    List<String> imageUrls;
     String postStatus;
 
     Boolean isAvailable;

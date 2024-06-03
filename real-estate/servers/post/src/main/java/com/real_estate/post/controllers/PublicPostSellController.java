@@ -68,8 +68,8 @@ public class PublicPostSellController {
 
     @GetMapping("/my-post/{accountId}")
     @Operation(summary = "Get list post of accountId", operationId = "sell.mypostsell")
-    public ResponseEntity<ResponseDto<List<PostSellEntity>>> getPostSellBy(@PathVariable("accountId") Long accountId) {
-        List<PostSellEntity> entities = postSellService.getPostByAccountId(accountId);
+    public ResponseEntity<ResponseDto<List<PostSellResponseDto>>> getPostSellBy(@PathVariable("accountId") Long accountId) {
+        List<PostSellResponseDto> entities = postSellService.getPostByAccountId(accountId);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, entities));
     }
 

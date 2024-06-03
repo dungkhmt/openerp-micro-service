@@ -1,5 +1,8 @@
 package com.real_estate.post.dtos.request;
 
+import com.real_estate.post.utils.DirectionsStatus;
+import com.real_estate.post.utils.LegalDocument;
+import com.real_estate.post.utils.TypeProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,23 +16,23 @@ public class CreatePostBuyRequestDto {
 	String title;
 	String description;
 
-	List<String> typeProperty;
+	TypeProperty typeProperty;
 	Long minAcreage;
-	Long fromPrice;
-	Long toPrice;
-	Float fromPricePerM2;
-	Float toPricePerM2;
-	Integer minBathroom;
-	Integer minParking;
-	Integer minBedroom;
-	Integer minFloor;
-	List<String> legalDocuments;
-	List<String> directionsProperty;
+	Long maxAcreage = 0L;
+	Long minPrice;
+	Long maxPrice = 0L;
 
+	Integer minBathroom = 0;
+	Integer minParking = 0;
+	Integer minBedroom = 0;
+	Integer minFloor = 0;
+	List<LegalDocument> legalDocuments;
+	List<DirectionsStatus> directionProperties;
 	Long minHorizontal = 0L;
 	Long minVertical = 0L;
 
-	String province;
-	List<String> district;
-
+	String provinceId;
+	String nameProvince;
+	List<String> nameDistricts;
+	List<String> districtIds;
 }

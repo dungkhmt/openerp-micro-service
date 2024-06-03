@@ -17,6 +17,7 @@ public class DashboardPriceEntity {
     Float highestPricePerM2;
     Float lowestPricePerM2;
     Double mediumPricePerM2;
+    Long totalPost;
     Long startTime;
     Long endTime;
 
@@ -26,6 +27,7 @@ public class DashboardPriceEntity {
                                 Float highestPricePerM2,
                                 Float lowestPricePerM2,
                                 Double mediumPricePerM2,
+                                Long totalPost,
                                 Long startTime,
                                 Long endTime
     ) {
@@ -35,6 +37,7 @@ public class DashboardPriceEntity {
         this.highestPricePerM2 = highestPricePerM2;
         this.lowestPricePerM2 = lowestPricePerM2;
         this.mediumPricePerM2 = mediumPricePerM2;
+        this.totalPost = totalPost;
         this.startTime = startTime;
         this.endTime = endTime;
     }

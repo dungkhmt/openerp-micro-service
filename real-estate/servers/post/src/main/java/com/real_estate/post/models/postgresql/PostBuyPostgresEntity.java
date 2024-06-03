@@ -30,24 +30,19 @@ public class PostBuyPostgresEntity {
 	String description;
 
 	@Column(name = "type_property")
-	@ElementCollection(fetch = FetchType.EAGER)
-	@CollectionTable(name = "post_buy_postgres_entity_type_property", joinColumns = @JoinColumn(name = "post_buy_id"))
-	List<String> typeProperty;
+	String typeProperty;
 
 	@Column(name = "min_acreage")
 	Long minAcreage;
 
-	@Column(name = "from_price")
-	Long fromPrice;
+	@Column(name = "max_acreage")
+	Long maxAcreage;
 
-	@Column(name = "to_price")
-	Long toPrice;
+	@Column(name = "min_price")
+	Long minPrice;
 
-	@Column(name = "from_price_perM2")
-	Float fromPricePerM2;
-
-	@Column(name = "to_price_perM2")
-	Float toPricePerM2;
+	@Column(name = "max_price")
+	Long maxPrice;
 
 	@Column(name = "min_bathroom")
 	Integer minBathroom;
@@ -66,10 +61,10 @@ public class PostBuyPostgresEntity {
 	@CollectionTable(name = "post_buy_postgres_entity_legal_documents", joinColumns = @JoinColumn(name = "post_buy_id"))
 	List<String> legalDocuments;
 
-	@Column(name = "directions_property")
+	@Column(name = "direction_properties")
 	@ElementCollection(fetch = FetchType.EAGER)
-	@CollectionTable(name = "post_buy_postgres_entity_directtions_property", joinColumns = @JoinColumn(name = "post_buy_id"))
-	List<String> directionsProperty;
+	@CollectionTable(name = "post_buy_postgres_entity_direction_properties", joinColumns = @JoinColumn(name = "post_buy_id"))
+	List<String> directionProperties;
 
 	@Column(name = "min_horizontal")
 	Long minHorizontal;
@@ -77,13 +72,21 @@ public class PostBuyPostgresEntity {
 	@Column(name = "min_vertical")
 	Long minVertical;
 
-	@Column(name = "pronvince")
-	String province;
+	@Column(name = "provinceId")
+	String provinceId;
 
-	@Column(name = "district")
+	@Column(name = "name_pronvince")
+	String nameProvince;
+
+	@Column(name = "districtIds")
 	@ElementCollection(fetch = FetchType.EAGER)
-	@CollectionTable(name = "post_buy_postgres_entity_district", joinColumns = @JoinColumn(name = "post_buy_id"))
-	List<String> district;
+	@CollectionTable(name = "post_buy_postgres_entity_district_ids", joinColumns = @JoinColumn(name = "post_buy_id"))
+	List<String> districtIds;
+
+	@Column(name = "name_districts")
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "post_buy_postgres_entity_name_districts", joinColumns = @JoinColumn(name = "post_buy_id"))
+	List<String> nameDistricts;
 
 	@Column(name = "post_status")
 	String postStatus;

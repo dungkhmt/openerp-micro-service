@@ -27,7 +27,7 @@ public class CreatePostSellRequestDto {
 
 	String typeProperty;
 	String legalDocument;
-	String directionsProperty;
+	String directionProperty;
 	Integer floor;
 	Integer bathroom;
 	Integer parking;

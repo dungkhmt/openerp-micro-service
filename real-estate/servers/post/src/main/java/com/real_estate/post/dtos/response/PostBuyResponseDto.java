@@ -19,27 +19,30 @@ public class PostBuyResponseDto {
     String nameAuthor;
     String avatarAuthor;
     String phoneAuthor;
+    String emailAuthor;
 
     String title;
     String description;
 
-    List<String> typeProperty;
+    String typeProperty;
     Long minAcreage;
-    Long fromPrice;
-    Long toPrice;
-    Float fromPricePerM2;
-    Float toPricePerM2;
+    Long maxAcreage;
+    Long minPrice;
+    Long maxPrice;
+
     Integer minBathroom;
     Integer minParking;
     Integer minBedroom;
     Integer minFloor;
     List<String> legalDocuments;
-    List<String> directionsProperty;
+    List<String> directionProperties;
     Long minHorizontal;
     Long minVertical;
 
-    String province;
-    List<String> district;
+    String provinceId;
+    String nameProvince;
+    List<String> nameDistricts;
+    List<String> districtIds;
     String postStatus;
 
     Boolean isAvailable;
@@ -52,24 +55,29 @@ public class PostBuyResponseDto {
         this.nameAuthor = a.getName();
         this.avatarAuthor = a.getAvatar();
         this.phoneAuthor = a.getPhone();
+        this.emailAuthor = a.getEmail();
         this.title = p.getTitle();
         this.description = p.getDescription();
         this.typeProperty = p.getTypeProperty();
         this.minAcreage = p.getMinAcreage();
-        this.fromPrice = p.getFromPrice();
-        this.toPrice = p.getToPrice();
-        this.fromPricePerM2 = p.getFromPricePerM2();
-        this.toPricePerM2 = p.getToPricePerM2();
+        this.maxAcreage = p.getMaxAcreage();
+        this.minPrice = p.getMinPrice();
+        this.maxPrice = p.getMaxPrice();
+
         this.minBathroom = p.getMinBathroom();
         this.minParking = p.getMinParking();
         this.minBedroom = p.getMinBedroom();
         this.minFloor = p.getMinFloor();
         this.legalDocuments = p.getLegalDocuments();
-        this.directionsProperty = p.getDirectionsProperty();
+        this.directionProperties = p.getDirectionProperties();
         this.minHorizontal = p.getMinHorizontal();
         this.minVertical = p.getMinVertical();
-        this.province = p.getProvince();
-        this.district = p.getDistrict();
+
+        this.provinceId = p.getProvinceId();
+        this.nameProvince = p.getNameProvince();
+        this.districtIds = p.getDistrictIds();
+        this.nameDistricts = p.getNameDistricts();
+
         this.postStatus = p.getPostStatus();
         this.isAvailable = p.getIsAvailable();
         this.createdAt = p.getCreatedAt();

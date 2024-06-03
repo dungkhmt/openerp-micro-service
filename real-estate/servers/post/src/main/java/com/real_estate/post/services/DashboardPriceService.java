@@ -1,6 +1,7 @@
 package com.real_estate.post.services;
 
 import com.real_estate.post.daos.interfaces.DashboardPriceDao;
+import com.real_estate.post.dtos.response.DashboardTopResponseDto;
 import com.real_estate.post.models.DashboardPriceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,5 +31,9 @@ public class DashboardPriceService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không có dữ liệu phù hợp");
         }
         return entities;
+    }
+
+    public List<DashboardTopResponseDto> getTop(String provinceId, String typeProperty, Long startTime) {
+        return dashboardPriceDao.find5mediumHighest(provinceId, typeProperty, startTime);
     }
 }

@@ -46,21 +46,13 @@ public class PostSellController {
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, "Cập nhập thành công"));
 	}
 
-	@GetMapping("")
-	@Operation(summary = "get post sell of account", operationId = "postsell.get")
-	public ResponseEntity<ResponseDto<List<PostSellEntity>>> getPostSellOfAccount() {
-		Long accountId = authenticationService.getAccountIdFromContext();
-		List<PostSellEntity> entities = postSellService.getPostByAccountId(accountId);
-		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, entities));
-	}
-
 	@PutMapping("/updateStatus")
 	@Operation(operationId = "postsell.updateStatus", summary = "update status of post")
 	public ResponseEntity<ResponseDto<String>> updateStatus(
 			@RequestBody UpdateStatusPost request
 	) {
 		Long accountId = authenticationService.getAccountIdFromContext();
-		postSellService.updateStatus(request.getPostSellId(), accountId, request.getStatus());
+		postSellService.updateStatus(request.getPostId(), accountId, request.getStatus());
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, "Cập nhập trạng thái thành công"));
 	}
 
