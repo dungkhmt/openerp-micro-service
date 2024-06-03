@@ -18,7 +18,7 @@ import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
-import { applicationUrl } from "../apiURL";
+import { applicationUrl, semesterUrl } from "../apiURL";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -31,6 +31,7 @@ const RequestApprovalScreen = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
+  const [semester, setSemester] = useState(SEMESTER);
 
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
@@ -41,6 +42,12 @@ const RequestApprovalScreen = () => {
   const [statusFilter, setStatusFilter] = useState("ALL");
 
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    request("get", semesterUrl.getCurrentSemester, (res) => {
+      setSemester(res.data);
+    });
+  }, []);
 
   const debouncedSearch = useCallback(
     (search, statusFilter) => {
@@ -60,12 +67,12 @@ const RequestApprovalScreen = () => {
 
   useEffect(() => {
     return debouncedSearch(search, statusFilter);
-  }, [search, statusFilter, debouncedSearch]);
+  }, [search, statusFilter, debouncedSearch, semester]);
 
   useEffect(() => {
     handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paginationModel]);
+  }, [paginationModel, semester]);
 
   const handleFetchData = () => {
     const searchParam =
@@ -76,7 +83,7 @@ const RequestApprovalScreen = () => {
     setIsLoading(true);
     request(
       "get",
-      `${applicationUrl.getApplicationBySemester}/${SEMESTER}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}${applicationStatusParam}`,
+      `${applicationUrl.getApplicationBySemester}/${semester}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}${applicationStatusParam}`,
       (res) => {
         setApplications(res.data.data);
         setOriginalApplications(res.data.data);

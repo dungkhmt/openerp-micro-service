@@ -20,7 +20,7 @@ import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { errorNoti } from "utils/notification";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
-import { applicationUrl } from "../apiURL";
+import { applicationUrl, semesterUrl } from "../apiURL";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -30,6 +30,7 @@ const DEFAULT_PAGINATION_MODEL = {
 const AssigningScreen = () => {
   const [applications, setApplications] = useState([]);
   const [originalApplications, setOriginalApplications] = useState([]);
+  const [semester, setSemester] = useState(SEMESTER);
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
@@ -43,6 +44,12 @@ const AssigningScreen = () => {
   const [statusFilter, setStatusFilter] = useState("ALL");
 
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    request("get", semesterUrl.getCurrentSemester, (res) => {
+      setSemester(res.data);
+    });
+  }, []);
 
   const debouncedSearch = useCallback(
     (search, statusFilter) => {
@@ -62,12 +69,12 @@ const AssigningScreen = () => {
 
   useEffect(() => {
     return debouncedSearch(search, statusFilter);
-  }, [search, statusFilter, debouncedSearch]);
+  }, [search, statusFilter, debouncedSearch, semester]);
 
   useEffect(() => {
     handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paginationModel]);
+  }, [paginationModel, semester]);
 
   const handleFetchData = () => {
     const searchParam =
@@ -80,7 +87,7 @@ const AssigningScreen = () => {
     setIsLoading(true);
     request(
       "get",
-      `${applicationUrl.getApplicationByStatusAndSemester}/${SEMESTER}/APPROVED?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}${assignStatusParam}`,
+      `${applicationUrl.getApplicationByStatusAndSemester}/${semester}/APPROVED?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}${assignStatusParam}`,
       (res) => {
         setApplications(res.data.data);
         setOriginalApplications(res.data.data);
@@ -139,7 +146,7 @@ const AssigningScreen = () => {
 
   const handleAutoAssign = () => {
     setIsLoading(true);
-    request("get", `${applicationUrl.autoAssignClass}/${SEMESTER}`, (res) => {
+    request("get", `${applicationUrl.autoAssignClass}/${semester}`, (res) => {
       handleFetchData();
       setIsLoading(false);
     });
