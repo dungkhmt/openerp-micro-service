@@ -8,6 +8,8 @@ export const applicationUrl = {
     "/application/get-application-by-status-and-semester",
   getAssignListFile: "/application/get-assign-list-file",
   updateApplicationStatus: "/application/update-application-status",
+  updateMultipleApplicationStatus:
+    "/application/update-multiple-application-status",
   updateApplication: "/application/update-application",
   updateAssignStatus: "/application/update-assign-status",
   deleteApplication: "/application/delete-application",

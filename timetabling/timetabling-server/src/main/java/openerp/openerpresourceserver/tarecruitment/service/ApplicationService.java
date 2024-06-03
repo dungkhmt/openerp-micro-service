@@ -31,6 +31,8 @@ public interface ApplicationService {
 
     Application updateApplicationStatus(int id, String status);
 
+    String updateMultipleApplicationStatus(List<Integer> idList, String status);
+
     Application updateAssignStatus(int id, String status);
 
     void autoAssignApplication(String semester);
