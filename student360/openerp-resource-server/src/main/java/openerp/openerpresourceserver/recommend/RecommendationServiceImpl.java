@@ -2,7 +2,7 @@ package openerp.openerpresourceserver.recommend;
 
 import openerp.openerpresourceserver.model.StudentPerformance;
 import openerp.openerpresourceserver.recommend.util.CoursesLoader;
-import openerp.openerpresourceserver.service.StudentSubmissionStatisticsService;
+import openerp.openerpresourceserver.service.StudentPerformanceService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -10,11 +10,8 @@ import openerp.openerpresourceserver.recommend.model.Course;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -23,11 +20,11 @@ import java.util.stream.Collectors;
 public class RecommendationServiceImpl implements RecommendationService {
 
     @Autowired
-    private StudentSubmissionStatisticsService studentSubmissionStatisticsService;
+    private StudentPerformanceService studentPerformanceService;
     @Override
     public List<Course> getRecommendCourses(String studentId, String price, String rating, String duration) {
         List<Course> courses = CoursesLoader.loadCoursesFromCSV("course.csv");
-        StudentPerformance student = studentSubmissionStatisticsService.getPerformanceStudentId(studentId);
+        StudentPerformance student = studentPerformanceService.getPerformanceStudentId(studentId);
         List<Course> recommendedCourses;
         double defaultRating = (rating != null) ? Double.parseDouble(rating) : 4.0;
         double defaultHour = (duration != null) ? Double.parseDouble(duration) : 3.0;
