@@ -12,12 +12,12 @@ import {
   Button,
 } from "@mui/material";
 import { styles } from "./index.style";
-import { SEMESTER, SEMESTER_LIST } from "../config/localize";
+import { SEMESTER } from "../config/localize";
 import DeleteDialog from "../components/DeleteDialog";
 import ApplicatorDialog from "./ApplicatorDialog";
 import { DataGrid } from "@mui/x-data-grid";
 import ImportDialog from "./ImportDialog";
-import { classCallUrl } from "../apiURL";
+import { classCallUrl, semesterUrl } from "../apiURL";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -27,6 +27,7 @@ const DEFAULT_PAGINATION_MODEL = {
 const AllClassScreen = () => {
   const [classes, setClasses] = useState([]);
   const [semester, setSemester] = useState(SEMESTER);
+  const [allSemester, setAllSemester] = useState([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [deleteId, setDeleteId] = useState("");
   const [openApplicatorDialog, setOpenApplicatorDialog] = useState(false);
@@ -45,6 +46,15 @@ const AllClassScreen = () => {
   const [rowSelect, setRowSelect] = useState([]);
 
   const history = useHistory();
+
+  useEffect(() => {
+    request("get", semesterUrl.getCurrentSemester, (res) => {
+      setSemester(res.data);
+    });
+    request("get", semesterUrl.getAllSemester, (res) => {
+      setAllSemester(res.data);
+    });
+  }, []);
 
   const debouncedSearch = useCallback(
     (search) => {
@@ -244,7 +254,7 @@ const AllClassScreen = () => {
               onChange={handleChangeSemester}
               MenuProps={{ PaperProps: { sx: styles.selection } }}
             >
-              {SEMESTER_LIST.map((semester, index) => (
+              {allSemester.map((semester, index) => (
                 <MenuItem key={index} value={semester}>
                   {semester}
                 </MenuItem>

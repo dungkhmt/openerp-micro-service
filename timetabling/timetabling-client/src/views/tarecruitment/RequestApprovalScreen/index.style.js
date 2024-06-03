@@ -35,6 +35,11 @@ const styles = {
     fontSize: 16,
     height: "65vh",
   },
+  firstButton: {
+    height: "40px",
+    marginTop: "0.6em",
+    marginLeft: "0.6em",
+  },
 };
 
 export default styles;

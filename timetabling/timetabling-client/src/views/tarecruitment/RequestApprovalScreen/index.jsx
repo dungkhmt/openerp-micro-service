@@ -11,6 +11,7 @@ import {
   TextField,
   Collapse,
   Typography,
+  Button,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
@@ -18,7 +19,8 @@ import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
-import { applicationUrl } from "../apiURL";
+import { applicationUrl, semesterUrl } from "../apiURL";
+import { successNoti } from "utils/notification";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -29,8 +31,11 @@ const RequestApprovalScreen = () => {
   const [applications, setApplications] = useState([]);
   const [originalApplications, setOriginalApplications] = useState([]);
 
+  const [rowSelect, setRowSelect] = useState([]);
+
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
+  const [semester, setSemester] = useState(SEMESTER);
 
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
@@ -41,6 +46,12 @@ const RequestApprovalScreen = () => {
   const [statusFilter, setStatusFilter] = useState("ALL");
 
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    request("get", semesterUrl.getCurrentSemester, (res) => {
+      setSemester(res.data);
+    });
+  }, []);
 
   const debouncedSearch = useCallback(
     (search, statusFilter) => {
@@ -60,12 +71,12 @@ const RequestApprovalScreen = () => {
 
   useEffect(() => {
     return debouncedSearch(search, statusFilter);
-  }, [search, statusFilter, debouncedSearch]);
+  }, [search, statusFilter, debouncedSearch, semester]);
 
   useEffect(() => {
     handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paginationModel]);
+  }, [paginationModel, semester]);
 
   const handleFetchData = () => {
     const searchParam =
@@ -76,7 +87,7 @@ const RequestApprovalScreen = () => {
     setIsLoading(true);
     request(
       "get",
-      `${applicationUrl.getApplicationBySemester}/${SEMESTER}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}${applicationStatusParam}`,
+      `${applicationUrl.getApplicationBySemester}/${semester}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}${applicationStatusParam}`,
       (res) => {
         setApplications(res.data.data);
         setOriginalApplications(res.data.data);
@@ -307,6 +318,21 @@ const RequestApprovalScreen = () => {
     note: application.note,
   }));
 
+  const updateMultipleApplicationStatus = (status) => {
+    let idList = rowSelect;
+    request(
+      "put",
+      `${applicationUrl.updateMultipleApplicationStatus}/${status}`,
+      (res) => {
+        successNoti(res.data, 5000);
+        handleFetchData();
+        setRowSelect([]);
+      },
+      {},
+      idList
+    );
+  };
+
   return (
     <Paper elevation={3}>
       <div style={styles.tableToolBar}>
@@ -331,6 +357,26 @@ const RequestApprovalScreen = () => {
                 )}
               </IconButton>
             </Tooltip>
+
+            <Button
+              style={styles.firstButton}
+              variant="outlined"
+              color="success"
+              disabled={rowSelect.length === 0}
+              onClick={() => updateMultipleApplicationStatus("APPROVED")}
+            >
+              Duyệt
+            </Button>
+
+            <Button
+              style={styles.firstButton}
+              variant="outlined"
+              color="error"
+              disabled={rowSelect.length === 0}
+              onClick={() => updateMultipleApplicationStatus("REJECTED")}
+            >
+              Không duyệt
+            </Button>
           </div>
 
           <TextField
@@ -359,7 +405,11 @@ const RequestApprovalScreen = () => {
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[10, 20, 50]}
-        checkboxSelection={false}
+        checkboxSelection
+        onRowSelectionModelChange={(newRowSelectionModel) => {
+          setRowSelect(newRowSelectionModel);
+        }}
+        rowSelectionModel={rowSelect}
         disableRowSelectionOnClick
       />
     </Paper>

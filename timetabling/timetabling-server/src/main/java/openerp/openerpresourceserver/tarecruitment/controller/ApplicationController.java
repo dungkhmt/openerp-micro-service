@@ -43,6 +43,16 @@ public class ApplicationController {
         }
     }
 
+    @PutMapping("/update-multiple-application-status/{status}")
+    public ResponseEntity<?> updateMultipleApplicationStatus(@PathVariable String status, @RequestBody List<Integer> idList) {
+        try {
+            String result = applicationService.updateMultipleApplicationStatus(idList, status);
+            return ResponseEntity.ok().body(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     @DeleteMapping("/delete-application/{id}")
     public ResponseEntity<?> deleteApplication(@PathVariable int id) {
         try {

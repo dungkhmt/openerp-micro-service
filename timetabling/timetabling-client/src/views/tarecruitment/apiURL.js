@@ -8,6 +8,8 @@ export const applicationUrl = {
     "/application/get-application-by-status-and-semester",
   getAssignListFile: "/application/get-assign-list-file",
   updateApplicationStatus: "/application/update-application-status",
+  updateMultipleApplicationStatus:
+    "/application/update-multiple-application-status",
   updateApplication: "/application/update-application",
   updateAssignStatus: "/application/update-assign-status",
   deleteApplication: "/application/delete-application",
@@ -29,4 +31,9 @@ export const classCallUrl = {
 
 export const userUrl = {
   getUserInfo: "/user/get-user-info",
+};
+
+export const semesterUrl = {
+  getAllSemester: "/ta-semester/get-all-semester",
+  getCurrentSemester: "/ta-semester/get-current-semester",
 };
