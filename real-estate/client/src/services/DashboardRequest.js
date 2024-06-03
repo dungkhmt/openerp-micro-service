@@ -5,4 +5,9 @@ export default class DashboardRequest extends BaseRequest {
         const url = "/public/dashboard";
         return this.get(url, params)
     }
+
+    get_top(params) {
+        const url = "/public/dashboard/top"
+        return this.get(url, params)
+    }
 }

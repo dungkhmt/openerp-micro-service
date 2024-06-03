@@ -1,9 +1,11 @@
 import React from 'react'
 import {Avatar, Menu} from '@mantine/core'
 import {useNavigate} from 'react-router-dom'
+import {useSelector} from "react-redux";
 
 const ProfileMenu = ({user, logout}) => {
     const navigate = useNavigate()
+    const currentAccount = useSelector(state => state.account.currentData);
     return (
         <Menu>
             <Menu.Target>
@@ -16,7 +18,7 @@ const ProfileMenu = ({user, logout}) => {
                     Thông tin cá nhân
                 </Menu.Item>
 
-                <Menu.Item onClick={() => navigate("/manager-post", {replace: true})}>
+                <Menu.Item onClick={() => navigate("/manager-post/" + currentAccount.accountId, {replace: true})}>
                     Quản lý bài viết
                 </Menu.Item>
 

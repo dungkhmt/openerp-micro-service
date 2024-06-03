@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import PostRequest from "../../services/PostRequest";
+import PostRequest from "../../services/PostSellRequest";
 import {useLocation, useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
 import InfoPostSell from "../../components/InfoPostSell/InfoPostSell";
@@ -9,16 +9,20 @@ import "./PostSellDetail.css"
 import Dashboard from "../../components/Dashboard/Dashboard";
 import ContactBox from "../../components/ContactBox/ContactBox";
 import {transferTimeToDate} from "../../utils/common";
+import PostSellRequest from "../../services/PostSellRequest";
+import {useSelector} from "react-redux";
 
 const PostSellDetail = () => {
+    const current_accountId = useSelector(status => status.account.currentData.accountId);
+    console.log(current_accountId)
     const authRequest = new AuthRequest();
     const dashboardRequest = new DashboardRequest();
     const navigate = useNavigate();
     const {pathname} = useLocation();
-    const id = pathname.split("/").slice(-1)[0];
+    const postId = pathname.split("/").slice(-1)[0];
 
-    const [post, setPost] = useState(null);
-    const [author, setAuthor] = useState(null);
+    const [post, setPost] = useState({});
+    const [author, setAuthor] = useState({});
     const [dashboard, setDashboard] = useState([]);
 
     const exposeHistory = (data) => {
@@ -52,12 +56,36 @@ const PostSellDetail = () => {
     }
 
     useEffect(() => {
-        const postRequest = new PostRequest();
-        postRequest.getPostSellById(id)
+        const postRequest = new PostSellRequest();
+        postRequest.getPostSellById(postId)
             .then(response => {
                 const status = response.code;
                 if (status === 200) {
                     setPost(response.data)
+                    const data = response.data;
+                    console.log(data)
+                    authRequest.get_info_account_by({
+                        accountId: data.authorId,
+                    })
+                        .then(response => {
+                            const status = response.code;
+                            if (status === 200) {
+                                setAuthor(response.data);
+                            }
+                        })
+
+                    const now = Date.now();
+                    const fromTime = now - now % 604800000 - 604800000 * 10;
+                    dashboardRequest.get_dashboard({
+                        fromTime: fromTime,
+                        districtId: data.districtId,
+                        typeProperty: data.typeProperty,
+                    }).then(response => {
+                        const status = response.code;
+                        if (status === 200) {
+                            setDashboard(response.data);
+                        }
+                    })
                     // console.log("o post",response.data);
                 } else {
                     toast.error(response.data.message)
@@ -67,34 +95,7 @@ const PostSellDetail = () => {
             .then()
     }, []);
 
-    useEffect(() => {
-        if (post !== null) {
-            authRequest.get_info_account_by({
-                accountId: post.authorId,
-            })
-                .then(response => {
-                    const status = response.code;
-                    if (status === 200) {
-                        setAuthor(response.data);
-                    }
-                })
-
-            const now = Date.now();
-            const fromTime = now - now % 604800000 - 604800000 * 10;
-            dashboardRequest.get_dashboard({
-                fromTime: fromTime,
-                districtId: post.districtId,
-                typeProperty: post.typeProperty,
-            }).then(response => {
-                const status = response.code;
-                if (status === 200) {
-                    setDashboard(response.data);
-                }
-            })
-        }
-    }, [post]);
-
-    if (post !== null) {
+    if (Object.keys(post).length > 0 && Object.keys(author).length > 0 ) {
         return (
             <div className="postSellDetail-container">
                 <div className="information-post-sell">
@@ -102,7 +103,7 @@ const PostSellDetail = () => {
                     <Dashboard historyPrice={exposeHistory(dashboard)} currentPrice={post.pricePerM2}/>
                 </div>
                 <div className="information-author-post">
-                    <ContactBox account={author}/>
+                    <ContactBox account={author} isOwner={author.accountId == current_accountId}/>
                 </div>
             </div>
         )

@@ -88,7 +88,7 @@ const CardSell = ({item}) => {
                         </div>
                         <div className="flexStart facility">
                             <ImCompass2 size={20} color="#1F3E72"/>
-                            <span style={{}}> {transferDirection(item?.directionsProperty)}</span>
+                            <span style={{}}> {transferDirection(item?.directionProperty)}</span>
                         </div>
                     </div>
 
@@ -99,7 +99,7 @@ const CardSell = ({item}) => {
                 <div className="infoAuthor">
                     <Grid w={"100%"}>
                         <Grid.Col span={"content"}>
-                            <Link to="/">
+                            <Link to={"/manager-post/" + item.authorId}>
                                 <Avatar src={item.avatarAuthor} size="lg"/>
                             </Link>
                         </Grid.Col>

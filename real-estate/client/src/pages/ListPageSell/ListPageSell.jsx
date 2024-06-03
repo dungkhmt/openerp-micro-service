@@ -1,11 +1,12 @@
 import CardSell from "../../components/CardSell/CardSell";
 import React, {useEffect, useState} from "react";
 import MarkerMap from "../../components/MarkerMap/MarkerMap";
-import PostRequest from "../../services/PostRequest";
+import PostRequest from "../../services/PostSellRequest";
 import {toast, ToastContainer} from "react-toastify";
 import "./ListPageSell.css"
 import FilterSell from "../../components/FilterSell/FilterSell";
 import {Pagination, ScrollArea} from "@mantine/core";
+import PostSellRequest from "../../services/PostSellRequest";
 
 const ListPageSell = ({}) => {
 
@@ -30,7 +31,7 @@ const ListPageSell = ({}) => {
         ))
     }
     const getListPostSell = (params) => {
-        const postRequest = new PostRequest();
+        const postRequest = new PostSellRequest();
         postRequest.getPageSell(params)
             .then((response) => {
                 if (response.code === 200) {

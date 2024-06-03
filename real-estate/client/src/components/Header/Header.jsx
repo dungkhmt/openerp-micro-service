@@ -65,7 +65,9 @@ const Header = () => {
                                 </Menu.Item>
                             </Menu.Dropdown>
                         </Menu>
-                        {/*<NavLink to="/sell/properties"></NavLink>*/}
+                        <NavLink to="/report">
+                            Phân tích thị trường
+                        </NavLink>
 
                         {/* add property */}
 

@@ -1,47 +1,54 @@
-import {Box, Button, MultiSelect, NumberInput, Select, Textarea, TextInput} from "@mantine/core";
+import {
+    Box,
+    Button,
+    Checkbox,
+    Grid,
+    MultiSelect,
+    NumberInput,
+    RangeSlider,
+    Select,
+    Textarea,
+    TextInput
+} from "@mantine/core";
 import React, {useEffect, useState} from "react";
-import {apiGetPublicDistrict, apiGetPublicProvinces} from "../../services/AppRequest";
-import PostRequest from "../../services/PostRequest";
-import {toast} from "react-toastify";
+import {toast, ToastContainer} from "react-toastify";
+import {transferPrice} from "../../utils/common";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import {CKEditor} from "@ckeditor/ckeditor5-react";
+import {PostBuyRequest} from "../../services/PostBuyRequest";
+import {useNavigate} from "react-router-dom";
+import DistrictRequest from "../../services/DistrictRequest";
 
 const AddPostBuy = () => {
+    const navigate = useNavigate();
 
-    const [propertyDetails, setPropertyDetails] = useState({
-        title: "",
-        description: "",
+    const [filterAcreage, setFilterAcreage] = useState([0, 100])
+    const [minAcreage, setMinAcreage] = useState(0)
+    const [maxAcreage, setMaxAcreage] = useState(100)
+    const [checkMaxAcreage, setCheckMaxAcreage] = useState(false)
 
-        province: "",
-        district: [],
-
-        minAcreage: 0,
-        fromPrice: 0,
-        toPrice: 0,
-        fromPricePerM2: 0,
-        toPricePerM2: 0,
-
-        typeProperty: [],
-        directionsProperty: [],
-        minBedroom: 0,
-        minParking: 0,
-        minBathroom: 0,
-        minFloor: 0,
-        legalDocuments: [],
-    });
-
+    const [filterPrice, setFilterPrice] = useState([0, 10000000000])
+    const [minPrice, setMinPrice] = useState(0)
+    const [maxPrice, setMaxPrice] = useState(10000000000)
+    const [checkMaxPrice, setCheckMaxPrice] = useState(false)
 
     const [title, setTitle] = useState(null);
-    const [description, setDescription] = useState(null);
+    const [description, setDescription] = useState('');
+
+
     const [provinces, setProvinces] = useState([])
     const [districts, setDistricts] = useState([])
-    const [province, setProvince] = useState(null)
-    const [district, setDistrict] = useState([])
-    const [typeProperty, setTypeProperty] = useState([]);
-    const [directionsProperty, setDirectionsProperty] = useState([]);
-    const [minAcreage, setMinAcreage] = useState(0);
-    const [fromPrice, setFromPrice] = useState(0);
-    const [toPrice, setToPrice] = useState(9999999999);
-    const [fromPricePerM2, setFromPricePerM2] = useState(0);
-    const [toPricePerM2, setToPricePerM2] = useState(0)
+
+    const [provinceId, setProvinceId] = useState()
+    const [nameProvince, setNameProvince] = useState()
+    const [districtIds, setDistrictIds] = useState([])
+
+    const [typeProperty, setTypeProperty] = useState();
+    const [directionProperties, setDirectionProperties] = useState([]);
+
+    const [minHorizontal, setMinHorizontal] = useState(0);
+    const [minVertical, setMinVertical] = useState(0);
+
     const [minBedroom, setMinBedroom] = useState(0);
     const [minBathroom, setMinBathroom] = useState(0);
     const [minParking, setMinParking] = useState(0);
@@ -49,46 +56,93 @@ const AddPostBuy = () => {
     const [legalDocuments, setLegalDocuments] = useState([])
 
     const optionsProvince = provinces?.map((item) => ({
-        value: item.nameProvince,
+        value: item.provinceId,
         label: item.nameProvince,
-        key: item.provinceId,
+        // key: item.provinceId,
     }));
 
     const optionsDistrict = districts?.map((item) => ({
-        value: item.nameDistrict,
+        value: item.districtId,
         label: item.nameDistrict,
-        key: item.districtId
+        // key: item.districtId
     }));
+
+    const marksPrice = [
+        {value: 2500000000, label: '2,5 tỷ'},
+        {value: 5000000000, label: '5 tỷ'},
+        {value: 7500000000, label: '7,5 tỷ'},
+    ];
+
+    const marksAcreage = [
+        {value: 20, label: '20 m²'},
+        {value: 40, label: '40 m²'},
+        {value: 60, label: '60 m²'},
+        {value: 80, label: '80 m²'},
+    ];
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        setPropertyDetails({
-            title: title,
-            description: description,
-            province: province,
-            district: district,
-            minAcreage: minAcreage,
-            fromPrice: fromPrice,
-            toPrice: toPrice,
-            fromPricePerM2: fromPricePerM2,
-            toPricePerM2: toPricePerM2,
-            minFloor: minFloor,
-            minBedroom: minBedroom,
-            minBathroom: minBathroom,
-            minParking: minParking,
-            legalDocuments: legalDocuments,
-            directionsProperty: directionsProperty,
-            typeProperty: typeProperty,
-        })
+        if (provinceId === null || districtIds.length === 0
+            || title.length < 20 || title.length > 50
+            || typeProperty === null || legalDocuments.length === 0
+            || directionProperties.length === 0
+        ) {
+            toast.error("Yêu cầu điền thông tin đầy đủ!")
+        } else {
+            const request = new PostBuyRequest();
+            const nameDistricts = districtIds.map(id => {
+                const district = districts.find(d => d.districtId === id);
+                return district ? district.nameDistrict : null;
+            }).filter(label => label !== null);
+            const data = {
+                title: title,
+                description: description,
+                provinceId: provinceId,
+                nameProvince: nameProvince,
+                districtIds: districtIds,
+                nameDistricts: nameDistricts,
+                minAcreage: minAcreage,
+                maxAcreage: maxAcreage,
+                minPrice: minPrice,
+                maxPrice: maxPrice,
+                minFloor: minFloor,
+                minBedroom: minBedroom,
+                minBathroom: minBathroom,
+                minParking: minParking,
+                legalDocuments: legalDocuments,
+                directionProperties: directionProperties,
+                typeProperty: typeProperty,
+
+                minHorizontal: minHorizontal,
+                minVertical: minVertical
+            }
+
+            console.log(data)
+            request.add_post(data)
+                .then((response) => {
+                    const status = response.code;
+                    if (status === 200) {
+                        toast.success(response.data)
+                        navigate("/buy/properties", {replace: true})
+                    } else {
+                        toast.error(response.data.message)
+                    }
+                })
+        }
+
     }
 
 
 
     useEffect(() => {
-        const fetchPublicProvince = async () => {
-            const response = await apiGetPublicProvinces()
-            if (response.status === 200) {
-                setProvinces(response?.data.data)
-            }
+        const fetchPublicProvince = () => {
+            const districtRequest = new DistrictRequest();
+            districtRequest.get_province()
+                .then(response => {
+                    if (response.code === 200) {
+                        setProvinces(response.data);
+                    }
+                })
         }
         fetchPublicProvince()
     }, [])
@@ -96,42 +150,37 @@ const AddPostBuy = () => {
 
     useEffect(() => {
         const fetchPublicDistrict = async () => {
-            const response = await apiGetPublicDistrict(province)
-            if (response.status === 200) {
-                setDistricts(response.data?.data)
-            }
-        }
-        province && fetchPublicDistrict()
-        setDistrict([]);
-    }, [province])
-
-    useEffect(() => {
-        if (minAcreage > 0) {
-            setFromPricePerM2(fromPrice / minAcreage);
-        }
-    }, [fromPrice])
-
-    useEffect(() => {
-        if (minAcreage > 0) {
-            setToPricePerM2(toPrice / minAcreage);
-        }
-    }, [toPrice])
-
-    useEffect(() => {
-        const request = new PostRequest();
-        console.log("goi api", propertyDetails);
-        request.addPostBuy(propertyDetails)
-            .then((response) => {
-                const status = response.code;
-                if (status === 200) {
-                    toast.success("Đăng bài thành công")
-                } else {
-                    toast.error(response.data.message)
+            const districtRequest = new DistrictRequest();
+            districtRequest.get_districts({
+                provinceId
+            }).then(response => {
+                if (response.code === 200) {
+                    setDistricts(response.data);
                 }
             })
-        // request.addPostBuy(propertyDetails);
-    }, [propertyDetails]);
+        }
+        provinceId && fetchPublicDistrict()
+    }, [provinceId])
 
+    useEffect(() => {
+        if (checkMaxAcreage === false) {
+            setMinAcreage(filterAcreage[0])
+            setMaxAcreage(filterAcreage[1])
+        } else {
+            setMinAcreage(100)
+            setMaxAcreage(0)
+        }
+    }, [filterAcreage, checkMaxAcreage]);
+
+    useEffect(() => {
+        if (checkMaxPrice === false) {
+            setMinPrice(filterPrice[0])
+            setMaxPrice(filterPrice[1])
+        } else {
+            setMinPrice(10000000000)
+            setMaxPrice(0)
+        }
+    }, [filterPrice, checkMaxPrice]);
 
     return (
         <div className="postBuy-wrapper">
@@ -144,13 +193,36 @@ const AddPostBuy = () => {
                     label="Tiêu đề"
                     value={title}
                     onChange={(event) => setTitle(event.currentTarget.value)}
+                    style={{paddingBottom: "30px"}}
+                    error={(title?.length > 50 || title?.length < 20) ? "Nhập 20 đến 50 ký tự" : ""}
+
                 />
-                <Textarea
-                    placeholder="Description"
-                    label="Mô tả"
-                    withAsterisk
-                    value={description}
-                    onChange={(event) => setDescription(event.currentTarget.value)}
+                <CKEditor
+                    style={{height: "400px"}}
+                    editor={ClassicEditor}
+                    data={description}
+                    onReady={editor => {
+                        // You can store the "editor" and use when it is needed.
+                        // editor.editing.view.change((writer) => {
+                        //     writer.setStyle(
+                        //         'width',
+                        //         "200px",
+                        //         editor.editing.view.document.getRoot()
+                        //     )
+                        // })
+
+                        // console.log('Editor is ready to use!', editor);
+                    }}
+                    onChange={(event, editor) => {
+                        // console.log( event );
+                        setDescription(editor.getData())
+                    }}
+                    onBlur={(event, editor) => {
+                        console.log('Blur.', editor);
+                    }}
+                    onFocus={(event, editor) => {
+                        console.log('Focus.', editor);
+                    }}
                 />
                 <Select
                     w={"100%"}
@@ -159,8 +231,12 @@ const AddPostBuy = () => {
                     clearable
                     searchable
                     data={optionsProvince}
-                    value={province}
-                    onChange={(value) => setProvince(value)}
+                    value={provinceId}
+                    onChange={(value, option) => {
+                        setProvinceId(option.value);
+                        setNameProvince(option.label);
+                    }}
+
                 />
 
                 <MultiSelect
@@ -170,54 +246,62 @@ const AddPostBuy = () => {
                     clearable
                     searchable
                     data={optionsDistrict}
-                    onChange={(value) => setDistrict(value)}
-                    value={district}
+                    onChange={(value) => {
+                        setDistrictIds(value)
+                    }}
+                    value={districtIds}
                 />
 
-                <NumberInput
-                    withAsterisk
-                    label="Diện tích tối thiểu"
-                    placeholder="1000"
-                    min={0}
-                    thousandSeparator=","
-                    suffix=" mét vuông"
-                    value={minAcreage}
-                    onChange={(value) => setMinAcreage(value)}
+                <RangeSlider
+                    style={{
+                        width: "50%",
+                        margin: "15px 0"
+                    }}
+                    label={value => value + "m²"}
+                    marks={marksAcreage} min={0} max={100} minRange={10} step={10}
+                    value={filterAcreage}
+                    onChange={setFilterAcreage}
+                    disabled={checkMaxAcreage}
                 />
-                <NumberInput
-                    withAsterisk
-                    label="Giá tối thiểu"
-                    placeholder="1000"
-                    min={0}
-                    thousandSeparator=","
-                    suffix=" VND"
-                    value={fromPrice}
-                    onChange={(value) => setFromPrice(value)}
-                    error={fromPrice > toPrice ? "Gía tối thiểu phải bé hơn giá tối đa" : ""}
+                <Checkbox
+                    style={{
+                        margin: "25px auto 5px auto"
+                    }}
+                    label="Trên 100 m²"
+                    checked={checkMaxAcreage}
+                    onChange={(event) => setCheckMaxAcreage(event.currentTarget.checked)}
                 />
-                <small>Giá bán trên 1 m2 đất đang là: ${fromPricePerM2.toLocaleString('us-US')} VND</small>
 
-                <NumberInput
-                    withAsterisk
-                    label="Giá tối đa"
-                    placeholder="1000"
-                    min={0}
-                    thousandSeparator=","
-                    suffix=" VND"
-                    value={toPrice}
-                    onChange={(value) => setToPrice(value)}
+                <RangeSlider
+                    style={{
+                        width: "50%",
+                        margin: "15px 0"
+                    }}
+                    label={value => transferPrice(value)}
+                    marks={marksPrice} min={0} max={10000000000} minRange={500000000} step={500000000}
+                    value={filterPrice}
+                    onChange={setFilterPrice}
+                    disabled={checkMaxPrice}
                 />
-                <small>Giá bán trên 1 m2 đất đang là: ${toPricePerM2.toLocaleString('us-US')} VND</small>
+                <Checkbox
+                    style={{
+                        margin: "25px auto 5px auto"
+                    }}
+                    label="Trên 10 tỷ"
+                    checked={checkMaxPrice}
+                    onChange={(event) => setCheckMaxPrice(event.currentTarget.checked)}
+                />
 
-                <MultiSelect
+                <Select
                     withAsterisk
-                    label="Kiểu bất sản muốn bán"
+                    label="Kiểu bất sản muốn mua"
                     data={
                         [{value: 'LAND', label: 'Đất'},
                         {value: 'HOUSE', label: 'Nhà ở'},
-                        {value: 'DEPARTMENT', label: 'Chung cư'}
+                        {value: 'APARTMENT', label: 'Chung cư'}
                     ]}
                     onChange={(value) => setTypeProperty(value)}
+                    value={typeProperty}
                 />
 
                 <MultiSelect
@@ -233,7 +317,8 @@ const AddPostBuy = () => {
                         {value: 'WEST', label: 'Tây'},
                         {value: 'WEST_NORTH', label: 'Tây Bắc'}
                     ]}
-                    onChange={(value) => setDirectionsProperty(value)}
+                    onChange={(value) => setDirectionProperties(value)}
+                    value={directionProperties}
                 />
 
                 <MultiSelect
@@ -241,57 +326,123 @@ const AddPostBuy = () => {
                     label="Trạng thái sổ đỏ"
                     data={[
                         {value: 'HAVE', label: 'Đã có sổ'},
-                        {value: 'WAITING', label: 'Đang chờ'},
+                        {value: 'WAIT', label: 'Đang chờ'},
                         {value: 'HAVE_NOT', label: 'Không có'},
                     ]}
                     value={legalDocuments}
                     onChange={(value) => setLegalDocuments(value)}
                 />
 
-                <NumberInput
-                    withAsterisk
-                    label="Số tầng tối thiểu"
-                    min={0}
-                    value={minFloor}
-                    onChange={(value) => setMinFloor(value)}
-                    allowDecimal={false}
-                    // disabled={isLand}
-                />
+                <Grid>
+                    <Grid.Col span={6}>
+                        <NumberInput
+                            label="Chiều dài tối thiểu"
+                            min={0}
+                            value={minHorizontal}
+                            onChange={(value) => setMinHorizontal(value)}
+                            allowDecimal={false}
+                        />
+                    </Grid.Col>
 
-                <NumberInput
-                    withAsterisk
-                    label="Số phòng ngủ tối thiểu"
-                    min={0}
-                    value={minBedroom}
-                    onChange={(value) => setMinBedroom(value)}
-                    allowDecimal={false}
-                    // disabled={isLand}
-                />
+                    <Grid.Col span={6}>
+                        <NumberInput
+                            label="Chiều rộng tối thiểu"
+                            min={0}
+                            value={minVertical}
+                            onChange={(value) => setMinVertical(value)}
+                            allowDecimal={false}
+                        />
+                    </Grid.Col>
 
-                <NumberInput
-                    withAsterisk
-                    label="Số phòng tắm tối thiểu"
-                    min={0}
-                    value={minBathroom}
-                    onChange={(value) => setMinBathroom(value)}
-                    allowDecimal={false}
-                    // disabled={isLand}
-                />
-                <NumberInput
-                    withAsterisk
-                    label="Có thể đậu ít nhất bao nhiêu xe ô tô"
-                    min={0}
-                    value={minParking}
-                    onChange={(value) => setMinParking(value)}
-                    allowDecimal={false}
-                    // disabled={isLand}
-                />
+                </Grid>
+
+                {typeProperty === 'APARTMENT' && (
+                    <Grid>
+                        <Grid.Col span={6}>
+                            <NumberInput
+                                label="Số phòng ngủ tối thiểu"
+                                min={0}
+                                value={minBedroom}
+                                onChange={(value) => setMinBedroom(value)}
+                                allowDecimal={false}
+                            />
+                        </Grid.Col>
+
+                        <Grid.Col span={6}>
+                            <NumberInput
+                                label="Số phòng tắm tối thiểu"
+                                min={0}
+                                value={minBathroom}
+                                onChange={(value) => setMinBathroom(value)}
+                                allowDecimal={false}
+                            />
+                        </Grid.Col>
+
+                    </Grid>
+                )}
+
+                {typeProperty === 'HOUSE' && (
+                    <Grid>
+                        <Grid.Col span={6}>
+                            <NumberInput
+                                label="Số tầng tối thiểu"
+                                min={0}
+                                value={minFloor}
+                                onChange={(value) => setMinFloor(value)}
+                                allowDecimal={false}
+                            />
+                        </Grid.Col>
+
+
+                        <Grid.Col span={6}>
+                            <NumberInput
+                                label="Số phòng ngủ tối thiểu"
+                                min={0}
+                                value={minBedroom}
+                                onChange={(value) => setMinBedroom(value)}
+                                allowDecimal={false}
+                            />
+                        </Grid.Col>
+
+
+                        <Grid.Col span={6}>
+                            <NumberInput
+                                label="Số phòng tắm tối thiểu"
+                                min={0}
+                                value={minBathroom}
+                                onChange={(value) => setMinBathroom(value)}
+                                allowDecimal={false}
+                            />
+                        </Grid.Col>
+
+
+                        <Grid.Col span={6}>
+                            <NumberInput
+                                label="Có thể đậu ít nhất bao nhiêu xe ô tô"
+                                min={0}
+                                value={minParking}
+                                onChange={(value) => setMinParking(value)}
+                                allowDecimal={false}
+                            />
+                        </Grid.Col>
+                    </Grid>
+                )}
             </Box>
 
             <Button onClick={handleSubmit} className="flexCenter" style={{margin: "3rem 45%"}}>
-                Đăng
+                Đăng bài
             </Button>
-
+            <ToastContainer
+                position="top-left"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
         </div>
 
     )

@@ -1,6 +1,6 @@
 import BaseRequest from "./BaseRequest";
 
-export default class PostRequest extends BaseRequest {
+export default class PostSellRequest extends BaseRequest {
     addPostSell = async (data) => {
         const url = "/post/sell";
         return await this.post(url, data);
@@ -21,12 +21,12 @@ export default class PostRequest extends BaseRequest {
         return this.get(url, params);
     }
 
-    getPostSellOfMe() {
-        const url = "/post/sell";
+    get_post_by_accountId(accountId) {
+        const url = `/public/post/sell/my-post/${accountId}`;
         return this.get(url)
     }
 
-    updateStatus(data) {
+    update_status(data) {
         const url = "/post/sell/updateStatus";
         return this.put(url, data)
     }
