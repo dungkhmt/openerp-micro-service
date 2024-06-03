@@ -8,12 +8,12 @@ import {
   Button,
   TextField,
 } from "@mui/material";
-import { SEMESTER, SEMESTER_LIST } from "../config/localize";
+import { SEMESTER } from "../config/localize";
 import { styles } from "./index.style";
 import { DataGrid } from "@mui/x-data-grid";
 import { useCallback, useEffect, useState } from "react";
 import { request } from "api";
-import { applicationUrl } from "../apiURL";
+import { applicationUrl, semesterUrl } from "../apiURL";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -23,6 +23,7 @@ const DEFAULT_PAGINATION_MODEL = {
 const TAAssistListScreen = () => {
   const [ta, setTa] = useState([]);
   const [semester, setSemester] = useState(SEMESTER);
+  const [allSemester, setAllSemester] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
 
@@ -31,6 +32,15 @@ const TAAssistListScreen = () => {
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
   );
+
+  useEffect(() => {
+    request("get", semesterUrl.getCurrentSemester, (res) => {
+      setSemester(res.data);
+    });
+    request("get", semesterUrl.getAllSemester, (res) => {
+      setAllSemester(res.data);
+    });
+  }, []);
 
   const debouncedSearch = useCallback(
     (search) => {
@@ -217,7 +227,7 @@ const TAAssistListScreen = () => {
               onChange={handleChangeSemester}
               MenuProps={{ PaperProps: { sx: styles.selection } }}
             >
-              {SEMESTER_LIST.map((semester, index) => (
+              {allSemester.map((semester, index) => (
                 <MenuItem key={index} value={semester}>
                   {semester}
                 </MenuItem>
