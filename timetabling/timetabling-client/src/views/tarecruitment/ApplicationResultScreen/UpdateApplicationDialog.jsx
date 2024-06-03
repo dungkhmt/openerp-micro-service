@@ -1,6 +1,6 @@
 import { request } from "api";
 import { useEffect, useState } from "react";
-import { successNoti } from "utils/notification";
+import { successNoti, warningNoti } from "utils/notification";
 
 import {
   Dialog,
@@ -62,19 +62,29 @@ const UpdateApplicationDialog = ({
     }));
   };
 
-  const handleUpdateApplication = () => [
-    request(
-      "put",
-      `${applicationUrl.updateApplication}/${applicationId}`,
-      (res) => {
-        successNoti("Cập nhật ứng tuyển thành công!", 5000);
-        fetchData();
-        handleClose();
-      },
-      {},
-      formData
-    ),
-  ];
+  const handleUpdateApplication = () => {
+    if (
+      formData.name === "" ||
+      formData.mssv === "" ||
+      formData.phoneNumber === "" ||
+      formData.email === "" ||
+      formData.cpa === ""
+    ) {
+      warningNoti("Vui lòng điền đầy đủ thông tin", 5000);
+    } else {
+      request(
+        "put",
+        `${applicationUrl.updateApplication}/${applicationId}`,
+        (res) => {
+          successNoti("Cập nhật ứng tuyển thành công!", 5000);
+          fetchData();
+          handleClose();
+        },
+        {},
+        formData
+      );
+    }
+  };
 
   return (
     <Dialog
