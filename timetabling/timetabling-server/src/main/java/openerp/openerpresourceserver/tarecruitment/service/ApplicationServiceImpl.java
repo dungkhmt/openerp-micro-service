@@ -185,6 +185,25 @@ public class ApplicationServiceImpl implements ApplicationService{
         }
     }
 
+    @Override
+    public String updateMultipleApplicationStatus(List<Integer> idList, String status) {
+        if (!("PENDING".equals(status) || "APPROVED".equals(status) || "REJECTED".equals(status))) {
+            throw new IllegalArgumentException("Invalid status");
+        }
+        else {
+            for(int id : idList) {
+                Optional<Application> application = applicationRepo.findById(id);
+                if(application.isEmpty()) {
+                    throw new IllegalArgumentException("Application with id " + id + " did not exist");
+                }
+                Application existApplication = application.get();
+                existApplication.setApplicationStatus(status);
+                applicationRepo.save(existApplication);
+            }
+            return "Cập nhật trạng thái thành công " + idList.size() + " đơn xin trợ giảng";
+        }
+    }
+
     // HAVEN'T CHECK THIS
     @Override
     public Application updateAssignStatus(int id, String status) {
