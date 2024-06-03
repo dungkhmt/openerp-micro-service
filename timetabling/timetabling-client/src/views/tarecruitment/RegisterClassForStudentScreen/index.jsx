@@ -78,8 +78,7 @@ const RegisterClassForStudentScreen = (props) => {
       formData.mssv === "" ||
       formData.phoneNumber === "" ||
       formData.email === "" ||
-      formData.cpa === "" ||
-      formData.englishScore === ""
+      formData.cpa === ""
     ) {
       warningNoti("Vui lòng điền đầy đủ thông tin", 5000);
     } else {
