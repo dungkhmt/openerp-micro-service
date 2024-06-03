@@ -42,15 +42,26 @@ export const useGeneralTableColumns = (
       "post",
       `/general-classes/${generalClassId}/room-reservations/`,
       (res) => {
-        const newClasses = res.data.timeSlots.map((timeSlot, index)=> {
-          const newClass = {...res.data, ...timeSlot, id: `${res.data.id}-${index+1}`}
-          delete newClass.timeSlots
-          return newClass; 
+        console.log(res.data);
+        const newClasses = res.data.timeSlots.map((timeSlot, index) => {
+          const newClass = {
+            ...res.data,
+            ...timeSlot,
+            id: `${res.data.id}-${index + 1}`,
+            roomReservationId: timeSlot?.id,
+          };
+          delete newClass.timeSlots;
+          console.log(newClass.roomReservationId)
+          return newClass;
         });
+
         setClasses((prevClasses) => {
-          return [...prevClasses.filter(
-            (prevClass) => prevClass.id.split("-")[0] !== generalClassId
-          ), ...newClasses];
+          return [
+            ...prevClasses.filter(
+              (prevClass) => prevClass.id.split("-")[0] !== generalClassId
+            ),
+            ...newClasses,
+          ];
         });
       },
       (err) => {
