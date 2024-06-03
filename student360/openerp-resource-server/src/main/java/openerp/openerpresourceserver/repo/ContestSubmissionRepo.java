@@ -53,7 +53,7 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmission, 
             "END AS grouped_language, " +
             "COUNT(*) AS submission_count " +
             "FROM contest_submission_new " +
-            "WHERE point > 0 and user_submission_id = :userId " +
+            "WHERE user_submission_id = :userId " +
             "GROUP BY user_submission_id, grouped_language " +
             "ORDER BY user_submission_id, submission_count DESC",nativeQuery = true)
     Object[] findNumberCountLanguagesDetailByUserId(@Param("userId") String userId);

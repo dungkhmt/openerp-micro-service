@@ -1,7 +1,6 @@
 package openerp.openerpresourceserver.controller;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.model.StudentPerformance;
 import openerp.openerpresourceserver.model.StudentStatisticContest;
 import openerp.openerpresourceserver.entity.StudentSubmissionStatistics;
 import openerp.openerpresourceserver.service.StudentSubmissionStatisticsService;
@@ -22,7 +21,6 @@ import java.util.List;
 public class StudentSubmissionStatisticsController {
 
     private StudentSubmissionStatisticsService StudentSubmissionStatisticsService;
-
     @GetMapping("/get-all")
     public ResponseEntity<?> getAllStudentStatistics() {
         List<StudentSubmissionStatistics> StudentSubmissionDetails = StudentSubmissionStatisticsService.getAllStatisticsDetailStudent();
@@ -34,12 +32,5 @@ public class StudentSubmissionStatisticsController {
     public ResponseEntity<?> getStaticsContestStudentId(@PathVariable String id, Principal principal) {
         StudentStatisticContest studentStatisticContest = StudentSubmissionStatisticsService.getStaticsContestStudentId(id);
         return ResponseEntity.ok().body(studentStatisticContest);
-    }
-
-    @PreAuthorize("hasRole('ROLE_TEACHER') or (hasRole('ROLE_STUDENT') and #id == principal.name)")
-    @GetMapping("/student-performance/{id}")
-    public ResponseEntity<?> getPerformanceStudentId(@PathVariable String id, Principal principal) {
-        StudentPerformance studentPerformance = StudentSubmissionStatisticsService.getPerformanceStudentId(id);
-        return ResponseEntity.ok().body(studentPerformance);
     }
 }

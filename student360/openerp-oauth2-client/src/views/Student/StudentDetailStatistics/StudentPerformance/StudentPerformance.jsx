@@ -84,6 +84,7 @@ function StudentPerformance(props) {
         `  (${detail?.programmingLanguageSubmitCounts
           .map((obj) => obj[0])
           .join(", ")})`;
+
       detail.studentSemesterResult = detail?.studentSemesterResult.map(
         (semesterResult) => {
           switch (semesterResult?.appearedInPlagiarism) {
@@ -97,13 +98,14 @@ function StudentPerformance(props) {
               semesterResult.appearedInPlagiarism = "Gian lận bài thi cuối kỳ";
               break;
             default:
-            // You can add a default action here
           }
           return semesterResult;
         }
       );
 
-      detail.mostLanguageUsed = detail.programmingLanguageSubmitCounts[0][0];
+      if (detail.programmingLanguageSubmitCounts.length > 0)
+        detail.mostLanguageUsed = detail?.programmingLanguageSubmitCounts[0][0];
+      else detail.mostLanguageUsed = "Không có";
 
       setStudentDetail(detail);
     };
@@ -113,7 +115,7 @@ function StudentPerformance(props) {
     };
     request(
       "GET",
-      `/student-statistics/student-performance/${studentLoginId}`,
+      `/student-performance/student-performance/${studentLoginId}`,
       successHandler,
       errorHandlers
     );
@@ -148,7 +150,7 @@ function StudentPerformance(props) {
     endTimeActive: "Thời gian kết thúc học",
     mostSubmittedTime: "Thời gian active nhiều nhất",
     mostEffectiveSubmittedTime: "Thời gian hiệu quả nhất",
-    // learningBehavior: "Xu hướng học tập trong học kỳ",
+    learningBehavior: "Xu hướng học tập trong học kỳ",
   };
 
   const studentLearningRoutineAttrTooltip = {
@@ -156,7 +158,7 @@ function StudentPerformance(props) {
     endTimeActive: "Thời gian kết thúc học trong học",
     mostSubmittedTime: "Thời gian nộp bài tập nhiều nhất",
     mostEffectiveSubmittedTime: "Thời gian nộp bài tập hiệu quả, được điểm cao",
-    // learningBehavior: "Xu hướng học tập trong học kỳ",
+    learningBehavior: "Xu hướng học tập trong học kỳ",
   };
 
   const studentCharacterAttrs = [
@@ -164,7 +166,7 @@ function StudentPerformance(props) {
     "languageVariety",
     "attitude",
     "evaluation",
-    // "learningStatus",
+    "learningStatus",
   ];
 
   const studentCharacterAttrLabels = {
@@ -172,7 +174,7 @@ function StudentPerformance(props) {
     languageVariety: "Đa dạng ngôn ngữ",
     attitude: "Thái độ học tập",
     evaluation: "Khả năng tư duy thuật toán",
-    // learningStatus: "Tình trạng học tập",
+    learningStatus: "Tình trạng học tập",
   };
 
   const studentCharacterAttrTooltips = {
@@ -180,20 +182,16 @@ function StudentPerformance(props) {
     languageVariety: "Số ngôn ngữ lập trình có thể sử dụng",
     attitude: "Trung bình số lần nộp bài trong ngày",
     evaluation: "Trung bình số lần tối thiểu nộp bài được điểm tối đa",
-    // learningStatus: "Tình trạng học tập",
+    learningStatus: "Tình trạng học tập",
   };
 
   const studentSemesterResultAttrs = [
-    "totalSubmission",
-    "totalProblem",
     "midtermPoint",
     "finalPoint",
     "appearedInPlagiarism",
     "passingState",
   ];
   const studentSemesterResultAttrLabels = {
-    totalSubmission: "Tổng số submissions",
-    totalProblem: "Tổng số bài đã nộp",
     midtermPoint: "Kết quả thi giữa kỳ",
     finalPoint: "Kết quả thi cuối kỳ",
     appearedInPlagiarism: "Phát hiện gian lận",

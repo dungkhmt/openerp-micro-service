@@ -5,8 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
-
-
+import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.sql.DataSource;
 
@@ -21,10 +20,15 @@ public class StartUpRunner implements CommandLineRunner {
     public void run(String... arg) throws Exception {
         createSQLViews();
     }
-
-    private void createSQLViews(){
+    @Scheduled(cron = "0 0 4 * * ?")
+    private void createSQLViews() {
         boolean IGNORE_FAILED_DROPS = true;
-        ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator(false, IGNORE_FAILED_DROPS , "UTF-8", new ClassPathResource("db/after_hibernate_init.sql"));  // Updated path
+        ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator(
+                false,
+                IGNORE_FAILED_DROPS,
+                "UTF-8",
+                new ClassPathResource("db/after_hibernate_init.sql")
+        );
         resourceDatabasePopulator.execute(dataSource);
     }
 }

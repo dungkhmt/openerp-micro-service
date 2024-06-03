@@ -75,4 +75,10 @@ FROM
 GROUP BY
     s.user_submission_id;
 
+REFRESH MATERIALIZED VIEW public.max_point_contest_view;
+REFRESH MATERIALIZED VIEW public.midterm_final_submission_view;
+REFRESH MATERIALIZED VIEW public.submission_hourly_summary;
+REFRESH MATERIALIZED VIEW public.student_submission_statistics;
+
+
 
