@@ -157,8 +157,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             submissionId);
         ProblemEntity problem = problemService.findProblemWithCache(submission.getProblemId());
         ContestEntity contest = contestService.findContestWithCache(submission.getContestId());
-        List<ContestSubmissionTestCaseEntity> submissionTestcases = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionId(
-            submissionId);
+        List<ContestSubmissionTestCaseEntity> submissionTestcases = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionIdOrderByCreatedStampDesc(
+                submissionId);
 
         boolean includePrivateTest = contest != null &&
             contest.getEvaluateBothPublicPrivateTestcase() != null &&
