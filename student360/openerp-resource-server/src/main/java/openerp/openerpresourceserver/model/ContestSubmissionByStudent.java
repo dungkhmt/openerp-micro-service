@@ -10,11 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ContestSubmissionByStudent {
-
     private String contestId;
-
     private int totalProblems;
-
     private int totalProblemsSubmitted;
-
 }

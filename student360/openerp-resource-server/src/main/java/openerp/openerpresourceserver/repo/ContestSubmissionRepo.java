@@ -11,7 +11,8 @@ import java.util.List;
 
 public interface ContestSubmissionRepo extends JpaRepository<ContestSubmission, String> {
 
-    List<ContestSubmission> findByUserSubmissionId(String studentId);
+    @Query("SELECT cs FROM ContestSubmission cs WHERE cs.userSubmissionId = :userId ORDER BY cs.createdDate ASC")
+    List<ContestSubmission> findAllByUserSubmissionIdOrderByCreatedDateAsc(@Param("userId") String userId);
     List<ContestSubmission> findByContestIdAndUserSubmissionId(String contestId, String studentId);
 
     long count();

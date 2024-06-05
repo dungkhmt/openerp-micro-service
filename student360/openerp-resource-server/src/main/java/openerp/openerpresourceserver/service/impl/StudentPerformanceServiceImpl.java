@@ -46,7 +46,7 @@ public class StudentPerformanceServiceImpl implements StudentPerformanceService 
 
         Object[] timeActive = (Object[]) objectTimeActive;
 
-        List<ContestSubmission> contestSubmissions = contestSubmissionRepo.findByUserSubmissionId(studentId);
+        List<ContestSubmission> contestSubmissions = contestSubmissionRepo.findAllByUserSubmissionIdOrderByCreatedDateAsc(studentId);
 
         // Lấy dữ liệu mỗi ngày sinh viên submitted bao nhiêu lần
         Map<LocalDate, Integer> dailySubmissionCounts = new HashMap<>();
@@ -263,11 +263,6 @@ public class StudentPerformanceServiceImpl implements StudentPerformanceService 
             studentSemesterResultList.add(result);
         }
 
-        contestSubmissions = contestSubmissionRepo.findByUserSubmissionId(studentId);
-
-        for (ContestSubmission contestSubmission : contestSubmissions) {
-            uniqueContestIds.add(contestSubmission.getContestId());
-        }
 
         List<ContestSubmissionByStudent> contestDetails = new ArrayList<>();
 
