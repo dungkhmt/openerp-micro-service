@@ -46,7 +46,7 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
     private DefenseJuryTeacherRoleRepo defenseJuryTeacherRoleRepo;
 
     @Override
-    public DefenseJury createNewDefenseJury(DefenseJuryIM defenseJury) {
+    public String createNewDefenseJury(DefenseJuryIM defenseJury) {
         DefenseJury newDefenseJury = new DefenseJury();
 
         if ((defenseJury.getName().isEmpty()) || (defenseJury.getDefenseDate() == null)
@@ -56,7 +56,13 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
 
         String thesisDefensePlanId = defenseJury.getThesisPlanName();
         ThesisDefensePlan thesisDefensePlan = thesisDefensePlanRepo.findById(thesisDefensePlanId).orElse(null);
-
+        if (thesisDefensePlan == null) return null;
+        //compare date
+        Date planStartDate = thesisDefensePlan.getStartDate();
+        Date planEndDate = thesisDefensePlan.getEndDate();
+        if (defenseJury.getDefenseDate().after(planEndDate)) return "Ngày tổ chức phải trước ngày " + planEndDate.toString() ;
+        if (defenseJury.getDefenseDate().before(planStartDate)) return "Ngày tổ chức phải sau ngày " + planStartDate.toString();
+        //
         List<AcademicKeyword> academicKeywordList = new LinkedList<>();
         for (int i = 0; i < defenseJury.getAcademicKeywordList().size(); i++) {
             AcademicKeyword foundAcademicKeyword = academicKeywordRepo.findById(defenseJury.getAcademicKeywordList().get(i)).orElse(null);
@@ -77,6 +83,14 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         if (defenseSession == null) {
             return null;
         }
+        List<DefenseJury> duplicateDefenseJury = defenseJuryRepo.findByThesisDefensePlanAndDefenseDateAndDefenseSessionAndDefenseRoom(thesisDefensePlan,
+                defenseJury.getDefenseDate(),
+                defenseSession,
+                defenseRoom);
+
+        if (!duplicateDefenseJury.isEmpty()){
+            return "Hội đồng " + duplicateDefenseJury.get(0).getName() + " đã được tổ chức vào phòng " + defenseRoom.getName() + " cùng buổi";
+        }
         newDefenseJury.setDefenseRoom(defenseRoom);
         newDefenseJury.setDefenseSession(defenseSession);
         newDefenseJury.setThesisDefensePlan(thesisDefensePlan);
@@ -86,7 +100,8 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         newDefenseJury.setCreatedTime(new Date());
         newDefenseJury.setMaxThesis(defenseJury.getMaxThesis());
 
-        return defenseJuryRepo.save(newDefenseJury);
+        DefenseJury saveJury = defenseJuryRepo.save(newDefenseJury);
+        return "Success";
     }
 
     @Override
@@ -109,7 +124,7 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
     }
 
     @Override
-    public DefenseJury assignTeacherAndThesis(AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList) {
+    public String assignTeacherAndThesis(AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList) {
         DefenseJury defenseJury = defenseJuryRepo.findById(UUID.fromString(teacherAndThesisList.getDefenseJuryId())).orElse(null);
         if (defenseJury == null) return null;
         List<DefenseJuryTeacherRoleIM> defenseJuryTeacherRole = teacherAndThesisList.getDefenseJuryTeacherRole();
@@ -120,6 +135,17 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
             Role teacherRole = roleRepo.findById(roleId).orElse(null);
             if (teacherRole == null) return null;
             if (teacher == null) return null;
+            List<DefenseJury> defenseJuryAtTheSameDate = defenseJuryRepo.findByThesisDefensePlanAndDefenseDateAndDefenseSessionAndDefenseJuryTeacherRolesTeacherId(
+                    defenseJury.getThesisDefensePlan(),
+                    defenseJury.getDefenseDate(),
+                    defenseJury.getDefenseSession(),
+                    teacherName
+            );
+            System.out.println("Bị trùng giáo viên");
+            if (!defenseJuryAtTheSameDate.isEmpty()){
+                return "Giáo viên " + teacher.getTeacherName() + " đã được phân vào hội đồng "
+                        + defenseJury.getName() + " cùng ngày";
+            }
             DefenseJuryTeacherRole defenseJuryTeacherRole1 = new DefenseJuryTeacherRole(teacher, teacherRole, defenseJury);
             DefenseJuryTeacherRole newDefenseJuryTeacherRole = defenseJuryTeacherRoleRepo.save(defenseJuryTeacherRole1);
             defenseJury.getDefenseJuryTeacherRoles().add(newDefenseJuryTeacherRole);
@@ -132,7 +158,8 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
             thesis.setDefenseJury(defenseJury);
             defenseJury.getThesisList().add(thesisRepo.save(thesis));
         }
-        return defenseJuryRepo.save(defenseJury);
+        DefenseJury savedJury = defenseJuryRepo.save(defenseJury);
+        return "Successed";
     }
 
     @Override
@@ -177,28 +204,41 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
     }
 
     @Override
-    public DefenseJury updateDefenseJury(UpdateDefenseJuryIM updateDefenseJuryIM) {
+    public String updateDefenseJury(UpdateDefenseJuryIM updateDefenseJuryIM) {
         DefenseJury defenseJury = defenseJuryRepo.findById(UUID.fromString(updateDefenseJuryIM.getId())).orElse(null);
         if (defenseJury == null) return null;
         DefenseRoom defenseRoom = defenseRoomRepo.findById(updateDefenseJuryIM.getDefenseRoomId()).orElse(null);
         if (defenseRoom == null) return null;
         DefenseSession defenseSession = defenseSessionRepo.findById(updateDefenseJuryIM.getDefenseSessionId()).orElse(null);
-
         if (defenseSession == null) return null;
+        Date defenseDate = updateDefenseJuryIM.getDefenseDate();
+        Date planStartDate = defenseJury.getThesisDefensePlan().getStartDate();
+        Date planEndDate = defenseJury.getThesisDefensePlan().getEndDate();
+        if (defenseDate.after(planEndDate)) return "Ngày tổ chức phải trước ngày " + planEndDate.toString() ;
+        if (defenseDate.before(planStartDate)) return "Ngày tổ chức phải sau ngày " + planStartDate.toString();
+
         List<AcademicKeyword> academicKeywordList = new ArrayList<>();
         for (String keyword : updateDefenseJuryIM.getAcademicKeywordList()) {
             AcademicKeyword academicKeyword = academicKeywordRepo.findById(keyword).orElse(null);
             if (academicKeyword == null) return null;
             academicKeywordList.add(academicKeyword);
         }
+        List<DefenseJury> duplicateDefenseJury = defenseJuryRepo.findByThesisDefensePlanAndDefenseDateAndDefenseSessionAndDefenseRoom(defenseJury.getThesisDefensePlan(),
+                defenseDate,
+                defenseSession,
+                defenseRoom);
+
+        if (!duplicateDefenseJury.isEmpty()){
+            return "Hội đồng " + duplicateDefenseJury.get(0).getName() + " đã được tổ chức vào phòng " + defenseRoom.getName() + " cùng buổi";
+        }
         defenseJury.setName(updateDefenseJuryIM.getName());
         defenseJury.setMaxThesis(updateDefenseJuryIM.getMaxThesis());
         defenseJury.setDefenseSession(defenseSession);
         defenseJury.setDefenseRoom(defenseRoom);
         defenseJury.setAcademicKeywordList(academicKeywordList);
-        defenseJury.setDefenseDate(updateDefenseJuryIM.getDefenseDate());
+        defenseJury.setDefenseDate(defenseDate);
         DefenseJury updatedDefenseJury = defenseJuryRepo.save(defenseJury);
-        return updatedDefenseJury;
+        return "SUCCESS";
     }
 
     @Override
@@ -209,7 +249,7 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         DefenseJury defenseJury = defenseJuryRepo.findById(UUID.fromString(defenseJuryId)).orElse(null);
         if (defenseJury == null) return null;
         List<DefenseJuryTeacherRole> defenseJuryTeacherRoles = defenseJury.getDefenseJuryTeacherRoles();
-        int i=0;
+        int i = 0;
         while (i < defenseJuryTeacherRoles.size()) { // them tat ca giao vien moi
             DefenseJuryTeacherRole defenseJuryTeacherRole = defenseJuryTeacherRoles.get(i);
             String teacher = defenseJuryTeacherRole.getTeacher().getTeacherName();
@@ -220,13 +260,11 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
             if (foundDefenseJuryTeacherRoleList.isEmpty()) { // K co gvien do trg ds moi
                 defenseJuryTeacherRoleRepo.delete(defenseJuryTeacherRole);
                 defenseJuryTeacherRoles.remove(defenseJuryTeacherRole);
-            }
-            else {
+            } else {
                 DefenseJuryTeacherRoleIM foundTeacher = foundDefenseJuryTeacherRoleList.get(0);
-                if (foundTeacher.getRoleId() == role){
+                if (foundTeacher.getRoleId() == role) {
                     i++;
-                }
-                else {
+                } else {
                     Role teacherRole = roleRepo.findById(foundTeacher.getRoleId()).orElse(null);
                     defenseJuryTeacherRole.setRole(teacherRole);
                     defenseJuryTeacherRoles.set(i, defenseJuryTeacherRoleRepo.save(defenseJuryTeacherRole));
@@ -254,7 +292,7 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
 
         defenseJury.setDefenseJuryTeacherRoles(defenseJuryTeacherRoles);
         List<Thesis> thesisList = defenseJury.getThesisList();
-        i=0;
+        i = 0;
         while (i < thesisList.size()) {
             Thesis thesis = thesisList.get(i);
             String id = thesis.getId().toString();
@@ -263,8 +301,7 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
                 thesis.setDefenseJury(null);
                 thesisRepo.save(thesis);
                 thesisList.remove(i);
-            }
-            else{
+            } else {
                 i++;
             }
         }
@@ -289,11 +326,12 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
     public DefenseJury deleteDefenseJuryByID(UUID id) {
         DefenseJury defenseJury = defenseJuryRepo.findById(id).orElse(null);
         if (defenseJury == null) return null;
-        for (DefenseJuryTeacherRole role: defenseJury.getDefenseJuryTeacherRoles()){
+        for (DefenseJuryTeacherRole role : defenseJury.getDefenseJuryTeacherRoles()) {
             defenseJuryTeacherRoleRepo.delete(role);
         }
-        for (Thesis thesis: defenseJury.getThesisList()){
+        for (Thesis thesis : defenseJury.getThesisList()) {
             thesis.setDefenseJury(null);
+            thesis.setScheduledReviewer(null);
             thesisRepo.save(thesis);
         }
         defenseJuryRepo.delete(defenseJury);

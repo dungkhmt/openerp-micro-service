@@ -1,19 +1,18 @@
 package openerp.openerpresourceserver.thesisdefensejuryassignment.controller;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.UpdateDefenseJuryDTO;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.DefenseJury;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.Teacher;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.Thesis;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.models.*;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.service.DefenseJuryServiceImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,27 +28,28 @@ public class DefenseJuryController {
     private static Logger logger = LogManager.getLogger(DefenseJuryController.class);
 
     @PostMapping("/save")
-    public ResponseEntity<DefenseJury> createDefenseJury(
+    public ResponseEntity<String> createDefenseJury(
             @RequestBody DefenseJuryIM request
-    ){
-        DefenseJury createdJury = juryService.createNewDefenseJury(request);
-        if (createdJury == null){
+    ) {
+        String createdJury = juryService.createNewDefenseJury(request);
+        if (createdJury == null) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(createdJury, HttpStatus.OK);
     }
 
     @PostMapping("/update")
-    public ResponseEntity<DefenseJury> updateDefenseJury(
+    public ResponseEntity<String> updateDefenseJury(
             @RequestBody UpdateDefenseJuryIM request
-    ){
+    ) {
         System.out.println("session: " + request.getDefenseSessionId());
-        DefenseJury updatedDefenseJury = juryService.updateDefenseJury(request);
-        if (updatedDefenseJury == null){
+        String updatedDefenseJury = juryService.updateDefenseJury(request);
+        if (updatedDefenseJury == null) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(updatedDefenseJury , HttpStatus.CREATED);
+        return new ResponseEntity<>(updatedDefenseJury, HttpStatus.CREATED);
     }
+
     @GetMapping("/teachers")
 
     public ResponseEntity<List<Teacher>> getAllTeachers() {
@@ -69,7 +69,7 @@ public class DefenseJuryController {
     public ResponseEntity<String> deleteDefenseJuryById(@PathVariable String id) {
         logger.info("Deleted Jury id: " + id);
         DefenseJury res = juryService.deleteDefenseJuryByID(UUID.fromString(id));
-        if (res == null){
+        if (res == null) {
             return new ResponseEntity<>("Xóa hội đồng không thành công", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>("Xóa hội đồng thành công", HttpStatus.OK);
@@ -86,11 +86,14 @@ public class DefenseJuryController {
     public ResponseEntity<String> assignTeacherAndThesisToDefenseJury(
             @RequestBody AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList
     ) {
-        DefenseJury defenseJury = juryService.assignTeacherAndThesis(teacherAndThesisList);
-        if (defenseJury == null){
+        String message = juryService.assignTeacherAndThesis(teacherAndThesisList);
+        if (message == null) {
             return new ResponseEntity<>("Không thể phân công hội đồng", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>("Phân công hội đồng thành công", HttpStatus.CREATED);
+        if (message.contains("Giáo viên")) {
+            return new ResponseEntity<>(message, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
 
@@ -99,7 +102,7 @@ public class DefenseJuryController {
             @RequestBody AssignReviewerToThesisIM teacherAndThesisList
     ) {
         DefenseJury defenseJury = juryService.assignReviewerToThesis(teacherAndThesisList);
-        if (defenseJury == null){
+        if (defenseJury == null) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);
@@ -118,7 +121,7 @@ public class DefenseJuryController {
             @RequestBody AssignTeacherAndThesisToDefenseJuryIM teacherListAndThesis
     ) {
         DefenseJury defenseJury = juryService.reassignTeacherAndThesis(teacherListAndThesis);
-        if (defenseJury == null){
+        if (defenseJury == null) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);

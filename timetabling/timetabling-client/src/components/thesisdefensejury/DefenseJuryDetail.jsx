@@ -61,6 +61,10 @@ function DefenseJuryDetail(props) {
         <div className="defense-jury-info">
           Ngày tổ chức: {defenseJury?.defenseDate?.split("T")[0]}
         </div>
+        <div className="defense-jury-info">
+          Ca tổ chức: {defenseJury?.defenseSession?.name}
+        </div>
+
         {defenseJury?.academicKeywordList.map(({ keyword, description }) => (
           <KeywordChip key={keyword} keyword={description} />
         ))}

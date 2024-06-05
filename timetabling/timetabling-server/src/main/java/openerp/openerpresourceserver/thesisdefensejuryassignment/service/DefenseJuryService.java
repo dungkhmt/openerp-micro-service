@@ -10,7 +10,7 @@ import java.util.UUID;
 
 
 public interface DefenseJuryService {
-    public DefenseJury createNewDefenseJury(DefenseJuryIM defenseJury);
+    public String createNewDefenseJury(DefenseJuryIM defenseJury);
 
     public List<Teacher> getAllTeachers();
 
@@ -18,12 +18,12 @@ public interface DefenseJuryService {
 
     public List<Thesis> getAllAvailableThesiss(String thesisDefensePlanId);
 
-    public DefenseJury assignTeacherAndThesis(AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList);
+    public String assignTeacherAndThesis(AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList);
 
     public DefenseJury assignReviewerToThesis(AssignReviewerToThesisIM teacherAndThesisList);
     public String assignTeacherAndThesisAutomatically(AssignTeacherToDefenseJuryAutomaticallyIM teacherIdList);
 
-    public DefenseJury updateDefenseJury(UpdateDefenseJuryIM updateDefenseJuryIM);
+    public String updateDefenseJury(UpdateDefenseJuryIM updateDefenseJuryIM);
 
     public DefenseJury reassignTeacherAndThesis(AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList);
 

@@ -10,6 +10,7 @@ import openerp.openerpresourceserver.thesisdefensejuryassignment.models.UpdateTh
 import openerp.openerpresourceserver.thesisdefensejuryassignment.repo.ThesisDefensePlanRepo;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -24,8 +25,9 @@ public class ThesisDefensePlanServiceImpl implements ThesisDefensePlanService {
 
     @Override
     public List<ThesisDefensePlan> getAllThesisDefensePlan() {
-
-        return graduationTermRepo.findAll();
+        List <ThesisDefensePlan> thesisDefensePlanList = graduationTermRepo.findAll();
+        Collections.reverse(thesisDefensePlanList);
+        return  thesisDefensePlanList;
     }
 
     @Override

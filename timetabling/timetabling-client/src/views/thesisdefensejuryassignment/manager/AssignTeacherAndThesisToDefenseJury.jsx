@@ -45,10 +45,15 @@ function AssignTeacherAndThesisToDefenseJury() {
       "/defense-jury/assign",
       (res) => {
         if (res?.data) {
-          successNoti(res?.data, true);
-          clearAssignedTeacher();
-          clearAssignedThesis();
-          return history.goBack();
+          if (res?.data === "Successed") {
+            successNoti("Phân chia hội đồng thành công", true);
+            clearAssignedTeacher();
+            clearAssignedThesis();
+            return history.goBack();
+          }
+          else {
+            errorNoti(res?.data, true);
+          }
         }
       },
       {

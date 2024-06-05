@@ -71,9 +71,15 @@ function CreateDefenseJury({
             "/defense-jury/save",
             (res) => {
                 if (res.data) {
-                    handleClose();
-                    handleToggle();
-                    successNoti("Create Successfully", true);
+                    const message = res.data;
+                    if (message == "Success") {
+                        handleClose();
+                        handleToggle();
+                        successNoti("Tạo hội đồng mới thành công", true);
+                    }
+                    else {
+                        errorNoti(message, true);
+                    }
                 } else {
                     errorNoti("Create failed", true);
                 }
