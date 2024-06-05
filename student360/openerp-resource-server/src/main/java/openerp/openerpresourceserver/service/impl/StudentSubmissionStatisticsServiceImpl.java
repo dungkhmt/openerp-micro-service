@@ -34,7 +34,7 @@ public class StudentSubmissionStatisticsServiceImpl implements StudentSubmission
         // Tính toán dữ liệu cần thiết từ cơ sở dữ liệu
         Set<String> uniqueContestIds = new HashSet<>();
 
-        List<ContestSubmission> contestSubmissions = contestSubmissionRepo.findByUserSubmissionId(studentId);
+        List<ContestSubmission> contestSubmissions = contestSubmissionRepo.findAllByUserSubmissionIdOrderByCreatedDateAsc(studentId);
 
         // Lấy dữ liệu mỗi ngày sinh viên submitted bao nhiêu lần
         Map<LocalDate, Integer> dailySubmissionCounts = new HashMap<>();
@@ -139,13 +139,6 @@ public class StudentSubmissionStatisticsServiceImpl implements StudentSubmission
         long totalDays = ChronoUnit.DAYS.between(firstSubmissionDate, lastSubmissionDate) + 1;
 
         double averageSubmissionPerDay = (double) totalSubmitted / totalDays;
-
-
-        contestSubmissions = contestSubmissionRepo.findByUserSubmissionId(studentId);
-
-        for (ContestSubmission contestSubmission : contestSubmissions) {
-            uniqueContestIds.add(contestSubmission.getContestId());
-        }
 
         List<ContestSubmissionByStudent> contestDetails = new ArrayList<>();
 

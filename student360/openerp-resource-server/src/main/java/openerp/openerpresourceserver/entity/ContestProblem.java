@@ -22,8 +22,6 @@ public class ContestProblem {
     public static final String SUBMISSION_MODE_SOLUTION_OUTPUT = "SUBMISSION_MODE_SOLUTION_OUTPUT";
     public static final String SUBMISSION_MODE_NOT_ALLOWED = "SUBMISSION_MODE_NOT_ALLOWED";
     public static final String SUBMISSION_MODE_HIDDEN = "SUBMISSION_MODE_HIDDEN";
-
-
     public static List<String> getSubmissionModes() {
         List<String> L = new ArrayList();
         L.add(SUBMISSION_MODE_SOURCE_CODE);
