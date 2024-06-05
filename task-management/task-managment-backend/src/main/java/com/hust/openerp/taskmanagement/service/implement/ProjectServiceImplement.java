@@ -18,6 +18,7 @@ import com.hust.openerp.taskmanagement.entity.ProjectMember;
 import com.hust.openerp.taskmanagement.entity.Project_;
 import com.hust.openerp.taskmanagement.exception.ApiException;
 import com.hust.openerp.taskmanagement.exception.ErrorCode;
+import com.hust.openerp.taskmanagement.repository.ProjectMemberRepository;
 import com.hust.openerp.taskmanagement.repository.ProjectRepository;
 import com.hust.openerp.taskmanagement.service.ProjectMemberService;
 import com.hust.openerp.taskmanagement.service.ProjectService;
@@ -32,6 +33,8 @@ import lombok.AllArgsConstructor;
 public class ProjectServiceImplement implements ProjectService {
 
     private final ProjectRepository projectRepository;
+
+    private final ProjectMemberRepository projectMemberRepository;
 
     private final ProjectMemberService projectMemberService;
 
@@ -63,7 +66,7 @@ public class ProjectServiceImplement implements ProjectService {
                 .userId(creatorId)
                 .roleId("owner")
                 .build();
-        projectMemberService.addMemberToProject(projectMember, creatorId);
+        projectMemberRepository.save(projectMember);
         var projectDto = mapper.map(projectEntity, ProjectDTO.class);
         projectDto.setRole("owner");
         return projectDto;
