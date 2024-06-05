@@ -61,7 +61,7 @@ export const EditDefenseJury = () => {
             id: juryId,
             name: defenseJury?.name,
             maxThesis: defenseJury?.maxThesis,
-            defenseDate: defenseJury?.defenseDate?.split("T")[0],
+            defenseDate: defenseJury?.defenseDate,
             defenseRoomId: 1,
             defenseSessionId: 1,
             academicKeywordList: [],
@@ -78,8 +78,14 @@ export const EditDefenseJury = () => {
             "/defense-jury/update",
             (res) => {
                 if (res.data) {
-                    successNoti("cập nhật hội đồng thành công", true)
-                    return history.goBack();
+                    const message = res.data;
+                    if (message.toUpperCase() === "SUCCESS") {
+                        successNoti("cập nhật hội đồng thành công", true)
+                        return history.goBack();
+                    }
+                    else {
+                        return errorNoti(message, true);
+                    }
                 }
             },
             {
@@ -114,17 +120,17 @@ export const EditDefenseJury = () => {
                     Cập nhật Hội Đồng
                 </Typography>
                 <Box mb={3}>
+                    <div>Tên hội đồng</div>
                     <TextField
                         {...register("name", { required: true })}
                         fullWidth={true}
                         id="input-with-icon-grid"
-                        label="Tên hội đồng"
                         variant="outlined"
                         margin="normal"
                     />
+                    <div>Số lượng đồ án tối đa</div>
                     <TextField
                         fullWidth={true}
-                        label="Số lượng đồ án tối đa"
                         name="maxThesis"
                         {...register("maxThesis", { required: true })}
                         variant="outlined"
