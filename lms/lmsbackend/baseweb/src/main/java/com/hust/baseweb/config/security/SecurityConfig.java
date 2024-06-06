@@ -2,7 +2,6 @@ package com.hust.baseweb.config.security;
 
 import com.hust.baseweb.applications.education.exception.CustomAccessDeniedHandler;
 import lombok.AllArgsConstructor;
-import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

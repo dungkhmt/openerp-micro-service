@@ -71,6 +71,6 @@ public class Predicate {
     }
 
     public StringExpression emptyIfNull(StringExpression stringExpression) {
-        return stringExpression.coalesce("").asString();
+        return stringExpression.coalesce("");
     }
 }

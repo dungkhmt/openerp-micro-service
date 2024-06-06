@@ -1,7 +1,6 @@
 package com.hust.baseweb.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
@@ -20,10 +19,9 @@ import java.util.concurrent.Callable;
 /**
  * @author Le Anh Tuan
  */
+@Log4j2
 @Configuration
 public class AsyncConfiguration implements AsyncConfigurer {
-
-    private final Logger log = LoggerFactory.getLogger(AsyncConfiguration.class);
 
     @Override
     @Bean(name = "taskExecutor")

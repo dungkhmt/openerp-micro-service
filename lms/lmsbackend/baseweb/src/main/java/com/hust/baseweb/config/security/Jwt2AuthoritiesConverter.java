@@ -1,6 +1,5 @@
 package com.hust.baseweb.config.security;
 
-import lombok.var;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

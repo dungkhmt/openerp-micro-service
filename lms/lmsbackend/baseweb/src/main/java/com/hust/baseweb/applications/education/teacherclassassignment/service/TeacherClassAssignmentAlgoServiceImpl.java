@@ -4,7 +4,6 @@ import com.hust.baseweb.applications.education.teacherclassassignment.model.*;
 import com.hust.baseweb.applications.education.teacherclassassignment.service.algorithm.solver.BaseSolver;
 import com.hust.baseweb.applications.education.teacherclassassignment.utils.TimetableConflictChecker;
 import lombok.extern.log4j.Log4j2;
-import lombok.var;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
