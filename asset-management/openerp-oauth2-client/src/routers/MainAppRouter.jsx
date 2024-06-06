@@ -17,6 +17,7 @@ import AssetReport from "views/reports/AssetReport";
 import RequestReport from "views/reports/RequestReport";
 import AssetDetail from "views/management/AssetDetail";
 import MyRequestScreen from "views/home/MyRequestScreen";
+import LocationDetail from "views/settings/LocationDetail";
 
 const styles = {
   loadingProgress: {
@@ -48,6 +49,8 @@ function MainAppRouter(props) {
           <PrivateRoute component={MyRequestScreen} exact path="/my-request" />
 
           <PrivateRoute component={LocationScreen} exact path="/locations" />
+
+          <PrivateRoute component={LocationDetail} exact path="/location/:id" />
 
           <PrivateRoute component={VendorScreen} exact path="/vendors" />
 

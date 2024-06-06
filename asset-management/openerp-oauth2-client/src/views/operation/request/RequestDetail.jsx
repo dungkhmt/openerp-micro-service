@@ -209,6 +209,7 @@ const RequestDetail = () => {
               <Typography>Start Date</Typography>
               <Typography>End Date</Typography>
               <Typography>STATUS</Typography>
+              <Typography>Description</Typography>
             </Grid>
             <Grid item md={8} sm={8} xs={8}>
               <Typography>
@@ -234,6 +235,9 @@ const RequestDetail = () => {
               </Typography>
               <Typography>
                 <b>:</b> {status}
+              </Typography>
+              <Typography>
+                <b>:</b> {requestDetail["description"]}
               </Typography>
             </Grid>
 

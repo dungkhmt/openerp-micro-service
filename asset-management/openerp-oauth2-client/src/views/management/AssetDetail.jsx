@@ -261,6 +261,7 @@ const AssetDetail = () => {
               <Typography>Location</Typography>
               <Typography>Vendor</Typography>
               <Typography>Status</Typography>
+              <Typography>Description</Typography>
             </Grid>
             <Grid item md={8} sm={8} xs={8}>
               <Typography>
@@ -286,6 +287,9 @@ const AssetDetail = () => {
               </Typography>
               <Typography>
                 <b>:</b> {status}
+              </Typography>
+              <Typography>
+                <b>:</b> {assetDetail["description"]}
               </Typography>
             </Grid>
           </Grid>

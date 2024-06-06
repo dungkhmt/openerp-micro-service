@@ -275,10 +275,6 @@ const MyRequestScreen = () => {
             ),
         },
         {
-            title: "Creator",
-            field: "user_id",
-        },
-        {
             title: "Asset",
             render: (rowData) => {
                 const asset = allAssets.find(item => item.id === rowData.asset_id);
