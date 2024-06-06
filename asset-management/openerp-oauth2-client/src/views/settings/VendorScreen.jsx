@@ -4,7 +4,6 @@ import {StandardTable} from "erp-hust/lib/StandardTable";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -15,7 +14,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { errorNoti, successNoti } from "utils/notification";
-import { Image } from "@mui/icons-material";
 
 export const VendorScreen = () => {
     const [vendors, setVendors] = useState([]);
@@ -99,6 +97,7 @@ export const VendorScreen = () => {
     const handleEdit = (vendor) => {
         setData({
             name: vendor.name,
+            description: vendor.description,
             address: vendor.address,
             phone: vendor.phone,
             email: vendor.email,
@@ -214,7 +213,7 @@ export const VendorScreen = () => {
 				onClose={handleClose}
 			>
 				<Box sx={style}>
-                    <div>CREATE LOCATION</div>
+                    <div>{title}</div>
                     <hr/>
                     <form onSubmit={handleSubmit}>
                         <TextField
@@ -225,6 +224,7 @@ export const VendorScreen = () => {
                             required
                             name='name'
                             placeholder='Location name'
+                            value={data.name}
                             onChange={handleInputChange}
                         />
                         <TextField
@@ -234,6 +234,7 @@ export const VendorScreen = () => {
                             margin="normal"
                             name='description'
                             placeholder='Location description'
+                            value={data.description}
                             onChange={handleInputChange}
                         />
                         <TextField
@@ -244,6 +245,7 @@ export const VendorScreen = () => {
                             required
                             name='email'
                             placeholder='Location email'
+                            value={data.email}
                             onChange={handleInputChange}
                         />                        
                         <div style={{display: "flex", gap: "20px"}}>
@@ -255,6 +257,7 @@ export const VendorScreen = () => {
                                 required
                                 name='phone'
                                 placeholder='Location phone'
+                                value={data.phone}
                                 onChange={handleInputChange}
                             />
                             <TextField
@@ -265,6 +268,7 @@ export const VendorScreen = () => {
                                 required
                                 name='url'
                                 placeholder='Location url'
+                                value={data.url}
                                 onChange={handleInputChange}
                             />
                         </div>
@@ -276,6 +280,7 @@ export const VendorScreen = () => {
                             required
                             name='address'
                             placeholder='Location address'
+                            value={data.address}
                             onChange={handleInputChange}
                         />            
                         <div style={{display: "flex", justifyContent: "space-between", marginTop: "20px"}}>
@@ -297,7 +302,7 @@ export const VendorScreen = () => {
                         </div>
                     </form>
 				</Box>
-      		</Modal>  
+      		</Modal>
             <Dialog
                 open={openDelete}
                 onClose={handleClose}
