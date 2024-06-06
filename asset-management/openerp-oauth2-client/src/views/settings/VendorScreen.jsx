@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {request} from "../../api";
 import {StandardTable} from "erp-hust/lib/StandardTable";
+import { Link as RouterLink } from "react-router-dom";
+import { Link } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -142,6 +144,14 @@ export const VendorScreen = () => {
         {
             title: "Name",
             field: "name",
+            render: (rowData) => (
+                <Link
+                    component={RouterLink}
+                    to={`/vendor/${rowData["id"]}`}
+                >
+                    {rowData["name"]}
+                </Link>
+            )
         },
         {
             title: "Address",
