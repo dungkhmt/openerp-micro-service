@@ -10,6 +10,8 @@ import BarsDataset from "components/reports/asset/BarsDataset";
 import PieActiveArc from "components/reports/asset/AssetPieActive";
 import BasicTable from "components/reports/asset/AdminTable";
 import { request } from "api";
+import AssetTypeTable from "components/reports/asset/AssetTypeTable";
+import AssetTypePie from "components/reports/asset/AssetTypePie";
 
 const AssetReport = () => {
   const [allAssets, setAllAssets] = useState([]);
@@ -17,25 +19,25 @@ const AssetReport = () => {
   const [allVendors, setAllVendors] = useState([]);
   const [allLocations, setAllLocations] = useState([]);
 
-  const getAllAssets = async() => {
+  const getAllAssets = async () => {
     await request("get", "/asset/get-all", (res) => {
       setAllAssets(res.data);
     });
   };
 
-  const getAllTypes = async() => {
+  const getAllTypes = async () => {
     await request("get", "/asset-type/get-all", (res) => {
       setAllTypes(res.data);
     });
   };
 
-  const getAllVendors = async() => {
+  const getAllVendors = async () => {
     await request("get", "/vendor/get-all", (res) => {
       setAllVendors(res.data);
     });
   };
 
-  const getAllLocations = async() => {
+  const getAllLocations = async () => {
     await request("get", "/location/get-all", (res) => {
       setAllLocations(res.data);
     });
@@ -149,7 +151,7 @@ const AssetReport = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               // transition={{ delay: 1.8, duration: 0.8 }}
-              children={<BarsDataset data={allAssets}/>}
+              children={<BarsDataset data={allAssets} />}
             />
           </Grid>
           <Grid item xs={5.5}>
@@ -158,6 +160,27 @@ const AssetReport = () => {
               animate={{ opacity: 1, y: 0 }}
               // transition={{ delay: 1.8, duration: 0.8 }}
               children={<PieActiveArc />}
+            />
+          </Grid>
+        </Grid>
+        <Grid
+          container
+          justifyContent={"space-between"}
+          sx={{ marginTop: "30px" }}
+        >
+          <Grid item xs={6} sx={{ marginLeft: "10px" }}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              children={<AssetTypeTable/>}
+            />
+          </Grid>
+          <Grid item xs={5}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              // transition={{ delay: 1.8, duration: 0.8 }}
+              children={<AssetTypePie />}
             />
           </Grid>
         </Grid>

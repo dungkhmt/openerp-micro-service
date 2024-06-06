@@ -55,7 +55,9 @@ public class AssetServiceImpl implements AssetService{
         newAsset.setName(asset.getName());
         AssetType assetType = assetTypeRepo.findById(asset.getType_id()).get();
         newAsset.setType_id(assetType.getId());
-        System.out.println(assetType);
+        Integer num_assets = assetType.getNum_assets();
+        assetType.setNum_assets(num_assets + 1);
+
         String prefix = assetType.getCode_prefix();
         Utils utils = new Utils();
         newAsset.setCode(prefix + "-" + utils.generateRandomHash(8));
@@ -70,6 +72,8 @@ public class AssetServiceImpl implements AssetService{
         Date currentDate = new Date();
         newAsset.setSince(currentDate);
         newAsset.setLast_updated(currentDate);
+        assetType.setLast_updated(currentDate);
+        assetTypeRepo.save(assetType);
         return assetRepo.save(newAsset);
     }
 

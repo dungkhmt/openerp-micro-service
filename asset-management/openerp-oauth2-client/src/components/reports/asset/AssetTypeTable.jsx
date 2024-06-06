@@ -11,7 +11,7 @@ import { request } from 'api';
 import { useEffect } from 'react';
 
 
-export default function BasicTable() {
+export default function AssetTypeTable() {
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
   const [count, setCount] = useState([]);
@@ -90,15 +90,15 @@ export default function BasicTable() {
 
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+      <Table sx={{ minWidth: 300 }} aria-label="simple table">
         <TableHead>
           <TableRow>
             <TableCell>Top Admin Users</TableCell>
-            <TableCell align="right">Asset Management</TableCell>
-            <TableCell align="right">Asset Available</TableCell>
-            <TableCell align="right">Asset In Use</TableCell>
-            <TableCell align="right">Asset Repairing</TableCell>
-            <TableCell align="right">Asset Deprecated</TableCell>
+            <TableCell align="right">Management</TableCell>
+            <TableCell align="right">Available</TableCell>
+            <TableCell align="right">In Use</TableCell>
+            <TableCell align="right">Repairing</TableCell>
+            <TableCell align="right">Deprecated</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
