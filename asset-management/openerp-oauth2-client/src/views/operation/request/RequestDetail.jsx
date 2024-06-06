@@ -173,8 +173,11 @@ const RequestDetail = () => {
 
   useEffect(() => {
     getRequestDetail();
-    getAsset();
   }, []);
+
+  useEffect(() => {
+    getAsset();
+  }, [requestDetail]);
 
   if (loading) {
     return <p>Loading...</p>;
@@ -241,7 +244,7 @@ const RequestDetail = () => {
               />
             </div>
           </Grid>
-          {requestDetail["status"] !== 0 && (
+          {requestDetail["status"] === 0 && (
             <Grid item md={5} sm={5} xs={5}>
               <div
                 style={{ display: "flex", alignItems: "center", gap: "20px" }}
