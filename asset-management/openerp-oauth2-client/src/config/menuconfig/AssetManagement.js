@@ -10,19 +10,5 @@ export const AssetManagement = {
             text: "Assets",
             child: []
         },
-        {
-            id: "MENU_ASSET_MANAGEMENT.ACCESSORIES",
-            path: "/assets/accessories",
-            isPublic: true,
-            text: "Accessories",
-            child: []
-        },
-        {
-            id: "MENU_ASSET_MANAGEMENT.LICENSE",
-            path: "/licenses",
-            isPublic: true,
-            text: "Licenses",
-            child: []
-        }
     ]
 };
