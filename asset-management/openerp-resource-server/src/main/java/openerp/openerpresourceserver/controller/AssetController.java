@@ -104,4 +104,20 @@ public class AssetController {
             .status(HttpStatus.OK)
             .body(asset);
     }
+
+    @GetMapping("/top-admin-users")
+    public ResponseEntity<?> getTopAdminUsers(){
+        List<String> users = assetService.getTopAdminUsers();
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(users);
+    }
+
+    @GetMapping("/get-by-admin/{userId}")
+    public ResponseEntity<?> getByAdminUser(@PathVariable String userId){
+        List<Asset> assets = assetService.getByAdminUser(userId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(assets);
+    }
 }

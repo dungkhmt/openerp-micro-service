@@ -8,7 +8,7 @@ import Users from "@heroicons/react/24/solid/UsersIcon";
 import React, { useEffect, useState } from "react";
 import BarsDataset from "components/reports/asset/BarsDataset";
 import PieActiveArc from "components/reports/asset/AssetPieActive";
-import BasicTable from "components/reports/asset/BasicTable";
+import BasicTable from "components/reports/asset/AdminTable";
 import { request } from "api";
 
 const AssetReport = () => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import * as React from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -6,7 +6,21 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { request } from "api";
+import { useState } from 'react';
+import { request } from 'api';
+import { useEffect } from 'react';
+
+function createData(name, calories, fat, carbs, protein) {
+  return { name, calories, fat, carbs, protein };
+}
+
+const rows = [
+  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
+  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
+  createData('Eclair', 262, 16.0, 24, 6.0),
+  createData('Cupcake', 305, 3.7, 67, 4.3),
+  createData('Gingerbread', 356, 16.0, 49, 3.9),
+];
 
 export default function BasicTable() {
   const [data, setData] = useState([]);
@@ -16,9 +30,19 @@ export default function BasicTable() {
   const [rowData, setRowData] = useState([]);
 
   const getTopUsers = async() => {
-    await request("get", "/request/top-users", (res) => {
+    await request("get", "/asset/top-admin-users", (res) => {
       setData(res.data);
     });
+  };
+
+  const queryUsers = async() => {
+    setLogs([]);
+    for(let i = 0; i < users.length; i++){
+      const user = users[i];
+      await request("get", `asset/get-by-admin/${user}`, (res) => {
+        setLogs((prev) => [...prev, res.data]);
+      });
+    }
   };
 
   const processData = () => {
@@ -33,34 +57,24 @@ export default function BasicTable() {
     }
   };
 
-  const queryUsers = async() => {
-    setLogs([]);
-    for(let i = 0; i < users.length; i++){
-      const user = users[i];
-      await request("get", `request/get-by-user/${user}`, (res) => {
-        setLogs((prev) => [...prev, res.data]);
-      });
-    }
-  };
-
   const buildData = () => {
     const arr = [];
     setRowData([]);
     for(let i = 0; i < logs.length; i++){
       const log = logs[i];
-      arr.push({id: i, name: log[0].user_id, all: count[i], pending: 0, approved: 0, rejected: 0, done: 0});
+      arr.push({id: i, name: log[0].admin_id, all: count[i], available: 0, inuse: 0, repairing: 0, deprecated: 0});
       for(let j = 0; j < log.length; j++){
-        if(log[j].status == 0){
-          arr[i]["pending"] += 1;
+        if(log[j].status_id == 1){
+          arr[i]["available"] += 1;
         }
-        if(log[j].status == 1){
-          arr[i]["approved"] += 1;
+        if(log[j].status_id == 2){
+          arr[i]["inuse"] += 1;
         }
-        if(log[j].status == 2){
-          arr[i]["rejected"] += 1;
+        if(log[j].status_id == 3){
+          arr[i]["repairing"] += 1;
         }
-        if(log[j].status == 3){
-          arr[i]["done"] += 1;
+        if(log[j].status_id == 4){
+          arr[i]["deprecated"] += 1;
         }
       }
     }
@@ -83,7 +97,6 @@ export default function BasicTable() {
     buildData();
   }, [logs]);
 
-  console.log("logs", logs);
   console.log("rowdata", rowData);
 
   return (
@@ -91,12 +104,12 @@ export default function BasicTable() {
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell>Top contributors</TableCell>
-            <TableCell align="right">Requests Created</TableCell>
-            <TableCell align="right">Requests Pending</TableCell>
-            <TableCell align="right">Requests Approved</TableCell>
-            <TableCell align="right">Requests Rejected</TableCell>
-            <TableCell align="right">Requests Done</TableCell>
+            <TableCell>Top Admin Users</TableCell>
+            <TableCell align="right">Asset Management</TableCell>
+            <TableCell align="right">Asset Available</TableCell>
+            <TableCell align="right">Asset In Use</TableCell>
+            <TableCell align="right">Asset Repairing</TableCell>
+            <TableCell align="right">Asset Deprecated</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -109,10 +122,10 @@ export default function BasicTable() {
                 {row.name}
               </TableCell>
               <TableCell align="right">{row.all}</TableCell>
-              <TableCell align="right">{row.pending}</TableCell>
-              <TableCell align="right">{row.approved}</TableCell>
-              <TableCell align="right">{row.rejected}</TableCell>
-              <TableCell align="right">{row.done}</TableCell>
+              <TableCell align="right">{row.available}</TableCell>
+              <TableCell align="right">{row.inuse}</TableCell>
+              <TableCell align="right">{row.repairing}</TableCell>
+              <TableCell align="right">{row.deprecated}</TableCell>
             </TableRow>
           ))}
         </TableBody>

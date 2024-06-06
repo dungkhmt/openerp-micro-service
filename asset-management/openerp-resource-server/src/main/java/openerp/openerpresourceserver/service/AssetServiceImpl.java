@@ -133,4 +133,19 @@ public class AssetServiceImpl implements AssetService{
         foundAsset.setLast_updated(new Date());
         return assetRepo.save(foundAsset);
     }
+
+    @Override
+    public List<String> getTopAssignUsers() {
+        return assetRepo.getTopAssignUsers();
+    }
+
+    @Override
+    public List<String> getTopAdminUsers() {
+        return assetRepo.getTopAdminUsers();
+    }
+
+    @Override
+    public List<Asset> getByAdminUser(String user_id) {
+        return assetRepo.findByAdminId(user_id);
+    }
 }
