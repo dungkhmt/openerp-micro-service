@@ -226,6 +226,7 @@ const AssetsScreen = () => {
         },
         {
             title: "Type",
+            sorting: false,
             render: (rowData) => {
                 let found = types.find(typ => typ.id === rowData.type_id);
                 if(found){

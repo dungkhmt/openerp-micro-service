@@ -141,6 +141,10 @@ export const TypeScreen = () => {
             field: "code_prefix",
         },
         {
+            title: "Num Assets",
+            field: "num_assets"
+        },
+        {
             title: "Edit",
             sorting: false,
             render: (rowData) => (
