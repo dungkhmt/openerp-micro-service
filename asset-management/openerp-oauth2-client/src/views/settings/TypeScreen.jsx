@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {request} from "../../api";
+import { Link as RouterLink } from "react-router-dom";
+import { Link } from "@mui/material";
 import {StandardTable} from "erp-hust/lib/StandardTable";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
@@ -130,6 +132,14 @@ export const TypeScreen = () => {
         {
             title: "Name",
             field: "name",
+            render: (rowData) => (
+                <Link
+                    component={RouterLink}
+                    to={`/type/${rowData["id"]}`}
+                >
+                    {rowData["name"]}
+                </Link>
+            )
         },
         {
             title: "Description",
