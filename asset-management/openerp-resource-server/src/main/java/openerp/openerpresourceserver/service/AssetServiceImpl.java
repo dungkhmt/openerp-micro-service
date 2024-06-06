@@ -102,10 +102,15 @@ public class AssetServiceImpl implements AssetService{
 
     @Override
     public void deleteAsset(Integer Id) {
-        Optional<Asset> asset = assetRepo.findById(Id);
-        if(asset.isPresent()){
-            assetRepo.deleteById(Id);
+        Asset asset = assetRepo.findById(Id).get();
+        if(asset.getStatus_id() == REPAIR || asset.getStatus_id() == INUSE) {
+            return;
         }
+        AssetType assetType = assetTypeRepo.findById(asset.getType_id()).get();
+        Integer num_assets = assetType.getNum_assets();
+        assetType.setNum_assets(num_assets - 1);
+        assetTypeRepo.save(assetType);
+        assetRepo.delete(asset);
     }
 
     @Override
