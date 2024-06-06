@@ -19,7 +19,12 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { Link as RouterLink } from "react-router-dom";
 import { errorNoti, successNoti } from "utils/notification";
-import { Link } from "@mui/material";
+import { Chip, Link } from "@mui/material";
+import { FcApproval } from "react-icons/fc";
+import { MdOutlineEventBusy } from "react-icons/md";
+import { IoSettingsSharp } from "react-icons/io5";
+import { BsFillTrash2Fill } from "react-icons/bs";
+
 
 const AssetsScreen = () => {    
     const [assetName, setAssetName] = useState("");
@@ -233,13 +238,45 @@ const AssetsScreen = () => {
             field: "status",
             render: (rowData) => {
                 if(rowData.status_id === 1){
-                    return <div>AVAILABLE</div>;
+                    return (
+                        <Chip
+                            icon={<FcApproval size={24}/>}
+                            label="AVAILABLE"
+                            color="primary"
+                            variant="outlined"
+                            style={{fontSize: "1rem", color: "green", borderColor: "green"}}
+                        />
+                    )
                 } else if(rowData.status_id === 2){
-                    return <div>IN USE</div>;
+                    return (
+                        <Chip
+                            icon={<MdOutlineEventBusy size={24}/>}
+                            label="IN USE"
+                            color="primary"
+                            variant="outlined"
+                            style={{fontSize: "1rem"}}
+                        />
+                    )
                 } else if(rowData.status_id === 3){
-                    return <div>REPAIRING</div>;
+                    return (
+                        <Chip
+                            icon={<IoSettingsSharp size={24}/>}
+                            label="REPAIRING"
+                            color="primary"
+                            variant="outlined"
+                            style={{fontSize: "1rem", color: "orange", borderColor: "orange"}}
+                        />
+                    )
                 } else if(rowData.status_id === 4){
-                    return <div>DEPRECATED</div>;
+                    return (
+                        <Chip
+                            icon={<BsFillTrash2Fill size={24}/>}
+                            label="DEPRECATED"
+                            color="primary"
+                            variant="outlined"
+                            style={{fontSize: "1rem", color: "red", borderColor: "red"}}
+                        />
+                    )
                 }
             }
         },

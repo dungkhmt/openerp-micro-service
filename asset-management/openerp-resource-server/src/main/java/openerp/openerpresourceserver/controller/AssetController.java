@@ -72,7 +72,7 @@ public class AssetController {
     @DeleteMapping("/delete/{Id}")
     public ResponseEntity<?> deleteAsset(@PathVariable Integer Id, Principal principal){
         assetService.deleteAsset(Id);
-        assetLogService.createNewAssetLog(Id, principal.getName(), "delete");
+//        assetLogService.createNewAssetLog(Id, principal.getName(), "delete");
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

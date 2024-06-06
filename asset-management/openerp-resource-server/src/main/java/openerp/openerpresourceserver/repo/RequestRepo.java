@@ -16,4 +16,7 @@ public interface RequestRepo extends JpaRepository<Request, Integer> {
 
     @Query(value = "SELECT * FROM asset_management_request WHERE admin_id = :adminId", nativeQuery = true)
     List<Request> findByAdminId(String adminId);
+
+    @Query(value = "SELECT user_id, COUNT(*) AS request_count FROM asset_management_request GROUP BY user_id ORDER BY request_count DESC LIMIT 5", nativeQuery = true)
+    List<String> getTopUsers();
 }

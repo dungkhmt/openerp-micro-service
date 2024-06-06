@@ -145,19 +145,6 @@ export const LocationScreen = () => {
             field: "name",
         },
         {
-            title: "Image",
-            field: "image",
-            render: (rowData) => (
-                <img
-                    src="https://vcdn-vnexpress.vnecdn.net/2022/05/10/DHBKHN-7506-1652177227.jpg"
-                    alt="Dai hoc Bach khoa Ha Noi"
-                    fit="contain"
-                    width={70}
-                    height={70}
-                />
-            )
-        },
-        {
             title: "Address",
             field: "address",
         },
@@ -269,21 +256,7 @@ export const LocationScreen = () => {
                             placeholder='Location address'
                             onChange={handleInputChange}
                             value={data.address}
-                        />     
-                        <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label">Age</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={age}
-                                label="Age"
-                                onChange={handleChange}
-                            >
-                                <MenuItem value={10}>Ten</MenuItem>
-                                <MenuItem value={20}>Twenty</MenuItem>
-                                <MenuItem value={30}>Thirty</MenuItem>
-                            </Select>
-                        </FormControl>       
+                        />           
                         <div style={{display: "flex", justifyContent: "space-between", marginTop: "20px"}}>
                             <Button
                                 variant="outlined"

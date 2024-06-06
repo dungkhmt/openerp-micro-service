@@ -110,4 +110,20 @@ public class RequestController {
             .status(HttpStatus.OK)
             .body(savedRequest);
     }
+
+    @GetMapping("/top-users")
+    public ResponseEntity<?> getTopUsers(){
+        List<String> users = requestService.getTopUsers();
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(users);
+    }
+
+    @GetMapping("/get-by-user/{user_id}")
+    public ResponseEntity<?> getByUser(@PathVariable String user_id){
+        List<Request> requests = requestService.getCreatorRequests(user_id);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(requests);
+    }
 }

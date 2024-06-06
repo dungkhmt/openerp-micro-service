@@ -145,20 +145,6 @@ export const VendorScreen = () => {
             field: "name",
         },
         {
-            title: "Image",
-            field: "image",
-            sorting: false,
-            render: (rowData) => (
-                <img
-                    src="https://vcdn-vnexpress.vnecdn.net/2022/05/10/DHBKHN-7506-1652177227.jpg"
-                    alt="Dai hoc Bach khoa Ha Noi"
-                    fit="contain"
-                    width={70}
-                    height={70}
-                />
-            )
-        },
-        {
             title: "Address",
             field: "address",
         },

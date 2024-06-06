@@ -68,7 +68,7 @@ const RequestTable = ({ request123 }) => {
         }).then();
         
     };
-    console.log("1111", requests);
+
     const style = {
 		position: 'absolute',
 		top: '50%',

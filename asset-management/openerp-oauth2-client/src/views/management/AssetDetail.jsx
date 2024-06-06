@@ -291,6 +291,7 @@ const AssetDetail = () => {
           </Grid>
         </CardContent>
       </Card>
+      
       <Modal
         open={open}
         aria-labelledby="modal-modal-title"
