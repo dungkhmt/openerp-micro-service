@@ -1,7 +1,8 @@
 import { a11yProps, AntTab, AntTabs, TabPanel } from 'components/tab';
 import React, { useState } from 'react'
-import { LocationScreen } from 'views/settings/LocationScreen';
 import RequestTable from './request/RequestTable';
+import RequestTableCreateByMe from './request/RequestTableCreateByMe';
+import RequestTableSendToMe from './request/RequestTableSendToMe';
 
 const RequestsScreen = () => {
     const tabsLabel = [
@@ -14,7 +15,6 @@ const RequestsScreen = () => {
     const handleChangeTab = (event, tabIndex) => {
         setActiveTab(tabIndex);
     };
-
     
 
     return (
@@ -34,10 +34,10 @@ const RequestsScreen = () => {
                 <RequestTable/>
             </TabPanel>
             <TabPanel value={activeTab} index={1}>
-                <RequestTable/>
+                <RequestTableSendToMe/>
             </TabPanel>
             <TabPanel value={activeTab} index={2}>
-                <RequestTable/>
+                <RequestTableCreateByMe/>
             </TabPanel>
         </div>
     );
