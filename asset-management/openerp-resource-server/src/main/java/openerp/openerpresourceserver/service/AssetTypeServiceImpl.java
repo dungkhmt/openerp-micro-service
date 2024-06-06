@@ -59,4 +59,9 @@ public class AssetTypeServiceImpl implements AssetTypeService{
             assetTypeRepo.deleteById(Id);
         }
     }
+
+    @Override
+    public List<Integer> getTopTypes() {
+        return assetTypeRepo.getTopTypes();
+    }
 }

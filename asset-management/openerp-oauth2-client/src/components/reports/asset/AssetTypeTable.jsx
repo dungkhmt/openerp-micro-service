@@ -12,93 +12,85 @@ import { useEffect } from 'react';
 
 
 export default function AssetTypeTable() {
-  const [data, setData] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [count, setCount] = useState([]);
+	const [types, setTypes] = useState([]);
   const [logs, setLogs] = useState([]);
+	const [assets, setAssets] = useState([]);
   const [rowData, setRowData] = useState([]);
 
-  const getTopUsers = async() => {
-    await request("get", "/asset/top-admin-users", (res) => {
-      setData(res.data);
-    });
-  };
+	const getTopTypes = async() => {
+		await request("get", "/asset-type/get-top-types", (res) => {
+			setTypes(res.data);
+		});
+	};
 
-  const queryUsers = async() => {
-    setLogs([]);
-    for(let i = 0; i < users.length; i++){
-      const user = users[i];
-      await request("get", `asset/get-by-admin/${user}`, (res) => {
-        setLogs((prev) => [...prev, res.data]);
-      });
-    }
-  };
+	const queryTypes = async() => {
+		setLogs([]);
+		for(let i = 0; i < types.length; i++){
+			await request("get", `/asset-type/get/${types[i]}`, (res) => {
+				setLogs((prev) => [...prev, res.data]);
+			});
+		}
+	};
 
-  const processData = () => {
-    setUsers([]);
-    setCount([]);
-    for(let i = 0; i < data.length; i++){
-      const item = data[i];
-      const words = item.split(",");
-
-      setUsers((prev) => [...prev, words[0]]);
-      setCount((prev) => [...prev, words[1]]);
-    }
-  };
+	// const queryAssets = async() => {
+	// 	setAssets([]);
+	// 	for(let i = 0; i < logs.length; i++){
+	// 		const log = logs[i];
+	// 		await request("get", `asset/get-by-type/${log.id}`, (res) => {
+	// 			setAssets((prev) => [...prev, res.data]);
+	// 		});
+	// 	}
+	// };
 
   const buildData = () => {
     const arr = [];
     setRowData([]);
-    for(let i = 0; i < logs.length; i++){
-      const log = logs[i];
-      arr.push({id: i, name: log[0].admin_id, all: count[i], available: 0, inuse: 0, repairing: 0, deprecated: 0});
-      for(let j = 0; j < log.length; j++){
-        if(log[j].status_id == 1){
-          arr[i]["available"] += 1;
-        }
-        if(log[j].status_id == 2){
-          arr[i]["inuse"] += 1;
-        }
-        if(log[j].status_id == 3){
-          arr[i]["repairing"] += 1;
-        }
-        if(log[j].status_id == 4){
-          arr[i]["deprecated"] += 1;
-        }
-      }
-    }
+		for(let i = 0; i < logs.length; i++){
+			const log = logs[i];
+			arr.push({id: log.id, name: log.name, all: log.num_assets, available: 0, inuse: 0, repairing: 0, deprecated: 0});
+		}
+    // for(let i = 0; i < assets.length; i++){
+		// 	const asset = assets[i];
+		// 	const type = arr.find(item => item.id === asset.type_id);
+		// 	if(asset.status_id == 1){
+		// 		type["available"] += 1;
+		// 	}
+		// 	if(asset.status_id == 2){
+		// 		type["inuse"] += 1;
+		// 	}
+		// 	if(asset.status_id == 3){
+		// 		type["repairing"] += 1;
+		// 	}
+		// 	if(asset.status_id == 4){
+		// 		type["deprecated"] += 1;
+		// 	}
+    // }
     setRowData(arr);
   };
 
   useEffect(() => {
-    getTopUsers();
+		getTopTypes();
   }, []);
 
   useEffect(() => {
-    processData();
-  }, [data]);
+		queryTypes();
+  }, [types]);
 
-  useEffect(() => {
-    queryUsers();
-  }, [users]);
+  // useEffect(() => {
+  //   queryAssets();
+  // }, [logs]);
 
-  useEffect(() => {
-    buildData();
-  }, [logs]);
-
-  console.log("rowdata", rowData);
+	useEffect(() => {
+		buildData();
+	}, [logs]);
 
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 300 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell>Top Admin Users</TableCell>
+            <TableCell>Top Asset Types</TableCell>
             <TableCell align="right">Management</TableCell>
-            <TableCell align="right">Available</TableCell>
-            <TableCell align="right">In Use</TableCell>
-            <TableCell align="right">Repairing</TableCell>
-            <TableCell align="right">Deprecated</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -111,10 +103,6 @@ export default function AssetTypeTable() {
                 {row.name}
               </TableCell>
               <TableCell align="right">{row.all}</TableCell>
-              <TableCell align="right">{row.available}</TableCell>
-              <TableCell align="right">{row.inuse}</TableCell>
-              <TableCell align="right">{row.repairing}</TableCell>
-              <TableCell align="right">{row.deprecated}</TableCell>
             </TableRow>
           ))}
         </TableBody>
