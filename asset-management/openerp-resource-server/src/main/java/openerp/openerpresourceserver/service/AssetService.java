@@ -30,4 +30,10 @@ public interface AssetService {
     List<String> getTopAdminUsers();
 
     List<Asset> getByAdminUser(String user_id);
+
+    List<Asset> getByTypes(Integer type_id);
+
+    List<Asset> getAssignToMe(String user_id);
+
+    List<Asset> getManageByMe(String user_id);
 }

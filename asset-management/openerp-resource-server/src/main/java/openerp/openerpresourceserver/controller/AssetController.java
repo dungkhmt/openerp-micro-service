@@ -120,4 +120,30 @@ public class AssetController {
             .status(HttpStatus.OK)
             .body(assets);
     }
+
+    @GetMapping("/assign-to-me")
+    public ResponseEntity<?> getAssignToMe(Principal principal){
+        String userId = principal.getName();
+        List<Asset> assets = assetService.getAssignToMe(userId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(assets);
+    }
+
+    @GetMapping("/manage-by-me")
+    public ResponseEntity<?> getManageByMe(Principal principal){
+        String userId = principal.getName();
+        List<Asset> assets = assetService.getManageByMe(userId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(assets);
+    }
+
+    @GetMapping("/get-by-type/{typeId}")
+    public ResponseEntity<?> getByTypes(@PathVariable Integer typeId){
+        List<Asset> assets = assetService.getByTypes(typeId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(assets);
+    }
 }

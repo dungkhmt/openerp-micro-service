@@ -157,4 +157,19 @@ public class AssetServiceImpl implements AssetService{
     public List<Asset> getByAdminUser(String user_id) {
         return assetRepo.findByAdminId(user_id);
     }
+
+    @Override
+    public List<Asset> getByTypes(Integer type_id) {
+        return assetRepo.findByTypes(type_id);
+    }
+
+    @Override
+    public List<Asset> getAssignToMe(String user_id) {
+        return assetRepo.assignToMe(user_id);
+    }
+
+    @Override
+    public List<Asset> getManageByMe(String user_id) {
+        return assetRepo.manageByMe(user_id);
+    }
 }
