@@ -891,6 +891,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 testcaseContent,
                 st.getStatus(),
                 st.getPoint(),
+                st.getUsedToGrade(),
                 st.getRuntime(),
                 testcaseOutput,
                 participantSolutionOutput,
@@ -1028,6 +1029,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                         participantSolutionOutput = st.getParticipantSolutionOtput();
                         break;
                 }
+                //String graded = ContestSubmissionTestCaseEntity.USED_TO_GRADE_YES;
 
                 result.add(new SubmissionDetailByTestcaseOM(
 //                    st.getContestSubmissionTestcaseId(),
@@ -1038,6 +1040,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     testCaseContent,
                     st.getStatus(),
                     st.getPoint(),
+                    st.getUsedToGrade(),
                     null,
                     testCaseOutput,
                     participantSolutionOutput,
