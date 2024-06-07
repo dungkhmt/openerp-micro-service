@@ -61,4 +61,13 @@ public class PublicAccountController {
         AccountResponseDto dto = accountService.getAccountBy(accountId);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, dto));
     }
+
+    @GetMapping("/forgot-password")
+    @Operation(summary = "Forgot Password", operationId = "publicAccount.pass")
+    public ResponseEntity<ResponseDto<String>> forgotPass(
+            @RequestParam("email") String email
+    ) {
+        accountService.resetPassword(email);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, "Mật khẩu mới đã được gửi tới email"));
+    }
 }

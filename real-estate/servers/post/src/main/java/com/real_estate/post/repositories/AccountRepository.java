@@ -27,11 +27,18 @@ public interface AccountRepository extends JpaRepository<AccountPostgresEntity, 
     @Query("update AccountPostgresEntity a set a.password = :newPassword where a.accountId = :accountId")
     public Integer updatePasswordBy(String newPassword, Long accountId);
 
+    @Transactional
     @Modifying
     @Query(value = "update AccountPostgresEntity a set a.totalPostSell = a.totalPostSell + 1 where a.accountId = :accountId")
     void updateTotalPostSell(Long accountId);
 
+    @Transactional
     @Modifying
     @Query(value = "update AccountPostgresEntity a set a.totalPostBuy = a.totalPostBuy + 1 where a.accountId = :accountId")
     void updateTotalPostBuy(Long accountId);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update AccountPostgresEntity a set a.password = :newPassword where a.email = :email and a.provider = 'local'")
+    Integer updatePassByEmail(String newPassword, String email);
 }
