@@ -1011,9 +1011,16 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                         break;
 
                     case ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_DISABLED:
-                        testCaseContent = "---HIDDEN---";
-                        testCaseOutput = "---HIDDEN---";
-                        participantSolutionOutput = "---HIDDEN---";
+                        if(tc.getIsPublic().equals("Y")){
+                            testCaseContent = tc.getTestCase();
+                            testCaseOutput = tc.getCorrectAnswer();
+                            participantSolutionOutput = st.getParticipantSolutionOtput();
+
+                        }else {
+                            testCaseContent = "---HIDDEN---";
+                            testCaseOutput = "---HIDDEN---";
+                            participantSolutionOutput = "---HIDDEN---";
+                        }
                         break;
                     case ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_INPUT_PARTICIPANT_OUTPUT:
                         testCaseContent = tc.getTestCase();

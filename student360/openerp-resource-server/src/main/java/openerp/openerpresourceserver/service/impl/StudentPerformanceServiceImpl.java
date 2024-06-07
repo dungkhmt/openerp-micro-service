@@ -25,7 +25,6 @@ import java.util.*;
 @AllArgsConstructor(onConstructor_ = @Autowired)
 @Service
 public class StudentPerformanceServiceImpl implements StudentPerformanceService {
-
     private ContestSubmissionRepo contestSubmissionRepo;
     private SubmissionHourlySummaryRepo submissionHourlySummaryRepo;
     private ContestProblemRepo contestProblemRepo;

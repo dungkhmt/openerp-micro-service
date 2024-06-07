@@ -200,7 +200,12 @@ public class SubmissionResponseHandler {
                                         + response;
                     }
 
-                    totalPoint += point;
+                    if(submissionTestcase.getUsedToGrade()
+                            .equals(ContestSubmissionTestCaseEntity.USED_TO_GRADE_YES)) {
+                        totalPoint += point;
+                    }else{
+                        // do not account test-case to the final grade of the submission
+                    }
                 }
 
                 submissionTestcase.setPoint(point);

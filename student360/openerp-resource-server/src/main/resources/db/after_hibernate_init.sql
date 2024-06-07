@@ -1,8 +1,3 @@
-DROP TABLE IF EXISTS "max_point_contest_view";
-DROP TABLE IF EXISTS "midterm_final_submission_view";
-DROP TABLE IF EXISTS "submission_hourly_summary";
-DROP TABLE IF EXISTS "student_submission_statistics";
-
 CREATE MATERIALIZED VIEW IF NOT EXISTS public.max_point_contest_view
 AS SELECT ccpn.contest_id,
           sum(tsn.test_case_point) AS total_point

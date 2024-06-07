@@ -46,7 +46,6 @@ public class DashboardServiceImpl implements DashBoardService {
                 default -> semesterScore.setNumStudentsWithGradeF(numStudents);
             }
             semesterScoreMap.put(semester, semesterScore);
-            System.out.println(semesterScoreMap);
         }
 
         List<SemesterScore> semesterScores = getSemesterScores(semesterScoreMap);

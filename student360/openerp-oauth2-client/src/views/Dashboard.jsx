@@ -99,12 +99,12 @@ export default function Home() {
         {/* </Grid> */}
       </Grid>
 
-      <LineChartComponent
+      {/* <LineChartComponent
         data={statistics?.totalStudentPassBySemester}
         title="Number of Students Passing by Semester"
         xAxisName="Semester"
         yAxisName="Total Student Passed"
-      />
+      /> */}
       <LineChartComponent
         data={statistics?.totalStudentPlagiarismBySemester}
         title="Number of Students Cheating by Semester"

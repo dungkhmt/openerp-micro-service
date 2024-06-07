@@ -14,7 +14,9 @@ import com.hust.baseweb.applications.education.report.model.quizparticipation.St
 import com.hust.baseweb.applications.education.service.LogUserLoginQuizQuestionService;
 import com.hust.baseweb.applications.notifications.entity.Notifications;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
+import com.hust.baseweb.applications.programmingcontest.entity.ProblemEntity;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestSubmissionRepo;
+import com.hust.baseweb.applications.programmingcontest.repo.ProblemRepo;
 import com.hust.baseweb.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.PrintWriter;
 import java.security.Principal;
 import java.util.*;
 
@@ -56,6 +59,9 @@ public class DataAdminController {
 
     @Autowired
     private ContestSubmissionRepo contestSubmissionRepo;
+
+    @Autowired
+    private ProblemRepo problemRepo;
 
     private final ProgrammingContestSubmissionServiceImpl contestSubmissionService;
 
@@ -288,5 +294,65 @@ public class DataAdminController {
         return ResponseEntity.ok().body(aPage);
 
     }
+    @GetMapping("/admin/data/get-accepted-submission")
+    public ResponseEntity<?> getAcceptedSubmissions(Principal principal){
+        log.info("getAcceptedSubmissions");
+        int count = contestSubmissionRepo.countTotalAccept();
+        log.info("getAcceptedSubmissions, subs.size = " + count);
+        try {
+            PrintWriter out = new PrintWriter("log.txt");
+            Map<String, List<String>> mProblemId2SolutionCode = new HashMap<String, List<String>>();
+            Map<String, ProblemEntity> mID2Problem = new HashMap<String, ProblemEntity>();
+            List<ProblemEntity> problems = problemRepo.findAll();
+            for (ProblemEntity p : problems) {
+                mID2Problem.put(p.getProblemId(), p);
+            }
 
+            int limit = 1000;
+            int offset = 0;
+            while(offset + limit <= count) {
+                log.info("getAcceptedSubmissions, offset = " + offset + " count = " + count);
+                //List<ContestSubmissionEntity> subs = contestSubmissionRepo.findAllByStatus(ContestSubmissionEntity.SUBMISSION_STATUS_ACCEPTED);
+
+                List<ContestSubmissionEntity> subs = contestSubmissionRepo.getPageContestSubmission(offset,limit,"Accept");
+
+
+                for (ContestSubmissionEntity s : subs) {
+                    String problemId = s.getProblemId();
+                    String solutionCode = s.getSourceCode();
+                    if (mProblemId2SolutionCode.get(problemId) == null) {
+                        mProblemId2SolutionCode.put(problemId, new ArrayList<String>());
+                    }
+                    mProblemId2SolutionCode.get(problemId).add(solutionCode);
+                }
+
+                offset += limit;
+            }
+
+            int cnt = 0;
+            for (String problemID : mProblemId2SolutionCode.keySet()) {
+                ProblemEntity p = mID2Problem.get(problemID);
+                List<String> sourceCodes = mProblemId2SolutionCode.get(problemID);
+                out.println("ProblemID: " + problemID);
+
+                if (p != null) {
+                    out.println(p.getProblemDescription());
+                    out.println("solution codes");
+                    log.info("problem " + problemID + " has " + sourceCodes.size() + " correct solution");
+                    for (String s : sourceCodes) {
+                        out.println(s);
+                        out.println("--------");
+                    }
+
+                }
+                log.info("getAcceptedSubmissions, finished " + cnt + "/" + problems.size());
+                out.println("---------------------------");
+            }
+
+            out.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().body("submissions");
+    }
 }

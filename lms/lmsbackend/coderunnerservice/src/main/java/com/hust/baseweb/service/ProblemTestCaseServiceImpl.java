@@ -160,13 +160,13 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         List<ContestSubmissionTestCaseEntity> submissionTestcases = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionIdOrderByCreatedStampDesc(
                 submissionId);
 
-        boolean includePrivateTest = contest != null &&
+        boolean includePublicAndPrivateTest = contest != null &&
             contest.getEvaluateBothPublicPrivateTestcase() != null &&
             contest.getEvaluateBothPublicPrivateTestcase()
                 .equals(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES);
 
         List<TestCaseEntity> testcases = testCaseService.findListTestCaseWithCache(
-                submission.getProblemId(), includePrivateTest)
+                submission.getProblemId(), includePublicAndPrivateTest)
             .stream()
             .filter(tc1 -> tc1.getStatusId() == null || !tc1.getStatusId()
                 .equals(TestCaseEntity.STATUS_DISABLED))
@@ -186,6 +186,16 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 .filter(st -> st.getTestCaseId().equals(testcase.getTestCaseId()))
                 .findFirst()
                 .get();
+
+            if(contest.getEvaluateBothPublicPrivateTestcase().equals(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES)){
+               submissionTestcase.setUsedToGrade(ContestSubmissionTestCaseEntity.USED_TO_GRADE_YES);
+            }else{
+                if(testcase.getIsPublic().equals(TestCaseEntity.PUBLIC_NO)){// always account private testcase
+                    submissionTestcase.setUsedToGrade(ContestSubmissionTestCaseEntity.USED_TO_GRADE_YES);
+                }else{
+                    submissionTestcase.setUsedToGrade(ContestSubmissionTestCaseEntity.USED_TO_GRADE_NO);
+                }
+            }
 
             String response;
             if (StringUtils.isBlank(submissionTestcase.getParticipantSolutionOtput())) {

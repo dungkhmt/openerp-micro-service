@@ -22,13 +22,21 @@ public class TestCaseService {
         return findListTestCase(problemId, evaluatePrivateTestcase);
     }
 
-    public List<TestCaseEntity> findListTestCase(String problemId, boolean includePrivateTest) {
+    public List<TestCaseEntity> findListTestCase(String problemId, boolean includePublicAndPrivateTest) {
         List<TestCaseEntity> testCaseEntityList;
-        if (includePrivateTest) {
+        // IMPROVED: run the submission on both public and private test-cases
+        // if includePublicAndPrivateTest = true, then both public and private are accounted to the grade of the submissoin
+        // else (includePublicAndPrivateTest = false) then only private testcases are accounted to the grade of the submission
+
+        testCaseEntityList = testCaseRepo.findAllByProblemId(problemId);
+
+        /* NO LONGER USED
+        if (includePublicAndPrivateTest) {
             testCaseEntityList = testCaseRepo.findAllByProblemId(problemId);
         } else {
             testCaseEntityList = testCaseRepo.findAllByProblemIdAndIsPublic(problemId, "Y");
         }
+        */
         return testCaseEntityList;
     }
 
