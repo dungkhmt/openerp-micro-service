@@ -18,8 +18,8 @@ public class TestCaseService {
     private static final String HASH = "TEST_CASE";
 
     @Cacheable(value = HASH, key = "#problemId + '_' + #evaluatePrivateTestcase")
-    public List<TestCaseEntity> findListTestCaseWithCache(String problemId, boolean evaluatePrivateTestcase) {
-        return findListTestCase(problemId, evaluatePrivateTestcase);
+    public List<TestCaseEntity> findListTestCaseWithCache(String problemId, boolean evaluatePrivatePublicTestcase) {
+        return findListTestCase(problemId, evaluatePrivatePublicTestcase);
     }
 
     public List<TestCaseEntity> findListTestCase(String problemId, boolean includePublicAndPrivateTest) {

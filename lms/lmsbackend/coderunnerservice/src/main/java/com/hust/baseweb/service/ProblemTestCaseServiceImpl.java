@@ -143,6 +143,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         tempDir.removeDir(tempName);
 
         submissionResponseHandler.processSubmissionResponseV2(
+                contest,
             testCaseEntityList,
             listSubmissionResponse,
             submission,
