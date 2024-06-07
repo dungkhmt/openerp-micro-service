@@ -44,6 +44,10 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
       cellStyle: { minWidth: 200 },
     },
     {
+      title: "Graded",
+      field: "graded"
+    },
+    {
       title: "Detail",
       sorting: false,
       // align: "center",

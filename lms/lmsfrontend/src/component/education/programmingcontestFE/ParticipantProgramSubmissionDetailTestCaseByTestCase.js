@@ -37,6 +37,10 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
       cellStyle: { minWidth: 200 },
     },
     {
+      title: "Graded",
+      field: "graded"
+    },
+    {
       title: "Detail",
       sorting: false,
       render: (rowData) => (
