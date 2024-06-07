@@ -1,6 +1,5 @@
 package com.real_estate.post.repositories;
 
-
 import com.real_estate.post.dtos.ProvinceEntity;
 import com.real_estate.post.models.postgresql.DistrictPostgresEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -56,6 +56,7 @@ public class WebSecurityConfig {
 		http
 			.authorizeHttpRequests(auth -> {
 				auth.requestMatchers(("/**")).permitAll();
+				auth.requestMatchers("/stomp", "/websocket", "/ws", "ws/**", "/app/**").permitAll();
 				auth.requestMatchers("/public/**").permitAll();
 				auth.requestMatchers(WHITE_LIST_URL).permitAll();
 				auth.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll();
