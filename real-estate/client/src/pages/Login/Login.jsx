@@ -8,10 +8,14 @@ import { useDispatch } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import { login_success } from "../../store/auth";
 import { setAuthorizationToRequest } from "../../utils/authenticate";
+import { useDisclosure } from "@mantine/hooks";
+import { Button, Dialog, TextInput, Group } from "@mantine/core";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [opened, { toggle, close }] = useDisclosure(false);
+  const [email, setEmail] = useState();
 
   const [showSignUp, setShowSignUp] = useState(false);
   const [dataLogin, setDataLogin] = useState({});
@@ -76,6 +80,22 @@ const Login = () => {
         }
       })
       .then();
+  };
+
+  const handleResetPass = () => {
+    const accountRequest = new AccountRequest();
+    close();
+    accountRequest
+      .reset_pass({
+        email,
+      })
+      .then((response) => {
+        if (response.code === 200) {
+          toast.success(response.data);
+        } else {
+          toast.error(response.data.message);
+        }
+      });
   };
   return (
     <div
@@ -171,7 +191,14 @@ const Login = () => {
             value={dataLogin.password || ""}
             onChange={handleChangeLogin}
           />
-          <a href="#">Forget Your Password?</a>
+          <div
+            onClick={toggle}
+            style={{
+              cursor: "pointer",
+            }}
+          >
+            Forget Your Password?
+          </div>
           <button type="submit">Sign In</button>
         </form>
       </div>
@@ -215,6 +242,24 @@ const Login = () => {
         draggable
         pauseOnHover
       />
+
+      <Dialog
+        zIndex={1001}
+        opened={opened}
+        withCloseButton
+        onClose={close}
+        size="lg"
+        radius="md"
+      >
+        <Group align="flex-end">
+          <TextInput
+            placeholder="hello@gluesticker.com"
+            style={{ flex: 1 }}
+            onChange={(event) => setEmail(event.currentTarget.value)}
+          />
+          <Button onClick={handleResetPass}>Gửi</Button>
+        </Group>
+      </Dialog>
     </div>
   );
 };
