@@ -1,6 +1,11 @@
-import {storage} from "../components/UploadImage/FireBaseConfig";
-import {deleteObject, getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
-import {v4} from "uuid";
+import { storage } from "../components/UploadImage/FireBaseConfig";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { v4 } from "uuid";
 
 export const getMenuStyles = (menuOpened) => {
   if (document.documentElement.clientWidth <= 800) {
@@ -47,19 +52,22 @@ export const validateString = (value) => {
 
 export const transferLegalDocument = (value) => {
   switch (value) {
-    case "HAVE": return "Đã có sổ đỏ";
-    case "WAIT": return "Đang chờ sổ đỏ";
-    default: return "Không có sổ đỏ"
+    case "HAVE":
+      return "Đã có sổ đỏ";
+    case "WAIT":
+      return "Đang chờ sổ đỏ";
+    default:
+      return "Không có sổ đỏ";
   }
-}
+};
 
 export const transferLegalDocuments = (listValue) => {
   let result = [];
-  listValue.forEach((item,index) => {
-    result = [...result, transferLegalDocument(item)]
-  })
+  listValue.forEach((item, index) => {
+    result = [...result, transferLegalDocument(item)];
+  });
   return result;
-}
+};
 
 export const transferDirection = (value) => {
   switch (value) {
@@ -82,24 +90,26 @@ export const transferDirection = (value) => {
     default:
       return "Hướng không xác định";
   }
-}
-
+};
 
 export const transferDirections = (listValue) => {
   let result = [];
-  listValue.forEach((item,index) => {
-    result = [...result, transferDirection(item)]
-  })
+  listValue.forEach((item, index) => {
+    result = [...result, transferDirection(item)];
+  });
   return result;
-}
+};
 
 export const transferTypeProperty = (value) => {
   switch (value) {
-    case "LAND": return "Đất";
-    case "HOUSE": return "Nhà ở";
-    default: return "Chung cư";
+    case "LAND":
+      return "Đất";
+    case "HOUSE":
+      return "Nhà ở";
+    default:
+      return "Chung cư";
   }
-}
+};
 
 export const transferTypeProperties = (listValue) => {
   let result = [];
@@ -107,7 +117,7 @@ export const transferTypeProperties = (listValue) => {
     result = [...result, transferTypeProperty(value)];
   }
   return result;
-}
+};
 
 export const transferPrice = (price) => {
   if (price >= 1000000000) {
@@ -117,9 +127,9 @@ export const transferPrice = (price) => {
     return (price / 1000000).toFixed(1) + " triệu";
   }
   if (price === 0) {
-    return "0 VND"
+    return "0 VND";
   }
-}
+};
 
 export const transferTime = (timestamp) => {
   const now = Date.now();
@@ -130,7 +140,7 @@ export const transferTime = (timestamp) => {
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
   const weeks = Math.floor(days / 7);
-  const months = Math.floor(weeks/4)
+  const months = Math.floor(weeks / 4);
   if (months > 0) {
     return `Đăng ${months} tháng trước`;
   } else if (weeks > 0) {
@@ -144,34 +154,34 @@ export const transferTime = (timestamp) => {
   } else {
     return `Đăng ${seconds} giây trước`;
   }
-}
+};
 
 export const uploadImage = (image) => {
   return new Promise((resolve, reject) => {
     const storageRef = ref(storage, `images/${v4()}`);
     const uploadTask = uploadBytesResumable(storageRef, image);
     uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          // Xử lý tiến trình tải lên
-        },
-        (error) => {
-          // Xử lý lỗi
-          console.log(error);
-          reject(error);
-        },
-        () => {
-          // Xử lý khi tải lên thành công
-          getDownloadURL(uploadTask.snapshot.ref)
-              .then((url) => {
-                console.log(url);
-                resolve(url);
-              })
-              .catch(error => reject(error));
-        }
+      "state_changed",
+      (snapshot) => {
+        // Xử lý tiến trình tải lên
+      },
+      (error) => {
+        // Xử lý lỗi
+        console.log(error);
+        reject(error);
+      },
+      () => {
+        // Xử lý khi tải lên thành công
+        getDownloadURL(uploadTask.snapshot.ref)
+          .then((url) => {
+            // console.log(url);
+            resolve(url);
+          })
+          .catch((error) => reject(error));
+      },
     );
   });
-}
+};
 
 export const handleDeleteImage = async (image) => {
   try {
@@ -181,21 +191,27 @@ export const handleDeleteImage = async (image) => {
   } catch (error) {
     console.log("Lỗi khi xóa ảnh:", error);
   }
-}
+};
 
 export const capitalizeFirstLetterOfEachWord = (string) => {
-  return string?.split(' ').map(word => {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  }).join(' ');
-}
+  return string
+    ?.split(" ")
+    .map((word) => {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
+};
 
 export const transferPostStatus = (status) => {
   switch (status) {
-    case "OPENING": return "Đang Mở";
-    case "CLOSED": return "Đã Đóng";
-    default: return "Đã Chốt";
+    case "OPENING":
+      return "Đang Mở";
+    case "CLOSED":
+      return "Đã Đóng";
+    default:
+      return "Đã Chốt";
   }
-}
+};
 
 export const transferColorPostStatus = (status) => {
   switch (status) {
@@ -206,14 +222,14 @@ export const transferColorPostStatus = (status) => {
     default:
       return "rgb(0, 155, 161)";
   }
-}
+};
 
 export const transferTimeToDate = (timestamp) => {
   const date = new Date(timestamp);
 
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const day = String(date.getDate()).padStart(2, "0");
 
   const formattedDate = `${month}/${day}`;
   return formattedDate;
-}
+};
