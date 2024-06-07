@@ -1,10 +1,11 @@
-import { Avatar, Button, Card, CardContent, CardHeader, Grid, Typography } from "@mui/material";
+import { Avatar, Box, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Modal, TextField, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { request } from "api";
 import { useEffect } from "react";
 import { useState } from "react";
 import { BiDetail } from "react-icons/bi";
 import { useParams, useHistory } from "react-router-dom";
+import { errorNoti, successNoti } from "utils/notification";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -36,6 +37,10 @@ const LocationDetail = () => {
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [address, setAddress] = useState("");
+
   const style = {
     position: "absolute",
     top: "50%",
@@ -55,6 +60,63 @@ const LocationDetail = () => {
       setLocationDetail(res.data);
     });
     setLoading(false);
+  };
+
+  const initData = () => {
+    setName(locationDetail["name"]);
+    setDescription(locationDetail["description"]);
+    setAddress(locationDetail["address"]);
+  };
+
+  const successHandler = () => {
+    successNoti("EDIT LOCATION SUCCESSFULLY", 3000);
+    window.location.reload();
+  };
+
+  const errorHandler = {
+    onError: (e) => {
+      console.log(e);
+      errorNoti("FAILED", 3000);
+    },
+  };
+
+  const successHandlerDelete = () => {
+		successNoti("DELETE LOCATION SUCCESSFULLY", 3000);
+		history.push("/locations");
+	};
+
+  const handleEdit = () => {
+    initData();
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleDelete = () => {
+    setOpenDelete(true);
+  };
+
+  const handleCloseDelete = ()  => {
+		setOpenDelete(false);
+	};
+
+  const deleteApi = async() => {
+    await request("delete", `/location/delete/${params.id}`, successHandlerDelete, errorHandler, {});
+    setOpenDelete(false);
+  };
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+    const body = {
+      name: name,
+      description: description,
+      address: address
+    };
+
+    await request("put", `/location/edit/${params.id}`, successHandler, errorHandler, body);
+    handleClose();
   };
 
   useEffect(() => {
@@ -77,8 +139,8 @@ const LocationDetail = () => {
           title={<Typography variant="h5">Asset Detail</Typography>}
         />
 				<div style={{ float: "right", paddingRight: "20px" }}>
-					<Button>Edit</Button>
-					<Button>Delete</Button>
+					<Button onClick={handleEdit}>Edit</Button>
+					<Button onClick={handleDelete}>Delete</Button>
 				</div>
 				<CardContent style={{ paddingTop: "20px" }}>
 					<Grid container className={classes.grid}>
@@ -105,6 +167,94 @@ const LocationDetail = () => {
 					</Grid>
 				</CardContent>
       </Card>
+      <Modal
+        open={open}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        onClose={handleClose}
+      >
+        <Box sx={style}>
+          <div>EDIT LOCATION</div>
+          <hr/>
+          <form onSubmit={(e) => handleSubmit(e)}>
+            <TextField
+              label="Name"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              required
+              value={name}
+              placeholder="Location Name"
+              onChange={(e) => setName(e.target.value)}
+            />
+            <TextField
+              label="Description"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              name="description"
+              placeholder="Location Description"
+              onChange={(e) => setDescription(e.target.value)}
+              value={description}
+            />
+            <TextField
+              label="Address"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              name="address"
+              placeholder="Location Address"
+              onChange={(e) => setAddress(e.target.value)}
+              value={address}
+            />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: "20px",
+              }}
+            >
+              <Button
+                variant="outlined"
+                color="primary"
+                type="cancel"
+                onClick={handleClose}
+              >
+                Cancel
+              </Button>
+              <Button variant="contained" color="primary" type="submit">
+                Submit
+              </Button>
+            </div>
+          </form>
+        </Box>
+      </Modal>
+      <Dialog
+        open={openDelete}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"DELETE THIS ASSET"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Do you want to delete this location. It cannot be undone?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={handleCloseDelete}>
+            CANCEL
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={deleteApi}
+            autoFocus
+          >
+            DELETE
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

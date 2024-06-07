@@ -211,12 +211,15 @@ const AssetDetail = () => {
     setOpen(true);
   };
 
+  const handleDelete = () => {
+    setOpenDelete(true);
+  };
+
 	const handleCloseDelete = ()  => {
 		setOpenDelete(false);
 	};
 
 	const deleteApi = () => {
-		console.log("chay vao day");
 		request("delete", `/asset/delete/${params.id}`, successHandlerDelete, errorHandlers, {});
 		setOpenDelete(false);
 	};
@@ -248,7 +251,7 @@ const AssetDetail = () => {
         />
         <div style={{ float: "right", paddingRight: "20px" }}>
           <Button onClick={handleEdit}>Edit</Button>
-          <Button>Delete</Button>
+          <Button onClick={handleDelete}>Delete</Button>
         </div>
         <CardContent style={{ paddingTop: "20px" }}>
           <Grid container className={classes.grid}>
