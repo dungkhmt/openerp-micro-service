@@ -233,7 +233,7 @@ export const VendorScreen = () => {
                             margin="normal"
                             required
                             name='name'
-                            placeholder='Location name'
+                            placeholder='Vendor Name'
                             value={data.name}
                             onChange={handleInputChange}
                         />
@@ -243,7 +243,7 @@ export const VendorScreen = () => {
                             fullWidth
                             margin="normal"
                             name='description'
-                            placeholder='Location description'
+                            placeholder='Vendor Description'
                             value={data.description}
                             onChange={handleInputChange}
                         />
@@ -254,7 +254,7 @@ export const VendorScreen = () => {
                             margin="normal"
                             required
                             name='email'
-                            placeholder='Location email'
+                            placeholder='Vendor Email'
                             value={data.email}
                             onChange={handleInputChange}
                         />                        
@@ -266,7 +266,7 @@ export const VendorScreen = () => {
                                 margin="normal"
                                 required
                                 name='phone'
-                                placeholder='Location phone'
+                                placeholder='Vendor Phone'
                                 value={data.phone}
                                 onChange={handleInputChange}
                             />
@@ -277,7 +277,7 @@ export const VendorScreen = () => {
                                 margin="normal"
                                 required
                                 name='url'
-                                placeholder='Location url'
+                                placeholder='Vendor URL'
                                 value={data.url}
                                 onChange={handleInputChange}
                             />
@@ -289,7 +289,7 @@ export const VendorScreen = () => {
                             margin="normal"
                             required
                             name='address'
-                            placeholder='Location address'
+                            placeholder='Vendor Address'
                             value={data.address}
                             onChange={handleInputChange}
                         />            

@@ -37,6 +37,7 @@ public class VendorServiceImpl implements VendorService{
         savedVendor.setDescription(vendor.getDescription());
         savedVendor.setImage(vendor.getImage());
         savedVendor.setUrl(vendor.getUrl());
+        savedVendor.setNum_assets(0);
 
         Date currentDate = new Date();
         savedVendor.setSince(currentDate);

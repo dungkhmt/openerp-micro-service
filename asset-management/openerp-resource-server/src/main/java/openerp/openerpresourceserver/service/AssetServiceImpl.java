@@ -3,8 +3,12 @@ package openerp.openerpresourceserver.service;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.entity.Asset;
 import openerp.openerpresourceserver.entity.AssetType;
+import openerp.openerpresourceserver.entity.Location;
+import openerp.openerpresourceserver.entity.Vendor;
 import openerp.openerpresourceserver.repo.AssetRepo;
 import openerp.openerpresourceserver.repo.AssetTypeRepo;
+import openerp.openerpresourceserver.repo.LocationRepo;
+import openerp.openerpresourceserver.repo.VendorRepo;
 import openerp.openerpresourceserver.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,8 @@ import java.util.Optional;
 public class AssetServiceImpl implements AssetService{
     private AssetRepo assetRepo;
     private AssetTypeRepo assetTypeRepo;
+    private LocationRepo locationRepo;
+    private VendorRepo vendorRepo;
 
     private final Integer AVAILABLE = 1;
     private final Integer INUSE = 2;
@@ -61,6 +67,13 @@ public class AssetServiceImpl implements AssetService{
         String prefix = assetType.getCode_prefix();
         Utils utils = new Utils();
         newAsset.setCode(prefix + "-" + utils.generateRandomHash(8));
+
+        Location location = locationRepo.findById(asset.getLocation_id()).get();
+        location.setNum_assets(location.getNum_assets() + 1);
+
+        Vendor vendor = vendorRepo.findById(asset.getVendor_id()).get();
+        vendor.setNum_assets(vendor.getNum_assets() + 1);
+
         newAsset.setAdmin_id(asset.getAdmin_id());
         newAsset.setStatus_id(AVAILABLE);
         newAsset.setAssignee_id(asset.getAssignee_id());
@@ -73,7 +86,11 @@ public class AssetServiceImpl implements AssetService{
         newAsset.setSince(currentDate);
         newAsset.setLast_updated(currentDate);
         assetType.setLast_updated(currentDate);
+        location.setLast_updated(currentDate);
+        vendor.setLast_updated(currentDate);
         assetTypeRepo.save(assetType);
+        locationRepo.save(location);
+        vendorRepo.save(vendor);
         return assetRepo.save(newAsset);
     }
 
@@ -106,10 +123,20 @@ public class AssetServiceImpl implements AssetService{
         if(asset.getStatus_id() == REPAIR || asset.getStatus_id() == INUSE) {
             return;
         }
+
         AssetType assetType = assetTypeRepo.findById(asset.getType_id()).get();
         Integer num_assets = assetType.getNum_assets();
         assetType.setNum_assets(num_assets - 1);
+
+        Location location = locationRepo.findById(asset.getLocation_id()).get();
+        location.setNum_assets(location.getNum_assets() - 1);
+
+        Vendor vendor = vendorRepo.findById(asset.getVendor_id()).get();
+        vendor.setNum_assets(vendor.getNum_assets() - 1);
+
         assetTypeRepo.save(assetType);
+        locationRepo.save(location);
+        vendorRepo.save(vendor);
         assetRepo.delete(asset);
     }
 
