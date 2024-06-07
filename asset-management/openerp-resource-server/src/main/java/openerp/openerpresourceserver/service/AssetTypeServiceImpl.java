@@ -33,6 +33,7 @@ public class AssetTypeServiceImpl implements AssetTypeService{
         newType.setName(assetType.getName());
         newType.setCode_prefix(assetType.getCode_prefix());
         newType.setDescription(assetType.getDescription());
+        newType.setNum_assets(0);
 
         Date currentDate = new Date();
         newType.setSince(currentDate);
