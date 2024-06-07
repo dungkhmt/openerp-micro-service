@@ -26,4 +26,15 @@ public class GmailSenderService {
         message.setText(mailContent);
         javaMailSender.send(message);
     }
+
+    public void sendPass(String to, String newPass) {
+        String mailContent = "New password of you: " + newPass;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("vykroos285@gmail.com");
+        message.setTo(to);
+        message.setSubject("Reset password");
+        message.setText(mailContent);
+        javaMailSender.send(message);
+    }
 }

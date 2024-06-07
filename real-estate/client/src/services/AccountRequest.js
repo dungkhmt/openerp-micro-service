@@ -30,4 +30,9 @@ export default class AccountRequest extends BaseRequest {
     const url = "/public/account";
     return this.get(url, params);
   }
+
+  reset_pass(params) {
+    const url = "/public/account/forgot-password";
+    return this.get(url, params);
+  }
 }

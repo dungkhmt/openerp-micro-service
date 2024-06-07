@@ -19,9 +19,14 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class AccountService {
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final int PASSWORD_LENGTH = 8;
+    private static final Random random = new Random();
+
     @Autowired
     @Qualifier("accountImpl")
     AccountDao accountDao;
@@ -31,6 +36,9 @@ public class AccountService {
 
     @Autowired
     TokenProvider tokenProvider;
+
+    @Autowired
+    GmailSenderService gmailSenderService;
 
     String avatar_default = "https://imgs.search.brave.com/HYWzW_u62rwqcCiSeS0ZXFOm48DScY8Z70UIusbvOyg/rs:fit:860:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzAzLzMyLzU5LzY1/LzM2MF9GXzMzMjU5/NjUzNV9sQWRMaGY2/S3piVzZQV1hCV2VJ/RlRvdlRpaTFkcmti/VC5qcGc";
 
@@ -92,5 +100,23 @@ public class AccountService {
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mật khẩu cũ không trùng khớp");
         }
+    }
+
+    public void resetPassword(String email) {
+        String newPass = generatePass();
+        int countRecord = accountDao.updatePassByEmail(passwordEncoder.encode(newPass), email);
+        if (countRecord == 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email chưa có tài khoản");
+        }
+        gmailSenderService.sendPass(email, newPass);
+    }
+
+    public String generatePass() {
+        StringBuilder password = new StringBuilder(PASSWORD_LENGTH);
+        for (int i = 0; i < PASSWORD_LENGTH; i++) {
+            int index = random.nextInt(CHARACTERS.length());
+            password.append(CHARACTERS.charAt(index));
+        }
+        return password.toString();
     }
 }

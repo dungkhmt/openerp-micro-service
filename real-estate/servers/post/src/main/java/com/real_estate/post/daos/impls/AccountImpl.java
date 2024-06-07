@@ -57,6 +57,11 @@ public class AccountImpl implements AccountDao {
     }
 
     @Override
+    public Integer updatePassByEmail(String newPassword, String email) {
+        return repository.updatePassByEmail(newPassword, email);
+    }
+
+    @Override
     public void incOneTotalPostSellBy(Long accountId) {
         repository.updateTotalPostSell(accountId);
     }
