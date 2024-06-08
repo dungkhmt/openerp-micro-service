@@ -17,8 +17,14 @@ const WebsocketContextProvider = ({ children }) => {
   const { addMessage } = useContext(ConversationContext);
 
   useEffect(() => {
-    if (account !== null) {
+    if (
+      account !== null &&
+      account !== undefined &&
+      Object.keys(account).length > 0
+    ) {
       initWs(account);
+    } else {
+      disconnect();
     }
   }, [account]);
 
@@ -47,6 +53,12 @@ const WebsocketContextProvider = ({ children }) => {
     });
   }
 
+  const disconnect = () => {
+    if (ws) {
+      ws.disconnect();
+    }
+  };
+
   return (
     <WebSocketContext.Provider
       value={{
@@ -58,6 +70,7 @@ const WebsocketContextProvider = ({ children }) => {
         setWsClient,
         setMessages,
         setWsConnected,
+        disconnect,
       }}
     >
       {children}

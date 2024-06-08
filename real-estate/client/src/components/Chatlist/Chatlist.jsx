@@ -7,12 +7,9 @@ const Chatlist = ({ setConversationSelect, conversations }) => {
   const [input, setInput] = useState("");
   const { account } = useContext(AccountContext);
 
-  // eslint-disable-next-line react/prop-types
   const filteredConversations = conversations.filter((c) =>
     c.other.name.toLowerCase().includes(input.toLowerCase()),
   );
-
-  let messageEnd = useRef(null);
 
   const transferLastMessage = (lastMessage) => {
     if (lastMessage.messageType === "TEXT") {
@@ -41,33 +38,22 @@ const Chatlist = ({ setConversationSelect, conversations }) => {
           />
         </div>
       </div>
-      <ScrollArea h={"80%"} viewportRef={messageEnd}>
-        {filteredConversations.map((coversation, index) => (
-          <div
-            className="item"
-            key={index}
-            onClick={() => setConversationSelect(coversation)}
-            style={{
-              backgroundColor: "#5183fe",
-            }}
-          >
-            <img src={coversation.other.avatar || "./avatar.png"} alt="" />
-            <div className="texts">
-              <span>{coversation.other.name}</span>
-              <p>{transferLastMessage(coversation?.messages[0])}</p>
-            </div>
-          </div>
-        ))}
+      {filteredConversations.map((coversation, index) => (
         <div
+          className="item"
+          key={index}
+          onClick={() => setConversationSelect(coversation)}
           style={{
-            float: "left",
-            clear: "both",
+            backgroundColor: "#5183fe",
           }}
-          ref={(el) => {
-            messageEnd = el;
-          }}
-        ></div>
-      </ScrollArea>
+        >
+          <img src={coversation.other.avatar || "./avatar.png"} alt="" />
+          <div className="texts">
+            <span>{coversation.other.name}</span>
+            <p>{transferLastMessage(coversation?.messages[0])}</p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

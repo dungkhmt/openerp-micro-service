@@ -14,7 +14,7 @@ import { ConversationContext } from "../../context/ConversationContext";
 import { uploadImage } from "../../utils/common";
 
 const ConversationDetail = ({ conversationSelect }) => {
-  const { addMessage } = useContext(ConversationContext);
+  const { addMessage, addConversation } = useContext(ConversationContext);
   const { account } = useContext(AccountContext);
   const { ws } = useContext(WebSocketContext);
   const [currentConversation, setCurrentConversation] =
@@ -92,12 +92,6 @@ const ConversationDetail = ({ conversationSelect }) => {
         }),
       );
     } else {
-      // console.log(
-      //   "gui tin nhan dau tien",
-      //   currentConversation.other,
-      //   content,
-      //   messageType,
-      // );
       const conversationRequest = new ConversationRequest();
       conversationRequest
         .createConversation({
@@ -109,6 +103,7 @@ const ConversationDetail = ({ conversationSelect }) => {
           if (response.code === 200) {
             // console.log(response.data);
             setCurrentConversation(response.data);
+            addConversation(response.data);
           }
         });
     }

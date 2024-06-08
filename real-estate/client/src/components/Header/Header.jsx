@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./Header.css";
 import { getMenuStyles } from "../../utils/common";
 import useHeaderColor from "../../hooks/useHeaderColor";
@@ -8,11 +8,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout_success } from "../../store/auth";
 import ProfileMenu from "../ProfileMenu/ProfileMenu";
 import { Button, Menu } from "@mantine/core";
+import { WebSocketContext } from "../../context/WebSocketContext";
 
 const Header = () => {
   const navigate = useNavigate();
   const [menuOpened, setMenuOpened] = useState(false);
   const headerColor = useHeaderColor();
+  const { disconnect } = useContext(WebSocketContext);
   const [modalOpened, setModalOpened] = useState(false);
 
   const token = useSelector((state) => state.auth.token);
@@ -22,6 +24,10 @@ const Header = () => {
 
   const logout = () => {
     dispatch(logout_success());
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate("/", { replace: true });
+    disconnect();
   };
 
   return (
