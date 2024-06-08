@@ -9,19 +9,20 @@ import { toast, ToastContainer } from "react-toastify";
 import { login_success } from "../../store/auth";
 import { setAuthorizationToRequest } from "../../utils/authenticate";
 import { useDisclosure } from "@mantine/hooks";
-import { Button, Dialog, TextInput, Group } from "@mantine/core";
+import { Button, Dialog, TextInput, Group, Loader } from "@mantine/core";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [opened, { toggle, close }] = useDisclosure(false);
-  const [email, setEmail] = useState();
+  const [openedReset, setOpenedReset] = useState(false);
+  const [email, setEmail] = useState("");
 
   const [showSignUp, setShowSignUp] = useState(false);
   const [dataLogin, setDataLogin] = useState({});
   const [dataSignUp, setDataSignUp] = useState({});
 
-  // const []
+  const [loading, setLoading] = useState(false);
+
   const handleChangeLogin = (event) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -44,11 +45,11 @@ const Login = () => {
 
   const handleSignUp = (event) => {
     event.preventDefault();
+    setLoading(true);
     const accountRequest = new AccountRequest();
     accountRequest
       .signup(dataSignUp)
       .then((response) => {
-        // console.log("gia tri response", response);
         const statusCode = response.code;
         if (statusCode === 200) {
           toast.success(response.data);
@@ -57,10 +58,7 @@ const Login = () => {
           toast.error(response.data.message);
         }
       })
-      .catch((error) => {
-        console.log(error);
-        toast.error(error);
-      });
+      .finally(() => setLoading(false));
   };
 
   const handleLogin = (event) => {
@@ -92,6 +90,8 @@ const Login = () => {
       .then((response) => {
         if (response.code === 200) {
           toast.success(response.data);
+          setOpenedReset(false);
+          setEmail("");
         } else {
           toast.error(response.data.message);
         }
@@ -102,106 +102,106 @@ const Login = () => {
       className={showSignUp ? "login-container active" : "login-container"}
       id="container"
     >
-      <div className="form-container sign-up">
-        <form onSubmit={handleSignUp}>
-          <h1>Create Account</h1>
-          <div className="social-icons">
-            <a href="#" className="icon">
-              <FontAwesomeIcon
-                icon={faGooglePlusG}
-                className="fa-brands fa-google-plus-g"
-              />
-            </a>
-            <a
-              href="http://localhost:2805/oauth2/authorization/facebook"
-              className="icon"
+      {showSignUp ? (
+        <div className="form-container sign-up">
+          {loading ? (
+            <div
+              className="flexColCenter"
+              style={{
+                height: "100%",
+                marginTop: "auto",
+              }}
             >
-              <FontAwesomeIcon
-                icon={faFacebookF}
-                className="fa-brands fa-facebook-f"
+              <Loader color="blue" size="50" />
+            </div>
+          ) : (
+            <form onSubmit={handleSignUp}>
+              <h1>Create Account</h1>
+              <div className="social-icons">
+                <a
+                  href="http://localhost:2805/oauth2/authorization/facebook"
+                  className="icon"
+                >
+                  <FontAwesomeIcon
+                    icon={faFacebookF}
+                    className="fa-brands fa-facebook-f"
+                  />
+                </a>
+              </div>
+              <span>or use your email for registeration</span>
+              <input
+                name="name"
+                type="text"
+                placeholder="Tên"
+                pattern="[A-Za-z0-9]{5-10}"
+                title="5-10 ký tự"
+                value={dataSignUp.name || ""}
+                onChange={handleChangeSignUp}
               />
-            </a>
-            {/*<a href="#" className="icon"><i className="fa-brands fa-facebook-f"></i></a>*/}
-            {/*<a href="#" className="icon"><i className="fa-brands fa-github"></i></a>*/}
-            {/*<a href="#" className="icon"><i className="fa-brands fa-linkedin-in"></i></a>*/}
-          </div>
-          <span>or use your email for registeration</span>
-          <input
-            name="name"
-            type="text"
-            placeholder="Tên"
-            pattern="[A-Za-z0-9]{5-10}"
-            title="5-10 ký tự"
-            value={dataSignUp.name || ""}
-            onChange={handleChangeSignUp}
-          />
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            value={dataSignUp.email || ""}
-            onChange={handleChangeSignUp}
-          />
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            pattern="[A-Za-z0-9]{8-16}"
-            title="8-16 ký tự"
-            value={dataSignUp.password || ""}
-            onChange={handleChangeSignUp}
-          />
-          <button type="submit">Sign Up</button>
-        </form>
-      </div>
-      <div className="form-container sign-in">
-        <form onSubmit={handleLogin}>
-          <h1>Sign In</h1>
-          <div className="social-icons">
-            <a href="#" className="icon">
-              <FontAwesomeIcon
-                icon={faGooglePlusG}
-                className="fa-brands fa-google-plus-g"
+              <input
+                name="email"
+                type="email"
+                placeholder="Email"
+                value={dataSignUp.email || ""}
+                onChange={handleChangeSignUp}
               />
-            </a>
-            <a
-              href="http://localhost:2805/oauth2/authorization/facebook"
-              className="icon"
+              <input
+                name="password"
+                type="password"
+                placeholder="Password"
+                pattern="[A-Za-z0-9]{8-16}"
+                title="8-16 ký tự"
+                value={dataSignUp.password || ""}
+                onChange={handleChangeSignUp}
+              />
+              <button type="submit">Sign Up</button>
+            </form>
+          )}
+        </div>
+      ) : (
+        <div className="form-container sign-in">
+          <form onSubmit={handleLogin}>
+            <h1>Sign In</h1>
+            <div className="social-icons">
+              <a
+                href="http://localhost:2805/oauth2/authorization/facebook"
+                className="icon"
+              >
+                <FontAwesomeIcon
+                  icon={faFacebookF}
+                  className="fa-brands fa-facebook-f"
+                />
+              </a>
+            </div>
+            <span>or use your email password</span>
+            <input
+              name="email"
+              type="email"
+              placeholder="Email"
+              value={dataLogin.email || ""}
+              onChange={handleChangeLogin}
+            />
+            <input
+              name="password"
+              type="password"
+              placeholder="Password"
+              pattern="[A-Za-z0-9]{8-16}"
+              title="8-16 ký tự"
+              value={dataLogin.password || ""}
+              onChange={handleChangeLogin}
+            />
+            <div
+              onClick={() => setOpenedReset(true)}
+              style={{
+                cursor: "pointer",
+              }}
             >
-              <FontAwesomeIcon
-                icon={faFacebookF}
-                className="fa-brands fa-facebook-f"
-              />
-            </a>
-          </div>
-          <span>or use your email password</span>
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            value={dataLogin.email || ""}
-            onChange={handleChangeLogin}
-          />
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            pattern="[A-Za-z0-9]{8-16}"
-            title="8-16 ký tự"
-            value={dataLogin.password || ""}
-            onChange={handleChangeLogin}
-          />
-          <div
-            onClick={toggle}
-            style={{
-              cursor: "pointer",
-            }}
-          >
-            Forget Your Password?
-          </div>
-          <button type="submit">Sign In</button>
-        </form>
-      </div>
+              Forget Your Password?
+            </div>
+            <button type="submit">Sign In</button>
+          </form>
+        </div>
+      )}
       <div className="toggle-container">
         <div className="toggle">
           <div className="toggle-panel toggle-left">
@@ -245,9 +245,9 @@ const Login = () => {
 
       <Dialog
         zIndex={1001}
-        opened={opened}
+        opened={openedReset}
         withCloseButton
-        onClose={close}
+        onClose={() => setOpenedReset(false)}
         size="lg"
         radius="md"
       >
@@ -257,7 +257,9 @@ const Login = () => {
             style={{ flex: 1 }}
             onChange={(event) => setEmail(event.currentTarget.value)}
           />
-          <Button onClick={handleResetPass}>Gửi</Button>
+          <Button onClick={handleResetPass} disabled={email === ""}>
+            Gửi
+          </Button>
         </Group>
       </Dialog>
     </div>

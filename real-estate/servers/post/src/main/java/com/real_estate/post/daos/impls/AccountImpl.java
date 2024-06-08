@@ -62,6 +62,11 @@ public class AccountImpl implements AccountDao {
     }
 
     @Override
+    public Integer updateActive(Long accountId) {
+        return repository.updateActive(accountId);
+    }
+
+    @Override
     public void incOneTotalPostSellBy(Long accountId) {
         repository.updateTotalPostSell(accountId);
     }

@@ -75,6 +75,9 @@ public class PostBuyImpl implements PostBuyDao {
 		if (district != null && district != "") {
 			rawQuery.append("and p.district = '" + district + "' ");
 		}
+
+		rawQuery.append("order by p.createdAt desc ");
+
 		Query query = entityManager.createQuery(rawQuery.toString());
 		query.setFirstResult(offset);
 		query.setMaxResults(limit);

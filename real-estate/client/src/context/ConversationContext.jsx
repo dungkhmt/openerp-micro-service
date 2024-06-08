@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import ConversationRequest from "../services/ConversationRequest";
+import { AccountContext } from "./AccountContext";
 
 const ConversationContext = createContext(undefined);
 
 const ConversationContextProvider = ({ children }) => {
+  const { account } = useContext(AccountContext);
   const [conversations, setConversations] = useState([]);
 
   const findConversationWith = (other) => {
@@ -51,23 +53,32 @@ const ConversationContextProvider = ({ children }) => {
             ...existingConversation,
             messages: [message, ...existingConversation.messages], // Thêm message mới vào đầu danh sách
             lastTimeMessage: message.createdAt, // Cập nhật lastTimeMessage
-            isLastMessage: true, // Đánh dấu là message cuối cùng
           },
           ...updatedConversations, // Chuyển conversation lên đầu danh sách
         ];
       } else {
-        // Nếu chưa tìm thấy conversation, tạo mới
         getConversations();
       }
     });
   };
 
+  const addConversation = (conversation) => {
+    setConversations([conversation, ...conversations]);
+  };
+
   useEffect(() => {
-    localStorage.getItem("token") && getConversations();
-  }, []);
+    if (Object.keys(account).length > 0) {
+      getConversations();
+    }
+  }, [account]);
   return (
     <ConversationContext.Provider
-      value={{ conversations, addMessage, findConversationWith }}
+      value={{
+        conversations,
+        addMessage,
+        findConversationWith,
+        addConversation,
+      }}
     >
       {children}
     </ConversationContext.Provider>

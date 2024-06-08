@@ -4,7 +4,7 @@ import AccountRequest from "../services/AccountRequest";
 const AccountContext = createContext(undefined);
 
 const AccountContextProvider = ({ children }) => {
-  const [account, setAccount] = useState(undefined);
+  const [account, setAccount] = useState({});
   const getAccountData = () => {
     const accountRequest = new AccountRequest();
     accountRequest.get_current_account().then((response) => {
