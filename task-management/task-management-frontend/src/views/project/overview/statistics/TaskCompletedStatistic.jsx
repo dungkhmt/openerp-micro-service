@@ -20,7 +20,7 @@ const TaskCompletedStatistic = forwardRef(function TaskCompletedStatistic(
   const { completed } = useSelector((state) => state.statistic);
 
   const chartOptions = {
-    stroke: { lineCap: "round" },
+    stroke: { lineCap: "round", show: false },
     labels: ["In progress"],
     legend: {
       show: false,
@@ -36,7 +36,7 @@ const TaskCompletedStatistic = forwardRef(function TaskCompletedStatistic(
         horizontal: 10,
       },
     },
-    colors: ["#00d4bd"],
+    colors: ["#9E69FD"],
     plotOptions: {
       radialBar: {
         inverseOrder: true,
@@ -122,7 +122,7 @@ const TaskCompletedStatistic = forwardRef(function TaskCompletedStatistic(
             </Grid>
             <Grid item xs={6} md={6} lg={7} xl={8} sx={{ mt: 2 }}>
               <Tooltip title={`${completed.percentage}%`}>
-                <div>
+                <div style={{ minWidth: "120px" }}>
                   <ReactApexcharts
                     type="radialBar"
                     height={120}
