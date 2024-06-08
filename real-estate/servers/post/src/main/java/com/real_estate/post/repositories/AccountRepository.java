@@ -41,4 +41,9 @@ public interface AccountRepository extends JpaRepository<AccountPostgresEntity, 
     @Modifying
     @Query(value = "update AccountPostgresEntity a set a.password = :newPassword where a.email = :email and a.provider = 'local'")
     Integer updatePassByEmail(String newPassword, String email);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update AccountPostgresEntity a set a.isActive = true where a.accountId = :accountId")
+    Integer updateActive(Long accountId);
 }

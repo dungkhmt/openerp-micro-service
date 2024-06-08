@@ -33,17 +33,13 @@ public class TokenProvider {
 //        this.appProperties = appProperties;
 //    }
 
-    public String createToken(Authentication authentication) {
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-
+    public String createToken(Long accountId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
-//        String roles = getRolesOfUser(authentication);
         Map<String, Object> claims = new HashMap<>();
-        claims.put("accountId", userPrincipal.getId());
-//        claims.put("scope", roles);
+        claims.put("accountId", accountId);
         return Jwts.builder()
-                .setSubject(Long.toString(userPrincipal.getId()))
+                .setSubject(Long.toString(accountId))
                 .setClaims(claims)
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)

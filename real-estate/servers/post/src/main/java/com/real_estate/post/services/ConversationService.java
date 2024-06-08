@@ -92,6 +92,7 @@ public class ConversationService {
                 result.add(dto);
             }
         }
+        result.sort((c1, c2) -> c2.getLastTimeMessage().compareTo(c1.getLastTimeMessage()));
         return result;
     }
 

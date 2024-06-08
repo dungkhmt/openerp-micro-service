@@ -19,6 +19,8 @@ public interface AccountDao {
 
     public Integer updatePassByEmail(String newPassword, String email);
 
+    public Integer updateActive(Long accountId);
+
     void incOneTotalPostSellBy(Long accountId);
 
     void incOneTotalPostBuyBy(Long accountId);

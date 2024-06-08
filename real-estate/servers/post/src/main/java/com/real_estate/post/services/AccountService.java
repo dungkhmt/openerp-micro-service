@@ -23,7 +23,7 @@ import java.util.Random;
 
 @Service
 public class AccountService {
-    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final String CHARACTERS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz123456789";
     private static final int PASSWORD_LENGTH = 8;
     private static final Random random = new Random();
 
@@ -52,13 +52,15 @@ public class AccountService {
         entity.setTotalPostSell(0);
         entity.setTotalPostBuy(0);
         entity.setRole(new HashSet<>(Collections.singletonList("USER")));
-        entity.setIsActive(true);
+        entity.setIsActive(false);
         entity.setProvider(AuthProvider.local);
         entity.setCreatedAt(now);
         entity.setUpdatedAt(now);
 
         try {
             entity = accountDao.save(entity);
+            String token = tokenProvider.createToken(entity.getAccountId());
+            gmailSenderService.sendEmail(token, entity);
         }
         catch (DataIntegrityViolationException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email đã được dùng");
@@ -118,5 +120,12 @@ public class AccountService {
             password.append(CHARACTERS.charAt(index));
         }
         return password.toString();
+    }
+
+    public void activeAccount(Long accountId) {
+        int countRecord = accountDao.updateActive(accountId);
+        if (countRecord == 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token không hợp lệ");
+        }
     }
 }

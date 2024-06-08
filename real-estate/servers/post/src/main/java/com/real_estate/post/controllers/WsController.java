@@ -18,15 +18,9 @@ public class WsController  {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-
-    @MessageMapping("/test")
-    public void test() {
-        System.out.println("hello");
-    }
-
     @MessageMapping("/message")
     public void mainChannel(InputTransportDTO input) {
-        System.out.println("du liejeu nhan " +input);
+        System.out.println("du liejeu nhan " +input.getContent());
         TransportActionEnum action = input.getAction();
         switch (action) {
             case NOTIFICATION_MESSAGE :

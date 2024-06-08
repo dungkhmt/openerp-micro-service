@@ -3,6 +3,7 @@ package com.real_estate.post.config;
 import com.real_estate.post.security.CustomUserDetailsService;
 import com.real_estate.post.security.TokenAuthenticationFilter;
 import com.real_estate.post.security.TokenProvider;
+import com.real_estate.post.security.UserPrincipal;
 import com.real_estate.post.security.oauth2.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -107,7 +108,9 @@ public class WebSecurityConfig {
 	@Bean
 	public AuthenticationSuccessHandler authenticationSuccessHandler() {
 		return ((request, response, authentication) -> {
-			String token = tokenProvider.createToken(authentication);
+			UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+			Long accountId = userPrincipal.getId();
+			String token = tokenProvider.createToken(accountId);
 			response.sendRedirect("http://localhost:2804/oauth/redirect?token=" + token);
 		});
 	}
