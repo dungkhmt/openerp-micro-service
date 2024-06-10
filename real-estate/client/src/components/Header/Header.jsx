@@ -1,23 +1,17 @@
 import React, { useContext, useState } from "react";
 import "./Header.css";
-import { getMenuStyles } from "../../utils/common";
-import useHeaderColor from "../../hooks/useHeaderColor";
-import OutsideClickHandler from "react-outside-click-handler";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout_success } from "../../store/auth";
 import ProfileMenu from "../ProfileMenu/ProfileMenu";
-import { Button, Menu } from "@mantine/core";
+import { Box, Button, Center, Menu, rem } from "@mantine/core";
 import { WebSocketContext } from "../../context/WebSocketContext";
+import { IconChevronDown } from "@tabler/icons-react";
 
 const Header = () => {
   const navigate = useNavigate();
-  const [menuOpened, setMenuOpened] = useState(false);
-  const headerColor = useHeaderColor();
   const { disconnect } = useContext(WebSocketContext);
-  const [modalOpened, setModalOpened] = useState(false);
 
-  const token = useSelector((state) => state.auth.token);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const current_account = useSelector((state) => state.account.currentData);
   const dispatch = useDispatch();
@@ -31,85 +25,72 @@ const Header = () => {
   };
 
   return (
-    <section className="h-wrapper" style={{ background: headerColor }}>
+    <section className="h-wrapper">
       <div className="flexCenter flexColEnd innerWidth paddings h-container">
-        {/* menu */}
-        <OutsideClickHandler
-          onOutsideClick={() => {
-            setMenuOpened(false);
-          }}
-        >
-          <div
-            // ref={menuRef}
-            className="flexCenter h-menu"
-            style={getMenuStyles(menuOpened)}
-          >
-            <Menu>
+        <div className="flexCenter h-menu">
+          <Menu zIndex={1002}>
+            <Menu.Target>
+              <Center>
+                <Box>Bài đăng</Box>
+                <IconChevronDown
+                  style={{ width: rem(16), height: rem(16) }}
+                  color={"rgba(255, 255, 255, 0.78"}
+                />
+              </Center>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item
+                onClick={() => navigate("/buy/properties", { replace: true })}
+              >
+                Tin Mua
+              </Menu.Item>
+              <Menu.Item
+                onClick={() => navigate("/sell/properties", { replace: true })}
+              >
+                Tin Bán
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+          <NavLink to="/report">Phân tích thị trường</NavLink>
+
+          {/* add property */}
+
+          {isLoggedIn && (
+            <Menu zIndex={1002}>
               <Menu.Target>
-                <button>Danh Sách Tin</button>
+                <Center>
+                  <Box>Đăng tin</Box>
+                  <IconChevronDown
+                    style={{ width: rem(16), height: rem(16) }}
+                    color={"rgba(255, 255, 255, 0.78"}
+                  />
+                </Center>
               </Menu.Target>
               <Menu.Dropdown>
                 <Menu.Item
-                  onClick={() => navigate("/buy/properties", { replace: true })}
+                  onClick={() => navigate("/add-post-buy", { replace: true })}
                 >
                   Tin Mua
                 </Menu.Item>
                 <Menu.Item
-                  onClick={() =>
-                    navigate("/sell/properties", { replace: true })
-                  }
+                  onClick={() => navigate("/add-post-sell", { replace: true })}
                 >
                   Tin Bán
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
-            <NavLink to="/report">Phân tích thị trường</NavLink>
+          )}
 
-            {/* add property */}
-
-            {isLoggedIn && (
-              <Menu>
-                <Menu.Target>
-                  <button>Đăng Tin</button>
-                </Menu.Target>
-                <Menu.Dropdown>
-                  <Menu.Item
-                    onClick={() => navigate("/add-post-buy", { replace: true })}
-                  >
-                    Tin Mua
-                  </Menu.Item>
-                  <Menu.Item
-                    onClick={() =>
-                      navigate("/add-post-sell", { replace: true })
-                    }
-                  >
-                    Tin Bán
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            )}
-
-            {/*<AddPropertyModal opened={modalOpened} setOpened={setModalOpened} />*/}
-            {/* login button */}
-            {!isLoggedIn ? (
-              <Button>
-                <NavLink to={"/login"}>Đăng Nhập</NavLink>
-              </Button>
-            ) : (
-              <div>
-                <ProfileMenu user={current_account} logout={logout} />
-              </div>
-            )}
-          </div>
-        </OutsideClickHandler>
-
-        {/* for medium and small screens */}
-        {/*<div*/}
-        {/*    className="menu-icon"*/}
-        {/*    onClick={() => setMenuOpened((prev) => !prev)}*/}
-        {/*>*/}
-        {/*    <BiMenuAltRight size={30}/>*/}
-        {/*</div>*/}
+          {!isLoggedIn ? (
+            <Button>
+              <NavLink to={"/login"}>Đăng Nhập</NavLink>
+            </Button>
+          ) : (
+            <div>
+              <ProfileMenu user={current_account} logout={logout} />
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

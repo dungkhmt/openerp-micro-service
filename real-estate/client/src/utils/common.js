@@ -7,12 +7,6 @@ import {
 } from "firebase/storage";
 import { v4 } from "uuid";
 
-export const getMenuStyles = (menuOpened) => {
-  if (document.documentElement.clientWidth <= 800) {
-    return { right: !menuOpened && "-100%" };
-  }
-};
-
 export const sliderSettings = {
   slidesPerView: 1,
   spaceBetween: 50,

@@ -1,15 +1,25 @@
 import React, { useState } from "react";
 import "./Login.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFacebookF, faGooglePlusG } from "@fortawesome/free-brands-svg-icons";
+import { faFacebookF } from "@fortawesome/free-brands-svg-icons";
 import { useNavigate } from "react-router-dom";
 import AccountRequest from "../../services/AccountRequest";
 import { useDispatch } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import { login_success } from "../../store/auth";
 import { setAuthorizationToRequest } from "../../utils/authenticate";
-import { useDisclosure } from "@mantine/hooks";
-import { Button, Dialog, TextInput, Group, Loader } from "@mantine/core";
+import {
+  Button,
+  Dialog,
+  TextInput,
+  Group,
+  Loader,
+  PasswordInput,
+  Text,
+  Divider,
+  Anchor,
+} from "@mantine/core";
+import { hasLength, isEmail, matches, useForm } from "@mantine/form";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -18,8 +28,47 @@ const Login = () => {
   const [email, setEmail] = useState("");
 
   const [showSignUp, setShowSignUp] = useState(false);
-  const [dataLogin, setDataLogin] = useState({});
-  const [dataSignUp, setDataSignUp] = useState({});
+
+  const formSignup = useForm({
+    model: "uncontrolled",
+    initialValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+    validate: (values) => ({
+      name:
+        values.name.length < 5 || values.name.length > 20
+          ? "5 đến 20 ký tự"
+          : null,
+      email: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+        values.email,
+      )
+        ? null
+        : "Sai định dạng email",
+      password: /^[a-zA-Z0-9]{8,16}$/.test(values.password)
+        ? null
+        : "Yêu cầu 8 đến 16 ký tự",
+    }),
+  });
+
+  const formLogin = useForm({
+    model: "uncontrolled",
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validate: (values) => ({
+      email: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+        values.email,
+      )
+        ? null
+        : "Sai định dạng email",
+      password: /^[a-zA-Z0-9]{8,16}$/.test(values.password)
+        ? null
+        : "Yêu cầu 8 đến 16 ký tự",
+    }),
+  });
 
   const [loading, setLoading] = useState(false);
 
@@ -43,17 +92,24 @@ const Login = () => {
     setShowSignUp(false);
   };
 
-  const handleSignUp = (event) => {
-    event.preventDefault();
+  const handleSignUp = (values) => {
     setLoading(true);
     const accountRequest = new AccountRequest();
     accountRequest
-      .signup(dataSignUp)
+      .signup({
+        name: values.name,
+        email: values.email,
+        password: values.password,
+      })
       .then((response) => {
         const statusCode = response.code;
         if (statusCode === 200) {
           toast.success(response.data);
-          setDataSignUp({});
+          formSignup.setValues({
+            name: "",
+            email: "",
+            password: "",
+          });
         } else {
           toast.error(response.data.message);
         }
@@ -61,11 +117,13 @@ const Login = () => {
       .finally(() => setLoading(false));
   };
 
-  const handleLogin = (event) => {
-    event.preventDefault();
+  const handleLogin = (values) => {
     const accountRequest = new AccountRequest();
     accountRequest
-      .login(dataLogin)
+      .login({
+        email: values.email,
+        password: values.password,
+      })
       .then((response) => {
         const statusCode = response.code;
         if (statusCode === 200) {
@@ -115,8 +173,14 @@ const Login = () => {
               <Loader color="blue" size="50" />
             </div>
           ) : (
-            <form onSubmit={handleSignUp}>
-              <h1>Create Account</h1>
+            <form
+              // onSubmit={handleSignUp}
+              onSubmit={(event) => {
+                event.preventDefault();
+                formSignup.onSubmit(handleSignUp)(event);
+              }}
+            >
+              <h1>Tạo tài khoản</h1>
               <div className="social-icons">
                 <a
                   href="http://localhost:2805/oauth2/authorization/facebook"
@@ -128,40 +192,67 @@ const Login = () => {
                   />
                 </a>
               </div>
-              <span>or use your email for registeration</span>
-              <input
-                name="name"
-                type="text"
+              <Divider
+                label="hoặc tiếp tực với email"
+                labelPosition="center"
+                my="sm"
+              />
+
+              <TextInput
+                style={{
+                  width: "75%",
+                  // marginBottom: "5px",
+                }}
                 placeholder="Tên"
-                pattern="[A-Za-z0-9]{5-10}"
-                title="5-10 ký tự"
-                value={dataSignUp.name || ""}
-                onChange={handleChangeSignUp}
+                title="2-20 ký tự"
+                key={formSignup.key("name")}
+                {...formSignup.getInputProps("name")}
               />
-              <input
-                name="email"
-                type="email"
+              <TextInput
+                // type="email"
+                style={{
+                  width: "75%",
+                  // marginBottom: "5px",
+                }}
                 placeholder="Email"
-                value={dataSignUp.email || ""}
-                onChange={handleChangeSignUp}
+                key={formSignup.key("email")}
+                {...formSignup.getInputProps("email")}
               />
-              <input
-                name="password"
-                type="password"
-                placeholder="Password"
-                pattern="[A-Za-z0-9]{8-16}"
+              <PasswordInput
+                style={{
+                  width: "75%",
+                }}
+                placeholder="Mật khẩu"
                 title="8-16 ký tự"
-                value={dataSignUp.password || ""}
-                onChange={handleChangeSignUp}
+                key={formSignup.key("password")}
+                {...formSignup.getInputProps("password")}
               />
-              <button type="submit">Sign Up</button>
+
+              <Button
+                style={{
+                  marginTop: "10px",
+                  backgroundColor: "#512da8",
+                  color: "#fff",
+                  textTransform: "uppercase",
+                  border: "1px solid transparent",
+                }}
+                type="submit"
+                radius="lg"
+              >
+                Đăng ký
+              </Button>
             </form>
           )}
         </div>
       ) : (
         <div className="form-container sign-in">
-          <form onSubmit={handleLogin}>
-            <h1>Sign In</h1>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              formLogin.onSubmit(handleLogin)(event);
+            }}
+          >
+            <h1>Đăng nhập</h1>
             <div className="social-icons">
               <a
                 href="http://localhost:2805/oauth2/authorization/facebook"
@@ -173,60 +264,107 @@ const Login = () => {
                 />
               </a>
             </div>
-            <span>or use your email password</span>
-            <input
-              name="email"
-              type="email"
-              placeholder="Email"
-              value={dataLogin.email || ""}
-              onChange={handleChangeLogin}
+            <Divider
+              label="hoặc tiếp tực với email"
+              labelPosition="center"
+              my="sm"
             />
-            <input
-              name="password"
-              type="password"
-              placeholder="Password"
-              pattern="[A-Za-z0-9]{8-16}"
-              title="8-16 ký tự"
-              value={dataLogin.password || ""}
-              onChange={handleChangeLogin}
-            />
-            <div
-              onClick={() => setOpenedReset(true)}
+            <TextInput
+              // type="email"
               style={{
-                cursor: "pointer",
+                width: "75%",
+                // marginBottom: "5px",
               }}
+              placeholder="Email"
+              key={formLogin.key("email")}
+              {...formLogin.getInputProps("email")}
+            />
+            <PasswordInput
+              style={{
+                width: "75%",
+              }}
+              placeholder="Mật khẩu"
+              title="8-16 ký tự"
+              key={formLogin.key("password")}
+              {...formLogin.getInputProps("password")}
+            />
+
+            <Group w={"70%"} justify="flex-end" mt="lg">
+              <Anchor
+                component="button"
+                size="sm"
+                onClick={() => setOpenedReset(true)}
+              >
+                Forgot password?
+              </Anchor>
+            </Group>
+            <Button
+              style={{
+                marginTop: "10px",
+                backgroundColor: "#512da8",
+                color: "#fff",
+                textTransform: "uppercase",
+                border: "1px solid transparent",
+              }}
+              type="submit"
+              radius="lg"
             >
-              Forget Your Password?
-            </div>
-            <button type="submit">Sign In</button>
+              Đăng nhập
+            </Button>
           </form>
         </div>
       )}
       <div className="toggle-container">
         <div className="toggle">
           <div className="toggle-panel toggle-left">
-            <h1>Welcome Back!</h1>
-            <p>Enter your personal details to use all of site features</p>
-            <button className="hidden" id="login" onClick={handleToLogin}>
-              Sign In
-            </button>
+            <h1>Chào mừng bạn trở lại</h1>
+            {/*<p>Sử dụng </p>*/}
+            <Button
+              color="#fff"
+              variant="outline"
+              id="login"
+              onClick={handleToLogin}
+              radius="lg"
+            >
+              Đăng nhập
+            </Button>
           </div>
           <div className="toggle-panel toggle-right">
-            <h1>Hello, Friend!</h1>
-            <p>
-              Register with your personal details to use all of site features
-            </p>
-            <button className="hidden" id="register" onClick={handleToSignUp}>
-              Sign Up
-            </button>
-            <p>Or</p>
-            <button
-              className="hidden"
-              onClick={() => navigate("/")}
-              style={{ marginTop: "5px" }}
+            <h1>Chào bạn!</h1>
+            <p
+              style={{
+                fontSize: "14px",
+                lineHeight: "20px",
+                letterSpacing: "0.3px",
+                margin: "20px 0",
+              }}
             >
-              Home
-            </button>
+              Đăng ký với thông tin cá nhân để có thể trải nghiệm sản phẩm của
+              chúng tôi
+            </p>
+            <Button
+              color="#fff"
+              variant="outline"
+              radius="lg"
+              style={{
+                fontSize: "12px",
+              }}
+              onClick={handleToSignUp}
+            >
+              Đăng ký
+            </Button>
+            <p>hoặc</p>
+            <Button
+              color="#fff"
+              variant="outline"
+              onClick={() => navigate("/")}
+              radius="lg"
+              style={{
+                fontSize: "12px",
+              }}
+            >
+              Trang chủ
+            </Button>
           </div>
         </div>
       </div>
@@ -251,9 +389,12 @@ const Login = () => {
         size="lg"
         radius="md"
       >
+        <Text size="sm" mb="xs" fw={500}>
+          Lấy lại mật khẩu
+        </Text>
         <Group align="flex-end">
           <TextInput
-            placeholder="hello@gluesticker.com"
+            placeholder="điền email đã đăng ký"
             style={{ flex: 1 }}
             onChange={(event) => setEmail(event.currentTarget.value)}
           />

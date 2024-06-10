@@ -9,6 +9,7 @@ import {
 } from "../../utils/common";
 import MultiplySelect from "../MultiplySelect/MultiplySelect";
 import DistrictRequest from "../../services/DistrictRequest";
+import { IconSearch, IconAdjustments } from "@tabler/icons-react";
 
 const FilterSell = ({ setParams }) => {
   const [provinceId, setProvinceId] = useState("");
@@ -177,6 +178,7 @@ const FilterSell = ({ setParams }) => {
       >
         <Popover.Target>
           <Button
+            w={"150px"}
             style={{
               backgroundColor: "white",
               color: "rgb(153, 153, 153)",
@@ -184,17 +186,10 @@ const FilterSell = ({ setParams }) => {
               fontWeight: "50",
               margin: "0 5px",
               border: "1px solid #F2F2F2",
-              // width: "150px"
             }}
+            rightSection={<IconAdjustments size={14} />}
           >
             Diện Tích
-            <LuChevronsUpDown
-              size={15}
-              style={{
-                color: "rgb(153, 153, 153)",
-                marginLeft: "10px",
-              }}
-            />
           </Button>
         </Popover.Target>
         <Popover.Dropdown>
@@ -231,6 +226,7 @@ const FilterSell = ({ setParams }) => {
       >
         <Popover.Target>
           <Button
+            w={"150px"}
             style={{
               backgroundColor: "white",
               color: "rgb(153, 153, 153)",
@@ -239,15 +235,9 @@ const FilterSell = ({ setParams }) => {
               margin: "0 5px",
               border: "1px solid #F2F2F2",
             }}
+            rightSection={<IconAdjustments size={14} />}
           >
             Mức Giá
-            <LuChevronsUpDown
-              size={15}
-              style={{
-                color: "rgb(153, 153, 153)",
-                marginLeft: "10px",
-              }}
-            />
           </Button>
         </Popover.Target>
         <Popover.Dropdown>
@@ -300,7 +290,19 @@ const FilterSell = ({ setParams }) => {
         transferContent={transferTypeProperty}
       />
 
-      <Button onClick={handleSearch}>Áp Dụng</Button>
+      <Button
+        w={"150px"}
+        style={{
+          fontSize: "16px",
+          fontWeight: "50",
+          margin: "0 5px",
+          border: "1px solid #F2F2F2",
+        }}
+        leftSection={<IconSearch size={14} />}
+        onClick={handleSearch}
+      >
+        Mức Giá
+      </Button>
     </div>
   );
 };
