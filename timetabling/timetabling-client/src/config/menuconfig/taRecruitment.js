@@ -20,6 +20,13 @@ export const taRecruitment = {
     },
     {
       id: "MENU_TA_RECRUITMENT.CLASS_LIST",
+      path: `${prefix}/teacher/dashboard`,
+      isPublic: true,
+      text: "Thống kê",
+      child: [],
+    },
+    {
+      id: "MENU_TA_RECRUITMENT.CLASS_LIST",
       path: `${prefix}/teacher/class-list`,
       isPublic: true,
       text: "Danh sách lớp học",

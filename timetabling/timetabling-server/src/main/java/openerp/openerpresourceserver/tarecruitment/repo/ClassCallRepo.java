@@ -21,4 +21,10 @@ public interface ClassCallRepo extends JpaRepository<ClassCall, Integer> {
     @Query("SELECT cc FROM ClassCall cc, Application a WHERE cc.id = a.classCall.id AND a.user.id = :userId " +
             "AND a.classCall.semester = :semester")
     List<ClassCall> getAllMyRegisteredClass(String userId, String semester);
+
+    @Query("SELECT cc FROM ClassCall cc WHERE cc.semester = :semester")
+    List<ClassCall> findAllBySemester(String semester);
+
+    @Query("SELECT DISTINCT cc.subjectId FROM ClassCall cc WHERE cc.semester = :semester")
+    List<String> getDistinctCourseBySemester(String semester);
 }

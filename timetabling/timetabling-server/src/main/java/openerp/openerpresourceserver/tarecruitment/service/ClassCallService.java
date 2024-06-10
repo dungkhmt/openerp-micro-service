@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.tarecruitment.service;
 
+import openerp.openerpresourceserver.tarecruitment.dto.ChartDTO;
 import openerp.openerpresourceserver.tarecruitment.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.ClassCall;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,4 +27,6 @@ public interface ClassCallService {
     List<ClassCall> getAllMyRegisteredClass(String userId, String semester);
 
     int importClass(MultipartFile file, String semester);
+
+    List<ChartDTO> getNumberOfClassEachSemester();
 }

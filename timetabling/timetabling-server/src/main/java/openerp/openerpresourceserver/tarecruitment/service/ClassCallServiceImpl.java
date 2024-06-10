@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.tarecruitment.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import openerp.openerpresourceserver.tarecruitment.dto.ChartDTO;
 import openerp.openerpresourceserver.tarecruitment.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.ClassCall;
 import openerp.openerpresourceserver.tarecruitment.repo.ClassCallRepo;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +27,7 @@ import java.util.Optional;
 public class ClassCallServiceImpl implements ClassCallService {
 
     private ClassCallRepo classCallRepo;
+    private TARecruitment_SemesterService semesterService;
     @Override
     public ClassCall createNewClass(ClassCall classCall) {
         Optional<ClassCall> existClassCall = classCallRepo.findById(classCall.getId());
@@ -202,5 +205,17 @@ public class ClassCallServiceImpl implements ClassCallService {
             throw new IllegalArgumentException("Something is wrong");
         }
         return 0;
+    }
+
+    @Override
+    public List<ChartDTO> getNumberOfClassEachSemester() {
+        List<ChartDTO> chart = new ArrayList<>();
+        List<String> semesters = semesterService.getAllSemester();
+        for(String semester : semesters) {
+            List<ClassCall> classcalls = classCallRepo.findAllBySemester(semester);
+            ChartDTO data = new ChartDTO(semester, classcalls.size());
+            chart.add(data);
+        }
+        return chart;
     }
 }
