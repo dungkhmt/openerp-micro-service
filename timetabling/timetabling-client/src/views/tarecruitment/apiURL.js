@@ -37,3 +37,11 @@ export const semesterUrl = {
   getAllSemester: "/ta-semester/get-all-semester",
   getCurrentSemester: "/ta-semester/get-current-semester",
 };
+
+export const dashboardUrl = {
+  getApplicatorData: "/application/get-applicator-data",
+  getApplicationData: "/application/get-application-data",
+  getTaData: "/application/get-ta-data",
+  getCourseData: "/application/get-course-data",
+  getClassNumbData: "/class-call/get-class-numb-data",
+};

@@ -6,6 +6,7 @@ import openerp.openerpresourceserver.generaltimetabling.model.entity.User;
 import openerp.openerpresourceserver.generaltimetabling.repo.UserRepo;
 import openerp.openerpresourceserver.tarecruitment.algorithm.ConvertDataV2;
 import openerp.openerpresourceserver.tarecruitment.algorithm.MaxMatching;
+import openerp.openerpresourceserver.tarecruitment.dto.ChartDTO;
 import openerp.openerpresourceserver.tarecruitment.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.Application;
 import openerp.openerpresourceserver.tarecruitment.entity.ClassCall;
@@ -23,9 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Log4j2
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -35,6 +34,8 @@ public class ApplicationServiceImpl implements ApplicationService{
     private ApplicationRepo applicationRepo;
     private UserRepo userRepo;
     private ClassCallRepo classCallRepo;
+    private TARecruitment_SemesterService semesterService;
+    private MailService mailService;
     @Override
     public Application createApplication(Application application) {
         Optional<User> existUser = userRepo.findById(application.getUser().getId());
@@ -48,6 +49,11 @@ public class ApplicationServiceImpl implements ApplicationService{
         application.setApplicationStatus("PENDING");
         application.setAssignStatus("PENDING");
         applicationRepo.save(application);
+        String email = application.getEmail();
+        String subject = "ĐĂNG KÝ TRỢ GIẢNG";
+        String body = "Bạn đã đăng ký trợ giảng cho lớp " + existClassCall.get().getSubjectId() + ", mã lớp " + existClassCall.get().getId();
+        log.info(email + subject + body);
+        mailService.sendingEmail(email, subject, body);
         return application;
     }
 
@@ -181,6 +187,14 @@ public class ApplicationServiceImpl implements ApplicationService{
             Application existApplication = application.get();
             existApplication.setApplicationStatus(status);
             applicationRepo.save(existApplication);
+            String textStatus;
+            if("PENDING".equals(status)) textStatus = "ĐANG CHỜ";
+            else if ("APPROVED".equals(status)) textStatus = "DUYỆT";
+            else textStatus = "TỪ CHỐI";
+            String email = existApplication.getEmail();
+            String subject = "CẬP NHẬT TRẠNG THÁI ĐƠN ĐĂNG KÝ";
+            String body = "Đơn xin vào lớp " + existApplication.getClassCall().getSubjectId() + " đã được cập nhật sang trạng thái " + textStatus;
+            mailService.sendingEmail(email, subject, body);
             return existApplication;
         }
     }
@@ -191,6 +205,10 @@ public class ApplicationServiceImpl implements ApplicationService{
             throw new IllegalArgumentException("Invalid status");
         }
         else {
+            String textStatus;
+            if("PENDING".equals(status)) textStatus = "ĐANG CHỜ";
+            else if ("APPROVED".equals(status)) textStatus = "DUYỆT";
+            else textStatus = "TỪ CHỐI";
             for(int id : idList) {
                 Optional<Application> application = applicationRepo.findById(id);
                 if(application.isEmpty()) {
@@ -199,6 +217,10 @@ public class ApplicationServiceImpl implements ApplicationService{
                 Application existApplication = application.get();
                 existApplication.setApplicationStatus(status);
                 applicationRepo.save(existApplication);
+                String email = existApplication.getEmail();
+                String subject = "CẬP NHẬT TRẠNG THÁI ĐƠN ĐĂNG KÝ";
+                String body = "Đơn xin vào lớp " + existApplication.getClassCall().getSubjectId() + " đã được cập nhật sang trạng thái " + textStatus;
+                mailService.sendingEmail(email, subject, body);
             }
             return "Cập nhật trạng thái thành công " + idList.size() + " đơn xin trợ giảng";
         }
@@ -211,6 +233,7 @@ public class ApplicationServiceImpl implements ApplicationService{
             throw new IllegalArgumentException("Invalid status");
         }
         else {
+            String textStatus;
             // Find that application by id
             Optional<Application> application = applicationRepo.findById(id);
             if(application.isEmpty()) {
@@ -252,6 +275,10 @@ public class ApplicationServiceImpl implements ApplicationService{
                 for(Application app : remainApplication) {
                     app.setAssignStatus("CANCELED");
                     applicationRepo.save(app);
+                    String email = app.getEmail();
+                    String subject = "CẬP NHẬT TRẠNG THÁI TRỢ GIẢNG";
+                    String body = "Đơn xin trợ giảng lớp " + app.getClassCall().getSubjectId() + " đã bị TỪ CHỐI";
+                    mailService.sendingEmail(email, subject, body);
                 }
 
                 updateApplication.setAssignStatus(status);
@@ -260,6 +287,15 @@ public class ApplicationServiceImpl implements ApplicationService{
 
             else updateApplication.setAssignStatus(status);
             applicationRepo.save(updateApplication);
+
+            if("PENDING".equals(status)) textStatus = " đã chuyển sang trạng thái ĐANG CHỜ";
+            else if ("APPROVED".equals(status)) textStatus = " đã được DUYỆT";
+            else textStatus = " đã bị TỪ CHỐI";
+
+            String email = updateApplication.getEmail();
+            String subject = "CẬP NHẬT TRẠNG THÁI TRỢ GIẢNG";
+            String body = "Đơn xin trợ giảng lớp " + updateApplication.getClassCall().getSubjectId() + textStatus;
+            mailService.sendingEmail(email, subject, body);
             return updateApplication;
         }
     }
@@ -286,14 +322,24 @@ public class ApplicationServiceImpl implements ApplicationService{
             log.info("User " + application.getUser().getId() + " got assign to class id: " + application.getClassCall().getId());
         }
 
+        applications.removeAll(assignApplication);
+
         for(Application app : applications) {
             app.setAssignStatus("CANCELED");
             applicationRepo.save(app);
+            String email = app.getEmail();
+            String subject = "CẬP NHẬT TRẠNG THÁI TRỢ GIẢNG";
+            String body = "Đơn xin trợ giảng lớp " + app.getClassCall().getSubjectId() + " đã bị TỪ CHỐI";
+            mailService.sendingEmail(email, subject, body);
         }
 
         for(Application app : assignApplication) {
             app.setAssignStatus("APPROVED");
             applicationRepo.save(app);
+            String email = app.getEmail();
+            String subject = "CẬP NHẬT TRẠNG THÁI TRỢ GIẢNG";
+            String body = "Đơn xin trợ giảng lớp " + app.getClassCall().getSubjectId() + " đã được DUYỆT";
+            mailService.sendingEmail(email, subject, body);
         }
     }
 
@@ -361,5 +407,54 @@ public class ApplicationServiceImpl implements ApplicationService{
         paginationDTO.setData(applications.getContent());
 
         return paginationDTO;
+    }
+
+    @Override
+    public List<ChartDTO> getApplicatorEachSemesterData() {
+        List<ChartDTO> chart = new ArrayList<>();
+        List<String> semesters = semesterService.getAllSemester();
+        for(String semester : semesters) {
+            List<String> applications = applicationRepo.findAllUserBySemester(semester);
+            ChartDTO data = new ChartDTO(semester, applications.size());
+            chart.add(data);
+        }
+        return chart;
+    }
+
+    @Override
+    public List<ChartDTO> getNumbApplicationEachSemesterData() {
+        List<ChartDTO> chart = new ArrayList<>();
+        List<String> semesters = semesterService.getAllSemester();
+        for(String semester : semesters) {
+            List<Application> applications = applicationRepo.getAllApplicationBySemester(semester);
+            ChartDTO data = new ChartDTO(semester, applications.size());
+            chart.add(data);
+        }
+        return chart;
+    }
+
+    @Override
+    public List<ChartDTO> getNumbApplicationApproveEachSemesterData() {
+        List<ChartDTO> chart = new ArrayList<>();
+        List<String> semesters = semesterService.getAllSemester();
+        for(String semester : semesters) {
+            List<Application> applications = applicationRepo.getTADataBySemester(semester);
+            ChartDTO data = new ChartDTO(semester, applications.size());
+            chart.add(data);
+        }
+        return chart;
+    }
+
+    @Override
+    public List<ChartDTO> dataApplicationEachCourseThisSemester() {
+        List<ChartDTO> chart = new ArrayList<>();
+        String semester = semesterService.getCurrentSemester();
+        List<String> courses = classCallRepo.getDistinctCourseBySemester(semester);
+        for(String course : courses) {
+            List<Application> applications = applicationRepo.getApplicationByCourseAndSemester(semester, course);
+            ChartDTO data = new ChartDTO(course, applications.size());
+            chart.add(data);
+        }
+        return chart;
     }
 }

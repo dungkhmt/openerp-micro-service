@@ -67,6 +67,16 @@ public interface ApplicationRepo extends JpaRepository<Application, Integer> {
             "AND a.applicationStatus = :applicationStatus")
     List<String> findDistinctUserIdsBySemester(String semester, String applicationStatus, String status);
 
+    @Query("SELECT DISTINCT a.user.id FROM Application a WHERE a.classCall.semester = :semester")
+    List<String> findAllUserBySemester(String semester);
+
+    @Query("SELECT a FROM Application a WHERE a.classCall.semester = :semester")
+    List<Application> getAllApplicationBySemester(String semester);
+
+    @Query("SELECT a FROM Application a WHERE a.classCall.semester = :semester AND a.applicationStatus = 'APPROVED' " +
+            "AND a.assignStatus = 'APPROVED'")
+    List<Application> getTADataBySemester(String semester);
+
     @Query("SELECT DISTINCT a.classCall FROM Application a WHERE a.classCall.semester = :semester")
     List<ClassCall> findDistinctClassCallBySemester(String semester);
 
@@ -77,4 +87,7 @@ public interface ApplicationRepo extends JpaRepository<Application, Integer> {
     @Query("SELECT a FROM Application a WHERE a.classCall.semester = :semester AND a.applicationStatus = 'APPROVED' AND " +
             "a.user.id != :userId AND a.classCall.id = :classCallId")
     List<Application> getAllRemainingApplication(String semester, String userId, int classCallId);
+
+    @Query("SELECT a FROM Application a WHERE a.classCall.semester = :semester AND a.classCall.subjectId = :course")
+    List<Application> getApplicationByCourseAndSemester(String semester, String course);
 }

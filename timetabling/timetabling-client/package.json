@@ -21,6 +21,8 @@
     "axios": "^0.27.2",
     "d3": "^7.9.0",
     "dayjs": "^1.11.10",
+    "echarts": "^5.5.0",
+    "echarts-for-react": "^3.0.2",
     "erp-hust": "^0.0.21",
     "event-source-polyfill": "^1.0.24",
     "file-saver": "^2.0.5",
