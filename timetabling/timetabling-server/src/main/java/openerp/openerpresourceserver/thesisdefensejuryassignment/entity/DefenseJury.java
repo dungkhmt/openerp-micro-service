@@ -56,18 +56,22 @@ public class DefenseJury implements Serializable {
     @JoinColumn(name ="defense_session_id", nullable = false, referencedColumnName = "id")
     private DefenseSession defenseSession;
 
-    @ManyToMany
-    @JoinTable(
-            name ="defense_jury_keyword",
-            joinColumns = @JoinColumn(name = "defense_jury_id"),
-            inverseJoinColumns = @JoinColumn(name="keyword_id")
-    )
-    private List<AcademicKeyword> academicKeywordList;
+//    @ManyToMany
+//    @JoinTable(
+//            name ="defense_jury_keyword",
+//            joinColumns = @JoinColumn(name = "defense_jury_id"),
+//            inverseJoinColumns = @JoinColumn(name="keyword_id")
+//    )
+//    private List<AcademicKeyword> academicKeywordList;
 
     @OneToMany(mappedBy = "defenseJury")
     private List<Thesis> thesisList;
     @OneToMany(mappedBy = "defenseJury")
     private List<DefenseJuryTeacherRole> defenseJuryTeacherRoles;
+
+    @ManyToOne
+    @JoinColumn(name ="jury_topic_id", referencedColumnName = "id")
+    private JuryTopic juryTopic;
 
     @Column(name = "isassigned")
     private boolean isAssigned;
@@ -113,9 +117,9 @@ public class DefenseJury implements Serializable {
         this.updatedDateTime = updatedDateTime;
     }
 
-    public List<AcademicKeyword> getAcademicKeywordList() {
-        return academicKeywordList;
-    }
+//    public List<AcademicKeyword> getAcademicKeywordList() {
+//        return academicKeywordList;
+//    }
 
     public String getName() {
         return name;
@@ -133,9 +137,9 @@ public class DefenseJury implements Serializable {
         this.maxThesis = maxThesis;
     }
 
-    public void setAcademicKeywordList(List<AcademicKeyword> academicKeywordList) {
-        this.academicKeywordList = academicKeywordList;
-    }
+//    public void setAcademicKeywordList(List<AcademicKeyword> academicKeywordList) {
+//        this.academicKeywordList = academicKeywordList;
+//    }
 
     public String getThesisDefensePlanId() {
         return thesisDefensePlan.getId();
@@ -187,5 +191,13 @@ public class DefenseJury implements Serializable {
 
     public void setAssigned(boolean assigned) {
         isAssigned = assigned;
+    }
+
+    public JuryTopic getJuryTopic() {
+        return juryTopic;
+    }
+
+    public void setJuryTopic(JuryTopic juryTopic) {
+        this.juryTopic = juryTopic;
     }
 }
